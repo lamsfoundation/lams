@@ -37,7 +37,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * 
@@ -45,71 +44,71 @@ import org.lamsfoundation.lams.util.MessageService;
  * 
  * @author Jacky Fang
  */
-public abstract class Grouping implements Serializable
-{
-    
-    /** Grouping type id of random grouping */
-    public static final Integer RANDOM_GROUPING_TYPE = new Integer(1);
-    
-    /** Grouping type id of chosen grouping */
-    public static final Integer CHOSEN_GROUPING_TYPE = new Integer(2);
-    
-    /** Grouping type id for lesson class grouping */
-    public static final Integer CLASS_GROUPING_TYPE = new Integer(3);
-    
-    /** identifier field */
-    private Long groupingId;
-    
-    /** nullable persistent field 
-     *  TODO It make sense only if we want to setup some limits for the number 
-     * 		 of groups the author can setup in the authoring GUI. It might need 
-     * 		 to be deleted if the end user doesn't like this limits.
-     */
-    private Integer maxNumberOfGroups;
-    
-    /** nullable persistent field */
-    private Integer groupingUIID;
-    
-    /** persistent field */
-    private Set groups;
-    
-    /** persistent field */
-    private Set activities;
-    
-    /** non-persistent field */
-    protected Set learners;
+public abstract class Grouping implements Serializable {
 
-    protected Grouper grouper;
-    /**
-     * static final variables indicating the grouping_support of activities
-     *******************************************************************/
-    public static final int GROUPING_SUPPORT_NONE = 1;
-    
-    public static final int GROUPING_SUPPORT_OPTIONAL = 2;
+	/** Grouping type id of random grouping */
+	public static final Integer RANDOM_GROUPING_TYPE = new Integer(1);
 
-    public static final int GROUPING_SUPPORT_REQUIRED = 3;
-    /******************************************************************/
-    
-    /** full constructor */
-    public Grouping(Long groupingId, Set groups, Set activities,Grouper grouper)
-    {
-        this.groupingId = groupingId;
-        this.groups = groups;
-        this.activities = activities;
-        this.grouper = grouper;
-    }
-    
-    /** default constructor */
-    public Grouping()
-    {
-    }
-    
-    /** minimal constructor */
-    public Grouping(Long groupingId)
-    {
-        this.groupingId = groupingId;
-    }
-    
+	/** Grouping type id of chosen grouping */
+	public static final Integer CHOSEN_GROUPING_TYPE = new Integer(2);
+
+	/** Grouping type id for lesson class grouping */
+	public static final Integer CLASS_GROUPING_TYPE = new Integer(3);
+
+	/** Grouping type id for lesson class grouping */
+	public static final Integer LEARNER_CHOICE_GROUPING_TYPE = new Integer(4);
+
+	/** identifier field */
+	private Long groupingId;
+
+	/** nullable persistent field 
+	 *  TODO It make sense only if we want to setup some limits for the number 
+	 * 		 of groups the author can setup in the authoring GUI. It might need 
+	 * 		 to be deleted if the end user doesn't like this limits.
+	 */
+	private Integer maxNumberOfGroups;
+
+	/** nullable persistent field */
+	private Integer groupingUIID;
+
+	/** persistent field */
+	private Set groups;
+
+	/** persistent field */
+	private Set activities;
+
+	/** non-persistent field */
+	protected Set learners;
+
+	protected Grouper grouper;
+	/**
+	 * static final variables indicating the grouping_support of activities
+	 *******************************************************************/
+	public static final int GROUPING_SUPPORT_NONE = 1;
+
+	public static final int GROUPING_SUPPORT_OPTIONAL = 2;
+
+	public static final int GROUPING_SUPPORT_REQUIRED = 3;
+
+	/******************************************************************/
+
+	/** full constructor */
+	public Grouping(Long groupingId, Set groups, Set activities, Grouper grouper) {
+		this.groupingId = groupingId;
+		this.groups = groups;
+		this.activities = activities;
+		this.grouper = grouper;
+	}
+
+	/** default constructor */
+	public Grouping() {
+	}
+
+	/** minimal constructor */
+	public Grouping(Long groupingId) {
+		this.groupingId = groupingId;
+	}
+
 	/** Create a deep copy of the this grouping. It should return the same
 	 * subclass as the grouping being copied. Does not copy the tool sessions.
 	 * Copies the groups but not users in the groups. Copies any group to 
@@ -121,255 +120,258 @@ public abstract class Grouping implements Serializable
 	 *  
 	 * @return deep copy of this object
 	 */
-    public abstract Grouping createCopy(int uiidOffset);
+	public abstract Grouping createCopy(int uiidOffset);
 
-    /** 
-     * Copy all the groups within this grouping to the newGrouping object.
-     * Copies the groups but not users in the groups. Copies any group to branch 
-     * mappings, updating the group but not the activity. Used by createCopy()
-     * implementations.
-     */
-    protected void copyGroupingFields(Grouping newGrouping, int  uiidOffset){
-      	newGrouping.setMaxNumberOfGroups(this.getMaxNumberOfGroups());
-      	newGrouping.setGroupingUIID(LearningDesign.addOffset(this.getGroupingUIID(), uiidOffset));
-   
-    	if ( this.getGroups() != null && this.getGroups().size() > 0 ) {
+	/** 
+	 * Copy all the groups within this grouping to the newGrouping object.
+	 * Copies the groups but not users in the groups. Copies any group to branch 
+	 * mappings, updating the group but not the activity. Used by createCopy()
+	 * implementations.
+	 */
+	protected void copyGroupingFields(Grouping newGrouping, int uiidOffset) {
+		newGrouping.setMaxNumberOfGroups(this.getMaxNumberOfGroups());
+		newGrouping.setGroupingUIID(LearningDesign.addOffset(this.getGroupingUIID(), uiidOffset));
+
+		if (this.getGroups() != null && this.getGroups().size() > 0) {
 			Iterator iter = this.getGroups().iterator();
-			while ( iter.hasNext() ) {
+			while (iter.hasNext()) {
 				Group oldGroup = (Group) iter.next();
-		    	Group newGroup = oldGroup.createCopy(newGrouping);
-		    	newGroup.setGroupUIID(LearningDesign.addOffset(newGroup.getGroupUIID(), uiidOffset));
-		    	newGrouping.getGroups().add(newGroup);
+				Group newGroup = oldGroup.createCopy(newGrouping);
+				newGroup.setGroupUIID(LearningDesign.addOffset(newGroup.getGroupUIID(), uiidOffset));
+				newGrouping.getGroups().add(newGroup);
 			}
-    	}
-    }
-    
-    /**
-     *            
-     *
-     */
-    public Long getGroupingId()
-    {
-        return this.groupingId;
-    }
-    
-    public void setGroupingId(Long groupingId)
-    {
-        this.groupingId = groupingId;
-    }
-    
-    
-    
-    /**
-     *            
-     *
-     */
-    public Integer getGroupingTypeId()
-    {
-      if(this instanceof LessonClass)
-            return CLASS_GROUPING_TYPE;
-        else if(this instanceof ChosenGrouping)
-            return CHOSEN_GROUPING_TYPE;
-        else
-            return RANDOM_GROUPING_TYPE; 
-        
-    }
-  
+		}
+	}
 
-    /**
-     *            
-     *
-     */
-    public Set getGroups()
-    {
-        if(this.groups==null)
-            setGroups(new TreeSet());
-        return this.groups;
-    }
-    
-    public void setGroups(Set groups)
-    {
-        this.groups = groups;
-    }
-    
-    /**
-     *           
-     *
-     */
-    public Set getActivities()
-    {
-        if(this.activities==null)
-            setActivities(new TreeSet(new ActivityOrderComparator()));
-        return this.activities;
-    }
-    
-    public void setActivities(Set activities)
-    {
-        this.activities = activities;
-    }
-    
-    public String toString()
-    {
-        return new ToStringBuilder(this)
-        .append("groupingId", getGroupingId())
-        .toString();
-    }
-    
-    public boolean equals(Object other)
-    {
-        if ( (this == other ) ) return true;
-        if ( !(other instanceof Grouping) ) return false;
-        Grouping castOther = (Grouping) other;
-        return new EqualsBuilder()
-        .append(this.getGroupingId(), castOther.getGroupingId())
-        .isEquals();
-    }
-    
-    public int hashCode()
-    {
-        return new HashCodeBuilder()
-        .append(getGroupingId())
-        .toHashCode();
-    }
-    /**
-     * 
-     */
-    public Integer getMaxNumberOfGroups()
-    {
-        return maxNumberOfGroups;
-    }
-    
-    /**
-     * @param maxNumberOfGroups The maxNumberOfGroups to set.
-     */
-    public void setMaxNumberOfGroups(Integer maxNumberOfGroups)
-    {
-        this.maxNumberOfGroups = maxNumberOfGroups;
-    }
+	/**
+	 *            
+	 *
+	 */
+	public Long getGroupingId() {
+		return groupingId;
+	}
+
+	public void setGroupingId(Long groupingId) {
+		this.groupingId = groupingId;
+	}
+
+	/**
+	 *            
+	 *
+	 */
+	public Integer getGroupingTypeId() {
+		if (this instanceof LessonClass) {
+			return Grouping.CLASS_GROUPING_TYPE;
+		}
+		else if (this instanceof ChosenGrouping) {
+			return Grouping.CHOSEN_GROUPING_TYPE;
+		}
+		else if (this instanceof LearnerChoiceGrouping) {
+			return Grouping.LEARNER_CHOICE_GROUPING_TYPE;
+		}
+		else {
+			return Grouping.RANDOM_GROUPING_TYPE;
+		}
+
+	}
+
+	/**
+	 *            
+	 *
+	 */
+	public Set getGroups() {
+		if (groups == null) {
+			setGroups(new TreeSet());
+		}
+		return groups;
+	}
+
+	public void setGroups(Set groups) {
+		this.groups = groups;
+	}
+
+	/**
+	 *           
+	 *
+	 */
+	public Set getActivities() {
+		if (activities == null) {
+			setActivities(new TreeSet(new ActivityOrderComparator()));
+		}
+		return activities;
+	}
+
+	public void setActivities(Set activities) {
+		this.activities = activities;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this).append("groupingId", getGroupingId()).toString();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (!(other instanceof Grouping)) {
+			return false;
+		}
+		Grouping castOther = (Grouping) other;
+		return new EqualsBuilder().append(this.getGroupingId(), castOther.getGroupingId()).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(getGroupingId()).toHashCode();
+	}
+
+	/**
+	 * 
+	 */
+	public Integer getMaxNumberOfGroups() {
+		return maxNumberOfGroups;
+	}
+
+	/**
+	 * @param maxNumberOfGroups The maxNumberOfGroups to set.
+	 */
+	public void setMaxNumberOfGroups(Integer maxNumberOfGroups) {
+		this.maxNumberOfGroups = maxNumberOfGroups;
+	}
+
 	public Integer getGroupingUIID() {
 		return groupingUIID;
 	}
+
 	public void setGroupingUIID(Integer groupingUIID) {
 		this.groupingUIID = groupingUIID;
 	}
-    //---------------------------------------------------------------------
-    // Service methods
-    //---------------------------------------------------------------------
-    /**
-     * Return the next group order id. Can't do it on size as groups may have been deleted.
-     * Returns -1 if the proposed name is the same as existing name
-     * @return the next order id.
-     */
-    public synchronized int getNextGroupOrderIdCheckName(String proposedName)
-    {
+
+	//---------------------------------------------------------------------
+	// Service methods
+	//---------------------------------------------------------------------
+	/**
+	 * Return the next group order id. Can't do it on size as groups may have been deleted.
+	 * Returns -1 if the proposed name is the same as existing name
+	 * @return the next order id.
+	 */
+	public synchronized int getNextGroupOrderIdCheckName(String proposedName) {
 		int maxOrderId = 0;
 
-		if ( this.getGroups() != null ) {
-    		Iterator iter = this.getGroups().iterator();
+		if (this.getGroups() != null) {
+			Iterator iter = this.getGroups().iterator();
 			while (iter.hasNext()) {
 				Group element = (Group) iter.next();
 				maxOrderId = element.getOrderId() > maxOrderId ? element.getOrderId() : maxOrderId;
-				if ( proposedName.equals(element.getGroupName()) )
+				if (proposedName.equals(element.getGroupName())) {
 					return -1;
+				}
 			}
-    	}
+		}
 		return ++maxOrderId;
-    }
-    
-    /**
-     * Return all the learners who participate this grouping.
-     * @return the learners set.
-     */
-    public Set getLearners()
-    {
-        
-        learners = new HashSet();
-        for(Iterator i = getGroups().iterator();i.hasNext();)
-        {
-            Group group = (Group)i.next();
-            if(isLearnerGroup(group))
-                learners.addAll(group.getUsers());
-        }
-        return learners;
-    }
+	}
 
-    /**
-     * Returns the group that current learner is in.
-     * @param learner the user in the group
-     * @return the group that has the learner
-     */
-    public Group getGroupBy(User learner)
-    {
-        for(Iterator i = getGroups().iterator();i.hasNext();)
-        {
-            Group group = (Group)i.next();
-            if(isLearnerGroup(group)&&group.hasLearner(learner))
-                return group;
-        }
-        return new NullGroup();
-    }
-    
-    /**
-     * Iterate through all the groups in this grouping and figure out the group
-     * with the least members in it. 
-     * @return the group with the least member.
-     */
-    public Group getGroupWithLeastMember()
-    {
-        List groups = new ArrayList(this.getGroups());
-        
+	/**
+	 * Return all the learners who participate this grouping.
+	 * @return the learners set.
+	 */
+	public Set getLearners() {
+
+		learners = new HashSet();
+		for (Iterator i = getGroups().iterator(); i.hasNext();) {
+			Group group = (Group) i.next();
+			if (isLearnerGroup(group)) {
+				learners.addAll(group.getUsers());
+			}
+		}
+		return learners;
+	}
+
+	/**
+	 * Returns the group that current learner is in.
+	 * @param learner the user in the group
+	 * @return the group that has the learner
+	 */
+	public Group getGroupBy(User learner) {
+		for (Iterator i = getGroups().iterator(); i.hasNext();) {
+			Group group = (Group) i.next();
+			if (isLearnerGroup(group) && group.hasLearner(learner)) {
+				return group;
+			}
+		}
+		return new NullGroup();
+	}
+
+	/**
+	 * Iterate through all the groups in this grouping and figure out the group
+	 * with the least members in it. 
+	 * @return the group with the least member.
+	 */
+	public Group getGroupWithLeastMember() {
+		List groups = new ArrayList(this.getGroups());
+
 		Group minGroup = (Group) groups.get(0);
-		
-		for (int i = 1; i < groups.size(); i++) 
-		{
+
+		for (int i = 1; i < groups.size(); i++) {
 			Group tempGroup = (Group) groups.get(i);
-			if (tempGroup.getUsers().size() < minGroup.getUsers().size()) 
+			if (tempGroup.getUsers().size() < minGroup.getUsers().size()) {
 				minGroup = tempGroup;
+			}
 		}
 		return minGroup;
-    }
-    
-    /**
-     * Is this group a learner group. It is also possible that the group is a
-     * staff group.
-     * @return	whether the group is learner group or not.
-     */
-    public abstract boolean isLearnerGroup(Group group);
-	
+	}
+
+	/**
+	 * Is this group a learner group. It is also possible that the group is a
+	 * staff group.
+	 * @return	whether the group is learner group or not.
+	 */
+	public abstract boolean isLearnerGroup(Group group);
+
 	/**
 	 * Return whether a learner is a existing learner for this grouping or not.
 	 * @param learner the current leaner
 	 * @return the boolean result
 	 */
-	public boolean doesLearnerExist(User learner)
-	{
-	    return !getGroupBy(learner).isNull();
+	public boolean doesLearnerExist(User learner) {
+		return !getGroupBy(learner).isNull();
 	}
-	public GroupingDTO getGroupingDTO(boolean setupUserList){
+
+	public GroupingDTO getGroupingDTO(boolean setupUserList) {
 		return new GroupingDTO(this, setupUserList);
 	}
-	public static Object getGroupingInstance(Integer groupingType){
-		if(groupingType.equals(RANDOM_GROUPING_TYPE))
+
+	public static Object getGroupingInstance(Integer groupingType) {
+		if (groupingType.equals(Grouping.RANDOM_GROUPING_TYPE)) {
 			return new RandomGrouping();
-		else if(groupingType.equals(CHOSEN_GROUPING_TYPE))
+		}
+		else if (groupingType.equals(Grouping.CHOSEN_GROUPING_TYPE)) {
 			return new ChosenGrouping();
-		else
+		}
+		else if (groupingType.equals(Grouping.LEARNER_CHOICE_GROUPING_TYPE)) {
+			return new ChosenGrouping();
+		}
+		else {
 			return new LessonClass();
+		}
 	}
-	
-	public boolean isRandomGrouping()
-	{
-	    return getGroupingTypeId() == RANDOM_GROUPING_TYPE;
+
+	public boolean isRandomGrouping() {
+		return getGroupingTypeId() == Grouping.RANDOM_GROUPING_TYPE;
 	}
-	
-	public boolean isChosenGrouping()
-	{
-	    return getGroupingTypeId() == CHOSEN_GROUPING_TYPE;
+
+	public boolean isChosenGrouping() {
+		return getGroupingTypeId() == Grouping.CHOSEN_GROUPING_TYPE;
 	}
-	
-	public boolean isClassGrouping()
-	{
-	    return getGroupingTypeId() == CLASS_GROUPING_TYPE;
+
+	public boolean isClassGrouping() {
+		return getGroupingTypeId() == Grouping.CLASS_GROUPING_TYPE;
+	}
+
+	public boolean isLearnerChoiceGrouping() {
+		return getGroupingTypeId() == Grouping.LEARNER_CHOICE_GROUPING_TYPE;
 	}
 
 	public Grouper getGrouper() {
@@ -379,14 +381,15 @@ public abstract class Grouping implements Serializable
 	public void setGrouper(Grouper grouper) {
 		this.grouper = grouper;
 	}
-	
+
 	public Group getGroup(Integer groupUIID) {
-		if ( this.getGroups() != null ) {
+		if (this.getGroups() != null) {
 			Iterator iter = this.getGroups().iterator();
 			while (iter.hasNext()) {
 				Group elem = (Group) iter.next();
-				if ( elem.getGroupUIID().equals(groupUIID)) 
+				if (elem.getGroupUIID().equals(groupUIID)) {
 					return elem;
+				}
 			}
 		}
 		return null;
@@ -399,8 +402,9 @@ public abstract class Grouping implements Serializable
 		Iterator actIter = getActivities().iterator();
 		while (actIter.hasNext()) {
 			Activity act = (Activity) actIter.next();
-			if ( act.isBranchingActivity() ) 
+			if (act.isBranchingActivity()) {
 				return true;
+			}
 		}
 		return false;
 	}
