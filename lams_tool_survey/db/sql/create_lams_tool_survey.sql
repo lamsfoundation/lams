@@ -24,7 +24,8 @@ reflect_on_activity smallint,
 show_questions_on_one_page smallint, 
 create_date datetime, 
 update_date datetime, 
-create_by bigint, 
+create_by bigint,
+answer_submit_notify tinyint DEFAULT 0,
 primary key (uid)
 )type=innodb;
 

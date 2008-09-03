@@ -22,6 +22,7 @@
  */
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.service;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -104,68 +106,81 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * @author Dapeng.Ni 
  * 
  */
-public class SurveyServiceImpl implements
-                              ISurveyService,ToolContentManager, ToolSessionManager, ToolContentImport102Manager
-               
+public class SurveyServiceImpl implements ISurveyService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager
+
 {
 	static Logger log = Logger.getLogger(SurveyServiceImpl.class.getName());
-	
+
 	//DAO
 	private SurveyDAO surveyDao;
+
 	private SurveyQuestionDAO surveyQuestionDao;
+
 	private SurveyAnswerDAO surveyAnswerDao;
+
 	private SurveyAttachmentDAO surveyAttachmentDao;
+
 	private SurveyUserDAO surveyUserDao;
+
 	private SurveySessionDAO surveySessionDao;
-	
+
 	//tool service
 	private SurveyToolContentHandler surveyToolContentHandler;
+
 	private MessageService messageService;
+
 	//system services
 	private IRepositoryService repositoryService;
+
 	private ILamsToolService toolService;
+
 	private ILearnerService learnerService;
+
 	private IAuditService auditService;
-	private IUserManagementService userManagementService; 
+
+	private IUserManagementService userManagementService;
+
 	private IExportToolContentService exportContentService;
+
 	private ICoreNotebookService coreNotebookService;
-	
+
+	private IEventNotificationService eventNotificationService;
+
 	//*******************************************************************************
 	// Service method
 	//*******************************************************************************
 
 	public Survey getSurveyByContentId(Long contentId) {
 		Survey rs = surveyDao.getByContentId(contentId);
-		if(rs == null){
-			log.error("Could not find the content by given ID:"+contentId);
+		if (rs == null) {
+			SurveyServiceImpl.log.error("Could not find the content by given ID:" + contentId);
 		}
-		return rs; 
+		return rs;
 	}
 
-
 	public Survey getDefaultContent(Long contentId) throws SurveyApplicationException {
-    	if (contentId == null)
-    	{
-    		String error=messageService.getMessage("error.msg.default.content.not.find");
-    	    log.error(error);
-    	    throw new SurveyApplicationException(error);
-    	}
-    	
-    	Survey defaultContent = getDefaultSurvey();
-    	//save default content by given ID.
-    	Survey content = new Survey();
-    	content = Survey.newInstance(defaultContent,contentId,surveyToolContentHandler);
+		if (contentId == null) {
+			String error = messageService.getMessage("error.msg.default.content.not.find");
+			SurveyServiceImpl.log.error(error);
+			throw new SurveyApplicationException(error);
+		}
+
+		Survey defaultContent = getDefaultSurvey();
+		//save default content by given ID.
+		Survey content = new Survey();
+		content = Survey.newInstance(defaultContent, contentId, surveyToolContentHandler);
 		return content;
 	}
 
-
 	public SurveyAttachment uploadInstructionFile(FormFile uploadFile, String fileType) throws UploadSurveyFileException {
-		if(uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName()))
-			throw new UploadSurveyFileException(messageService.getMessage("error.msg.upload.file.not.found",new Object[]{uploadFile}));
-		
+		if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
+			throw new UploadSurveyFileException(messageService.getMessage("error.msg.upload.file.not.found",
+					new Object[] { uploadFile }));
+		}
+
 		//upload file to repository
-		NodeKey nodeKey = processFile(uploadFile,fileType);
-		
+		NodeKey nodeKey = processFile(uploadFile, fileType);
+
 		//create new attachement
 		SurveyAttachment file = new SurveyAttachment();
 		file.setFileType(fileType);
@@ -173,61 +188,57 @@ public class SurveyServiceImpl implements
 		file.setFileVersionId(nodeKey.getVersion());
 		file.setFileName(uploadFile.getFileName());
 		file.setCreated(new Date());
-		
+
 		return file;
 	}
-
 
 	public void createUser(SurveyUser surveyUser) {
 		surveyUserDao.saveObject(surveyUser);
 	}
 
-
 	public SurveyUser getUserByIDAndContent(Long userId, Long contentId) {
-		
-		return (SurveyUser) surveyUserDao.getUserByUserIDAndContentID(userId,contentId);
-		
-	}
-	public SurveyUser getUserByIDAndSession(Long userId, Long sessionId)  {
-		
-		return (SurveyUser) surveyUserDao.getUserByUserIDAndSessionID(userId,sessionId);
-		
+
+		return surveyUserDao.getUserByUserIDAndContentID(userId, contentId);
+
 	}
 
+	public SurveyUser getUserByIDAndSession(Long userId, Long sessionId) {
+
+		return surveyUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+
+	}
 
 	public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SurveyApplicationException {
 		ITicket ticket = getRepositoryLoginTicket();
 		try {
-			repositoryService.deleteVersion(ticket, fileUuid,fileVersionId);
-		} catch (Exception e) {
-			throw new SurveyApplicationException(
-					"Exception occured while deleting files from"
-							+ " the repository " + e.getMessage());
+			repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
+		}
+		catch (Exception e) {
+			throw new SurveyApplicationException("Exception occured while deleting files from" + " the repository "
+					+ e.getMessage());
 		}
 	}
-
 
 	public void saveOrUpdateSurvey(Survey survey) {
 		surveyDao.saveObject(survey);
 	}
 
-
 	public void deleteSurveyAttachment(Long attachmentUid) {
 		surveyAttachmentDao.removeObject(SurveyAttachment.class, attachmentUid);
-		
+
 	}
 
-	public Survey getSurveyBySessionId(Long sessionId){
+	public Survey getSurveyBySessionId(Long sessionId) {
 		SurveySession session = surveySessionDao.getSessionBySessionId(sessionId);
 		//to skip CGLib problem
 		Long contentId = session.getSurvey().getContentId();
 		Survey res = surveyDao.getByContentId(contentId);
 		return res;
 	}
+
 	public SurveySession getSurveySessionBySessionId(Long sessionId) {
 		return surveySessionDao.getSessionBySessionId(sessionId);
 	}
-
 
 	public void saveOrUpdateSurveySession(SurveySession resSession) {
 		surveySessionDao.saveObject(resSession);
@@ -237,100 +248,107 @@ public class SurveyServiceImpl implements
 		SurveyUser user = surveyUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 		user.setSessionFinished(true);
 		surveyUserDao.saveObject(user);
-		
-//		SurveySession session = surveySessionDao.getSessionBySessionId(toolSessionId);
-//		session.setStatus(SurveyConstants.COMPLETED);
-//		surveySessionDao.saveObject(session);
-		
+
+		//		SurveySession session = surveySessionDao.getSessionBySessionId(toolSessionId);
+		//		session.setStatus(SurveyConstants.COMPLETED);
+		//		surveySessionDao.saveObject(session);
+
 		String nextUrl = null;
 		try {
-			nextUrl = this.leaveToolSession(toolSessionId,userId);
-		} catch (DataMissingException e) {
+			nextUrl = this.leaveToolSession(toolSessionId, userId);
+		}
+		catch (DataMissingException e) {
 			throw new SurveyApplicationException(e);
-		} catch (ToolException e) {
+		}
+		catch (ToolException e) {
 			throw new SurveyApplicationException(e);
 		}
 		return nextUrl;
 	}
 
-	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry){
+	public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
 		Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
 
 		List<SurveySession> sessionList = surveySessionDao.getByContentId(contentId);
-		for(SurveySession session:sessionList){
+		for (SurveySession session : sessionList) {
 			Long sessionId = session.getSessionId();
 			boolean hasRefection = session.getSurvey().isReflectOnActivity();
 			Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
 			//get all users in this session
 			List<SurveyUser> users = surveyUserDao.getBySessionID(sessionId);
-			for(SurveyUser user : users){
+			for (SurveyUser user : users) {
 				ReflectDTO ref = new ReflectDTO(user);
-				
+
 				if (setEntry) {
-					NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, 
+					NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 							SurveyConstants.TOOL_SIGNATURE, user.getUserId().intValue());
 					if (entry != null) {
 						ref.setReflect(entry.getEntry());
 					}
 				}
-				
+
 				ref.setHasRefection(hasRefection);
 				list.add(ref);
 			}
 			map.put(sessionId, list);
 		}
-		
+
 		return map;
 	}
 
-	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText) {
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+			String entryText) {
 		return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "", entryText);
 	}
-	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID){
+
+	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 		List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
 		if (list == null || list.isEmpty()) {
 			return null;
-		} else {
+		}
+		else {
 			return list.get(0);
 		}
 	}
-	
+
 	/**
 	 * @param notebookEntry
 	 */
 	public void updateEntry(NotebookEntry notebookEntry) {
 		coreNotebookService.updateEntry(notebookEntry);
 	}
-	
-	public SurveyUser getUser(Long uid){
+
+	public SurveyUser getUser(Long uid) {
 		return (SurveyUser) surveyUserDao.getObject(SurveyUser.class, uid);
 	}
-	
-	public List<SurveyUser> getSessionUsers(Long sessionId){
+
+	public List<SurveyUser> getSessionUsers(Long sessionId) {
 		return surveyUserDao.getBySessionID(sessionId);
 	}
 
 	public void deleteQuestion(Long uid) {
 		surveyQuestionDao.removeObject(SurveyQuestion.class, uid);
-		
+
 	}
 
-	public List<AnswerDTO> getQuestionAnswers(Long sessionId,Long userUid) {
+	public List<AnswerDTO> getQuestionAnswers(Long sessionId, Long userUid) {
 		List<SurveyQuestion> questions = new ArrayList<SurveyQuestion>();
 		SurveySession session = surveySessionDao.getSessionBySessionId(sessionId);
-		if(session != null){
+		if (session != null) {
 			Survey survey = session.getSurvey();
-			if(survey != null)
+			if (survey != null) {
 				questions = new ArrayList<SurveyQuestion>(survey.getQuestions());
+			}
 		}
-		
+
 		//set answer for this question acoording
 		List<AnswerDTO> answers = new ArrayList<AnswerDTO>();
-		for(SurveyQuestion question:questions){
+		for (SurveyQuestion question : questions) {
 			AnswerDTO answerDTO = new AnswerDTO(question);
-			SurveyAnswer answer = surveyAnswerDao.getAnswer(question.getUid(),userUid);
-			if(answer != null)
+			SurveyAnswer answer = surveyAnswerDao.getAnswer(question.getUid(), userUid);
+			if (answer != null) {
 				answer.setChoices(SurveyWebUtils.getChoiceList(answer.getAnswerChoices()));
+			}
 			answerDTO.setAnswer(answer);
 			answerDTO.setReplier((SurveyUser) surveyUserDao.getObject(SurveyUser.class, userUid));
 			answers.add(answerDTO);
@@ -339,83 +357,83 @@ public class SurveyServiceImpl implements
 	}
 
 	public void updateAnswerList(List<SurveyAnswer> answerList) {
-		for(SurveyAnswer ans : answerList){
+		for (SurveyAnswer ans : answerList) {
 			surveyAnswerDao.saveObject(ans);
 		}
 	}
 
-	public AnswerDTO getQuestionResponse(Long sessionId, Long questionUid){
+	public AnswerDTO getQuestionResponse(Long sessionId, Long questionUid) {
 		SurveyQuestion question = surveyQuestionDao.getByUid(questionUid);
 		AnswerDTO answerDto = new AnswerDTO(question);
-		
+
 		//get question all answer from this session
 		List<SurveyAnswer> answsers = surveyAnswerDao.getSessionAnswer(sessionId, questionUid);
 
 		//create a map to hold Option UID and sequenceID(start from 0); 
 		Map<String, Integer> optMap = new HashMap<String, Integer>();
 		Set<SurveyOption> options = answerDto.getOptions();
-		int idx=0;
+		int idx = 0;
 		for (SurveyOption option : options) {
-			optMap.put(option.getUid().toString(),idx);
+			optMap.put(option.getUid().toString(), idx);
 			idx++;
 		}
-		
+
 		//initial a array to hold how many time chose has been done for a option or open text.
 		int optSize = options.size();
 		//for appendText and open Text Entry will be the last one of choose[] array.
-		if(answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+		if (answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			optSize++;
-		
+		}
+
 		int[] choose = new int[optSize];
 		Arrays.fill(choose, 0);
 
 		//sum up all option and open text (if has) have been selected count list
 		int answerSum = 0;
-		if(answsers != null){
+		if (answsers != null) {
 			for (SurveyAnswer answer : answsers) {
 				String[] choseOpt = SurveyWebUtils.getChoiceList(answer.getAnswerChoices());
 				for (String optUid : choseOpt) {
 					//if option has been chosen, the relative index of choose[] array will increase.
-					if(optMap.containsKey(optUid)){
+					if (optMap.containsKey(optUid)) {
 						choose[optMap.get(optUid)]++;
-						answerSum ++;
+						answerSum++;
 					}
 				}
 				//handle appendText or Open Text Entry
-				if((answerDto.isAppendText()
-						|| answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
-						&& !StringUtils.isBlank(answer.getAnswerText())){
-					choose[optSize-1]++;
-					answerSum ++;
+				if ((answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+						&& !StringUtils.isBlank(answer.getAnswerText())) {
+					choose[optSize - 1]++;
+					answerSum++;
 				}
 			}
 		}
 		//caculate the percentage of answer response
-		idx=0;
-		if(answerSum == 0){
+		idx = 0;
+		if (answerSum == 0) {
 			answerSum = 1;
 		}
 		for (SurveyOption option : options) {
-			option.setResponse((double)choose[idx]/(double)answerSum * 100d);
+			option.setResponse((double) choose[idx] / (double) answerSum * 100d);
 			option.setResponseFormatStr(new Long(Math.round(option.getResponse())).toString());
 			option.setResponseCount(choose[idx]);
 			idx++;
 		}
-		if(answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY){
-			answerDto.setOpenResponse((double)choose[idx]/(double)answerSum * 100d);
+		if (answerDto.isAppendText() || answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+			answerDto.setOpenResponse((double) choose[idx] / (double) answerSum * 100d);
 			answerDto.setOpenResponseFormatStr(new Long(Math.round(answerDto.getOpenResponse())).toString());
 			answerDto.setOpenResponseCount(choose[idx]);
 		}
-		
+
 		return answerDto;
-		
+
 	}
-	
-	public SortedMap<SurveySession,List<AnswerDTO>> getSummary(Long toolContentId) {
-		
-		SortedMap<SurveySession,List<AnswerDTO>> summary = 
-				new TreeMap<SurveySession, List<AnswerDTO>>(new SurveySessionComparator());
-		
+
+	public SortedMap<SurveySession, List<AnswerDTO>> getSummary(Long toolContentId) {
+
+		SortedMap<SurveySession, List<AnswerDTO>> summary = new TreeMap<SurveySession, List<AnswerDTO>>(
+				new SurveySessionComparator());
+
 		Survey survey = surveyDao.getByContentId(toolContentId);
 		//get all question under this survey
 		Set<SurveyQuestion> questionList = survey.getQuestions();
@@ -429,45 +447,45 @@ public class SurveyServiceImpl implements
 			}
 			summary.put(session, responseList);
 		}
-		
+
 		return summary;
 	}
 
-	public SortedMap<SurveySession, Integer> getStatistic(Long contentId){
+	public SortedMap<SurveySession, Integer> getStatistic(Long contentId) {
 		SortedMap<SurveySession, Integer> result = new TreeMap<SurveySession, Integer>(new SurveySessionComparator());
 		List<SurveySession> sessionList = surveySessionDao.getByContentId(contentId);
-		if(sessionList == null)
+		if (sessionList == null) {
 			return result;
-		
+		}
+
 		for (SurveySession session : sessionList) {
 			List<SurveyUser> users = getSessionUsers(session.getSessionId());
-			result.put(session, users != null?users.size():0);
+			result.put(session, users != null ? users.size() : 0);
 		}
-		
+
 		return result;
-		
+
 	}
+
 	public SurveyQuestion getQuestion(Long questionUid) {
 		return surveyQuestionDao.getByUid(questionUid);
 	}
 
+	public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByContentId(Long toolContentID) {
 
+		SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
+				new SurveySessionComparator());
 
-	public SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByContentId(Long toolContentID) {
-	
-		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> summary = 
-			new TreeMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>(new SurveySessionComparator());
-		
 		//get all tool sessions in this content
 		List<SurveySession> sessions = surveySessionDao.getByContentId(toolContentID);
-		if(sessions != null){
+		if (sessions != null) {
 			for (SurveySession session : sessions) {
 				//get all users under this session 
 				List<SurveyUser> users = surveyUserDao.getBySessionID(session.getSessionId());
-				
+
 				//container for this user's answers
-				List<List<AnswerDTO>> learnerAnswers  = new ArrayList<List<AnswerDTO>>();
-				if(users != null){
+				List<List<AnswerDTO>> learnerAnswers = new ArrayList<List<AnswerDTO>>();
+				if (users != null) {
 					//for every user, get answers of all questions. 
 					for (SurveyUser user : users) {
 						List<AnswerDTO> answers = getQuestionAnswers(user.getSession().getSessionId(), user.getUid());
@@ -477,21 +495,22 @@ public class SurveyServiceImpl implements
 				toQuestionMap(summary, session, learnerAnswers);
 			}
 		}
-		
+
 		return summary;
 	}
-	public SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportBySessionId(Long toolSessionID) {
-		
-		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> summary = 
-			new TreeMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>(new SurveySessionComparator());
-		
+
+	public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportBySessionId(Long toolSessionID) {
+
+		SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
+				new SurveySessionComparator());
+
 		//get  tool sessions
 		SurveySession session = surveySessionDao.getSessionBySessionId(toolSessionID);
 		List<SurveyUser> users = surveyUserDao.getBySessionID(session.getSessionId());
-		
+
 		//container for this user's answers
-		List<List<AnswerDTO>> learnerAnswers  = new ArrayList<List<AnswerDTO>>();
-		if(users != null){
+		List<List<AnswerDTO>> learnerAnswers = new ArrayList<List<AnswerDTO>>();
+		if (users != null) {
 			//for every user, get answers of all questions. 
 			for (SurveyUser user : users) {
 				List<AnswerDTO> answers = getQuestionAnswers(user.getSession().getSessionId(), user.getUid());
@@ -499,26 +518,23 @@ public class SurveyServiceImpl implements
 			}
 		}
 		toQuestionMap(summary, session, learnerAnswers);
-		
+
 		return summary;
 	}
 
+	public SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByLearner(SurveyUser learner) {
+		SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary = new TreeMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>(
+				new SurveySessionComparator());
 
-
-	public SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByLearner(SurveyUser learner) {
-		SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> summary = 
-				new TreeMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>>(new SurveySessionComparator());
-		
 		SurveySession session = learner.getSession();
 		List<AnswerDTO> answers = getQuestionAnswers(session.getSessionId(), learner.getUid());
-		List<List<AnswerDTO>> learnerAnswers  = new ArrayList<List<AnswerDTO>>();
+		List<List<AnswerDTO>> learnerAnswers = new ArrayList<List<AnswerDTO>>();
 		learnerAnswers.add(answers);
-		
+
 		toQuestionMap(summary, session, learnerAnswers);
-		
+
 		return summary;
 	}
-
 
 	//*****************************************************************************
 	// private methods
@@ -526,20 +542,21 @@ public class SurveyServiceImpl implements
 	/**
 	 * Convert all user's answers to another map sorted by SurveyQuestion, rather than old sorted by user. 
 	 */
-	private void toQuestionMap(SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> summary
-				, SurveySession session, List<List<AnswerDTO>> learnerAnswers) {
+	private void toQuestionMap(SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> summary,
+			SurveySession session, List<List<AnswerDTO>> learnerAnswers) {
 		//after get all users' all answers, then sort them by SurveyQuestion
-		SortedMap<SurveyQuestion,List<AnswerDTO>> questionMap = new TreeMap<SurveyQuestion, List<AnswerDTO>>(new QuestionsComparator()); 
+		SortedMap<SurveyQuestion, List<AnswerDTO>> questionMap = new TreeMap<SurveyQuestion, List<AnswerDTO>>(
+				new QuestionsComparator());
 		Survey survey = getSurveyBySessionId(session.getSessionId());
 		Set<SurveyQuestion> questionList = survey.getQuestions();
-		if(questionList != null){
+		if (questionList != null) {
 			for (SurveyQuestion question : questionList) {
 				List<AnswerDTO> queAnsList = new ArrayList<AnswerDTO>();
 				questionMap.put(question, queAnsList);
 				for (List<AnswerDTO> listAns : learnerAnswers) {
 					for (AnswerDTO answerDTO : listAns) {
 						//get a user's answer for this question
-						if(answerDTO.getUid().equals(question.getUid())){
+						if (answerDTO.getUid().equals(question.getUid())) {
 							queAnsList.add(answerDTO);
 							break;
 						}
@@ -548,62 +565,64 @@ public class SurveyServiceImpl implements
 				}
 			}//for this question, get all users answer, the continue next
 		}
-		
+
 		summary.put(session, questionMap);
 	}
 
 	private Survey getDefaultSurvey() throws SurveyApplicationException {
-    	Long defaultSurveyId = getToolDefaultContentIdBySignature(SurveyConstants.TOOL_SIGNATURE);
-    	Survey defaultSurvey = getSurveyByContentId(defaultSurveyId);
-    	if(defaultSurvey == null)
-    	{
-    	    String error=messageService.getMessage("error.msg.default.content.not.find");
-    	    log.error(error);
-    	    throw new SurveyApplicationException(error);
-    	}
-    	
-    	return defaultSurvey;
+		Long defaultSurveyId = getToolDefaultContentIdBySignature(SurveyConstants.TOOL_SIGNATURE);
+		Survey defaultSurvey = getSurveyByContentId(defaultSurveyId);
+		if (defaultSurvey == null) {
+			String error = messageService.getMessage("error.msg.default.content.not.find");
+			SurveyServiceImpl.log.error(error);
+			throw new SurveyApplicationException(error);
+		}
+
+		return defaultSurvey;
 	}
-    private Long getToolDefaultContentIdBySignature(String toolSignature) throws SurveyApplicationException
-    {
-        Long contentId = null;
-    	contentId=new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));    
-    	if (contentId == null)
-    	{
-    		String error=messageService.getMessage("error.msg.default.content.not.find");
-    	    log.error(error);
-    	    throw new SurveyApplicationException(error);
-    	}
-	    return contentId;
-    }
-    /**
-     * Process an uploaded file.
-     * 
-     * @throws SurveyApplicationException 
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
-     */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadSurveyFileException {
-    	NodeKey node = null;
-        if (file!= null && !StringUtils.isEmpty(file.getFileName())) {
-            String fileName = file.getFileName();
-            try {
-				node = surveyToolContentHandler.uploadFile(file.getInputStream(), fileName, 
-				        file.getContentType(), fileType);
-			} catch (InvalidParameterException e) {
-				throw new UploadSurveyFileException (messageService.getMessage("error.msg.invaid.param.upload"));
-			} catch (FileNotFoundException e) {
-				throw new UploadSurveyFileException (messageService.getMessage("error.msg.file.not.found"));
-			} catch (RepositoryCheckedException e) {
-				throw new UploadSurveyFileException (messageService.getMessage("error.msg.repository"));
-			} catch (IOException e) {
-				throw new UploadSurveyFileException (messageService.getMessage("error.msg.io.exception"));
+
+	private Long getToolDefaultContentIdBySignature(String toolSignature) throws SurveyApplicationException {
+		Long contentId = null;
+		contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+		if (contentId == null) {
+			String error = messageService.getMessage("error.msg.default.content.not.find");
+			SurveyServiceImpl.log.error(error);
+			throw new SurveyApplicationException(error);
+		}
+		return contentId;
+	}
+
+	/**
+	 * Process an uploaded file.
+	 * 
+	 * @throws SurveyApplicationException 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws RepositoryCheckedException
+	 * @throws InvalidParameterException
+	 */
+	private NodeKey processFile(FormFile file, String fileType) throws UploadSurveyFileException {
+		NodeKey node = null;
+		if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+			String fileName = file.getFileName();
+			try {
+				node = surveyToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType(), fileType);
 			}
-          }
-        return node;
-    }
+			catch (InvalidParameterException e) {
+				throw new UploadSurveyFileException(messageService.getMessage("error.msg.invaid.param.upload"));
+			}
+			catch (FileNotFoundException e) {
+				throw new UploadSurveyFileException(messageService.getMessage("error.msg.file.not.found"));
+			}
+			catch (RepositoryCheckedException e) {
+				throw new UploadSurveyFileException(messageService.getMessage("error.msg.repository"));
+			}
+			catch (IOException e) {
+				throw new UploadSurveyFileException(messageService.getMessage("error.msg.io.exception"));
+			}
+		}
+		return node;
+	}
 
 	/**
 	 * This method verifies the credentials of the Share Survey Tool and gives it
@@ -617,20 +636,19 @@ public class SurveyServiceImpl implements
 	 * @throws SurveyApplicationException
 	 */
 	private ITicket getRepositoryLoginTicket() throws SurveyApplicationException {
-		ICredentials credentials = new SimpleCredentials(
-				surveyToolContentHandler.getRepositoryUser(),
-				surveyToolContentHandler.getRepositoryId());
+		ICredentials credentials = new SimpleCredentials(surveyToolContentHandler.getRepositoryUser(), surveyToolContentHandler
+				.getRepositoryId());
 		try {
-			ITicket ticket = repositoryService.login(credentials,
-					surveyToolContentHandler.getRepositoryWorkspaceName());
+			ITicket ticket = repositoryService.login(credentials, surveyToolContentHandler.getRepositoryWorkspaceName());
 			return ticket;
-		} catch (AccessDeniedException ae) {
-			throw new SurveyApplicationException("Access Denied to repository."
-					+ ae.getMessage());
-		} catch (WorkspaceNotFoundException we) {
-			throw new SurveyApplicationException("Workspace not found."
-					+ we.getMessage());
-		} catch (LoginException e) {
+		}
+		catch (AccessDeniedException ae) {
+			throw new SurveyApplicationException("Access Denied to repository." + ae.getMessage());
+		}
+		catch (WorkspaceNotFoundException we) {
+			throw new SurveyApplicationException("Workspace not found." + we.getMessage());
+		}
+		catch (LoginException e) {
 			throw new SurveyApplicationException("Login failed." + e.getMessage());
 		}
 	}
@@ -638,50 +656,55 @@ public class SurveyServiceImpl implements
 	//*******************************************************************************
 	//ToolContentManager, ToolSessionManager methods
 	//*******************************************************************************
-	
+
 	public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 		Survey toolContentObj = surveyDao.getByContentId(toolContentId);
- 		if(toolContentObj == null) {
- 			try {
+		if (toolContentObj == null) {
+			try {
 				toolContentObj = getDefaultSurvey();
-			} catch (SurveyApplicationException e) {
+			}
+			catch (SurveyApplicationException e) {
 				throw new DataMissingException(e.getMessage());
 			}
- 		}
- 		if(toolContentObj == null)
- 			throw new DataMissingException("Unable to find default content for the survey tool");
- 		
- 		//set SurveyToolContentHandler as null to avoid copy file node in repository again.
- 		toolContentObj = Survey.newInstance(toolContentObj,toolContentId,null);
- 		toolContentObj.setToolContentHandler(null);
- 		toolContentObj.setOfflineFileList(null);
- 		toolContentObj.setOnlineFileList(null);
+		}
+		if (toolContentObj == null) {
+			throw new DataMissingException("Unable to find default content for the survey tool");
+		}
+
+		//set SurveyToolContentHandler as null to avoid copy file node in repository again.
+		toolContentObj = Survey.newInstance(toolContentObj, toolContentId, null);
+		toolContentObj.setToolContentHandler(null);
+		toolContentObj.setOfflineFileList(null);
+		toolContentObj.setOnlineFileList(null);
 		try {
-			exportContentService.registerFileClassForExport(SurveyAttachment.class.getName(),"fileUuid","fileVersionId");
-			exportContentService.exportToolContent( toolContentId, toolContentObj,surveyToolContentHandler, rootPath);
-		} catch (ExportToolContentException e) {
+			exportContentService.registerFileClassForExport(SurveyAttachment.class.getName(), "fileUuid", "fileVersionId");
+			exportContentService.exportToolContent(toolContentId, toolContentObj, surveyToolContentHandler, rootPath);
+		}
+		catch (ExportToolContentException e) {
 			throw new ToolException(e);
 		}
 	}
 
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
+			String toVersion) throws ToolException {
 
-	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath,String fromVersion,String toVersion) throws ToolException {
-	
 		try {
-			exportContentService.registerFileClassForImport(SurveyAttachment.class.getName()
-					,"fileUuid","fileVersionId","fileName","fileType",null,null);
-			
-			Object toolPOJO =  exportContentService.importToolContent(toolContentPath,surveyToolContentHandler,fromVersion,toVersion);
-			if(!(toolPOJO instanceof Survey))
+			exportContentService.registerFileClassForImport(SurveyAttachment.class.getName(), "fileUuid", "fileVersionId",
+					"fileName", "fileType", null, null);
+
+			Object toolPOJO = exportContentService.importToolContent(toolContentPath, surveyToolContentHandler, fromVersion,
+					toVersion);
+			if (!(toolPOJO instanceof Survey)) {
 				throw new ImportToolContentException("Import survey tool content failed. Deserialized object is " + toolPOJO);
+			}
 			Survey toolContentObj = (Survey) toolPOJO;
-			
-//			reset it to new toolContentId
+
+			//			reset it to new toolContentId
 			toolContentObj.setContentId(toolContentId);
 			SurveyUser user = surveyUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()), toolContentId);
-			if(user == null){
+			if (user == null) {
 				user = new SurveyUser();
-				UserDTO sysUser = ((User)userManagementService.findById(User.class,newUserUid)).getUserDTO();
+				UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
 				user.setFirstName(sysUser.getFirstName());
 				user.setLastName(sysUser.getLastName());
 				user.setLoginName(sysUser.getLogin());
@@ -689,14 +712,15 @@ public class SurveyServiceImpl implements
 				user.setSurvey(toolContentObj);
 			}
 			toolContentObj.setCreatedBy(user);
-			
+
 			//reset all surveyItem createBy user
 			Set<SurveyQuestion> items = toolContentObj.getQuestions();
-			for(SurveyQuestion item:items){
+			for (SurveyQuestion item : items) {
 				item.setCreateBy(user);
 			}
 			surveyDao.saveObject(toolContentObj);
-		} catch (ImportToolContentException e) {
+		}
+		catch (ImportToolContentException e) {
 			throw new ToolException(e);
 		}
 	}
@@ -711,69 +735,66 @@ public class SurveyServiceImpl implements
 	}
 
 	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-		if (toContentId == null)
-			throw new ToolException(
-					"Failed to create the SharedSurveyFiles tool seession");
+		if (toContentId == null) {
+			throw new ToolException("Failed to create the SharedSurveyFiles tool seession");
+		}
 
 		Survey survey = null;
-		if ( fromContentId != null ) {
-			survey = 	surveyDao.getByContentId(fromContentId);
+		if (fromContentId != null) {
+			survey = surveyDao.getByContentId(fromContentId);
 		}
-		if ( survey == null ) {
+		if (survey == null) {
 			try {
 				survey = getDefaultSurvey();
-			} catch (SurveyApplicationException e) {
+			}
+			catch (SurveyApplicationException e) {
 				throw new ToolException(e);
 			}
 		}
 
-		Survey toContent = Survey.newInstance(survey,toContentId,surveyToolContentHandler);
+		Survey toContent = Survey.newInstance(survey, toContentId, surveyToolContentHandler);
 		surveyDao.saveObject(toContent);
-		
+
 		//save survey items as well
 		Set items = toContent.getQuestions();
-		if(items != null){
+		if (items != null) {
 			Iterator iter = items.iterator();
-			while(iter.hasNext()){
+			while (iter.hasNext()) {
 				SurveyQuestion item = (SurveyQuestion) iter.next();
-//				createRootTopic(toContent.getUid(),null,msg);
+				//				createRootTopic(toContent.getUid(),null,msg);
 			}
 		}
 	}
 
-
 	public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Survey survey = surveyDao.getByContentId(toolContentId);
-		if(survey == null){
+		if (survey == null) {
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
 		survey.setDefineLater(value);
 	}
 
-
 	public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 		Survey survey = surveyDao.getByContentId(toolContentId);
-		if(survey == null){
+		if (survey == null) {
 			throw new ToolException("No found tool content by given content ID:" + toolContentId);
 		}
-		survey.setRunOffline(value);		
+		survey.setRunOffline(value);
 	}
-
 
 	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException, ToolException {
 		Survey survey = surveyDao.getByContentId(toolContentId);
-		if(removeSessionData){
+		if (removeSessionData) {
 			List list = surveySessionDao.getByContentId(toolContentId);
 			Iterator iter = list.iterator();
-			while(iter.hasNext()){
-				SurveySession session = (SurveySession ) iter.next();
+			while (iter.hasNext()) {
+				SurveySession session = (SurveySession) iter.next();
 				surveySessionDao.delete(session);
 			}
 		}
 		surveyDao.delete(survey);
 	}
 
-	
 	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 		SurveySession session = new SurveySession();
 		session.setSessionId(toolSessionId);
@@ -783,29 +804,25 @@ public class SurveyServiceImpl implements
 		surveySessionDao.saveObject(session);
 	}
 
-
 	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-		if(toolSessionId == null){
-			log.error("Fail to leave tool Session based on null tool session id.");
+		if (toolSessionId == null) {
+			SurveyServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
 			throw new ToolException("Fail to remove tool Session based on null tool session id.");
 		}
-		if(learnerId == null){
-			log.error("Fail to leave tool Session based on null learner.");
+		if (learnerId == null) {
+			SurveyServiceImpl.log.error("Fail to leave tool Session based on null learner.");
 			throw new ToolException("Fail to remove tool Session based on null learner.");
 		}
-		return learnerService.completeToolSession(toolSessionId,learnerId);
+		return learnerService.completeToolSession(toolSessionId, learnerId);
 	}
-
 
 	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		return null;
 	}
 
-
 	public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException {
 		return null;
 	}
-
 
 	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 		surveySessionDao.deleteBySessionId(toolSessionId);
@@ -815,17 +832,15 @@ public class SurveyServiceImpl implements
 	 * Get the tool output for the given tool output names.
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
 	 */
-	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
-			Long toolSessionId, Long learnerId) {
-		return new TreeMap<String,ToolOutput>();
+	public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
+		return new TreeMap<String, ToolOutput>();
 	}
 
 	/** 
 	 * Get the tool output for the given tool output name.
 	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
 	 */
-	public ToolOutput getToolOutput(String name, Long toolSessionId,
-			Long learnerId) {
+	public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 		return null;
 	}
 
@@ -897,125 +912,130 @@ public class SurveyServiceImpl implements
 		</struct></array></var>
 		<var name='firstActivity'><number>31.0</number></var>
 	*/
-	
-    /**
-     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-     */
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
-    {
-    	Date now = new Date();
-    	Survey toolContentObj = new Survey();
 
-    	try {
-	    	toolContentObj.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-	    	toolContentObj.setContentId(toolContentId);
-	    	toolContentObj.setContentInUse(Boolean.FALSE);
-	    	toolContentObj.setCreated(now);
-	    	toolContentObj.setDefineLater(Boolean.FALSE);
-	    	toolContentObj.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-	    	toolContentObj.setOfflineInstructions(null);
-	    	toolContentObj.setOnlineInstructions(null);
-	    	toolContentObj.setRunOffline(Boolean.FALSE);
-	    	toolContentObj.setUpdated(now);
+	/**
+	 * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
+	 */
+	public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
+		Date now = new Date();
+		Survey toolContentObj = new Survey();
 
-   	   		Boolean isReusable = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
-	    	toolContentObj.setLockWhenFinished(isReusable != null ? ! isReusable.booleanValue() : true);
-	    	
-	    	SurveyUser ruser = new SurveyUser();
-	    	ruser.setUserId(new Long(user.getUserID().longValue()));
-	    	ruser.setFirstName(user.getFirstName());
-	    	ruser.setLastName(user.getLastName());
-	    	ruser.setLoginName(user.getLogin());
+		try {
+			toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+			toolContentObj.setContentId(toolContentId);
+			toolContentObj.setContentInUse(Boolean.FALSE);
+			toolContentObj.setCreated(now);
+			toolContentObj.setDefineLater(Boolean.FALSE);
+			toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
+					.get(ToolContentImport102Manager.CONTENT_BODY)));
+			toolContentObj.setOfflineInstructions(null);
+			toolContentObj.setOnlineInstructions(null);
+			toolContentObj.setRunOffline(Boolean.FALSE);
+			toolContentObj.setUpdated(now);
+
+			Boolean isReusable = WDDXProcessor.convertToBoolean(importValues, ToolContentImport102Manager.CONTENT_REUSABLE);
+			toolContentObj.setLockWhenFinished(isReusable != null ? !isReusable.booleanValue() : true);
+
+			SurveyUser ruser = new SurveyUser();
+			ruser.setUserId(new Long(user.getUserID().longValue()));
+			ruser.setFirstName(user.getFirstName());
+			ruser.setLastName(user.getLastName());
+			ruser.setLoginName(user.getLogin());
 			createUser(ruser);
-		    toolContentObj.setCreatedBy(ruser);
-	
-	    	//survey questions
-		    toolContentObj.setQuestions(new HashSet<SurveyQuestion>());
-		    
-	    	Vector questions = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTIONS);
-	    	if ( questions != null ) {
-		    	int dummySequenceNumber = questions.size(); // dummy number in case we can't convert question order
-	    		Iterator iter = questions.iterator();
-	    		while ( iter.hasNext() ) {
-	    			Hashtable questionMap = (Hashtable) iter.next();
-	    			
-	    			SurveyQuestion item = new SurveyQuestion();
-	    			item.setCreateDate(now);
-	    			item.setCreateBy(ruser);
+			toolContentObj.setCreatedBy(ruser);
 
-	    			// try to set the type from the map. if that doesn't work then assume it is a text entry
-	    			String surveyType = (String) questionMap.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTION_TYPE);
-	    			if ( ToolContentImport102Manager.CONTENT_SURVEY_TYPE_SINGLE.equals(surveyType)) {
-	    				item.setType((short)1);
-	    				item.setAllowMultipleAnswer(false);
-	    			}
-	    			else if ( ToolContentImport102Manager.CONTENT_SURVEY_TYPE_MULTIPLE.equals(surveyType)) {
-	    				item.setType((short)2);
-	    				item.setAllowMultipleAnswer(true);
-	    			} else { 
-	    				item.setType((short)3);	    			
-	    				item.setAllowMultipleAnswer(false);
-	    			}
+			//survey questions
+			toolContentObj.setQuestions(new HashSet<SurveyQuestion>());
+
+			Vector questions = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTIONS);
+			if (questions != null) {
+				int dummySequenceNumber = questions.size(); // dummy number in case we can't convert question order
+				Iterator iter = questions.iterator();
+				while (iter.hasNext()) {
+					Hashtable questionMap = (Hashtable) iter.next();
+
+					SurveyQuestion item = new SurveyQuestion();
+					item.setCreateDate(now);
+					item.setCreateBy(ruser);
+
+					// try to set the type from the map. if that doesn't work then assume it is a text entry
+					String surveyType = (String) questionMap.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTION_TYPE);
+					if (ToolContentImport102Manager.CONTENT_SURVEY_TYPE_SINGLE.equals(surveyType)) {
+						item.setType((short) 1);
+						item.setAllowMultipleAnswer(false);
+					}
+					else if (ToolContentImport102Manager.CONTENT_SURVEY_TYPE_MULTIPLE.equals(surveyType)) {
+						item.setType((short) 2);
+						item.setAllowMultipleAnswer(true);
+					}
+					else {
+						item.setType((short) 3);
+						item.setAllowMultipleAnswer(false);
+					}
 
 					Integer order = WDDXProcessor.convertToInteger(questionMap, ToolContentImport102Manager.CONTENT_SURVEY_ORDER);
-					item.setSequenceId(order!=null?order.intValue():dummySequenceNumber++);
-					
-					item.setDescription(WebUtil.convertNewlines((String)questionMap.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTION)));
-					
+					item.setSequenceId(order != null ? order.intValue() : dummySequenceNumber++);
+
+					item.setDescription(WebUtil.convertNewlines((String) questionMap
+							.get(ToolContentImport102Manager.CONTENT_SURVEY_QUESTION)));
+
 					// completion message purposely not supported in 2.0, so value can be dropped.
 
-					Boolean appendText = WDDXProcessor.convertToBoolean(questionMap, ToolContentImport102Manager.CONTENT_SURVEY_TEXTBOX_ENABLED);
+					Boolean appendText = WDDXProcessor.convertToBoolean(questionMap,
+							ToolContentImport102Manager.CONTENT_SURVEY_TEXTBOX_ENABLED);
 					item.setAppendText(appendText != null ? appendText.booleanValue() : false);
-					
-					Boolean isOptional = WDDXProcessor.convertToBoolean(questionMap, ToolContentImport102Manager.CONTENT_SURVEY_OPTIONAL);
+
+					Boolean isOptional = WDDXProcessor.convertToBoolean(questionMap,
+							ToolContentImport102Manager.CONTENT_SURVEY_OPTIONAL);
 					item.setOptional(isOptional != null ? isOptional.booleanValue() : false);
-					
+
 					Vector candidates = (Vector) questionMap.get(ToolContentImport102Manager.CONTENT_SURVEY_CANDIDATES);
-	    			if ( candidates != null && candidates.size() > 0 ) {
-	    				item.setOptions(new HashSet());
-	    		    	int dummyCandidateOrder = candidates.size(); // dummy number in case we can't convert question order
-	    				Iterator candIter = candidates.iterator();
-	    				while (candIter.hasNext()) {
-	    					Hashtable candidateEntry = (Hashtable) candIter.next();
+					if (candidates != null && candidates.size() > 0) {
+						item.setOptions(new HashSet());
+						int dummyCandidateOrder = candidates.size(); // dummy number in case we can't convert question order
+						Iterator candIter = candidates.iterator();
+						while (candIter.hasNext()) {
+							Hashtable candidateEntry = (Hashtable) candIter.next();
 							String candidateText = (String) candidateEntry.get(ToolContentImport102Manager.CONTENT_SURVEY_ANSWER);
-							Integer candidateOrder = WDDXProcessor.convertToInteger(candidateEntry, ToolContentImport102Manager.CONTENT_SURVEY_ORDER);
-							
+							Integer candidateOrder = WDDXProcessor.convertToInteger(candidateEntry,
+									ToolContentImport102Manager.CONTENT_SURVEY_ORDER);
+
 							SurveyOption option = new SurveyOption();
 							option.setDescription(candidateText);
 							option.setSequenceId(candidateOrder != null ? candidateOrder.intValue() : dummyCandidateOrder++);
 							item.getOptions().add(option);
 						}
-	    			}
-	
+					}
 
-	    			toolContentObj.getQuestions().add(item);
-	    		}
-	    	}
-	    	
-    	} catch (WDDXProcessorConversionException e) {
-    		log.error("Unable to content for activity "+toolContentObj.getTitle()+"properly due to a WDDXProcessorConversionException.",e);
-    		throw new ToolException("Invalid import data format for activity "+toolContentObj.getTitle()+"- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
-    	}
+					toolContentObj.getQuestions().add(item);
+				}
+			}
 
-    	surveyDao.saveObject(toolContentObj);
+		}
+		catch (WDDXProcessorConversionException e) {
+			SurveyServiceImpl.log.error("Unable to content for activity " + toolContentObj.getTitle()
+					+ "properly due to a WDDXProcessorConversionException.", e);
+			throw new ToolException("Invalid import data format for activity " + toolContentObj.getTitle()
+					+ "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+		}
 
+		surveyDao.saveObject(toolContentObj);
 
-    }
+	}
 
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) 
-    		throws ToolException, DataMissingException {
-    	
-    	Survey toolContentObj = getSurveyByContentId(toolContentId);
-    	if ( toolContentObj == null ) {
-    		throw new DataMissingException("Unable to set reflective data titled "+title
-	       			+" on activity toolContentId "+toolContentId
-	       			+" as the tool content does not exist.");
-    	}
+	/** Set the description, throws away the title value as this is not supported in 2.0 */
+	public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
+			DataMissingException {
 
-    	// toolContentObj.setReflectOnActivity(Boolean.TRUE);
-    	// toolContentObj.setReflectInstructions(description);
-    }
+		Survey toolContentObj = getSurveyByContentId(toolContentId);
+		if (toolContentObj == null) {
+			throw new DataMissingException("Unable to set reflective data titled " + title + " on activity toolContentId "
+					+ toolContentId + " as the tool content does not exist.");
+		}
+
+		// toolContentObj.setReflectOnActivity(Boolean.TRUE);
+		// toolContentObj.setReflectInstructions(description);
+	}
 
 	//*****************************************************************************
 	// set methods for Spring Bean
@@ -1023,38 +1043,48 @@ public class SurveyServiceImpl implements
 	public void setAuditService(IAuditService auditService) {
 		this.auditService = auditService;
 	}
+
 	public void setLearnerService(ILearnerService learnerService) {
 		this.learnerService = learnerService;
 	}
+
 	public void setMessageService(MessageService messageService) {
 		this.messageService = messageService;
 	}
+
 	public void setRepositoryService(IRepositoryService repositoryService) {
 		this.repositoryService = repositoryService;
 	}
+
 	public void setSurveyAttachmentDao(SurveyAttachmentDAO surveyAttachmentDao) {
 		this.surveyAttachmentDao = surveyAttachmentDao;
 	}
+
 	public void setSurveyDao(SurveyDAO surveyDao) {
 		this.surveyDao = surveyDao;
 	}
+
 	public void setSurveyQuestionDao(SurveyQuestionDAO surveyItemDao) {
-		this.surveyQuestionDao = surveyItemDao;
+		surveyQuestionDao = surveyItemDao;
 	}
+
 	public void setSurveySessionDao(SurveySessionDAO surveySessionDao) {
 		this.surveySessionDao = surveySessionDao;
 	}
+
 	public void setSurveyToolContentHandler(SurveyToolContentHandler surveyToolContentHandler) {
 		this.surveyToolContentHandler = surveyToolContentHandler;
 	}
+
 	public void setSurveyUserDao(SurveyUserDAO surveyUserDao) {
 		this.surveyUserDao = surveyUserDao;
 	}
+
 	public void setToolService(ILamsToolService toolService) {
 		this.toolService = toolService;
 	}
 
-    public IExportToolContentService getExportContentService() {
+	public IExportToolContentService getExportContentService() {
 		return exportContentService;
 	}
 
@@ -1062,29 +1092,35 @@ public class SurveyServiceImpl implements
 		this.exportContentService = exportContentService;
 	}
 
-
 	public IUserManagementService getUserManagementService() {
 		return userManagementService;
 	}
-
 
 	public void setUserManagementService(IUserManagementService userManagementService) {
 		this.userManagementService = userManagementService;
 	}
 
-
 	public ICoreNotebookService getCoreNotebookService() {
 		return coreNotebookService;
 	}
-
 
 	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 		this.coreNotebookService = coreNotebookService;
 	}
 
-
 	public void setSurveyAnswerDao(SurveyAnswerDAO surveyAnswerDao) {
 		this.surveyAnswerDao = surveyAnswerDao;
 	}
 
+	public IEventNotificationService getEventNotificationService() {
+		return eventNotificationService;
+	}
+
+	public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+		this.eventNotificationService = eventNotificationService;
+	}
+
+	public String getLocalisedMessage(String key, Object[] args) {
+		return messageService.getMessage(key, args);
+	}
 }

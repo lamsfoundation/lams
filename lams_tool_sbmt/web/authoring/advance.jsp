@@ -37,6 +37,14 @@
 </p>
 
 <p>
+	<html:checkbox property="notifyTeachersOnFileSubmit" styleId="notifyTeachersOnFileSubmit"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="notifyTeachersOnFileSubmit">
+		<fmt:message key="label.authoring.advanced.notify.onfilesubmit" />
+	</label>
+</p>
+<p>
 	<html:checkbox property="reflectOnActivity" styleClass="noBorder"
 		styleId="reflectOn">
 	</html:checkbox>

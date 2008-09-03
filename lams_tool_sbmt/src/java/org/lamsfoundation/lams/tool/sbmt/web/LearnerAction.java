@@ -246,6 +246,15 @@ public class LearnerAction extends DispatchAction {
 		SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 		ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 		setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
+
+		SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
+		if (content.isNotifyTeachersOnFileSubmit()
+				&& submitFilesService.getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
+						SbmtConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_FILE_SUBMIT, content.getContentID())) {
+			String fullName = learner.getLastName() + " " + learner.getFirstName();
+			submitFilesService.getEventNotificationService().trigger(SbmtConstants.TOOL_SIGNATURE,
+					SbmtConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_FILE_SUBMIT, content.getContentID(), new Object[] { fullName });
+		}
 		return mapping.getInputForward();
 	}
 

@@ -34,9 +34,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler;
 
@@ -47,10 +44,10 @@ import org.lamsfoundation.lams.tool.survey.util.SurveyToolContentHandler;
  * @hibernate.class  table="tl_lasurv11_survey"
  *
  */
-public class Survey implements Cloneable{
-	
+public class Survey implements Cloneable {
+
 	private static final Logger log = Logger.getLogger(Survey.class);
-	
+
 	//key 
 	private Long uid;
 	//tool contentID
@@ -60,151 +57,156 @@ public class Survey implements Cloneable{
 	//advance
 	private boolean showOnePage;
 	private boolean lockWhenFinished;
-	
+
 	private boolean reflectOnActivity;
 	private String reflectInstructions;
-	
+
 	private boolean defineLater;
 	private boolean runOffline;
 	private boolean contentInUse;
+
+	private boolean notifyTeachersOnAnswerSumbit;
 	//instructions
 	private String onlineInstructions;
 	private String offlineInstructions;
 	private Set<SurveyAttachment> attachments;
-	
+
 	//general infomation
 	private Date created;
 	private Date updated;
 	private SurveyUser createdBy;
-	
+
 	//survey Items
 	private Set<SurveyQuestion> questions;
 
-	
 	//*************** NON Persist Fields ********************
 	private IToolContentHandler toolContentHandler;
 
 	private List<SurveyAttachment> onlineFileList;
 	private List<SurveyAttachment> offlineFileList;
+
 	/**
 	 * Default contruction method. 
 	 *
 	 */
-  	public Survey(){
-  		attachments = new HashSet<SurveyAttachment>();
-  		questions = new HashSet<SurveyQuestion>();
-  	}
-//  **********************************************************
-  	//		Function method for Survey
-//  **********************************************************
+	public Survey() {
+		attachments = new HashSet<SurveyAttachment>();
+		questions = new HashSet<SurveyQuestion>();
+	}
+
+	//  **********************************************************
+	//		Function method for Survey
+	//  **********************************************************
 	public static Survey newInstance(Survey defaultContent, Long contentId, SurveyToolContentHandler surveyToolContentHandler) {
 		Survey toContent = new Survey();
 		defaultContent.toolContentHandler = surveyToolContentHandler;
 		toContent = (Survey) defaultContent.clone();
 		toContent.setContentId(contentId);
-		
+
 		//reset user info as well
-		if(toContent.getCreatedBy() != null){
+		if (toContent.getCreatedBy() != null) {
 			toContent.getCreatedBy().setSurvey(toContent);
 			Set<SurveyQuestion> items = toContent.getQuestions();
-			for(SurveyQuestion item:items){
+			for (SurveyQuestion item : items) {
 				item.setCreateBy(toContent.getCreatedBy());
 			}
 		}
 		return toContent;
 	}
-  	public Object clone(){
-  		
-  		Survey survey = null;
-  		try{
-  			survey = (Survey) super.clone();
-  			survey.setUid(null);
-  			if(questions != null){
-  				Iterator iter = questions.iterator();
-  				Set<SurveyQuestion> set = new HashSet<SurveyQuestion>();
-  				while(iter.hasNext()){
-  					SurveyQuestion item = (SurveyQuestion)iter.next(); 
-  					SurveyQuestion newItem = (SurveyQuestion) item.clone();
+
+	@Override
+	public Object clone() {
+
+		Survey survey = null;
+		try {
+			survey = (Survey) super.clone();
+			survey.setUid(null);
+			if (questions != null) {
+				Iterator iter = questions.iterator();
+				Set<SurveyQuestion> set = new HashSet<SurveyQuestion>();
+				while (iter.hasNext()) {
+					SurveyQuestion item = (SurveyQuestion) iter.next();
+					SurveyQuestion newItem = (SurveyQuestion) item.clone();
 					set.add(newItem);
-  				}
-  				survey.questions = set;
-  			}
-  			//clone attachment
-  			if(attachments != null){
-  				Iterator iter = attachments.iterator();
-  				Set set = new HashSet();
-  				while(iter.hasNext()){
-  					SurveyAttachment file = (SurveyAttachment)iter.next(); 
-  					SurveyAttachment newFile = (SurveyAttachment) file.clone();
-//  				clone old file without duplicate it in repository
-  					
+				}
+				survey.questions = set;
+			}
+			//clone attachment
+			if (attachments != null) {
+				Iterator iter = attachments.iterator();
+				Set set = new HashSet();
+				while (iter.hasNext()) {
+					SurveyAttachment file = (SurveyAttachment) iter.next();
+					SurveyAttachment newFile = (SurveyAttachment) file.clone();
+					//  				clone old file without duplicate it in repository
+
 					set.add(newFile);
-  				}
-  				survey.attachments = set;
-  			}
-  			//clone ReourceUser as well
-  			if(this.createdBy != null){
-  				survey.setCreatedBy((SurveyUser) this.createdBy.clone());
-  			}
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Survey.class + " failed");
+				}
+				survey.attachments = set;
+			}
+			//clone ReourceUser as well
+			if (createdBy != null) {
+				survey.setCreatedBy((SurveyUser) createdBy.clone());
+			}
 		}
-  		
-  		return survey;
-  	}
+		catch (CloneNotSupportedException e) {
+			Survey.log.error("When clone " + Survey.class + " failed");
+		}
+
+		return survey;
+	}
+
+	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (!(o instanceof Survey))
+		}
+		if (!(o instanceof Survey)) {
 			return false;
+		}
 
 		final Survey genericEntity = (Survey) o;
 
-      	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.title,genericEntity.title)
-      	.append(this.instructions,genericEntity.instructions)
-      	.append(this.onlineInstructions,genericEntity.onlineInstructions)
-      	.append(this.offlineInstructions,genericEntity.offlineInstructions)
-      	.append(this.created,genericEntity.created)
-      	.append(this.updated,genericEntity.updated)
-      	.append(this.createdBy,genericEntity.createdBy)
-      	.isEquals();
+		return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(instructions,
+				genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions).append(
+				offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created).append(updated,
+				genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
 	}
 
+	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title)
-		.append(instructions).append(onlineInstructions)
-		.append(offlineInstructions).append(created)
-		.append(updated).append(createdBy)
-		.toHashCode();
+		return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
+				offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
 	}
-	
+
 	/**
 	 * Updates the modification data for this entity.
 	 */
 	public void updateModificationData() {
-	
+
 		long now = System.currentTimeMillis();
 		if (created == null) {
-			this.setCreated (new Date(now));
+			this.setCreated(new Date(now));
 		}
 		this.setUpdated(new Date(now));
 	}
 
-	public void toDTO(){
+	public void toDTO() {
 		onlineFileList = new ArrayList<SurveyAttachment>();
 		offlineFileList = new ArrayList<SurveyAttachment>();
 		Set<SurveyAttachment> fileSet = this.getAttachments();
-		if(fileSet != null){
-			for(SurveyAttachment file:fileSet){
-				if(StringUtils.equalsIgnoreCase(file.getFileType(),IToolContentHandler.TYPE_OFFLINE))
+		if (fileSet != null) {
+			for (SurveyAttachment file : fileSet) {
+				if (StringUtils.equalsIgnoreCase(file.getFileType(), IToolContentHandler.TYPE_OFFLINE)) {
 					offlineFileList.add(file);
-				else
+				}
+				else {
 					onlineFileList.add(file);
+				}
 			}
 		}
 	}
+
 	//**********************************************************
 	// get/set methods
 	//**********************************************************
@@ -215,7 +217,7 @@ public class Survey implements Cloneable{
 	 * @hibernate.property column="create_date"
 	 */
 	public Date getCreated() {
-      return created;
+		return created;
 	}
 
 	/**
@@ -224,7 +226,7 @@ public class Survey implements Cloneable{
 	 * @param created
 	 */
 	public void setCreated(Date created) {
-	    this.created = created;
+		this.created = created;
 	}
 
 	/**
@@ -234,7 +236,7 @@ public class Survey implements Cloneable{
 	 * @hibernate.property column="update_date"
 	 */
 	public Date getUpdated() {
-        return updated;
+		return updated;
 	}
 
 	/**
@@ -243,31 +245,31 @@ public class Survey implements Cloneable{
 	 * @param updated
 	 */
 	public void setUpdated(Date updated) {
-        this.updated = updated;
+		this.updated = updated;
 	}
 
-    /**
-     * @return Returns the userid of the user who created the Share surveys.
-     *
-     * @hibernate.many-to-one
-     *      cascade="save-update"
-     * 		column="create_by"
-     *
-     */
-    public SurveyUser getCreatedBy() {
-        return createdBy;
-    }
+	/**
+	 * @return Returns the userid of the user who created the Share surveys.
+	 *
+	 * @hibernate.many-to-one
+	 *      cascade="save-update"
+	 * 		column="create_by"
+	 *
+	 */
+	public SurveyUser getCreatedBy() {
+		return createdBy;
+	}
 
-    /**
-     * @param createdBy The userid of the user who created this Share surveys.
-     */
-    public void setCreatedBy(SurveyUser createdBy) {
-        this.createdBy = createdBy;
-    }
+	/**
+	 * @param createdBy The userid of the user who created this Share surveys.
+	 */
+	public void setCreatedBy(SurveyUser createdBy) {
+		this.createdBy = createdBy;
+	}
 
-    /**
-     * @hibernate.id column="uid" generator-class="native"
-     */
+	/**
+	 * @hibernate.id column="uid" generator-class="native"
+	 */
 	public Long getUid() {
 		return uid;
 	}
@@ -294,8 +296,6 @@ public class Survey implements Cloneable{
 		this.title = title;
 	}
 
-	
-
 	/**
 	 * @return Returns the runOffline.
 	 *
@@ -306,99 +306,99 @@ public class Survey implements Cloneable{
 	public boolean getRunOffline() {
 		return runOffline;
 	}
-    
+
 	/**
 	 * @param runOffline The forceOffLine to set.
 	 *
 	 *
 	 */
 	public void setRunOffline(boolean forceOffline) {
-		this.runOffline = forceOffline;
+		runOffline = forceOffline;
 	}
 
-    /**
-     * @return Returns the lockWhenFinish.
-     *
-     * @hibernate.property
-     * 		column="lock_on_finished"
-     *
-     */
-    public boolean getLockWhenFinished() {
-        return lockWhenFinished;
-    }
-
-    /**
-     * @param lockWhenFinished Set to true to lock the survey for finished users.
-     */
-    public void setLockWhenFinished(boolean lockWhenFinished) {
-        this.lockWhenFinished = lockWhenFinished;
-    }
-
-    /**
-     * @return Returns the instructions set by the teacher.
-     *
-     * @hibernate.property
-     * 		column="instructions"
-     *      type="text"
-     */
-    public String getInstructions() {
-        return instructions;
-    }
-
-    public void setInstructions(String instructions) {
-        this.instructions = instructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     *
-     * @hibernate.property
-     * 		column="online_instructions"
-     *      type="text"
-     */
-    public String getOnlineInstructions() {
-        return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-        this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     *
-     * @hibernate.property
-     * 		column="offline_instructions"
-     *      type="text"
-     */
-    public String getOfflineInstructions() {
-        return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-        this.offlineInstructions = offlineInstructions;
-    }
+	/**
+	 * @return Returns the lockWhenFinish.
+	 *
+	 * @hibernate.property
+	 * 		column="lock_on_finished"
+	 *
+	 */
+	public boolean getLockWhenFinished() {
+		return lockWhenFinished;
+	}
 
 	/**
-     *
-     * @hibernate.set   lazy="true"
-     * 					cascade="all"
-     * 					inverse="false"
-     * 					order-by="create_date desc"
-     * @hibernate.collection-key column="survey_uid"
-     * @hibernate.collection-one-to-many
-     * 			class="org.lamsfoundation.lams.tool.survey.model.SurveyAttachment"
-     *
-     * @return a set of Attachments to this Message.
-     */
+	 * @param lockWhenFinished Set to true to lock the survey for finished users.
+	 */
+	public void setLockWhenFinished(boolean lockWhenFinished) {
+		this.lockWhenFinished = lockWhenFinished;
+	}
+
+	/**
+	 * @return Returns the instructions set by the teacher.
+	 *
+	 * @hibernate.property
+	 * 		column="instructions"
+	 *      type="text"
+	 */
+	public String getInstructions() {
+		return instructions;
+	}
+
+	public void setInstructions(String instructions) {
+		this.instructions = instructions;
+	}
+
+	/**
+	 * @return Returns the onlineInstructions set by the teacher.
+	 *
+	 * @hibernate.property
+	 * 		column="online_instructions"
+	 *      type="text"
+	 */
+	public String getOnlineInstructions() {
+		return onlineInstructions;
+	}
+
+	public void setOnlineInstructions(String onlineInstructions) {
+		this.onlineInstructions = onlineInstructions;
+	}
+
+	/**
+	 * @return Returns the onlineInstructions set by the teacher.
+	 *
+	 * @hibernate.property
+	 * 		column="offline_instructions"
+	 *      type="text"
+	 */
+	public String getOfflineInstructions() {
+		return offlineInstructions;
+	}
+
+	public void setOfflineInstructions(String offlineInstructions) {
+		this.offlineInstructions = offlineInstructions;
+	}
+
+	/**
+	 *
+	 * @hibernate.set   lazy="true"
+	 * 					cascade="all"
+	 * 					inverse="false"
+	 * 					order-by="create_date desc"
+	 * @hibernate.collection-key column="survey_uid"
+	 * @hibernate.collection-one-to-many
+	 * 			class="org.lamsfoundation.lams.tool.survey.model.SurveyAttachment"
+	 *
+	 * @return a set of Attachments to this Message.
+	 */
 	public Set getAttachments() {
 		return attachments;
 	}
 
-    /*
+	/*
 	 * @param attachments The attachments to set.
-     */
-    public void setAttachments(Set attachments) {
+	 */
+	public void setAttachments(Set attachments) {
 		this.attachments = attachments;
 	}
 
@@ -417,10 +417,10 @@ public class Survey implements Cloneable{
 	public Set<SurveyQuestion> getQuestions() {
 		return questions;
 	}
-	public void setQuestions(Set questions) {
-		this.questions= questions;
-	}
 
+	public void setQuestions(Set questions) {
+		this.questions = questions;
+	}
 
 	/**
 	 * @hibernate.property  column="content_in_use"
@@ -433,6 +433,7 @@ public class Survey implements Cloneable{
 	public void setContentInUse(boolean contentInUse) {
 		this.contentInUse = contentInUse;
 	}
+
 	/**
 	 * @hibernate.property column="define_later"
 	 * @return
@@ -444,6 +445,7 @@ public class Survey implements Cloneable{
 	public void setDefineLater(boolean defineLater) {
 		this.defineLater = defineLater;
 	}
+
 	/**
 	 * @hibernate.property column="content_id" unique="true" 
 	 * @return
@@ -455,18 +457,23 @@ public class Survey implements Cloneable{
 	public void setContentId(Long contentId) {
 		this.contentId = contentId;
 	}
+
 	public List<SurveyAttachment> getOfflineFileList() {
 		return offlineFileList;
 	}
+
 	public void setOfflineFileList(List<SurveyAttachment> offlineFileList) {
 		this.offlineFileList = offlineFileList;
 	}
+
 	public List<SurveyAttachment> getOnlineFileList() {
 		return onlineFileList;
 	}
+
 	public void setOnlineFileList(List<SurveyAttachment> onlineFileList) {
 		this.onlineFileList = onlineFileList;
 	}
+
 	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
 		this.toolContentHandler = toolContentHandler;
 	}
@@ -474,31 +481,48 @@ public class Survey implements Cloneable{
 	/**
 	 * @hibernate.property column="reflect_instructions"
 	 * @return
-	 */	
+	 */
 	public String getReflectInstructions() {
 		return reflectInstructions;
 	}
+
 	public void setReflectInstructions(String reflectInstructions) {
 		this.reflectInstructions = reflectInstructions;
 	}
+
 	/**
 	 * @hibernate.property column="reflect_on_activity"
 	 * @return
-	 */		
+	 */
 	public boolean isReflectOnActivity() {
 		return reflectOnActivity;
 	}
+
 	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
 	}
+
 	/**
 	 * @hibernate.property column="show_questions_on_one_page"
 	 * @return
-	 */	
+	 */
 	public boolean isShowOnePage() {
 		return showOnePage;
 	}
+
 	public void setShowOnePage(boolean showOnePage) {
 		this.showOnePage = showOnePage;
+	}
+
+	/**
+	 * @hibernate.property column="answer_submit_notify"
+	 * @return
+	 */
+	public boolean isNotifyTeachersOnAnswerSumbit() {
+		return notifyTeachersOnAnswerSumbit;
+	}
+
+	public void setNotifyTeachersOnAnswerSumbit(boolean notifyTeachersOnAnswerSumbit) {
+		this.notifyTeachersOnAnswerSumbit = notifyTeachersOnAnswerSumbit;
 	}
 }

@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
@@ -44,9 +45,8 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
  * 
  * Interface that defines the contract that all Survey service provider must follow.
  */
-public interface ISurveyService 
-{
-	
+public interface ISurveyService {
+
 	//******************************************************************************************
 	// Content methods
 	//******************************************************************************************
@@ -56,12 +56,14 @@ public interface ISurveyService
 	 * @return
 	 */
 	Survey getSurveyByContentId(Long contentId);
+
 	/**
 	 * Get survey which is relative with the special toolSession.
 	 * @param sessionId
 	 * @return
 	 */
 	Survey getSurveyBySessionId(Long sessionId);
+
 	/**
 	 * Get a cloned copy of  tool default tool content (Survey) and assign the toolContentId of that copy as the 
 	 * given <code>contentId</code> 
@@ -70,14 +72,13 @@ public interface ISurveyService
 	 * @throws SurveyApplicationException
 	 */
 	Survey getDefaultContent(Long contentId) throws SurveyApplicationException;
-	
 
 	/**
 	 * Save or update survey into database.
 	 * @param Survey
 	 */
 	void saveOrUpdateSurvey(Survey Survey);
-	
+
 	//******************************************************************************************
 	//*************** Instruction file methods **********************
 	//******************************************************************************************
@@ -89,7 +90,7 @@ public interface ISurveyService
 	 * @throws UploadSurveyFileException
 	 */
 	SurveyAttachment uploadInstructionFile(FormFile file, String type) throws UploadSurveyFileException;
-	
+
 	/**
 	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not
 	 * delete the file from repository.
@@ -97,16 +98,18 @@ public interface ISurveyService
 	 * @param attachmentUid
 	 */
 	void deleteSurveyAttachment(Long attachmentUid);
-	
+
 	//******************************************************************************************
 	//*************** Questions and Answers methods **********************
 	//******************************************************************************************
 	SurveyQuestion getQuestion(Long questionUid);
+
 	/**
 	 * Delete resoruce item from database.
 	 * @param uid
 	 */
 	void deleteQuestion(Long uid);
+
 	/**
 	 * Get a learner's all answers in a survey. 
 	 * @param sessionId
@@ -114,6 +117,7 @@ public interface ISurveyService
 	 * @return
 	 */
 	List<AnswerDTO> getQuestionAnswers(Long sessionId, Long userUid);
+
 	/**
 	 * Get question's answer with response percentage infromation.
 	 * @param sessionId
@@ -121,12 +125,13 @@ public interface ISurveyService
 	 * @return
 	 */
 	AnswerDTO getQuestionResponse(Long sessionId, Long questionUid);
-	
+
 	/**
 	 * Commit answers for a group of question together. 
 	 * @param answerList
 	 */
 	void updateAnswerList(List<SurveyAnswer> answerList);
+
 	//******************************************************************************************
 	//********** user methods *************
 	//******************************************************************************************
@@ -134,12 +139,13 @@ public interface ISurveyService
 	 * Create a new user in database.
 	 */
 	void createUser(SurveyUser surveyUser);
+
 	/**
 	 * Get user by given userID and toolContentID.
 	 * @param long1
 	 * @return
 	 */
-	SurveyUser getUserByIDAndContent(Long userID, Long contentId); 
+	SurveyUser getUserByIDAndContent(Long userID, Long contentId);
 
 	/**
 	 * Get user by sessionID and UserID
@@ -147,7 +153,7 @@ public interface ISurveyService
 	 * @param sessionId
 	 * @return
 	 */
-	SurveyUser getUserByIDAndSession(Long long1, Long sessionId); 
+	SurveyUser getUserByIDAndSession(Long long1, Long sessionId);
 
 	/**
 	 * Get user by UID
@@ -169,7 +175,7 @@ public interface ISurveyService
 	/**
 	 * Delete file from repository.
 	 */
-	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SurveyApplicationException ;
+	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SurveyApplicationException;
 
 	//******************************************************************************************
 	//********** Session methods ***********************
@@ -194,9 +200,8 @@ public interface ISurveyService
 	 * @param userId
 	 * @return
 	 */
-	String finishToolSession(Long toolSessionId, Long userId)  throws SurveyApplicationException;
+	String finishToolSession(Long toolSessionId, Long userId) throws SurveyApplicationException;
 
-	
 	//******************************************************************************************
 	//  	Monitoring summary /statistic methods
 	//******************************************************************************************
@@ -205,26 +210,29 @@ public interface ISurveyService
 	 * Return a map which sorted by SurveySession and list of questions for this session. 
 	 */
 
-	SortedMap<SurveySession,List<AnswerDTO>> getSummary(Long contentId);
+	SortedMap<SurveySession, List<AnswerDTO>> getSummary(Long contentId);
+
 	/**
 	 * Return a map which sorted by SurveySesson and a list of total user count in this session.
 	 * @param contentId
 	 * @return
 	 */
 	SortedMap<SurveySession, Integer> getStatistic(Long contentId);
+
 	//******************************************************************************************
 	//  	Export portfolio methods
 	//******************************************************************************************
-	SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByLearner(SurveyUser learner);
-	SortedMap<SurveySession,SortedMap<SurveyQuestion,List<AnswerDTO>>> exportByContentId(Long toolContentID);
-	
+	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByLearner(SurveyUser learner);
+
+	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByContentId(Long toolContentID);
+
 	//This export for exporting Excel format file in Survey monitoring summary page:
 	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportBySessionId(Long toolSessionID);
 
 	//******************************************************************************************
 	//  	NOTEBOOK Functions
 	//******************************************************************************************
-	
+
 	/**
 	 * Create refection entry into notebook tool.
 	 * @param sessionId
@@ -233,7 +241,9 @@ public interface ISurveyService
 	 * @param userId
 	 * @param entryText
 	 */
-	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+			String entryText);
+
 	/**
 	 * Get reflection entry from notebook tool.
 	 * @param sessionId
@@ -248,7 +258,7 @@ public interface ISurveyService
 	 * @param notebookEntry
 	 */
 	public void updateEntry(NotebookEntry notebookEntry);
-	
+
 	/**
 	 * Get Reflect DTO list grouped by sessionID.
 	 * @param contentId
@@ -256,6 +266,14 @@ public interface ISurveyService
 	 */
 	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
+	/**
+	 * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages. 
+	 * @param key key of the message
+	 * @param args arguments for the message
+	 * @return message content
+	 */
+	String getLocalisedMessage(String key, Object[] args);
+
+	IEventNotificationService getEventNotificationService();
 
 }
-

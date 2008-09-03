@@ -30,6 +30,7 @@ import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.Summary;
@@ -44,8 +45,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
  * 
  * Interface that defines the contract that all ShareResource service provider must follow.
  */
-public interface IResourceService 
-{
+public interface IResourceService {
 
 	/**
 	 * Get file <code>IVersiondNode</code> by given package id and path.
@@ -54,14 +54,15 @@ public interface IResourceService
 	 * @return
 	 * @throws ResourceApplicationException
 	 */
-	IVersionedNode getFileNode(Long packageId, String relPathString) throws ResourceApplicationException ;
-	
+	IVersionedNode getFileNode(Long packageId, String relPathString) throws ResourceApplicationException;
+
 	/**
 	 * Get <code>Resource</code> by toolContentID.
 	 * @param contentId
 	 * @return
 	 */
 	Resource getResourceByContentId(Long contentId);
+
 	/**
 	 * Get a cloned copy of  tool default tool content (Resource) and assign the toolContentId of that copy as the 
 	 * given <code>contentId</code> 
@@ -70,13 +71,14 @@ public interface IResourceService
 	 * @throws ResourceApplicationException
 	 */
 	Resource getDefaultContent(Long contentId) throws ResourceApplicationException;
-	
+
 	/**
 	 * Get list of resource items by given resourceUid. These resource items must be created by author.
 	 * @param resourceUid
 	 * @return
 	 */
 	List getAuthoredItems(Long resourceUid);
+
 	/**
 	 * Upload instruciton file into repository.
 	 * @param file
@@ -85,7 +87,7 @@ public interface IResourceService
 	 * @throws UploadResourceFileException
 	 */
 	ResourceAttachment uploadInstructionFile(FormFile file, String type) throws UploadResourceFileException;
-	
+
 	/**
 	 * Upload resource item file to repository. i.e., single file, websize zip file, or learning object zip file.
 	 * @param item
@@ -99,12 +101,13 @@ public interface IResourceService
 	 * Create a new user in database.
 	 */
 	void createUser(ResourceUser resourceUser);
+
 	/**
 	 * Get user by given userID and toolContentID.
 	 * @param long1
 	 * @return
 	 */
-	ResourceUser getUserByIDAndContent(Long userID, Long contentId); 
+	ResourceUser getUserByIDAndContent(Long userID, Long contentId);
 
 	/**
 	 * Get user by sessionID and UserID
@@ -112,20 +115,20 @@ public interface IResourceService
 	 * @param sessionId
 	 * @return
 	 */
-	ResourceUser getUserByIDAndSession(Long long1, Long sessionId); 
-
+	ResourceUser getUserByIDAndSession(Long long1, Long sessionId);
 
 	//********** Repository methods ***********************
 	/**
 	 * Delete file from repository.
 	 */
-	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ResourceApplicationException ;
+	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ResourceApplicationException;
 
 	/**
 	 * Save or update resource into database.
 	 * @param Resource
 	 */
 	void saveOrUpdateResource(Resource Resource);
+
 	/**
 	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not
 	 * delete the file from repository.
@@ -133,24 +136,27 @@ public interface IResourceService
 	 * @param attachmentUid
 	 */
 	void deleteResourceAttachment(Long attachmentUid);
+
 	/**
 	 * Delete resoruce item from database.
 	 * @param uid
 	 */
 	void deleteResourceItem(Long uid);
-	
+
 	/**
 	 * Return all reource items within the given toolSessionID.
 	 * @param sessionId
 	 * @return
 	 */
 	List<ResourceItem> getResourceItemsBySessionId(Long sessionId);
+
 	/**
 	 * Get resource which is relative with the special toolSession.
 	 * @param sessionId
 	 * @return
 	 */
 	Resource getResourceBySessionId(Long sessionId);
+
 	/**
 	 * Get resource toolSession by toolSessionId
 	 * @param sessionId
@@ -163,23 +169,27 @@ public interface IResourceService
 	 * @param resSession
 	 */
 	void saveOrUpdateResourceSession(ResourceSession resSession);
-	
+
 	void retrieveComplete(SortedSet<ResourceItem> resourceItemList, ResourceUser user);
-	void setItemComplete(Long resourceItemUid, Long userId , Long sessionId);
+
+	void setItemComplete(Long resourceItemUid, Long userId, Long sessionId);
+
 	void setItemAccess(Long resourceItemUid, Long userId, Long sessionId);
+
 	/**
 	 * the reqired number minus the count of view of the given user.
 	 * @param userUid
 	 * @return
 	 */
 	int checkMiniView(Long toolSessionId, Long userId);
+
 	/**
 	 * If success return next activity's url, otherwise return null.
 	 * @param toolSessionId
 	 * @param userId
 	 * @return
 	 */
-	String finishToolSession(Long toolSessionId, Long userId)  throws ResourceApplicationException;
+	String finishToolSession(Long toolSessionId, Long userId) throws ResourceApplicationException;
 
 	ResourceItem getResourceItemByUid(Long itemUid);
 
@@ -208,6 +218,7 @@ public interface IResourceService
 	 * @return
 	 */
 	public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
+
 	public List<List<Summary>> exportByContentId(Long contentId);
 
 	/**
@@ -218,7 +229,9 @@ public interface IResourceService
 	 * @param userId
 	 * @param entryText
 	 */
-	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+			String entryText);
+
 	/**
 	 * Get reflection entry from notebook tool.
 	 * @param sessionId
@@ -233,7 +246,7 @@ public interface IResourceService
 	 * @param notebookEntry
 	 */
 	public void updateEntry(NotebookEntry notebookEntry);
-	
+
 	/**
 	 * Get Reflect DTO list grouped by sessionID.
 	 * @param contentId
@@ -247,5 +260,14 @@ public interface IResourceService
 	 * @return
 	 */
 	ResourceUser getUser(Long uid);
-}
 
+	public IEventNotificationService getEventNotificationService();
+
+	/**
+	 * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages. 
+	 * @param key key of the message
+	 * @param args arguments for the message
+	 * @return message content
+	 */
+	String getLocalisedMessage(String key, Object[] args);
+}

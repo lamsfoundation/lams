@@ -61,6 +61,8 @@ public class AuthoringForm extends ValidatorForm {
 
 	private boolean notifyLearnersOnMarkRelease;
 
+	private boolean notifyTeachersOnFileSubmit;
+
 	@Override
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 		lockOnFinished = false;
@@ -104,7 +106,7 @@ public class AuthoringForm extends ValidatorForm {
 			}
 		}
 		setNotifyLearnersOnMarkRelease(content.isNotifyLearnersOnMarkRelease());
-
+		setNotifyTeachersOnFileSubmit(content.isNotifyTeachersOnFileSubmit());
 	}
 
 	//**************************************************
@@ -252,5 +254,13 @@ public class AuthoringForm extends ValidatorForm {
 
 	public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
 		this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
+	}
+
+	public boolean isNotifyTeachersOnFileSubmit() {
+		return notifyTeachersOnFileSubmit;
+	}
+
+	public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
+		this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
 	}
 }

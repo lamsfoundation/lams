@@ -20,6 +20,14 @@
 		<fmt:message key="label.authoring.advance.show.on.one.page" />
 	</label>
 </p>
+<p>
+	<html:checkbox property="survey.notifyTeachersOnAnswerSumbit"
+		styleClass="noBorder" styleId="notifyTeachersOnAnswerSumbit">
+	</html:checkbox>
+	<label for="notifyTeachersOnAnswerSumbit">
+		<fmt:message key="label.authoring.advanced.notify.onanswersubmit" />
+	</label>
+</p>
 
 <p>
 	<html:checkbox property="survey.reflectOnActivity"

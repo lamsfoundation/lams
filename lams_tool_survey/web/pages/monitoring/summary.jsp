@@ -58,7 +58,23 @@
 			</c:choose>	
 		</td>
 	</tr>
-	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advanced.notify.onanswersubmit" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.survey.notifyTeachersOnAnswerSumbit}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+		
+	</tr>
 	<tr>
 		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />

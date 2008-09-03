@@ -76,6 +76,8 @@ public class AuthoringDTO implements Serializable {
 
 	private boolean notifyLearnersOnMarkRelease;
 
+	private boolean notifyTeachersOnFileSubmit;
+
 	public AuthoringDTO() {
 	}
 
@@ -264,5 +266,13 @@ public class AuthoringDTO implements Serializable {
 
 	public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
 		this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
+	}
+
+	public boolean isNotifyTeachersOnFileSubmit() {
+		return notifyTeachersOnFileSubmit;
+	}
+
+	public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
+		this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
 	}
 }

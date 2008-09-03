@@ -9,7 +9,7 @@
 <table-list>
 <table alias="" name="tl_lasbmt11_content" remarks="" uid="935d0:119cae91b03:-7ffe">
 <table-description/>
-<table-figure-bounds height="172" width="184" x="10" y="10"/>
+<table-figure-bounds height="182" width="184" x="10" y="10"/>
 <column-list>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="0" mandatory="true" name="content_id" remarks="" uid="935d0:119cae91b03:-7ffc">
 <column-description/>
@@ -120,6 +120,19 @@
 <variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
 </data-type>
 </column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="0" mandatory="false" name="file_submit_notify" remarks="" uid="120fac0:11c25acc4f7:-7f88">
+<column-description/>
+<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT">
+<variant type-name-pattern="TINYINT"/>
+<variant type-name-pattern="TINYINT UNSIGNED"/>
+<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="TINYINT ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
+</data-type>
+</column>
 </column-list>
 <primary-key alias="" name="PRIMARY" remarks="" uid="935d0:119cae91b03:-7ffd">
 <primary-key-description/>
@@ -128,7 +141,7 @@
 <unique-key-list/>
 <foreign-key-list/>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" uid="935d0:119cae91b03:-7ff2" unique="false">
+<index alias="" name="PRIMARY_CONTENT" remarks="" uid="935d0:119cae91b03:-7ff2" unique="false">
 <index-description/>
 <index-column name="content_id" sort="ASC"/>
 </index>
@@ -220,7 +233,7 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" uid="935d0:119cae91b03:-7fe9" unique="false">
+<index alias="" name="PRIMARY_INSTRUCION_FILES" remarks="" uid="935d0:119cae91b03:-7fe9" unique="false">
 <index-description/>
 <index-column name="file_id" sort="ASC"/>
 </index>
@@ -285,7 +298,7 @@
 <unique-key-list/>
 <foreign-key-list/>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" uid="935d0:119cae91b03:-7fe1" unique="false">
+<index alias="" name="PRIMARY_REPORT" remarks="" uid="935d0:119cae91b03:-7fe1" unique="false">
 <index-description/>
 <index-column name="report_id" sort="ASC"/>
 </index>
@@ -357,7 +370,7 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" uid="935d0:119cae91b03:-7fda" unique="false">
+<index alias="" name="PRIMARY_SESSION" remarks="" uid="935d0:119cae91b03:-7fda" unique="false">
 <index-description/>
 <index-column name="session_id" sort="ASC"/>
 </index>
@@ -431,7 +444,7 @@
 <unique-key-list/>
 <foreign-key-list/>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" uid="935d0:119cae91b03:-7fd2" unique="false">
+<index alias="" name="PRIMARY_SESSION_LEARNERS" remarks="" uid="935d0:119cae91b03:-7fd2" unique="false">
 <index-description/>
 <index-column name="learner_id" sort="ASC"/>
 </index>
@@ -549,7 +562,7 @@
 </foreign-key>
 </foreign-key-list>
 <index-list>
-<index alias="" name="PRIMARY" remarks="" uid="935d0:119cae91b03:-7fc7" unique="false">
+<index alias="" name="PRIMARY_SUBMISSION_DETAILS" remarks="" uid="935d0:119cae91b03:-7fc7" unique="false">
 <index-description/>
 <index-column name="submission_id" sort="ASC"/>
 </index>

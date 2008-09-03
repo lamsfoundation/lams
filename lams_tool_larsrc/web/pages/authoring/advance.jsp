@@ -64,6 +64,15 @@
 </p>
 
 <p>
+	<html:checkbox property="resource.notifyTeachersOnAssigmentSumbit"
+		styleClass="noBorder" styleId="notifyTeachersOnAssigmentSumbit">
+	</html:checkbox>
+	<label for="notifyTeachersOnAssigmentSumbit">
+		<fmt:message key="label.authoring.advanced.notify.onassigmentsubmit" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="resource.reflectOnActivity"
 		styleClass="noBorder" styleId="reflectOn">
 	</html:checkbox>

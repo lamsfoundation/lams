@@ -182,6 +182,14 @@
             column="mark_release_notify"
         />
 
+        <property
+            name="notifyTeachersOnFileSubmit"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="file_submit_notify"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-SubmitFilesContent.xml

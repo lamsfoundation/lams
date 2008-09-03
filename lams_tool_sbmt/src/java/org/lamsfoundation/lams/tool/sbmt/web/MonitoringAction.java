@@ -37,6 +37,7 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -49,6 +50,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
@@ -62,10 +64,12 @@ import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -136,6 +140,20 @@ public class MonitoringAction extends LamsDispatchAction {
 		DynaActionForm smbtMonitoringForm = (DynaActionForm) form;
 		//		smbtMonitoringForm.set("currentTab", WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
 
+		if (persistContent.isNotifyTeachersOnFileSubmit()) {
+			//Since we don't know if the event exists, we just try to create it.
+			submitFilesService.getEventNotificationService().createEvent(SbmtConstants.TOOL_SIGNATURE,
+					SbmtConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_FILE_SUBMIT, contentID,
+					submitFilesService.getLocalisedMessage("event.file.submit.subject", null),
+					submitFilesService.getLocalisedMessage("event.file.submit.body", null));
+
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			//Now we subscribe the teacher
+			submitFilesService.getEventNotificationService().subscribe(SbmtConstants.TOOL_SIGNATURE,
+					SbmtConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_FILE_SUBMIT, contentID, user.getUserID().longValue(),
+					IEventNotificationService.DELIVERY_METHOD_MAIL, IEventNotificationService.PERIODICITY_SINGLE);
+		}
 		return mapping.findForward("success");
 	}
 

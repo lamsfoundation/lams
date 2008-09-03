@@ -25,6 +25,7 @@ create table tl_lasbmt11_content (
    created_by bigint, 
    updated datetime,
    mark_release_notify tinyint DEFAULT 0,
+   file_submit_notify tinyint DEFAULT 0,
    primary key (content_id)
 )TYPE=InnoDB;
 create table tl_lasbmt11_user (

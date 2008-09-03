@@ -94,6 +94,22 @@
 	
 	<tr>
 		<td>
+			<fmt:message key="label.authoring.advanced.notify.onassigmentsubmit" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.resource.notifyTeachersOnAssigmentSumbit == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	<tr>
+		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />
 		</td>
 		

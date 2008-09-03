@@ -60,6 +60,8 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
 	private boolean notifyLearnersOnMarkRelease;
 
+	private boolean notifyTeachersOnFileSubmit;
+
 	//instruction tab fields
 	private String offlineInstruction;
 
@@ -406,5 +408,17 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
 	public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
 		this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
+	}
+
+	/**
+	 * @hibernate.property column="file_submit_notify"
+	 * @return
+	 */
+	public boolean isNotifyTeachersOnFileSubmit() {
+		return notifyTeachersOnFileSubmit;
+	}
+
+	public void setNotifyTeachersOnFileSubmit(boolean notifyTeachersOnFileSubmit) {
+		this.notifyTeachersOnFileSubmit = notifyTeachersOnFileSubmit;
 	}
 }

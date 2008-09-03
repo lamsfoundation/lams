@@ -25,80 +25,133 @@ package org.lamsfoundation.lams.tool.rsrc;
 
 public class ResourceConstants {
 	public static final String TOOL_SIGNATURE = "larsrc11";
+
 	public static final String RESOURCE_SERVICE = "resourceService";
+
 	public static final String TOOL_CONTENT_HANDLER_NAME = "resourceToolContentHandler";
 
 	public static final int COMPLETED = 1;
-	
+
 	//resource type;
 	public static final short RESOURCE_TYPE_URL = 1;
+
 	public static final short RESOURCE_TYPE_FILE = 2;
+
 	public static final short RESOURCE_TYPE_WEBSITE = 3;
+
 	public static final short RESOURCE_TYPE_LEARNING_OBJECT = 4;
-	
+
 	//for action forward name
 	public static final String SUCCESS = "success";
+
 	public static final String ERROR = "error";
+
 	public static final String DEFINE_LATER = "definelater";
-	
+
 	//for parameters' name
 	public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
-	public static final String PARAM_TOOL_SESSION_ID = "toolSessionID"; 
+
+	public static final String PARAM_TOOL_SESSION_ID = "toolSessionID";
+
 	public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
+
 	public static final String PARAM_FILE_UUID = "fileUuid";
+
 	public static final String PARAM_ITEM_INDEX = "itemIndex";
+
 	public static final String PARAM_RESOURCE_ITEM_UID = "itemUid";
+
 	public static final String PARAM_CURRENT_INSTRUCTION_INDEX = "insIdx";
+
 	public static final String PARAM_RUN_OFFLINE = "runOffline";
+
 	public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
+
 	public static final String PARAM_TITLE = "title";
-	
+
 	//for request attribute name
 	public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
-	public static final String ATTR_TOOL_SESSION_ID = "toolSessionID"; 
+
+	public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
+
 	public static final String ATTR_INSTRUCTION_LIST = "instructionList";
+
 	public static final String ATTR_RESOURCE_ITEM_LIST = "resourceList";
+
 	public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
+
 	public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteResourceList";
+
 	public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
-	public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST =  "deletedItemAttachmmentList";;
+
+	public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
+
 	public static final String ATT_LEARNING_OBJECT = "cpPackage";
+
 	public static final String ATTR_RESOURCE_REVIEW_URL = "resourceItemReviewUrl";
+
 	public static final String ATTR_RESOURCE = "resource";
+
 	public static final String ATTR_RUN_AUTO = "runAuto";
+
 	public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
+
 	public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
+
 	public static final String ATTR_SUMMARY_LIST = "summaryList";
+
 	public static final String ATTR_USER_LIST = "userList";
+
 	public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";
+
 	public static final String ATTR_FINISH_LOCK = "finishedLock";
+
 	public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
+
 	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
+
 	public static final String ATTR_RESOURCE_FORM = "resourceForm";
+
 	public static final String ATTR_ADD_RESOURCE_TYPE = "addType";
+
 	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
+
 	public static final String ATTR_TITLE = "title";
+
 	public static final String ATTR_INSTRUCTIONS = "instructions";
+
 	public static final String ATTR_USER_FINISHED = "userFinished";
-	
+
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
+
 	public static final String ERROR_MSG_URL_BLANK = "error.resource.item.url.blank";
+
 	public static final String ERROR_MSG_DESC_BLANK = "error.resource.item.desc.blank";
+
 	public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
+
 	public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
+
 	public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
-	
-	
+
 	public static final String PAGE_EDITABLE = "isPageEditable";
+
 	public static final String MODE_AUTHOR_SESSION = "author_session";
+
 	public static final String ATTR_REFLECTION_ON = "reflectOn";
+
 	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
+
 	public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-	
+
 	public static final String ATTR_REFLECT_LIST = "reflectList";
+
 	public static final String ATTR_USER_UID = "userUid";
 
 	public static final String DEFUALT_PROTOCOL_REFIX = "http://";
+
 	public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
+
+	public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";
 }

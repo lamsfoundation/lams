@@ -42,7 +42,8 @@ create table tl_larsrc11_resource (
    mini_view_resource_number integer,
    allow_auto_run tinyint,
    reflect_instructions varchar(255), 
-   reflect_on_activity smallint, 
+   reflect_on_activity smallint,
+   assigment_submit_notify tinyint DEFAULT 0,
    primary key (uid)
 )type=innodb;
 create table tl_larsrc11_resource_item (

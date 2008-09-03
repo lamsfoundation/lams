@@ -34,9 +34,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 
@@ -47,168 +44,193 @@ import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
  * @hibernate.class  table="tl_larsrc11_resource"
  *
  */
-public class Resource implements Cloneable{
-	
+public class Resource implements Cloneable {
+
 	private static final Logger log = Logger.getLogger(Resource.class);
-	
+
 	//key 
 	private Long uid;
+
 	//tool contentID
 	private Long contentId;
+
 	private String title;
+
 	private String instructions;
+
 	//advance
 	private boolean runOffline;
+
 	private boolean runAuto;
+
 	private int miniViewResourceNumber;
+
 	private boolean allowAddFiles;
+
 	private boolean allowAddUrls;
-	
+
 	private boolean lockWhenFinished;
+
 	private boolean defineLater;
+
 	private boolean contentInUse;
+
+	private boolean notifyTeachersOnAssigmentSumbit;
+
 	//instructions
 	private String onlineInstructions;
+
 	private String offlineInstructions;
+
 	private Set attachments;
-	
+
 	//general infomation
 	private Date created;
+
 	private Date updated;
+
 	private ResourceUser createdBy;
-	
+
 	//resource Items
 	private Set resourceItems;
-	
+
 	private boolean reflectOnActivity;
+
 	private String reflectInstructions;
-	
+
 	//*************** NON Persist Fields ********************
 	private IToolContentHandler toolContentHandler;
 
 	private String miniViewNumberStr;
+
 	private List<ResourceAttachment> onlineFileList;
+
 	private List<ResourceAttachment> offlineFileList;
+
 	/**
 	 * Default contruction method. 
 	 *
 	 */
-  	public Resource(){
-  		attachments = new HashSet();
-  		resourceItems = new HashSet();
-  	}
-//  **********************************************************
-  	//		Function method for Resource
-//  **********************************************************
-	public static Resource newInstance(Resource defaultContent, Long contentId, ResourceToolContentHandler resourceToolContentHandler) {
+	public Resource() {
+		attachments = new HashSet();
+		resourceItems = new HashSet();
+	}
+
+	//  **********************************************************
+	//		Function method for Resource
+	//  **********************************************************
+	public static Resource newInstance(Resource defaultContent, Long contentId,
+			ResourceToolContentHandler resourceToolContentHandler) {
 		Resource toContent = new Resource();
 		defaultContent.toolContentHandler = resourceToolContentHandler;
 		toContent = (Resource) defaultContent.clone();
 		toContent.setContentId(contentId);
-		
+
 		//reset user info as well
-		if(toContent.getCreatedBy() != null){
+		if (toContent.getCreatedBy() != null) {
 			toContent.getCreatedBy().setResource(toContent);
 			Set<ResourceItem> items = toContent.getResourceItems();
-			for(ResourceItem item:items){
+			for (ResourceItem item : items) {
 				item.setCreateBy(toContent.getCreatedBy());
 			}
 		}
 		return toContent;
 	}
-  	public Object clone(){
-  		
-  		Resource resource = null;
-  		try{
-  			resource = (Resource) super.clone();
-  			resource.setUid(null);
-  			if(resourceItems != null){
-  				Iterator iter = resourceItems.iterator();
-  				Set set = new HashSet();
-  				while(iter.hasNext()){
-  					ResourceItem item = (ResourceItem)iter.next(); 
-  					ResourceItem newItem = (ResourceItem) item.clone();
-//  				just clone old file without duplicate it in repository
+
+	@Override
+	public Object clone() {
+
+		Resource resource = null;
+		try {
+			resource = (Resource) super.clone();
+			resource.setUid(null);
+			if (resourceItems != null) {
+				Iterator iter = resourceItems.iterator();
+				Set set = new HashSet();
+				while (iter.hasNext()) {
+					ResourceItem item = (ResourceItem) iter.next();
+					ResourceItem newItem = (ResourceItem) item.clone();
+					//  				just clone old file without duplicate it in repository
 					set.add(newItem);
-  				}
-  				resource.resourceItems = set;
-  			}
-  			//clone attachment
-  			if(attachments != null){
-  				Iterator iter = attachments.iterator();
-  				Set set = new HashSet();
-  				while(iter.hasNext()){
-  					ResourceAttachment file = (ResourceAttachment)iter.next(); 
-  					ResourceAttachment newFile = (ResourceAttachment) file.clone();
-//  				just clone old file without duplicate it in repository
-  					
+				}
+				resource.resourceItems = set;
+			}
+			//clone attachment
+			if (attachments != null) {
+				Iterator iter = attachments.iterator();
+				Set set = new HashSet();
+				while (iter.hasNext()) {
+					ResourceAttachment file = (ResourceAttachment) iter.next();
+					ResourceAttachment newFile = (ResourceAttachment) file.clone();
+					//  				just clone old file without duplicate it in repository
+
 					set.add(newFile);
-  				}
-  				resource.attachments = set;
-  			}
-  			//clone ReourceUser as well
-  			if(this.createdBy != null){
-  				resource.setCreatedBy((ResourceUser) this.createdBy.clone());
-  			}
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Resource.class + " failed");
+				}
+				resource.attachments = set;
+			}
+			//clone ReourceUser as well
+			if (createdBy != null) {
+				resource.setCreatedBy((ResourceUser) createdBy.clone());
+			}
 		}
-  		
-  		return resource;
-  	}
+		catch (CloneNotSupportedException e) {
+			Resource.log.error("When clone " + Resource.class + " failed");
+		}
+
+		return resource;
+	}
+
+	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (!(o instanceof Resource))
+		}
+		if (!(o instanceof Resource)) {
 			return false;
+		}
 
 		final Resource genericEntity = (Resource) o;
 
-      	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.title,genericEntity.title)
-      	.append(this.instructions,genericEntity.instructions)
-      	.append(this.onlineInstructions,genericEntity.onlineInstructions)
-      	.append(this.offlineInstructions,genericEntity.offlineInstructions)
-      	.append(this.created,genericEntity.created)
-      	.append(this.updated,genericEntity.updated)
-      	.append(this.createdBy,genericEntity.createdBy)
-      	.isEquals();
+		return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(instructions,
+				genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions).append(
+				offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created).append(updated,
+				genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
 	}
 
+	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title)
-		.append(instructions).append(onlineInstructions)
-		.append(offlineInstructions).append(created)
-		.append(updated).append(createdBy)
-		.toHashCode();
+		return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
+				offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
 	}
-	
+
 	/**
 	 * Updates the modification data for this entity.
 	 */
 	public void updateModificationData() {
-	
+
 		long now = System.currentTimeMillis();
 		if (created == null) {
-			this.setCreated (new Date(now));
+			this.setCreated(new Date(now));
 		}
 		this.setUpdated(new Date(now));
 	}
 
-	public void toDTO(){
+	public void toDTO() {
 		onlineFileList = new ArrayList<ResourceAttachment>();
 		offlineFileList = new ArrayList<ResourceAttachment>();
 		Set<ResourceAttachment> fileSet = this.getAttachments();
-		if(fileSet != null){
-			for(ResourceAttachment file:fileSet){
-				if(StringUtils.equalsIgnoreCase(file.getFileType(),IToolContentHandler.TYPE_OFFLINE))
+		if (fileSet != null) {
+			for (ResourceAttachment file : fileSet) {
+				if (StringUtils.equalsIgnoreCase(file.getFileType(), IToolContentHandler.TYPE_OFFLINE)) {
 					offlineFileList.add(file);
-				else
+				}
+				else {
 					onlineFileList.add(file);
+				}
 			}
 		}
 	}
+
 	//**********************************************************
 	// get/set methods
 	//**********************************************************
@@ -219,7 +241,7 @@ public class Resource implements Cloneable{
 	 * @hibernate.property column="create_date"
 	 */
 	public Date getCreated() {
-      return created;
+		return created;
 	}
 
 	/**
@@ -228,7 +250,7 @@ public class Resource implements Cloneable{
 	 * @param created
 	 */
 	public void setCreated(Date created) {
-	    this.created = created;
+		this.created = created;
 	}
 
 	/**
@@ -238,7 +260,7 @@ public class Resource implements Cloneable{
 	 * @hibernate.property column="update_date"
 	 */
 	public Date getUpdated() {
-        return updated;
+		return updated;
 	}
 
 	/**
@@ -247,31 +269,31 @@ public class Resource implements Cloneable{
 	 * @param updated
 	 */
 	public void setUpdated(Date updated) {
-        this.updated = updated;
+		this.updated = updated;
 	}
 
-    /**
-     * @return Returns the userid of the user who created the Share resources.
-     *
-     * @hibernate.many-to-one
-     *      cascade="save-update"
-     * 		column="create_by"
-     *
-     */
-    public ResourceUser getCreatedBy() {
-        return createdBy;
-    }
+	/**
+	 * @return Returns the userid of the user who created the Share resources.
+	 *
+	 * @hibernate.many-to-one
+	 *      cascade="save-update"
+	 * 		column="create_by"
+	 *
+	 */
+	public ResourceUser getCreatedBy() {
+		return createdBy;
+	}
 
-    /**
-     * @param createdBy The userid of the user who created this Share resources.
-     */
-    public void setCreatedBy(ResourceUser createdBy) {
-        this.createdBy = createdBy;
-    }
+	/**
+	 * @param createdBy The userid of the user who created this Share resources.
+	 */
+	public void setCreatedBy(ResourceUser createdBy) {
+		this.createdBy = createdBy;
+	}
 
-    /**
-     * @hibernate.id column="uid" generator-class="native"
-     */
+	/**
+	 * @hibernate.id column="uid" generator-class="native"
+	 */
 	public Long getUid() {
 		return uid;
 	}
@@ -298,8 +320,6 @@ public class Resource implements Cloneable{
 		this.title = title;
 	}
 
-	
-
 	/**
 	 * @return Returns the runOffline.
 	 *
@@ -310,99 +330,99 @@ public class Resource implements Cloneable{
 	public boolean getRunOffline() {
 		return runOffline;
 	}
-    
+
 	/**
 	 * @param runOffline The forceOffLine to set.
 	 *
 	 *
 	 */
 	public void setRunOffline(boolean forceOffline) {
-		this.runOffline = forceOffline;
+		runOffline = forceOffline;
 	}
 
-    /**
-     * @return Returns the lockWhenFinish.
-     *
-     * @hibernate.property
-     * 		column="lock_on_finished"
-     *
-     */
-    public boolean getLockWhenFinished() {
-        return lockWhenFinished;
-    }
-
-    /**
-     * @param lockWhenFinished Set to true to lock the resource for finished users.
-     */
-    public void setLockWhenFinished(boolean lockWhenFinished) {
-        this.lockWhenFinished = lockWhenFinished;
-    }
-
-    /**
-     * @return Returns the instructions set by the teacher.
-     *
-     * @hibernate.property
-     * 		column="instructions"
-     *      type="text"
-     */
-    public String getInstructions() {
-        return instructions;
-    }
-
-    public void setInstructions(String instructions) {
-        this.instructions = instructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     *
-     * @hibernate.property
-     * 		column="online_instructions"
-     *      type="text"
-     */
-    public String getOnlineInstructions() {
-        return onlineInstructions;
-    }
-
-    public void setOnlineInstructions(String onlineInstructions) {
-        this.onlineInstructions = onlineInstructions;
-    }
-
-    /**
-     * @return Returns the onlineInstructions set by the teacher.
-     *
-     * @hibernate.property
-     * 		column="offline_instructions"
-     *      type="text"
-     */
-    public String getOfflineInstructions() {
-        return offlineInstructions;
-    }
-
-    public void setOfflineInstructions(String offlineInstructions) {
-        this.offlineInstructions = offlineInstructions;
-    }
+	/**
+	 * @return Returns the lockWhenFinish.
+	 *
+	 * @hibernate.property
+	 * 		column="lock_on_finished"
+	 *
+	 */
+	public boolean getLockWhenFinished() {
+		return lockWhenFinished;
+	}
 
 	/**
-     *
-     * @hibernate.set   lazy="true"
-     * 					cascade="all"
-     * 					inverse="false"
-     * 					order-by="create_date desc"
-     * @hibernate.collection-key column="resource_uid"
-     * @hibernate.collection-one-to-many
-     * 			class="org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment"
-     *
-     * @return a set of Attachments to this Message.
-     */
+	 * @param lockWhenFinished Set to true to lock the resource for finished users.
+	 */
+	public void setLockWhenFinished(boolean lockWhenFinished) {
+		this.lockWhenFinished = lockWhenFinished;
+	}
+
+	/**
+	 * @return Returns the instructions set by the teacher.
+	 *
+	 * @hibernate.property
+	 * 		column="instructions"
+	 *      type="text"
+	 */
+	public String getInstructions() {
+		return instructions;
+	}
+
+	public void setInstructions(String instructions) {
+		this.instructions = instructions;
+	}
+
+	/**
+	 * @return Returns the onlineInstructions set by the teacher.
+	 *
+	 * @hibernate.property
+	 * 		column="online_instructions"
+	 *      type="text"
+	 */
+	public String getOnlineInstructions() {
+		return onlineInstructions;
+	}
+
+	public void setOnlineInstructions(String onlineInstructions) {
+		this.onlineInstructions = onlineInstructions;
+	}
+
+	/**
+	 * @return Returns the onlineInstructions set by the teacher.
+	 *
+	 * @hibernate.property
+	 * 		column="offline_instructions"
+	 *      type="text"
+	 */
+	public String getOfflineInstructions() {
+		return offlineInstructions;
+	}
+
+	public void setOfflineInstructions(String offlineInstructions) {
+		this.offlineInstructions = offlineInstructions;
+	}
+
+	/**
+	 *
+	 * @hibernate.set   lazy="true"
+	 * 					cascade="all"
+	 * 					inverse="false"
+	 * 					order-by="create_date desc"
+	 * @hibernate.collection-key column="resource_uid"
+	 * @hibernate.collection-one-to-many
+	 * 			class="org.lamsfoundation.lams.tool.rsrc.model.ResourceAttachment"
+	 *
+	 * @return a set of Attachments to this Message.
+	 */
 	public Set getAttachments() {
 		return attachments;
 	}
 
-    /*
+	/*
 	 * @param attachments The attachments to set.
-     */
-    public void setAttachments(Set attachments) {
+	 */
+	public void setAttachments(Set attachments) {
 		this.attachments = attachments;
 	}
 
@@ -421,10 +441,10 @@ public class Resource implements Cloneable{
 	public Set getResourceItems() {
 		return resourceItems;
 	}
-	public void setResourceItems(Set resourceItems) {
-		this.resourceItems= resourceItems;
-	}
 
+	public void setResourceItems(Set resourceItems) {
+		this.resourceItems = resourceItems;
+	}
 
 	/**
 	 * @hibernate.property  column="content_in_use"
@@ -437,6 +457,7 @@ public class Resource implements Cloneable{
 	public void setContentInUse(boolean contentInUse) {
 		this.contentInUse = contentInUse;
 	}
+
 	/**
 	 * @hibernate.property column="define_later"
 	 * @return
@@ -448,6 +469,7 @@ public class Resource implements Cloneable{
 	public void setDefineLater(boolean defineLater) {
 		this.defineLater = defineLater;
 	}
+
 	/**
 	 * @hibernate.property column="content_id" unique="true" 
 	 * @return
@@ -459,6 +481,7 @@ public class Resource implements Cloneable{
 	public void setContentId(Long contentId) {
 		this.contentId = contentId;
 	}
+
 	/**
 	 * @hibernate.property column="allow_add_files"
 	 * @return
@@ -466,9 +489,11 @@ public class Resource implements Cloneable{
 	public boolean isAllowAddFiles() {
 		return allowAddFiles;
 	}
+
 	public void setAllowAddFiles(boolean allowAddFiles) {
 		this.allowAddFiles = allowAddFiles;
 	}
+
 	/**
 	 * @hibernate.property column="allow_add_urls"
 	 * @return
@@ -476,9 +501,11 @@ public class Resource implements Cloneable{
 	public boolean isAllowAddUrls() {
 		return allowAddUrls;
 	}
+
 	public void setAllowAddUrls(boolean allowAddUrls) {
 		this.allowAddUrls = allowAddUrls;
 	}
+
 	/**
 	 *  @hibernate.property column="mini_view_resource_number"
 	 * @return
@@ -486,9 +513,11 @@ public class Resource implements Cloneable{
 	public int getMiniViewResourceNumber() {
 		return miniViewResourceNumber;
 	}
+
 	public void setMiniViewResourceNumber(int minViewResourceNumber) {
-		this.miniViewResourceNumber = minViewResourceNumber;
+		miniViewResourceNumber = minViewResourceNumber;
 	}
+
 	/**
 	 * @hibernate.property column="allow_auto_run"
 	 * @return
@@ -496,9 +525,11 @@ public class Resource implements Cloneable{
 	public boolean isRunAuto() {
 		return runAuto;
 	}
+
 	public void setRunAuto(boolean runAuto) {
 		this.runAuto = runAuto;
 	}
+
 	/**
 	 * For display use
 	 * @return
@@ -506,21 +537,27 @@ public class Resource implements Cloneable{
 	public String getMiniViewNumberStr() {
 		return miniViewNumberStr;
 	}
+
 	public void setMiniViewNumberStr(String minViewNumber) {
-		this.miniViewNumberStr = minViewNumber;
+		miniViewNumberStr = minViewNumber;
 	}
+
 	public List<ResourceAttachment> getOfflineFileList() {
 		return offlineFileList;
 	}
+
 	public void setOfflineFileList(List<ResourceAttachment> offlineFileList) {
 		this.offlineFileList = offlineFileList;
 	}
+
 	public List<ResourceAttachment> getOnlineFileList() {
 		return onlineFileList;
 	}
+
 	public void setOnlineFileList(List<ResourceAttachment> onlineFileList) {
 		this.onlineFileList = onlineFileList;
 	}
+
 	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
 		this.toolContentHandler = toolContentHandler;
 	}
@@ -528,21 +565,36 @@ public class Resource implements Cloneable{
 	/**
 	 * @hibernate.property column="reflect_instructions"
 	 * @return
-	 */	
+	 */
 	public String getReflectInstructions() {
 		return reflectInstructions;
 	}
+
 	public void setReflectInstructions(String reflectInstructions) {
 		this.reflectInstructions = reflectInstructions;
 	}
+
 	/**
 	 * @hibernate.property column="reflect_on_activity"
 	 * @return
-	 */		
+	 */
 	public boolean isReflectOnActivity() {
 		return reflectOnActivity;
 	}
+
 	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	/**
+	 * @hibernate.property column="assigment_submit_notify"
+	 * @return
+	 */
+	public boolean isNotifyTeachersOnAssigmentSumbit() {
+		return notifyTeachersOnAssigmentSumbit;
+	}
+
+	public void setNotifyTeachersOnAssigmentSumbit(boolean notifyTeachersOnAssigmentSumbit) {
+		this.notifyTeachersOnAssigmentSumbit = notifyTeachersOnAssigmentSumbit;
 	}
 }

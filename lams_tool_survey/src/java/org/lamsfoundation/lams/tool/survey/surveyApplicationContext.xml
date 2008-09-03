@@ -111,7 +111,10 @@
    			<ref bean="exportToolContentService"/>
    		</property>
    		<property name="messageService"><ref bean="lasurvMessageService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   		
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   	
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>   	
     </bean>
 
     <bean id="lasurvSurveyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

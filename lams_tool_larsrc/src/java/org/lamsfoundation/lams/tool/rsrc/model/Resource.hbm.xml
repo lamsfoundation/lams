@@ -212,6 +212,14 @@
             column="reflect_on_activity"
         />
 
+        <property
+            name="notifyTeachersOnAssigmentSumbit"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="assigment_submit_notify"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Resource.xml
