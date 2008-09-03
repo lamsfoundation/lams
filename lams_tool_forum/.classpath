@@ -8,8 +8,8 @@
 	<classpathentry sourcepath="/lams_contentrepository" kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE13_CONTAINER"/>
 	<classpathentry sourcepath="/lams_learning" kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
-	<classpathentry kind="lib" path="D:/jboss-4.0.2/server/default/deploy/jboss-hibernate.deployer/jboss-hibernate.jar"/>
-	<classpathentry kind="lib" path="D:/jboss-4.0.2/server/default/lib/jboss-cache.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deploy/jboss-hibernate.deployer/jboss-hibernate.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-cache.jar"/>
 	<classpathentry sourcepath="/lams_central/src" kind="lib" path="/lams_build/lib/lams/lams-central.jar"/>
 	<classpathentry kind="output" path="classes/java"/>
 </classpath>

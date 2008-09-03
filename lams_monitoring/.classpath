@@ -8,8 +8,8 @@
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
 	<classpathentry kind="lib" path="lib/lams/lams-tool-survey.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-central.jar"/>
-	<classpathentry kind="lib" path="/Users/fiona/development/jboss-4.0.2/server/default/lib/jboss-j2ee.jar"/>
-	<classpathentry kind="lib" path="/Users/fiona/development/jboss-4.0.2/server/default/lib/javax.servlet.jsp.jar"/>
-	<classpathentry kind="lib" path="/Users/fiona/development/jboss-4.0.2/server/default/lib/javax.servlet.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jsp.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>
