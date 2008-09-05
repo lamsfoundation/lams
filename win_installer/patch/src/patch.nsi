@@ -50,9 +50,9 @@
 # constants
 !define VERSION "2.1.1"
 !define PREVIOUS_VERSION "2.1"
-!define LANGUAGE_PACK_VERSION "2008-06-19"
-!define LANGUAGE_PACK_VERSION_INT "20080619"
-!define DATE_TIME_STAMP "200806190000"
+!define LANGUAGE_PACK_VERSION "2008-09-05"
+!define LANGUAGE_PACK_VERSION_INT "20080905"
+!define DATE_TIME_STAMP "200809050000"
 ######################## Added in the extra .0 for 2.1 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
@@ -162,7 +162,12 @@ Var WILDFIRE_PASS       ; wildfie password
 ;Var RETAIN_FILES        ; bool value to devide whether to retain files
 Var TIMESTAMP           ; timestamp
 Var BACKUP              ; bool value to determine whether the updater will backup
-Var OLD_LANG_VERSION    ; int to that gets the old language version from the regestry
+
+#LANGUAGE PACK VARIABLES #####
+Var UPDATE_LANGUAGES    ; bool value to determine whether to update languages with language pack
+Var LAMS_DIR            ; directory lams is installed at
+Var VERSION_INT         ; version of the language pack
+Var OLD_LANG_VERSION         ; previous version of language pack
 
 
 
@@ -175,16 +180,6 @@ SectionGroup "LAMS ${VERSION} Patch (Requires LAMS 2.0)" update
         ; Backing up existing lams installation
         call backupLams
        
-        ;ReadRegStr $MYSQL_HOST HKLM "${REG_HEAD}" "mysql_host"
-        ; TODO Change after 2.1, get the port from the registry instead or hard coding it
-        ;ReadRegStr $MYSQL_PORT HKLM "${REG_HEAD}" "mysql_port"
-        ;strcpy $MYSQL_PORT 3360
-        
-        ;${if} $MYSQL_HOST == ""
-        ;    strcpy $MYSQL_HOST "localhost"
-        ;${endif}
-        
-        
         ; removing temporary jboss files
         clearerrors
         Detailprint "Removing $INSTDIR\jboss-4.0.2\server\default\tmp "
@@ -206,6 +201,32 @@ SectionGroup "LAMS ${VERSION} Patch (Requires LAMS 2.0)" update
         
         ; Updating the database to support version
         call updateDatabase
+        
+        # RUNNING THE LANGUAGE PACK ##################
+        call languagePackInit
+        ; copy language files from LAMS projects to a folder in $INSTDIR
+        call copyProjects
+        
+        ; get the language files locations specific to this server from the database
+        ; unpack to $INSTDIR\library\llidx
+        call copyllid
+                        
+        ; Finally, add rows in the database (lams_supported_locale) for all new language files
+        call updateLanguageTables
+        
+        # write this language pack version to registry
+        Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "$VERSION_INT"'
+       
+        DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
+
+        ################################################
+        
+        strcpy $INSTDIR $LAMS_DIR
+        setoutpath $INSTDIR
+        File /a "${DOCUMENTS}\license.txt"
+        File /a "${DOCUMENTS}\license-wrapper.txt"
+        File /a "${DOCUMENTS}\readme.txt"
+     
         
         ; Update the registry
         call WriteRegEntries
@@ -681,10 +702,357 @@ Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "mysql_host" "$MYSQL_HOST"
     WriteRegStr HKLM "${REG_HEAD}" "mysql_port" "$MYSQL_PORT"
     WriteRegStr HKLM "${REG_HEAD}" "version" "${VERSION}"
+    WriteRegStr HKLM "${REG_HEAD}" "language_pack" "${VERSION}"
 FunctionEnd
 
 
+################################################################################
+# CODE USED FOR LANGUAGE PACK                                                  #
+################################################################################
+
+; first, finds the location of the language files in the database
+; then copy the required files to the dirname
+Var CSllid
+Var FSllid
+Var RFllid
+Function copyllid
+    setoutpath "$TEMP\lams"
+    File "${BUILD_DIR}\GetLlidFolderNames.class"
+    
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
+    # execute llid finder
+    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    pop $0
+    pop $CSllid
+    ${if} $0 != '0'
+        Messagebox MB_OK|MB_ICONSTOP "Error while finding Chat and Scrbe llid folders: $CSllid"
+        Abort
+    ${endif}
+    
+    setoutpath "$TEMP\lams"
+    File "${BUILD_DIR}\GetLlidFolderNames.class"
+    
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
+    # execute llid finder
+    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    pop $0
+    pop $FSllid
+    ${if} $0 != '0'
+        Messagebox MB_OK|MB_ICONSTOP "Error while finding Forum and Scribe llid folders"
+        Abort
+    ${endif}
+    
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
+    # execute llid finder
+    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Resource and Forum" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Resources and Forum" "$1" "$DB_USER" "$DB_PASS"'
+    pop $0
+    pop $RFllid
+    ${if} $0 != '0'
+        Messagebox MB_OK|MB_ICONSTOP "Error while finding Resource and Forum llid folders"
+        Abort
+    ${endif}
+    
+    setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$CSllid"
+    file /a "${BASE_PROJECT_DIR}\lams_build\librarypackages\chatscribe\language\lams\*"
+    
+    setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$FSllid"
+    file /a "${BASE_PROJECT_DIR}\lams_build\librarypackages\forumscribe\language\lams\*"
+    
+    setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$RFllid"
+    file /a "${BASE_PROJECT_DIR}\lams_build\librarypackages\shareresourcesforum\language\lams\*"
+    
+FunctionEnd
+
+Function languagePackInit
+    InitPluginsDir
+
+    
+    #get the version in from the version date yyyy-mm-dd
+    call getVersionInt
+ 
+    # getting the mysql database details
+    ReadRegStr $MYSQL_DIR HKLM "${REG_HEAD}" "dir_mysql"
+    ReadRegStr $DB_NAME   HKLM "${REG_HEAD}" "db_name"
+    ReadRegStr $DB_USER   HKLM "${REG_HEAD}" "db_user"
+    ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
+    
+    # Abort install if already installed or if a newer version is installed
+    strcpy $OLD_LANG_VERSION "20061205" ;default old version (Date of First language pack of LAMS2)
+    ReadRegStr $0 HKLM "${REG_HEAD}" "language_pack"
+    ${VersionCompare} "$VERSION_INT" "$0" $1
+    ${If} $1 == "0"
+        DetailPrint "LAMS Language pack already up-to-date"
+        strcpy $UPDATE_LANGUAGES "0"
+        goto done
+    ${EndIf}    
+    ${if} $1 == "2"
+        DetailPrint "LAMS Language pack already up-to-date"
+        goto done
+        strcpy $UPDATE_LANGUAGES "0"
+    ${EndIf}
+    strcpy $UPDATE_LANGUAGES "1"
+    ${If} $0 != ""
+        strcpy $OLD_LANG_VERSION $0
+    ${EndIf}
+    
+    # Abort if there is no version of LAMS2 installed
+    ReadRegStr $0 HKLM "${REG_HEAD}" "version"
+    ${If} $0 = ""
+        MessageBox MB_OK|MB_ICONSTOP "No version of LAMS 2.x is installed$\n$\n\
+                                      Please install LAMS 2 before continuing"
+        Abort
+    ${EndIf}
+    
+    #set the installation directory
+    ReadRegStr $0 HKLM "${REG_HEAD}" "dir_inst"
+    strcpy $LAMS_DIR $0
+    strcpy $INSTDIR "$0\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams"
+    
+    done:
+FunctionEnd
+
+Function getVersionInt
+    push ${LANGUAGE_PACK_VERSION}
+    push "-"
+    push 0
+    push 1
+    call Strtok
+    pop $VERSION_INT
+    
+    push ${LANGUAGE_PACK_VERSION}
+    push "-"
+    push 1
+    push 1
+    call Strtok
+    pop $0
+    strcpy $VERSION_INT "$VERSION_INT$0"
+    
+    push ${LANGUAGE_PACK_VERSION}
+    push "-"
+    push 2
+    push 1
+    call Strtok
+    pop $0
+    strcpy $VERSION_INT "$VERSION_INT$0"
+    
+FunctionEnd
+
+; copies all the lams_blah project language files from lams_blah/conf/languages
+; files are compresses then extracted to the jboss language directory:
+; C:\lams\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams
+Function copyProjects
+
+    setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war\flashxml\"
+    detailprint "Extracting language files for flash"
+    file /a /r "${BASE_PROJECT_DIR}\lams_central\build\lib\lams-central.war\flashxml\*"
+
+    ;copying COMMON project language files
+    setoutpath "$INSTDIR"
+    detailprint "Extracting language files for lams_common"
+    file /a "${BASE_PROJECT_DIR}\lams_common\build\lib\language\org\lamsfoundation\lams\*"
+    
+    ;copying ADMIN project language files
+    setoutpath "$INSTDIR\admin"
+    detailprint "Extracting language files for lams_admin"
+    file /a "${BASE_PROJECT_DIR}\lams_admin\build\lib\language\org\lamsfoundation\lams\admin\*"
+    
+    ;copying CENTRAL project language files
+    setoutpath "$INSTDIR\central"
+    detailprint "Extracting language files for lams_central"
+    file /a "${BASE_PROJECT_DIR}\lams_central\build\lib\language\org\lamsfoundation\lams\central\*"
+    
+    ;copying CONTENTREPOSITORY project language files
+    setoutpath "$INSTDIR\contentrepository"
+    detailprint "Extracting language files for lams_contentrepository"
+    file /a  /x CVS "${BASE_PROJECT_DIR}\lams_contentrepository\conf\language\*"
+    
+    ;copying LEARNING project language files
+    setoutpath "$INSTDIR\learning"
+    detailprint "Extracting language files for lams_learning"
+    file /a "${BASE_PROJECT_DIR}\lams_learning\build\lib\language\org\lamsfoundation\lams\learning\*"
+     
+    ;copying MONITORING project language files
+    setoutpath "$INSTDIR\monitoring"
+    detailprint "Extracting language files for lams_monitoring"
+    file /a  "${BASE_PROJECT_DIR}\lams_monitoring\build\lib\language\org\lamsfoundation\lams\monitoring\*"
+    
+    ;copying TOOL_CHAT project language files
+    setoutpath "$INSTDIR\tool\chat"
+    detailprint "Extracting language files for lams_tool_chat"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_chat\build\deploy\language\*"
+    
+    ;copying TOOL_FORUM project language files
+    setoutpath "$INSTDIR\tool\forum"
+    detailprint "Extracting language files for lams_tool_forum"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_forum\build\deploy\language\*"
+    
+    ;copying TOOL_LAMC project language files
+    setoutpath "$INSTDIR\tool\mc"
+    detailprint "Extracting language files for lams_tool_lamc"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_lamc\build\deploy\language\*"
+    
+    ;copying TOOL_LAQA project language filesh
+    setoutpath "$INSTDIR\tool\qa"
+    detailprint "Extracting language files for lams_tool_laqa"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_laqa\build\deploy\language\*"
+    
+    ;copying TOOL_NOTEBOOK project language files
+    setoutpath "$INSTDIR\tool\notebook"
+    detailprint "Extracting language files for lams_tool_notebook"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_notebook\build\deploy\language\*"
+    
+    ;copying TOOL_NB project language files
+    setoutpath "$INSTDIR\tool\noticeboard"
+    detailprint "Extracting language files for lams_tool_nb"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_nb\build\deploy\language\*"
+    
+    ;copying TOOL_LARSRC project language files
+    setoutpath "$INSTDIR\tool\rsrc"
+    detailprint "Extracting language files for lams_tool_larsrc"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\deploy\language\*"
+
+    ;copying TOOL_SBMT project language files
+    setoutpath "$INSTDIR\tool\sbmt"
+    detailprint "Extracting language files for lams_tool_sbmt"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\deploy\language\*"
+    
+    ;copying TOOL_SCRIBE project language files
+    setoutpath "$INSTDIR\tool\scribe"
+    detailprint "Extracting language files for lams_tool_scribe"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_scribe\build\deploy\language\*"
+    
+    ;copying TOOL_SURVEY project language files
+    setoutpath "$INSTDIR\tool\survey"
+    detailprint "Extracting language files for lams_tool_survey"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_survey\build\deploy\language\*"
+    
+    ;copying TOOL_VOTE project language files
+    setoutpath "$INSTDIR\tool\vote"
+    detailprint "Extracting language files for lams_tool_vote"
+    file /a "${BASE_PROJECT_DIR}\lams_tool_vote\build\deploy\language\*" 
+FunctionEnd
 
 
+Function SplitFirstStrPart
+    Exch $R0
+    Exch
+    Exch $R1
+    Push $R2
+    Push $R3
+    StrCpy $R3 $R1
+    StrLen $R1 $R0
+    IntOp $R1 $R1 + 1
+    loop:
+        IntOp $R1 $R1 - 1
+        StrCpy $R2 $R0 1 -$R1
+        StrCmp $R1 0 exit0
+        StrCmp $R2 $R3 exit1 loop
+    exit0:
+        StrCpy $R1 ""
+        Goto exit2
+    exit1:
+        IntOp $R1 $R1 - 1
+        StrCmp $R1 0 0 +3
+        StrCpy $R2 ""
+        Goto +2
+        StrCpy $R2 $R0 "" -$R1
+        IntOp $R1 $R1 + 1
+        StrCpy $R0 $R0 -$R1
+        StrCpy $R1 $R2
+    exit2:
+        Pop $R3
+        Pop $R2
+        Exch $R1 ;rest
+        Exch
+        Exch $R0 ;first
+FunctionEnd
 
+;checks if the languages in the language pack exist
+;inserts rows into lams_supported_locale iff the languages dont exist 
+Function updateLanguageTables
+    
+    ; get the procedure scripts required
+    setoutpath "$INSTDIR"
+    File /a ${SQL}\updateLocales.sql
+    File /a ${ANT}\LanguagePack.xml
+    
+    
+    setoutpath "$INSTDIR\apache-ant-1.6.5\bin"
+    File /a "${BASE_DIR}\apache-ant-1.6.5\bin\*"
+    
+    setoutpath "$INSTDIR\apache-ant-1.6.5\lib"
+    File /a "${BASE_DIR}\apache-ant-1.6.5\lib\*"
+    
+    ; update locals must be stored as a procedure first
+    ; nsExec wont let me do "mysql < insertLocale.sql"  so i had to use ant
+    ; create installer.properties
+    ClearErrors
+    FileOpen $0 $TEMP\installer.properties w
+    IfErrors 0 +2
+        goto error
+       
+    # convert '\' to '/' for Ant's benefit
+    Push $TEMP
+    Push "\"
+    Call StrSlash
+    Pop $2
+    FileWrite $0 "TEMP=$2$\r$\n"
+            
+    Push $INSTDIR
+    Push "\"
+    Call StrSlash
+    Pop $2
+    FileWrite $0 "INSTDIR=$2/$\r$\n"
+    FileWrite $0 "DB_NAME=$DB_NAME$\r$\n"
+    FileWrite $0 "MYSQL_HOST=$MYSQL_HOST$\r$\n"
+    FileWrite $0 "DB_USER=$DB_USER$\r$\n"
+    FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"
+    Push $LAMS_DIR
+    Push "\"
+    Call StrSlash
+    Pop $2
+    FileWrite $0 "EARDIR=$2/jboss-4.0.2/server/default/deploy/lams.ear$\r$\n"
+
+    copyfiles "$TEMP\installer.properties" $INSTDIR
+    
+    SetOutPath $INSTDIR
+    File /a "${ANT}\LanguagePack.xml"
+
+    ReadRegStr $0 HKLM "${REG_HEAD}" "dir_inst"
+    
+    ; update locals must be stored as a procedure first
+    ; use ANT to store procedures
+    DetailPrint '$0\apache-ant-1.6.5\bin\newAnt.bat insertLocale-db'
+    nsExec::ExecToStack '$0\apache-ant-1.6.5\bin\newAnt.bat -logfile "..\..\..\..\..\..\..\..\..\update-logs\ant-insert-locales.log" -buildfile $INSTDIR\LanguagePack.xml insertLocale-db'
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    DetailPrint "Database insert status: $0"
+    DetailPrint "Database insert output: $1"
+    ${if} $0 != 0
+        goto error
+    ${endif}
+    
+    goto done
+    error:
+        DetailPrint "Ant insertLocale-db failed."
+        MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed."
+    
+    done: 
+        ; remove the sql scripts
+        delete "$INSTDIR\updateLocales.sql"
+        delete "$INSTDIR\LanguagePack.xml"
+        delete "$INSTDIR\installer.properties"
+        rmdir /r "$INSTDIR\apache-ant-1.6.5"
+       
+FunctionEnd
+################################################################################
+# END CODE USED FOR LANGUAGE PACK                                              #
+################################################################################
 
