@@ -18,6 +18,7 @@
 		    <arg line="assembly" />
 			<arg line="docs" />
 			<arg line="bin" />
+			<arg line="language-pack" />
 			<arg line="sql-scripts" />
 		    <arg line="install-lams-patch.sh" />			
 			<arg line="readme" />
