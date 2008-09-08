@@ -223,6 +223,10 @@ backup
 printf "\nApplying $LAMS_VERSION_UPDATE patch, this may take a few moments...\n"
 
 
+printf "\nRemoving jboss caches...\n"
+rm -r $DEFAULT_DIR/work/*
+rm -r $DEFAULT_DIR/tmp/*
+
 ################################################################################
 # 2.1.1 Specific updates
 ################################################################################
