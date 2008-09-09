@@ -137,7 +137,7 @@ j_security_login_page
 				   <a href="<lams:LAMSURL/>forgotPassword.jsp">
                     <fmt:message key="label.forgot.password"/>
                    </a>
-				   &nbsp;
+				   <br/>
 				   <a href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
                     <fmt:message key="label.help"/>
                    </a>
