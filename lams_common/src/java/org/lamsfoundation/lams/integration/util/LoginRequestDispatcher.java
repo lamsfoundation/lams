@@ -124,12 +124,20 @@ public class LoginRequestDispatcher {
 			
 			String parameters = "";
 			
+			if (customCSV != null && extLmsId != null)
+			{
+				parameters += "&" + PARAM_CUSTOM_CSV + "=" + customCSV;
+				parameters += "&" + PARAM_EXT_LMS_ID + "=" + extLmsId;
+			}
+			else
+			{
+				log.error("Parameter customCSV not present");
+			}
+			
 			if (requestSrc != null && notifyCloseURL != null) {
 				try {
 					parameters = "&" + PARAM_REQUEST_SRC + "=" + URLEncoder.encode(requestSrc, "UTF8");
 					parameters += "&" + PARAM_NOTIFY_CLOSE_URL + "=" + URLEncoder.encode(notifyCloseURL, "UTF8");				
-					parameters += "&" + PARAM_CUSTOM_CSV + "=" + customCSV;
-					parameters += "&" + PARAM_EXT_LMS_ID + "=" + extLmsId;
 				} catch (UnsupportedEncodingException e) {
 					log.error(e);
 				}
