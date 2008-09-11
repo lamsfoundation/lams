@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -41,61 +42,66 @@ import org.springframework.dao.DataRetrievalFailureException;
  * @author Manpreet Minhas
  */
 public class GroupingDAO extends BaseDAO implements IGroupingDAO {
-	
-	private final static String GROUPINGS_FOR_LEARNING_DESIGN_VIA_CREATE = "select grouping from "
-		+ Grouping.class.getName() + " grouping, " + GroupingActivity.class.getName() + " grouping_activity "
-		+ " where grouping_activity.learningDesign.id = ? "
-		+ " and grouping_activity.createGrouping = grouping";
-	private final static String GROUPINGS_FOR_LEARNING_DESIGN_VIA_GROUPING =  "select grouping from "
-		+ Grouping.class.getName() + " grouping, " + Activity.class.getName() + " activity "
-		+ " where activity.learningDesign.id = ? "
-		+ " and activity.grouping = grouping";
+
+	private final static String GROUPINGS_FOR_LEARNING_DESIGN_VIA_CREATE = "select grouping from " + Grouping.class.getName()
+			+ " grouping, " + GroupingActivity.class.getName() + " grouping_activity "
+			+ " where grouping_activity.learningDesign.id = ? " + " and grouping_activity.createGrouping = grouping";
+	private final static String GROUPINGS_FOR_LEARNING_DESIGN_VIA_GROUPING = "select grouping from " + Grouping.class.getName()
+			+ " grouping, " + Activity.class.getName() + " activity " + " where activity.learningDesign.id = ? "
+			+ " and activity.grouping = grouping";
 
 	/**
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IGroupingDAO#getGroupingById(java.lang.Long)
 	 */
 	public Grouping getGroupingById(Long groupingID) {
-		Grouping grouping = (Grouping)super.find(Grouping.class,groupingID);
+		Grouping grouping = (Grouping) super.find(Grouping.class, groupingID);
 		return getNonCGLibGrouping(grouping);
 	}
 
-    /**
-     * Returns the list of groupings applicable for the given learning design. This is a combination of the groupings defined 
-     * via a GroupingActivity.createGrouping (which may or may not be applied to any other activities in the design) and groupings
-     * related to branches and which are not attached to a GroupingActivity.
-     */
-   public List<Grouping> getGroupingsByLearningDesign(Long learningDesignId){
-    	List groupingsA = this.getHibernateTemplate().find(GROUPINGS_FOR_LEARNING_DESIGN_VIA_CREATE,learningDesignId);
-    	List groupingsB = this.getHibernateTemplate().find(GROUPINGS_FOR_LEARNING_DESIGN_VIA_GROUPING,learningDesignId);
-    	HashMap<Long, Grouping> realGroupings = new HashMap<Long, Grouping>();
-    	Iterator iter = groupingsA.iterator();
-    	while (iter.hasNext()) {
+	/**
+	 * Returns the list of groupings applicable for the given learning design. This is a combination of the groupings defined 
+	 * via a GroupingActivity.createGrouping (which may or may not be applied to any other activities in the design) and groupings
+	 * related to branches and which are not attached to a GroupingActivity.
+	 */
+	public List<Grouping> getGroupingsByLearningDesign(Long learningDesignId) {
+		List groupingsA = this.getHibernateTemplate()
+				.find(GroupingDAO.GROUPINGS_FOR_LEARNING_DESIGN_VIA_CREATE, learningDesignId);
+		List groupingsB = this.getHibernateTemplate().find(GroupingDAO.GROUPINGS_FOR_LEARNING_DESIGN_VIA_GROUPING,
+				learningDesignId);
+		HashMap<Long, Grouping> realGroupings = new HashMap<Long, Grouping>();
+		Iterator iter = groupingsA.iterator();
+		while (iter.hasNext()) {
 			Grouping element = (Grouping) iter.next();
 			realGroupings.put(element.getGroupingId(), getNonCGLibGrouping(element));
 		}
-    	iter = groupingsB.iterator();
-    	while (iter.hasNext()) {
+		iter = groupingsB.iterator();
+		while (iter.hasNext()) {
 			Grouping element = (Grouping) iter.next();
-			if ( ! realGroupings.containsKey(element.getGroupingId()) )
+			if (!realGroupings.containsKey(element.getGroupingId())) {
 				realGroupings.put(element.getGroupingId(), getNonCGLibGrouping(element));
+			}
 		}
-    	return new ArrayList<Grouping>(realGroupings.values());
-    }
+		return new ArrayList<Grouping>(realGroupings.values());
+	}
 
 	/** we must return the real grouping, not a Hibernate proxy. So relook
 	* it up. This should be quick as it should be in the cache.
 	*/
 	private Grouping getNonCGLibGrouping(Grouping grouping) {
-		if ( grouping != null ) {
-			if ( grouping.isRandomGrouping() ) {
-				return (Grouping)super.find(RandomGrouping.class,grouping.getGroupingId());
-			} else if ( grouping.isChosenGrouping() ) {
-				return (Grouping)super.find(ChosenGrouping.class,grouping.getGroupingId());
+		if (grouping != null) {
+			if (grouping.isRandomGrouping()) {
+				return (Grouping) super.find(RandomGrouping.class, grouping.getGroupingId());
 			}
-			throw new DataRetrievalFailureException("Unable to get grouping as the grouping type is unknown or missing. Grouping object is "+grouping);
+			else if (grouping.isChosenGrouping()) {
+				return (Grouping) super.find(ChosenGrouping.class, grouping.getGroupingId());
+			}
+			else if (grouping.isLearnerChoiceGrouping()) {
+				return (Grouping) super.find(LearnerChoiceGrouping.class, grouping.getGroupingId());
+			}
+			throw new DataRetrievalFailureException(
+					"Unable to get grouping as the grouping type is unknown or missing. Grouping object is " + grouping);
 		}
 		return null;
 	}
-
 
 }

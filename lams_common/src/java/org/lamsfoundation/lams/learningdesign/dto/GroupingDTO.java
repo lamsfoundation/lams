@@ -31,6 +31,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
@@ -38,8 +39,8 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 /**
  * @author Manpreet Minhas
  */
-public class GroupingDTO extends BaseDTO{
-	
+public class GroupingDTO extends BaseDTO {
+
 	private Long groupingID;
 	private Integer groupingUIID;
 	private Integer groupingTypeID;
@@ -47,34 +48,33 @@ public class GroupingDTO extends BaseDTO{
 	private Integer learnersPerGroup;
 	private Long staffGroupID;
 	private Integer maxNumberOfGroups;
+	private Boolean equalNumberOfLearners;
 	//list of GroupDTO
 	private List groups;
-	
 
-	public GroupingDTO(Long groupingID, Integer groupingUIID,
-			Integer groupingType, Integer numberOfGroups,
-			Integer learnersPerGroup, Long staffGroupID,
-			Integer maxNumberOfGroups,List groupDTOs) {		
+	public GroupingDTO(Long groupingID, Integer groupingUIID, Integer groupingType, Integer numberOfGroups,
+			Integer learnersPerGroup, Long staffGroupID, Integer maxNumberOfGroups, List groupDTOs) {
 		this.groupingID = groupingID;
 		this.groupingUIID = groupingUIID;
-		this.groupingTypeID = groupingType;
+		groupingTypeID = groupingType;
 		this.numberOfGroups = numberOfGroups;
 		this.learnersPerGroup = learnersPerGroup;
 		this.staffGroupID = staffGroupID;
 		this.maxNumberOfGroups = maxNumberOfGroups;
-		this.groups = groupDTOs;
+		groups = groupDTOs;
 	}
-	public GroupingDTO(Grouping grouping, boolean setupUserList){
-		this.groupingID = grouping.getGroupingId();
-		this.groupingUIID = grouping.getGroupingUIID();
-		this.maxNumberOfGroups = grouping.getMaxNumberOfGroups();		
-		this.groupingTypeID = grouping.getGroupingTypeId();
+
+	public GroupingDTO(Grouping grouping, boolean setupUserList) {
+		groupingID = grouping.getGroupingId();
+		groupingUIID = grouping.getGroupingUIID();
+		maxNumberOfGroups = grouping.getMaxNumberOfGroups();
+		groupingTypeID = grouping.getGroupingTypeId();
 		Set groupSet = grouping.getGroups();
 		groups = new ArrayList();
-		if(groupSet != null){
+		if (groupSet != null) {
 			Iterator iter = groupSet.iterator();
-			while(iter.hasNext()){
-				groups.add(((Group)iter.next()).getGroupDTO(setupUserList));
+			while (iter.hasNext()) {
+				groups.add(((Group) iter.next()).getGroupDTO(setupUserList));
 			}
 		}
 		/*The two lines of code below are commented out, because it creates a new grouping instance and then tries to 
@@ -84,115 +84,153 @@ public class GroupingDTO extends BaseDTO{
 		//processGroupingActivity(object);
 		processGroupingActivity(grouping);
 	}
-	public void processGroupingActivity(Object object){
-		if(object instanceof RandomGrouping)
-			addRandomGroupingAttributes((RandomGrouping)object);
-		else if (object instanceof ChosenGrouping)
-			addChosenGroupingAttributes((ChosenGrouping)object);
-		else
-			addLessonClassAttributes((LessonClass)object);
+
+	public void processGroupingActivity(Object object) {
+		if (object instanceof RandomGrouping) {
+			addRandomGroupingAttributes((RandomGrouping) object);
+		}
+		else if (object instanceof ChosenGrouping) {
+			addChosenGroupingAttributes((ChosenGrouping) object);
+		}
+		else if (object instanceof LearnerChoiceGrouping) {
+			addLearnerChoiceGroupingAttributes((LearnerChoiceGrouping) object);
+		}
+		else {
+			addLessonClassAttributes((LessonClass) object);
+		}
 	}
-	private void addRandomGroupingAttributes(RandomGrouping grouping){
-		this.learnersPerGroup = grouping.getLearnersPerGroup();
-		this.numberOfGroups = grouping.getNumberOfGroups();		
+
+	private void addRandomGroupingAttributes(RandomGrouping grouping) {
+		learnersPerGroup = grouping.getLearnersPerGroup();
+		numberOfGroups = grouping.getNumberOfGroups();
 	}
-	private void addChosenGroupingAttributes(ChosenGrouping grouping){
-		
+
+	private void addChosenGroupingAttributes(ChosenGrouping grouping) {
+
 	}
-	private void addLessonClassAttributes(LessonClass grouping){
-		this.staffGroupID = grouping.getStaffGroup().getGroupId();
+
+	private void addLearnerChoiceGroupingAttributes(LearnerChoiceGrouping grouping) {
+		learnersPerGroup = grouping.getLearnersPerGroup();
+		numberOfGroups = grouping.getNumberOfGroups();
+		equalNumberOfLearners = grouping.getEqualNumberOfLearners();
 	}
+
+	private void addLessonClassAttributes(LessonClass grouping) {
+		staffGroupID = grouping.getStaffGroup().getGroupId();
+	}
+
 	/**
 	 * @return Returns the groupingID.
 	 */
 	public Long getGroupingID() {
 		return groupingID;
 	}
+
 	/**
 	 * @param groupingID The groupingID to set.
 	 */
 	public void setGroupingID(Long groupingID) {
-		if(!groupingID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+		if (!groupingID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
 			this.groupingID = groupingID;
+		}
 	}
+
 	/**
 	 * @return Returns the groupingType.
 	 */
 	public Integer getGroupingTypeID() {
 		return groupingTypeID;
 	}
+
 	/**
 	 * @param groupingType The groupingType to set.
 	 */
 	public void setGroupingTypeID(Integer groupingType) {
-		if(!groupingType.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			this.groupingTypeID = groupingType;
+		if (!groupingType.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
+			groupingTypeID = groupingType;
+		}
 	}
+
 	/**
 	 * @return Returns the groupingUIID.
 	 */
 	public Integer getGroupingUIID() {
 		return groupingUIID;
 	}
+
 	/**
 	 * @param groupingUIID The groupingUIID to set.
 	 */
 	public void setGroupingUIID(Integer groupingUIID) {
-		if(!groupingUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+		if (!groupingUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
 			this.groupingUIID = groupingUIID;
+		}
 	}
+
 	/**
 	 * @return Returns the learnersPerGroup.
 	 */
 	public Integer getLearnersPerGroup() {
 		return learnersPerGroup;
 	}
+
 	/**
 	 * @param learnersPerGroup The learnersPerGroup to set.
 	 */
 	public void setLearnersPerGroup(Integer learnersPerGroup) {
-		if(!learnersPerGroup.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+		if (!learnersPerGroup.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
 			this.learnersPerGroup = learnersPerGroup;
+		}
 	}
+
 	/**
 	 * @return Returns the maxNumberOfGroups.
 	 */
 	public Integer getMaxNumberOfGroups() {
 		return maxNumberOfGroups;
 	}
+
 	/**
 	 * @param maxNumberOfGroups The maxNumberOfGroups to set.
 	 */
 	public void setMaxNumberOfGroups(Integer maxNumberOfGroups) {
-		if(!maxNumberOfGroups.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+		if (!maxNumberOfGroups.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
 			this.maxNumberOfGroups = maxNumberOfGroups;
+		}
 	}
+
 	/**
 	 * @return Returns the numberOfGroups.
 	 */
 	public Integer getNumberOfGroups() {
 		return numberOfGroups;
 	}
+
 	/**
 	 * @param numberOfGroups The numberOfGroups to set.
 	 */
 	public void setNumberOfGroups(Integer numberOfGroups) {
-		if(!numberOfGroups.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+		if (!numberOfGroups.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
 			this.numberOfGroups = numberOfGroups;
+		}
 	}
+
 	/**
 	 * @return Returns the staffGroupID.
 	 */
 	public Long getStaffGroupID() {
 		return staffGroupID;
 	}
+
 	/**
 	 * @param staffGroupID The staffGroupID to set.
 	 */
 	public void setStaffGroupID(Long staffGroupID) {
-		if(!staffGroupID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+		if (!staffGroupID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
 			this.staffGroupID = staffGroupID;
+		}
 	}
+
 	/**
 	 * 
 	 * @return group list belongs to this grouping.
@@ -200,7 +238,16 @@ public class GroupingDTO extends BaseDTO{
 	public List getGroups() {
 		return groups;
 	}
+
 	public void setGroups(List groups) {
 		this.groups = groups;
+	}
+
+	public Boolean getEqualNumberOfLearners() {
+		return equalNumberOfLearners;
+	}
+
+	public void setEqualNumberOfLearners(Boolean equalNumberOfLearners) {
+		this.equalNumberOfLearners = equalNumberOfLearners;
 	}
 }

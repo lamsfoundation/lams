@@ -24,17 +24,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-
-	<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self">
+<%@ taglib uri="tags-function" prefix="fn" %>
+	
 
 	<div id="content">
-
 		<h1><c:out value="${title}"/></h1>
-
+		<p>&nbsp;</p>
+		<p><fmt:message key="label.learner.choice.group.message"/></p>
+		
 		<table class="alternative-color" cellspacing="0">
 			<tr>
 				<th width="25%" class="first">
 					<fmt:message key="label.view.groups.title"/>
+				</th>
+				<th>
 				</th>
 				<th>
 				</th>
@@ -44,27 +47,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<td width="25%" class="first">
 					<c:out value="${group.groupName}"/>
 				</td>
-				<td>
+				<td width="60%">
 					<c:forEach items="${group.users}" var="user">
 						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/><BR>
 					</c:forEach>
 					&nbsp;
 				</td>
+				<td>
+				<c:choose>
+					<c:when test="${not empty maxLearnersPerGroup and fn:length(group.users)>=maxLearnersPerGroup}">
+						<fmt:message key="label.learner.choice.group.full"/>
+					</c:when>
+					<c:otherwise>
+						<html:form action="/grouping.do?method=learnerChooseGroup&userId=${user.userId}&activityID=${activityID}&groupId=${group.groupId}" target="_self">
+							<html:submit styleClass="button"><fmt:message key="label.choose.group.button"/></html:submit>
+						</html:form>
+					</c:otherwise>
+				</c:choose>
+				</td>
 			</tr>
 			</logic:iterate>
 		</table>
-
-	<c:if test="${finishedButton}">
-			<table><tr><td><div id="right" class="right-buttons">
-					<html:submit styleClass="button"><fmt:message key="label.finish.button"/></html:submit>
-			</div></td></tr></table>
-	</c:if>
 
 	</div>  <!--closes content-->
 
 	<div id="footer">
 	</div><!--closes footer-->
-
-	</html:form>
 
 </div>

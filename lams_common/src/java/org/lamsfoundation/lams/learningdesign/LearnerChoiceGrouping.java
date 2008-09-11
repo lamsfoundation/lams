@@ -26,10 +26,18 @@ package org.lamsfoundation.lams.learningdesign;
 import java.util.Set;
 
 /**
- * Grouping formed by learners' choice
- * @author chris
+ * Grouping formed by learner's choice
+ * @author Marcin Cieslak
  */
 public class LearnerChoiceGrouping extends Grouping {
+	/** nullable persistent field */
+	private Boolean equalNumberOfLearners;
+
+	/** nullable persistent field */
+	private Integer numberOfGroups;
+
+	/** nullable persistent field */
+	private Integer learnersPerGroup;
 
 	/** Creates a new instance of ChosenGrouping */
 	public LearnerChoiceGrouping() {
@@ -43,12 +51,15 @@ public class LearnerChoiceGrouping extends Grouping {
 
 	/**
 	 * This method creates a deep copy of the Grouping 
-	 * @return ChosenGrouping The deep copied Grouping object
+	 * @return LearnerChoiceGrouping The deep copied Grouping object
 	 */
 	@Override
 	public Grouping createCopy(int uiidOffset) {
 		LearnerChoiceGrouping learnerChoiceGrouping = new LearnerChoiceGrouping();
 		copyGroupingFields(learnerChoiceGrouping, uiidOffset);
+		learnerChoiceGrouping.setEqualNumberOfLearners(getEqualNumberOfLearners());
+		learnerChoiceGrouping.setLearnersPerGroup(getLearnersPerGroup());
+		learnerChoiceGrouping.setNumberOfGroups(getNumberOfGroups());
 		return learnerChoiceGrouping;
 	}
 
@@ -60,6 +71,30 @@ public class LearnerChoiceGrouping extends Grouping {
 	@Override
 	public boolean isLearnerGroup(Group group) {
 		return true;
+	}
+
+	public Boolean getEqualNumberOfLearners() {
+		return equalNumberOfLearners;
+	}
+
+	public void setEqualNumberOfLearners(Boolean equalNumberOfLearners) {
+		this.equalNumberOfLearners = equalNumberOfLearners;
+	}
+
+	public Integer getLearnersPerGroup() {
+		return learnersPerGroup;
+	}
+
+	public void setLearnersPerGroup(Integer learnersPerGroup) {
+		this.learnersPerGroup = learnersPerGroup;
+	}
+
+	public Integer getNumberOfGroups() {
+		return numberOfGroups;
+	}
+
+	public void setNumberOfGroups(Integer numberOfGroups) {
+		this.numberOfGroups = numberOfGroups;
 	}
 
 }

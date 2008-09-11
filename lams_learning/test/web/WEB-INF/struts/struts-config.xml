@@ -105,6 +105,11 @@
         path=".grouping"
         redirect="false"
       />
+      <forward
+        name="chooseGroup"
+        path=".choosegroup"
+        redirect="false"
+      />
     </action>
     <action
       path="/dummylearner"

@@ -76,7 +76,7 @@
         />
     </subclass>
     <subclass name="org.lamsfoundation.lams.learningdesign.ChosenGrouping" discriminator-value="2"/>
-        
+       
     <subclass name="org.lamsfoundation.lams.lesson.LessonClass" discriminator-value="3">
         <!-- uni-directional many-to-one (effectiviey a  one to one) assocaites to Group in staff group role -->
         <many-to-one name="staffGroup" 
@@ -90,5 +90,26 @@
         	property-ref="lessonClass" 
         	cascade="none"/>
     </subclass>
+    
+    <subclass name="org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping" discriminator-value="4">
+        <property
+        name="numberOfGroups"
+        type="java.lang.Integer"
+        column="number_of_groups"
+        length="11"
+        />
+        <property
+        name="learnersPerGroup"
+        type="java.lang.Integer"
+        column="learners_per_group"
+        length="11"
+        />
+        <property
+        name="equalNumberOfLearners"
+        type="java.lang.Boolean"
+        column="equal_number_of_learners_per_group"
+        />
+    </subclass>
+    
 </class>
 </hibernate-mapping>

@@ -395,6 +395,7 @@ CREATE TABLE lams_grouping (
      , learners_per_group INT(11)
      , staff_group_id BIGINT(20) DEFAULT 0
      , max_number_of_groups INT(3)
+	 , equal_number_of_learners_per_group TINYINT DEFAULT 0
      , PRIMARY KEY (grouping_id)
      , INDEX (grouping_type_id)
      , CONSTRAINT FK_lams_learning_grouping_1 FOREIGN KEY (grouping_type_id)

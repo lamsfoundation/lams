@@ -26,36 +26,36 @@ package org.lamsfoundation.lams.learningdesign.dto;
 import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 
-
 public class ValidationErrorDTO {
-	
+
 	/** Struts Message Resource related variables */
-	public static final String CONFIG_PARAM = "org.lamsfoundation.lams.applicationResources";								// Code:
-	public static final String OTHER_ERROR_KEY = "validation.error.other";													// O
-	public static final String TRANSITION_ERROR_KEY = "validation.error.transitionNoActivityBeforeOrAfter";					// T
-	public static final String ACTIVITY_TRANSITION_ERROR_KEY= "validation.error.activityWithNoTransition";					// AT
-	public static final String INPUT_TRANSITION_ERROR_TYPE1_KEY = "validation.error.inputTransitionType1";					// IT
-	public static final String INPUT_TRANSITION_ERROR_TYPE2_KEY = "validation.error.inputTransitionType2";  				
-	public static final String OUTPUT_TRANSITION_ERROR_TYPE1_KEY = "validation.error.outputTransitionType1";				// OT
-	public static final String OUTPUT_TRANSITION_ERROR_TYPE2_KEY = "validation.error.outputTransitionType2";				
-	public static final String GROUPING_REQUIRED_ERROR_KEY = "validation.error.GroupingRequired";							// GR
-	public static final String GROUPING_NOT_REQUIRED_ERROR_KEY = "validation.error.GroupingNotRequired";					// GNR
-	public static final String GROUPING_SELECTED_ERROR_KEY = "validation.error.GroupingSelected";							// GS
-	public static final String OPTIONAL_ACTIVITY_ERROR_KEY = "validation.error.OptionalActivity";							// OA
-	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "validation.error.OptionalActivityOrderId";	// OAOI
-	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1";			// SG
-	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";			
-	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_KEY = "validation.error.grouping.missing";				// GM
-	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY = "validation.error.group.count.mismatch";		// GC
-	public static final String BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH = "validation.error.branching.must.have.a.branch"; 	// BB
-	public static final String BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH = "validation.error.toolBranchingMustHaveDefaultBranch"; 		// BDB
-	public static final String SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY = "validation.error.sequenceActivityMustHaveFirstActivity"; 		// SFA
-	public static final String BRANCHING_ACTVITY_GROUPING = "validation.error.groupedBranchingMustHaveAGrouping"; 				//BGG
+	public static final String CONFIG_PARAM = "org.lamsfoundation.lams.applicationResources"; // Code:
+	public static final String OTHER_ERROR_KEY = "validation.error.other"; // O
+	public static final String TRANSITION_ERROR_KEY = "validation.error.transitionNoActivityBeforeOrAfter"; // T
+	public static final String ACTIVITY_TRANSITION_ERROR_KEY = "validation.error.activityWithNoTransition"; // AT
+	public static final String INPUT_TRANSITION_ERROR_TYPE1_KEY = "validation.error.inputTransitionType1"; // IT
+	public static final String INPUT_TRANSITION_ERROR_TYPE2_KEY = "validation.error.inputTransitionType2";
+	public static final String OUTPUT_TRANSITION_ERROR_TYPE1_KEY = "validation.error.outputTransitionType1"; // OT
+	public static final String OUTPUT_TRANSITION_ERROR_TYPE2_KEY = "validation.error.outputTransitionType2";
+	public static final String GROUPING_REQUIRED_ERROR_KEY = "validation.error.GroupingRequired"; // GR
+	public static final String GROUPING_NOT_REQUIRED_ERROR_KEY = "validation.error.GroupingNotRequired"; // GNR
+	public static final String GROUPING_SELECTED_ERROR_KEY = "validation.error.GroupingSelected"; // GS
+	public static final String OPTIONAL_ACTIVITY_ERROR_KEY = "validation.error.OptionalActivity"; // OA
+	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "validation.error.OptionalActivityOrderId"; // OAOI
+	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1"; // SG
+	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";
+	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_KEY = "validation.error.grouping.missing"; // GM
+	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY = "validation.error.group.count.mismatch"; // GC
+
+	public static final String BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH = "validation.error.branching.must.have.a.branch"; // BB
+	public static final String BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH = "validation.error.toolBranchingMustHaveDefaultBranch"; // BDB
+	public static final String SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY = "validation.error.sequenceActivityMustHaveFirstActivity"; // SFA
+	public static final String BRANCHING_ACTVITY_GROUPING = "validation.error.groupedBranchingMustHaveAGrouping"; //BGG
 	public static final String BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED = "validation.error.groupedBranchingMustHaveBranchForGroup"; //BGM
-	public static final String BRANCH_CONDITION_INVALID = "validation.error.toolBranchingConditionInvalid"; 				// BCOND
-	public static final String BRANCHING_ACTVITY_TOOLINPUT = "validation.error.toolBranchingMustHaveAnInputToolActivity"; 	// BTI
-	public static final String BRANCHING_ACTVITY_TOOLCONDITION = "validation.error.toolBranchingMustHaveACondition"; 		// BTC
-	
+	public static final String BRANCH_CONDITION_INVALID = "validation.error.toolBranchingConditionInvalid"; // BCOND
+	public static final String BRANCHING_ACTVITY_TOOLINPUT = "validation.error.toolBranchingMustHaveAnInputToolActivity"; // BTI
+	public static final String BRANCHING_ACTVITY_TOOLCONDITION = "validation.error.toolBranchingMustHaveACondition"; // BTC
+
 	public static final String OTHER_ERROR_CODE = "O";
 	public static final String TRANSITION_ERROR_CODE = "T";
 	public static final String ACTIVITY_TRANSITION_ERROR_CODE = "AT";
@@ -77,135 +77,143 @@ public class ValidationErrorDTO {
 	public static final String BRANCH_CONDITION_INVALID_ERROR_CODE = "BCOND";
 	public static final String BRANCHING_ACTVITY_TOOLINPUT_ERROR_CODE = "BTI";
 	public static final String BRANCHING_ACTVITY_TOOLCONDITION_ERROR_CODE = "BTC";
-	
-	
-	private static MessageResources resources = MessageResources.getMessageResources(CONFIG_PARAM);
+
+	private static MessageResources resources = MessageResources.getMessageResources(ValidationErrorDTO.CONFIG_PARAM);
 	/**
 	 * Rule: Other (Covers any cases that are not covered by another code)
 	 */
-	public static final String OTHER_ERROR = resources.getMessage(OTHER_ERROR_KEY);
-	
+	public static final String OTHER_ERROR = ValidationErrorDTO.resources.getMessage(ValidationErrorDTO.OTHER_ERROR_KEY);
+
 	/**
 	 * Rule: Each transition must have an activity before and after the transition
 	 */
-	public static final String TRANSITION_ERROR = resources.getMessage(TRANSITION_ERROR_KEY);
-	
+	public static final String TRANSITION_ERROR = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY);
+
 	/**
 	 * Rule: Exactly one top level activity will have no input transition
 	 * If more than one activity is missing an input transition
 	 */
-	public static final String INPUT_TRANSITION_ERROR_TYPE1 = resources.getMessage(INPUT_TRANSITION_ERROR_TYPE1_KEY);
-	
+	public static final String INPUT_TRANSITION_ERROR_TYPE1 = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1_KEY);
+
 	/**
 	 * Rule: Exactly one top level activity will have no input transition
 	 * If no activities are missing their input transitions
 	 */
-	public static final String INPUT_TRANSITION_ERROR_TYPE2= resources.getMessage(INPUT_TRANSITION_ERROR_TYPE2_KEY);
-	
+	public static final String INPUT_TRANSITION_ERROR_TYPE2 = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE2_KEY);
+
 	/**
 	 * Rule: Exactly one top level activity will have no output transition
 	 * If more than one activity is missing the output transition.
 	 */
-	public static final String OUTPUT_TRANSITION_ERROR_TYPE1 = resources.getMessage(OUTPUT_TRANSITION_ERROR_TYPE1_KEY);
-	
+	public static final String OUTPUT_TRANSITION_ERROR_TYPE1 = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1_KEY);
+
 	/**
 	 * Rule: Exactly one top level activity will have no output transition
 	 * If no activities are missing their output transitions.
 	 */
-	public static final String OUTPUT_TRANSITION_ERROR_TYPE2 = resources.getMessage(OUTPUT_TRANSITION_ERROR_TYPE2_KEY);
-	
+	public static final String OUTPUT_TRANSITION_ERROR_TYPE2 = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2_KEY);
+
 	/**
 	 * Rule: If grouping is required then a grouping must have been applied to the activity
 	 */
-	public static final String GROUPING_REQUIRED_ERROR = resources.getMessage(GROUPING_REQUIRED_ERROR_KEY);
-	
+	public static final String GROUPING_REQUIRED_ERROR = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.GROUPING_REQUIRED_ERROR_KEY);
+
 	/**
 	 * Rule: If grouping is not supported/required, then a grouping has not been applied to the activity.
 	 */
-	public static final String GROUPING_NOT_REQUIRED_ERROR = resources.getMessage(GROUPING_NOT_REQUIRED_ERROR_KEY);
-	
+	public static final String GROUPING_NOT_REQUIRED_ERROR = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR_KEY);
+
 	/**
 	 * Rule: If grouping is selected, then grouping exists
 	 */
-	public static final String GROUPING_SELECTED_ERROR = resources.getMessage(GROUPING_SELECTED_ERROR_KEY);
-	
+	public static final String GROUPING_SELECTED_ERROR = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.GROUPING_SELECTED_ERROR_KEY);
+
 	/**
 	 * Rule: An optional activity must contain one or more activities
 	 */
-	public static final String OPTIONAL_ACTIVITY_ERROR = resources.getMessage(OPTIONAL_ACTIVITY_ERROR_KEY);
-	
+	public static final String OPTIONAL_ACTIVITY_ERROR = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_KEY);
+
 	/**
 	 * Rule: An optional activity must have valid order ids - the order ids should be 
 	 * sequential starting at 1 and must have no duplicates.
 	 */
-	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR = resources.getMessage(OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY);
-	
+	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY);
+
 	/**
 	 * Rule: For any learning design that has more than one activity then each activity should 
 	 * have at least one input or one output transition. 
 	 */
-	public static final String ACTIVITY_TRANSITION_ERROR = resources.getMessage(ACTIVITY_TRANSITION_ERROR_KEY);
+	public static final String ACTIVITY_TRANSITION_ERROR = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY);
 
 	/**
 	 * Rule: For Schedule Gates (Activity) if start and end time offsets are set they should not be equal.
 	 */
-	public static final String SCHEDULE_GATE_ERROR_TYPE1 = resources.getMessage(SCHEDULE_GATE_ERROR_TYPE1_KEY);
-	
-	
+	public static final String SCHEDULE_GATE_ERROR_TYPE1 = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE1_KEY);
+
 	/**
 	 * Rule: For Schedule Gates (Activity) if start and end time offsets are set then the start time offset should be 
 	 * greater than the end time offset.
 	 */
-	public static final String SCHEDULE_GATE_ERROR_TYPE2 = resources.getMessage(SCHEDULE_GATE_ERROR_TYPE2_KEY);
-	
+	public static final String SCHEDULE_GATE_ERROR_TYPE2 = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE2_KEY);
+
 	/**
 	 * Rule: For Grouping Activities there must be a grouping.
 	 */
-	public static final String GROUPING_ACTIVITY_MISSING_GROUPING = resources.getMessage(GROUPING_ACTIVITY_MISSING_GROUPING_KEY); 	// GM
+	public static final String GROUPING_ACTIVITY_MISSING_GROUPING = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_MISSING_GROUPING_KEY); // GM
 
 	/**
 	 * Rule: For Grouping Activities the number of groups must be less than or equal to the desired number.
 	 */
-	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH = resources.getMessage(GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY); 	// GC
+	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY); // GC
 
 	private Integer UIID;
 	private String message; //the validation message explaining what the problem is
-	private String code;	// unique code representing the validation error message
-	
-	public ValidationErrorDTO(String code, String message, Integer UIID)
-	{
+	private String code; // unique code representing the validation error message
+
+	public ValidationErrorDTO(String code, String message, Integer UIID) {
 		this.code = code;
-		this.message =  message;
+		this.message = message;
 		this.UIID = UIID;
-		
-		
+
 	}
-	
-	public ValidationErrorDTO(String code, String message)
-	{
+
+	public ValidationErrorDTO(String code, String message) {
 		this.code = code;
 		this.message = message;
 	}
 
-	public ValidationErrorDTO(LearningDesign learningDesign)
-	{
-		
+	public ValidationErrorDTO(LearningDesign learningDesign) {
+
 	}
-	
-	public ValidationErrorDTO()
-	{		
+
+	public ValidationErrorDTO() {
 	}
-	
+
 	public String getCode() {
 		return code;
 	}
+
 	public String getMessage() {
 		return message;
 	}
+
 	public Integer getUIID() {
 		return UIID;
 	}
-	
-	
 
 }

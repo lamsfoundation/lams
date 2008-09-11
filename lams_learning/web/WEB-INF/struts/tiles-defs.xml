@@ -119,6 +119,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="pageTitleKey" value="label.view.groups.title" />
 		<put name="body" value="/grouping/wait.jsp"/>
 	</definition>
+	<definition name=".choosegroup" extends=".layout">
+		<put name="pageTitleKey" value="label.view.groups.title" />
+		<put name="body" value="/grouping/choose.jsp"/>
+	</definition>
 	
 	<!-- Gate definitions -->
 	<definition name=".synchGate" extends=".gateLayout">

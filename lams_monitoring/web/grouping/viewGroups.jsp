@@ -51,7 +51,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</td>
 				<td>
 					<c:forEach items="${group.users}" var="user">
-						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
+						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/><br />
 					</c:forEach>
 				</td>
 			</tr>

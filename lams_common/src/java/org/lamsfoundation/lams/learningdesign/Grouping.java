@@ -55,7 +55,7 @@ public abstract class Grouping implements Serializable {
 	/** Grouping type id for lesson class grouping */
 	public static final Integer CLASS_GROUPING_TYPE = new Integer(3);
 
-	/** Grouping type id for lesson class grouping */
+	/** Grouping type id for learner's choice grouping */
 	public static final Integer LEARNER_CHOICE_GROUPING_TYPE = new Integer(4);
 
 	/** identifier field */
@@ -351,7 +351,7 @@ public abstract class Grouping implements Serializable {
 			return new ChosenGrouping();
 		}
 		else if (groupingType.equals(Grouping.LEARNER_CHOICE_GROUPING_TYPE)) {
-			return new ChosenGrouping();
+			return new LearnerChoiceGrouping();
 		}
 		else {
 			return new LessonClass();

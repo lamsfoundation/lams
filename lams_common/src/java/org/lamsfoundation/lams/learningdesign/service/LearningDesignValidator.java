@@ -54,75 +54,83 @@ public class LearningDesignValidator {
 	MessageService messageService;
 	LearningDesign learningDesign;
 	Vector<ValidationErrorDTO> errors;
-	
+
 	LearningDesignValidator(LearningDesign learningDesign, MessageService messageService) {
 		this.messageService = messageService;
 		this.learningDesign = learningDesign;
 	}
-	
+
 	/** Run the validation */
 	public Vector<ValidationErrorDTO> validate() {
-		errors = new Vector<ValidationErrorDTO>();		// initialises the list of validation messages.
-		
+		errors = new Vector<ValidationErrorDTO>(); // initialises the list of validation messages.
+
 		// check all activities have their necessary transitions. First check the 
 		// top level, then we need to check each branch inside a branching activity.
-		Set<Activity> topLevelActivities = (Set<Activity>) learningDesign.getParentActivities();
+		Set<Activity> topLevelActivities = learningDesign.getParentActivities();
 		validateActivityTransitionRules(topLevelActivities, learningDesign.getTransitions());
-		
-		for ( Activity activity : (Set<Activity>) learningDesign.getActivities() ) {
+
+		for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
 			checkIfGroupingRequired(activity);
-			validateGroupingIfGroupingIsApplied(activity);	
+			validateGroupingIfGroupingIsApplied(activity);
 			validateOptionalActivity(activity);
 			validateOptionsActivityOrderId(activity);
 			validateGroupingActivity(activity);
 			Vector<ValidationErrorDTO> activityErrors = activity.validateActivity(messageService);
-			if(activityErrors != null && !activityErrors.isEmpty())
+			if (activityErrors != null && !activityErrors.isEmpty()) {
 				errors.addAll(activityErrors);
+			}
 		}
 
 		cleanupValidationErrors();
 		return errors;
 	}
+
 	/**
 	 * Cleans up multiple and redundant error messages in the list.
 	 * @param errors	List of errors to cleanup.
 	 */
 	private void cleanupValidationErrors() {
 		Iterator it = errors.iterator();
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			cleanupTransitionErrors(it);
 		}
 	}
-	
+
 	private void cleanupTransitionErrors(Iterator topIt) {
 		ValidationErrorDTO nextError;
 		ValidationErrorDTO currentError = (ValidationErrorDTO) topIt.next();
 		Iterator it = errors.iterator();
-		
-		while(it.hasNext()) {
+
+		while (it.hasNext()) {
 			nextError = (ValidationErrorDTO) it.next();
-		
-			if(currentError.getCode().equals(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE) && 
-					(nextError.getCode().equals(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE) ||
-					 nextError.getCode().equals(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE)))
-				if(currentError.getUIID().equals(nextError.getUIID())) {
+
+			if (currentError.getCode().equals(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE)
+					&& (nextError.getCode().equals(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE) || nextError.getCode().equals(
+							ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE))) {
+				if (currentError.getUIID().equals(nextError.getUIID())) {
 					topIt.remove();
 					return;
 				}
-			else if(currentError.getCode().equals(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE)) 
-					if(nextError.getCode().equals(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE))
-						if(currentError.getUIID().equals(nextError.getUIID()))
+				else if (currentError.getCode().equals(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE)) {
+					if (nextError.getCode().equals(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE)) {
+						if (currentError.getUIID().equals(nextError.getUIID())) {
 							it.remove();
-			else if(currentError.getCode().equals(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE))
-					if(nextError.getCode().equals(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE))
-						if(currentError.getUIID().equals(nextError.getUIID()))
-							it.remove();
-			
-		}			   
-			
-		
+						}
+						else if (currentError.getCode().equals(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE)) {
+							if (nextError.getCode().equals(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE)) {
+								if (currentError.getUIID().equals(nextError.getUIID())) {
+									it.remove();
+								}
+							}
+						}
+					}
+				}
+			}
+
+		}
+
 	}
-	
+
 	/**
 	 * Perform transition related validations.
 	 * 
@@ -137,87 +145,87 @@ public class LearningDesignValidator {
 	 * @param transitions A transitions from the design
 	 * 
 	 */
-	private void validateActivityTransitionRules(Set<Activity> activities, Set<Transition> transitions)
-	{
+	private void validateActivityTransitionRules(Set<Activity> activities, Set<Transition> transitions) {
 		validateTransitions(transitions);
 		ArrayList<Activity> noInputTransition = new ArrayList<Activity>(); //a list to hold the activities which have no input transition
 		ArrayList<Activity> noOuputTransition = new ArrayList<Activity>(); //a list to hold the activities which have no output transition
 		int numOfTopLevelActivities = activities.size();
-		
+
 		// All the branching activities and optional activities we find are stored in this list, so we can process them at the end. 
 		// We don't want to process them straight away or the branch activity errors would be mixed up with the previous level's errors.
 		// We need the optional activities, as they may contain a branching activity.
-		ArrayList<ComplexActivity> complexActivitiesToProcess = null; 
-		
-		for ( Activity activity : activities ) 
-		{
+		ArrayList<ComplexActivity> complexActivitiesToProcess = null;
+
+		for (Activity activity : activities) {
 			checkActivityForTransition(activity, numOfTopLevelActivities);
-			if (activity.getTransitionFrom() == null) 
-			{
+			if (activity.getTransitionFrom() == null) {
 				noOuputTransition.add(activity);
 			}
-			if (activity.getTransitionTo() == null)
-			{
+			if (activity.getTransitionTo() == null) {
 				noInputTransition.add(activity);
 			}
 			complexActivitiesToProcess = checkActivityForFurtherProcessing(complexActivitiesToProcess, activity);
 		}
-		
-		if (numOfTopLevelActivities > 0)
-		{
-			if (noInputTransition.size() == 0)
-				errors.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE2_KEY)));
-			
-			if (noInputTransition.size() > 1)
-			{
+
+		if (numOfTopLevelActivities > 0) {
+			if (noInputTransition.size() == 0) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE2_KEY)));
+			}
+
+			if (noInputTransition.size() > 1) {
 
 				// put out an error for each activity, but skip the any activities that are the first activity in the branch as they shouldn't have an input transition.
-				for ( Activity a : noInputTransition) {
-						errors.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));
+				for (Activity a : noInputTransition) {
+					errors.add(new ValidationErrorDTO(ValidationErrorDTO.INPUT_TRANSITION_ERROR_CODE, messageService
+							.getMessage(ValidationErrorDTO.INPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));
 				}
 			}
 
-			if (noOuputTransition.size() == 0)
-				errors.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE,messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2_KEY)));
+			if (noOuputTransition.size() == 0) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE2_KEY)));
+			}
 
-			if (noOuputTransition.size() > 1)
-			{
+			if (noOuputTransition.size() > 1) {
 				//there is more than one activity with no output transitions
-				for ( Activity a : noOuputTransition)
-					errors.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));					
+				for (Activity a : noOuputTransition) {
+					errors.add(new ValidationErrorDTO(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_CODE, messageService
+							.getMessage(ValidationErrorDTO.OUTPUT_TRANSITION_ERROR_TYPE1_KEY), a.getActivityUIID()));
+				}
 			}
 		}
-	
+
 		processComplexActivitiesForTransitions(complexActivitiesToProcess);
 
 	}
 
 	private void processComplexActivitiesForTransitions(ArrayList<ComplexActivity> complexActivitiesToProcess) {
 
-		if ( complexActivitiesToProcess != null ) 
-		{
-			for ( ComplexActivity complex : complexActivitiesToProcess )
+		if (complexActivitiesToProcess != null) {
+			for (ComplexActivity complex : complexActivitiesToProcess) {
 				checkTransitionsInComplexActivity(complex);
+			}
 		}
-		
+
 	}
-	
-	private void checkTransitionsInComplexActivity(ComplexActivity complexActivity) 
-	{
+
+	private void checkTransitionsInComplexActivity(ComplexActivity complexActivity) {
 		// All the branching activities and optional activities we find are stored in this list, so we can process them at the end. 
 		// We don't want to process them straight away or the branch activity errors would be mixed up with the previous level's errors.
 		// We need the optional activities, as they may contain a branching activity.
-		ArrayList<ComplexActivity> complexActivitiesToProcess = null; 
+		ArrayList<ComplexActivity> complexActivitiesToProcess = null;
 
-		if ( complexActivity.isBranchingActivity() ) {
-			for ( ComplexActivity sequence : (Set<ComplexActivity>) complexActivity.getActivities() ) {
-				for ( Activity activity : (Set<Activity>) sequence.getActivities() ) {
+		if (complexActivity.isBranchingActivity()) {
+			for (ComplexActivity sequence : (Set<ComplexActivity>) complexActivity.getActivities()) {
+				for (Activity activity : (Set<Activity>) sequence.getActivities()) {
 					checkActivityForTransition(activity, sequence.getActivities().size());
 					complexActivitiesToProcess = checkActivityForFurtherProcessing(complexActivitiesToProcess, activity);
 				}
 			}
-		} else {
-			for ( Activity activity : (Set<Activity>) complexActivity.getActivities() ) {
+		}
+		else {
+			for (Activity activity : (Set<Activity>) complexActivity.getActivities()) {
 				complexActivitiesToProcess = checkActivityForFurtherProcessing(complexActivitiesToProcess, activity);
 			}
 		}
@@ -230,26 +238,27 @@ public class LearningDesignValidator {
 	 * @param activity
 	 * @return
 	 */
-	private ArrayList<ComplexActivity> checkActivityForFurtherProcessing(
-			ArrayList<ComplexActivity> complexActivitiesToProcess,
+	private ArrayList<ComplexActivity> checkActivityForFurtherProcessing(ArrayList<ComplexActivity> complexActivitiesToProcess,
 			Activity activity) {
-		if ( activity.isComplexActivity() && ! activity.isParallelActivity() ) 
-		{
-			if ( complexActivitiesToProcess == null )
+		if (activity.isComplexActivity() && !activity.isParallelActivity()) {
+			if (complexActivitiesToProcess == null) {
 				complexActivitiesToProcess = new ArrayList<ComplexActivity>();
-			complexActivitiesToProcess.add((ComplexActivity ) activity);
+			}
+			complexActivitiesToProcess.add((ComplexActivity) activity);
 		}
 		return complexActivitiesToProcess;
 	}
 
 	private boolean isFirstActivityInBranch(Activity a) {
 		ComplexActivity parentActivity = (ComplexActivity) a.getParentActivity();
-		if ( parentActivity == null || ! parentActivity.isSequenceActivity()) 
+		if (parentActivity == null || !parentActivity.isSequenceActivity()) {
 			return false;
-		else 
+		}
+		else {
 			return parentActivity.getDefaultActivity() != null && parentActivity.getDefaultActivity().equals(a);
+		}
 	}
-	
+
 	/**
 	 * This method checks if each transition in the learning design has an activity
 	 * before and after the transition.
@@ -258,23 +267,25 @@ public class LearningDesignValidator {
 	 * the ValidationErrorDTO is added to the list of validation messages.
 	 * @param transitions the set of transitions to iterate through and validate
 	 */
-	private void validateTransitions(Set transitions)
-	{
+	private void validateTransitions(Set transitions) {
 		Iterator i = transitions.iterator();
-		while (i.hasNext())
-		{
-			Transition transition = (Transition)i.next();
+		while (i.hasNext()) {
+			Transition transition = (Transition) i.next();
 			Activity fromActivity = transition.getFromActivity();
 			Activity toActivity = transition.getToActivity();
-			if (fromActivity == null)
-				errors.add(new ValidationErrorDTO(ValidationErrorDTO.TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
-			else if (toActivity == null)
-				errors.add(new ValidationErrorDTO(ValidationErrorDTO.TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
-			
+			if (fromActivity == null) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.TRANSITION_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
+			}
+			else if (toActivity == null) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.TRANSITION_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.TRANSITION_ERROR_KEY), transition.getTransitionUIID()));
+			}
+
 		}
-		
+
 	}
-	
+
 	/**
 	 * For any learning design that has more than one activity then each activity should have at least an input
 	 * or output transition. If there is only one activity in the learning design, then that activity should
@@ -284,26 +295,27 @@ public class LearningDesignValidator {
 	 * @param activity The Activity to validate
 	 * @param numOfActivities The number of activities in the learning design.
 	 */
-	private void checkActivityForTransition(Activity activity, int numOfActivities)
-	{
+	private void checkActivityForTransition(Activity activity, int numOfActivities) {
 		//if one activity, then shouldn't have any transitions
 		Transition inputTransition = activity.getTransitionTo();
 		Transition outputTransition = activity.getTransitionFrom();
-		
-		if(numOfActivities > 1)
-		{
-			if (inputTransition == null && outputTransition == null && ! isFirstActivityInBranch(activity) )
-				errors.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
+
+		if (numOfActivities > 1) {
+			if (inputTransition == null && outputTransition == null && !isFirstActivityInBranch(activity)) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
+			}
 		}
-		if (numOfActivities == 1)
-		{	
-			if (inputTransition != null || outputTransition != null)				
-				errors.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
-			
+		if (numOfActivities == 1) {
+			if (inputTransition != null || outputTransition != null) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.ACTIVITY_TRANSITION_ERROR_KEY), activity.getActivityUIID()));
+			}
+
 		}
-	
+
 	}
-	
+
 	/**
 	 * If grouping support type is set to <code>GROUPING_SUPPORT_REQUIRED</code>, 
 	 * then the activity is validated to ensure that the grouping exists.
@@ -315,55 +327,49 @@ public class LearningDesignValidator {
 	 * 
 	 * @param activity
 	 */
-	private void checkIfGroupingRequired(Activity activity)
-	{
-		
-			Integer groupingSupportType = activity.getGroupingSupportType();
-			if (groupingSupportType.intValue() == Grouping.GROUPING_SUPPORT_REQUIRED)
-			{
-				//make sure activity has been assigned a grouping
-				Grouping grouping = activity.getGrouping();
-				if (grouping == null)
-				{
-					errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_REQUIRED_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
-				}
+	private void checkIfGroupingRequired(Activity activity) {
+
+		Integer groupingSupportType = activity.getGroupingSupportType();
+		if (groupingSupportType.intValue() == Grouping.GROUPING_SUPPORT_REQUIRED) {
+			//make sure activity has been assigned a grouping
+			Grouping grouping = activity.getGrouping();
+			if (grouping == null) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_REQUIRED_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.GROUPING_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
 			}
-			else if(groupingSupportType.intValue() == Grouping.GROUPING_SUPPORT_NONE)
-			{
-				Grouping grouping = activity.getGrouping();
-				if (grouping != null)
-				{
-					errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
-				}
+		}
+		else if (groupingSupportType.intValue() == Grouping.GROUPING_SUPPORT_NONE) {
+			Grouping grouping = activity.getGrouping();
+			if (grouping != null) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.GROUPING_NOT_REQUIRED_ERROR_KEY), activity.getActivityUIID()));
 			}
-				
+		}
+
 	}
-	
+
 	/**
 	 * If this activity is an OptionalActivity, then it must contain one or more
 	 * activities.
 	 * 
 	 * @param parentActivity
 	 */
-	private void validateOptionalActivity(Activity parentActivity)
-	{
-			
-			if (parentActivity.isOptionsActivity())
-			{
-				//get the child activities and check how many there are.
-				OptionsActivity optionsActivity = (OptionsActivity)parentActivity;
-				Set childActivities = optionsActivity.getActivities();
-				int numOfChildActivities = childActivities.size();
-				if(numOfChildActivities == 0)
-				{
-					errors.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_KEY), optionsActivity.getActivityUIID()));
-				}
-				
-				
+	private void validateOptionalActivity(Activity parentActivity) {
+
+		if (parentActivity.isOptionsActivity()) {
+			//get the child activities and check how many there are.
+			OptionsActivity optionsActivity = (OptionsActivity) parentActivity;
+			Set childActivities = optionsActivity.getActivities();
+			int numOfChildActivities = childActivities.size();
+			if (numOfChildActivities == 0) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_KEY), optionsActivity.getActivityUIID()));
 			}
-		
+
+		}
+
 	}
-	
+
 	/**
 	 * If this activity is an GroupingActivity, the number of groups in the grouping records is greater than 0 and 
 	 * the grouping has some groups, then the actual number of groups must no exceed the desired number of groups. 
@@ -372,30 +378,33 @@ public class LearningDesignValidator {
 	 * 
 	 * @param parentActivity
 	 */
-	private void validateGroupingActivity(Activity activity)
-	{
-			
-			if (activity.isGroupingActivity())
-			{
-				//get the child activities and check how many there are.
-				GroupingActivity groupingActivity = (GroupingActivity)activity;
-				Grouping grouping = groupingActivity.getCreateGrouping();
-				if ( grouping == null ) {
-					errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_ACTIVITY_MISSING_GROUPING_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_MISSING_GROUPING_KEY), activity.getActivityUIID()));
-				}
-				Integer numGroupsInteger = null;
-				if ( grouping.isRandomGrouping() ) {
-					RandomGrouping random = (RandomGrouping) grouping;
-					numGroupsInteger = random.getNumberOfGroups();
-				} else {
-					numGroupsInteger = grouping.getMaxNumberOfGroups();
-				}
-				int maxNumGroups = numGroupsInteger == null ? 0 : numGroupsInteger.intValue(); 
-				if ( maxNumGroups > 0 && grouping.getGroups() != null && grouping.getGroups().size() > maxNumGroups) {
-					errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY), activity.getActivityUIID()));
-				}
+	private void validateGroupingActivity(Activity activity) {
+
+		if (activity.isGroupingActivity()) {
+			//get the child activities and check how many there are.
+			GroupingActivity groupingActivity = (GroupingActivity) activity;
+			Grouping grouping = groupingActivity.getCreateGrouping();
+			if (grouping == null) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_ACTIVITY_MISSING_GROUPING_ERROR_CODE,
+						messageService.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_MISSING_GROUPING_KEY), activity
+								.getActivityUIID()));
 			}
-		
+			Integer numGroupsInteger = null;
+			if (grouping.isRandomGrouping()) {
+				RandomGrouping random = (RandomGrouping) grouping;
+				numGroupsInteger = random.getNumberOfGroups();
+			}
+			else {
+				numGroupsInteger = grouping.getMaxNumberOfGroups();
+			}
+			int maxNumGroups = numGroupsInteger == null ? 0 : numGroupsInteger.intValue();
+			if (maxNumGroups > 0 && grouping.getGroups() != null && grouping.getGroups().size() > maxNumGroups) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_ERROR_CODE,
+						messageService.getMessage(ValidationErrorDTO.GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY), activity
+								.getActivityUIID()));
+			}
+		}
+
 	}
 
 	/**
@@ -406,59 +415,57 @@ public class LearningDesignValidator {
 	 * The currentActivityId should be 1 greater than the previous activity order id.
 	 * @param parentActivity
 	 */
-	private void validateOptionsActivityOrderId(Activity parentActivity)
-	{
+	private void validateOptionsActivityOrderId(Activity parentActivity) {
 		Integer thisActivityOrderId = null;
 		Integer previousActivityOrderId = null;
 		boolean validOrderId = true;
-		if(parentActivity.isOptionsActivity())
-		{
-			OptionsActivity optionsActivity = (OptionsActivity)parentActivity;
+		if (parentActivity.isOptionsActivity()) {
+			OptionsActivity optionsActivity = (OptionsActivity) parentActivity;
 			Set childActivities = optionsActivity.getActivities(); //childActivities should be sorted according to order id (using the activityOrderComparator)
 			Iterator i = childActivities.iterator();
-			while (i.hasNext() && validOrderId)
-			{
-				Activity childActivity = (Activity)i.next();
-				thisActivityOrderId= childActivity.getOrderId();
-				if (previousActivityOrderId != null)
-				{
+			while (i.hasNext() && validOrderId) {
+				Activity childActivity = (Activity) i.next();
+				thisActivityOrderId = childActivity.getOrderId();
+				if (previousActivityOrderId != null) {
 					//compare the two numbers
-					if (thisActivityOrderId==null ) {
-						validOrderId = false;
-					} else if ( thisActivityOrderId.longValue() != (previousActivityOrderId.longValue() + 1)) {
+					if (thisActivityOrderId == null) {
 						validOrderId = false;
 					}
-					
-				}
-				else
-				{
-					//this is the first activity, since the previousActivityId is null
-					if(thisActivityOrderId==null || thisActivityOrderId.longValue()!= 1)
+					else if (thisActivityOrderId.longValue() != previousActivityOrderId.longValue() + 1) {
 						validOrderId = false;
+					}
+
 				}
-				previousActivityOrderId = thisActivityOrderId; 
+				else {
+					//this is the first activity, since the previousActivityId is null
+					if (thisActivityOrderId == null || thisActivityOrderId.longValue() != 1) {
+						validOrderId = false;
+					}
+				}
+				previousActivityOrderId = thisActivityOrderId;
 			}
-			
-			if (!validOrderId)
-				errors.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY), optionsActivity.getActivityUIID()));
-			
-		}	
+
+			if (!validOrderId) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_CODE,
+						messageService.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY),
+						optionsActivity.getActivityUIID()));
+			}
+
+		}
 	}
 
-	
 	/**
 	 * If applyGrouping is set, then the grouping must exist
 	 * @param activity
 	 */
-	private void validateGroupingIfGroupingIsApplied(Activity activity)
-	{
-			if(activity.getApplyGrouping().booleanValue()) //if grouping is applied, ensure grouping exists
-			{				
-				if (activity.getGrouping() == null)
-				{
-					errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_SELECTED_ERROR_CODE, messageService.getMessage(ValidationErrorDTO.GROUPING_SELECTED_ERROR_KEY), activity.getActivityUIID()));
-				}
+	private void validateGroupingIfGroupingIsApplied(Activity activity) {
+		if (activity.getApplyGrouping().booleanValue()) //if grouping is applied, ensure grouping exists
+		{
+			if (activity.getGrouping() == null) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.GROUPING_SELECTED_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.GROUPING_SELECTED_ERROR_KEY), activity.getActivityUIID()));
 			}
-		
+		}
+
 	}
 }

@@ -13,6 +13,7 @@
 		classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
   		classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
+  		classpath:/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml
   		classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
 		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
 		<!--  Add tool contexts after this -->
@@ -68,13 +69,13 @@
 </listener>	
 
    <servlet>
-      <servlet-name>initializeLesson</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
+      <servlet-name>gateExportPortfolio</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
 
    </servlet>
    <servlet>
-      <servlet-name>performChosenGrouping</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.PerformChosenGroupingServlet</servlet-class>
+      <servlet-name>createLessonClass</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -83,8 +84,8 @@
 
    </servlet>
    <servlet>
-      <servlet-name>gateExportPortfolio</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
+      <servlet-name>performChosenGrouping</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.PerformChosenGroupingServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -93,8 +94,8 @@
 
    </servlet>
    <servlet>
-      <servlet-name>createLessonClass</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
+      <servlet-name>initializeLesson</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
 
    </servlet>
 
@@ -126,28 +127,28 @@
 </servlet-mapping>
 
    <servlet-mapping>
-      <servlet-name>initializeLesson</servlet-name>
-      <url-pattern>/initializeLesson</url-pattern>
+      <servlet-name>gateExportPortfolio</servlet-name>
+      <url-pattern>/gateExportPortfolio</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>performChosenGrouping</servlet-name>
-      <url-pattern>/monitoring/performChosenGrouping</url-pattern>
+      <servlet-name>createLessonClass</servlet-name>
+      <url-pattern>/createLessonClass</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>branchingExportPortfolio</servlet-name>
       <url-pattern>/branchingExportPortfolio</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>gateExportPortfolio</servlet-name>
-      <url-pattern>/gateExportPortfolio</url-pattern>
+      <servlet-name>performChosenGrouping</servlet-name>
+      <url-pattern>/monitoring/performChosenGrouping</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>sequenceExportPortfolio</servlet-name>
       <url-pattern>/sequenceExportPortfolio</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>createLessonClass</servlet-name>
-      <url-pattern>/createLessonClass</url-pattern>
+      <servlet-name>initializeLesson</servlet-name>
+      <url-pattern>/initializeLesson</url-pattern>
    </servlet-mapping>
 
    <session-config>
@@ -255,5 +256,38 @@
     		<form-error-page>/login.jsp</form-error-page>
    		</form-login-config>
    	</login-config>
+	<!-- ======================================================== -->
+	<!--  Security Roles -->
+    <!-- ======================================================== -->
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can create/modify a learning design</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can running and monitoring a learning session</description>
+		<role-name>MONITOR</role-name>
+	</security-role>
+
+    <security-role>
+		<role-name>GROUP MANAGER</role-name>
+	</security-role>
+   	<security-role>
+		<role-name>GROUP ADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Can add/remove users to the system, set up classes of users for sessions</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+
+	<security-role>
+		<role-name>AUTHOR ADMIN</role-name>
+	</security-role>
 
 </web-app>
