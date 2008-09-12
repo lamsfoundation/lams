@@ -35,65 +35,54 @@ public class MonitoringForm extends ActionForm {
 	private static final long serialVersionUID = 9096908688391850595L;
 
 	// Fields
-	
-	private String dispatch;
 
-	private boolean teacherVisible;
+	private String dispatch;
 
 	private Long toolSessionID;
 
-	// editing message page.
-	private Long messageUID;
+	private String topic;
 
-	private String messageBody;
+	private String meetingKey;
 
-	private boolean messageHidden;
-
-	public String getMessageBody() {
-		return messageBody;
-	}
-
-	public void setMessageBody(String messageBody) {
-		this.messageBody = messageBody;
-	}
-
-	public Long getMessageUID() {
-		return messageUID;
-	}
-
-	public void setMessageUID(Long messageUID) {
-		this.messageUID = messageUID;
-	}
+	private Integer maxAttendeeMikes;
 
 	public String getDispatch() {
 		return dispatch;
 	}
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
+	public Integer getMaxAttendeeMikes() {
+		return maxAttendeeMikes;
+	}
+
+	public String getMeetingKey() {
+		return meetingKey;
 	}
 
 	public Long getToolSessionID() {
 		return toolSessionID;
 	}
 
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setDispatch(String dispatch) {
+		this.dispatch = dispatch;
+	}
+
+	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
+		this.maxAttendeeMikes = maxAttendeeMikes;
+	}
+
+	public void setMeetingKey(String meetingKey) {
+		this.meetingKey = meetingKey;
+	}
+
 	public void setToolSessionID(Long toolSessionID) {
 		this.toolSessionID = toolSessionID;
 	}
 
-	public boolean isTeacherVisible() {
-		return teacherVisible;
-	}
-
-	public void setTeacherVisible(boolean visible) {
-		this.teacherVisible = visible;
-	}
-
-	public boolean isMessageHidden() {
-		return messageHidden;
-	}
-
-	public void setMessageHidden(boolean messageHidden) {
-		this.messageHidden = messageHidden;
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 }

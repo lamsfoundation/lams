@@ -407,7 +407,6 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public DimdimUser getUserByUserIdAndSessionId(Long userId,
 			Long toolSessionId) {
 		return dimdimUserDAO.getByUserIdAndSessionId(userId, toolSessionId);

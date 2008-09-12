@@ -70,13 +70,11 @@ public class AuthoringForm extends ActionForm {
 
 	private SessionMap<String, Object> sessionMap;
 	
-	private Integer maxParticipants;
+	private String topic;
+	
+	private String meetingKey;
 
-	private Integer meetingDurationInHours;
-
-	private boolean allowVideo;
-
-	private Integer attendeeMikes;
+	private Integer maxAttendeeMikes;
 	
 	@Override
 	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
@@ -191,35 +189,28 @@ public class AuthoringForm extends ActionForm {
 		this.allowRichEditor = allowRichEditor;
 	}
 
-	public Integer getMaxParticipants() {
-		return maxParticipants;
+	public String getTopic() {
+		return topic;
 	}
 
-	public void setMaxParticipants(Integer maxParticipants) {
-		this.maxParticipants = maxParticipants;
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
-	public Integer getMeetingDurationInHours() {
-		return meetingDurationInHours;
+	public String getMeetingKey() {
+		return meetingKey;
 	}
 
-	public void setMeetingDurationInHours(Integer meetingDurationInHours) {
-		this.meetingDurationInHours = meetingDurationInHours;
+	public void setMeetingKey(String meetingKey) {
+		this.meetingKey = meetingKey;
 	}
 
-	public boolean isAllowVideo() {
-		return allowVideo;
+	public Integer getMaxAttendeeMikes() {
+		return maxAttendeeMikes;
 	}
 
-	public void setAllowVideo(boolean allowVideo) {
-		this.allowVideo = allowVideo;
+	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
+		this.maxAttendeeMikes = maxAttendeeMikes;
 	}
 
-	public Integer getAttendeeMikes() {
-		return attendeeMikes;
-	}
-
-	public void setAttendeeMikes(Integer attendeeMikes) {
-		this.attendeeMikes = attendeeMikes;
-	}
 }

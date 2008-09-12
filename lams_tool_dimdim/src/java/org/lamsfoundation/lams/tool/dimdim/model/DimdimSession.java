@@ -60,7 +60,13 @@ public class DimdimSession implements java.io.Serializable {
 	private Dimdim dimdim;
 
 	private Set<DimdimUser> dimdimUsers;
+	
+	private String topic;
 
+	private String meetingKey;
+
+	private Integer maxAttendeeMikes;
+	
 	// Constructors
 
 	/** default constructor */
@@ -188,6 +194,58 @@ public class DimdimSession implements java.io.Serializable {
 		this.dimdimUsers = dimdimUsers;
 	}
 
+	/**
+	 * @hibernate.property column="topic"
+	 * @return
+	 */
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	/**
+	 * @hibernate.property column="meeting_key"
+	 * @return
+	 */
+	public String getMeetingKey() {
+		return meetingKey;
+	}
+
+	public void setMeetingKey(String meetingKey) {
+		this.meetingKey = meetingKey;
+	}
+
+	/**
+	 * @hibernate.property column="max_attendee_mikes"
+	 * @return
+	 */
+	public Integer getMaxAttendeeMikes() {
+		return maxAttendeeMikes;
+	}
+
+	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
+		this.maxAttendeeMikes = maxAttendeeMikes;
+	}
+	
+	
+	/**
+	 * @hibernate.property column="conf_key"
+	 * @return
+	 */
+	public String getConfKey() {
+		return confKey;
+	}
+
+	public void setConfKey(String confKey) {
+		this.confKey = confKey;
+	}
+
+	private String confKey;
+
+	
 	/**
 	 * toString
 	 * 

@@ -79,13 +79,11 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 
 	private Set<DimdimSession> dimdimSessions;
 
-	private Integer maxParticipants;
+	private String topic;
+	
+	private String meetingKey;
 
-	private Integer meetingDurationInHours;
-
-	private boolean allowVideo;
-
-	private Integer attendeeMikes;
+	private Integer maxAttendeeMikes;
 
 	// Constructors
 
@@ -329,53 +327,41 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 	public void setDimdimSessions(Set<DimdimSession> dimdimSessions) {
 		this.dimdimSessions = dimdimSessions;
 	}
-
+	
 	/**
-	 * @hibernate.property column="max_participants"
+	 * @hibernate.property column="topic"
 	 * @return
 	 */
-	public Integer getMaxParticipants() {
-		return maxParticipants;
+	public String getTopic() {
+		return topic;
 	}
 
-	public void setMaxParticipants(Integer maxParticipants) {
-		this.maxParticipants = maxParticipants;
-	}
-
-	/**
-	 * @hibernate.property column="meeting_duration_in_hours"
-	 * @return
-	 */
-	public Integer getMeetingDurationInHours() {
-		return meetingDurationInHours;
-	}
-
-	public void setMeetingDurationInHours(Integer meetingDurationInHours) {
-		this.meetingDurationInHours = meetingDurationInHours;
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
 	/**
-	 * @hibernate.property column="allow_video" length="1"
+	 * @hibernate.property column="meeting_key"
 	 * @return
 	 */
-	public boolean isAllowVideo() {
-		return allowVideo;
+	public String getMeetingKey() {
+		return meetingKey;
 	}
 
-	public void setAllowVideo(boolean allowVideo) {
-		this.allowVideo = allowVideo;
+	public void setMeetingKey(String meetingKey) {
+		this.meetingKey = meetingKey;
 	}
 
 	/**
-	 * @hibernate.property column="attendee_mikes"
+	 * @hibernate.property column="max_attendee_mikes"
 	 * @return
 	 */
-	public Integer getAttendeeMikes() {
-		return attendeeMikes;
+	public Integer getMaxAttendeeMikes() {
+		return maxAttendeeMikes;
 	}
 
-	public void setAttendeeMikes(Integer attendeeMikes) {
-		this.attendeeMikes = attendeeMikes;
+	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
+		this.maxAttendeeMikes = maxAttendeeMikes;
 	}
 
 	/**

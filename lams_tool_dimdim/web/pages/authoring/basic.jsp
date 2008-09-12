@@ -36,51 +36,25 @@
 
 	<tr>
 		<td>
-			<fmt:message key="label.authoring.basic.maxParticipants" />
+			<fmt:message key="label.authoring.basic.topic" />
 			:
-			<html:select property="maxParticipants">
-				<html:option value="20"></html:option>
-				<html:option value="40"></html:option>
-				<html:option value="60"></html:option>
-				<html:option value="80"></html:option>
-				<html:option value="100"></html:option>
-				<html:option value="200"></html:option>
-				<html:option value="300"></html:option>
-				<html:option value="400"></html:option>
-				<html:option value="500"></html:option>
-			</html:select>
+			<html:text property="topic"></html:text>
 		</td>
 	</tr>
 
 	<tr>
 		<td>
-			<fmt:message key="label.authoring.basic.meetingDurationInHours" />
+			<fmt:message key="label.authoring.basic.meetingKey" />
 			:
-			<html:select property="meetingDurationInHours">
-				<html:option value="1"></html:option>
-				<html:option value="2"></html:option>
-				<html:option value="3"></html:option>
-				<html:option value="4"></html:option>
-				<html:option value="5"></html:option>
-			</html:select>
+			<html:text property="meetingKey"></html:text>
 		</td>
 	</tr>
 
 	<tr>
 		<td>
-			<html:checkbox property="allowVideo" value="1" styleClass="noBorder"
-				styleId="allowVideo"></html:checkbox>
-			<label for="allowVideo">
-				<fmt:message key="label.authoring.basic.allowVideo" />
-			</label>
-		</td>
-	</tr>
-
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.basic.attendeeMikes" />
+			<fmt:message key="label.authoring.basic.maxAttendeeMikes" />
 			:
-			<html:select property="attendeeMikes">
+			<html:select property="maxAttendeeMikes">
 				<html:option value="1"></html:option>
 				<html:option value="2"></html:option>
 				<html:option value="3"></html:option>

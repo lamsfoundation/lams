@@ -373,11 +373,9 @@ public class AuthoringAction extends DispatchAction {
 			dimdim.setAllowRichEditor(authForm.isAllowRichEditor());
 
 			// TODO check whether these fields should be in here
-			dimdim.setMaxParticipants(authForm.getMaxParticipants());
-			dimdim.setMeetingDurationInHours(authForm
-					.getMeetingDurationInHours());
-			dimdim.setAllowVideo(authForm.isAllowVideo());
-			dimdim.setAttendeeMikes(authForm.getAttendeeMikes());
+			dimdim.setTopic(authForm.getTopic());
+			dimdim.setMeetingKey(authForm.getMeetingKey());
+			dimdim.setMaxAttendeeMikes(authForm.getMaxAttendeeMikes());
 		}
 	}
 

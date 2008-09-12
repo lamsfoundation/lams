@@ -64,6 +64,48 @@
 	</table>
 </div>
 
+<c:out value="" />
+
+<c:choose>
+	<c:when test="${fn:length(dto.sessionDTOs) gt 1}">
+		<!-- Dimdim only supports one conference session at a time -->
+	</c:when>
+	<c:when test="${fn:length(dto.sessionDTOs) eq 0}">
+		<!-- No Tool Sessions available -->
+	</c:when>
+	<c:otherwise>
+		<c:forEach var="session" items="${dto.sessionDTOs}">
+			<html:form action="monitoring">
+				<html:hidden property="dispatch" value="startDimdim" />
+				<html:hidden property="toolSessionID" value="${session.sessionID}" />
+	
+				<div>		
+					<fmt:message key="label.authoring.basic.topic" />
+					:
+					<html:text property="topic"></html:text>
+				</div>
+				<div>
+					<fmt:message key="label.authoring.basic.meetingKey" />
+					:
+					<html:text property="meetingKey"></html:text>
+				</div>
+				<div>
+					<fmt:message key="label.authoring.basic.maxAttendeeMikes" />
+					:
+					<html:select property="maxAttendeeMikes">
+						<html:option value="1"></html:option>
+						<html:option value="2"></html:option>
+						<html:option value="3"></html:option>
+						<html:option value="4"></html:option>
+						<html:option value="5"></html:option>
+					</html:select>
+				</div>
+				<html:submit></html:submit>
+			</html:form>
+		</c:forEach>
+	</c:otherwise>
+</c:choose>
+
 <c:forEach var="session" items="${dto.sessionDTOs}">
 
 	<table>

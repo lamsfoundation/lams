@@ -64,13 +64,11 @@ public class ContentDTO {
 
 	public Long currentTab;
 	
-	public Integer maxParticipants;
+	private String topic;
+	
+	private String meetingKey;
 
-	public  Integer meetingDurationInHours;
-
-	public  boolean allowVideo;
-
-	public  Integer attendeeMikes;
+	private Integer maxAttendeeMikes;
 
 	/* Constructors */
 	public ContentDTO() {
@@ -210,35 +208,28 @@ public class ContentDTO {
 		this.currentTab = currentTab;
 	}
 
-	public Integer getMaxParticipants() {
-		return maxParticipants;
+	public String getTopic() {
+		return topic;
 	}
 
-	public void setMaxParticipants(Integer maxParticipants) {
-		this.maxParticipants = maxParticipants;
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
-	public Integer getMeetingDurationInHours() {
-		return meetingDurationInHours;
+	public String getMeetingKey() {
+		return meetingKey;
 	}
 
-	public void setMeetingDurationInHours(Integer meetingDurationInHours) {
-		this.meetingDurationInHours = meetingDurationInHours;
+	public void setMeetingKey(String meetingKey) {
+		this.meetingKey = meetingKey;
 	}
 
-	public boolean isAllowVideo() {
-		return allowVideo;
+	public Integer getMaxAttendeeMikes() {
+		return maxAttendeeMikes;
 	}
 
-	public void setAllowVideo(boolean allowVideo) {
-		this.allowVideo = allowVideo;
+	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
+		this.maxAttendeeMikes = maxAttendeeMikes;
 	}
 
-	public Integer getAttendeeMikes() {
-		return attendeeMikes;
-	}
-
-	public void setAttendeeMikes(Integer attendeeMikes) {
-		this.attendeeMikes = attendeeMikes;
-	}
 }
