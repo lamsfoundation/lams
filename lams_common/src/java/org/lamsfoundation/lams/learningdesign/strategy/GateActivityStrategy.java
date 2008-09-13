@@ -29,7 +29,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
-
 /**
  * Activity strategy that deal with the calculation of all sub gate activities.
  * It is abstract calculation layer for all concrete gate activities.
@@ -39,74 +38,77 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @version 1.1
  * 
  */
-public abstract class GateActivityStrategy extends SimpleActivityStrategy
-{
+public abstract class GateActivityStrategy extends SimpleActivityStrategy {
 	protected GateActivity gateActivity = null;
-	
+
 	public GateActivityStrategy(GateActivity gateActivity) {
 		this.gateActivity = gateActivity;
 	}
 
+	//---------------------------------------------------------------------
+	// Template methods
+	//---------------------------------------------------------------------
+	/**
+	 * Returns wether we should open the gate or close the gate. It's 
+	 * implementation depends on the type of the gate we are dealing with. 
+	 * Generally, it needs the check up the current gate status. If the gate
+	 * is already opened, we will keep it open for current learner. Otherwise,
+	 * we need to validate the open condition for this learner.
+	 * 
+	 * @param learner the learner who just arrived at the gate.
+	 * @param activity the gate activity.
+	 * @param lessonLearners all learners who have started the lesson
+	 * @return whether we should open it or not.
+	 */
+	public boolean shouldOpenGateFor(User learner, List lessonLearners) {
+		gateActivity.addLeaner(learner, false);
 
-    //---------------------------------------------------------------------
-    // Template methods
-    //---------------------------------------------------------------------
-    /**
-     * Returns wether we should open the gate or close the gate. It's 
-     * implementation depends on the type of the gate we are dealing with. 
-     * Generally, it needs the check up the current gate status. If the gate
-     * is already opened, we will keep it open for current learner. Otherwise,
-     * we need to validate the open condition for this learner.
-     * 
-     * @param learner the learner who just arrived at the gate.
-     * @param activity the gate activity.
-     * @param lessonLearners all learners who have started the lesson
-     * @return whether we should open it or not.
-     */
-    public boolean shouldOpenGateFor(User learner,List lessonLearners)
-    {
-    	gateActivity.addWaitingLeaner(learner);
-        
-        if(!gateActivity.getGateOpen().booleanValue())
-        {
-            if( isOpenConditionMet(lessonLearners))
-            {
-            	gateActivity.setGateOpen(new Boolean(true));
-            	gateActivity.getWaitingLearners().clear();
-            }
+		if (!gateActivity.getGateOpen().booleanValue()) {
+			if (isOpenConditionMet(lessonLearners)) {
+				gateActivity.setGateOpen(new Boolean(true));
+				//always clear all lists if the gate is opened
+				gateActivity.getAllGateUsers().clear();
+				gateActivity.getWaitingLearners().clear();
+				gateActivity.getAllowedToPassLearners().clear();
+			}
+			else if (gateActivity.getAllowedToPassLearners().contains(learner)) {
+				return true;
+			}
+		}
+		//always clear all lists if the gate is already opened.
+		else {
+			gateActivity.getAllGateUsers().clear();
+			gateActivity.getWaitingLearners().clear();
+			gateActivity.getAllowedToPassLearners().clear();
+		}
+		return gateActivity.getGateOpen().booleanValue();
+	}
 
-        }
-        //always clear waiting list if the gate is already opened.
-        else {
-        	gateActivity.getWaitingLearners().clear();
-        }
-        return gateActivity.getGateOpen().booleanValue();
-    }
-    
-    //---------------------------------------------------------------------
-    // Abstract methods
-    //---------------------------------------------------------------------
-    /**
-     * Check up the open condition according the gate type.
-     * @return return true if the condition is met.
-     */
-    protected abstract boolean isOpenConditionMet(List lessonLearners);
-    //---------------------------------------------------------------------
-    // Overidden methods
-    //---------------------------------------------------------------------
-    /**
-     * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
-     */
-    protected abstract void setUpContributionType(ArrayList<Integer> contributionTypes);
+	//---------------------------------------------------------------------
+	// Abstract methods
+	//---------------------------------------------------------------------
+	/**
+	 * Check up the open condition according the gate type.
+	 * @return return true if the condition is met.
+	 */
+	protected abstract boolean isOpenConditionMet(List lessonLearners);
 
-    /**
-     * Get the activity for this strategy. The activity should be set
-     * when the strategy is created.
-     */
-    protected Activity getActivity() {
-    	return gateActivity;
-    }
+	//---------------------------------------------------------------------
+	// Overidden methods
+	//---------------------------------------------------------------------
+	/**
+	 * @see org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy#setUpContributionType(org.lamsfoundation.lams.learningdesign.Activity, java.util.ArrayList)
+	 */
+	@Override
+	protected abstract void setUpContributionType(ArrayList<Integer> contributionTypes);
 
-
+	/**
+	 * Get the activity for this strategy. The activity should be set
+	 * when the strategy is created.
+	 */
+	@Override
+	protected Activity getActivity() {
+		return gateActivity;
+	}
 
 }

@@ -47,28 +47,32 @@ import org.lamsfoundation.lams.usermanagement.User;
  * DTO wrapping a normal Gate Activity class, with an extra "calculated" field added for the learning module's gate screen.
  *
  */
-public class GateActivityDTO  {
+public class GateActivityDTO {
 
 	private List expectedLearners;
 	private GateActivity gateActivity;
-	
-	public GateActivityDTO(GateActivity gateActivity, List lessonLearners) {
+	private boolean allowToPass;
+
+	public GateActivityDTO(GateActivity gateActivity, List lessonLearners, boolean allowToPass) {
 		this.gateActivity = gateActivity;
-		this.expectedLearners = lessonLearners;
+		expectedLearners = lessonLearners;
+		this.allowToPass = allowToPass;
 	}
-   /**
-     * Temporary value of the expected number of learners. This may change every time
-     * the gate is knocked, and is NOT persisted to the database. It is calculated when this 
-     * DTO is created by the knockGate() method in LearnerService.
-     */
+
+	/**
+	  * Temporary value of the expected number of learners. This may change every time
+	  * the gate is knocked, and is NOT persisted to the database. It is calculated when this 
+	  * DTO is created by the knockGate() method in LearnerService.
+	  */
 	public List getExpectedLearners() {
 		return expectedLearners;
 	}
 
 	public void setExpectedLearners(List tempExpectedLearnerCount) {
-		this.expectedLearners = tempExpectedLearnerCount;
+		expectedLearners = tempExpectedLearnerCount;
 	}
 
+	@Override
 	public boolean equals(Object other) {
 		return gateActivity.equals(other);
 	}
@@ -97,11 +101,9 @@ public class GateActivityDTO  {
 		return gateActivity.getApplyGrouping();
 	}
 
-	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(
-			ArrayList<BranchActivityEntryDTO> branchMappings,
+	public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings,
 			String languageCode) {
-		return gateActivity.getAuthoringActivityDTOSet(branchMappings,
-				languageCode);
+		return gateActivity.getAuthoringActivityDTOSet(branchMappings, languageCode);
 	}
 
 	public Date getCreateDateTime() {
@@ -240,6 +242,7 @@ public class GateActivityDTO  {
 		return gateActivity.getYcoord();
 	}
 
+	@Override
 	public int hashCode() {
 		return gateActivity.hashCode();
 	}
@@ -256,6 +259,7 @@ public class GateActivityDTO  {
 		return gateActivity.isSystemToolActivity();
 	}
 
+	@Override
 	public String toString() {
 		return gateActivity.toString();
 	}
@@ -270,18 +274,28 @@ public class GateActivityDTO  {
 	public void setGateActivity(GateActivity gateActivity) {
 		this.gateActivity = gateActivity;
 	}
+
 	public boolean isPermissionGate() {
 		return gateActivity.isPermissionGate();
 	}
+
 	public boolean isScheduleGate() {
 		return gateActivity.isScheduleGate();
 	}
+
 	public boolean isSynchGate() {
 		return gateActivity.isSynchGate();
 	}
+
 	public boolean isSystemGate() {
 		return gateActivity.isSystemGate();
 	}
 
+	public boolean getAllowToPass() {
+		return getGateOpen() || allowToPass;
+	}
 
+	public void setAllowToPass(boolean allowToPass) {
+		this.allowToPass = allowToPass;
+	}
 }

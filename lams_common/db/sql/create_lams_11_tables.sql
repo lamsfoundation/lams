@@ -823,6 +823,7 @@ CREATE TABLE lams_tool_content (
 CREATE TABLE lams_activity_learners (
        user_id BIGINT(20) NOT NULL DEFAULT 0
      , activity_id BIGINT(20) NOT NULL DEFAULT 0
+	 , allowed_to_pass TINYINT NOT NULL DEFAULT 0
      , INDEX (user_id)
      , CONSTRAINT FK_TABLE_32_1 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id)

@@ -709,7 +709,7 @@ public class LearnerService implements ICoreLearnerService {
 		//update gate including updating the waiting list and gate status in
 		//the database.
 		activityDAO.update(gate);
-		return new GateActivityDTO(gate, lessonLearners);
+		return new GateActivityDTO(gate, lessonLearners, gateOpen);
 
 	}
 

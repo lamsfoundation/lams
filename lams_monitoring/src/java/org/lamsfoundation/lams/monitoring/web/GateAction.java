@@ -25,6 +25,8 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,18 +37,15 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
-import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-
 
 /**
  * <p>The action servlet that allows the teacher to view the status of sync 
@@ -81,201 +80,217 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * ----------------XDoclet Tags--------------------
  * 
  */
-public class GateAction extends LamsDispatchAction
-{
-    //---------------------------------------------------------------------
-    // Instance variables
-    //---------------------------------------------------------------------
+public class GateAction extends LamsDispatchAction {
+	//---------------------------------------------------------------------
+	// Instance variables
+	//---------------------------------------------------------------------
 	// private static Logger log = Logger.getLogger(GateAction.class);
-	
+
 	private IMonitoringService monitoringService;
 	private ICoreLearnerService learnerService;
-    //---------------------------------------------------------------------
-    // Class level constants - Struts forward
-    //---------------------------------------------------------------------
-    private static final String VIEW_SYNCH_GATE = "viewSynchGate";
-    private static final String VIEW_PERMISSION_GATE = "viewPermissionGate";
-    private static final String VIEW_SCHEDULE_GATE="viewScheduleGate";
-    
-    // Gate Form fields
+	//---------------------------------------------------------------------
+	// Class level constants - Struts forward
+	//---------------------------------------------------------------------
+	private static final String VIEW_SYNCH_GATE = "viewSynchGate";
+	private static final String VIEW_PERMISSION_GATE = "viewPermissionGate";
+	private static final String VIEW_SCHEDULE_GATE = "viewScheduleGate";
+
+	// Gate Form fields
 	private static final String ACTIVITY_FORM_FIELD = "activityId";
 	private static final String TOTAL_LEARNERS_FORM_FIELD = "totalLearners";
-	public static final String READ_ONLY= "readOnly";
-	public static final String LOCAL_FILES= "localFiles";
+	public static final String READ_ONLY = "readOnly";
+	public static final String LOCAL_FILES = "localFiles";
+	private static final String USER_ID = "userId";
 
-    //---------------------------------------------------------------------
-    // Struts Dispatch Method
-    //---------------------------------------------------------------------
-    /**
-     * <p>The dispatch method that allows the teacher to view the status of the 
-     * gate. It is expecting the caller passed in lesson id and gate activity
-     * id as http parameter. Otherwise, the utility method will generate some
-     * exception.</p>
-     * 
-     * <p>Based on the lesson id and gate activity id, it sets up the gate form
-     * to show the waiting learners and the total waiting learners. Regarding
-     * schedule gate, it also shows the estimated gate opening time and gate
-     * closing time.</p>
-     * 
-     * <b>Note:</b> gate form attribute <code>waitingLearners</code> got setup
-     * after the view is dispatch to ensure there won't be casting exception
-     * occur if the activity id is not a gate by chance.
-     * 
-     * 
-     * @param mapping An ActionMapping class that will be used by the Action 
-     * class to tell the ActionServlet where to send the end-user.
-     *
-     * @param form The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param response A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet 
-     * 		   indicating where the user is to go next.
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward viewGate(ActionMapping mapping,
-                                  ActionForm form,
-                                  HttpServletRequest request,
-                                  HttpServletResponse response) throws IOException,
-                                                                          ServletException
-    {
-        DynaActionForm gateForm = (DynaActionForm)form;
-        
-        // if this is the initial call then activity id will be in the request, otherwise
-        // get it from the form (if being called from openGate.jsp
-        Long gateIdLong = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
-        if ( gateIdLong == null ) {
-        	gateIdLong = (Long)gateForm.get(ACTIVITY_FORM_FIELD);
-        }
-        long gateId = gateIdLong != null ? gateIdLong.longValue() : -1 ;
-        
-        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-        this.learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
-        
-        GateActivity gate = (GateActivity) monitoringService.getActivityById(gateId);
-        
-        if ( gate == null ) {
-        	throw new MonitoringServiceException("Gate activity missing. Activity id"+gateId);
-        }
-        
-        //setup the total learners
-        int totalLearners = learnerService.getLearnersForGate(gate).size();
-        gateForm.set(TOTAL_LEARNERS_FORM_FIELD,new Integer(totalLearners));
-        gateForm.set(ACTIVITY_FORM_FIELD,gateIdLong);        
-    	gateForm.set(LOCAL_FILES, Boolean.FALSE);
+	//---------------------------------------------------------------------
+	// Struts Dispatch Method
+	//---------------------------------------------------------------------
+	/**
+	 * <p>The dispatch method that allows the teacher to view the status of the 
+	 * gate. It is expecting the caller passed in lesson id and gate activity
+	 * id as http parameter. Otherwise, the utility method will generate some
+	 * exception.</p>
+	 * 
+	 * <p>Based on the lesson id and gate activity id, it sets up the gate form
+	 * to show the waiting learners and the total waiting learners. Regarding
+	 * schedule gate, it also shows the estimated gate opening time and gate
+	 * closing time.</p>
+	 * 
+	 * <b>Note:</b> gate form attribute <code>waitingLearners</code> got setup
+	 * after the view is dispatch to ensure there won't be casting exception
+	 * occur if the activity id is not a gate by chance.
+	 * 
+	 * 
+	 * @param mapping An ActionMapping class that will be used by the Action 
+	 * class to tell the ActionServlet where to send the end-user.
+	 *
+	 * @param form The ActionForm class that will contain any data submitted
+	 * by the end-user via a form.
+	 * @param request A standard Servlet HttpServletRequest class.
+	 * @param response A standard Servlet HttpServletResponse class.
+	 * @return An ActionForward class that will be returned to the ActionServlet 
+	 * 		   indicating where the user is to go next.
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	public ActionForward viewGate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+		DynaActionForm gateForm = (DynaActionForm) form;
 
-        
-        return findViewByGateType(mapping, gateForm, gate);
-    }
-    /**
-     * Open the gate if is closed.
-     * 
-     * @param mapping An ActionMapping class that will be used by the Action 
-     * class to tell the ActionServlet where to send the end-user.
-     *
-     * @param form The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param request A standard Servlet HttpServletRequest class.
-     * @param response A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet 
-     * 		   indicating where the user is to go next.
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward openGate(ActionMapping mapping,
-                                  ActionForm form,
-                                  HttpServletRequest request,
-                                  HttpServletResponse response) throws IOException,
-                                                                          ServletException
-    {
-        this.monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+		// if this is the initial call then activity id will be in the request, otherwise
+		// get it from the form (if being called from openGate.jsp
+		Long gateIdLong = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
+		if (gateIdLong == null) {
+			gateIdLong = (Long) gateForm.get(GateAction.ACTIVITY_FORM_FIELD);
+		}
+		long gateId = gateIdLong != null ? gateIdLong.longValue() : -1;
 
-        DynaActionForm gateForm = (DynaActionForm)form;
-        
-        GateActivity gate = monitoringService.openGate((Long)gateForm.get(ACTIVITY_FORM_FIELD));
+		monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+		learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 
-        return findViewByGateType(mapping, gateForm, gate);
-    }
-    
-    /**
-     * Export Portfolio Page
-     */
-    public ActionForward exportPortfolio(ActionMapping mapping,
-                                  ActionForm form,
-                                  HttpServletRequest request,
-                                  HttpServletResponse response) throws IOException,
-                                                                          ServletException
-    {
-    	DynaActionForm gateForm = (DynaActionForm)form;
-    	ActionForward forward = viewGate(mapping, form, request, response);
-    	gateForm.set(READ_ONLY, Boolean.TRUE);
-    	gateForm.set(LOCAL_FILES, Boolean.TRUE);
-    	return forward;
-    }
-    
+		GateActivity gate = (GateActivity) monitoringService.getActivityById(gateId);
 
-    //---------------------------------------------------------------------
-    // Helper Methods
-    //---------------------------------------------------------------------    
-    /**
-     * Dispatch view the according to the gate type.
-     * 
-     * @param mapping An ActionMapping class that will be used by the Action 
-     * class to tell the ActionServlet where to send the end-user.
-     * @param gateForm The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param permissionGate the gate acitivty object
-     * @return An ActionForward class that will be returned to the ActionServlet 
-     * 		   indicating where the user is to go next.
-     */
-    private ActionForward findViewByGateType(ActionMapping mapping, 
-                                             DynaActionForm gateForm, 
-                                             GateActivity gate)
-    {
-    	// reset all the other fields, so that the following code only has to set up its own values (LDEV-1237)
-    	gateForm.set(READ_ONLY, Boolean.FALSE);
-        gateForm.set("gate",null);
-        gateForm.set("waitingLearners",null);
-        gateForm.set("startingTime",null);
-        gateForm.set("endingTime",null);
-        gateForm.set("gate",gate);
-        gateForm.set("waitingLearners",new Integer(gate.getWaitingLearners().size()));
+		if (gate == null) {
+			throw new MonitoringServiceException("Gate activity missing. Activity id" + gateId);
+		}
 
-        //dispatch the view according to the type of the gate.
-        if(gate.isSynchGate())
-            return mapping.findForward(VIEW_SYNCH_GATE);
-        else if(gate.isScheduleGate())
-            return viewScheduleGate(mapping,gateForm,(ScheduleGateActivity)gate);
-        else if(gate.isPermissionGate() || gate.isSystemGate())
-            return mapping.findForward(VIEW_PERMISSION_GATE);
-        else
-            throw new MonitoringServiceException("Invalid gate activity. " +
-            		"gate id ["+gate.getActivityId()+"] - the type ["+
-            		gate.getActivityTypeId()+"] is not a gate type");
-    }
+		//setup the total learners
+		int totalLearners = learnerService.getLearnersForGate(gate).size();
+		gateForm.set(GateAction.TOTAL_LEARNERS_FORM_FIELD, new Integer(totalLearners));
+		gateForm.set(GateAction.ACTIVITY_FORM_FIELD, gateIdLong);
+		gateForm.set(GateAction.LOCAL_FILES, Boolean.FALSE);
 
+		return findViewByGateType(mapping, gateForm, gate);
+	}
 
+	/**
+	 * Open the gate if is closed.
+	 * 
+	 * @param mapping An ActionMapping class that will be used by the Action 
+	 * class to tell the ActionServlet where to send the end-user.
+	 *
+	 * @param form The ActionForm class that will contain any data submitted
+	 * by the end-user via a form.
+	 * @param request A standard Servlet HttpServletRequest class.
+	 * @param response A standard Servlet HttpServletResponse class.
+	 * @return An ActionForward class that will be returned to the ActionServlet 
+	 * 		   indicating where the user is to go next.
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	public ActionForward openGate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+		monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 
-    /**
-     * Set up the form attributes specific to the schedule gate and navigate
-     * to the schedule gate view.
-     * 
-     * @param mapping An ActionMapping class that will be used by the Action 
-     * class to tell the ActionServlet where to send the end-user.
-     * @param gateForm The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param permissionGate the gate acitivty object
-     * @return An ActionForward class that will be returned to the ActionServlet 
-     * 		   indicating where the user is to go next.
-     */
-    private ActionForward viewScheduleGate(ActionMapping mapping, 
-                                           DynaActionForm gateForm,
-                                           ScheduleGateActivity scheduleGate)
-    {
-        gateForm.set("startingTime",scheduleGate.getGateStartDateTime());
-        gateForm.set("endingTime",scheduleGate.getGateEndDateTime());
-        return mapping.findForward(VIEW_SCHEDULE_GATE);
-    }
+		DynaActionForm gateForm = (DynaActionForm) form;
+
+		GateActivity gate = monitoringService.openGate((Long) gateForm.get(GateAction.ACTIVITY_FORM_FIELD));
+
+		return findViewByGateType(mapping, gateForm, gate);
+	}
+
+	/**
+	 * Allows a single learner to pass the gate.
+	 * @param mapping An ActionMapping class that will be used by the Action 
+	 * class to tell the ActionServlet where to send the end-user.
+	 * @param form he ActionForm class that will contain any data submitted
+	 * by the end-user via a form.
+	 * @param request A standard Servlet HttpServletRequest class.
+	 * @param response A standard Servlet HttpServletRequest class.
+	 * @return An ActionForward class that will be returned to the ActionServlet 
+	 * 		   indicating where the user is to go next.
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	public ActionForward openGateForSingleUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+		monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+
+		DynaActionForm gateForm = (DynaActionForm) form;
+		Long gateIdLong = (Long) gateForm.get(GateAction.ACTIVITY_FORM_FIELD);
+		Integer userId = (Integer) gateForm.get(GateAction.USER_ID);
+		GateActivity gate = monitoringService.openGateForSingleUser(gateIdLong, userId);
+		return findViewByGateType(mapping, gateForm, gate);
+	}
+
+	/**
+	 * Export Portfolio Page
+	 */
+	public ActionForward exportPortfolio(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+		DynaActionForm gateForm = (DynaActionForm) form;
+		ActionForward forward = viewGate(mapping, form, request, response);
+		gateForm.set(GateAction.READ_ONLY, Boolean.TRUE);
+		gateForm.set(GateAction.LOCAL_FILES, Boolean.TRUE);
+		return forward;
+	}
+
+	//---------------------------------------------------------------------
+	// Helper Methods
+	//---------------------------------------------------------------------    
+	/**
+	 * Dispatch view the according to the gate type.
+	 * 
+	 * @param mapping An ActionMapping class that will be used by the Action 
+	 * class to tell the ActionServlet where to send the end-user.
+	 * @param gateForm The ActionForm class that will contain any data submitted
+	 * by the end-user via a form.
+	 * @param permissionGate the gate acitivty object
+	 * @return An ActionForward class that will be returned to the ActionServlet 
+	 * 		   indicating where the user is to go next.
+	 */
+	private ActionForward findViewByGateType(ActionMapping mapping, DynaActionForm gateForm, GateActivity gate) {
+		// reset all the other fields, so that the following code only has to set up its own values (LDEV-1237)
+		gateForm.set(GateAction.READ_ONLY, Boolean.FALSE);
+		gateForm.set("gate", null);
+		gateForm.set("waitingLearners", null);
+		gateForm.set("waitingLearnerList", null);
+		gateForm.set("allowedToPassLearnerList", null);
+		gateForm.set("forbiddenLearnerList", null);
+		gateForm.set("startingTime", null);
+		gateForm.set("endingTime", null);
+
+		Set<User> waitingLearnersList = gate.getWaitingLearners();
+		gateForm.set("gate", gate);
+		gateForm.set("waitingLearners", new Integer(waitingLearnersList.size()));
+
+		//dispatch the view according to the type of the gate.
+		if (gate.isSynchGate()) {
+			return mapping.findForward(GateAction.VIEW_SYNCH_GATE);
+		}
+		else if (gate.isScheduleGate()) {
+			return viewScheduleGate(mapping, gateForm, (ScheduleGateActivity) gate);
+		}
+		else if (gate.isPermissionGate() || gate.isSystemGate()) {
+			gateForm.set("waitingLearnerList", waitingLearnersList);
+			gateForm.set("allowedToPassLearnerList", gate.getAllowedToPassLearners());
+			Collection<User> forbiddenUsers = learnerService.getLearnersForGate(gate);
+			forbiddenUsers.removeAll(gate.getAllowedToPassLearners());
+			gateForm.set("forbiddenLearnerList", forbiddenUsers);
+			return mapping.findForward(GateAction.VIEW_PERMISSION_GATE);
+		}
+		else {
+			throw new MonitoringServiceException("Invalid gate activity. " + "gate id [" + gate.getActivityId()
+					+ "] - the type [" + gate.getActivityTypeId() + "] is not a gate type");
+		}
+	}
+
+	/**
+	 * Set up the form attributes specific to the schedule gate and navigate
+	 * to the schedule gate view.
+	 * 
+	 * @param mapping An ActionMapping class that will be used by the Action 
+	 * class to tell the ActionServlet where to send the end-user.
+	 * @param gateForm The ActionForm class that will contain any data submitted
+	 * by the end-user via a form.
+	 * @param permissionGate the gate acitivty object
+	 * @return An ActionForward class that will be returned to the ActionServlet 
+	 * 		   indicating where the user is to go next.
+	 */
+	private ActionForward viewScheduleGate(ActionMapping mapping, DynaActionForm gateForm, ScheduleGateActivity scheduleGate) {
+		gateForm.set("startingTime", scheduleGate.getGateStartDateTime());
+		gateForm.set("endingTime", scheduleGate.getGateEndDateTime());
+		return mapping.findForward(GateAction.VIEW_SCHEDULE_GATE);
+	}
 
 }

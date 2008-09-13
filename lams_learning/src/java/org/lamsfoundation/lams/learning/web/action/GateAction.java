@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
@@ -41,16 +41,13 @@ import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
-import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-
 
 /**
  * <p>The action servlet that deals with gate activity. This class allows the 
@@ -83,27 +80,26 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts:action-forward name="synchGate" path=".synchGate"
  * ----------------XDoclet Tags--------------------
  */
-public class GateAction extends LamsDispatchAction
-{
-
-    //---------------------------------------------------------------------
-    // Instance variables
-    //---------------------------------------------------------------------
-	// private static Logger log = Logger.getLogger(GateAction.class);
-
-    //---------------------------------------------------------------------
-    // Class level constants - Struts forward
-    //---------------------------------------------------------------------
-    private static final String VIEW_PERMISSION_GATE = "permissionGate";
-    private static final String VIEW_SCHEDULE_GATE = "scheduleGate";
-    private static final String VIEW_SYNCH_GATE = "synchGate";
-	
-    /** Input parameter. Boolean value */
-    public static final String PARAM_FORCE_GATE_OPEN  = "force";
+public class GateAction extends LamsDispatchAction {
 
 	//---------------------------------------------------------------------
-    // Struts Dispatch Method
-    //---------------------------------------------------------------------    
+	// Instance variables
+	//---------------------------------------------------------------------
+	// private static Logger log = Logger.getLogger(GateAction.class);
+
+	//---------------------------------------------------------------------
+	// Class level constants - Struts forward
+	//---------------------------------------------------------------------
+	private static final String VIEW_PERMISSION_GATE = "permissionGate";
+	private static final String VIEW_SCHEDULE_GATE = "scheduleGate";
+	private static final String VIEW_SYNCH_GATE = "synchGate";
+
+	/** Input parameter. Boolean value */
+	public static final String PARAM_FORCE_GATE_OPEN = "force";
+
+	//---------------------------------------------------------------------
+	// Struts Dispatch Method
+	//---------------------------------------------------------------------    
 	/**
 	 * 
 	 * @param mapping
@@ -114,94 +110,88 @@ public class GateAction extends LamsDispatchAction
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	public ActionForward knockGate(ActionMapping mapping,
-                                   ActionForm form,
-                                   HttpServletRequest request,
-                                   HttpServletResponse response) throws IOException,
-                                                                          ServletException
-    {
-        boolean forceGate = WebUtil.readBooleanParam(request,PARAM_FORCE_GATE_OPEN,false);
-        Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-        Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-        
-        //initialize service object
-        ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-        Activity activity = learnerService.getActivity(activityId);
+	public ActionForward knockGate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+		boolean forceGate = WebUtil.readBooleanParam(request, GateAction.PARAM_FORCE_GATE_OPEN, false);
+		Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+		Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+
+		//initialize service object
+		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+		Activity activity = learnerService.getActivity(activityId);
 		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
 		User learner = LearningWebUtil.getUser(learnerService);
-        Lesson lesson = learnerService.getLesson(lessonId);
+		Lesson lesson = learnerService.getLesson(lessonId);
 
-        // don't use LearningWebUtil.getLearnerProgress(request, learnerService) as it may try to get the lesson 
-        //  from the activity and the activity may be null (if this was a system stop gate).
- 		LearnerProgress learnerProgress = (LearnerProgress)request.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
-        if ( learnerProgress == null ) {
-        	learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
-        }
+		// don't use LearningWebUtil.getLearnerProgress(request, learnerService) as it may try to get the lesson 
+		//  from the activity and the activity may be null (if this was a system stop gate).
+		LearnerProgress learnerProgress = (LearnerProgress) request
+				.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
+		if (learnerProgress == null) {
+			learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
+		}
 
-        if ( activity != null ) {
-	        //knock the gate
-	        GateActivityDTO gate = learnerService.knockGate(activityId,learner,forceGate);
+		if (activity != null) {
+			//knock the gate
+			GateActivityDTO gate = learnerService.knockGate(activityId, learner, forceGate);
 
-	        if ( gate == null ) {
-	    		throw new LearnerServiceException("Gate missing. gate id ["+activityId+"]");
-	        }
+			if (gate == null) {
+				throw new LearnerServiceException("Gate missing. gate id [" + activityId + "]");
+			}
 
-	        //if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
-	        if ( ! gate.getGateOpen() )  {
-	            ActionForward forward = findViewByGateType(mapping, (DynaActionForm)form, gate, lesson);
-	    		LearningWebUtil.setupProgressInRequest((DynaActionForm)form, request, learnerProgress);
-	            return forward;
-	        }
-        }
-        
-        // gate is open, so let the learner go to the next activity ( updating the cached learner progress on the way )
-        return LearningWebUtil.completeActivity(request, response,
-		    		actionMappings, learnerProgress, activity, 
-		    			learner.getUserId(), learnerService, true);
+			//if the gate is closed, ask the learner to wait ( updating the cached learner progress on the way )
+			if (!gate.getAllowToPass()) {
+				ActionForward forward = findViewByGateType(mapping, (DynaActionForm) form, gate, lesson);
+				LearningWebUtil.setupProgressInRequest((DynaActionForm) form, request, learnerProgress);
+				return forward;
+			}
+		}
 
-    }
-	
-    //---------------------------------------------------------------------
-    // Helper methods
-    //---------------------------------------------------------------------
-    /**
-     * Dispatch view the according to the gate type.
-     * 
-     * @param mapping An ActionMapping class that will be used by the Action 
-     * class to tell the ActionServlet where to send the end-user.
-     * @param gateForm The ActionForm class that will contain any data submitted
-     * by the end-user via a form.
-     * @param permissionGate the gate activity object
-     * @param totalNumActiveLearners total number of active learners in the lesson (may not all be logged in)
-     * @return An ActionForward class that will be returned to the ActionServlet 
-     * 		   indicating where the user is to go next.
-     */
-    private ActionForward findViewByGateType(ActionMapping mapping, 
-                                             DynaActionForm gateForm, 
-                                             GateActivityDTO gate,
-                                             Lesson lesson)
-    {
-   		gateForm.set("totalLearners",new Integer(gate.getExpectedLearners().size()));
-        gateForm.set("waitingLearners",new Integer(gate.getWaitingLearners().size()));
-   		gateForm.set("previewLesson",lesson.isPreviewLesson());
-   		gateForm.set(AttributeNames.PARAM_ACTIVITY_ID,gate.getActivityId());
-   		gateForm.set(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
-        gateForm.set("gate",gate);
-        if(gate.isSynchGate())  {
-            return mapping.findForward(VIEW_SYNCH_GATE);
-        } else if(gate.isScheduleGate()) {
-        	ScheduleGateActivity scheduleGate = (ScheduleGateActivity)gate.getGateActivity();
-            gateForm.set("startingTime",scheduleGate.getGateStartDateTime());
-            gateForm.set("endingTime",scheduleGate.getGateEndDateTime());
-            return mapping.findForward(VIEW_SCHEDULE_GATE);
-        } else if(gate.isPermissionGate() || gate.isSystemGate()) {
-            return mapping.findForward(VIEW_PERMISSION_GATE);
-        } else {
-            throw new LearnerServiceException("Invalid gate activity. " +
-            		"gate id ["+gate.getActivityId()+"] - the type ["+
-            		gate.getActivityTypeId()+"] is not a gate type");
-        }
-    }
+		// gate is open, so let the learner go to the next activity ( updating the cached learner progress on the way )
+		return LearningWebUtil.completeActivity(request, response, actionMappings, learnerProgress, activity,
+				learner.getUserId(), learnerService, true);
+
+	}
+
+	//---------------------------------------------------------------------
+	// Helper methods
+	//---------------------------------------------------------------------
+	/**
+	 * Dispatch view the according to the gate type.
+	 * 
+	 * @param mapping An ActionMapping class that will be used by the Action 
+	 * class to tell the ActionServlet where to send the end-user.
+	 * @param gateForm The ActionForm class that will contain any data submitted
+	 * by the end-user via a form.
+	 * @param permissionGate the gate activity object
+	 * @param totalNumActiveLearners total number of active learners in the lesson (may not all be logged in)
+	 * @return An ActionForward class that will be returned to the ActionServlet 
+	 * 		   indicating where the user is to go next.
+	 */
+	private ActionForward findViewByGateType(ActionMapping mapping, DynaActionForm gateForm, GateActivityDTO gate, Lesson lesson) {
+		gateForm.set("totalLearners", new Integer(gate.getExpectedLearners().size()));
+		gateForm.set("waitingLearners", new Integer(gate.getWaitingLearners().size()));
+		gateForm.set("previewLesson", lesson.isPreviewLesson());
+		gateForm.set(AttributeNames.PARAM_ACTIVITY_ID, gate.getActivityId());
+		gateForm.set(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
+		gateForm.set("gate", gate);
+		if (gate.isSynchGate()) {
+			return mapping.findForward(GateAction.VIEW_SYNCH_GATE);
+		}
+		else if (gate.isScheduleGate()) {
+			ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate.getGateActivity();
+			gateForm.set("startingTime", scheduleGate.getGateStartDateTime());
+			gateForm.set("endingTime", scheduleGate.getGateEndDateTime());
+			return mapping.findForward(GateAction.VIEW_SCHEDULE_GATE);
+		}
+		else if (gate.isPermissionGate() || gate.isSystemGate()) {
+			return mapping.findForward(GateAction.VIEW_PERMISSION_GATE);
+		}
+		else {
+			throw new LearnerServiceException("Invalid gate activity. " + "gate id [" + gate.getActivityId() + "] - the type ["
+					+ gate.getActivityTypeId() + "] is not a gate type");
+		}
+	}
 
 }
