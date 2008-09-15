@@ -61,11 +61,13 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimAttachmentDAO;
+import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimConfigDAO;
 import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimDAO;
 import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimSessionDAO;
 import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimUserDAO;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimAttachment;
+import org.lamsfoundation.lams.tool.dimdim.model.DimdimConfig;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.util.Constants;
@@ -98,6 +100,8 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 	private IDimdimUserDAO dimdimUserDAO = null;
 
 	private IDimdimAttachmentDAO dimdimAttachmentDAO = null;
+	
+	private IDimdimConfigDAO dimdimConfigDAO = null;
 
 	private ILearnerService learnerService;
 
@@ -409,6 +413,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 
 	public DimdimUser getUserByUserIdAndSessionId(Long userId,
 			Long toolSessionId) {
+		// TODO fix this
 		return dimdimUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
 	}
 
@@ -464,6 +469,20 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		DimdimUser dimdimUser = new DimdimUser(user, dimdimSession);
 		saveOrUpdateDimdimUser(dimdimUser);
 		return dimdimUser;
+	}
+	
+	public DimdimConfig getConfigEntry(String key) {
+		dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
+		List<DimdimConfig> list = dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
+		if (list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}
+
+	public void saveOrUpdateConfigEntry(DimdimConfig dimdimConfig) {
+		dimdimConfigDAO.insertOrUpdate(dimdimConfig);
 	}
 
 	public IAuditService getAuditService() {
@@ -592,7 +611,6 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 	public IDimdimAttachmentDAO getDimdimAttachmentDAO() {
 		return dimdimAttachmentDAO;
 	}
-
 	public void setDimdimAttachmentDAO(IDimdimAttachmentDAO attachmentDAO) {
 		this.dimdimAttachmentDAO = attachmentDAO;
 	}
@@ -600,7 +618,6 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 	public IDimdimDAO getDimdimDAO() {
 		return dimdimDAO;
 	}
-
 	public void setDimdimDAO(IDimdimDAO dimdimDAO) {
 		this.dimdimDAO = dimdimDAO;
 	}
@@ -620,6 +637,14 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 
 	public void setDimdimSessionDAO(IDimdimSessionDAO sessionDAO) {
 		this.dimdimSessionDAO = sessionDAO;
+	}
+	
+	public IDimdimConfigDAO getDimdimConfigDAO() {
+		return dimdimConfigDAO;
+	}
+
+	public void setDimdimConfigDAO(IDimdimConfigDAO dimdimConfigDAO) {
+		this.dimdimConfigDAO = dimdimConfigDAO;
 	}
 
 	public ILamsToolService getToolService() {

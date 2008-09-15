@@ -26,7 +26,10 @@ package org.lamsfoundation.lams.tool.dimdim.util;
 
 public interface Constants {
 	public static final String TOOL_SIGNATURE = "laddim10";
-
+	
+	// Config keys
+	public static final String CONFIG_SERVER_URL = "server_url";
+	
 	// Authoring SessionMap key names
 	public static final String KEY_TOOL_CONTENT_ID = "toolContentID";
 	public static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
@@ -46,4 +49,6 @@ public interface Constants {
 	
 	// Parameter names
 	public static final String PARAM_USER_UID = "userUID";
+
+	public static final String ATTR_CONFERENCE_URL = "conferenceURL";
 }

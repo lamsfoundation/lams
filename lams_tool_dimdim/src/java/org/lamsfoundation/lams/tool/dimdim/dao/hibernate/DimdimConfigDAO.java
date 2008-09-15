@@ -22,14 +22,14 @@
  */
 /* $$Id$$ */
 
-package org.lamsfoundation.lams.tool.dimdim.dao;
+package org.lamsfoundation.lams.tool.dimdim.dao.hibernate;
 
-import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimConfigDAO;
 
 /**
- * DAO for accessing the DimdimConfig objects - interface defining methods to be
- * implemented by the Hibernate or other implementation.
+ * DAO for accessing the Dimdim objects - Hibernate specific code.
  */
-public interface IDimdimDAO extends IBaseDAO {
+public class DimdimConfigDAO extends BaseDAO implements IDimdimConfigDAO {
 	
 }

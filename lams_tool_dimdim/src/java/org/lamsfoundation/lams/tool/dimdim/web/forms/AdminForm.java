@@ -33,9 +33,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 
 /**
- * @struts.form name=adminForm"
+ * @struts.form name="adminForm"
  * @author Anthony Sukkar
- * 
+
  */
 public class AdminForm extends ActionForm {
 
@@ -43,9 +43,7 @@ public class AdminForm extends ActionForm {
 
 	// Fields
 
-	private String dimdimServerHost;
-
-	private String dimdimServerPort;
+	private String dimdimServerURL;
 
 	@Override
 	public ActionErrors validate(ActionMapping mapping,
@@ -53,30 +51,18 @@ public class AdminForm extends ActionForm {
 
 		ActionErrors errors = new ActionErrors();
 
-		if (StringUtils.isBlank(this.dimdimServerHost)) {
+		if (StringUtils.isBlank(this.dimdimServerURL)) {
 			// TODO add error messages;
 		}
-
-		if (StringUtils.isBlank(this.dimdimServerPort)) {
-			// TODO add error messages;
-		}
-
 		return errors;
 	}
 
-	public String getDimdimServerHost() {
-		return dimdimServerHost;
+	public String getDimdimServerURL() {
+		return dimdimServerURL;
 	}
 
-	public void setDimdimServerHost(String dimdimServerHost) {
-		this.dimdimServerHost = dimdimServerHost;
+	public void setDimdimServerURL(String dimdimServerURL) {
+		this.dimdimServerURL = dimdimServerURL;
 	}
 
-	public String getDimdimServerPort() {
-		return dimdimServerPort;
-	}
-
-	public void setDimdimServerPort(String dimdimServerPort) {
-		this.dimdimServerPort = dimdimServerPort;
-	}
 }

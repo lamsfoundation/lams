@@ -19,6 +19,7 @@
 				<value>org/lamsfoundation/lams/tool/dimdim/model/DimdimSession.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/dimdim/model/DimdimUser.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/dimdim/model/DimdimAttachment.hbm.xml</value> 
+				<value>org/lamsfoundation/lams/tool/dimdim/model/DimdimConfig.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
@@ -33,6 +34,7 @@
 				<property name="dimdimSessionDAO"><ref bean="dimdimSessionDAO"/></property>
 				<property name="dimdimUserDAO"><ref bean="dimdimUserDAO"/></property>
 				<property name="dimdimDAO"><ref bean="dimdimDAO"/></property>
+				<property name="dimdimConfigDAO"><ref bean="dimdimConfigDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>	
 				<property name="auditService"><ref bean="auditService"/></property>		
@@ -78,6 +80,10 @@
 	</bean>
 	
 	<bean id="dimdimAttachmentDAO" class="org.lamsfoundation.lams.tool.dimdim.dao.hibernate.DimdimAttachmentDAO">
+		<property name="sessionFactory"><ref local="dimdimSessionFactory"/></property>
+	</bean>
+	
+	<bean id="dimdimConfigDAO" class="org.lamsfoundation.lams.tool.dimdim.dao.hibernate.DimdimConfigDAO">
 		<property name="sessionFactory"><ref local="dimdimSessionFactory"/></property>
 	</bean>
 	

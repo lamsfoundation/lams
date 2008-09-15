@@ -92,7 +92,7 @@
 		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
 		<put name="body" value="/pages/monitoring/dimdimDisplay.jsp" />	
 	</definition>
-
+	
 	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:tabbed">
 		<put name="headItems" value="/pages/monitoring/headItems.jsp" />
 	</definition>

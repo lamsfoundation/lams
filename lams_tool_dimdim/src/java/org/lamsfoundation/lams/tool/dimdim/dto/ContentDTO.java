@@ -86,6 +86,10 @@ public class ContentDTO {
 
 		this.onlineInstructionsFiles = new TreeSet<AttachmentDTO>();
 		this.offlineInstructionsFiles = new TreeSet<AttachmentDTO>();
+		
+		this.topic = dimdim.getTopic();
+		this.meetingKey = dimdim.getMeetingKey();
+		this.maxAttendeeMikes = dimdim.getMaxAttendeeMikes();
 
 		for (DimdimAttachment att : dimdim.getDimdimAttachments()) {
 			Set<AttachmentDTO> attSet = null;

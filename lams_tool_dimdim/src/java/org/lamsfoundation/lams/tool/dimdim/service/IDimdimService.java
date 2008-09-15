@@ -28,6 +28,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimAttachment;
+import org.lamsfoundation.lams.tool.dimdim.model.DimdimConfig;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.util.DimdimException;
@@ -153,4 +154,17 @@ public interface IDimdimService {
 	 * @param entry
 	 */
 	void updateEntry(Long uid, String entry);
+
+	/**
+	 * 
+	 * @param key
+	 */
+	DimdimConfig getConfigEntry(String key);
+
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	void saveOrUpdateConfigEntry(DimdimConfig dimdimConfig);
 }

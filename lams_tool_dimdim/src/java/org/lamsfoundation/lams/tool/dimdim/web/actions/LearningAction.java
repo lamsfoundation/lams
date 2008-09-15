@@ -24,7 +24,14 @@
 
 package org.lamsfoundation.lams.tool.dimdim.web.actions;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,6 +47,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dimdim.dto.ContentDTO;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
+import org.lamsfoundation.lams.tool.dimdim.model.DimdimConfig;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
@@ -163,6 +171,47 @@ public class LearningAction extends DispatchAction {
 		}
 		request.setAttribute(Constants.ATTR_FINISHED_ACTIVITY, dimdimUser
 				.isFinishedActivity());
+
+		// Get LAMS userDTO
+		org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
+				.getSession().getAttribute(AttributeNames.USER);
+
+		// get dimdim url
+		DimdimConfig serverURL = dimdimService
+				.getConfigEntry(Constants.CONFIG_SERVER_URL);
+
+		URL url = new URL(serverURL.getValue()
+				+ "/dimdim/JoinConferenceCheck.action?"
+				+ "email="
+				+ URLEncoder.encode(lamsUserDTO.getEmail(), "UTF8")
+				+ "&displayName="
+				+ URLEncoder.encode(lamsUserDTO.getFirstName() + " "
+						+ lamsUserDTO.getLastName(), "UTF8") + "&confKey="
+				+ URLEncoder.encode(dimdimSession.getMeetingKey(), "UTF8"));
+
+		URLConnection connection = url.openConnection();
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(connection
+				.getInputStream()));
+		String dimdimResponse = "";
+		String line = "";
+
+		while ((line = in.readLine()) != null)
+			dimdimResponse += line;
+		in.close();
+
+		log.debug(dimdimResponse + "1");
+
+		// Extract the connect url from the json string.
+		Pattern pattern = Pattern.compile("url:\"(.*?)\"");
+		Matcher matcher = pattern.matcher(dimdimResponse);
+
+		matcher.find();
+		String connectURL = matcher.group(1);
+		
+		String s = new String();
+
+		request.setAttribute(Constants.ATTR_CONFERENCE_URL, serverURL.getValue() + connectURL);
 
 		return mapping.findForward("dimdim");
 	}

@@ -230,22 +230,6 @@ public class DimdimSession implements java.io.Serializable {
 		this.maxAttendeeMikes = maxAttendeeMikes;
 	}
 	
-	
-	/**
-	 * @hibernate.property column="conf_key"
-	 * @return
-	 */
-	public String getConfKey() {
-		return confKey;
-	}
-
-	public void setConfKey(String confKey) {
-		this.confKey = confKey;
-	}
-
-	private String confKey;
-
-	
 	/**
 	 * toString
 	 * 

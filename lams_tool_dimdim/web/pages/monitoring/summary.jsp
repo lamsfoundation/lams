@@ -75,7 +75,7 @@
 	</c:when>
 	<c:otherwise>
 		<c:forEach var="session" items="${dto.sessionDTOs}">
-			<html:form action="monitoring">
+			<html:form action="monitoring" target="_blank">
 				<html:hidden property="dispatch" value="startDimdim" />
 				<html:hidden property="toolSessionID" value="${session.sessionID}" />
 	
@@ -100,7 +100,7 @@
 						<html:option value="5"></html:option>
 					</html:select>
 				</div>
-				<html:submit></html:submit>
+				<html:submit styleClass="button">Open Conference</html:submit>
 			</html:form>
 		</c:forEach>
 	</c:otherwise>

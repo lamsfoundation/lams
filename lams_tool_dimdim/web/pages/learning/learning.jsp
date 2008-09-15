@@ -49,6 +49,11 @@
 		${contentDTO.instructions}
 	</p>
 
+	<html:link href="${conferenceURL}" target="_blank">
+		Open Conference ///
+	</html:link>	
+
+
 	<c:if test="${contentDTO.lockOnFinish and mode == 'learner'}">
 		<div class="info">
 			<c:choose>
