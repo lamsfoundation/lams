@@ -22,6 +22,10 @@
 	<form-property name="endingTime" type="java.util.Date" />
 	<form-property name="readOnly" type="java.lang.Boolean" />
 	<form-property name="localFiles" type="java.lang.Boolean" />
+	<form-property name="waitingLearnerList" type="java.util.Collection" />
+	<form-property name="forbiddenLearnerList" type="java.util.Collection" />
+	<form-property name="allowedToPassLearnerList" type="java.util.Collection" />
+	<form-property name="userId" type="java.lang.Integer" />
 </form-bean>
 
   </form-beans>

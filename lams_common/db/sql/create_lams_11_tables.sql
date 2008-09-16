@@ -602,7 +602,7 @@ CREATE TABLE lams_branch_activity_entry (
        entry_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , entry_ui_id INT(11)
      , group_id BIGINT(20)
-     , sequence_activity_id BIGINT(20) NOT NULL
+     , sequence_activity_id BIGINT(20)
      , branch_activity_id BIGINT(20) NOT NULL
      , condition_id BIGINT(20)
      , PRIMARY KEY (entry_id)

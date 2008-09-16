@@ -137,6 +137,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="pageTitleKey" value="label.schedule.gate.title" />
 		<put name="body" value="/gate/scheduleGateContent.jsp"/>
 	</definition>
+	<definition name=".conditionGate" extends=".gateLayout">
+		<put name="pageTitleKey" value="label.condition.gate.title" />
+		<put name="body" value="/gate/conditionGateContent.jsp"/>
+	</definition>
 	
 	<!--  Branching definitions -->
 	<definition name=".branchingActivityWait" extends=".branchingWaitLayout">

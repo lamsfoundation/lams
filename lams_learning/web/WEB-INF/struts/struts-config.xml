@@ -116,6 +116,11 @@
         path=".synchGate"
         redirect="false"
       />
+      <forward
+        name="conditionGate"
+        path=".conditionGate"
+        redirect="false"
+      />
     </action>
     <action
       path="/ChooseActivity"

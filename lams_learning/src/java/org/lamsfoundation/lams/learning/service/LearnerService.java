@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -704,6 +705,10 @@ public class LearnerService implements ICoreLearnerService {
 		if (!gateOpen) {
 			// normal case - knock the gate.
 			gateOpen = gate.shouldOpenGateFor(knocker, lessonLearners);
+			if (!gateOpen) {
+				//only for a condition gate
+				gateOpen = determineConditionGateStatus(gate, knocker);
+			}
 		}
 
 		//update gate including updating the waiting list and gate status in
@@ -1002,6 +1007,58 @@ public class LearnerService implements ICoreLearnerService {
 		}
 
 		return sequenceActivity;
+	}
+
+	/**
+	 * Checks if any of the conditions that open the gate is met.
+	 * @param gate gate to check
+	 * @param learner learner who is knocking to the gate 
+	 * @return <code>true</code> if learner satisfied any of the conditions and is allowed to pass
+	 */
+	private boolean determineConditionGateStatus(GateActivity gate, User learner) {
+		boolean shouldOpenGate = false;
+		if (gate instanceof ConditionGateActivity) {
+			ConditionGateActivity conditionGate = (ConditionGateActivity) gate;
+
+			// Work out the tool session appropriate for this user and gate activity. We expect there to be only one at this point.
+			ToolSession toolSession = null;
+			for (Activity inputActivity : (Set<Activity>) conditionGate.getInputActivities()) {
+				toolSession = lamsCoreToolService.getToolSessionByLearner(learner, inputActivity);
+			}
+
+			if (toolSession != null) {
+
+				Set<BranchActivityEntry> openingGateConditions = conditionGate.getOpeningGateBranchEntries();
+
+				// Go through each condition until we find one that passes and that opens the gate.
+				// Cache the tool output so that we aren't calling it over an over again.
+				Map<String, ToolOutput> toolOutputMap = new HashMap<String, ToolOutput>();
+				Iterator<BranchActivityEntry> conditionIterator = openingGateConditions.iterator();
+
+				while (!shouldOpenGate && conditionIterator.hasNext()) {
+					BranchCondition condition = conditionIterator.next().getCondition();
+					String conditionName = condition.getName();
+					ToolOutput toolOutput = toolOutputMap.get(conditionName);
+					if (toolOutput == null) {
+						toolOutput = lamsCoreToolService.getOutputFromTool(conditionName, toolSession, learner.getUserId());
+						if (toolOutput == null) {
+							LearnerService.log.warn("Condition " + condition + " refers to a tool output " + conditionName
+									+ " but tool doesn't return any tool output for that name. Skipping this condition.");
+						}
+						else {
+							toolOutputMap.put(conditionName, toolOutput);
+						}
+					}
+
+					if (toolOutput != null && condition.isMet(toolOutput)) {
+						shouldOpenGate = true;
+						//save the learner to the "allowed to pass" list so we don't check the conditions over and over again (maybe we should??)
+						conditionGate.addLeaner(learner, true);
+					}
+				}
+			}
+		}
+		return shouldOpenGate;
 	}
 
 	/**

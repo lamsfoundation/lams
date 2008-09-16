@@ -52,10 +52,10 @@ public class BranchActivityEntry {
 	/** persistent field */
 	protected SequenceActivity branchSequenceActivity;
 	/** persistent field */
-	protected BranchingActivity branchingActivity;
-    /** persistent field */
-    private Group group;
-    /** persistent field */
+	protected Activity branchingActivity;
+	/** persistent field */
+	private Group group;
+	/** persistent field */
 	private BranchCondition condition;
 
 	/**
@@ -67,31 +67,30 @@ public class BranchActivityEntry {
 	/**
 	 * Constructor for group based linking
 	 */
-	public BranchActivityEntry(Long entryId, Integer entryUIID, SequenceActivity branchSequenceActivity, 
-			BranchingActivity branchingActivity, Group group) {
-		
+	public BranchActivityEntry(Long entryId, Integer entryUIID, SequenceActivity branchSequenceActivity,
+			Activity branchingActivity, Group group) {
+
 		this.entryId = entryId;
 		this.entryUIID = entryUIID;
 		this.branchSequenceActivity = branchSequenceActivity;
 		this.branchingActivity = branchingActivity;
 		this.group = group;
-		this.condition = null;
+		condition = null;
 	}
-	
+
 	/**
 	 * Constructor for tool output based linking
 	 */
-	public BranchActivityEntry(Long entryId, Integer entryUIID, SequenceActivity branchSequenceActivity, 
-			BranchingActivity branchingActivity, BranchCondition condition) {
-		
+	public BranchActivityEntry(Long entryId, Integer entryUIID, SequenceActivity branchSequenceActivity,
+			Activity branchingActivity, BranchCondition condition) {
+
 		this.entryId = entryId;
 		this.entryUIID = entryUIID;
 		this.branchSequenceActivity = branchSequenceActivity;
 		this.branchingActivity = branchingActivity;
-		this.group = null;
+		group = null;
 		this.condition = condition;
 	}
-	
 
 	/** 
 	 *            @hibernate.id
@@ -101,7 +100,7 @@ public class BranchActivityEntry {
 	 *         
 	 */
 	public Long getEntryId() {
-	    return this.entryId;
+		return entryId;
 	}
 
 	public void setEntryId(Long id) {
@@ -112,7 +111,7 @@ public class BranchActivityEntry {
 	 * @hibernate.property column="entry_ui_id" length="11"
 	 */
 	public Integer getEntryUIID() {
-		return this.entryUIID;
+		return entryUIID;
 	}
 
 	public void setEntryUIID(Integer entryUIID) {
@@ -126,11 +125,11 @@ public class BranchActivityEntry {
 	 *         
 	 */
 	public org.lamsfoundation.lams.learningdesign.SequenceActivity getBranchSequenceActivity() {
-	    return this.branchSequenceActivity;
+		return branchSequenceActivity;
 	}
 
 	public void setBranchSequenceActivity(org.lamsfoundation.lams.learningdesign.SequenceActivity branchSequenceActivity) {
-	    this.branchSequenceActivity = branchSequenceActivity;
+		this.branchSequenceActivity = branchSequenceActivity;
 	}
 
 	/** 
@@ -139,28 +138,28 @@ public class BranchActivityEntry {
 	 *            @hibernate.column name="branch_activity_id"         
 	 *         
 	 */
-	public org.lamsfoundation.lams.learningdesign.BranchingActivity getBranchingActivity() {
-	    return this.branchingActivity;
+	public org.lamsfoundation.lams.learningdesign.Activity getBranchingActivity() {
+		return branchingActivity;
 	}
 
-	public void setBranchingActivity(org.lamsfoundation.lams.learningdesign.BranchingActivity branchingActivity) {
-	    this.branchingActivity = branchingActivity;
+	public void setBranchingActivity(Activity branchingActivity) {
+		this.branchingActivity = branchingActivity;
 	}
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="group_id"         
-     *         
-     */
-    public org.lamsfoundation.lams.learningdesign.Group getGroup() {
-        return this.group;
-    }
+	/** 
+	 *            @hibernate.many-to-one
+	 *             not-null="true"
+	 *            @hibernate.column name="group_id"         
+	 *         
+	 */
+	public org.lamsfoundation.lams.learningdesign.Group getGroup() {
+		return group;
+	}
 
-    public void setGroup(org.lamsfoundation.lams.learningdesign.Group group) {
-        this.group = group;
-    }
-    
+	public void setGroup(org.lamsfoundation.lams.learningdesign.Group group) {
+		this.group = group;
+	}
+
 	/** 
 	 * Used for tool output based branching only
 	 * 
@@ -177,21 +176,21 @@ public class BranchActivityEntry {
 		this.condition = condition;
 	}
 
-
 	public BranchActivityEntryDTO getBranchActivityEntryDTO(Integer toolActivityUIID) {
 
 		BranchActivityEntryDTO entryDTO = null;
-		if ( getCondition() != null ) {
+		if (getCondition() != null) {
 			ToolOutputBranchActivityEntryDTO toolEntryDTO = new ToolOutputBranchActivityEntryDTO();
 			toolEntryDTO.setCondition(getCondition().getBranchConditionDTO(toolActivityUIID));
 			entryDTO = toolEntryDTO;
-		} else {
+		}
+		else {
 			entryDTO = new BranchActivityEntryDTO();
 		}
 
 		entryDTO.setEntryID(getEntryId());
 		entryDTO.setEntryUIID(getEntryUIID());
-		if ( getGroup() != null ) {
+		if (getGroup() != null) {
 			entryDTO.setGroupUIID(getGroup().getGroupUIID());
 		}
 		entryDTO.setSequenceActivityUIID(getBranchSequenceActivity().getActivityUIID());
@@ -199,39 +198,35 @@ public class BranchActivityEntry {
 		return entryDTO;
 	}
 
+	@Override
 	public boolean equals(Object other) {
-	    if ( (this == other ) ) return true;
-	    if ( !(other instanceof BranchActivityEntry) ) return false;
-	    BranchActivityEntry castOther = (BranchActivityEntry) other;
-	    return new EqualsBuilder()
-	    	.append(this.getEntryId(), castOther.getEntryId())
-	    	.append(this.getEntryUIID(), castOther.getEntryUIID())
-	        .isEquals();
+		if (this == other) {
+			return true;
+		}
+		if (!(other instanceof BranchActivityEntry)) {
+			return false;
+		}
+		BranchActivityEntry castOther = (BranchActivityEntry) other;
+		return new EqualsBuilder().append(this.getEntryId(), castOther.getEntryId()).append(this.getEntryUIID(),
+				castOther.getEntryUIID()).isEquals();
 	}
 
+	@Override
 	public int hashCode() {
-	    return new HashCodeBuilder()
-	    	.append(getEntryId())
-	    	.append(getEntryUIID())
-	        .toHashCode();
+		return new HashCodeBuilder().append(getEntryId()).append(getEntryUIID()).toHashCode();
 	}
 
 	public int compareTo(Object other) {
 		BranchActivityEntry castOther = (BranchActivityEntry) other;
-		return new CompareToBuilder()
-			.append(this.getEntryId(), castOther.getEntryId())
-			.append(this.getEntryUIID(), castOther.getEntryUIID())
-			.toComparison();
+		return new CompareToBuilder().append(this.getEntryId(), castOther.getEntryId()).append(this.getEntryUIID(),
+				castOther.getEntryUIID()).toComparison();
 	}
-	
-	   public String toString() {
-	        return new ToStringBuilder(this)
-	            .append("entryId", getEntryId())
-	            .append("entryUIID", getEntryUIID())
-	            .append("group", getGroup() != null ? getGroup().getGroupId().toString() : "")
-	            .append("sequence activity", getBranchSequenceActivity() != null ? getBranchSequenceActivity().getActivityId().toString() : "")
-	            .toString();
-	    }
 
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this).append("entryId", getEntryId()).append("entryUIID", getEntryUIID()).append("group",
+				getGroup() != null ? getGroup().getGroupId().toString() : "").append("sequence activity",
+				getBranchSequenceActivity() != null ? getBranchSequenceActivity().getActivityId().toString() : "").toString();
+	}
 
 }

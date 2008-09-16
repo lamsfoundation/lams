@@ -71,8 +71,8 @@ public abstract class GateActivityStrategy extends SimpleActivityStrategy {
 				gateActivity.getWaitingLearners().clear();
 				gateActivity.getAllowedToPassLearners().clear();
 			}
-			else if (gateActivity.getAllowedToPassLearners().contains(learner)) {
-				return true;
+			else {
+				return gateActivity.getAllowedToPassLearners().contains(learner);
 			}
 		}
 		//always clear all lists if the gate is already opened.
@@ -110,5 +110,4 @@ public abstract class GateActivityStrategy extends SimpleActivityStrategy {
 	protected Activity getActivity() {
 		return gateActivity;
 	}
-
 }

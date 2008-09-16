@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -1197,6 +1198,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		else if (activity instanceof SystemGateActivity) {
 			buildSystemGateActivity((SystemGateActivity) activity, activityDetails);
 		}
+		else if (activity instanceof ConditionGateActivity) {
+			buildConditionGateActivity((ConditionGateActivity) activity, activityDetails);
+		}
 		else {
 			buildScheduleGateActivity((ScheduleGateActivity) activity, activityDetails);
 		}
@@ -1219,6 +1223,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	private void buildSystemGateActivity(SystemGateActivity activity, Hashtable activityDetails)
 			throws WDDXProcessorConversionException {
 		activity.setSystemTool(getSystemTool(SystemTool.SYSTEM_GATE));
+	}
+
+	private void buildConditionGateActivity(ConditionGateActivity activity, Hashtable activityDetails)
+			throws WDDXProcessorConversionException {
+		activity.setSystemTool(getSystemTool(SystemTool.CONDITION_GATE));
 	}
 
 	private void buildScheduleGateActivity(ScheduleGateActivity activity, Hashtable activityDetails)
@@ -1427,7 +1436,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	@SuppressWarnings("unchecked")
-	/** Get the BranchActivityEntry details. This may be either for group based branching, or it may be for tool output based branching */
+	/** Get the BranchActivityEntry details.
+	 * This may be either for group based branching, it may be for tool output based branching or for a condition gate activity.
+	 */
 	private BranchActivityEntry extractBranchActivityEntry(Hashtable details) throws WDDXProcessorConversionException {
 
 		Long entryId = WDDXProcessor.convertToLong(details, WDDXTAGS.BRANCH_ACTIVITY_ENTRY_ID);
@@ -1439,32 +1450,34 @@ public class ObjectExtractor implements IObjectExtractor {
 		Integer sequenceActivityUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_SEQUENCE_ACTIVITY_UIID);
 		Integer branchingActivityUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_ACTIVITY_UIID);
 
-		SequenceActivity sequenceActivity = null;
-		Activity activity = newActivityMap.get(sequenceActivityUIID);
-		if (activity == null) {
-			throw new WDDXProcessorConversionException(
-					"Sequence Activity listed in the branch mapping list is missing. Mapping entry UUID " + entryUIID
-							+ " sequenceActivityUIID " + sequenceActivityUIID);
-		}
-		else if (!activity.isSequenceActivity()) {
-			throw new WDDXProcessorConversionException(
-					"Activity listed in the branch mapping list is not a sequence activity. Mapping entry UUID " + entryUIID
-							+ " sequenceActivityUIID " + sequenceActivityUIID);
-		}
-		else {
-			sequenceActivity = (SequenceActivity) activity;
-		}
-
 		Activity branchingActivity = newActivityMap.get(branchingActivityUIID);
 		if (branchingActivity == null) {
 			throw new WDDXProcessorConversionException(
 					"Branching Activity listed in the branch mapping list is missing. Mapping entry UUID " + entryUIID
 							+ " branchingActivityUIID " + branchingActivityUIID);
 		}
-		if (!branchingActivity.isBranchingActivity()) {
+		if (!branchingActivity.isBranchingActivity() && !branchingActivity.isConditionGate()) {
 			throw new WDDXProcessorConversionException(
-					"Activity listed in the branch mapping list is not a branching activity. Mapping entry UUID " + entryUIID
-							+ " branchingActivityUIID " + branchingActivityUIID);
+					"Activity listed in the branch mapping list is not a branching activity nor a condition gate. Mapping entry UUID "
+							+ entryUIID + " branchingActivityUIID " + branchingActivityUIID);
+		}
+		//sequence activity is null for a condition gate
+		SequenceActivity sequenceActivity = null;
+		if (!branchingActivity.isConditionGate()) {
+			Activity activity = newActivityMap.get(sequenceActivityUIID);
+			if (activity == null) {
+				throw new WDDXProcessorConversionException(
+						"Sequence Activity listed in the branch mapping list is missing. Mapping entry UUID " + entryUIID
+								+ " sequenceActivityUIID " + sequenceActivityUIID);
+			}
+			else if (!activity.isSequenceActivity()) {
+				throw new WDDXProcessorConversionException(
+						"Activity listed in the branch mapping list is not a sequence activity. Mapping entry UUID " + entryUIID
+								+ " sequenceActivityUIID " + sequenceActivityUIID);
+			}
+			else {
+				sequenceActivity = (SequenceActivity) activity;
+			}
 		}
 
 		// If the mapping was created at runtime, there will be an ID but no IU ID field.
@@ -1473,8 +1486,17 @@ public class ObjectExtractor implements IObjectExtractor {
 		// is created at runtime but then modified in authoring (and has has a new UI ID added) is handled.
 		BranchActivityEntry uiid_match = null;
 		BranchActivityEntry id_match = null;
-		if (sequenceActivity.getBranchEntries() != null) {
-			Iterator iter = sequenceActivity.getBranchEntries().iterator();
+		Iterator iter = null;
+		if (sequenceActivity != null) {
+			if (sequenceActivity.getBranchEntries() != null) {
+				iter = sequenceActivity.getBranchEntries().iterator();
+			}
+		}
+		else {
+			iter = ((ConditionGateActivity) branchingActivity).getOpeningGateBranchEntries().iterator();
+		}
+
+		if (iter != null) {
 			while (uiid_match == null && iter.hasNext()) {
 				BranchActivityEntry possibleEntry = (BranchActivityEntry) iter.next();
 				if (entryUIID.equals(possibleEntry.getEntryUIID())) {
@@ -1511,7 +1533,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 		if (entry == null) {
 			if (condition != null) {
-				entry = condition.allocateBranchToCondition(entryUIID, sequenceActivity, (BranchingActivity) branchingActivity);
+				entry = condition.allocateBranchToCondition(entryUIID, sequenceActivity, branchingActivity);
 			}
 			else {
 				entry = group.allocateBranchToGroup(entryUIID, sequenceActivity, (BranchingActivity) branchingActivity);
@@ -1520,17 +1542,18 @@ public class ObjectExtractor implements IObjectExtractor {
 		else {
 			entry.setEntryUIID(entryUIID);
 			entry.setBranchSequenceActivity(sequenceActivity);
-			entry.setBranchingActivity((BranchingActivity) branchingActivity);
+			entry.setBranchingActivity(branchingActivity);
 		}
 
 		entry.setGroup(group);
 		entry.setCondition(condition);
-
-		if (sequenceActivity.getBranchEntries() == null) {
-			sequenceActivity.setBranchEntries(new HashSet());
+		if (sequenceActivity != null) {
+			if (sequenceActivity.getBranchEntries() == null) {
+				sequenceActivity.setBranchEntries(new HashSet());
+			}
+			sequenceActivity.getBranchEntries().add(entry);
+			activityDAO.update(sequenceActivity);
 		}
-		sequenceActivity.getBranchEntries().add(entry);
-		activityDAO.update(sequenceActivity);
 
 		if (group != null) {
 			groupingDAO.update(group);

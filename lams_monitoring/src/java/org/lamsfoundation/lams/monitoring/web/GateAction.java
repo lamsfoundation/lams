@@ -94,6 +94,7 @@ public class GateAction extends LamsDispatchAction {
 	private static final String VIEW_SYNCH_GATE = "viewSynchGate";
 	private static final String VIEW_PERMISSION_GATE = "viewPermissionGate";
 	private static final String VIEW_SCHEDULE_GATE = "viewScheduleGate";
+	private static final String VIEW_CONDITION_GATE = "viewConditionGate";
 
 	// Gate Form fields
 	private static final String ACTIVITY_FORM_FIELD = "activityId";
@@ -260,6 +261,11 @@ public class GateAction extends LamsDispatchAction {
 		}
 		else if (gate.isScheduleGate()) {
 			return viewScheduleGate(mapping, gateForm, (ScheduleGateActivity) gate);
+		}
+		else if (gate.isConditionGate()) {
+			gateForm.set("allowedToPassLearnerList", gate.getAllowedToPassLearners());
+			gateForm.set(GateAction.READ_ONLY, Boolean.TRUE);
+			return mapping.findForward(GateAction.VIEW_CONDITION_GATE);
 		}
 		else if (gate.isPermissionGate() || gate.isSystemGate()) {
 			gateForm.set("waitingLearnerList", waitingLearnersList);

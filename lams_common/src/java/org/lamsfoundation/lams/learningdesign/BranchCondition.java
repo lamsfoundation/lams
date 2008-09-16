@@ -23,8 +23,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign;
 
-import java.util.HashSet;
-
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -33,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
-
 
 /**
  * The ToolOutputBranchActivityEntries record the branch selection details for tool output based branching. During 
@@ -48,59 +45,54 @@ public class BranchCondition implements Comparable {
 
 	private Long conditionId;
 	private Integer conditionUIID;
-    private Integer orderId; 
-    private String name; 
-    private String displayName;
-    private String type; 
-    private String startValue; 
-    private String endValue; 
-    private String exactMatchValue;
-    
-    /** default constructor */
-    public BranchCondition() {
-    }
+	private Integer orderId;
+	private String name;
+	private String displayName;
+	private String type;
+	private String startValue;
+	private String endValue;
+	private String exactMatchValue;
 
-    /** full constructor */
-    public BranchCondition(Long conditionId, Integer conditionUIID, Integer orderId, 
-    			String name, String displayName, String type, String startValue, String endValue, String exactMatchValue) {
-    	this.conditionId = conditionId;
-    	this.conditionUIID = conditionUIID;
-    	this.orderId = orderId;
-    	this.name = name;
-    	this.displayName = displayName;
-    	this.type = type;
-    	this.startValue = startValue;
-    	this.endValue = endValue;
-    	this.exactMatchValue = exactMatchValue;
-    }
+	/** default constructor */
+	public BranchCondition() {
+	}
 
-    /** Create a condition object based on an existing DTO object. Copies all fields including the id field */
-    public BranchCondition(BranchConditionDTO conditionDTO) {
-    	this(conditionDTO.getConditionId(), 
-			conditionDTO.getConditionUIID(), 
-			conditionDTO.getOrderID(),
-			conditionDTO.getName(),
-			conditionDTO.getDisplayName(),
-			conditionDTO.getType(),
-			conditionDTO.getStartValue(),
-			conditionDTO.getEndValue(),
-			conditionDTO.getExactMatchValue());
-    }
-    
- 	/** 
-	 *            @hibernate.id
-	 *             generator-class="native"
-	 *             type="java.lang.Long"
-	 *             column="condition_id"
-	 *         
-	 */
+	/** full constructor */
+	public BranchCondition(Long conditionId, Integer conditionUIID, Integer orderId, String name, String displayName,
+			String type, String startValue, String endValue, String exactMatchValue) {
+		this.conditionId = conditionId;
+		this.conditionUIID = conditionUIID;
+		this.orderId = orderId;
+		this.name = name;
+		this.displayName = displayName;
+		this.type = type;
+		this.startValue = startValue;
+		this.endValue = endValue;
+		this.exactMatchValue = exactMatchValue;
+	}
+
+	/** Create a condition object based on an existing DTO object. Copies all fields including the id field */
+	public BranchCondition(BranchConditionDTO conditionDTO) {
+		this(conditionDTO.getConditionId(), conditionDTO.getConditionUIID(), conditionDTO.getOrderID(), conditionDTO.getName(),
+				conditionDTO.getDisplayName(), conditionDTO.getType(), conditionDTO.getStartValue(), conditionDTO.getEndValue(),
+				conditionDTO.getExactMatchValue());
+	}
+
+	/** 
+	*            @hibernate.id
+	*             generator-class="native"
+	*             type="java.lang.Long"
+	*             column="condition_id"
+	*         
+	*/
 	public Long getConditionId() {
 		return conditionId;
 	}
+
 	public void setConditionId(Long conditionId) {
 		this.conditionId = conditionId;
 	}
-	
+
 	/** 
 	 *            @hibernate.property column="condition_ui_id" length="11"
 	 *         
@@ -108,28 +100,33 @@ public class BranchCondition implements Comparable {
 	public Integer getConditionUIID() {
 		return conditionUIID;
 	}
+
 	public void setConditionUIID(Integer conditionUIID) {
 		this.conditionUIID = conditionUIID;
 	}
-	
+
 	/**
 	 * @hibernate.property column="order_id" length="11"
 	 */
 	public Integer getOrderId() {
 		return orderId;
 	}
+
 	public void setOrderId(Integer orderId) {
 		this.orderId = orderId;
 	}
+
 	/**
 	 * @hibernate.property column="name" length="255"
 	 */
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	/**
 	 * The display name is a name shown to the user so they can link a condition to a branch. 
 	 * @hibernate.property column="display_name" length="255"
@@ -137,235 +134,246 @@ public class BranchCondition implements Comparable {
 	public String getDisplayName() {
 		return displayName;
 	}
+
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
+
 	/**
 	 * @hibernate.property column="type" length="255"
 	 */
 	public String getType() {
 		return type;
 	}
+
 	public void setType(String type) {
 		this.type = type;
 	}
+
 	/**
 	 * @hibernate.property column="start_value" length="255"
 	 */
 	public String getStartValue() {
 		return startValue;
 	}
+
 	public void setStartValue(String startValue) {
 		this.startValue = startValue;
 	}
+
 	/**
 	 * @hibernate.property column="end_value" length="255"
 	 */
 	public String getEndValue() {
 		return endValue;
 	}
+
 	public void setEndValue(String endValue) {
 		this.endValue = endValue;
 	}
+
 	/**
 	 * @hibernate.property column="exact_match_value" length="255"
 	 */
 	public String getExactMatchValue() {
 		return exactMatchValue;
 	}
+
 	public void setExactMatchValue(String exactMatchValue) {
 		this.exactMatchValue = exactMatchValue;
-	} 
+	}
 
 	public BranchConditionDTO getBranchConditionDTO(Integer toolActivityUIID) {
 		return new BranchConditionDTO(this, toolActivityUIID);
 	}
 
-    public String toString() {
-        return new ToStringBuilder(this)
-        	.append("conditionId", conditionId)
-            .append("conditionUIID", conditionUIID)
-            .append("orderId", orderId)
-            .append("name", name)
-            .append("displayName", displayName)
-            .append("type", type)
-            .append("startValue", startValue)
-            .append("endValue", endValue)
-            .append("exactMatchValue", exactMatchValue)
-            .toString();
-    }
- 
-    /** Allocate this condition to the given branch, in a branching activity. This creates the BranchActivityEntry record and adds it 
-     * to the branchActivities set. EntryUIID will only be populated if this is called from authoring
-     */
-    public BranchActivityEntry allocateBranchToCondition(Integer entryUIID, SequenceActivity branch, BranchingActivity branchingActivity) {
-    	BranchActivityEntry entry = new BranchActivityEntry(null, entryUIID, branch, (BranchingActivity) branchingActivity, this);
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this).append("conditionId", conditionId).append("conditionUIID", conditionUIID).append(
+				"orderId", orderId).append("name", name).append("displayName", displayName).append("type", type).append(
+				"startValue", startValue).append("endValue", endValue).append("exactMatchValue", exactMatchValue).toString();
+	}
+
+	/** Allocate this condition to the given branch, in a branching activity. This creates the BranchActivityEntry record and adds it 
+	 * to the branchActivities set. EntryUIID will only be populated if this is called from authoring
+	 */
+	public BranchActivityEntry allocateBranchToCondition(Integer entryUIID, SequenceActivity branch, Activity branchingActivity) {
+		BranchActivityEntry entry = new BranchActivityEntry(null, entryUIID, branch, branchingActivity, this);
 		return entry;
-    }
-    
-    /** Create a new BranchCondition based on itself, leaving conditionId as null */
-    public BranchCondition clone(int uiidOffset) {
-    	Integer newConditionUIID = LearningDesign.addOffset(conditionUIID, uiidOffset);
-    	return new BranchCondition(null, newConditionUIID, orderId, name, displayName, type, startValue, endValue, exactMatchValue);
-    }
+	}
+
+	/** Create a new BranchCondition based on itself, leaving conditionId as null */
+	public BranchCondition clone(int uiidOffset) {
+		Integer newConditionUIID = LearningDesign.addOffset(conditionUIID, uiidOffset);
+		return new BranchCondition(null, newConditionUIID, orderId, name, displayName, type, startValue, endValue,
+				exactMatchValue);
+	}
 
 	public int compareTo(Object arg0) {
 		BranchCondition other = (BranchCondition) arg0;
-		return new CompareToBuilder()
-			.append(orderId, other.getOrderId())
-			.append(conditionId, other.getConditionId())
-			.append(name, other.getName())
-			.append(conditionUIID, other.getConditionUIID())
-			.toComparison();
+		return new CompareToBuilder().append(orderId, other.getOrderId()).append(conditionId, other.getConditionId()).append(
+				name, other.getName()).append(conditionUIID, other.getConditionUIID()).toComparison();
 	}
 
+	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(orderId)
-			.append(conditionId)
-			.append(name)
-			.append(conditionUIID)
-			.toHashCode();
+		return new HashCodeBuilder().append(orderId).append(conditionId).append(name).append(conditionUIID).toHashCode();
 	}
 
+	@Override
 	public boolean equals(Object arg0) {
 		BranchCondition other = (BranchCondition) arg0;
-		return new EqualsBuilder()
-			.append(orderId, other.getOrderId())
-			.append(conditionId, other.getConditionId())
-			.append(name, other.getName())
-			.append(conditionUIID, other.getConditionUIID())
-			.isEquals();
+		return new EqualsBuilder().append(orderId, other.getOrderId()).append(conditionId, other.getConditionId()).append(name,
+				other.getName()).append(conditionUIID, other.getConditionUIID()).isEquals();
 	}
-	
+
 	/** Is this condition met? */
 	public boolean isMet(ToolOutput output) {
-		if ( output != null ) {
-			if ( exactMatchValue != null ) {
+		if (output != null) {
+			if (exactMatchValue != null) {
 				return exactMatchMet(output.getValue());
-			} else if ( startValue != null || endValue != null) {
+			}
+			else if (startValue != null || endValue != null) {
 				return inRange(output.getValue());
 			}
 		}
 		return false;
 	}
-	
+
 	public boolean exactMatchMet(ToolOutputValue outputValue) {
-		if ( "OUTPUT_LONG".equals(type) ) {
+		if ("OUTPUT_LONG".equals(type)) {
 			Long exactMatchObj = exactMatchValue != null ? convertToLong(exactMatchValue) : null;
 			Long actualValue = outputValue.getLong();
-			return ( actualValue != null && actualValue.equals(exactMatchObj)); 
-		} else if ( "OUTPUT_DOUBLE".equals(type) ) {
+			return actualValue != null && actualValue.equals(exactMatchObj);
+		}
+		else if ("OUTPUT_DOUBLE".equals(type)) {
 			Double exactMatchObj = exactMatchValue != null ? Double.parseDouble(exactMatchValue) : null;
 			Double actualValue = outputValue.getDouble();
-			return ( actualValue != null && actualValue.equals(exactMatchObj)); 
-		} else if ( "OUTPUT_BOOLEAN".equals(type) ) {
+			return actualValue != null && actualValue.equals(exactMatchObj);
+		}
+		else if ("OUTPUT_BOOLEAN".equals(type)) {
 			Boolean exactMatchObj = exactMatchValue != null ? Boolean.parseBoolean(exactMatchValue) : null;
 			Boolean actualValue = outputValue.getBoolean();
-			return ( actualValue != null && actualValue.equals(exactMatchObj)); 
-		} else if ( "OUTPUT_STRING".equals(type) ) {
+			return actualValue != null && actualValue.equals(exactMatchObj);
+		}
+		else if ("OUTPUT_STRING".equals(type)) {
 			Double actualValue = outputValue.getDouble();
-			return ( actualValue != null && actualValue.equals(exactMatchValue)); 
-		} 
-		return false;	
+			return actualValue != null && actualValue.equals(exactMatchValue);
+		}
+		return false;
 	}
-	
+
 	public boolean inRange(ToolOutputValue outputValue) {
-		if ( "OUTPUT_LONG".equals(type) ) {
+		if ("OUTPUT_LONG".equals(type)) {
 			Long startValueLong = startValue != null ? convertToLong(startValue) : null;
 			Long endValueLong = endValue != null ? convertToLong(endValue) : null;
 			Long actualValue = outputValue.getLong();
-			return ( actualValue != null &&
-				( startValueLong==null || actualValue.compareTo(startValueLong) >= 0 ) &&
-				( endValueLong==null || actualValue.compareTo(endValueLong) <= 0 )) ;
-		} else if ( "OUTPUT_DOUBLE".equals(type) ) {
+			return actualValue != null && (startValueLong == null || actualValue.compareTo(startValueLong) >= 0)
+					&& (endValueLong == null || actualValue.compareTo(endValueLong) <= 0);
+		}
+		else if ("OUTPUT_DOUBLE".equals(type)) {
 			Double startValueDouble = startValue != null ? Double.parseDouble(startValue) : null;
 			Double endValueDouble = endValue != null ? Double.parseDouble(endValue) : null;
 			Double actualValue = outputValue.getDouble();
-			return ( actualValue != null &&
-				( startValueDouble==null || actualValue.compareTo(startValueDouble) >= 0 ) &&
-				( endValueDouble==null || actualValue.compareTo(endValueDouble) <= 0 ));
-		} else if ( "OUTPUT_BOOLEAN".equals(type) ) {
+			return actualValue != null && (startValueDouble == null || actualValue.compareTo(startValueDouble) >= 0)
+					&& (endValueDouble == null || actualValue.compareTo(endValueDouble) <= 0);
+		}
+		else if ("OUTPUT_BOOLEAN".equals(type)) {
 			// this is a nonsense, but we'll code it just in case. What order is a boolean? True greater than false?
 			Boolean startValueBoolean = startValue != null ? Boolean.parseBoolean(startValue) : null;
 			Boolean endValueBoolean = endValue != null ? Boolean.parseBoolean(endValue) : null;
 			Boolean actualValue = outputValue.getBoolean();
-			return ( actualValue != null &&
-				( startValueBoolean==null || actualValue.compareTo(startValueBoolean) >= 0 ) &&
-				( endValueBoolean==null || actualValue.compareTo(endValueBoolean) <= 0 ));
-			
-		} else if ( "OUTPUT_STRING".equals(type) ) {
+			return actualValue != null && (startValueBoolean == null || actualValue.compareTo(startValueBoolean) >= 0)
+					&& (endValueBoolean == null || actualValue.compareTo(endValueBoolean) <= 0);
+
+		}
+		else if ("OUTPUT_STRING".equals(type)) {
 			String actualValue = outputValue.getString();
-			return ( actualValue != null &&
-				( startValue==null || actualValue.compareTo(startValue) >= 0 ) &&
-				( endValue==null || actualValue.compareTo(endValue) <= 0 ));
-		} 
+			return actualValue != null && (startValue == null || actualValue.compareTo(startValue) >= 0)
+					&& (endValue == null || actualValue.compareTo(endValue) <= 0);
+		}
 		return false;
 	}
 
 	/** The data may have come in from WDDX and have .0 on the end of Longs, so eliminate that */
-	private Long convertToLong( String textValue ) {
-		if ( textValue.length() == 0 )
+	private Long convertToLong(String textValue) {
+		if (textValue.length() == 0) {
 			return null;
+		}
 
 		int posPeriod = textValue.indexOf('.');
-		if ( posPeriod > 0 ) {
-			textValue = textValue.substring(0,posPeriod);
+		if (posPeriod > 0) {
+			textValue = textValue.substring(0, posPeriod);
 		}
-		return new Long (textValue);
+		return new Long(textValue);
 	}
 
 	/** All conditions must have either (a) an exact match value or (b) a start value and no end value 
 	 * or (c) start value and an end value and the end value must be >= start value. 
 	 */
 	protected boolean isValid() {
-		if ( exactMatchValue != null ) {
+		if (exactMatchValue != null) {
 			try {
-				if ( getTypedValue(exactMatchValue) != null )
+				if (getTypedValue(exactMatchValue) != null) {
 					return true;
-			} catch ( Exception e ) { }
-			log.error("Condition contains an unconvertible value for exactMatchValue. Type is "+type+" value "+exactMatchValue);
+				}
+			}
+			catch (Exception e) {
+			}
+			BranchCondition.log.error("Condition contains an unconvertible value for exactMatchValue. Type is " + type
+					+ " value " + exactMatchValue);
 			return false;
-		} else {
+		}
+		else {
 			Comparable typedStartValue = null;
 			Comparable typedEndValue = null;
 
 			try {
-				if ( startValue != null )
+				if (startValue != null) {
 					typedStartValue = getTypedValue(startValue);
-			} catch ( Exception e ) {
-				log.error("Condition contains an unconvertible value for startValue. Type is "+type+" value "+startValue);
+				}
+			}
+			catch (Exception e) {
+				BranchCondition.log.error("Condition contains an unconvertible value for startValue. Type is " + type + " value "
+						+ startValue);
 				return false;
 			}
-			
+
 			try {
-				if ( endValue != null ) 
+				if (endValue != null) {
 					typedEndValue = getTypedValue(endValue);
-			} catch ( Exception e ) {
-				log.error("Condition contains an unconvertible value for endValue. Type is "+type+" value "+endValue);
-				return false; 
+				}
+			}
+			catch (Exception e) {
+				BranchCondition.log.error("Condition contains an unconvertible value for endValue. Type is " + type + " value "
+						+ endValue);
+				return false;
 			}
 
-			if ( typedStartValue == null && typedEndValue != null ) 
+			if (typedStartValue == null && typedEndValue != null) {
 				return true;
-			
-			else if ( typedEndValue == null || typedEndValue.compareTo(typedStartValue) >= 0 ) {
+			}
+			else if (typedEndValue == null || typedEndValue.compareTo(typedStartValue) >= 0) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	private Comparable getTypedValue( String untypedValue ) {
-		if ( "OUTPUT_LONG".equals(type) ) {
+
+	private Comparable getTypedValue(String untypedValue) {
+		if ("OUTPUT_LONG".equals(type)) {
 			return convertToLong(untypedValue);
-		} else if ( "OUTPUT_DOUBLE".equals(type) ) {
+		}
+		else if ("OUTPUT_DOUBLE".equals(type)) {
 			return Double.parseDouble(untypedValue);
-		} else if ( "OUTPUT_BOOLEAN".equals(type) ) {
+		}
+		else if ("OUTPUT_BOOLEAN".equals(type)) {
 			return Boolean.parseBoolean(untypedValue);
-		} else if ( "OUTPUT_STRING".equals(type) ) {
+		}
+		else if ("OUTPUT_STRING".equals(type)) {
 			return untypedValue;
-		} else {
+		}
+		else {
 			return null;
 		}
 	}

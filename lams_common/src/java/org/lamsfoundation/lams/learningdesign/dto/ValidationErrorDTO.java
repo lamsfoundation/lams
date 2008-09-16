@@ -44,6 +44,8 @@ public class ValidationErrorDTO {
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "validation.error.OptionalActivityOrderId"; // OAOI
 	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1"; // SG
 	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";
+	public static final String CONDITION_GATE_ACTVITY_CONDITION = "validation.error.conditionGateMustHaveACondition"; // CGC
+	public static final String CONDITION_GATE_ACTVITY_TOOLINPUT = "validation.error.conditionGateMustHaveAnInputToolActivity"; // CGI
 	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_KEY = "validation.error.grouping.missing"; // GM
 	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY = "validation.error.group.count.mismatch"; // GC
 
@@ -67,6 +69,8 @@ public class ValidationErrorDTO {
 	public static final String OPTIONAL_ACTIVITY_ERROR_CODE = "OA";
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_CODE = "OAOI";
 	public static final String SCHEDULE_GATE_ERROR_CODE = "SG1";
+	public static final String CONDITION_GATE_ACTVITY_CONDITION_ERROR_CODE = "CGC";
+	public static final String CONDITION_GATE_ACTVITY_TOOLINPUT_ERROR_CODE = "CGI";
 	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_ERROR_CODE = "GM";
 	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_ERROR_CODE = "GC";
 	public static final String BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE = "BB";
@@ -161,6 +165,16 @@ public class ValidationErrorDTO {
 	 */
 	public static final String SCHEDULE_GATE_ERROR_TYPE1 = ValidationErrorDTO.resources
 			.getMessage(ValidationErrorDTO.SCHEDULE_GATE_ERROR_TYPE1_KEY);
+	/**
+	 * Rule: A condition gate must have at least condition defined.
+	 */
+	public static final String CONDITION_GATE_CONDITION_ERROR = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.CONDITION_GATE_ACTVITY_CONDITION_ERROR_CODE);
+	/**
+	 * Rule: A condition gate must have an input tool.
+	 */
+	public static final String CONDITION_GATE_TOOLINPUT_ERROR = ValidationErrorDTO.resources
+			.getMessage(ValidationErrorDTO.CONDITION_GATE_ACTVITY_TOOLINPUT_ERROR_CODE);
 
 	/**
 	 * Rule: For Schedule Gates (Activity) if start and end time offsets are set then the start time offset should be 

@@ -237,8 +237,18 @@
 			<subclass name="org.lamsfoundation.lams.learningdesign.SystemGateActivity" discriminator-value="9">
 				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 			</subclass>
-		</subclass>			
-				
+			<subclass name="org.lamsfoundation.lams.learningdesign.ConditionGateActivity" discriminator-value="10">
+				<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+				<set name="openingGateBranchEntries" lazy="true" inverse="true" cascade="all-delete-orphan" >
+		    		<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan" 
+		    				@hibernate.collection-key column="branch_activity_id" 
+		    				@hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"
+					</meta>    										
+		            <key><column name="branch_activity_id" /></key>
+		            <one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"/>
+				</set>
+			</subclass>
+		</subclass>						
 	</subclass>
 
 	<subclass name="org.lamsfoundation.lams.learningdesign.ComplexActivity" >

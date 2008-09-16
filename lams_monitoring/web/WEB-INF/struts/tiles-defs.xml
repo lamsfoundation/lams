@@ -41,6 +41,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".viewScheduleGate" extends=".baseDef" >
 		<put name="content" value="/gate/scheduleGateContent.jsp" />	
 	</definition>
+	<definition name=".viewConditionGate" extends=".baseDef" >
+		<put name="content" value="/gate/conditionGateContent.jsp" />	
+	</definition>
 <!-- ============= Grouping Page Definitions ====================== -->	
 	<definition name=".viewGroups" extends=".baseDef" >
 		<put name="content" value="/grouping/viewGroups.jsp" />	

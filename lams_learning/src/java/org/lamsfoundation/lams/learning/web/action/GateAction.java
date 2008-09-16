@@ -78,6 +78,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts:action-forward name="permissionGate" path=".permissionGate"
  * @struts:action-forward name="scheduleGate" path=".scheduleGate"
  * @struts:action-forward name="synchGate" path=".synchGate"
+ * @struts:action-forward name="conditionGate" path=".conditionGate"
  * ----------------XDoclet Tags--------------------
  */
 public class GateAction extends LamsDispatchAction {
@@ -93,6 +94,7 @@ public class GateAction extends LamsDispatchAction {
 	private static final String VIEW_PERMISSION_GATE = "permissionGate";
 	private static final String VIEW_SCHEDULE_GATE = "scheduleGate";
 	private static final String VIEW_SYNCH_GATE = "synchGate";
+	private static final String VIEW_CONDITION_GATE = "conditionGate";
 
 	/** Input parameter. Boolean value */
 	public static final String PARAM_FORCE_GATE_OPEN = "force";
@@ -184,6 +186,9 @@ public class GateAction extends LamsDispatchAction {
 			gateForm.set("startingTime", scheduleGate.getGateStartDateTime());
 			gateForm.set("endingTime", scheduleGate.getGateEndDateTime());
 			return mapping.findForward(GateAction.VIEW_SCHEDULE_GATE);
+		}
+		else if (gate.isConditionGate()) {
+			return mapping.findForward(GateAction.VIEW_CONDITION_GATE);
 		}
 		else if (gate.isPermissionGate() || gate.isSystemGate()) {
 			return mapping.findForward(GateAction.VIEW_PERMISSION_GATE);

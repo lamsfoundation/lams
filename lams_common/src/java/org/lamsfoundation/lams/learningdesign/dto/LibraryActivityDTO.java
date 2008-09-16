@@ -27,6 +27,7 @@ import java.util.Date;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
@@ -39,16 +40,15 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.util.HelpUtil;
 
-public class LibraryActivityDTO extends BaseDTO
-{
-    private Integer activityTypeID;
-    private Long activityID;
-    private Integer activityCategoryID;
-    private Integer activityUIID;
-    private Long learningLibraryID; //not sure if this is needed
-    private Long learningDesignID;
-    private Long libraryActivityID;
-    private Long parentActivityID;
+public class LibraryActivityDTO extends BaseDTO {
+	private Integer activityTypeID;
+	private Long activityID;
+	private Integer activityCategoryID;
+	private Integer activityUIID;
+	private Long learningLibraryID; //not sure if this is needed
+	private Long learningDesignID;
+	private Long libraryActivityID;
+	private Long parentActivityID;
 	private Integer parentUIID;
 	private Integer orderID;
 	private Long groupingID;
@@ -68,7 +68,7 @@ public class LibraryActivityDTO extends BaseDTO
 	/** Name of the file (including the package) that contains the text strings for
 	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
 	private String languageFile;
-	
+
 	/* Properties Specific to ToolActivity */
 	private Long toolID;
 	private Long toolContentID;
@@ -78,429 +78,490 @@ public class LibraryActivityDTO extends BaseDTO
 	private Boolean supportsDefineLater;
 	private Boolean supportsRunOffline;
 	private Boolean supportsModeration;
-	private Boolean supportsContribute;	
+	private Boolean supportsContribute;
 	private String authoringURL;
 	private String adminURL;
 	private Boolean supportsOutputs;
 	private String extLmsId;
-	
+
 	/* Grouping Activities */
-	
+
 	/* Optional Activities */
 	private Integer maxOptions;
 	private Integer minOptions;
 	private String optionsInstructions;
-	
+
 	/* Sequence Activities */
-	
+
 	/* Gate Activities */
-	private Integer gateActivityLevelID;	
-	private Boolean gateOpen;	
-	private Long gateStartTimeOffset;	
-	private Long gateEndTimeOffset;	
-	private Date gateStartDateTime;	
+	private Integer gateActivityLevelID;
+	private Boolean gateOpen;
+	private Long gateStartTimeOffset;
+	private Long gateEndTimeOffset;
+	private Date gateStartDateTime;
 	private Date gateEndDateTime;
-		
+
 	/** Used for I18N the URLS. Does not need to be sent to clients, so no getter exists. */
-	private String languageCode; 
-	
+	private String languageCode;
+
 	private Boolean toolAdapter;
 
-	public LibraryActivityDTO (Activity activity, String languageCode)
-	{
-	    this.activityTypeID = activity.getActivityTypeId();
-	    this.activityID = activity.getActivityId();
-	    this.activityCategoryID = activity.getActivityCategoryID();
-	    this.activityUIID = activity.getActivityUIID();
-	    this.learningLibraryID = activity.getLearningLibrary() != null ? activity.getLearningLibrary().getLearningLibraryId() : null;
-	    this.learningDesignID = activity.getLearningDesign() != null ? activity.getLearningDesign().getLearningDesignId() : null;
-	    this.libraryActivityID = activity.getLibraryActivity() != null ? activity.getLibraryActivity().getActivityId() : null;
-	    this.parentActivityID = activity.getParentActivity() != null ? activity.getParentActivity().getActivityId() : null;
-	    this.parentUIID = activity.getParentUIID();
-	    this.orderID = activity.getOrderId();
-	    this.groupingID = activity.getGrouping()!= null? activity.getGrouping().getGroupingId(): null;
-	    this.groupingUIID = activity.getGroupingUIID();
-	    this.description = activity.getDescription();
-	    this.activityTitle = activity.getTitle();
-	    this.helpText = activity.getHelpText();
-	    this.xCoord = activity.getXcoord();
-	    this.yCoord = activity.getYcoord();
-	    this.libraryActivityUIImage = activity.getLibraryActivityUiImage();
-	    this.applyGrouping = activity.getApplyGrouping();
-	    this.runOffline = activity.getRunOffline();
-	    this.defineLater = activity.getDefineLater();
-	    this.createDateTime = activity.getCreateDateTime();
-	    this.groupingSupportType = activity.getGroupingSupportType();
-	    this.languageFile = activity.getLanguageFile();
-	    
-	    this.languageCode = languageCode;
-	    processActivityType(activity);
-	    
+	public LibraryActivityDTO(Activity activity, String languageCode) {
+		activityTypeID = activity.getActivityTypeId();
+		activityID = activity.getActivityId();
+		activityCategoryID = activity.getActivityCategoryID();
+		activityUIID = activity.getActivityUIID();
+		learningLibraryID = activity.getLearningLibrary() != null ? activity.getLearningLibrary().getLearningLibraryId() : null;
+		learningDesignID = activity.getLearningDesign() != null ? activity.getLearningDesign().getLearningDesignId() : null;
+		libraryActivityID = activity.getLibraryActivity() != null ? activity.getLibraryActivity().getActivityId() : null;
+		parentActivityID = activity.getParentActivity() != null ? activity.getParentActivity().getActivityId() : null;
+		parentUIID = activity.getParentUIID();
+		orderID = activity.getOrderId();
+		groupingID = activity.getGrouping() != null ? activity.getGrouping().getGroupingId() : null;
+		groupingUIID = activity.getGroupingUIID();
+		description = activity.getDescription();
+		activityTitle = activity.getTitle();
+		helpText = activity.getHelpText();
+		xCoord = activity.getXcoord();
+		yCoord = activity.getYcoord();
+		libraryActivityUIImage = activity.getLibraryActivityUiImage();
+		applyGrouping = activity.getApplyGrouping();
+		runOffline = activity.getRunOffline();
+		defineLater = activity.getDefineLater();
+		createDateTime = activity.getCreateDateTime();
+		groupingSupportType = activity.getGroupingSupportType();
+		languageFile = activity.getLanguageFile();
+
+		this.languageCode = languageCode;
+		processActivityType(activity);
+
 	}
-	
-	private  void processActivityType(Activity activity){
-		if(activity.isGroupingActivity())
-			 addGroupingActivityAttributes((GroupingActivity)activity);
-		else if(activity.isToolActivity())
-			 addToolActivityAttributes((ToolActivity)activity);
-		else if(activity.isGateActivity())
-			 addGateActivityAttributes(activity);
-		else 			
-			 addComplexActivityAttributes(activity);		
+
+	private void processActivityType(Activity activity) {
+		if (activity.isGroupingActivity()) {
+			addGroupingActivityAttributes((GroupingActivity) activity);
+		}
+		else if (activity.isToolActivity()) {
+			addToolActivityAttributes((ToolActivity) activity);
+		}
+		else if (activity.isGateActivity()) {
+			addGateActivityAttributes(activity);
+		}
+		else {
+			addComplexActivityAttributes(activity);
+		}
 	}
-	
-	private void addComplexActivityAttributes(Activity activity){		
-		if(activity.isOptionsActivity())
-			addOptionsActivityAttributes((OptionsActivity)activity);
-		else if (activity.isParallelActivity())
-			addParallelActivityAttributes((ParallelActivity)activity);
-		else if (activity.isBranchingActivity())
-			addBranchingActivityAttributes((BranchingActivity)activity);
-		else
-			addSequenceActivityAttributes((SequenceActivity)activity);
-		
-		
+
+	private void addComplexActivityAttributes(Activity activity) {
+		if (activity.isOptionsActivity()) {
+			addOptionsActivityAttributes((OptionsActivity) activity);
+		}
+		else if (activity.isParallelActivity()) {
+			addParallelActivityAttributes((ParallelActivity) activity);
+		}
+		else if (activity.isBranchingActivity()) {
+			addBranchingActivityAttributes((BranchingActivity) activity);
+		}
+		else {
+			addSequenceActivityAttributes((SequenceActivity) activity);
+		}
+
 	}
-	private void addGroupingActivityAttributes(GroupingActivity groupingActivity){
+
+	private void addGroupingActivityAttributes(GroupingActivity groupingActivity) {
 		/*	Grouping grouping = groupingActivity.getCreateGrouping();		
 		this.groupingDTO = grouping.getGroupingDTO();
 		this.createGroupingID = grouping.getGroupingId();
 		this.createGroupingUIID = grouping.getGroupingUIID();
 		this.groupingType = grouping.getGroupingTypeId(); */
 	}
-	private void addOptionsActivityAttributes(OptionsActivity optionsActivity){
-		this.maxOptions = optionsActivity.getMaxNumberOfOptions();
-		this.minOptions = optionsActivity.getMinNumberOfOptions();
-		this.optionsInstructions = optionsActivity.getOptionsInstructions();	 
+
+	private void addOptionsActivityAttributes(OptionsActivity optionsActivity) {
+		maxOptions = optionsActivity.getMaxNumberOfOptions();
+		minOptions = optionsActivity.getMinNumberOfOptions();
+		optionsInstructions = optionsActivity.getOptionsInstructions();
 	}
-	private void addParallelActivityAttributes(ParallelActivity activity){	
-	    
+
+	private void addParallelActivityAttributes(ParallelActivity activity) {
+
 	}
-	private void addBranchingActivityAttributes(BranchingActivity activity){	
-	    
+
+	private void addBranchingActivityAttributes(BranchingActivity activity) {
+
 	}
-	private void addSequenceActivityAttributes(SequenceActivity activity){
+
+	private void addSequenceActivityAttributes(SequenceActivity activity) {
 	}
-	private void addToolActivityAttributes(ToolActivity toolActivity){
-	    Tool tool = toolActivity.getTool();
-	    if (tool != null)
-	    {
-	        this.toolID = tool.getToolId();
-			this.toolContentID = new Long(tool.getDefaultToolContentId());
-			this.toolDisplayName = tool.getToolDisplayName();
-			this.toolLanguageFile = tool.getLanguageFile();
-			this.toolSignature = tool.getToolSignature();
-			this.supportsDefineLater = new Boolean(tool.getSupportsDefineLater());
-			this.supportsRunOffline = new Boolean(tool.getSupportsRunOffline());
-			this.supportsModeration = new Boolean(tool.getSupportsModeration());
-			this.supportsContribute = new Boolean(tool.getSupportsContribute());
-			this.authoringURL = tool.getAuthorUrl();
-			this.adminURL = tool.getAdminUrl();
-			this.supportsOutputs = tool.getSupportsOutputs();
-			this.extLmsId = tool.getExtLmsId();
-			this.helpURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, "", languageCode);
-	    }
-	     
+
+	private void addToolActivityAttributes(ToolActivity toolActivity) {
+		Tool tool = toolActivity.getTool();
+		if (tool != null) {
+			toolID = tool.getToolId();
+			toolContentID = new Long(tool.getDefaultToolContentId());
+			toolDisplayName = tool.getToolDisplayName();
+			toolLanguageFile = tool.getLanguageFile();
+			toolSignature = tool.getToolSignature();
+			supportsDefineLater = new Boolean(tool.getSupportsDefineLater());
+			supportsRunOffline = new Boolean(tool.getSupportsRunOffline());
+			supportsModeration = new Boolean(tool.getSupportsModeration());
+			supportsContribute = new Boolean(tool.getSupportsContribute());
+			authoringURL = tool.getAuthorUrl();
+			adminURL = tool.getAdminUrl();
+			supportsOutputs = tool.getSupportsOutputs();
+			extLmsId = tool.getExtLmsId();
+			helpURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, "", languageCode);
+		}
+
 	}
-	private void addGateActivityAttributes(Object activity){
-		if(activity instanceof SynchGateActivity)
-			addSynchGateActivityAttributes((SynchGateActivity)activity);
-		else if (activity instanceof PermissionGateActivity)
-			addPermissionGateActivityAttributes((PermissionGateActivity)activity);
-		else
-			addScheduleGateActivityAttributes((ScheduleGateActivity)activity);
-		GateActivity gateActivity = (GateActivity)activity ;
-		this.gateActivityLevelID = gateActivity.getGateActivityLevelId();
-		this.gateOpen = gateActivity.getGateOpen(); 
-				
+
+	private void addGateActivityAttributes(Object activity) {
+		if (activity instanceof SynchGateActivity) {
+			addSynchGateActivityAttributes((SynchGateActivity) activity);
+		}
+		else if (activity instanceof PermissionGateActivity) {
+			addPermissionGateActivityAttributes((PermissionGateActivity) activity);
+		}
+		else if (activity instanceof ConditionGateActivity) {
+			addConditionGateActivityAttributes((ConditionGateActivity) activity);
+		}
+		else {
+			addScheduleGateActivityAttributes((ScheduleGateActivity) activity);
+		}
+		GateActivity gateActivity = (GateActivity) activity;
+		gateActivityLevelID = gateActivity.getGateActivityLevelId();
+		gateOpen = gateActivity.getGateOpen();
+
 	}
-	private void addSynchGateActivityAttributes(SynchGateActivity activity){	
+
+	private void addSynchGateActivityAttributes(SynchGateActivity activity) {
 	}
-	private void addPermissionGateActivityAttributes(PermissionGateActivity activity){		
+
+	private void addPermissionGateActivityAttributes(PermissionGateActivity activity) {
 	}
-	private void addScheduleGateActivityAttributes(ScheduleGateActivity activity){	    
-	    this.gateStartDateTime = activity.getGateStartDateTime();
-		this.gateStartTimeOffset = activity.getGateStartTimeOffset();
-		this.gateEndDateTime = activity.getGateEndDateTime();
-		this.gateEndTimeOffset = activity.getGateEndTimeOffset();	 
+
+	private void addScheduleGateActivityAttributes(ScheduleGateActivity activity) {
+		gateStartDateTime = activity.getGateStartDateTime();
+		gateStartTimeOffset = activity.getGateStartTimeOffset();
+		gateEndDateTime = activity.getGateEndDateTime();
+		gateEndTimeOffset = activity.getGateEndTimeOffset();
 	}
-	
-    /**
-     * @return Returns the activityCategoryID.
-     */
-    public Integer getActivityCategoryID() {
-        return activityCategoryID;
-    }
-    /**
-     * @return Returns the activityID.
-     */
-    public Long getActivityID() {
-        return activityID;
-    }
-    /**
-     * @return Returns the activityTypeID.
-     */
-    public Integer getActivityTypeID() {
-        return activityTypeID;
-    }
-    /**
-     * @return Returns the activityUIID.
-     */
-    public Integer getActivityUIID() {
-        return activityUIID;
-    }
-    /**
-     * @return Returns the applyGrouping.
-     */
-    public Boolean getApplyGrouping() {
-        return applyGrouping;
-    }
-    /**
-     * @return Returns the createDateTime.
-     */
-    public Date getCreateDateTime() {
-        return createDateTime;
-    }
-    /**
-     * @return Returns the defineLater.
-     */
-    public Boolean getDefineLater() {
-        return defineLater;
-    }
-    /**
-     * @return Returns the description.
-     */
-    public String getDescription() {
-        return description;
-    }
-    /**
-     * @return Returns the groupingID.
-     */
-    public Long getGroupingID() {
-        return groupingID;
-    }
-    /**
-     * @return Returns the groupingSupportType.
-     */
-    public Integer getGroupingSupportType() {
-        return groupingSupportType;
-    }
-    /**
-     * @return Returns the groupingUIID.
-     */
-    public Integer getGroupingUIID() {
-        return groupingUIID;
-    }
-    /**
-     * @return Returns the helpText.
-     */
-    public String getHelpText() {
-        return helpText;
-    }
-    /**
-     * 
-     * @return Return the helpURL
-     */
-    public String getHelpURL() {
-    	return helpURL;
-    }
-    /**
-     * @return Returns the learningDesignID.
-     */
-    public Long getLearningDesignID() {
-        return learningDesignID;
-    }
-    /**
-     * @return Returns the learningLibraryID.
-     */
-    public Long getLearningLibraryID() {
-        return learningLibraryID;
-    }
-    /**
-     * @return Returns the libraryActivityID.
-     */
-    public Long getLibraryActivityID() {
-        return libraryActivityID;
-    }
-    /**
-     * @return Returns the libraryActivityUIImage.
-     */
-    public String getLibraryActivityUIImage() {
-        return libraryActivityUIImage;
-    }
-    /**
-     * @return Returns the orderID.
-     */
-    public Integer getOrderID() {
-        return orderID;
-    }
-    /**
-     * @return Returns the parentActivityID.
-     */
-    public Long getParentActivityID() {
-        return parentActivityID;
-    }
-    /**
-     * @return Returns the parentUIID.
-     */
-    public Integer getParentUIID() {
-        return parentUIID;
-    }
-    /**
-     * @return Returns the runOffline.
-     */
-    public Boolean getRunOffline() {
-        return runOffline;
-    }
-    /**
-     * @return Returns the title.
-     */
-    public String getActivityTitle() {
-        return activityTitle;
-    }
-   
-    /**
-     * @return Returns the xCoord.
-     */
-    public Integer getxCoord() {
-        return xCoord;
-    }
-    /**
-     * @return Returns the yCoord.
-     */
-    public Integer getyCoord() {
-        return yCoord;
-    }
-        
-    /**
-     * @return Returns the authoringURL.
-     */
-    public String getAuthoringURL() {
-        return authoringURL;
-    }
-    /**
-     * @return Returns the adminURL.
-     */
-    public String getAdminURL() {
-        return adminURL;
-    }
-    /**
-     * @return Returns the supportsContribute.
-     */
-    public Boolean getSupportsContribute() {
-        return supportsContribute;
-    }
-    /**
-     * @return Returns the supportsDefineLater.
-     */
-    public Boolean getSupportsDefineLater() {
-        return supportsDefineLater;
-    }
-    /**
-     * @return Returns the supportsModeration.
-     */
-    public Boolean getSupportsModeration() {
-        return supportsModeration;
-    }
-    /**
-     * @return Returns the supportsRunOffline.
-     */
-    public Boolean getSupportsRunOffline() {
-        return supportsRunOffline;
-    }
-    /**
-     * @return Returns the toolContentID.
-     */
-    public Long getToolContentID() {
-        return toolContentID;
-    }
-    /**
-     * @return Returns the toolDisplayName.
-     */
-    public String getToolDisplayName() {
-        return toolDisplayName;
-    }
-    /**
-     * @return Returns the toolID.
-     */
-    public Long getToolID() {
-        return toolID;
-    }
-    
-    /**
-     * 
-     * @return Returns the toolSignature
-     */
-    public String getToolSignature() {
+
+	private void addConditionGateActivityAttributes(ConditionGateActivity activity) {
+	}
+
+	/**
+	 * @return Returns the activityCategoryID.
+	 */
+	public Integer getActivityCategoryID() {
+		return activityCategoryID;
+	}
+
+	/**
+	 * @return Returns the activityID.
+	 */
+	public Long getActivityID() {
+		return activityID;
+	}
+
+	/**
+	 * @return Returns the activityTypeID.
+	 */
+	public Integer getActivityTypeID() {
+		return activityTypeID;
+	}
+
+	/**
+	 * @return Returns the activityUIID.
+	 */
+	public Integer getActivityUIID() {
+		return activityUIID;
+	}
+
+	/**
+	 * @return Returns the applyGrouping.
+	 */
+	public Boolean getApplyGrouping() {
+		return applyGrouping;
+	}
+
+	/**
+	 * @return Returns the createDateTime.
+	 */
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+
+	/**
+	 * @return Returns the defineLater.
+	 */
+	public Boolean getDefineLater() {
+		return defineLater;
+	}
+
+	/**
+	 * @return Returns the description.
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @return Returns the groupingID.
+	 */
+	public Long getGroupingID() {
+		return groupingID;
+	}
+
+	/**
+	 * @return Returns the groupingSupportType.
+	 */
+	public Integer getGroupingSupportType() {
+		return groupingSupportType;
+	}
+
+	/**
+	 * @return Returns the groupingUIID.
+	 */
+	public Integer getGroupingUIID() {
+		return groupingUIID;
+	}
+
+	/**
+	 * @return Returns the helpText.
+	 */
+	public String getHelpText() {
+		return helpText;
+	}
+
+	/**
+	 * 
+	 * @return Return the helpURL
+	 */
+	public String getHelpURL() {
+		return helpURL;
+	}
+
+	/**
+	 * @return Returns the learningDesignID.
+	 */
+	public Long getLearningDesignID() {
+		return learningDesignID;
+	}
+
+	/**
+	 * @return Returns the learningLibraryID.
+	 */
+	public Long getLearningLibraryID() {
+		return learningLibraryID;
+	}
+
+	/**
+	 * @return Returns the libraryActivityID.
+	 */
+	public Long getLibraryActivityID() {
+		return libraryActivityID;
+	}
+
+	/**
+	 * @return Returns the libraryActivityUIImage.
+	 */
+	public String getLibraryActivityUIImage() {
+		return libraryActivityUIImage;
+	}
+
+	/**
+	 * @return Returns the orderID.
+	 */
+	public Integer getOrderID() {
+		return orderID;
+	}
+
+	/**
+	 * @return Returns the parentActivityID.
+	 */
+	public Long getParentActivityID() {
+		return parentActivityID;
+	}
+
+	/**
+	 * @return Returns the parentUIID.
+	 */
+	public Integer getParentUIID() {
+		return parentUIID;
+	}
+
+	/**
+	 * @return Returns the runOffline.
+	 */
+	public Boolean getRunOffline() {
+		return runOffline;
+	}
+
+	/**
+	 * @return Returns the title.
+	 */
+	public String getActivityTitle() {
+		return activityTitle;
+	}
+
+	/**
+	 * @return Returns the xCoord.
+	 */
+	public Integer getxCoord() {
+		return xCoord;
+	}
+
+	/**
+	 * @return Returns the yCoord.
+	 */
+	public Integer getyCoord() {
+		return yCoord;
+	}
+
+	/**
+	 * @return Returns the authoringURL.
+	 */
+	public String getAuthoringURL() {
+		return authoringURL;
+	}
+
+	/**
+	 * @return Returns the adminURL.
+	 */
+	public String getAdminURL() {
+		return adminURL;
+	}
+
+	/**
+	 * @return Returns the supportsContribute.
+	 */
+	public Boolean getSupportsContribute() {
+		return supportsContribute;
+	}
+
+	/**
+	 * @return Returns the supportsDefineLater.
+	 */
+	public Boolean getSupportsDefineLater() {
+		return supportsDefineLater;
+	}
+
+	/**
+	 * @return Returns the supportsModeration.
+	 */
+	public Boolean getSupportsModeration() {
+		return supportsModeration;
+	}
+
+	/**
+	 * @return Returns the supportsRunOffline.
+	 */
+	public Boolean getSupportsRunOffline() {
+		return supportsRunOffline;
+	}
+
+	/**
+	 * @return Returns the toolContentID.
+	 */
+	public Long getToolContentID() {
+		return toolContentID;
+	}
+
+	/**
+	 * @return Returns the toolDisplayName.
+	 */
+	public String getToolDisplayName() {
+		return toolDisplayName;
+	}
+
+	/**
+	 * @return Returns the toolID.
+	 */
+	public Long getToolID() {
+		return toolID;
+	}
+
+	/**
+	 * 
+	 * @return Returns the toolSignature
+	 */
+	public String getToolSignature() {
 		return toolSignature;
 	}
-    
-    /**
-     * @return Returns the gateActivityLevelID.
-     */
-    public Integer getGateActivityLevelID() {
-        return gateActivityLevelID;
-    }
-    /**
-     * @return Returns the gateEndDateTime.
-     */
-    public Date getGateEndDateTime() {
-        return gateEndDateTime;
-    }
-    /**
-     * @return Returns the gateEndTimeOffset.
-     */
-    public Long getGateEndTimeOffset() {
-        return gateEndTimeOffset;
-    }
-    /**
-     * @return Returns the gateOpen.
-     */
-    public Boolean getGateOpen() {
-        return gateOpen;
-    }
-    /**
-     * @return Returns the gateStartDateTime.
-     */
-    public Date getGateStartDateTime() {
-        return gateStartDateTime;
-    }
-    /**
-     * @return Returns the gateStartTimeOffset.
-     */
-    public Long getGateStartTimeOffset() {
-        return gateStartTimeOffset;
-    }
-    
-    /**
-     * @return Returns the maxOptions.
-     */
-    public Integer getMaxOptions() {
-        return maxOptions;
-    }
-    /**
-     * @return Returns the minOptions.
-     */
-    public Integer getMinOptions() {
-        return minOptions;
-    }
-    /**
-     * @return Returns the optionsInstructions.
-     */
-    public String getOptionsInstructions() {
-        return optionsInstructions;
-    }
 
-    /**
-     * @return Returns the languge file for the activity (for I8N).
-     */
- 	public String getLanguageFile() {
+	/**
+	 * @return Returns the gateActivityLevelID.
+	 */
+	public Integer getGateActivityLevelID() {
+		return gateActivityLevelID;
+	}
+
+	/**
+	 * @return Returns the gateEndDateTime.
+	 */
+	public Date getGateEndDateTime() {
+		return gateEndDateTime;
+	}
+
+	/**
+	 * @return Returns the gateEndTimeOffset.
+	 */
+	public Long getGateEndTimeOffset() {
+		return gateEndTimeOffset;
+	}
+
+	/**
+	 * @return Returns the gateOpen.
+	 */
+	public Boolean getGateOpen() {
+		return gateOpen;
+	}
+
+	/**
+	 * @return Returns the gateStartDateTime.
+	 */
+	public Date getGateStartDateTime() {
+		return gateStartDateTime;
+	}
+
+	/**
+	 * @return Returns the gateStartTimeOffset.
+	 */
+	public Long getGateStartTimeOffset() {
+		return gateStartTimeOffset;
+	}
+
+	/**
+	 * @return Returns the maxOptions.
+	 */
+	public Integer getMaxOptions() {
+		return maxOptions;
+	}
+
+	/**
+	 * @return Returns the minOptions.
+	 */
+	public Integer getMinOptions() {
+		return minOptions;
+	}
+
+	/**
+	 * @return Returns the optionsInstructions.
+	 */
+	public String getOptionsInstructions() {
+		return optionsInstructions;
+	}
+
+	/**
+	 * @return Returns the languge file for the activity (for I8N).
+	 */
+	public String getLanguageFile() {
 		return languageFile;
 	}
 
-    /**
-     * @return Returns the languge file for the tool (for I8N).
-     */
+	/**
+	 * @return Returns the languge file for the tool (for I8N).
+	 */
 	public String getToolLanguageFile() {
 		return toolLanguageFile;
 	}
@@ -514,7 +575,7 @@ public class LibraryActivityDTO extends BaseDTO
 	public void setHelpText(String helpText) {
 		this.helpText = helpText;
 	}
-	
+
 	/**
 	 * Set the activity's help url
 	 * @param helpURL
@@ -525,18 +586,18 @@ public class LibraryActivityDTO extends BaseDTO
 
 	/** Set the activity's title */
 	public void setActivityTitle(String title) {
-		this.activityTitle = title;
+		activityTitle = title;
 	}
 
 	/** Set the tool's display name (similar to title) */
 	public void setToolDisplayName(String toolDisplayName) {
 		this.toolDisplayName = toolDisplayName;
 	}
-	
+
 	/** Set the tool's signature 
 	 *	@param toolSignature 
 	 */
-	
+
 	public void setToolSignature(String toolSignature) {
 		this.toolSignature = toolSignature;
 	}

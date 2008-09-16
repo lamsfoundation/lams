@@ -287,6 +287,10 @@ public class GateActivityDTO {
 		return gateActivity.isSynchGate();
 	}
 
+	public boolean isConditionGate() {
+		return gateActivity.isConditionGate();
+	}
+
 	public boolean isSystemGate() {
 		return gateActivity.isSystemGate();
 	}

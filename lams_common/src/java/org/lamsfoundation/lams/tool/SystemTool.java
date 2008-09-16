@@ -30,7 +30,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**  
  * Represents the URLs for the internal functionality such as grouping and gates.
  * Eventually these will become "pluggable" tools, so that we can have other
@@ -50,312 +49,293 @@ public class SystemTool implements Serializable {
 	public static final Long GROUP_BASED_BRANCHING = new Long(7);
 	public static final Long TOOL_BASED_BRANCHING = new Long(8);
 	public static final Long SEQUENCE = new Long(9);
-	
-    /** identifier field */
-    private Long systemToolId;
+	public static final Long CONDITION_GATE = new Long(9);
 
-    /** persistent field - the type of activity */
+	/** identifier field */
+	private Long systemToolId;
+
+	/** persistent field - the type of activity */
 	private Integer activityTypeId;
 
-    /** persistent field */
-    private String toolDisplayName;
+	/** persistent field */
+	private String toolDisplayName;
 
-    /** nullable persistent field */
-    private String description;
+	/** nullable persistent field */
+	private String description;
 
-    /** persistent field */
-    private String learnerUrl;
+	/** persistent field */
+	private String learnerUrl;
 
-    /** persistent field */
-    private String learnerPreviewUrl;
+	/** persistent field */
+	private String learnerPreviewUrl;
 
-    /** persistent field */
-    private String learnerProgressUrl;
+	/** persistent field */
+	private String learnerProgressUrl;
 
-    /** persistent field */
-    private String exportPortfolioLearnerUrl;
+	/** persistent field */
+	private String exportPortfolioLearnerUrl;
 
-    /** persistent field */
-    private String exportPortfolioClassUrl;
+	/** persistent field */
+	private String exportPortfolioClassUrl;
 
-    /** persistent field */
-    private String monitorUrl;
-    
-    /** persistent field */
-    private String contributeUrl;
-    
-    /** persistent field */
-    private String helpUrl;
-    
-    /** persistent field */
-    private String adminUrl;
-    
-    /** persistent field */
-    private Date createDateTime;
-    
+	/** persistent field */
+	private String monitorUrl;
+
+	/** persistent field */
+	private String contributeUrl;
+
+	/** persistent field */
+	private String helpUrl;
+
+	/** persistent field */
+	private String adminUrl;
+
+	/** persistent field */
+	private Date createDateTime;
+
 	/** 
 	 * Entries for an tool in a language property file 
 	 */
 	public static final String I18N_DISPLAY_NAME = "tool.display.name";
 	public static final String I18N_DESCRIPTION = "tool.description";
 
-    /** full constructor */
-    public SystemTool(Long systemToolId, 
-    			Integer activityTypeId,
-                String displayName, 
-                String description, 
-                String learnerUrl, 
-                String learnerPreviewUrl,
-                String learnerProgressUrl,
-                String exportPortfolioLearnerUrl,
-                String exportPortfolioClassUrl,
-                String monitorUrl,
-                String contributeUrl,
-                String helpUrl,
-                Date createDateTime) 
-    {
-        this.systemToolId = systemToolId;
-        this.activityTypeId = activityTypeId;
-        this.toolDisplayName = displayName;
-        this.description = description;
-        
-        this.learnerUrl = learnerUrl;
-        this.learnerPreviewUrl = learnerPreviewUrl;
-        this.learnerProgressUrl = learnerProgressUrl;
-        this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
-        this.exportPortfolioClassUrl = exportPortfolioClassUrl;
-        this.monitorUrl = monitorUrl;
-        this.contributeUrl = contributeUrl;
-        this.helpUrl = helpUrl;
+	/** full constructor */
+	public SystemTool(Long systemToolId, Integer activityTypeId, String displayName, String description, String learnerUrl,
+			String learnerPreviewUrl, String learnerProgressUrl, String exportPortfolioLearnerUrl,
+			String exportPortfolioClassUrl, String monitorUrl, String contributeUrl, String helpUrl, Date createDateTime) {
+		this.systemToolId = systemToolId;
+		this.activityTypeId = activityTypeId;
+		toolDisplayName = displayName;
+		this.description = description;
 
-        this.createDateTime = createDateTime;
-    }
+		this.learnerUrl = learnerUrl;
+		this.learnerPreviewUrl = learnerPreviewUrl;
+		this.learnerProgressUrl = learnerProgressUrl;
+		this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
+		this.exportPortfolioClassUrl = exportPortfolioClassUrl;
+		this.monitorUrl = monitorUrl;
+		this.contributeUrl = contributeUrl;
+		this.helpUrl = helpUrl;
 
-    /** default constructor */
-    public SystemTool() {
-    }
+		this.createDateTime = createDateTime;
+	}
 
-    /** 
-     * @hibernate.id generator-class="native" type="java.lang.Long"
-     *             	 column="system_tool_id"      
-     */
-    public Long getSystemToolId() {
-        return this.systemToolId;
-    }
+	/** default constructor */
+	public SystemTool() {
+	}
 
-    public void setSystemToolId(Long systemToolId) {
-        this.systemToolId = systemToolId;
-    }
+	/** 
+	 * @hibernate.id generator-class="native" type="java.lang.Long"
+	 *             	 column="system_tool_id"      
+	 */
+	public Long getSystemToolId() {
+		return systemToolId;
+	}
 
- 
-    /** 
-     * @hibernate.property column="learning_activity_type_id" type="java.lang.Integer"
-     *            		   not-null="true"    
-     */
-    public Integer getActivityTypeId() {
-        return this.activityTypeId;
-    }
+	public void setSystemToolId(Long systemToolId) {
+		this.systemToolId = systemToolId;
+	}
 
-    public void setActivityTypeId(Integer activityTypeId) {
-        this.activityTypeId = activityTypeId;
-    }
+	/** 
+	 * @hibernate.property column="learning_activity_type_id" type="java.lang.Integer"
+	 *            		   not-null="true"    
+	 */
+	public Integer getActivityTypeId() {
+		return activityTypeId;
+	}
 
-    /** 
-     * @hibernate.property column="tool_display_name" length="255"
-     *             		   not-null="true"     
-     */
-    public String getToolDisplayName() {
-        return this.toolDisplayName;
-    }
+	public void setActivityTypeId(Integer activityTypeId) {
+		this.activityTypeId = activityTypeId;
+	}
 
-    public void setToolDisplayName(String toolDisplayName) {
-        this.toolDisplayName = toolDisplayName;
-    }
+	/** 
+	 * @hibernate.property column="tool_display_name" length="255"
+	 *             		   not-null="true"     
+	 */
+	public String getToolDisplayName() {
+		return toolDisplayName;
+	}
 
-    /** 
-     * @hibernate.property column="description" length="65535"     
-     */
-    public String getDescription() {
-        return this.description;
-    }
+	public void setToolDisplayName(String toolDisplayName) {
+		this.toolDisplayName = toolDisplayName;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	/** 
+	 * @hibernate.property column="description" length="65535"     
+	 */
+	public String getDescription() {
+		return description;
+	}
 
-    /** 
-     * @hibernate.property column="learner_url" length="65535"
-     *            		   not-null="true"    
-     */
-    public String getLearnerUrl() {
-        return this.learnerUrl;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public void setLearnerUrl(String learnerUrl) {
-        this.learnerUrl = learnerUrl;
-    }
+	/** 
+	 * @hibernate.property column="learner_url" length="65535"
+	 *            		   not-null="true"    
+	 */
+	public String getLearnerUrl() {
+		return learnerUrl;
+	}
 
-    /** 
-     * @hibernate.property column="learner_preview_url" length="65535"
-     *            		   not-null="false"    
-     */
-    public String getLearnerPreviewUrl() {
-        return this.learnerPreviewUrl;
-    }
+	public void setLearnerUrl(String learnerUrl) {
+		this.learnerUrl = learnerUrl;
+	}
 
-    public void setLearnerPreviewUrl(String learnerPreviewUrl) {
-        this.learnerPreviewUrl = learnerPreviewUrl;
-    }
+	/** 
+	 * @hibernate.property column="learner_preview_url" length="65535"
+	 *            		   not-null="false"    
+	 */
+	public String getLearnerPreviewUrl() {
+		return learnerPreviewUrl;
+	}
 
-    /** 
-     * @hibernate.property column="learner_progress_url" length="65535"
-     *            		   not-null="false"    
-     */
-    public String getLearnerProgressUrl() {
-        return this.learnerProgressUrl;
-    }
+	public void setLearnerPreviewUrl(String learnerPreviewUrl) {
+		this.learnerPreviewUrl = learnerPreviewUrl;
+	}
 
-    public void setLearnerProgressUrl(String learnerProgressUrl) {
-        this.learnerProgressUrl = learnerProgressUrl;
-    }
+	/** 
+	 * @hibernate.property column="learner_progress_url" length="65535"
+	 *            		   not-null="false"    
+	 */
+	public String getLearnerProgressUrl() {
+		return learnerProgressUrl;
+	}
 
-    /** 
-     * @hibernate.property column="export_pfolio_learner_url" length="65535"
-     *             		   not-null="false"  
-     */
-    public String getExportPortfolioLearnerUrl() {
-        return this.exportPortfolioLearnerUrl;
-    }
+	public void setLearnerProgressUrl(String learnerProgressUrl) {
+		this.learnerProgressUrl = learnerProgressUrl;
+	}
 
-    public void setExportPortfolioLearnerUrl(String exportPortfolioLearnerUrl) {
-        this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
-    }
+	/** 
+	 * @hibernate.property column="export_pfolio_learner_url" length="65535"
+	 *             		   not-null="false"  
+	 */
+	public String getExportPortfolioLearnerUrl() {
+		return exportPortfolioLearnerUrl;
+	}
 
-    /** 
-     * @hibernate.property column="export_pfolio_class_url" length="65535"
-     *             		   not-null="false"  
-     */
-    public String getExportPortfolioClassUrl() {
-        return this.exportPortfolioClassUrl;
-    }
+	public void setExportPortfolioLearnerUrl(String exportPortfolioLearnerUrl) {
+		this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
+	}
 
-    public void setExportPortfolioClassUrl(String exportPortfolioClassUrl) {
-        this.exportPortfolioClassUrl = exportPortfolioClassUrl;
-    }
+	/** 
+	 * @hibernate.property column="export_pfolio_class_url" length="65535"
+	 *             		   not-null="false"  
+	 */
+	public String getExportPortfolioClassUrl() {
+		return exportPortfolioClassUrl;
+	}
 
-    /**
-     * @hibernate.property column="admin_url" length="65535" not-null="false"  
-     * @return Returns the helpUrl.
-     */
-    public String getAdminUrl()
-    {
-        return adminUrl;
-    }
-    /**
-     * @param helpUrl The helpUrl to set.
-     */
-    public void setAdminUrl(String adminUrl)
-    {
-        this.adminUrl = adminUrl;
-    }
+	public void setExportPortfolioClassUrl(String exportPortfolioClassUrl) {
+		this.exportPortfolioClassUrl = exportPortfolioClassUrl;
+	}
 
-    /**
-     * @hibernate.property column="create_date_time"
+	/**
+	 * @hibernate.property column="admin_url" length="65535" not-null="false"  
+	 * @return Returns the helpUrl.
+	 */
+	public String getAdminUrl() {
+		return adminUrl;
+	}
+
+	/**
+	 * @param helpUrl The helpUrl to set.
+	 */
+	public void setAdminUrl(String adminUrl) {
+		this.adminUrl = adminUrl;
+	}
+
+	/**
+	 * @hibernate.property column="create_date_time"
 				           length="19" not-null="true"
-     * @return Returns the createDateTime.
-     */
-    public Date getCreateDateTime()
-    {
-        return createDateTime;
-    }
-    /**
-     * @param createDateTime The createDateTime to set.
-     */
-    public void setCreateDateTime(Date createDateTime)
-    {
-        this.createDateTime = createDateTime;
-    }
-    
+	 * @return Returns the createDateTime.
+	 */
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
 
-    /**
-     * Does this tool support contribute? Will be true if the contributeURL is not null/empty string.
-     */
-    public boolean getSupportsContribute()
-    {
-    	String contributeURL = getContributeUrl();
-    	return ( contributeURL != null && contributeURL.trim().length() > 0);   
-    }
-    
+	/**
+	 * @param createDateTime The createDateTime to set.
+	 */
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
 
-    /**
-     * @hibernate.property column="contribute_url" length="65535" not-null="false"  
-     * @return Returns the contributeUrl.
-     */
-    public String getContributeUrl()
-    {
-        return contributeUrl;
-    }
-    /**
-     * @param contributeUrl The contributUrl to set.
-     */
-    public void setContributeUrl(String contributeUrl)
-    {
-        this.contributeUrl = contributeUrl;
-    }
+	/**
+	 * Does this tool support contribute? Will be true if the contributeURL is not null/empty string.
+	 */
+	public boolean getSupportsContribute() {
+		String contributeURL = getContributeUrl();
+		return contributeURL != null && contributeURL.trim().length() > 0;
+	}
 
-    /**
-     * @hibernate.property column="monitor_url" length="65535" not-null="false"  
-     * @return Returns the monitorUrl.
-     */
-    public String getMonitorUrl()
-    {
-        return monitorUrl;
-    }
-    /**
-     * @param monitorUrl The monitorUrl to set.
-     */
-    public void setMonitorUrl(String monitorUrl)
-    {
-        this.monitorUrl = monitorUrl;
-    }
- 
-    /**
-     * @hibernate.property column="help_url" length="65535" not-null="false"  
-     * @return Returns the helpUrl.
-     */
-    public String getHelpUrl()
-    {
-        return helpUrl;
-    }
-    /**
-     * @param helpUrl The helpUrl to set.
-     */
-    public void setHelpUrl(String helpUrl)
-    {
-        this.helpUrl = helpUrl;
-    }
- 
-   
-    public String toString() {
-        return new ToStringBuilder(this)
-            .append("systemToolId", getSystemToolId())
-            .append("activityTypeId",getActivityTypeId())
-            .toString();
-    }
+	/**
+	 * @hibernate.property column="contribute_url" length="65535" not-null="false"  
+	 * @return Returns the contributeUrl.
+	 */
+	public String getContributeUrl() {
+		return contributeUrl;
+	}
 
-    public boolean equals(Object other) {
-        if ( (this == other ) ) return true;
-        if ( !(other instanceof SystemTool) ) return false;
-        SystemTool castOther = (SystemTool) other;
-        return new EqualsBuilder()
-            .append(this.getSystemToolId(), castOther.getSystemToolId())
-            .isEquals();
-    }
+	/**
+	 * @param contributeUrl The contributUrl to set.
+	 */
+	public void setContributeUrl(String contributeUrl) {
+		this.contributeUrl = contributeUrl;
+	}
 
-    public int hashCode() {
-        return new HashCodeBuilder()
-            .append(getSystemToolId())
-            .toHashCode();
-    }
+	/**
+	 * @hibernate.property column="monitor_url" length="65535" not-null="false"  
+	 * @return Returns the monitorUrl.
+	 */
+	public String getMonitorUrl() {
+		return monitorUrl;
+	}
+
+	/**
+	 * @param monitorUrl The monitorUrl to set.
+	 */
+	public void setMonitorUrl(String monitorUrl) {
+		this.monitorUrl = monitorUrl;
+	}
+
+	/**
+	 * @hibernate.property column="help_url" length="65535" not-null="false"  
+	 * @return Returns the helpUrl.
+	 */
+	public String getHelpUrl() {
+		return helpUrl;
+	}
+
+	/**
+	 * @param helpUrl The helpUrl to set.
+	 */
+	public void setHelpUrl(String helpUrl) {
+		this.helpUrl = helpUrl;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this).append("systemToolId", getSystemToolId()).append("activityTypeId", getActivityTypeId())
+				.toString();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) {
+			return true;
+		}
+		if (!(other instanceof SystemTool)) {
+			return false;
+		}
+		SystemTool castOther = (SystemTool) other;
+		return new EqualsBuilder().append(this.getSystemToolId(), castOther.getSystemToolId()).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(getSystemToolId()).toHashCode();
+	}
 
 }

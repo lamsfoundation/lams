@@ -84,6 +84,7 @@ import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -659,7 +660,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				else if (actDto.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
 						|| actDto.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
 						|| actDto.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE)
-						|| actDto.getActivityTypeID().equals(Activity.SYSTEM_GATE_ACTIVITY_TYPE)) {
+						|| actDto.getActivityTypeID().equals(Activity.SYSTEM_GATE_ACTIVITY_TYPE)
+						|| actDto.getActivityTypeID().equals(Activity.CONDITION_GATE_ACTIVITY_TYPE)) {
 					att = new Attribute(ExportToolContentService.IMS_ATTR_REF, ExportToolContentService.IMS_PREFIX_ACTIVITY_REF
 							+ ExportToolContentService.IMS_TAG_GATE + "-" + actDto.getActivityID());
 				}
@@ -2201,7 +2203,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 		BranchActivityEntry entry = null;
 		if (condition != null) {
-			entry = condition.allocateBranchToCondition(entryDto.getEntryUIID(), branch, (BranchingActivity) branchingActivity);
+			entry = condition.allocateBranchToCondition(entryDto.getEntryUIID(), branch, branchingActivity);
 		}
 		else if (group != null) {
 			entry = group.allocateBranchToGroup(entryDto.getEntryUIID(), branch, (BranchingActivity) branchingActivity);
@@ -2310,6 +2312,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				((PermissionGateActivity) act).setGateOpen(false);
 				((PermissionGateActivity) act).setWaitingLearners(null);
 				((PermissionGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
+				break;
+			case Activity.CONDITION_GATE_ACTIVITY_TYPE:
+				((ConditionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+				((ConditionGateActivity) act).setGateOpen(false);
+				((ConditionGateActivity) act).setWaitingLearners(null);
+				((ConditionGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
 				break;
 			case Activity.PARALLEL_ACTIVITY_TYPE:
 				break;

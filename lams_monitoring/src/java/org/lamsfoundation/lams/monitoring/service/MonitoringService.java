@@ -1014,7 +1014,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	public GateActivity openGateForSingleUser(Long gateId, Integer userId) {
 		GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
-		if (gate != null && gate.isPermissionGate() && userId != null && userId >= 0) {
+		if (gate != null && userId != null && userId >= 0) {
 			User user = (User) baseDAO.find(User.class, userId);
 			gate.addLeaner(user, true);
 			activityDAO.update(gate);
@@ -1134,7 +1134,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		else if (activity.isGateActivity()) {
 			GateActivity gate = (GateActivity) activity;
 			GateActivityDTO dto = learnerService.knockGate(gate, learner, false);
-			if (dto.getGateOpen()) {
+			if (dto.getAllowToPass()) {
 				//the gate is opened, continue to next activity to complete
 				learnerService.completeActivity(learner.getUserId(), activity, lessonId);
 				if (MonitoringService.log.isDebugEnabled()) {
@@ -1855,6 +1855,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
 			table.put("gateStartTime", scheduleGate.getGateStartDateTime());
 			table.put("gateEndTime", scheduleGate.getGateEndDateTime());
+		}
+		else if (gate.isPermissionGate() || gate.isConditionGate()) {
+			table.put("allowedToPassLearnerList", gate.getAllowedToPassLearners());
 		}
 		return table;
 	}
