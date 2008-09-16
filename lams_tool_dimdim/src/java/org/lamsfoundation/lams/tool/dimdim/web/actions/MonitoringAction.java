@@ -138,7 +138,7 @@ public class MonitoringAction extends DispatchAction {
 	}
 
 	public ActionForward startDimdim(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		MonitoringForm monitoringForm = (MonitoringForm) form;
 
@@ -151,69 +151,14 @@ public class MonitoringAction extends DispatchAction {
 		session.setMeetingKey(monitoringForm.getMeetingKey());
 		session.setMaxAttendeeMikes(monitoringForm.getMaxAttendeeMikes());
 
-		// Get Dimdim server url
-		DimdimConfig serverURL = dimdimService
-				.getConfigEntry(Constants.CONFIG_SERVER_URL);
-
-		if (serverURL == null) {
-			throw new DimdimException("Dimdim server url not found");
-		}
-
 		// Get LAMS userDTO
 		org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
 				.getSession().getAttribute(AttributeNames.USER);
 
-		// get dimdim url
-		try {
-			URL url = new URL(serverURL.getValue()
-					+ "/dimdim/StartNewConferenceCheck.action?"
-					+ "email="
-					+ URLEncoder.encode(lamsUserDTO.getEmail(), "UTF8")
-					+ "&displayName="
-					+ URLEncoder.encode(lamsUserDTO.getFirstName() + " "
-							+ lamsUserDTO.getLastName(), "UTF8") + "&confName="
-					+ URLEncoder.encode(session.getTopic(), "UTF8")
-					+ "&confKey="
-					+ URLEncoder.encode(session.getMeetingKey(), "UTF8")
-					+ "&lobby=false" + "&networkProfile=3" + "&meetingHours=99"
-					+ "&maxAttendeeMikes=0" + "&returnUrl=asdf"
-					+ "&presenterAV=av" + "&privateChatEnabled=true"
-					+ "&publicChatEnabled=true" + "&screenShareEnabled=true"
-					+ "&whiteboardEnabled=true");
-
-			URLConnection connection = url.openConnection();
-
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					connection.getInputStream()));
-			String dimdimResponse = "";
-			String line = "";
-
-			while ((line = in.readLine()) != null)
-				dimdimResponse += line;
-			in.close();
-			
-			log.debug(dimdimResponse + "1");
-			
-			// Extract the connect url from the json string.
-			Pattern pattern = Pattern.compile("url:\"(.*?)\"");
-			Matcher matcher = pattern.matcher(dimdimResponse);
-			
-			matcher.find();
-			String connectURL = matcher.group(1);
-			
-			response.sendRedirect(serverURL.getValue() + connectURL);
-
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey(), session.getTopic());
 		
+		response.sendRedirect(startConferenceURL);
+				
 		return null;
 
 	}

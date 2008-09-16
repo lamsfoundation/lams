@@ -175,47 +175,19 @@ public class LearningAction extends DispatchAction {
 		// Get LAMS userDTO
 		org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
 				.getSession().getAttribute(AttributeNames.USER);
-
-		// get dimdim url
-		DimdimConfig serverURL = dimdimService
-				.getConfigEntry(Constants.CONFIG_SERVER_URL);
-
-		URL url = new URL(serverURL.getValue()
-				+ "/dimdim/JoinConferenceCheck.action?"
-				+ "email="
-				+ URLEncoder.encode(lamsUserDTO.getEmail(), "UTF8")
-				+ "&displayName="
-				+ URLEncoder.encode(lamsUserDTO.getFirstName() + " "
-						+ lamsUserDTO.getLastName(), "UTF8") + "&confKey="
-				+ URLEncoder.encode(dimdimSession.getMeetingKey(), "UTF8"));
-
-		URLConnection connection = url.openConnection();
-
-		BufferedReader in = new BufferedReader(new InputStreamReader(connection
-				.getInputStream()));
-		String dimdimResponse = "";
-		String line = "";
-
-		while ((line = in.readLine()) != null)
-			dimdimResponse += line;
-		in.close();
-
-		log.debug(dimdimResponse + "1");
-
-		// Extract the connect url from the json string.
-		Pattern pattern = Pattern.compile("url:\"(.*?)\"");
-		Matcher matcher = pattern.matcher(dimdimResponse);
-
-		matcher.find();
-		String connectURL = matcher.group(1);
-
+		
+		String connectURL = "";
+		if (mode.isAuthor()) {
+			connectURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, dimdim.getMeetingKey(), dimdim.getTopic());
+		} else {
+			connectURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO, dimdimSession.getMeetingKey());
+		}
+		
 		boolean conferenceOpen = connectURL.isEmpty() ? false : true;
 		request.setAttribute(Constants.ATTR_CONFERENCE_OPEN, conferenceOpen);
 
 		if (conferenceOpen) {
-			request.setAttribute(Constants.ATTR_CONFERENCE_URL, serverURL
-					.getValue()
-					+ connectURL);
+			request.setAttribute(Constants.ATTR_CONFERENCE_URL, connectURL);
 		}
 
 		return mapping.findForward("dimdim");

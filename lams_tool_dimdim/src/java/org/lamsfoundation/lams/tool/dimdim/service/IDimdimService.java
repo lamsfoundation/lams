@@ -167,4 +167,23 @@ public interface IDimdimService {
 	 * @param value
 	 */
 	void saveOrUpdateConfigEntry(DimdimConfig dimdimConfig);
+	
+	/**
+	 * 
+	 * @param userDTO
+	 * @param meetingKey
+	 * @param topic
+	 * @return
+	 */
+	String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey, String topic) throws Exception;
+	
+	/**
+	 * 
+	 * @param userDTOm
+	 * @param meetingKey
+	 * @return
+	 */
+	String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey) throws Exception;
+	
+	
 }

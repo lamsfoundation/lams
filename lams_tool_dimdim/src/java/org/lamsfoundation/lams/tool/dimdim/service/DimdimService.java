@@ -24,14 +24,23 @@
 
 package org.lamsfoundation.lams.tool.dimdim.service;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -100,7 +109,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 	private IDimdimUserDAO dimdimUserDAO = null;
 
 	private IDimdimAttachmentDAO dimdimAttachmentDAO = null;
-	
+
 	private IDimdimConfigDAO dimdimConfigDAO = null;
 
 	private ILearnerService learnerService;
@@ -122,7 +131,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		// TODO Auto-generated constructor stub
 	}
 
-	/* ************ Methods from ToolSessionManager ************* */
+	/* Methods from ToolSessionManager */
 	public void createToolSession(Long toolSessionId, String toolSessionName,
 			Long toolContentId) throws ToolException {
 		if (logger.isDebugEnabled()) {
@@ -169,8 +178,9 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 	/**
 	 * Get the tool output for the given tool output names.
 	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>,
-	 *      java.lang.Long, java.lang.Long)
+	 * @see 
+	 *      org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util
+	 *      .List<String>, java.lang.Long, java.lang.Long)
 	 */
 	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
 			Long toolSessionId, Long learnerId) {
@@ -188,7 +198,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		return null;
 	}
 
-	/* ************ Methods from ToolContentManager ************************* */
+	/* Methods from ToolContentManager */
 
 	public void copyToolContent(Long fromContentId, Long toContentId)
 			throws ToolException {
@@ -332,7 +342,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		return new TreeMap<String, ToolOutputDefinition>();
 	}
 
-	/* ********** IDimdimService Methods ********************************* */
+	/* IDimdimService Methods */
 
 	public Long createNotebookEntry(Long id, Integer idType, String signature,
 			Integer userID, String entry) {
@@ -452,6 +462,88 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 							+ " the repository " + e.getMessage());
 		}
 	}
+	
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 */
+	private String sendDimdimRequest(URL url) throws Exception {
+		URLConnection connection = url.openConnection();
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(connection
+				.getInputStream()));
+		String dimdimResponse = "";
+		String line = "";
+
+		while ((line = in.readLine()) != null)
+			dimdimResponse += line;
+		in.close();
+
+		logger.debug(dimdimResponse + "1");
+
+		// Extract the connect url from the json string.
+		Pattern pattern = Pattern.compile("url:\"(.*?)\"");
+		Matcher matcher = pattern.matcher(dimdimResponse);
+
+		matcher.find();
+		String connectURL = matcher.group(1);
+		
+		return connectURL;
+	}
+	
+	public String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey) throws Exception {
+		
+		// Get Dimdim server url
+		DimdimConfig serverURL = getConfigEntry(Constants.CONFIG_SERVER_URL);
+		if (serverURL == null) {
+			throw new DimdimException("Dimdim server url not found");
+		}
+		
+		URL url = new URL(serverURL.getValue()
+				+ "/dimdim/JoinConferenceCheck.action?"
+				+ "email="
+				+ URLEncoder.encode(userDTO.getEmail(), "UTF8")
+				+ "&displayName="
+				+ URLEncoder.encode(userDTO.getFirstName() + " "
+						+ userDTO.getLastName(), "UTF8") + "&confKey="
+				+ URLEncoder.encode(meetingKey, "UTF8"));
+		
+		String connectURL = sendDimdimRequest(url);
+
+		return serverURL.getValue() + connectURL;
+	}
+
+	public String getDimdimStartConferenceURL(UserDTO userDTO,
+			String meetingKey, String topic) throws Exception {
+
+		// Get Dimdim server url
+		DimdimConfig serverURL = getConfigEntry(Constants.CONFIG_SERVER_URL);
+		if (serverURL == null) {
+			throw new DimdimException("Dimdim server url not found");
+		}
+
+		// get dimdim url
+
+		URL url = new URL(serverURL.getValue()
+				+ "/dimdim/StartNewConferenceCheck.action?"
+				+ "email="
+				+ URLEncoder.encode(userDTO.getEmail(), "UTF8")
+				+ "&displayName="
+				+ URLEncoder.encode(userDTO.getFirstName() + " "
+						+ userDTO.getLastName(), "UTF8") + "&confName="
+				+ URLEncoder.encode(topic, "UTF8") + "&confKey="
+				+ URLEncoder.encode(meetingKey, "UTF8") + "&lobby=false"
+				+ "&networkProfile=3" + "&meetingHours=99"
+				+ "&maxAttendeeMikes=0" + "&returnUrl=asdf" + "&presenterAV=av"
+				+ "&privateChatEnabled=true" + "&publicChatEnabled=true"
+				+ "&screenShareEnabled=true" + "&whiteboardEnabled=true");
+
+		String connectURL = sendDimdimRequest(url);
+
+		return serverURL.getValue() + connectURL;
+
+	}
 
 	public void saveOrUpdateDimdim(Dimdim dimdim) {
 		dimdimDAO.insertOrUpdate(dimdim);
@@ -470,10 +562,11 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		saveOrUpdateDimdimUser(dimdimUser);
 		return dimdimUser;
 	}
-	
+
 	public DimdimConfig getConfigEntry(String key) {
 		dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
-		List<DimdimConfig> list = dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
+		List<DimdimConfig> list = dimdimConfigDAO.findByProperty(
+				DimdimConfig.class, "key", key);
 		if (list.isEmpty()) {
 			return null;
 		} else {
@@ -605,12 +698,14 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		dimdim.setInstructions(description);
 	}
 
-	// =========================================================================================
-	/* ********** Used by Spring to "inject" the linked objects ************* */
+	//==========================================================================
+	// ===============
+	/* Used by Spring to "inject" the linked objects */
 
 	public IDimdimAttachmentDAO getDimdimAttachmentDAO() {
 		return dimdimAttachmentDAO;
 	}
+
 	public void setDimdimAttachmentDAO(IDimdimAttachmentDAO attachmentDAO) {
 		this.dimdimAttachmentDAO = attachmentDAO;
 	}
@@ -618,6 +713,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 	public IDimdimDAO getDimdimDAO() {
 		return dimdimDAO;
 	}
+
 	public void setDimdimDAO(IDimdimDAO dimdimDAO) {
 		this.dimdimDAO = dimdimDAO;
 	}
@@ -638,7 +734,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 	public void setDimdimSessionDAO(IDimdimSessionDAO sessionDAO) {
 		this.dimdimSessionDAO = sessionDAO;
 	}
-	
+
 	public IDimdimConfigDAO getDimdimConfigDAO() {
 		return dimdimConfigDAO;
 	}
