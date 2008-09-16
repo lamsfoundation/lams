@@ -208,10 +208,15 @@ public class LearningAction extends DispatchAction {
 
 		matcher.find();
 		String connectURL = matcher.group(1);
-		
-		String s = new String();
 
-		request.setAttribute(Constants.ATTR_CONFERENCE_URL, serverURL.getValue() + connectURL);
+		boolean conferenceOpen = connectURL.isEmpty() ? false : true;
+		request.setAttribute(Constants.ATTR_CONFERENCE_OPEN, conferenceOpen);
+
+		if (conferenceOpen) {
+			request.setAttribute(Constants.ATTR_CONFERENCE_URL, serverURL
+					.getValue()
+					+ connectURL);
+		}
 
 		return mapping.findForward("dimdim");
 	}

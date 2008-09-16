@@ -48,12 +48,6 @@
 	<p>
 		${contentDTO.instructions}
 	</p>
-	
-	<p>
-		<html:link href="${conferenceURL}" target="_blank">
-			<fmt:message key="label.learning.joinConference" />
-		</html:link>
-	</p>	
 
 	<c:if test="${contentDTO.lockOnFinish and mode == 'learner'}">
 		<div class="info">
@@ -67,6 +61,24 @@
 			</c:choose>
 		</div>
 	</c:if>
+
+	<p>
+		<c:choose>
+			<c:when test="${conferenceOpen}">
+				<html:link href="${conferenceURL}" target="_blank">
+					<fmt:message key="label.learning.joinConference" />
+				</html:link>
+			</c:when>
+			<c:otherwise>
+				<p>
+					<fmt:message key="label.learning.conferenceNotAvailable" />
+				</p>
+				<html:link href="#" onclick="window.location.reload()">
+					<fmt:message key="label.refresh" />
+				</html:link>
+			</c:otherwise>
+		</c:choose>
+	</p>	
 
 	<html:form action="/learning" method="post"
 		onsubmit="return validateForm();">

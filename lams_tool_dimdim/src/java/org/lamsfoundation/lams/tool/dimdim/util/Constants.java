@@ -51,6 +51,6 @@ public interface Constants {
 	
 	// Parameter names
 	public static final String PARAM_USER_UID = "userUID";
-
+	public static final String ATTR_CONFERENCE_OPEN = "conferenceOpen";
 
 }
