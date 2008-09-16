@@ -2,12 +2,20 @@
 
 <div id="content">
 
-	<h1><fmt:message key="admin.title" /></h1>
-	
-	<html:form action="/admin/save">
-		<fmt:message key="admin.dimdimServerURL"/> : <html:text property="dimdimServerURL" />
-		<html:submit titleKey="label.save" styleClass="button"></html:submit>	
-	</html:form>
+	<h1>
+		<fmt:message key="admin.title" />
+	</h1>
 
+	<html:form action="/admin/save">
+
+		<div>
+			<fmt:message key="admin.dimdimServerURL" /> : <html:text property="dimdimServerURL" />
+		</div>
+		<div class="align-right">
+			<html:submit styleClass="button">
+				<fmt:message key="label.save"/>
+			</html:submit>
+		</div>
+	</html:form>
 </div>
 

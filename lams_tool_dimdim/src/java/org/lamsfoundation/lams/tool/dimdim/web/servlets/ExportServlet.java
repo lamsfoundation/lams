@@ -116,46 +116,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		logger.debug("doExportLearner: toolContentID:" + toolSessionID);
 
-		// check if toolContentID available
-		if (toolSessionID == null) {
-			String error = "Tool Session ID is missing. Unable to continue";
-			logger.error(error);
-			throw new DimdimException(error);
-		}
-
-		DimdimSession dimdimSession = dimdimService
-				.getSessionBySessionId(toolSessionID);
-
-		Dimdim dimdim = dimdimSession.getDimdim();
-
-		// Get LAMS userDTO
-		org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
-				.getSession().getAttribute(AttributeNames.USER);
-
-		DimdimUser dimdimUser = dimdimService.getUserByUserIdAndSessionId(
-				new Long(lamsUserDTO.getUserID()), toolSessionID);
-
-		NotebookEntry dimdimEntry = dimdimService.getEntry(dimdimUser
-				.getEntryUID());
-
-		// construct dto's
-		ContentDTO contentDTO = new ContentDTO();
-		contentDTO.setTitle(dimdim.getTitle());
-		contentDTO.setInstructions(dimdim.getInstructions());
-
-		SessionDTO sessionDTO = new SessionDTO();
-		sessionDTO.setSessionName(dimdimSession.getSessionName());
-		sessionDTO.setSessionID(dimdimSession.getSessionId());
-
-		// If the user hasn't put in their entry yet, dimdimEntry will be null;
-		UserDTO userDTO = dimdimEntry != null ? new UserDTO(dimdimUser,
-				dimdimEntry) : new UserDTO(dimdimUser);
-
-		sessionDTO.getUserDTOs().add(userDTO);
-		contentDTO.getSessionDTOs().add(sessionDTO);
-
-		request.getSession().setAttribute(Constants.ATTR_CONTENT_DTO,
-				contentDTO);
 	}
 
 	private void doTeacherExport(HttpServletRequest request,
@@ -164,32 +124,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		logger.debug("doExportTeacher: toolContentID:" + toolContentID);
 
-		// check if toolContentID available
-		if (toolContentID == null) {
-			String error = "Tool Content ID is missing. Unable to continue";
-			logger.error(error);
-			throw new DimdimException(error);
-		}
-
-		Dimdim dimdim = dimdimService.getDimdimByContentId(toolContentID);
-
-		ContentDTO contentDTO = new ContentDTO(dimdim);
-
-		// add the dimdimEntry for each user in each session
-
-		for (SessionDTO sessionDTO : contentDTO.getSessionDTOs()) {
-			for (UserDTO user : sessionDTO.getUserDTOs()) {
-				NotebookEntry entry = dimdimService
-						.getEntry(user.getEntryUID());
-				if (entry != null) {
-					NotebookEntryDTO entryDTO = new NotebookEntryDTO(entry);
-					user.setEntryDTO(entryDTO);
-				}
-			}
-		}
-
-		request.getSession().setAttribute(Constants.ATTR_CONTENT_DTO,
-				contentDTO);
 	}
 
 	private void setupService() {

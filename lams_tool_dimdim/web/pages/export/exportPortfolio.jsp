@@ -13,73 +13,11 @@
 	<body class="stripes">
 
 		<div id="content">
-
-			<h1>
-				<c:out value="${contentDTO.title}" escapeXml="false" />
-			</h1>
-
+			
 			<p>
-				<c:out value="${contentDTO.instructions}" escapeXml="false" />
+				<fmt:message key="export.toolExportNotSupported"/>
 			</p>
 
-			<c:if test='${mode == "teacher"}'>
-				<div id="sessionContents">
-					<ul>
-						<c:forEach var="session" items="${contentDTO.sessionDTOs}">
-							<li>
-								<a href="#sid-${session.sessionID}">${session.sessionName}</a>
-							</li>
-						</c:forEach>
-					</ul>
-				</div>
-			</c:if>
-
-			<c:forEach var="session" items="${contentDTO.sessionDTOs}">
-				<div id="sid-${session.sessionID}">
-					<h2>
-						${session.sessionName}
-					</h2>
-					<p>
-						&nbsp;
-					</p>
-					<c:forEach var="user" items="${session.userDTOs}">
-						<table>
-							<tr>
-								<th colspan="2">
-									${user.firstName} ${user.lastName }
-								</th>
-							</tr>
-							<c:if test="${not empty user.entryDTO}">
-								<tr>
-									<td class="field-name" width="20%">
-										<fmt:message key="label.created" />
-									</td>
-									<td>
-										<lams:Date value="${user.entryDTO.createDate }"></lams:Date>
-									</td>
-								</tr>
-								<tr>
-									<td class="field-name" width="20%">
-										<fmt:message key="label.lastModified" />
-									</td>
-									<td>
-										<lams:Date value="${user.entryDTO.lastModified }"></lams:Date>
-									</td>
-								</tr>
-
-								<tr>
-									<td class="field-name">
-										<fmt:message key="label.notebookEntry" />
-									</td>
-									<td>
-										<c:out value="${user.entryDTO.entry}" escapeXml="false"></c:out>
-									</td>
-								</tr>
-							</c:if>
-						</table>
-					</c:forEach>
-				</div>
-			</c:forEach>
 		</div>
 		<!--closes content-->
 

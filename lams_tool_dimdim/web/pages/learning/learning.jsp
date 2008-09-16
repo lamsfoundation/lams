@@ -48,11 +48,12 @@
 	<p>
 		${contentDTO.instructions}
 	</p>
-
-	<html:link href="${conferenceURL}" target="_blank">
-		Open Conference ///
-	</html:link>	
-
+	
+	<p>
+		<html:link href="${conferenceURL}" target="_blank">
+			<fmt:message key="label.learning.joinConference" />
+		</html:link>
+	</p>	
 
 	<c:if test="${contentDTO.lockOnFinish and mode == 'learner'}">
 		<div class="info">
@@ -66,8 +67,6 @@
 			</c:choose>
 		</div>
 	</c:if>
-
-	&nbsp;
 
 	<html:form action="/learning" method="post"
 		onsubmit="return validateForm();">

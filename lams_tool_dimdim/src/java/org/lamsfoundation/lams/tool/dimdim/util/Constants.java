@@ -46,9 +46,11 @@ public interface Constants {
 	public static final String ATTR_FINISHED_ACTIVITY = "finishedActivity";
 	public static final String ATTR_SESSION_MAP = "sessionMap";
 	public static final String ATTR_USER_DTO = "userDTO";
+	public static final String ATTR_CONFERENCE_URL = "conferenceURL";
+	public static final String ATTR_SAVE_SUCCESS = "saveSuccess";
 	
 	// Parameter names
 	public static final String PARAM_USER_UID = "userUID";
 
-	public static final String ATTR_CONFERENCE_URL = "conferenceURL";
+
 }
