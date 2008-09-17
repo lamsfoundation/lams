@@ -114,6 +114,7 @@ class PropertyInspectorControls extends MovieClip {
 	private var groupType_lbl:Label;
 	private var numGroups_lbl:Label;
 	private var numLearners_lbl:Label;
+	private var equalGroupSizes_lbl:Label;
 	private var groupType_cmb:ComboBox;
 	private var numGroups_rdo:RadioButton;
 	private var numLearners_rdo:RadioButton;
@@ -123,6 +124,7 @@ class PropertyInspectorControls extends MovieClip {
 	private var numLearners_stp:NumericStepper;
 	
 	private var _group_naming_btn:Button;
+	private var	equalGroupSizes_chk:CheckBox;
 	
 	//Complex Activity
 	private var min_lbl:Label;
@@ -487,6 +489,8 @@ class PropertyInspectorControls extends MovieClip {
 		}else{
 			numGroups_lbl.visible = v;
 			numLearners_lbl.visible = v;
+			equalGroupSizes_lbl.visible = v;
+			equalGroupSizes_chk.visible = v;
 			numGroups_rdo.visible = v;
 			numLearners_rdo.visible = v;
 			numGroups_stp.visible = v;
@@ -502,13 +506,13 @@ class PropertyInspectorControls extends MovieClip {
 		var ga = _canvasModel.selectedItem.activity;
 		var g = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
 		
-		Debugger.log('g.groupingTypeID:'+g.groupingTypeID,Debugger.GEN,'showRelevantGroupOptions','org.lamsfoundation.lams.common.cv.PropertyInspector');
-		Debugger.log('Grouping.CHOSEN_GROUPING:'+Grouping.CHOSEN_GROUPING,Debugger.GEN,'showRelevantGroupOptions','org.lamsfoundation.lams.common.cv.PropertyInspector');
-		Debugger.log('Grouping.RANDOM_GROUPING:'+Grouping.RANDOM_GROUPING,Debugger.GEN,'showRelevantGroupOptions','org.lamsfoundation.lams.common.cv.PropertyInspector');
+		Debugger.log("showRelevantGroupOptions->g.groupingTypeID: "+g.groupingTypeID, Debugger.GEN, "showRelevantGroupOptions", "PIC*");
 		
 		if(g.groupingTypeID == Grouping.CHOSEN_GROUPING){
 			numGroups_lbl.visible = true;
 			numLearners_lbl.visible = false;
+			equalGroupSizes_lbl.visible = false;
+			equalGroupSizes_chk.visible = false;
 			numGroups_stp.visible = true;
 			numRandomGroups_stp.visible = false;
 			numLearners_stp.visible = false;
@@ -521,10 +525,41 @@ class PropertyInspectorControls extends MovieClip {
 				numGroups_lbl.enabled = e;
 				_group_naming_btn.enabled = e;
 			}
-			
-		} else if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
+		} 
+		else if(g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING){
 			numGroups_lbl.visible = true;
 			numLearners_lbl.visible = true;
+			equalGroupSizes_lbl.visible = true;
+			equalGroupSizes_chk.visible = true;
+			numRandomGroups_stp.visible = false;
+			numGroups_stp.visible = true;
+			numLearners_stp.visible = true;
+			numLearners_rdo.visible = true;
+			numGroups_rdo.visible = true;
+			
+			_group_naming_btn.visible = true;
+			
+			if(e != null) {
+				numGroups_lbl.enabled = e;
+				numLearners_lbl.enabled = e;
+				equalGroupSizes_lbl.enabled = e;
+				//numGroups_stp.enabled = e;
+				//numLearners_stp.enabled = e;
+				numLearners_rdo.enabled = e;
+				numGroups_rdo.enabled = e;
+				equalGroupSizes_chk.enabled = e;
+				
+				_group_naming_btn.enabled = e;
+			}
+			
+			checkGroupRadioOptions(e);
+			checkEnableGroupsOptions(e);
+		} 
+		else if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
+			numGroups_lbl.visible = true;
+			numLearners_lbl.visible = true;
+			equalGroupSizes_lbl.visible = false;
+			equalGroupSizes_chk.visible = false;
 			numGroups_stp.visible = false;
 			numRandomGroups_stp.visible = true;
 			numLearners_stp.visible = true;
@@ -556,7 +591,17 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private function reDrawTroublesomeSteppers(e:Boolean){
 		numLearners_stp.visible = true;
-		numRandomGroups_stp.visible = true;
+		
+		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
+		
+		if (g.groupingTypeID == Grouping.RANDOM_GROUPING) {
+			numRandomGroups_stp.visible = true; 
+			numGroups_stp.visible = false;
+		}
+		else if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
+			numRandomGroups_stp.visible = false;
+			numGroups_stp.visible = true;
+		}
 	}
 	
 	private function checkEnableGateControls(e:Boolean){
@@ -598,15 +643,24 @@ class PropertyInspectorControls extends MovieClip {
 		
 		if(groupingBy == 'num_learners'){
 			numRandomGroups_stp.value = 0;
+			numGroups_stp.value = 0;
 			g.numberOfGroups = 0;
+			g.equalGroupSizes = null;
+			equalGroupSizes_chk.selected = false;
 			
 			numRandomGroups_stp.enabled = false;
+			numGroups_stp.enabled = false;
+			
 			numLearners_stp.enabled = (e != null) ? e : true;
 			
+			equalGroupSizes_lbl.visible = false;
+			equalGroupSizes_chk.visible = false;
 			_group_naming_btn.visible = false;
 			
 		}else{
 			numRandomGroups_stp.enabled = (e != null) ? e : true;
+			numGroups_stp.enabled = (e != null) ? e : true;
+			
 			numLearners_stp.value = 0;
 			g.learnersPerGroups = 0;
 			
@@ -614,7 +668,12 @@ class PropertyInspectorControls extends MovieClip {
 			
 			_group_naming_btn.enabled = (e != null) ? e : true;
 			_group_naming_btn.visible = true;
-		
+			
+			if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
+				equalGroupSizes_chk.enabled = (e != null) ? e : true;
+				equalGroupSizes_lbl.visible = true;
+				equalGroupSizes_chk.visible = true;
+			}
 		}
 		
 		//this is a crazy hack to stop the steppter dissapearing after its .enabled property is set.
@@ -625,29 +684,42 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private function checkGroupRadioOptions(e:Boolean) {
 		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
-		Debugger.log("checking group radio options: " + g.numberOfGroups, Debugger.CRITICAL, "checkGroupRadioOptions", "PIC*");
 		
 		if(g.numberOfGroups > 0 && g.learnersPerGroups <= 0) { 	
 			numGroups_rdo.selected = true; 
 			_group_naming_btn.visible = true; 
-			_group_naming_btn.enabled = (e != null) ? e : true; 
-		} else if(g.learnersPerGroups > 0 && g.numberOfGroups <= 0) 
-			{ numLearners_rdo.selected = true; _group_naming_btn.visible = false; }
-		else 
-			{ numGroups_rdo.selected = true; _group_naming_btn.visible = false; }
+			_group_naming_btn.enabled = (e != null) ? e : true;
+			
+			equalGroupSizes_lbl.visible = false;
+			equalGroupSizes_chk.visible = false;
+						
+		} else if(g.learnersPerGroups > 0 && g.numberOfGroups <= 0) { 
+			numLearners_rdo.selected = true; 
+			_group_naming_btn.visible = false;
+			
+			if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
+				equalGroupSizes_lbl.visible = true;
+				equalGroupSizes_chk.visible = true;
+			}
+		}
+		else { // this is the case where both the steppers have 0 values
+			Debugger.log("checkGroupRadioOptions else", Debugger.GEN, "checkGroupRadioOptions", "PIC*");
+			numGroups_rdo.selected = true;
+			_group_naming_btn.visible = false;
+		}
 	}
 	
 	public function reDrawTroublesomeSteppersLater(){
 		MovieClipUtils.doLater(Proxy.create(this,reDrawTroublesomeSteppers));
 	}
 	
-	private function  populateGroupingProperties(ga:GroupingActivity){
-		Debugger.log("populating Grouping Properties createGroupingUIID: " + ga.createGroupingUIID, Debugger.CRITICAL, "populateGroupingProperties", "PIC*");
+	private function populateGroupingProperties(ga:GroupingActivity){
+		Debugger.log("populating Grouping Properties createGroupingUIID: " + ga.createGroupingUIID, Debugger.CRITICAL, "populateGroupingProperties", "PropertyInspectorControls");
 		
 		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_grouping');
 		
-		Debugger.log('This is the grouping object:',Debugger.GEN,'populateGroupingProperties','PropertyInspector');
+		Debugger.log('This is the grouping object:',Debugger.GEN,'populateGroupingProperties','PropertyInspectorControls');
 		ObjectUtils.printObject(g);
 		
 		//loop through combo to fins SI of our gate activity type
@@ -657,7 +729,14 @@ class PropertyInspectorControls extends MovieClip {
 		if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
 			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 0;
 			numRandomGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 0;
-		} else {
+		}
+		else if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
+			
+			numGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 0;
+			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 0;
+			equalGroupSizes_chk.selected = (g.equalGroupSizes != null) ? g.equalGroupSizes : false;
+		}
+		else { // Teacher Chosen Grouping
 			numGroups_stp.value = (g.maxNumberOfGroups != null) ? g.maxNumberOfGroups : 0;
 		}
 		
@@ -673,7 +752,7 @@ class PropertyInspectorControls extends MovieClip {
 		
 		Debugger.log("updating grouping method data: " + g.groupingUIID, Debugger.CRITICAL, "updateGroupingMethodData", "PropertyInspectorControls");
 		
-		if(!_canvasController.isBusy() && evt.type == 'focusOut') {
+		if(!_canvasController.isBusy() && (evt.type == 'focusOut' || evt.type == 'click')) {
 			var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		
 			doUpdateGroupingMethodData(g);
@@ -689,7 +768,12 @@ class PropertyInspectorControls extends MovieClip {
 			
 			numGroups_stp.value = 0;
 			g.maxNumberOfGroups = 0;
-			
+		}
+		else if(g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING){
+			g.learnersPerGroups = numLearners_stp.value;
+			g.numberOfGroups = numGroups_stp.value;
+			g.maxNumberOfGroups = 0;
+			g.equalGroupSizes = equalGroupSizes_chk.selected;
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
 			
@@ -697,25 +781,9 @@ class PropertyInspectorControls extends MovieClip {
 			numLearners_stp.value = 0;
 			g.learnersPerGroups = 0;
 			g.numberOfGroups = 0;
-			
 		}
 				
 		setModified();
-		
-		_canvasController.clearBusy();
-		
-	}
-	
-	public function retainOldGroupingMethodData(){
-		var ga = _canvasModel.selectedItem.activity;
-		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
-		
-		if(g.groupingTypeID == Grouping.RANDOM_GROUPING){
-			numLearners_stp.value = (g.learnersPerGroups == null) ? 0 : g.learnersPerGroups;
-			numRandomGroups_stp.value = (g.numberOfGroups == null) ? 0 : g.numberOfGroups;
-		} else{
-			numGroups_stp.value = (g.maxNumberOfGroups == null) ? 0 : g.maxNumberOfGroups;
-		}
 		
 		_canvasController.clearBusy();
 		
@@ -796,6 +864,7 @@ class PropertyInspectorControls extends MovieClip {
 		hoursEnd_lbl.setStyle('styleName', styleObj);
 		minsEnd_lbl.setStyle('styleName', styleObj);
 		numGroups_lbl.setStyle('styleName', styleObj);
+		equalGroupSizes_lbl.setStyle('styleName', styleObj);
 		numLearners_lbl.setStyle('styleName', styleObj);
 		groupType_lbl.setStyle('styleName', styleObj);
 		applied_grouping_lbl.setStyle('styleName', styleObj);
@@ -922,8 +991,6 @@ class PropertyInspectorControls extends MovieClip {
 				branchToolInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[index].data);
 			}
 		}
-		
-		
 	}
 	
 	/**
@@ -944,7 +1011,7 @@ class PropertyInspectorControls extends MovieClip {
 	private function updateGroupingType(g:Grouping, typeID:Number) {
 		g.groupingTypeID = typeID;
 		
-		Debugger.log('Set group type to: '+g.groupingTypeID,Debugger.GEN,'onGroupTypeChange','PropertyInspector');
+		Debugger.log('Set group type to: '+g.groupingTypeID,Debugger.GEN,'onGroupTypeChange','PropertyInspectorControls');
 		showRelevantGroupOptions(!_canvasModel.selectedItem.activity.readOnly);
 		doUpdateGroupingMethodData(g);
 		

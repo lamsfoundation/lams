@@ -125,6 +125,8 @@ class PropertyInspector extends PropertyInspectorControls {
 		numRandomGroups_stp.addEventListener("change", Delegate.create(this, updateGroupingMethodData));
 		numRandomGroups_stp.addEventListener("focusOut", Delegate.create(this, updateGroupingMethodData));
 		
+		equalGroupSizes_chk.addEventListener("click", Delegate.create(this, updateGroupingMethodData));
+		
 		_group_match_btn.addEventListener("click", Delegate.create(this, onGroupMatchClick));
 		_group_naming_btn.addEventListener("click", Delegate.create(this, onGroupNamingClick));
 		_tool_output_match_btn.addEventListener("click", Delegate.create(this, onConditionMatchClick));
@@ -164,6 +166,8 @@ class PropertyInspector extends PropertyInspectorControls {
 		endOffset_lbl.text = Dictionary.getValue('pi_end_offset');
 		
 		groupType_lbl.text = Dictionary.getValue('pi_group_type');
+		equalGroupSizes_lbl.text = "Equal group sizes";
+		//equalGroupSizes_lbl = Dictionary.getValue('pi_equal_group_sizes');
 		numGroups_lbl.text = Dictionary.getValue('pi_num_groups');
 		numLearners_lbl.text = Dictionary.getValue('pi_num_learners');
 		
@@ -334,7 +338,6 @@ class PropertyInspector extends PropertyInspectorControls {
 				showAppliedGroupingProperties(ba);
 					
 			} else if(a.isGroupActivity()) {
-			
 			
 				showGroupingControls(true, !a.readOnly);
 				showGeneralControls(true, !a.readOnly);
@@ -748,7 +751,6 @@ class PropertyInspector extends PropertyInspectorControls {
 	private function showAppliedGroupingProperties(a:Activity){
 		//update the grouping drop down values
 		appliedGroupingActivity_cmb.dataProvider = getGroupingActivitiesDP();
-		_global.breakpoint();
 
 		var appliedGroupingAct:GroupingActivity = _canvasModel.getCanvas().ddm.getGroupingActivityByGroupingUIID(a.groupingUIID);
 		Debugger.log('a.groupingUIID='+a.groupingUIID+', appliedGroupingAct.activityUIID :'+appliedGroupingAct.activityUIID ,Debugger.GEN,'showAppliedGroupingProperties','PropertyInspector');

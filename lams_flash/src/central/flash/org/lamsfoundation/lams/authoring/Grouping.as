@@ -35,6 +35,9 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	
 	public static var RANDOM_GROUPING:Number = 1;
 	public static var CHOSEN_GROUPING:Number = 2;
+	public static var LEARNER_CHOICE_GROUPING:Number = 4;
+	
+	private var _equalGroupSizes:Boolean;
 	
 	private var _groupingID:Number;
 	private var _groupingUIID:Number;
@@ -64,6 +67,8 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		var types:Array = [];
 		types.addItem({label: Dictionary.getValue('random_grp_lbl'), data: RANDOM_GROUPING});
 		types.addItem({label: Dictionary.getValue('chosen_grp_lbl'), data: CHOSEN_GROUPING});
+		//types.addItem({label: Dictionary.getValue('learner_choice_grp_lbl'), data: LEARNER_CHOICE_GROUPING});
+		types.addItem({label: "Learner's choice", data: LEARNER_CHOICE_GROUPING});
 		return types;
 	}
 
@@ -80,6 +85,7 @@ class org.lamsfoundation.lams.authoring.Grouping {
 			_numberOfGroups = dto.numberOfGroups;
 			_maxNumberOfGroups = dto.maxNumberOfGroups;
 			_learnersPerGroups = dto.learnersPerGroup;
+			_equalGroupSizes = dto.equalNumberOfLearnersPerGroup;
 			
 			populateGroups(dto.groups);
 	}
@@ -122,11 +128,12 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		
 		dto.numberOfGroups = (_numberOfGroups > 0) ? _numberOfGroups : Config.NUMERIC_NULL_VALUE;
 		dto.maxNumberOfGroups = (_maxNumberOfGroups > 0) ? _maxNumberOfGroups : Config.NUMERIC_NULL_VALUE;
+		dto.equalNumberOfLearnersPerGroup = (_equalGroupSizes != null && _equalGroupSizes != undefined) ? equalGroupSizes : Config.BOOLEAN_NULL_VALUE;
 		dto.learnersPerGroup = (_learnersPerGroups > 0) ? _learnersPerGroups :  Config.NUMERIC_NULL_VALUE; 
 		
 		dto.groups = new Array();
 		
-		var groupTotal = (groupingTypeID == RANDOM_GROUPING) ? numberOfGroups : maxNumberOfGroups;
+		var groupTotal = (groupingTypeID == RANDOM_GROUPING || groupingTypeID == LEARNER_CHOICE_GROUPING) ? numberOfGroups : maxNumberOfGroups;
 		if(groupTotal == 0) _groups.clear();
 			
 		var groups:Array = getGroups(_ddm);
@@ -141,7 +148,7 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	}
 	
 	public function getGroups(_ddm:DesignDataModel):Array {
-		var groupTotal = (groupingTypeID == RANDOM_GROUPING) ? numberOfGroups : maxNumberOfGroups;
+		var groupTotal = (groupingTypeID == RANDOM_GROUPING || groupingTypeID == LEARNER_CHOICE_GROUPING) ? numberOfGroups : maxNumberOfGroups;
 		var groupDiff:Number = groupTotal - _groups.size();
 		
 		var groups = _groups.values();
@@ -277,6 +284,24 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	/**
 	 * 
 	 * @usage   
+	 * @param   equalSizes true if the groups are equally sized 
+	 * @return  
+	 */
+	public function set equalGroupSizes (equalSizes:Boolean):Void {
+		_equalGroupSizes = equalSizes;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get equalGroupSizes ():Boolean {
+		return _equalGroupSizes;
+	}
+	
+	/**
+	 * 
+	 * @usage   
 	 * @param   newlearnersPerGroups 
 	 * @return  
 	 */
@@ -291,9 +316,4 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	public function get learnersPerGroups ():Number {
 		return _learnersPerGroups;
 	}
-
-
-
-
-	
 }
