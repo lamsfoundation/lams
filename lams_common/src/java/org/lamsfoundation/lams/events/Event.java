@@ -102,7 +102,7 @@ public class Event {
 	 */
 	protected boolean deleted;
 
-	private Event() {
+	public Event() {
 
 	}
 

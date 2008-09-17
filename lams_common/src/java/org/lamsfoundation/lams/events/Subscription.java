@@ -54,7 +54,7 @@ class Subscription {
 	/**
 	 * For Hibernate usage.
 	 */
-	private Subscription() {
+	public Subscription() {
 
 	}
 
