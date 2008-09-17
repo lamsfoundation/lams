@@ -613,6 +613,7 @@ public class MonitoringAction extends Action {
 		forumService.releaseMarksForSession(sessionID);
 
 		try {
+			response.setContentType("text/html;charset=utf-8");
 			PrintWriter out = response.getWriter();
 			ForumToolSession session = forumService.getSessionBySessionId(sessionID);
 			String sessionName = "";
