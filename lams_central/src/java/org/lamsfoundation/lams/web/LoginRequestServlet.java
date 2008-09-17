@@ -109,7 +109,7 @@ public class LoginRequestServlet extends HttpServlet {
 		String method = request.getParameter(LoginRequestDispatcher.PARAM_METHOD);
 		String countryIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
 		String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
-
+		String courseName   = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 	
 		// implicit login params
 		String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
@@ -138,7 +138,7 @@ public class LoginRequestServlet extends HttpServlet {
 			
 			 
 			Authenticator.authenticate(serverMap, timestamp, extUsername, method, hash);
-			ExtCourseClassMap orgMap = getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode);
+			ExtCourseClassMap orgMap = getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode, courseName);
 			User user = userMap.getUser();
 			String login = user.getLogin();
 			//was using hses.inNew() API to check if the external user has logged in yet,

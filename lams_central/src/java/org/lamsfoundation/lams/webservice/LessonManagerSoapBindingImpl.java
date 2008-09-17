@@ -69,7 +69,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-					countryIsoCode, langIsoCode);
+					countryIsoCode, langIsoCode, null);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
 					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV);
@@ -91,7 +91,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-					countryIsoCode, langIsoCode);
+					countryIsoCode, langIsoCode, null);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc,  Boolean.TRUE, ldId, orgMap
 					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV);

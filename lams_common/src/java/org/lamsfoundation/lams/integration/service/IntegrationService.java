@@ -32,7 +32,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -89,9 +91,21 @@ public class IntegrationService implements IIntegrationService{
 	
 	// wrapper method for compatibility with original integration modules
 	public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
-			String extCourseId, String countryIsoCode, String langIsoCode){
+			String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName){
+		
+		// Set the pretty course name if available, otherwise maintain the extCourseId
+		String courseName = "";
+		if (prettyCourseName != null)
+		{
+			courseName = prettyCourseName;
+		}
+		else
+		{
+			courseName = extCourseId;
+		}
+		
 		return getExtCourseClassMap(serverMap, userMap, 
-				extCourseId, extCourseId, countryIsoCode, langIsoCode, 
+				extCourseId, courseName, countryIsoCode, langIsoCode, 
 				service.getRootOrganisation().getOrganisationId().toString(), true, true);		
 	}
 	
@@ -111,6 +125,13 @@ public class IntegrationService implements IIntegrationService{
 			ExtCourseClassMap map = (ExtCourseClassMap)list.get(0);
 			User user = userMap.getUser();
 			Organisation org = map.getOrganisation();
+			
+			// update external course name if if has changed
+			if (extCourseName != null && !org.getName().equals(buildName(serverMap.getPrefix(), extCourseName)))
+			{
+				org.setName(buildName(serverMap.getPrefix(), extCourseName));
+				service.updateOrganisationandWorkspaceNames(org);
+			}
 			if(service.getUserOrganisation(user.getUserId(), org.getOrganisationId())==null){
 				addMemberships(user, org, isTeacher);
 			}

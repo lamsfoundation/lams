@@ -278,11 +278,11 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 			String hashValue 	= request.getParameter(CentralConstants.PARAM_HASH_VALUE);
 			String username 	= request.getParameter(CentralConstants.PARAM_USERNAME);
 			String courseId 	= request.getParameter(CentralConstants.PARAM_COURSE_ID);
+			String courseName   = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 			String country 		= request.getParameter(CentralConstants.PARAM_COUNTRY);
 			String lang 		= request.getParameter(CentralConstants.PARAM_LANG);
 			String modeStr 		= request.getParameter(CentralConstants.PARAM_MODE);
 
-			
 			String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
 			String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
 			String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
@@ -323,7 +323,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 			
 			integrationService.getExtCourseClassMap(serverMap, userMap,
 					courseId,
-					country, lang);
+					country, lang, courseName);
 
 			String contentTree = buildContentTree(
 					userMap.getUser().getUserId(), mode).toString();

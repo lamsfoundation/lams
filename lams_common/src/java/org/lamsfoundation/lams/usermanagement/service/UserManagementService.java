@@ -541,6 +541,28 @@ public class UserManagementService implements IUserManagementService {
             return organisation; 	 
     }
     
+    @SuppressWarnings("unchecked")
+	public void updateOrganisationandWorkspaceNames(Organisation organisation) 	 
+    {
+    	baseDAO.update(organisation);
+    	if ( organisation.getOrganisationId() != null ) 
+    	{
+    		Workspace workspace = organisation.getWorkspace();
+        	if (workspace != null) {
+        		workspace.setName(organisation.getName());
+        		baseDAO.update(workspace);
+        		
+        		WorkspaceFolder defaultFolder = workspace.getDefaultFolder();
+        		if (defaultFolder != null) defaultFolder.setName(organisation.getName());
+        		baseDAO.update(defaultFolder);
+        		
+        		WorkspaceFolder runSeqFolder = workspace.getDefaultRunSequencesFolder();
+        		if (runSeqFolder != null) runSeqFolder.setName(getRunSequencesFolderName(organisation.getName()));
+        		baseDAO.update(runSeqFolder);
+        	}
+    	}
+    }
+    
     private String getRunSequencesFolderName(String workspaceName) {
     	String runSeqName = messageService.getMessage(SEQUENCES_FOLDER_NAME_KEY, new Object[] {workspaceName});
 		if ( runSeqName != null && runSeqName.startsWith("???") ) {

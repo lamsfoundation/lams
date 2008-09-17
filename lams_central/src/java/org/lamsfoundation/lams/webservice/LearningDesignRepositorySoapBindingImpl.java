@@ -159,7 +159,7 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-			integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang);
+			integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, null);
 			return buildContentTree(userMap.getUser().getUserId(), mode).toString();
 		} catch (Exception e) {
 			log.debug(e.getMessage(),e);

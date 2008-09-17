@@ -283,7 +283,7 @@ public class LessonManagerServlet extends HttpServlet {
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(
 					serverMap, username);
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(
-					serverMap, userMap, courseId, countryIsoCode, langIsoCode);
+					serverMap, userMap, courseId, countryIsoCode, langIsoCode, null);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, 
 							orgMap.getOrganisation().getOrganisationId(), 
@@ -314,7 +314,7 @@ public class LessonManagerServlet extends HttpServlet {
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(
 					serverMap, username);
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(
-					serverMap, userMap, courseId, countryIsoCode, langIsoCode);
+					serverMap, userMap, courseId, countryIsoCode, langIsoCode, null);
 			// 1. init lesson
 			Lesson lesson = monitoringService
 					.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
@@ -527,7 +527,7 @@ public class LessonManagerServlet extends HttpServlet {
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(
 					serverMap, username);
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(
-					serverMap, userMap, courseId, countryIsoCode, langIsoCode);
+					serverMap, userMap, courseId, countryIsoCode, langIsoCode, null);
 			// 1. init lesson
 			Lesson lesson = monitoringService
 					.initializeLessonForPreview(title, desc, ldId, userMap.getUser().getUserId(), customCSV);
@@ -748,7 +748,7 @@ public class LessonManagerServlet extends HttpServlet {
 			Authenticator.authenticate(serverMap, datetime, requestorUsername, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
 			// adds user to group
-			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, countryIsoCode, langIsoCode);
+			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, countryIsoCode, langIsoCode, null);
 			
 			if (lessonService == null) {
 				lessonService = (ILessonService) WebApplicationContextUtils

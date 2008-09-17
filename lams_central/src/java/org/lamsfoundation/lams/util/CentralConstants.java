@@ -38,6 +38,8 @@ public class CentralConstants {
 	public static final String PARAM_USERNAME = "username";
 
 	public static final String PARAM_COURSE_ID = "courseId";
+	
+	public static final String PARAM_COURSE_NAME = "courseName";
 
 	public static final String PARAM_LEARNING_DESIGN_ID = "ldId";
 

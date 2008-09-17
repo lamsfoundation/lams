@@ -295,6 +295,13 @@ public interface IUserManagementService {
      */ 	 
     public Organisation saveOrganisation( Organisation organisation, Integer userID );
     
+    /**
+     * Update and organisation's name, used for integrations.
+     * It also updates the workspace name and workspace folders
+     * @param organisation
+     */
+    public void updateOrganisationandWorkspaceNames(Organisation organisation);
+    
     public List<UserManageBean> getUserManageBeans(Integer orgId);
     
 	/** Remove a user from the system completely. Only able to be done if they don't have any 
