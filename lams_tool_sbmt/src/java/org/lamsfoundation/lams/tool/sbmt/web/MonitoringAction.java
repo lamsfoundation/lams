@@ -195,6 +195,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		submitFilesService.releaseMarksForSession(sessionID);
 
 		try {
+			response.setContentType("text/html;charset=utf-8");
 			PrintWriter out = response.getWriter();
 			SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 			String sessionName = "";
