@@ -27,14 +27,15 @@ package org.lamsfoundation.lams.tool.gmap.service;
 import java.util.List;
 
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
+import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
+import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
-import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
 /**
  * Defines the services available to the web layer from the Gmap Service
@@ -187,4 +188,18 @@ public interface IGmapService {
 	 * 
 	 */
 	void updateEntry(NotebookEntry notebookEntry);
+
+	/**
+	 * Get the Gmap config item by key
+	 * @param key
+	 * @return
+	 */
+	public GmapConfigItem getConfigItem(String key);
+	
+	/**
+	 * Save a Gmap configItem
+	 * @param item
+	 */
+	public void saveOrUpdateGmapConfigItem(GmapConfigItem item);
+	
 }

@@ -30,14 +30,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import org.xml.sax.InputSource;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -50,24 +46,21 @@ import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
-import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
+import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
-import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
+import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
+import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.tool.gmap.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.NamedNodeMap;
 
 /**
  * @author
@@ -156,6 +149,13 @@ public class AuthoringAction extends LamsDispatchAction {
 		// add the sessionMap to HTTPSession.
 		request.getSession().setAttribute(map.getSessionID(), map);
 		request.setAttribute(GmapConstants.ATTR_SESSION_MAP, map);
+		
+		// get the gmap API key from the config table and add it to the session
+		GmapConfigItem gmapKey = gmapService.getConfigItem(GmapConfigItem.KEY_GMAP_KEY);
+		if (gmapKey != null && gmapKey.getConfigValue() != null)
+		{
+			request.setAttribute(GmapConstants.ATTR_GMAP_KEY, gmapKey.getConfigValue());
+		}
 
 		return mapping.findForward("success");
 	}
@@ -236,6 +236,13 @@ public class AuthoringAction extends LamsDispatchAction {
 		authForm.setSessionMapID(map.getSessionID());
 
 		request.setAttribute(GmapConstants.ATTR_SESSION_MAP, map);
+		
+		// get the gmap API key from the config table and add it to the session
+		GmapConfigItem gmapKey = gmapService.getConfigItem(GmapConfigItem.KEY_GMAP_KEY);
+		if (gmapKey != null && gmapKey.getConfigValue() != null)
+		{
+			request.setAttribute(GmapConstants.ATTR_GMAP_KEY, gmapKey.getConfigValue());
+		}
 
 		return mapping.findForward("success");
 	}

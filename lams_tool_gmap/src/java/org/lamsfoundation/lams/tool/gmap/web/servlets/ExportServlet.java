@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
+import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
@@ -90,6 +91,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		catch (GmapException e) 
 		{
 			logger.error("Cannot perform export for gmap tool.");
+		}
+		
+		// get the gmap API key from the config table and add it to the session
+		GmapConfigItem gmapKey = gmapService.getConfigItem(GmapConfigItem.KEY_GMAP_KEY);
+		if (gmapKey != null && gmapKey.getConfigValue() != null)
+		{
+			request.getSession().setAttribute(GmapConstants.ATTR_GMAP_KEY, gmapKey.getConfigValue());
 		}
 		
 		String basePath = request.getScheme() + "://" + request.getServerName()

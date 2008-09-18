@@ -30,7 +30,6 @@ import java.io.StringReader;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -59,8 +58,8 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -71,15 +70,17 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapAttachmentDAO;
+import org.lamsfoundation.lams.tool.gmap.dao.IGmapConfigItemDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapDAO;
+import org.lamsfoundation.lams.tool.gmap.dao.IGmapMarkerDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapSessionDAO;
 import org.lamsfoundation.lams.tool.gmap.dao.IGmapUserDAO;
-import org.lamsfoundation.lams.tool.gmap.dao.IGmapMarkerDAO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapAttachment;
+import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
+import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
-import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.tool.gmap.util.GmapToolContentHandler;
@@ -130,6 +131,8 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 	private IExportToolContentService exportContentService;
 
 	private ICoreNotebookService coreNotebookService;
+	
+	private IGmapConfigItemDAO gmapConfigItemDAO;
 
 	public GmapService() {
 		super();
@@ -512,6 +515,18 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 		return gmapUser;
 	}
 
+	public GmapConfigItem getConfigItem(String key)
+	{
+		return gmapConfigItemDAO.getConfigItemByKey(key);
+	}
+	
+	public void saveOrUpdateGmapConfigItem(GmapConfigItem item)
+	{
+		gmapConfigItemDAO.saveOrUpdate(item);
+	}
+	
+	
+	
 	public IAuditService getAuditService() {
 		return auditService;
 	}
@@ -776,7 +791,14 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 		this.gmapMarkerDAO = gmapMarkerDAO;
 	}
 	
-	
+	public IGmapConfigItemDAO getGmapConfigItemDAO() {
+		return gmapConfigItemDAO;
+	}
+
+	public void setGmapConfigItemDAO(IGmapConfigItemDAO gmapConfigItemDAO) {
+		this.gmapConfigItemDAO = gmapConfigItemDAO;
+	}
+
 	public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
 	}

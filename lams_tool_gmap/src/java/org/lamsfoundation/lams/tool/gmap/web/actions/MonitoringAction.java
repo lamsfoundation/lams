@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
+import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
 import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
@@ -112,6 +113,13 @@ public class MonitoringAction extends LamsDispatchAction {
 				}			
 				sessionDTO.getUserDTOs().add(userDTO);
 			}
+		}
+		
+		// get the gmap API key from the config table and add it to the session
+		GmapConfigItem gmapKey = gmapService.getConfigItem(GmapConfigItem.KEY_GMAP_KEY);
+		if (gmapKey != null && gmapKey.getConfigValue() != null)
+		{
+			request.setAttribute(GmapConstants.ATTR_GMAP_KEY, gmapKey.getConfigValue());
 		}
 		
 		request.setAttribute("gmapDTO", gmapDT0);
