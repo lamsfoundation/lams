@@ -28,7 +28,8 @@ language_file,
 classpath_addition,
 context_file,
 create_date_time,
-modified_date_time
+modified_date_time,
+admin_url
 )
 VALUES
 (
@@ -58,5 +59,6 @@ NULL,
 'lams-tool-lagmap10.jar',
 '/org/lamsfoundation/lams/tool/gmap/gmapApplicationContext.xml',
 NOW(),
-NOW()
+NOW(),
+'tool/lagmap10/lagmap10admin.do'
 )
