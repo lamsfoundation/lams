@@ -14,23 +14,6 @@ Author: lfoxton
 	<lams:WebAppURL />
 </c:set>
 
-<c:set var="gmapKey">
-	<%= Configuration.get(ConfigurationKeys.GMAP_KEY) %>
-</c:set>
-
-<c:choose>
-	<c:when test="${gmapKey != ''}">
-		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=<%= Configuration.get(ConfigurationKeys.GMAP_KEY) %>" type="text/javascript"></script>
-	</c:when>
-	<c:otherwise>
-		<script type="text/javascript">	
-		<!--
-			alert("<fmt:message key='error.gmapKeyMissing'/>");
-		-->
-		</script>
-	</c:otherwise>
-</c:choose>
-
 <script type="text/javascript">
 <!--
 

@@ -6,6 +6,20 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+
+<!-- Include the gmap API header -->
+<c:choose>
+	<c:when test="${gmapKey != null}">
+		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=${gmapKey}" type="text/javascript"></script>
+	</c:when>
+	<c:otherwise>
+		<script type="text/javascript">	
+		<!--
+			alert("<fmt:message key='error.gmapKeyMissing'/>");
+		-->
+		</script>
+	</c:otherwise>
+</c:choose>
 <c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <lams:head>  

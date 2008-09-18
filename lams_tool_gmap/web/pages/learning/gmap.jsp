@@ -49,7 +49,7 @@
 	</table>
 	<p />
 	
-	<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress();return false;}" size="60" name="address" id="address" value="${gmapDTO.defaultGeocoderAddress}" />
+	<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress();return false;}" size="55" name="address" id="address" value="${gmapDTO.defaultGeocoderAddress}" />
     			<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
 	
 	

@@ -5,6 +5,20 @@
 
 <script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/mapFunctionsAuthoring.js"></script>
+
+<!-- Include the gmap API header -->
+<c:choose>
+	<c:when test="${gmapKey != null}">
+		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=${gmapKey}" type="text/javascript"></script>
+	</c:when>
+	<c:otherwise>
+		<script type="text/javascript">	
+		<!--
+			alert("<fmt:message key='error.gmapKeyMissing'/>");
+		-->
+		</script>
+	</c:otherwise>
+</c:choose>
 <%@ include file="/includes/jsp/mapFunctions.jsp"%>
 
 <script type="text/javascript">

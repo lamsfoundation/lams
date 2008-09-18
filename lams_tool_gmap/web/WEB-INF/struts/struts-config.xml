@@ -22,6 +22,10 @@
       type="org.lamsfoundation.lams.tool.gmap.web.forms.AuthoringForm"
     />
     <form-bean
+      name="lagmap10AdminForm"
+      type="org.lamsfoundation.lams.tool.gmap.web.forms.AdminForm"
+    />
+    <form-bean
       name="learningForm"
       type="org.lamsfoundation.lams.tool.gmap.web.forms.LearningForm"
     />
@@ -41,6 +45,21 @@
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
+    <action
+      path="/lagmap10admin"
+      type="org.lamsfoundation.lams.tool.gmap.web.actions.AdminAction"
+      name="lagmap10AdminForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="config"
+        path="/pages/admin/config.jsp"
+        redirect="false"
+      />
+    </action>
     <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.gmap.web.actions.AuthoringAction"

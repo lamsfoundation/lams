@@ -344,6 +344,6 @@
 	
 //-->
 </script>
-<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/monitorToolSummaryAdvanced.js" />
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 	
 
