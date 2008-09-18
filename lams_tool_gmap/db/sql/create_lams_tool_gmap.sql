@@ -21,6 +21,8 @@ alter table tl_lagmap10_marker add index FK10F22749529F7FD3 (created_by), add co
 alter table tl_lagmap10_session add index FK519D516774028C80 (gmap_uid), add constraint FK519D516774028C80 foreign key (gmap_uid) references tl_lagmap10_gmap (uid);
 alter table tl_lagmap10_user add index FK7CB3F69AC5F056D9 (gmap_session_uid), add constraint FK7CB3F69AC5F056D9 foreign key (gmap_session_uid) references tl_lagmap10_session (uid);
 
+-- Inserting the required config item into the config table
+-- Gmap API key is added here for shaun so the Gmap works there automatically for each build
 INSERT INTO tl_lagmap10_configuration (
 	config_key, 
 	config_value
