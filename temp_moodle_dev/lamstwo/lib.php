@@ -13,6 +13,7 @@ $LAMS2CONSTANTS->param_timestamp = 'ts';
 $LAMS2CONSTANTS->param_hash      = 'hash';
 $LAMS2CONSTANTS->param_method    = 'method';
 $LAMS2CONSTANTS->param_courseid  = 'courseid';
+$LAMS2CONSTANTS->param_coursename = 'courseName';
 $LAMS2CONSTANTS->param_country   = 'country';
 $LAMS2CONSTANTS->param_lang      = 'lang';
 $LAMS2CONSTANTS->param_lsid      = 'lsid';
@@ -271,12 +272,15 @@ function lamstwo_get_sequences($username,$courseid,$country,$lang) {
  * @return string to define the tree structure
  * @TODO complete the documentation of this function
  */
-function lamstwo_get_sequences_rest($username,$courseid,$country,$lang) {
+function lamstwo_get_sequences_rest($username,$courseid,$coursename,$coursecreatedate,$country,$lang) {
     global $CFG,$USER;
     if(!isset($CFG->lamstwo_serverid)||!isset($CFG->lamstwo_serverkey)||!isset($CFG->lamstwo_serverurl))
     {
         return get_string('notsetup', 'lamstwo');
     }
+
+    // append month/year to course name
+    $coursename = $coursename.' '.date('n/Y', $coursecreatedate);
 
     // generate hash
     $datetime = date('F d,Y g:i a');
@@ -286,7 +290,7 @@ function lamstwo_get_sequences_rest($username,$courseid,$country,$lang) {
 
     // Put together REST URL
     $service = '/services/xml/LearningDesignRepository';
-    $request = "$CFG->lamstwo_serverurl$service?serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&courseId=$courseid&mode=2&country=$country&lang=$lang";
+    $request = "$CFG->lamstwo_serverurl$service?serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&courseId=$courseid&courseName=".urlencode($coursename)."&mode=2&country=$country&lang=$lang";
 
     // GET call to LAMS
     $xml = file_get_contents($request);
@@ -613,8 +617,11 @@ function lamstwo_get_locale($courseid) {
  * Return URL to join a LAMS lesson as a learner or staff depending on method.
  * URL redirects LAMS to learner or monitor interface depending on method.
  */
-function lamstwo_get_url($username, $lang, $country, $lessonid, $courseid, $method, $customcsv='') {
+function lamstwo_get_url($username, $lang, $country, $lessonid, $courseid, $coursename, $coursecreatedate, $method, $customcsv='') {
     global $CFG, $LAMS2CONSTANTS;
+
+    // append month/year to course name
+    $coursename = $coursename.' '.date('n/Y', $coursecreatedate);
     
     $datetime = date('F d,Y g:i a');
     $plaintext = trim($datetime)
@@ -631,10 +638,11 @@ function lamstwo_get_url($username, $lang, $country, $lessonid, $courseid, $meth
         '&'.$LAMS2CONSTANTS->param_hash.'='.$hash.
         ($method==$LAMS2CONSTANTS->author_method ? '' : '&'.$LAMS2CONSTANTS->param_lsid.'='.$lessonid).
         '&'.$LAMS2CONSTANTS->param_courseid.'='.$courseid.
+        '&'.$LAMS2CONSTANTS->param_coursename.'='.urlencode($coursename).
 		'&'.$LAMS2CONSTANTS->param_country.'='.trim($country).
 		'&'.$LAMS2CONSTANTS->param_lang.'='.substr(trim($lang),0,2);
     if ($customcsv != '') {
-      $url .= '&'.$LAMS2CONSTANTS->custom_csv.'='.$customcsv;
+      $url .= '&'.$LAMS2CONSTANTS->custom_csv.'='.urlencode($customcsv);
     }
     return $url;
 }

@@ -26,7 +26,7 @@ class mod_lamstwo_add_form extends moodleform {
         
         // display user's lams workspace
         $sequencelabel = get_string('selectsequence', 'lamstwo');
-        $lds = '[' . lamstwo_get_sequences_rest($USER->username, $course->id, $USER->country, $USER->lang) . ']';
+        $lds = '[' . lamstwo_get_sequences_rest($USER->username, $course->id, $course->fullname, $course->timecreated, $USER->country, $USER->lang) . ']';
         $html = <<<XXX
 	<script type="text/javascript" src="tree.js"></script>
 	<script type="text/javascript" src="tree_tpl.js"></script>

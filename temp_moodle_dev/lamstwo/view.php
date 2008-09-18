@@ -61,7 +61,7 @@ if ($canmanage) {
 </script>
 XXX;
     $customcsv = "$USER->username,$course->id,$cm->section";
-    $authorurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], 0, $course->id, $LAMS2CONSTANTS->author_method, $customcsv);
+    $authorurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], 0, $course->id, $course->fullname, $course->timecreated, $LAMS2CONSTANTS->author_method, $customcsv);
 	
     echo $openauthorjs;
 
@@ -102,12 +102,12 @@ if (!empty($lessons)) {
 		$links = '';
 		$lessonlink = $lesson->name;
 		if ($canparticipate) {
-			$learnerurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], $lesson->lesson_id, $course->id, $LAMS2CONSTANTS->learner_method);
+			$learnerurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], $lesson->lesson_id, $course->id, $course->fullname, $course->timecreated, $LAMS2CONSTANTS->learner_method);
 			$learnerurl = "onclick=\"javascript:window.open('".$learnerurl."','learner','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=600,resizable',0)\"";
 			$lessonlink = "<a href=\"#\" $learnerurl>$lesson->name</a>";
 		}
 		if ($canmanage) {
-			$monitorurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], $lesson->lesson_id, $course->id, $LAMS2CONSTANTS->monitor_method);
+			$monitorurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], $lesson->lesson_id, $course->id, $course->fullname, $course->timecreated, $LAMS2CONSTANTS->monitor_method);
 			$monitorurl = "onclick=\"javascript:window.open('".$monitorurl."','monitor','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=600,resizable',0)\"";
 			$monitorlink = "<a href=\"#\" $monitorurl>".get_string('openmonitor', 'lamstwo')."</a>";
 			$links .= $monitorlink;
