@@ -10,5 +10,5 @@
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-learning.jar" sourcepath="/lams_learning"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar" sourcepath="/lams_contentrepository"/>
-	<classpathentry kind="output" path="exploded"/>
+	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>
