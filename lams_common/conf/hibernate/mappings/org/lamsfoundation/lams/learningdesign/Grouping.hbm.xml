@@ -105,7 +105,7 @@
         length="11"
         />
         <property
-        name="equalNumberOfLearners"
+        name="equalNumberOfLearnersPerGroup"
         type="java.lang.Boolean"
         column="equal_number_of_learners_per_group"
         />

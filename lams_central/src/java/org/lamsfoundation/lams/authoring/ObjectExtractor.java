@@ -764,7 +764,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (numLearnersPerGroup != null && numLearnersPerGroup.intValue() > 0) {
 			learnerChoiceGrouping.setLearnersPerGroup(numLearnersPerGroup);
 			learnerChoiceGrouping.setNumberOfGroups(null);
-			learnerChoiceGrouping.setEqualNumberOfLearners(null);
+			learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(null);
 		}
 		else {
 			Integer numGroups = WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.NUMBER_OF_GROUPS);
@@ -778,7 +778,7 @@ public class ObjectExtractor implements IObjectExtractor {
 			Boolean equalNumberOfLearnersPerGroup = WDDXProcessor.convertToBoolean(groupingDetails,
 					WDDXTAGS.EQUAL_NUMBER_OF_LEARNERS_PER_GROUP);
 			if (equalNumberOfLearnersPerGroup != null) {
-				learnerChoiceGrouping.setEqualNumberOfLearners(equalNumberOfLearnersPerGroup);
+				learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(equalNumberOfLearnersPerGroup);
 			}
 		}
 	}

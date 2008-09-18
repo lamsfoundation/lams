@@ -31,7 +31,7 @@ import java.util.Set;
  */
 public class LearnerChoiceGrouping extends Grouping {
 	/** nullable persistent field */
-	private Boolean equalNumberOfLearners;
+	private Boolean equalNumberOfLearnersPerGroup;
 
 	/** nullable persistent field */
 	private Integer numberOfGroups;
@@ -57,7 +57,7 @@ public class LearnerChoiceGrouping extends Grouping {
 	public Grouping createCopy(int uiidOffset) {
 		LearnerChoiceGrouping learnerChoiceGrouping = new LearnerChoiceGrouping();
 		copyGroupingFields(learnerChoiceGrouping, uiidOffset);
-		learnerChoiceGrouping.setEqualNumberOfLearners(getEqualNumberOfLearners());
+		learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(getEqualNumberOfLearnersPerGroup());
 		learnerChoiceGrouping.setLearnersPerGroup(getLearnersPerGroup());
 		learnerChoiceGrouping.setNumberOfGroups(getNumberOfGroups());
 		return learnerChoiceGrouping;
@@ -73,12 +73,12 @@ public class LearnerChoiceGrouping extends Grouping {
 		return true;
 	}
 
-	public Boolean getEqualNumberOfLearners() {
-		return equalNumberOfLearners;
+	public Boolean getEqualNumberOfLearnersPerGroup() {
+		return equalNumberOfLearnersPerGroup;
 	}
 
-	public void setEqualNumberOfLearners(Boolean equalNumberOfLearners) {
-		this.equalNumberOfLearners = equalNumberOfLearners;
+	public void setEqualNumberOfLearnersPerGroup(Boolean equalNumberOfLearnersPerGroup) {
+		this.equalNumberOfLearnersPerGroup = equalNumberOfLearnersPerGroup;
 	}
 
 	public Integer getLearnersPerGroup() {

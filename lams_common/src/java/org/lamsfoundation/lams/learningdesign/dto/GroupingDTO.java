@@ -48,12 +48,13 @@ public class GroupingDTO extends BaseDTO {
 	private Integer learnersPerGroup;
 	private Long staffGroupID;
 	private Integer maxNumberOfGroups;
-	private Boolean equalNumberOfLearners;
+	private Boolean equalNumberOfLearnersPerGroup;
 	//list of GroupDTO
 	private List groups;
 
 	public GroupingDTO(Long groupingID, Integer groupingUIID, Integer groupingType, Integer numberOfGroups,
-			Integer learnersPerGroup, Long staffGroupID, Integer maxNumberOfGroups, List groupDTOs) {
+			Integer learnersPerGroup, Long staffGroupID, Integer maxNumberOfGroups, Boolean equalNumberOfLearnersPerGroup,
+			List groupDTOs) {
 		this.groupingID = groupingID;
 		this.groupingUIID = groupingUIID;
 		groupingTypeID = groupingType;
@@ -61,6 +62,7 @@ public class GroupingDTO extends BaseDTO {
 		this.learnersPerGroup = learnersPerGroup;
 		this.staffGroupID = staffGroupID;
 		this.maxNumberOfGroups = maxNumberOfGroups;
+		this.equalNumberOfLearnersPerGroup = equalNumberOfLearnersPerGroup;
 		groups = groupDTOs;
 	}
 
@@ -112,7 +114,7 @@ public class GroupingDTO extends BaseDTO {
 	private void addLearnerChoiceGroupingAttributes(LearnerChoiceGrouping grouping) {
 		learnersPerGroup = grouping.getLearnersPerGroup();
 		numberOfGroups = grouping.getNumberOfGroups();
-		equalNumberOfLearners = grouping.getEqualNumberOfLearners();
+		equalNumberOfLearnersPerGroup = grouping.getEqualNumberOfLearnersPerGroup();
 	}
 
 	private void addLessonClassAttributes(LessonClass grouping) {
@@ -243,11 +245,11 @@ public class GroupingDTO extends BaseDTO {
 		this.groups = groups;
 	}
 
-	public Boolean getEqualNumberOfLearners() {
-		return equalNumberOfLearners;
+	public Boolean getEqualNumberOfLearnersPerGroup() {
+		return equalNumberOfLearnersPerGroup;
 	}
 
-	public void setEqualNumberOfLearners(Boolean equalNumberOfLearners) {
-		this.equalNumberOfLearners = equalNumberOfLearners;
+	public void setEqualNumberOfLearnersPerGroup(Boolean equalNumberOfLearnersPerGroup) {
+		equalNumberOfLearnersPerGroup = equalNumberOfLearnersPerGroup;
 	}
 }

@@ -2134,7 +2134,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			grouping = new LearnerChoiceGrouping();
 			((LearnerChoiceGrouping) grouping).setLearnersPerGroup(groupingDto.getLearnersPerGroup());
 			((LearnerChoiceGrouping) grouping).setNumberOfGroups(groupingDto.getNumberOfGroups());
-			((LearnerChoiceGrouping) grouping).setEqualNumberOfLearners(groupingDto.getEqualNumberOfLearners());
+			((LearnerChoiceGrouping) grouping).setEqualNumberOfLearnersPerGroup(groupingDto.getEqualNumberOfLearnersPerGroup());
 		}
 		else {
 			log.error("Unable to determine the grouping type. Creating a random grouping. GroupingDTO was " + groupingDto);

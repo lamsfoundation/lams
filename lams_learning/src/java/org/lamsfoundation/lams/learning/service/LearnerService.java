@@ -607,21 +607,23 @@ public class LearnerService implements ICoreLearnerService {
 
 				User learner = (User) userManagementService.findById(User.class, learnerId);
 				if (learner != null) {
-
-					if (((LearnerChoiceGrouping) grouping).getEqualNumberOfLearners()) {
-						Integer maxNumberOfLearnersPerGroup = null;
-						Set<Group> groups = grouping.getGroups();
-						if (((LearnerChoiceGrouping) grouping).getLearnersPerGroup() == null) {
-							Lesson lesson = getLesson(lessonId);
-							int learnerCount = lesson.getAllLearners().size();
-
-							int groupCount = grouping.getGroups().size();
-							maxNumberOfLearnersPerGroup = learnerCount / groupCount + (learnerCount % groupCount == 0 ? 0 : 1);
+					Integer maxNumberOfLearnersPerGroup = null;
+					Set<Group> groups = grouping.getGroups();
+					if (((LearnerChoiceGrouping) grouping).getLearnersPerGroup() == null) {
+						if (((LearnerChoiceGrouping) grouping).getEqualNumberOfLearnersPerGroup()) {
+							if (((LearnerChoiceGrouping) grouping).getLearnersPerGroup() == null) {
+								Lesson lesson = getLesson(lessonId);
+								int learnerCount = lesson.getAllLearners().size();
+								int groupCount = grouping.getGroups().size();
+								maxNumberOfLearnersPerGroup = learnerCount / groupCount
+										+ (learnerCount % groupCount == 0 ? 0 : 1);
+							}
 						}
-						else {
-							maxNumberOfLearnersPerGroup = ((LearnerChoiceGrouping) grouping).getLearnersPerGroup();
-						}
-
+					}
+					else {
+						maxNumberOfLearnersPerGroup = ((LearnerChoiceGrouping) grouping).getLearnersPerGroup();
+					}
+					if (maxNumberOfLearnersPerGroup != null) {
 						for (Group group : groups) {
 							if (group.getGroupId().equals(groupId)) {
 								if (group.getUsers().size() >= maxNumberOfLearnersPerGroup) {
@@ -630,6 +632,7 @@ public class LearnerService implements ICoreLearnerService {
 							}
 						}
 					}
+
 					lessonService.performGrouping(grouping, groupId, learner);
 					return true;
 				}
@@ -1169,20 +1172,22 @@ public class LearnerService implements ICoreLearnerService {
 		Integer maxNumberOfLearnersPerGroup = null;
 		int learnerCount = lesson.getAllLearners().size();
 		int groupCount = grouping.getGroups().size();
-		if (groupCount == 0) {
-			((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(grouping, 2);
-			groupCount = grouping.getGroups().size();
-			groupingDAO.update(grouping);
-		}
 		if (grouping.getLearnersPerGroup() == null) {
-			if (grouping.getEqualNumberOfLearners()) {
+			if (groupCount == 0) {
+				((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(grouping, 2);
+				groupCount = grouping.getGroups().size();
+				groupingDAO.update(grouping);
+			}
+			if (grouping.getEqualNumberOfLearnersPerGroup()) {
 				maxNumberOfLearnersPerGroup = learnerCount / groupCount + (learnerCount % groupCount == 0 ? 0 : 1);
 			}
 		}
 		else {
 			maxNumberOfLearnersPerGroup = grouping.getLearnersPerGroup();
-			if (groupCount * maxNumberOfLearnersPerGroup == learnerCount) {
-				((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(grouping, 1);
+			int desiredGroupCount = learnerCount / maxNumberOfLearnersPerGroup
+					+ (learnerCount % maxNumberOfLearnersPerGroup == 0 ? 0 : 1);
+			if (desiredGroupCount > groupCount) {
+				((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(grouping, desiredGroupCount - groupCount);
 				groupingDAO.update(grouping);
 			}
 		}
