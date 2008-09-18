@@ -72,7 +72,8 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
 			Activity defaultActivity,
             Integer maxNumberOfOptions, 
             Integer minNumberOfOptions,
-			String options_instructions) {
+			String options_instructions,
+			Set branchActivityEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -95,7 +96,8 @@ public class OptionsActivity extends ComplexActivity implements Serializable {
 				stopAfterActivity,
 				inputActivities,
                 activities,
-                defaultActivity);
+                defaultActivity,
+                branchActivityEntries);
         this.maxNumberOfOptions = maxNumberOfOptions;
         this.minNumberOfOptions = minNumberOfOptions;
         this.optionsInstructions = options_instructions;

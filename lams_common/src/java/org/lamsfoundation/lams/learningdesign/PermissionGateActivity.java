@@ -63,7 +63,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
 			Set inputActivities,
             Integer gateActivityLevelId,
             Set waitingLearners,
-            SystemTool sysTool)
+            SystemTool sysTool,
+            Set branchActivityEntries)
     {
         super(activityId,
                 id,
@@ -88,7 +89,8 @@ public class PermissionGateActivity extends GateActivity implements Serializable
     			inputActivities,
                 gateActivityLevelId,
                 waitingLearners,
-                sysTool);
+                sysTool,
+                branchActivityEntries);
         super.simpleActivityStrategy = new PermissionGateActivityStrategy(this);
     }
     

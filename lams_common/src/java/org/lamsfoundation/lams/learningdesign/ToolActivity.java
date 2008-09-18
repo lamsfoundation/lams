@@ -83,7 +83,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
             Boolean stopAfterActivity,
 			Set inputActivities,
             Tool tool,
-            Long toolContentId)
+            Long toolContentId,
+            Set branchActivityEntries)
     {
         super(activityId,
                 id,
@@ -105,7 +106,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
 				transitionFrom,
 				languageFile,
                 stopAfterActivity,
-    			inputActivities);
+    			inputActivities,
+    			branchActivityEntries);
         this.tool = tool;
         this.toolContentId = toolContentId;
         super.simpleActivityStrategy = new ToolActivityStrategy(this);

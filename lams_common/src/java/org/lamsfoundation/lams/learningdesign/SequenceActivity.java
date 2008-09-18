@@ -75,7 +75,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 			Set activities,
 			Activity defaultActivity,
             Set branchEntries,
-            SystemTool systemTool) {
+            SystemTool systemTool,
+            Set branchActivityEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -98,7 +99,8 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 				stopAfterActivity,
 				inputActivities,
                 activities,
-                defaultActivity);
+                defaultActivity,
+                branchActivityEntries);
         super.activityStrategy = new SequenceActivityStrategy(this);
         this.branchEntries = branchEntries;
         this.systemTool = systemTool;

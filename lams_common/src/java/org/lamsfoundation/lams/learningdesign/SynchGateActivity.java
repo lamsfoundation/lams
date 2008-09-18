@@ -62,7 +62,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
 			Set inputActivities,
             Integer gateActivityLevelId,
             Set waitingLearners,
-            SystemTool sysTool) {
+            SystemTool sysTool,
+            Set branchActivityEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -86,7 +87,8 @@ public class SynchGateActivity extends GateActivity implements Serializable {
     			inputActivities,
                 gateActivityLevelId,
                 waitingLearners,
-                sysTool);
+                sysTool,
+                branchActivityEntries);
         super.simpleActivityStrategy = new SynchGateActivityStrategy(this);
     }
 

@@ -227,6 +227,12 @@ public abstract class Activity implements Serializable, Nullable {
 	 * The activities that supplied inputs to this activity.
 	 */
 	private Set inputActivities;
+	
+	/**
+	 * The BranchActivityEntries that map conditions to this Activity; bi-directional association
+	 * required (e.g. LDEV-1910)
+	 */
+	private Set branchActivityEntries;
 
 	//---------------------------------------------------------------------
 	// Object constructors
@@ -241,7 +247,7 @@ public abstract class Activity implements Serializable, Nullable {
 			Integer orderId, Boolean defineLater, Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
 			Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
 			Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
-			Boolean stopAfterActivity, Set inputActivities) {
+			Boolean stopAfterActivity, Set inputActivities, Set branchActivityEntries) {
 		this.activityId = activityId;
 		activityUIID = id;
 		this.description = description;
@@ -265,6 +271,7 @@ public abstract class Activity implements Serializable, Nullable {
 		initialised = false;
 		this.stopAfterActivity = stopAfterActivity;
 		this.inputActivities = inputActivities;
+		this.branchActivityEntries = branchActivityEntries;
 	}
 
 	/** default constructor */
@@ -612,6 +619,20 @@ public abstract class Activity implements Serializable, Nullable {
 	 */
 	public void setInputActivities(Set inputActivities) {
 		this.inputActivities = inputActivities;
+	}
+	
+	/** 
+	 * @return Returns the branchActivityEntries.
+	 */
+	public Set getBranchActivityEntries() {
+		return branchActivityEntries;
+	}
+
+	/**
+	 * @param branchActivityEntries The branchActivityEntries to set.
+	 */
+	public void setBranchActivityEntries(Set branchActivityEntries) {
+		this.branchActivityEntries = branchActivityEntries;
 	}
 
 	@Override

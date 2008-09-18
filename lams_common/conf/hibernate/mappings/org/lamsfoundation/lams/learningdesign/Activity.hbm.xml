@@ -134,6 +134,12 @@
    		<key><column name="activity_id" /></key>
    		<many-to-many column="input_activity_id" class="org.lamsfoundation.lams.learningdesign.Activity"/>
 	</set>
+	
+	<!-- bi-directional assocation to BranchActivityEntry -->
+	<set name="branchActivityEntries" lazy="true" inverse="true" cascade="all-delete-orphan">
+		<key><column name="branch_activity_id" /></key>
+		<one-to-many class="org.lamsfoundation.lams.learningdesign.BranchActivityEntry"/>
+	</set>  
     
     <!-- Subclass definations for polymorphic persistence -->
     <subclass name="org.lamsfoundation.lams.learningdesign.SimpleActivity" >
@@ -324,7 +330,7 @@
 	             <!-- uni-directional many-to-one association to System Tool -->
 	             <many-to-one name="systemTool" class="org.lamsfoundation.lams.tool.SystemTool" lazy="false" >
 	             	<column name="system_tool_id" not-null="false"/>
-	             </many-to-one>                 
+	             </many-to-one>
 
 	  			<property name="startXcoord" type="java.lang.Integer" column="start_xcoord" length="11" >
 			       <meta attribute="field-description">@hibernate.property column="start_xcoord" length="11" </meta>    

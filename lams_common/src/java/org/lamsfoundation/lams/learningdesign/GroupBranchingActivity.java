@@ -71,7 +71,8 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 			Set inputActivities,
             Set activities,
 			Activity defaultActivity,
-            SystemTool systemTool) {
+            SystemTool systemTool,
+            Set branchActivityEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -99,7 +100,8 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 				inputActivities,
                 activities,
     			defaultActivity,
-                systemTool);
+                systemTool,
+                branchActivityEntries);
     }
 
     /** default constructor */

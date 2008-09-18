@@ -73,7 +73,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
 			String languageFile,
 			Boolean stopAfterActivity,
 			Set inputActivities,
-            SystemTool sysTool)
+            SystemTool sysTool,
+            Set branchActivityEntries)
     {
         super(activityId, 
                 id, 
@@ -95,7 +96,8 @@ public class GroupingActivity extends SimpleActivity implements Serializable, IS
 				transitionFrom,
 				languageFile,
                 stopAfterActivity,
-                inputActivities);
+                inputActivities,
+                branchActivityEntries);
         this.createGrouping = createGrouping;        
         this.createGroupingUIID = create_grouping_ui_id;
         this.systemTool = sysTool;

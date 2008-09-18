@@ -111,7 +111,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
             Long gateStartTimeOffset, 
             Long gateEndTimeOffset,
             Set waitingLearners,
-            SystemTool sysTool) {
+            SystemTool sysTool,
+            Set branchActivityEntries) {
         super(activityId, 
                 id,
                 description,
@@ -135,7 +136,8 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
     			inputActivities,
                 gateActivityLevelId,
                 waitingLearners,
-                sysTool);
+                sysTool,
+                branchActivityEntries);
         //validate pre-condition.
         if(gateStartTimeOffset != null && gateEndTimeOffset != null && (gateStartTimeOffset.intValue()>gateEndTimeOffset.intValue()))
             throw new IllegalStateException("End time offset must be larger" +

@@ -62,7 +62,8 @@ public class SystemGateActivity extends PermissionGateActivity implements Serial
 			Set inputActivities,
             Integer gateActivityLevelId,
             Set waitingLearners,
-            SystemTool sysTool) {
+            SystemTool sysTool,
+            Set branchActivityEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -86,7 +87,8 @@ public class SystemGateActivity extends PermissionGateActivity implements Serial
                 inputActivities,
                 gateActivityLevelId,
                 waitingLearners,
-                sysTool);
+                sysTool,
+                branchActivityEntries);
         super.simpleActivityStrategy = new SystemGateActivityStrategy(this);
     }
 

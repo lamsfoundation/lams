@@ -59,7 +59,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
 			Transition transitionFrom,
 			String languageFile,
 			Boolean stopAfterActivity,
-			Set inputActivities){
+			Set inputActivities,
+			Set branchActivityEntries){
         super(activityId, 
                 id, 
                 description, 
@@ -80,7 +81,8 @@ public abstract class SimpleActivity extends Activity implements Serializable
 				transitionFrom,
 				languageFile,
 				stopAfterActivity,
-				inputActivities);
+				inputActivities,
+				branchActivityEntries);
     }
     
     /** default constructor */

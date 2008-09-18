@@ -59,7 +59,8 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
 			Boolean stopAfterActivity,
 			Set inputActivities,
 			Set activities,
-			Activity defaultActivity) {
+			Activity defaultActivity,
+			Set branchActivityEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -82,7 +83,8 @@ public class ParallelActivity extends ComplexActivity implements Serializable {
 				stopAfterActivity,
 				inputActivities,
                 activities,
-                defaultActivity);
+                defaultActivity,
+                branchActivityEntries);
         super.activityStrategy = new ParallelActivityStrategy(this);
     }
 

@@ -80,7 +80,8 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 			Set inputActivities,
             Set activities,
 			Activity defaultActivity,
-            SystemTool systemTool) {
+            SystemTool systemTool,
+            Set branchActivityEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -103,7 +104,8 @@ abstract public class BranchingActivity extends ComplexActivity implements Seria
 				stopAfterActivity,
 				inputActivities,
                 activities,
-    			defaultActivity);
+    			defaultActivity,
+    			branchActivityEntries);
         super.activityStrategy = new BranchingActivityStrategy(this);
         this.systemTool = systemTool;
         this.startXcoord = startXcoord;

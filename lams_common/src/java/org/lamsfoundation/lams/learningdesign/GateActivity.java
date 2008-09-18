@@ -71,10 +71,11 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 			Integer orderId, Boolean defineLater, java.util.Date createDateTime, LearningLibrary learningLibrary,
 			Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 			Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
-			Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId, Set waitingLearners, SystemTool sysTool) {
+			Boolean stopAfterActivity, Set inputActivities, Integer gateActivityLevelId, Set waitingLearners, SystemTool sysTool,
+			Set branchActivityEntries) {
 		super(activityId, id, description, title, xcoord, ycoord, orderId, defineLater, createDateTime, learningLibrary,
 				parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
-				transitionFrom, languageFile, stopAfterActivity, inputActivities);
+				transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
 		this.gateActivityLevelId = gateActivityLevelId;
 		this.waitingLearners = waitingLearners;
 		systemTool = sysTool;

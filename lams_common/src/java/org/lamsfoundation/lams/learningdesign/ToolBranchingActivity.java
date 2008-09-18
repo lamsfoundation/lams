@@ -71,7 +71,8 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 			Set inputActivities,
 			Set activities,
 			Activity defaultActivity,
-            SystemTool systemTool) {
+            SystemTool systemTool,
+            Set branchActivityEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -99,7 +100,8 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
                 inputActivities,
                 activities,
     			defaultActivity,
-                systemTool);
+                systemTool,
+                branchActivityEntries);
    }
 
     /** default constructor */

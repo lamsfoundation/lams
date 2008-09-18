@@ -67,7 +67,8 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
 			Set inputActivities,
 			Set activities,
 			Activity defaultActivity,
-            SystemTool systemTool) {
+            SystemTool systemTool,
+            Set branchActivityEntries) {
         super(activityId, 
                 id, 
                 description, 
@@ -95,7 +96,8 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
 				inputActivities,
 	            activities,
 	            defaultActivity,
-	            systemTool);
+	            systemTool,
+	            branchActivityEntries);
     }
 
     /** default constructor */
