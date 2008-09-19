@@ -250,6 +250,6 @@ public class GroupingDTO extends BaseDTO {
 	}
 
 	public void setEqualNumberOfLearnersPerGroup(Boolean equalNumberOfLearnersPerGroup) {
-		equalNumberOfLearnersPerGroup = equalNumberOfLearnersPerGroup;
+		this.equalNumberOfLearnersPerGroup = equalNumberOfLearnersPerGroup;
 	}
 }
