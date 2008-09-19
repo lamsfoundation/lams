@@ -73,7 +73,7 @@ class EventNotificationService implements IEventNotificationService {
 	/**
 	 * Name of the Quartz trigger that resends messages.
 	 */
-	private final static String RESEND_MESSAGES_TRIGGER_NAME = "Resend Messages Job";
+	private final static String RESEND_MESSAGES_TRIGGER_NAME = "Resend Messages Job trigger";
 
 	/**
 	 * Default constructor. Should be called only once, since this class in a singleton.
