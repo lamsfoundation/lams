@@ -118,6 +118,7 @@
 				<patternset id="lib.jars">
 					<!--  the desired jars are nominated explicitly so -->
 					<!--  we don't release a build only one by accident -->
+					<include name="autopatch/*.jar" />
 					<include name="axis/*.jar" />
 					<include name="cglib/*.jar" />
 					<include name="dom4j/*.jar" />

@@ -89,6 +89,12 @@
 						<include name="**/*.properties"/>
 				</fileset>
 		</copy>
+		<!-- Autopatch -->
+		<copy overwrite="yes" todir="${build.classes.java}/">
+					<fileset dir="${src.java.dir}/">
+							<include name="migration.properties"/>
+					</fileset>
+		</copy>
 	</target>
 
 	<target name="compile.test" depends="compile">
@@ -275,8 +281,11 @@
 	<target name="deploy-war" depends="build-war">
 		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/>
-		<copy file="${build.lib}/${product}.war"
-				todir="${jboss.deploy}"/>
+		<copy todir="${jboss.deploy}/${product}.war">
+			<fileset dir="${build.lib}/${product}.war">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
 		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/central">
 			<fileset dir="${conf.language.dir}">
 				<include name="**/*.properties"/>
@@ -295,39 +304,6 @@
 		</copy>
 	</target>
 
-	
-	<!-- Debug target: Explode tool to ear folder for debug use  -->
-	<target name="delete-exploded-folder" description="delete old tool exploded tool folder">
-		<!-- delete old war folder tree -->
-		<delete quiet="true" includeemptydirs="true">
-			<fileset dir="${jboss.deploy}/${product}.war">
-			    <include name="**"/>
-			</fileset>
-		</delete>
-		<!-- if use explode tool target when jboss is running, explode may be failed and left the the temp folder. Here try to delete the temp folder -->
-		<delete quiet="true" includeemptydirs="true">
-			<fileset dir="${jboss.deploy}/temp-${product}.war">
-			    <include name="**"/>
-			</fileset>
-		</delete>
-	</target>
-	
-	<target name="explode-war" depends="delete-exploded-folder,deploy-war" description="explode tool jar and war package to a war folder">
-		<!-- rename war file to avoid name conflict -->
-		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war"/>
-		<!-- explode the ear -->
-		<!-- Don't explode jar file, becuase classes in jar will conflict with those same classes files in war -->
-		<!--<unjar src="${jboss.deploy}/${product}.jar" dest="${jboss.deploy}/${product}.war" />-->
-		<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
-		<!-- delete war and jar files -->
-		<delete>
-			<fileset dir="${jboss.deploy}">
-			    <include name="temp-${product}.war"/>
-			 <!--   <include name="${product}.jar"/> -->
-			</fileset>
-		</delete>
-	
-	</target>
 	
 	<!-- ================================= -->
 	<!--  target: synchronize-deploy          -->            

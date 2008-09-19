@@ -76,6 +76,12 @@
 
     <!--  Third Party JAR Files -->
 	<module>
+		<java>tk-autopatch-1.2.0-b2-cvs.jar</java>
+	</module>
+	<module>
+		<java>tk-discovery-1.0.0.jar</java>
+	</module>
+	<module>
 		<java>axis.jar</java>
 	</module>
 	<module>
