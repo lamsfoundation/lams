@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.web.actions;
 
@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -71,8 +70,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  */
 public class AuthoringAction extends DispatchAction {
 
-	private static final Logger logger = Logger
-			.getLogger(AuthoringAction.class);
+	// private static final Logger logger =
+	// Logger.getLogger(AuthoringAction.class);
 
 	private IDimdimService dimdimService;
 
@@ -235,7 +234,7 @@ public class AuthoringAction extends DispatchAction {
 				IToolContentHandler.TYPE_OFFLINE, request);
 	}
 
-	/* ========== Private Methods ********** */
+	/* ========== Private Methods */
 
 	private ActionForward uploadFile(ActionMapping mapping,
 			AuthoringForm authForm, String type, HttpServletRequest request) {
@@ -374,7 +373,6 @@ public class AuthoringAction extends DispatchAction {
 
 			// TODO check whether these fields should be in here
 			dimdim.setTopic(authForm.getTopic());
-			dimdim.setMeetingKey(authForm.getMeetingKey());
 			dimdim.setMaxAttendeeMikes(authForm.getMaxAttendeeMikes());
 		}
 	}
@@ -448,10 +446,11 @@ public class AuthoringAction extends DispatchAction {
 		ToolAccessMode mode;
 		String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 		if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER
-				.toString()))
+				.toString())) {
 			mode = ToolAccessMode.TEACHER;
-		else
+		} else {
 			mode = ToolAccessMode.AUTHOR;
+		}
 		return mode;
 	}
 

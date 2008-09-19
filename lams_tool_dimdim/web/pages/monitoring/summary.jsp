@@ -89,12 +89,6 @@
 							<html:text property="topic"></html:text>
 						</td>
 					</tr>
-					<tr>
-						<td>
-							<fmt:message key="label.authoring.basic.meetingKey" />
-							:
-							<html:text property="meetingKey"></html:text>
-						</td>
 					</tr>
 					<tr>
 						<td>

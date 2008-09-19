@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.service;
 
@@ -28,8 +28,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -162,6 +160,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
 			throws DataMissingException, ToolException {
 		// TODO Auto-generated method stub
@@ -436,6 +435,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		} else {
 			return list.get(0);
 		}
+
 	}
 
 	public DimdimAttachment uploadFileToContent(Long toolContentId,
@@ -462,7 +462,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 							+ " the repository " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param url
@@ -488,18 +488,19 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 
 		matcher.find();
 		String connectURL = matcher.group(1);
-		
+
 		return connectURL;
 	}
-	
-	public String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey) throws Exception {
-		
+
+	public String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey)
+			throws Exception {
+
 		// Get Dimdim server url
 		DimdimConfig serverURL = getConfigEntry(Constants.CONFIG_SERVER_URL);
 		if (serverURL == null) {
 			throw new DimdimException("Dimdim server url not found");
 		}
-		
+
 		URL url = new URL(serverURL.getValue()
 				+ "/dimdim/JoinConferenceCheck.action?"
 				+ "email="
@@ -508,7 +509,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 				+ URLEncoder.encode(userDTO.getFirstName() + " "
 						+ userDTO.getLastName(), "UTF8") + "&confKey="
 				+ URLEncoder.encode(meetingKey, "UTF8"));
-		
+
 		String connectURL = sendDimdimRequest(url);
 
 		return serverURL.getValue() + connectURL;
@@ -563,10 +564,11 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 		return dimdimUser;
 	}
 
+	@SuppressWarnings("unchecked")
 	public DimdimConfig getConfigEntry(String key) {
 		dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
-		List<DimdimConfig> list = dimdimConfigDAO.findByProperty(
-				DimdimConfig.class, "key", key);
+		List<DimdimConfig> list = (List<DimdimConfig>) dimdimConfigDAO
+				.findByProperty(DimdimConfig.class, "key", key);
 		if (list.isEmpty()) {
 			return null;
 		} else {
@@ -653,6 +655,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager,
 	/**
 	 * Import the data for a 1.0.2 Dimdim
 	 */
+	@SuppressWarnings("unchecked")
 	public void import102ToolContent(Long toolContentId, UserDTO user,
 			Hashtable importValues) {
 		Date now = new Date();

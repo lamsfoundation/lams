@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.web.forms;
@@ -69,13 +68,11 @@ public class AuthoringForm extends ActionForm {
 	private Long deleteFileUuid;
 
 	private SessionMap<String, Object> sessionMap;
-	
+
 	private String topic;
-	
-	private String meetingKey;
 
 	private Integer maxAttendeeMikes;
-	
+
 	@Override
 	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
 		ActionErrors ac = new ActionErrors();
@@ -195,14 +192,6 @@ public class AuthoringForm extends ActionForm {
 
 	public void setTopic(String topic) {
 		this.topic = topic;
-	}
-
-	public String getMeetingKey() {
-		return meetingKey;
-	}
-
-	public void setMeetingKey(String meetingKey) {
-		this.meetingKey = meetingKey;
 	}
 
 	public Integer getMaxAttendeeMikes() {

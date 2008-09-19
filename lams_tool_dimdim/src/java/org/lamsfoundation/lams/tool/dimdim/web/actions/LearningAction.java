@@ -20,18 +20,11 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.web.actions;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,13 +40,13 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dimdim.dto.ContentDTO;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
-import org.lamsfoundation.lams.tool.dimdim.model.DimdimConfig;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
 import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 import org.lamsfoundation.lams.tool.dimdim.util.DimdimException;
+import org.lamsfoundation.lams.tool.dimdim.util.DimdimUtil;
 import org.lamsfoundation.lams.tool.dimdim.web.forms.LearningForm;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -175,14 +168,17 @@ public class LearningAction extends DispatchAction {
 		// Get LAMS userDTO
 		org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
 				.getSession().getAttribute(AttributeNames.USER);
-		
+
 		String connectURL = "";
 		if (mode.isAuthor()) {
-			connectURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, dimdim.getMeetingKey(), dimdim.getTopic());
+			String meetingKey = DimdimUtil.generateMeetingKey();
+			connectURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO,
+					meetingKey, dimdim.getTopic());
 		} else {
-			connectURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO, dimdimSession.getMeetingKey());
+			connectURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO,
+					dimdimSession.getMeetingKey());
 		}
-		
+
 		boolean conferenceOpen = connectURL.isEmpty() ? false : true;
 		request.setAttribute(Constants.ATTR_CONFERENCE_OPEN, conferenceOpen);
 
@@ -238,9 +234,9 @@ public class LearningAction extends DispatchAction {
 			dimdimUser.setFinishedActivity(true);
 			dimdimService.saveOrUpdateDimdimUser(dimdimUser);
 		} else {
-			logger.error("finishActivity(): couldn't find DimdimUser with id: "
-					+ dimdimUser.getUserId() + "and toolSessionID: "
-					+ toolSessionID);
+			logger
+					.error("finishActivity(): couldn't find/create DimdimUser in toolSessionID: "
+							+ toolSessionID);
 		}
 
 		ToolSessionManager sessionMgrService = DimdimServiceProxy

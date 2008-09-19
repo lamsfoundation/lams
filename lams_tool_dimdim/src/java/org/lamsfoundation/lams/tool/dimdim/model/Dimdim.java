@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.model;
 
@@ -80,8 +80,6 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 	private Set<DimdimSession> dimdimSessions;
 
 	private String topic;
-	
-	private String meetingKey;
 
 	private Integer maxAttendeeMikes;
 
@@ -302,7 +300,8 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 	/**
 	 * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
 	 * @hibernate.collection-key column="dimdim_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.dimdim.model.DimdimAttachment"
+	 * @hibernate.collection-one-to-many 
+	 *                                   class="org.lamsfoundation.lams.tool.dimdim.model.DimdimAttachment"
 	 * 
 	 */
 
@@ -317,7 +316,8 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 	/**
 	 * @hibernate.set lazy="true" inverse="true" cascade="none"
 	 * @hibernate.collection-key column="dimdim_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.dimdim.model.DimdimSession"
+	 * @hibernate.collection-one-to-many 
+	 *                                   class="org.lamsfoundation.lams.tool.dimdim.model.DimdimSession"
 	 * 
 	 */
 	public Set<DimdimSession> getDimdimSessions() {
@@ -327,7 +327,7 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 	public void setDimdimSessions(Set<DimdimSession> dimdimSessions) {
 		this.dimdimSessions = dimdimSessions;
 	}
-	
+
 	/**
 	 * @hibernate.property column="topic"
 	 * @return
@@ -338,18 +338,6 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 
 	public void setTopic(String topic) {
 		this.topic = topic;
-	}
-
-	/**
-	 * @hibernate.property column="meeting_key"
-	 * @return
-	 */
-	public String getMeetingKey() {
-		return meetingKey;
-	}
-
-	public void setMeetingKey(String meetingKey) {
-		this.meetingKey = meetingKey;
 	}
 
 	/**

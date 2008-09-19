@@ -44,14 +44,6 @@
 
 	<tr>
 		<td>
-			<fmt:message key="label.authoring.basic.meetingKey" />
-			:
-			<html:text property="meetingKey"></html:text>
-		</td>
-	</tr>
-
-	<tr>
-		<td>
 			<fmt:message key="label.authoring.basic.maxAttendeeMikes" />
 			:
 			<html:select property="maxAttendeeMikes">

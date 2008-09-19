@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.web.forms;
@@ -42,47 +41,37 @@ public class MonitoringForm extends ActionForm {
 
 	private String topic;
 
-	private String meetingKey;
-
 	private Integer maxAttendeeMikes;
 
 	public String getDispatch() {
 		return dispatch;
 	}
 
-	public Integer getMaxAttendeeMikes() {
-		return maxAttendeeMikes;
-	}
-
-	public String getMeetingKey() {
-		return meetingKey;
+	public void setDispatch(String dispatch) {
+		this.dispatch = dispatch;
 	}
 
 	public Long getToolSessionID() {
 		return toolSessionID;
 	}
 
-	public String getTopic() {
-		return topic;
-	}
-
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
-
-	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
-		this.maxAttendeeMikes = maxAttendeeMikes;
-	}
-
-	public void setMeetingKey(String meetingKey) {
-		this.meetingKey = meetingKey;
-	}
-
 	public void setToolSessionID(Long toolSessionID) {
 		this.toolSessionID = toolSessionID;
 	}
 
+	public String getTopic() {
+		return topic;
+	}
+
 	public void setTopic(String topic) {
 		this.topic = topic;
+	}
+
+	public Integer getMaxAttendeeMikes() {
+		return maxAttendeeMikes;
+	}
+
+	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
+		this.maxAttendeeMikes = maxAttendeeMikes;
 	}
 }

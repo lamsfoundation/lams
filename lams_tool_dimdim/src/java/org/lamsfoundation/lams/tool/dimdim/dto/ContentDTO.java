@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.dto;
@@ -63,10 +62,8 @@ public class ContentDTO {
 	public Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
 
 	public Long currentTab;
-	
+
 	private String topic;
-	
-	private String meetingKey;
 
 	private Integer maxAttendeeMikes;
 
@@ -86,9 +83,8 @@ public class ContentDTO {
 
 		this.onlineInstructionsFiles = new TreeSet<AttachmentDTO>();
 		this.offlineInstructionsFiles = new TreeSet<AttachmentDTO>();
-		
+
 		this.topic = dimdim.getTopic();
-		this.meetingKey = dimdim.getMeetingKey();
 		this.maxAttendeeMikes = dimdim.getMaxAttendeeMikes();
 
 		for (DimdimAttachment att : dimdim.getDimdimAttachments()) {
@@ -220,14 +216,6 @@ public class ContentDTO {
 		this.topic = topic;
 	}
 
-	public String getMeetingKey() {
-		return meetingKey;
-	}
-
-	public void setMeetingKey(String meetingKey) {
-		this.meetingKey = meetingKey;
-	}
-
 	public Integer getMaxAttendeeMikes() {
 		return maxAttendeeMikes;
 	}
@@ -235,5 +223,4 @@ public class ContentDTO {
 	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
 		this.maxAttendeeMikes = maxAttendeeMikes;
 	}
-
 }

@@ -20,20 +20,9 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.web.actions;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,13 +35,12 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dimdim.dto.ContentDTO;
 import org.lamsfoundation.lams.tool.dimdim.dto.UserDTO;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
-import org.lamsfoundation.lams.tool.dimdim.model.DimdimConfig;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
 import org.lamsfoundation.lams.tool.dimdim.util.Constants;
-import org.lamsfoundation.lams.tool.dimdim.util.DimdimException;
+import org.lamsfoundation.lams.tool.dimdim.util.DimdimUtil;
 import org.lamsfoundation.lams.tool.dimdim.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -108,7 +96,6 @@ public class MonitoringAction extends DispatchAction {
 		MonitoringForm monitoringForm = (MonitoringForm) form;
 		// populate using authoring values
 		monitoringForm.setTopic(contentDT0.getTopic());
-		monitoringForm.setMeetingKey((contentDT0.getMeetingKey()));
 		monitoringForm.setMaxAttendeeMikes((contentDT0.getMaxAttendeeMikes()));
 
 		// TODO may need to populate using session values if they already exist
@@ -138,7 +125,8 @@ public class MonitoringAction extends DispatchAction {
 	}
 
 	public ActionForward startDimdim(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 
 		MonitoringForm monitoringForm = (MonitoringForm) form;
 
@@ -148,17 +136,21 @@ public class MonitoringAction extends DispatchAction {
 
 		// update dimdim meeting settings
 		session.setTopic(monitoringForm.getTopic());
-		session.setMeetingKey(monitoringForm.getMeetingKey());
 		session.setMaxAttendeeMikes(monitoringForm.getMaxAttendeeMikes());
 
 		// Get LAMS userDTO
 		org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
 				.getSession().getAttribute(AttributeNames.USER);
 
-		String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey(), session.getTopic());
-		
+		String meetingKey = DimdimUtil.generateMeetingKey();
+		session.setMeetingKey(meetingKey);
+		dimdimService.saveOrUpdateDimdimSession(session);
+
+		String startConferenceURL = dimdimService.getDimdimStartConferenceURL(
+				lamsUserDTO, session.getMeetingKey(), session.getTopic());
+
 		response.sendRedirect(startConferenceURL);
-				
+
 		return null;
 
 	}
