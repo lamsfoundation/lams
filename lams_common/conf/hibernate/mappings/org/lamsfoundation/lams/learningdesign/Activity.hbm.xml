@@ -152,6 +152,16 @@
 				
 				<!-- needs to be lazy because each tool session contains user and
 				lesson -->
+				
+				<set name="competenceMappings" lazy="true" inverse="true" cascade="none" >
+			        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none"
+        												@hibernate.collection-key column="competence_mapping_id"
+        										        @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.CompetenceMapping"
+			        </meta>
+			        <key><column name="activity_id" /></key>
+			        <one-to-many class="org.lamsfoundation.lams.learningdesign.CompetenceMapping"/>
+			    </set>
+				
 				<set name="toolSessions" lazy="true" inverse="true" cascade="none" >
 			        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none"
         												@hibernate.collection-key column="tool_session_id"
@@ -160,7 +170,7 @@
 			        <key><column name="activity_id" /></key>
 			        <one-to-many class="org.lamsfoundation.lams.tool.ToolSession"/>
 			    </set>
-                 
+
                  <!-- bi-directional many-to-one association to Tool-->
                  <many-to-one name="tool" class="org.lamsfoundation.lams.tool.Tool" lazy="false" >
                  	<column name="tool_id" not-null="false"/>

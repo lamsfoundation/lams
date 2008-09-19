@@ -231,6 +231,11 @@
     	 <key><column name="learning_design_id" /></key>
          <one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"/>
     </set>
+    
+    <set name="competences" lazy="false" inverse="true" cascade="all-delete-orphan" >
+    	 <key><column name="learning_design_id" /></key>
+         <one-to-many class="org.lamsfoundation.lams.learningdesign.Competence"/>
+    </set>
 
     <!-- bi-directional many-to-one association to the user who is editing -->
     <!-- this design as part of edit on fly. Should only be set if editOverrideLock = 1 -->
