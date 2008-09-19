@@ -46,6 +46,8 @@ import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.Competence;
+import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -57,6 +59,8 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceDAO;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceMappingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
@@ -120,6 +124,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	protected LicenseDAO licenseDAO;
 	protected GroupingDAO groupingDAO;
 	protected GroupDAO groupDAO;
+	protected CompetenceDAO competenceDAO;
+	protected CompetenceMappingDAO competenceMappingDAO;
 	protected SystemToolDAO systemToolDAO;
 	protected ILamsCoreToolService lamsCoreToolService;
 	protected ILearningDesignService learningDesignService;
@@ -156,6 +162,38 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 	public void setGroupingDAO(GroupingDAO groupingDAO) {
 		this.groupingDAO = groupingDAO;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public CompetenceDAO getCompetenceDAO() {
+		return competenceDAO;
+	}
+
+	/**
+	 * 
+	 * @param competenceDAO
+	 */
+	public void setCompetenceDAO(CompetenceDAO competenceDAO) {
+		this.competenceDAO = competenceDAO;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public CompetenceMappingDAO getCompetenceMappingDAO() {
+		return competenceMappingDAO;
+	}
+
+	/**
+	 * 
+	 * @param competenceMappingDAO
+	 */
+	public void setCompetenceMappingDAO(CompetenceMappingDAO competenceMappingDAO) {
+		this.competenceMappingDAO = competenceMappingDAO;
 	}
 
 	/**
@@ -811,11 +849,16 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		newLearningDesign.setEditOverrideLock(false); // clear the live edit flag
 		learningDesignDAO.insert(newLearningDesign);
 
+		updateDesignCompetences(originalLearningDesign, newLearningDesign, false);
 		HashMap<Integer, Activity> newActivities = updateDesignActivities(originalLearningDesign, newLearningDesign, 0, customCSV);
 		updateDesignTransitions(originalLearningDesign, newLearningDesign, newActivities, 0);
+
 		// set first activity assumes that the transitions are all set up correctly.
 		newLearningDesign.setFirstActivity(newLearningDesign.calculateFirstActivity());
 		newLearningDesign.setLearningDesignUIID(originalLearningDesign.getLearningDesignUIID());
+
+		updateCompetenceMappings(newLearningDesign.getCompetences(), newActivities);
+
 		return newLearningDesign;
 	}
 
@@ -878,11 +921,14 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 		// now dump the import design into our main sequence. Leave the first activity ui id for the design as it is.
 		int uiidOffset = mainDesign.getMaxID().intValue();
+		updateDesignCompetences(designToImport, mainDesign, true);
 		HashMap<Integer, Activity> newActivities = updateDesignActivities(designToImport, mainDesign, uiidOffset, customCSV);
 		updateDesignTransitions(designToImport, mainDesign, newActivities, uiidOffset);
 		mainDesign.setMaxID(LearningDesign.addOffset(designToImport.getMaxID(), uiidOffset));
 		mainDesign.setValidDesign(Boolean.FALSE);
 		learningDesignDAO.update(mainDesign);
+
+		insertCompetenceMappings(mainDesign.getCompetences(), designToImport.getCompetences(), newActivities);
 
 		return mainDesign;
 
@@ -1146,6 +1192,139 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			newLearningDesign.setTransitions(newTransitions);
 		}
 
+	}
+
+	/**
+	 * Updates the competence information in the newLearningDesign based 
+	 * on the originalLearningDesign
+	 * 
+	 * @param originalLearningDesign The LearningDesign to be copied 
+	 * @param newLearningDesign The copy of the originalLearningDesign
+	 */
+	public void updateDesignCompetences(LearningDesign originalLearningDesign, LearningDesign newLearningDesign, boolean insert) {
+		HashSet<Competence> newCompeteces = new HashSet<Competence>();
+
+		Set<Competence> oldCompetences = originalLearningDesign.getCompetences();
+		for (Competence competence : oldCompetences) {
+			Competence newCompetence = competence.createCopy(competence);
+			newCompetence.setLearningDesign(newLearningDesign);
+
+			// check for existing competences to prevent duplicates
+			if (competenceDAO.getCompetence(newLearningDesign, newCompetence.getTitle()) == null) {
+				competenceDAO.saveOrUpdate(newCompetence);
+			}
+			newCompeteces.add(newCompetence);
+		}
+
+		if (newLearningDesign.getCompetences() != null) {
+			if (!insert) {
+				newLearningDesign.getCompetences().clear();
+				newLearningDesign.getCompetences().addAll(newCompeteces);
+			}
+			else {
+				// handle inserting sequences
+				for (Competence newCompetence : newCompeteces) {
+					boolean alreadyExistsInLD = false;
+					for (Competence existingCompetence : originalLearningDesign.getCompetences()) {
+						if (newCompetence.getTitle().equals(existingCompetence.getTitle())) {
+							alreadyExistsInLD = true;
+							break;
+						}
+					}
+					if (!alreadyExistsInLD) {
+						newLearningDesign.getCompetences().add(newCompetence);
+					}
+				}
+			}
+
+		}
+		else {
+			newLearningDesign.setCompetences(newCompeteces);
+		}
+
+	}
+
+	public void insertCompetenceMappings(Set<Competence> oldCompetences, Set<Competence> newCompetences,
+			HashMap<Integer, Activity> newActivities) {
+
+		for (Integer activityKey : newActivities.keySet()) {
+			Activity activity = newActivities.get(activityKey);
+			if (activity.isToolActivity()) {
+				Set<CompetenceMapping> newCompetenceMappings = new HashSet<CompetenceMapping>();
+				ToolActivity newToolActivity = (ToolActivity) activity;
+				if (newToolActivity.getCompetenceMappings() != null) {
+					for (CompetenceMapping competenceMapping : newToolActivity.getCompetenceMappings()) {
+						CompetenceMapping newMapping = new CompetenceMapping();
+						newMapping.setToolActivity(newToolActivity);
+
+						// Check if competence mapping title already exists as a competence in the original sequence
+						// If so, simply use the existing competence to map to.
+						if (oldCompetences != null && oldCompetences.size() > 0
+								&& getCompetenceFromSet(oldCompetences, competenceMapping.getCompetence().getTitle()) != null) {
+							newMapping.setCompetence(getCompetenceFromSet(oldCompetences, competenceMapping.getCompetence()
+									.getTitle()));
+							competenceMappingDAO.insert(newMapping);
+							newCompetenceMappings.add(newMapping);
+						}
+						// If competence was not already existing in the ld, add a new mappping
+						else if (newCompetences != null && newCompetences.size() > 0
+								&& getCompetenceFromSet(newCompetences, competenceMapping.getCompetence().getTitle()) != null) {
+							newMapping.setCompetence(getCompetenceFromSet(newCompetences, competenceMapping.getCompetence()
+									.getTitle()));
+							competenceMappingDAO.insert(newMapping);
+							newCompetenceMappings.add(newMapping);
+						}
+					}
+				}
+				newToolActivity.getCompetenceMappings().addAll(newCompetenceMappings);
+			}
+		}
+	}
+
+	public Competence getCompetenceFromSet(Set<Competence> competences, String title) {
+		Competence ret = null;
+		for (Competence competence : competences) {
+			if (competence.getTitle().equals(title)) {
+				ret = competence;
+				break;
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * Updates the competence information in the newLearningDesign based 
+	 * on the originalLearningDesign
+	 * 
+	 * @param originalLearningDesign The LearningDesign to be copied 
+	 * @param newLearningDesign The copy of the originalLearningDesign
+	 */
+	public void updateCompetenceMappings(Set<Competence> newCompetences, HashMap<Integer, Activity> newActivities) {
+		for (Integer activityKey : newActivities.keySet()) {
+			Activity activity = newActivities.get(activityKey);
+			if (activity.isToolActivity()) {
+				Set<CompetenceMapping> newCompetenceMappings = new HashSet<CompetenceMapping>();
+				ToolActivity newToolActivity = (ToolActivity) activity;
+				if (newToolActivity.getCompetenceMappings() != null) {
+					for (CompetenceMapping competenceMapping : newToolActivity.getCompetenceMappings()) {
+						CompetenceMapping newMapping = new CompetenceMapping();
+						if (newCompetences != null) {
+							for (Competence newCompetence : newCompetences) {
+								if (competenceMapping.getCompetence().getTitle().equals(newCompetence.getTitle())
+										&& competenceMappingDAO.getCompetenceMapping(newToolActivity, newCompetence) == null) {
+									newMapping.setToolActivity(newToolActivity);
+									newMapping.setCompetence(newCompetence);
+									competenceMappingDAO.insert(newMapping);
+									newCompetenceMappings.add(newMapping);
+								}
+							}
+						}
+					}
+				}
+				newToolActivity.getCompetenceMappings().addAll(newCompetenceMappings);
+				//activityDAO.update(newToolActivity);
+			}
+		}
 	}
 
 	/**
