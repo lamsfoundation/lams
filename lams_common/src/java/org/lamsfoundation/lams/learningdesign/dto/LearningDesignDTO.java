@@ -34,6 +34,7 @@ import java.util.TreeSet;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityDTOOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.Competence;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -85,6 +86,7 @@ public class LearningDesignDTO extends BaseDTO{
 	private ArrayList activities;
 	private ArrayList transitions;
 	private ArrayList branchMappings;
+	private ArrayList competences;
 
 	public LearningDesignDTO(){		
 	}
@@ -147,6 +149,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.activities = new ArrayList();
 		this.transitions = new ArrayList();
 		this.branchMappings = new ArrayList();
+		this.competences = new ArrayList();
 	}	
 	public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO, GroupingDAO groupingDAO, String languageCode){
 		this.learningDesignID = learningDesign.getLearningDesignId();
@@ -206,6 +209,7 @@ public class LearningDesignDTO extends BaseDTO{
 		this.groupings = populateGroupings(learningDesign,groupingDAO);
 		this.activities = populateActivities(learningDesign, languageCode);
 		this.transitions = populateTransitions(learningDesign);
+		this.competences = populateCompetences(learningDesign);
 		
 	}
 	
@@ -431,7 +435,7 @@ public class LearningDesignDTO extends BaseDTO{
 		return new ArrayList<AuthoringActivityDTO>(dtoSet);
 	}	
 
-public ArrayList populateTransitions(LearningDesign design){
+	public ArrayList populateTransitions(LearningDesign design){
 		ArrayList<TransitionDTO> transitions = new ArrayList<TransitionDTO>();
 		if(design.getTransitions()!=null){
 			Iterator iterator = design.getTransitions().iterator();
@@ -442,6 +446,22 @@ public ArrayList populateTransitions(LearningDesign design){
 		}
 		return transitions;
 	}
+	
+	public ArrayList populateCompetences(LearningDesign design){
+		ArrayList<CompetenceDTO> competenceDTOs = new ArrayList<CompetenceDTO>();
+		if(design.getCompetences()!=null){
+			Iterator iterator = design.getCompetences().iterator();
+			while(iterator.hasNext()){
+				Competence competence  = (Competence) iterator.next();
+				CompetenceDTO competenceDTO = new CompetenceDTO(competence);
+				competenceDTOs.add(competenceDTO);
+			}
+		}
+		return competenceDTOs;
+	}
+	
+	
+	
 	public ArrayList getTransitions(){
 		return this.transitions;
 	}	
@@ -683,4 +703,13 @@ public ArrayList populateTransitions(LearningDesign design){
 	public void setBranchMappings(ArrayList branchMappings) {
 		this.branchMappings = branchMappings;
 	}
+	
+	public ArrayList getCompetences() {
+		return competences;
+	}
+	
+	public void setCompetences(ArrayList competences) {
+		this.competences = competences;
+	}
+   
 }

@@ -28,10 +28,12 @@ import java.util.Date;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.HashSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
+import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
@@ -58,7 +60,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
     /** List of sessions associated with this ToolActivity */
     private Set toolSessions;
     
-   
+    private Set<CompetenceMapping> competenceMappings;
        
     /** full constructor */
     public ToolActivity(Long activityId,
@@ -84,7 +86,8 @@ public class ToolActivity extends SimpleActivity implements Serializable
 			Set inputActivities,
             Tool tool,
             Long toolContentId,
-            Set branchActivityEntries)
+            Set branchActivityEntries,
+            Set competenceMappings)
     {
         super(activityId,
                 id,
@@ -110,6 +113,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
     			branchActivityEntries);
         this.tool = tool;
         this.toolContentId = toolContentId;
+        this.competenceMappings = competenceMappings;
         super.simpleActivityStrategy = new ToolActivityStrategy(this);
     }
     
@@ -156,7 +160,18 @@ public class ToolActivity extends SimpleActivity implements Serializable
     	ToolActivity newToolActivity = new ToolActivity();
     	copyToNewActivity(newToolActivity, uiidOffset);
 		newToolActivity.setTool(this.getTool());
-		newToolActivity.setToolContentId(this.getToolContentId());    	
+		newToolActivity.setToolContentId(this.getToolContentId());  
+		
+		Set<CompetenceMapping> newCompetenceMappings = new HashSet();
+		for (CompetenceMapping compMap : this.competenceMappings)
+		{
+			CompetenceMapping newComp = new CompetenceMapping();
+			newComp.setCompetence(compMap.getCompetence());
+			newComp.setToolActivity(compMap.getToolActivity());
+			newCompetenceMappings.add(compMap);
+		}
+		newToolActivity.setCompetenceMappings(newCompetenceMappings);
+		
     	return newToolActivity;
     }    
     
@@ -300,8 +315,24 @@ public class ToolActivity extends SimpleActivity implements Serializable
 	public void setToolSessions(Set toolSessions) {
 		this.toolSessions = toolSessions;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Set<CompetenceMapping> getCompetenceMappings() {
+		return competenceMappings;
+	}
 
-    /**
+	/**
+	 * 
+	 * @param competenceMappings
+	 */
+	public void setCompetenceMappings(Set<CompetenceMapping> competenceMappings) {
+		this.competenceMappings = competenceMappings;
+	}
+
+	/**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
     public boolean isNull()
@@ -317,5 +348,7 @@ public class ToolActivity extends SimpleActivity implements Serializable
 	protected void getToolActivitiesInActivity(SortedSet toolActivities) {
         toolActivities.add(this);
 	}
+	
+	
 	
 }

@@ -52,6 +52,8 @@
 				<value>org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>				
 				<value>org/lamsfoundation/lams/learningdesign/Grouping.hbm.xml</value>
 				<value>org/lamsfoundation/lams/learningdesign/LearningDesign.hbm.xml</value>
+				<value>org/lamsfoundation/lams/learningdesign/Competence.hbm.xml</value>
+				<value>org/lamsfoundation/lams/learningdesign/CompetenceMapping.hbm.xml</value>
 				<value>org/lamsfoundation/lams/learningdesign/LearningLibrary.hbm.xml</value>	
 				<value>org/lamsfoundation/lams/learningdesign/Transition.hbm.xml</value>	
 				<value>org/lamsfoundation/lams/learningdesign/License.hbm.xml</value>	
@@ -359,6 +361,14 @@
 	
 	<!--  Configuration related beans -->
 	<bean id="configurationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Competence related beans -->
+	<bean id="competenceDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	<bean id="competenceMappingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceMappingDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	

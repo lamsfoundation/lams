@@ -127,7 +127,7 @@ public class AuthoringAction extends LamsDispatchAction{
 		try {
 			Long learningDesignID = WebUtil.readLongParam(request,"learningDesignID",false);
 			wddxPacket = authoringService.getLearningDesignDetails(learningDesignID, getUserLanguage());
-			log.debug("Import LD wddx packet: " + wddxPacket);
+			log.debug("LD wddx packet: " + wddxPacket);			
 		} catch (Exception e) {
 			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService, true).serializeMessage();
 		}

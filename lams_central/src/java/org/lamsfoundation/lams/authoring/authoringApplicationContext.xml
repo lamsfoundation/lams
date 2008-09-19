@@ -26,6 +26,8 @@
 		<property name="learningLibraryDAO"><ref bean="learningLibraryDAO"/></property>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="competenceDAO"><ref bean="competenceDAO"/></property>
+		<property name="competenceMappingDAO"><ref bean="competenceMappingDAO"/></property>
 		<property name="transitionDAO"><ref bean="transitionDAO"/></property>
 		<property name="toolDAO"><ref bean="toolDAO"/></property>
 		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
@@ -46,6 +48,8 @@
 		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
+		<property name="competenceDAO"><ref bean="competenceDAO"/></property>
+		<property name="competenceMappingDAO"><ref bean="competenceMappingDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>
@@ -54,6 +58,7 @@
 		<property name="lessonService"><ref bean="lessonService"/></property>
 		<property name="monitoringService"><ref bean="monitoringService"/></property>
 		<property name="workspaceManagementService"><ref bean="workspaceManagementService"/></property>
+		
 	</bean>
 	
 	<bean id="authoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

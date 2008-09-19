@@ -182,6 +182,7 @@ public class LearningDesignService implements ILearningDesignService{
 				log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId() + " does not have a template activity");
 			}
 			// convert library to DTO format
+
 			LearningLibraryDTO libraryDTO = learningLibrary.getLearningLibraryDTO(templateActivities, languageCode);
 			internationaliseActivities(libraryDTO.getTemplateActivities());
 			libraries.add(libraryDTO);

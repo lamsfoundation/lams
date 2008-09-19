@@ -128,6 +128,9 @@ public class LearningDesign implements Serializable {
 
 	/** persistent field */
 	private Set activities;
+	
+	/** persistent field */
+	private Set<Competence> competences;
 
 	/** persistent field */
 	private WorkspaceFolder workspaceFolder;
@@ -277,7 +280,7 @@ public class LearningDesign implements Serializable {
 		newDesign.setLicense(design.getLicense());
 		newDesign.setLicenseText(design.getLicenseText());
 		newDesign.setLastModifiedDateTime(new Date());
-				
+		
 		if(designCopyType.intValue()!=COPY_TYPE_NONE)
 			newDesign.setReadOnly(new Boolean(true));
 		else
@@ -553,6 +556,16 @@ public class LearningDesign implements Serializable {
    public static Integer addOffset(Integer uiid, int uiidOffset) {
     	return uiid != null && uiidOffset > 0 ? new Integer(uiid.intValue() + uiidOffset) : uiid;
    	}
+
+	public Set<Competence> getCompetences() {
+		return competences;
+	}
+	
+	public void setCompetences(Set<Competence> competences) {
+		this.competences = competences;
+	}
+   
+   
 
 
 }
