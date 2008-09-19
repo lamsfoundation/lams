@@ -66,6 +66,14 @@ class EventNotificationService implements IEventNotificationService {
 	 * Quartz scheduler used for resending messages.
 	 */
 	private Scheduler scheduler;
+	/**
+	 * Name of the Quartz job that resends messages.
+	 */
+	private final static String RESEND_MESSAGES_JOB_NAME = "Resend Messages Job";
+	/**
+	 * Name of the Quartz trigger that resends messages.
+	 */
+	private final static String RESEND_MESSAGES_TRIGGER_NAME = "Resend Messages Job";
 
 	/**
 	 * Default constructor. Should be called only once, since this class in a singleton.
@@ -76,19 +84,20 @@ class EventNotificationService implements IEventNotificationService {
 			EventNotificationService.instance = this;
 			this.scheduler = scheduler;
 			EventNotificationService.availableDeliveryMethods.add(IEventNotificationService.DELIVERY_METHOD_MAIL);
-
-			JobDetail resendMessagesJobDetail = new JobDetail("Resend Messages Job", Scheduler.DEFAULT_GROUP,
-					ResendMessagesJob.class);
-			resendMessagesJobDetail.setDescription("");
-			Trigger resendMessageTrigger = new SimpleTrigger("Resend Messages Job trigger", Scheduler.DEFAULT_GROUP,
-					SimpleTrigger.REPEAT_INDEFINITELY, EventNotificationService.RESEND_FREQUENCY);
-
 			try {
+				JobDetail resendMessagesJobDetail = getScheduler().getJobDetail(
+						EventNotificationService.RESEND_MESSAGES_JOB_NAME, Scheduler.DEFAULT_GROUP);
+				if (resendMessagesJobDetail == null) {
+					resendMessagesJobDetail = new JobDetail(EventNotificationService.RESEND_MESSAGES_JOB_NAME,
+							Scheduler.DEFAULT_GROUP, ResendMessagesJob.class);
+					resendMessagesJobDetail.setDescription("");
+					Trigger resendMessageTrigger = new SimpleTrigger(EventNotificationService.RESEND_MESSAGES_TRIGGER_NAME,
+							Scheduler.DEFAULT_GROUP, SimpleTrigger.REPEAT_INDEFINITELY, EventNotificationService.RESEND_FREQUENCY);
+					getScheduler().scheduleJob(resendMessagesJobDetail, resendMessageTrigger);
+				}
 				getScheduler().start();
-				getScheduler().scheduleJob(resendMessagesJobDetail, resendMessageTrigger);
 			}
 			catch (SchedulerException e) {
-
 				EventNotificationService.log.error(e.getMessage());
 			}
 		}
