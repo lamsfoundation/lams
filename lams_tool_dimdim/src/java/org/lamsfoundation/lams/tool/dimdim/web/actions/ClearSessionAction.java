@@ -20,8 +20,8 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $Id$ */
+
 package org.lamsfoundation.lams.tool.dimdim.web.actions;
 
 import javax.servlet.http.HttpSession;
@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  * 
  * @author Steve.Ni
  * 
- * ----------------XDoclet Tags--------------------
+ *         ----------------XDoclet Tags--------------------
  * 
  * @struts:action path="/clearsession" validate="false"
  * 

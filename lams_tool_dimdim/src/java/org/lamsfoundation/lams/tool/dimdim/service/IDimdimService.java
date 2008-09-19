@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.service;
 
@@ -167,7 +167,7 @@ public interface IDimdimService {
 	 * @param value
 	 */
 	void saveOrUpdateConfigEntry(DimdimConfig dimdimConfig);
-	
+
 	/**
 	 * 
 	 * @param userDTO
@@ -175,15 +175,16 @@ public interface IDimdimService {
 	 * @param topic
 	 * @return
 	 */
-	String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey, String topic) throws Exception;
-	
+	String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey,
+			String topic) throws Exception;
+
 	/**
 	 * 
 	 * @param userDTOm
 	 * @param meetingKey
 	 * @return
 	 */
-	String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey) throws Exception;
-	
-	
+	String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey)
+			throws Exception;
+
 }

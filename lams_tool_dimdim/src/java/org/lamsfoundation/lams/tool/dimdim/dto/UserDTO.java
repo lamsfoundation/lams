@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.dto;

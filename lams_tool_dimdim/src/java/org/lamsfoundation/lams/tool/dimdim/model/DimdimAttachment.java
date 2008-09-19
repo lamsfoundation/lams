@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.model;
 
@@ -46,7 +46,7 @@ public class DimdimAttachment implements java.io.Serializable, Cloneable {
 			.getLogger(DimdimAttachment.class);
 
 	// Fields
-	
+
 	private Long uid;
 
 	private Long fileVersionId;
@@ -158,6 +158,7 @@ public class DimdimAttachment implements java.io.Serializable, Cloneable {
 
 	/**
 	 * @hibernate.many-to-one not-null="true"
+	 *                        foreign-key="fk_laddim10_dimdim_attachment_to_dimdim"
 	 * @hibernate.column name="dimdim_uid"
 	 * 
 	 */

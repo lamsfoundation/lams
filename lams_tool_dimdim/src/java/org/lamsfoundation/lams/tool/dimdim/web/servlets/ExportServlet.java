@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.web.servlets;
@@ -31,21 +30,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.dimdim.dto.ContentDTO;
-import org.lamsfoundation.lams.tool.dimdim.dto.NotebookEntryDTO;
-import org.lamsfoundation.lams.tool.dimdim.dto.SessionDTO;
-import org.lamsfoundation.lams.tool.dimdim.dto.UserDTO;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
-import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
-import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 import org.lamsfoundation.lams.tool.dimdim.util.DimdimException;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class ExportServlet extends AbstractExportPortfolioServlet {

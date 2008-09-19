@@ -20,14 +20,14 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 
 /**
- * DAO for accessing the Dimdim objects - interface defining methods to be
+ * DAO for accessing the DimdimConfig objects - interface defining methods to be
  * implemented by the Hibernate or other implementation.
  */
 public interface IDimdimConfigDAO extends IBaseDAO {

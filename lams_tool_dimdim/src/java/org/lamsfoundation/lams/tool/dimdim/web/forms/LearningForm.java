@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.web.forms;
@@ -38,7 +37,7 @@ public class LearningForm extends ActionForm {
 	private static final long serialVersionUID = -4728946254882237144L;
 
 	// Fields
-	
+
 	private String title;
 
 	private String instructions;

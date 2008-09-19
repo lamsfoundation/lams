@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.dao;
 
@@ -31,5 +31,5 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
  * implemented by the Hibernate or other implementation.
  */
 public interface IDimdimDAO extends IBaseDAO {
-	
+
 }

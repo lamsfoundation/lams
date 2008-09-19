@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.model;
 
@@ -32,20 +32,20 @@ public class DimdimConfig {
 	private Long uid;
 
 	private String key;
-	
+
 	private String value;
-	
+
 	/**
 	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
 	 */
 	public Long getUid() {
 		return uid;
 	}
-	
+
 	public void setUid(Long uid) {
 		this.uid = uid;
 	}
-	
+
 	/**
 	 * @hibernate.property column="config_key"
 	 * @return
@@ -57,7 +57,7 @@ public class DimdimConfig {
 	public void setKey(String key) {
 		this.key = key;
 	}
-	
+
 	/**
 	 * @hibernate.property column="config_value"
 	 * @return

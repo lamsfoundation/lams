@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.dao.hibernate;
 
@@ -31,4 +31,5 @@ import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimSessionDAO;
  * DAO for accessing the DimdimSession objects - Hibernate specific code.
  */
 public class DimdimSessionDAO extends BaseDAO implements IDimdimSessionDAO {
+
 }

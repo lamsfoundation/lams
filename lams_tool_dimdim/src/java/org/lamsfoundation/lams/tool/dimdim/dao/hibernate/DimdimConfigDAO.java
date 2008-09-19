@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.dao.hibernate;
 
@@ -28,8 +28,8 @@ import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimConfigDAO;
 
 /**
- * DAO for accessing the Dimdim objects - Hibernate specific code.
+ * DAO for accessing the DimdimConfig objects - Hibernate specific code.
  */
 public class DimdimConfigDAO extends BaseDAO implements IDimdimConfigDAO {
-	
+
 }

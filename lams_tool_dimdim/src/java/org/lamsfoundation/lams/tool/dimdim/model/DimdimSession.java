@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.model;
 
@@ -44,7 +44,7 @@ public class DimdimSession implements java.io.Serializable {
 	private static final long serialVersionUID = 4407078136514639026L;
 
 	// Fields
-	
+
 	private Long uid;
 
 	private Date sessionEndDate;
@@ -60,13 +60,13 @@ public class DimdimSession implements java.io.Serializable {
 	private Dimdim dimdim;
 
 	private Set<DimdimUser> dimdimUsers;
-	
+
 	private String topic;
 
 	private String meetingKey;
 
 	private Integer maxAttendeeMikes;
-	
+
 	// Constructors
 
 	/** default constructor */
@@ -167,6 +167,7 @@ public class DimdimSession implements java.io.Serializable {
 
 	/**
 	 * @hibernate.many-to-one not-null="true"
+	 *                        foreign-key="fk_laddim10_dimdim_session_to_dimdim"
 	 * @hibernate.column name="dimdim_uid"
 	 * 
 	 */
@@ -182,7 +183,8 @@ public class DimdimSession implements java.io.Serializable {
 	/**
 	 * @hibernate.set lazy="true" inverse="true" cascade="none"
 	 * @hibernate.collection-key column="dimdim_session_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.dimdim.model.DimdimUser"
+	 * @hibernate.collection-one-to-many 
+	 *                                   class="org.lamsfoundation.lams.tool.dimdim.model.DimdimUser"
 	 * 
 	 */
 
@@ -229,7 +231,7 @@ public class DimdimSession implements java.io.Serializable {
 	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
 		this.maxAttendeeMikes = maxAttendeeMikes;
 	}
-	
+
 	/**
 	 * toString
 	 * 

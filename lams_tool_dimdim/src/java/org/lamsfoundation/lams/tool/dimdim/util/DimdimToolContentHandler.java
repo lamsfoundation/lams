@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.util;
 
@@ -49,7 +49,8 @@ public class DimdimToolContentHandler extends ToolContentHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
+	 * @seeorg.lamsfoundation.lams.contentrepository.client.ToolContentHandler#
+	 * getRepositoryWorkspaceName()
 	 */
 	public String getRepositoryWorkspaceName() {
 		return repositoryWorkspaceName;
@@ -58,7 +59,8 @@ public class DimdimToolContentHandler extends ToolContentHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
+	 * @seeorg.lamsfoundation.lams.contentrepository.client.ToolContentHandler#
+	 * getRepositoryUser()
 	 */
 	public String getRepositoryUser() {
 		return repositoryUser;
@@ -67,7 +69,8 @@ public class DimdimToolContentHandler extends ToolContentHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
+	 * @seeorg.lamsfoundation.lams.contentrepository.client.ToolContentHandler#
+	 * getRepositoryId()
 	 */
 	public char[] getRepositoryId() {
 		return repositoryId;

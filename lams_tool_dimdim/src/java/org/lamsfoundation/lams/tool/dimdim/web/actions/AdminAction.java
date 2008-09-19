@@ -20,14 +20,13 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.web.actions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -55,7 +54,7 @@ public class AdminAction extends MappingDispatchAction {
 
 	private IDimdimService dimdimService;
 
-	private static final Logger logger = Logger.getLogger(AdminAction.class);
+	// private static final Logger logger = Logger.getLogger(AdminAction.class);
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form,

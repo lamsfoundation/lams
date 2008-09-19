@@ -20,24 +20,16 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $Id$ */
+/* $Id: */
 
-package org.lamsfoundation.lams.tool.dimdim.dao;
+package org.lamsfoundation.lams.tool.dimdim.util;
 
-import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
+import java.util.Random;
 
-/**
- * DAO for accessing the DimdimUser objects - interface defining methods to be
- * implemented by the Hibernate or other implementation.
- */
-public interface IDimdimUserDAO extends IBaseDAO {
+public class DimdimUtil {
 
-	/**
-	 * 
-	 * @param userId
-	 * @param toolSessionId
-	 * @return
-	 */
-	DimdimUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
+	public static String generateMeetingKey() {
+		return new Long(System.currentTimeMillis()).toString() + "-"
+				+ (new Random().nextInt());
+	}
 }

@@ -20,7 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.web.forms;
@@ -35,7 +34,6 @@ import org.apache.struts.action.ActionMapping;
 /**
  * @struts.form name="adminForm"
  * @author Anthony Sukkar
-
  */
 public class AdminForm extends ActionForm {
 

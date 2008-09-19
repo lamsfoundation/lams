@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.dimdim.model;
 
@@ -40,7 +40,7 @@ public class DimdimUser implements java.io.Serializable {
 	private static final long serialVersionUID = -3701664859818409197L;
 
 	// Persistent Fields
-	
+
 	private Long uid;
 
 	private Long userId;
@@ -154,6 +154,7 @@ public class DimdimUser implements java.io.Serializable {
 
 	/**
 	 * @hibernate.many-to-one not-null="true"
+	 *                        foreign-key="fk_laddim10_dimdim_user_to_dimdim_session"
 	 * @hibernate.column name="dimdim_session_uid"
 	 * 
 	 */
