@@ -1,21 +1,20 @@
-/****************************************************************
+/*******************************************************************************
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
- * =============================================================
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * ============================================================= License
+ * Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation.
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License version 2.0 as published by the
+ * Free Software Foundation.
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
- * USA
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * 
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
@@ -45,10 +44,12 @@ import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Competence;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.License;
@@ -191,9 +192,12 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	/** Constructor to be used if Spring method injection is not used */
-	public ObjectExtractor(IBaseDAO baseDAO, ILearningDesignDAO learningDesignDAO, IActivityDAO activityDAO,
-			ILearningLibraryDAO learningLibraryDAO, ILicenseDAO licenseDAO, IGroupingDAO groupingDAO, IToolDAO toolDAO,
-			ISystemToolDAO systemToolDAO, IGroupDAO groupDAO, ITransitionDAO transitionDAO, IToolSessionDAO toolSessionDAO) {
+	public ObjectExtractor(IBaseDAO baseDAO,
+			ILearningDesignDAO learningDesignDAO, IActivityDAO activityDAO,
+			ILearningLibraryDAO learningLibraryDAO, ILicenseDAO licenseDAO,
+			IGroupingDAO groupingDAO, IToolDAO toolDAO,
+			ISystemToolDAO systemToolDAO, IGroupDAO groupDAO,
+			ITransitionDAO transitionDAO, IToolSessionDAO toolSessionDAO) {
 		this.baseDAO = baseDAO;
 		this.learningDesignDAO = learningDesignDAO;
 		this.activityDAO = activityDAO;
@@ -229,7 +233,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		return competenceMappingDAO;
 	}
 
-	public void setCompetenceMappingDAO(ICompetenceMappingDAO competenceMappingDAO) {
+	public void setCompetenceMappingDAO(
+			ICompetenceMappingDAO competenceMappingDAO) {
 		this.competenceMappingDAO = competenceMappingDAO;
 	}
 
@@ -325,7 +330,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		return branchActivityEntryDAO;
 	}
 
-	public void setBranchActivityEntryDAO(IBranchActivityEntryDAO branchActivityEntryDAO) {
+	public void setBranchActivityEntryDAO(
+			IBranchActivityEntryDAO branchActivityEntryDAO) {
 		this.branchActivityEntryDAO = branchActivityEntryDAO;
 	}
 
@@ -334,25 +340,33 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * 
 	 * @see org.lamsfoundation.lams.authoring.IObjectExtractor#extractSaveLearningDesign(java.util.Hashtable)
 	 */
-	public LearningDesign extractSaveLearningDesign(Hashtable table, LearningDesign existingLearningDesign,
-			WorkspaceFolder workspaceFolder, User user) throws WDDXProcessorConversionException, ObjectExtractorException {
+	public LearningDesign extractSaveLearningDesign(Hashtable table,
+			LearningDesign existingLearningDesign,
+			WorkspaceFolder workspaceFolder, User user)
+			throws WDDXProcessorConversionException, ObjectExtractorException {
 
 		// if the learningDesign already exists, update it, otherwise create a
 		// new one.
-		learningDesign = existingLearningDesign != null ? existingLearningDesign : new LearningDesign();
+		learningDesign = existingLearningDesign != null ? existingLearningDesign
+				: new LearningDesign();
 
 		// Check the copy type. Can only update it if it is COPY_TYPE_NONE (ie
 		// authoring copy)
-		Integer copyTypeID = WDDXProcessor.convertToInteger(table, WDDXTAGS.COPY_TYPE);
+		Integer copyTypeID = WDDXProcessor.convertToInteger(table,
+				WDDXTAGS.COPY_TYPE);
 		if (copyTypeID == null) {
 			copyTypeID = LearningDesign.COPY_TYPE_NONE;
 		}
 		if (learningDesign != null && learningDesign.getCopyTypeID() != null
-				&& !learningDesign.getCopyTypeID().equals(copyTypeID) && !learningDesign.getEditOverrideLock()) {
-			throw new ObjectExtractorException("Unable to save learning design.  Cannot change copy type on existing design.");
+				&& !learningDesign.getCopyTypeID().equals(copyTypeID)
+				&& !learningDesign.getEditOverrideLock()) {
+			throw new ObjectExtractorException(
+					"Unable to save learning design.  Cannot change copy type on existing design.");
 		}
-		if (!copyTypeID.equals(LearningDesign.COPY_TYPE_NONE) && !learningDesign.getEditOverrideLock()) {
-			throw new ObjectExtractorException("Unable to save learning design.  Learning design is read-only");
+		if (!copyTypeID.equals(LearningDesign.COPY_TYPE_NONE)
+				&& !learningDesign.getEditOverrideLock()) {
+			throw new ObjectExtractorException(
+					"Unable to save learning design.  Learning design is read-only");
 		}
 		learningDesign.setCopyTypeID(copyTypeID);
 
@@ -378,52 +392,67 @@ public class ObjectExtractor implements IObjectExtractor {
 		// get the core learning design stuff - default to invalid
 		learningDesign.setValidDesign(Boolean.FALSE);
 		if (keyExists(table, WDDXTAGS.LEARNING_DESIGN_UIID)) {
-			learningDesign.setLearningDesignUIID(WDDXProcessor.convertToInteger(table, WDDXTAGS.LEARNING_DESIGN_UIID));
+			learningDesign.setLearningDesignUIID(WDDXProcessor
+					.convertToInteger(table, WDDXTAGS.LEARNING_DESIGN_UIID));
 		}
 		if (keyExists(table, WDDXTAGS.DESCRIPTION)) {
-			learningDesign.setDescription(WDDXProcessor.convertToString(table, WDDXTAGS.DESCRIPTION));
+			learningDesign.setDescription(WDDXProcessor.convertToString(table,
+					WDDXTAGS.DESCRIPTION));
 		}
 		if (keyExists(table, WDDXTAGS.TITLE)) {
-			learningDesign.setTitle(WDDXProcessor.convertToString(table, WDDXTAGS.TITLE));
+			learningDesign.setTitle(WDDXProcessor.convertToString(table,
+					WDDXTAGS.TITLE));
 		}
 		if (keyExists(table, WDDXTAGS.MAX_ID)) {
-			learningDesign.setMaxID(WDDXProcessor.convertToInteger(table, WDDXTAGS.MAX_ID));
+			learningDesign.setMaxID(WDDXProcessor.convertToInteger(table,
+					WDDXTAGS.MAX_ID));
 		}
 		if (keyExists(table, WDDXTAGS.VALID_DESIGN)) {
-			learningDesign.setValidDesign(WDDXProcessor.convertToBoolean(table, WDDXTAGS.VALID_DESIGN));
+			learningDesign.setValidDesign(WDDXProcessor.convertToBoolean(table,
+					WDDXTAGS.VALID_DESIGN));
 		}
 		if (keyExists(table, WDDXTAGS.READ_ONLY)) {
-			learningDesign.setReadOnly(WDDXProcessor.convertToBoolean(table, WDDXTAGS.READ_ONLY));
+			learningDesign.setReadOnly(WDDXProcessor.convertToBoolean(table,
+					WDDXTAGS.READ_ONLY));
 		}
 		if (keyExists(table, WDDXTAGS.EDIT_OVERRIDE_LOCK)) {
-			learningDesign.setEditOverrideLock(WDDXProcessor.convertToBoolean(table, WDDXTAGS.EDIT_OVERRIDE_LOCK));
+			learningDesign.setEditOverrideLock(WDDXProcessor.convertToBoolean(
+					table, WDDXTAGS.EDIT_OVERRIDE_LOCK));
 		}
 		if (keyExists(table, WDDXTAGS.DATE_READ_ONLY)) {
-			learningDesign.setDateReadOnly(WDDXProcessor.convertToDate(table, WDDXTAGS.DATE_READ_ONLY));
+			learningDesign.setDateReadOnly(WDDXProcessor.convertToDate(table,
+					WDDXTAGS.DATE_READ_ONLY));
 		}
 		if (keyExists(table, WDDXTAGS.OFFLINE_INSTRUCTIONS)) {
-			learningDesign.setOfflineInstructions(WDDXProcessor.convertToString(table, WDDXTAGS.OFFLINE_INSTRUCTIONS));
+			learningDesign.setOfflineInstructions(WDDXProcessor
+					.convertToString(table, WDDXTAGS.OFFLINE_INSTRUCTIONS));
 		}
 		if (keyExists(table, WDDXTAGS.ONLINE_INSTRUCTIONS)) {
-			learningDesign.setOnlineInstructions(WDDXProcessor.convertToString(table, WDDXTAGS.ONLINE_INSTRUCTIONS));
+			learningDesign.setOnlineInstructions(WDDXProcessor.convertToString(
+					table, WDDXTAGS.ONLINE_INSTRUCTIONS));
 		}
 		if (keyExists(table, WDDXTAGS.HELP_TEXT)) {
-			learningDesign.setHelpText(WDDXProcessor.convertToString(table, WDDXTAGS.HELP_TEXT));
+			learningDesign.setHelpText(WDDXProcessor.convertToString(table,
+					WDDXTAGS.HELP_TEXT));
 		}
 		// don't receive version from flash anymore(it was hardcoded). Get it
 		// from lams configuration database.
-		learningDesign.setVersion(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
+		learningDesign.setVersion(Configuration
+				.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
 
 		if (keyExists(table, WDDXTAGS.DURATION)) {
-			learningDesign.setDuration(WDDXProcessor.convertToLong(table, WDDXTAGS.DURATION));
+			learningDesign.setDuration(WDDXProcessor.convertToLong(table,
+					WDDXTAGS.DURATION));
 		}
 
 		if (keyExists(table, WDDXTAGS.DURATION)) {
-			learningDesign.setDuration(WDDXProcessor.convertToLong(table, WDDXTAGS.DURATION));
+			learningDesign.setDuration(WDDXProcessor.convertToLong(table,
+					WDDXTAGS.DURATION));
 		}
 
 		if (keyExists(table, WDDXTAGS.CONTENT_FOLDER_ID)) {
-			learningDesign.setContentFolderID(WDDXProcessor.convertToString(table, WDDXTAGS.CONTENT_FOLDER_ID));
+			learningDesign.setContentFolderID(WDDXProcessor.convertToString(
+					table, WDDXTAGS.CONTENT_FOLDER_ID));
 		}
 
 		if (keyExists(table, WDDXTAGS.SAVE_MODE)) {
@@ -438,7 +467,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		learningDesign.setLastModifiedDateTime(modificationDate);
 
 		if (keyExists(table, WDDXTAGS.LICENCE_ID)) {
-			Long licenseID = WDDXProcessor.convertToLong(table, WDDXTAGS.LICENCE_ID);
+			Long licenseID = WDDXProcessor.convertToLong(table,
+					WDDXTAGS.LICENCE_ID);
 			if (licenseID != null) {
 				License license = licenseDAO.getLicenseByID(licenseID);
 				learningDesign.setLicense(license);
@@ -448,13 +478,16 @@ public class ObjectExtractor implements IObjectExtractor {
 			}
 		}
 		if (keyExists(table, WDDXTAGS.LICENSE_TEXT)) {
-			learningDesign.setLicenseText(WDDXProcessor.convertToString(table, WDDXTAGS.LICENSE_TEXT));
+			learningDesign.setLicenseText(WDDXProcessor.convertToString(table,
+					WDDXTAGS.LICENSE_TEXT));
 		}
 
 		if (keyExists(table, WDDXTAGS.ORIGINAL_DESIGN_ID)) {
-			Long parentLearningDesignID = WDDXProcessor.convertToLong(table, WDDXTAGS.ORIGINAL_DESIGN_ID);
+			Long parentLearningDesignID = WDDXProcessor.convertToLong(table,
+					WDDXTAGS.ORIGINAL_DESIGN_ID);
 			if (parentLearningDesignID != null) {
-				LearningDesign parent = learningDesignDAO.getLearningDesignById(parentLearningDesignID);
+				LearningDesign parent = learningDesignDAO
+						.getLearningDesignById(parentLearningDesignID);
 				learningDesign.setOriginalLearningDesign(parent);
 			}
 			else {
@@ -465,16 +498,19 @@ public class ObjectExtractor implements IObjectExtractor {
 		learningDesignDAO.insertOrUpdate(learningDesign);
 
 		// now process the "parts" of the learning design
-		parseCompetences((Vector) table.get(WDDXTAGS.COMPETENCES), learningDesign);
+		parseCompetences((Vector) table.get(WDDXTAGS.COMPETENCES),
+				learningDesign);
 		parseGroupings((Vector) table.get(WDDXTAGS.GROUPINGS));
 		parseActivities((Vector) table.get(WDDXTAGS.ACTIVITIES));
-		parseActivitiesToMatchUpParentandInputActivities((Vector) table.get(WDDXTAGS.ACTIVITIES));
+		parseActivitiesToMatchUpParentandInputActivities((Vector) table
+				.get(WDDXTAGS.ACTIVITIES));
 		parseTransitions((Vector) table.get(WDDXTAGS.TRANSITIONS));
 		parseBranchMappings((Vector) table.get(WDDXTAGS.BRANCH_MAPPINGS));
 		parseCompetenceMappings((Vector) table.get(WDDXTAGS.ACTIVITIES));
 		progressDefaultChildActivities();
 
-		learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
+		learningDesign
+				.setFirstActivity(learningDesign.calculateFirstActivity());
 		learningDesignDAO.insertOrUpdate(learningDesign);
 		deleteUnwantedGroupings();
 		deleteUnwantedToolSessions(learningDesign);
@@ -491,15 +527,19 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * 
 	 * @throws WDDXProcessorConversionException
 	 */
-	private void progressDefaultChildActivities() throws WDDXProcessorConversionException {
+	private void progressDefaultChildActivities()
+			throws WDDXProcessorConversionException {
 
 		if (defaultActivityMap.size() > 0) {
 			for (Integer defaultChildUIID : defaultActivityMap.keySet()) {
-				ComplexActivity complex = defaultActivityMap.get(defaultChildUIID);
+				ComplexActivity complex = defaultActivityMap
+						.get(defaultChildUIID);
 				Activity defaultActivity = newActivityMap.get(defaultChildUIID);
 				if (defaultActivity == null) {
-					String msg = "Unable to find the default child activity (" + defaultChildUIID + ") for the activity ("
-							+ complex + ") referred to in First Child to Sequence map.";
+					String msg = "Unable to find the default child activity ("
+							+ defaultChildUIID + ") for the activity ("
+							+ complex
+							+ ") referred to in First Child to Sequence map.";
 					throw new WDDXProcessorConversionException(msg);
 				}
 				else {
@@ -507,26 +547,32 @@ public class ObjectExtractor implements IObjectExtractor {
 
 					// fix up the order ids for SequenceActivities
 					if (complex.isSequenceActivity()) {
-						Set unprocessedChildren = new TreeSet(new ActivityOrderComparator());
+						Set unprocessedChildren = new TreeSet(
+								new ActivityOrderComparator());
 						unprocessedChildren.addAll(complex.getActivities());
 
 						unprocessedChildren.remove(defaultActivity);
 						defaultActivity.setOrderId(1);
 
 						int nextOrderId = 2;
-						Activity nextActivity = defaultActivity.getTransitionFrom() != null ? defaultActivity.getTransitionFrom()
-								.getToActivity() : null;
+						Activity nextActivity = defaultActivity
+								.getTransitionFrom() != null ? defaultActivity
+								.getTransitionFrom().getToActivity() : null;
 						while (nextActivity != null) {
-							boolean removed = unprocessedChildren.remove(nextActivity);
+							boolean removed = unprocessedChildren
+									.remove(nextActivity);
 							if (!removed) {
 								log
 										.error("Next activity should be a child of the current sequence, but it isn't. Could we have a loop in the transitions? Aborting the ordering of ids based on transitions. Sequence activity "
-												+ complex + " next activity " + nextActivity);
+												+ complex
+												+ " next activity "
+												+ nextActivity);
 								break;
 							}
 							nextActivity.setOrderId(nextOrderId++);
-							nextActivity = nextActivity.getTransitionFrom() != null ? nextActivity.getTransitionFrom()
-									.getToActivity() : null;
+							nextActivity = nextActivity.getTransitionFrom() != null ? nextActivity
+									.getTransitionFrom().getToActivity()
+									: null;
 						}
 
 						if (unprocessedChildren.size() > 0) {
@@ -549,7 +595,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * db and before it is changed.
 	 */
 	private void initialiseGroupings() {
-		List dbGroupings = groupingDAO.getGroupingsByLearningDesign(learningDesign.getLearningDesignId());
+		List dbGroupings = groupingDAO
+				.getGroupingsByLearningDesign(learningDesign
+						.getLearningDesignId());
 		Iterator iter = dbGroupings.iterator();
 		while (iter.hasNext()) {
 			Grouping grouping = (Grouping) iter.next();
@@ -559,7 +607,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	private void intialiseBranchActivityMappings() {
-		oldbranchActivityEntryList = branchActivityEntryDAO.getEntriesByLearningDesign(learningDesign.getLearningDesignId());
+		oldbranchActivityEntryList = branchActivityEntryDAO
+				.getEntriesByLearningDesign(learningDesign
+						.getLearningDesignId());
 	}
 
 	/**
@@ -569,14 +619,17 @@ public class ObjectExtractor implements IObjectExtractor {
 	 */
 	@SuppressWarnings("unchecked")
 	private void initialiseToolSessionMap(LearningDesign learningDesign) {
-		if (learningDesign.getEditOverrideLock() && learningDesign.getEditOverrideUser() != null) {
+		if (learningDesign.getEditOverrideLock()
+				&& learningDesign.getEditOverrideUser() != null) {
 			Iterator iter = learningDesign.getActivities().iterator();
 			while (iter.hasNext()) {
 				Activity activity = (Activity) iter.next();
 				oldActivityMap.put(activity.getActivityUIID(), activity);
-				List<ToolSession> toolSessions = toolSessionDAO.getToolSessionByActivity(activity);
+				List<ToolSession> toolSessions = toolSessionDAO
+						.getToolSessionByActivity(activity);
 				if (toolSessions != null && toolSessions.size() > 0) {
-					toolSessionMap.put(activity.getActivityUIID(), toolSessions);
+					toolSessionMap
+							.put(activity.getActivityUIID(), toolSessions);
 				}
 			}
 		}
@@ -597,8 +650,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * grouped activity - either more than one tool session exists or the
 	 * activity is grouped, then abort.
 	 */
-	private void deleteUnwantedToolSessions(LearningDesign learningDesign) throws ObjectExtractorException {
-		if (learningDesign.getEditOverrideLock() && learningDesign.getEditOverrideUser() != null) {
+	private void deleteUnwantedToolSessions(LearningDesign learningDesign)
+			throws ObjectExtractorException {
+		if (learningDesign.getEditOverrideLock()
+				&& learningDesign.getEditOverrideUser() != null) {
 
 			for (Integer uiid : toolSessionMap.keySet()) {
 				if (!newActivityMap.containsKey(uiid)) {
@@ -616,7 +671,8 @@ public class ObjectExtractor implements IObjectExtractor {
 						}
 						else if (toolSessions.size() == 1) {
 
-							ToolSession toolSession = (ToolSession) toolSessions.get(0);
+							ToolSession toolSession = (ToolSession) toolSessions
+									.get(0);
 							if (activity.isGroupingActivity()) {
 								throw new ObjectExtractorException(
 										"Activity "
@@ -628,7 +684,8 @@ public class ObjectExtractor implements IObjectExtractor {
 
 							// all okay, do ahead and delete the tool session
 							if (log.isDebugEnabled()) {
-								log.debug("Removing tool session for activity " + activity.getTitle() + " ("
+								log.debug("Removing tool session for activity "
+										+ activity.getTitle() + " ("
 										+ activity.getActivityUIID() + ")");
 							}
 
@@ -651,7 +708,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @throws WDDXProcessorConversionException
 	 */
 
-	private void parseGroupings(List groupingsList) throws WDDXProcessorConversionException {
+	private void parseGroupings(List groupingsList)
+			throws WDDXProcessorConversionException {
 		// iterate through the list of groupings objects
 		// each object should contain information groupingUUID, groupingID,
 		// groupingTypeID
@@ -669,12 +727,16 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 	}
 
-	public Grouping extractGroupingObject(Hashtable groupingDetails) throws WDDXProcessorConversionException {
+	public Grouping extractGroupingObject(Hashtable groupingDetails)
+			throws WDDXProcessorConversionException {
 
-		Integer groupingUUID = WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.GROUPING_UIID);
-		Integer groupingTypeID = WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.GROUPING_TYPE_ID);
+		Integer groupingUUID = WDDXProcessor.convertToInteger(groupingDetails,
+				WDDXTAGS.GROUPING_UIID);
+		Integer groupingTypeID = WDDXProcessor.convertToInteger(
+				groupingDetails, WDDXTAGS.GROUPING_TYPE_ID);
 		if (groupingTypeID == null) {
-			throw new WDDXProcessorConversionException("groupingTypeID is missing");
+			throw new WDDXProcessorConversionException(
+					"groupingTypeID is missing");
 		}
 
 		Grouping grouping = groupings.get(groupingUUID);
@@ -696,7 +758,8 @@ public class ObjectExtractor implements IObjectExtractor {
 			grouping = (Grouping) object;
 
 			if (keyExists(groupingDetails, WDDXTAGS.GROUPING_UIID)) {
-				grouping.setGroupingUIID(WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.GROUPING_UIID));
+				grouping.setGroupingUIID(WDDXProcessor.convertToInteger(
+						groupingDetails, WDDXTAGS.GROUPING_UIID));
 			}
 		}
 
@@ -706,12 +769,18 @@ public class ObjectExtractor implements IObjectExtractor {
 		else if (grouping.isChosenGrouping()) {
 			createChosenGrouping((ChosenGrouping) grouping, groupingDetails);
 		}
+
+		else if (grouping.isLearnerChoiceGrouping()) {
+			createLearnerChoiceGrouping((LearnerChoiceGrouping) grouping,
+					groupingDetails);
+		}
 		else {
 			createLessonClass((LessonClass) grouping, groupingDetails);
 		}
 
 		if (keyExists(groupingDetails, WDDXTAGS.MAX_NUMBER_OF_GROUPS)) {
-			grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.MAX_NUMBER_OF_GROUPS));
+			grouping.setMaxNumberOfGroups(WDDXProcessor.convertToInteger(
+					groupingDetails, WDDXTAGS.MAX_NUMBER_OF_GROUPS));
 		}
 
 		Set<Group> groupsToDelete = new HashSet<Group>(grouping.getGroups());
@@ -732,9 +801,11 @@ public class ObjectExtractor implements IObjectExtractor {
 			while (iter.hasNext()) {
 				Group group = (Group) iter.next();
 				if (group.getBranchActivities() != null) {
-					Iterator branchIter = group.getBranchActivities().iterator();
+					Iterator branchIter = group.getBranchActivities()
+							.iterator();
 					while (branchIter.hasNext()) {
-						BranchActivityEntry entry = (BranchActivityEntry) branchIter.next();
+						BranchActivityEntry entry = (BranchActivityEntry) branchIter
+								.next();
 						entry.setGroup(null);
 					}
 					group.getBranchActivities().clear();
@@ -746,15 +817,19 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Group extractGroupObject(Hashtable groupDetails, Grouping grouping) throws WDDXProcessorConversionException {
+	private Group extractGroupObject(Hashtable groupDetails, Grouping grouping)
+			throws WDDXProcessorConversionException {
 
 		Group group = null;
-		Integer groupUIID = WDDXProcessor.convertToInteger(groupDetails, WDDXTAGS.GROUP_UIID);
+		Integer groupUIID = WDDXProcessor.convertToInteger(groupDetails,
+				WDDXTAGS.GROUP_UIID);
 		if (groupUIID == null) {
-			throw new WDDXProcessorConversionException("Group is missing its UUID. Group " + groupDetails + " grouping "
-					+ grouping);
+			throw new WDDXProcessorConversionException(
+					"Group is missing its UUID. Group " + groupDetails
+							+ " grouping " + grouping);
 		}
-		Long groupID = WDDXProcessor.convertToLong(groupDetails, WDDXTAGS.GROUP_ID);
+		Long groupID = WDDXProcessor.convertToLong(groupDetails,
+				WDDXTAGS.GROUP_ID);
 
 		// Does it exist already? If the group was created at runtime, there
 		// will be an ID but no IU ID field.
@@ -773,7 +848,8 @@ public class ObjectExtractor implements IObjectExtractor {
 				if (groupUIID.equals(possibleGroup.getGroupUIID())) {
 					uiid_match = possibleGroup;
 				}
-				if (groupID != null && groupID.equals(possibleGroup.getGroupId())) {
+				if (groupID != null
+						&& groupID.equals(possibleGroup.getGroupId())) {
 					id_match = possibleGroup;
 				}
 			}
@@ -785,12 +861,14 @@ public class ObjectExtractor implements IObjectExtractor {
 			grouping.getGroups().add(group);
 		}
 
-		group.setGroupName(WDDXProcessor.convertToString(groupDetails, WDDXTAGS.GROUP_NAME));
+		group.setGroupName(WDDXProcessor.convertToString(groupDetails,
+				WDDXTAGS.GROUP_NAME));
 		group.setGrouping(grouping);
 		group.setGroupUIID(groupUIID);
 
 		if (keyExists(groupDetails, WDDXTAGS.ORDER_ID)) {
-			group.setOrderId(WDDXProcessor.convertToInteger(groupDetails, WDDXTAGS.ORDER_ID));
+			group.setOrderId(WDDXProcessor.convertToInteger(groupDetails,
+					WDDXTAGS.ORDER_ID));
 		}
 		else {
 			group.setOrderId(0);
@@ -799,17 +877,19 @@ public class ObjectExtractor implements IObjectExtractor {
 		return group;
 	}
 
-	private void createRandomGrouping(RandomGrouping randomGrouping, Hashtable groupingDetails)
-			throws WDDXProcessorConversionException {
+	private void createRandomGrouping(RandomGrouping randomGrouping,
+			Hashtable groupingDetails) throws WDDXProcessorConversionException {
 		// the two settings are mutually exclusive. Flash takes care of this,
 		// but we'll code it here too just to make sure.
-		Integer numLearnersPerGroup = WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.LEARNERS_PER_GROUP);
+		Integer numLearnersPerGroup = WDDXProcessor.convertToInteger(
+				groupingDetails, WDDXTAGS.LEARNERS_PER_GROUP);
 		if (numLearnersPerGroup != null && numLearnersPerGroup.intValue() > 0) {
 			randomGrouping.setLearnersPerGroup(numLearnersPerGroup);
 			randomGrouping.setNumberOfGroups(null);
 		}
 		else {
-			Integer numGroups = WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.NUMBER_OF_GROUPS);
+			Integer numGroups = WDDXProcessor.convertToInteger(groupingDetails,
+					WDDXTAGS.NUMBER_OF_GROUPS);
 			if (numGroups != null && numGroups.intValue() > 0) {
 				randomGrouping.setNumberOfGroups(numGroups);
 			}
@@ -820,8 +900,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 	}
 
-	private void createChosenGrouping(ChosenGrouping chosenGrouping, Hashtable groupingDetails)
-			throws WDDXProcessorConversionException {
+	private void createChosenGrouping(ChosenGrouping chosenGrouping,
+			Hashtable groupingDetails) throws WDDXProcessorConversionException {
 		// no extra properties as yet
 	}
 
@@ -834,12 +914,13 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * list of current activities) are deleted.
 	 * 
 	 * @param activitiesList
-	 *                The list of activities from the WDDX packet.
+	 *            The list of activities from the WDDX packet.
 	 * @throws WDDXProcessorConversionException
 	 * @throws ObjectExtractorException
 	 */
 	@SuppressWarnings("unchecked")
-	private void parseActivities(List activitiesList) throws WDDXProcessorConversionException, ObjectExtractorException {
+	private void parseActivities(List activitiesList)
+			throws WDDXProcessorConversionException, ObjectExtractorException {
 
 		if (activitiesList != null) {
 			Iterator iterator = activitiesList.iterator();
@@ -873,12 +954,13 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * against the old set and the db is updated accordingly
 	 * 
 	 * @param activitiesList
-	 *                The list of activities from the WDDX packet.
+	 *            The list of activities from the WDDX packet.
 	 * @throws WDDXProcessorConversionException
 	 * @throws ObjectExtractorException
 	 */
 	@SuppressWarnings("unchecked")
-	private void parseCompetenceMappings(List activitiesList) throws WDDXProcessorConversionException, ObjectExtractorException {
+	private void parseCompetenceMappings(List activitiesList)
+			throws WDDXProcessorConversionException, ObjectExtractorException {
 
 		if (activitiesList != null) {
 			Iterator iterator = activitiesList.iterator();
@@ -888,7 +970,8 @@ public class ObjectExtractor implements IObjectExtractor {
 				// Check that this is a tool activity, otherwise continue to the
 				// next iteration
 				if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID)) {
-					int actType = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID);
+					int actType = WDDXProcessor.convertToInteger(
+							activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID);
 					if (actType != Activity.TOOL_ACTIVITY_TYPE) {
 						continue;
 					}
@@ -897,15 +980,18 @@ public class ObjectExtractor implements IObjectExtractor {
 				// Get the tool activity using the UIID and the learningDesignID
 				ToolActivity toolActivity = null;
 				if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_UIID)) {
-					toolActivity = (ToolActivity) activityDAO.getActivityByUIID(WDDXProcessor.convertToInteger(activityDetails,
-							WDDXTAGS.ACTIVITY_UIID), learningDesign);
+					toolActivity = (ToolActivity) activityDAO
+							.getActivityByUIID(WDDXProcessor.convertToInteger(
+									activityDetails, WDDXTAGS.ACTIVITY_UIID),
+									learningDesign);
 				}
 				else {
 					continue;
 				}
 
 				if (keyExists(activityDetails, WDDXTAGS.COMPETENCE_MAPPINGS)) {
-					List<String> competenceMappingsList = (Vector) activityDetails.get(WDDXTAGS.COMPETENCE_MAPPINGS);
+					List<String> competenceMappingsList = (Vector) activityDetails
+							.get(WDDXTAGS.COMPETENCE_MAPPINGS);
 
 					for (String competenceMappingEntry : competenceMappingsList) {
 
@@ -913,16 +999,19 @@ public class ObjectExtractor implements IObjectExtractor {
 
 							// First get the competence from the competence
 							// mapping entry in the hashtable
-							Competence competence = competenceDAO.getCompetence(toolActivity.getLearningDesign(),
-									competenceMappingEntry);
+							Competence competence = competenceDAO
+									.getCompetence(toolActivity
+											.getLearningDesign(),
+											competenceMappingEntry);
 							if (competence == null) {
 								continue;
 							}
 
 							// Now get the competence mapping using the tool
 							// activity and the competence as reference
-							CompetenceMapping competenceMapping = competenceMappingDAO.getCompetenceMapping(toolActivity,
-									competence);
+							CompetenceMapping competenceMapping = competenceMappingDAO
+									.getCompetenceMapping(toolActivity,
+											competence);
 
 							// Only save new competence mappings, no need to
 							// update existing
@@ -937,7 +1026,9 @@ public class ObjectExtractor implements IObjectExtractor {
 							}
 						}
 						else {
-							Competence competence = competenceDAO.getCompetence(learningDesign, competenceMappingEntry);
+							Competence competence = competenceDAO
+									.getCompetence(learningDesign,
+											competenceMappingEntry);
 							CompetenceMapping newMapping = new CompetenceMapping();
 							newMapping.setCompetence(competence);
 							newMapping.setToolActivity(toolActivity);
@@ -947,30 +1038,37 @@ public class ObjectExtractor implements IObjectExtractor {
 					}
 
 					// delete any pre-existing mappings that have been deleted
-					Set<CompetenceMapping> existingMappings = toolActivity.getCompetenceMappings();
+					Set<CompetenceMapping> existingMappings = toolActivity
+							.getCompetenceMappings();
 					if (existingMappings != null) {
 						Set<CompetenceMapping> removeCompetenceMappings = new HashSet();
-						if (competenceMappingsList != null && competenceMappingsList.size() > 0) {
+						if (competenceMappingsList != null
+								&& competenceMappingsList.size() > 0) {
 							for (CompetenceMapping competenceMapping : existingMappings) {
 								boolean remove = true;
 
 								for (String competenceMappingEntry : competenceMappingsList) {
-									if (competenceMappingEntry.equals(competenceMapping.getCompetence().getTitle())) {
+									if (competenceMappingEntry
+											.equals(competenceMapping
+													.getCompetence().getTitle())) {
 										remove = false;
 										break;
 									}
 								}
 
 								if (remove) {
-									removeCompetenceMappings.add(competenceMapping);
+									removeCompetenceMappings
+											.add(competenceMapping);
 								}
 							}
 						}
 						else {
 							removeCompetenceMappings.addAll(existingMappings);
 						}
-						competenceMappingDAO.deleteAll(removeCompetenceMappings);
-						toolActivity.getCompetenceMappings().removeAll(removeCompetenceMappings);
+						competenceMappingDAO
+								.deleteAll(removeCompetenceMappings);
+						toolActivity.getCompetenceMappings().removeAll(
+								removeCompetenceMappings);
 					}
 				}
 			}
@@ -986,22 +1084,25 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * appear in the list of current competences) are deleted.
 	 * 
 	 * @param activitiesList
-	 *                The list of activities from the WDDX packet.
+	 *            The list of activities from the WDDX packet.
 	 * @throws WDDXProcessorConversionException
 	 * @throws ObjectExtractorException
 	 */
 	@SuppressWarnings("unchecked")
-	private void parseCompetences(List<Hashtable> competenceList, LearningDesign learningDesign)
+	private void parseCompetences(List<Hashtable> competenceList,
+			LearningDesign learningDesign)
 			throws WDDXProcessorConversionException, ObjectExtractorException {
 
 		Set<Competence> existingCompetences = learningDesign.getCompetences();
 		if (competenceList != null) {
 			for (Hashtable competenceTable : competenceList) {
 				String title = (String) competenceTable.get("title");
-				String description = (String) competenceTable.get("description");
+				String description = (String) competenceTable
+						.get("description");
 
 				if (getComptenceFromSet(existingCompetences, title) != null) {
-					Competence updateCompetence = getComptenceFromSet(existingCompetences, title);
+					Competence updateCompetence = getComptenceFromSet(
+							existingCompetences, title);
 					updateCompetence.setDescription(description);
 					competenceDAO.saveOrUpdate(updateCompetence);
 				}
@@ -1022,7 +1123,8 @@ public class ObjectExtractor implements IObjectExtractor {
 					for (Competence existingCompetence : existingCompetences) {
 						boolean remove = true;
 						for (Hashtable competenceTable : competenceList) {
-							if (existingCompetence.getTitle().equals(competenceTable.get("title"))) {
+							if (existingCompetence.getTitle().equals(
+									competenceTable.get("title"))) {
 								remove = false;
 								break;
 							}
@@ -1042,7 +1144,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 	}
 
-	private Competence getComptenceFromSet(Set<Competence> competences, String title) {
+	private Competence getComptenceFromSet(Set<Competence> competences,
+			String title) {
 		if (competences != null) {
 			for (Competence competence : competences) {
 				if (competence.getTitle().equals(title)) {
@@ -1065,7 +1168,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @throws WDDXProcessorConversionException
 	 * @throws ObjectExtractorException
 	 */
-	private void parseActivitiesToMatchUpParentandInputActivities(List activitiesList) throws WDDXProcessorConversionException,
+	private void parseActivitiesToMatchUpParentandInputActivities(
+			List activitiesList) throws WDDXProcessorConversionException,
 			ObjectExtractorException {
 		if (activitiesList != null) {
 			Iterator iterator = activitiesList.iterator();
@@ -1073,22 +1177,32 @@ public class ObjectExtractor implements IObjectExtractor {
 
 				Hashtable activityDetails = (Hashtable) iterator.next();
 
-				Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_UIID);
+				Integer activityUUID = WDDXProcessor.convertToInteger(
+						activityDetails, WDDXTAGS.ACTIVITY_UIID);
 				Activity existingActivity = newActivityMap.get(activityUUID);
 
 				// match up activity to parent based on UIID
 				if (keyExists(activityDetails, WDDXTAGS.PARENT_UIID)) {
-					Integer parentUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.PARENT_UIID);
+					Integer parentUIID = WDDXProcessor.convertToInteger(
+							activityDetails, WDDXTAGS.PARENT_UIID);
 					if (parentUIID != null) {
-						Activity parentActivity = newActivityMap.get(parentUIID);
+						Activity parentActivity = newActivityMap
+								.get(parentUIID);
 						if (parentActivity == null) {
-							throw new ObjectExtractorException("Parent activity " + parentUIID + " missing for activity "
-									+ existingActivity.getTitle() + ": " + existingActivity.getActivityUIID());
+							throw new ObjectExtractorException(
+									"Parent activity "
+											+ parentUIID
+											+ " missing for activity "
+											+ existingActivity.getTitle()
+											+ ": "
+											+ existingActivity
+													.getActivityUIID());
 						}
 						existingActivity.setParentActivity(parentActivity);
 						existingActivity.setParentUIID(parentUIID);
 						if (parentActivity.isComplexActivity()) {
-							((ComplexActivity) parentActivity).addActivity(existingActivity);
+							((ComplexActivity) parentActivity)
+									.addActivity(existingActivity);
 							activityDAO.update(parentActivity);
 						}
 
@@ -1105,12 +1219,16 @@ public class ObjectExtractor implements IObjectExtractor {
 				// match up activity to input activities based on UIID. At
 				// present there will be only one input activity
 				existingActivity.getInputActivities().clear();
-				Integer inputActivityUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.INPUT_TOOL_ACTIVITY_UIID);
+				Integer inputActivityUIID = WDDXProcessor.convertToInteger(
+						activityDetails, WDDXTAGS.INPUT_TOOL_ACTIVITY_UIID);
 				if (inputActivityUIID != null) {
-					Activity inputActivity = newActivityMap.get(inputActivityUIID);
+					Activity inputActivity = newActivityMap
+							.get(inputActivityUIID);
 					if (inputActivity == null) {
-						throw new ObjectExtractorException("Input activity " + inputActivityUIID + " missing for activity "
-								+ existingActivity.getTitle() + ": " + existingActivity.getActivityUIID());
+						throw new ObjectExtractorException("Input activity "
+								+ inputActivityUIID + " missing for activity "
+								+ existingActivity.getTitle() + ": "
+								+ existingActivity.getActivityUIID());
 					}
 					existingActivity.getInputActivities().add(inputActivity);
 				}
@@ -1127,12 +1245,13 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * updated and any transitions that are no longer needed are deleted.
 	 * 
 	 * @param transitionsList
-	 *                The list of transitions from the wddx packet
+	 *            The list of transitions from the wddx packet
 	 * @param learningDesign
 	 * @throws WDDXProcessorConversionException
 	 */
 	@SuppressWarnings("unchecked")
-	private void parseTransitions(List transitionsList) throws WDDXProcessorConversionException {
+	private void parseTransitions(List transitionsList)
+			throws WDDXProcessorConversionException {
 
 		HashMap<Integer, Transition> newMap = new HashMap<Integer, Transition>();
 
@@ -1175,21 +1294,25 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	}
 
-	public Activity extractActivityObject(Hashtable activityDetails) throws WDDXProcessorConversionException,
-			ObjectExtractorException {
+	public Activity extractActivityObject(Hashtable activityDetails)
+			throws WDDXProcessorConversionException, ObjectExtractorException {
 
 		// it is assumed that the activityUUID will always be sent by flash.
-		Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_UIID);
+		Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails,
+				WDDXTAGS.ACTIVITY_UIID);
 		Activity activity = null;
-		Integer activityTypeID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID);
+		Integer activityTypeID = WDDXProcessor.convertToInteger(
+				activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID);
 		if (activityTypeID == null) {
 			throw new ObjectExtractorException("activityTypeID missing");
 		}
 
 		// get the activity with the particular activity uuid, if null, then new
 		// object needs to be created.
-		Activity existingActivity = activityDAO.getActivityByUIID(activityUUID, learningDesign);
-		if (existingActivity != null && !existingActivity.getActivityTypeId().equals(activityTypeID)) {
+		Activity existingActivity = activityDAO.getActivityByUIID(activityUUID,
+				learningDesign);
+		if (existingActivity != null
+				&& !existingActivity.getActivityTypeId().equals(activityTypeID)) {
 			existingActivity = null;
 		}
 
@@ -1202,34 +1325,43 @@ public class ObjectExtractor implements IObjectExtractor {
 		processActivityType(activity, activityDetails);
 
 		if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID)) {
-			activity.setActivityTypeId(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID));
+			activity.setActivityTypeId(WDDXProcessor.convertToInteger(
+					activityDetails, WDDXTAGS.ACTIVITY_TYPE_ID));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_UIID)) {
-			activity.setActivityUIID(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_UIID));
+			activity.setActivityUIID(WDDXProcessor.convertToInteger(
+					activityDetails, WDDXTAGS.ACTIVITY_UIID));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.DESCRIPTION)) {
-			activity.setDescription(WDDXProcessor.convertToString(activityDetails, WDDXTAGS.DESCRIPTION));
+			activity.setDescription(WDDXProcessor.convertToString(
+					activityDetails, WDDXTAGS.DESCRIPTION));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_TITLE)) {
-			activity.setTitle(WDDXProcessor.convertToString(activityDetails, WDDXTAGS.ACTIVITY_TITLE));
+			activity.setTitle(WDDXProcessor.convertToString(activityDetails,
+					WDDXTAGS.ACTIVITY_TITLE));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.HELP_TEXT)) {
-			activity.setHelpText(WDDXProcessor.convertToString(activityDetails, WDDXTAGS.HELP_TEXT));
+			activity.setHelpText(WDDXProcessor.convertToString(activityDetails,
+					WDDXTAGS.HELP_TEXT));
 		}
 
 		activity.setXcoord(getCoord(activityDetails, WDDXTAGS.XCOORD));
 		activity.setYcoord(getCoord(activityDetails, WDDXTAGS.YCOORD));
 
 		if (keyExists(activityDetails, WDDXTAGS.GROUPING_UIID)) {
-			Integer groupingUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.GROUPING_UIID);
+			Integer groupingUIID = WDDXProcessor.convertToInteger(
+					activityDetails, WDDXTAGS.GROUPING_UIID);
 			if (groupingUIID != null) {
 				Grouping grouping = groupings.get(groupingUIID);
 				if (grouping != null) {
 					setGrouping(activity, grouping, groupingUIID);
 				}
 				else {
-					log.warn("Unable to find matching grouping for groupingUIID" + groupingUIID + ". Activity UUID"
-							+ activityUUID + " will not be grouped.");
+					log
+							.warn("Unable to find matching grouping for groupingUIID"
+									+ groupingUIID
+									+ ". Activity UUID"
+									+ activityUUID + " will not be grouped.");
 					clearGrouping(activity);
 				}
 			}
@@ -1242,18 +1374,22 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 
 		if (keyExists(activityDetails, WDDXTAGS.ORDER_ID)) {
-			activity.setOrderId(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ORDER_ID));
+			activity.setOrderId(WDDXProcessor.convertToInteger(activityDetails,
+					WDDXTAGS.ORDER_ID));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.DEFINE_LATER)) {
-			activity.setDefineLater(WDDXProcessor.convertToBoolean(activityDetails, WDDXTAGS.DEFINE_LATER));
+			activity.setDefineLater(WDDXProcessor.convertToBoolean(
+					activityDetails, WDDXTAGS.DEFINE_LATER));
 		}
 
 		activity.setLearningDesign(learningDesign);
 
 		if (keyExists(activityDetails, WDDXTAGS.LEARNING_LIBRARY_ID)) {
-			Long learningLibraryID = WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.LEARNING_LIBRARY_ID);
+			Long learningLibraryID = WDDXProcessor.convertToLong(
+					activityDetails, WDDXTAGS.LEARNING_LIBRARY_ID);
 			if (learningLibraryID != null) {
-				LearningLibrary library = learningLibraryDAO.getLearningLibraryById(learningLibraryID);
+				LearningLibrary library = learningLibraryDAO
+						.getLearningLibraryById(learningLibraryID);
 				activity.setLearningLibrary(library);
 			}
 			else {
@@ -1267,32 +1403,39 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 
 		if (keyExists(activityDetails, WDDXTAGS.RUN_OFFLINE)) {
-			activity.setRunOffline(WDDXProcessor.convertToBoolean(activityDetails, WDDXTAGS.RUN_OFFLINE));
+			activity.setRunOffline(WDDXProcessor.convertToBoolean(
+					activityDetails, WDDXTAGS.RUN_OFFLINE));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_CATEGORY_ID)) {
-			activity.setActivityCategoryID(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_CATEGORY_ID));
+			activity.setActivityCategoryID(WDDXProcessor.convertToInteger(
+					activityDetails, WDDXTAGS.ACTIVITY_CATEGORY_ID));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.LIBRARY_IMAGE)) {
-			activity.setLibraryActivityUiImage(WDDXProcessor.convertToString(activityDetails, WDDXTAGS.LIBRARY_IMAGE));
+			activity.setLibraryActivityUiImage(WDDXProcessor.convertToString(
+					activityDetails, WDDXTAGS.LIBRARY_IMAGE));
 		}
 
 		if (keyExists(activityDetails, WDDXTAGS.GROUPING_SUPPORT_TYPE)) {
-			activity.setGroupingSupportType(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.GROUPING_SUPPORT_TYPE));
+			activity.setGroupingSupportType(WDDXProcessor.convertToInteger(
+					activityDetails, WDDXTAGS.GROUPING_SUPPORT_TYPE));
 		}
 
 		if (keyExists(activityDetails, WDDXTAGS.STOP_AFTER_ACTIVITY)) {
-			activity.setStopAfterActivity(WDDXProcessor.convertToBoolean(activityDetails, WDDXTAGS.STOP_AFTER_ACTIVITY));
+			activity.setStopAfterActivity(WDDXProcessor.convertToBoolean(
+					activityDetails, WDDXTAGS.STOP_AFTER_ACTIVITY));
 		}
 
 		return activity;
 	}
 
-	private Integer getCoord(Hashtable details, String wddxtag) throws WDDXProcessorConversionException {
+	private Integer getCoord(Hashtable details, String wddxtag)
+			throws WDDXProcessorConversionException {
 		Integer coord = null;
 		if (keyExists(details, wddxtag)) {
 			coord = WDDXProcessor.convertToInteger(details, wddxtag);
 		}
-		return coord == null || coord >= 0 ? coord : ObjectExtractor.DEFAULT_COORD;
+		return coord == null || coord >= 0 ? coord
+				: ObjectExtractor.DEFAULT_COORD;
 	}
 
 	private void clearGrouping(Activity activity) {
@@ -1301,13 +1444,15 @@ public class ObjectExtractor implements IObjectExtractor {
 		activity.setApplyGrouping(false);
 	}
 
-	private void setGrouping(Activity activity, Grouping grouping, Integer groupingUIID) {
+	private void setGrouping(Activity activity, Grouping grouping,
+			Integer groupingUIID) {
 		activity.setGrouping(grouping);
 		activity.setGroupingUIID(groupingUIID);
 		activity.setApplyGrouping(true);
 	}
 
-	private void processActivityType(Activity activity, Hashtable activityDetails) throws WDDXProcessorConversionException,
+	private void processActivityType(Activity activity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException,
 			ObjectExtractorException {
 		if (activity.isGroupingActivity()) {
 			buildGroupingActivity((GroupingActivity) activity, activityDetails);
@@ -1323,8 +1468,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		}
 	}
 
-	private void buildComplexActivity(ComplexActivity activity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException, ObjectExtractorException {
+	private void buildComplexActivity(ComplexActivity activity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException,
+			ObjectExtractorException {
 		// clear all the children - will be built up again by
 		// parseActivitiesToMatchUpParentActivityByParentUIID
 		// we don't use all-delete-orphan on the activities relationship so we
@@ -1332,7 +1478,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		activity.getActivities().clear();
 
 		activity.setDefaultActivity(null);
-		Integer defaultActivityMapUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.DEFAULT_ACTIVITY_UIID);
+		Integer defaultActivityMapUIID = WDDXProcessor.convertToInteger(
+				activityDetails, WDDXTAGS.DEFAULT_ACTIVITY_UIID);
 		if (defaultActivityMapUIID != null) {
 			defaultActivityMap.put(defaultActivityMapUIID, activity);
 		}
@@ -1344,38 +1491,49 @@ public class ObjectExtractor implements IObjectExtractor {
 			buildParallelActivity((ParallelActivity) activity, activityDetails);
 		}
 		else if (activity instanceof BranchingActivity) {
-			buildBranchingActivity((BranchingActivity) activity, activityDetails);
+			buildBranchingActivity((BranchingActivity) activity,
+					activityDetails);
 		}
 		else {
 			buildSequenceActivity((SequenceActivity) activity, activityDetails);
 		}
 	}
 
-	private void buildBranchingActivity(BranchingActivity branchingActivity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException, ObjectExtractorException {
+	private void buildBranchingActivity(BranchingActivity branchingActivity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException,
+			ObjectExtractorException {
 		if (branchingActivity.isChosenBranchingActivity()) {
-			branchingActivity.setSystemTool(getSystemTool(SystemTool.TEACHER_CHOSEN_BRANCHING));
+			branchingActivity
+					.setSystemTool(getSystemTool(SystemTool.TEACHER_CHOSEN_BRANCHING));
 		}
 		else if (branchingActivity.isGroupBranchingActivity()) {
-			branchingActivity.setSystemTool(getSystemTool(SystemTool.GROUP_BASED_BRANCHING));
+			branchingActivity
+					.setSystemTool(getSystemTool(SystemTool.GROUP_BASED_BRANCHING));
 		}
 		else if (branchingActivity.isToolBranchingActivity()) {
-			branchingActivity.setSystemTool(getSystemTool(SystemTool.TOOL_BASED_BRANCHING));
+			branchingActivity
+					.setSystemTool(getSystemTool(SystemTool.TOOL_BASED_BRANCHING));
 		}
 
-		branchingActivity.setStartXcoord(getCoord(activityDetails, WDDXTAGS.START_XCOORD));
-		branchingActivity.setStartYcoord(getCoord(activityDetails, WDDXTAGS.START_YCOORD));
-		branchingActivity.setEndXcoord(getCoord(activityDetails, WDDXTAGS.END_XCOORD));
-		branchingActivity.setEndYcoord(getCoord(activityDetails, WDDXTAGS.END_YCOORD));
+		branchingActivity.setStartXcoord(getCoord(activityDetails,
+				WDDXTAGS.START_XCOORD));
+		branchingActivity.setStartYcoord(getCoord(activityDetails,
+				WDDXTAGS.START_YCOORD));
+		branchingActivity.setEndXcoord(getCoord(activityDetails,
+				WDDXTAGS.END_XCOORD));
+		branchingActivity.setEndYcoord(getCoord(activityDetails,
+				WDDXTAGS.END_YCOORD));
 	}
 
-	private void buildGroupingActivity(GroupingActivity groupingActivity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException, ObjectExtractorException {
+	private void buildGroupingActivity(GroupingActivity groupingActivity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException,
+			ObjectExtractorException {
 		/**
 		 * read the createGroupingUUID, get the Grouping Object, and set
 		 * CreateGrouping to that object
 		 */
-		Integer createGroupingUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.CREATE_GROUPING_UIID);
+		Integer createGroupingUIID = WDDXProcessor.convertToInteger(
+				activityDetails, WDDXTAGS.CREATE_GROUPING_UIID);
 		Grouping grouping = groupings.get(createGroupingUIID);
 		if (grouping != null) {
 			groupingActivity.setCreateGrouping(grouping);
@@ -1396,90 +1554,114 @@ public class ObjectExtractor implements IObjectExtractor {
 		 */
 	}
 
-	private void buildOptionsActivity(OptionsActivity optionsActivity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException {
+	private void buildOptionsActivity(OptionsActivity optionsActivity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException {
 		if (keyExists(activityDetails, WDDXTAGS.MAX_OPTIONS)) {
-			optionsActivity.setMaxNumberOfOptions(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.MAX_OPTIONS));
+			optionsActivity.setMaxNumberOfOptions(WDDXProcessor
+					.convertToInteger(activityDetails, WDDXTAGS.MAX_OPTIONS));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.MIN_OPTIONS)) {
-			optionsActivity.setMinNumberOfOptions(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.MIN_OPTIONS));
+			optionsActivity.setMinNumberOfOptions(WDDXProcessor
+					.convertToInteger(activityDetails, WDDXTAGS.MIN_OPTIONS));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.OPTIONS_INSTRUCTIONS)) {
-			optionsActivity.setOptionsInstructions(WDDXProcessor.convertToString(activityDetails, WDDXTAGS.OPTIONS_INSTRUCTIONS));
+			optionsActivity.setOptionsInstructions(WDDXProcessor
+					.convertToString(activityDetails,
+							WDDXTAGS.OPTIONS_INSTRUCTIONS));
 		}
 	}
 
-	private void buildParallelActivity(ParallelActivity activity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException {
+	private void buildParallelActivity(ParallelActivity activity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException {
 	}
 
-	private void buildSequenceActivity(SequenceActivity activity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException {
+	private void buildSequenceActivity(SequenceActivity activity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException {
 		activity.setSystemTool(getSystemTool(SystemTool.SEQUENCE));
 	}
 
-	private void buildToolActivity(ToolActivity toolActivity, Hashtable activityDetails) throws WDDXProcessorConversionException {
+	private void buildToolActivity(ToolActivity toolActivity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException {
 		if (log.isDebugEnabled()) {
-			log.debug("In tool activity UUID" + activityDetails.get(WDDXTAGS.ACTIVITY_UIID) + " tool content id="
+			log.debug("In tool activity UUID"
+					+ activityDetails.get(WDDXTAGS.ACTIVITY_UIID)
+					+ " tool content id="
 					+ activityDetails.get(WDDXTAGS.TOOL_CONTENT_ID));
 		}
 		if (keyExists(activityDetails, WDDXTAGS.TOOL_CONTENT_ID)) {
-			toolActivity.setToolContentId(WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.TOOL_CONTENT_ID));
+			toolActivity.setToolContentId(WDDXProcessor.convertToLong(
+					activityDetails, WDDXTAGS.TOOL_CONTENT_ID));
 		}
 
 		if (keyExists(activityDetails, WDDXTAGS.TOOL_ID)) {
-			Tool tool = toolDAO.getToolByID(WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.TOOL_ID));
+			Tool tool = toolDAO.getToolByID(WDDXProcessor.convertToLong(
+					activityDetails, WDDXTAGS.TOOL_ID));
 			toolActivity.setTool(tool);
 		}
 	}
 
-	private void buildGateActivity(Object activity, Hashtable activityDetails) throws WDDXProcessorConversionException {
+	private void buildGateActivity(Object activity, Hashtable activityDetails)
+			throws WDDXProcessorConversionException {
 		if (activity instanceof SynchGateActivity) {
-			buildSynchGateActivity((SynchGateActivity) activity, activityDetails);
+			buildSynchGateActivity((SynchGateActivity) activity,
+					activityDetails);
 		}
 		else if (activity instanceof PermissionGateActivity) {
-			buildPermissionGateActivity((PermissionGateActivity) activity, activityDetails);
+			buildPermissionGateActivity((PermissionGateActivity) activity,
+					activityDetails);
 		}
 		else if (activity instanceof SystemGateActivity) {
-			buildSystemGateActivity((SystemGateActivity) activity, activityDetails);
+			buildSystemGateActivity((SystemGateActivity) activity,
+					activityDetails);
+		}
+		else if (activity instanceof ConditionGateActivity) {
+			buildConditionGateActivity((ConditionGateActivity) activity,
+					activityDetails);
 		}
 		else {
-			buildScheduleGateActivity((ScheduleGateActivity) activity, activityDetails);
+			buildScheduleGateActivity((ScheduleGateActivity) activity,
+					activityDetails);
 		}
 		GateActivity gateActivity = (GateActivity) activity;
-		gateActivity.setGateActivityLevelId(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.GATE_ACTIVITY_LEVEL_ID));
-		gateActivity.setGateOpen(WDDXProcessor.convertToBoolean(activityDetails, WDDXTAGS.GATE_OPEN));
+		gateActivity.setGateActivityLevelId(WDDXProcessor.convertToInteger(
+				activityDetails, WDDXTAGS.GATE_ACTIVITY_LEVEL_ID));
+		gateActivity.setGateOpen(WDDXProcessor.convertToBoolean(
+				activityDetails, WDDXTAGS.GATE_OPEN));
 
 	}
 
-	private void buildSynchGateActivity(SynchGateActivity activity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException {
+	private void buildSynchGateActivity(SynchGateActivity activity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException {
 		activity.setSystemTool(getSystemTool(SystemTool.SYNC_GATE));
 	}
 
-	private void buildPermissionGateActivity(PermissionGateActivity activity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException {
+	private void buildPermissionGateActivity(PermissionGateActivity activity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException {
 		activity.setSystemTool(getSystemTool(SystemTool.PERMISSION_GATE));
 	}
 
-	private void buildSystemGateActivity(SystemGateActivity activity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException {
+	private void buildSystemGateActivity(SystemGateActivity activity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException {
 		activity.setSystemTool(getSystemTool(SystemTool.SYSTEM_GATE));
 	}
 
-	private void buildScheduleGateActivity(ScheduleGateActivity activity, Hashtable activityDetails)
-			throws WDDXProcessorConversionException {
+	private void buildScheduleGateActivity(ScheduleGateActivity activity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException {
 		// activity.setGateStartDateTime(WDDXProcessor.convertToDate(activityDetails,WDDXTAGS.GATE_START_DATE));
 		// activity.setGateEndDateTime(WDDXProcessor.convertToDate(activityDetails,WDDXTAGS.GATE_END_DATE));
-		activity.setGateStartTimeOffset(WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.GATE_START_OFFSET));
-		activity.setGateEndTimeOffset(WDDXProcessor.convertToLong(activityDetails, WDDXTAGS.GATE_END_OFFSET));
+		activity.setGateStartTimeOffset(WDDXProcessor.convertToLong(
+				activityDetails, WDDXTAGS.GATE_START_OFFSET));
+		activity.setGateEndTimeOffset(WDDXProcessor.convertToLong(
+				activityDetails, WDDXTAGS.GATE_END_OFFSET));
 		SystemTool systemTool = getSystemTool(SystemTool.SCHEDULE_GATE);
 		activity.setSystemTool(systemTool);
 	}
 
-	private void createLessonClass(LessonClass lessonClass, Hashtable groupingDetails) throws WDDXProcessorConversionException {
+	private void createLessonClass(LessonClass lessonClass,
+			Hashtable groupingDetails) throws WDDXProcessorConversionException {
 		if (keyExists(groupingDetails, WDDXTAGS.STAFF_GROUP_ID)) {
-			Group group = groupDAO.getGroupById(WDDXProcessor.convertToLong(groupingDetails, WDDXTAGS.STAFF_GROUP_ID));
+			Group group = groupDAO.getGroupById(WDDXProcessor.convertToLong(
+					groupingDetails, WDDXTAGS.STAFF_GROUP_ID));
 			if (group != null) {
 				lessonClass.setStaffGroup(group);
 			}
@@ -1500,25 +1682,33 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @param transitionDetails
 	 * @throws WDDXProcessorConversionException
 	 */
-	private Transition extractTransitionObject(Hashtable transitionDetails) throws WDDXProcessorConversionException {
+	private Transition extractTransitionObject(Hashtable transitionDetails)
+			throws WDDXProcessorConversionException {
 
-		Integer transitionUUID = WDDXProcessor.convertToInteger(transitionDetails, WDDXTAGS.TRANSITION_UIID);
+		Integer transitionUUID = WDDXProcessor.convertToInteger(
+				transitionDetails, WDDXTAGS.TRANSITION_UIID);
 		if (transitionUUID == null) {
-			throw new WDDXProcessorConversionException("Transition is missing its UUID " + transitionDetails);
+			throw new WDDXProcessorConversionException(
+					"Transition is missing its UUID " + transitionDetails);
 		}
 
-		Integer toUIID = WDDXProcessor.convertToInteger(transitionDetails, WDDXTAGS.TO_ACTIVITY_UIID);
+		Integer toUIID = WDDXProcessor.convertToInteger(transitionDetails,
+				WDDXTAGS.TO_ACTIVITY_UIID);
 		if (toUIID == null) {
-			throw new WDDXProcessorConversionException("Transition is missing its toUUID " + transitionDetails);
+			throw new WDDXProcessorConversionException(
+					"Transition is missing its toUUID " + transitionDetails);
 		}
 
-		Integer fromUIID = WDDXProcessor.convertToInteger(transitionDetails, WDDXTAGS.FROM_ACTIVITY_UIID);
+		Integer fromUIID = WDDXProcessor.convertToInteger(transitionDetails,
+				WDDXTAGS.FROM_ACTIVITY_UIID);
 		if (fromUIID == null) {
-			throw new WDDXProcessorConversionException("Transition is missing its fromUUID " + transitionDetails);
+			throw new WDDXProcessorConversionException(
+					"Transition is missing its fromUUID " + transitionDetails);
 		}
 
 		Transition transition = null;
-		Transition existingTransition = findTransition(transitionUUID, toUIID, fromUIID);
+		Transition existingTransition = findTransition(transitionUUID, toUIID,
+				fromUIID);
 
 		if (existingTransition == null) {
 			transition = new Transition();
@@ -1553,15 +1743,18 @@ public class ObjectExtractor implements IObjectExtractor {
 			transition.setFromUIID(null);
 		}
 
-		transition.setDescription(WDDXProcessor.convertToString(transitionDetails, WDDXTAGS.DESCRIPTION));
-		transition.setTitle(WDDXProcessor.convertToString(transitionDetails, WDDXTAGS.TITLE));
+		transition.setDescription(WDDXProcessor.convertToString(
+				transitionDetails, WDDXTAGS.DESCRIPTION));
+		transition.setTitle(WDDXProcessor.convertToString(transitionDetails,
+				WDDXTAGS.TITLE));
 
 		// Set creation date based on the server timezone, not the client.
 		if (transition.getCreateDateTime() == null) {
 			transition.setCreateDateTime(modificationDate);
 		}
 
-		if (transition.getToActivity() != null && transition.getFromActivity() != null) {
+		if (transition.getToActivity() != null
+				&& transition.getFromActivity() != null) {
 			transition.setLearningDesign(learningDesign);
 			return transition;
 		}
@@ -1599,16 +1792,19 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * then inserting a new one in the db will trigger a duplicate key
 	 * exception. So we need to reuse any that have the same to/from.
 	 */
-	private Transition findTransition(Integer transitionUUID, Integer toUIID, Integer fromUIID) {
+	private Transition findTransition(Integer transitionUUID, Integer toUIID,
+			Integer fromUIID) {
 		Transition existingTransition = null;
 		Set transitions = learningDesign.getTransitions();
 		Iterator iter = transitions.iterator();
 		while (existingTransition == null && iter.hasNext()) {
 			Transition element = (Transition) iter.next();
-			if (transitionUUID != null && transitionUUID.equals(element.getTransitionUIID())) {
+			if (transitionUUID != null
+					&& transitionUUID.equals(element.getTransitionUIID())) {
 				existingTransition = element;
 			}
-			else if (toUIID != null && toUIID.equals(element.getToUIID()) && fromUIID != null
+			else if (toUIID != null && toUIID.equals(element.getToUIID())
+					&& fromUIID != null
 					&& fromUIID.equals(element.getFromUIID())) {
 				existingTransition = element;
 			}
@@ -1622,9 +1818,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * false.
 	 * 
 	 * @param table
-	 *                The hashtable to check
+	 *            The hashtable to check
 	 * @param key
-	 *                The key to find
+	 *            The key to find
 	 * @return
 	 */
 	private boolean keyExists(Hashtable table, String key) {
@@ -1657,7 +1853,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @throws WDDXProcessorConversionException
 	 */
 
-	private void parseBranchMappings(List branchMappingsList) throws WDDXProcessorConversionException {
+	private void parseBranchMappings(List branchMappingsList)
+			throws WDDXProcessorConversionException {
 		if (branchMappingsList != null) {
 			Iterator iterator = branchMappingsList.iterator();
 			while (iterator.hasNext()) {
@@ -1672,7 +1869,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		Iterator iter = oldbranchActivityEntryList.iterator();
 		while (iter.hasNext()) {
 			BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
-			SequenceActivity sequenceActivity = oldEntry.getBranchSequenceActivity();
+			SequenceActivity sequenceActivity = oldEntry
+					.getBranchSequenceActivity();
 			if (sequenceActivity != null) {
 				sequenceActivity.getBranchEntries().remove(oldEntry);
 			}
@@ -1689,43 +1887,61 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * Get the BranchActivityEntry details. This may be either for group based
 	 * branching, or it may be for tool output based branching
 	 */
-	private BranchActivityEntry extractBranchActivityEntry(Hashtable details) throws WDDXProcessorConversionException {
+	private BranchActivityEntry extractBranchActivityEntry(Hashtable details)
+			throws WDDXProcessorConversionException {
 
-		Long entryId = WDDXProcessor.convertToLong(details, WDDXTAGS.BRANCH_ACTIVITY_ENTRY_ID);
-		Integer entryUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_ACTIVITY_ENTRY_UIID);
+		Long entryId = WDDXProcessor.convertToLong(details,
+				WDDXTAGS.BRANCH_ACTIVITY_ENTRY_ID);
+		Integer entryUIID = WDDXProcessor.convertToInteger(details,
+				WDDXTAGS.BRANCH_ACTIVITY_ENTRY_UIID);
 		if (entryUIID == null) {
-			throw new WDDXProcessorConversionException("Group based branch mapping entry is missing its UUID. Entry " + details);
+			throw new WDDXProcessorConversionException(
+					"Group based branch mapping entry is missing its UUID. Entry "
+							+ details);
 		}
 
-		Integer sequenceActivityUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_SEQUENCE_ACTIVITY_UIID);
-		Integer branchingActivityUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_ACTIVITY_UIID);
-
-		SequenceActivity sequenceActivity = null;
-		Activity activity = newActivityMap.get(sequenceActivityUIID);
-		if (activity == null) {
-			throw new WDDXProcessorConversionException(
-					"Sequence Activity listed in the branch mapping list is missing. Mapping entry UUID " + entryUIID
-							+ " sequenceActivityUIID " + sequenceActivityUIID);
-		}
-		else if (!activity.isSequenceActivity()) {
-			throw new WDDXProcessorConversionException(
-					"Activity listed in the branch mapping list is not a sequence activity. Mapping entry UUID " + entryUIID
-							+ " sequenceActivityUIID " + sequenceActivityUIID);
-		}
-		else {
-			sequenceActivity = (SequenceActivity) activity;
-		}
+		Integer sequenceActivityUIID = WDDXProcessor.convertToInteger(details,
+				WDDXTAGS.BRANCH_SEQUENCE_ACTIVITY_UIID);
+		Integer branchingActivityUIID = WDDXProcessor.convertToInteger(details,
+				WDDXTAGS.BRANCH_ACTIVITY_UIID);
 
 		Activity branchingActivity = newActivityMap.get(branchingActivityUIID);
 		if (branchingActivity == null) {
 			throw new WDDXProcessorConversionException(
-					"Branching Activity listed in the branch mapping list is missing. Mapping entry UUID " + entryUIID
-							+ " branchingActivityUIID " + branchingActivityUIID);
+					"Branching Activity listed in the branch mapping list is missing. Mapping entry UUID "
+							+ entryUIID
+							+ " branchingActivityUIID "
+							+ branchingActivityUIID);
 		}
-		if (!branchingActivity.isBranchingActivity()) {
+		if (!branchingActivity.isBranchingActivity()
+				&& !branchingActivity.isConditionGate()) {
 			throw new WDDXProcessorConversionException(
-					"Activity listed in the branch mapping list is not a branching activity. Mapping entry UUID " + entryUIID
-							+ " branchingActivityUIID " + branchingActivityUIID);
+					"Activity listed in the branch mapping list is not a branching activity nor a condition gate. Mapping entry UUID "
+							+ entryUIID
+							+ " branchingActivityUIID "
+							+ branchingActivityUIID);
+		}
+		// sequence activity is null for a condition gate
+		SequenceActivity sequenceActivity = null;
+		if (!branchingActivity.isConditionGate()) {
+			Activity activity = newActivityMap.get(sequenceActivityUIID);
+			if (activity == null) {
+				throw new WDDXProcessorConversionException(
+						"Sequence Activity listed in the branch mapping list is missing. Mapping entry UUID "
+								+ entryUIID
+								+ " sequenceActivityUIID "
+								+ sequenceActivityUIID);
+			}
+			else if (!activity.isSequenceActivity()) {
+				throw new WDDXProcessorConversionException(
+						"Activity listed in the branch mapping list is not a sequence activity. Mapping entry UUID "
+								+ entryUIID
+								+ " sequenceActivityUIID "
+								+ sequenceActivityUIID);
+			}
+			else {
+				sequenceActivity = (SequenceActivity) activity;
+			}
 		}
 
 		// If the mapping was created at runtime, there will be an ID but no IU
@@ -1738,14 +1954,26 @@ public class ObjectExtractor implements IObjectExtractor {
 		// new UI ID added) is handled.
 		BranchActivityEntry uiid_match = null;
 		BranchActivityEntry id_match = null;
-		if (sequenceActivity.getBranchEntries() != null) {
-			Iterator iter = sequenceActivity.getBranchEntries().iterator();
+		Iterator iter = null;
+		if (sequenceActivity != null) {
+			if (sequenceActivity.getBranchEntries() != null) {
+				iter = sequenceActivity.getBranchEntries().iterator();
+			}
+		}
+		else {
+			iter = ((ConditionGateActivity) branchingActivity)
+					.getOpeningGateBranchEntries().iterator();
+		}
+
+		if (iter != null) {
 			while (uiid_match == null && iter.hasNext()) {
-				BranchActivityEntry possibleEntry = (BranchActivityEntry) iter.next();
+				BranchActivityEntry possibleEntry = (BranchActivityEntry) iter
+						.next();
 				if (entryUIID.equals(possibleEntry.getEntryUIID())) {
 					uiid_match = possibleEntry;
 				}
-				if (entryId != null && entryId.equals(possibleEntry.getEntryId())) {
+				if (entryId != null
+						&& entryId.equals(possibleEntry.getEntryId())) {
 					id_match = possibleEntry;
 				}
 			}
@@ -1757,30 +1985,36 @@ public class ObjectExtractor implements IObjectExtractor {
 		// (which is used for doing deletions later).
 		oldbranchActivityEntryList.remove(entry);
 
-		BranchCondition condition = extractCondition((Hashtable) details.get(WDDXTAGS.BRANCH_CONDITION), entry);
+		BranchCondition condition = extractCondition((Hashtable) details
+				.get(WDDXTAGS.BRANCH_CONDITION), entry);
 
-		Integer groupUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.GROUP_UIID);
+		Integer groupUIID = WDDXProcessor.convertToInteger(details,
+				WDDXTAGS.GROUP_UIID);
 		Group group = null;
 		if (groupUIID != null) {
 			group = groups.get(groupUIID);
 			if (group == null) {
 				throw new WDDXProcessorConversionException(
-						"Group listed in the branch mapping list is missing. Mapping entry UUID " + entryUIID + " groupUIID "
-								+ groupUIID);
+						"Group listed in the branch mapping list is missing. Mapping entry UUID "
+								+ entryUIID + " groupUIID " + groupUIID);
 			}
 		}
 
 		if (condition == null && group == null) {
-			throw new WDDXProcessorConversionException("Branch mapping has neither a group or a condition. Not a valid mapping. "
-					+ details);
+			throw new WDDXProcessorConversionException(
+					"Branch mapping has neither a group or a condition. Not a valid mapping. "
+							+ details);
 		}
 
 		if (entry == null) {
 			if (condition != null) {
-				entry = condition.allocateBranchToCondition(entryUIID, sequenceActivity, branchingActivity);
+				entry = condition.allocateBranchToCondition(entryUIID,
+						sequenceActivity, branchingActivity);
 			}
 			else {
-				entry = group.allocateBranchToGroup(entryUIID, sequenceActivity, (BranchingActivity) branchingActivity);
+				entry = group
+						.allocateBranchToGroup(entryUIID, sequenceActivity,
+								(BranchingActivity) branchingActivity);
 			}
 		}
 		else {
@@ -1791,12 +2025,13 @@ public class ObjectExtractor implements IObjectExtractor {
 
 		entry.setGroup(group);
 		entry.setCondition(condition);
-
-		if (sequenceActivity.getBranchEntries() == null) {
-			sequenceActivity.setBranchEntries(new HashSet());
+		if (sequenceActivity != null) {
+			if (sequenceActivity.getBranchEntries() == null) {
+				sequenceActivity.setBranchEntries(new HashSet());
+			}
+			sequenceActivity.getBranchEntries().add(entry);
+			activityDAO.update(sequenceActivity);
 		}
-		sequenceActivity.getBranchEntries().add(entry);
-		activityDAO.update(sequenceActivity);
 
 		if (group != null) {
 			groupingDAO.update(group);
@@ -1811,49 +2046,69 @@ public class ObjectExtractor implements IObjectExtractor {
 	 * @return
 	 * @throws WDDXProcessorConversionException
 	 */
-	private BranchCondition extractCondition(Hashtable conditionTable, BranchActivityEntry entry)
-			throws WDDXProcessorConversionException {
+	private BranchCondition extractCondition(Hashtable conditionTable,
+			BranchActivityEntry entry) throws WDDXProcessorConversionException {
 
 		BranchCondition condition = null;
 
 		if (conditionTable != null && conditionTable.size() > 0) {
 
-			Long conditionID = WDDXProcessor.convertToLong(conditionTable, WDDXTAGS.CONDITION_ID);
+			Long conditionID = WDDXProcessor.convertToLong(conditionTable,
+					WDDXTAGS.CONDITION_ID);
 			if (entry != null) {
 				condition = entry.getCondition();
 			}
-			if (condition != null && conditionID != null && !condition.getConditionId().equals(conditionID)) {
+			if (condition != null && conditionID != null
+					&& !condition.getConditionId().equals(conditionID)) {
 				log
 						.warn("Unexpected behaviour: condition supplied in WDDX packet has a different ID to matching branch activity entry in the database. Dropping old database condition."
-								+ " Old db condition " + condition + " new entry in WDDX " + conditionTable);
+								+ " Old db condition "
+								+ condition
+								+ " new entry in WDDX " + conditionTable);
 				condition = null; // Hibernate should dispose of it
 				// automatically via the cascade
 			}
 
-			Integer conditionUIID = WDDXProcessor.convertToInteger(conditionTable, WDDXTAGS.CONDITION_UIID);
+			Integer conditionUIID = WDDXProcessor.convertToInteger(
+					conditionTable, WDDXTAGS.CONDITION_UIID);
 			if (conditionUIID == null) {
-				throw new WDDXProcessorConversionException("Condition is missing its UUID: " + conditionTable);
+				throw new WDDXProcessorConversionException(
+						"Condition is missing its UUID: " + conditionTable);
 			}
 
-			String endValue = WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_END_VALUE);
+			String endValue = WDDXProcessor.convertToString(conditionTable,
+					WDDXTAGS.CONDITION_END_VALUE);
 
 			if (condition == null) {
-				condition = new BranchCondition(null, conditionUIID, WDDXProcessor.convertToInteger(conditionTable,
-						WDDXTAGS.ORDER_ID), WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_NAME), WDDXProcessor
-						.convertToString(conditionTable, WDDXTAGS.CONDITION_DISPLAY_NAME), WDDXProcessor.convertToString(
-						conditionTable, WDDXTAGS.CONDITION_TYPE), WDDXProcessor.convertToString(conditionTable,
-						WDDXTAGS.CONDITION_START_VALUE), endValue, WDDXProcessor.convertToString(conditionTable,
-						WDDXTAGS.CONDITION_EXACT_MATCH_VALUE));
+				condition = new BranchCondition(null, conditionUIID,
+						WDDXProcessor.convertToInteger(conditionTable,
+								WDDXTAGS.ORDER_ID), WDDXProcessor
+								.convertToString(conditionTable,
+										WDDXTAGS.CONDITION_NAME), WDDXProcessor
+								.convertToString(conditionTable,
+										WDDXTAGS.CONDITION_DISPLAY_NAME),
+						WDDXProcessor.convertToString(conditionTable,
+								WDDXTAGS.CONDITION_TYPE), WDDXProcessor
+								.convertToString(conditionTable,
+										WDDXTAGS.CONDITION_START_VALUE),
+						endValue, WDDXProcessor.convertToString(conditionTable,
+								WDDXTAGS.CONDITION_EXACT_MATCH_VALUE));
 			}
 			else {
 				condition.setConditionUIID(conditionUIID);
-				condition.setDisplayName(WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_DISPLAY_NAME));
+				condition.setDisplayName(WDDXProcessor.convertToString(
+						conditionTable, WDDXTAGS.CONDITION_DISPLAY_NAME));
 				condition.setEndValue(endValue);
-				condition.setExactMatchValue(WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_EXACT_MATCH_VALUE));
-				condition.setName(WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_NAME));
-				condition.setOrderId(WDDXProcessor.convertToInteger(conditionTable, WDDXTAGS.ORDER_ID));
-				condition.setStartValue(WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_START_VALUE));
-				condition.setType(WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_TYPE));
+				condition.setExactMatchValue(WDDXProcessor.convertToString(
+						conditionTable, WDDXTAGS.CONDITION_EXACT_MATCH_VALUE));
+				condition.setName(WDDXProcessor.convertToString(conditionTable,
+						WDDXTAGS.CONDITION_NAME));
+				condition.setOrderId(WDDXProcessor.convertToInteger(
+						conditionTable, WDDXTAGS.ORDER_ID));
+				condition.setStartValue(WDDXProcessor.convertToString(
+						conditionTable, WDDXTAGS.CONDITION_START_VALUE));
+				condition.setType(WDDXProcessor.convertToString(conditionTable,
+						WDDXTAGS.CONDITION_TYPE));
 			}
 		}
 		return condition;
@@ -1867,10 +2122,47 @@ public class ObjectExtractor implements IObjectExtractor {
 				systemTools.put(systemToolId, tool);
 			}
 			else {
-				log.error("ObjectExtractor: Unable to find matching system tool for id " + systemToolId);
+				log
+						.error("ObjectExtractor: Unable to find matching system tool for id "
+								+ systemToolId);
 			}
 		}
 		return tool;
 	}
 
+	private void createLearnerChoiceGrouping(
+			LearnerChoiceGrouping learnerChoiceGrouping,
+			Hashtable groupingDetails) throws WDDXProcessorConversionException {
+
+		Integer numLearnersPerGroup = WDDXProcessor.convertToInteger(
+				groupingDetails, WDDXTAGS.LEARNERS_PER_GROUP);
+		if (numLearnersPerGroup != null && numLearnersPerGroup.intValue() > 0) {
+			learnerChoiceGrouping.setLearnersPerGroup(numLearnersPerGroup);
+			learnerChoiceGrouping.setNumberOfGroups(null);
+			learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(null);
+		}
+		else {
+			Integer numGroups = WDDXProcessor.convertToInteger(groupingDetails,
+					WDDXTAGS.NUMBER_OF_GROUPS);
+			if (numGroups != null && numGroups.intValue() > 0) {
+				learnerChoiceGrouping.setNumberOfGroups(numGroups);
+			}
+			else {
+				learnerChoiceGrouping.setNumberOfGroups(null);
+			}
+			learnerChoiceGrouping.setLearnersPerGroup(null);
+			Boolean equalNumberOfLearnersPerGroup = WDDXProcessor
+					.convertToBoolean(groupingDetails,
+							WDDXTAGS.EQUAL_NUMBER_OF_LEARNERS_PER_GROUP);
+			if (equalNumberOfLearnersPerGroup != null) {
+				learnerChoiceGrouping
+						.setEqualNumberOfLearnersPerGroup(equalNumberOfLearnersPerGroup);
+			}
+		}
+	}
+
+	private void buildConditionGateActivity(ConditionGateActivity activity,
+			Hashtable activityDetails) throws WDDXProcessorConversionException {
+		activity.setSystemTool(getSystemTool(SystemTool.CONDITION_GATE));
+	}
 }
