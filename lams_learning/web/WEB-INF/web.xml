@@ -130,11 +130,7 @@
       <servlet-name>groupingExportPortfolio</servlet-name>
       <url-pattern>/groupingExportPortfolio</url-pattern>
    </servlet-mapping>
-
-   <session-config>
-      <session-timeout>120</session-timeout>
-   </session-config>
-
+   
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
    Organize mime-mappings.xml following this DTD slice:
@@ -219,10 +215,8 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
-    		<role-name>TEACHER</role-name>
     		<role-name>MONITOR</role-name>
     		<role-name>AUTHOR</role-name>
-    		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
 			<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>

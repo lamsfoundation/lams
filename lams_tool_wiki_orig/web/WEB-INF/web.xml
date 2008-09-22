@@ -127,6 +127,13 @@
 	    </init-param>
 	    <load-on-startup>3</load-on-startup>
 	</servlet>
+<servlet>
+	<servlet-name>WikiLinkHandler</servlet-name>
+	<display-name>WikiLinkHandler Servlet For FCKEditor</display-name>
+	<servlet-class>
+		org.lamsfoundation.lams.tool.wiki.web.WikiLinkHandlerServlet
+	</servlet-class>
+</servlet>
 
   <servlet-mapping>
 	<servlet-name>action</servlet-name>
@@ -148,9 +155,10 @@
 	<url-pattern>/exportPortfolio</url-pattern>
 </servlet-mapping>
 
-   <session-config>
-      <session-timeout>120</session-timeout>
-   </session-config>
+<servlet-mapping>
+	<servlet-name>WikiLinkHandler</servlet-name>
+	<url-pattern>/WikiLinkHandler</url-pattern>
+</servlet-mapping>
 
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.

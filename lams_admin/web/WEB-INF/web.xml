@@ -72,11 +72,6 @@
 	<listener-class>
 		org.springframework.web.context.ContextLoaderListener
 	</listener-class>
-</listener>	
-<listener>
-	<listener-class>
- 		org.lamsfoundation.lams.web.SessionListener
- 	</listener-class>
 </listener>
 
  <servlet>
@@ -124,10 +119,6 @@
     <servlet-name>Connector</servlet-name>
     <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 </servlet-mapping>
-
-   <session-config>
-      <session-timeout>120</session-timeout>
-   </session-config>
 
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.

@@ -67,8 +67,8 @@
 	
 	<listener>
 		<listener-class>
-	 		org.lamsfoundation.lams.web.SessionListener
-	 	</listener-class>
+			org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
+		</listener-class>
 	</listener>
 	
 	<servlet>
@@ -144,10 +144,6 @@
 	    <servlet-name>Connector</servlet-name>
 	    <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>
-
-   	<session-config>
-      	<session-timeout>120</session-timeout>
-   	</session-config>
    
     <error-page>
         <error-code>500</error-code>

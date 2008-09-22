@@ -5,7 +5,6 @@
 </listener>	
 <listener>
 	<listener-class>
- 		org.lamsfoundation.lams.web.SessionListener
- 	</listener-class>
+		org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
+	</listener-class>
 </listener>
- 	

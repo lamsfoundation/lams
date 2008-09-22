@@ -15,3 +15,9 @@
 		org.apache.axis.transport.http.AxisHTTPSessionListener
 	</listener-class>
 </listener>
+
+<listener>
+	<listener-class>
+		org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
+	</listener-class>
+</listener>

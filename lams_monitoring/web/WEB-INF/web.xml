@@ -69,18 +69,8 @@
 </listener>	
 
    <servlet>
-      <servlet-name>gateExportPortfolio</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>createLessonClass</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>branchingExportPortfolio</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.BranchingExportPortfolioServlet</servlet-class>
+      <servlet-name>initializeLesson</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -89,13 +79,23 @@
 
    </servlet>
    <servlet>
+      <servlet-name>branchingExportPortfolio</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.BranchingExportPortfolioServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>gateExportPortfolio</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>sequenceExportPortfolio</servlet-name>
       <servlet-class>org.lamsfoundation.lams.monitoring.web.SequenceExportPortfolioServlet</servlet-class>
 
    </servlet>
    <servlet>
-      <servlet-name>initializeLesson</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
+      <servlet-name>createLessonClass</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
 
    </servlet>
 
@@ -127,33 +127,29 @@
 </servlet-mapping>
 
    <servlet-mapping>
-      <servlet-name>gateExportPortfolio</servlet-name>
-      <url-pattern>/gateExportPortfolio</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>createLessonClass</servlet-name>
-      <url-pattern>/createLessonClass</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>branchingExportPortfolio</servlet-name>
-      <url-pattern>/branchingExportPortfolio</url-pattern>
+      <servlet-name>initializeLesson</servlet-name>
+      <url-pattern>/initializeLesson</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>performChosenGrouping</servlet-name>
       <url-pattern>/monitoring/performChosenGrouping</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
+      <servlet-name>branchingExportPortfolio</servlet-name>
+      <url-pattern>/branchingExportPortfolio</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>gateExportPortfolio</servlet-name>
+      <url-pattern>/gateExportPortfolio</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
       <servlet-name>sequenceExportPortfolio</servlet-name>
       <url-pattern>/sequenceExportPortfolio</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>initializeLesson</servlet-name>
-      <url-pattern>/initializeLesson</url-pattern>
+      <servlet-name>createLessonClass</servlet-name>
+      <url-pattern>/createLessonClass</url-pattern>
    </servlet-mapping>
-
-   <session-config>
-      <session-timeout>120</session-timeout>
-   </session-config>
 
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
@@ -238,10 +234,8 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
-    		<role-name>TEACHER</role-name>
     		<role-name>MONITOR</role-name>
     		<role-name>AUTHOR</role-name>
-    		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
 			<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
