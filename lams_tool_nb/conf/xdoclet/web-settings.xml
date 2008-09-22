@@ -13,8 +13,3 @@
 			classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
 		</param-value>
 	</context-param>
-	<listener>
-		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>	
