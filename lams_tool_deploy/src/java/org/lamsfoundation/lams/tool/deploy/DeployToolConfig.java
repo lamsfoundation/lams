@@ -54,6 +54,7 @@ public class DeployToolConfig extends DeployConfig {
     private static final String TOOL_LIBRARY_INSERT_SCRIPT_PATH = "toolLibraryInsertScriptPath";
     private static final String TOOL_TABLES_SCRIPT_PATH = "toolTablesScriptPath";
     private static final String TOOL_TABLES_DELETE_SCRIPT_PATH = "toolTablesDeleteScriptPath";
+    private static final String TOOL_DB_VERSION_SCRIPT_PATH = "toolDBVersionScriptPath";
     private static final String TOOL_APP_CONTEXT_FILE_PATH = "toolApplicationContextPath";
     private static final String TOOL_JAR_FILE_NAME = "toolJarFileName";
     private static final String DEPLOY_FILES= "deployFiles";
@@ -118,6 +119,11 @@ public class DeployToolConfig extends DeployConfig {
      */
     private String toolTablesDeleteScriptPath;
 
+    /**
+     * Holds value of property toolDBVersionScriptPath.
+     */
+    private String toolDBVersionScriptPath;
+    
     /**
      * Holds value of property toolTablesDeleteScriptPath.
      */
@@ -240,6 +246,10 @@ public class DeployToolConfig extends DeployConfig {
        if ( key.equalsIgnoreCase(TOOL_TABLES_DELETE_SCRIPT_PATH) ) {
            toolTablesDeleteScriptPath  = value;
        }
+       
+       if ( key.equalsIgnoreCase(TOOL_DB_VERSION_SCRIPT_PATH) ) {
+    	   toolDBVersionScriptPath  = value;
+       }
 
        if ( key.equalsIgnoreCase(TOOL_APP_CONTEXT_FILE_PATH) ) {
            toolApplicationContextPath  = value;
@@ -301,6 +311,7 @@ public class DeployToolConfig extends DeployConfig {
        valid = valid && validateStringProperty(toolInsertScriptPath, TOOL_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolLibraryInsertScriptPath, TOOL_LIBRARY_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolActivityInsertScriptPath, TOOL_ACTIVITY_INSERT_SCRIPT_PATH);
+       valid = valid && validateStringProperty(toolDBVersionScriptPath, TOOL_DB_VERSION_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolWebUri, TOOL_TABLES_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolApplicationContextPath, TOOL_APP_CONTEXT_FILE_PATH);
        valid = valid && validateStringProperty(toolJarFileName,TOOL_JAR_FILE_NAME);
@@ -345,6 +356,8 @@ public class DeployToolConfig extends DeployConfig {
 	       this.toolTablesScriptPath = config.getToolTablesScriptPath();
        if (config.getToolTablesDeleteScriptPath() != null)
 	       this.toolTablesDeleteScriptPath = config.getToolTablesDeleteScriptPath();
+       if (config.getToolDBVersionScriptPath() != null)
+           this.toolDBVersionScriptPath = config.getToolDBVersionScriptPath();
        if (config.getToolApplicationContextPath() != null)
 	       this.toolApplicationContextPath = config.getToolApplicationContextPath();
        if ( config.getToolJarFileName() != null )
@@ -373,6 +386,7 @@ public class DeployToolConfig extends DeployConfig {
        System.out.println("ToolActivityInsertScriptPath: " + this.toolActivityInsertScriptPath);
        System.out.println("ToolTableScriptPath: " + this.toolTablesScriptPath);
        System.out.println("ToolTableDeleteScriptPath: " + this.toolTablesDeleteScriptPath);
+       System.out.println("ToolDBVersionScriptPath: " + this.toolDBVersionScriptPath);
        System.out.println("ToolApplicationContextPath: " + this.toolApplicationContextPath);
        System.out.println("ToolJarFileName: "+this.toolJarFileName);
        System.out.println("MinServerVersionNumber: "+this.minServerVersionNumber);
@@ -550,6 +564,18 @@ public class DeployToolConfig extends DeployConfig {
 	public ArrayList<String> getLanguageFiles() {
 		return languageFiles;
 	}
+	/**
+     * @return Returns the toolDBVersionScriptPath.
+     */
+    public String getToolDBVersionScriptPath() {
+        return toolDBVersionScriptPath;
+    }
+    /**
+     * @param toolDBVersionScriptPath The toolDBVersionScriptPath to set.
+     */
+    public void setToolDBVersionScriptPath(String toolDBVersionScriptPath) {
+        this.toolDBVersionScriptPath = toolDBVersionScriptPath;
+    }
 	
 	
 
@@ -591,6 +617,7 @@ public class DeployToolConfig extends DeployConfig {
 	    	toolActivityInsertScriptPath = stripPath(toolActivityInsertScriptPath, outputPath, lengthOfPath);
 	    	toolTablesScriptPath = stripPath(toolTablesScriptPath, outputPath, lengthOfPath);
 	    	toolTablesDeleteScriptPath = stripPath(toolTablesDeleteScriptPath, outputPath, lengthOfPath);
+	    	toolDBVersionScriptPath = stripPath(toolDBVersionScriptPath, outputPath, lengthOfPath);
 	    	
 	    	ArrayList<String> newLanguageFiles = new ArrayList<String>(languageFiles.size());
 	    	for ( String file : languageFiles ) {

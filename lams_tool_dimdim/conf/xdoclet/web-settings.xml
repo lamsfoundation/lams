@@ -13,7 +13,8 @@
             	classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
-				classpath:/org/lamsfoundation/lams/tool/dimdim/dimdimApplicationContext.xml			
+				classpath:/org/lamsfoundation/lams/tool/dimdim/dimdimApplicationContext.xml
+				classpath:/org/lamsfoundation/lams/tool/dimdim/dbupdates/autopatchContext.xml			
 	</param-value>
 </context-param>
 

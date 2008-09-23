@@ -75,6 +75,8 @@
 				<include name="**/*.xml"/>
 				<include name="**/*.hbm.xml"/>
 				<include name="**/*.properties"/>
+				<!-- Autopatch -->
+				<include name="**/*.sql"/>
 			</fileset>
 		</copy>
 	</target>
@@ -334,6 +336,16 @@
 			</filterset>
 		</copy>
 		
+		<copy overwrite="yes" todir="${build.deploy}/sql">
+			<fileset dir="${db.scripts}/">
+				<include name="db_version_insert.sql" />
+			</fileset>	
+			<filterset>
+				<filter token="tool_version" value="${tool.version}" />
+				<filter token="signature" value="${signature}" />
+			</filterset>
+		</copy>
+		
 		<copy overwrite="yes" todir="${build.deploy}/sql/updatescripts" failonerror="false">
 			<fileset dir="${db.scripts}/updatescripts/">
 				<include name="*.sql" />
@@ -391,6 +403,7 @@
 			toolActivityInsertScriptPath="${build.deploy}/sql/activity_insert.sql" 
 			toolLibraryInsertScriptPath="${build.deploy}/sql/library_insert.sql" 
 			toolInsertScriptPath="${build.deploy}/sql/tool_insert.sql" 
+			toolDBVersionScriptPath="${build.deploy}/sql/db_version_insert.sql"
 			toolApplicationContextPath="/org/lamsfoundation/lams/tool/wiki/wikiApplicationContext.xml"
 			lamsEarPath="${jboss.deploy}"
 			toolContext="${toolContext}"

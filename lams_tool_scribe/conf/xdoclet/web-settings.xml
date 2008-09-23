@@ -14,6 +14,7 @@
 				classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
 				classpath:/org/lamsfoundation/lams/tool/scribe/scribeApplicationContext.xml			
+				classpath:/org/lamsfoundation/lams/tool/scribe/dbupdates/autopatchContext.xml	
 	</param-value>
 </context-param>
 

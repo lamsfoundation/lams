@@ -184,6 +184,7 @@ public class Deploy
             dbDeployTask.setToolLibraryInsertScriptPath(config.getToolLibraryInsertScriptPath());
             dbDeployTask.setToolActivityInsertScriptPath(config.getToolActivityInsertScriptPath());
             dbDeployTask.setToolTablesScriptPath(config.getToolTablesScriptPath());
+            dbDeployTask.setToolDBVersionScriptPath(config.getToolDBVersionScriptPath());
             dbDeployTask.execute();
             
             System.out.println("Deploying files to ear");

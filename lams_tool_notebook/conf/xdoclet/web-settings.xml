@@ -14,6 +14,7 @@
 				classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
 				classpath:/org/lamsfoundation/lams/tool/notebook/notebookApplicationContext.xml			
+				classpath:/org/lamsfoundation/lams/tool/notebook/dbupdates/autopatchContext.xml	
 	</param-value>
 </context-param>
 

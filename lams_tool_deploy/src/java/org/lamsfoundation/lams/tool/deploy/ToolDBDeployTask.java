@@ -62,6 +62,11 @@ public class ToolDBDeployTask extends DBTask
     private String toolUpdateScriptPath;
     
     /**
+     * File path to insert autopatch version script
+     */
+    private String toolDBVersionScriptPath;
+    
+    /**
      * Holds value of property toolId.
      */
     private long toolId;
@@ -129,12 +134,22 @@ public class ToolDBDeployTask extends DBTask
         this.toolTablesScriptPath = toolTablesScriptPath;
     }
     
+    /**
+     * Setter for property toolDBVersionScriptPath.
+     * @param toolDBVersionScriptPath New value of property toolDBVersionScriptPath.
+     */
+    public void setToolDBVersionScriptPath(String toolDBVersionScriptPath)
+    {
+        this.toolDBVersionScriptPath = toolDBVersionScriptPath;
+    }
+    
     public void execute() throws DeployException
     {
         toolInsertScript = new File(toolInsertScriptPath);
         toolLibraryInsertScript = new File(toolLibraryInsertScriptPath);
         toolActivityInsertScript = new File(toolActivityInsertScriptPath);
         toolTablesScript = new File(toolTablesScriptPath);
+        toolDBVersionScript = new File(toolDBVersionScriptPath);
         //get a connection
         Connection conn = getConnection();
         try
@@ -181,6 +196,9 @@ public class ToolDBDeployTask extends DBTask
             
             //run the tool table script
             runScript(toolTablesScriptSQL, conn);
+            
+            //run the db version script
+            runScript(readFile(toolDBVersionScript), conn);
             
             //commit transaction
             conn.commit();
@@ -427,4 +445,6 @@ public class ToolDBDeployTask extends DBTask
     private File toolLibraryInsertScript;
 
     private File toolTablesScript;
+    
+    private File toolDBVersionScript;
 }
