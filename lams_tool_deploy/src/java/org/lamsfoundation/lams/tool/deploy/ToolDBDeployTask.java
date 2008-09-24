@@ -149,7 +149,9 @@ public class ToolDBDeployTask extends DBTask
         toolLibraryInsertScript = new File(toolLibraryInsertScriptPath);
         toolActivityInsertScript = new File(toolActivityInsertScriptPath);
         toolTablesScript = new File(toolTablesScriptPath);
-        toolDBVersionScript = new File(toolDBVersionScriptPath);
+        if (toolDBVersionScriptPath != null && toolDBVersionScriptPath.trim().length() > 0) {
+            toolDBVersionScript = new File(toolDBVersionScriptPath);
+        }
         //get a connection
         Connection conn = getConnection();
         try
@@ -198,7 +200,9 @@ public class ToolDBDeployTask extends DBTask
             runScript(toolTablesScriptSQL, conn);
             
             //run the db version script
-            runScript(readFile(toolDBVersionScript), conn);
+            if (toolDBVersionScriptPath != null && toolDBVersionScriptPath.trim().length() > 0) {
+        	runScript(readFile(toolDBVersionScript), conn);
+            }
             
             //commit transaction
             conn.commit();

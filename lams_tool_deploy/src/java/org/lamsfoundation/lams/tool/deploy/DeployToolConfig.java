@@ -298,7 +298,9 @@ public class DeployToolConfig extends DeployConfig {
        return list;
    }
    
-   /** Check that all the correct properties exist - tool delete path is optional. */
+   /** Check that all the correct properties exist - tool delete path is optional. 
+    *  toolDBVersionScriptPath is also optional. 
+    */
    public void validateProperties() throws DeployException {
        boolean valid;
        validationError = ""; // object attribute - will be updated by validateProperty() if something is missing.
@@ -311,7 +313,7 @@ public class DeployToolConfig extends DeployConfig {
        valid = valid && validateStringProperty(toolInsertScriptPath, TOOL_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolLibraryInsertScriptPath, TOOL_LIBRARY_INSERT_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolActivityInsertScriptPath, TOOL_ACTIVITY_INSERT_SCRIPT_PATH);
-       valid = valid && validateStringProperty(toolDBVersionScriptPath, TOOL_DB_VERSION_SCRIPT_PATH);
+       //valid = valid && validateStringProperty(toolDBVersionScriptPath, TOOL_DB_VERSION_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolWebUri, TOOL_TABLES_SCRIPT_PATH);
        valid = valid && validateStringProperty(toolApplicationContextPath, TOOL_APP_CONTEXT_FILE_PATH);
        valid = valid && validateStringProperty(toolJarFileName,TOOL_JAR_FILE_NAME);
@@ -617,7 +619,9 @@ public class DeployToolConfig extends DeployConfig {
 	    	toolActivityInsertScriptPath = stripPath(toolActivityInsertScriptPath, outputPath, lengthOfPath);
 	    	toolTablesScriptPath = stripPath(toolTablesScriptPath, outputPath, lengthOfPath);
 	    	toolTablesDeleteScriptPath = stripPath(toolTablesDeleteScriptPath, outputPath, lengthOfPath);
-	    	toolDBVersionScriptPath = stripPath(toolDBVersionScriptPath, outputPath, lengthOfPath);
+	    	if (toolDBVersionScriptPath != null && toolDBVersionScriptPath.trim().length() > 0) {
+	    	    toolDBVersionScriptPath = stripPath(toolDBVersionScriptPath, outputPath, lengthOfPath);
+	    	}
 	    	
 	    	ArrayList<String> newLanguageFiles = new ArrayList<String>(languageFiles.size());
 	    	for ( String file : languageFiles ) {
