@@ -541,7 +541,11 @@ class MonitorController extends AbstractController {
 			
 			//set up UI
 			//note this function registeres the dialog to receive view updates
-			evt.target.scrollContent.setUpContent();		
+			if (evt.target.scrollContent instanceof org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog) {
+				evt.target.scrollContent.setUpContent(_monitorModel);
+			} else {
+				evt.target.scrollContent.setUpContent();
+			}
 			
         } else {
             //TODO DI 25/05/05 raise wrong event type error 

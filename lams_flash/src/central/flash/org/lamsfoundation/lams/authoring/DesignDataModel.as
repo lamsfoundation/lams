@@ -82,8 +82,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _groupings:Hashtable;
 	private var _branches:Hashtable;
 	private var _branchMappings:Hashtable;
+	private var _competences:Hashtable;
 	private var _outputConditions:Hashtable;
-	
 	
 	private var _licenseID:Number;
 	private var _licenseText:String;
@@ -107,6 +107,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		_groupings = new Hashtable("_groupings");
 		_branches = new Hashtable("_branches");
 		_branchMappings = new Hashtable("_branchMappings");
+		_competences = new Hashtable("_competences");
 		_outputConditions = new Hashtable("_outputConditions");
 		
 		//set the defualts:
@@ -581,6 +582,13 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				_branchMappings.put(newMappingEntry.entryUIID, newMappingEntry);
 		}
 		
+		//set the competences in the hashtable
+		_competences = new Hashtable("_competences");
+		for(var i=0; i<design.competences.length;i++){
+			var competenceDTO = design.competences[i];
+			_competences.put(competenceDTO.title, competenceDTO.description);
+		}
+		
 		return success;
 	}
 	
@@ -788,6 +796,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				
 		design.branchMappings = new Array();
 		var classMappingEntries = _branchMappings.values();
+		
+		design.competences = new Array();
+		if (competences.size() > 0) {
+			for (var i=0; i<competences.size(); i++) {
+				var cdto:Object = new Object();
+				cdto.title = competences.keys()[i];
+				cdto.description = competences.get(cdto.title);
+				design.competences.push(cdto);
+			}
+		}
 		
 		if(classMappingEntries.length > 0)
 			for(var i=0; i<classMappingEntries.length; i++)
@@ -1408,7 +1426,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function set branchMappings(a:Hashtable):Void {
 		_branchMappings = a;
-	}	
+	}
+	
+	public function get competences():Hashtable {
+		return _competences;
+	}
 	
 	public function set conditions(a:Hashtable):Void {
 		_outputConditions = a;

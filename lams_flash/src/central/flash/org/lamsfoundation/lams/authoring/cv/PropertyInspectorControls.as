@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.cmpt.*;
 import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*
@@ -123,8 +124,11 @@ class PropertyInspectorControls extends MovieClip {
 	private var numRandomGroups_stp:NumericStepper;
 	private var numLearners_stp:NumericStepper;
 	
-	private var _group_naming_btn:Button;
 	private var	equalGroupSizes_chk:CheckBox;
+	private var _group_naming_btn:Button;
+	
+	//Competence
+	private var _map_competence_btn:Button;
 	
 	//Complex Activity
 	private var min_lbl:Label;
@@ -257,12 +261,16 @@ class PropertyInspectorControls extends MovieClip {
 		defineLater_chk.visible = v;
 		editGrouping_btn.visible = v;
 		
+		_map_competence_btn.visible = v;
+		
 		if(e != null) {
 			grouping_lbl.enabled = e;
 			currentGrouping_lbl.enabled = e;
 			runOffline_chk.enabled = e;
 			defineLater_chk.enabled = e;
 			editGrouping_btn.enabled = e;
+			
+			_map_competence_btn.enabled = e;
 		}
 	}
 	
@@ -843,6 +851,8 @@ class PropertyInspectorControls extends MovieClip {
 		_tool_output_match_btn.setStyle('styleName', styleObj);
 		_conditions_setup_btn.setStyle('styleName', styleObj);
 		
+		_map_competence_btn.setStyle('styleName', styleObj);
+		
 		styleObj = _tm.getStyleObject('PIlabel');
 		
 		toolDisplayName_lbl.setStyle('styleName', styleObj);
@@ -1180,12 +1190,17 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function onGroupNamingClick(evt:Object){
-		
+	
 		// open group to branch matching window
 		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('groupnaming_dlg_title_lbl'), closeButton:true, resize:false, scrollContentPath:'GroupNamingDialog'});
 		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, GroupNamingDialogLoaded));
 		
 		setModified();
+	}
+	
+	private function onMapCompetenceClick(evt:Object){
+		// open group to competence mapping window
+		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:"Competence Mappings", closeButton:true, resize:false, scrollContentPath:'CompetenceMappingDialog'});
 	}
 	
 	public function openConditionMatchDialog():Void {

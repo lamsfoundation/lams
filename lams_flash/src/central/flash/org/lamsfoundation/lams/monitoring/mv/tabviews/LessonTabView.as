@@ -226,6 +226,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 				_monitorController = getController();
 				showLearnersDialog(mm);
 				break;
+			case 'VIEW_COMPETENCES_DIALOG' :
+				Debugger.log("LessonTabView->VIEW_COMPETENCES_DIALOG update received", Debugger.CRITICAL, "update", "LessonTabView");
+				_monitorController = getController();
+				showCompetencesDialog(mm);
+				break;
 			case 'LEARNERS_LOADED' :
 				_dialog.checkLearners(mm.organisation);
 				break;
@@ -697,6 +702,19 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		opendialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
 		
     }
+	
+	
+	/**
+    * Opens the view competences dialog
+    */
+	public function showCompetencesDialog(mm:MonitorModel) {
+		var opendialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, false,{title:"View Competences",closeButton:true,scrollContentPath:'viewCompetencesDialog'});
+		opendialog.addEventListener('contentLoaded',Delegate.create(_monitorController,testFunction));
+	}
+	
+	public function testFunction():Void {
+		Debugger.log("testFunction invoked, therefore content has been loaded", Debugger.CRITICAL, "testFunction", "LessonTabView");
+	}
 	
 	/**
 	 * 

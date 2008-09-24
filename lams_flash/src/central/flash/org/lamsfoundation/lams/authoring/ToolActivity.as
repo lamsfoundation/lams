@@ -55,6 +55,8 @@ class ToolActivity extends Activity{
 	private var _supportsRunOffline:Boolean;
 	private var _supportsOutputs:Boolean;
 	
+	private var _competenceMappings:Array; // competences to which this activity is mapped
+	
 	private var _toolOutputDefinitions:Hashtable;
 	
 	function ToolActivity(activityUIID:Number){
@@ -65,6 +67,7 @@ class ToolActivity extends Activity{
 		_activityTypeID = TOOL_ACTIVITY_TYPE;
 		_toolOutputDefinitions = new Hashtable("_toolOutputDefinitions");
 		
+		_competenceMappings = new Array();
 	}
 	
 	//TODO: ADD A VALIDATE() FUNCTION
@@ -140,6 +143,13 @@ class ToolActivity extends Activity{
 			if(StringUtils.isWDDXNull(dto.extLmsId)) { _extLmsId = null }
 			else { _extLmsId = dto.extLmsId; }
 			 
+			_competenceMappings = new Array();
+			if(!StringUtils.isWDDXNull(dto.competenceMappingTitles)) {
+				for (var i=0; i<dto.competenceMappingTitles.length; i++) {
+					_competenceMappings.push(dto.competenceMappingTitles[i]);
+				}
+			}
+			
 			_supportsContribute = dto.supportsContribute;
 			_supportsDefineLater = dto.supportsDefineLater;
 			_supportsModeration = dto.supportsRunOffline
@@ -162,6 +172,14 @@ class ToolActivity extends Activity{
 		dto.toolID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
 		
 		dto.extLmsId = (_extLmsId) ? _extLmsId : Config.STRING_NULL_VALUE;
+		
+		dto.competenceMappings = new Array();
+		if (_competenceMappings.length > 0) {
+			for (var i=0; i<_competenceMappings.length; i++) {
+				dto.competenceMappings.push(_competenceMappings[i]);
+			}
+		}
+		
 		/* THESE are internal flags, not part of the design
 		dto.supportsContribute = (_supportsContribute!=null) ?  _supportsContribute: Config.BOOLEAN_NULL_VALUE;	
 		dto.supportsDefineLater = (_supportsDefineLater!=null) ?  _supportsDefineLater: Config.BOOLEAN_NULL_VALUE;	
@@ -233,6 +251,10 @@ class ToolActivity extends Activity{
 	
 	public function get definitions():Array {
 		return _toolOutputDefinitions.values();
+	}
+	
+	public function get competenceMappings():Array {
+		return _competenceMappings	
 	}
 	
 	//GETTERS + SETTERS

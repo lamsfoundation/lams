@@ -22,6 +22,7 @@
  */
 
 import org.lamsfoundation.lams.authoring.cv.*;
+import org.lamsfoundation.lams.authoring.cmpt.*;
 import org.lamsfoundation.lams.authoring.br.BranchConnector;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*
@@ -129,6 +130,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 		_group_match_btn.addEventListener("click", Delegate.create(this, onGroupMatchClick));
 		_group_naming_btn.addEventListener("click", Delegate.create(this, onGroupNamingClick));
+		_map_competence_btn.addEventListener("click", Delegate.create(this, onMapCompetenceClick));
 		_tool_output_match_btn.addEventListener("click", Delegate.create(this, onConditionMatchClick));
 		_conditions_setup_btn.addEventListener("click", Delegate.create(this, onConditionsSetupClick));
 		
@@ -191,6 +193,9 @@ class PropertyInspector extends PropertyInspectorControls {
 		_conditions_setup_btn.label = Dictionary.getValue('pi_condmatch_btn_lbl');
 
 		_define_monitor_cb.label = Dictionary.getValue('pi_define_monitor_cb_lbl');
+
+		//TODO Internationalise
+		_map_competence_btn.label = "Map to competences";
 
 		// Branch 
 		_pi_defaultBranch_cb.label = Dictionary.getValue("pi_defaultBranch_cb_lbl");
@@ -751,6 +756,7 @@ class PropertyInspector extends PropertyInspectorControls {
 	private function showAppliedGroupingProperties(a:Activity){
 		//update the grouping drop down values
 		appliedGroupingActivity_cmb.dataProvider = getGroupingActivitiesDP();
+		_global.breakpoint();
 
 		var appliedGroupingAct:GroupingActivity = _canvasModel.getCanvas().ddm.getGroupingActivityByGroupingUIID(a.groupingUIID);
 		Debugger.log('a.groupingUIID='+a.groupingUIID+', appliedGroupingAct.activityUIID :'+appliedGroupingAct.activityUIID ,Debugger.GEN,'showAppliedGroupingProperties','PropertyInspector');

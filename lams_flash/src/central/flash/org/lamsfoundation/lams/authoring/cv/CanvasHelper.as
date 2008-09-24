@@ -21,6 +21,7 @@
  * ************************************************************************
  */
 
+import org.lamsfoundation.lams.authoring.cmpt.*
 import org.lamsfoundation.lams.authoring.cv.*
 import org.lamsfoundation.lams.authoring.br.*
 import org.lamsfoundation.lams.authoring.tk.*
@@ -33,7 +34,7 @@ import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.common.ws.Workspace
 import org.lamsfoundation.lams.common.ApplicationParent
 import org.lamsfoundation.lams.common.* 
-
+   
 import mx.managers.*
 import mx.utils.*
 import mx.transitions.Tween;
@@ -539,7 +540,7 @@ class CanvasHelper {
 		if (_root.customCSV != null) {
 			o.customCSV = _root.customCSV;
 		}
-
+		
 		return o;
 	}
 	
@@ -816,6 +817,27 @@ class CanvasHelper {
 		
 	}
 	
+	/**
+    * Opens the competence editor window
+    */
+    public function openCompetenceEditorWindow() {
+		var controller:CanvasController = canvasView.getController();
+
+		app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"Competence Editor",closeButton:true, resize:false, scrollContentPath:'CompetenceEditorDialog'});
+		app.dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
+	}	
+	
+	/**
+    * Opens the competence definition dialog
+    */
+    public function openCompetenceDefinitionWindow():MovieClip {
+		var controller:CanvasController = canvasView.getController();
+		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"Competence Definition Dialog", closeButton:true, scrollContentPath:'CompetenceDefinitionDialog'});			
+		
+		dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
+		return dialog;
+	}
+	
 	public function openBranchView(ba, visible:Boolean){
 		var cx:Number = ba._x + ba.getVisibleWidth()/2;
 		var cy:Number = ba._y + ba.getVisibleHeight()/2;
@@ -934,7 +956,6 @@ class CanvasHelper {
 	private function createContentFolder():Void{
 		var callback:Function = Proxy.create(this,setNewContentFolderID);
 		Application.getInstance().getComms().getRequest('authoring/author.do?method=createUniqueContentFolder&userID='+_root.userID,callback, false);
-		
 	}
 	
 	private function setNewContentFolderID(o:Object) {

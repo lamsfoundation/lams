@@ -998,7 +998,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		if(evt.type == 'contentLoaded'){
 			//set up UI
 			//note this function registers the dialog to recieve view updates
-			evt.target.scrollContent.setUpContent();		
+			if (evt.target.scrollContent instanceof org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog) {
+				evt.target.scrollContent.setUpContent(_canvasModel);
+			} else {
+				evt.target.scrollContent.setUpContent();
+			}
 			
         } else {
             //TODO DI 25/05/05 raise wrong event type error 

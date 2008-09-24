@@ -175,7 +175,12 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 		
         tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_trans'), instanceName:"drawTransitionalItem"});
         tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_opt'), instanceName:"drawOptionalItem"});
-        //tools_menu.addMenuItem({type:"separator"});
+        
+		tools_menu.addMenuItem({type:"separator"});
+		tools_menu.addMenuItem({label:"Competence Editor", instanceName:"competenceEditor"});
+		//tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_competence'), instanceName:"competenceEditor"});
+		
+		//tools_menu.addMenuItem({type:"separator"});
         //tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_prefs'), instanceName:"prefsItem", enabled:false});
 
         /*=================
@@ -220,6 +225,8 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         view_menu = _mb.addMenu(Dictionary.getValue('mnu_view'));
 		
         view_menu.addMenuItem({label:Dictionary.getValue('mnu_view_learners'), instanceName:"viewLearners", enabled:false});
+        //view_menu.addMenuItem({label:Dictionary.getValue('mnu_view_competences'), instanceName:"viewCompetences", enabled:false});
+        view_menu.addMenuItem({label:"View Competences", instanceName:"viewCompetences", enabled:true});
 		
 		/*=================
             GO MENU
@@ -377,6 +384,9 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			case eventObj.menu.viewLearners : 
 				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().getMM().setDialogOpen("VM_DIALOG");
 				break;
+			case eventObj.menu.viewCompetences : 
+				org.lamsfoundation.lams.monitoring.Application(app).getMonitor().getMM().setDialogOpen("VIEW_COMPETENCES_DIALOG");
+				break;
 		}
 	}
 	
@@ -394,6 +404,9 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 				break;
 			case eventObj.menu.drawOptionalItem :
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().toggleOptionalActivity();
+				break;
+			case eventObj.menu.competenceEditor :
+				org.lamsfoundation.lams.authoring.Application(app).getCanvas().openCompetenceEditorWindow();
 				break;
         }        
     }    

@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.*;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog;
 import org.lamsfoundation.lams.authoring.cv.CanvasActivity;
 import org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity;
 import org.lamsfoundation.lams.authoring.cv.CanvasComplexView;
@@ -209,6 +210,13 @@ class Monitor {
 		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:dialog_title, closeButton:true, scrollContentPath:'ViewBranchConditionMappingsDialog'});
 		dialog.addEventListener('contentLoaded', Delegate.create(controller, controller.viewBranchConditionMappingsDialogLoaded));
 		
+	}
+	
+	public function showMappedCompetences() {
+		
+		var controller:MonitorController = monitorView.getController();
+		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"Mapped Competences",closeButton:true,scrollContentPath:'CompetenceEditorDialog'});
+		dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
 	}
 
 	/**
