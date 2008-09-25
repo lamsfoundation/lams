@@ -142,6 +142,7 @@
 					<include name="wddx/*.jar" />
 					<include name="concurrent/*.jar" />					
 					<include name="xstream/*.jar" />					
+					<include name="flagstone/*.jar" />	
 				</patternset>
 			</fileset> 
 			<fileset dir="..">
