@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -39,11 +40,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.Workspace;
@@ -60,6 +61,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -564,13 +566,18 @@ public class UserManagementService implements IUserManagementService {
     }
     
     private String getRunSequencesFolderName(String workspaceName) {
-    	String runSeqName = messageService.getMessage(SEQUENCES_FOLDER_NAME_KEY, new Object[] {workspaceName});
-		if ( runSeqName != null && runSeqName.startsWith("???") ) {
-			log.warn("Problem in the language file - can't find an entry for "+SEQUENCES_FOLDER_NAME_KEY+
-					". Creating folder as \"run sequences\" ");
-			runSeqName = "run sequences";
-		}
-		return runSeqName;
+	// get i18n'd message according to server locale
+	String[] tokenisedLocale = LanguageUtil.getDefaultLangCountry();
+	Locale serverLocale = new Locale(tokenisedLocale[0], tokenisedLocale[1]);
+	String runSeqName = messageService.getMessageSource().getMessage(SEQUENCES_FOLDER_NAME_KEY,
+		new Object[] { workspaceName }, serverLocale);
+
+	if (runSeqName != null && runSeqName.startsWith("???")) {
+	    log.warn("Problem in the language file - can't find an entry for " + SEQUENCES_FOLDER_NAME_KEY
+		    + ". Creating folder as \"run sequences\" ");
+	    runSeqName = "run sequences";
+	}
+	return runSeqName;
     }
 
 	@SuppressWarnings("unchecked")
