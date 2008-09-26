@@ -1311,7 +1311,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 						if (newCompetences != null) {
 							for (Competence newCompetence : newCompetences) {
 								if (competenceMapping.getCompetence().getTitle().equals(newCompetence.getTitle())
-										&& competenceMappingDAO.getCompetenceMapping(newToolActivity, newCompetence) == null) {
+										) {
 									newMapping.setToolActivity(newToolActivity);
 									newMapping.setCompetence(newCompetence);
 									competenceMappingDAO.insert(newMapping);
