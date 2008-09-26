@@ -8,16 +8,7 @@
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
-	<!-- Message source for this context, loaded from localized "messages_xx" files -->
-	<bean id="commonMessageService" class="org.lamsfoundation.lams.util.MessageService" >
-		<property name="messageSource">
-			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-				<property name="basename">
-					<value>org.lamsfoundation.lams.ApplicationResources</value>
-				</property>										
-			</bean>
-		</property>
-    </bean>
+	<import resource="messageContext.xml"/>
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
   
