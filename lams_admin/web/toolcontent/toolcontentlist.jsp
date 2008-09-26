@@ -20,32 +20,45 @@
 </logic:iterate>
 
 <p>
-<table class="alternative-color" cellspacing="0">
+<table class="alternative-color" width="100%">
+	<tr>
+		<th><fmt:message key="label.tool" /></th>
+		<th><fmt:message key="sysadmin.library.activity.description" /></th>
+		<th><fmt:message key="label.tool.version" /></th>
+		<th><fmt:message key="label.database.version" /></th>
+	</tr>
 	<logic:iterate name="activeTools" id="dto">
 		<tr>
 			<td>
 				<c:out value="${dto.activityTitle}" />
 			</td>
 			<td>
+				<c:out value="${dto.description}" />
+			</td>
+			<td>
+				<c:out value="${toolVersions[dto.toolID]}" />
+			</td>
+			<td>
+				<c:out value="${dbVersions[dto.toolSignature]}" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="4">
 				<a
 					href="<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=<c:out value="${dto.toolContentID}" />&contentFolderID=-1">
-					<c:out value="${dto.toolDisplayName}" /> </a>
-			</td>
-
-			<c:if test="${displayToolManagement == 'true'}">
-				<td>
+					<fmt:message key="sysadmin.edit.default.tool.content" /> </a>
+				<c:if test="${displayToolManagement == 'true'}">
 					<c:choose>
-						<c:when test="${dto.adminURL == null}">
-							&nbsp;
-						</c:when>
-						<c:otherwise>
+						<c:when test="${dto.adminURL != null}">
+							&nbsp;&nbsp;
 							<a href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />">
 								<fmt:message key="msg.tool.management"></fmt:message>
 							</a>
-						</c:otherwise>
+						</c:when>
+						<c:otherwise></c:otherwise>
 					</c:choose>
-				</td>
-			</c:if>
+				</c:if>
+			</td>
 		</tr>
 	</logic:iterate>
 </table>
