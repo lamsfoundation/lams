@@ -44,9 +44,12 @@
 		</tr>
 		<tr>
 			<td colspan="4">
-				<a
-					href="<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=<c:out value="${dto.toolContentID}" />&contentFolderID=-1">
-					<fmt:message key="sysadmin.edit.default.tool.content" /> </a>
+				<c:set var="editDefaultContentUrl">
+					<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=<c:out value="${dto.toolContentID}" />&contentFolderID=-1"
+				</c:set>
+				<a href="${editDefaultContentUrl}" target="_blank">
+					<fmt:message key="sysadmin.edit.default.tool.content" />
+				</a>
 				<c:if test="${displayToolManagement == 'true'}">
 					<c:choose>
 						<c:when test="${dto.adminURL != null}">
