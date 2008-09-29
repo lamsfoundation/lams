@@ -76,6 +76,7 @@ class GroupMatchingDialog extends BranchMappingDialog {
         groups_label.text = Dictionary.getValue('groupmatch_dlg_groups_lst_lbl');
         branches_label.text = Dictionary.getValue('branch_mapping_dlg_branches_lst_lbl');
         match_dgd_lbl.text = Dictionary.getValue('branch_mapping_dlg_match_dgd_lbl');
+		close_btn.label = Dictionary.getValue('mnu_file_close');
 		
         //EVENTS
         //Add event listeners for ok, cancel and close buttons
