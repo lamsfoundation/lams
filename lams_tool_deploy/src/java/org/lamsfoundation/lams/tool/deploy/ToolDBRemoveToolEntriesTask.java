@@ -163,6 +163,10 @@ public class ToolDBRemoveToolEntriesTask extends DBTask
             stmt = conn.prepareStatement("DELETE FROM lams_learning_library WHERE learning_library_id = ?");
             stmt.setLong(1, libraryId);
             stmt.execute();
+            
+            stmt = conn.prepareStatement("DELETE FROM patches WHERE system_name = ?");
+            stmt.setString(1, toolSignature);
+            stmt.execute();
 
         }
         catch (SQLException sqlex)
