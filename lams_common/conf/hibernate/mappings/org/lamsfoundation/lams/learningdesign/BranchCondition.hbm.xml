@@ -9,6 +9,7 @@
 <class 
     name="org.lamsfoundation.lams.learningdesign.BranchCondition" 
     table="lams_branch_condition"
+    discriminator-value="0"
 >
     <id
         name="conditionId"
@@ -50,5 +51,26 @@
         <meta attribute="field-description">@hibernate.property column="exact_match_value" length="255" </meta>    
     </property>
     
+     <joined-subclass name="org.lamsfoundation.lams.learningdesign.TextSearchCondition" table="lams_text_search_condition">
+     	<meta attribute="class-description" inherit="false">@hibernate.class </meta>
+     	
+     	<key column="condition_id" />
+     	
+	     <property name="allWords" type="java.lang.String" column="text_search_all_words">
+	        <meta attribute="field-description">@hibernate.property column="text_search_all_words"</meta>    
+	    </property>
+	    
+	    <property name="phrase" type="java.lang.String" column="text_search_phrase">
+	        <meta attribute="field-description">@hibernate.property column="text_search_phrase"</meta>    
+	    </property>
+	    
+	    <property name="anyWords" type="java.lang.String" column="text_search_any_words">
+	        <meta attribute="field-description">@hibernate.property column="text_search_any_words"</meta>    
+	    </property>
+	    
+	    <property name="excludedWords" type="java.lang.String" column="text_search_excluded_words">
+	        <meta attribute="field-description">@hibernate.property column="text_search_excluded_words"</meta>    
+	    </property>
+     </joined-subclass>
 </class>
 </hibernate-mapping>

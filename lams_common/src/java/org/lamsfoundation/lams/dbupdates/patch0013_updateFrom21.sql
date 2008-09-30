@@ -1,5 +1,4 @@
 -- SQL statements to update from LAMS 2.1/2.1.1
-
 -- LDEV1909 - Competence Editor Update Scripts ---------------------------------
 CREATE TABLE lams_competence (
        competence_id BIGINT NOT NULL UNIQUE auto_increment
@@ -25,4 +24,14 @@ CREATE TABLE lams_competence_mapping (
 	                  REFERENCES lams_competence (competence_id) ON DELETE CASCADE ON UPDATE CASCADE
 )TYPE=InnoDB;
 
---------------------------------------------------------------------------------
+-- LDEV-1604 - Text based complex conditions -----------------------------------
+CREATE TABLE lams_text_search_condition (
+       condition_id BIGINT(20) NOT NULL
+	 , text_search_all_words TEXT
+	 , text_search_phrase TEXT
+	 , text_search_any_words TEXT
+	 , text_search_excluded_words TEXT
+     , PRIMARY KEY (condition_id)
+	 , CONSTRAINT TextSearchConditionInheritance FOREIGN KEY (condition_id)
+                  REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
+)TYPE=InnoDB;

@@ -598,6 +598,17 @@ CREATE TABLE lams_branch_condition (
      , PRIMARY KEY (condition_id)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_text_search_condition (
+       condition_id BIGINT(20) NOT NULL
+	 , text_search_all_words TEXT
+	 , text_search_phrase TEXT
+	 , text_search_any_words TEXT
+	 , text_search_excluded_words TEXT
+     , PRIMARY KEY (condition_id)
+	 , CONSTRAINT TextSearchConditionInheritance FOREIGN KEY (condition_id)
+                  REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
+)TYPE=InnoDB;
+
 CREATE TABLE lams_branch_activity_entry (
        entry_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , entry_ui_id INT(11)
@@ -1037,3 +1048,4 @@ CREATE TABLE patches (
      , patch_in_progress CHAR(1) NOT NULL DEFAULT 'F'
      , PRIMARY KEY (system_name)
 )TYPE=InnoDB;
+ 
