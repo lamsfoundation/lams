@@ -33,6 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		tabs.add("label.basic");
 		tabs.add("label.advanced");
 		tabs.add("label.instructions");
+		tabs.add("label.conditions");
 		pageContext.setAttribute("tabs", tabs);
 		
 		Set tabsBasic = new LinkedHashSet();
@@ -154,7 +155,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<lams:TabBody id="3" titleKey="label.instructions" page="InstructionsContent.jsp" />
 			<!-- end of content (Instructions) -->
 
-
+			<!-- tab content 4 (Conditions) -->
+			<lams:TabBody id="4" titleKey="label.conditions" page="conditions.jsp" />
+			<!-- end of content (Conditions) -->
+			
 			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
 			cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 

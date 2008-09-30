@@ -224,7 +224,24 @@
               <one-to-many
                   class="org.lamsfoundation.lams.tool.qa.QaUploadedFile"
               />
-    </set> 
+    </set>
+    <set
+            name="conditions"
+            lazy="true"
+            inverse="false"
+            cascade="all"
+            sort="org.lamsfoundation.lams.tool.qa.util.QaConditionComparator"
+        >
+
+            <key
+                column="content_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.qa.QaCondition"
+            />
+    </set>
 
 </class>
 </hibernate-mapping>

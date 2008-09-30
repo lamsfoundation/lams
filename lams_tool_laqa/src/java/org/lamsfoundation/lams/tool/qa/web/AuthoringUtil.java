@@ -29,7 +29,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -37,832 +40,776 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
+import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.util.QaConditionComparator;
+import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
+import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
- * Keeps all operations needed for Authoring mode. 
+ * Keeps all operations needed for Authoring mode.
+ * 
  * @author Ozgur Demirtas
- *
+ * 
  */
 public class AuthoringUtil implements QaAppConstants {
-	static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
-    
-    
-    protected static List swapNodes(List listQuestionContentDTO, String questionIndex, String direction)
-    {
-        logger.debug("swapNodes:");
-        logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
-        logger.debug("questionIndex:" + questionIndex);
-        logger.debug("direction:" + direction);
+    static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 
-        int intQuestionIndex=new Integer(questionIndex).intValue();
-        int intOriginalQuestionIndex=intQuestionIndex;
-        logger.debug("intQuestionIndex:" + intQuestionIndex);
-        
-        int replacedNodeIndex=0;
-        if (direction.equals("down"))
-        {
-            logger.debug("direction down:");
-            replacedNodeIndex=++intQuestionIndex;
-        }
-        else
-        {
-            logger.debug("direction up:");
-            replacedNodeIndex=--intQuestionIndex;
-            
-        }
-        logger.debug("replacedNodeIndex:" + replacedNodeIndex);
-        logger.debug("replacing nodes:" + intOriginalQuestionIndex + " and " + replacedNodeIndex);
-        
-        QaQuestionContentDTO mainNode=extractNodeAtDisplayOrder(listQuestionContentDTO, intOriginalQuestionIndex);
-        logger.debug("mainNode:" + mainNode);
-        
+    protected static List swapNodes(List listQuestionContentDTO, String questionIndex, String direction,
+	    Set<QaCondition> conditions) {
+	AuthoringUtil.logger.debug("swapNodes:");
+	AuthoringUtil.logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
+	AuthoringUtil.logger.debug("questionIndex:" + questionIndex);
+	AuthoringUtil.logger.debug("direction:" + direction);
 
-        QaQuestionContentDTO replacedNode=extractNodeAtDisplayOrder(listQuestionContentDTO, replacedNodeIndex);
-        logger.debug("replacedNode:" + replacedNode);
+	int intQuestionIndex = new Integer(questionIndex).intValue();
+	int intOriginalQuestionIndex = intQuestionIndex;
+	AuthoringUtil.logger.debug("intQuestionIndex:" + intQuestionIndex);
 
-        List listFinalQuestionContentDTO=new LinkedList();
-        
-        listFinalQuestionContentDTO=reorderSwappedListQuestionContentDTO(listQuestionContentDTO, intOriginalQuestionIndex,
-                replacedNodeIndex, mainNode, replacedNode);
-        
-        
-	    logger.debug("listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
-        return listFinalQuestionContentDTO;
+	int replacedNodeIndex = 0;
+	if (direction.equals("down")) {
+	    AuthoringUtil.logger.debug("direction down:");
+	    replacedNodeIndex = ++intQuestionIndex;
+	} else {
+	    AuthoringUtil.logger.debug("direction up:");
+	    replacedNodeIndex = --intQuestionIndex;
+
+	}
+	AuthoringUtil.logger.debug("replacedNodeIndex:" + replacedNodeIndex);
+	AuthoringUtil.logger.debug("replacing nodes:" + intOriginalQuestionIndex + " and " + replacedNodeIndex);
+
+	QaQuestionContentDTO mainNode = extractNodeAtDisplayOrder(listQuestionContentDTO, intOriginalQuestionIndex);
+	AuthoringUtil.logger.debug("mainNode:" + mainNode);
+
+	QaQuestionContentDTO replacedNode = extractNodeAtDisplayOrder(listQuestionContentDTO, replacedNodeIndex);
+	AuthoringUtil.logger.debug("replacedNode:" + replacedNode);
+
+	List listFinalQuestionContentDTO = new LinkedList();
+
+	listFinalQuestionContentDTO = reorderSwappedListQuestionContentDTO(listQuestionContentDTO,
+		intOriginalQuestionIndex, replacedNodeIndex, mainNode, replacedNode, conditions);
+
+	AuthoringUtil.logger.debug("listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
+	return listFinalQuestionContentDTO;
     }
-    
-    
-    
-    protected  static List reorderSwappedListQuestionContentDTO(List listQuestionContentDTO, int intOriginalQuestionIndex, 
-            int replacedNodeIndex, QaQuestionContentDTO mainNode, QaQuestionContentDTO replacedNode)
-    {
-        logger.debug("reorderSwappedListQuestionContentDTO: intOriginalQuestionIndex:" + intOriginalQuestionIndex);
-        logger.debug("reorderSwappedListQuestionContentDTO: replacedNodeIndex:" + replacedNodeIndex);
-        logger.debug("mainNode: " + mainNode);
-        logger.debug("replacedNode: " + replacedNode);
-        
-        
-        List listFinalQuestionContentDTO=new LinkedList();
-    	
-	    int queIndex=0;
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
-	    {
-	        QaQuestionContentDTO qaQuestionContentDTO= (QaQuestionContentDTO)listIterator.next();
-	        logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-	        logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
-	        queIndex++;
-	        QaQuestionContentDTO tempNode=new QaQuestionContentDTO();
-	        
-            if ((!qaQuestionContentDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) && 
-                 !qaQuestionContentDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString()))
-            {
-            	logger.debug("normal copy ");
-            	tempNode.setQuestion(qaQuestionContentDTO.getQuestion());
-            	tempNode.setDisplayOrder(qaQuestionContentDTO.getDisplayOrder());
-            	tempNode.setFeedback(qaQuestionContentDTO.getFeedback());
-            }
-            else if (qaQuestionContentDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString()))
-            {
-            	logger.debug("move type 1 ");
-            	tempNode.setQuestion(replacedNode.getQuestion());
-            	tempNode.setDisplayOrder(replacedNode.getDisplayOrder());
-            	tempNode.setFeedback(replacedNode.getFeedback());
-            }
-            else if (qaQuestionContentDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString()))
-            {
-            	logger.debug("move type 1 ");
-            	tempNode.setQuestion(mainNode.getQuestion());
-            	tempNode.setDisplayOrder(mainNode.getDisplayOrder());
-            	tempNode.setFeedback(mainNode.getFeedback());
-            }
-	        
-	        listFinalQuestionContentDTO.add(tempNode);
+
+    protected static List reorderSwappedListQuestionContentDTO(List listQuestionContentDTO,
+	    int intOriginalQuestionIndex, int replacedNodeIndex, QaQuestionContentDTO mainNode,
+	    QaQuestionContentDTO replacedNode, Set<QaCondition> conditions) {
+	AuthoringUtil.logger.debug("reorderSwappedListQuestionContentDTO: intOriginalQuestionIndex:"
+		+ intOriginalQuestionIndex);
+	AuthoringUtil.logger.debug("reorderSwappedListQuestionContentDTO: replacedNodeIndex:" + replacedNodeIndex);
+	AuthoringUtil.logger.debug("mainNode: " + mainNode);
+	AuthoringUtil.logger.debug("replacedNode: " + replacedNode);
+
+	List listFinalQuestionContentDTO = new LinkedList();
+
+	int queIndex = 0;
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	while (listIterator.hasNext()) {
+	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
+	    queIndex++;
+	    QaQuestionContentDTO tempNode = new QaQuestionContentDTO();
+
+	    if (!qaQuestionContentDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())
+		    && !qaQuestionContentDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString())) {
+		AuthoringUtil.logger.debug("normal copy ");
+		tempNode.setQuestion(qaQuestionContentDTO.getQuestion());
+		tempNode.setDisplayOrder(qaQuestionContentDTO.getDisplayOrder());
+		tempNode.setFeedback(qaQuestionContentDTO.getFeedback());
+	    } else if (qaQuestionContentDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
+		AuthoringUtil.logger.debug("move type 1 ");
+		tempNode.setQuestion(replacedNode.getQuestion());
+		tempNode.setDisplayOrder(replacedNode.getDisplayOrder());
+		tempNode.setFeedback(replacedNode.getFeedback());
+	    } else if (qaQuestionContentDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString())) {
+		AuthoringUtil.logger.debug("move type 1 ");
+		tempNode.setQuestion(mainNode.getQuestion());
+		tempNode.setDisplayOrder(mainNode.getDisplayOrder());
+		tempNode.setFeedback(mainNode.getFeedback());
 	    }
 
-	    
-	    
-        logger.debug("final listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
-        return listFinalQuestionContentDTO;
-    }
-
-
-    
-
-    
-    protected static QaQuestionContentDTO extractNodeAtDisplayOrder(List listQuestionContentDTO, int intOriginalQuestionIndex)
-    {
-        logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
-        logger.debug("intOriginalQuestionIndex:" + intOriginalQuestionIndex);
-        
-        Iterator listIterator=listQuestionContentDTO.iterator();
-        while (listIterator.hasNext())
-        {
-            QaQuestionContentDTO qaQuestionContentDTO=(QaQuestionContentDTO)listIterator.next();
-            logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-            logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
-            
-            logger.debug("intOriginalQuestionIndex versus displayOrder:" + new Integer(intOriginalQuestionIndex).toString() + " versus " + 
-                    qaQuestionContentDTO.getDisplayOrder());
-            if (new Integer(intOriginalQuestionIndex).toString().equals(qaQuestionContentDTO.getDisplayOrder()))
-            {
-                logger.debug("node found:" + qaQuestionContentDTO);
-                return qaQuestionContentDTO;
-            }
-        }
-        return null;
-    }
-
-
-    
-    protected static Map extractMapQuestionContent(List listQuestionContentDTO)
-    {
-        logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
-        Map mapQuestionContent= new TreeMap(new QaComparator());
-        
-        Iterator listIterator=listQuestionContentDTO.iterator();
-        int queIndex=0;
-        while (listIterator.hasNext())
-        {
-            QaQuestionContentDTO qaQuestionContentDTO=(QaQuestionContentDTO)listIterator.next();
-            logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-            logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion()); 
-        
-            queIndex++;
-            logger.debug("queIndex:" + queIndex);
-            mapQuestionContent.put(new Integer(queIndex).toString(), qaQuestionContentDTO.getQuestion());
-        }
-        logger.debug("mapQuestionContent:" + mapQuestionContent);
-        return mapQuestionContent;
-    }
-
-    protected static Map extractMapFeedback(List listQuestionContentDTO)
-    {
-        logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
-        Map mapFeedbackContent= new TreeMap(new QaComparator());
-        
-        Iterator listIterator=listQuestionContentDTO.iterator();
-        int queIndex=0;
-        while (listIterator.hasNext())
-        {
-            QaQuestionContentDTO qaQuestionContentDTO=(QaQuestionContentDTO)listIterator.next();
-            logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-            logger.debug("qaQuestionContentDTO feedback:" + qaQuestionContentDTO.getFeedback()); 
-        
-            queIndex++;
-            logger.debug("queIndex:" + queIndex);
-            mapFeedbackContent.put(new Integer(queIndex).toString(), qaQuestionContentDTO.getFeedback());
-        }
-        logger.debug("mapFeedbackContent:" + mapFeedbackContent);
-        return mapFeedbackContent;
-    }
-
-    
-    protected  static Map reorderQuestionContentMap(Map mapQuestionContent)
-    {
-    	logger.debug("reorderQuestionContentMap:" + mapQuestionContent);
-    	
-    	Map mapFinalQuestionContent = new TreeMap(new QaComparator());
-    	
-    	int queIndex=0;
-    	Iterator itMap = mapQuestionContent.entrySet().iterator();
-	    while (itMap.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)itMap.next();
-	        if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-    		{
-	            ++queIndex;
-	            logger.debug("using queIndex:" + queIndex);
-	        	mapFinalQuestionContent.put(new Integer(queIndex).toString(), pairs.getValue());
-
-    		}
+	    listFinalQuestionContentDTO.add(tempNode);
+	}
+	// references in conditions also need to be changed
+	if (conditions != null) {
+	    for (QaCondition condition : conditions) {
+		SortedSet<QaQuestionContentDTO> newQuestionDTOSet = new TreeSet<QaQuestionContentDTO>(
+			new QaQuestionContentDTOComparator());
+		for (QaQuestionContentDTO dto : (List<QaQuestionContentDTO>) listFinalQuestionContentDTO) {
+		    if (condition.temporaryQuestionDTOSet.contains(dto)) {
+			newQuestionDTOSet.add(dto);
+		    }
+		}
+		condition.temporaryQuestionDTOSet = newQuestionDTOSet;
 	    }
-	    
-        logger.debug("final mapFinalQuestionContent:" + mapFinalQuestionContent);
-        return mapFinalQuestionContent;
+	}
+	AuthoringUtil.logger.debug("final listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
+	return listFinalQuestionContentDTO;
     }
 
+    protected static QaQuestionContentDTO extractNodeAtDisplayOrder(List listQuestionContentDTO,
+	    int intOriginalQuestionIndex) {
+	AuthoringUtil.logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
+	AuthoringUtil.logger.debug("intOriginalQuestionIndex:" + intOriginalQuestionIndex);
 
-    protected  static List reorderListQuestionContentDTO(List listQuestionContentDTO, String excludeQuestionIndex)
-    {
-        logger.debug("reorderListQuestionContentDTO");
-    	logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
-    	logger.debug("excludeQuestionIndex:" + excludeQuestionIndex);
-    	
-    	List listFinalQuestionContentDTO=new LinkedList();
-    	
-	    int queIndex=0;
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
-	    {
-	        QaQuestionContentDTO qaQuestionContentDTO= (QaQuestionContentDTO)listIterator.next();
-	        logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-	        logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
-	        
-	        String question=qaQuestionContentDTO.getQuestion();
-	        logger.debug("question:" + question);
-	        
-	        String displayOrder=qaQuestionContentDTO.getDisplayOrder();
-	        logger.debug("displayOrder:" + displayOrder);
-	        
-	        String feedback=qaQuestionContentDTO.getFeedback();
-	        logger.debug("feedback:" + feedback);
-	        
-	        logger.debug("displayOrder versus excludeQuestionIndex :" + displayOrder + " versus " + excludeQuestionIndex);
-	        
-	        if ((question != null) && (!question.equals("")))
-    		{
-	            if (!displayOrder.equals(excludeQuestionIndex))
-	            {
-		            ++queIndex;
-		            logger.debug("using queIndex:" + queIndex);
-		            
-		            qaQuestionContentDTO.setQuestion(question);
-		            qaQuestionContentDTO.setDisplayOrder(new Integer(queIndex).toString());
-		            qaQuestionContentDTO.setFeedback(feedback);
-		            
-		            listFinalQuestionContentDTO.add(qaQuestionContentDTO);
-	            }
-    		}
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	while (listIterator.hasNext()) {
+	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
+
+	    AuthoringUtil.logger.debug("intOriginalQuestionIndex versus displayOrder:"
+		    + new Integer(intOriginalQuestionIndex).toString() + " versus "
+		    + qaQuestionContentDTO.getDisplayOrder());
+	    if (new Integer(intOriginalQuestionIndex).toString().equals(qaQuestionContentDTO.getDisplayOrder())) {
+		AuthoringUtil.logger.debug("node found:" + qaQuestionContentDTO);
+		return qaQuestionContentDTO;
 	    }
-	    
-	    
-        logger.debug("final listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
-        return listFinalQuestionContentDTO;
+	}
+	return null;
     }
 
-    
-    protected  static List reorderSimpleListQuestionContentDTO(List listQuestionContentDTO)
-    {
-        logger.debug("reorderListQuestionContentDTO");
-    	logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
-    	List listFinalQuestionContentDTO=new LinkedList();
-    	
-	    int queIndex=0;
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
-	    {
-	        QaQuestionContentDTO qaQuestionContentDTO= (QaQuestionContentDTO)listIterator.next();
-	        logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-	        logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
-	        
-	        String question=qaQuestionContentDTO.getQuestion();
-	        logger.debug("question:" + question);
-	        
-	        String displayOrder=qaQuestionContentDTO.getDisplayOrder();
-	        logger.debug("displayOrder:" + displayOrder);
-	        
-	        String feedback=qaQuestionContentDTO.getFeedback();
-	        logger.debug("feedback:" + feedback);
-	        
-	        if ((question != null) && (!question.equals("")))
-    		{
-		            ++queIndex;
-		            logger.debug("using queIndex:" + queIndex);
-		            
-		            qaQuestionContentDTO.setQuestion(question);
-		            qaQuestionContentDTO.setDisplayOrder(new Integer(queIndex).toString());
-		            qaQuestionContentDTO.setFeedback(feedback);
-		            
-		            listFinalQuestionContentDTO.add(qaQuestionContentDTO);
-    		}
+    protected static Map extractMapQuestionContent(List listQuestionContentDTO) {
+	AuthoringUtil.logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
+	Map mapQuestionContent = new TreeMap(new QaComparator());
+
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	int queIndex = 0;
+	while (listIterator.hasNext()) {
+	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
+
+	    queIndex++;
+	    AuthoringUtil.logger.debug("queIndex:" + queIndex);
+	    mapQuestionContent.put(new Integer(queIndex).toString(), qaQuestionContentDTO.getQuestion());
+	}
+	AuthoringUtil.logger.debug("mapQuestionContent:" + mapQuestionContent);
+	return mapQuestionContent;
+    }
+
+    protected static Map extractMapFeedback(List listQuestionContentDTO) {
+	AuthoringUtil.logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
+	Map mapFeedbackContent = new TreeMap(new QaComparator());
+
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	int queIndex = 0;
+	while (listIterator.hasNext()) {
+	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO feedback:" + qaQuestionContentDTO.getFeedback());
+
+	    queIndex++;
+	    AuthoringUtil.logger.debug("queIndex:" + queIndex);
+	    mapFeedbackContent.put(new Integer(queIndex).toString(), qaQuestionContentDTO.getFeedback());
+	}
+	AuthoringUtil.logger.debug("mapFeedbackContent:" + mapFeedbackContent);
+	return mapFeedbackContent;
+    }
+
+    protected static Map reorderQuestionContentMap(Map mapQuestionContent) {
+	AuthoringUtil.logger.debug("reorderQuestionContentMap:" + mapQuestionContent);
+
+	Map mapFinalQuestionContent = new TreeMap(new QaComparator());
+
+	int queIndex = 0;
+	Iterator itMap = mapQuestionContent.entrySet().iterator();
+	while (itMap.hasNext()) {
+	    Map.Entry pairs = (Map.Entry) itMap.next();
+	    if (pairs.getValue() != null && !pairs.getValue().equals("")) {
+		++queIndex;
+		AuthoringUtil.logger.debug("using queIndex:" + queIndex);
+		mapFinalQuestionContent.put(new Integer(queIndex).toString(), pairs.getValue());
+
 	    }
-	    
-	    
-        logger.debug("final listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
-        return listFinalQuestionContentDTO;
+	}
+
+	AuthoringUtil.logger.debug("final mapFinalQuestionContent:" + mapFinalQuestionContent);
+	return mapFinalQuestionContent;
     }
 
-    
-    
-    protected  static List reorderUpdateListQuestionContentDTO(List listQuestionContentDTO, 
-            										QaQuestionContentDTO qaQuestionContentDTONew, 
-            										String editableQuestionIndex)
-    {
-        logger.debug("reorderUpdateListQuestionContentDTO");
-    	logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
-    	logger.debug("qaQuestionContentDTONew:" + qaQuestionContentDTONew);
-    	logger.debug("editableQuestionIndex:" + editableQuestionIndex);
-    	
-    	
-    	List listFinalQuestionContentDTO=new LinkedList();
-    	
-	    int queIndex=0;
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
-	    {
-	        QaQuestionContentDTO qaQuestionContentDTO= (QaQuestionContentDTO)listIterator.next();
-	        logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-	        logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
-	        
-	        ++queIndex;
-	        logger.debug("using queIndex:" + queIndex);
-	        String question=qaQuestionContentDTO.getQuestion();
-	        logger.debug("question:" + question);
-	        
-	        String displayOrder=qaQuestionContentDTO.getDisplayOrder();
-	        logger.debug("displayOrder:" + displayOrder);
-	        
-	        String feedback=qaQuestionContentDTO.getFeedback();
-	        logger.debug("feedback:" + feedback);
-	        
-	        if (displayOrder.equals(editableQuestionIndex))
-            {
-	            logger.debug("displayOrder equals editableQuestionIndex:" + editableQuestionIndex);
-		        qaQuestionContentDTO.setQuestion(qaQuestionContentDTONew.getQuestion());
-	            qaQuestionContentDTO.setDisplayOrder(qaQuestionContentDTONew.getDisplayOrder());
-	            qaQuestionContentDTO.setFeedback(qaQuestionContentDTONew.getFeedback());
-	            
-	            listFinalQuestionContentDTO.add(qaQuestionContentDTO);
-	        }
-	        else
-	        {
-	            logger.debug("displayOrder does not equal editableQuestionIndex:" + editableQuestionIndex);
-	            qaQuestionContentDTO.setQuestion(question);
-	            qaQuestionContentDTO.setDisplayOrder(displayOrder);
-	            qaQuestionContentDTO.setFeedback(feedback);
+    protected static List reorderListQuestionContentDTO(List listQuestionContentDTO, String excludeQuestionIndex) {
+	AuthoringUtil.logger.debug("reorderListQuestionContentDTO");
+	AuthoringUtil.logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
+	AuthoringUtil.logger.debug("excludeQuestionIndex:" + excludeQuestionIndex);
 
-	            listFinalQuestionContentDTO.add(qaQuestionContentDTO);
-	            
-	        }
-	         
-    	}
-	    
-	    logger.debug("listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
-        return listFinalQuestionContentDTO;
+	List listFinalQuestionContentDTO = new LinkedList();
+
+	int queIndex = 0;
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	while (listIterator.hasNext()) {
+	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
+
+	    String question = qaQuestionContentDTO.getQuestion();
+	    AuthoringUtil.logger.debug("question:" + question);
+
+	    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
+	    AuthoringUtil.logger.debug("displayOrder:" + displayOrder);
+
+	    String feedback = qaQuestionContentDTO.getFeedback();
+	    AuthoringUtil.logger.debug("feedback:" + feedback);
+
+	    AuthoringUtil.logger.debug("displayOrder versus excludeQuestionIndex :" + displayOrder + " versus "
+		    + excludeQuestionIndex);
+
+	    if (question != null && !question.equals("")) {
+		if (!displayOrder.equals(excludeQuestionIndex)) {
+		    ++queIndex;
+		    AuthoringUtil.logger.debug("using queIndex:" + queIndex);
+
+		    qaQuestionContentDTO.setQuestion(question);
+		    qaQuestionContentDTO.setDisplayOrder(new Integer(queIndex).toString());
+		    qaQuestionContentDTO.setFeedback(feedback);
+
+		    listFinalQuestionContentDTO.add(qaQuestionContentDTO);
+		}
+	    }
+	}
+
+	AuthoringUtil.logger.debug("final listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
+	return listFinalQuestionContentDTO;
     }
-    
-    
-  
-    
+
+    protected static List reorderSimpleListQuestionContentDTO(List listQuestionContentDTO) {
+	AuthoringUtil.logger.debug("reorderListQuestionContentDTO");
+	AuthoringUtil.logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
+	List listFinalQuestionContentDTO = new LinkedList();
+
+	int queIndex = 0;
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	while (listIterator.hasNext()) {
+	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
+
+	    String question = qaQuestionContentDTO.getQuestion();
+	    AuthoringUtil.logger.debug("question:" + question);
+
+	    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
+	    AuthoringUtil.logger.debug("displayOrder:" + displayOrder);
+
+	    String feedback = qaQuestionContentDTO.getFeedback();
+	    AuthoringUtil.logger.debug("feedback:" + feedback);
+
+	    if (question != null && !question.equals("")) {
+		++queIndex;
+		AuthoringUtil.logger.debug("using queIndex:" + queIndex);
+
+		qaQuestionContentDTO.setQuestion(question);
+		qaQuestionContentDTO.setDisplayOrder(new Integer(queIndex).toString());
+		qaQuestionContentDTO.setFeedback(feedback);
+
+		listFinalQuestionContentDTO.add(qaQuestionContentDTO);
+	    }
+	}
+
+	AuthoringUtil.logger.debug("final listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
+	return listFinalQuestionContentDTO;
+    }
+
+    protected static List reorderUpdateListQuestionContentDTO(List listQuestionContentDTO,
+	    QaQuestionContentDTO qaQuestionContentDTONew, String editableQuestionIndex) {
+	AuthoringUtil.logger.debug("reorderUpdateListQuestionContentDTO");
+	AuthoringUtil.logger.debug("listQuestionContentDTO:" + listQuestionContentDTO);
+	AuthoringUtil.logger.debug("qaQuestionContentDTONew:" + qaQuestionContentDTONew);
+	AuthoringUtil.logger.debug("editableQuestionIndex:" + editableQuestionIndex);
+
+	List listFinalQuestionContentDTO = new LinkedList();
+
+	int queIndex = 0;
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	while (listIterator.hasNext()) {
+	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
+	    AuthoringUtil.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
+
+	    ++queIndex;
+	    AuthoringUtil.logger.debug("using queIndex:" + queIndex);
+	    String question = qaQuestionContentDTO.getQuestion();
+	    AuthoringUtil.logger.debug("question:" + question);
+
+	    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
+	    AuthoringUtil.logger.debug("displayOrder:" + displayOrder);
+
+	    String feedback = qaQuestionContentDTO.getFeedback();
+	    AuthoringUtil.logger.debug("feedback:" + feedback);
+
+	    if (displayOrder.equals(editableQuestionIndex)) {
+		AuthoringUtil.logger.debug("displayOrder equals editableQuestionIndex:" + editableQuestionIndex);
+		qaQuestionContentDTO.setQuestion(qaQuestionContentDTONew.getQuestion());
+		qaQuestionContentDTO.setDisplayOrder(qaQuestionContentDTONew.getDisplayOrder());
+		qaQuestionContentDTO.setFeedback(qaQuestionContentDTONew.getFeedback());
+
+		listFinalQuestionContentDTO.add(qaQuestionContentDTO);
+	    } else {
+		AuthoringUtil.logger
+			.debug("displayOrder does not equal editableQuestionIndex:" + editableQuestionIndex);
+		qaQuestionContentDTO.setQuestion(question);
+		qaQuestionContentDTO.setDisplayOrder(displayOrder);
+		qaQuestionContentDTO.setFeedback(feedback);
+
+		listFinalQuestionContentDTO.add(qaQuestionContentDTO);
+
+	    }
+
+	}
+
+	AuthoringUtil.logger.debug("listFinalQuestionContentDTO:" + listFinalQuestionContentDTO);
+	return listFinalQuestionContentDTO;
+    }
+
     /**
-     * repopulateMap(TreeMap mapQuestionContent, HttpServletRequest request)
-     * return void 
-     * repopulates the user entries into the Map
+     * repopulateMap(TreeMap mapQuestionContent, HttpServletRequest request) return void repopulates the user entries
+     * into the Map
      */
-    protected void repopulateMap(Map mapQuestionContent, HttpServletRequest request)
-    {
-        logger.debug("starting repopulateMap");
-        int intQuestionIndex= mapQuestionContent.size();
-        logger.debug("intQuestionIndex: " + intQuestionIndex);
+    protected void repopulateMap(Map mapQuestionContent, HttpServletRequest request) {
+	AuthoringUtil.logger.debug("starting repopulateMap");
+	int intQuestionIndex = mapQuestionContent.size();
+	AuthoringUtil.logger.debug("intQuestionIndex: " + intQuestionIndex);
 
-    	/* if there is data in the Map remaining from previous session remove those */
-		mapQuestionContent.clear();
-		logger.debug("Map got initialized: " + mapQuestionContent);
-		
-		for (long i=0; i < intQuestionIndex  ; i++)
-		{
-			String candidateQuestionEntry =request.getParameter("questionContent" + i);
-			if (i==0)
-    		{
-    			logger.debug("defaultQuestionContent set to: " + candidateQuestionEntry);
-    		}
-			if ((candidateQuestionEntry != null) && (candidateQuestionEntry.length() > 0))
-			{
-				logger.debug("using key: " + i);
-				mapQuestionContent.put(new Long(i+1).toString(), candidateQuestionEntry);
-				logger.debug("added new entry.");	
-			}
-		}
+	/*
+	 * if there is data in the Map remaining from previous session remove those
+	 */
+	mapQuestionContent.clear();
+	AuthoringUtil.logger.debug("Map got initialized: " + mapQuestionContent);
+
+	for (long i = 0; i < intQuestionIndex; i++) {
+	    String candidateQuestionEntry = request.getParameter("questionContent" + i);
+	    if (i == 0) {
+		AuthoringUtil.logger.debug("defaultQuestionContent set to: " + candidateQuestionEntry);
+	    }
+	    if (candidateQuestionEntry != null && candidateQuestionEntry.length() > 0) {
+		AuthoringUtil.logger.debug("using key: " + i);
+		mapQuestionContent.put(new Long(i + 1).toString(), candidateQuestionEntry);
+		AuthoringUtil.logger.debug("added new entry.");
+	    }
+	}
     }
 
+    public QaContent saveOrUpdateQaContent(Map mapQuestionContent, Map mapFeedback, IQaService qaService,
+	    QaAuthoringForm qaAuthoringForm, HttpServletRequest request, QaContent qaContent, String strToolContentID,
+	    Set<QaCondition> conditions) {
+	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
-    public QaContent  saveOrUpdateQaContent(Map mapQuestionContent, Map mapFeedback, IQaService qaService, QaAuthoringForm qaAuthoringForm, 
-            HttpServletRequest request, QaContent qaContent, String strToolContentID)
-    {
-        UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-        
-        String richTextTitle = request.getParameter(TITLE);
-        String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
+	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-        logger.debug("richTextTitle: " + richTextTitle);
-        logger.debug("richTextInstructions: " + richTextInstructions);
+	AuthoringUtil.logger.debug("richTextTitle: " + richTextTitle);
+	AuthoringUtil.logger.debug("richTextInstructions: " + richTextInstructions);
 
-		String synchInMonitor=request.getParameter(SYNC_IN_MONITOR);
-		logger.debug("synchInMonitor: " + synchInMonitor);
-		
-		String usernameVisible=request.getParameter(USERNAME_VISIBLE);
-		logger.debug("usernameVisible: " + usernameVisible);
-		
-		String showOtherAnswers=request.getParameter("showOtherAnswers");
-		logger.debug("showOtherAnswers: " + showOtherAnswers);
-		
-		String questionsSequenced=request.getParameter(QUESTIONS_SEQUENCED);
-		logger.debug("questionsSequenced: " + questionsSequenced);
-		
-		String lockWhenFinished=request.getParameter("lockWhenFinished");
-		logger.debug("lockWhenFinished: " + lockWhenFinished);
-		
-		
-		String richTextOfflineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
-		String richTextOnlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
-		String reflect=request.getParameter(REFLECT);
-		logger.debug("reflect: " + reflect);
-		
-		String reflectionSubject=request.getParameter(REFLECTION_SUBJECT);
-		logger.debug("reflectionSubject: " + reflectionSubject);
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		logger.debug("activeModule: " + activeModule);
-        
-        
-        boolean setCommonContent=true; 
-        if ((questionsSequenced == null) || (synchInMonitor == null) || (lockWhenFinished == null) || 
-             (usernameVisible == null) || (reflect == null) || (showOtherAnswers == null))
-        {
-        	setCommonContent=false;
-        }
-        logger.debug("setCommonContent: " + setCommonContent);
-		
-        boolean questionsSequencedBoolean=false;
-        boolean synchInMonitorBoolean=false;
-        boolean lockWhenFinishedBoolean=false;
-        boolean usernameVisibleBoolean=false;
-        boolean showOtherAnswersBoolean=false;
-        boolean reflectBoolean=false;
+	String synchInMonitor = request.getParameter(QaAppConstants.SYNC_IN_MONITOR);
+	AuthoringUtil.logger.debug("synchInMonitor: " + synchInMonitor);
 
-    	if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1")))
-            questionsSequencedBoolean=true;            
-        
-        if ((synchInMonitor != null) && (synchInMonitor.equalsIgnoreCase("1")))
-            synchInMonitorBoolean=true;            
-        
-        if ((lockWhenFinished != null) && (lockWhenFinished.equalsIgnoreCase("1")))
-            lockWhenFinishedBoolean=true;
-        
-        if ((usernameVisible != null) && (usernameVisible.equalsIgnoreCase("1")))
-            usernameVisibleBoolean=true;            
+	String usernameVisible = request.getParameter(QaAppConstants.USERNAME_VISIBLE);
+	AuthoringUtil.logger.debug("usernameVisible: " + usernameVisible);
 
-        if ((showOtherAnswers != null) && (showOtherAnswers.equalsIgnoreCase("1")))
-            showOtherAnswersBoolean=true;            
+	String showOtherAnswers = request.getParameter("showOtherAnswers");
+	AuthoringUtil.logger.debug("showOtherAnswers: " + showOtherAnswers);
 
-        
-        if ((reflect != null) && (reflect.equalsIgnoreCase("1")))
-            reflectBoolean=true;
-            
-            
-        logger.debug("questionsSequencedBoolean: " + questionsSequencedBoolean);
-        logger.debug("synchInMonitorBoolean: " + synchInMonitorBoolean);
-        logger.debug("lockWhenFinishedBoolean: " + lockWhenFinishedBoolean);
-        logger.debug("usernameVisibleBoolean: " + usernameVisibleBoolean);
-        logger.debug("showOtherAnswersBoolean: " + showOtherAnswersBoolean);
-        logger.debug("reflectBoolean: " + reflectBoolean);
-        
-        long userId=0;
-        if (toolUser != null)
-        {
-        	userId = toolUser.getUserID().longValue();	
-        }
-        else
-        {
-    		HttpSession ss = SessionManager.getSession();
-    		logger.debug("ss: " + ss);
-    		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-    		logger.debug("user" + user);
-    		if (user != null)
-    		{
-    			userId = user.getUserID().longValue();	
-    		}
-    		else
-    		{
-    			logger.debug("should not reach here");
-    			userId=0;
-    		}
-        }
-        logger.debug("userId: " + userId);
-     	logger.debug("qaContent: " + qaContent);
-     	
-     	boolean newContent=false;
-        if(qaContent == null)
-        {
-        	qaContent = new QaContent();
-        	newContent=true;
-        }
+	String questionsSequenced = request.getParameter(QaAppConstants.QUESTIONS_SEQUENCED);
+	AuthoringUtil.logger.debug("questionsSequenced: " + questionsSequenced);
 
+	String lockWhenFinished = request.getParameter("lockWhenFinished");
+	AuthoringUtil.logger.debug("lockWhenFinished: " + lockWhenFinished);
 
-    	logger.debug("setting common content values..." + richTextTitle + " " + richTextInstructions);
-    	qaContent.setQaContentId(new Long(strToolContentID));
-     	qaContent.setTitle(richTextTitle);
-     	qaContent.setInstructions(richTextInstructions);
-     	qaContent.setUpdateDate(new Date(System.currentTimeMillis())); /**keep updating this one*/
-     	logger.debug("userId: " + userId);
-     	qaContent.setCreatedBy(userId); /**make sure we are setting the userId from the User object above*/
-     	logger.debug("end of setting common content values...");
+	String richTextOfflineInstructions = request.getParameter(QaAppConstants.OFFLINE_INSTRUCTIONS);
+	String richTextOnlineInstructions = request.getParameter(QaAppConstants.ONLINE_INSTRUCTIONS);
+	String reflect = request.getParameter(QaAppConstants.REFLECT);
+	AuthoringUtil.logger.debug("reflect: " + reflect);
 
-     	
+	String reflectionSubject = request.getParameter(QaAppConstants.REFLECTION_SUBJECT);
+	AuthoringUtil.logger.debug("reflectionSubject: " + reflectionSubject);
 
-     	logger.debug("activeModule:" + activeModule);
-     	if (activeModule.equals(AUTHORING))
-		{
-        	logger.debug("setting other content values...");
-         	qaContent.setOnlineInstructions(richTextOnlineInstructions);
-         	qaContent.setOfflineInstructions(richTextOfflineInstructions);
-         	qaContent.setUsernameVisible(usernameVisibleBoolean);
-         	qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
-         	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
-         	qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
-         	qaContent.setSynchInMonitor(synchInMonitorBoolean);	
-         	qaContent.setReflect(reflectBoolean);
-         	qaContent.setReflectionSubject(reflectionSubject);
+	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
+	AuthoringUtil.logger.debug("activeModule: " + activeModule);
+
+	boolean setCommonContent = true;
+	if (questionsSequenced == null || synchInMonitor == null || lockWhenFinished == null || usernameVisible == null
+		|| reflect == null || showOtherAnswers == null) {
+	    setCommonContent = false;
+	}
+	AuthoringUtil.logger.debug("setCommonContent: " + setCommonContent);
+
+	boolean questionsSequencedBoolean = false;
+	boolean synchInMonitorBoolean = false;
+	boolean lockWhenFinishedBoolean = false;
+	boolean usernameVisibleBoolean = false;
+	boolean showOtherAnswersBoolean = false;
+	boolean reflectBoolean = false;
+
+	if (questionsSequenced != null && questionsSequenced.equalsIgnoreCase("1")) {
+	    questionsSequencedBoolean = true;
+	}
+
+	if (synchInMonitor != null && synchInMonitor.equalsIgnoreCase("1")) {
+	    synchInMonitorBoolean = true;
+	}
+
+	if (lockWhenFinished != null && lockWhenFinished.equalsIgnoreCase("1")) {
+	    lockWhenFinishedBoolean = true;
+	}
+
+	if (usernameVisible != null && usernameVisible.equalsIgnoreCase("1")) {
+	    usernameVisibleBoolean = true;
+	}
+
+	if (showOtherAnswers != null && showOtherAnswers.equalsIgnoreCase("1")) {
+	    showOtherAnswersBoolean = true;
+	}
+
+	if (reflect != null && reflect.equalsIgnoreCase("1")) {
+	    reflectBoolean = true;
+	}
+
+	AuthoringUtil.logger.debug("questionsSequencedBoolean: " + questionsSequencedBoolean);
+	AuthoringUtil.logger.debug("synchInMonitorBoolean: " + synchInMonitorBoolean);
+	AuthoringUtil.logger.debug("lockWhenFinishedBoolean: " + lockWhenFinishedBoolean);
+	AuthoringUtil.logger.debug("usernameVisibleBoolean: " + usernameVisibleBoolean);
+	AuthoringUtil.logger.debug("showOtherAnswersBoolean: " + showOtherAnswersBoolean);
+	AuthoringUtil.logger.debug("reflectBoolean: " + reflectBoolean);
+
+	long userId = 0;
+	if (toolUser != null) {
+	    userId = toolUser.getUserID().longValue();
+	} else {
+	    HttpSession ss = SessionManager.getSession();
+	    AuthoringUtil.logger.debug("ss: " + ss);
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    AuthoringUtil.logger.debug("user" + user);
+	    if (user != null) {
+		userId = user.getUserID().longValue();
+	    } else {
+		AuthoringUtil.logger.debug("should not reach here");
+		userId = 0;
+	    }
+	}
+	AuthoringUtil.logger.debug("userId: " + userId);
+	AuthoringUtil.logger.debug("qaContent: " + qaContent);
+
+	boolean newContent = false;
+	if (qaContent == null) {
+	    qaContent = new QaContent();
+	    newContent = true;
+	}
+
+	AuthoringUtil.logger.debug("setting common content values..." + richTextTitle + " " + richTextInstructions);
+	qaContent.setQaContentId(new Long(strToolContentID));
+	qaContent.setTitle(richTextTitle);
+	qaContent.setInstructions(richTextInstructions);
+	qaContent.setUpdateDate(new Date(System.currentTimeMillis()));
+	/** keep updating this one */
+	AuthoringUtil.logger.debug("userId: " + userId);
+	qaContent.setCreatedBy(userId);
+	/** make sure we are setting the userId from the User object above */
+	AuthoringUtil.logger.debug("end of setting common content values...");
+
+	AuthoringUtil.logger.debug("activeModule:" + activeModule);
+	if (activeModule.equals(QaAppConstants.AUTHORING)) {
+	    AuthoringUtil.logger.debug("setting other content values...");
+	    qaContent.setOnlineInstructions(richTextOnlineInstructions);
+	    qaContent.setOfflineInstructions(richTextOfflineInstructions);
+	    qaContent.setUsernameVisible(usernameVisibleBoolean);
+	    qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
+	    qaContent.setQuestionsSequenced(questionsSequencedBoolean);
+	    qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
+	    qaContent.setSynchInMonitor(synchInMonitorBoolean);
+	    qaContent.setReflect(reflectBoolean);
+	    qaContent.setReflectionSubject(reflectionSubject);
+
+	}
+
+	qaContent.setConditions(new TreeSet<QaCondition>(new QaConditionComparator()));
+	if (newContent) {
+	    AuthoringUtil.logger.debug("will create: " + qaContent);
+	    qaService.createQa(qaContent);
+	} else {
+	    AuthoringUtil.logger.debug("will update: " + qaContent);
+	    qaService.updateQa(qaContent);
+	}
+
+	qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
+	AuthoringUtil.logger.debug("qaContent: " + qaContent);
+	qaContent = createQuestionContent(mapQuestionContent, mapFeedback, qaService, qaContent, conditions);
+
+	qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
+
+	for (QaCondition condition : conditions) {
+	    condition.setQuestions(new TreeSet<QaQueContent>(new QaQueContentComparator()));
+	    for (QaQuestionContentDTO dto : condition.temporaryQuestionDTOSet) {
+		for (QaQueContent queContent : (Set<QaQueContent>) qaContent.getQaQueContents()) {
+		    if (dto.getDisplayOrder().equals(String.valueOf(queContent.getDisplayOrder()))) {
+			condition.getQuestions().add(queContent);
+		    }
 		}
-        	
- 
-        if (newContent)
-        {
-        	logger.debug("will create: " + qaContent);
-         	qaService.createQa(qaContent);
-        }
-        else
-        {
-        	logger.debug("will update: " + qaContent);
-            qaService.updateQa(qaContent);
-        }
-        
-        qaContent=qaService.loadQa(new Long(strToolContentID).longValue());
-     	logger.debug("qaContent: " + qaContent);
-        
-        qaContent=createQuestionContent(mapQuestionContent, mapFeedback, qaService, qaContent);
-        
-        return qaContent;
+	    }
+	}
+	qaContent.setConditions(conditions);
+	qaService.updateQa(qaContent);
+	return qaContent;
     }
-    
-    
+
     /**
-     * removes unused question entries from db
-     * removeRedundantQuestions (Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm)
+     * removes unused question entries from db removeRedundantQuestions (Map mapQuestionContent, IQaService qaService,
+     * QaAuthoringForm qaAuthoringForm)
      * 
      * @param mapQuestionContent
      * @param qaService
      * @param qaAuthoringForm
      */
-    public void removeRedundantQuestions (Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm, 
-            HttpServletRequest request, String toolContentID)
-	{
-    	logger.debug("removing unused entries... ");
-    	logger.debug("mapQuestionContent:  " + mapQuestionContent);
-    	logger.debug("toolContentID:  " + toolContentID);
-    	
-    	QaContent qaContent=qaService.loadQa( new Long(toolContentID).longValue());
-    	logger.debug("qaContent:  " + qaContent);
-    	
-    	if (qaContent != null)
-    	{
-        	logger.debug("qaContent uid: " + qaContent.getUid());
-        	List allQuestions=qaService.getAllQuestionEntries(qaContent.getUid());
-        	logger.debug("allQuestions: " + allQuestions);
-        	
-        	Iterator listIterator=allQuestions.iterator();
-    		int mapIndex=0;
-    		boolean entryUsed=false;
-    		while (listIterator.hasNext())
-    		{
-	            ++mapIndex;
-	            logger.debug("current mapIndex: " +  mapIndex);
+    public void removeRedundantQuestions(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm,
+	    HttpServletRequest request, String toolContentID) {
+	AuthoringUtil.logger.debug("removing unused entries... ");
+	AuthoringUtil.logger.debug("mapQuestionContent:  " + mapQuestionContent);
+	AuthoringUtil.logger.debug("toolContentID:  " + toolContentID);
 
-    			QaQueContent queContent=(QaQueContent)listIterator.next();
-    			logger.debug("queContent data: " + queContent);
-    			logger.debug("queContent: " + queContent.getQuestion() + " " + queContent.getDisplayOrder());
-    			
-    			entryUsed=false;
-    	        Iterator itMap = mapQuestionContent.entrySet().iterator();
-    	        int displayOrder=0;
-    	        while (itMap.hasNext()) 
-    		    {
-    	            ++displayOrder;
-    	            logger.debug("current displayOrder: " +  displayOrder);
-    	        	entryUsed=false;
-    		        Map.Entry pairs = (Map.Entry)itMap.next();
-    		        logger.debug("using the pair: " +  pairs.getKey() + " = " + pairs.getValue());
-    		        
-    		        if (pairs.getValue().toString().length() != 0)
-    		        {
-    		        	logger.debug("text from map:" + pairs.getValue().toString());
-    		        	logger.debug("text from db:" + queContent.getQuestion());
+	QaContent qaContent = qaService.loadQa(new Long(toolContentID).longValue());
+	AuthoringUtil.logger.debug("qaContent:  " + qaContent);
 
-		        	    logger.debug("mapIndex versus displayOrder:" + mapIndex + " versus " + displayOrder);
-    		        	if (mapIndex == displayOrder)
-    		        	{
-    		        		//logger.debug("used entry in db:" + queContent.getQuestion());
-    		        	    logger.debug("used displayOrder position:" + displayOrder);
-    		        		entryUsed=true;
-    		        		break;
-    		        	}
-    		        	
-    		        }
-    		    }
-    	        
-    	        if (entryUsed == false)
-    	        {
-    	        	logger.debug("removing unused entry in db:" + queContent.getQuestion());
-    	        	
-    	        	QaQueContent removeableQaQueContent=qaService.getQuestionContentByQuestionText(queContent.getQuestion(), qaContent.getUid());
-        			logger.debug("removeableQaQueContent"  + removeableQaQueContent);
-        			if (removeableQaQueContent != null)
-        			{
-        			    //qaContent.getQaQueContents().remove(removeableQaQueContent);
-        				qaService.removeQaQueContent(removeableQaQueContent);
-            			logger.debug("removed removeableQaQueContent from the db: " + removeableQaQueContent);	
-        			}
-    	        	
-    	        }
-    		}    		
-    	}
-	
+	if (qaContent != null) {
+	    AuthoringUtil.logger.debug("qaContent uid: " + qaContent.getUid());
+	    List allQuestions = qaService.getAllQuestionEntries(qaContent.getUid());
+	    AuthoringUtil.logger.debug("allQuestions: " + allQuestions);
+
+	    Iterator listIterator = allQuestions.iterator();
+	    int mapIndex = 0;
+	    boolean entryUsed = false;
+	    while (listIterator.hasNext()) {
+		++mapIndex;
+		AuthoringUtil.logger.debug("current mapIndex: " + mapIndex);
+
+		QaQueContent queContent = (QaQueContent) listIterator.next();
+		AuthoringUtil.logger.debug("queContent data: " + queContent);
+		AuthoringUtil.logger.debug("queContent: " + queContent.getQuestion() + " "
+			+ queContent.getDisplayOrder());
+
+		entryUsed = false;
+		Iterator itMap = mapQuestionContent.entrySet().iterator();
+		int displayOrder = 0;
+		while (itMap.hasNext()) {
+		    ++displayOrder;
+		    AuthoringUtil.logger.debug("current displayOrder: " + displayOrder);
+		    entryUsed = false;
+		    Map.Entry pairs = (Map.Entry) itMap.next();
+		    AuthoringUtil.logger.debug("using the pair: " + pairs.getKey() + " = " + pairs.getValue());
+
+		    if (pairs.getValue().toString().length() != 0) {
+			AuthoringUtil.logger.debug("text from map:" + pairs.getValue().toString());
+			AuthoringUtil.logger.debug("text from db:" + queContent.getQuestion());
+
+			AuthoringUtil.logger.debug("mapIndex versus displayOrder:" + mapIndex + " versus "
+				+ displayOrder);
+			if (mapIndex == displayOrder) {
+			    // logger.debug("used entry in db:" +
+			    // queContent.getQuestion());
+			    AuthoringUtil.logger.debug("used displayOrder position:" + displayOrder);
+			    entryUsed = true;
+			    break;
+			}
+
+		    }
+		}
+
+		if (entryUsed == false) {
+		    AuthoringUtil.logger.debug("removing unused entry in db:" + queContent.getQuestion());
+
+		    QaQueContent removeableQaQueContent = qaService.getQuestionContentByQuestionText(queContent
+			    .getQuestion(), qaContent.getUid());
+		    AuthoringUtil.logger.debug("removeableQaQueContent" + removeableQaQueContent);
+		    if (removeableQaQueContent != null) {
+			// qaContent.getQaQueContents().remove(removeableQaQueContent);
+			qaService.removeQaQueContent(removeableQaQueContent);
+			AuthoringUtil.logger.debug("removed removeableQaQueContent from the db: "
+				+ removeableQaQueContent);
+		    }
+
+		}
+	    }
 	}
-    
+
+    }
+
     /**
-     * createQuestionContent(TreeMap mapQuestionContent, HttpServletRequest request)
-     * return void
+     * createQuestionContent(TreeMap mapQuestionContent, HttpServletRequest request) return void
      * 
-     * persist the questions in the Map the user has submitted 
+     * persist the questions in the Map the user has submitted
      */
-    protected QaContent createQuestionContent(Map mapQuestionContent, Map mapFeedback, IQaService qaService, QaContent qaContent)
-    {    
-        logger.debug("createQuestionContent: ");
-        logger.debug("content uid is: " + qaContent.getUid());
-        List questions=qaService.retrieveQaQueContentsByToolContentId(qaContent.getUid().longValue());
-        logger.debug("questions: " + questions);
-        
-        logger.debug("mapQuestionContent: " + mapQuestionContent);
-        logger.debug("mapFeedback: " + mapFeedback);
+    protected QaContent createQuestionContent(Map mapQuestionContent, Map mapFeedback, IQaService qaService,
+	    QaContent qaContent, Set<QaCondition> conditions) {
+	AuthoringUtil.logger.debug("createQuestionContent: ");
+	AuthoringUtil.logger.debug("content uid is: " + qaContent.getUid());
+	List questions = qaService.retrieveQaQueContentsByToolContentId(qaContent.getUid().longValue());
+	AuthoringUtil.logger.debug("questions: " + questions);
 
-        
-        Iterator itMap = mapQuestionContent.entrySet().iterator();
-        int displayOrder=0;
-        while (itMap.hasNext()) 
-	    {
-	        Map.Entry pairs = (Map.Entry)itMap.next();
-	        logger.debug("using the pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	        
-	        if (pairs.getValue().toString().length() != 0)
-	        {
-	        	logger.debug("starting createQuestionContent: pairs.getValue().toString():" + pairs.getValue().toString());
-	        	logger.debug("starting createQuestionContent: qaContent: " + qaContent);
-	        	
-	        	++displayOrder;
-	        	logger.debug("starting createQuestionContent: displayOrder: " + displayOrder);
-	        	String currentFeedback=(String)mapFeedback.get(new Integer(displayOrder).toString());
-	        	logger.debug("currentFeedback: " + currentFeedback);
-	        	
-	        	QaQueContent queContent=  new QaQueContent(pairs.getValue().toString(), 
-		        											displayOrder,
-		        											currentFeedback,
-															qaContent,
-															null,
-															null);
-		        
-		        
-	        	logger.debug("queContent: " + queContent);
-	        	
-			       /* checks if the question is already recorded*/
-			       logger.debug("question text is: " + pairs.getValue().toString());
-			       logger.debug("content uid is: " + qaContent.getUid());
-			       logger.debug("question display order is: " + displayOrder);
-			       QaQueContent existingQaQueContent=qaService.getQuestionContentByDisplayOrder(new Long(displayOrder), qaContent.getUid());
-			       logger.debug("existingQaQueContent: " + existingQaQueContent);
-			       
-			       if (existingQaQueContent == null)
-			       {
-			       	/*make sure a question with the same question text is not already saved*/
-			    	QaQueContent duplicateQaQueContent=qaService.getQuestionContentByQuestionText(pairs.getValue().toString(), qaContent.getUid());
-			    	logger.debug("duplicateQaQueContent: " + duplicateQaQueContent);
-				       	//if (duplicateQaQueContent == null)
-				       	//{
-				       		logger.debug("adding a new question to content: " + queContent);
-				       		qaContent.getQaQueContents().add(queContent);
-				       		queContent.setQaContent(qaContent);
-		
-				       		qaService.createQaQue(queContent);
-				       	//}
-			       }
-			       else
-			       {
+	AuthoringUtil.logger.debug("mapQuestionContent: " + mapQuestionContent);
+	AuthoringUtil.logger.debug("mapFeedback: " + mapFeedback);
 
-				       String existingQuestion=existingQaQueContent.getQuestion(); 
-				       logger.debug("existingQuestion: " + existingQuestion);
-				       
-				       logger.debug("map question versus existingQuestion: " + pairs.getValue().toString() + 
-				               " versus db question value: " + existingQuestion);
+	Iterator itMap = mapQuestionContent.entrySet().iterator();
+	int displayOrder = 0;
+	while (itMap.hasNext()) {
+	    Map.Entry pairs = (Map.Entry) itMap.next();
+	    AuthoringUtil.logger.debug("using the pair: " + pairs.getKey() + " = " + pairs.getValue());
 
-			       		existingQaQueContent.setQuestion(pairs.getValue().toString());
-			       		existingQaQueContent.setFeedback(currentFeedback);
-			       		existingQaQueContent.setDisplayOrder(displayOrder);
-			       		
-			       		logger.debug("updating the existing question content: " + existingQaQueContent);
-			       		qaService.updateQaQueContent(existingQaQueContent);
-			       }
-	        }      
+	    if (pairs.getValue().toString().length() != 0) {
+		AuthoringUtil.logger.debug("starting createQuestionContent: pairs.getValue().toString():"
+			+ pairs.getValue().toString());
+		AuthoringUtil.logger.debug("starting createQuestionContent: qaContent: " + qaContent);
+
+		++displayOrder;
+		AuthoringUtil.logger.debug("starting createQuestionContent: displayOrder: " + displayOrder);
+		String currentFeedback = (String) mapFeedback.get(new Integer(displayOrder).toString());
+		AuthoringUtil.logger.debug("currentFeedback: " + currentFeedback);
+
+		QaQueContent queContent = new QaQueContent(pairs.getValue().toString(), displayOrder, currentFeedback,
+			qaContent, null, null);
+
+		AuthoringUtil.logger.debug("queContent: " + queContent);
+
+		/* checks if the question is already recorded */
+		AuthoringUtil.logger.debug("question text is: " + pairs.getValue().toString());
+		AuthoringUtil.logger.debug("content uid is: " + qaContent.getUid());
+		AuthoringUtil.logger.debug("question display order is: " + displayOrder);
+		QaQueContent existingQaQueContent = qaService.getQuestionContentByDisplayOrder(new Long(displayOrder),
+			qaContent.getUid());
+		AuthoringUtil.logger.debug("existingQaQueContent: " + existingQaQueContent);
+
+		if (existingQaQueContent == null) {
+		    /*
+		     * make sure a question with the same question text is not already saved
+		     */
+		    QaQueContent duplicateQaQueContent = qaService.getQuestionContentByQuestionText(pairs.getValue()
+			    .toString(), qaContent.getUid());
+		    AuthoringUtil.logger.debug("duplicateQaQueContent: " + duplicateQaQueContent);
+		    // if (duplicateQaQueContent == null)
+		    // {
+		    AuthoringUtil.logger.debug("adding a new question to content: " + queContent);
+		    qaContent.getQaQueContents().add(queContent);
+		    queContent.setQaContent(qaContent);
+
+		    qaService.createQaQue(queContent);
+
+		    // }
+		} else {
+
+		    String existingQuestion = existingQaQueContent.getQuestion();
+		    AuthoringUtil.logger.debug("existingQuestion: " + existingQuestion);
+
+		    AuthoringUtil.logger.debug("map question versus existingQuestion: " + pairs.getValue().toString()
+			    + " versus db question value: " + existingQuestion);
+
+		    existingQaQueContent.setQuestion(pairs.getValue().toString());
+		    existingQaQueContent.setFeedback(currentFeedback);
+		    existingQaQueContent.setDisplayOrder(displayOrder);
+
+		    AuthoringUtil.logger.debug("updating the existing question content: " + existingQaQueContent);
+		    qaService.updateQaQueContent(existingQaQueContent);
+		}
 	    }
-        return qaContent;
-    }
-    
-    
-    public static boolean checkDuplicateQuestions(List listQuestionContentDTO, String newQuestion)
-    {
-        logger.debug("checkDuplicateQuestions: " + listQuestionContentDTO);
-        logger.debug("newQuestion: " + newQuestion);
-        
-        Map mapQuestionContent=extractMapQuestionContent(listQuestionContentDTO);
-        logger.debug("mapQuestionContent: " + mapQuestionContent);
-        
-    	Iterator itMap = mapQuestionContent.entrySet().iterator();
-	    while (itMap.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)itMap.next();
-	        if ((pairs.getValue() != null) && (!pairs.getValue().equals("")))
-    		{
-	        	logger.debug("checking the  pair: " +  pairs.getKey() + " = " + pairs.getValue());
-	        	
-	        	if (pairs.getValue().equals(newQuestion))
-	        	{
-	        	    logger.debug("entry found: " +  newQuestion);
-	        	    return true;
-	        	}
-    		}
-	    }
-	    return false;
-    }
-    
+	}
 
-    
-    
+	return qaContent;
+    }
+
+    public static boolean checkDuplicateQuestions(List listQuestionContentDTO, String newQuestion) {
+	AuthoringUtil.logger.debug("checkDuplicateQuestions: " + listQuestionContentDTO);
+	AuthoringUtil.logger.debug("newQuestion: " + newQuestion);
+
+	Map mapQuestionContent = extractMapQuestionContent(listQuestionContentDTO);
+	AuthoringUtil.logger.debug("mapQuestionContent: " + mapQuestionContent);
+
+	Iterator itMap = mapQuestionContent.entrySet().iterator();
+	while (itMap.hasNext()) {
+	    Map.Entry pairs = (Map.Entry) itMap.next();
+	    if (pairs.getValue() != null && !pairs.getValue().equals("")) {
+		AuthoringUtil.logger.debug("checking the  pair: " + pairs.getKey() + " = " + pairs.getValue());
+
+		if (pairs.getValue().equals(newQuestion)) {
+		    AuthoringUtil.logger.debug("entry found: " + newQuestion);
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }
+
     /**
-     * sorts the questions by the display order
-     * reOrganizeDisplayOrder(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm, QaContent qaContent)
+     * sorts the questions by the display order reOrganizeDisplayOrder(Map mapQuestionContent, IQaService qaService,
+     * QaAuthoringForm qaAuthoringForm, QaContent qaContent)
      * 
      * @param mapQuestionContent
      * @param qaService
      * @param qaAuthoringForm
      * @param qaContent
      */
-    public void reOrganizeDisplayOrder(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm, QaContent qaContent)
-    {    
-        logger.debug("qaContent: " + qaContent);
-        if (qaContent != null)
-        {
-        	logger.debug("content uid: " + qaContent.getUid());
-        	List sortedQuestions=qaService.getAllQuestionEntriesSorted(qaContent.getUid().longValue());
-        	logger.debug("sortedQuestions: " + sortedQuestions);
-        	
-    		Iterator listIterator=sortedQuestions.iterator();
-    		int displayOrder=1;
-    		while (listIterator.hasNext())
-    		{
-    			QaQueContent queContent=(QaQueContent)listIterator.next();
-    			logger.debug("queContent data: " + queContent);
-    			logger.debug("queContent: " + queContent.getQuestion() + " " + queContent.getDisplayOrder());
-    			
-    			QaQueContent existingQaQueContent=qaService.getQuestionContentByQuestionText(queContent.getQuestion(), qaContent.getUid());
-    	    	logger.debug("existingQaQueContent: " + existingQaQueContent);
-    	    	existingQaQueContent.setDisplayOrder(displayOrder);
-    	    	logger.debug("updating the existing question content for displayOrder: " + existingQaQueContent);
-           		qaService.updateQaQueContent(existingQaQueContent);
-    			displayOrder++;
-    		}
-        }
-		logger.debug("done with reOrganizeDisplayOrder...");
+    public void reOrganizeDisplayOrder(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm,
+	    QaContent qaContent) {
+	AuthoringUtil.logger.debug("qaContent: " + qaContent);
+	if (qaContent != null) {
+	    AuthoringUtil.logger.debug("content uid: " + qaContent.getUid());
+	    List sortedQuestions = qaService.getAllQuestionEntriesSorted(qaContent.getUid().longValue());
+	    AuthoringUtil.logger.debug("sortedQuestions: " + sortedQuestions);
+
+	    Iterator listIterator = sortedQuestions.iterator();
+	    int displayOrder = 1;
+	    while (listIterator.hasNext()) {
+		QaQueContent queContent = (QaQueContent) listIterator.next();
+		AuthoringUtil.logger.debug("queContent data: " + queContent);
+		AuthoringUtil.logger.debug("queContent: " + queContent.getQuestion() + " "
+			+ queContent.getDisplayOrder());
+
+		QaQueContent existingQaQueContent = qaService.getQuestionContentByQuestionText(
+			queContent.getQuestion(), qaContent.getUid());
+		AuthoringUtil.logger.debug("existingQaQueContent: " + existingQaQueContent);
+		existingQaQueContent.setDisplayOrder(displayOrder);
+		AuthoringUtil.logger.debug("updating the existing question content for displayOrder: "
+			+ existingQaQueContent);
+		qaService.updateQaQueContent(existingQaQueContent);
+		displayOrder++;
+	    }
+	}
+	AuthoringUtil.logger.debug("done with reOrganizeDisplayOrder...");
     }
-    
-    
+
     /**
-     * checks if any entry is duplicate 
-     * verifyDuplicatesOptionsMap(Map mapQuestions)
+     * checks if any entry is duplicate verifyDuplicatesOptionsMap(Map mapQuestions)
      * 
      * @param mapQuestions
      * @return
      */
-    public static boolean verifyDuplicatesOptionsMap(Map mapQuestions)
-	{
-    	Map originalMap=mapQuestions;
-    	Map backupMap=mapQuestions;
-    	
-    	int optionCount=0;
-    	for (long i=1; i <= MAX_QUESTION_COUNT.longValue()  ; i++)
-		{
-    		String currentOption=(String)originalMap.get(new Long(i).toString());
-    		
-    		optionCount=0;
-    		for (long j=1; j <= MAX_QUESTION_COUNT.longValue() ; j++)
-    		{
-        		String backedOption=(String)backupMap.get(new Long(j).toString());
-        		
-        		if ((currentOption != null) && (backedOption !=null))
-        		{
-        			if (currentOption.equals(backedOption))
-    				{
-    					optionCount++;
-    				}
-    				
-            		if (optionCount > 1)
-            			return false;	
-        		}
-    		}	
+    public static boolean verifyDuplicatesOptionsMap(Map mapQuestions) {
+	Map originalMap = mapQuestions;
+	Map backupMap = mapQuestions;
+
+	int optionCount = 0;
+	for (long i = 1; i <= QaAppConstants.MAX_QUESTION_COUNT.longValue(); i++) {
+	    String currentOption = (String) originalMap.get(new Long(i).toString());
+
+	    optionCount = 0;
+	    for (long j = 1; j <= QaAppConstants.MAX_QUESTION_COUNT.longValue(); j++) {
+		String backedOption = (String) backupMap.get(new Long(j).toString());
+
+		if (currentOption != null && backedOption != null) {
+		    if (currentOption.equals(backedOption)) {
+			optionCount++;
+		    }
+
+		    if (optionCount > 1) {
+			return false;
+		    }
 		}
-    	return true;
+	    }
 	}
+	return true;
+    }
 }

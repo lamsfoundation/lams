@@ -49,7 +49,8 @@ language_file,
 classpath_addition,
 context_file,
 create_date_time,
-modified_date_time
+modified_date_time,
+supports_outputs
 )
 VALUES
 (
@@ -79,5 +80,6 @@ NULL,
 'lams-tool-laqa11.jar',
 '/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml',
 NOW(),
-NOW()
+NOW(),
+1
 )

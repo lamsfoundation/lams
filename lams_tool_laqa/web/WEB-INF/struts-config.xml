@@ -16,6 +16,7 @@
 		<form-bean name="QaAuthoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm"/>
 	   	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
 	   	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
+	   <form-bean name="QaConditionForm" type="org.lamsfoundation.lams.tool.qa.web.QaConditionForm"/>
 	</form-beans>
 	
 	  <!-- ========== Global Exceptions Definitions =================================== -->
@@ -72,7 +73,7 @@
 			redirect="false"
 	  	/>
 	
-	</action>  
+	</action>
 	
 	<action
       path="/authoring"
@@ -128,6 +129,57 @@
 	        redirect="false"
 	  	/>
   </action>
+	<!-- ==========  Authroing Definitions: Add QaCondition methods ========== -->
+		
+		<action path="/authoring/showConditions"
+			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			name="QaAuthoringForm" 
+			scope="request" 
+			parameter="showConditions" 
+			validate="false">
+			<forward name="success" path="/authoring/conditions.jsp" />
+		</action>
+		<action path="/authoring/newConditionInit"
+			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			name="QaConditionForm" 
+			scope="request" 
+			validate="false"			
+			parameter="newConditionInit">
+			<forward name="addcondition" path="/authoring/addCondition.jsp" />
+		</action>
+		<action path="/authoring/editCondition"
+			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			name="QaConditionForm" 
+			scope="request" 
+			parameter="editCondition" 
+			validate="false">
+			<forward name="addcondition" path="/authoring/addCondition.jsp" />
+		</action>
+		<action path="/authoring/saveOrUpdateCondition"
+			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			parameter="saveOrUpdateCondition"
+			name="QaConditionForm" 
+			scope="request" 
+			validate="false">
+			<forward name="addcondition" path="/authoring/addCondition.jsp" />
+			<forward name="success" path="/authoring/conditionList.jsp" />
+		</action>
+		<action path="/authoring/removeCondition"
+			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			parameter="removeCondition">
+			<forward name="success" path="/authoring/conditionList.jsp" />
+		</action>
+		<action path="/authoring/upCondition"
+			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			parameter="upCondition">
+			<forward name="success" path="/authoring/conditionList.jsp" />
+		</action>
+		<action path="/authoring/downCondition"
+			type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringConditionAction"
+			parameter="downCondition">
+			<forward name="success" path="/authoring/conditionList.jsp" />
+		</action>
+	
 	
 	<!--Learning Starter  -->
    <action 
