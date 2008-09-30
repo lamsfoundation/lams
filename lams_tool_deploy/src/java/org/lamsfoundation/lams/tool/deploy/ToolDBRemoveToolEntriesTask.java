@@ -29,207 +29,173 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.dbutils.DbUtils;
 
 /**
- * Task removes all the entries for tool from the tool tables.
- * Only use during development - too dangerous to run in production
+ * Task removes all the entries for tool from the tool tables. Only use during
+ * development - too dangerous to run in production
+ * 
  * @author Fiona Malikoff
  */
-public class ToolDBRemoveToolEntriesTask extends DBTask
-{
-    
+public class ToolDBRemoveToolEntriesTask extends DBTask {
+
     /**
-     * Holds value of property toolTablesDeleteScriptPath - deletes
-     * the tool's tables.
+     * Holds value of property toolTablesDeleteScriptPath - deletes the
+     * tool's tables.
      */
     private String toolTablesDeleteScriptPath;
-    
+
     private File toolTablesDeleteScript;
-    
+
     /**
      * Holds value of the tool signature
      */
     private String toolSignature;
 
     /** Creates a new instance of ToolDBActivateTask */
-    public ToolDBRemoveToolEntriesTask()
-    {
+    public ToolDBRemoveToolEntriesTask() {
     }
-    
+
     /**
      * Setter for property toolTablesDeleteCreatScript.
-     * @param toolTablesCreatScript New value of property toolTablesDeleteCreatScript.
+     * 
+     * @param toolTablesCreatScript
+     *                New value of property toolTablesDeleteCreatScript.
      */
-    public void setToolTablesDeleteScriptPath(String toolTablesDeleteScriptPath)
-    {
+    public void setToolTablesDeleteScriptPath(String toolTablesDeleteScriptPath) {
 
-        this.toolTablesDeleteScriptPath = toolTablesDeleteScriptPath;
+	this.toolTablesDeleteScriptPath = toolTablesDeleteScriptPath;
     }
-    
+
     /**
      * Setter for property toolSignature.
-     * @param toolSignature New value of property toolSignature.
+     * 
+     * @param toolSignature
+     *                New value of property toolSignature.
      */
-    public void setToolSignature(String toolSignature)
-    {
+    public void setToolSignature(String toolSignature) {
 
-        this.toolSignature = toolSignature;
+	this.toolSignature = toolSignature;
     }
-  
-    /** Remove the tool and the related library activity. 
-     **/
-    public void execute() throws DeployException
-    {
-        long toolId = 0;
-        long libId = 0;
-        
-        toolTablesDeleteScript = new File(toolTablesDeleteScriptPath);
-                
-        //get a connection
-        Connection conn = getConnection();
-        try
-        {
-            conn.setAutoCommit(false);
-            toolId = getToolId(conn);
-            if ( toolId != 0 ) {
-            	libId = getLearningLibraryId(toolId, conn);
-	            
-	            System.out.println("Deleting rows where toolId = "+toolId+" and learningLibraryId = "+libId);
-	            cleanupToolTables(toolId, libId, conn);
-	            
-	            //run the tool table delete script
-	            if ( toolTablesDeleteScriptPath == null || toolTablesDeleteScriptPath.length() == 0 ) {
-	                System.err.println("Unable to run tool delete script as not specified. Later calls may fail.");
-	            } else {
-	                ScriptRunner runner = new ScriptRunner(readFile(toolTablesDeleteScript), conn);
-	                runner.run();
-	            }
-            }
-            
-            //commit transaction
-            conn.commit();
-        }
-        catch (SQLException sqlex)
-        {
-            try
-            {
-                DbUtils.rollback(conn);
-            }
-            catch (SQLException sqlex2)
-            {
-                throw new DeployException("Attempted to rollback because of "+sqlex+" but failed - cleanup maybe required (see root cause)", sqlex2);
-            }
-            throw new DeployException("Execute failed", sqlex);
-        }
-        catch (DeployException dex)
-        {
-            try
-            {
-                DbUtils.rollback(conn);
-            }
-            catch (SQLException sqlex)
-            {
-                throw new DeployException("Attempted to rollback because of "+dex+" but failed - cleanup maybe required (see root cause)", sqlex);
-            }
-            throw dex;
-        }
-        finally
-        {
-            DbUtils.closeQuietly(conn);
-        }
+
+    /**
+     * Remove the tool and the related library activity.
+     */
+    public void execute() throws DeployException {
+	long toolId = 0;
+	long libId = 0;
+
+	toolTablesDeleteScript = new File(toolTablesDeleteScriptPath);
+
+	// get a connection
+	Connection conn = getConnection();
+	try {
+	    conn.setAutoCommit(false);
+	    toolId = getToolId(conn);
+	    if (toolId != 0) {
+		libId = getLearningLibraryId(toolId, conn);
+
+		System.out.println("Deleting rows where toolId = " + toolId + " and learningLibraryId = " + libId);
+		cleanupToolTables(toolId, libId, conn);
+
+		// run the tool table delete script
+		if (toolTablesDeleteScriptPath == null || toolTablesDeleteScriptPath.length() == 0) {
+		    System.err.println("Unable to run tool delete script as not specified. Later calls may fail.");
+		} else {
+		    ScriptRunner runner = new ScriptRunner(readFile(toolTablesDeleteScript), conn);
+		    runner.run();
+		}
+	    }
+
+	    // commit transaction
+	    conn.commit();
+	} catch (SQLException sqlex) {
+	    try {
+		DbUtils.rollback(conn);
+	    } catch (SQLException sqlex2) {
+		throw new DeployException("Attempted to rollback because of " + sqlex
+			+ " but failed - cleanup maybe required (see root cause)", sqlex2);
+	    }
+	    throw new DeployException("Execute failed", sqlex);
+	} catch (DeployException dex) {
+	    try {
+		DbUtils.rollback(conn);
+	    } catch (SQLException sqlex) {
+		throw new DeployException("Attempted to rollback because of " + dex
+			+ " but failed - cleanup maybe required (see root cause)", sqlex);
+	    }
+	    throw dex;
+	} finally {
+	    DbUtils.closeQuietly(conn);
+	}
     }
-    
-    private void cleanupToolTables(long toolId, long libraryId, Connection conn) throws DeployException
-    {
-        PreparedStatement stmt = null;
-        try
-        {
-            stmt = conn.prepareStatement("DELETE FROM lams_learning_activity WHERE tool_id = ?");
-            stmt.setLong(1, toolId);
-            stmt.execute();
-            
-            stmt = conn.prepareStatement("DELETE FROM lams_tool_content WHERE tool_id = ?");
-            stmt.setLong(1, toolId);
-            stmt.execute();
 
-            stmt = conn.prepareStatement("DELETE FROM lams_tool WHERE tool_id = ?");
-            stmt.setLong(1, toolId);
-            stmt.execute();
+    private void cleanupToolTables(long toolId, long libraryId, Connection conn) throws DeployException {
+	PreparedStatement stmt = null;
+	try {
+	    stmt = conn.prepareStatement("DELETE FROM lams_learning_activity WHERE tool_id = ?");
+	    stmt.setLong(1, toolId);
+	    stmt.execute();
 
-            stmt = conn.prepareStatement("DELETE FROM lams_learning_library WHERE learning_library_id = ?");
-            stmt.setLong(1, libraryId);
-            stmt.execute();
-            
-            stmt = conn.prepareStatement("DELETE FROM patches WHERE system_name = ?");
-            stmt.setString(1, toolSignature);
-            stmt.execute();
+	    stmt = conn.prepareStatement("DELETE FROM lams_tool_content WHERE tool_id = ?");
+	    stmt.setLong(1, toolId);
+	    stmt.execute();
 
-        }
-        catch (SQLException sqlex)
-        {
-            throw new DeployException("Could not remove tool entries from core tool tables.", sqlex);
-        }
-        finally
-        {
-            DbUtils.closeQuietly(stmt);
-        }
+	    stmt = conn.prepareStatement("DELETE FROM lams_tool WHERE tool_id = ?");
+	    stmt.setLong(1, toolId);
+	    stmt.execute();
+
+	    stmt = conn.prepareStatement("DELETE FROM lams_learning_library WHERE learning_library_id = ?");
+	    stmt.setLong(1, libraryId);
+	    stmt.execute();
+
+	    stmt = conn.prepareStatement("DELETE FROM patches WHERE system_name = ?");
+	    stmt.setString(1, toolSignature);
+	    stmt.execute();
+
+	} catch (SQLException sqlex) {
+	    throw new DeployException("Could not remove tool entries from core tool tables.", sqlex);
+	} finally {
+	    DbUtils.closeQuietly(stmt);
+	}
     }
-    
 
-
-    private long getToolId(final Connection conn) throws DeployException
-    {
-        PreparedStatement stmt = null;
-        ResultSet results = null;
-        try
-        {
-            stmt  = conn.prepareStatement("SELECT tool_id FROM lams_tool where tool_signature = ?");
-            stmt.setString(1, toolSignature);
-            results = stmt.executeQuery();
-            if (results.next())
-            {
-                return results.getLong("tool_id");
-            }
-        }
-        catch (SQLException sqlex)
-        {
-            throw new DeployException("Failed to run tool insert script",sqlex);
-        }
-        finally
-        {
-            DbUtils.closeQuietly(stmt);
-            DbUtils.closeQuietly(results);
-        }
-        return 0;
+    private long getToolId(final Connection conn) throws DeployException {
+	PreparedStatement stmt = null;
+	ResultSet results = null;
+	try {
+	    stmt = conn.prepareStatement("SELECT tool_id FROM lams_tool where tool_signature = ?");
+	    stmt.setString(1, toolSignature);
+	    results = stmt.executeQuery();
+	    if (results.next()) {
+		return results.getLong("tool_id");
+	    }
+	} catch (SQLException sqlex) {
+	    throw new DeployException("Failed to run tool insert script", sqlex);
+	} finally {
+	    DbUtils.closeQuietly(stmt);
+	    DbUtils.closeQuietly(results);
+	}
+	return 0;
     }
-    
-    private long getLearningLibraryId(long toolId, final Connection conn) throws DeployException
-    {
-        PreparedStatement stmt = null;
-        ResultSet results = null;
-        try
-        {
-            stmt  = conn.prepareStatement("SELECT learning_library_id FROM lams_learning_activity where tool_id = ?");
-            stmt.setLong(1, toolId);
-            results = stmt.executeQuery();
-            if (results.next())
-            {
-                return results.getLong("learning_library_id");
-            }
-        }
-        catch (SQLException sqlex)
-        {
-            throw new DeployException("Failed to run tool insert script",sqlex);
-        }
-        finally
-        {
-            DbUtils.closeQuietly(stmt);
-            DbUtils.closeQuietly(results);
-        }
-        return 0;
+
+    private long getLearningLibraryId(long toolId, final Connection conn) throws DeployException {
+	PreparedStatement stmt = null;
+	ResultSet results = null;
+	try {
+	    stmt = conn.prepareStatement("SELECT learning_library_id FROM lams_learning_activity where tool_id = ?");
+	    stmt.setLong(1, toolId);
+	    results = stmt.executeQuery();
+	    if (results.next()) {
+		return results.getLong("learning_library_id");
+	    }
+	} catch (SQLException sqlex) {
+	    throw new DeployException("Failed to run tool insert script", sqlex);
+	} finally {
+	    DbUtils.closeQuietly(stmt);
+	    DbUtils.closeQuietly(results);
+	}
+	return 0;
     }
 }
