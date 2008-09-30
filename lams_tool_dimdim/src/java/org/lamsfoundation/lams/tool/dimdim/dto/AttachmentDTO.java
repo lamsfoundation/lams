@@ -30,69 +30,69 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimAttachment;
 
 public class AttachmentDTO implements Comparable<AttachmentDTO> {
 
-	Long uid;
+    Long uid;
 
-	Long fileUuid;
+    Long fileUuid;
 
-	Long fileVersionId;
+    Long fileVersionId;
 
-	String fileName;
+    String fileName;
 
-	Date createDate;
+    Date createDate;
 
-	public AttachmentDTO(DimdimAttachment att) {
-		this.fileUuid = att.getFileUuid();
-		this.fileName = att.getFileName();
-		this.fileVersionId = att.getFileVersionId();
-		this.createDate = att.getCreateDate();
-		this.uid = att.getUid();
+    public AttachmentDTO(DimdimAttachment att) {
+	this.fileUuid = att.getFileUuid();
+	this.fileName = att.getFileName();
+	this.fileVersionId = att.getFileVersionId();
+	this.createDate = att.getCreateDate();
+	this.uid = att.getUid();
+    }
+
+    public int compareTo(AttachmentDTO other) {
+	int ret = this.createDate.compareTo(other.getCreateDate());
+	if (ret == 0) {
+	    ret = this.uid.compareTo(other.getUid());
 	}
+	return ret;
+    }
 
-	public int compareTo(AttachmentDTO other) {
-		int ret = this.createDate.compareTo(other.getCreateDate());
-		if (ret == 0) {
-			ret = this.uid.compareTo(other.getUid());
-		}
-		return ret;
-	}
+    public String getFileName() {
+	return fileName;
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public void setFileName(String fileName) {
+	this.fileName = fileName;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public Long getFileUuid() {
+	return fileUuid;
+    }
 
-	public Long getFileUuid() {
-		return fileUuid;
-	}
+    public void setFileUuid(Long fileUuid) {
+	this.fileUuid = fileUuid;
+    }
 
-	public void setFileUuid(Long fileUuid) {
-		this.fileUuid = fileUuid;
-	}
+    public Long getFileVersionId() {
+	return fileVersionId;
+    }
 
-	public Long getFileVersionId() {
-		return fileVersionId;
-	}
+    public void setFileVersionId(Long fileVersionId) {
+	this.fileVersionId = fileVersionId;
+    }
 
-	public void setFileVersionId(Long fileVersionId) {
-		this.fileVersionId = fileVersionId;
-	}
+    public Date getCreateDate() {
+	return createDate;
+    }
 
-	public Date getCreateDate() {
-		return createDate;
-	}
+    public void setCreateDate(Date createDate) {
+	this.createDate = createDate;
+    }
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
+    public Long getUid() {
+	return uid;
+    }
 
-	public Long getUid() {
-		return uid;
-	}
-
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 }

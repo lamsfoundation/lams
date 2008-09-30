@@ -29,44 +29,44 @@ package org.lamsfoundation.lams.tool.dimdim.model;
  */
 public class DimdimConfig {
 
-	private Long uid;
+    private Long uid;
 
-	private String key;
+    private String key;
 
-	private String value;
+    private String value;
 
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 */
-	public Long getUid() {
-		return uid;
-	}
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     */
+    public Long getUid() {
+	return uid;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	/**
-	 * @hibernate.property column="config_key"
-	 * @return
-	 */
-	public String getKey() {
-		return key;
-	}
+    /**
+     * @hibernate.property column="config_key"
+     * @return
+     */
+    public String getKey() {
+	return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+	this.key = key;
+    }
 
-	/**
-	 * @hibernate.property column="config_value"
-	 * @return
-	 */
-	public String getValue() {
-		return value;
-	}
+    /**
+     * @hibernate.property column="config_value"
+     * @return
+     */
+    public String getValue() {
+	return value;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public void setValue(String value) {
+	this.value = value;
+    }
 }

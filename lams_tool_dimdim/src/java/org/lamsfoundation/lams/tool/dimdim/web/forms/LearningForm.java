@@ -34,67 +34,67 @@ import org.apache.struts.action.ActionForm;
  */
 public class LearningForm extends ActionForm {
 
-	private static final long serialVersionUID = -4728946254882237144L;
+    private static final long serialVersionUID = -4728946254882237144L;
 
-	// Fields
+    // Fields
 
-	private String title;
+    private String title;
 
-	private String instructions;
+    private String instructions;
 
-	private String dispatch;
+    private String dispatch;
 
-	private Long toolSessionID;
+    private Long toolSessionID;
 
-	private String mode;
+    private String mode;
 
-	private String entryText;
+    private String entryText;
 
-	public String getMode() {
-		return mode;
-	}
+    public String getMode() {
+	return mode;
+    }
 
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+    public void setMode(String mode) {
+	this.mode = mode;
+    }
 
-	public String getDispatch() {
-		return dispatch;
-	}
+    public String getDispatch() {
+	return dispatch;
+    }
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
 
-	public Long getToolSessionID() {
-		return toolSessionID;
-	}
+    public Long getToolSessionID() {
+	return toolSessionID;
+    }
 
-	public void setToolSessionID(Long toolSessionID) {
-		this.toolSessionID = toolSessionID;
-	}
+    public void setToolSessionID(Long toolSessionID) {
+	this.toolSessionID = toolSessionID;
+    }
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public String getEntryText() {
-		return entryText;
-	}
+    public String getEntryText() {
+	return entryText;
+    }
 
-	public void setEntryText(String entryText) {
-		this.entryText = entryText;
-	}
+    public void setEntryText(String entryText) {
+	this.entryText = entryText;
+    }
 }

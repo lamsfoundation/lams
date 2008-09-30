@@ -38,68 +38,59 @@ import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 import org.lamsfoundation.lams.tool.dimdim.web.forms.AdminForm;
 
 /**
- * @struts.action path="/admin/main" name="adminForm" parameter="main"
- *                scope="request" validate="false"
+ * @struts.action path="/admin/main" name="adminForm" parameter="main" scope="request" validate="false"
  * @struts.action-forward name="main-success" path="tiles:/admin/main"
  * 
- * @struts.action path="/admin/save" name="adminForm" parameter="save"
- *                scope="request" validate="false"
- * @struts.action-forward name="save-success" redirect="true"
- *                        path="/admin/main.do"
+ * @struts.action path="/admin/save" name="adminForm" parameter="save" scope="request" validate="false"
+ * @struts.action-forward name="save-success" redirect="true" path="/admin/main.do"
  * 
  * @author Anthony Sukkar
  * 
  */
 public class AdminAction extends MappingDispatchAction {
 
-	private IDimdimService dimdimService;
+    private IDimdimService dimdimService;
 
-	// private static final Logger logger = Logger.getLogger(AdminAction.class);
+    // private static final Logger logger = Logger.getLogger(AdminAction.class);
 
-	@Override
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
-		// set up dimdimService
-		dimdimService = DimdimServiceProxy.getDimdimService(this.getServlet()
-				.getServletContext());
+	// set up dimdimService
+	dimdimService = DimdimServiceProxy.getDimdimService(this.getServlet().getServletContext());
 
-		return super.execute(mapping, form, request, response);
+	return super.execute(mapping, form, request, response);
+    }
+
+    public ActionForward main(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	AdminForm adminForm = (AdminForm) form;
+	DimdimConfig serverURL = dimdimService.getConfigEntry(Constants.CONFIG_SERVER_URL);
+
+	if (serverURL != null) {
+	    adminForm.setDimdimServerURL(serverURL.getValue());
 	}
 
-	public ActionForward main(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	return mapping.findForward("main-success");
+    }
 
-		AdminForm adminForm = (AdminForm) form;
-		DimdimConfig serverURL = dimdimService
-				.getConfigEntry(Constants.CONFIG_SERVER_URL);
+    public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
-		if (serverURL != null) {
-			adminForm.setDimdimServerURL(serverURL.getValue());
-		}
+	AdminForm adminForm = (AdminForm) form;
 
-		return mapping.findForward("main-success");
+	DimdimConfig dimdimConfig = dimdimService.getConfigEntry(Constants.CONFIG_SERVER_URL);
+
+	if (dimdimConfig == null) {
+	    dimdimConfig = new DimdimConfig();
+	    dimdimConfig.setKey(Constants.CONFIG_SERVER_URL);
 	}
 
-	public ActionForward save(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	dimdimConfig.setValue(adminForm.getDimdimServerURL());
+	dimdimService.saveOrUpdateConfigEntry(dimdimConfig);
 
-		AdminForm adminForm = (AdminForm) form;
-
-		DimdimConfig dimdimConfig = dimdimService
-				.getConfigEntry(Constants.CONFIG_SERVER_URL);
-
-		if (dimdimConfig == null) {
-			dimdimConfig = new DimdimConfig();
-			dimdimConfig.setKey(Constants.CONFIG_SERVER_URL);
-		}
-
-		dimdimConfig.setValue(adminForm.getDimdimServerURL());
-		dimdimService.saveOrUpdateConfigEntry(dimdimConfig);
-
-		return mapping.findForward("save-success");
-	}
+	return mapping.findForward("save-success");
+    }
 }

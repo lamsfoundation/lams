@@ -38,153 +38,147 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Defines the services available to the web layer from the Dimdim Service
  */
 public interface IDimdimService {
-	/**
-	 * Makes a copy of the default content and assigns it a newContentID
-	 * 
-	 * @params newContentID
-	 * @return
-	 */
-	public Dimdim copyDefaultContent(Long newContentID);
+    /**
+     * Makes a copy of the default content and assigns it a newContentID
+     * 
+     * @params newContentID
+     * @return
+     */
+    public Dimdim copyDefaultContent(Long newContentID);
 
-	/**
-	 * Returns an instance of the Dimdim tools default content.
-	 * 
-	 * @return
-	 */
-	public Dimdim getDefaultContent();
+    /**
+     * Returns an instance of the Dimdim tools default content.
+     * 
+     * @return
+     */
+    public Dimdim getDefaultContent();
 
-	/**
-	 * @param toolSignature
-	 * @return
-	 */
-	public Long getDefaultContentIdBySignature(String toolSignature);
+    /**
+     * @param toolSignature
+     * @return
+     */
+    public Long getDefaultContentIdBySignature(String toolSignature);
 
-	/**
-	 * @param toolContentID
-	 * @return
-	 */
-	public Dimdim getDimdimByContentId(Long toolContentID);
+    /**
+     * @param toolContentID
+     * @return
+     */
+    public Dimdim getDimdimByContentId(Long toolContentID);
 
-	/**
-	 * @param toolContentId
-	 * @param file
-	 * @param type
-	 * @return
-	 */
-	public DimdimAttachment uploadFileToContent(Long toolContentId,
-			FormFile file, String type);
+    /**
+     * @param toolContentId
+     * @param file
+     * @param type
+     * @return
+     */
+    public DimdimAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
 
-	/**
-	 * @param uuid
-	 * @param versionID
-	 */
-	public void deleteFromRepository(Long uuid, Long versionID)
-			throws DimdimException;
+    /**
+     * @param uuid
+     * @param versionID
+     */
+    public void deleteFromRepository(Long uuid, Long versionID) throws DimdimException;
 
-	/**
-	 * @param dimdim
-	 */
-	public void saveOrUpdateDimdim(Dimdim dimdim);
+    /**
+     * @param dimdim
+     */
+    public void saveOrUpdateDimdim(Dimdim dimdim);
 
-	/**
-	 * @param toolSessionId
-	 * @return
-	 */
-	public DimdimSession getSessionBySessionId(Long toolSessionId);
+    /**
+     * @param toolSessionId
+     * @return
+     */
+    public DimdimSession getSessionBySessionId(Long toolSessionId);
 
-	/**
-	 * @param dimdimSession
-	 */
-	public void saveOrUpdateDimdimSession(DimdimSession dimdimSession);
+    /**
+     * @param dimdimSession
+     */
+    public void saveOrUpdateDimdimSession(DimdimSession dimdimSession);
 
-	/**
-	 * 
-	 * @param userId
-	 * @param toolSessionId
-	 * @return
-	 */
-	public DimdimUser getUserByUserIdAndSessionId(Long userId,
-			Long toolSessionId);
+    /**
+     * 
+     * @param userId
+     * @param toolSessionId
+     * @return
+     */
+    public DimdimUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
-	/**
-	 * 
-	 * @param uid
-	 * @return
-	 */
-	public DimdimUser getUserByUID(Long uid);
+    /**
+     * 
+     * @param uid
+     * @return
+     */
+    public DimdimUser getUserByUID(Long uid);
 
-	/**
-	 * 
-	 * @param dimdimUser
-	 */
-	public void saveOrUpdateDimdimUser(DimdimUser dimdimUser);
+    /**
+     * 
+     * @param dimdimUser
+     */
+    public void saveOrUpdateDimdimUser(DimdimUser dimdimUser);
 
-	/**
-	 * 
-	 * @param user
-	 * @param dimdimSession
-	 * @return
-	 */
-	public DimdimUser createDimdimUser(UserDTO user, DimdimSession dimdimSession);
+    /**
+     * 
+     * @param user
+     * @param dimdimSession
+     * @return
+     */
+    public DimdimUser createDimdimUser(UserDTO user, DimdimSession dimdimSession);
 
-	/**
-	 * 
-	 * @param id
-	 * @param idType
-	 * @param signature
-	 * @param userID
-	 * @param title
-	 * @param entry
-	 * @return
-	 */
-	Long createNotebookEntry(Long id, Integer idType, String signature,
-			Integer userID, String entry);
+    /**
+     * 
+     * @param id
+     * @param idType
+     * @param signature
+     * @param userID
+     * @param title
+     * @param entry
+     * @return
+     */
+    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
-	/**
-	 * 
-	 * @param uid
-	 * @return
-	 */
-	NotebookEntry getEntry(Long uid);
+    /**
+     * 
+     * @param uid
+     * @return
+     */
+    NotebookEntry getEntry(Long uid);
 
-	/**
-	 * 
-	 * @param uid
-	 * @param title
-	 * @param entry
-	 */
-	void updateEntry(Long uid, String entry);
+    /**
+     * 
+     * @param uid
+     * @param title
+     * @param entry
+     */
+    void updateEntry(Long uid, String entry);
 
-	/**
-	 * 
-	 * @param key
-	 */
-	DimdimConfig getConfigEntry(String key);
+    /**
+     * 
+     * @param key
+     */
+    DimdimConfig getConfigEntry(String key);
 
-	/**
-	 * 
-	 * @param key
-	 * @param value
-	 */
-	void saveOrUpdateConfigEntry(DimdimConfig dimdimConfig);
+    /**
+     * 
+     * @param key
+     * @param value
+     */
+    void saveOrUpdateConfigEntry(DimdimConfig dimdimConfig);
 
-	/**
-	 * 
-	 * @param userDTO
-	 * @param meetingKey
-	 * @param topic
-	 * @return
-	 */
-	String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey,
-			String topic) throws Exception;
+    /**
+     * 
+     * @param userDTO
+     * @param meetingKey
+     * @param topic
+     * @return
+     */
+    String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey, String topic) throws Exception;
 
-	/**
-	 * 
-	 * @param userDTOm
-	 * @param meetingKey
-	 * @return
-	 */
-	String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey)
-			throws Exception;
+    /**
+     * 
+     * @param userDTOm
+     * @param meetingKey
+     * @return
+     */
+    String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey) throws Exception;
 
 }

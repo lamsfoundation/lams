@@ -41,86 +41,77 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
-	private static final long serialVersionUID = -2829707715037631881L;
+    private static final long serialVersionUID = -2829707715037631881L;
 
-	private static final Logger logger = Logger.getLogger(ExportServlet.class);
+    private static final Logger logger = Logger.getLogger(ExportServlet.class);
 
-	private final String FILENAME = "dimdim_main.html";
+    private final String FILENAME = "dimdim_main.html";
 
-	private IDimdimService dimdimService;
+    private IDimdimService dimdimService;
 
-	protected String doExport(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies) {
+    protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
 
-		setupService();
+	setupService();
 
-		try {
-			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
-						ToolAccessMode.LEARNER);
-				doLearnerExport(request, response, directoryName, cookies);
-			} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER
-					.toString())) {
-				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
-						ToolAccessMode.TEACHER);
-				doTeacherExport(request, response, directoryName, cookies);
-			}
-		} catch (DimdimException e) {
-			logger.error("Cannot perform export for dimdim tool.");
-		}
-
-		String basePath = request.getScheme() + "://" + request.getServerName()
-				+ ":" + request.getServerPort() + request.getContextPath();
-		writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
-				directoryName, FILENAME, cookies);
-
-		return FILENAME;
+	try {
+	    if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
+		request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.LEARNER);
+		doLearnerExport(request, response, directoryName, cookies);
+	    } else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
+		request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+		doTeacherExport(request, response, directoryName, cookies);
+	    }
+	} catch (DimdimException e) {
+	    logger.error("Cannot perform export for dimdim tool.");
 	}
 
-	protected String doOfflineExport(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies) {
-		if (toolContentID == null && toolSessionID == null) {
-			logger
-					.error("Tool content Id or and session Id are null. Unable to activity title");
-		} else {
-			setupService();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+		+ request.getContextPath();
+	writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
 
-			Dimdim content = null;
-			if (toolContentID != null) {
-				content = dimdimService.getDimdimByContentId(toolContentID);
-			} else {
-				DimdimSession session = dimdimService
-						.getSessionBySessionId(toolSessionID);
-				if (session != null)
-					content = session.getDimdim();
-			}
-			if (content != null) {
-				activityTitle = content.getTitle();
-			}
-		}
-		return super.doOfflineExport(request, response, directoryName, cookies);
+	return FILENAME;
+    }
+
+    protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
+	if (toolContentID == null && toolSessionID == null) {
+	    logger.error("Tool content Id or and session Id are null. Unable to activity title");
+	} else {
+	    setupService();
+
+	    Dimdim content = null;
+	    if (toolContentID != null) {
+		content = dimdimService.getDimdimByContentId(toolContentID);
+	    } else {
+		DimdimSession session = dimdimService.getSessionBySessionId(toolSessionID);
+		if (session != null)
+		    content = session.getDimdim();
+	    }
+	    if (content != null) {
+		activityTitle = content.getTitle();
+	    }
 	}
+	return super.doOfflineExport(request, response, directoryName, cookies);
+    }
 
-	private void doLearnerExport(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies)
-			throws DimdimException {
+    private void doLearnerExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) throws DimdimException {
 
-		logger.debug("doExportLearner: toolContentID:" + toolSessionID);
+	logger.debug("doExportLearner: toolContentID:" + toolSessionID);
 
+    }
+
+    private void doTeacherExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) throws DimdimException {
+
+	logger.debug("doExportTeacher: toolContentID:" + toolContentID);
+
+    }
+
+    private void setupService() {
+	if (dimdimService == null) {
+	    dimdimService = DimdimServiceProxy.getDimdimService(getServletContext());
 	}
-
-	private void doTeacherExport(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies)
-			throws DimdimException {
-
-		logger.debug("doExportTeacher: toolContentID:" + toolContentID);
-
-	}
-
-	private void setupService() {
-		if (dimdimService == null) {
-			dimdimService = DimdimServiceProxy
-					.getDimdimService(getServletContext());
-		}
-	}
+    }
 }

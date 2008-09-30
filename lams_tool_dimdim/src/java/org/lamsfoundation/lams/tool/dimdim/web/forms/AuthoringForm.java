@@ -39,167 +39,166 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  */
 public class AuthoringForm extends ActionForm {
 
-	private static final long serialVersionUID = 3950453134542135495L;
+    private static final long serialVersionUID = 3950453134542135495L;
 
-	// Fields
+    // Fields
 
-	private String title;
+    private String title;
 
-	private String instructions;
+    private String instructions;
 
-	private String offlineInstruction;
+    private String offlineInstruction;
 
-	private String onlineInstruction;
+    private String onlineInstruction;
 
-	private boolean lockOnFinished;
+    private boolean lockOnFinished;
 
-	private boolean allowRichEditor;
+    private boolean allowRichEditor;
 
-	private FormFile onlineFile;
+    private FormFile onlineFile;
 
-	private FormFile offlineFile;
+    private FormFile offlineFile;
 
-	private String currentTab;
+    private String currentTab;
 
-	private String dispatch;
+    private String dispatch;
 
-	private String sessionMapID;
+    private String sessionMapID;
 
-	private Long deleteFileUuid;
+    private Long deleteFileUuid;
 
-	private SessionMap<String, Object> sessionMap;
+    private SessionMap<String, Object> sessionMap;
 
-	private String topic;
+    private String topic;
 
-	private Integer maxAttendeeMikes;
+    private Integer maxAttendeeMikes;
 
-	@Override
-	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-		ActionErrors ac = new ActionErrors();
-		ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				"this is an error"));
+    @Override
+    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
+	ActionErrors ac = new ActionErrors();
+	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
 
-		return ac;
-	}
+	return ac;
+    }
 
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
 
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
 
-	public String getCurrentTab() {
-		return currentTab;
-	}
+    public String getCurrentTab() {
+	return currentTab;
+    }
 
-	public void setCurrentTab(String currentTab) {
-		this.currentTab = currentTab;
-	}
+    public void setCurrentTab(String currentTab) {
+	this.currentTab = currentTab;
+    }
 
-	public String getDispatch() {
-		return dispatch;
-	}
+    public String getDispatch() {
+	return dispatch;
+    }
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public boolean isLockOnFinished() {
-		return lockOnFinished;
-	}
+    public boolean isLockOnFinished() {
+	return lockOnFinished;
+    }
 
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
-	}
+    public void setLockOnFinished(boolean lockOnFinished) {
+	this.lockOnFinished = lockOnFinished;
+    }
 
-	public FormFile getOfflineFile() {
-		return offlineFile;
-	}
+    public FormFile getOfflineFile() {
+	return offlineFile;
+    }
 
-	public void setOfflineFile(FormFile offlineFile) {
-		this.offlineFile = offlineFile;
-	}
+    public void setOfflineFile(FormFile offlineFile) {
+	this.offlineFile = offlineFile;
+    }
 
-	public String getOfflineInstruction() {
-		return offlineInstruction;
-	}
+    public String getOfflineInstruction() {
+	return offlineInstruction;
+    }
 
-	public void setOfflineInstruction(String offlineInstruction) {
-		this.offlineInstruction = offlineInstruction;
-	}
+    public void setOfflineInstruction(String offlineInstruction) {
+	this.offlineInstruction = offlineInstruction;
+    }
 
-	public FormFile getOnlineFile() {
-		return onlineFile;
-	}
+    public FormFile getOnlineFile() {
+	return onlineFile;
+    }
 
-	public void setOnlineFile(FormFile onlineFile) {
-		this.onlineFile = onlineFile;
-	}
+    public void setOnlineFile(FormFile onlineFile) {
+	this.onlineFile = onlineFile;
+    }
 
-	public String getOnlineInstruction() {
-		return onlineInstruction;
-	}
+    public String getOnlineInstruction() {
+	return onlineInstruction;
+    }
 
-	public void setOnlineInstruction(String onlineInstruction) {
-		this.onlineInstruction = onlineInstruction;
-	}
+    public void setOnlineInstruction(String onlineInstruction) {
+	this.onlineInstruction = onlineInstruction;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public void setSessionMap(SessionMap<String, Object> sessionMap) {
-		this.sessionMap = sessionMap;
-	}
+    public void setSessionMap(SessionMap<String, Object> sessionMap) {
+	this.sessionMap = sessionMap;
+    }
 
-	public SessionMap<String, Object> getSessionMap() {
-		return sessionMap;
-	}
+    public SessionMap<String, Object> getSessionMap() {
+	return sessionMap;
+    }
 
-	public Long getDeleteFileUuid() {
-		return deleteFileUuid;
-	}
+    public Long getDeleteFileUuid() {
+	return deleteFileUuid;
+    }
 
-	public void setDeleteFileUuid(Long deleteFile) {
-		this.deleteFileUuid = deleteFile;
-	}
+    public void setDeleteFileUuid(Long deleteFile) {
+	this.deleteFileUuid = deleteFile;
+    }
 
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
-	}
+    public boolean isAllowRichEditor() {
+	return allowRichEditor;
+    }
 
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
-	}
+    public void setAllowRichEditor(boolean allowRichEditor) {
+	this.allowRichEditor = allowRichEditor;
+    }
 
-	public String getTopic() {
-		return topic;
-	}
+    public String getTopic() {
+	return topic;
+    }
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+    public void setTopic(String topic) {
+	this.topic = topic;
+    }
 
-	public Integer getMaxAttendeeMikes() {
-		return maxAttendeeMikes;
-	}
+    public Integer getMaxAttendeeMikes() {
+	return maxAttendeeMikes;
+    }
 
-	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
-		this.maxAttendeeMikes = maxAttendeeMikes;
-	}
+    public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
+	this.maxAttendeeMikes = maxAttendeeMikes;
+    }
 
 }

@@ -31,47 +31,47 @@ import org.apache.struts.action.ActionForm;
  */
 public class MonitoringForm extends ActionForm {
 
-	private static final long serialVersionUID = 9096908688391850595L;
+    private static final long serialVersionUID = 9096908688391850595L;
 
-	// Fields
+    // Fields
 
-	private String dispatch;
+    private String dispatch;
 
-	private Long toolSessionID;
+    private Long toolSessionID;
 
-	private String topic;
+    private String topic;
 
-	private Integer maxAttendeeMikes;
+    private Integer maxAttendeeMikes;
 
-	public String getDispatch() {
-		return dispatch;
-	}
+    public String getDispatch() {
+	return dispatch;
+    }
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
 
-	public Long getToolSessionID() {
-		return toolSessionID;
-	}
+    public Long getToolSessionID() {
+	return toolSessionID;
+    }
 
-	public void setToolSessionID(Long toolSessionID) {
-		this.toolSessionID = toolSessionID;
-	}
+    public void setToolSessionID(Long toolSessionID) {
+	this.toolSessionID = toolSessionID;
+    }
 
-	public String getTopic() {
-		return topic;
-	}
+    public String getTopic() {
+	return topic;
+    }
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+    public void setTopic(String topic) {
+	this.topic = topic;
+    }
 
-	public Integer getMaxAttendeeMikes() {
-		return maxAttendeeMikes;
-	}
+    public Integer getMaxAttendeeMikes() {
+	return maxAttendeeMikes;
+    }
 
-	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
-		this.maxAttendeeMikes = maxAttendeeMikes;
-	}
+    public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
+	this.maxAttendeeMikes = maxAttendeeMikes;
+    }
 }

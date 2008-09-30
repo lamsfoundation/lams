@@ -33,14 +33,11 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
  */
 public class DimdimUserDAO extends BaseDAO implements IDimdimUserDAO {
 
-	private static final String FIND_BY_USER_ID_SESSION_ID = "from "
-			+ DimdimUser.class.getName()
-			+ " as dimdimUser where dimdimUser.userId=:userId and dimdimUser.dimdimSession.sessionId=:sessionId";
+    private static final String FIND_BY_USER_ID_SESSION_ID = "from " + DimdimUser.class.getName()
+	    + " as dimdimUser where dimdimUser.userId=:userId and dimdimUser.dimdimSession.sessionId=:sessionId";
 
-	public DimdimUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-		return (DimdimUser) getSession()
-				.createQuery(FIND_BY_USER_ID_SESSION_ID).setLong("userId",
-						userId).setLong("sessionId", toolSessionId)
-				.uniqueResult();
-	}
+    public DimdimUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
+	return (DimdimUser) getSession().createQuery(FIND_BY_USER_ID_SESSION_ID).setLong("userId", userId).setLong(
+		"sessionId", toolSessionId).uniqueResult();
+    }
 }

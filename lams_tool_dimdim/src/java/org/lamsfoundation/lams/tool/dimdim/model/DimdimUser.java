@@ -28,189 +28,183 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * 
- * Caches the user details. This allows the tool to be more efficient at
- * displaying user names but means that when people's names change, they won't
- * change in the "old" tool data.
+ * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
+ * people's names change, they won't change in the "old" tool data.
  * 
  * @hibernate.class table="tl_laddim10_user"
  */
 
 public class DimdimUser implements java.io.Serializable {
 
-	private static final long serialVersionUID = -3701664859818409197L;
+    private static final long serialVersionUID = -3701664859818409197L;
 
-	// Persistent Fields
+    // Persistent Fields
 
-	private Long uid;
+    private Long uid;
 
-	private Long userId;
+    private Long userId;
 
-	private String lastName;
+    private String lastName;
 
-	private String firstName;
+    private String firstName;
 
-	private String loginName;
+    private String loginName;
 
-	private DimdimSession dimdimSession;
+    private DimdimSession dimdimSession;
 
-	private boolean finishedActivity;
+    private boolean finishedActivity;
 
-	private Long entryUID;
+    private Long entryUID;
 
-	// Constructors
+    // Constructors
 
-	/** default constructor */
-	public DimdimUser() {
-	}
+    /** default constructor */
+    public DimdimUser() {
+    }
 
-	public DimdimUser(UserDTO user, DimdimSession dimdimSession) {
-		this.userId = new Long(user.getUserID().intValue());
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.loginName = user.getLogin();
-		this.dimdimSession = dimdimSession;
-		this.finishedActivity = false;
-	}
+    public DimdimUser(UserDTO user, DimdimSession dimdimSession) {
+	this.userId = new Long(user.getUserID().intValue());
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.loginName = user.getLogin();
+	this.dimdimSession = dimdimSession;
+	this.finishedActivity = false;
+    }
 
-	/** full constructor */
-	public DimdimUser(Long userId, String lastName, String firstName,
-			DimdimSession dimdimSession) {
-		this.userId = userId;
-		this.lastName = lastName;
-		this.firstName = firstName;
-		this.dimdimSession = dimdimSession;
-	}
+    /** full constructor */
+    public DimdimUser(Long userId, String lastName, String firstName, DimdimSession dimdimSession) {
+	this.userId = userId;
+	this.lastName = lastName;
+	this.firstName = firstName;
+	this.dimdimSession = dimdimSession;
+    }
 
-	// Property accessors
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 */
-	public Long getUid() {
-		return this.uid;
-	}
+    // Property accessors
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     */
+    public Long getUid() {
+	return this.uid;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	/**
-	 * @hibernate.property column="user_id" length="20"
-	 * 
-	 */
-	public Long getUserId() {
-		return this.userId;
-	}
+    /**
+     * @hibernate.property column="user_id" length="20"
+     * 
+     */
+    public Long getUserId() {
+	return this.userId;
+    }
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
+    public void setUserId(Long userId) {
+	this.userId = userId;
+    }
 
-	/**
-	 * @hibernate.property column="last_name" length="255"
-	 * 
-	 */
-	public String getLastName() {
-		return this.lastName;
-	}
+    /**
+     * @hibernate.property column="last_name" length="255"
+     * 
+     */
+    public String getLastName() {
+	return this.lastName;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
 
-	/**
-	 * @hibernate.property column="login_name" length="255"
-	 * 
-	 */
-	public String getLoginName() {
-		return loginName;
-	}
+    /**
+     * @hibernate.property column="login_name" length="255"
+     * 
+     */
+    public String getLoginName() {
+	return loginName;
+    }
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
-	}
+    public void setLoginName(String loginName) {
+	this.loginName = loginName;
+    }
 
-	/**
-	 * @hibernate.property column="first_name" length="255"
-	 * 
-	 */
-	public String getFirstName() {
-		return this.firstName;
-	}
+    /**
+     * @hibernate.property column="first_name" length="255"
+     * 
+     */
+    public String getFirstName() {
+	return this.firstName;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
 
-	/**
-	 * @hibernate.property column="finishedActivity"
-	 */
-	public boolean isFinishedActivity() {
-		return finishedActivity;
-	}
+    /**
+     * @hibernate.property column="finishedActivity"
+     */
+    public boolean isFinishedActivity() {
+	return finishedActivity;
+    }
 
-	public void setFinishedActivity(boolean finishedActivity) {
-		this.finishedActivity = finishedActivity;
-	}
+    public void setFinishedActivity(boolean finishedActivity) {
+	this.finishedActivity = finishedActivity;
+    }
 
-	/**
-	 * @hibernate.many-to-one not-null="true"
-	 *                        foreign-key="fk_laddim10_dimdim_user_to_dimdim_session"
-	 * @hibernate.column name="dimdim_session_uid"
-	 * 
-	 */
-	public DimdimSession getDimdimSession() {
-		return this.dimdimSession;
-	}
+    /**
+     * @hibernate.many-to-one not-null="true" foreign-key="fk_laddim10_dimdim_user_to_dimdim_session"
+     * @hibernate.column name="dimdim_session_uid"
+     * 
+     */
+    public DimdimSession getDimdimSession() {
+	return this.dimdimSession;
+    }
 
-	public void setDimdimSession(DimdimSession dimdimSession) {
-		this.dimdimSession = dimdimSession;
-	}
+    public void setDimdimSession(DimdimSession dimdimSession) {
+	this.dimdimSession = dimdimSession;
+    }
 
-	/**
-	 * @hibernate.property column="entry_uid"
-	 */
-	public Long getEntryUID() {
-		return entryUID;
-	}
+    /**
+     * @hibernate.property column="entry_uid"
+     */
+    public Long getEntryUID() {
+	return entryUID;
+    }
 
-	public void setEntryUID(Long entryUID) {
-		this.entryUID = entryUID;
-	}
+    public void setEntryUID(Long entryUID) {
+	this.entryUID = entryUID;
+    }
 
-	/**
-	 * toString
-	 * 
-	 * @return String
-	 */
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+    /**
+     * toString
+     * 
+     * @return String
+     */
+    public String toString() {
+	StringBuffer buffer = new StringBuffer();
 
-		buffer.append(getClass().getName()).append("@").append(
-				Integer.toHexString(hashCode())).append(" [");
-		buffer.append("userId").append("='").append(getUserId()).append("' ");
-		buffer.append("]");
+	buffer.append(getClass().getName()).append("@").append(Integer.toHexString(hashCode())).append(" [");
+	buffer.append("userId").append("='").append(getUserId()).append("' ");
+	buffer.append("]");
 
-		return buffer.toString();
-	}
+	return buffer.toString();
+    }
 
-	public boolean equals(Object other) {
-		if ((this == other))
-			return true;
-		if ((other == null))
-			return false;
-		if (!(other instanceof DimdimUser))
-			return false;
-		DimdimUser castOther = (DimdimUser) other;
+    public boolean equals(Object other) {
+	if ((this == other))
+	    return true;
+	if ((other == null))
+	    return false;
+	if (!(other instanceof DimdimUser))
+	    return false;
+	DimdimUser castOther = (DimdimUser) other;
 
-		return ((this.getUid() == castOther.getUid()) || (this.getUid() != null
-				&& castOther.getUid() != null && this.getUid().equals(
-				castOther.getUid())));
-	}
+	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null && this
+		.getUid().equals(castOther.getUid())));
+    }
 
-	public int hashCode() {
-		int result = 17;
-		result = 37 * result
-				+ (getUid() == null ? 0 : this.getUid().hashCode());
-		return result;
-	}
+    public int hashCode() {
+	int result = 17;
+	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());
+	return result;
+    }
 }

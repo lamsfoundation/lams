@@ -28,16 +28,16 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 
 /**
- * DAO for accessing the DimdimUser objects - interface defining methods to be
- * implemented by the Hibernate or other implementation.
+ * DAO for accessing the DimdimUser objects - interface defining methods to be implemented by the Hibernate or other
+ * implementation.
  */
 public interface IDimdimUserDAO extends IBaseDAO {
 
-	/**
-	 * 
-	 * @param userId
-	 * @param toolSessionId
-	 * @return
-	 */
-	DimdimUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
+    /**
+     * 
+     * @param userId
+     * @param toolSessionId
+     * @return
+     */
+    DimdimUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
 }

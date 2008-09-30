@@ -37,30 +37,29 @@ import org.apache.struts.action.ActionMapping;
  */
 public class AdminForm extends ActionForm {
 
-	private static final long serialVersionUID = 8367278543453322252L;
+    private static final long serialVersionUID = 8367278543453322252L;
 
-	// Fields
+    // Fields
 
-	private String dimdimServerURL;
+    private String dimdimServerURL;
 
-	@Override
-	public ActionErrors validate(ActionMapping mapping,
-			HttpServletRequest request) {
+    @Override
+    public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
 
-		ActionErrors errors = new ActionErrors();
+	ActionErrors errors = new ActionErrors();
 
-		if (StringUtils.isBlank(this.dimdimServerURL)) {
-			// TODO add error messages;
-		}
-		return errors;
+	if (StringUtils.isBlank(this.dimdimServerURL)) {
+	    // TODO add error messages;
 	}
+	return errors;
+    }
 
-	public String getDimdimServerURL() {
-		return dimdimServerURL;
-	}
+    public String getDimdimServerURL() {
+	return dimdimServerURL;
+    }
 
-	public void setDimdimServerURL(String dimdimServerURL) {
-		this.dimdimServerURL = dimdimServerURL;
-	}
+    public void setDimdimServerURL(String dimdimServerURL) {
+	this.dimdimServerURL = dimdimServerURL;
+    }
 
 }

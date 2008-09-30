@@ -28,8 +28,7 @@ import java.util.Random;
 
 public class DimdimUtil {
 
-	public static String generateMeetingKey() {
-		return new Long(System.currentTimeMillis()).toString() + "-"
-				+ (new Random().nextInt());
-	}
+    public static String generateMeetingKey() {
+	return new Long(System.currentTimeMillis()).toString() + "-" + (new Random().nextInt());
+    }
 }

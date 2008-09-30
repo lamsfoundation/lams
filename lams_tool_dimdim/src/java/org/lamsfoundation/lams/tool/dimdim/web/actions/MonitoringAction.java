@@ -50,108 +50,98 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request"
- *                name="monitoringForm" validate="false"
+ * @struts.action path="/monitoring" parameter="dispatch" scope="request" name="monitoringForm" validate="false"
  * 
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="dimdim_display"
- *                        path="tiles:/monitoring/dimdim_display"
+ * @struts.action-forward name="dimdim_display" path="tiles:/monitoring/dimdim_display"
  */
 public class MonitoringAction extends DispatchAction {
 
-	// private static final Logger logger =
-	// Logger.getLogger(MonitoringAction.class);
+    // private static final Logger logger =
+    // Logger.getLogger(MonitoringAction.class);
 
-	private IDimdimService dimdimService;
+    private IDimdimService dimdimService;
 
-	@Override
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
-		// set up dimdimService
-		dimdimService = DimdimServiceProxy.getDimdimService(this.getServlet()
-				.getServletContext());
+	// set up dimdimService
+	dimdimService = DimdimServiceProxy.getDimdimService(this.getServlet().getServletContext());
 
-		return super.execute(mapping, form, request, response);
+	return super.execute(mapping, form, request, response);
+    }
+
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+
+	Dimdim dimdim = dimdimService.getDimdimByContentId(toolContentID);
+
+	if (dimdim == null) {
+	    // TODO error page.
 	}
 
-	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+	ContentDTO contentDT0 = new ContentDTO(dimdim);
 
-		Long toolContentID = new Long(WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_CONTENT_ID));
+	MonitoringForm monitoringForm = (MonitoringForm) form;
+	// populate using authoring values
+	monitoringForm.setTopic(contentDT0.getTopic());
+	monitoringForm.setMaxAttendeeMikes((contentDT0.getMaxAttendeeMikes()));
 
-		String contentFolderID = WebUtil.readStrParam(request,
-				AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	// TODO may need to populate using session values if they already exist
 
-		Dimdim dimdim = dimdimService.getDimdimByContentId(toolContentID);
+	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
+	contentDT0.setCurrentTab(currentTab);
 
-		if (dimdim == null) {
-			// TODO error page.
-		}
+	request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDT0);
+	request.setAttribute(Constants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
+	return mapping.findForward("success");
+    }
 
-		ContentDTO contentDT0 = new ContentDTO(dimdim);
+    public ActionForward showDimdim(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long uid = new Long(WebUtil.readLongParam(request, Constants.PARAM_USER_UID));
 
-		MonitoringForm monitoringForm = (MonitoringForm) form;
-		// populate using authoring values
-		monitoringForm.setTopic(contentDT0.getTopic());
-		monitoringForm.setMaxAttendeeMikes((contentDT0.getMaxAttendeeMikes()));
+	DimdimUser user = dimdimService.getUserByUID(uid);
+	NotebookEntry entry = dimdimService.getEntry(user.getEntryUID());
 
-		// TODO may need to populate using session values if they already exist
+	UserDTO userDTO = new UserDTO(user, entry);
 
-		Long currentTab = WebUtil.readLongParam(request,
-				AttributeNames.PARAM_CURRENT_TAB, true);
-		contentDT0.setCurrentTab(currentTab);
+	request.setAttribute(Constants.ATTR_USER_DTO, userDTO);
 
-		request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDT0);
-		request.setAttribute(Constants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
-		return mapping.findForward("success");
-	}
+	return mapping.findForward("dimdim_display");
+    }
 
-	public ActionForward showDimdim(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		Long uid = new Long(WebUtil.readLongParam(request,
-				Constants.PARAM_USER_UID));
+    public ActionForward startDimdim(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
-		DimdimUser user = dimdimService.getUserByUID(uid);
-		NotebookEntry entry = dimdimService.getEntry(user.getEntryUID());
+	MonitoringForm monitoringForm = (MonitoringForm) form;
 
-		UserDTO userDTO = new UserDTO(user, entry);
+	// get dimdim session
+	DimdimSession session = dimdimService.getSessionBySessionId(monitoringForm.getToolSessionID());
 
-		request.setAttribute(Constants.ATTR_USER_DTO, userDTO);
+	// update dimdim meeting settings
+	session.setTopic(monitoringForm.getTopic());
+	session.setMaxAttendeeMikes(monitoringForm.getMaxAttendeeMikes());
 
-		return mapping.findForward("dimdim_display");
-	}
+	// Get LAMS userDTO
+	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
+		.getSession().getAttribute(AttributeNames.USER);
 
-	public ActionForward startDimdim(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	String meetingKey = DimdimUtil.generateMeetingKey();
+	session.setMeetingKey(meetingKey);
+	dimdimService.saveOrUpdateDimdimSession(session);
 
-		MonitoringForm monitoringForm = (MonitoringForm) form;
+	String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey(),
+		session.getTopic());
 
-		// get dimdim session
-		DimdimSession session = dimdimService
-				.getSessionBySessionId(monitoringForm.getToolSessionID());
+	response.sendRedirect(startConferenceURL);
 
-		// update dimdim meeting settings
-		session.setTopic(monitoringForm.getTopic());
-		session.setMaxAttendeeMikes(monitoringForm.getMaxAttendeeMikes());
+	return null;
 
-		// Get LAMS userDTO
-		org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
-				.getSession().getAttribute(AttributeNames.USER);
-
-		String meetingKey = DimdimUtil.generateMeetingKey();
-		session.setMeetingKey(meetingKey);
-		dimdimService.saveOrUpdateDimdimSession(session);
-
-		String startConferenceURL = dimdimService.getDimdimStartConferenceURL(
-				lamsUserDTO, session.getMeetingKey(), session.getTopic());
-
-		response.sendRedirect(startConferenceURL);
-
-		return null;
-
-	}
+    }
 }

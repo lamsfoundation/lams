@@ -35,192 +35,188 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 
 public class ContentDTO {
 
-	private static final Logger logger = Logger.getLogger(ContentDTO.class);
+    private static final Logger logger = Logger.getLogger(ContentDTO.class);
 
-	public Long toolContentId;
+    public Long toolContentId;
 
-	public String title;
+    public String title;
 
-	public String instructions;
+    public String instructions;
 
-	public String onlineInstructions;
+    public String onlineInstructions;
 
-	public String offlineInstructions;
+    public String offlineInstructions;
 
-	public boolean defineLater;
+    public boolean defineLater;
 
-	public boolean contentInUse;
+    public boolean contentInUse;
 
-	public boolean allowRichEditor;
+    public boolean allowRichEditor;
 
-	public boolean lockOnFinish;
+    public boolean lockOnFinish;
 
-	public Set<AttachmentDTO> onlineInstructionsFiles;
+    public Set<AttachmentDTO> onlineInstructionsFiles;
 
-	public Set<AttachmentDTO> offlineInstructionsFiles;
+    public Set<AttachmentDTO> offlineInstructionsFiles;
 
-	public Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
+    public Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
 
-	public Long currentTab;
+    public Long currentTab;
 
-	private String topic;
+    private String topic;
 
-	private Integer maxAttendeeMikes;
+    private Integer maxAttendeeMikes;
 
-	/* Constructors */
-	public ContentDTO() {
+    /* Constructors */
+    public ContentDTO() {
+    }
+
+    public ContentDTO(Dimdim dimdim) {
+	this.toolContentId = dimdim.getToolContentId();
+	this.title = dimdim.getTitle();
+	this.instructions = dimdim.getInstructions();
+	this.onlineInstructions = dimdim.getOnlineInstructions();
+	this.offlineInstructions = dimdim.getOfflineInstructions();
+	this.contentInUse = dimdim.isContentInUse();
+	this.allowRichEditor = dimdim.isAllowRichEditor();
+	this.lockOnFinish = dimdim.isLockOnFinished();
+
+	this.onlineInstructionsFiles = new TreeSet<AttachmentDTO>();
+	this.offlineInstructionsFiles = new TreeSet<AttachmentDTO>();
+
+	this.topic = dimdim.getTopic();
+	this.maxAttendeeMikes = dimdim.getMaxAttendeeMikes();
+
+	for (DimdimAttachment att : dimdim.getDimdimAttachments()) {
+	    Set<AttachmentDTO> attSet = null;
+	    if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
+		attSet = offlineInstructionsFiles;
+	    } else if (att.getFileType().equals(IToolContentHandler.TYPE_ONLINE)) {
+		attSet = onlineInstructionsFiles;
+	    } else {
+		// something is wrong. Ignore file, log error
+		logger.error("File with uid " + att.getFileUuid() + " contains invalid fileType: " + att.getFileType());
+	    }
+
+	    if (attSet != null)
+		attSet.add(new AttachmentDTO(att));
 	}
 
-	public ContentDTO(Dimdim dimdim) {
-		this.toolContentId = dimdim.getToolContentId();
-		this.title = dimdim.getTitle();
-		this.instructions = dimdim.getInstructions();
-		this.onlineInstructions = dimdim.getOnlineInstructions();
-		this.offlineInstructions = dimdim.getOfflineInstructions();
-		this.contentInUse = dimdim.isContentInUse();
-		this.allowRichEditor = dimdim.isAllowRichEditor();
-		this.lockOnFinish = dimdim.isLockOnFinished();
-
-		this.onlineInstructionsFiles = new TreeSet<AttachmentDTO>();
-		this.offlineInstructionsFiles = new TreeSet<AttachmentDTO>();
-
-		this.topic = dimdim.getTopic();
-		this.maxAttendeeMikes = dimdim.getMaxAttendeeMikes();
-
-		for (DimdimAttachment att : dimdim.getDimdimAttachments()) {
-			Set<AttachmentDTO> attSet = null;
-			if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
-				attSet = offlineInstructionsFiles;
-			} else if (att.getFileType()
-					.equals(IToolContentHandler.TYPE_ONLINE)) {
-				attSet = onlineInstructionsFiles;
-			} else {
-				// something is wrong. Ignore file, log error
-				logger.error("File with uid " + att.getFileUuid()
-						+ " contains invalid fileType: " + att.getFileType());
-			}
-
-			if (attSet != null)
-				attSet.add(new AttachmentDTO(att));
-		}
-
-		for (DimdimSession dimdimSession : dimdim.getDimdimSessions()) {
-			sessionDTOs.add(new SessionDTO(dimdimSession));
-		}
+	for (DimdimSession dimdimSession : dimdim.getDimdimSessions()) {
+	    sessionDTOs.add(new SessionDTO(dimdimSession));
 	}
+    }
 
-	/* Getters / Setters */
-	public Set<SessionDTO> getSessionDTOs() {
-		return sessionDTOs;
-	}
+    /* Getters / Setters */
+    public Set<SessionDTO> getSessionDTOs() {
+	return sessionDTOs;
+    }
 
-	public void setSessionDTOs(Set<SessionDTO> sessionDTOs) {
-		this.sessionDTOs = sessionDTOs;
-	}
+    public void setSessionDTOs(Set<SessionDTO> sessionDTOs) {
+	this.sessionDTOs = sessionDTOs;
+    }
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public String getOfflineInstructions() {
-		return offlineInstructions;
-	}
+    public String getOfflineInstructions() {
+	return offlineInstructions;
+    }
 
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
+    public void setOfflineInstructions(String offlineInstructions) {
+	this.offlineInstructions = offlineInstructions;
+    }
 
-	public Set<AttachmentDTO> getOfflineInstructionsFiles() {
-		return offlineInstructionsFiles;
-	}
+    public Set<AttachmentDTO> getOfflineInstructionsFiles() {
+	return offlineInstructionsFiles;
+    }
 
-	public void setOfflineInstructionsFiles(
-			Set<AttachmentDTO> offlineInstructionsFiles) {
-		this.offlineInstructionsFiles = offlineInstructionsFiles;
-	}
+    public void setOfflineInstructionsFiles(Set<AttachmentDTO> offlineInstructionsFiles) {
+	this.offlineInstructionsFiles = offlineInstructionsFiles;
+    }
 
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
+    public String getOnlineInstructions() {
+	return onlineInstructions;
+    }
 
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
+    public void setOnlineInstructions(String onlineInstructions) {
+	this.onlineInstructions = onlineInstructions;
+    }
 
-	public Set<AttachmentDTO> getOnlineInstructionsFiles() {
-		return onlineInstructionsFiles;
-	}
+    public Set<AttachmentDTO> getOnlineInstructionsFiles() {
+	return onlineInstructionsFiles;
+    }
 
-	public void setOnlineInstructionsFiles(
-			Set<AttachmentDTO> onlineInstructionsFiles) {
-		this.onlineInstructionsFiles = onlineInstructionsFiles;
-	}
+    public void setOnlineInstructionsFiles(Set<AttachmentDTO> onlineInstructionsFiles) {
+	this.onlineInstructionsFiles = onlineInstructionsFiles;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public Long getToolContentId() {
-		return toolContentId;
-	}
+    public Long getToolContentId() {
+	return toolContentId;
+    }
 
-	public void setToolContentId(Long toolContentID) {
-		this.toolContentId = toolContentID;
-	}
+    public void setToolContentId(Long toolContentID) {
+	this.toolContentId = toolContentID;
+    }
 
-	public Boolean getContentInUse() {
-		return contentInUse;
-	}
+    public Boolean getContentInUse() {
+	return contentInUse;
+    }
 
-	public void setContentInUse(Boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
+    public void setContentInUse(Boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
 
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
-	}
+    public boolean isAllowRichEditor() {
+	return allowRichEditor;
+    }
 
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
-	}
+    public void setAllowRichEditor(boolean allowRichEditor) {
+	this.allowRichEditor = allowRichEditor;
+    }
 
-	public boolean isLockOnFinish() {
-		return lockOnFinish;
-	}
+    public boolean isLockOnFinish() {
+	return lockOnFinish;
+    }
 
-	public void setLockOnFinish(boolean lockOnFinish) {
-		this.lockOnFinish = lockOnFinish;
-	}
+    public void setLockOnFinish(boolean lockOnFinish) {
+	this.lockOnFinish = lockOnFinish;
+    }
 
-	public Long getCurrentTab() {
-		return currentTab;
-	}
+    public Long getCurrentTab() {
+	return currentTab;
+    }
 
-	public void setCurrentTab(Long currentTab) {
-		this.currentTab = currentTab;
-	}
+    public void setCurrentTab(Long currentTab) {
+	this.currentTab = currentTab;
+    }
 
-	public String getTopic() {
-		return topic;
-	}
+    public String getTopic() {
+	return topic;
+    }
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+    public void setTopic(String topic) {
+	this.topic = topic;
+    }
 
-	public Integer getMaxAttendeeMikes() {
-		return maxAttendeeMikes;
-	}
+    public Integer getMaxAttendeeMikes() {
+	return maxAttendeeMikes;
+    }
 
-	public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
-		this.maxAttendeeMikes = maxAttendeeMikes;
-	}
+    public void setMaxAttendeeMikes(Integer maxAttendeeMikes) {
+	this.maxAttendeeMikes = maxAttendeeMikes;
+    }
 }

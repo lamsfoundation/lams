@@ -32,82 +32,82 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 
 public class SessionDTO implements Comparable<SessionDTO> {
 
-	Long sessionID;
+    Long sessionID;
 
-	String sessionName;
+    String sessionName;
 
-	Set<UserDTO> userDTOs = new TreeSet<UserDTO>();
+    Set<UserDTO> userDTOs = new TreeSet<UserDTO>();
 
-	int numberOfLearners;
+    int numberOfLearners;
 
-	int numberOfFinishedLearners;;
+    int numberOfFinishedLearners;;
 
-	public SessionDTO(DimdimSession session) {
-		this.sessionID = session.getSessionId();
-		this.sessionName = session.getSessionName();
+    public SessionDTO(DimdimSession session) {
+	this.sessionID = session.getSessionId();
+	this.sessionName = session.getSessionName();
 
-		numberOfFinishedLearners = 0;
+	numberOfFinishedLearners = 0;
 
-		for (DimdimUser dimdimUser : session.getDimdimUsers()) {
-			UserDTO userDTO = new UserDTO(dimdimUser);
-			if (userDTO.getEntryUID() != null) {
-				numberOfFinishedLearners++;
-			}
-			userDTOs.add(userDTO);
-		}
-
-		numberOfLearners = userDTOs.size();
-
+	for (DimdimUser dimdimUser : session.getDimdimUsers()) {
+	    UserDTO userDTO = new UserDTO(dimdimUser);
+	    if (userDTO.getEntryUID() != null) {
+		numberOfFinishedLearners++;
+	    }
+	    userDTOs.add(userDTO);
 	}
 
-	public int compareTo(SessionDTO other) {
-		int ret = this.sessionName.compareToIgnoreCase(other.sessionName);
-		if (ret == 0) {
-			ret = this.sessionID.compareTo(other.sessionID);
-		}
-		return ret;
-	}
+	numberOfLearners = userDTOs.size();
 
-	public SessionDTO() {
-	}
+    }
 
-	public Long getSessionID() {
-		return sessionID;
+    public int compareTo(SessionDTO other) {
+	int ret = this.sessionName.compareToIgnoreCase(other.sessionName);
+	if (ret == 0) {
+	    ret = this.sessionID.compareTo(other.sessionID);
 	}
+	return ret;
+    }
 
-	public void setSessionID(Long sessionID) {
-		this.sessionID = sessionID;
-	}
+    public SessionDTO() {
+    }
 
-	public String getSessionName() {
-		return sessionName;
-	}
+    public Long getSessionID() {
+	return sessionID;
+    }
 
-	public void setSessionName(String sessionName) {
-		this.sessionName = sessionName;
-	}
+    public void setSessionID(Long sessionID) {
+	this.sessionID = sessionID;
+    }
 
-	public Set<UserDTO> getUserDTOs() {
-		return userDTOs;
-	}
+    public String getSessionName() {
+	return sessionName;
+    }
 
-	public void setUserDTOs(Set<UserDTO> dimdimUsers) {
-		this.userDTOs = dimdimUsers;
-	}
+    public void setSessionName(String sessionName) {
+	this.sessionName = sessionName;
+    }
 
-	public int getNumberOfLearners() {
-		return numberOfLearners;
-	}
+    public Set<UserDTO> getUserDTOs() {
+	return userDTOs;
+    }
 
-	public void setNumberOfLearners(int numberOfLearners) {
-		this.numberOfLearners = numberOfLearners;
-	}
+    public void setUserDTOs(Set<UserDTO> dimdimUsers) {
+	this.userDTOs = dimdimUsers;
+    }
 
-	public int getNumberOfFinishedLearners() {
-		return numberOfFinishedLearners;
-	}
+    public int getNumberOfLearners() {
+	return numberOfLearners;
+    }
 
-	public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
-		this.numberOfFinishedLearners = numberOfFinishedLearners;
-	}
+    public void setNumberOfLearners(int numberOfLearners) {
+	this.numberOfLearners = numberOfLearners;
+    }
+
+    public int getNumberOfFinishedLearners() {
+	return numberOfFinishedLearners;
+    }
+
+    public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
+	this.numberOfFinishedLearners = numberOfFinishedLearners;
+    }
 }

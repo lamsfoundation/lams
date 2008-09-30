@@ -29,100 +29,100 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 
 public class UserDTO implements Comparable<UserDTO> {
 
-	public Long uid;
+    public Long uid;
 
-	public String loginName;
+    public String loginName;
 
-	public String firstName;
+    public String firstName;
 
-	public String lastName;
+    public String lastName;
 
-	public boolean finishedActivity;
+    public boolean finishedActivity;
 
-	public NotebookEntryDTO entryDTO;
+    public NotebookEntryDTO entryDTO;
 
-	public Long entryUID;
+    public Long entryUID;
 
-	public UserDTO(DimdimUser user, NotebookEntry entry) {
-		this.uid = user.getUid();
-		this.loginName = user.getLoginName();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.finishedActivity = user.isFinishedActivity();
-		this.entryUID = user.getEntryUID();
-		this.entryDTO = new NotebookEntryDTO(entry);
+    public UserDTO(DimdimUser user, NotebookEntry entry) {
+	this.uid = user.getUid();
+	this.loginName = user.getLoginName();
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.finishedActivity = user.isFinishedActivity();
+	this.entryUID = user.getEntryUID();
+	this.entryDTO = new NotebookEntryDTO(entry);
+    }
+
+    public UserDTO(DimdimUser user) {
+	this.uid = user.getUid();
+	this.loginName = user.getLoginName();
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.finishedActivity = user.isFinishedActivity();
+	this.entryUID = user.getEntryUID();
+    }
+
+    public int compareTo(UserDTO other) {
+	int ret = this.lastName.compareToIgnoreCase(other.lastName);
+	if (ret == 0) {
+	    ret = this.uid.compareTo(other.uid);
 	}
+	return ret;
+    }
 
-	public UserDTO(DimdimUser user) {
-		this.uid = user.getUid();
-		this.loginName = user.getLoginName();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.finishedActivity = user.isFinishedActivity();
-		this.entryUID = user.getEntryUID();
-	}
+    public String getFirstName() {
+	return firstName;
+    }
 
-	public int compareTo(UserDTO other) {
-		int ret = this.lastName.compareToIgnoreCase(other.lastName);
-		if (ret == 0) {
-			ret = this.uid.compareTo(other.uid);
-		}
-		return ret;
-	}
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public String getLastName() {
+	return lastName;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public String getLoginName() {
+	return loginName;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setLoginName(String loginName) {
+	this.loginName = loginName;
+    }
 
-	public String getLoginName() {
-		return loginName;
-	}
+    public Long getUid() {
+	return uid;
+    }
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	public Long getUid() {
-		return uid;
-	}
+    public NotebookEntryDTO getEntryDTO() {
+	return entryDTO;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    public void setEntryDTO(NotebookEntryDTO entryDTO) {
+	this.entryDTO = entryDTO;
+    }
 
-	public NotebookEntryDTO getEntryDTO() {
-		return entryDTO;
-	}
+    public Long getEntryUID() {
+	return entryUID;
+    }
 
-	public void setEntryDTO(NotebookEntryDTO entryDTO) {
-		this.entryDTO = entryDTO;
-	}
+    public void setEntryUID(Long entryUID) {
+	this.entryUID = entryUID;
+    }
 
-	public Long getEntryUID() {
-		return entryUID;
-	}
+    public boolean isFinishedActivity() {
+	return finishedActivity;
+    }
 
-	public void setEntryUID(Long entryUID) {
-		this.entryUID = entryUID;
-	}
-
-	public boolean isFinishedActivity() {
-		return finishedActivity;
-	}
-
-	public void setFinishedActivity(boolean finishedActivity) {
-		this.finishedActivity = finishedActivity;
-	}
+    public void setFinishedActivity(boolean finishedActivity) {
+	this.finishedActivity = finishedActivity;
+    }
 }

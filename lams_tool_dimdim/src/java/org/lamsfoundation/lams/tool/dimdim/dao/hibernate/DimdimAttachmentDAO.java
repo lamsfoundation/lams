@@ -30,6 +30,5 @@ import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimAttachmentDAO;
 /**
  * DAO for accessing the DimdimAttachment objects - Hibernate specific code.
  */
-public class DimdimAttachmentDAO extends BaseDAO implements
-		IDimdimAttachmentDAO {
+public class DimdimAttachmentDAO extends BaseDAO implements IDimdimAttachmentDAO {
 }

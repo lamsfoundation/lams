@@ -33,47 +33,39 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * <p>
- * This class act as the proxy between web layer and service layer. It is
- * designed to decouple the presentation logic and business logic completely. In
- * this way, the presentation tier will no longer be aware of the changes in
- * service layer. Therefore we can feel free to switch the business logic
- * implementation.
+ * This class act as the proxy between web layer and service layer. It is designed to decouple the presentation logic
+ * and business logic completely. In this way, the presentation tier will no longer be aware of the changes in service
+ * layer. Therefore we can feel free to switch the business logic implementation.
  * </p>
  */
 
 public class DimdimServiceProxy {
 
-	public static final IDimdimService getDimdimService(
-			ServletContext servletContext) {
-		return (IDimdimService) getDimdimDomainService(servletContext);
-	}
+    public static final IDimdimService getDimdimService(ServletContext servletContext) {
+	return (IDimdimService) getDimdimDomainService(servletContext);
+    }
 
-	private static Object getDimdimDomainService(ServletContext servletContext) {
-		WebApplicationContext wac = WebApplicationContextUtils
-				.getRequiredWebApplicationContext(servletContext);
-		return wac.getBean("dimdimService");
-	}
+    private static Object getDimdimDomainService(ServletContext servletContext) {
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+	return wac.getBean("dimdimService");
+    }
 
-	/*
-	 * Return the dimdim tool version of tool session manager implementation. It
-	 * will delegate to the Spring helper method to retrieve the proper bean
-	 * from Spring bean factory. @param servletContext the servletContext for
-	 * current application @return noticeboard service object.
-	 */
-	public static final ToolSessionManager getDimdimSessionManager(
-			ServletContext servletContext) {
-		return (ToolSessionManager) getDimdimDomainService(servletContext);
-	}
+    /*
+     * Return the dimdim tool version of tool session manager implementation. It will delegate to the Spring helper
+     * method to retrieve the proper bean from Spring bean factory. @param servletContext the servletContext for current
+     * application @return noticeboard service object.
+     */
+    public static final ToolSessionManager getDimdimSessionManager(ServletContext servletContext) {
+	return (ToolSessionManager) getDimdimDomainService(servletContext);
+    }
 
-	/*
-	 * Return the dimdim tool version of tool content manager implementation. It
-	 * will delegate to the Spring helper method to retrieve the proper bean
-	 * from Spring bean factory. @param servletContext the servletContext for
-	 * current application @return noticeboard service object.
-	 */
-	public static final ToolContentManager getDimdimContentManager(
-			ServletContext servletContext) {
-		return (ToolContentManager) getDimdimDomainService(servletContext);
-	}
+    /*
+     * Return the dimdim tool version of tool content manager implementation. It will delegate to the Spring helper
+     * method to retrieve the proper bean from Spring bean factory. @param servletContext the servletContext for current
+     * application @return noticeboard service object.
+     */
+    public static final ToolContentManager getDimdimContentManager(ServletContext servletContext) {
+	return (ToolContentManager) getDimdimDomainService(servletContext);
+    }
 
 }
