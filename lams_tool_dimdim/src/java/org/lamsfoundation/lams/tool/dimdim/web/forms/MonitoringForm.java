@@ -39,8 +39,6 @@ public class MonitoringForm extends ActionForm {
 
     private Long toolSessionID;
 
-    private String topic;
-
     private Integer maxAttendeeMikes;
 
     public String getDispatch() {
@@ -57,14 +55,6 @@ public class MonitoringForm extends ActionForm {
 
     public void setToolSessionID(Long toolSessionID) {
 	this.toolSessionID = toolSessionID;
-    }
-
-    public String getTopic() {
-	return topic;
-    }
-
-    public void setTopic(String topic) {
-	this.topic = topic;
     }
 
     public Integer getMaxAttendeeMikes() {

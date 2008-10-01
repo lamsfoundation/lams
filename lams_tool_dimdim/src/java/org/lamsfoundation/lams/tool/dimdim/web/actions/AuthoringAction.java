@@ -351,7 +351,6 @@ public class AuthoringAction extends DispatchAction {
 	    dimdim.setAllowRichEditor(authForm.isAllowRichEditor());
 
 	    // TODO check whether these fields should be in here
-	    dimdim.setTopic(authForm.getTopic());
 	    dimdim.setMaxAttendeeMikes(authForm.getMaxAttendeeMikes());
 	}
     }

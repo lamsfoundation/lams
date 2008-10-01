@@ -90,7 +90,6 @@ public class MonitoringAction extends DispatchAction {
 
 	MonitoringForm monitoringForm = (MonitoringForm) form;
 	// populate using authoring values
-	monitoringForm.setTopic(contentDT0.getTopic());
 	monitoringForm.setMaxAttendeeMikes((contentDT0.getMaxAttendeeMikes()));
 
 	// TODO may need to populate using session values if they already exist
@@ -127,7 +126,6 @@ public class MonitoringAction extends DispatchAction {
 	DimdimSession session = dimdimService.getSessionBySessionId(monitoringForm.getToolSessionID());
 
 	// update dimdim meeting settings
-	session.setTopic(monitoringForm.getTopic());
 	session.setMaxAttendeeMikes(monitoringForm.getMaxAttendeeMikes());
 
 	// Get LAMS userDTO
@@ -138,8 +136,7 @@ public class MonitoringAction extends DispatchAction {
 	session.setMeetingKey(meetingKey);
 	dimdimService.saveOrUpdateDimdimSession(session);
 
-	String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey(),
-		session.getTopic());
+	String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey());
 
 	response.sendRedirect(startConferenceURL);
 

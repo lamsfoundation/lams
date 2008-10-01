@@ -23,9 +23,6 @@
 			</div>
 			<lams:FCKEditor id="instructions" value="${formBean.instructions}"
 				contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
-				
-							<lams:FCKEditor id="instructions" value="${formBean.instructions}"
-				contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 		</td>
 	</tr>
 
@@ -34,19 +31,7 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.dimdimSettings" />
 			</div>
-		</td>
-	</tr>
 
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.basic.topic" />
-			:
-			<html:text property="topic"></html:text>
-		</td>
-	</tr>
-
-	<tr>
-		<td>
 			<fmt:message key="label.authoring.basic.maxAttendeeMikes" />
 			:
 			<html:select property="maxAttendeeMikes">

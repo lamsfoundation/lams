@@ -83,14 +83,6 @@
 				
 				<table>
 					<tr>
-						<td>				
-							<fmt:message key="label.authoring.basic.topic" />
-							:
-							<html:text property="topic"></html:text>
-						</td>
-					</tr>
-					</tr>
-					<tr>
 						<td>
 							<fmt:message key="label.authoring.basic.maxAttendeeMikes" />
 							:

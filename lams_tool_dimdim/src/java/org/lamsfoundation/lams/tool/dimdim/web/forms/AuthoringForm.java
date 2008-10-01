@@ -73,8 +73,6 @@ public class AuthoringForm extends ActionForm {
 
     private SessionMap<String, Object> sessionMap;
 
-    private String topic;
-
     private Integer maxAttendeeMikes;
 
     @Override
@@ -203,14 +201,6 @@ public class AuthoringForm extends ActionForm {
 
     public void setAllowRichEditor(boolean allowRichEditor) {
 	this.allowRichEditor = allowRichEditor;
-    }
-
-    public String getTopic() {
-	return topic;
-    }
-
-    public void setTopic(String topic) {
-	this.topic = topic;
     }
 
     public Integer getMaxAttendeeMikes() {

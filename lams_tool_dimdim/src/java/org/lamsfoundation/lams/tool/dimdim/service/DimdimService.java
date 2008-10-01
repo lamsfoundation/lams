@@ -480,7 +480,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	return serverURL.getValue() + connectURL;
     }
 
-    public String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey, String topic) throws Exception {
+    public String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey) throws Exception {
 
 	// Get Dimdim server url
 	DimdimConfig serverURL = getConfigEntry(Constants.CONFIG_SERVER_URL);
@@ -493,11 +493,10 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
 	URL url = new URL(serverURL.getValue() + "/dimdim/StartNewConferenceCheck.action?" + "email="
 		+ URLEncoder.encode(userDTO.getEmail(), "UTF8") + "&displayName="
-		+ URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confName="
-		+ URLEncoder.encode(topic, "UTF8") + "&confKey=" + URLEncoder.encode(meetingKey, "UTF8")
-		+ "&lobby=false" + "&networkProfile=3" + "&meetingHours=99" + "&maxAttendeeMikes=0" + "&returnUrl=asdf"
-		+ "&presenterAV=av" + "&privateChatEnabled=true" + "&publicChatEnabled=true"
-		+ "&screenShareEnabled=true" + "&whiteboardEnabled=true");
+		+ URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confKey="
+		+ URLEncoder.encode(meetingKey, "UTF8") + "&lobby=false" + "&networkProfile=3" + "&meetingHours=99"
+		+ "&maxAttendeeMikes=0" + "&returnUrl=asdf" + "&presenterAV=av" + "&privateChatEnabled=true"
+		+ "&publicChatEnabled=true" + "&screenShareEnabled=true" + "&whiteboardEnabled=true");
 
 	String connectURL = sendDimdimRequest(url);
 

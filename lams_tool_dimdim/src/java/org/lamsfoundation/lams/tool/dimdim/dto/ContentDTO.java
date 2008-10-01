@@ -67,8 +67,6 @@ public class ContentDTO {
 
     public Long currentTab;
 
-    private String topic;
-
     private Integer maxAttendeeMikes;
 
     /* Constructors */
@@ -90,7 +88,6 @@ public class ContentDTO {
 	this.onlineInstructionsFiles = new TreeSet<AttachmentDTO>();
 	this.offlineInstructionsFiles = new TreeSet<AttachmentDTO>();
 
-	this.topic = dimdim.getTopic();
 	this.maxAttendeeMikes = dimdim.getMaxAttendeeMikes();
 
 	for (DimdimAttachment att : dimdim.getDimdimAttachments()) {
@@ -224,14 +221,6 @@ public class ContentDTO {
 
     public void setCurrentTab(Long currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    public String getTopic() {
-	return topic;
-    }
-
-    public void setTopic(String topic) {
-	this.topic = topic;
     }
 
     public Integer getMaxAttendeeMikes() {

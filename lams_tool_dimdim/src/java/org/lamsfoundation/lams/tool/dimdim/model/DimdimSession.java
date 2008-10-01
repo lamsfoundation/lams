@@ -61,8 +61,6 @@ public class DimdimSession implements java.io.Serializable {
 
     private Set<DimdimUser> dimdimUsers;
 
-    private String topic;
-
     private String meetingKey;
 
     private Integer maxAttendeeMikes;
@@ -191,18 +189,6 @@ public class DimdimSession implements java.io.Serializable {
 
     public void setDimdimUsers(Set<DimdimUser> dimdimUsers) {
 	this.dimdimUsers = dimdimUsers;
-    }
-
-    /**
-     * @hibernate.property column="topic"
-     * @return
-     */
-    public String getTopic() {
-	return topic;
-    }
-
-    public void setTopic(String topic) {
-	this.topic = topic;
     }
 
     /**

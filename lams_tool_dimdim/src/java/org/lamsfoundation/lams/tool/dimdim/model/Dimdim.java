@@ -83,8 +83,6 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 
     private Set<DimdimSession> dimdimSessions;
 
-    private String topic;
-
     private Integer maxAttendeeMikes;
 
     // Constructors
@@ -346,18 +344,6 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 
     public void setDimdimSessions(Set<DimdimSession> dimdimSessions) {
 	this.dimdimSessions = dimdimSessions;
-    }
-
-    /**
-     * @hibernate.property column="topic"
-     * @return
-     */
-    public String getTopic() {
-	return topic;
-    }
-
-    public void setTopic(String topic) {
-	this.topic = topic;
     }
 
     /**
