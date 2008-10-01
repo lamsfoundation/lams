@@ -83,34 +83,6 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 
     private Integer maxAttendeeMikes;
 
-    // Constructors
-
-    /** default constructor */
-    public Dimdim() {
-    }
-
-    /** full constructor */
-    // TODO check full constructor to see whether we need add new fields
-    public Dimdim(Date createDate, Date updateDate, Long createBy, String title, String instructions,
-	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
-	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
-	    Long toolContentId, Set<DimdimAttachment> dimdimAttachments, Set<DimdimSession> dimdimSessions) {
-	this.createDate = createDate;
-	this.updateDate = updateDate;
-	this.createBy = createBy;
-	this.title = title;
-	this.instructions = instructions;
-	this.runOffline = runOffline;
-	this.lockOnFinished = lockOnFinished;
-	this.onlineInstructions = onlineInstructions;
-	this.offlineInstructions = offlineInstructions;
-	this.contentInUse = contentInUse;
-	this.defineLater = defineLater;
-	this.toolContentId = toolContentId;
-	this.dimdimAttachments = dimdimAttachments;
-	this.dimdimSessions = dimdimSessions;
-    }
-
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"

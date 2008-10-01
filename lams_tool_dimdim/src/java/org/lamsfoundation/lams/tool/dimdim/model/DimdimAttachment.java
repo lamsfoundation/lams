@@ -59,12 +59,6 @@ public class DimdimAttachment implements java.io.Serializable, Cloneable {
 
     private Dimdim dimdim;
 
-    // Constructors
-
-    /** default constructor */
-    public DimdimAttachment() {
-    }
-
     /** Constructor setting up all the properties except for dimdim one */
     public DimdimAttachment(Long fileVersionId, String fileType, String fileName, Long fileUuid, Date createDate) {
 	this.fileVersionId = fileVersionId;

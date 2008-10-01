@@ -58,10 +58,6 @@ public class DimdimUser implements java.io.Serializable {
 
     // Constructors
 
-    /** default constructor */
-    public DimdimUser() {
-    }
-
     public DimdimUser(UserDTO user, DimdimSession dimdimSession) {
 	this.userId = new Long(user.getUserID().intValue());
 	this.firstName = user.getFirstName();
@@ -71,15 +67,8 @@ public class DimdimUser implements java.io.Serializable {
 	this.finishedActivity = false;
     }
 
-    /** full constructor */
-    public DimdimUser(Long userId, String lastName, String firstName, DimdimSession dimdimSession) {
-	this.userId = userId;
-	this.lastName = lastName;
-	this.firstName = firstName;
-	this.dimdimSession = dimdimSession;
-    }
-
     // Property accessors
+
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
      */

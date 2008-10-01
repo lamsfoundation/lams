@@ -65,30 +65,12 @@ public class DimdimSession implements java.io.Serializable {
 
     private Integer maxAttendeeMikes;
 
-    // Constructors
-
-    /** default constructor */
-    public DimdimSession() {
-    }
-
-    /** full constructor */
-    public DimdimSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId,
-	    String sessionName, Dimdim dimdim, Set<DimdimUser> dimdimUsers) {
-	this.sessionEndDate = sessionEndDate;
-	this.sessionStartDate = sessionStartDate;
-	this.status = status;
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
-	this.dimdim = dimdim;
-	this.dimdimUsers = dimdimUsers;
-    }
-
     // Property accessors
+
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
      * 
      */
-
     public Long getUid() {
 	return this.uid;
     }
@@ -101,7 +83,6 @@ public class DimdimSession implements java.io.Serializable {
      * @hibernate.property column="session_end_date"
      * 
      */
-
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
     }
@@ -114,7 +95,6 @@ public class DimdimSession implements java.io.Serializable {
      * @hibernate.property column="session_start_date"
      * 
      */
-
     public Date getSessionStartDate() {
 	return this.sessionStartDate;
     }
@@ -127,7 +107,6 @@ public class DimdimSession implements java.io.Serializable {
      * @hibernate.property column="status" length="11"
      * 
      */
-
     public Integer getStatus() {
 	return this.status;
     }
@@ -140,7 +119,6 @@ public class DimdimSession implements java.io.Serializable {
      * @hibernate.property column="session_id" length="20"
      * 
      */
-
     public Long getSessionId() {
 	return this.sessionId;
     }
@@ -153,7 +131,6 @@ public class DimdimSession implements java.io.Serializable {
      * @hibernate.property column="session_name" length="250"
      * 
      */
-
     public String getSessionName() {
 	return this.sessionName;
     }
@@ -167,7 +144,6 @@ public class DimdimSession implements java.io.Serializable {
      * @hibernate.column name="dimdim_uid"
      * 
      */
-
     public Dimdim getDimdim() {
 	return this.dimdim;
     }
@@ -182,7 +158,6 @@ public class DimdimSession implements java.io.Serializable {
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.dimdim.model.DimdimUser"
      * 
      */
-
     public Set<DimdimUser> getDimdimUsers() {
 	return this.dimdimUsers;
     }
