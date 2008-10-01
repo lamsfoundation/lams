@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.dimdim.web.actions;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +40,8 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dimdim.dto.ContentDTO;
+import org.lamsfoundation.lams.tool.dimdim.dto.NotebookEntryDTO;
+import org.lamsfoundation.lams.tool.dimdim.dto.UserDTO;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
@@ -50,7 +53,6 @@ import org.lamsfoundation.lams.tool.dimdim.util.DimdimUtil;
 import org.lamsfoundation.lams.tool.dimdim.web.forms.LearningForm;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -60,6 +62,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
  * @struts.action-forward name="dimdim" path="tiles:/learning/main"
+ * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  */
@@ -112,6 +115,8 @@ public class LearningAction extends DispatchAction {
 	contentDTO.instructions = dimdim.getInstructions();
 	contentDTO.allowRichEditor = dimdim.isAllowRichEditor();
 	contentDTO.lockOnFinish = dimdim.isLockOnFinished();
+	contentDTO.reflectOnActivity = dimdim.isReflectOnActivity();
+	contentDTO.reflectInstructions = dimdim.getReflectInstructions();
 
 	request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDTO);
 
@@ -134,22 +139,13 @@ public class LearningAction extends DispatchAction {
 	    dimdimUser = getCurrentUser(toolSessionID);
 	}
 
-	// get any existing dimdim entry
-	NotebookEntry nbEntry = null;
-	if (dimdimUser != null) {
-	    nbEntry = dimdimService.getEntry(dimdimUser.getEntryUID());
+	// get any existing notebook entries and create userDTO
+	NotebookEntry entry = dimdimService.getNotebookEntry(dimdimUser.getNotebookEntryUID());
+	UserDTO userDTO = new UserDTO(dimdimUser);
+	if (entry != null) {
+	    userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
 	}
-	if (nbEntry != null) {
-	    learningForm.setEntryText(nbEntry.getEntry());
-	}
-
-	// set readOnly flag.
-	if (mode.equals(ToolAccessMode.TEACHER) || (dimdim.isLockOnFinished() && dimdimUser.isFinishedActivity())) {
-	    request.setAttribute("contentEditable", false);
-	} else {
-	    request.setAttribute("contentEditable", true);
-	}
-	request.setAttribute(Constants.ATTR_FINISHED_ACTIVITY, dimdimUser.isFinishedActivity());
+	request.setAttribute(Constants.ATTR_USER_DTO, userDTO);
 
 	// Get LAMS userDTO
 	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
@@ -160,7 +156,9 @@ public class LearningAction extends DispatchAction {
 	    String meetingKey = DimdimUtil.generateMeetingKey();
 	    connectURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, meetingKey, dimdim.getTopic());
 	} else {
-	    connectURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO, dimdimSession.getMeetingKey());
+	    if (dimdimSession.getMeetingKey() != null) {
+		connectURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO, dimdimSession.getMeetingKey());
+	    } // otherwise, meeting has not been started in monitoring
 	}
 
 	boolean conferenceOpen = connectURL.isEmpty() ? false : true;
@@ -170,11 +168,15 @@ public class LearningAction extends DispatchAction {
 	    request.setAttribute(Constants.ATTR_CONFERENCE_URL, connectURL);
 	}
 
+	// set toolSessionID in request
+	request.setAttribute(Constants.ATTR_TOOL_SESSION_ID, dimdimSession.getSessionId());
+
 	return mapping.findForward("dimdim");
     }
 
     private DimdimUser getCurrentUser(Long toolSessionId) {
-	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	org.lamsfoundation.lams.usermanagement.dto.UserDTO user = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
+		.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
 	DimdimUser dimdimUser = dimdimService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
@@ -186,6 +188,57 @@ public class LearningAction extends DispatchAction {
 	}
 
 	return dimdimUser;
+    }
+
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	// set the finished flag
+	DimdimUser dimdimUser = getCurrentUser(lrnForm.getToolSessionID());
+	ContentDTO contentDTO = new ContentDTO(dimdimUser.getDimdimSession().getDimdim());
+
+	request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDTO);
+
+	NotebookEntry notebookEntry = dimdimService.getNotebookEntry(dimdimUser.getNotebookEntryUID());
+
+	if (notebookEntry != null) {
+	    lrnForm.setEntryText(notebookEntry.getEntry());
+	}
+
+	return mapping.findForward("notebook");
+
+    }
+
+    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	// save the reflection entry and call the notebook.
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	DimdimUser dimdimUser = getCurrentUser(lrnForm.getToolSessionID());
+	Long toolSessionID = dimdimUser.getDimdimSession().getSessionId();
+	Integer userID = dimdimUser.getUserId().intValue();
+
+	// check for existing notebook entry
+	NotebookEntry entry = dimdimService.getNotebookEntry(dimdimUser.getNotebookEntryUID());
+
+	if (entry == null) {
+	    // create new entry
+	    Long entryUID = dimdimService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    Constants.TOOL_SIGNATURE, userID, lrnForm.getEntryText());
+	    dimdimUser.setNotebookEntryUID(entryUID);
+	    dimdimService.saveOrUpdateDimdimUser(dimdimUser);
+	} else {
+	    // update existing entry
+	    entry.setEntry(lrnForm.getEntryText());
+	    entry.setLastModified(new Date());
+	    dimdimService.updateNotebookEntry(entry);
+	}
+
+	return finishActivity(mapping, form, request, response);
     }
 
     public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -201,13 +254,13 @@ public class LearningAction extends DispatchAction {
 
 	    // TODO fix idType to use real value not 999
 
-	    if (dimdimUser.getEntryUID() == null) {
-		dimdimUser.setEntryUID(dimdimService.createNotebookEntry(toolSessionID,
+	    if (dimdimUser.getNotebookEntryUID() == null) {
+		dimdimUser.setNotebookEntryUID(dimdimService.createNotebookEntry(toolSessionID,
 			CoreNotebookConstants.NOTEBOOK_TOOL, Constants.TOOL_SIGNATURE, dimdimUser.getUserId()
 				.intValue(), learningForm.getEntryText()));
 	    } else {
 		// update existing entry.
-		dimdimService.updateEntry(dimdimUser.getEntryUID(), learningForm.getEntryText());
+		dimdimService.updateNotebookEntry(dimdimUser.getNotebookEntryUID(), learningForm.getEntryText());
 	    }
 
 	    dimdimUser.setFinishedActivity(true);

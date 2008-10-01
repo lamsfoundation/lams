@@ -118,34 +118,24 @@
 
 <c:forEach var="session" items="${dto.sessionDTOs}">
 
-	<table>
-		<tr>
-			<td>
-				<h2>
-					${session.sessionName}
-				</h2>
-			</td>
-		</tr>
-	</table>
+	<h2>
+		${session.sessionName}
+	</h2>
 
-	<table cellpadding="0">
-		<tr>
-			<td class="field-name" width="30%">
-				<fmt:message key="heading.totalLearners" />
-			</td>
-			<td width="70%">
-				${session.numberOfLearners}
-			</td>
-		</tr>
-	</table>
-
-	<table cellpadding="0">
+	<p>
+		<span class="field-name">
+			<fmt:message key="heading.totalLearners" />
+		</span>
+		${session.numberOfLearners}
+	</p>
+	
+	<table cellspacing="0" class="alternative-color">
 
 		<tr>
-			<th>
+			<th style="width: 30%;">
 				<fmt:message key="heading.learner" />
 			</th>
-			<th>
+			<th style="width: 70%;">
 				<fmt:message key="heading.notebookEntry" />
 			</th>
 		</tr>
@@ -153,18 +143,18 @@
 
 		<c:forEach var="user" items="${session.userDTOs}">
 			<tr>
-				<td width="30%">
+				<td>
 					${user.firstName} ${user.lastName}
 				</td>
-				<td width="70%">
+				<td>
 					<c:choose>
-						<c:when test="${user.entryUID == null}">
+						<c:when test="${user.notebookEntryUID == null}">
 							<fmt:message key="label.notAvailable" />
 						</c:when>
 
 						<c:otherwise>
 							<a
-								href="./monitoring.do?dispatch=showDimdim&amp;userUID=${user.uid}">
+								href="./monitoring.do?dispatch=openNotebook&amp;userUID=${user.uid}">
 								<fmt:message key="label.view" /> </a>
 						</c:otherwise>
 					</c:choose>

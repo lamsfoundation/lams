@@ -54,7 +54,7 @@ public class DimdimUser implements java.io.Serializable {
 
     private boolean finishedActivity;
 
-    private Long entryUID;
+    private Long notebookEntryUID;
 
     // Constructors
 
@@ -164,14 +164,14 @@ public class DimdimUser implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="entry_uid"
+     * @hibernate.property column="notebook_entry_uid"
      */
-    public Long getEntryUID() {
-	return entryUID;
+    public Long getNotebookEntryUID() {
+	return notebookEntryUID;
     }
 
-    public void setEntryUID(Long entryUID) {
-	this.entryUID = entryUID;
+    public void setNotebookEntryUID(Long notebookEntryUID) {
+	this.notebookEntryUID = notebookEntryUID;
     }
 
     /**

@@ -63,6 +63,10 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 
     private boolean lockOnFinished;
 
+    private boolean reflectOnActivity;
+
+    private String reflectInstructions;
+
     private boolean allowRichEditor;
 
     private String onlineInstructions;
@@ -214,6 +218,28 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 
     public void setLockOnFinished(boolean lockOnFinished) {
 	this.lockOnFinished = lockOnFinished;
+    }
+
+    /**
+     * @hibernate.property column="reflect_on_activity" length="1"
+     */
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    /**
+     * @hibernate.property column="reflect_instructions" length="65535"
+     */
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
+
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
     }
 
     /**

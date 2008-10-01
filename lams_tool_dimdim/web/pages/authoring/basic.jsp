@@ -23,6 +23,9 @@
 			</div>
 			<lams:FCKEditor id="instructions" value="${formBean.instructions}"
 				contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
+				
+							<lams:FCKEditor id="instructions" value="${formBean.instructions}"
+				contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 		</td>
 	</tr>
 

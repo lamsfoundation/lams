@@ -141,7 +141,13 @@ public interface IDimdimService {
      * @param uid
      * @return
      */
-    NotebookEntry getEntry(Long uid);
+    NotebookEntry getNotebookEntry(Long uid);
+
+    /**
+     * 
+     * @param notebookEntry
+     */
+    void updateNotebookEntry(NotebookEntry notebookEntry);
 
     /**
      * 
@@ -149,7 +155,7 @@ public interface IDimdimService {
      * @param title
      * @param entry
      */
-    void updateEntry(Long uid, String entry);
+    void updateNotebookEntry(Long uid, String entry);
 
     /**
      * 

@@ -317,12 +317,26 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
-    public NotebookEntry getEntry(Long uid) {
+    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
+
+	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
+	if (list == null || list.isEmpty()) {
+	    return null;
+	} else {
+	    return list.get(0);
+	}
+    }
+
+    public NotebookEntry getNotebookEntry(Long uid) {
 	return coreNotebookService.getEntry(uid);
     }
 
-    public void updateEntry(Long uid, String entry) {
+    public void updateNotebookEntry(Long uid, String entry) {
 	coreNotebookService.updateEntry(uid, "", entry);
+    }
+
+    public void updateNotebookEntry(NotebookEntry notebookEntry) {
+	coreNotebookService.updateEntry(notebookEntry);
     }
 
     public Long getDefaultContentIdBySignature(String toolSignature) {
@@ -471,6 +485,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	// Get Dimdim server url
 	DimdimConfig serverURL = getConfigEntry(Constants.CONFIG_SERVER_URL);
 	if (serverURL == null) {
+	    logger.error("Dimdim server URL is null, configure using dimdim tool management");
 	    throw new DimdimException("Dimdim server url not found");
 	}
 
@@ -599,6 +614,8 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	dimdim.setLockOnFinished(Boolean.TRUE);
 	dimdim.setOfflineInstructions(null);
 	dimdim.setOnlineInstructions(null);
+	dimdim.setReflectInstructions(null);
+	dimdim.setReflectOnActivity(Boolean.FALSE);
 	dimdim.setRunOffline(Boolean.FALSE);
 	dimdim.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	dimdim.setToolContentId(toolContentId);
@@ -624,7 +641,8 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
 	}
 
-	dimdim.setInstructions(description);
+	dimdim.setReflectOnActivity(Boolean.TRUE);
+	dimdim.setReflectInstructions(description);
     }
 
     // ==========================================================================

@@ -45,15 +45,14 @@ public final class Constants {
     // Attribute names
     public static final String ATTR_CONTENT_DTO = "contentDTO";
     public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
-    public static final String ATTR_FINISHED_ACTIVITY = "finishedActivity";
     public static final String ATTR_SESSION_MAP = "sessionMap";
     public static final String ATTR_USER_DTO = "userDTO";
     public static final String ATTR_CONFERENCE_URL = "conferenceURL";
-    public static final String ATTR_SAVE_SUCCESS = "saveSuccess";
+    public static final String ATTR_CONFERENCE_OPEN = "conferenceOpen";
+    public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
 
     // Parameter names
     public static final String PARAM_USER_UID = "userUID";
-    public static final String ATTR_CONFERENCE_OPEN = "conferenceOpen";
 
     private Constants() {
 	// prevent construction

@@ -345,6 +345,8 @@ public class AuthoringAction extends DispatchAction {
 	if (mode.isAuthor()) { // Teacher cannot modify following
 	    dimdim.setOfflineInstructions(authForm.getOfflineInstruction());
 	    dimdim.setOnlineInstructions(authForm.getOnlineInstruction());
+	    dimdim.setReflectOnActivity(authForm.isReflectOnActivity());
+	    dimdim.setReflectInstructions(authForm.getReflectInstructions());
 	    dimdim.setLockOnFinished(authForm.isLockOnFinished());
 	    dimdim.setAllowRichEditor(authForm.isAllowRichEditor());
 

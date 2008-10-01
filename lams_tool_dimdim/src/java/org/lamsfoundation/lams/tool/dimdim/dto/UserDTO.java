@@ -24,7 +24,6 @@
 
 package org.lamsfoundation.lams.tool.dimdim.dto;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 
 public class UserDTO implements Comparable<UserDTO> {
@@ -39,19 +38,9 @@ public class UserDTO implements Comparable<UserDTO> {
 
     public boolean finishedActivity;
 
-    public NotebookEntryDTO entryDTO;
+    public NotebookEntryDTO notebookEntryDTO;
 
-    public Long entryUID;
-
-    public UserDTO(DimdimUser user, NotebookEntry entry) {
-	this.uid = user.getUid();
-	this.loginName = user.getLoginName();
-	this.firstName = user.getFirstName();
-	this.lastName = user.getLastName();
-	this.finishedActivity = user.isFinishedActivity();
-	this.entryUID = user.getEntryUID();
-	this.entryDTO = new NotebookEntryDTO(entry);
-    }
+    public Long notebookEntryUID;
 
     public UserDTO(DimdimUser user) {
 	this.uid = user.getUid();
@@ -59,7 +48,7 @@ public class UserDTO implements Comparable<UserDTO> {
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.finishedActivity = user.isFinishedActivity();
-	this.entryUID = user.getEntryUID();
+	this.notebookEntryUID = user.getNotebookEntryUID();
     }
 
     public int compareTo(UserDTO other) {
@@ -102,20 +91,20 @@ public class UserDTO implements Comparable<UserDTO> {
 	this.uid = uid;
     }
 
-    public NotebookEntryDTO getEntryDTO() {
-	return entryDTO;
+    public NotebookEntryDTO getNotebookEntryDTO() {
+	return notebookEntryDTO;
     }
 
-    public void setEntryDTO(NotebookEntryDTO entryDTO) {
-	this.entryDTO = entryDTO;
+    public void setNotebookEntryDTO(NotebookEntryDTO notebookEntryDTO) {
+	this.notebookEntryDTO = notebookEntryDTO;
     }
 
-    public Long getEntryUID() {
-	return entryUID;
+    public Long getNotebookEntryUID() {
+	return notebookEntryUID;
     }
 
-    public void setEntryUID(Long entryUID) {
-	this.entryUID = entryUID;
+    public void setNotebookEntryUID(Long notebookEntryUID) {
+	this.notebookEntryUID = notebookEntryUID;
     }
 
     public boolean isFinishedActivity() {

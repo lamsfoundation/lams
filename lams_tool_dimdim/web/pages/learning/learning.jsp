@@ -79,31 +79,9 @@
 			</c:otherwise>
 		</c:choose>
 	</p>	
-
-	<html:form action="/learning" method="post"
-		onsubmit="return validateForm();">
-		<html:hidden property="dispatch" value="finishActivity" />
-		<html:hidden property="toolSessionID" />
-
-		<c:set var="lrnForm"
-			value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-
-		<c:choose>
-			<c:when test="${contentEditable}">
-
-				<div class="space-bottom-top align-right">
-					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message key="button.finish" />
-					</html:submit>
-				</div>
-
-			</c:when>
-
-			<c:otherwise>
-				<lams:out value="${lrnForm.entryText}" />
-			</c:otherwise>
-		</c:choose>
-
-	</html:form>
+	
+	<c:if test="${mode == 'learner' || mode == 'author'}">
+		<%@ include file="parts/finishButton.jsp"%>
+	</c:if>
+	
 </div>

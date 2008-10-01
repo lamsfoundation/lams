@@ -47,6 +47,10 @@ public class ContentDTO {
 
     public String offlineInstructions;
 
+    public boolean reflectOnActivity;
+
+    public String reflectInstructions;
+
     public boolean defineLater;
 
     public boolean contentInUse;
@@ -78,6 +82,8 @@ public class ContentDTO {
 	this.onlineInstructions = dimdim.getOnlineInstructions();
 	this.offlineInstructions = dimdim.getOfflineInstructions();
 	this.contentInUse = dimdim.isContentInUse();
+	this.reflectInstructions = dimdim.getReflectInstructions();
+	this.reflectOnActivity = dimdim.isReflectOnActivity();
 	this.allowRichEditor = dimdim.isAllowRichEditor();
 	this.lockOnFinish = dimdim.isLockOnFinished();
 
@@ -154,6 +160,22 @@ public class ContentDTO {
 
     public void setOnlineInstructionsFiles(Set<AttachmentDTO> onlineInstructionsFiles) {
 	this.onlineInstructionsFiles = onlineInstructionsFiles;
+    }
+
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
+
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
     }
 
     public String getTitle() {

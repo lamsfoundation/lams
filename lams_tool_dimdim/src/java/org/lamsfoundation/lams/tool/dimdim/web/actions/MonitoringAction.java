@@ -33,6 +33,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dimdim.dto.ContentDTO;
+import org.lamsfoundation.lams.tool.dimdim.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.dimdim.dto.UserDTO;
 import org.lamsfoundation.lams.tool.dimdim.model.Dimdim;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
@@ -102,14 +103,15 @@ public class MonitoringAction extends DispatchAction {
 	return mapping.findForward("success");
     }
 
-    public ActionForward showDimdim(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	Long uid = new Long(WebUtil.readLongParam(request, Constants.PARAM_USER_UID));
 
 	DimdimUser user = dimdimService.getUserByUID(uid);
-	NotebookEntry entry = dimdimService.getEntry(user.getEntryUID());
+	NotebookEntry entry = dimdimService.getNotebookEntry(user.getNotebookEntryUID());
 
-	UserDTO userDTO = new UserDTO(user, entry);
+	UserDTO userDTO = new UserDTO(user);
+	userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
 
 	request.setAttribute(Constants.ATTR_USER_DTO, userDTO);
 

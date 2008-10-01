@@ -3,17 +3,11 @@
 <c:set var="dto" value="${contentDTO}" />
 <c:forEach var="session" items="${dto.sessionDTOs}">
 
-	<table>
-		<tr>
-			<td>
-				<h2>
-					${session.sessionName}
-				</h2>
-			</td>
-		</tr>
-	</table>
+	<h2>
+		${session.sessionName}
+	</h2>
 
-	<table cellpadding="0">
+	<table>
 		<tr>
 			<td class="field-name" width="40%">
 				<fmt:message>heading.totalLearnersInGroup</fmt:message>

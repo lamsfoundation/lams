@@ -50,7 +50,7 @@ public class SessionDTO implements Comparable<SessionDTO> {
 
 	for (DimdimUser dimdimUser : session.getDimdimUsers()) {
 	    UserDTO userDTO = new UserDTO(dimdimUser);
-	    if (userDTO.getEntryUID() != null) {
+	    if (userDTO.getNotebookEntryUID() != null) {
 		numberOfFinishedLearners++;
 	    }
 	    userDTOs.add(userDTO);

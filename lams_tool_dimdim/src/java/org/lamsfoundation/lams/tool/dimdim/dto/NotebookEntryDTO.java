@@ -38,11 +38,11 @@ public class NotebookEntryDTO {
 
     private Date lastModified;
 
-    public NotebookEntryDTO(NotebookEntry entry) {
-	this.uid = entry.getUid();
-	this.entry = entry.getEntry();
-	this.createDate = entry.getCreateDate();
-	this.lastModified = entry.getLastModified();
+    public NotebookEntryDTO(NotebookEntry notebookEntry) {
+	this.uid = notebookEntry.getUid();
+	this.entry = notebookEntry.getEntry();
+	this.createDate = notebookEntry.getCreateDate();
+	this.lastModified = notebookEntry.getLastModified();
     }
 
     public Date getCreateDate() {

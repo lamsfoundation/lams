@@ -69,7 +69,9 @@
 	<definition name="tiles:/learning/main" extends="tiles:/layout:simple">
 		<put name="body" value="/pages/learning/learning.jsp" />
 	</definition>
-	
+	<definition name="tiles:/learning/notebook" extends="tiles:/layout:simple">
+		<put name="body" value="/pages/learning/notebook.jsp" />
+	</definition>	
 	<definition name="tiles:/learning/runOffline" extends="tiles:/layout:simple">
 		<put name="body" value="/pages/learning/runOffline.jsp" />
 	</definition>
@@ -89,12 +91,16 @@
 	
 	<definition name="tiles:/monitoring/dimdim_display" extends="tiles:/layout:simple">
 		<put name="pageTitleKey" value="pageTitle.monitoring" />
-		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
-		<put name="body" value="/pages/monitoring/dimdimDisplay.jsp" />	
+		<put name="header" value="tiles:/header:monitoring/notebook" type="definition" />
+		<put name="body" value="/pages/monitoring/notebook.jsp" />	
 	</definition>
 	
 	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:tabbed">
 		<put name="headItems" value="/pages/monitoring/headItems.jsp" />
+	</definition>
+	
+	<definition name="tiles:/header:monitoring/notebook" extends="tiles:/header:simple">
+		<put name="headItems" value="/common/empty.jsp" />
 	</definition>
 	<!-- End: Monitoring -->
 
