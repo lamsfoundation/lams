@@ -76,6 +76,7 @@ public class QaOutputFactory extends OutputFactory {
 
 		allAnswersDefinition.getDefaultConditions().add(defaultCondition);
 	    }
+	    allAnswersDefinition.setShowConditionNameOnly(true);
 	    definitionMap.put(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME, allAnswersDefinition);
 	}
 
