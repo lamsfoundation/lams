@@ -113,7 +113,6 @@ public class LearningAction extends DispatchAction {
 	ContentDTO contentDTO = new ContentDTO();
 	contentDTO.title = dimdim.getTitle();
 	contentDTO.instructions = dimdim.getInstructions();
-	contentDTO.allowRichEditor = dimdim.isAllowRichEditor();
 	contentDTO.lockOnFinish = dimdim.isLockOnFinished();
 	contentDTO.reflectOnActivity = dimdim.isReflectOnActivity();
 	contentDTO.reflectInstructions = dimdim.getReflectInstructions();

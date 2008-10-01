@@ -55,8 +55,6 @@ public class ContentDTO {
 
     public boolean contentInUse;
 
-    public boolean allowRichEditor;
-
     public boolean lockOnFinish;
 
     public Set<AttachmentDTO> onlineInstructionsFiles;
@@ -82,7 +80,6 @@ public class ContentDTO {
 	this.contentInUse = dimdim.isContentInUse();
 	this.reflectInstructions = dimdim.getReflectInstructions();
 	this.reflectOnActivity = dimdim.isReflectOnActivity();
-	this.allowRichEditor = dimdim.isAllowRichEditor();
 	this.lockOnFinish = dimdim.isLockOnFinished();
 
 	this.onlineInstructionsFiles = new TreeSet<AttachmentDTO>();
@@ -197,14 +194,6 @@ public class ContentDTO {
 
     public void setContentInUse(Boolean contentInUse) {
 	this.contentInUse = contentInUse;
-    }
-
-    public boolean isAllowRichEditor() {
-	return allowRichEditor;
-    }
-
-    public void setAllowRichEditor(boolean allowRichEditor) {
-	this.allowRichEditor = allowRichEditor;
     }
 
     public boolean isLockOnFinish() {

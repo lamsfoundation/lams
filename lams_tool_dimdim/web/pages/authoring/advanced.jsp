@@ -11,14 +11,6 @@
 </p>
 
 <p>
-	<html:checkbox property="allowRichEditor" value="1"
-		styleClass="noBorder" styleId="allowRichEditor"></html:checkbox>
-	<label for="allowRichEditor">
-		<fmt:message key="advanced.allowRichEditor" />
-	</label>
-</p>
-
-<p>
 	<html:checkbox property="reflectOnActivity" value="1"
 		styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
 

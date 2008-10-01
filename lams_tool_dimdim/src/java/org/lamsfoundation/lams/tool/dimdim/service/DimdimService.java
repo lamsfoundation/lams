@@ -619,7 +619,6 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	dimdim.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
 	dimdim.setToolContentId(toolContentId);
 	dimdim.setUpdateDate(now);
-	dimdim.setAllowRichEditor(Boolean.FALSE);
 	// leave as empty, no need to set them to anything.
 	// setDimdimAttachments(Set dimdimAttachments);
 	// setDimdimSessions(Set dimdimSessions);

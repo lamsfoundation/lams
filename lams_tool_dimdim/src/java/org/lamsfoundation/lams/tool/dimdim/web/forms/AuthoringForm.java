@@ -57,8 +57,6 @@ public class AuthoringForm extends ActionForm {
 
     private String reflectInstructions;
 
-    private boolean allowRichEditor;
-
     private FormFile onlineFile;
 
     private FormFile offlineFile;
@@ -193,14 +191,6 @@ public class AuthoringForm extends ActionForm {
 
     public void setDeleteFileUuid(Long deleteFile) {
 	this.deleteFileUuid = deleteFile;
-    }
-
-    public boolean isAllowRichEditor() {
-	return allowRichEditor;
-    }
-
-    public void setAllowRichEditor(boolean allowRichEditor) {
-	this.allowRichEditor = allowRichEditor;
     }
 
     public Integer getMaxAttendeeMikes() {

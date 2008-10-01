@@ -348,7 +348,6 @@ public class AuthoringAction extends DispatchAction {
 	    dimdim.setReflectOnActivity(authForm.isReflectOnActivity());
 	    dimdim.setReflectInstructions(authForm.getReflectInstructions());
 	    dimdim.setLockOnFinished(authForm.isLockOnFinished());
-	    dimdim.setAllowRichEditor(authForm.isAllowRichEditor());
 
 	    // TODO check whether these fields should be in here
 	    dimdim.setMaxAttendeeMikes(authForm.getMaxAttendeeMikes());

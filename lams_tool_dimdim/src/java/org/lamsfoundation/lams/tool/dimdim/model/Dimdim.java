@@ -67,8 +67,6 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 
     private String reflectInstructions;
 
-    private boolean allowRichEditor;
-
     private String onlineInstructions;
 
     private String offlineInstructions;
@@ -238,18 +236,6 @@ public class Dimdim implements java.io.Serializable, Cloneable {
 
     public void setReflectInstructions(String reflectInstructions) {
 	this.reflectInstructions = reflectInstructions;
-    }
-
-    /**
-     * @hibernate.property column="allow_rich_editor" length="1"
-     * @return
-     */
-    public boolean isAllowRichEditor() {
-	return allowRichEditor;
-    }
-
-    public void setAllowRichEditor(boolean allowRichEditor) {
-	this.allowRichEditor = allowRichEditor;
     }
 
     /**

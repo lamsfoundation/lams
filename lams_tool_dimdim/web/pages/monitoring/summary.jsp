@@ -45,22 +45,6 @@
 			</td>
 		</tr>
 
-		<tr>
-			<td>
-				<fmt:message key="advanced.allowRichEditor" />
-			</td>
-
-			<td>
-				<c:choose>
-					<c:when test="${dto.allowRichEditor}">
-						<fmt:message key="label.on" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="label.off" />
-					</c:otherwise>
-				</c:choose>
-			</td>
-		</tr>
 	</table>
 </div>
 
