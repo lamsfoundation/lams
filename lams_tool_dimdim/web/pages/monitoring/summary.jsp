@@ -57,14 +57,14 @@
 	</c:when>
 	<c:otherwise>
 		<h1>
-			<fmt:message key="monitor.summary.dimdimSettings"/>
+			<fmt:message key="monitor.summary.dimdimSettings" />
 		</h1>
 
 		<c:forEach var="session" items="${dto.sessionDTOs}">
 			<html:form action="monitoring" target="_blank">
 				<html:hidden property="dispatch" value="startDimdim" />
 				<html:hidden property="toolSessionID" value="${session.sessionID}" />
-				
+
 				<table>
 					<tr>
 						<td>
@@ -99,12 +99,10 @@
 	</h2>
 
 	<p>
-		<span class="field-name">
-			<fmt:message key="heading.totalLearners" />
-		</span>
-		${session.numberOfLearners}
+		<span class="field-name"> <fmt:message
+				key="heading.totalLearners" /> </span> ${session.numberOfLearners}
 	</p>
-	
+
 	<table cellspacing="0" class="alternative-color">
 
 		<tr>

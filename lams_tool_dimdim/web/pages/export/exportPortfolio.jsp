@@ -13,9 +13,9 @@
 	<body class="stripes">
 
 		<div id="content">
-			
+
 			<p>
-				<fmt:message key="export.toolExportNotSupported"/>
+				<fmt:message key="export.toolExportNotSupported" />
 			</p>
 
 		</div>

@@ -11,7 +11,8 @@
 		${contentDTO.title}
 	</h1>
 
-	<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
+	<html:form action="/learning" method="post"
+		onsubmit="disableFinishButton();">
 
 		<p class="small-space-top">
 			<lams:out value="${contentDTO.reflectInstructions}" />

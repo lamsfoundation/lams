@@ -15,16 +15,17 @@
 
 	<c:if
 		test="${userDTO.finishedActivity and contentDTO.reflectOnActivity}">
-		
+
 		<div class="space-top">
 			<h2>
 				${contentDTO.reflectInstructions}
 			</h2>
 
-			<p>	
+			<p>
 				<c:choose>
 					<c:when test="${userDTO.notebookEntryDTO != null}">
-						<lams:out escapeHtml="true" value="${userDTO.notebookEntryDTO.entry}" />
+						<lams:out escapeHtml="true"
+							value="${userDTO.notebookEntryDTO.entry}" />
 					</c:when>
 
 					<c:otherwise>

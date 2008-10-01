@@ -112,7 +112,8 @@
 			<div class="field-name-alternative-color">
 				<fmt:message key="instructions.offlineInstructions"></fmt:message>
 			</div>
-			<lams:STRUTS-textarea property="offlineInstruction" rows="3" cols="75" />
+			<lams:STRUTS-textarea property="offlineInstruction" rows="3"
+				cols="75" />
 		</td>
 	</tr>
 

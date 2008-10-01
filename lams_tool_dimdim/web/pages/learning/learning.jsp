@@ -78,10 +78,10 @@
 				</html:link>
 			</c:otherwise>
 		</c:choose>
-	</p>	
-	
+	</p>
+
 	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<%@ include file="parts/finishButton.jsp"%>
 	</c:if>
-	
+
 </div>

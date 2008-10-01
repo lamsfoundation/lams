@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<%@ page
-	import="org.lamsfoundation.lams.tool.dimdim.util.Constants"%>
+<%@ page import="org.lamsfoundation.lams.tool.dimdim.util.Constants"%>
 
 <html:form action="/authoring" styleId="authoringForm" method="post"
 	enctype="multipart/form-data">
@@ -41,11 +40,12 @@
 			</c:if>
 			<logic:messagesPresent>
 				<p class="warning">
-				        <html:messages id="error">
-				            <c:out value="${error}" escapeXml="false"/><br/>
-				        </html:messages>
+					<html:messages id="error">
+						<c:out value="${error}" escapeXml="false" />
+						<br />
+					</html:messages>
 				</p>
-			</logic:messagesPresent>			
+			</logic:messagesPresent>
 		</div>
 
 		<lams:help toolSignature="<%=Constants.TOOL_SIGNATURE%>"
@@ -64,7 +64,7 @@
 			cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save"
 			toolContentID="${sessionMap.toolContentID}"
 			accessMode="${sessionMap.mode}" defineLater="${defineLater}"
-			customiseSessionID="${sessionMap.sessionID}" 
+			customiseSessionID="${sessionMap.sessionID}"
 			contentFolderID="${sessionMap.contentFolderID}" />
 	</div>
 </html:form>

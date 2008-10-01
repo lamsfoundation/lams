@@ -20,7 +20,8 @@
 </p>
 
 <p>
-	<html:textarea property="reflectInstructions" cols="30" rows="3" styleId="reflectInstructions"/>
+	<html:textarea property="reflectInstructions" cols="30" rows="3"
+		styleId="reflectInstructions" />
 </p>
 
 <script type="text/javascript">

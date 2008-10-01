@@ -9,11 +9,13 @@
 	<html:form action="/admin/save">
 
 		<div>
-			<fmt:message key="admin.dimdimServerURL" /> : <html:text property="dimdimServerURL" />
+			<fmt:message key="admin.dimdimServerURL" />
+			:
+			<html:text property="dimdimServerURL" />
 		</div>
 		<div class="align-right">
 			<html:submit styleClass="button">
-				<fmt:message key="label.save"/>
+				<fmt:message key="label.save" />
 			</html:submit>
 		</div>
 	</html:form>
