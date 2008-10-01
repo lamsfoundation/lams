@@ -87,12 +87,21 @@
         />
 
         <property
-            name="allowRichEditor"
+            name="reflectOnActivity"
             type="boolean"
             update="true"
             insert="true"
-            column="allow_rich_editor"
+            column="reflect_on_activity"
             length="1"
+        />
+
+        <property
+            name="reflectInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="reflect_instructions"
+            length="65535"
         />
 
         <property
@@ -179,36 +188,11 @@
         </set>
 
         <property
-            name="maxParticipants"
+            name="maxAttendeeMikes"
             type="java.lang.Integer"
             update="true"
             insert="true"
-            column="max_participants"
-        />
-
-        <property
-            name="meetingDurationInHours"
-            type="java.lang.Integer"
-            update="true"
-            insert="true"
-            column="meeting_duration_in_hours"
-        />
-
-        <property
-            name="allowVideo"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="allow_video"
-            length="1"
-        />
-
-        <property
-            name="attendeeMikes"
-            type="java.lang.Integer"
-            update="true"
-            insert="true"
-            column="attendee_mikes"
+            column="max_attendee_mikes"
         />
 
         <!--

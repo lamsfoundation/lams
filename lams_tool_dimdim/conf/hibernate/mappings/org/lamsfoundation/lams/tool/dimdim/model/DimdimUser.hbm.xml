@@ -76,6 +76,7 @@
             outer-join="auto"
             update="true"
             insert="true"
+            foreign-key="fk_laddim10_dimdim_user_to_dimdim_session"
         >
             <column
                 name="dimdim_session_uid" 
@@ -83,11 +84,11 @@
         </many-to-one>
 
         <property
-            name="entryUID"
+            name="notebookEntryUID"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="entry_uid"
+            column="notebook_entry_uid"
         />
 
         <!--

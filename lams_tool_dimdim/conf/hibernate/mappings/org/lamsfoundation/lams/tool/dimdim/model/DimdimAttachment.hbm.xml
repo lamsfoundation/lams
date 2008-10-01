@@ -76,6 +76,7 @@
             outer-join="auto"
             update="true"
             insert="true"
+            foreign-key="fk_laddim10_dimdim_attachment_to_dimdim"
         >
             <column
                 name="dimdim_uid" 
