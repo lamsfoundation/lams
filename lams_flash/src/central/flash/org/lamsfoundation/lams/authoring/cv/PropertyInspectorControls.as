@@ -1200,7 +1200,7 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private function onMapCompetenceClick(evt:Object){
 		// open group to competence mapping window
-		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:"Competence Mappings", closeButton:true, resize:false, scrollContentPath:'CompetenceMappingDialog'});
+		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue("competence_mappings_btn"), closeButton:true, resize:false, scrollContentPath:'CompetenceMappingDialog'});
 	}
 	
 	public function openConditionMatchDialog():Void {

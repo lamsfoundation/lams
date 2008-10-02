@@ -195,7 +195,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		_define_monitor_cb.label = Dictionary.getValue('pi_define_monitor_cb_lbl');
 
 		//TODO Internationalise
-		_map_competence_btn.label = "Map to competences";
+		_map_competence_btn.label = Dictionary.getValue('map_comptence_btn');
 
 		// Branch 
 		_pi_defaultBranch_cb.label = Dictionary.getValue("pi_defaultBranch_cb_lbl");

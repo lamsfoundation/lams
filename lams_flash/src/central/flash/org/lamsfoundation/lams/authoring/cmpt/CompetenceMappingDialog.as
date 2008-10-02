@@ -104,10 +104,9 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceMappingDialog extends Mov
         themeManager = ThemeManager.getInstance();
 
         //Set the text for buttons
-        //close_btn.label = Dictionary.getValue('al_ok');
-		competence_mapping_lbl.text = "Competences mapped to "+app.canvas.model.selectedItem.activity.title;
+		competence_mapping_lbl.text = Dictionary.getValue("competences_mapped_to_act_lbl", [app.canvas.model.selectedItem.activity.title]);
 		
-        close_btn.label = "OK";
+        close_btn.label = Dictionary.getValue("prefs_dlg_ok");
 		
 		main_mc = competence_mapping_scp.content;
 		

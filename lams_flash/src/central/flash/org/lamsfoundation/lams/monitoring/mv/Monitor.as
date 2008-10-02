@@ -215,7 +215,7 @@ class Monitor {
 	public function showMappedCompetences() {
 		
 		var controller:MonitorController = monitorView.getController();
-		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"Mapped Competences",closeButton:true,scrollContentPath:'CompetenceEditorDialog'});
+		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("mapped_competences_lbl"),closeButton:true,scrollContentPath:'CompetenceEditorDialog'});
 		dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
 	}
 

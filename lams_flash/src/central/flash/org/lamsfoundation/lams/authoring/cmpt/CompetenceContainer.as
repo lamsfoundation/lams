@@ -100,11 +100,13 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
         //set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
 		
-		competence_title_lbl.text = "Title";
-		competence_description_lbl.text = "Description";
+		//dictionary keys vary for author/monitor and this class is shared between them;
+		competence_title_lbl.text = (Dictionary.getValue("pi_lbl_title") != null && Dictionary.getValue("pi_lbl_title") != undefined) ? Dictionary.getValue("pi_lbl_title") : Dictionary.getValue("competence_title_lbl");
+		competence_description_lbl.text = (Dictionary.getValue("ws_dlg_description") != null && Dictionary.getValue("ws_dlg_description") != undefined) ? Dictionary.getValue("ws_dlg_description") : Dictionary.getValue("competence_desc_lbl");
 		
-		edit_competence_btn.label = "Edit";
-		delete_competence_btn.label = "Delete";
+		// author only buttons
+		edit_competence_btn.label = Dictionary.getValue("mnu_edit"); 
+		delete_competence_btn.label = Dictionary.getValue("delete_btn"); 
 		
 		competence_title_txt.editable = false;
 		competence_description_txt.editable = false;
@@ -151,7 +153,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
 		var _isMapped:Boolean = isCompetenceMapped();
 		
 		if (_isMapped) {
-			LFMessage.showMessageConfirm("The competence you are attempting to delete is currently mapped to one or more activities. Deleting this competence will remove it's mappings. Are you sure you want to proceed?", Proxy.create(this, deleteMappedCompetences, _competenceTitle), null);
+			LFMessage.showMessageConfirm(Dictionary.getValue("competence_editor_warning_competence_mapped"), null);
 		} else {
 			deleteCompetence();
 		}

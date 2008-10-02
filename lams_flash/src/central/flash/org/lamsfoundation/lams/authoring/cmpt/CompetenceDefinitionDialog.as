@@ -101,13 +101,13 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 		fm = _container.getFocusManager();
 		
         //Set the text for buttons
-        close_btn.label = "Cancel";
+        close_btn.label = Dictionary.getValue("prefs_dlg_cancel");
 		
-		competence_title_lbl.text = "Title";
-		competence_description_lbl.text = "Description";
+		competence_title_lbl.text = Dictionary.getValue("competence_title_lbl");
+		competence_description_lbl.text = Dictionary.getValue("competence_desc_lbl");
 		
-		add_competence_btn.label = "Add";
-		save_competence_btn.label = "Save";
+		add_competence_btn.label = Dictionary.getValue("competence_editor_add_competence_btn");
+		save_competence_btn.label = Dictionary.getValue("mnu_file_save");
 		
 		editingCompetence = CompetenceEditorDialog(app.dialog.scrollContent).editingCompetence;
 		
@@ -202,11 +202,12 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 		var competenceDesc:String = StringUtils.trim(competence_description_txt.text);
 		
 		if (competenceName.length == 0) {
-			LFMessage.showMessageAlert("The competence title cannot be blank", null);
+			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
+			
 		}
 		else if (app.getDesignDataModel().competences.containsKey(competenceName)) {
 			// entry already exists, do not add
-			LFMessage.showMessageAlert("A competence with the title '"+competenceName+"' already exists", null);
+			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_exists", [competenceName]), null);
 		} 
 		else {
 			// add the new competence to the hashtable			app.getDesignDataModel().competences.put(competenceName, competenceDesc);
@@ -251,7 +252,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 				CompetenceEditorDialog(app.dialog.scrollContent).draw();
 			}
 			else {
-				LFMessage.showMessageAlert("The competence title cannot be blank", null);
+				LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
 			}
 		} 
 		

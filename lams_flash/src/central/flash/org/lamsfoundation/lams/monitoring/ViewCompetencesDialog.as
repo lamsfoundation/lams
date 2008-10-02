@@ -112,7 +112,7 @@ class ViewCompetencesDialog extends MovieClip implements Dialog{
 		close_btn.label = Dictionary.getValue('ls_win_learners_close_btn');
 		 
 		 //Set the labels
-		competences_lbl.text = "Competences in learning design: "+ app.monitor.ddm.title;
+		competences_lbl.text = Dictionary.getValue('view_competences_in_ld_lbl', [app.monitor.ddm.title]);
 		
         //EVENTS
         //Add event listeners for ok, cancel and close buttons

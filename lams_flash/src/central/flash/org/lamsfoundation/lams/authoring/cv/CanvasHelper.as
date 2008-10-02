@@ -823,7 +823,7 @@ class CanvasHelper {
     public function openCompetenceEditorWindow() {
 		var controller:CanvasController = canvasView.getController();
 
-		app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"Competence Editor",closeButton:true, resize:false, scrollContentPath:'CompetenceEditorDialog'});
+		app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('competence_editor_dlg'), closeButton:true, resize:false, scrollContentPath:'CompetenceEditorDialog'});
 		app.dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
 	}	
 	
@@ -832,7 +832,7 @@ class CanvasHelper {
     */
     public function openCompetenceDefinitionWindow():MovieClip {
 		var controller:CanvasController = canvasView.getController();
-		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:"Competence Definition Dialog", closeButton:true, scrollContentPath:'CompetenceDefinitionDialog'});			
+		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('competence_def_dlg'), closeButton:true, scrollContentPath:'CompetenceDefinitionDialog'});			
 		
 		dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
 		return dialog;

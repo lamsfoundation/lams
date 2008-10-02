@@ -177,8 +177,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_opt'), instanceName:"drawOptionalItem"});
         
 		tools_menu.addMenuItem({type:"separator"});
-		tools_menu.addMenuItem({label:"Competence Editor", instanceName:"competenceEditor"});
-		//tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_competence'), instanceName:"competenceEditor"});
+		tools_menu.addMenuItem({label:Dictionary.getValue('competence_editor_dlg'), instanceName:"competenceEditor"});
 		
 		//tools_menu.addMenuItem({type:"separator"});
         //tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_prefs'), instanceName:"prefsItem", enabled:false});
@@ -225,8 +224,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         view_menu = _mb.addMenu(Dictionary.getValue('mnu_view'));
 		
         view_menu.addMenuItem({label:Dictionary.getValue('mnu_view_learners'), instanceName:"viewLearners", enabled:false});
-        //view_menu.addMenuItem({label:Dictionary.getValue('mnu_view_competences'), instanceName:"viewCompetences", enabled:false});
-        view_menu.addMenuItem({label:"View Competences", instanceName:"viewCompetences", enabled:true});
+        view_menu.addMenuItem({label:Dictionary.getValue('view_competences_dlg'), instanceName:"viewCompetences", enabled:true});
 		
 		/*=================
             GO MENU

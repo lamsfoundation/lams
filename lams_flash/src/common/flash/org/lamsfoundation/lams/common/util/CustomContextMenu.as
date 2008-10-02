@@ -117,8 +117,7 @@ class CustomContextMenu {
 		menuArr[5] = [Dictionary.getValue('ccm_paste_activity'),getPaste, false, v, authorC];
 		menuArr[6] = [Dictionary.getValue('ccm_pi'),getPI, true, true, authorC];
 		menuArr[7] = [Dictionary.getValue('ccm_author_activityhelp'),getHelp, false, v, authorC];
-		//menuArr[8] = [Dictionary.getValue('ccm_author_activityhelp'),getHelp, false, v, authorC];
-		menuArr[8] = ["View Mapped Competences",getMappedCompetences, false, v, monitorC];
+		menuArr[8] = [Dictionary.getValue('view_act_mapped_competences'),getMappedCompetences, false, v, monitorC];
 		
 		for (var i=0; i<menuArr.length; i++){
 			if (menuArr[i][4]) {

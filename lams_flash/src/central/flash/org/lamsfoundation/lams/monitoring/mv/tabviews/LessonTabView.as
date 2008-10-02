@@ -708,7 +708,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
     * Opens the view competences dialog
     */
 	public function showCompetencesDialog(mm:MonitorModel) {
-		var opendialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, false,{title:"View Competences",closeButton:true,scrollContentPath:'viewCompetencesDialog'});
+		var opendialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, false,{title:Dictionary.getValue('view_competences_dlg'),closeButton:true,scrollContentPath:'viewCompetencesDialog'});
 		opendialog.addEventListener('contentLoaded',Delegate.create(_monitorController,testFunction));
 	}
 	

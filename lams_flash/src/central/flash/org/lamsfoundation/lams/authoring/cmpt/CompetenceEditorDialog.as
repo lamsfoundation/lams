@@ -105,11 +105,10 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
         themeManager = ThemeManager.getInstance();
 		
         //Set the text for buttons
-        //close_btn.label = Dictionary.getValue('al_ok');
-		competence_lbl.text = "Competences";
+		competence_lbl.text = Dictionary.getValue('competences_lbl');
 		
-		add_competence_btn.label = "Add"
-        close_btn.label = "Close";
+		add_competence_btn.label = Dictionary.getValue('competence_editor_add_competence_btn');
+        close_btn.label = (Dictionary.getValue('mnu_file_close') != null && Dictionary.getValue('mnu_file_close') != undefined) ? Dictionary.getValue('mnu_file_close') : Dictionary.getValue('ls_win_learners_close_btn');
 			
 		main_mc = competence_editor_scp.content;
 		
@@ -152,7 +151,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
 			selectedActivityUIID = app.monitor.model.selectedItem.activity.activityUIID;
 			if (app.monitor.ddm.activities.get(selectedActivityUIID) instanceof ToolActivity) {
 				var activityTitle:String = ToolActivity(app.monitor.ddm.activities.get(selectedActivityUIID)).title;
-				competence_lbl.text = "Competences mapped to "+activityTitle;
+				competence_lbl.text = Dictionary.getValue("competences_mapped_to_act_lbl", [activityTitle]);
 			}
 		} else {
 			Debugger.log("model type not recognized", Debugger.CRITICAL, "setUpContent", "CompetenceEditorDialog");
