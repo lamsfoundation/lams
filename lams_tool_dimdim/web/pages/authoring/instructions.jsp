@@ -10,7 +10,7 @@
 			<div class="field-name">
 				<fmt:message key="instructions.onlineInstructions"></fmt:message>
 			</div>
-			<lams:STRUTS-textarea property="onlineInstruction" rows="3" cols="75" />
+			<lams:STRUTS-textarea property="onlineInstructions" rows="3" cols="75" />
 		</td>
 	</tr>
 
@@ -33,18 +33,18 @@
 								</c:set>
 								<a
 									href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-									<fmt:message key="link.view" /> </a> &nbsp;
+									<fmt:message key="label.view" /> </a> &nbsp;
 
 								<c:set var="downloadURL">
 									<html:rewrite
 										page="/download/?uuid=${file.fileUuid}&amp;preferDownload=true" />
 								</c:set>
 								<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-									<fmt:message key="link.download" /> </a> &nbsp;
+									<fmt:message key="label.download" /> </a> &nbsp;
 
 								<html:link
 									href="javascript:deleteAttachment('deleteOnline','${file.fileUuid}')">
-									<fmt:message key="link.delete" />
+									<fmt:message key="label.delete" />
 								</html:link>
 							</li>
 						</c:forEach>
@@ -61,18 +61,18 @@
 								</c:set>
 								<a
 									href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-									<fmt:message key="link.view" /> </a> &nbsp;
+									<fmt:message key="label.view" /> </a> &nbsp;
 
 								<c:set var="downloadURL">
 									<html:rewrite
 										page="/download/?uuid=${file.fileUuid}&amp;preferDownload=true" />
 								</c:set>
 								<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-									<fmt:message key="link.download" /> </a> &nbsp;
+									<fmt:message key="label.download" /> </a> &nbsp;
 
 								<html:link
 									href="javascript:deleteAttachment('removeUnsavedOnline','${file.fileUuid}')">
-									<fmt:message key="link.delete" />
+									<fmt:message key="label.delete" />
 								</html:link>
 							</li>
 						</c:forEach>
@@ -112,7 +112,7 @@
 			<div class="field-name-alternative-color">
 				<fmt:message key="instructions.offlineInstructions"></fmt:message>
 			</div>
-			<lams:STRUTS-textarea property="offlineInstruction" rows="3"
+			<lams:STRUTS-textarea property="offlineInstructions" rows="3"
 				cols="75" />
 		</td>
 	</tr>
@@ -138,18 +138,18 @@
 								</c:set>
 								<a
 									href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-									<fmt:message key="link.view" /> </a> &nbsp;
+									<fmt:message key="label.view" /> </a> &nbsp;
 
 								<c:set var="downloadURL">
 									<html:rewrite
 										page="/download/?uuid=${file.fileUuid}&amp;preferDownload=true" />
 								</c:set>
 								<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-									<fmt:message key="link.download" /> </a> &nbsp;
+									<fmt:message key="label.download" /> </a> &nbsp;
 
 								<html:link
 									href="javascript:deleteAttachment('deleteOffline','${file.fileUuid}')">
-									<fmt:message key="link.delete" />
+									<fmt:message key="label.delete" />
 								</html:link>
 							</li>
 						</c:forEach>
@@ -166,18 +166,18 @@
 								</c:set>
 								<a
 									href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-									<fmt:message key="link.view" /> </a> &nbsp;
+									<fmt:message key="label.view" /> </a> &nbsp;
 
 								<c:set var="downloadURL">
 									<html:rewrite
 										page="/download/?uuid=${file.fileUuid}&amp;preferDownload=true" />
 								</c:set>
 								<a href="<c:out value='${downloadURL}' escapeXml='false'/>">
-									<fmt:message key="link.download" /> </a> &nbsp;
+									<fmt:message key="label.download" /> </a> &nbsp;
 
 								<html:link
 									href="javascript:deleteAttachment('removeUnsavedOffline','${file.fileUuid}')">
-									<fmt:message key="link.delete" />
+									<fmt:message key="label.delete" />
 								</html:link>
 							</li>
 						</c:forEach>

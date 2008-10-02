@@ -35,7 +35,7 @@
 				</c:set>
 				<a
 					href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"
-					class="button"> <fmt:message key="link.view" /> </a> &nbsp;
+					class="button"> <fmt:message key="label.view" /> </a> &nbsp;
 			</td>
 
 			<td width="5%" align="left">
@@ -44,7 +44,7 @@
 						page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
 				</c:set>
 				<a href="<c:out value='${downloadURL}' escapeXml='false'/>"
-					class="button"> <fmt:message key="link.download" /> </a>
+					class="button"> <fmt:message key="label.download" /> </a>
 			</td>
 		</tr>
 	</c:forEach>
@@ -88,7 +88,7 @@
 				</c:set>
 				<a
 					href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"
-					class="button"> <fmt:message key="link.view" /> </a> &nbsp;
+					class="button"> <fmt:message key="label.view" /> </a> &nbsp;
 			</td>
 
 			<td width="5%" align="left">
@@ -97,7 +97,7 @@
 						page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
 				</c:set>
 				<a href="<c:out value='${downloadURL}' escapeXml='false'/>"
-					class="button"> <fmt:message key="link.download" /> </a>
+					class="button"> <fmt:message key="label.download" /> </a>
 			</td>
 		</tr>
 	</c:forEach>
