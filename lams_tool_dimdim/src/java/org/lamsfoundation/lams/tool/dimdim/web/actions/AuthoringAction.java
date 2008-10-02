@@ -343,8 +343,8 @@ public class AuthoringAction extends DispatchAction {
 	dimdim.setTitle(authForm.getTitle());
 	dimdim.setInstructions(authForm.getInstructions());
 	if (mode.isAuthor()) { // Teacher cannot modify following
-	    dimdim.setOfflineInstructions(authForm.getOfflineInstruction());
-	    dimdim.setOnlineInstructions(authForm.getOnlineInstruction());
+	    dimdim.setOfflineInstructions(authForm.getOfflineInstructions());
+	    dimdim.setOnlineInstructions(authForm.getOnlineInstructions());
 	    dimdim.setReflectOnActivity(authForm.isReflectOnActivity());
 	    dimdim.setReflectInstructions(authForm.getReflectInstructions());
 	    dimdim.setLockOnFinished(authForm.isLockOnFinished());

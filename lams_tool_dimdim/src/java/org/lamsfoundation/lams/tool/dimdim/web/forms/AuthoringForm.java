@@ -47,9 +47,9 @@ public class AuthoringForm extends ActionForm {
 
     private String instructions;
 
-    private String offlineInstruction;
+    private String offlineInstructions;
 
-    private String onlineInstruction;
+    private String onlineInstructions;
 
     private boolean lockOnFinished;
 
@@ -145,12 +145,12 @@ public class AuthoringForm extends ActionForm {
 	this.offlineFile = offlineFile;
     }
 
-    public String getOfflineInstruction() {
-	return offlineInstruction;
+    public String getOfflineInstructions() {
+	return offlineInstructions;
     }
 
-    public void setOfflineInstruction(String offlineInstruction) {
-	this.offlineInstruction = offlineInstruction;
+    public void setOfflineInstructions(String offlineInstructions) {
+	this.offlineInstructions = offlineInstructions;
     }
 
     public FormFile getOnlineFile() {
@@ -161,12 +161,12 @@ public class AuthoringForm extends ActionForm {
 	this.onlineFile = onlineFile;
     }
 
-    public String getOnlineInstruction() {
-	return onlineInstruction;
+    public String getOnlineInstructions() {
+	return onlineInstructions;
     }
 
-    public void setOnlineInstruction(String onlineInstruction) {
-	this.onlineInstruction = onlineInstruction;
+    public void setOnlineInstructions(String onlineInstructions) {
+	this.onlineInstructions = onlineInstructions;
     }
 
     public String getTitle() {
