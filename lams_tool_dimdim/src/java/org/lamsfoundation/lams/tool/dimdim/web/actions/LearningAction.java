@@ -30,6 +30,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -160,7 +161,7 @@ public class LearningAction extends DispatchAction {
 	    } // otherwise, meeting has not been started in monitoring
 	}
 
-	boolean conferenceOpen = connectURL.isEmpty() ? false : true;
+	boolean conferenceOpen = StringUtils.isEmpty(connectURL) ? false : true;
 	request.setAttribute(Constants.ATTR_CONFERENCE_OPEN, conferenceOpen);
 
 	if (conferenceOpen) {
