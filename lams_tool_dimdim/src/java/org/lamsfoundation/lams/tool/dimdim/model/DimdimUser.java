@@ -58,6 +58,10 @@ public class DimdimUser implements java.io.Serializable {
 
     // Constructors
 
+    public DimdimUser() {
+
+    }
+
     public DimdimUser(UserDTO user, DimdimSession dimdimSession) {
 	this.userId = new Long(user.getUserID().intValue());
 	this.firstName = user.getFirstName();
