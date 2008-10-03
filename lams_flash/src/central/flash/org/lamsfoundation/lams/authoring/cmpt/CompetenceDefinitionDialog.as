@@ -64,9 +64,14 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
 	
-    //Dimensions for resizing
-    private var xOkOffset:Number;
-    private var yOkOffset:Number;
+	//Dimensions for resizing
+	private var TEXT_FIELD_HEIGHT:Number = 22;
+	private var X_TEXT_FIELD_PADDING:Number = 93;
+	private var X_TEXT_AREA_PADDING:Number = 40;
+	private var Y_TEXT_AREA_PADDING:Number = 120;
+	
+    private var xAddSaveOffset:Number;
+    private var yAddSaveOffset:Number;
     private var xCancelOffset:Number;
     private var yCancelOffset:Number;
 
@@ -122,9 +127,12 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
         _container.addEventListener('size',this);
 		
         //work out offsets from bottom RHS of panel
-        xOkOffset = _bgpanel._width - close_btn._x;
-        yOkOffset = _bgpanel._height - close_btn._y;
-        
+        xAddSaveOffset = _bgpanel._width - add_competence_btn._x;
+		yAddSaveOffset = _bgpanel._height - add_competence_btn._y;
+		
+        xCancelOffset = _bgpanel._width - close_btn._x;
+        yCancelOffset = _bgpanel._height - close_btn._y;
+
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
         setStyles();
@@ -281,9 +289,14 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
     public function setSize(w:Number,h:Number):Void{
 		//Size the panel
         _bgpanel.setSize(w,h);
+		
+		competence_title_txt.setSize(w - X_TEXT_FIELD_PADDING, TEXT_FIELD_HEIGHT);
+		competence_description_txt.setSize(w - X_TEXT_AREA_PADDING, h - Y_TEXT_AREA_PADDING)
 
         //Buttons
-        close_btn.move(w-xOkOffset,h-yOkOffset);
+		add_competence_btn.move(w-xAddSaveOffset, h-yAddSaveOffset);
+		save_competence_btn.move(w-xAddSaveOffset, h-yAddSaveOffset);
+        close_btn.move(w-xCancelOffset,h-yCancelOffset);
 		
     }
     
