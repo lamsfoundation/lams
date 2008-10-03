@@ -38,8 +38,6 @@
 				<html:option value="1"></html:option>
 				<html:option value="2"></html:option>
 				<html:option value="3"></html:option>
-				<html:option value="4"></html:option>
-				<html:option value="5"></html:option>
 			</html:select>
 		</td>
 	</tr>
