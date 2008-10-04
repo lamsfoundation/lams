@@ -87,7 +87,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
     protected List<String> excludedWordsCondition = new ArrayList<String>();
 
     public TextSearchCondition() {
-
+	super();
     }
 
     /**
@@ -97,10 +97,6 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
      */
     public TextSearchCondition(BranchConditionDTO conditionDTO) {
 	super(conditionDTO);
-	allWords = conditionDTO.getAllWords();
-	phrase = conditionDTO.getPhrase();
-	anyWords = conditionDTO.getAnyWords();
-	excludedWords = conditionDTO.getExcludedWords();
     }
 
     /**
@@ -117,7 +113,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
     }
 
     @Override
-    public BranchCondition clone(int uiidOffset) {
+    public TextSearchCondition clone(int uiidOffset) {
 	Integer newConditionUIID = LearningDesign.addOffset(conditionUIID, uiidOffset);
 	return new TextSearchCondition(null, newConditionUIID, orderId, name, displayName, type, startValue, endValue,
 		exactMatchValue, allWords, phrase, anyWords, excludedWords);

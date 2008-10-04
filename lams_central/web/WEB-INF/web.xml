@@ -170,6 +170,11 @@
 
    </servlet>
    <servlet>
+      <servlet-name>WhiteboardToSwfServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToSwfServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>dumpWDDX</servlet-name>
       <servlet-class>org.lamsfoundation.lams.web.ReportWddxStructureServlet</servlet-class>
 
@@ -240,6 +245,11 @@
 
    </servlet>
    <servlet>
+      <servlet-name>BogoPogoServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToJpgServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>flashCrashDump</servlet-name>
       <servlet-class>org.lamsfoundation.lams.web.FlashCrashDumpServlet</servlet-class>
 
@@ -247,6 +257,11 @@
    <servlet>
       <servlet-name>editLD</servlet-name>
       <servlet-class>org.lamsfoundation.lams.authoring.web.EditOnFlyServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>competenceServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.CompetenceServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -272,11 +287,6 @@
    <servlet>
       <servlet-name>insertLearningDesign</servlet-name>
       <servlet-class>org.lamsfoundation.lams.authoring.web.InsertLDServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>BogoPogoServlet</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.webservice.BogoPogoServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -414,6 +424,10 @@
       <url-pattern>/ForgotPasswordRequest</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
+      <servlet-name>WhiteboardToSwfServlet</servlet-name>
+      <url-pattern>/WhiteboardToSwf</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
       <servlet-name>dumpWDDX</servlet-name>
       <url-pattern>/servlet/dumpWDDX</url-pattern>
    </servlet-mapping>
@@ -430,12 +444,20 @@
       <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
+      <servlet-name>BogoPogoServlet</servlet-name>
+      <url-pattern>/BogoPogo</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
       <servlet-name>flashCrashDump</servlet-name>
       <url-pattern>/servlet/flashCrashDump</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>editLD</servlet-name>
       <url-pattern>/eof/authoring/editLearningDesign</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>competenceServlet</servlet-name>
+      <url-pattern>/competenceServlet</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>LessonJoinServlet</servlet-name>
@@ -458,10 +480,6 @@
       <url-pattern>/servlet/authoring/insertLearningDesign</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>BogoPogoServlet</servlet-name>
-      <url-pattern>/BogoPogo</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
       <servlet-name>storeNotebookEntry</servlet-name>
       <url-pattern>/servlet/notebook/storeNotebookEntry</url-pattern>
    </servlet-mapping>
@@ -469,6 +487,10 @@
       <servlet-name>copyMultipleToolContent</servlet-name>
       <url-pattern>/servlet/authoring/copyMultipleToolContent</url-pattern>
    </servlet-mapping>
+
+   <session-config>
+      <session-timeout>120</session-timeout>
+   </session-config>
 
   <mime-mapping>
 	<extension>csv</extension>

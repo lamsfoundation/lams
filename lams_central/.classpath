@@ -11,5 +11,7 @@
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/mail.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-monitoring.jar"/>
+	<classpathentry kind="lib" path="/lams_build/lib/flagstone/transform.jar"/>
+	<classpathentry kind="lib" path="/lams_build/lib/flagstone/translate.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

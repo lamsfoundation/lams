@@ -9,7 +9,7 @@
 <class 
     name="org.lamsfoundation.lams.learningdesign.BranchCondition" 
     table="lams_branch_condition"
-    discriminator-value="0"
+    discriminator-value="0" 
 >
     <id
         name="conditionId"
@@ -51,7 +51,7 @@
         <meta attribute="field-description">@hibernate.property column="exact_match_value" length="255" </meta>    
     </property>
     
-     <joined-subclass name="org.lamsfoundation.lams.learningdesign.TextSearchCondition" table="lams_text_search_condition">
+     <joined-subclass  name="org.lamsfoundation.lams.learningdesign.TextSearchCondition" table="lams_text_search_condition" lazy="false">
      	<meta attribute="class-description" inherit="false">@hibernate.class </meta>
      	
      	<key column="condition_id" />

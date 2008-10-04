@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.learningdesign.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
-import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
 
 /**
  * The BranchConditionDTO records the details of one particular condition, used for tool output based branching. On one
@@ -47,11 +46,6 @@ public class BranchConditionDTO {
     private String exactMatchValue;
     private Integer toolActivityUIID;
 
-    private String allWords;
-    private String phrase;
-    private String anyWords;
-    private String excludedWords;
-
     public BranchConditionDTO(BranchCondition condition, Integer toolActivityUIID) {
 	conditionId = condition.getConditionId();
 	conditionUIID = condition.getConditionUIID();
@@ -65,14 +59,6 @@ public class BranchConditionDTO {
 
 	exactMatchValue = condition.getExactMatchValue();
 	this.toolActivityUIID = toolActivityUIID;
-
-	if (condition instanceof TextSearchCondition) {
-	    TextSearchCondition textSearchCondition = (TextSearchCondition) condition;
-	    allWords = textSearchCondition.getAllWords();
-	    phrase = textSearchCondition.getPhrase();
-	    anyWords = textSearchCondition.getAnyWords();
-	    excludedWords = textSearchCondition.getExcludedWords();
-	}
     }
 
     public Long getConditionId() {
@@ -143,9 +129,7 @@ public class BranchConditionDTO {
     public String toString() {
 	return new ToStringBuilder(this).append("conditionId", conditionId).append("conditionUIID", conditionUIID)
 		.append("orderId", orderID).append("name", name).append("type", type).append("startValue", startValue)
-		.append("endValue", endValue).append("exactMatchValue", exactMatchValue).append("allWordsCondition",
-			allWords).append("phraseCondition", phrase).append("anyWordsCondition",
-			anyWords).append("excludedWordsCondition", excludedWords).toString();
+		.append("endValue", endValue).append("exactMatchValue", exactMatchValue).toString();
     }
 
     public String getDisplayName() {
@@ -170,38 +154,6 @@ public class BranchConditionDTO {
 
     public void setToolActivityUIID(Integer toolActivityUIID) {
 	this.toolActivityUIID = toolActivityUIID;
-    }
-
-    public String getAllWords() {
-	return allWords;
-    }
-
-    public void setAllWords(String allWordsCondition) {
-	this.allWords = allWordsCondition;
-    }
-
-    public String getPhrase() {
-	return phrase;
-    }
-
-    public void setPhrase(String phraseCondition) {
-	this.phrase = phraseCondition;
-    }
-
-    public String getAnyWords() {
-	return anyWords;
-    }
-
-    public void setAnyWords(String anyWordsCondition) {
-	this.anyWords = anyWordsCondition;
-    }
-
-    public String getExcludedWords() {
-	return excludedWords;
-    }
-
-    public void setExcludedWords(String excludedWordsCondition) {
-	this.excludedWords = excludedWordsCondition;
     }
 
 }
