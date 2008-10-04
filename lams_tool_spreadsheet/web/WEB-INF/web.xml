@@ -207,10 +207,10 @@
 
    	<!--  Security Constraint -->
 	<security-constraint>
-	   	<web-spreadsheet-collection>
-	    	<web-spreadsheet-name>Secure Content</web-spreadsheet-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
-    	</web-spreadsheet-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
     		<role-name>TEACHER</role-name>
@@ -223,10 +223,10 @@
     </security-constraint>
 
     <security-constraint>
-	   	<web-spreadsheet-collection>
-	    	<web-spreadsheet-name>Authoring Update</web-spreadsheet-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Authoring Update</web-resource-name>
 		    <url-pattern>/authoring/*</url-pattern>
-    	</web-spreadsheet-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     		<role-name>AUTHOR ADMIN</role-name>
@@ -234,20 +234,20 @@
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-spreadsheet-collection>
-	    	<web-spreadsheet-name>Staff Content</web-spreadsheet-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
 		    <url-pattern>/monitoring.do</url-pattern>
-    	</web-spreadsheet-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-spreadsheet-collection>
-	    	<web-spreadsheet-name>Staff Content</web-spreadsheet-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
 		    <url-pattern>/definelater.do</url-pattern>
-    	</web-spreadsheet-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
@@ -255,29 +255,29 @@
     </security-constraint>
 
     <security-constraint>
-	   	<web-spreadsheet-collection>
-	    	<web-spreadsheet-name>Adminstrator Content</web-spreadsheet-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Adminstrator Content</web-resource-name>
 		    <url-pattern>/admin.do</url-pattern> 
-    	</web-spreadsheet-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-spreadsheet-collection>
-	    	<web-spreadsheet-name>LAMS System Adminstrator Content</web-spreadsheet-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>LAMS System Adminstrator Content</web-resource-name>
 		    <url-pattern>/sysadmin.do</url-pattern> 
-    	</web-spreadsheet-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 	<!--  some combine role security setting -->
     <security-constraint>
-	   	<web-spreadsheet-collection>
-	    	<web-spreadsheet-name>Download Files</web-spreadsheet-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Download Files</web-resource-name>
 		    <url-pattern>/download/</url-pattern>
-    	</web-spreadsheet-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
     		<role-name>AUTHOR</role-name>

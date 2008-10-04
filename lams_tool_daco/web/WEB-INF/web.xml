@@ -212,10 +212,10 @@
 
    	<!--  Security Constraint -->
 	<security-constraint>
-	   	<web-daco-collection>
-	    	<web-daco-name>Secure Content</web-daco-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
-    	</web-daco-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
     		<role-name>TEACHER</role-name>
@@ -228,10 +228,10 @@
     </security-constraint>
 
     <security-constraint>
-	   	<web-daco-collection>
-	    	<web-daco-name>Authoring Update</web-daco-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Authoring Update</web-resource-name>
 		    <url-pattern>/authoring/*</url-pattern>
-    	</web-daco-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     		<role-name>AUTHOR ADMIN</role-name>
@@ -239,20 +239,20 @@
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-daco-collection>
-	    	<web-daco-name>Staff Content</web-daco-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
 		    <url-pattern>/monitoring.do</url-pattern>
-    	</web-daco-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-daco-collection>
-	    	<web-daco-name>Staff Content</web-daco-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
 		    <url-pattern>/definelater.do</url-pattern>
-    	</web-daco-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
@@ -260,29 +260,29 @@
     </security-constraint>
 
     <security-constraint>
-	   	<web-daco-collection>
-	    	<web-daco-name>Adminstrator Content</web-daco-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Adminstrator Content</web-resource-name>
 		    <url-pattern>/admin.do</url-pattern> 
-    	</web-daco-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-daco-collection>
-	    	<web-daco-name>LAMS System Adminstrator Content</web-daco-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>LAMS System Adminstrator Content</web-resource-name>
 		    <url-pattern>/sysadmin.do</url-pattern> 
-    	</web-daco-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 	<!--  some combine role security setting -->
     <security-constraint>
-	   	<web-daco-collection>
-	    	<web-daco-name>Download Files</web-daco-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Download Files</web-resource-name>
 		    <url-pattern>/download/</url-pattern>
-    	</web-daco-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
     		<role-name>AUTHOR</role-name>
