@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
 import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.tool.OutputType;
@@ -101,4 +102,22 @@ public class QaCondition extends TextSearchCondition {
     public void setQuestions(Set<QaQueContent> questions) {
 	this.questions = questions;
     }
+
+    @Override
+    public Object clone() {
+	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
+	questionsCopy.addAll(questions);
+	return new QaCondition(null, null, orderId, name, displayName, type, null, null, null, allWords, phrase,
+		anyWords, excludedWords, questionsCopy);
+    }
+
+    @Override
+    public QaCondition clone(int uiidOffset) {
+	Integer newConditionUIID = LearningDesign.addOffset(conditionUIID, uiidOffset);
+	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
+	questionsCopy.addAll(questions);
+	return new QaCondition(null, newConditionUIID, orderId, name, displayName, type, startValue, endValue,
+		exactMatchValue, allWords, phrase, anyWords, excludedWords, questionsCopy);
+    }
+
 }

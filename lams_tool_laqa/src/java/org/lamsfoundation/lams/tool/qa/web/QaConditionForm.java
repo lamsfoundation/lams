@@ -104,4 +104,13 @@ public class QaConditionForm extends TextSearchActionForm {
 	return new QaCondition(null, null, getOrderId(), null, getDisplayName(), "OUTPUT_COMPLEX", null, null, null,
 		getAllWords(), getPhrase(), getAnyWords(), getExcludedWords(), null);
     }
+
+    public void extractCondition(QaCondition condition) {
+	condition.setOrderId(getOrderId());
+	condition.setDisplayName(getDisplayName());
+	condition.setAllWords(getAllWords());
+	condition.setPhrase(getPhrase());
+	condition.setAnyWords(getAnyWords());
+	condition.setExcludedWords(getExcludedWords());
+    }
 }

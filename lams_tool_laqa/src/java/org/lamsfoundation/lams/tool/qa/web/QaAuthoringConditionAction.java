@@ -351,7 +351,7 @@ public class QaAuthoringConditionAction extends Action {
 	    HttpServletRequest request) {
 	form.populateForm(condition);
 	if (orderId >= 0) {
-	    form.setOrderId(new Integer(orderId));
+	    form.setOrderId(orderId + 1);
 	}
 
 	Integer[] selectedItems = new Integer[condition.temporaryQuestionDTOSet.size()];
@@ -423,7 +423,8 @@ public class QaAuthoringConditionAction extends Action {
 	    conditionSet.add(condition);
 	} else { // edit
 	    List<QaCondition> conditionList = new ArrayList<QaCondition>(conditionSet);
-	    condition = conditionList.get(orderId);
+	    condition = conditionList.get(orderId - 1);
+	    form.extractCondition(condition);
 	}
 
 	Integer[] selectedItems = form.getSelectedItems();
@@ -437,6 +438,7 @@ public class QaAuthoringConditionAction extends Action {
 		}
 	    }
 	}
+
     }
 
     /**
@@ -461,7 +463,7 @@ public class QaAuthoringConditionAction extends Action {
 	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
 	    for (QaCondition condition : conditionSet) {
 		if (formConditionName.equals(condition.getDisplayName())
-			&& !formConditionOrderId.equals(condition.getOrderId() - 1)) {
+			&& !formConditionOrderId.equals(condition.getOrderId())) {
 
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.condition.duplicated.name"));
 		    break;

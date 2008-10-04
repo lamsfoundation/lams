@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
 /**
@@ -137,12 +138,15 @@ public class QaOutputFactory extends OutputFactory {
 	    Set<QaQueContent> questions = taskList.getQaQueContents();
 	    String[] answers = new String[questions.size()];
 	    for (QaQueContent question : questions) {
-		List<QaUsrResp> attempts = qaService.getAttemptsForUserAndQuestionContent(learnerId, question
-			.getQaContentId());
+		QaQueUsr user = qaService.getQaQueUsrById(learnerId);
+		List<QaUsrResp> attempts = null;
+		if (user != null) {
+		    attempts = qaService.getAttemptsForUserAndQuestionContent(user.getUid(), question.getQaContentId());
+		}
 		if (attempts != null && !attempts.isEmpty()) {
 		    // only the last attempt is taken into consideration
 		    String answer = attempts.get(attempts.size() - 1).getAnswer();
-		    answers[question.getDisplayOrder()] = answer;
+		    answers[question.getDisplayOrder() - 1] = answer;
 		}
 	    }
 	    return new ToolOutput(name, getI18NText(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME, true), answers, false);

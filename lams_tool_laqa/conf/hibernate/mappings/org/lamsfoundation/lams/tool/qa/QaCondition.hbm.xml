@@ -8,6 +8,7 @@
 	    name="org.lamsfoundation.lams.tool.qa.QaCondition" 
 	    table="tl_laqa11_conditions"
 	    extends="org.lamsfoundation.lams.learningdesign.TextSearchCondition"
+	    lazy="false"
 	>
 	
 		<key column="condition_id" />
