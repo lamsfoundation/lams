@@ -28,15 +28,17 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 
 /**
- * DAO for accessing the Notebook objects - interface defining
- * methods to be implemented by the Hibernate or other implementation.
+ * DAO for accessing the Notebook objects - interface defining methods to be implemented by the Hibernate or other
+ * implementation.
  */
-public interface INotebookDAO extends IBaseDAO{
+public interface INotebookDAO extends IBaseDAO {
 
-	Notebook getByContentId(Long toolContentId);
+    Notebook getByContentId(Long toolContentId);
 
-	void saveOrUpdate(Notebook toContent);
+    void saveOrUpdate(Notebook toContent);
 
-	void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
-	
+    void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type);
+
+    void releaseFromCache(Object o);
+
 }

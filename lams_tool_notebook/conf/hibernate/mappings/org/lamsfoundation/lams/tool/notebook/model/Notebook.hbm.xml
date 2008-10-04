@@ -178,6 +178,24 @@
 
         </set>
 
+        <set
+            name="conditions"
+            lazy="true"
+            cascade="all"
+            sort="unsorted"
+        >
+
+            <key
+                column="content_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.notebook.model.NotebookCondition"
+            />
+
+        </set>
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Notebook.xml

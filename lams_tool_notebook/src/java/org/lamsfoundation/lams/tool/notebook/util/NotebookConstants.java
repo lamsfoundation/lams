@@ -25,27 +25,41 @@
 package org.lamsfoundation.lams.tool.notebook.util;
 
 public interface NotebookConstants {
-	public static final String TOOL_SIGNATURE = "lantbk11";
-	
-	// Notebook session status
-	public static final Integer SESSION_NOT_STARTED = new Integer(0);
-	public static final Integer SESSION_IN_PROGRESS = new Integer(1);
-	public static final Integer SESSION_COMPLETED = new Integer(2);	
-	
-	public static final String AUTHORING_DEFAULT_TAB = "1";
-	public static final String ATTACHMENT_LIST = "attachmentList";
-	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
-	public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
-	public static final String AUTH_SESSION_ID = "authoringSessionId";
-	
-	public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
-	
-	// Attribute names
-	public static final String ATTR_MESSAGE = "message";
-	public static final String ATTR_SESSION_MAP = "sessionMap";
-	
-	// Parameter names
-	public static final String PARAM_PARENT_PAGE = "parentPage";
-	
-	static final String FILTER_REPLACE_TEXT = "***";
+    public static final String TOOL_SIGNATURE = "lantbk11";
+
+    // Notebook session status
+    public static final Integer SESSION_NOT_STARTED = new Integer(0);
+    public static final Integer SESSION_IN_PROGRESS = new Integer(1);
+    public static final Integer SESSION_COMPLETED = new Integer(2);
+
+    public static final String AUTHORING_DEFAULT_TAB = "1";
+    public static final String ATTACHMENT_LIST = "attachmentList";
+    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
+    public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
+    public static final String AUTH_SESSION_ID = "authoringSessionId";
+
+    public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
+
+    // Attribute names
+    public static final String ATTR_MESSAGE = "message";
+    public static final String ATTR_SESSION_MAP = "sessionMap";
+
+    // Parameter names
+    public static final String PARAM_PARENT_PAGE = "parentPage";
+
+    static final String FILTER_REPLACE_TEXT = "***";
+
+    public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
+    public static final String ATTR_CONDITION_SET = "conditionList";
+
+    public static final String PARAM_ORDER_ID = "orderId";
+    public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
+    public static final String TEXT_SEARCH_DEFINITION_NAME = "text.search.output.definition.notebook";
+    public static final String TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "text.search.output.definition.notebook.default.condition";
+    public static final String SUCCESS = "success";
+    public static final String ERROR_MSG_CONDITION = "error.condition";
+    public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
+    public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
+
+    public static final String DEFINE_LATER = "defineLater";
 }

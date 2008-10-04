@@ -26,12 +26,13 @@ package org.lamsfoundation.lams.tool.notebook.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -69,6 +70,7 @@ import org.lamsfoundation.lams.tool.notebook.dao.INotebookSessionDAO;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookUserDAO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment;
+import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
@@ -82,565 +84,571 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 /**
  * An implementation of the INotebookService interface.
  * 
- * As a requirement, all LAMS tool's service bean must implement
- * ToolContentManager and ToolSessionManager.
+ * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
-public class NotebookService implements ToolSessionManager, ToolContentManager,
-		INotebookService,  ToolContentImport102Manager {
+public class NotebookService implements ToolSessionManager, ToolContentManager, INotebookService,
+	ToolContentImport102Manager {
 
-	static Logger logger = Logger.getLogger(NotebookService.class.getName());
+    static Logger logger = Logger.getLogger(NotebookService.class.getName());
 
-	private INotebookDAO notebookDAO = null;
+    private INotebookDAO notebookDAO = null;
 
-	private INotebookSessionDAO notebookSessionDAO = null;
+    private INotebookSessionDAO notebookSessionDAO = null;
 
-	private INotebookUserDAO notebookUserDAO = null;
+    private INotebookUserDAO notebookUserDAO = null;
 
-	private INotebookAttachmentDAO notebookAttachmentDAO = null;
+    private INotebookAttachmentDAO notebookAttachmentDAO = null;
 
-	private ILearnerService learnerService;
+    private ILearnerService learnerService;
 
-	private ILamsToolService toolService;
+    private ILamsToolService toolService;
 
-	private IToolContentHandler notebookToolContentHandler = null;
+    private IToolContentHandler notebookToolContentHandler = null;
 
-	private IRepositoryService repositoryService = null;
+    private IRepositoryService repositoryService = null;
 
-	private IAuditService auditService = null;
+    private IAuditService auditService = null;
 
-	private IExportToolContentService exportContentService;
+    private IExportToolContentService exportContentService;
 
-	private ICoreNotebookService coreNotebookService;
+    private ICoreNotebookService coreNotebookService;
 
-	public NotebookService() {
-		super();
-		// TODO Auto-generated constructor stub
+    private NotebookOutputFactory notebookOutputFactory;
+
+    private Random generator = new Random();
+
+    public NotebookService() {
+	super();
+	// TODO Auto-generated constructor stub
+    }
+
+    /* ************ Methods from ToolSessionManager ************* */
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
+	if (NotebookService.logger.isDebugEnabled()) {
+	    NotebookService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
+		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
-	/* ************ Methods from ToolSessionManager ************* */
-	public void createToolSession(Long toolSessionId, String toolSessionName,
-			Long toolContentId) throws ToolException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering method createToolSession:"
-					+ " toolSessionId = " + toolSessionId
-					+ " toolSessionName = " + toolSessionName
-					+ " toolContentId = " + toolContentId);
-		}
+	NotebookSession session = new NotebookSession();
+	session.setSessionId(toolSessionId);
+	session.setSessionName(toolSessionName);
+	// learner starts
+	// TODO need to also set other fields.
+	Notebook notebook = notebookDAO.getByContentId(toolContentId);
+	session.setNotebook(notebook);
+	notebookSessionDAO.saveOrUpdate(session);
+    }
 
-		NotebookSession session = new NotebookSession();
-		session.setSessionId(toolSessionId);
-		session.setSessionName(toolSessionName);
-		// learner starts
-		// TODO need to also set other fields.
-		Notebook notebook = notebookDAO.getByContentId(toolContentId);
-		session.setNotebook(notebook);
-		notebookSessionDAO.saveOrUpdate(session);
+    public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
+	return learnerService.completeToolSession(toolSessionId, learnerId);
+    }
+
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
+	    ToolException {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+	notebookSessionDAO.deleteBySessionID(toolSessionId);
+	// TODO check if cascade worked
+    }
+
+    /**
+     * Get the tool output for the given tool output names.
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
+     *      java.lang.Long)
+     */
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
+	return getNotebookOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
+    }
+
+    /**
+     * Get the tool output for the given tool output name.
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
+     *      java.lang.Long)
+     */
+    public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
+	return getNotebookOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+
+    /* ************ Methods from ToolContentManager ************************* */
+
+    public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
+
+	if (NotebookService.logger.isDebugEnabled()) {
+	    NotebookService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
+		    + " toContentId=" + toContentId);
 	}
 
-	public String leaveToolSession(Long toolSessionId, Long learnerId)
-			throws DataMissingException, ToolException {
-		return learnerService.completeToolSession(toolSessionId, learnerId);
+	if (toContentId == null) {
+	    String error = "Failed to copy tool content: toContentID is null";
+	    throw new ToolException(error);
 	}
 
-	public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
-			throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
-		return null;
+	Notebook fromContent = null;
+	if (fromContentId != null) {
+	    fromContent = notebookDAO.getByContentId(fromContentId);
+	}
+	if (fromContent == null) {
+	    // create the fromContent using the default tool content
+	    fromContent = getDefaultContent();
+	}
+	Notebook toContent = Notebook.newInstance(fromContent, toContentId, notebookToolContentHandler);
+	notebookDAO.saveOrUpdate(toContent);
+    }
+
+    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
+	Notebook notebook = notebookDAO.getByContentId(toolContentId);
+	if (notebook == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	notebook.setDefineLater(value);
+	notebookDAO.saveOrUpdate(notebook);
+    }
+
+    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
+	Notebook notebook = notebookDAO.getByContentId(toolContentId);
+	if (notebook == null) {
+	    throw new ToolException("Could not find tool with toolContentID: " + toolContentId);
+	}
+	notebook.setRunOffline(value);
+	notebookDAO.saveOrUpdate(notebook);
+    }
+
+    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
+	    ToolException {
+	// TODO Auto-generated method stub
+    }
+
+    /**
+     * Export the XML fragment for the tool's content, along with any files needed for the content.
+     * 
+     * @throws DataMissingException
+     *                 if no tool content matches the toolSessionId
+     * @throws ToolException
+     *                 if any other error occurs
+     */
+
+    public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+	Notebook notebook = notebookDAO.getByContentId(toolContentId);
+	if (notebook == null) {
+	    notebook = getDefaultContent();
+	}
+	if (notebook == null) {
+	    throw new DataMissingException("Unable to find default content for the notebook tool");
 	}
 
-	public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
-			throws DataMissingException, ToolException {
-		// TODO Auto-generated method stub
-		return null;
+	// set ResourceToolContentHandler as null to avoid copy file node in
+	// repository again.
+	notebook = Notebook.newInstance(notebook, toolContentId, null);
+	notebook.setToolContentHandler(null);
+	notebook.setNotebookSessions(null);
+	Set<NotebookAttachment> atts = notebook.getNotebookAttachments();
+	for (NotebookAttachment att : atts) {
+	    att.setNotebook(null);
+	}
+	try {
+	    exportContentService.registerFileClassForExport(NotebookAttachment.class.getName(), "fileUuid",
+		    "fileVersionId");
+	    exportContentService.exportToolContent(toolContentId, notebook, notebookToolContentHandler, rootPath);
+	} catch (ExportToolContentException e) {
+	    throw new ToolException(e);
+	}
+    }
+
+    /**
+     * Import the XML fragment for the tool's content, along with any files needed for the content.
+     * 
+     * @throws ToolException
+     *                 if any other error occurs
+     */
+    public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
+	    String toVersion) throws ToolException {
+	try {
+	    exportContentService.registerFileClassForImport(NotebookAttachment.class.getName(), "fileUuid",
+		    "fileVersionId", "fileName", "fileType", null, null);
+
+	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, notebookToolContentHandler,
+		    fromVersion, toVersion);
+	    if (!(toolPOJO instanceof Notebook)) {
+		throw new ImportToolContentException("Import Notebook tool content failed. Deserialized object is "
+			+ toolPOJO);
+	    }
+	    Notebook notebook = (Notebook) toolPOJO;
+
+	    // reset it to new toolContentId
+	    notebook.setToolContentId(toolContentId);
+	    notebook.setCreateBy(new Long(newUserUid.longValue()));
+
+	    notebookDAO.saveOrUpdate(notebook);
+	} catch (ImportToolContentException e) {
+	    throw new ToolException(e);
+	}
+    }
+
+    /**
+     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
+     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
+     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * the toolContentId
+     * 
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     */
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+	Notebook notebook = getNotebookDAO().getByContentId(toolContentId);
+
+	if (notebook == null) {
+	    notebook = getDefaultContent();
+	}
+	// If there are no user added conditions, the default condition will be added in the output factory. It also
+	// needs to be persisted.
+	boolean defaultConditionToBeAdded = notebook.getConditions().isEmpty();
+	SortedMap<String, ToolOutputDefinition> map = getNotebookOutputFactory().getToolOutputDefinitions(notebook);
+	if (defaultConditionToBeAdded && !notebook.getConditions().isEmpty()) {
+	    saveOrUpdateNotebook(notebook);
+	}
+	return map;
+    }
+
+    /* ********** INotebookService Methods ********************************* */
+
+    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
+	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
+    }
+
+    public NotebookEntry getEntry(Long uid) {
+	return coreNotebookService.getEntry(uid);
+    }
+
+    public void updateEntry(Long uid, String entry) {
+	coreNotebookService.updateEntry(uid, "", entry);
+    }
+
+    public Long getDefaultContentIdBySignature(String toolSignature) {
+	Long toolContentId = null;
+	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	if (toolContentId == null) {
+	    String error = "Could not retrieve default content id for this tool";
+	    NotebookService.logger.error(error);
+	    throw new NotebookException(error);
+	}
+	return toolContentId;
+    }
+
+    public Notebook getDefaultContent() {
+	Long defaultContentID = getDefaultContentIdBySignature(NotebookConstants.TOOL_SIGNATURE);
+	Notebook defaultContent = getNotebookByContentId(defaultContentID);
+	if (defaultContent == null) {
+	    String error = "Could not retrieve default content record for this tool";
+	    NotebookService.logger.error(error);
+	    throw new NotebookException(error);
+	}
+	return defaultContent;
+    }
+
+    public Notebook copyDefaultContent(Long newContentID) {
+
+	if (newContentID == null) {
+	    String error = "Cannot copy the Notebook tools default content: + " + "newContentID is null";
+	    NotebookService.logger.error(error);
+	    throw new NotebookException(error);
 	}
 
-	public void removeToolSession(Long toolSessionId)
-			throws DataMissingException, ToolException {
-		notebookSessionDAO.deleteBySessionID(toolSessionId);
-		// TODO check if cascade worked
+	Notebook defaultContent = getDefaultContent();
+	// create new notebook using the newContentID
+	Notebook newContent = new Notebook();
+	newContent = Notebook.newInstance(defaultContent, newContentID, notebookToolContentHandler);
+	notebookDAO.saveOrUpdate(newContent);
+	return newContent;
+    }
+
+    public Notebook getNotebookByContentId(Long toolContentID) {
+	Notebook notebook = notebookDAO.getByContentId(toolContentID);
+	if (notebook == null) {
+	    NotebookService.logger.debug("Could not find the content with toolContentID:" + toolContentID);
+	}
+	return notebook;
+    }
+
+    public NotebookSession getSessionBySessionId(Long toolSessionId) {
+	NotebookSession notebookSession = notebookSessionDAO.getBySessionId(toolSessionId);
+	if (notebookSession == null) {
+	    NotebookService.logger.debug("Could not find the notebook session with toolSessionID:" + toolSessionId);
+	}
+	return notebookSession;
+    }
+
+    public NotebookUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
+	return notebookUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
+    }
+
+    public NotebookUser getUserByLoginNameAndSessionId(String loginName, Long toolSessionId) {
+	return notebookUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
+    }
+
+    public NotebookUser getUserByUID(Long uid) {
+	return notebookUserDAO.getByUID(uid);
+    }
+
+    public NotebookAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
+	if (file == null || StringUtils.isEmpty(file.getFileName())) {
+	    throw new NotebookException("Could not find upload file: " + file);
 	}
 
-	/** 
-	 * Get the tool output for the given tool output names.
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
-	 */
-	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
-			Long toolSessionId, Long learnerId) {
-		return new TreeMap<String,ToolOutput>();
+	NodeKey nodeKey = processFile(file, type);
+
+	NotebookAttachment attachment = new NotebookAttachment(nodeKey.getVersion(), type, file.getFileName(), nodeKey
+		.getUuid(), new Date());
+	return attachment;
+    }
+
+    public void deleteFromRepository(Long uuid, Long versionID) throws NotebookException {
+	ITicket ticket = getRepositoryLoginTicket();
+	try {
+	    repositoryService.deleteVersion(ticket, uuid, versionID);
+	} catch (Exception e) {
+	    throw new NotebookException("Exception occured while deleting files from" + " the repository "
+		    + e.getMessage());
 	}
+    }
 
-	/** 
-	 * Get the tool output for the given tool output name.
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
-	 */
-	public ToolOutput getToolOutput(String name, Long toolSessionId,
-			Long learnerId) {
-		return null;
+    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
+	notebookDAO.deleteInstructionFile(contentID, uuid, versionID, type);
+
+    }
+
+    public void saveOrUpdateNotebook(Notebook notebook) {
+	notebookDAO.saveOrUpdate(notebook);
+    }
+
+    public void saveOrUpdateNotebookSession(NotebookSession notebookSession) {
+	notebookSessionDAO.saveOrUpdate(notebookSession);
+    }
+
+    public void saveOrUpdateNotebookUser(NotebookUser notebookUser) {
+	notebookUserDAO.saveOrUpdate(notebookUser);
+    }
+
+    public NotebookUser createNotebookUser(UserDTO user, NotebookSession notebookSession) {
+	NotebookUser notebookUser = new NotebookUser(user, notebookSession);
+	saveOrUpdateNotebookUser(notebookUser);
+	return notebookUser;
+    }
+
+    public IAuditService getAuditService() {
+	return auditService;
+    }
+
+    public void setAuditService(IAuditService auditService) {
+	this.auditService = auditService;
+    }
+
+    private NodeKey processFile(FormFile file, String type) {
+	NodeKey node = null;
+	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+	    String fileName = file.getFileName();
+	    try {
+		node = getNotebookToolContentHandler().uploadFile(file.getInputStream(), fileName,
+			file.getContentType(), type);
+	    } catch (InvalidParameterException e) {
+		throw new NotebookException("InvalidParameterException occured while trying to upload File"
+			+ e.getMessage());
+	    } catch (FileNotFoundException e) {
+		throw new NotebookException("FileNotFoundException occured while trying to upload File"
+			+ e.getMessage());
+	    } catch (RepositoryCheckedException e) {
+		throw new NotebookException("RepositoryCheckedException occured while trying to upload File"
+			+ e.getMessage());
+	    } catch (IOException e) {
+		throw new NotebookException("IOException occured while trying to upload File" + e.getMessage());
+	    }
 	}
+	return node;
+    }
 
-	/* ************ Methods from ToolContentManager ************************* */
-
-	public void copyToolContent(Long fromContentId, Long toContentId)
-			throws ToolException {
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering method copyToolContent:" + " fromContentId="
-					+ fromContentId + " toContentId=" + toContentId);
-		}
-
-		if (toContentId == null) {
-			String error = "Failed to copy tool content: toContentID is null";
-			throw new ToolException(error);
-		}
-
-		Notebook fromContent = null;
-		if ( fromContentId != null ) 		{
-			fromContent = notebookDAO.getByContentId(fromContentId);
-		}
-		if (fromContent == null) {
-			// create the fromContent using the default tool content
-			fromContent = getDefaultContent();
-		}
-		Notebook toContent = Notebook.newInstance(fromContent, toContentId,
-				notebookToolContentHandler);
-		notebookDAO.saveOrUpdate(toContent);
+    /**
+     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
+     * access the Content Repository.
+     * 
+     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
+     * the tool needs to upload/download files from the content repository.
+     * 
+     * @return ITicket The ticket for repostory access
+     * @throws SubmitFilesException
+     */
+    private ITicket getRepositoryLoginTicket() throws NotebookException {
+	repositoryService = RepositoryProxy.getRepositoryService();
+	ICredentials credentials = new SimpleCredentials(NotebookToolContentHandler.repositoryUser,
+		NotebookToolContentHandler.repositoryId);
+	try {
+	    ITicket ticket = repositoryService.login(credentials, NotebookToolContentHandler.repositoryWorkspaceName);
+	    return ticket;
+	} catch (AccessDeniedException ae) {
+	    throw new NotebookException("Access Denied to repository." + ae.getMessage());
+	} catch (WorkspaceNotFoundException we) {
+	    throw new NotebookException("Workspace not found." + we.getMessage());
+	} catch (LoginException e) {
+	    throw new NotebookException("Login failed." + e.getMessage());
 	}
+    }
 
-	public void setAsDefineLater(Long toolContentId, boolean value)
-			throws DataMissingException, ToolException {
-		Notebook notebook = notebookDAO.getByContentId(toolContentId);
-		if (notebook == null) {
-			throw new ToolException("Could not find tool with toolContentID: "
-					+ toolContentId);
-		}
-		notebook.setDefineLater(value);
-		notebookDAO.saveOrUpdate(notebook);
-	}
-
-	public void setAsRunOffline(Long toolContentId, boolean value)
-			throws DataMissingException, ToolException {
-		Notebook notebook = notebookDAO.getByContentId(toolContentId);
-		if (notebook == null) {
-			throw new ToolException("Could not find tool with toolContentID: "
-					+ toolContentId);
-		}
-		notebook.setRunOffline(value);
-		notebookDAO.saveOrUpdate(notebook);
-	}
-
-	public void removeToolContent(Long toolContentId, boolean removeSessionData)
-			throws SessionDataExistsException, ToolException {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * Export the XML fragment for the tool's content, along with any files
-	 * needed for the content.
-	 * 
-	 * @throws DataMissingException
-	 *             if no tool content matches the toolSessionId
-	 * @throws ToolException
-	 *             if any other error occurs
-	 */
-
-	public void exportToolContent(Long toolContentId, String rootPath)
-			throws DataMissingException, ToolException {
-		Notebook notebook = notebookDAO.getByContentId(toolContentId);
-		if (notebook == null) {
-			notebook = getDefaultContent();
-		}
-		if (notebook == null)
- 			throw new DataMissingException("Unable to find default content for the notebook tool");
-
-		// set ResourceToolContentHandler as null to avoid copy file node in
-		// repository again.
-		notebook = Notebook.newInstance(notebook, toolContentId,
-				null);
-		notebook.setToolContentHandler(null);
-		notebook.setNotebookSessions(null);
-		Set<NotebookAttachment> atts = notebook.getNotebookAttachments();
-		for (NotebookAttachment att : atts) {
-			att.setNotebook(null);
-		}
-		try {
-			exportContentService.registerFileClassForExport(
-					NotebookAttachment.class.getName(), "fileUuid",
-					"fileVersionId");
-			exportContentService.exportToolContent(toolContentId,
-					notebook, notebookToolContentHandler, rootPath);
-		} catch (ExportToolContentException e) {
-			throw new ToolException(e);
-		}
-	}
-
-	/**
-	 * Import the XML fragment for the tool's content, along with any files
-	 * needed for the content.
-	 * 
-	 * @throws ToolException
-	 *             if any other error occurs
-	 */
-	public void importToolContent(Long toolContentId, Integer newUserUid,
-			String toolContentPath,String fromVersion,String toVersion) throws ToolException {
-		try {
-			exportContentService.registerFileClassForImport(
-					NotebookAttachment.class.getName(), "fileUuid",
-					"fileVersionId", "fileName", "fileType", null, null);
-
-			Object toolPOJO = exportContentService.importToolContent(
-					toolContentPath, notebookToolContentHandler,fromVersion,toVersion);
-			if (!(toolPOJO instanceof Notebook))
-				throw new ImportToolContentException(
-						"Import Notebook tool content failed. Deserialized object is "
-								+ toolPOJO);
-			Notebook notebook = (Notebook) toolPOJO;
-
-			// reset it to new toolContentId
-			notebook.setToolContentId(toolContentId);
-			notebook.setCreateBy(new Long(newUserUid.longValue()));
-
-			notebookDAO.saveOrUpdate(notebook);
-		} catch (ImportToolContentException e) {
-			throw new ToolException(e);
-		}
-	}
-
-	/** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
-	 * available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
-	 * such as the answer to the third question contains the word Koala and hence the need for the toolContentId
-	 * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-	 */
-	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-		return new TreeMap<String, ToolOutputDefinition>();
-	}
-
-	/* ********** INotebookService Methods ********************************* */
-
-	public Long createNotebookEntry(Long id, Integer idType, String signature,
-			Integer userID, String entry) {
-		return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-	}
-
-	public NotebookEntry getEntry(Long uid) {
-		return coreNotebookService.getEntry(uid);
-	}
-
-	public void updateEntry(Long uid, String entry) {
-		coreNotebookService.updateEntry(uid, "", entry);
-	}
-	
-	public Long getDefaultContentIdBySignature(String toolSignature) {
-		Long toolContentId = null;
-		toolContentId = new Long(toolService
-				.getToolDefaultContentIdBySignature(toolSignature));
-		if (toolContentId == null) {
-			String error = "Could not retrieve default content id for this tool";
-			logger.error(error);
-			throw new NotebookException(error);
-		}
-		return toolContentId;
-	}
-
-	public Notebook getDefaultContent() {
-		Long defaultContentID = getDefaultContentIdBySignature(NotebookConstants.TOOL_SIGNATURE);
-		Notebook defaultContent = getNotebookByContentId(defaultContentID);
-		if (defaultContent == null) {
-			String error = "Could not retrieve default content record for this tool";
-			logger.error(error);
-			throw new NotebookException(error);
-		}
-		return defaultContent;
-	}
-
-	public Notebook copyDefaultContent(Long newContentID) {
-
-		if (newContentID == null) {
-			String error = "Cannot copy the Notebook tools default content: + "
-					+ "newContentID is null";
-			logger.error(error);
-			throw new NotebookException(error);
-		}
-
-		Notebook defaultContent = getDefaultContent();
-		// create new notebook using the newContentID
-		Notebook newContent = new Notebook();
-		newContent = Notebook.newInstance(defaultContent, newContentID,
-				notebookToolContentHandler);
-		notebookDAO.saveOrUpdate(newContent);
-		return newContent;
-	}
-
-	public Notebook getNotebookByContentId(Long toolContentID) {
-		Notebook notebook = (Notebook) notebookDAO
-				.getByContentId(toolContentID);
-		if (notebook == null) {
-			logger.debug("Could not find the content with toolContentID:"
-					+ toolContentID);
-		}
-		return notebook;
-	}
-
-	public NotebookSession getSessionBySessionId(Long toolSessionId) {
-		NotebookSession notebookSession = notebookSessionDAO
-				.getBySessionId(toolSessionId);
-		if (notebookSession == null) {
-			logger
-					.debug("Could not find the notebook session with toolSessionID:"
-							+ toolSessionId);
-		}
-		return notebookSession;
-	}
-
-	public NotebookUser getUserByUserIdAndSessionId(Long userId,
-			Long toolSessionId) {
-		return notebookUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
-	}
-
-	public NotebookUser getUserByLoginNameAndSessionId(String loginName,
-			Long toolSessionId) {
-		return notebookUserDAO.getByLoginNameAndSessionId(loginName,
-				toolSessionId);
-	}
-
-	public NotebookUser getUserByUID(Long uid) {
-		return notebookUserDAO.getByUID(uid);
-	}
-
-	public NotebookAttachment uploadFileToContent(Long toolContentId,
-			FormFile file, String type) {
-		if (file == null || StringUtils.isEmpty(file.getFileName()))
-			throw new NotebookException("Could not find upload file: " + file);
-
-		NodeKey nodeKey = processFile(file, type);
-
-		NotebookAttachment attachment = new NotebookAttachment(nodeKey.getVersion(), type, file.getFileName(), nodeKey.getUuid(), new Date());
-		return attachment;
-	}
-
-	public void deleteFromRepository(Long uuid, Long versionID)
-			throws NotebookException {
-		ITicket ticket = getRepositoryLoginTicket();
-		try {
-			repositoryService.deleteVersion(ticket, uuid, versionID);
-		} catch (Exception e) {
-			throw new NotebookException(
-					"Exception occured while deleting files from"
-							+ " the repository " + e.getMessage());
-		}
-	}
-
-	public void deleteInstructionFile(Long contentID, Long uuid,
-			Long versionID, String type) {
-		notebookDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-
-	}
-
-	public void saveOrUpdateNotebook(Notebook notebook) {
-		notebookDAO.saveOrUpdate(notebook);
-	}
-
-	public void saveOrUpdateNotebookSession(NotebookSession notebookSession) {
-		notebookSessionDAO.saveOrUpdate(notebookSession);
-	}
-
-	public void saveOrUpdateNotebookUser(NotebookUser notebookUser) {
-		notebookUserDAO.saveOrUpdate(notebookUser);
-	}
-
-	public NotebookUser createNotebookUser(UserDTO user,
-			NotebookSession notebookSession) {
-		NotebookUser notebookUser = new NotebookUser(user, notebookSession);
-		saveOrUpdateNotebookUser(notebookUser);
-		return notebookUser;
-	}
-
-	public IAuditService getAuditService() {
-		return auditService;
-	}
-
-	public void setAuditService(IAuditService auditService) {
-		this.auditService = auditService;
-	}
-
-	private NodeKey processFile(FormFile file, String type) {
-		NodeKey node = null;
-		if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-			String fileName = file.getFileName();
-			try {
-				node = getNotebookToolContentHandler().uploadFile(
-						file.getInputStream(), fileName, file.getContentType(),
-						type);
-			} catch (InvalidParameterException e) {
-				throw new NotebookException(
-						"InvalidParameterException occured while trying to upload File"
-								+ e.getMessage());
-			} catch (FileNotFoundException e) {
-				throw new NotebookException(
-						"FileNotFoundException occured while trying to upload File"
-								+ e.getMessage());
-			} catch (RepositoryCheckedException e) {
-				throw new NotebookException(
-						"RepositoryCheckedException occured while trying to upload File"
-								+ e.getMessage());
-			} catch (IOException e) {
-				throw new NotebookException(
-						"IOException occured while trying to upload File"
-								+ e.getMessage());
-			}
-		}
-		return node;
-	}
-
-	/**
-	 * This method verifies the credentials of the SubmitFiles Tool and gives it
-	 * the <code>Ticket</code> to login and access the Content Repository.
-	 * 
-	 * A valid ticket is needed in order to access the content from the
-	 * repository. This method would be called evertime the tool needs to
-	 * upload/download files from the content repository.
-	 * 
-	 * @return ITicket The ticket for repostory access
-	 * @throws SubmitFilesException
-	 */
-	private ITicket getRepositoryLoginTicket() throws NotebookException {
-		repositoryService = RepositoryProxy.getRepositoryService();
-		ICredentials credentials = new SimpleCredentials(
-				NotebookToolContentHandler.repositoryUser,
-				NotebookToolContentHandler.repositoryId);
-		try {
-			ITicket ticket = repositoryService.login(credentials,
-					NotebookToolContentHandler.repositoryWorkspaceName);
-			return ticket;
-		} catch (AccessDeniedException ae) {
-			throw new NotebookException("Access Denied to repository."
-					+ ae.getMessage());
-		} catch (WorkspaceNotFoundException we) {
-			throw new NotebookException("Workspace not found."
-					+ we.getMessage());
-		} catch (LoginException e) {
-			throw new NotebookException("Login failed." + e.getMessage());
-		}
-	}
-
-	/* ===============Methods implemented from ToolContentImport102Manager =============== */
-	
+    /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /**
      * Import the data for a 1.0.2 Notebook
      */
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues)
-    {
-    	Date now = new Date();
-    	Notebook notebook = new Notebook();
-    	notebook.setContentInUse(Boolean.FALSE);
-    	notebook.setCreateBy(new Long(user.getUserID().longValue()));
-    	notebook.setCreateDate(now);
-    	notebook.setDefineLater(Boolean.FALSE);
-    	notebook.setInstructions(WebUtil.convertNewlines((String)importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-    	notebook.setLockOnFinished(Boolean.TRUE);
-    	notebook.setOfflineInstructions(null);
-    	notebook.setOnlineInstructions(null);
-    	notebook.setRunOffline(Boolean.FALSE);
-    	notebook.setTitle((String)importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-    	notebook.setToolContentId(toolContentId);
-    	notebook.setUpdateDate(now);
-    	notebook.setAllowRichEditor(Boolean.FALSE);
-    	// leave as empty, no need to set them to anything.
-    	//setNotebookAttachments(Set notebookAttachments);
-    	//setNotebookSessions(Set notebookSessions);
-    	notebookDAO.saveOrUpdate(notebook);
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
+	Date now = new Date();
+	Notebook notebook = new Notebook();
+	notebook.setContentInUse(Boolean.FALSE);
+	notebook.setCreateBy(new Long(user.getUserID().longValue()));
+	notebook.setCreateDate(now);
+	notebook.setDefineLater(Boolean.FALSE);
+	notebook.setInstructions(WebUtil.convertNewlines((String) importValues
+		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	notebook.setLockOnFinished(Boolean.TRUE);
+	notebook.setOfflineInstructions(null);
+	notebook.setOnlineInstructions(null);
+	notebook.setRunOffline(Boolean.FALSE);
+	notebook.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+	notebook.setToolContentId(toolContentId);
+	notebook.setUpdateDate(now);
+	notebook.setAllowRichEditor(Boolean.FALSE);
+	// leave as empty, no need to set them to anything.
+	// setNotebookAttachments(Set notebookAttachments);
+	// setNotebookSessions(Set notebookSessions);
+	notebookDAO.saveOrUpdate(notebook);
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
-    public void setReflectiveData(Long toolContentId, String title, String description) 
-    		throws ToolException, DataMissingException {
+    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
+	    DataMissingException {
 
-    	logger.warn("Setting the reflective field on a notebook. This doesn't make sense as the notebook is for reflection and we don't reflect on reflection!");
-    	Notebook notebook = getNotebookByContentId(toolContentId);
-    	if ( notebook == null ) {
-    		throw new DataMissingException("Unable to set reflective data titled "+title
-	       			+" on activity toolContentId "+toolContentId
-	       			+" as the tool content does not exist.");
-    	}
-    	
-    	notebook.setInstructions(description);
+	NotebookService.logger
+		.warn("Setting the reflective field on a notebook. This doesn't make sense as the notebook is for reflection and we don't reflect on reflection!");
+	Notebook notebook = getNotebookByContentId(toolContentId);
+	if (notebook == null) {
+	    throw new DataMissingException("Unable to set reflective data titled " + title
+		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
+	}
+
+	notebook.setInstructions(description);
     }
-    
-    //=========================================================================================
-	/* ********** Used by Spring to "inject" the linked objects ************* */
 
-	public INotebookAttachmentDAO getNotebookAttachmentDAO() {
-		return notebookAttachmentDAO;
-	}
+    // =========================================================================================
+    /* ********** Used by Spring to "inject" the linked objects ************* */
 
-	public void setNotebookAttachmentDAO(INotebookAttachmentDAO attachmentDAO) {
-		this.notebookAttachmentDAO = attachmentDAO;
-	}
+    public INotebookAttachmentDAO getNotebookAttachmentDAO() {
+	return notebookAttachmentDAO;
+    }
 
-	public INotebookDAO getNotebookDAO() {
-		return notebookDAO;
-	}
+    public void setNotebookAttachmentDAO(INotebookAttachmentDAO attachmentDAO) {
+	notebookAttachmentDAO = attachmentDAO;
+    }
 
-	public void setNotebookDAO(INotebookDAO notebookDAO) {
-		this.notebookDAO = notebookDAO;
-	}
+    public INotebookDAO getNotebookDAO() {
+	return notebookDAO;
+    }
 
-	public IToolContentHandler getNotebookToolContentHandler() {
-		return notebookToolContentHandler;
-	}
+    public void setNotebookDAO(INotebookDAO notebookDAO) {
+	this.notebookDAO = notebookDAO;
+    }
 
-	public void setNotebookToolContentHandler(
-			IToolContentHandler notebookToolContentHandler) {
-		this.notebookToolContentHandler = notebookToolContentHandler;
-	}
+    public IToolContentHandler getNotebookToolContentHandler() {
+	return notebookToolContentHandler;
+    }
 
-	public INotebookSessionDAO getNotebookSessionDAO() {
-		return notebookSessionDAO;
-	}
+    public void setNotebookToolContentHandler(IToolContentHandler notebookToolContentHandler) {
+	this.notebookToolContentHandler = notebookToolContentHandler;
+    }
 
-	public void setNotebookSessionDAO(INotebookSessionDAO sessionDAO) {
-		this.notebookSessionDAO = sessionDAO;
-	}
+    public INotebookSessionDAO getNotebookSessionDAO() {
+	return notebookSessionDAO;
+    }
 
-	public ILamsToolService getToolService() {
-		return toolService;
-	}
+    public void setNotebookSessionDAO(INotebookSessionDAO sessionDAO) {
+	notebookSessionDAO = sessionDAO;
+    }
 
-	public void setToolService(ILamsToolService toolService) {
-		this.toolService = toolService;
-	}
+    public ILamsToolService getToolService() {
+	return toolService;
+    }
 
-	public INotebookUserDAO getNotebookUserDAO() {
-		return notebookUserDAO;
-	}
+    public void setToolService(ILamsToolService toolService) {
+	this.toolService = toolService;
+    }
 
-	public void setNotebookUserDAO(INotebookUserDAO userDAO) {
-		this.notebookUserDAO = userDAO;
-	}
+    public INotebookUserDAO getNotebookUserDAO() {
+	return notebookUserDAO;
+    }
 
-	public ILearnerService getLearnerService() {
-		return learnerService;
-	}
+    public void setNotebookUserDAO(INotebookUserDAO userDAO) {
+	notebookUserDAO = userDAO;
+    }
 
-	public void setLearnerService(ILearnerService learnerService) {
-		this.learnerService = learnerService;
-	}
+    public ILearnerService getLearnerService() {
+	return learnerService;
+    }
 
-	public IExportToolContentService getExportContentService() {
-		return exportContentService;
-	}
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
 
-	public void setExportContentService(
-			IExportToolContentService exportContentService) {
-		this.exportContentService = exportContentService;
-	}
+    public IExportToolContentService getExportContentService() {
+	return exportContentService;
+    }
 
-	public ICoreNotebookService getCoreNotebookService() {
-		return coreNotebookService;
-	}
+    public void setExportContentService(IExportToolContentService exportContentService) {
+	this.exportContentService = exportContentService;
+    }
 
-	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-		this.coreNotebookService = coreNotebookService;
+    public ICoreNotebookService getCoreNotebookService() {
+	return coreNotebookService;
+    }
+
+    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+	this.coreNotebookService = coreNotebookService;
+    }
+
+    public NotebookOutputFactory getNotebookOutputFactory() {
+	return notebookOutputFactory;
+    }
+
+    public void setNotebookOutputFactory(NotebookOutputFactory notebookOutputFactory) {
+	this.notebookOutputFactory = notebookOutputFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String createConditionName(Collection<NotebookCondition> existingConditions) {
+	String uniqueNumber = null;
+	do {
+	    uniqueNumber = String.valueOf(Math.abs(generator.nextInt()));
+	    for (NotebookCondition condition : existingConditions) {
+		String[] splitedName = getNotebookOutputFactory().splitConditionName(condition.getName());
+		if (uniqueNumber.equals(splitedName[1])) {
+		    uniqueNumber = null;
+		}
+	    }
+	} while (uniqueNumber == null);
+	return getNotebookOutputFactory().buildConditionName(uniqueNumber);
+    }
+
+    public void releaseConditionsFromCache(Notebook notebook) {
+	if (notebook.getConditions() != null) {
+	    for (NotebookCondition condition : notebook.getConditions()) {
+		getNotebookDAO().releaseFromCache(condition);
+	    }
 	}
+    }
 }
