@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,13 +43,10 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 
 /**
@@ -62,8 +58,7 @@ import org.lamsfoundation.lams.util.HashUtil;
 /**
  * struts doclets
  * 
- * @struts:action path="/usersave" name="UserForm" input=".user" scope="request"
- *                validate="false"
+ * @struts:action path="/usersave" name="UserForm" input=".user" scope="request" validate="false"
  * 
  * @struts:action-forward name="user" path="/user.do?method=edit"
  * @struts:action-forward name="userlist" path="/usermanage.do"
@@ -72,132 +67,138 @@ import org.lamsfoundation.lams.util.HashUtil;
  */
 public class UserSaveAction extends Action {
 
-	private static Logger log = Logger.getLogger(UserSaveAction.class);
-	private static IUserManagementService service;
+    private static Logger log = Logger.getLogger(UserSaveAction.class);
+    private static IUserManagementService service;
 
-	@SuppressWarnings("unchecked")
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+    @Override
+    @SuppressWarnings("unchecked")
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		
-		// action input
-		ActionMessages errors = new ActionMessages();
-		DynaActionForm userForm = (DynaActionForm) form;
-		Integer orgId = (Integer) userForm.get("orgId");
-		Integer userId = (Integer) userForm.get("userId");
-		
-		log.debug("orgId: " + orgId);
-		Boolean edit = false;
-		Boolean passwordChanged = true;
-		SupportedLocale locale = (SupportedLocale)service.findById(SupportedLocale.class, (Integer)userForm.get("localeId"));
-		log.debug("locale: " + locale);
-		
-		if (isCancelled(request)) {
-			if (orgId==null || orgId==0) {
-				return mapping.findForward("usersearch");
-			}
-			request.setAttribute("org", orgId);
-			return mapping.findForward("userlist");
-		}
+	UserSaveAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
 
-		User user = null;
-		if (userId != 0) {
-			edit = true;
-			user = (User)service.findById(User.class, userId);
-		}
+	// action input
+	ActionMessages errors = new ActionMessages();
+	DynaActionForm userForm = (DynaActionForm) form;
+	Integer orgId = (Integer) userForm.get("orgId");
+	Integer userId = (Integer) userForm.get("userId");
 
-		// (dyna)form validation
-		userForm.set("login", userForm.getString("login").trim());
-		if ((userForm.get("login") == null) || (userForm.getString("login").length() == 0)) {
-			errors.add("login", new ActionMessage("error.login.required"));
-		}
-		if (service.getUserByLogin(userForm.getString("login")) != null) {
-			if (user != null && StringUtils.equals(user.getLogin(),userForm.getString("login"))) {
-				// login exists - it's the user's current login
-			} else {
-				errors.add("login", new ActionMessage("error.login.unique", "("+userForm.getString("login")+")"));
-			}
-		}		
-		if (!StringUtils.equals((String)userForm.get("password"),((String)userForm.get("password2")))) {
-			errors.add("password", new ActionMessage("error.newpassword.mismatch"));
-		}
-		if ((userForm.get("password") == null) || (userForm.getString("password").trim().length() == 0)) {
-			passwordChanged = false;
-			if (!edit) errors.add("password", new ActionMessage("error.password.required"));
-		}
-		if ((userForm.get("firstName") == null) || (userForm.getString("firstName").trim().length() == 0)) {
-			errors.add("firstName", new ActionMessage("error.firstname.required"));
-		}
-		if ((userForm.get("lastName") == null) || (userForm.getString("lastName").trim().length() == 0)) {
-			errors.add("lastName", new ActionMessage("error.lastname.required"));
-		}
-		if ((userForm.get("email") == null) || (userForm.getString("email").trim().length() == 0)) {
-			errors.add("email", new ActionMessage("error.email.required"));
-		} else {
-			Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
-			Matcher m = p.matcher(userForm.getString("email"));
-			if (!m.matches()) {
-				errors.add("email", new ActionMessage("error.valid.email.required"));
-			}
-		}
-		
-		if (errors.isEmpty()) {
-			if (edit) { // edit user
-				log.debug("editing userId: " + userId);
-				// hash the new password if necessary, and audit the fact
-				if (passwordChanged) {
-					service.auditPasswordChanged(user, AdminConstants.MODULE_NAME);
-					userForm.set("password", HashUtil.sha1((String)userForm.get("password")));
-				} else {
-					userForm.set("password", user.getPassword());
-				}
-				BeanUtils.copyProperties(user, userForm);
-				user.setLocale(locale);
-			} else { // create user
-				user = new User();
-				userForm.set("password", HashUtil.sha1((String)userForm.get("password")));
-				BeanUtils.copyProperties(user, userForm);
-				log.debug("creating user... new login: " + user.getLogin());
-				if (errors.isEmpty()) {
-					// TODO set flash/html themes according to user input instead of server default.
-					user.setFlashTheme(service.getDefaultFlashTheme());
-					user.setHtmlTheme(service.getDefaultHtmlTheme());
-					user.setDisabledFlag(false);
-					user.setCreateDate(new Date());
-					user.setAuthenticationMethod((AuthenticationMethod)service.findByProperty(AuthenticationMethod.class,
-							"authenticationMethodName","LAMS-Database").get(0));
-					user.setUserId(null);
-					user.setLocale(locale);
-					service.save(user);
-					
-					// make 'create user' audit log entry
-					service.auditUserCreated(user, AdminConstants.MODULE_NAME);
-					
-					log.debug("user: " + user.toString());
-				}
-			}
-		}
+	UserSaveAction.log.debug("orgId: " + orgId);
+	Boolean edit = false;
+	Boolean passwordChanged = true;
+	SupportedLocale locale = (SupportedLocale) UserSaveAction.service.findById(SupportedLocale.class,
+		(Integer) userForm.get("localeId"));
+	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service.findById(
+		AuthenticationMethod.class, (Integer) userForm.get("authenticationMethodId"));
+	UserSaveAction.log.debug("locale: " + locale);
+	UserSaveAction.log.debug("authenticationMethod:" + authenticationMethod);
 
-		
-		if (errors.isEmpty()) {
-			if (orgId==null || orgId==0) {
-				return mapping.findForward("usersearch");
-			}
-			if (edit) {
-				request.setAttribute("org", orgId);
-				return mapping.findForward("userlist");
-			} else {
-				request.setAttribute("orgId", orgId);
-				request.setAttribute("userId", user.getUserId());
-				return mapping.findForward("userroles");
-			}
-		} else {
-			saveErrors(request, errors);
-			request.setAttribute("orgId", orgId);
-			return mapping.findForward("user");
-		}
+	if (isCancelled(request)) {
+	    if (orgId == null || orgId == 0) {
+		return mapping.findForward("usersearch");
+	    }
+	    request.setAttribute("org", orgId);
+	    return mapping.findForward("userlist");
 	}
-	
+
+	User user = null;
+	if (userId != 0) {
+	    edit = true;
+	    user = (User) UserSaveAction.service.findById(User.class, userId);
+	}
+
+	// (dyna)form validation
+	userForm.set("login", userForm.getString("login").trim());
+	if (userForm.get("login") == null || userForm.getString("login").length() == 0) {
+	    errors.add("login", new ActionMessage("error.login.required"));
+	}
+	if (UserSaveAction.service.getUserByLogin(userForm.getString("login")) != null) {
+	    if (user != null && StringUtils.equals(user.getLogin(), userForm.getString("login"))) {
+		// login exists - it's the user's current login
+	    } else {
+		errors.add("login", new ActionMessage("error.login.unique", "(" + userForm.getString("login") + ")"));
+	    }
+	}
+	if (!StringUtils.equals((String) userForm.get("password"), ((String) userForm.get("password2")))) {
+	    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
+	}
+	if (userForm.get("password") == null || userForm.getString("password").trim().length() == 0) {
+	    passwordChanged = false;
+	    if (!edit) {
+		errors.add("password", new ActionMessage("error.password.required"));
+	    }
+	}
+	if (userForm.get("firstName") == null || userForm.getString("firstName").trim().length() == 0) {
+	    errors.add("firstName", new ActionMessage("error.firstname.required"));
+	}
+	if (userForm.get("lastName") == null || userForm.getString("lastName").trim().length() == 0) {
+	    errors.add("lastName", new ActionMessage("error.lastname.required"));
+	}
+	if (userForm.get("email") == null || userForm.getString("email").trim().length() == 0) {
+	    errors.add("email", new ActionMessage("error.email.required"));
+	} else {
+	    Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+	    Matcher m = p.matcher(userForm.getString("email"));
+	    if (!m.matches()) {
+		errors.add("email", new ActionMessage("error.valid.email.required"));
+	    }
+	}
+
+	if (errors.isEmpty()) {
+	    if (edit) { // edit user
+		UserSaveAction.log.debug("editing userId: " + userId);
+		// hash the new password if necessary, and audit the fact
+		if (passwordChanged) {
+		    UserSaveAction.service.auditPasswordChanged(user, AdminConstants.MODULE_NAME);
+		    userForm.set("password", HashUtil.sha1((String) userForm.get("password")));
+		} else {
+		    userForm.set("password", user.getPassword());
+		}
+		BeanUtils.copyProperties(user, userForm);
+		user.setLocale(locale);
+		user.setAuthenticationMethod(authenticationMethod);
+	    } else { // create user
+		user = new User();
+		userForm.set("password", HashUtil.sha1((String) userForm.get("password")));
+		BeanUtils.copyProperties(user, userForm);
+		UserSaveAction.log.debug("creating user... new login: " + user.getLogin());
+		if (errors.isEmpty()) {
+		    // TODO set flash/html themes according to user input instead of server default.
+		    user.setFlashTheme(UserSaveAction.service.getDefaultFlashTheme());
+		    user.setHtmlTheme(UserSaveAction.service.getDefaultHtmlTheme());
+		    user.setDisabledFlag(false);
+		    user.setCreateDate(new Date());
+		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service.findByProperty(
+			    AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database").get(0));
+		    user.setUserId(null);
+		    user.setLocale(locale);
+		    UserSaveAction.service.save(user);
+
+		    // make 'create user' audit log entry
+		    UserSaveAction.service.auditUserCreated(user, AdminConstants.MODULE_NAME);
+
+		    UserSaveAction.log.debug("user: " + user.toString());
+		}
+	    }
+	}
+
+	if (errors.isEmpty()) {
+	    if (orgId == null || orgId == 0) {
+		return mapping.findForward("usersearch");
+	    }
+	    if (edit) {
+		request.setAttribute("org", orgId);
+		return mapping.findForward("userlist");
+	    } else {
+		request.setAttribute("orgId", orgId);
+		request.setAttribute("userId", user.getUserId());
+		return mapping.findForward("userroles");
+	    }
+	} else {
+	    saveErrors(request, errors);
+	    request.setAttribute("orgId", orgId);
+	    return mapping.findForward("user");
+	}
+    }
+
 }

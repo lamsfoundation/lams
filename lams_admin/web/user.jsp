@@ -47,6 +47,18 @@
 					<td><html-el:password property="password2" size="50" maxlength="50" /></td>
 				</tr>
 				<tr>
+					<td class="align-right"><fmt:message key="admin.user.authentication.method"/>:</td>
+					<td>
+						<html-el:select property="authenticationMethodId">
+							<c:forEach items="${authenticationMethods}" var="method">
+								<html-el:option value="${method.authenticationMethodId}">
+									<c:out value="${method.authenticationMethodName}" />
+								</html-el:option>
+							</c:forEach>	
+						</html-el:select>
+					</td>
+				</tr>
+				<tr>
 					<td class="align-right"><fmt:message key="admin.user.title"/>:</td>
 					<td><html-el:text property="title" size="32" maxlength="32" /></td>
 				</tr>
