@@ -63,8 +63,8 @@ class ViewCompetencesDialog extends MovieClip implements Dialog{
 	//Dimensions for resizing
     private var xCloseOffset:Number;
     private var yCloseOffset:Number;
-	private var xScrollPaneOffset:Number;
-	private var yScrollPaneOffset:Number;
+	private var xContentOffset:Number;
+	private var yContentOffset:Number;
 	
 	private var _lessonTabView:LessonTabView;
 	private var _monitorModel:MonitorModel;
@@ -127,8 +127,8 @@ class ViewCompetencesDialog extends MovieClip implements Dialog{
         //work out offsets from bottom RHS of panel
         xCloseOffset = panel._width - close_btn._x;
         yCloseOffset = panel._height - close_btn._y;
-		xScrollPaneOffset = 15.1;
-		yScrollPaneOffset = 73.1;
+		xContentOffset = 15.1;
+		yContentOffset = 73.1;
 		
 		loadCompetences();
 		
@@ -276,8 +276,9 @@ class ViewCompetencesDialog extends MovieClip implements Dialog{
 		//Size the panel
 		panel.setSize(w,h);
 
-		competences_scp.setSize(w-xScrollPaneOffset, h-yScrollPaneOffset);
-		
+		competences_scp.setSize(w-xContentOffset, h-yContentOffset);
+		competences_lbl.setSize(w-xContentOffset, h-yContentOffset);
+
         //Buttons
         close_btn.move(w-xCloseOffset,h-yCloseOffset);
 		
