@@ -218,7 +218,6 @@ public class AuthoringActivityDTO extends BaseDTO {
      * GroupingActivity. For the groupings array see LearningDesignDTO.
      */
     // private GroupingDTO groupingDTO;
-
     /**
      * Single Library can have one or more activities defined inside it. This field indicates which activity is this.
      */
@@ -954,7 +953,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *                The groupingID to set.
      */
     public void setGroupingID(Long groupingID) {
-	if (!groupingID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
+	if (!WDDXTAGS.NUMERIC_NULL_VALUE_LONG.equals(groupingID)) {
 	    this.groupingID = groupingID;
 	}
     }
@@ -964,7 +963,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *                The groupingUIID to set.
      */
     public void setGroupingUIID(Integer groupingUIID) {
-	if (!groupingUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
+	if (!WDDXTAGS.NUMERIC_NULL_VALUE_LONG.equals(groupingUIID)) {
 	    this.groupingUIID = groupingUIID;
 	}
     }

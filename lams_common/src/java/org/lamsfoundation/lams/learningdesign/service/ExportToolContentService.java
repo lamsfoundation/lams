@@ -468,11 +468,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		ldDto.setTitle(ldDto.getTitle().concat(ExportToolContentService.IMS_FILE_NAME_EXT));
 	    }
 
-	    XStream designXml = new XStream();
-	    designXml.toXML(ldDto, ldFile);
-	    ldFile.close();
-
-	    log.debug("Learning design xml export success");
+	    /*
+	     * learning design DTO is ready to be written into XML, but we need to find out which groupings and
+	     * branching mappings are not supposed to be included into the structure (LDEV-1825)
+	     */
+	    Set<Long> groupingsToSkip = new TreeSet<Long>();
+	    // for these branching activities there will be no branching mappings saved into XML, since they will be
+	    // recreated in monitoring
+	    Set<Integer> branchingActivitiesToSkip = new TreeSet<Integer>();
 
 	    // iterator all activities in this learning design and export their content to given folder.
 	    // The content will contain tool.xml and attachment files of tools from LAMS repository.
@@ -484,9 +487,25 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // iterator all activities and export tool.xml and its attachments
 	    for (AuthoringActivityDTO activity : activities) {
 
+		int activityTypeID = activity.getActivityTypeID().intValue();
+		// for teacher chosen and tool based branching activities there should be no groupings saved to XML
+		if (activityTypeID == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE
+			|| activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
+		    Long groupingID = activity.getGroupingID();
+		    if (groupingID != null) {
+			groupingsToSkip.add(groupingID);
+		    }
+		    activity.setApplyGrouping(false);
+		    activity.setGroupingID(null);
+		    activity.setGroupingUIID(null);
+		    continue;
+		}
+		// for group based define later branching activities there should be no branching mappings saved to XML
+		if (activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE && activity.getDefineLater()) {
+		    branchingActivitiesToSkip.add(activity.getActivityUIID());
+		}
 		// skip non-tool activities
-		if (activity.getActivityTypeID().intValue() != Activity.TOOL_ACTIVITY_TYPE) {
-
+		if (activityTypeID != Activity.TOOL_ACTIVITY_TYPE) {
 		    continue;
 		}
 
@@ -516,6 +535,28 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    handleIMS(rootDir, activity, resChildren);
 		}
 	    } // end all activities export
+
+	    // skipping unwanted elements; learning design DTO is altered but not persisted;
+	    Iterator<GroupingDTO> groupingIter = ldDto.getGroupings().iterator();
+	    while (groupingIter.hasNext()) {
+		if (groupingsToSkip.contains(groupingIter.next().getGroupingID())) {
+		    groupingIter.remove();
+		}
+	    }
+
+	    Iterator<BranchActivityEntryDTO> branchMappingsIter = ldDto.getBranchMappings().iterator();
+	    while (branchMappingsIter.hasNext()) {
+		if (branchingActivitiesToSkip.contains(branchMappingsIter.next().getBranchingActivityUIID())) {
+		    branchMappingsIter.remove();
+		}
+	    }
+
+	    // exporting XML
+	    XStream designXml = new XStream();
+	    designXml.toXML(ldDto, ldFile);
+	    ldFile.close();
+
+	    log.debug("Learning design xml export success");
 
 	    try {
 		// handle IMS format
