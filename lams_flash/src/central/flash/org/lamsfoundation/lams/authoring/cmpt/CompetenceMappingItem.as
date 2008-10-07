@@ -63,10 +63,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceMappingItem extends Movie
     private var themeManager:ThemeManager;  //Theme manager
 	
     //Dimensions for resizing
-    private var xOkOffset:Number;
-    private var yOkOffset:Number;
-    private var xCancelOffset:Number;
-    private var yCancelOffset:Number;
+    private var xTextFieldOffset:Number;
 
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -109,6 +106,9 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceMappingItem extends Movie
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
         setStyles();
+		
+		//dimensions for resizing
+		xTextFieldOffset = 100;
 		
         //fire event to say we have loaded
 		_container.contentLoaded();
@@ -168,9 +168,13 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceMappingItem extends Movie
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number):Void{
+		
 		//Size the panel
         _bgpanel.setSize(w,h);
 		
+		competence_title_txt.setSize(w - xTextFieldOffset, competence_title_txt._height);
+		_map_competence_checkbox.move(40.1 + competence_title_txt._width + 14.3, _map_competence_checkbox._y);
+
     }
     
     //Gets+Sets

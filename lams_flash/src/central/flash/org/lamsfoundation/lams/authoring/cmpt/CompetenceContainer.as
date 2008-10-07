@@ -32,6 +32,8 @@ import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.authoring.br.*
 import org.lamsfoundation.lams.authoring.cmpt.*;
+import org.lamsfoundation.lams.authoring.cv.CanvasModel;
+import org.lamsfoundation.lams.monitoring.mv.MonitorModel;
  
 import mx.controls.*
 import mx.utils.*
@@ -46,6 +48,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
 
     //References to components + clips 
     private var _container:MovieClip;  //The container window that holds the dialog
+	private var _container_base_mc:MovieClip;
 	
 	private var _competenceTitle:String;
 	private var _description:String;
@@ -66,8 +69,15 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
     private var fm:FocusManager;            //Reference to focus manager
     private var themeManager:ThemeManager;  //Theme manager
 	
+	private var _model:Observable; //passed in in init
+	
     //Dimensions for resizing
-    private var xOkOffset:Number;
+	private var containerWidthOffset:Number;
+	private	var containerWidth:Number;
+	private	var xTextFieldOffset:Number;
+	private	var xTextAreaOffset:Number;
+    
+	private var xOkOffset:Number;
     private var yOkOffset:Number;
     private var xCancelOffset:Number;
     private var yCancelOffset:Number;
@@ -96,7 +106,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
     private function init():Void{
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
-        
+		
         //set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
 		
@@ -124,8 +134,9 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
         delete_competence_btn.addEventListener('click',Delegate.create(this, deleteHandler));
 		
         //work out offsets from bottom RHS of panel
-        xOkOffset = _bgpanel._width;// - close_btn._x;
-        yOkOffset = _bgpanel._height;// - close_btn._y;
+        xOkOffset = _bgpanel._width;
+        yOkOffset = _bgpanel._height;
+		containerWidthOffset = 77.1; // width of dialog minus width of container
         
         //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
@@ -265,14 +276,31 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
     public function click(e:Object):Void{
         e.target.deletePopUp();
     }
-    
+	
     /**
     * Main resize method, called by scrollpane container/parent
     */
     public function setSize(w:Number,h:Number):Void{
-		//Size the panel
-        _bgpanel.setSize(w,h);
 		
+		var containerWidth:Number = w - containerWidthOffset;
+		
+		var xTextFieldOffset:Number = 240;
+		var xTextAreaOffset:Number = 180;
+
+		if (_model != null && _model != undefined) {
+			if (_model instanceof MonitorModel) {
+				xTextFieldOffset = 150;
+				xTextAreaOffset = 96.9;
+			}
+		}
+		
+		_container_base_mc.setSize(containerWidth,_container_base_mc._height);
+		
+		competence_title_txt.setSize(w-xTextFieldOffset, competence_title_txt._height);		
+		competence_description_txt.setSize(w-xTextAreaOffset, 44);
+		
+		edit_competence_btn.move((competence_description_txt._x+competence_description_txt._width+12), edit_competence_btn._y);
+		delete_competence_btn.move((competence_description_txt._x+competence_description_txt._width+12), delete_competence_btn._y);
     }
     
     //Gets+Sets

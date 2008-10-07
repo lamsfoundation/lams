@@ -272,6 +272,10 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceMappingDialog extends Mov
 
 		competence_mapping_scp.setSize(w, h-80);
 		
+		for (var i=0; i<competenceItemMCs.length; ++i) {
+			CompetenceMappingItem(competenceItemMCs[i]).setSize(this._width, this._height);
+		}
+		
         //Buttons
         close_btn.move(w-xOkOffset,h-yOkOffset);
 		

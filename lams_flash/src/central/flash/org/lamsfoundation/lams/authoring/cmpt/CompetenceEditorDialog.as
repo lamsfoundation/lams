@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.common.style.*
 import org.lamsfoundation.lams.authoring.*
 import org.lamsfoundation.lams.authoring.br.*
 
+import org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer;
 import org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog;
 import org.lamsfoundation.lams.authoring.cv.CanvasModel;
 import org.lamsfoundation.lams.monitoring.mv.MonitorModel;
@@ -62,6 +63,8 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
 	private var main_mc:MovieClip
 	private var competenceContainerLayer:MovieClip;
 	private var definitionDialog:MovieClip;
+	
+	private var containerArray:Array;
 	
 	private var competence_editor_scp:ScrollPane;
 		
@@ -158,7 +161,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
 			// other model types not currently supported
 		}
 
-		draw();
+		draw(model);
 		this._visible = true;
 	}
 	
@@ -187,21 +190,30 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
 		return competenceKeys;
 	}
 	
-	public function draw() {
+	public function draw(m:Observable) {
 		
 		var competenceKeys:Array = getCompetenceKeysToDraw();
 		competenceKeys.sort();
 		
 		yContainerOffset = 0;
+		containerArray = new Array();
 		
 		for (var i=0; i<competenceKeys.length; i++) {
 			
 			var titleKey:String = competenceKeys[i];		
 			var descriptionValue:String = (model instanceof MonitorModel) ? app.monitor.ddm.competences.get(competenceKeys[i]) : app.getDesignDataModel().competences.get(competenceKeys[i]);
 			var competenceTitle:String = new String("competenceContainer_"+titleKey);
-			var mc:MovieClip = competenceContainerLayer.attachMovie("competenceContainer", competenceTitle, competenceContainerLayer.getNextHighestDepth(), {_x:0, _y:yContainerOffset, _competenceTitle:titleKey, _description:descriptionValue});
-
+			var mc:MovieClip = competenceContainerLayer.attachMovie("competenceContainer", competenceTitle, competenceContainerLayer.getNextHighestDepth(), {_x:0, _y:yContainerOffset, _competenceTitle:titleKey, _description:descriptionValue, _model:m});
+			
+			containerArray.push(mc);
 			yContainerOffset = yContainerOffset + 120;
+		}
+		
+		MovieClipUtils.doLater(Delegate.create(this, resizeContainers));
+	}
+	
+	public function resizeContainers() {		for (var i=0; i<containerArray.length; ++i) {
+			CompetenceContainer(containerArray[i]).setSize(this._width, this._height);
 		}
 		
 		competence_editor_scp.invalidate();
@@ -291,6 +303,10 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
         _bgpanel.setSize(w,h);
 
 		competence_editor_scp.setSize(w-45, h-82);
+		
+		for (var i=0; i<containerArray.length; ++i) {
+			CompetenceContainer(containerArray[i]).setSize(w,h);
+		}
 		
         //Buttons
 		add_competence_btn.move(add_competence_btn._x,h-yOkOffset);
