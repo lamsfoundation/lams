@@ -26,9 +26,29 @@ package org.lamsfoundation.lams.tool.dimdim.util;
 
 import java.util.Random;
 
+import javax.servlet.http.HttpServletRequest;
+
 public class DimdimUtil {
 
     public static String generateMeetingKey() {
 	return new Long(System.currentTimeMillis()).toString() + "-" + (new Random().nextInt());
+    }
+
+    public static String generateReturnURL(HttpServletRequest request) {
+	String protocol = request.getProtocol();
+	if (protocol.startsWith("HTTPS")) {
+	    protocol = "https://";
+	} else {
+	    protocol = "http://";
+	}
+
+	String path = protocol + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+	if (!path.endsWith("/")) {
+	    path = path + "/";
+	}
+
+	path += "endMeeting.do";
+
+	return path;
     }
 }

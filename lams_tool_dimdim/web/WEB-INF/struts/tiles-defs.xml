@@ -44,14 +44,6 @@
 	</definition>
 	<!-- End: Headers -->
 
-	<definition name="tiles:/generic/message" extends="tiles:/layout:simple">
-		<put name="pageTitleKey" value="pageTitle.authoring" />
-		<put name="header" value="tiles:/header:tabbed" />
-		<put name="body" value="/common/message.jsp"></put>
-	</definition>
-	<!-- End: Generic -->
-
-
 	<!-- Begin: Authoring -->
 	<definition name="tiles:/authoring/main" extends="tiles:/layout:tabbed">
 		<put name="pageTitleKey" value="pageTitle.authoring" />
@@ -110,5 +102,11 @@
 		<put name="body" value="/pages/admin/admin.jsp" />
 	</definition>
 	<!-- End Admin -->
+	
+	<!-- Begin Dimdim -->
+	<definition name="tiles:/dimdim/end_meeting" extends="tiles:/layout:simple">
+		<put name="body" value="/pages/dimdim/end_meeting.jsp" />
+	</definition>
+	<!-- End Dimdim -->
 	
 </tiles-definitions>

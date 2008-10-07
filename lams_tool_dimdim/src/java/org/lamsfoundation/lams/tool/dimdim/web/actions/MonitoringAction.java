@@ -136,7 +136,10 @@ public class MonitoringAction extends DispatchAction {
 	session.setMeetingKey(meetingKey);
 	dimdimService.saveOrUpdateDimdimSession(session);
 
-	String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey());
+	String returnURL = DimdimUtil.generateReturnURL(request);
+
+	String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey(),
+		returnURL);
 
 	response.sendRedirect(startConferenceURL);
 

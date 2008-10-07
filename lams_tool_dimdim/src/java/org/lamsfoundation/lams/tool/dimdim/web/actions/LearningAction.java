@@ -154,7 +154,8 @@ public class LearningAction extends DispatchAction {
 	String connectURL = "";
 	if (mode.isAuthor()) {
 	    String meetingKey = DimdimUtil.generateMeetingKey();
-	    connectURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, meetingKey);
+	    String returnURL = DimdimUtil.generateReturnURL(request);
+	    connectURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, meetingKey, returnURL);
 	} else {
 	    if (dimdimSession.getMeetingKey() != null) {
 		connectURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO, dimdimSession.getMeetingKey());

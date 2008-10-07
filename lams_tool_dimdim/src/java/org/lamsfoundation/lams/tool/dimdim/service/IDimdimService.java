@@ -177,7 +177,7 @@ public interface IDimdimService {
      * @return
      * @throws Exception
      */
-    String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey) throws Exception;
+    String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey, String returnURL) throws Exception;
 
     /**
      * 
