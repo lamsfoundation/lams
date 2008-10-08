@@ -1,0 +1,23 @@
+<%@ include file="/common/taglibs.jsp"%>
+
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
+
+<lams:head>
+	<title>
+		<fmt:message key="activity.title" />
+	</title>
+	
+	
+	
+	
+	<lams:headItems />
+	<tiles:insert attribute="headItems" />
+	
+	
+	<link href="${tool}/includes/css/wiki_style.css" rel="stylesheet" type="text/css">
+</lams:head>
