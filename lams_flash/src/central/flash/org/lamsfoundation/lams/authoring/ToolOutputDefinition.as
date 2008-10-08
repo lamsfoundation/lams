@@ -33,12 +33,14 @@ class ToolOutputDefinition  {
 	public static var LONG:String = "OUTPUT_LONG";
 	public static var BOOL:String = "OUTPUT_BOOLEAN";
 	public static var USER_DEFINED:String = "OUTPUT_SET_BOOLEAN";
+	public static var COMPLEX:String = "OUTPUT_COMPLEX";
 	
 	private var _name:String;
 	private var _description:String;
 	private var _type:String;
 	private var _startValue:Object;
 	private var _endValue:Object;
+	private var _complexDefinition:Object;
 	private var _defaultConditions:Array;
 	private var _showConditionNameOnly:Boolean;
 	
@@ -115,6 +117,10 @@ class ToolOutputDefinition  {
 	
 	public function get endValue():Object {
 		return _endValue;
+	}
+	
+	public function get complexDefinition():Object {
+		return _complexDefinition;
 	}
 	
 	public function get defaultConditions():Array {

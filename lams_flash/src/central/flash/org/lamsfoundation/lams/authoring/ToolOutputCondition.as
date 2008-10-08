@@ -103,7 +103,7 @@ class ToolOutputCondition   {
 	}
 	
 	public function populateFromDTO(dto:Object):Void {
-		_conditionID = dto.conditionID;
+		_conditionID = dto.conditionId;
 		_conditionUIID = dto.conditionUIID;
 		
 		_orderID = dto.orderID;
@@ -118,7 +118,7 @@ class ToolOutputCondition   {
 	public function toData():Object {
 		var dto:Object = new Object();
 		
-		if(_conditionID) dto.conditionID = conditionID;
+		if(_conditionID) dto.conditionId = conditionID;
 		if(_conditionUIID) dto.conditionUIID = _conditionUIID;
 		
 		if(_orderID) dto.orderID = _orderID;

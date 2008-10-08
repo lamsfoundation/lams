@@ -162,6 +162,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
         xOkOffset = _bgpanel._width - close_btn._x;
         yOkOffset = _bgpanel._height - close_btn._y;
 		
+		_condition_item_dgd.selectable = false;
+		
 		 //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
 		
@@ -323,6 +325,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				_toolOutputDefin_cmb.selectedIndex = i;
 			else if(items[i].type == ToolOutputDefinition.USER_DEFINED && name.substring(0, name.indexOf(DEFINITION_DELIMITER)) == items[i].name)
 				_toolOutputDefin_cmb.selectedIndex = i;
+			else if(items[i].type == ToolOutputDefinition.COMPLEX && name.substring(0, name.indexOf(DEFINITION_DELIMITER)) == items[i].name) // TODO: CHECK
+				_toolOutputDefin_cmb.selectedIndex = i;
 
 	}
 	
@@ -406,11 +410,14 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_min", [String(condition.endValue)]), data: condition, orderID: condition.orderID});
 				else
 					_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: Dictionary.getValue("branch_mapping_dlg_condition_col_value_exact", [String(condition.exactMatchValue)]), data: condition, orderID: condition.orderID});
-				
 				break;
+				
 			case ToolOutputDefinition.BOOL: 
 				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition, orderID: condition.orderID});
 				break;
+			case ToolOutputDefinition.COMPLEX:
+				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition, orderID: condition.orderID});
+				break;	
 			case ToolOutputDefinition.USER_DEFINED:
 				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition, orderID: condition.orderID});
 				break;
@@ -460,6 +467,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				}
 				break;
 			case ToolOutputDefinition.BOOL:
+				return true;
+			case ToolOutputDefinition.COMPLEX:
 				return true;
 			case ToolOutputDefinition.USER_DEFINED:
 				return true;
@@ -627,6 +636,19 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				addDefaultConditions(_selectedDefinition.defaultConditions);
 				
 				break;
+			case ToolOutputDefinition.COMPLEX:
+				_condition_item_dgd.visible = true;
+				_toolOutputLongOptions_cmb.visible = false;
+				add_btn.visible = false;
+				remove_item_btn.visible = false;
+				clear_all_btn.visible = false;
+				
+				refresh_btn.visible = true;
+				
+				showSteppers(false, false);
+				
+				addDefaultConditions(_selectedDefinition.defaultConditions); // _selectedDefinition object the same when working/not working
+				break;
 			case ToolOutputDefinition.USER_DEFINED:
 				_condition_item_dgd.visible = true;
 				_toolOutputLongOptions_cmb.visible = false;
@@ -722,6 +744,9 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		switch(type) {
 			case ToolOutputDefinition.BOOL:
 				return Dictionary.getValue("to_conditions_dlg_defin_bool_type");
+				break;
+			case ToolOutputDefinition.COMPLEX:
+				return Dictionary.getValue("to_conditions_dlg_defin_complex_type");
 				break;
 			case ToolOutputDefinition.LONG:
 				return Dictionary.getValue("to_conditions_dlg_defin_long_type");
