@@ -65,7 +65,7 @@ NULL
 , NULL
 , ${tool_id}
 , NULL
-, 6
+, 2
 , NULL
 , NULL
 , NULL
