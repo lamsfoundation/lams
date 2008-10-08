@@ -55,9 +55,14 @@
 		<c:if test="${question.type == 1}">
 			<c:set var="jsfunc" value="onclick=\" singleChoice('optionChoice${question.uid}')\""/>
 		</c:if>
-
-		<textarea name="optionText${question.uid}" rows="7" cols="50"
-			type="_moz"${jsfunc}>${answerText}</textarea>
+		
+		<p>
+			<fmt:message key="label.specifyOther" />
+		</p>
+		<p>
+			<textarea name="optionText${question.uid}" rows="7" cols="50"
+				type="_moz"${jsfunc}>${answerText}</textarea>
+		</p>
 	</c:if>
 
 </div>
