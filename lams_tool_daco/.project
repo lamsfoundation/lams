@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>exploded</name>
-			<type>2</type>
-			<location>D:/jboss-4.0.2/server/default/deploy/lams.ear/lams-tool-ladaco10.war</location>
-		</link>
-	</linkedResources>
 </projectDescription>
