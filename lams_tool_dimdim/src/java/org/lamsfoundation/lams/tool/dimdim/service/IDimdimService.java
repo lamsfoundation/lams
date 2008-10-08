@@ -174,10 +174,12 @@ public interface IDimdimService {
      * 
      * @param userDTO
      * @param meetingKey
+     * @param maxAttendeeMikes
      * @return
      * @throws Exception
      */
-    String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey, String returnURL) throws Exception;
+    String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey, String returnURL, Integer maxAttendeeMikes)
+	    throws Exception;
 
     /**
      * 

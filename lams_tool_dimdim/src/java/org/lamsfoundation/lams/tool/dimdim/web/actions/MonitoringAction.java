@@ -139,7 +139,7 @@ public class MonitoringAction extends DispatchAction {
 	String returnURL = DimdimUtil.generateReturnURL(request);
 
 	String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey(),
-		returnURL);
+		returnURL, session.getMaxAttendeeMikes());
 
 	response.sendRedirect(startConferenceURL);
 
