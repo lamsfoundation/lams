@@ -111,8 +111,8 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
         themeManager = ThemeManager.getInstance();
 		
 		//dictionary keys vary for author/monitor and this class is shared between them;
-		competence_title_lbl.text = (Dictionary.getValue("pi_lbl_title") != null && Dictionary.getValue("pi_lbl_title") != undefined) ? Dictionary.getValue("pi_lbl_title") : Dictionary.getValue("competence_title_lbl");
-		competence_description_lbl.text = (Dictionary.getValue("ws_dlg_description") != null && Dictionary.getValue("ws_dlg_description") != undefined) ? Dictionary.getValue("ws_dlg_description") : Dictionary.getValue("competence_desc_lbl");
+		competence_title_lbl.text = (Dictionary.getValue("pi_lbl_title") != "?") ? Dictionary.getValue("pi_lbl_title") : Dictionary.getValue("competence_title_lbl");
+		competence_description_lbl.text = (Dictionary.getValue("ws_dlg_description") != "?") ? Dictionary.getValue("ws_dlg_description") : Dictionary.getValue("competence_desc_lbl");
 		
 		// author only buttons
 		edit_competence_btn.label = Dictionary.getValue("mnu_edit"); 

@@ -111,7 +111,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
 		competence_lbl.text = Dictionary.getValue('competences_lbl');
 		
 		add_competence_btn.label = Dictionary.getValue('competence_editor_add_competence_btn');
-        close_btn.label = (Dictionary.getValue('mnu_file_close') != null && Dictionary.getValue('mnu_file_close') != undefined) ? Dictionary.getValue('mnu_file_close') : Dictionary.getValue('ls_win_learners_close_btn');
+        close_btn.label = (Dictionary.getValue('mnu_file_close') != "?") ? Dictionary.getValue('mnu_file_close') : Dictionary.getValue('ls_win_learners_close_btn');
 			
 		main_mc = competence_editor_scp.content;
 		

@@ -108,8 +108,8 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
         //Set the text for buttons
         close_btn.label = Dictionary.getValue("prefs_dlg_cancel");
 		
-		competence_title_lbl.text = Dictionary.getValue("competence_title_lbl");
-		competence_description_lbl.text = Dictionary.getValue("competence_desc_lbl");
+		competence_title_lbl.text = Dictionary.getValue("pi_lbl_title")
+		competence_description_lbl.text = Dictionary.getValue("ws_dlg_description")
 		
 		add_competence_btn.label = Dictionary.getValue("competence_editor_add_competence_btn");
 		save_competence_btn.label = Dictionary.getValue("mnu_file_save");
