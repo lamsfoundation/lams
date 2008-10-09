@@ -25,30 +25,21 @@ var FCK = oEditor.FCK;
 var FCKLang = oEditor.FCKLang ;
 var FCKWikiLinks = oEditor.FCKWikiLinks ;
 
-jQuery.ajax({
-    url : "<lams:LAMSURL/>/tool/lawiki10/WikiLinkHandler",
-    data : {toolSessionId: window.parent.InnerDialogLoaded().FCK.toolSessionId,
-    		sessionMapID: window.parent.InnerDialogLoaded().FCK.sessionMapID,
-    		wikiID: window.parent.InnerDialogLoaded().FCK.wikiID,
-    		method: 'getWikis'},
-    async : false, 
-    success : function(xml) {
-    	xmlDoc = xml;
-    	wikiArray = xmlDoc.getElementsByTagName('Wiki');
-    }
-});
+// Get the array of possible wiki links from the opening window
+wikiArray = window.top.opener.top.document.getElementById("wikiLinks").value.split(',');
+
 
 function init()
 {
 	// First of all, translate the dialog box texts
 	oEditor.FCKLanguageManager.TranslatePage( document ) ;
-	//alert('<fmt:message key="error.forgot.password.email" />');
 	
 	document.getElementById("linkAlias").value = getSelectedText();
 
 	// Show the "Ok" button.
 	window.parent.SetOkButton( true ) ;
 }
+
 
 function getSelectedText() 
 {
@@ -121,17 +112,8 @@ function Ok()
 							var i;
 							for (i=0; i<wikiArray.length; ++i) 
 							{	
-								var wiki = wikiArray[i];
-								var attr = wiki.attributes;
-								if (attr!=null)
-								{
-	       							var wikiName = attr.getNamedItem('name').nodeValue;
-	       							var wikiURL = attr.getNamedItem('url').nodeValue;
-	       							if (wikiName.length < 18)
-	       								addOption(document.getElementById('existingWikiDropDownMenu'), wikiName, wikiURL);
-	       							else 
-	          							addOption(document.getElementById('existingWikiDropDownMenu'), wikiName.substr(0,15) + "...", wikiURL);
-	          					}
+								var wikiURL="javascript:changeWikiPage(\'" + wikiArray[i] + "\')";
+								addOption(document.getElementById('existingWikiDropDownMenu'), wikiArray[i], wikiURL);
 							}
 						//-->		
 					</script>
