@@ -644,6 +644,9 @@ public class LearnerService implements ICoreLearnerService {
 	    if (grouping != null && grouping.isLearnerChoiceGrouping()) {
 
 		User learner = (User) userManagementService.findById(User.class, learnerId);
+		if (grouping.doesLearnerExist(learner)) {
+		    return true;
+		}
 		if (learner != null) {
 		    Integer maxNumberOfLearnersPerGroup = null;
 		    Set<Group> groups = grouping.getGroups();
