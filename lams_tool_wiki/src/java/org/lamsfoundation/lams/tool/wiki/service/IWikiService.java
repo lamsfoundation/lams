@@ -230,4 +230,20 @@ public interface IWikiService {
      * @return
      */
     String comparePages(String old, String current);
+
+    /**
+     * 
+     * @param learnerId
+     * @param toolSessionId
+     * @return
+     */
+    int getEditsNum(Long learnerId, Long toolSessionId);
+
+    /**
+     * 
+     * @param learnerId
+     * @param toolSessionId
+     * @return
+     */
+    int getAddsNum(Long learnerId, Long toolSessionId);
 }

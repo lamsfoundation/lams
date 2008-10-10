@@ -25,6 +25,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     private Set<WikiPageContent> wikiContentVersions;
     private WikiPageContent currentWikiContent;
     private WikiSession wikiSession;
+    private WikiUser addedBy;
 
     public WikiPage() {
     }
@@ -104,6 +105,20 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 
     public void setCurrentWikiContent(WikiPageContent currentWikiContent) {
 	this.currentWikiContent = currentWikiContent;
+    }
+
+    
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="editor"
+     * 
+     */
+    public WikiUser getAddedBy() {
+        return addedBy;
+    }
+
+    public void setAddedBy(WikiUser addedBy) {
+        this.addedBy = addedBy;
     }
 
     /**

@@ -126,6 +126,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     private ICoreNotebookService coreNotebookService;
 
+    private WikiOutputFactory wikiOutputFactory;
+
     public WikiService() {
 	super();
 	// TODO Auto-generated constructor stub
@@ -203,7 +205,13 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      *      java.lang.Long, java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+
+	wikiOutputFactory = getWikiOutputFactory();
+	WikiSession session = this.getSessionBySessionId(toolSessionId);
+	if (session == null) {
+	    return null;
+	}
+	return wikiOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     /**
@@ -213,7 +221,28 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      *      java.lang.Long, java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	wikiOutputFactory = getWikiOutputFactory();
+	WikiSession session = this.getSessionBySessionId(toolSessionId);
+	if (session == null) {
+	    return null;
+	}
+	return wikiOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
+    }
+
+    /**
+     * Get the definitions for possible output for an activity, based on the
+     * toolContentId.
+     * 
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of
+     *         each definition
+     */
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+	wikiOutputFactory = getWikiOutputFactory();
+	Wiki wiki = getWikiByContentId(toolContentId);
+	if (wiki == null) {
+	    wiki = getDefaultContent();
+	}
+	return wikiOutputFactory.getToolOutputDefinitions(wiki);
     }
 
     /* ************ Methods from ToolContentManager ************************* */
@@ -363,41 +392,26 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
     }
 
-    /**
-     * Get the definitions for possible output for an activity, based on the
-     * toolContentId. These may be definitions that are always available for the
-     * tool (e.g. number of marks for Multiple Choice) or a custom definition
-     * created for a particular activity such as the answer to the third
-     * question contains the word Koala and hence the need for the toolContentId
-     * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of
-     *         each definition
-     */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
-    }
-
     /* ********** IWikiService Methods ********************************* */
-
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
-    
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID){
-    	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-    	if (list == null || list.isEmpty()) {
-    		return null;
-    	} else {
-    		return list.get(0);
-    	}
+
+    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
+	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
+	if (list == null || list.isEmpty()) {
+	    return null;
+	} else {
+	    return list.get(0);
+	}
     }
-    
+
     /**
      * @param notebookEntry
      */
     public void updateEntry(NotebookEntry notebookEntry) {
-    	coreNotebookService.updateEntry(notebookEntry);
+	coreNotebookService.updateEntry(notebookEntry);
     }
 
     public String comparePages(String old, String current) {
@@ -622,6 +636,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	wikiPage.setParentWiki(wiki);
 	wikiPage.setTitle(wikiPageForm.getNewPageTitle());
 	wikiPage.setEditable(wikiPageForm.getNewPageIsEditable());
+	wikiPage.setAddedBy(user);
 	wikiPage.setWikiContentVersions(new HashSet<WikiPageContent>());
 	wikiPage.setWikiSession(session);
 	wikiPageDAO.saveOrUpdate(wikiPage);
@@ -765,6 +780,50 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	} catch (LoginException e) {
 	    throw new WikiException("Login failed." + e.getMessage());
 	}
+    }
+
+    /**
+     * 
+     * @param learnerId
+     * @param toolSessionId
+     * @return
+     */
+    public int getEditsNum(Long learnerId, Long toolSessionId) {
+	WikiUser wikiUser = getUserByUserIdAndSessionId(learnerId, toolSessionId);
+
+	WikiSession wikiSession = getSessionBySessionId(toolSessionId);
+
+	int edits = 0;
+	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
+	    for (WikiPageContent wikiPageContent : wikiPage.getWikiContentVersions()) {
+		if (wikiPageContent.getEditor() != null
+			&& wikiPageContent.getEditor().getUid().equals(wikiUser.getUid())) {
+		    edits++;
+		}
+	    }
+	}
+	return edits;
+    }
+
+    /**
+     * 
+     * @param learnerId
+     * @param toolSessionId
+     * @return
+     */
+    public int getAddsNum(Long learnerId, Long toolSessionId) {
+
+	WikiUser wikiUser = getUserByUserIdAndSessionId(learnerId, toolSessionId);
+
+	WikiSession wikiSession = getSessionBySessionId(toolSessionId);
+
+	int adds = 0;
+	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
+	    if (wikiPage.getAddedBy() != null && wikiPage.getAddedBy().getUid().equals(wikiUser.getUid())) {
+		adds++;
+	    }
+	}
+	return adds;
     }
 
     /*
@@ -912,5 +971,17 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+
+    public WikiOutputFactory getWikiOutputFactory() {
+
+	if (wikiOutputFactory == null) {
+	    wikiOutputFactory = new WikiOutputFactory();
+	}
+	return wikiOutputFactory;
+    }
+
+    public void setWikiOutputFactory(WikiOutputFactory wikiOutputFactory) {
+	this.wikiOutputFactory = wikiOutputFactory;
     }
 }
