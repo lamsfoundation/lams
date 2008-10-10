@@ -123,6 +123,26 @@
 		    AND ({lesson}.class_grouping_id IS NULL)
 		    AND NOT ({lesson}.lesson_state_id = 7)		    
 	</sql-query>
+	
+	<sql-query name="monitorsByToolSessionId">
+		<return alias="user" class="org.lamsfoundation.lams.usermanagement.User" />
+		SELECT DISTINCT {user.*}
+		  FROM lams_lesson,
+		    lams_grouping,
+		    lams_group,
+		    lams_user_group,
+		    lams_learning_design,
+		    lams_tool_session,
+		    lams_user {user}
+		  WHERE (lams_lesson.class_grouping_id = lams_grouping.grouping_id)
+		    AND (lams_grouping.staff_group_id = lams_group.group_id)
+		    AND (lams_group.group_id = lams_user_group.group_id)
+		    AND ({user}.user_id = lams_user_group.user_id)
+		    AND (lams_tool_session.tool_session_id = :sessionId)
+		    AND (lams_tool_session.lesson_id = lams_lesson.lesson_id)
+		    AND (lams_lesson.learning_design_id = lams_learning_design.learning_design_id)
+		    AND (lams_learning_design.copy_type_id=2)	    
+	</sql-query>
 
 	<sql-query name="lessonsForMonitoring">
 		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />

@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Dapeng.Ni
@@ -47,233 +48,264 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
  */
 public interface ISurveyService {
 
-	//******************************************************************************************
-	// Content methods
-	//******************************************************************************************
-	/**
-	 * Get <code>Survey</code> by toolContentID.
-	 * @param contentId
-	 * @return
-	 */
-	Survey getSurveyByContentId(Long contentId);
+    // ******************************************************************************************
+    // Content methods
+    // ******************************************************************************************
+    /**
+     * Get <code>Survey</code> by toolContentID.
+     * 
+     * @param contentId
+     * @return
+     */
+    Survey getSurveyByContentId(Long contentId);
 
-	/**
-	 * Get survey which is relative with the special toolSession.
-	 * @param sessionId
-	 * @return
-	 */
-	Survey getSurveyBySessionId(Long sessionId);
+    /**
+     * Get survey which is relative with the special toolSession.
+     * 
+     * @param sessionId
+     * @return
+     */
+    Survey getSurveyBySessionId(Long sessionId);
 
-	/**
-	 * Get a cloned copy of  tool default tool content (Survey) and assign the toolContentId of that copy as the 
-	 * given <code>contentId</code> 
-	 * @param contentId
-	 * @return
-	 * @throws SurveyApplicationException
-	 */
-	Survey getDefaultContent(Long contentId) throws SurveyApplicationException;
+    /**
+     * Get a cloned copy of tool default tool content (Survey) and assign the toolContentId of that copy as the given
+     * <code>contentId</code>
+     * 
+     * @param contentId
+     * @return
+     * @throws SurveyApplicationException
+     */
+    Survey getDefaultContent(Long contentId) throws SurveyApplicationException;
 
-	/**
-	 * Save or update survey into database.
-	 * @param Survey
-	 */
-	void saveOrUpdateSurvey(Survey Survey);
+    /**
+     * Save or update survey into database.
+     * 
+     * @param Survey
+     */
+    void saveOrUpdateSurvey(Survey Survey);
 
-	//******************************************************************************************
-	//*************** Instruction file methods **********************
-	//******************************************************************************************
-	/**
-	 * Upload instruciton file into repository.
-	 * @param file
-	 * @param type
-	 * @return
-	 * @throws UploadSurveyFileException
-	 */
-	SurveyAttachment uploadInstructionFile(FormFile file, String type) throws UploadSurveyFileException;
+    // ******************************************************************************************
+    // *************** Instruction file methods **********************
+    // ******************************************************************************************
+    /**
+     * Upload instruciton file into repository.
+     * 
+     * @param file
+     * @param type
+     * @return
+     * @throws UploadSurveyFileException
+     */
+    SurveyAttachment uploadInstructionFile(FormFile file, String type) throws UploadSurveyFileException;
 
-	/**
-	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not
-	 * delete the file from repository.
-	 * 
-	 * @param attachmentUid
-	 */
-	void deleteSurveyAttachment(Long attachmentUid);
+    /**
+     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
+     * file from repository.
+     * 
+     * @param attachmentUid
+     */
+    void deleteSurveyAttachment(Long attachmentUid);
 
-	//******************************************************************************************
-	//*************** Questions and Answers methods **********************
-	//******************************************************************************************
-	SurveyQuestion getQuestion(Long questionUid);
+    // ******************************************************************************************
+    // *************** Questions and Answers methods **********************
+    // ******************************************************************************************
+    SurveyQuestion getQuestion(Long questionUid);
 
-	/**
-	 * Delete resoruce item from database.
-	 * @param uid
-	 */
-	void deleteQuestion(Long uid);
+    /**
+     * Delete resoruce item from database.
+     * 
+     * @param uid
+     */
+    void deleteQuestion(Long uid);
 
-	/**
-	 * Get a learner's all answers in a survey. 
-	 * @param sessionId
-	 * @param userUid
-	 * @return
-	 */
-	List<AnswerDTO> getQuestionAnswers(Long sessionId, Long userUid);
+    /**
+     * Get a learner's all answers in a survey.
+     * 
+     * @param sessionId
+     * @param userUid
+     * @return
+     */
+    List<AnswerDTO> getQuestionAnswers(Long sessionId, Long userUid);
 
-	/**
-	 * Get question's answer with response percentage infromation.
-	 * @param sessionId
-	 * @param questionUid
-	 * @return
-	 */
-	AnswerDTO getQuestionResponse(Long sessionId, Long questionUid);
+    /**
+     * Get question's answer with response percentage infromation.
+     * 
+     * @param sessionId
+     * @param questionUid
+     * @return
+     */
+    AnswerDTO getQuestionResponse(Long sessionId, Long questionUid);
 
-	/**
-	 * Commit answers for a group of question together. 
-	 * @param answerList
-	 */
-	void updateAnswerList(List<SurveyAnswer> answerList);
+    /**
+     * Commit answers for a group of question together.
+     * 
+     * @param answerList
+     */
+    void updateAnswerList(List<SurveyAnswer> answerList);
 
-	//******************************************************************************************
-	//********** user methods *************
-	//******************************************************************************************
-	/**
-	 * Create a new user in database.
-	 */
-	void createUser(SurveyUser surveyUser);
+    // ******************************************************************************************
+    // ********** user methods *************
+    // ******************************************************************************************
+    /**
+     * Create a new user in database.
+     */
+    void createUser(SurveyUser surveyUser);
 
-	/**
-	 * Get user by given userID and toolContentID.
-	 * @param long1
-	 * @return
-	 */
-	SurveyUser getUserByIDAndContent(Long userID, Long contentId);
+    /**
+     * Get user by given userID and toolContentID.
+     * 
+     * @param long1
+     * @return
+     */
+    SurveyUser getUserByIDAndContent(Long userID, Long contentId);
 
-	/**
-	 * Get user by sessionID and UserID
-	 * @param long1
-	 * @param sessionId
-	 * @return
-	 */
-	SurveyUser getUserByIDAndSession(Long long1, Long sessionId);
+    /**
+     * Get user by sessionID and UserID
+     * 
+     * @param long1
+     * @param sessionId
+     * @return
+     */
+    SurveyUser getUserByIDAndSession(Long long1, Long sessionId);
 
-	/**
-	 * Get user by UID
-	 * @param uid
-	 * @return
-	 */
-	SurveyUser getUser(Long uid);
+    /**
+     * Get user by UID
+     * 
+     * @param uid
+     * @return
+     */
+    SurveyUser getUser(Long uid);
 
-	/**
-	 * Get all users under one tool session.
-	 * @param sessionId
-	 * @return
-	 */
-	List<SurveyUser> getSessionUsers(Long sessionId);
+    /**
+     * Get all users under one tool session.
+     * 
+     * @param sessionId
+     * @return
+     */
+    List<SurveyUser> getSessionUsers(Long sessionId);
 
-	//******************************************************************************************
-	//********** Repository methods ***********************
-	//******************************************************************************************
-	/**
-	 * Delete file from repository.
-	 */
-	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SurveyApplicationException;
+    // ******************************************************************************************
+    // ********** Repository methods ***********************
+    // ******************************************************************************************
+    /**
+     * Delete file from repository.
+     */
+    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws SurveyApplicationException;
 
-	//******************************************************************************************
-	//********** Session methods ***********************
-	//******************************************************************************************
+    // ******************************************************************************************
+    // ********** Session methods ***********************
+    // ******************************************************************************************
 
-	/**
-	 * Get survey toolSession by toolSessionId
-	 * @param sessionId
-	 * @return
-	 */
-	SurveySession getSurveySessionBySessionId(Long sessionId);
+    /**
+     * Get survey toolSession by toolSessionId
+     * 
+     * @param sessionId
+     * @return
+     */
+    SurveySession getSurveySessionBySessionId(Long sessionId);
 
-	/**
-	 * Save or update survey session.
-	 * @param resSession
-	 */
-	void saveOrUpdateSurveySession(SurveySession resSession);
+    /**
+     * Save or update survey session.
+     * 
+     * @param resSession
+     */
+    void saveOrUpdateSurveySession(SurveySession resSession);
 
-	/**
-	 * If success return next activity's url, otherwise return null.
-	 * @param toolSessionId
-	 * @param userId
-	 * @return
-	 */
-	String finishToolSession(Long toolSessionId, Long userId) throws SurveyApplicationException;
+    /**
+     * If success return next activity's url, otherwise return null.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    String finishToolSession(Long toolSessionId, Long userId) throws SurveyApplicationException;
 
-	//******************************************************************************************
-	//  	Monitoring summary /statistic methods
-	//******************************************************************************************
+    // ******************************************************************************************
+    // Monitoring summary /statistic methods
+    // ******************************************************************************************
 
-	/**
-	 * Return a map which sorted by SurveySession and list of questions for this session. 
-	 */
+    /**
+     * Return a map which sorted by SurveySession and list of questions for this session.
+     */
 
-	SortedMap<SurveySession, List<AnswerDTO>> getSummary(Long contentId);
+    SortedMap<SurveySession, List<AnswerDTO>> getSummary(Long contentId);
 
-	/**
-	 * Return a map which sorted by SurveySesson and a list of total user count in this session.
-	 * @param contentId
-	 * @return
-	 */
-	SortedMap<SurveySession, Integer> getStatistic(Long contentId);
+    /**
+     * Return a map which sorted by SurveySesson and a list of total user count in this session.
+     * 
+     * @param contentId
+     * @return
+     */
+    SortedMap<SurveySession, Integer> getStatistic(Long contentId);
 
-	//******************************************************************************************
-	//  	Export portfolio methods
-	//******************************************************************************************
-	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByLearner(SurveyUser learner);
+    // ******************************************************************************************
+    // Export portfolio methods
+    // ******************************************************************************************
+    SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByLearner(SurveyUser learner);
 
-	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByContentId(Long toolContentID);
+    SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportByContentId(Long toolContentID);
 
-	//This export for exporting Excel format file in Survey monitoring summary page:
-	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportBySessionId(Long toolSessionID);
+    // This export for exporting Excel format file in Survey monitoring summary page:
+    SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> exportBySessionId(Long toolSessionID);
 
-	//******************************************************************************************
-	//  	NOTEBOOK Functions
-	//******************************************************************************************
+    // ******************************************************************************************
+    // NOTEBOOK Functions
+    // ******************************************************************************************
 
-	/**
-	 * Create refection entry into notebook tool.
-	 * @param sessionId
-	 * @param notebook_tool
-	 * @param tool_signature
-	 * @param userId
-	 * @param entryText
-	 */
-	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-			String entryText);
+    /**
+     * Create refection entry into notebook tool.
+     * 
+     * @param sessionId
+     * @param notebook_tool
+     * @param tool_signature
+     * @param userId
+     * @param entryText
+     */
+    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+	    String entryText);
 
-	/**
-	 * Get reflection entry from notebook tool.
-	 * @param sessionId
-	 * @param idType
-	 * @param signature
-	 * @param userID
-	 * @return
-	 */
-	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+    /**
+     * Get reflection entry from notebook tool.
+     * 
+     * @param sessionId
+     * @param idType
+     * @param signature
+     * @param userID
+     * @return
+     */
+    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
-	/**
-	 * @param notebookEntry
-	 */
-	public void updateEntry(NotebookEntry notebookEntry);
+    /**
+     * @param notebookEntry
+     */
+    public void updateEntry(NotebookEntry notebookEntry);
 
-	/**
-	 * Get Reflect DTO list grouped by sessionID.
-	 * @param contentId
-	 * @return
-	 */
-	Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
+    /**
+     * Get Reflect DTO list grouped by sessionID.
+     * 
+     * @param contentId
+     * @return
+     */
+    Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
-	/**
-	 * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages. 
-	 * @param key key of the message
-	 * @param args arguments for the message
-	 * @return message content
-	 */
-	String getLocalisedMessage(String key, Object[] args);
+    /**
+     * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
+     * 
+     * @param key
+     *                key of the message
+     * @param args
+     *                arguments for the message
+     * @return message content
+     */
+    String getLocalisedMessage(String key, Object[] args);
 
-	IEventNotificationService getEventNotificationService();
+    IEventNotificationService getEventNotificationService();
 
+    /**
+     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
+     * 
+     * @param sessionId
+     *                tool session ID
+     * @return list of teachers that monitor the lesson which contains the tool with given session ID
+     */
+    public List<User> getMonitorsByToolSessionId(Long sessionId);
 }

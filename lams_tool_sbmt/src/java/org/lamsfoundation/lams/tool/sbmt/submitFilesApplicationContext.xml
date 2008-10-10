@@ -70,6 +70,7 @@
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
 		<property name="messageService"><ref bean="sbmtMessageService"/></property>
 		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
+		<property name="lessonService"><ref bean="lessonService"/></property> 
 	</bean>
 	
 	<bean id="submitFilesService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

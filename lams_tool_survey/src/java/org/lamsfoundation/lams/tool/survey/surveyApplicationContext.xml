@@ -115,6 +115,9 @@
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
 		</property>   	
+		<property name="lessonService">
+			<ref bean="lessonService"/>
+		</property>   
     </bean>
 
     <bean id="lasurvSurveyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

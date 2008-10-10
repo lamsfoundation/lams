@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -106,1002 +107,1024 @@ import org.springframework.dao.DataAccessException;
  * @author Manpreet Minhas
  */
 public class SubmitFilesService implements ToolContentManager, ToolSessionManager, ISubmitFilesService,
-		ToolContentImport102Manager {
+	ToolContentImport102Manager {
 
-	private static Logger log = Logger.getLogger(SubmitFilesService.class);
+    private static Logger log = Logger.getLogger(SubmitFilesService.class);
 
-	private ISubmitFilesContentDAO submitFilesContentDAO;
+    private ISubmitFilesContentDAO submitFilesContentDAO;
 
-	private ISubmitFilesReportDAO submitFilesReportDAO;
+    private ISubmitFilesReportDAO submitFilesReportDAO;
 
-	private ISubmitFilesSessionDAO submitFilesSessionDAO;
+    private ISubmitFilesSessionDAO submitFilesSessionDAO;
 
-	private ISubmissionDetailsDAO submissionDetailsDAO;
+    private ISubmissionDetailsDAO submissionDetailsDAO;
 
-	private ISubmitUserDAO submitUserDAO;
+    private ISubmitUserDAO submitUserDAO;
 
-	private IAttachmentDAO attachmentDAO;
+    private IAttachmentDAO attachmentDAO;
 
-	private IToolContentHandler sbmtToolContentHandler;
+    private IToolContentHandler sbmtToolContentHandler;
 
-	private ILamsToolService toolService;
+    private ILamsToolService toolService;
 
-	private ILearnerService learnerService;
+    private ILearnerService learnerService;
 
-	private IRepositoryService repositoryService;
+    private IRepositoryService repositoryService;
 
-	private IExportToolContentService exportContentService;
+    private IExportToolContentService exportContentService;
 
-	private ICoreNotebookService coreNotebookService;
+    private ICoreNotebookService coreNotebookService;
 
-	private IUserManagementService userManagementService;
+    private IUserManagementService userManagementService;
 
-	private IEventNotificationService eventNotificationService;
+    private IEventNotificationService eventNotificationService;
 
-	private MessageService messageService;
+    private MessageService messageService;
 
-	private class FileDtoComparator implements Comparator<FileDetailsDTO> {
+    private ILessonService lessonService;
 
-		public int compare(FileDetailsDTO o1, FileDetailsDTO o2) {
-			if (o1 != null && o2 != null && o1.getDateOfSubmission() != null && o2.getDateOfSubmission() != null) {
-				//don't use Date.comparaTo() directly, because the date could be Timestamp or Date (depeneds the object is persist or not)
-				return o1.getDateOfSubmission().getTime() - o2.getDateOfSubmission().getTime() > 0 ? 1 : -1;
-			}
-			else if (o1 != null) {
-				return 1;
-			}
-			else {
-				return -1;
-			}
-		}
+    private class FileDtoComparator implements Comparator<FileDetailsDTO> {
 
+	public int compare(FileDetailsDTO o1, FileDetailsDTO o2) {
+	    if (o1 != null && o2 != null && o1.getDateOfSubmission() != null && o2.getDateOfSubmission() != null) {
+		// don't use Date.comparaTo() directly, because the date could be Timestamp or Date (depeneds the object
+		// is persist or not)
+		return o1.getDateOfSubmission().getTime() - o2.getDateOfSubmission().getTime() > 0 ? 1 : -1;
+	    } else if (o1 != null) {
+		return 1;
+	    } else {
+		return -1;
+	    }
 	}
 
-	public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-			String entryText) {
-		return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "", entryText);
+    }
+
+    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+	    String entryText) {
+	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
+		entryText);
+    }
+
+    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
+	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
+	if (list == null || list.isEmpty()) {
+	    return null;
+	} else {
+	    return list.get(0);
+	}
+    }
+
+    public void updateEntry(NotebookEntry notebookEntry) {
+	coreNotebookService.updateEntry(notebookEntry);
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long, java.lang.Long)
+     */
+    public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
+	if (toContentId == null) {
+	    throw new ToolException("Failed to create the SubmitFiles tool seession");
 	}
 
-	public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-		List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-		if (list == null || list.isEmpty()) {
-			return null;
-		}
-		else {
-			return list.get(0);
-		}
+	SubmitFilesContent fromContent = null;
+	if (fromContentId != null) {
+	    fromContent = submitFilesContentDAO.getContentByID(fromContentId);
+	}
+	if (fromContent == null) {
+	    fromContent = getDefaultSubmit();
+	}
+	SubmitFilesContent toContent = SubmitFilesContent.newInstance(fromContent, toContentId, sbmtToolContentHandler);
+
+	submitFilesContentDAO.saveOrUpdate(toContent);
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsRunOffline(java.lang.Long)
+     */
+    public void setAsRunOffline(Long toolContentId, boolean value) {
+	// pre-condition validation
+	if (toolContentId == null) {
+	    throw new SubmitFilesException("Fail to set tool content to run offline - "
+		    + " based on null toolContentId");
+	}
+	try {
+	    SubmitFilesContent content = getSubmitFilesContent(toolContentId);
+	    if (content == null || !toolContentId.equals(content.getContentID())) {
+		content = duplicateDefaultToolContent(toolContentId);
+	    }
+	    content.setRunOffline(value);
+	    submitFilesContentDAO.saveOrUpdate(content);
+	} catch (DataAccessException e) {
+	    throw new SubmitFilesException("Exception occured when LAMS is setting content to run offline"
+		    + e.getMessage(), e);
+	}
+    }
+
+    /**
+     * If the toolContentID does not exist, then get default tool content id from tool core and initialize a emtpy
+     * <code>SubmitFilesContent</code> return.
+     * 
+     * @param toolContentId
+     * @return
+     */
+    private SubmitFilesContent duplicateDefaultToolContent(Long toolContentId) {
+	long contentId = 0;
+	contentId = toolService.getToolDefaultContentIdBySignature(SbmtConstants.TOOL_SIGNATURE);
+	SubmitFilesContent content = new SubmitFilesContent();
+	content.setContentID(new Long(contentId));
+	return content;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsDefineLater(java.lang.Long)
+     */
+    public void setAsDefineLater(Long toolContentId, boolean value) {
+	// pre-condition validation
+	if (toolContentId == null) {
+	    throw new SubmitFilesException("Fail to set tool content to define later - "
+		    + " based on null toolContentId");
+	}
+	try {
+	    SubmitFilesContent content = getSubmitFilesContent(toolContentId);
+	    if (content == null || !toolContentId.equals(content.getContentID())) {
+		content = duplicateDefaultToolContent(toolContentId);
+	    }
+	    content.setDefineLater(value);
+	    submitFilesContentDAO.saveOrUpdate(content);
+	} catch (DataAccessException e) {
+	    throw new SubmitFilesException("Exception occured when LAMS is setting content to run define later"
+		    + e.getMessage(), e);
 	}
 
-	public void updateEntry(NotebookEntry notebookEntry) {
-		coreNotebookService.updateEntry(notebookEntry);
-	}
+    }
 
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long,
-	 *      java.lang.Long)
-	 */
-	public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-		if (toContentId == null) {
-			throw new ToolException("Failed to create the SubmitFiles tool seession");
-		}
-
-		SubmitFilesContent fromContent = null;
-		if (fromContentId != null) {
-			fromContent = submitFilesContentDAO.getContentByID(fromContentId);
-		}
-		if (fromContent == null) {
-			fromContent = getDefaultSubmit();
-		}
-		SubmitFilesContent toContent = SubmitFilesContent.newInstance(fromContent, toContentId, sbmtToolContentHandler);
-
-		submitFilesContentDAO.saveOrUpdate(toContent);
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsRunOffline(java.lang.Long)
-	 */
-	public void setAsRunOffline(Long toolContentId, boolean value) {
-		//pre-condition validation
-		if (toolContentId == null) {
-			throw new SubmitFilesException("Fail to set tool content to run offline - " + " based on null toolContentId");
-		}
-		try {
-			SubmitFilesContent content = getSubmitFilesContent(toolContentId);
-			if (content == null || !toolContentId.equals(content.getContentID())) {
-				content = duplicateDefaultToolContent(toolContentId);
-			}
-			content.setRunOffline(value);
-			submitFilesContentDAO.saveOrUpdate(content);
-		}
-		catch (DataAccessException e) {
-			throw new SubmitFilesException("Exception occured when LAMS is setting content to run offline" + e.getMessage(), e);
-		}
-	}
-
-	/**
-	 * If the toolContentID does not exist, then get default tool content id from tool core and 
-	 * initialize a emtpy <code>SubmitFilesContent</code> return.
-	 * 
-	 * @param toolContentId
-	 * @return
-	 */
-	private SubmitFilesContent duplicateDefaultToolContent(Long toolContentId) {
-		long contentId = 0;
-		contentId = toolService.getToolDefaultContentIdBySignature(SbmtConstants.TOOL_SIGNATURE);
-		SubmitFilesContent content = new SubmitFilesContent();
-		content.setContentID(new Long(contentId));
-		return content;
-	}
-
-	/**
-	 * @see org.lamsfoundation.lams.tool.ToolContentManager#setAsDefineLater(java.lang.Long)
-	 */
-	public void setAsDefineLater(Long toolContentId, boolean value) {
-		//pre-condition validation
-		if (toolContentId == null) {
-			throw new SubmitFilesException("Fail to set tool content to define later - " + " based on null toolContentId");
-		}
-		try {
-			SubmitFilesContent content = getSubmitFilesContent(toolContentId);
-			if (content == null || !toolContentId.equals(content.getContentID())) {
-				content = duplicateDefaultToolContent(toolContentId);
-			}
-			content.setDefineLater(value);
-			submitFilesContentDAO.saveOrUpdate(content);
-		}
-		catch (DataAccessException e) {
-			throw new SubmitFilesException("Exception occured when LAMS is setting content to run define later" + e.getMessage(),
-					e);
-		}
-
-	}
-
-	/**
-	 * @throws SessionDataExistsException 
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long)
-	 */
-	public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException {
-		SubmitFilesContent submitFilesContent = submitFilesContentDAO.getContentByID(toolContentId);
-		if (submitFilesContent != null) {
-			//if session data exist and removeSessionData=false, throw an exception
-			List submissionData = submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId);
-			if (!(submissionData == null || submissionData.isEmpty()) && !removeSessionData) {
-				throw new SessionDataExistsException("Delete failed: There is session data that belongs to this tool content id");
-			}
-			else if (submissionData != null) {
-				Iterator iter = submissionData.iterator();
-				while (iter.hasNext()) {
-					SubmitFilesSession element = (SubmitFilesSession) iter.next();
-					removeToolSession(element);
-				}
-			}
-			submitFilesContentDAO.delete(submitFilesContent);
-		}
-	}
-
-	public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID) {
-		return submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentID);
-	}
-
-	/**
-	 * Export the XML fragment for the tool's content, along with any files needed
-	 * for the content.
-	 * @throws ExportToolContentException 
-	 */
-	public void exportToolContent(Long toolContentId, String toPath) throws ToolException, DataMissingException {
-		exportContentService.registerFileClassForExport(InstructionFiles.class.getName(), "uuID", "versionID");
-		SubmitFilesContent toolContentObj = submitFilesContentDAO.getContentByID(toolContentId);
-		if (toolContentObj == null) {
-			toolContentObj = getDefaultSubmit();
-		}
-		if (toolContentObj == null) {
-			throw new DataMissingException("Unable to find default content for the submit files tool");
-		}
-
-		//set toolContentHandler as null to avoid duplicate file node in repository.
-		toolContentObj = SubmitFilesContent.newInstance(toolContentObj, toolContentId, null);
-		toolContentObj.setToolContentHandler(null);
-		try {
-			exportContentService.exportToolContent(toolContentId, toolContentObj, sbmtToolContentHandler, toPath);
-		}
-		catch (ExportToolContentException e) {
-			throw new ToolException(e);
-		}
-	}
-
-	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
-			String toVersion) throws ToolException {
-
-		try {
-			exportContentService.registerFileClassForImport(InstructionFiles.class.getName(), "uuID", "versionID", "name",
-					"type", null, null);
-
-			Object toolPOJO = exportContentService.importToolContent(toolContentPath, sbmtToolContentHandler, fromVersion,
-					toVersion);
-			if (!(toolPOJO instanceof SubmitFilesContent)) {
-				throw new ImportToolContentException("Import Submit tool content failed. Deserialized object is " + toolPOJO);
-			}
-			SubmitFilesContent toolContentObj = (SubmitFilesContent) toolPOJO;
-
-			//reset it to new toolContentId
-			toolContentObj.setContentID(toolContentId);
-
-			SubmitUser user = submitUserDAO.getContentUser(toolContentId, newUserUid);
-			if (user == null) {
-				user = new SubmitUser();
-				UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
-				user.setFirstName(sysUser.getFirstName());
-				user.setLastName(sysUser.getLastName());
-				user.setLogin(sysUser.getLogin());
-				user.setUserID(newUserUid);
-				user.setContentID(toolContentId);
-				submitUserDAO.saveOrUpdateUser(user);
-			}
-
-			toolContentObj.setCreatedBy(user);
-			toolContentObj.setCreated(new Date());
-			toolContentObj.setUpdated(new Date());
-
-			submitFilesContentDAO.saveOrUpdate(toolContentObj);
-		}
-		catch (ImportToolContentException e) {
-			throw new ToolException(e);
-		}
-	}
-
-	/** Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions that are always
-	 * available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created for a particular activity
-	 * such as the answer to the third question contains the word Koala and hence the need for the toolContentId
-	 * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
-	 */
-	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-		return new TreeMap<String, ToolOutputDefinition>();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#updateSubmitFilesContent(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
-	 */
-	public void saveOrUpdateContent(SubmitFilesContent submitFilesContent) {
-		submitFilesContent.setUpdated(new Date());
-		submitFilesContentDAO.saveOrUpdate(submitFilesContent);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesContent(java.lang.Long)
-	 */
-	public SubmitFilesContent getSubmitFilesContent(Long contentID) {
-		SubmitFilesContent content = null;
-		try {
-			content = submitFilesContentDAO.getContentByID(contentID);
-		}
-		catch (Exception e) {
-			SubmitFilesService.log.error("Could not find the content by given ID:" + contentID + ". Excpetion is " + e);
-		}
-		if (content == null) {
-			SubmitFilesService.log.error("Could not find the content by given ID:" + contentID);
-		}
-
-		return content;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesReport(java.lang.Long)
-	 */
-	public SubmitFilesReport getSubmitFilesReport(Long reportID) {
-		return submitFilesReportDAO.getReportByID(reportID);
-	}
-
-	/**
-	 * This method verifies the credentials of the SubmitFiles Tool and gives it
-	 * the <code>Ticket</code> to login and access the Content Repository.
-	 * 
-	 * A valid ticket is needed in order to access the content from the
-	 * repository. This method would be called evertime the tool needs to
-	 * upload/download files from the content repository.
-	 * 
-	 * @return ITicket The ticket for repostory access
-	 * @throws SubmitFilesException
-	 */
-	private ITicket getRepositoryLoginTicket() throws SubmitFilesException {
-		repositoryService = RepositoryProxy.getRepositoryService();
-		ICredentials credentials = new SimpleCredentials(SbmtToolContentHandler.repositoryUser,
-				SbmtToolContentHandler.repositoryId);
-		try {
-			ITicket ticket = repositoryService.login(credentials, SbmtToolContentHandler.repositoryWorkspaceName);
-			return ticket;
-		}
-		catch (AccessDeniedException ae) {
-			throw new SubmitFilesException("Access Denied to repository." + ae.getMessage());
-		}
-		catch (WorkspaceNotFoundException we) {
-			throw new SubmitFilesException("Workspace not found." + we.getMessage());
-		}
-		catch (LoginException e) {
-			throw new SubmitFilesException("Login failed." + e.getMessage());
-		}
-	}
-
-	/**
-	 * This method deletes the content with the given <code>uuid</code> and
-	 * <code>versionID</code> from the content repository
-	 * 
-	 * @param uuid
-	 *            The <code>uuid</code> of the node to be deleted
-	 * @param versionID
-	 *            The <code>version_id</code> of the node to be deleted.
-	 * @throws SubmitFilesException
-	 */
-	public void deleteFromRepository(Long uuid, Long versionID) throws SubmitFilesException {
-		ITicket ticket = getRepositoryLoginTicket();
-		try {
-			repositoryService.deleteVersion(ticket, uuid, versionID);
-		}
-		catch (Exception e) {
-			throw new SubmitFilesException("Exception occured while deleting files from" + " the repository " + e.getMessage());
-		}
-	}
-
-	public void deleteInstructionFile(Long uid) {
-		attachmentDAO.deleteById(InstructionFiles.class, uid);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long,java.lang.String,
-	 *      java.lang.Long)
-	 */
-	public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) {
-		//pre-condition validation
-		if (toolSessionId == null || toolContentId == null) {
-			throw new SubmitFilesException("Fail to create a submission session"
-					+ " based on null toolSessionId or toolContentId");
-		}
-
-		SubmitFilesService.log.debug("Start to create submission session based on toolSessionId[" + toolSessionId.longValue()
-				+ "] and toolContentId[" + toolContentId.longValue() + "]");
-		try {
-			SubmitFilesContent submitContent = getSubmitFilesContent(toolContentId);
-			if (submitContent == null || !toolContentId.equals(submitContent.getContentID())) {
-				submitContent = new SubmitFilesContent();
-				submitContent.setContentID(toolContentId);
-			}
-			SubmitFilesSession submitSession = new SubmitFilesSession();
-
-			submitSession.setSessionID(toolSessionId);
-			submitSession.setSessionName(toolSessionName);
-			submitSession.setStatus(new Integer(SubmitFilesSession.INCOMPLETE));
-			submitSession.setContent(submitContent);
-			submitFilesSessionDAO.createSession(submitSession);
-			SubmitFilesService.log.debug("Submit File session created");
-		}
-		catch (DataAccessException e) {
-			throw new SubmitFilesException(
-					"Exception occured when lams is creating" + " a submission Session: " + e.getMessage(), e);
-		}
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long,
-	 *      org.lamsfoundation.lams.usermanagement.User)
-	 */
-	public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-		if (toolSessionId == null) {
-			SubmitFilesService.log.error("Fail to leave tool Session based on null tool session id.");
-			throw new ToolException("Fail to remove tool Session based on null tool session id.");
-		}
-		if (learnerId == null) {
-			SubmitFilesService.log.error("Fail to leave tool Session based on null learner.");
-			throw new ToolException("Fail to remove tool Session based on null learner.");
-		}
-
-		SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
-		if (session != null) {
-			session.setStatus(new Integer(SubmitFilesSession.COMPLETED));
-			submitFilesSessionDAO.update(session);
-		}
-		else {
-			SubmitFilesService.log.error("Fail to leave tool Session.Could not find submit file "
-					+ "session by given session id: " + toolSessionId);
-			throw new DataMissingException("Fail to leave tool Session."
-					+ "Could not find submit file session by given session id: " + toolSessionId);
-		}
-		return learnerService.completeToolSession(toolSessionId, learnerId);
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.lang.Long)
-	 */
-	public ToolSessionExportOutputData exportToolSession(Long toolSessionId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.util.List)
-	 */
-	public ToolSessionExportOutputData exportToolSession(List toolSessionIds) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#removeToolSession(java.lang.Long)
-	 */
-	public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-		if (toolSessionId == null) {
-			SubmitFilesService.log.error("Fail to remove tool Session based on null tool session id.");
-			throw new ToolException("Fail to remove tool Session based on null tool session id.");
-		}
-
-		SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
-		if (session != null) {
-			removeToolSession(session);
-		}
-		else {
-			SubmitFilesService.log.error("Could not find submit file session by given session id: " + toolSessionId);
-			throw new DataMissingException("Could not find submit file session by given session id: " + toolSessionId);
-		}
-	}
-
-	/** Remove a tool session. The session parameter must not be null. */
-	private void removeToolSession(SubmitFilesSession session) {
-		Set filesUploaded = session.getSubmissionDetails();
-		if (filesUploaded != null) {
-			Iterator fileIterator = filesUploaded.iterator();
-			while (fileIterator.hasNext()) {
-				SubmissionDetails details = (SubmissionDetails) fileIterator.next();
-				deleteFromRepository(details.getUuid(), details.getVersionID());
-				submissionDetailsDAO.delete(details);
-			}
-		}
-		submitFilesSessionDAO.delete(session);
-	}
-
-	/** 
-	 * Get the tool output for the given tool output names.
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long, java.lang.Long)
-	 */
-	public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-		return new TreeMap<String, ToolOutput>();
-	}
-
-	/** 
-	 * Get the tool output for the given tool output name.
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long, java.lang.Long)
-	 */
-	public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-		return null;
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToContent(Long,FormFile ) 
-	 */
-	public InstructionFiles uploadFileToContent(Long contentID, FormFile uploadFile, String fileType) throws SubmitFilesException {
-		if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-			throw new SubmitFilesException("Could not find upload file: " + uploadFile);
-		}
-
-		NodeKey nodeKey = processFile(uploadFile, fileType);
-
-		InstructionFiles file = new InstructionFiles();
-		file.setType(fileType);
-		file.setUuID(nodeKey.getUuid());
-		file.setVersionID(nodeKey.getVersion());
-		file.setName(uploadFile.getFileName());
-
-		return file;
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToSession(Long,FormFile,String,Long ) 
-	 */
-	public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
-			throws SubmitFilesException {
-
-		if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
-			throw new SubmitFilesException("Could not find upload file: " + uploadFile);
-		}
-
-		SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionID);
-		if (session == null) {
-			throw new SubmitFilesException("No such session with a sessionID of: " + sessionID + " found.");
-		}
-
-		NodeKey nodeKey = processFile(uploadFile, IToolContentHandler.TYPE_ONLINE);
-
-		SubmissionDetails details = new SubmissionDetails();
-		details.setFileDescription(fileDescription);
-		details.setFilePath(uploadFile.getFileName());
-		details.setDateOfSubmission(new Date());
-
-		SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
-		details.setLearner(learner);
-		details.setUuid(nodeKey.getUuid());
-		details.setVersionID(nodeKey.getVersion());
-		SubmitFilesReport report = new SubmitFilesReport();
-		details.setReport(report);
-		details.setSubmitFileSession(session);
-
-		//update session, then insert the detail too.
-		Set detailSet = session.getSubmissionDetails();
-		detailSet.add(details);
-		session.setSubmissionDetails(detailSet);
-		submissionDetailsDAO.saveOrUpdate(session);
-
-	}
-
-	/**
-	 * Process an uploaded file.
-	 * 
-	 * @param forumForm
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws RepositoryCheckedException
-	 * @throws InvalidParameterException
-	 */
-	private NodeKey processFile(FormFile file, String fileType) {
-		NodeKey node = null;
-		if (file != null && !StringUtils.isEmpty(file.getFileName())) {
-			String fileName = file.getFileName();
-			try {
-				node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(), fileType);
-			}
-			catch (InvalidParameterException e) {
-				throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			}
-			catch (FileNotFoundException e) {
-				throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			}
-			catch (RepositoryCheckedException e) {
-				throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			}
-			catch (IOException e) {
-				throw new SubmitFilesException("FileNotFoundException occured while trying to upload File" + e.getMessage());
-			}
-		}
-		return node;
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long, java.lang.Long)
-	 */
-	public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale) {
-		List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, userID);
-		SortedSet details = new TreeSet(this.new FileDtoComparator());
-		if (list == null) {
-			return new ArrayList(details);
-		}
-
-		NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
-		for (SubmissionDetails submissionDetails : list) {
-			FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
-			details.add(detailDto);
-		}
-		return new ArrayList(details);
-	}
-
-	/**
-	 * This method save SubmissionDetails list into a map container: key is user id,
-	 * value is a list container, which contains all <code>FileDetailsDTO</code> object belong to
-	 * this user.
-	 */
-	public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale) {
-		List list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
-		if (list != null) {
-			SortedMap map = new TreeMap(new LastNameAlphabeticComparator());
-			Iterator iterator = list.iterator();
-			List userFileList;
-			NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
-			while (iterator.hasNext()) {
-				SubmissionDetails submissionDetails = (SubmissionDetails) iterator.next();
-				SubmitUser learner = submissionDetails.getLearner();
-				if (learner == null) {
-					SubmitFilesService.log.error("Could not find learer for special submission item:" + submissionDetails);
-					return null;
-				}
-				SubmitUserDTO submitUserDTO = new SubmitUserDTO(learner);
-
-				FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
-				userFileList = (List) map.get(submitUserDTO);
-				//if it is first time to this user, creating a new ArrayList for this user.
-				if (userFileList == null) {
-					userFileList = new ArrayList();
-				}
-				userFileList.add(detailDto);
-				map.put(submitUserDTO, userFileList);
-			}
-			return map;
-		}
-		else {
-			return null;
-		}
-	}
-
-	public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale) {
-		SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
-		return new FileDetailsDTO(details, currentLocale != null ? NumberFormat.getInstance(currentLocale) : null);
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getUsersBySession(java.lang.Long)
-	 */
-	public List<SubmitUser> getUsersBySession(Long sessionID) {
-		return submitUserDAO.getUsersBySession(sessionID);
-	}
-
-	public void updateMarks(Long reportID, Float marks, String comments) {
-		SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
-		if (report != null) {
-			report.setComments(comments);
-			report.setMarks(marks);
-			submitFilesReportDAO.update(report);
-		}
-	}
-
-	public IVersionedNode downloadFile(Long uuid, Long versionID) throws SubmitFilesException {
-		ITicket ticket = getRepositoryLoginTicket();
-		try {
-			IVersionedNode node = repositoryService.getFileItem(ticket, uuid, null);
-			return node;
-		}
-		catch (AccessDeniedException ae) {
-			throw new SubmitFilesException("AccessDeniedException occured while trying to download file " + ae.getMessage());
-		}
-		catch (FileException fe) {
-			throw new SubmitFilesException("FileException occured while trying to download file " + fe.getMessage());
-		}
-		catch (ItemNotFoundException ie) {
-			throw new SubmitFilesException("ItemNotFoundException occured while trying to download file " + ie.getMessage());
-		}
-	}
-
-	public SubmitFilesSession getSessionById(Long sessionID) {
-		return submitFilesSessionDAO.getSessionByID(sessionID);
-	}
-
-	public boolean releaseMarksForSession(Long sessionID) {
-		List list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
-		Iterator iter = list.iterator();
-		SubmissionDetails details;
-		SubmitFilesReport report;
-		SubmitFilesSession session = getSessionById(sessionID);
-
-		SubmitFilesContent content = session.getContent();
-		boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
-				SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID());
-		Map<Long, StringBuilder> notificationMessages = null;
-		Object[] notificationMessageParameters = null;
-		if (notifyLearnersOnMarkRelease) {
-			notificationMessages = new TreeMap<Long, StringBuilder>();
-			notificationMessageParameters = new Object[3];
-		}
+    /**
+     * @throws SessionDataExistsException
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolContentManager#removeToolContent(java.lang.Long)
+     */
+    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException {
+	SubmitFilesContent submitFilesContent = submitFilesContentDAO.getContentByID(toolContentId);
+	if (submitFilesContent != null) {
+	    // if session data exist and removeSessionData=false, throw an exception
+	    List submissionData = submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId);
+	    if (!(submissionData == null || submissionData.isEmpty()) && !removeSessionData) {
+		throw new SessionDataExistsException(
+			"Delete failed: There is session data that belongs to this tool content id");
+	    } else if (submissionData != null) {
+		Iterator iter = submissionData.iterator();
 		while (iter.hasNext()) {
-			details = (SubmissionDetails) iter.next();
-			report = details.getReport();
-			report.setDateMarksReleased(new Date());
-			if (notifyLearnersOnMarkRelease) {
-				SubmitUser user = details.getLearner();
-				StringBuilder notificationMessage = notificationMessages.get(user.getUserID().longValue());
-				if (notificationMessage == null) {
-					notificationMessage = new StringBuilder();
-				}
-				notificationMessageParameters[0] = details.getFilePath();
-				notificationMessageParameters[1] = details.getDateOfSubmission();
-				notificationMessageParameters[2] = report.getMarks();
-				notificationMessage.append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
-				notificationMessages.put(user.getUserID().longValue(), notificationMessage);
-			}
-			submitFilesReportDAO.updateReport(report);
+		    SubmitFilesSession element = (SubmitFilesSession) iter.next();
+		    removeToolSession(element);
 		}
-		//current there is no false return
-		if (notifyLearnersOnMarkRelease) {
-			notificationMessageParameters = new Object[1];
-			for (Long userID : notificationMessages.keySet()) {
-				notificationMessageParameters[0] = notificationMessages.get(userID).toString();
-				getEventNotificationService().triggerForSingleUser(SbmtConstants.TOOL_SIGNATURE,
-						SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(), userID,
-						notificationMessageParameters);
-			}
+	    }
+	    submitFilesContentDAO.delete(submitFilesContent);
+	}
+    }
+
+    public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID) {
+	return submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentID);
+    }
+
+    /**
+     * Export the XML fragment for the tool's content, along with any files needed for the content.
+     * 
+     * @throws ExportToolContentException
+     */
+    public void exportToolContent(Long toolContentId, String toPath) throws ToolException, DataMissingException {
+	exportContentService.registerFileClassForExport(InstructionFiles.class.getName(), "uuID", "versionID");
+	SubmitFilesContent toolContentObj = submitFilesContentDAO.getContentByID(toolContentId);
+	if (toolContentObj == null) {
+	    toolContentObj = getDefaultSubmit();
+	}
+	if (toolContentObj == null) {
+	    throw new DataMissingException("Unable to find default content for the submit files tool");
+	}
+
+	// set toolContentHandler as null to avoid duplicate file node in repository.
+	toolContentObj = SubmitFilesContent.newInstance(toolContentObj, toolContentId, null);
+	toolContentObj.setToolContentHandler(null);
+	try {
+	    exportContentService.exportToolContent(toolContentId, toolContentObj, sbmtToolContentHandler, toPath);
+	} catch (ExportToolContentException e) {
+	    throw new ToolException(e);
+	}
+    }
+
+    public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
+	    String toVersion) throws ToolException {
+
+	try {
+	    exportContentService.registerFileClassForImport(InstructionFiles.class.getName(), "uuID", "versionID",
+		    "name", "type", null, null);
+
+	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, sbmtToolContentHandler,
+		    fromVersion, toVersion);
+	    if (!(toolPOJO instanceof SubmitFilesContent)) {
+		throw new ImportToolContentException("Import Submit tool content failed. Deserialized object is "
+			+ toolPOJO);
+	    }
+	    SubmitFilesContent toolContentObj = (SubmitFilesContent) toolPOJO;
+
+	    // reset it to new toolContentId
+	    toolContentObj.setContentID(toolContentId);
+
+	    SubmitUser user = submitUserDAO.getContentUser(toolContentId, newUserUid);
+	    if (user == null) {
+		user = new SubmitUser();
+		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
+		user.setFirstName(sysUser.getFirstName());
+		user.setLastName(sysUser.getLastName());
+		user.setLogin(sysUser.getLogin());
+		user.setUserID(newUserUid);
+		user.setContentID(toolContentId);
+		submitUserDAO.saveOrUpdateUser(user);
+	    }
+
+	    toolContentObj.setCreatedBy(user);
+	    toolContentObj.setCreated(new Date());
+	    toolContentObj.setUpdated(new Date());
+
+	    submitFilesContentDAO.saveOrUpdate(toolContentObj);
+	} catch (ImportToolContentException e) {
+	    throw new ToolException(e);
+	}
+    }
+
+    /**
+     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
+     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
+     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * the toolContentId
+     * 
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     */
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+	return new TreeMap<String, ToolOutputDefinition>();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#updateSubmitFilesContent(org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent)
+     */
+    public void saveOrUpdateContent(SubmitFilesContent submitFilesContent) {
+	submitFilesContent.setUpdated(new Date());
+	submitFilesContentDAO.saveOrUpdate(submitFilesContent);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesContent(java.lang.Long)
+     */
+    public SubmitFilesContent getSubmitFilesContent(Long contentID) {
+	SubmitFilesContent content = null;
+	try {
+	    content = submitFilesContentDAO.getContentByID(contentID);
+	} catch (Exception e) {
+	    SubmitFilesService.log.error("Could not find the content by given ID:" + contentID + ". Excpetion is " + e);
+	}
+	if (content == null) {
+	    SubmitFilesService.log.error("Could not find the content by given ID:" + contentID);
+	}
+
+	return content;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getSubmitFilesReport(java.lang.Long)
+     */
+    public SubmitFilesReport getSubmitFilesReport(Long reportID) {
+	return submitFilesReportDAO.getReportByID(reportID);
+    }
+
+    /**
+     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
+     * access the Content Repository.
+     * 
+     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
+     * the tool needs to upload/download files from the content repository.
+     * 
+     * @return ITicket The ticket for repostory access
+     * @throws SubmitFilesException
+     */
+    private ITicket getRepositoryLoginTicket() throws SubmitFilesException {
+	repositoryService = RepositoryProxy.getRepositoryService();
+	ICredentials credentials = new SimpleCredentials(SbmtToolContentHandler.repositoryUser,
+		SbmtToolContentHandler.repositoryId);
+	try {
+	    ITicket ticket = repositoryService.login(credentials, SbmtToolContentHandler.repositoryWorkspaceName);
+	    return ticket;
+	} catch (AccessDeniedException ae) {
+	    throw new SubmitFilesException("Access Denied to repository." + ae.getMessage());
+	} catch (WorkspaceNotFoundException we) {
+	    throw new SubmitFilesException("Workspace not found." + we.getMessage());
+	} catch (LoginException e) {
+	    throw new SubmitFilesException("Login failed." + e.getMessage());
+	}
+    }
+
+    /**
+     * This method deletes the content with the given <code>uuid</code> and <code>versionID</code> from the content
+     * repository
+     * 
+     * @param uuid
+     *                The <code>uuid</code> of the node to be deleted
+     * @param versionID
+     *                The <code>version_id</code> of the node to be deleted.
+     * @throws SubmitFilesException
+     */
+    public void deleteFromRepository(Long uuid, Long versionID) throws SubmitFilesException {
+	ITicket ticket = getRepositoryLoginTicket();
+	try {
+	    repositoryService.deleteVersion(ticket, uuid, versionID);
+	} catch (Exception e) {
+	    throw new SubmitFilesException("Exception occured while deleting files from" + " the repository "
+		    + e.getMessage());
+	}
+    }
+
+    public void deleteInstructionFile(Long uid) {
+	attachmentDAO.deleteById(InstructionFiles.class, uid);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long,java.lang.String,
+     *      java.lang.Long)
+     */
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) {
+	// pre-condition validation
+	if (toolSessionId == null || toolContentId == null) {
+	    throw new SubmitFilesException("Fail to create a submission session"
+		    + " based on null toolSessionId or toolContentId");
+	}
+
+	SubmitFilesService.log.debug("Start to create submission session based on toolSessionId["
+		+ toolSessionId.longValue() + "] and toolContentId[" + toolContentId.longValue() + "]");
+	try {
+	    SubmitFilesContent submitContent = getSubmitFilesContent(toolContentId);
+	    if (submitContent == null || !toolContentId.equals(submitContent.getContentID())) {
+		submitContent = new SubmitFilesContent();
+		submitContent.setContentID(toolContentId);
+	    }
+	    SubmitFilesSession submitSession = new SubmitFilesSession();
+
+	    submitSession.setSessionID(toolSessionId);
+	    submitSession.setSessionName(toolSessionName);
+	    submitSession.setStatus(new Integer(SubmitFilesSession.INCOMPLETE));
+	    submitSession.setContent(submitContent);
+	    submitFilesSessionDAO.createSession(submitSession);
+	    SubmitFilesService.log.debug("Submit File session created");
+	} catch (DataAccessException e) {
+	    throw new SubmitFilesException("Exception occured when lams is creating" + " a submission Session: "
+		    + e.getMessage(), e);
+	}
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#leaveToolSession(java.lang.Long,
+     *      org.lamsfoundation.lams.usermanagement.User)
+     */
+    public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
+	if (toolSessionId == null) {
+	    SubmitFilesService.log.error("Fail to leave tool Session based on null tool session id.");
+	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
+	}
+	if (learnerId == null) {
+	    SubmitFilesService.log.error("Fail to leave tool Session based on null learner.");
+	    throw new ToolException("Fail to remove tool Session based on null learner.");
+	}
+
+	SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
+	if (session != null) {
+	    session.setStatus(new Integer(SubmitFilesSession.COMPLETED));
+	    submitFilesSessionDAO.update(session);
+	} else {
+	    SubmitFilesService.log.error("Fail to leave tool Session.Could not find submit file "
+		    + "session by given session id: " + toolSessionId);
+	    throw new DataMissingException("Fail to leave tool Session."
+		    + "Could not find submit file session by given session id: " + toolSessionId);
+	}
+	return learnerService.completeToolSession(toolSessionId, learnerId);
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.lang.Long)
+     */
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#exportToolSession(java.util.List)
+     */
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#removeToolSession(java.lang.Long)
+     */
+    public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+	if (toolSessionId == null) {
+	    SubmitFilesService.log.error("Fail to remove tool Session based on null tool session id.");
+	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
+	}
+
+	SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
+	if (session != null) {
+	    removeToolSession(session);
+	} else {
+	    SubmitFilesService.log.error("Could not find submit file session by given session id: " + toolSessionId);
+	    throw new DataMissingException("Could not find submit file session by given session id: " + toolSessionId);
+	}
+    }
+
+    /** Remove a tool session. The session parameter must not be null. */
+    private void removeToolSession(SubmitFilesSession session) {
+	Set filesUploaded = session.getSubmissionDetails();
+	if (filesUploaded != null) {
+	    Iterator fileIterator = filesUploaded.iterator();
+	    while (fileIterator.hasNext()) {
+		SubmissionDetails details = (SubmissionDetails) fileIterator.next();
+		deleteFromRepository(details.getUuid(), details.getVersionID());
+		submissionDetailsDAO.delete(details);
+	    }
+	}
+	submitFilesSessionDAO.delete(session);
+    }
+
+    /**
+     * Get the tool output for the given tool output names.
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
+     *      java.lang.Long)
+     */
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
+	return new TreeMap<String, ToolOutput>();
+    }
+
+    /**
+     * Get the tool output for the given tool output name.
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
+     *      java.lang.Long)
+     */
+    public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
+	return null;
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToContent(Long,FormFile )
+     */
+    public InstructionFiles uploadFileToContent(Long contentID, FormFile uploadFile, String fileType)
+	    throws SubmitFilesException {
+	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
+	    throw new SubmitFilesException("Could not find upload file: " + uploadFile);
+	}
+
+	NodeKey nodeKey = processFile(uploadFile, fileType);
+
+	InstructionFiles file = new InstructionFiles();
+	file.setType(fileType);
+	file.setUuID(nodeKey.getUuid());
+	file.setVersionID(nodeKey.getVersion());
+	file.setName(uploadFile.getFileName());
+
+	return file;
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToSession(Long,FormFile,String,Long )
+     */
+    public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
+	    throws SubmitFilesException {
+
+	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
+	    throw new SubmitFilesException("Could not find upload file: " + uploadFile);
+	}
+
+	SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(sessionID);
+	if (session == null) {
+	    throw new SubmitFilesException("No such session with a sessionID of: " + sessionID + " found.");
+	}
+
+	NodeKey nodeKey = processFile(uploadFile, IToolContentHandler.TYPE_ONLINE);
+
+	SubmissionDetails details = new SubmissionDetails();
+	details.setFileDescription(fileDescription);
+	details.setFilePath(uploadFile.getFileName());
+	details.setDateOfSubmission(new Date());
+
+	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
+	details.setLearner(learner);
+	details.setUuid(nodeKey.getUuid());
+	details.setVersionID(nodeKey.getVersion());
+	SubmitFilesReport report = new SubmitFilesReport();
+	details.setReport(report);
+	details.setSubmitFileSession(session);
+
+	// update session, then insert the detail too.
+	Set detailSet = session.getSubmissionDetails();
+	detailSet.add(details);
+	session.setSubmissionDetails(detailSet);
+	submissionDetailsDAO.saveOrUpdate(session);
+
+    }
+
+    /**
+     * Process an uploaded file.
+     * 
+     * @param forumForm
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
+     */
+    private NodeKey processFile(FormFile file, String fileType) {
+	NodeKey node = null;
+	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+	    String fileName = file.getFileName();
+	    try {
+		node = getSbmtToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(),
+			fileType);
+	    } catch (InvalidParameterException e) {
+		throw new SubmitFilesException("FileNotFoundException occured while trying to upload File"
+			+ e.getMessage());
+	    } catch (FileNotFoundException e) {
+		throw new SubmitFilesException("FileNotFoundException occured while trying to upload File"
+			+ e.getMessage());
+	    } catch (RepositoryCheckedException e) {
+		throw new SubmitFilesException("FileNotFoundException occured while trying to upload File"
+			+ e.getMessage());
+	    } catch (IOException e) {
+		throw new SubmitFilesException("FileNotFoundException occured while trying to upload File"
+			+ e.getMessage());
+	    }
+	}
+	return node;
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long,
+     *      java.lang.Long)
+     */
+    public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale) {
+	List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, userID);
+	SortedSet details = new TreeSet(this.new FileDtoComparator());
+	if (list == null) {
+	    return new ArrayList(details);
+	}
+
+	NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
+	for (SubmissionDetails submissionDetails : list) {
+	    FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
+	    details.add(detailDto);
+	}
+	return new ArrayList(details);
+    }
+
+    /**
+     * This method save SubmissionDetails list into a map container: key is user id, value is a list container, which
+     * contains all <code>FileDetailsDTO</code> object belong to this user.
+     */
+    public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale) {
+	List list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
+	if (list != null) {
+	    SortedMap map = new TreeMap(new LastNameAlphabeticComparator());
+	    Iterator iterator = list.iterator();
+	    List userFileList;
+	    NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
+	    while (iterator.hasNext()) {
+		SubmissionDetails submissionDetails = (SubmissionDetails) iterator.next();
+		SubmitUser learner = submissionDetails.getLearner();
+		if (learner == null) {
+		    SubmitFilesService.log.error("Could not find learer for special submission item:"
+			    + submissionDetails);
+		    return null;
 		}
-		return true;
-	}
+		SubmitUserDTO submitUserDTO = new SubmitUserDTO(learner);
 
-	public void finishSubmission(Long sessionID, Integer userID) {
-		SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
-		learner.setFinished(true);
-		submitUserDAO.saveOrUpdateUser(learner);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getToolDefaultContentIdBySignature(java.lang.Long)
-	 */
-	public Long getToolDefaultContentIdBySignature(String toolSignature) {
-		Long contentId = null;
-		contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
-		if (contentId == null) {
-			String error = "Could not retrieve default content id for this tool";
-			SubmitFilesService.log.error(error);
-			throw new SubmitFilesException(error);
+		FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
+		userFileList = (List) map.get(submitUserDTO);
+		// if it is first time to this user, creating a new ArrayList for this user.
+		if (userFileList == null) {
+		    userFileList = new ArrayList();
 		}
-		return contentId;
+		userFileList.add(detailDto);
+		map.put(submitUserDTO, userFileList);
+	    }
+	    return map;
+	} else {
+	    return null;
 	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#createDefaultContent(java.lang.Long)
-	 */
-	public SubmitFilesContent createDefaultContent(Long contentID) {
-		if (contentID == null) {
-			String error = "Could not retrieve default content id for this tool";
-			SubmitFilesService.log.error(error);
-			throw new SubmitFilesException(error);
+    public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale) {
+	SubmissionDetails details = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
+	return new FileDetailsDTO(details, currentLocale != null ? NumberFormat.getInstance(currentLocale) : null);
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getUsersBySession(java.lang.Long)
+     */
+    public List<SubmitUser> getUsersBySession(Long sessionID) {
+	return submitUserDAO.getUsersBySession(sessionID);
+    }
+
+    public void updateMarks(Long reportID, Float marks, String comments) {
+	SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
+	if (report != null) {
+	    report.setComments(comments);
+	    report.setMarks(marks);
+	    submitFilesReportDAO.update(report);
+	}
+    }
+
+    public IVersionedNode downloadFile(Long uuid, Long versionID) throws SubmitFilesException {
+	ITicket ticket = getRepositoryLoginTicket();
+	try {
+	    IVersionedNode node = repositoryService.getFileItem(ticket, uuid, null);
+	    return node;
+	} catch (AccessDeniedException ae) {
+	    throw new SubmitFilesException("AccessDeniedException occured while trying to download file "
+		    + ae.getMessage());
+	} catch (FileException fe) {
+	    throw new SubmitFilesException("FileException occured while trying to download file " + fe.getMessage());
+	} catch (ItemNotFoundException ie) {
+	    throw new SubmitFilesException("ItemNotFoundException occured while trying to download file "
+		    + ie.getMessage());
+	}
+    }
+
+    public SubmitFilesSession getSessionById(Long sessionID) {
+	return submitFilesSessionDAO.getSessionByID(sessionID);
+    }
+
+    public boolean releaseMarksForSession(Long sessionID) {
+	List list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
+	Iterator iter = list.iterator();
+	SubmissionDetails details;
+	SubmitFilesReport report;
+	SubmitFilesSession session = getSessionById(sessionID);
+
+	SubmitFilesContent content = session.getContent();
+	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
+		SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID());
+	Map<Long, StringBuilder> notificationMessages = null;
+	Object[] notificationMessageParameters = null;
+	if (notifyLearnersOnMarkRelease) {
+	    notificationMessages = new TreeMap<Long, StringBuilder>();
+	    notificationMessageParameters = new Object[3];
+	}
+	while (iter.hasNext()) {
+	    details = (SubmissionDetails) iter.next();
+	    report = details.getReport();
+	    report.setDateMarksReleased(new Date());
+	    if (notifyLearnersOnMarkRelease) {
+		SubmitUser user = details.getLearner();
+		StringBuilder notificationMessage = notificationMessages.get(user.getUserID().longValue());
+		if (notificationMessage == null) {
+		    notificationMessage = new StringBuilder();
 		}
-		SubmitFilesContent defaultContent = getDefaultSubmit();
+		notificationMessageParameters[0] = details.getFilePath();
+		notificationMessageParameters[1] = details.getDateOfSubmission();
+		notificationMessageParameters[2] = report.getMarks();
+		notificationMessage
+			.append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
+		notificationMessages.put(user.getUserID().longValue(), notificationMessage);
+	    }
+	    submitFilesReportDAO.updateReport(report);
+	}
+	// current there is no false return
+	if (notifyLearnersOnMarkRelease) {
+	    notificationMessageParameters = new Object[1];
+	    for (Long userID : notificationMessages.keySet()) {
+		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
+		getEventNotificationService().triggerForSingleUser(SbmtConstants.TOOL_SIGNATURE,
+			SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(), userID,
+			notificationMessageParameters);
+	    }
+	}
+	return true;
+    }
 
-		//save default content by given ID.
-		SubmitFilesContent content = new SubmitFilesContent();
-		content = SubmitFilesContent.newInstance(defaultContent, contentID, sbmtToolContentHandler);
-		content.setContentID(contentID);
+    public void finishSubmission(Long sessionID, Integer userID) {
+	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
+	learner.setFinished(true);
+	submitUserDAO.saveOrUpdateUser(learner);
+    }
 
-		return content;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getToolDefaultContentIdBySignature(java.lang.Long)
+     */
+    public Long getToolDefaultContentIdBySignature(String toolSignature) {
+	Long contentId = null;
+	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	if (contentId == null) {
+	    String error = "Could not retrieve default content id for this tool";
+	    SubmitFilesService.log.error(error);
+	    throw new SubmitFilesException(error);
+	}
+	return contentId;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#createDefaultContent(java.lang.Long)
+     */
+    public SubmitFilesContent createDefaultContent(Long contentID) {
+	if (contentID == null) {
+	    String error = "Could not retrieve default content id for this tool";
+	    SubmitFilesService.log.error(error);
+	    throw new SubmitFilesException(error);
+	}
+	SubmitFilesContent defaultContent = getDefaultSubmit();
+
+	// save default content by given ID.
+	SubmitFilesContent content = new SubmitFilesContent();
+	content = SubmitFilesContent.newInstance(defaultContent, contentID, sbmtToolContentHandler);
+	content.setContentID(contentID);
+
+	return content;
+    }
+
+    private SubmitFilesContent getDefaultSubmit() {
+	Long defaultToolContentId = getToolDefaultContentIdBySignature(SbmtConstants.TOOL_SIGNATURE);
+	SubmitFilesContent defaultContent = getSubmitFilesContent(defaultToolContentId);
+	if (defaultContent == null) {
+	    String error = "Could not retrieve default content record for this tool";
+	    SubmitFilesService.log.error(error);
+	    throw new SubmitFilesException(error);
+	}
+	return defaultContent;
+    }
+
+    public List getSubmitFilesSessionByContentID(Long contentID) {
+	List learners = submitFilesSessionDAO.getSubmitFilesSessionByContentID(contentID);
+	if (learners == null) {
+	    learners = new ArrayList(); // return sized 0 list rather than null value
+	}
+	return learners;
+    }
+
+    /* ===============Methods implemented from ToolContentImport102Manager =============== */
+
+    /**
+     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
+     */
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
+	Date now = new Date();
+	SubmitFilesContent toolContentObj = new SubmitFilesContent();
+
+	toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+	toolContentObj.setContentID(toolContentId);
+	toolContentObj.setContentInUse(Boolean.FALSE);
+	toolContentObj.setCreated(now);
+	toolContentObj.setDefineLater(Boolean.FALSE);
+	toolContentObj.setInstruction(WebUtil.convertNewlines((String) importValues
+		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	toolContentObj.setOfflineInstruction(null);
+	toolContentObj.setOnlineInstruction(null);
+	toolContentObj.setRunOffline(Boolean.FALSE);
+	toolContentObj.setUpdated(now);
+	// 1.0.2 doesn't allow users to go back after completion, which is the equivalent of lock on finish.
+	toolContentObj.setLockOnFinished(Boolean.TRUE);
+	toolContentObj.setReflectOnActivity(Boolean.FALSE);
+	toolContentObj.setReflectInstructions(null);
+
+	SubmitUser suser = createContentUser(user, toolContentId);
+	toolContentObj.setCreatedBy(suser);
+
+	// leave as empty, no need to set them to anything.
+	// toolContentObj.setInstructionFiles(attachments);
+
+	submitFilesContentDAO.saveOrUpdate(toolContentObj);
+    }
+
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
+	    DataMissingException {
+
+	SubmitFilesContent toolContentObj = getSubmitFilesContent(toolContentId);
+	if (toolContentObj == null) {
+	    throw new DataMissingException("Unable to set reflective data titled " + title
+		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
 	}
 
-	private SubmitFilesContent getDefaultSubmit() {
-		Long defaultToolContentId = getToolDefaultContentIdBySignature(SbmtConstants.TOOL_SIGNATURE);
-		SubmitFilesContent defaultContent = getSubmitFilesContent(defaultToolContentId);
-		if (defaultContent == null) {
-			String error = "Could not retrieve default content record for this tool";
-			SubmitFilesService.log.error(error);
-			throw new SubmitFilesException(error);
-		}
-		return defaultContent;
+	toolContentObj.setReflectOnActivity(Boolean.TRUE);
+	toolContentObj.setReflectInstructions(description);
+    }
+
+    public SubmitUser getUserByUid(Long learnerID) {
+	return (SubmitUser) submitUserDAO.find(SubmitUser.class, learnerID);
+
+    }
+
+    public SubmitUser createSessionUser(UserDTO userDto, Long sessionID) {
+	SubmitUser learner = submitUserDAO.getLearner(sessionID, userDto.getUserID());
+	if (learner != null) {
+	    return learner;
 	}
+	learner = new SubmitUser();
+	learner.setUserID(userDto.getUserID());
+	learner.setFirstName(userDto.getFirstName());
+	learner.setLastName(userDto.getLastName());
+	learner.setLogin(userDto.getLogin());
+	learner.setSessionID(sessionID);
+	learner.setFinished(false);
 
-	public List getSubmitFilesSessionByContentID(Long contentID) {
-		List learners = submitFilesSessionDAO.getSubmitFilesSessionByContentID(contentID);
-		if (learners == null) {
-			learners = new ArrayList(); //return sized 0 list rather than null value
-		}
-		return learners;
+	submitUserDAO.saveOrUpdateUser(learner);
+
+	return learner;
+    }
+
+    public SubmitUser getSessionUser(Long sessionID, Integer userID) {
+	return submitUserDAO.getLearner(sessionID, userID);
+    }
+
+    public SubmitUser createContentUser(UserDTO userDto, Long contentId) {
+	SubmitUser learner = submitUserDAO.getContentUser(contentId, userDto.getUserID());
+	if (learner != null) {
+	    return learner;
 	}
+	learner = new SubmitUser();
+	learner.setUserID(userDto.getUserID());
+	learner.setFirstName(userDto.getFirstName());
+	learner.setLastName(userDto.getLastName());
+	learner.setLogin(userDto.getLogin());
+	learner.setContentID(contentId);
+	learner.setFinished(false);
 
-	/* ===============Methods implemented from ToolContentImport102Manager =============== */
+	submitUserDAO.saveOrUpdateUser(learner);
+	return learner;
 
-	/**
-	 * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
-	 */
-	public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
-		Date now = new Date();
-		SubmitFilesContent toolContentObj = new SubmitFilesContent();
+    }
 
-		toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
-		toolContentObj.setContentID(toolContentId);
-		toolContentObj.setContentInUse(Boolean.FALSE);
-		toolContentObj.setCreated(now);
-		toolContentObj.setDefineLater(Boolean.FALSE);
-		toolContentObj.setInstruction(WebUtil
-				.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
-		toolContentObj.setOfflineInstruction(null);
-		toolContentObj.setOnlineInstruction(null);
-		toolContentObj.setRunOffline(Boolean.FALSE);
-		toolContentObj.setUpdated(now);
-		// 1.0.2 doesn't allow users to go back after completion, which is the equivalent of lock on finish.
-		toolContentObj.setLockOnFinished(Boolean.TRUE);
-		toolContentObj.setReflectOnActivity(Boolean.FALSE);
-		toolContentObj.setReflectInstructions(null);
+    public SubmitUser getContentUser(Long contentId, Integer userID) {
+	return submitUserDAO.getContentUser(contentId, userID);
+    }
 
-		SubmitUser suser = createContentUser(user, toolContentId);
-		toolContentObj.setCreatedBy(suser);
+    /*******************************************************************************************************************
+     * Property Injection Methods
+     ******************************************************************************************************************/
 
-		// leave as empty, no need to set them to anything.
-		//toolContentObj.setInstructionFiles(attachments);
+    /**
+     * @param submitFilesContentDAO
+     *                The submitFilesContentDAO to set.
+     */
+    public void setSubmitFilesContentDAO(ISubmitFilesContentDAO submitFilesContentDAO) {
+	this.submitFilesContentDAO = submitFilesContentDAO;
+    }
 
-		submitFilesContentDAO.saveOrUpdate(toolContentObj);
-	}
+    /**
+     * @param submitFilesReportDAO
+     *                The submitFilesReportDAO to set.
+     */
+    public void setSubmitFilesReportDAO(ISubmitFilesReportDAO submitFilesReportDAO) {
+	this.submitFilesReportDAO = submitFilesReportDAO;
+    }
 
-	/** Set the description, throws away the title value as this is not supported in 2.0 */
-	public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
-			DataMissingException {
+    /**
+     * @param submitFilesSessionDAO
+     *                The submitFilesSessionDAO to set.
+     */
+    public void setSubmitFilesSessionDAO(ISubmitFilesSessionDAO submitFilesSessionDAO) {
+	this.submitFilesSessionDAO = submitFilesSessionDAO;
+    }
 
-		SubmitFilesContent toolContentObj = getSubmitFilesContent(toolContentId);
-		if (toolContentObj == null) {
-			throw new DataMissingException("Unable to set reflective data titled " + title + " on activity toolContentId "
-					+ toolContentId + " as the tool content does not exist.");
-		}
+    /**
+     * @param submissionDetailsDAO
+     *                The submissionDetailsDAO to set.
+     */
+    public void setSubmissionDetailsDAO(ISubmissionDetailsDAO submissionDetailsDAO) {
+	this.submissionDetailsDAO = submissionDetailsDAO;
+    }
 
-		toolContentObj.setReflectOnActivity(Boolean.TRUE);
-		toolContentObj.setReflectInstructions(description);
-	}
+    /**
+     * @return Returns the sbmtToolContentHandler.
+     */
+    public IToolContentHandler getSbmtToolContentHandler() {
+	return sbmtToolContentHandler;
+    }
 
-	public SubmitUser getUserByUid(Long learnerID) {
-		return (SubmitUser) submitUserDAO.find(SubmitUser.class, learnerID);
+    /**
+     * @param sbmtToolContentHandler
+     *                The sbmtToolContentHandler to set.
+     */
+    public void setSbmtToolContentHandler(IToolContentHandler sbmtToolContentHandler) {
+	this.sbmtToolContentHandler = sbmtToolContentHandler;
+    }
 
-	}
+    /**
+     * @return Returns the learnerDAO.
+     */
+    public ISubmitUserDAO getSubmitUserDAO() {
+	return submitUserDAO;
+    }
 
-	public SubmitUser createSessionUser(UserDTO userDto, Long sessionID) {
-		SubmitUser learner = submitUserDAO.getLearner(sessionID, userDto.getUserID());
-		if (learner != null) {
-			return learner;
-		}
-		learner = new SubmitUser();
-		learner.setUserID(userDto.getUserID());
-		learner.setFirstName(userDto.getFirstName());
-		learner.setLastName(userDto.getLastName());
-		learner.setLogin(userDto.getLogin());
-		learner.setSessionID(sessionID);
-		learner.setFinished(false);
+    /**
+     * @param learnerDAO
+     *                The learnerDAO to set.
+     */
+    public void setSubmitUserDAO(ISubmitUserDAO learnerDAO) {
+	submitUserDAO = learnerDAO;
+    }
 
-		submitUserDAO.saveOrUpdateUser(learner);
+    public ILearnerService getLearnerService() {
+	return learnerService;
+    }
 
-		return learner;
-	}
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
 
-	public SubmitUser getSessionUser(Long sessionID, Integer userID) {
-		return submitUserDAO.getLearner(sessionID, userID);
-	}
+    public ILamsToolService getToolService() {
+	return toolService;
+    }
 
-	public SubmitUser createContentUser(UserDTO userDto, Long contentId) {
-		SubmitUser learner = submitUserDAO.getContentUser(contentId, userDto.getUserID());
-		if (learner != null) {
-			return learner;
-		}
-		learner = new SubmitUser();
-		learner.setUserID(userDto.getUserID());
-		learner.setFirstName(userDto.getFirstName());
-		learner.setLastName(userDto.getLastName());
-		learner.setLogin(userDto.getLogin());
-		learner.setContentID(contentId);
-		learner.setFinished(false);
+    public void setToolService(ILamsToolService toolService) {
+	this.toolService = toolService;
+    }
 
-		submitUserDAO.saveOrUpdateUser(learner);
-		return learner;
+    public IExportToolContentService getExportContentService() {
+	return exportContentService;
+    }
 
-	}
+    public void setExportContentService(IExportToolContentService exportContentService) {
+	this.exportContentService = exportContentService;
+    }
 
-	public SubmitUser getContentUser(Long contentId, Integer userID) {
-		return submitUserDAO.getContentUser(contentId, userID);
-	}
+    public ICoreNotebookService getCoreNotebookService() {
+	return coreNotebookService;
+    }
 
-	/***************************************************************************
-	 * Property Injection Methods
-	 **************************************************************************/
+    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+	this.coreNotebookService = coreNotebookService;
+    }
 
-	/**
-	 * @param submitFilesContentDAO
-	 *            The submitFilesContentDAO to set.
-	 */
-	public void setSubmitFilesContentDAO(ISubmitFilesContentDAO submitFilesContentDAO) {
-		this.submitFilesContentDAO = submitFilesContentDAO;
-	}
+    public void setAttachmentDAO(IAttachmentDAO attachmentDAO) {
+	this.attachmentDAO = attachmentDAO;
+    }
 
-	/**
-	 * @param submitFilesReportDAO
-	 *            The submitFilesReportDAO to set.
-	 */
-	public void setSubmitFilesReportDAO(ISubmitFilesReportDAO submitFilesReportDAO) {
-		this.submitFilesReportDAO = submitFilesReportDAO;
-	}
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
+    }
 
-	/**
-	 * @param submitFilesSessionDAO
-	 *            The submitFilesSessionDAO to set.
-	 */
-	public void setSubmitFilesSessionDAO(ISubmitFilesSessionDAO submitFilesSessionDAO) {
-		this.submitFilesSessionDAO = submitFilesSessionDAO;
-	}
+    public IEventNotificationService getEventNotificationService() {
+	return eventNotificationService;
+    }
 
-	/**
-	 * @param submissionDetailsDAO The submissionDetailsDAO to set.
-	 */
-	public void setSubmissionDetailsDAO(ISubmissionDetailsDAO submissionDetailsDAO) {
-		this.submissionDetailsDAO = submissionDetailsDAO;
-	}
+    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+	this.eventNotificationService = eventNotificationService;
+    }
 
-	/**
-	 * @return Returns the sbmtToolContentHandler.
-	 */
-	public IToolContentHandler getSbmtToolContentHandler() {
-		return sbmtToolContentHandler;
-	}
+    public String getLocalisedMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
+    }
 
-	/**
-	 * @param sbmtToolContentHandler The sbmtToolContentHandler to set.
-	 */
-	public void setSbmtToolContentHandler(IToolContentHandler sbmtToolContentHandler) {
-		this.sbmtToolContentHandler = sbmtToolContentHandler;
-	}
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
 
-	/**
-	 * @return Returns the learnerDAO.
-	 */
-	public ISubmitUserDAO getSubmitUserDAO() {
-		return submitUserDAO;
-	}
+    public List<User> getMonitorsByToolSessionId(Long sessionId) {
+	return getLessonService().getMonitorsByToolSessionId(sessionId);
+    }
 
-	/**
-	 * @param learnerDAO The learnerDAO to set.
-	 */
-	public void setSubmitUserDAO(ISubmitUserDAO learnerDAO) {
-		submitUserDAO = learnerDAO;
-	}
+    public ILessonService getLessonService() {
+	return lessonService;
+    }
 
-	public ILearnerService getLearnerService() {
-		return learnerService;
-	}
-
-	public void setLearnerService(ILearnerService learnerService) {
-		this.learnerService = learnerService;
-	}
-
-	public ILamsToolService getToolService() {
-		return toolService;
-	}
-
-	public void setToolService(ILamsToolService toolService) {
-		this.toolService = toolService;
-	}
-
-	public IExportToolContentService getExportContentService() {
-		return exportContentService;
-	}
-
-	public void setExportContentService(IExportToolContentService exportContentService) {
-		this.exportContentService = exportContentService;
-	}
-
-	public ICoreNotebookService getCoreNotebookService() {
-		return coreNotebookService;
-	}
-
-	public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-		this.coreNotebookService = coreNotebookService;
-	}
-
-	public void setAttachmentDAO(IAttachmentDAO attachmentDAO) {
-		this.attachmentDAO = attachmentDAO;
-	}
-
-	public void setUserManagementService(IUserManagementService userManagementService) {
-		this.userManagementService = userManagementService;
-	}
-
-	public IEventNotificationService getEventNotificationService() {
-		return eventNotificationService;
-	}
-
-	public void setEventNotificationService(IEventNotificationService eventNotificationService) {
-		this.eventNotificationService = eventNotificationService;
-	}
-
-	public String getLocalisedMessage(String key, Object[] args) {
-		return messageService.getMessage(key, args);
-	}
-
-	public void setMessageService(MessageService messageService) {
-		this.messageService = messageService;
-	}
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
 }

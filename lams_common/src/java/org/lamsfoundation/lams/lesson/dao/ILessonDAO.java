@@ -32,69 +32,84 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Inteface defines Lesson DAO Methods
+ * 
  * @author chris
  */
-public interface ILessonDAO extends IBaseDAO
-{
-    
+public interface ILessonDAO extends IBaseDAO {
+
     /**
      * Retrieves the Lesson
-     * @param lessonId identifies the lesson to get
+     * 
+     * @param lessonId
+     *                identifies the lesson to get
      * @return the lesson
      */
     public Lesson getLesson(Long lessonId);
-    
+
     /** Get all the lessons in the database. This includes the disabled lessons. */
     public List getAllLessons();
-    
+
     public Lesson getLessonWithJoinFetchedProgress(Long lessonId);
+
     /**
-     * Gets all lessons that are active for a learner.
-     * TODO to be removed when the dummy interface is no longer needed
-     * @param learner a User that identifies the learner.
+     * Gets all lessons that are active for a learner. TODO to be removed when the dummy interface is no longer needed
+     * 
+     * @param learner
+     *                a User that identifies the learner.
      * @return a Set with all active lessons in it.
      */
     public List getActiveLessonsForLearner(User learner);
-    
+
     /**
      * Gets all lessons that are active for a learner, in a given organisation
-     * @param learnerId a User that identifies the learner.
-     * @param organisationId the desired organisation .
+     * 
+     * @param learnerId
+     *                a User that identifies the learner.
+     * @param organisationId
+     *                the desired organisation .
      * @return a List with all active lessons in it.
      */
     public List getActiveLessonsForLearner(final Integer learnerId, final Integer organisationID);
 
     /**
      * Saves or Updates a Lesson.
-     * @param lesson the Lesson to save
+     * 
+     * @param lesson
+     *                the Lesson to save
      */
     public void saveLesson(Lesson lesson);
-    
+
     /**
      * Deletes a Lesson <b>permanently</b>.
-     * @param lesson the Lesson to remove.
+     * 
+     * @param lesson
+     *                the Lesson to remove.
      */
     public void deleteLesson(Lesson lesson);
-    
+
     /**
      * Update a requested lesson.
+     * 
      * @param createdLesson
      */
     public void updateLesson(Lesson lesson);
-    
+
     /**
-      * Returns the list of available Lessons created by
-     * a given user. Does not return disabled lessons or preview lessons.
-    * 
-     * @param userID The user_id of the user
+     * Returns the list of available Lessons created by a given user. Does not return disabled lessons or preview
+     * lessons.
+     * 
+     * @param userID
+     *                The user_id of the user
      * @return List The list of Lessons for the given user
      */
     public List getLessonsCreatedByUser(Integer userID);
-    
+
     /**
-     * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return 
-     * disabled lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
-     * @param user a User that identifies the teacher/staff member.
+     * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return disabled
+     * lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
+     * 
+     * @param user
+     *                a User that identifies the teacher/staff member.
      * @return a List with all appropriate lessons in it.
      */
     public List getLessonsForMonitoring(final int userID, final int organisationID);
@@ -102,57 +117,75 @@ public interface ILessonDAO extends IBaseDAO
     /**
      * Returns the all the learners that have started the requested lesson.
      * 
-     * @param lessonId the id of the requested lesson.
+     * @param lessonId
+     *                the id of the requested lesson.
      * @return the list of learners.
      */
     public List getActiveLearnerByLesson(final long lessonId);
 
     /**
-     * Returns the all the learners that have started the requested lesson and 
-     * are in the given group.
-     *  
-     * @param lessonId the id of the requested lesson.
-     * @param groupId the id of the requested group.
+     * Returns the all the learners that have started the requested lesson and are in the given group.
+     * 
+     * @param lessonId
+     *                the id of the requested lesson.
+     * @param groupId
+     *                the id of the requested group.
      * @return the list of learners.
      */
     public List getActiveLearnerByLessonAndGroup(final long lessonId, final long groupId);
- 
+
     /**
      * Returns the count of all the learners that have started the requested lesson.
      * 
-     * @param lessonId the id of the requested lesson.
+     * @param lessonId
+     *                the id of the requested lesson.
      * @return the count of the learners.
      */
     public Integer getCountActiveLearnerByLesson(final long lessonId);
- 
+
     /**
      * Get all the preview lessons more with the creation date before the given date.
      * 
-     * @param startDate UTC date 
+     * @param startDate
+     *                UTC date
      * @return the list of Lessons
      */
     public List getPreviewLessonsBeforeDate(final Date startDate);
-    
+
     /**
      * Get the lesson that applies to this activity. Not all activities have an attached lesson.
      */
     public Lesson getLessonForActivity(final long activityId);
-    
+
     /**
-     * Gets all non-removed lessons for a user in an org; set isStaff flag whether you want lessons where user
-     * is in the staff list, or just in the learner list.
-     * @param userId a user id that identifies the user.
-     * @param orgId an org id that identifies the organisation.
-     * @param isStaff boolean flag for whether user is staff in returned lessons.
+     * Gets all non-removed lessons for a user in an org; set isStaff flag whether you want lessons where user is in the
+     * staff list, or just in the learner list.
+     * 
+     * @param userId
+     *                a user id that identifies the user.
+     * @param orgId
+     *                an org id that identifies the organisation.
+     * @param isStaff
+     *                boolean flag for whether user is staff in returned lessons.
      * @return a List containing a list of tuples containing lesson details and the lesson completed flag for the user.
      */
     public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final boolean isStaff);
 
     /**
      * Get lessons based on learning designs where the original learning design has the given id.
+     * 
      * @param ldId
      * @param orgId
      * @return list of lessons
      */
     public List getLessonsByOriginalLearningDesign(final Long ldId, final Integer orgId);
+
+    /**
+     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
+     * 
+     * @param sessionId
+     *                tool session ID
+     * @return list of teachers that monitor the lesson which contains the tool with given session ID
+     */
+    public List<User> getMonitorsByToolSessionId(Long sessionId);
 }

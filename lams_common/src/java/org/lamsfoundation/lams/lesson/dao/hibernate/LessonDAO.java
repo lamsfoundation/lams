@@ -30,7 +30,7 @@ import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.Restrictions;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -40,304 +40,283 @@ import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
+
 /**
  * Hibernate implementation of ILessonDAO
+ * 
  * @author chris
  */
-public class LessonDAO extends BaseDAO implements ILessonDAO
-{
-	private final static String FIND_LESSON_BY_CREATOR="from "
-					+ Lesson.class.getName()
-					+ " lesson where lesson.user.userId=? and lesson.lessonStateId <= 6 and "
-					+" lesson.learningDesign.copyTypeID="
-					+ LearningDesign.COPY_TYPE_LESSON;
-	private final static String FIND_PREVIEW_BEFORE_START_DATE=	"from "
-					+ Lesson.class.getName()
-					+ " lesson where lesson.learningDesign.copyTypeID="
-					+ LearningDesign.COPY_TYPE_PREVIEW 
-					+ "and lesson.startDateTime is not null and lesson.startDateTime < ?";
-	private final static String COUNT_ACTIVE_LEARNERS = "select count(distinct progress.user.id)"
-					+ " from "+LearnerProgress.class.getName()+" progress"
-					+ " where progress.lesson.id = :lessonId";
-	private final static String FIND_LESSON_FOR_ACTIVITY =	"select lesson from "
-		+ Lesson.class.getName()+" lesson, "+ Activity.class.getName() + " activity "
-		+ " where activity.activityId=:activityId and activity.learningDesign=lesson.learningDesign";
-	private final static String LESSONS_WITH_ORIGINAL_LEARNING_DESIGN = "select l from "
-		+ Lesson.class.getName() + " l "
-		+ "where l.learningDesign.originalLearningDesign.learningDesignId = ? "
-		+ "and l.learningDesign.copyTypeID != " + LearningDesign.COPY_TYPE_PREVIEW + " "
-		+ "and l.lessonStateId = " + Lesson.STARTED_STATE + " "
-		+ "and l.organisation.organisationId = ? "
-		+ " order by l.lessonName";
+public class LessonDAO extends BaseDAO implements ILessonDAO {
+    private final static String FIND_LESSON_BY_CREATOR = "from " + Lesson.class.getName()
+	    + " lesson where lesson.user.userId=? and lesson.lessonStateId <= 6 and "
+	    + " lesson.learningDesign.copyTypeID=" + LearningDesign.COPY_TYPE_LESSON;
+    private final static String FIND_PREVIEW_BEFORE_START_DATE = "from " + Lesson.class.getName()
+	    + " lesson where lesson.learningDesign.copyTypeID=" + LearningDesign.COPY_TYPE_PREVIEW
+	    + "and lesson.startDateTime is not null and lesson.startDateTime < ?";
+    private final static String COUNT_ACTIVE_LEARNERS = "select count(distinct progress.user.id)" + " from "
+	    + LearnerProgress.class.getName() + " progress" + " where progress.lesson.id = :lessonId";
+    private final static String FIND_LESSON_FOR_ACTIVITY = "select lesson from " + Lesson.class.getName() + " lesson, "
+	    + Activity.class.getName() + " activity "
+	    + " where activity.activityId=:activityId and activity.learningDesign=lesson.learningDesign";
+    private final static String LESSONS_WITH_ORIGINAL_LEARNING_DESIGN = "select l from " + Lesson.class.getName()
+	    + " l " + "where l.learningDesign.originalLearningDesign.learningDesignId = ? "
+	    + "and l.learningDesign.copyTypeID != " + LearningDesign.COPY_TYPE_PREVIEW + " " + "and l.lessonStateId = "
+	    + Lesson.STARTED_STATE + " " + "and l.organisation.organisationId = ? " + " order by l.lessonName";
 
     /**
-     * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces 
-     * an initialize.
-     * @param lessonId identifies the lesson to get
+     * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
+     * 
+     * @param lessonId
+     *                identifies the lesson to get
      * @return the lesson
      */
-    public Lesson getLesson(Long lessonId)
-    {
-        Lesson lesson =  (Lesson)getHibernateTemplate().get(Lesson.class, lessonId);
-        return lesson;
+    public Lesson getLesson(Long lessonId) {
+	Lesson lesson = (Lesson) getHibernateTemplate().get(Lesson.class, lessonId);
+	return lesson;
     }
-    
-    
-    public Lesson getLessonWithJoinFetchedProgress(final Long lessonId)
-    {
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 
-        return (Lesson)hibernateTemplate.execute(
-             new HibernateCallback() 
-             {
-                 public Object doInHibernate(Session session) throws HibernateException 
-                 {
-                     return session.createCriteria(Lesson.class)
-                     			   .add(Expression.like("lessonId",lessonId))
-                     			   .setFetchMode("learnerProgresses",FetchMode.JOIN)
-                     			   .uniqueResult();
-                 }
-             }
-       ); 
+    public Lesson getLessonWithJoinFetchedProgress(final Long lessonId) {
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+
+	return (Lesson) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createCriteria(Lesson.class).add(Restrictions.like("lessonId", lessonId)).setFetchMode(
+			"learnerProgresses", FetchMode.JOIN).uniqueResult();
+	    }
+	});
     }
-  
+
     /** Get all the lessons in the database. This includes the disabled lessons. */
-    public List getAllLessons()
-    {
-        return getHibernateTemplate().loadAll(Lesson.class);
+    public List getAllLessons() {
+	return getHibernateTemplate().loadAll(Lesson.class);
     }
-    
-     /**
+
+    /**
      * Gets all lessons that are active for a learner.
-     * @param learner a User that identifies the learner.
+     * 
+     * @param learner
+     *                a User that identifies the learner.
      * @return a List with all active lessons in it.
      */
-    public List getActiveLessonsForLearner(final User learner)
-    {
-    	List lessons = null;
-    	
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-    	lessons = (List)hibernateTemplate.execute(
-            new HibernateCallback() {
-                public Object doInHibernate(Session session) throws HibernateException {
-        	    	Query query = session.getNamedQuery("activeLessonsAllOrganisations");
-        	    	query.setInteger("userId", learner.getUserId().intValue());
-        	    	List result = query.list();
-                    return result;
-                }
-            }
-        );
-        return lessons;
+    public List getActiveLessonsForLearner(final User learner) {
+	List lessons = null;
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	lessons = (List) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.getNamedQuery("activeLessonsAllOrganisations");
+		query.setInteger("userId", learner.getUserId().intValue());
+		List result = query.list();
+		return result;
+	    }
+	});
+	return lessons;
     }
-    
+
     /**
      * Gets all lessons that are active for a learner, in a given organisation
-     * @param learnerId a User that identifies the learner.
-     * @param organisationId the desired organisation.
+     * 
+     * @param learnerId
+     *                a User that identifies the learner.
+     * @param organisationId
+     *                the desired organisation.
      * @return a List with all active lessons in it.
      */
-    public List getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId)
-    {
-    	List lessons = null;
-    	
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-    	lessons = (List)hibernateTemplate.execute(
-            new HibernateCallback() {
-                public Object doInHibernate(Session session) throws HibernateException {
-        	    	Query query = session.getNamedQuery("activeLessons");
-        	    	query.setInteger("userId", learnerId);
-        	    	query.setInteger("organisationId", organisationId);
-        	    	List result = query.list();
-                    return result;
-                }
-            }
-        );
-        return lessons;
+    public List getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId) {
+	List lessons = null;
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	lessons = (List) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.getNamedQuery("activeLessons");
+		query.setInteger("userId", learnerId);
+		query.setInteger("organisationId", organisationId);
+		List result = query.list();
+		return result;
+	    }
+	});
+	return lessons;
     }
 
     /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
      */
-    public List getActiveLearnerByLesson(final long lessonId)
-    {
-    	List learners = null;
-    	
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-        learners = (List)hibernateTemplate.execute(
-            new HibernateCallback() {
-                public Object doInHibernate(Session session) throws HibernateException {
-        	    	Query query = session.getNamedQuery("activeLearners");
-        	    	query.setLong("lessonId", lessonId);
-        	    	List result = query.list();
-                    return result;
-                }
-            }
-        );
-        return learners;
+    public List getActiveLearnerByLesson(final long lessonId) {
+	List learners = null;
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	learners = (List) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.getNamedQuery("activeLearners");
+		query.setLong("lessonId", lessonId);
+		List result = query.list();
+		return result;
+	    }
+	});
+	return learners;
     }
 
     /**
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLessonAndGroup(long, long)
      */
-    public List getActiveLearnerByLessonAndGroup(final long lessonId, final long groupId)
-    {
-    	List learners = null;
-    	
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-        learners = (List)hibernateTemplate.execute(
-            new HibernateCallback() {
-                public Object doInHibernate(Session session) throws HibernateException {
-        	    	Query query = session.getNamedQuery("activeLearnersByGroup");
-        	    	query.setLong("lessonId", lessonId);
-        	    	query.setLong("groupId", groupId);
-        	    	List result = query.list();
-                    return result;
-                }
-            }
-        );
-        return learners;
+    public List getActiveLearnerByLessonAndGroup(final long lessonId, final long groupId) {
+	List learners = null;
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	learners = (List) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.getNamedQuery("activeLearnersByGroup");
+		query.setLong("lessonId", lessonId);
+		query.setLong("groupId", groupId);
+		List result = query.list();
+		return result;
+	    }
+	});
+	return learners;
     }
 
     /**
-     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long)
-     * Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getActiveLearnerByLesson(long) Note: Hibernate 3.1
+     *      query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
      */
-    public Integer getCountActiveLearnerByLesson(final long lessonId)
-    {
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-        return (Integer) hibernateTemplate.execute(new HibernateCallback() {
-            public Object doInHibernate(Session session)
-                    throws HibernateException {
-    	    	Query query = session.createQuery(COUNT_ACTIVE_LEARNERS);
-    	    	query.setLong("lessonId", lessonId);
-    	    	Object value = query.uniqueResult();
-    	    	return new Integer (((Number)value).intValue()); 
-            }
-        });
+    public Integer getCountActiveLearnerByLesson(final long lessonId) {
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	return (Integer) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.createQuery(LessonDAO.COUNT_ACTIVE_LEARNERS);
+		query.setLong("lessonId", lessonId);
+		Object value = query.uniqueResult();
+		return new Integer(((Number) value).intValue());
+	    }
+	});
     }
-/**f
-     * Saves or Updates a Lesson.
+
+    /**
+     * f Saves or Updates a Lesson.
+     * 
      * @param lesson
      */
-    public void saveLesson(Lesson lesson)
-    {
-        getHibernateTemplate().save(lesson);
+    public void saveLesson(Lesson lesson) {
+	getHibernateTemplate().save(lesson);
     }
-    
+
     /**
      * Deletes a Lesson <b>permanently</b>.
+     * 
      * @param lesson
      */
-    public void deleteLesson(Lesson lesson)
-    {
-        getHibernateTemplate().delete(lesson);
+    public void deleteLesson(Lesson lesson) {
+	getHibernateTemplate().delete(lesson);
     }
-    
-
 
     /**
      * Update the lesson data
+     * 
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#updateLesson(org.lamsfoundation.lams.lesson.Lesson)
      */
-    public void updateLesson(Lesson lesson)
-    {
-        getHibernateTemplate().update(lesson);
+    public void updateLesson(Lesson lesson) {
+	getHibernateTemplate().update(lesson);
     }
-    
+
     /**
-     * Returns the list of available Lessons created by
-     * a given user. Does not return disabled lessons or preview lessons.
+     * Returns the list of available Lessons created by a given user. Does not return disabled lessons or preview
+     * lessons.
      * 
-     * @param userID The user_id of the user
+     * @param userID
+     *                The user_id of the user
      * @return List The list of Lessons for the given user
      */
-   public List getLessonsCreatedByUser(Integer userID){
-    	List lessons = this.getHibernateTemplate().find(FIND_LESSON_BY_CREATOR,userID);
-    	return lessons;
-    }
-   
-   /**
-    * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return 
-    * disabled lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
-    * @param user a User that identifies the teacher/staff member.
-    * @return a List with all appropriate lessons in it.
-    */
-   public List getLessonsForMonitoring(final int userID, final int organisationID)
-   {
-	   List lessons = null;
-   	
-       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-   		lessons = (List)hibernateTemplate.execute(
-           new HibernateCallback() {
-               public Object doInHibernate(Session session) throws HibernateException {
-       	    	Query query = session.getNamedQuery("lessonsForMonitoring");
-       	    	query.setInteger("userId", userID);
-       	    	query.setInteger("organisationId", organisationID);
-       	    	List result = query.list();
-                   return result;
-               }
-           }
-       );
-       return lessons;
-   }
-   /**
-    * Get all the preview lessons more with the creation date before the given date.
-    * 
-    * @param startDate UTC date 
-    * @return the list of Lessons
-    */
-   public List getPreviewLessonsBeforeDate(final Date startDate){
-   	List lessons = this.getHibernateTemplate().find(FIND_PREVIEW_BEFORE_START_DATE,startDate);
+    public List getLessonsCreatedByUser(Integer userID) {
+	List lessons = this.getHibernateTemplate().find(LessonDAO.FIND_LESSON_BY_CREATOR, userID);
 	return lessons;
-   }
-   /**
-    * Get the lesson that applies to this activity. Not all activities have an attached lesson.
-    */
-   public Lesson getLessonForActivity(final long activityId)
-   {
-       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-       return (Lesson) hibernateTemplate.execute(new HibernateCallback() {
-           public Object doInHibernate(Session session)
-                   throws HibernateException {
-   	    	Query query = session.createQuery(FIND_LESSON_FOR_ACTIVITY);
-   	    	query.setLong("activityId", activityId);
-            return query.uniqueResult();
-           }
-       });
-   }
-   
-   /**
-    * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOrgAndUserWithCompletedFlag(Integer, Integer, boolean)
-    */
-   public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final boolean isStaff)
-   {
-	   List dtos = null;
-   	
-       HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
-       dtos = (List)hibernateTemplate.execute(
-           new HibernateCallback() {
-               public Object doInHibernate(Session session) throws HibernateException {
-       	    	Query query = session.getNamedQuery( 
-       	    		isStaff ? "staffLessonsByOrgAndUserWithCompletedFlag" : "learnerLessonsByOrgAndUserWithCompletedFlag"
-       	    	);
-       	    	query.setInteger("userId", userId.intValue());
-       	    	query.setInteger("orgId", orgId.intValue());
-       	    	List result = query.list();
-                   return result;
-               }
-           }
-       );
-       return dtos;
-   }
-   
-   /**
-    * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOriginalLearningDesign(Integer)
-    */
-   public List getLessonsByOriginalLearningDesign(final Long ldId, final Integer orgId)
-   {
-	   Object[] args = {ldId.longValue(), orgId.intValue()};
-	   List lessons = this.getHibernateTemplate().find(LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, args);
-	   return lessons;
-   }
+    }
+
+    /**
+     * Gets all lessons in the given organisation, for which this user is in the staff group. Does not return disabled
+     * lessons or preview lessons. This is the list of lessons that a user may monitor/moderate/manage.
+     * 
+     * @param user
+     *                a User that identifies the teacher/staff member.
+     * @return a List with all appropriate lessons in it.
+     */
+    public List getLessonsForMonitoring(final int userID, final int organisationID) {
+	List lessons = null;
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	lessons = (List) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.getNamedQuery("lessonsForMonitoring");
+		query.setInteger("userId", userID);
+		query.setInteger("organisationId", organisationID);
+		List result = query.list();
+		return result;
+	    }
+	});
+	return lessons;
+    }
+
+    /**
+     * Get all the preview lessons more with the creation date before the given date.
+     * 
+     * @param startDate
+     *                UTC date
+     * @return the list of Lessons
+     */
+    public List getPreviewLessonsBeforeDate(final Date startDate) {
+	List lessons = this.getHibernateTemplate().find(LessonDAO.FIND_PREVIEW_BEFORE_START_DATE, startDate);
+	return lessons;
+    }
+
+    /**
+     * Get the lesson that applies to this activity. Not all activities have an attached lesson.
+     */
+    public Lesson getLessonForActivity(final long activityId) {
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	return (Lesson) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.createQuery(LessonDAO.FIND_LESSON_FOR_ACTIVITY);
+		query.setLong("activityId", activityId);
+		return query.uniqueResult();
+	    }
+	});
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOrgAndUserWithCompletedFlag(Integer, Integer,
+     *      boolean)
+     */
+    public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final boolean isStaff) {
+	List dtos = null;
+
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	dtos = (List) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.getNamedQuery(isStaff ? "staffLessonsByOrgAndUserWithCompletedFlag"
+			: "learnerLessonsByOrgAndUserWithCompletedFlag");
+		query.setInteger("userId", userId.intValue());
+		query.setInteger("orgId", orgId.intValue());
+		List result = query.list();
+		return result;
+	    }
+	});
+	return dtos;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOriginalLearningDesign(Integer)
+     */
+    public List getLessonsByOriginalLearningDesign(final Long ldId, final Integer orgId) {
+	Object[] args = { ldId.longValue(), orgId.intValue() };
+	List lessons = this.getHibernateTemplate().find(LessonDAO.LESSONS_WITH_ORIGINAL_LEARNING_DESIGN, args);
+	return lessons;
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getMonitorsByToolSessionId(Long)
+     */
+    public List<User> getMonitorsByToolSessionId(Long sessionId) {
+	return this.getHibernateTemplate().findByNamedQueryAndNamedParam("monitorsByToolSessionId", "sessionId",
+		sessionId);
+    }
 
 }
