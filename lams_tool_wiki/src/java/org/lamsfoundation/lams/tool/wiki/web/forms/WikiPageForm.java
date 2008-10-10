@@ -46,19 +46,19 @@ public class WikiPageForm extends ActionForm {
 
     private static final long serialVersionUID = 234235265633376356L;
 
-    private String title;
-    private String wikiBody;
-    private Boolean isEditable;
+    String title;
+    String wikiBody;
+    Boolean isEditable;
 
     // Extra params for adding pages
-    private String newPageTitle;
-    private String newPageWikiBody;
+    String newPageTitle;
+    String newPageWikiBody;
 
-    private Long currentWikiPageId;
-    private String newPageName;
-    private Boolean newPageIsEditable;
+    Long currentWikiPageId;
+    String newPageName;
+    Boolean newPageIsEditable;
 
-    private Long historyPageContentId;
+    Long historyPageContentId;
 
     public WikiPageForm() {
     }

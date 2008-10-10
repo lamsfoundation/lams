@@ -120,8 +120,6 @@ public class AuthoringAction extends WikiPageAction {
 	// Set up the authForm.
 	AuthoringForm authForm = (AuthoringForm) form;
 
-	// Long currentPageUid = WebUtil.readLongParam(request,
-	// WikiConstants.ATTR_CURRENT_WIKI, true);
 	Long currentPageUid = authForm.getCurrentWikiPageId();
 
 	// set up wikiService
@@ -162,6 +160,9 @@ public class AuthoringAction extends WikiPageAction {
 	}
 	WikiPageDTO currentPageDTO = new WikiPageDTO(currentWikiPage);
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, currentPageDTO);
+	
+	// Reset the isEditable field for the form
+	authForm.setIsEditable(currentPageDTO.getEditable());
 
 	// Set the current wiki history
 	SortedSet<WikiPageContentDTO> currentWikiPageHistoryDTOs = new TreeSet<WikiPageContentDTO>();

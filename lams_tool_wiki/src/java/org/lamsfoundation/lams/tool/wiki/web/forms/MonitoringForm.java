@@ -25,8 +25,6 @@
 
 package org.lamsfoundation.lams.tool.wiki.web.forms;
 
-import org.apache.struts.action.ActionForm;
-
 /**
  * @struts.form name="monitoringForm"
  */
@@ -42,6 +40,7 @@ public class MonitoringForm extends WikiPageForm {
     Long messageUID;
     String messageBody;
     boolean messageHidden;
+    String mode;
 
     public String getMessageBody() {
 	return messageBody;
@@ -91,4 +90,11 @@ public class MonitoringForm extends WikiPageForm {
 	this.messageHidden = messageHidden;
     }
 
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
 }

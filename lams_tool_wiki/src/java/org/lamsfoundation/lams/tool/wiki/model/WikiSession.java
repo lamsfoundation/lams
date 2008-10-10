@@ -63,6 +63,8 @@ public class WikiSession implements java.io.Serializable {
     private Set<WikiUser> wikiUsers;
 
     private Set<WikiPage> wikiPages; // Need a runtime copy for each wikiPage
+    
+    private WikiPage mainPage; //Need a runtime reference to the main page
 
     // Constructors
 
@@ -204,6 +206,19 @@ public class WikiSession implements java.io.Serializable {
 
     public void setWikiPages(Set<WikiPage> wikiPages) {
 	this.wikiPages = wikiPages;
+    }
+    
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="wiki_main_page_uid"
+     * 
+     */
+    public WikiPage getMainPage() {
+	return mainPage;
+    }
+
+    public void setMainPage(WikiPage mainPage) {
+	this.mainPage = mainPage;
     }
 
     /**

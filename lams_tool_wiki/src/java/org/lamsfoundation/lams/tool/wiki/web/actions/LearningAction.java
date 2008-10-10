@@ -114,14 +114,11 @@ public class LearningAction extends WikiPageAction {
 	}
 
 	// set mode, toolSessionID and WikiDTO
-	request.setAttribute("mode", mode.toString());
+	request.setAttribute(WikiConstants.ATTR_MODE, mode.toString());
 	learningForm.setToolSessionID(toolSessionID);
 
-	WikiDTO wikiDTO = new WikiDTO();
-	wikiDTO.title = wiki.getTitle();
-	wikiDTO.instructions = wiki.getInstructions();
-	wikiDTO.lockOnFinish = wiki.isLockOnFinished();
-	request.setAttribute("wikiDTO", wikiDTO);
+	WikiDTO wikiDTO = new WikiDTO(wiki);
+	request.setAttribute(WikiConstants.ATTR_WIKI_DTO, wikiDTO);
 
 	// Set the content in use flag.
 	if (!wiki.isContentInUse()) {
@@ -141,29 +138,41 @@ public class LearningAction extends WikiPageAction {
 	} else {
 	    wikiUser = getCurrentUser(toolSessionID);
 	}
-
+	
+	// Set whether user has reached maximum edits
+	int maxEdits = wiki.getMaximumEdits();
+	Boolean maxEditsReached = (maxEdits != 0 && wikiUser.getWikiEdits() >= maxEdits);
+	request.setAttribute(WikiConstants.ATTR_MAX_EDITS_REACHED, maxEditsReached);
+	request.setAttribute(WikiConstants.ATTR_EDITS_LEFT, maxEdits - wikiUser.getWikiEdits());
+	
+	
+	// Set whether user has reached minimum edits
+	int minEdits = wiki.getMinimumEdits();
+	Boolean minEditsReached = (wikiUser.getWikiEdits() >=  minEdits);
+	request.setAttribute(WikiConstants.ATTR_MIN_EDITS_REACHED, minEditsReached);
+	
 	// Get the wikipages from the session and the main page
 	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
-	WikiPage mainPage = null;
+	//WikiPage mainPage = null;
 	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
 	    WikiPageDTO pageDTO = new WikiPageDTO(wikiPage);
 
 	    wikiPageDTOs.add(pageDTO);
 
 	    // Set the main page
-	    if (wikiPage.getTitle().equals(wiki.getMainPage().getTitle())) {
-		mainPage = wikiPage;
-	    }
+	    // if (wikiPage.getTitle().equals(wiki.getMainPage().getTitle())) {
+	    //	mainPage = wikiPage;
+	    //}
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
-	request.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(mainPage));
+	request.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
 
 	// Set the current wiki page, if there is none, set to the main page
 	WikiPage currentWikiPage = null;
 	if (currentPageUid != null) {
 	    currentWikiPage = wikiService.getWikiPageByUid(currentPageUid);
 	} else {
-	    currentWikiPage = mainPage;
+	    currentWikiPage = wikiSession.getMainPage();
 	}
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, new WikiPageDTO(currentWikiPage));
 
@@ -174,20 +183,13 @@ public class LearningAction extends WikiPageAction {
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGE_CONTENT_HISTORY, currentWikiPageHistoryDTOs);
 
-	// get any existing wiki entry
-	/*
-	 * NotebookEntry nbEntry = null; if ( wikiUser != null ) { nbEntry =
-	 * wikiService.getEntry(wikiUser.getEntryUID()); } if (nbEntry != null) {
-	 * learningForm.setEntryText(nbEntry.getEntry()); }
-	 */
-
 	// set readOnly flag.
 	if (mode.equals(ToolAccessMode.TEACHER) || (wiki.isLockOnFinished() && wikiUser.isFinishedActivity())) {
-	    request.setAttribute("contentEditable", false);
+	    request.setAttribute(WikiConstants.ATTR_CONTENT_EDITAVLE, false);
 	} else {
-	    request.setAttribute("contentEditable", true);
+	    request.setAttribute(WikiConstants.ATTR_CONTENT_EDITAVLE, true);
 	}
-	request.setAttribute("finishedActivity", wikiUser.isFinishedActivity());
+	request.setAttribute(WikiConstants.ATTR_FINISHED_ACTIVITY, wikiUser.isFinishedActivity());
 
 	return mapping.findForward("wiki");
     }

@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageDTO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
@@ -99,16 +100,38 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Set up the wiki form
 	WikiPageForm wikiForm = (WikiPageForm) form;
 
+	// Get the current wiki page
+	WikiPage currentPage = wikiService.getWikiPageByUid(currentPageUid);
+
 	// Set up the wiki user if this is a tool session (learner)
-	Long toolSessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true));
+	// Also set the editable flag here
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	WikiUser user = null;
 	if (toolSessionID != null) {
 	    user = this.getCurrentUser(toolSessionID);
-	}
+	} 
 
+	// Setting the editable flag based on call origin
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
+	if (mode == null || mode==ToolAccessMode.TEACHER)
+	{
+	    // Author/Monitor/Live edit 
+	    // If no editable flag came in the form (as in learner), set false
+	    if (wikiForm.getIsEditable() == null) {
+		wikiForm.setIsEditable(false);
+	    }
+	}
+	else
+	{
+	    // Learner or preview
+	    // If no editable flag came in the form (as in learner), set true
+	    if (wikiForm.getIsEditable() == null) {
+		wikiForm.setIsEditable(true);
+	    }
+	}
 	// Updating the wikiPage, setting a null user which indicated this
 	// change was made in author
-	wikiService.updateWikiPage(wikiForm, currentPageUid, user);
+	wikiService.updateWikiPage(wikiForm, currentPage, user);
 
 	// Make sure the current page is set correctly then return to the wiki
 	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
@@ -134,8 +157,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
 	}
 
+	// Get the current wiki page
+	WikiPage currentPage = wikiService.getWikiPageByUid(currentPageUid);
+
 	// Set up the wiki user if this is a tool session (learner)
-	Long toolSessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true));
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	WikiUser user = null;
 	if (toolSessionID != null) {
 	    user = this.getCurrentUser(toolSessionID);
@@ -148,10 +174,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	// Set the wiki body in the authform
 	wikiForm.setWikiBody(content.getBody());
+	wikiForm.setIsEditable(currentPage.getEditable());
 
 	// Updating the wikiPage, setting a null user which indicated this
 	// change was made in author
-	wikiService.updateWikiPage(wikiForm, currentPageUid, user);
+	wikiService.updateWikiPage(wikiForm, currentPage, user);
 
 	return unspecified(mapping, wikiForm, request, response);
     }
@@ -183,8 +210,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Get the old wiki content to compare
 	WikiPageContent compareContent = wikiService.getWikiPageContent(revertPageContentVersion);
 
-	// String diff = Diff.diff(compareContent.getBody(),
-	// currentContent.getBody());
+	// Do the compariason
 	String diff = wikiService.comparePages(compareContent.getBody(), currentContent.getBody());
 
 	request.setAttribute(WikiConstants.ATTR_COMPARE_VERSIONS, compareContent.getVersion().toString() + "-"
@@ -253,11 +279,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	String newPageName = WebUtil.readStrParam(request, WikiConstants.ATTR_NEW_PAGE_NAME);
 
-	Long toolSessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true));
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 
 	// get the wiki by either toolContentId or tool session
 	if (toolSessionID == null) {
-	    Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	    Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	    wiki = wikiService.getWikiByContentId(toolContentID);
 
 	    // Get the page to change to
@@ -295,20 +321,45 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	WikiSession session = null;
 	WikiUser user = null;
 
-	Long toolSessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true));
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
+
+	// Set up the authoring form
+	WikiPageForm wikiForm = (WikiPageForm) form;
 
 	// get the wiki by either toolContentId or tool session
 	if (toolSessionID == null) {
-	    Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	    Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	    wiki = wikiService.getWikiByContentId(toolContentID);
+	    // If no editable flag came in the form (as in learner), set true
+	    if (wikiForm.getNewPageIsEditable() == null) {
+		wikiForm.setNewPageIsEditable(false);
+	    }
 	} else {
 	    session = wikiService.getSessionBySessionId(toolSessionID);
 	    wiki = session.getWiki();
 	    user = getCurrentUser(toolSessionID);
+	   
+	    
 	}
-
-	// Set up the authoring form
-	WikiPageForm wikiForm = (WikiPageForm) form;
+	
+	// Setting the editable flag based on call origin
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
+	if (mode == null || mode==ToolAccessMode.TEACHER)
+	{
+	    // Author/Monitor/Live edit 
+	    // If no editable flag came in the form (as in learner), set false
+	    if (wikiForm.getNewPageIsEditable() == null) {
+		wikiForm.setNewPageIsEditable(false);
+	    }
+	}
+	else
+	{
+	    // Learner or preview
+	    // If no editable flag came in the form (as in learner), set true
+	    if (wikiForm.getNewPageIsEditable() == null) {
+		wikiForm.setNewPageIsEditable(true);
+	    }
+	}
 
 	// inserting the wiki page, null user and session indicates that this
 	// page was saved in author

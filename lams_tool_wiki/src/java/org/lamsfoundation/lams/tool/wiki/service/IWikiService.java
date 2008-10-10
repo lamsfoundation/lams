@@ -103,8 +103,10 @@ public interface IWikiService {
     /**
      * 
      * @param wikiPageForm
+     * @param wikiPage
+     * @param user
      */
-    public void updateWikiPage(WikiPageForm wikiPageForm, Long wikiPageUid, WikiUser user);
+    public void updateWikiPage(WikiPageForm wikiPageForm, WikiPage wikiPage, WikiUser user);
 
     /**
      * 

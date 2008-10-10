@@ -41,6 +41,10 @@ public interface WikiConstants {
     public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
 
     // Attribute names
+    public static final String ATTR_WIKI_DTO = "wikiDTO";
+    public static final String ATTR_SESSION_DTO = "sessionDTO";
+    public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
+    public static final String ATTR_MODE = "mode";
     public static final String ATTR_MESSAGE = "message";
     public static final String ATTR_SESSION_MAP = "sessionMap";
     public static final String ATTR_MAIN_WIKI_PAGE = "mainWikiPage";
@@ -52,6 +56,11 @@ public interface WikiConstants {
     public static final String ATTR_COMPARE_STRING = "compareString";
     public static final String ATTR_COMPARE_TITLE = "compareTitle";
     public static final String ATTR_COMPARE_VERSIONS = "compareVersions";
+    public static final String ATTR_MAX_EDITS_REACHED = "maxEditsReached";
+    public static final String ATTR_EDITS_LEFT = "editsLeft";
+    public static final String ATTR_MIN_EDITS_REACHED = "minEditsReached";
+    public static final String ATTR_FINISHED_ACTIVITY = "finishedActivity";
+    public static final String ATTR_CONTENT_EDITAVLE = "contentEditable";
 
     // Parameter names
     public static final String PARAM_PARENT_PAGE = "parentPage";

@@ -1,13 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+
 <script type="text/javascript">
 <!--
-	var evalcomixWindow = null;
-	
-	function openEvalcomixWindow(url)
+	var viewWindow = null;
+	function openViewWindow(url)
 	{
-    	evalcomixWindow=window.open(url,'evalcomixWindow','width=800,height=600,scrollbars=yes,resizable=yes');
-		if (window.focus) {evalcomixWindow.focus()}
+		if(viewWindow && viewWindow.open && !viewWindow.closed){
+			viewWindow.close();
+		}
+		viewWindow = window.open(url,'viewWindow','resizable,width=796,height=570,scrollbars');
+		viewWindow.window.focus();
 	}
 //-->
 </script>
@@ -45,12 +48,12 @@
 	
 	<tr>
 		<td>
-			<fmt:message key="advanced.allowRichEditor" />
+			<fmt:message key="advanced.allowLearnerCreatePages" />
 		</td>
 		
 		<td>
 			<c:choose>
-				<c:when test="${dto.allowRichEditor}">
+				<c:when test="${dto.allowLearnerCreatePages}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -59,64 +62,139 @@
 			</c:choose>	
 		</td>
 	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowLearnerInsertLinks" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.allowLearnerInsertLinks}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowLearnerAttachImages" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.allowLearnerAttachImages}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowLearnerAttachImages" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.allowLearnerAttachImages}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="monitor.summary.td.addNotebook" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.reflectOnActivity == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<c:choose>
+		<c:when test="${dto.reflectOnActivity == true}">
+			<tr>
+				<td>
+					<fmt:message key="monitor.summary.td.notebookInstructions" />
+				</td>
+				<td>
+					${dto.reflectInstructions}	
+				</td>
+			</tr>
+		</c:when>
+	</c:choose>
+	
+	<tr>
+		<td>
+			<fmt:message key="advanced.editingLimits.prompt" />
+		</td>
+		
+		<td>
+			<fmt:message key="advanced.editingLimits.minimum" /> 
+			<c:choose>
+				<c:when test="${dto.minimumEdits == 0}">
+					<fmt:message key="advanced.editingLimits.nominimum" />
+				</c:when>
+				<c:otherwise>
+					${dto.minimumEdits}
+				</c:otherwise>
+			</c:choose>
+			
+			<br />
+			
+			<fmt:message key="advanced.editingLimits.maximum" /> 
+			<c:choose>
+				<c:when test="${dto.maximumEdits == 0}">
+					<fmt:message key="advanced.editingLimits.nomaximum" />
+				</c:when>
+				<c:otherwise>
+					${dto.maximumEdits}
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	
 </table>
 </div>
 
-<c:forEach var="session" items="${dto.sessionDTOs}">
+<table class="alternative-color">
+	<tr>
+		<th>
+			<fmt:message key="monitor.th.sessions"></fmt:message>
+		</th>	
+		<th>
+			<fmt:message key="monitor.th.numlearners"></fmt:message>
+		</th>
+	</tr>
+	<c:forEach var="session" items="${dto.sessionDTOs}">
+	<tr>
+		<td>
+			<a href='javascript:openViewWindow("./monitoring.do?dispatch=showWiki&amp;toolSessionID=${session.sessionID}");'>${session.sessionName}</a>
+		</td>	
+		<td>
+			${session.numberOfLearners}
+		</td>	
+	</tr>
+	</c:forEach>
+</table>
 
-	<table>
-		<tr>
-			<td>
-				<h2>
-					${session.sessionName}
-				</h2>
-			</td>
-		</tr>
-	</table>
-
-	<table cellpadding="0">
-		<tr>
-			<td class="field-name" width="30%">
-				<fmt:message key="heading.totalLearners" />
-			</td>
-			<td width="70%">
-				${session.numberOfLearners}
-			</td>
-		</tr>
-	</table>
-
-	<table cellpadding="0">
-
-		<tr>
-			<th>
-				<fmt:message key="heading.learner" />
-			</th>
-			<th>
-				<fmt:message key="heading.notebookEntry" />
-			</th>
-		</tr>
-
-
-		<c:forEach var="user" items="${session.userDTOs}">
-			<tr>
-				<td width="30%">
-					${user.firstName} ${user.lastName}
-				</td>
-				<td width="70%">
-					<c:choose>
-						<c:when test="${user.entryUID == null}">
-							<fmt:message key="label.notAvailable" />
-						</c:when>
-
-						<c:otherwise>
-							<a
-								href="./monitoring.do?dispatch=showWiki&amp;userUID=${user.uid}">
-								<fmt:message key="label.view" /> </a>
-						</c:otherwise>
-					</c:choose>
-
-				</td>
-			</tr>
-		</c:forEach>
-	</table>
-</c:forEach>

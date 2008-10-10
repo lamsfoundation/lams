@@ -41,19 +41,61 @@
 -->
 </script>
 
+
 <div id="content">
-	<c:if test="${wikiDTO.lockOnFinish and mode == 'learner'}">
-		<div class="info">
+	<!-- Display the advanced option warnings -->
+	<div class="info" id="messageDiv" style="display:none;">
+		<c:if test="${wikiDTO.lockOnFinish and mode == 'learner'}">
+				<p>
+				<c:choose>
+					<c:when test="${finishedActivity}">
+						<fmt:message key="message.activityLocked" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.warnLockOnFinish" />
+					</c:otherwise>
+				</c:choose>
+				</p>
+		</c:if>
+		
+		<c:if test="${not (wikiDTO.lockOnFinish and finishedActivity) }">
 			<c:choose>
-				<c:when test="${finishedActivity}">
-					<fmt:message key="message.activityLocked" />
+				<c:when test="${currentWikiPage.editable}">
+					<c:if test="${not minEditsReached}">
+						<p>
+						<fmt:message key="message.minumumEditsNotReached">
+							<fmt:param>
+								${wikiDTO.minimumEdits}
+							</fmt:param>
+						</fmt:message>
+						</p>
+					</c:if>
+					
+					<c:if test="${wikiDTO.maximumEdits > 0}">
+						<p>
+							<c:choose>
+								<c:when test="${maxEditsReached}">
+									<fmt:message key="message.maxEditsReached" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="message.warnMaxEdits" >
+										<fmt:param>
+										${editsLeft} 
+										</fmt:param>
+									</fmt:message>
+								</c:otherwise>
+							</c:choose>
+						</p>
+					</c:if>
 				</c:when>
 				<c:otherwise>
-					<fmt:message key="message.warnLockOnFinish" />
+					<p>		
+						<fmt:message key="message.pageNotEditable" />
+					</p>
 				</c:otherwise>
 			</c:choose>
-		</div>
-	</c:if>
+		</c:if>
+	</div>
 
 	&nbsp;
 
@@ -65,9 +107,13 @@
 		<input type="hidden" id="wikiLinks"/>
 		<html:hidden property="newPageName" styleId="newPageName"/>
 		<html:hidden property="historyPageContentId" styleId="historyPageContentId"/>
-
 		<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-
+		
+		<!-- Set up edit and add flags -->
+		<c:set var="editableFlag" value="${currentWikiPage.editable and not maxEditsReached}" />
+		<c:set var="addFlag" value="${wikiDTO.allowLearnerCreatePages and not maxEditsReached}" />
+		
+		
 		<div id="wikimenu">
 			<div id="breadcrumb" style="float: left; width: 30%;">
 				<c:if test="${currentWikiPage.title != mainWikiPage.title}">
@@ -77,14 +123,24 @@
 			</div>
 			
 			<div id="buttons" style="float: right; width: 70%;">
-				<a href="javascript:changeDiv('view');" class="button"><fmt:message key="label.wiki.view"></fmt:message></a>
-				<a href="javascript:changeDiv('edit');" class="button"><fmt:message key="label.wiki.edit"></fmt:message></a>
-				<a href="javascript:cancelAdd();changeDiv('add');" class="button"><fmt:message key="label.wiki.add"></fmt:message></a>
-				<a href="javascript:changeDiv('history');" class="button"><fmt:message key="label.wiki.history"></fmt:message></a>
-				<c:if test="${currentWikiPage.title != mainWikiPage.title}">
-					<a href="javascript:doRemove(&#39;<fmt:message key="label.wiki.remove.confirm"></fmt:message>&#39;)" class="button"><fmt:message key="label.wiki.remove"></fmt:message></a>
+			
+				<c:if test="${contentEditable}">
+					<c:if test="${editableFlag or addFlag}">	
+						<a href="javascript:changeDiv('view');" class="button"><fmt:message key="label.wiki.view"></fmt:message></a>
+					</c:if>
+					<c:if test="${editableFlag}">	
+						<a href="javascript:changeDiv('edit');" class="button"><fmt:message key="label.wiki.edit"></fmt:message></a>
+					</c:if>
+					<c:if test="${addFlag}">
+						<a href="javascript:cancelAdd();changeDiv('add');" class="button"><fmt:message key="label.wiki.add"></fmt:message></a>
+					</c:if>
+					<c:if test="${editableFlag}">
+						<a href="javascript:changeDiv('history');" class="button"><fmt:message key="label.wiki.history"></fmt:message></a>
+					</c:if>
+					<c:if test="${currentWikiPage.title != mainWikiPage.title && editableFlag}">
+						<a href="javascript:doRemove(&#39;<fmt:message key="label.wiki.remove.confirm"></fmt:message>&#39;)" class="button"><fmt:message key="label.wiki.remove"></fmt:message></a>
+					</c:if>
 				</c:if>
-				
 			</div>
 		</div>
 		
@@ -270,44 +326,15 @@
 			</a><br />
 		</c:forEach>
 
-		
-		<c:choose>
-			<c:when test="${contentEditable}">
-				<div class="space-bottom-top align-right" id="finishButtonDiv">
-					<a href="javascript:submitWiki('finishActivity');" class="button"><fmt:message key="button.finish"></fmt:message></a>
-				</div>
-			</c:when>
-		</c:choose>
-		
-		<!--  
-		<c:choose>
-			<c:when test="${contentEditable}">
-				<c:choose>
-					<c:when test="${wikiDTO.allowRichEditor}">
-						<lams:FCKEditor id="entryText" value="${lrnForm.entryText}"
-							toolbarSet="Default-Learner">
-						</lams:FCKEditor>
-					</c:when>
-
-					<c:otherwise>
-						<html:textarea cols="60" rows="8" property="entryText"
-							styleClass="text-area"></html:textarea>
-					</c:otherwise>
-				</c:choose>
-
-				<div class="space-bottom-top align-right">
-					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message>button.finish</fmt:message>
-					</html:submit>
-				</div>
-
-			</c:when>
-
-			<c:otherwise>
-				<lams:out value="${lrnForm.entryText}" />
-			</c:otherwise>
-		</c:choose>
-		-->
+		<div id="finishButtonDiv">
+			<c:choose>
+				<c:when test="${contentEditable and minEditsReached}">
+					<div class="space-bottom-top align-right" id="finishButtonDiv">
+						<a href="javascript:submitWiki('finishActivity');" class="button"><fmt:message key="button.finish"></fmt:message></a>
+					</div>
+				</c:when>
+			</c:choose>
+		</div>
 	</html:form>
 </div>
 
@@ -321,6 +348,17 @@
 			wikiLinkArray[wikiLinkArray.length] = '${wikiPage.title}';
 		</c:forEach>
 		document.getElementById("wikiLinks").value = wikiLinkArray.toString();
+	}
+	
+	displayMessageDiv();
+	function displayMessageDiv()
+	{
+		var messageDiv = document.getElementById("messageDiv");
+
+		if (trim(messageDiv.innerHTML) != "")
+		{
+			messageDiv.style.display="block";
+		}
 	}
 	
 	function doEditOrAdd(dispatch)

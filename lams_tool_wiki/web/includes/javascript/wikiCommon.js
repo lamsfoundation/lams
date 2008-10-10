@@ -62,6 +62,6 @@ function doCompareOrView(webAppUrl, historyId, currentPageId, dispatch)
 	if(compareWindow && compareWindow.open && !compareWindow.closed){
 		compareWindow.close();
 	}
-	compareWindow = window.open(url,'instructions','resizable,width=796,height=570,scrollbars');
+	compareWindow = window.open(url,'compareWindow','resizable,width=796,height=570,scrollbars');
 	compareWindow.window.focus();
 }

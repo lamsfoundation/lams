@@ -167,6 +167,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    newChildPage.setWikiSession(session);
 	    newChildPage.getWikiContentVersions().add(newPageContent);
 
+	    // if childpage is the main page, set the session main page
+	    if (newChildPage.getTitle().equals(wiki.getMainPage().getTitle())) {
+		session.setMainPage(newChildPage);
+	    }
+
 	    // Add page to the list
 	    sessionWikiPages.add(newChildPage);
 	}
@@ -246,6 +251,10 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    // Clone the current content - leave the history null
 	    WikiPageContent newPageContent = (WikiPageContent) childPage.getCurrentWikiContent().clone();
 	    newPageContent.setWikiPage(newChildPage);
+	    // If the edit date is null, set it to now.
+	    if (newPageContent.getEditDate() == null) {
+		newPageContent.setEditDate(new Date());
+	    }
 	    wikiPageContentDAO.saveOrUpdate(newPageContent);
 
 	    // Set the current content
@@ -555,15 +564,13 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * learner
      * 
      * @param wikiPageForm
-     * @param wikiPageUid
+     * @param wikiPage
      * @param user
      */
-    public void updateWikiPage(WikiPageForm wikiPageForm, Long wikiPageUid, WikiUser user) {
+    public void updateWikiPage(WikiPageForm wikiPageForm, WikiPage wikiPage, WikiUser user) {
 
-	// First retrieve the wikipage from the db
-	WikiPage wikiPage = getWikiPageByUid(wikiPageUid);
 	if (wikiPage == null) {
-	    throw new WikiException("Could not find wiki page to update with uid: " + wikiPageUid.toString());
+	    throw new WikiException("Could not find wiki page to update");
 	}
 
 	// Create a new wiki page content using the wiki page form
@@ -582,6 +589,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	wikiPage.getWikiContentVersions().add(wikiPageContent);
 	wikiPage.setEditable(wikiPageForm.getIsEditable());
 	wikiPageContentDAO.saveOrUpdate(wikiPageContent);
+
+	// Update the user's edits
+	if (user != null) {
+	    user.setWikiEdits(user.getWikiEdits() + 1);
+	    wikiUserDAO.saveOrUpdate(user);
+	}
     }
 
     /**
@@ -617,6 +630,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	wikiPage.setCurrentWikiContent(wikiPageContent);
 	wikiPage.getWikiContentVersions().add(wikiPageContent);
 	wikiPageDAO.saveOrUpdate(wikiPage);
+
+	// Update the user's edits
+	if (user != null) {
+	    user.setWikiEdits(user.getWikiEdits() + 1);
+	    wikiUserDAO.saveOrUpdate(user);
+	}
 
 	return wikiPage.getUid();
     }

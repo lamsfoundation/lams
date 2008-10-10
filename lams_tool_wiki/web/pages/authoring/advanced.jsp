@@ -96,7 +96,7 @@
 		var min = document.getElementById("minimumEdits").value;
 		var max = document.getElementById("maximumEdits").value;
 		
-		if (min > max)
+		if (max > 0 && min > max)
 		{
 			alert('<fmt:message key="advanced.editingLimits.error" />');
 			minMenu.selectedIndex = max;

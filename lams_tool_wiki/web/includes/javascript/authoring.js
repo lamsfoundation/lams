@@ -12,6 +12,18 @@ function doSelectTab(tabId) {
 	var tag = document.getElementById("currentTab");
 	tag.value = tabId;
 	selectTab(tabId);
+	
+	// Making sure the save button is shown at the correct time
+	var finishButtonDiv = document.getElementById("finishButtonDiv");
+	var viewDiv = document.getElementById("view");
+	if (tabId==1 && viewDiv.style.display=="none")
+	{
+		finishButtonDiv.style.display = "none";
+	}
+	else
+	{
+		finishButtonDiv.style.display = "block";
+	}
 }
 function doSubmit(method) {
 	document.authoringForm.dispatch.value = method;

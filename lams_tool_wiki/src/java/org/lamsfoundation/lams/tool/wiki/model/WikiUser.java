@@ -40,7 +40,7 @@ public class WikiUser implements java.io.Serializable {
     /**
      * 
      */
-    private static final long serialVersionUID = -3243742837238907521L;
+    private static final long serialVersionUID = -534126658843778423L;
 
     // Fields
     private Long uid;
@@ -58,6 +58,8 @@ public class WikiUser implements java.io.Serializable {
     private boolean finishedActivity;
 
     private Long entryUID;
+    
+    private Integer wikiEdits;
 
     // Constructors
 
@@ -72,6 +74,7 @@ public class WikiUser implements java.io.Serializable {
 	this.loginName = user.getLogin();
 	this.wikiSession = wikiSession;
 	this.finishedActivity = false;
+	this.wikiEdits = 0;
     }
 
     /** full constructor */
@@ -80,6 +83,7 @@ public class WikiUser implements java.io.Serializable {
 	this.lastName = lastName;
 	this.firstName = firstName;
 	this.wikiSession = wikiSession;
+	this.wikiEdits = 0;
     }
 
     // Property accessors
@@ -175,6 +179,18 @@ public class WikiUser implements java.io.Serializable {
 
     public void setEntryUID(Long entryUID) {
 	this.entryUID = entryUID;
+    }
+    
+    
+    /**
+     * @hibernate.property column="wiki_edits"
+     */
+    public Integer getWikiEdits() {
+        return wikiEdits;
+    }
+
+    public void setWikiEdits(Integer wikiEdits) {
+        this.wikiEdits = wikiEdits;
     }
 
     /**

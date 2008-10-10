@@ -154,6 +154,11 @@
 			</td>
 		</tr>
 		<tr>
+			<td>
+				<html:checkbox property="isEditable" value="1" styleClass="noBorder" styleId="isEditable"></html:checkbox>&nbsp;<fmt:message key="label.authoring.basic.wikipagevisible"></fmt:message>
+			</td>
+		</tr>
+		<tr>
 			<td align="right">
 				<a href="javascript:doEditOrAdd('editPage');" class="button"><fmt:message key="label.wiki.savechanges"></fmt:message></a>	
 				<a href="javascript:changeDiv('view');" class="button"><fmt:message key="button.cancel"></fmt:message></a>
@@ -164,35 +169,40 @@
 
 <div id="add" style="display:none;"  >
 
-<h1><fmt:message key="label.wiki.add"></fmt:message></h1>
-<table cellpadding="0">
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"></fmt:message>
-			</div>
-			<html:text property="newPageTitle" styleId="newPageTitle" style="width: 99%;" value=""></html:text>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.wiki.body"></fmt:message>
-			</div>
-			<lams:FCKEditor id="newPageWikiBody"
-				value=""
-				height="400px"
-				contentFolderID="${sessionMap.contentFolderID}"
-				toolbarSet="Custom-Learner"></lams:FCKEditor>
-		</td>
-	</tr>
-	<tr>
-		<td align="right">
-			<a href="javascript:doEditOrAdd('addPage');" class="button"><fmt:message key="label.wiki.savechanges"></fmt:message></a>	
-			<a href="javascript:cancelAdd();changeDiv('view');" class="button"><fmt:message key="button.cancel"></fmt:message></a>
-		</td>
-	</tr>
-</table>
+	<h1><fmt:message key="label.wiki.add"></fmt:message></h1>
+	<table cellpadding="0">
+		<tr>
+			<td>
+				<div class="field-name">
+					<fmt:message key="label.authoring.basic.title"></fmt:message>
+				</div>
+				<html:text property="newPageTitle" styleId="newPageTitle" style="width: 99%;" value=""></html:text>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="field-name">
+					<fmt:message key="label.wiki.body"></fmt:message>
+				</div>
+				<lams:FCKEditor id="newPageWikiBody"
+					value=""
+					height="400px"
+					contentFolderID="${sessionMap.contentFolderID}"
+					toolbarSet="Custom-Learner"></lams:FCKEditor>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<html:checkbox property="newPageIsEditable"  styleClass="noBorder" value="1" styleId="newPageIsEditable"></html:checkbox>&nbsp;<fmt:message key="label.authoring.basic.wikipagevisible"></fmt:message>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
+				<a href="javascript:doEditOrAdd('addPage');" class="button"><fmt:message key="label.wiki.savechanges"></fmt:message></a>	
+				<a href="javascript:cancelAdd();changeDiv('view');" class="button"><fmt:message key="button.cancel"></fmt:message></a>
+			</td>
+		</tr>
+	</table>
 </div>
 
 <br />
