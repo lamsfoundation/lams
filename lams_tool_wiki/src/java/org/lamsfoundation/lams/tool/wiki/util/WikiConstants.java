@@ -42,6 +42,7 @@ public interface WikiConstants {
 
     // Attribute names
     public static final String ATTR_WIKI_DTO = "wikiDTO";
+    public static final String ATTR_USER_DTO = "userDTO";
     public static final String ATTR_SESSION_DTO = "sessionDTO";
     public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
     public static final String ATTR_MODE = "mode";

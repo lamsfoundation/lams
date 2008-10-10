@@ -270,6 +270,7 @@
 				</tr>
 				<tr>
 					<td align="right">
+						<br />
 						<a href="javascript:doEditOrAdd('editPage');" class="button"><fmt:message key="label.wiki.savechanges"></fmt:message></a>	
 						<a href="javascript:changeDiv('view');" class="button"><fmt:message key="button.cancel"></fmt:message></a>
 					</td>
@@ -302,6 +303,7 @@
 				</tr>
 				<tr>
 					<td align="right">
+						<br />
 						<a href="javascript:doEditOrAdd('addPage');" class="button"><fmt:message key="label.wiki.savechanges"></fmt:message></a>	
 						<a href="javascript:cancelAdd();changeDiv('view');" class="button"><fmt:message key="button.cancel"></fmt:message></a>
 					</td>
@@ -326,7 +328,9 @@
 			</a><br />
 		</c:forEach>
 
+		<!-- 
 		<div id="finishButtonDiv">
+			
 			<c:choose>
 				<c:when test="${contentEditable and minEditsReached}">
 					<div class="space-bottom-top align-right" id="finishButtonDiv">
@@ -334,8 +338,17 @@
 					</div>
 				</c:when>
 			</c:choose>
+			
+			
+			
 		</div>
+		-->
 	</html:form>
+		
+	<c:if test="${mode == 'learner' || mode == 'author'}">
+		<%@ include file="parts/finishButton.jsp"%>
+	</c:if>
+	
 </div>
 
 <script type="text/javascript">

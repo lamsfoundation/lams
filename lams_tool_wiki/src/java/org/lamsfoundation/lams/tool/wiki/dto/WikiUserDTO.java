@@ -31,6 +31,8 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 public class WikiUserDTO implements Comparable {
 
     public Long uid;
+    
+    private Long userId;
 
     public String loginName;
 
@@ -40,19 +42,9 @@ public class WikiUserDTO implements Comparable {
 
     public boolean finishedActivity;
 
-    public NotebookEntryDTO entryDTO;
+    public String notebookEntry;
 
     public Long entryUID;
-
-    public WikiUserDTO(WikiUser user, NotebookEntry entry) {
-	this.uid = user.getUid();
-	this.loginName = user.getLoginName();
-	this.firstName = user.getFirstName();
-	this.lastName = user.getLastName();
-	this.finishedActivity = user.isFinishedActivity();
-	this.entryUID = user.getEntryUID();
-	this.entryDTO = new NotebookEntryDTO(entry);
-    }
 
     public WikiUserDTO(WikiUser user) {
 	this.uid = user.getUid();
@@ -61,6 +53,7 @@ public class WikiUserDTO implements Comparable {
 	this.lastName = user.getLastName();
 	this.finishedActivity = user.isFinishedActivity();
 	this.entryUID = user.getEntryUID();
+	this.userId = user.getUserId();
     }
 
     public int compareTo(Object o) {
@@ -104,13 +97,13 @@ public class WikiUserDTO implements Comparable {
     public void setUid(Long uid) {
 	this.uid = uid;
     }
-
-    public NotebookEntryDTO getEntryDTO() {
-	return entryDTO;
+    
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setEntryDTO(NotebookEntryDTO entryDTO) {
-	this.entryDTO = entryDTO;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getEntryUID() {
@@ -128,4 +121,13 @@ public class WikiUserDTO implements Comparable {
     public void setFinishedActivity(boolean finishedActivity) {
 	this.finishedActivity = finishedActivity;
     }
+
+    public String getNotebookEntry() {
+        return notebookEntry;
+    }
+
+    public void setNotebookEntry(String notebookEntry) {
+        this.notebookEntry = notebookEntry;
+    }
+
 }

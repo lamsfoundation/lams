@@ -42,7 +42,9 @@ public class WikiSessionDTO implements Comparable {
 
     int numberOfLearners;
 
-    int numberOfFinishedLearners;;
+    int numberOfFinishedLearners;
+    
+    boolean reflectOnActivity;
 
     public WikiSessionDTO(WikiSession session) {
 	this.sessionID = session.getSessionId();
@@ -59,6 +61,8 @@ public class WikiSessionDTO implements Comparable {
 	}
 
 	numberOfLearners = userDTOs.size();
+	
+	reflectOnActivity = session.getWiki().isReflectOnActivity();
 
     }
 
@@ -113,5 +117,13 @@ public class WikiSessionDTO implements Comparable {
 
     public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
 	this.numberOfFinishedLearners = numberOfFinishedLearners;
+    }
+
+    public boolean isReflectOnActivity() {
+        return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+        this.reflectOnActivity = reflectOnActivity;
     }
 }

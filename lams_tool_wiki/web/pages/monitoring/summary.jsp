@@ -12,6 +12,18 @@
 		viewWindow = window.open(url,'viewWindow','resizable,width=796,height=570,scrollbars');
 		viewWindow.window.focus();
 	}
+	
+	function showInFrame(url) {
+		
+		var area=document.getElementById("wikiArea");
+		if(area != null){
+			area.style.width="640px";
+			area.style.height="100%";
+			area.src=url;
+			area.style.display="block";
+		}
+		location.hash = "wikiArea";
+	}
 //-->
 </script>
 
@@ -177,24 +189,31 @@
 </table>
 </div>
 
-<table class="alternative-color">
-	<tr>
-		<th>
-			<fmt:message key="monitor.th.sessions"></fmt:message>
-		</th>	
-		<th>
-			<fmt:message key="monitor.th.numlearners"></fmt:message>
-		</th>
-	</tr>
-	<c:forEach var="session" items="${dto.sessionDTOs}">
-	<tr>
-		<td>
-			<a href='javascript:openViewWindow("./monitoring.do?dispatch=showWiki&amp;toolSessionID=${session.sessionID}");'>${session.sessionName}</a>
-		</td>	
-		<td>
-			${session.numberOfLearners}
-		</td>	
-	</tr>
-	</c:forEach>
-</table>
+<c:choose>
+	<c:when test="${not empty dto.sessionDTOs}">
+		<table class="alternative-color">
+			<tr>
+				<th>
+					<fmt:message key="monitor.th.sessions"></fmt:message>
+				</th>	
+				<th>
+					<fmt:message key="monitor.th.numlearners"></fmt:message>
+				</th>
+			</tr>
+			<c:forEach var="session" items="${dto.sessionDTOs}">
+			<tr>
+				<td>
+					<a href='javascript:openViewWindow("./monitoring.do?dispatch=showWiki&amp;toolSessionID=${session.sessionID}");'>${session.sessionName}</a>
+				</td>	
+				<td>
+					${session.numberOfLearners}
+				</td>	
+			</tr>
+			</c:forEach>
+		</table>
 
+	</c:when>
+	<c:otherwise>
+		<fmt:message key="monitor.nosessions"></fmt:message> 
+	</c:otherwise>
+</c:choose>

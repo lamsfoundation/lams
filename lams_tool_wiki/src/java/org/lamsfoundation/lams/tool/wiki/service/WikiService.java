@@ -379,16 +379,25 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     /* ********** IWikiService Methods ********************************* */
 
+
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
-
-    public NotebookEntry getEntry(Long uid) {
-	return coreNotebookService.getEntry(uid);
+    
+    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID){
+    	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
+    	if (list == null || list.isEmpty()) {
+    		return null;
+    	} else {
+    		return list.get(0);
+    	}
     }
-
-    public void updateEntry(Long uid, String entry) {
-	coreNotebookService.updateEntry(uid, "", entry);
+    
+    /**
+     * @param notebookEntry
+     */
+    public void updateEntry(NotebookEntry notebookEntry) {
+    	coreNotebookService.updateEntry(notebookEntry);
     }
 
     public String comparePages(String old, String current) {

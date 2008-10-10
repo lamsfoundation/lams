@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.wiki.web.actions;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -73,6 +74,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="compareWiki" path="/pages/wiki/compare.jsp"
  * @struts.action-forward name="viewWiki" path="/pages/wiki/viewWiki.jsp"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
+ * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
  */
 public class LearningAction extends WikiPageAction {
 
@@ -138,6 +140,18 @@ public class LearningAction extends WikiPageAction {
 	} else {
 	    wikiUser = getCurrentUser(toolSessionID);
 	}
+	
+	WikiUserDTO wikiUserDTO = new WikiUserDTO(wikiUser);
+	if (wikiUser.isFinishedActivity()) {
+		// get the notebook entry.
+		NotebookEntry notebookEntry = wikiService.getEntry(toolSessionID,
+				CoreNotebookConstants.NOTEBOOK_TOOL,
+				WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
+		if (notebookEntry != null) {
+			wikiUserDTO.setNotebookEntry(notebookEntry.getEntry());
+		}
+	}
+	request.setAttribute(WikiConstants.ATTR_USER_DTO, wikiUserDTO);
 	
 	// Set whether user has reached maximum edits
 	int maxEdits = wiki.getMaximumEdits();
@@ -228,7 +242,7 @@ public class LearningAction extends WikiPageAction {
 	    LearningForm learningForm = (LearningForm) form;
 
 	    // TODO fix idType to use real value not 999
-
+	    /*
 	    if (wikiUser.getEntryUID() == null) {
 		wikiUser.setEntryUID(wikiService.createNotebookEntry(toolSessionID,
 			CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId()
@@ -237,6 +251,7 @@ public class LearningAction extends WikiPageAction {
 		// update existing entry.
 		wikiService.updateEntry(wikiUser.getEntryUID(), learningForm.getEntryText());
 	    }
+	    */
 
 	    wikiUser.setFinishedActivity(true);
 	    wikiService.saveOrUpdateWikiUser(wikiUser);
@@ -260,5 +275,57 @@ public class LearningAction extends WikiPageAction {
 	}
 
 	return null; // TODO need to return proper page.
+    }
+    
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form,
+    		HttpServletRequest request, HttpServletResponse response) {
+    
+    	LearningForm lrnForm = (LearningForm) form;
+    	
+    	// set the finished flag
+    	WikiUser wikiUser = this.getCurrentUser(lrnForm.getToolSessionID());
+    	WikiDTO wikiDTO = new WikiDTO(wikiUser.getWikiSession().getWiki());
+    
+    	request.setAttribute("wikiDTO", wikiDTO);
+    
+    	NotebookEntry notebookEntry = wikiService.getEntry(wikiUser.getWikiSession().getSessionId(),
+    			CoreNotebookConstants.NOTEBOOK_TOOL,
+    			WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
+    
+    	if (notebookEntry != null) {
+    		lrnForm.setEntryText(notebookEntry.getEntry());
+    	}
+    
+    	return mapping.findForward("notebook");
+    }
+    
+    public ActionForward submitReflection(ActionMapping mapping,
+		ActionForm form, HttpServletRequest request,
+		HttpServletResponse response) {
+
+	// save the reflection entry and call the notebook.
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	WikiUser wikiUser = this.getCurrentUser(lrnForm.getToolSessionID());
+	Long toolSessionID = wikiUser.getWikiSession().getSessionId();
+	Integer userID = wikiUser.getUserId().intValue();
+
+	// check for existing notebook entry
+	NotebookEntry entry = wikiService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		WikiConstants.TOOL_SIGNATURE, userID);
+
+	if (entry == null) {
+	    // create new entry
+	    wikiService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    WikiConstants.TOOL_SIGNATURE, userID, lrnForm.getEntryText());
+	} else {
+	    // update existing entry
+	    entry.setEntry(lrnForm.getEntryText());
+	    entry.setLastModified(new Date());
+	    wikiService.updateEntry(entry);
+	}
+
+	return finishActivity(mapping, form, request, response);
     }
 }

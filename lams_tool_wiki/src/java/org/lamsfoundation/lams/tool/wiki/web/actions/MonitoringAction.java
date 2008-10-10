@@ -34,10 +34,13 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiSessionDTO;
+import org.lamsfoundation.lams.tool.wiki.dto.WikiUserDTO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
@@ -47,7 +50,6 @@ import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
-import org.lamsfoundation.lams.tool.wiki.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.tool.wiki.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -126,40 +128,39 @@ public class MonitoringAction extends WikiPageAction {
     public ActionForward showWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	
+
 	if (wikiService == null) {
 	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
 	}
-	
+
 	WikiSession wikiSession = wikiService.getSessionBySessionId(toolSessionId);
 	WikiSessionDTO sessionDTO = new WikiSessionDTO(wikiSession);
-	
+
+	// Add all the user notebook entries to the session dto
+	for (WikiUserDTO userDTO : sessionDTO.getUserDTOs()) {
+	    NotebookEntry notebookEntry = wikiService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    WikiConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
+	    userDTO.setNotebookEntry(notebookEntry.getEntry());
+	    sessionDTO.getUserDTOs().add(userDTO);
+	}
 	request.setAttribute(WikiConstants.ATTR_SESSION_DTO, sessionDTO);
-	
-	
+
 	// Set up the authForm.
 	MonitoringForm monForm = (MonitoringForm) form;
 
 	Long currentPageUid = monForm.getCurrentWikiPageId();
-	
+
 	// Get the wikipages from the session and the main page
 	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
-	//WikiPage mainPage = null;
 	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
 	    WikiPageDTO pageDTO = new WikiPageDTO(wikiPage);
 
 	    wikiPageDTOs.add(pageDTO);
-
-	    // Set the main page
-	    //if (wikiPage.getTitle().equals(wikiSession.getWiki().getMainPage().getTitle())) {
-		//mainPage = wikiPage;
-	    //}
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
 	request.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
-	
+
 	// Set the current wiki page, if there is none, set to the main page
 	WikiPage currentWikiPage = null;
 	if (currentPageUid != null) {
@@ -168,30 +169,17 @@ public class MonitoringAction extends WikiPageAction {
 	    currentWikiPage = wikiSession.getMainPage();
 	}
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, new WikiPageDTO(currentWikiPage));
-	
+
 	// Reset the isEditable and newPageIdEditable field for the form
 	monForm.setIsEditable(currentWikiPage.getEditable());
 	monForm.setNewPageIsEditable(true);
-	
+
 	// Set the current wiki history
 	SortedSet<WikiPageContentDTO> currentWikiPageHistoryDTOs = new TreeSet<WikiPageContentDTO>();
 	for (WikiPageContent wikiPageContentHistoryItem : currentWikiPage.getWikiContentVersions()) {
 	    currentWikiPageHistoryDTOs.add(new WikiPageContentDTO(wikiPageContentHistoryItem));
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGE_CONTENT_HISTORY, currentWikiPageHistoryDTOs);
-	
-
-	/*
-	Long uid = new Long(WebUtil.readLongParam(request, "userUID"));
-
-	WikiUser user = wikiService.getUserByUID(uid);
-	NotebookEntry entry = wikiService.getEntry(user.getEntryUID());
-
-	WikiUserDTO userDTO = new WikiUserDTO(user, entry);
-
-	request.setAttribute("userDTO", userDTO);
-	
-	*/
 
 	return mapping.findForward("wiki_display");
     }

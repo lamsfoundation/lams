@@ -128,7 +128,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	WikiUser wikiUser = wikiService.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()), toolSessionID);
 
-	NotebookEntry wikiEntry = wikiService.getEntry(wikiUser.getEntryUID());
+	//NotebookEntry wikiEntry = wikiService.getEntry(wikiUser.getEntryUID());
 
 	// construct dto's
 	WikiDTO wikiDTO = new WikiDTO();
@@ -140,9 +140,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	sessionDTO.setSessionID(wikiSession.getSessionId());
 
 	// If the user hasn't put in their entry yet, wikiEntry will be null;
-	WikiUserDTO userDTO = wikiEntry != null ? new WikiUserDTO(wikiUser, wikiEntry) : new WikiUserDTO(wikiUser);
+	//WikiUserDTO userDTO = wikiEntry != null ? new WikiUserDTO(wikiUser, wikiEntry) : new WikiUserDTO(wikiUser);
 
-	sessionDTO.getUserDTOs().add(userDTO);
+	//sessionDTO.getUserDTOs().add(userDTO);
 	wikiDTO.getSessionDTOs().add(sessionDTO);
 
 	request.getSession().setAttribute("wikiDTO", wikiDTO);
@@ -166,6 +166,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	// add the wikiEntry for each user in each session
 
+	/*
 	for (WikiSessionDTO session : wikiDTO.getSessionDTOs()) {
 	    for (WikiUserDTO user : session.getUserDTOs()) {
 		NotebookEntry entry = wikiService.getEntry(user.getEntryUID());
@@ -175,6 +176,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		}
 	    }
 	}
+	*/
 
 	request.getSession().setAttribute("wikiDTO", wikiDTO);
     }

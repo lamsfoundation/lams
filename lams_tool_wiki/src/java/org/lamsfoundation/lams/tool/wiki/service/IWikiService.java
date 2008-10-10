@@ -200,31 +200,28 @@ public interface IWikiService {
     public WikiUser createWikiUser(UserDTO user, WikiSession wikiSession);
 
     /**
+     * Creates a core notebook entry
      * 
      * @param id
      * @param idType
      * @param signature
      * @param userID
-     * @param title
      * @param entry
      * @return
      */
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
     /**
+     * Gets the entry from the database
      * 
-     * @param uid
-     * @return
      */
-    NotebookEntry getEntry(Long uid);
+    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
     /**
+     * Updates an existing notebook entry
      * 
-     * @param uid
-     * @param title
-     * @param entry
      */
-    void updateEntry(Long uid, String entry);
+    void updateEntry(NotebookEntry notebookEntry);
 
     /**
      * 
