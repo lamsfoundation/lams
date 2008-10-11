@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.imageGallery.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+    <!-- Hibernate SessionFactory -->
+    <bean id="imageGallerySessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+
+        <!-- Must references all OR mapping files. -->
+        <property name="mappingResources">
+            <list>
+               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryUser.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGallery.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryItem.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryItemVisitLog.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryAttachment.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGallerySession.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- core beans -->
+    <bean id="imageGalleryDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="imageGallerySessionFactory"/>
+        </property>
+    </bean>
+    <bean id="imageGalleryItemDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="imageGallerySessionFactory"/>
+        </property>
+    </bean>
+    <bean id="imageGalleryItemVisitDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryItemVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="imageGallerySessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="imageGalleryAttachmentDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryAttachmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="imageGallerySessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="imageGalleryUserDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="imageGallerySessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="imageGallerySessionDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGallerySessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="imageGallerySessionFactory"/>
+        </property>
+    </bean>
+
+
+    <!-- Managers -->
+	<bean id="imageGalleryToolContentHandler" class="org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="imageGalleryManagerTarget" class="org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryServiceImpl">
+        <property name="imageGalleryDao">
+            <ref local="imageGalleryDao"/>
+        </property>
+        <property name="imageGalleryItemDao">
+            <ref local="imageGalleryItemDao"/>
+        </property>
+        <property name="imageGalleryItemVisitDao">
+            <ref local="imageGalleryItemVisitDao"/>
+        </property>
+        <property name="imageGalleryAttachmentDao">
+            <ref local="imageGalleryAttachmentDao"/>
+        </property>
+        <property name="imageGalleryUserDao">
+            <ref local="imageGalleryUserDao"/>
+        </property>
+        <property name="imageGallerySessionDao">
+            <ref local="imageGallerySessionDao"/>
+        </property>
+        <property name="imageGalleryToolContentHandler">
+            <ref local="imageGalleryToolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="auditService">
+   			<ref bean="auditService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="messageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>   
+				
+    </bean>
+
+    <bean id="imageGalleryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="imageGalleryManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+
