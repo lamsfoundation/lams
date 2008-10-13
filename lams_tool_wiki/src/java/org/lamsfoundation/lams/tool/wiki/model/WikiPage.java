@@ -144,6 +144,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	    wikiPage = (WikiPage) super.clone();
 	    wikiPage.setUid(null);
 	    wikiPage.setWikiSession(null);
+	    wikiPage.setAddedBy(null);
 	    WikiPageContent newContent = (WikiPageContent) currentWikiContent.clone();
 	    newContent.setWikiPage(wikiPage);
 	    wikiPage.setCurrentWikiContent(newContent);

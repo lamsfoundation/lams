@@ -131,6 +131,8 @@ public class WikiPageContent implements java.io.Serializable, Cloneable {
 	try {
 	    wikiContent = (WikiPageContent) super.clone();
 	    wikiContent.setUid(null);
+	    wikiContent.setEditor(null);
+	    wikiContent.setEditDate(new Date());
 	} catch (CloneNotSupportedException cnse) {
 	    log.error("Error cloning " + WikiPageContent.class);
 	}

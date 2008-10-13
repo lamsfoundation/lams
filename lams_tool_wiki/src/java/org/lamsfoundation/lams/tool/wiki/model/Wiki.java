@@ -525,6 +525,9 @@ public class Wiki implements java.io.Serializable, Cloneable {
 		}
 		wiki.setWikiPages(newPages);
 	    }
+	    
+	    wiki.setMainPage((WikiPage)wiki.getMainPage().clone());
+	    
 
 	    // create an empty set for the wikiSession
 	    wiki.wikiSessions = new HashSet<WikiSession>();
