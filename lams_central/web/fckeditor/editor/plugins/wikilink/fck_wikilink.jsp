@@ -26,7 +26,7 @@ var FCKLang = oEditor.FCKLang ;
 var FCKWikiLinks = oEditor.FCKWikiLinks ;
 
 // Get the array of possible wiki links from the opening window
-wikiArray = window.top.opener.top.document.getElementById("wikiLinks").value.split(',');
+wikiArray = window.top.opener.top.wikiLinkArray;
 
 
 function init()
@@ -60,6 +60,11 @@ function addOption(dropDownMenu, wikiName, wikiURL)
 	option.text = wikiName;
 	option.value = wikiURL;
 	dropDownMenu.options.add(option);
+}
+
+function prettyWikiLink(wikiLink)
+{
+	return wikiLink.replace("`", "'").replace("&quot;", '"');
 }
 
 function Ok()
@@ -113,7 +118,7 @@ function Ok()
 							for (i=0; i<wikiArray.length; ++i) 
 							{	
 								var wikiURL="javascript:changeWikiPage(\'" + wikiArray[i] + "\')";
-								addOption(document.getElementById('existingWikiDropDownMenu'), wikiArray[i], wikiURL);
+								addOption(document.getElementById('existingWikiDropDownMenu'), prettyWikiLink(wikiArray[i]), wikiURL);
 							}
 						//-->		
 					</script>
