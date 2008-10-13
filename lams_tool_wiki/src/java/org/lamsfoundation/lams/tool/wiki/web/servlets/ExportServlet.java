@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
-import org.lamsfoundation.lams.tool.wiki.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiSessionDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiUserDTO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;

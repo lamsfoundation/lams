@@ -140,34 +140,32 @@ public class LearningAction extends WikiPageAction {
 	} else {
 	    wikiUser = getCurrentUser(toolSessionID);
 	}
-	
+
 	WikiUserDTO wikiUserDTO = new WikiUserDTO(wikiUser);
 	if (wikiUser.isFinishedActivity()) {
-		// get the notebook entry.
-		NotebookEntry notebookEntry = wikiService.getEntry(toolSessionID,
-				CoreNotebookConstants.NOTEBOOK_TOOL,
-				WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
-		if (notebookEntry != null) {
-			wikiUserDTO.setNotebookEntry(notebookEntry.getEntry());
-		}
+	    // get the notebook entry.
+	    NotebookEntry notebookEntry = wikiService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
+	    if (notebookEntry != null) {
+		wikiUserDTO.setNotebookEntry(notebookEntry.getEntry());
+	    }
 	}
 	request.setAttribute(WikiConstants.ATTR_USER_DTO, wikiUserDTO);
-	
+
 	// Set whether user has reached maximum edits
 	int maxEdits = wiki.getMaximumEdits();
 	Boolean maxEditsReached = (maxEdits != 0 && wikiUser.getWikiEdits() >= maxEdits);
 	request.setAttribute(WikiConstants.ATTR_MAX_EDITS_REACHED, maxEditsReached);
 	request.setAttribute(WikiConstants.ATTR_EDITS_LEFT, maxEdits - wikiUser.getWikiEdits());
-	
-	
+
 	// Set whether user has reached minimum edits
 	int minEdits = wiki.getMinimumEdits();
-	Boolean minEditsReached = (wikiUser.getWikiEdits() >=  minEdits);
+	Boolean minEditsReached = (wikiUser.getWikiEdits() >= minEdits);
 	request.setAttribute(WikiConstants.ATTR_MIN_EDITS_REACHED, minEditsReached);
-	
+
 	// Get the wikipages from the session and the main page
 	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
-	//WikiPage mainPage = null;
+	// WikiPage mainPage = null;
 	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
 	    WikiPageDTO pageDTO = new WikiPageDTO(wikiPage);
 
@@ -175,8 +173,8 @@ public class LearningAction extends WikiPageAction {
 
 	    // Set the main page
 	    // if (wikiPage.getTitle().equals(wiki.getMainPage().getTitle())) {
-	    //	mainPage = wikiPage;
-	    //}
+	    // mainPage = wikiPage;
+	    // }
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
 	request.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
@@ -243,15 +241,14 @@ public class LearningAction extends WikiPageAction {
 
 	    // TODO fix idType to use real value not 999
 	    /*
-	    if (wikiUser.getEntryUID() == null) {
-		wikiUser.setEntryUID(wikiService.createNotebookEntry(toolSessionID,
-			CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId()
-				.intValue(), learningForm.getEntryText()));
-	    } else {
-		// update existing entry.
-		wikiService.updateEntry(wikiUser.getEntryUID(), learningForm.getEntryText());
-	    }
-	    */
+	     * if (wikiUser.getEntryUID() == null) {
+	     * wikiUser.setEntryUID(wikiService.createNotebookEntry(toolSessionID,
+	     * CoreNotebookConstants.NOTEBOOK_TOOL,
+	     * WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId() .intValue(),
+	     * learningForm.getEntryText())); } else { // update existing entry.
+	     * wikiService.updateEntry(wikiUser.getEntryUID(),
+	     * learningForm.getEntryText()); }
+	     */
 
 	    wikiUser.setFinishedActivity(true);
 	    wikiService.saveOrUpdateWikiUser(wikiUser);
@@ -276,32 +273,30 @@ public class LearningAction extends WikiPageAction {
 
 	return null; // TODO need to return proper page.
     }
-    
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form,
-    		HttpServletRequest request, HttpServletResponse response) {
-    
-    	LearningForm lrnForm = (LearningForm) form;
-    	
-    	// set the finished flag
-    	WikiUser wikiUser = this.getCurrentUser(lrnForm.getToolSessionID());
-    	WikiDTO wikiDTO = new WikiDTO(wikiUser.getWikiSession().getWiki());
-    
-    	request.setAttribute("wikiDTO", wikiDTO);
-    
-    	NotebookEntry notebookEntry = wikiService.getEntry(wikiUser.getWikiSession().getSessionId(),
-    			CoreNotebookConstants.NOTEBOOK_TOOL,
-    			WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
-    
-    	if (notebookEntry != null) {
-    		lrnForm.setEntryText(notebookEntry.getEntry());
-    	}
-    
-    	return mapping.findForward("notebook");
+
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	// set the finished flag
+	WikiUser wikiUser = this.getCurrentUser(lrnForm.getToolSessionID());
+	WikiDTO wikiDTO = new WikiDTO(wikiUser.getWikiSession().getWiki());
+
+	request.setAttribute("wikiDTO", wikiDTO);
+
+	NotebookEntry notebookEntry = wikiService.getEntry(wikiUser.getWikiSession().getSessionId(),
+		CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
+
+	if (notebookEntry != null) {
+	    lrnForm.setEntryText(notebookEntry.getEntry());
+	}
+
+	return mapping.findForward("notebook");
     }
-    
-    public ActionForward submitReflection(ActionMapping mapping,
-		ActionForm form, HttpServletRequest request,
-		HttpServletResponse response) {
+
+    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	// save the reflection entry and call the notebook.
 

@@ -141,7 +141,9 @@ public class MonitoringAction extends WikiPageAction {
 	for (WikiUserDTO userDTO : sessionDTO.getUserDTOs()) {
 	    NotebookEntry notebookEntry = wikiService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		    WikiConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
-	    userDTO.setNotebookEntry(notebookEntry.getEntry());
+	    if (notebookEntry != null) {
+		userDTO.setNotebookEntry(notebookEntry.getEntry());
+	    }
 	    sessionDTO.getUserDTOs().add(userDTO);
 	}
 	request.setAttribute(WikiConstants.ATTR_SESSION_DTO, sessionDTO);

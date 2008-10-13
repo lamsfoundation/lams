@@ -277,7 +277,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	WikiSession session = null;
 	WikiPage wikiPage = null;
 
-	String newPageName = WebUtil.readStrParam(request, WikiConstants.ATTR_NEW_PAGE_NAME);
+	String newPageName = WebUtil.readStrParam(request, WikiConstants.ATTR_NEW_PAGE_NAME).replaceAll("`", "'");
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 
@@ -294,6 +294,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	    // Get the page to change to
 	    wikiPage = wikiService.getWikiBySessionAndTitle(session, newPageName);
+	}
+	
+	if (wikiPage == null)
+	{
+	    //TODO: Error handling page does not exist
 	}
 
 	// go through unspecified to display the author screen, using wrapper

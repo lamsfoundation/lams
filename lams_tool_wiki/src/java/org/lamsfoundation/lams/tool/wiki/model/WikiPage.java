@@ -110,7 +110,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     
     /**
      * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="editor"
+     * @hibernate.column name="added_by"
      * 
      */
     public WikiUser getAddedBy() {

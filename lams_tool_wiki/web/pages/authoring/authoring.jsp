@@ -34,7 +34,6 @@
 		<html:hidden property="toolContentID"/>
 		<!--<html:hidden property="mode"/>-->
 		<html:hidden property="currentWikiPage" value="${currentWikiPage.uid}" styleId="currentWikiPage" />
-		<input type="hidden" id="wikiLinks"/>
 		<html:hidden property="newPageName" styleId="newPageName"/>
 		<html:hidden property="historyPageContentId" styleId="historyPageContentId"/>
 		

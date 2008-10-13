@@ -6,6 +6,7 @@ public class WikiPageDTO implements Comparable<WikiPageDTO> {
 
     private Long uid;
     private String title;
+    private String javaScriptTitle;
     private Boolean editable;
     private WikiPageContentDTO currentWikiContentDTO;
 
@@ -17,6 +18,7 @@ public class WikiPageDTO implements Comparable<WikiPageDTO> {
 	this.title = wikiPage.getTitle();
 	this.editable = wikiPage.getEditable();
 	this.currentWikiContentDTO = new WikiPageContentDTO(wikiPage.getCurrentWikiContent());
+	this.javaScriptTitle = this.javaScriptEscape(wikiPage.getTitle());
     }
 
     public Long getUid() {
@@ -46,6 +48,14 @@ public class WikiPageDTO implements Comparable<WikiPageDTO> {
     public WikiPageContentDTO getCurrentWikiContentDTO() {
 	return currentWikiContentDTO;
     }
+    
+    public String getJavaScriptTitle() {
+        return javaScriptTitle;
+    }
+
+    public void setJavaScriptTitle(String javaScriptTitle) {
+        this.javaScriptTitle = javaScriptTitle;
+    }
 
     public void setCurrentWikiContentDTO(WikiPageContentDTO currentWikiContentDTO) {
 	this.currentWikiContentDTO = currentWikiContentDTO;
@@ -53,6 +63,12 @@ public class WikiPageDTO implements Comparable<WikiPageDTO> {
 
     public int compareTo(WikiPageDTO wikiPageDTO) {
 	return wikiPageDTO.getUid().compareTo(uid) * -1;
+    }
+    
+    public String javaScriptEscape(String string)
+    {
+	//return string.replaceAll("\'", "\\\\'").replaceAll("\"","\\\\\"");
+	return string.replaceAll("\'", "`").replaceAll("\"","\\&quot;");
     }
 
 }

@@ -117,9 +117,9 @@
 		<div id="wikimenu">
 			<div id="breadcrumb" style="float: left; width: 30%;">
 				<c:if test="${currentWikiPage.title != mainWikiPage.title}">
-					<a href="javascript:changeWikiPage('${mainWikiPage.title}')">/${mainWikiPage.title}</a>
+					<a href="javascript:changeWikiPage('${mainWikiPage.javaScriptTitle}')">/${mainWikiPage.title}</a>
 				</c:if>
-				<a href="javascript:changeWikiPage('${currentWikiPage.title}')">/${currentWikiPage.title}</a>
+				<a href="javascript:changeWikiPage('${currentWikiPage.javaScriptTitle}')">/${currentWikiPage.title}</a>
 			</div>
 			
 			<div id="buttons" style="float: right; width: 70%;">
@@ -320,7 +320,7 @@
 			<fmt:message key="label.wiki.pages"></fmt:message>
 		</div>
 		<c:forEach var="wikiPage" items="${wikiPages}">
-			<a href='javascript:changeWikiPage("${wikiPage.title}")'>
+			<a href="javascript:changeWikiPage('${wikiPage.javaScriptTitle}')">
 				${wikiPage.title}
 				<c:if test="${wikiPage.title == mainWikiPage.title}">
 					<fmt:message key="label.wiki.main"></fmt:message>
@@ -358,7 +358,7 @@
 	function populateWikiLinkArray()
 	{
 		<c:forEach var="wikiPage" items="${wikiPages}">
-			wikiLinkArray[wikiLinkArray.length] = '${wikiPage.title}';
+			wikiLinkArray[wikiLinkArray.length] = '${wikiPage.javaScriptTitle}';
 		</c:forEach>
 		document.getElementById("wikiLinks").value = wikiLinkArray.toString();
 	}
@@ -397,7 +397,7 @@
 		
 		for (i=0; i<wikiLinkArray.length; i++)
 		{
-			if(dispatch == "editPage" && wikiLinkArray[i] == '${currentWikiPage.title}')
+			if(dispatch == "editPage" && wikiLinkArray[i] == '${currentWikiPage.javaScriptTitle}')
 			{
 				continue;
 			}
