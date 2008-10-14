@@ -269,6 +269,9 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
 	Wiki toContent = Wiki.newInstance(fromContent, toContentId, wikiToolContentHandler);
 
+	insertUnsavedWikiContent(toContent);
+	
+	/*
 	wikiDAO.saveOrUpdate(toContent);
 
 	// Go through and copy child pages and content
@@ -301,6 +304,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	}
 	wikiDAO.saveOrUpdate(toContent);
+	*/
     }
 
     public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
@@ -349,6 +353,25 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	wiki = Wiki.newInstance(wiki, toolContentId, null);
 	wiki.setToolContentHandler(null);
 	wiki.setWikiSessions(null);
+
+	// Go through each page add page content and remove parent references
+	Set<WikiPage> wikiPages = wiki.getWikiPages();
+	for (WikiPage page : wikiPages) {
+	    page.setParentWiki(null);
+	    page.setWikiContentVersions(null);
+	    page.setWikiSession(null);
+	    WikiPageContent content = page.getCurrentWikiContent();
+	    content.setWikiPage(null);
+	    content.setEditDate(null);
+	    content.setEditor(null);
+	    page.setCurrentWikiContent(content);
+	}
+
+	// Null the main page (apart from its title for identification)
+	WikiPage mainPage = new WikiPage();
+	mainPage.setTitle(wiki.getMainPage().getTitle());
+	wiki.setMainPage(mainPage);
+
 	Set<WikiAttachment> atts = wiki.getWikiAttachments();
 	for (WikiAttachment att : atts) {
 	    att.setWiki(null);
@@ -386,7 +409,34 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    wiki.setToolContentId(toolContentId);
 	    wiki.setCreateBy(new Long(newUserUid.longValue()));
 
+	    insertUnsavedWikiContent(wiki);
+	    
+	    /*
+	    // Go through the wiki object and save all the pages and content
+	    for (WikiPage wikiPage : wiki.getWikiPages()) {
+		WikiPageContent currentContent = wikiPage.getCurrentWikiContent();
+		currentContent.setEditDate(new Date());
+		wikiPageContentDAO.saveOrUpdate(currentContent);
+
+		currentContent.setWikiPage(wikiPage);
+		wikiPage.setCurrentWikiContent(currentContent);
+		wikiPageDAO.saveOrUpdate(wikiPage);
+
+		if (wiki.getMainPage().getTitle() == wikiPage.getTitle()) {
+		    wiki.setMainPage(wikiPage);
+		}
+
+		wiki.getWikiPages().add(wikiPage);
+	    }
 	    wikiDAO.saveOrUpdate(wiki);
+
+	    // Update the wiki pages to reference their parent
+	    for (WikiPage wikiPage : wiki.getWikiPages()) {
+		wikiPage.setParentWiki(wiki);
+		wikiPageDAO.saveOrUpdate(wikiPage);
+	    }
+	    */
+
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}
@@ -513,25 +563,86 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
 
 	Wiki defaultContent = getDefaultContent();
-	// create new wiki using the newContentID
-	Wiki newContent = new Wiki();
-	newContent = Wiki.newInstance(defaultContent, newContentID, wikiToolContentHandler);
+	Wiki newContent = Wiki.newInstance(defaultContent, newContentID, wikiToolContentHandler);
+
+	insertUnsavedWikiContent(newContent);
+	
+	// Go through the wiki object and save all the pages and content
+	/*
+	for (WikiPage wikiPage : newContent.getWikiPages()) {
+	    WikiPageContent currentContent = wikiPage.getCurrentWikiContent();
+	    currentContent.setEditDate(new Date());
+	    wikiPageContentDAO.saveOrUpdate(currentContent);
+
+	    currentContent.setWikiPage(wikiPage);
+	    wikiPage.setCurrentWikiContent(currentContent);
+	    wikiPageDAO.saveOrUpdate(wikiPage);
+
+	    if (newContent.getMainPage().getTitle() == wikiPage.getTitle()) {
+		newContent.setMainPage(wikiPage);
+	    }
+
+	    newContent.getWikiPages().add(wikiPage);
+	}
 	wikiDAO.saveOrUpdate(newContent);
 
-	WikiPage newMainPage = (WikiPage) defaultContent.getMainPage().clone();
-	wikiPageDAO.saveOrUpdate(newMainPage);
+	// Update the wiki pages to reference their parent
+	for (WikiPage wikiPage : newContent.getWikiPages()) {
+	    wikiPage.setParentWiki(newContent);
+	    wikiPageDAO.saveOrUpdate(wikiPage);
+	}
+	*/
 
-	WikiPageContent newMainPageContent = (WikiPageContent) defaultContent.getMainPage().getCurrentWikiContent()
-		.clone();
-	newMainPageContent.setEditDate(new Date());
-	wikiPageContentDAO.saveOrUpdate(newMainPageContent);
-
-	newMainPageContent.setWikiPage(newMainPage);
-	newMainPage.setCurrentWikiContent(newMainPageContent);
-	newMainPage.setParentWiki(newContent);
-	newContent.setMainPage(newMainPage);
-	wikiDAO.saveOrUpdate(newContent);
+	/*
+	 * // create new wiki using the newContentID 
+	 * Wiki newContent = new Wiki(); newContent = Wiki.newInstance(defaultContent, newContentID,
+	 * wikiToolContentHandler); wikiDAO.saveOrUpdate(newContent);
+	 * 
+	 * WikiPage newMainPage = (WikiPage)
+	 * defaultContent.getMainPage().clone();
+	 * wikiPageDAO.saveOrUpdate(newMainPage);
+	 * 
+	 * WikiPageContent newMainPageContent = (WikiPageContent)
+	 * defaultContent.getMainPage().getCurrentWikiContent() .clone();
+	 * newMainPageContent.setEditDate(new Date());
+	 * wikiPageContentDAO.saveOrUpdate(newMainPageContent);
+	 * 
+	 * newMainPageContent.setWikiPage(newMainPage);
+	 * newMainPage.setCurrentWikiContent(newMainPageContent);
+	 * newMainPage.setParentWiki(newContent);
+	 * newContent.setMainPage(newMainPage);
+	 * wikiDAO.saveOrUpdate(newContent);
+	 */
 	return newContent;
+    }
+    
+    private Wiki insertUnsavedWikiContent(Wiki wiki)
+    {
+	// Go through the wiki object and save all the pages and content
+	for (WikiPage wikiPage : wiki.getWikiPages()) {
+	    WikiPageContent currentContent = wikiPage.getCurrentWikiContent();
+	    currentContent.setEditDate(new Date());
+	    wikiPageContentDAO.saveOrUpdate(currentContent);
+
+	    currentContent.setWikiPage(wikiPage);
+	    wikiPage.setCurrentWikiContent(currentContent);
+	    wikiPageDAO.saveOrUpdate(wikiPage);
+
+	    if (wiki.getMainPage().getTitle() == wikiPage.getTitle()) {
+		wiki.setMainPage(wikiPage);
+	    }
+
+	    wiki.getWikiPages().add(wikiPage);
+	}
+	wikiDAO.saveOrUpdate(wiki);
+
+	// Update the wiki pages to reference their parent
+	for (WikiPage wikiPage : wiki.getWikiPages()) {
+	    wikiPage.setParentWiki(wiki);
+	    wikiPageDAO.saveOrUpdate(wikiPage);
+	}
+	
+	return wiki;
     }
 
     public Wiki getWikiByContentId(Long toolContentID) {
