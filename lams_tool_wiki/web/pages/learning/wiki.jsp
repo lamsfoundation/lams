@@ -344,7 +344,7 @@
 		</div>
 		-->
 	</html:form>
-		
+			
 	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<%@ include file="parts/finishButton.jsp"%>
 	</c:if>
