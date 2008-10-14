@@ -62,6 +62,7 @@ public interface WikiConstants {
     public static final String ATTR_MIN_EDITS_REACHED = "minEditsReached";
     public static final String ATTR_FINISHED_ACTIVITY = "finishedActivity";
     public static final String ATTR_CONTENT_EDITAVLE = "contentEditable";
+    public static final String ATTR_MAIN_PAGE_TITLE = "mainPageTitle";
 
     // Parameter names
     public static final String PARAM_PARENT_PAGE = "parentPage";

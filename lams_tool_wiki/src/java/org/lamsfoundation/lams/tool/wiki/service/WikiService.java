@@ -154,6 +154,13 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	// Here we need to clone wikipages and content for tool session versions
 	for (WikiPage childPage : wiki.getWikiPages()) {
+	    
+	    // check that this page does not already have a session
+	    if (childPage.getWikiSession() != null)
+	    {
+		continue;
+	    }
+	    
 	    // Clone the wiki page
 	    WikiPage newChildPage = (WikiPage) childPage.clone();
 	    wikiPageDAO.saveOrUpdate(newChildPage);

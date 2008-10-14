@@ -74,7 +74,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		doLearnerExport(request, response, directoryName, basePath, cookies);
 	    } else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
 		request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
-		doTeacherExport(request, response, directoryName, cookies);
+		doTeacherExport(request, response, directoryName, basePath, cookies);
 	    }
 	} catch (WikiException e) {
 	    logger.error("Cannot perform export for wiki tool.");
@@ -148,11 +148,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	request.getSession()
 		.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
 
-	writeResponseToFile(basePath + "/pages/export/exportPortfolioLearner.jsp", directoryName, FILENAME, cookies);
+	// Set the mode
+	request.getSession().setAttribute(WikiConstants.ATTR_MODE, ToolAccessMode.LEARNER);
+
+	writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
     }
 
     private void doTeacherExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    Cookie[] cookies) throws WikiException {
+	    String basePath, Cookie[] cookies) throws WikiException {
 
 	logger.debug("doExportTeacher: toolContentID:" + toolContentID);
 
@@ -163,21 +166,47 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    throw new WikiException(error);
 	}
 
+	// Set up the main wiki dto
 	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
-
 	WikiDTO wikiDTO = new WikiDTO(wiki);
+	request.getSession().setAttribute(WikiConstants.ATTR_WIKI_DTO, wikiDTO);
 
-	// add the wikiEntry for each user in each session
+	// Set up the title
+	String wikiTitle = wiki.getMainPage().getTitle();
+	request.getSession().setAttribute(WikiConstants.ATTR_MAIN_PAGE_TITLE, wikiTitle);
+	
+	// Do the main monitoring page
+	writeResponseToFile(basePath + "/pages/export/exportPortfolioTeacher.jsp", directoryName, FILENAME, cookies);
 
-	/*
-	 * for (WikiSessionDTO session : wikiDTO.getSessionDTOs()) { for
-	 * (WikiUserDTO user : session.getUserDTOs()) { NotebookEntry entry =
-	 * wikiService.getEntry(user.getEntryUID()); if (entry != null) {
-	 * NotebookEntryDTO entryDTO = new NotebookEntryDTO(entry);
-	 * user.setEntryDTO(entryDTO); } } }
-	 */
+	// Do the wiki pages for each session
+	for (WikiSession wikiSession : wiki.getWikiSessions()) {
+	    // construct wiki session dto
+	    WikiSessionDTO sessionDTO = new WikiSessionDTO(wikiSession);
+	    request.getSession().setAttribute(WikiConstants.ATTR_SESSION_DTO, sessionDTO);
 
-	request.getSession().setAttribute("wikiDTO", wikiDTO);
+	    // construct wiki pages dto
+	    SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
+	    for (WikiPage wikiPage : wikiSession.getWikiPages()) {
+		wikiPageDTOs.add(new WikiPageDTO(wikiPage));
+	    }
+	    request.getSession().setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
+
+	    // construct current page dto
+	    request.getSession().setAttribute(WikiConstants.ATTR_CURRENT_WIKI,
+		    new WikiPageDTO(wikiSession.getMainPage()));
+
+	    // construct main page dto
+	    request.getSession().setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE,
+		    new WikiPageDTO(wikiSession.getMainPage()));
+
+	    writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, wikiSession
+		    .getSessionId()
+		    + ".html", cookies);
+
+	    // Set the mode
+	    request.getSession().setAttribute(WikiConstants.ATTR_MODE, ToolAccessMode.TEACHER);
+
+	}
     }
 
 }
