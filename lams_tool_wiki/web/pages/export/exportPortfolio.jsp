@@ -99,31 +99,48 @@
 		
 		
 			<!-- Reflections -->
-			<c:if test="${not empty sessionDTO.userDTOs && sessionDTO.reflectOnActivity && mode=='teacher'}">
-				
-				<br />
-				<hr />
-				<br />
-				
-				<h4>
-					<fmt:message key="monitor.notebooks"></fmt:message>
-				</h4>
-				<br />
-				<table class="alternative-color">
-					<c:forEach var="user" items="${sessionDTO.userDTOs}">
-						<c:if test="${not empty user.notebookEntry}">
-						<tr>
-							<td>
-								${user.firstName} ${user.lastName}
-							</td>
-							<td> 
-								<lams:out escapeHtml="true" value="${user.notebookEntry}" />
-							</td>
-						</tr>
-						</c:if>
-					</c:forEach>
-				</table>
-			</c:if>
+			<c:choose>
+				<c:when test="${mode=='teacher'}">
+					<c:if test="${not empty sessionDTO.userDTOs && sessionDTO.reflectOnActivity}">
+						<br />
+						<hr />
+						<br />
+						
+						<h4>
+							<fmt:message key="monitor.notebooks"></fmt:message>
+						</h4>
+						<table class="alternative-color">
+							<c:forEach var="user" items="${sessionDTO.userDTOs}">
+								<c:if test="${not empty user.notebookEntry}">
+								<tr>
+									<td>
+										${user.firstName} ${user.lastName}
+									</td>
+									<td> 
+										<lams:out escapeHtml="true" value="${user.notebookEntry}" />
+									</td>
+								</tr>
+								</c:if>
+							</c:forEach>
+						</table>
+					</c:if>
+				</c:when>
+				<c:otherwise>
+					<c:if test="${userDTO.notebookEntry != null && wikiDTO.reflectOnActivity}">
+						<br />
+						<hr />
+						<br />
+						
+						<h4>
+							${wikiDTO.reflectInstructions}
+						</h4>
+						<br />
+						
+							<lams:out escapeHtml="true" value="${userDTO.notebookEntry}" />	
+					</c:if>
+				</c:otherwise>
+			</c:choose>
+			
 		
 		</div>
 		<!--closes content-->

@@ -34,18 +34,24 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiSessionDTO;
+import org.lamsfoundation.lams.tool.wiki.dto.WikiUserDTO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
+import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class ExportServlet extends AbstractExportPortfolioServlet {
@@ -148,6 +154,20 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	request.getSession()
 		.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
 
+	// Construct the user dto
+	UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	WikiUser wikiUser = wikiService.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()), toolSessionID);
+	WikiUserDTO wikiUserDTO = new WikiUserDTO(wikiUser);
+	if (wikiUser.isFinishedActivity()) {
+	    // get the notebook entry.
+	    NotebookEntry notebookEntry = wikiService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
+	    if (notebookEntry != null) {
+		wikiUserDTO.setNotebookEntry(notebookEntry.getEntry());
+	    }
+	}
+	request.getSession().setAttribute(WikiConstants.ATTR_USER_DTO, wikiUserDTO);
+
 	// Set the mode
 	request.getSession().setAttribute(WikiConstants.ATTR_MODE, ToolAccessMode.LEARNER);
 
@@ -174,7 +194,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	// Set up the title
 	String wikiTitle = wiki.getMainPage().getTitle();
 	request.getSession().setAttribute(WikiConstants.ATTR_MAIN_PAGE_TITLE, wikiTitle);
-	
+
 	// Do the main monitoring page
 	writeResponseToFile(basePath + "/pages/export/exportPortfolioTeacher.jsp", directoryName, FILENAME, cookies);
 
@@ -182,6 +202,19 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	for (WikiSession wikiSession : wiki.getWikiSessions()) {
 	    // construct wiki session dto
 	    WikiSessionDTO sessionDTO = new WikiSessionDTO(wikiSession);
+	    
+	    for (WikiUserDTO wikiUserDTO : sessionDTO.getUserDTOs()) {
+		if (wikiUserDTO.isFinishedActivity()) {
+		    // get the notebook entry.
+		    NotebookEntry notebookEntry = wikiService.getEntry(sessionDTO.getSessionID(),
+			    CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE, wikiUserDTO.getUserId()
+				    .intValue());
+		    if (notebookEntry != null) {
+			wikiUserDTO.setNotebookEntry(notebookEntry.getEntry());
+		    }
+		}
+		sessionDTO.getUserDTOs().add(wikiUserDTO);
+	    }
 	    request.getSession().setAttribute(WikiConstants.ATTR_SESSION_DTO, sessionDTO);
 
 	    // construct wiki pages dto
