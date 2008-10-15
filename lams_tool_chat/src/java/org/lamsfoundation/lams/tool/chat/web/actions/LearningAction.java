@@ -63,8 +63,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/learning" parameter="dispatch" scope="request"
- *                name="learningForm"
+ * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
  * @struts.action-forward name="learning" path="tiles:/learning/main"
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
@@ -72,198 +71,177 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class LearningAction extends LamsDispatchAction {
 
-	private static Logger log = Logger.getLogger(LearningAction.class);
+    private static Logger log = Logger.getLogger(LearningAction.class);
 
-	private IChatService chatService;
+    private IChatService chatService;
 
-	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		// 'toolSessionID' and 'mode' paramters are expected to be present.
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,
-				AttributeNames.PARAM_MODE, false);
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	// 'toolSessionID' and 'mode' paramters are expected to be present.
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 
-		Long toolSessionID = WebUtil.readLongParam(request,
-				AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-		// set up chatService
-		if (chatService == null) {
-			chatService = ChatServiceProxy.getChatService(this.getServlet()
-					.getServletContext());
-		}
-
-		// Retrieve the session and content.
-		ChatSession chatSession = chatService
-				.getSessionBySessionId(toolSessionID);
-		if (chatSession == null) {
-			throw new ChatException(
-					"Cannot retreive session with toolSessionID"
-							+ toolSessionID);
-		}
-
-		Chat chat = chatSession.getChat();
-
-		// Retrieve the current user
-		ChatUser chatUser = getCurrentUser(toolSessionID);
-
-		// check defineLater
-		if (chat.isDefineLater()) {
-			return mapping.findForward("defineLater");
-		}
-
-		request.setAttribute("MODE", mode.toString());
-
-		// Create the room if it doesnt exist
-		log.debug(chatSession.isRoomCreated());
-		if (!chatSession.isRoomCreated()) {
-			chatService.createJabberRoom(chatSession);
-			chatService.saveOrUpdateChatSession(chatSession);
-		}
-
-		ChatDTO chatDTO = new ChatDTO(chat);
-		request.setAttribute("chatDTO", chatDTO);
-
-		request.setAttribute("XMPPDOMAIN", Configuration
-				.get(ConfigurationKeys.XMPP_DOMAIN));
-		request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
-
-		ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
-		if (chatUser.isFinishedActivity()) {
-			// get the notebook entry.
-			NotebookEntry notebookEntry = chatService.getEntry(toolSessionID,
-					CoreNotebookConstants.NOTEBOOK_TOOL,
-					ChatConstants.TOOL_SIGNATURE, chatUser.getUserId()
-							.intValue());
-			if (notebookEntry != null) {
-				chatUserDTO.notebookEntry = notebookEntry.getEntry();
-			}
-		}
-		request.setAttribute("chatUserDTO", chatUserDTO);
-
-		// Ensure that the content is use flag is set.
-		if (!chat.isContentInUse()) {
-			chat.setContentInUse(new Boolean(true));
-			chatService.saveOrUpdateChat(chat);
-		}
-
-		// check runOffline
-		if (chat.isRunOffline()) {
-			return mapping.findForward("runOffline");
-		}
-
-		return mapping.findForward("learning");
-
+	// set up chatService
+	if (chatService == null) {
+	    chatService = ChatServiceProxy.getChatService(this.getServlet().getServletContext());
 	}
 
-	private ChatUser getCurrentUser(Long toolSessionId) {
-		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
-				AttributeNames.USER);
-
-		// attempt to retrieve user using userId and toolSessionId
-		ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(
-				user.getUserID().intValue()), toolSessionId);
-
-		if (chatUser == null) {
-			ChatSession chatSession = chatService
-					.getSessionBySessionId(toolSessionId);
-			chatUser = chatService.createChatUser(user, chatSession);
-		}
-
-		return chatUser;
+	// Retrieve the session and content.
+	ChatSession chatSession = chatService.getSessionBySessionId(toolSessionID);
+	if (chatSession == null) {
+	    throw new ChatException("Cannot retreive session with toolSessionID" + toolSessionID);
 	}
 
-	public ActionForward finishActivity(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+	Chat chat = chatSession.getChat();
 
-		LearningForm lrnForm = (LearningForm) form;
+	// Retrieve the current user
+	ChatUser chatUser = getCurrentUser(toolSessionID);
 
-		// set the finished flag
-		ChatUser chatUser = chatService.getUserByUID(lrnForm.getChatUserUID());
-		if (chatUser != null) {
-			chatUser.setFinishedActivity(true);
-			chatService.saveOrUpdateChatUser(chatUser);
-		} else {
-			log.error("finishActivity(): couldn't find ChatUser with uid: "
-					+ lrnForm.getChatUserUID());
-		}
-
-		ToolSessionManager sessionMgrService = ChatServiceProxy
-				.getChatSessionManager(getServlet().getServletContext());
-
-		HttpSession ss = SessionManager.getSession();
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		Long userID = new Long(user.getUserID().longValue());
-		Long toolSessionID = chatUser.getChatSession().getSessionId();
-
-		String nextActivityUrl;
-		try {
-			nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID,
-					userID);
-			response.sendRedirect(nextActivityUrl);
-		} catch (DataMissingException e) {
-			throw new ChatException(e);
-		} catch (ToolException e) {
-			throw new ChatException(e);
-		} catch (IOException e) {
-			throw new ChatException(e);
-		}
-
-		return null; // TODO need to return proper page.
+	// check defineLater
+	if (chat.isDefineLater()) {
+	    return mapping.findForward("defineLater");
 	}
 
-	public ActionForward openNotebook(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+	request.setAttribute("MODE", mode.toString());
 
-		LearningForm lrnForm = (LearningForm) form;
-
-		// set the finished flag
-		ChatUser chatUser = chatService.getUserByUID(lrnForm.getChatUserUID());
-		ChatDTO chatDTO = new ChatDTO(chatUser.getChatSession().getChat());
-
-		request.setAttribute("chatDTO", chatDTO);
-
-		NotebookEntry notebookEntry = chatService.getEntry(chatUser
-				.getChatSession().getSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL,
-				ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
-
-		if (notebookEntry != null) {
-			lrnForm.setEntryText(notebookEntry.getEntry());
-		}
-
-		return mapping.findForward("notebook");
+	// Create the room if it doesnt exist
+	log.debug(chatSession.isRoomCreated());
+	if (!chatSession.isRoomCreated()) {
+	    chatService.createJabberRoom(chatSession);
+	    chatService.saveOrUpdateChatSession(chatSession);
 	}
 
-	public ActionForward submitReflection(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
+	ChatDTO chatDTO = new ChatDTO(chat);
+	request.setAttribute("chatDTO", chatDTO);
 
-		// save the reflection entry and call the notebook.
+	request.setAttribute("XMPPDOMAIN", Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
+	request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 
-		LearningForm lrnForm = (LearningForm) form;
-
-		ChatUser chatUser = chatService.getUserByUID(lrnForm.getChatUserUID());
-		Long toolSessionID = chatUser.getChatSession().getSessionId();
-		Integer userID = chatUser.getUserId().intValue();
-
-		// check for existing notebook entry
-		NotebookEntry entry = chatService.getEntry(toolSessionID,
-				CoreNotebookConstants.NOTEBOOK_TOOL,
-				ChatConstants.TOOL_SIGNATURE, userID);
-
-		if (entry == null) {
-			// create new entry
-			chatService.createNotebookEntry(toolSessionID,
-					CoreNotebookConstants.NOTEBOOK_TOOL,
-					ChatConstants.TOOL_SIGNATURE, userID, lrnForm
-							.getEntryText());
-		} else {
-			// update existing entry
-			entry.setEntry(lrnForm.getEntryText());
-			entry.setLastModified(new Date());
-			chatService.updateEntry(entry);
-		}
-
-		return finishActivity(mapping, form, request, response);
+	ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
+	if (chatUser.isFinishedActivity()) {
+	    // get the notebook entry.
+	    NotebookEntry notebookEntry = chatService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
+	    if (notebookEntry != null) {
+		chatUserDTO.notebookEntry = notebookEntry.getEntry();
+	    }
 	}
+	request.setAttribute("chatUserDTO", chatUserDTO);
+
+	// Ensure that the content is use flag is set.
+	if (!chat.isContentInUse()) {
+	    chat.setContentInUse(new Boolean(true));
+	    chatService.saveOrUpdateChat(chat);
+	}
+
+	// check runOffline
+	if (chat.isRunOffline()) {
+	    return mapping.findForward("runOffline");
+	}
+
+	return mapping.findForward("learning");
+
+    }
+
+    private ChatUser getCurrentUser(Long toolSessionId) {
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+
+	// attempt to retrieve user using userId and toolSessionId
+	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+		toolSessionId);
+
+	if (chatUser == null) {
+	    ChatSession chatSession = chatService.getSessionBySessionId(toolSessionId);
+	    chatUser = chatService.createChatUser(user, chatSession);
+	}
+
+	return chatUser;
+    }
+
+    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	// set the finished flag
+	ChatUser chatUser = chatService.getUserByUID(lrnForm.getChatUserUID());
+	if (chatUser != null) {
+	    chatUser.setFinishedActivity(true);
+	    chatService.saveOrUpdateChatUser(chatUser);
+	} else {
+	    log.error("finishActivity(): couldn't find ChatUser with uid: " + lrnForm.getChatUserUID());
+	}
+
+	ToolSessionManager sessionMgrService = ChatServiceProxy.getChatSessionManager(getServlet().getServletContext());
+
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = new Long(user.getUserID().longValue());
+	Long toolSessionID = chatUser.getChatSession().getSessionId();
+
+	String nextActivityUrl;
+	try {
+	    nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, userID);
+	    response.sendRedirect(nextActivityUrl);
+	} catch (DataMissingException e) {
+	    throw new ChatException(e);
+	} catch (ToolException e) {
+	    throw new ChatException(e);
+	} catch (IOException e) {
+	    throw new ChatException(e);
+	}
+
+	return null; // TODO need to return proper page.
+    }
+
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	// set the finished flag
+	ChatUser chatUser = chatService.getUserByUID(lrnForm.getChatUserUID());
+	ChatDTO chatDTO = new ChatDTO(chatUser.getChatSession().getChat());
+
+	request.setAttribute("chatDTO", chatDTO);
+
+	NotebookEntry notebookEntry = chatService.getEntry(chatUser.getChatSession().getSessionId(),
+		CoreNotebookConstants.NOTEBOOK_TOOL, ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
+
+	if (notebookEntry != null) {
+	    lrnForm.setEntryText(notebookEntry.getEntry());
+	}
+
+	return mapping.findForward("notebook");
+    }
+
+    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	// save the reflection entry and call the notebook.
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	ChatUser chatUser = chatService.getUserByUID(lrnForm.getChatUserUID());
+	Long toolSessionID = chatUser.getChatSession().getSessionId();
+	Integer userID = chatUser.getUserId().intValue();
+
+	// check for existing notebook entry
+	NotebookEntry entry = chatService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		ChatConstants.TOOL_SIGNATURE, userID);
+
+	if (entry == null) {
+	    // create new entry
+	    chatService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ChatConstants.TOOL_SIGNATURE, userID, lrnForm.getEntryText());
+	} else {
+	    // update existing entry
+	    entry.setEntry(lrnForm.getEntryText());
+	    entry.setLastModified(new Date());
+	    chatService.updateEntry(entry);
+	}
+
+	return finishActivity(mapping, form, request, response);
+    }
 }
