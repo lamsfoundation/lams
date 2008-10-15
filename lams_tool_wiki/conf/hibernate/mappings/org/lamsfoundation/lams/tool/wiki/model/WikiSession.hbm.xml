@@ -120,6 +120,28 @@
 
         </set>
 
+        <many-to-one
+            name="mainPage"
+            class="org.lamsfoundation.lams.tool.wiki.model.WikiPage"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+        >
+            <column
+                name="wiki_main_page_uid" 
+            />
+        </many-to-one>
+
+        <property
+            name="contentFolderID"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="content_folder_id"
+            length="255"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-WikiSession.xml

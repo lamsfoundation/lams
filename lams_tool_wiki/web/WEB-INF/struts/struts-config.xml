@@ -75,6 +75,11 @@
         path="tiles:/learning/defineLater"
         redirect="false"
       />
+      <forward
+        name="notebook"
+        path="tiles:/learning/notebook"
+        redirect="false"
+      />
     </action>
     <action
       path="/monitoring"
@@ -93,6 +98,16 @@
       <forward
         name="wiki_display"
         path="tiles:/monitoring/wiki_display"
+        redirect="false"
+      />
+      <forward
+        name="compareWiki"
+        path="/pages/wiki/compare.jsp"
+        redirect="false"
+      />
+      <forward
+        name="viewWiki"
+        path="/pages/wiki/viewWiki.jsp"
         redirect="false"
       />
     </action>

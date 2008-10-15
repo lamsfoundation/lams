@@ -90,6 +90,14 @@
             column="entry_uid"
         />
 
+        <property
+            name="wikiEdits"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="wiki_edits"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-WikiUser.xml

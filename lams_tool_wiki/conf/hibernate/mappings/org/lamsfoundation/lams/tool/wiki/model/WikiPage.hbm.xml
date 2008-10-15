@@ -90,6 +90,19 @@
         </many-to-one>
 
         <many-to-one
+            name="addedBy"
+            class="org.lamsfoundation.lams.tool.wiki.model.WikiUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+        >
+            <column
+                name="added_by" 
+            />
+        </many-to-one>
+
+        <many-to-one
             name="wikiSession"
             class="org.lamsfoundation.lams.tool.wiki.model.WikiSession"
             cascade="none"
