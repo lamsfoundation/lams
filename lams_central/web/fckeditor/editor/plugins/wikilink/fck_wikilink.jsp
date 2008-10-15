@@ -26,8 +26,7 @@ var FCKLang = oEditor.FCKLang ;
 var FCKWikiLinks = oEditor.FCKWikiLinks ;
 
 // Get the array of possible wiki links from the opening window
-wikiArray = window.top.opener.parent.wikiLinkArray;
-
+wikiArray = window.parent.InnerDialogLoaded().FCK.wikiLinkArray
 
 function init()
 {

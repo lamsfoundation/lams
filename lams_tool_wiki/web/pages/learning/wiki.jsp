@@ -401,6 +401,8 @@
 		if (!${wikiDTO.allowLearnerInsertLinks}) {	
 			hideToolbarItem(editorInstance, 'Link');
 		}
+		
+		editorInstance.wikiLinkArray = wikiLinkArray;
 	}
 
 -->

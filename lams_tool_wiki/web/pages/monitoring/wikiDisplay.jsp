@@ -296,6 +296,11 @@
 		document.getElementById("monitoringForm").submit();
 	}
 	
+	function FCKeditor_OnComplete(editorInstance) 
+	{ 	
+		editorInstance.wikiLinkArray = wikiLinkArray;
+	}
+	
 -->
 </script>
 

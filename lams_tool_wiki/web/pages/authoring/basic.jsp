@@ -201,12 +201,30 @@ ${currentWikiPage.title}</h1>
 <!--
 	var wikiLinkArray = new Array();
 	populateWikiLinkArray();
+	
+	
 	function populateWikiLinkArray()
 	{
 		<c:forEach var="wikiPage" items="${wikiPages}">
 			wikiLinkArray[wikiLinkArray.length] = '${wikiPage.javaScriptTitle}';
 		</c:forEach>
+		
+		
 	}
+	
+	/*
+	window.onload = function () {
+		<c:forEach var="wikiPage" items="${wikiPages}">
+			wikiLinkArray[wikiLinkArray.length] = '${wikiPage.javaScriptTitle}';
+		</c:forEach>
+		
+		var oEditor = FCKeditorAPI.GetInstance('wikiBody');
+		var oEditor2 = FCKeditorAPI.GetInstance('newPageWikiBody');
+		
+		oEditor.wikiLinkArray = wikiLinkArray;
+		oEditor2.wikiLinkArray = wikiLinkArray;
+	}
+	*/
 	
 	function doEditOrAdd(dispatch)
 	{
@@ -251,6 +269,11 @@ ${currentWikiPage.title}</h1>
 	{
 		document.getElementById("dispatch").value=dispatch;
 		document.getElementById("authoringForm").submit();
+	}
+	
+	function FCKeditor_OnComplete(editorInstance) 
+	{ 	
+		editorInstance.wikiLinkArray = wikiLinkArray;
 	}
 	
 -->
