@@ -65,6 +65,8 @@ public class WikiSession implements java.io.Serializable {
     private Set<WikiPage> wikiPages; // Need a runtime copy for each wikiPage
     
     private WikiPage mainPage; //Need a runtime reference to the main page
+    
+    private String contentFolderID; //Need a runtime content folder to share files
 
     // Constructors
 
@@ -74,7 +76,7 @@ public class WikiSession implements java.io.Serializable {
 
     /** full constructor */
     public WikiSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId, String sessionName,
-	    Wiki wiki, Set<WikiUser> wikiUsers, Set<WikiPage> wikiPages) {
+	    Wiki wiki, Set<WikiUser> wikiUsers, Set<WikiPage> wikiPages, String contentFolderID) {
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStartDate = sessionStartDate;
 	this.status = status;
@@ -83,6 +85,7 @@ public class WikiSession implements java.io.Serializable {
 	this.wiki = wiki;
 	this.wikiUsers = wikiUsers;
 	this.wikiPages = wikiPages;
+	this.contentFolderID = contentFolderID;
     }
 
     // Property accessors
@@ -219,6 +222,19 @@ public class WikiSession implements java.io.Serializable {
 
     public void setMainPage(WikiPage mainPage) {
 	this.mainPage = mainPage;
+    }
+    
+    
+    /**
+     * @hibernate.property column="content_folder_id" length="255"
+     * 
+     */
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
     }
 
     /**

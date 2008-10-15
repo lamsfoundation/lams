@@ -261,7 +261,7 @@
 						</div>
 						<lams:FCKEditor id="wikiBody"
 							value="${currentWikiPage.currentWikiContentDTO.body}"
-							contentFolderID="${sessionMap.contentFolderID}"
+							contentFolderID="${contentFolderID}"
 							toolbarSet="Custom-Learner"
 							height="400px"
 							>
@@ -277,7 +277,7 @@
 				</tr>
 			</table>
 		</div>
-		
+
 		<div id="add" style="display:none;"  >
 			<h1><fmt:message key="label.wiki.add"></fmt:message></h1>
 			<table cellpadding="0">
@@ -297,7 +297,7 @@
 						<lams:FCKEditor id="newPageWikiBody"
 							value=""
 							height="400px"
-							contentFolderID="${sessionMap.contentFolderID}"
+							contentFolderID="${contentFolderID}"
 							toolbarSet="Custom-Learner"></lams:FCKEditor>
 					</td>
 				</tr>

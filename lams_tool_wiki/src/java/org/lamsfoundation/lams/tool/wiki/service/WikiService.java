@@ -34,7 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -86,6 +85,7 @@ import org.lamsfoundation.lams.tool.wiki.util.diff.Diff;
 import org.lamsfoundation.lams.tool.wiki.util.diff.Difference;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -148,6 +148,9 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	// Get the wiki content to start a session
 	Wiki wiki = wikiDAO.getByContentId(toolContentId);
 	session.setWiki(wiki);
+	
+	// Generate a unique content folder id for the wiki
+	session.setContentFolderID(FileUtil.generateUniqueContentFolderID());
 
 	// Create an empty list to copy the wiki pages into
 	Set<WikiPage> sessionWikiPages = new HashSet<WikiPage>();

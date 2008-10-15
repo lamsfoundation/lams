@@ -25,8 +25,11 @@
 
 package org.lamsfoundation.lams.tool.wiki.web.servlets;
 
+import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -34,15 +37,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learning.export.web.action.ImageBundler;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
+import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiSessionDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiUserDTO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
+import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
@@ -84,6 +90,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    }
 	} catch (WikiException e) {
 	    logger.error("Cannot perform export for wiki tool.");
+	} catch (IOException e) {
+	    logger.error("Cannot perform export for wiki tool.");
 	}
 
 	// writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
@@ -117,7 +125,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     }
 
     private void doLearnerExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    String basePath, Cookie[] cookies) throws WikiException {
+	    String basePath, Cookie[] cookies) throws WikiException, IOException {
 
 	logger.debug("doExportLearner: toolContentID:" + toolSessionID);
 
@@ -143,7 +151,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	// construct wiki pages dto
 	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
 	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
-	    wikiPageDTOs.add(new WikiPageDTO(wikiPage));
+
+	    WikiPageDTO wikiPageDTO = new WikiPageDTO(wikiPage);
+
+	    // Update image links
+	    WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
+	    contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID()));
+	    wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
+	    
+	    wikiPageDTOs.add(wikiPageDTO);
 	}
 	request.getSession().setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
 
@@ -153,6 +169,11 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	// construct main page dto
 	request.getSession()
 		.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
+
+	// bundle all user uploaded content and FCKEditor smileys with the
+	// package
+	ImageBundler imageBundler = new ImageBundler(directoryName, wikiSession.getContentFolderID());
+	imageBundler.bundleImages();
 
 	// Construct the user dto
 	UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -175,7 +196,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     }
 
     private void doTeacherExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    String basePath, Cookie[] cookies) throws WikiException {
+	    String basePath, Cookie[] cookies) throws WikiException, IOException {
 
 	logger.debug("doExportTeacher: toolContentID:" + toolContentID);
 
@@ -202,7 +223,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	for (WikiSession wikiSession : wiki.getWikiSessions()) {
 	    // construct wiki session dto
 	    WikiSessionDTO sessionDTO = new WikiSessionDTO(wikiSession);
-	    
+
 	    for (WikiUserDTO wikiUserDTO : sessionDTO.getUserDTOs()) {
 		if (wikiUserDTO.isFinishedActivity()) {
 		    // get the notebook entry.
@@ -220,7 +241,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    // construct wiki pages dto
 	    SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
 	    for (WikiPage wikiPage : wikiSession.getWikiPages()) {
-		wikiPageDTOs.add(new WikiPageDTO(wikiPage));
+
+		WikiPageDTO wikiPageDTO = new WikiPageDTO(wikiPage);
+
+		// Update image links
+		WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
+		contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID()));
+		wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
+		
+		wikiPageDTOs.add(wikiPageDTO);
 	    }
 	    request.getSession().setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
 
@@ -232,6 +261,11 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    request.getSession().setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE,
 		    new WikiPageDTO(wikiSession.getMainPage()));
 
+	    // bundle all user uploaded content and FCKEditor smileys with the
+	    // package
+	    ImageBundler imageBundler = new ImageBundler(directoryName, wikiSession.getContentFolderID());
+	    imageBundler.bundleImages();
+
 	    writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, wikiSession
 		    .getSessionId()
 		    + ".html", cookies);
@@ -240,6 +274,30 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    request.getSession().setAttribute(WikiConstants.ATTR_MODE, ToolAccessMode.TEACHER);
 
 	}
+    }
+
+    private String replaceImageFolderLinks(String body, String contentFolderID) {
+	String fckeditorpath = "/rams//www/secure/" + contentFolderID;
+	String fckeditorsmiley = "/rams//fckeditor/editor/images/smiley";
+
+	String newfckeditorpath = "./" + contentFolderID;
+	String newfckeditorsmiley = "./fckeditor/editor/images/smiley";
+
+	// The pattern matches control characters
+	Pattern p = Pattern.compile(fckeditorpath);
+	Matcher m = p.matcher("");
+
+	Pattern p2 = Pattern.compile(fckeditorsmiley);
+	Matcher m2 = p2.matcher("");
+
+	// Replace the p matching pattern with the newfckeditorpath
+	m.reset(body);
+	String result = m.replaceAll(newfckeditorpath);
+
+	m2.reset(result);
+	result = m2.replaceAll(newfckeditorsmiley);
+	
+	return result;
     }
 
 }

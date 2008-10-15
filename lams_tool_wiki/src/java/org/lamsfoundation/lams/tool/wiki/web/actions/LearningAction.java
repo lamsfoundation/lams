@@ -55,11 +55,9 @@ import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
-import org.lamsfoundation.lams.tool.wiki.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.tool.wiki.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -195,6 +193,9 @@ public class LearningAction extends WikiPageAction {
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGE_CONTENT_HISTORY, currentWikiPageHistoryDTOs);
 
+	// Set the content folder id
+	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, wikiSession.getContentFolderID());
+	
 	// set readOnly flag.
 	if (mode.equals(ToolAccessMode.TEACHER) || (wiki.isLockOnFinished() && wikiUser.isFinishedActivity())) {
 	    request.setAttribute(WikiConstants.ATTR_CONTENT_EDITAVLE, false);

@@ -150,7 +150,7 @@
 			</div>
 			<lams:FCKEditor id="wikiBody"
 				value="${currentWikiPage.currentWikiContentDTO.body}"
-				contentFolderID="${sessionMap.contentFolderID}"
+				contentFolderID="${contentFolderID}"
 				toolbarSet="Custom-Learner" height="400px">
 			</lams:FCKEditor></td>
 		</tr>
@@ -184,7 +184,7 @@
 			<div class="field-name"><fmt:message key="label.wiki.body"></fmt:message>
 			</div>
 			<lams:FCKEditor id="newPageWikiBody" value="" height="400px"
-				contentFolderID="${sessionMap.contentFolderID}"
+				contentFolderID="${contentFolderID}"
 				toolbarSet="Custom-Learner"></lams:FCKEditor></td>
 		</tr>
 		<tr>

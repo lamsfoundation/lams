@@ -43,12 +43,15 @@ public class WikiSessionDTO implements Comparable {
     int numberOfLearners;
 
     int numberOfFinishedLearners;
-    
+
     boolean reflectOnActivity;
+
+    String contentFolderID;
 
     public WikiSessionDTO(WikiSession session) {
 	this.sessionID = session.getSessionId();
 	this.sessionName = session.getSessionName();
+	this.contentFolderID = session.getContentFolderID();
 
 	numberOfFinishedLearners = 0;
 	for (Iterator iterator = session.getWikiUsers().iterator(); iterator.hasNext();) {
@@ -61,7 +64,7 @@ public class WikiSessionDTO implements Comparable {
 	}
 
 	numberOfLearners = userDTOs.size();
-	
+
 	reflectOnActivity = session.getWiki().isReflectOnActivity();
 
     }
@@ -120,10 +123,19 @@ public class WikiSessionDTO implements Comparable {
     }
 
     public boolean isReflectOnActivity() {
-        return reflectOnActivity;
+	return reflectOnActivity;
     }
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
-        this.reflectOnActivity = reflectOnActivity;
+	this.reflectOnActivity = reflectOnActivity;
     }
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
+
 }

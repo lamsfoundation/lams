@@ -13,8 +13,6 @@
 	}
 </script>
 
-Reflect: ${wikiDTO.reflectOnActivity} <br />
-User:${userDTO.finishedActivity} <br />	
 <c:if test="${userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
 <html:form action="/learning" method="get" styleId="reflectEditForm">
 	<html:hidden property="dispatch" value="openNotebook" />
@@ -44,8 +42,6 @@ User:${userDTO.finishedActivity} <br />
 	
 </html:form>
 </c:if>
-
-${!userDTO.finishedActivity and wikiDTO.reflectOnActivity}
 
 <html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="learningButtonForm">
 	<html:hidden property="dispatch" styleId = "dispatch2" value="finishActivity" />
