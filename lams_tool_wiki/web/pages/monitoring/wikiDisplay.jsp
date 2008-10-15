@@ -25,7 +25,8 @@
 	<div id="breadcrumb" style="float: left; width: 30%;"><c:if
 		test="${currentWikiPage.title != mainWikiPage.title}">
 		<a href="javascript:changeWikiPage('${mainWikiPage.javaScriptTitle}')">/${mainWikiPage.title}</a>
-	</c:if> <a href="javascript:changeWikiPage('${currentWikiPage.javaScriptTitle}')">/${currentWikiPage.title}</a>
+	</c:if> <a
+		href="javascript:changeWikiPage('${currentWikiPage.javaScriptTitle}')">/${currentWikiPage.title}</a>
 	</div>
 
 	<div id="buttons" style="float: right; width: 70%;"><a
@@ -110,17 +111,14 @@
 							</c:choose></td>
 							<td><a
 								href="javascript:doRevert('${wikiContentPageVersion.uid}');"
-								class="button"
 								title='<fmt:message key="label.wiki.history.actions.compare.tooltip" />'>
 							<fmt:message key="label.wiki.history.actions.revert" /> </a> &nbsp;
 							<a
 								href="javascript:doCompareOrView('<lams:WebAppURL/>', '${wikiContentPageVersion.uid}', '${currentWikiPage.uid}', 'comparePage');"
-								class="button"
 								title='<fmt:message key="label.wiki.history.actions.compare.tooltip" />'>
 							<fmt:message key="label.wiki.history.actions.compare" /> </a> &nbsp;
 							<a
 								href="javascript:doCompareOrView('<lams:WebAppURL/>', '${wikiContentPageVersion.uid}', '${currentWikiPage.uid}', 'viewPage');"
-								class="button"
 								title='<fmt:message key="label.wiki.history.actions.compare.tooltip" />'>
 							<fmt:message key="label.wiki.history.actions.view" /> </a></td>
 						</tr>
@@ -150,8 +148,8 @@
 			</div>
 			<lams:FCKEditor id="wikiBody"
 				value="${currentWikiPage.currentWikiContentDTO.body}"
-				contentFolderID="${contentFolderID}"
-				toolbarSet="Custom-Learner" height="400px">
+				contentFolderID="${contentFolderID}" toolbarSet="Custom-Learner"
+				height="400px">
 			</lams:FCKEditor></td>
 		</tr>
 		<tr>
@@ -184,8 +182,7 @@
 			<div class="field-name"><fmt:message key="label.wiki.body"></fmt:message>
 			</div>
 			<lams:FCKEditor id="newPageWikiBody" value="" height="400px"
-				contentFolderID="${contentFolderID}"
-				toolbarSet="Custom-Learner"></lams:FCKEditor></td>
+				contentFolderID="${contentFolderID}" toolbarSet="Custom-Learner"></lams:FCKEditor></td>
 		</tr>
 		<tr>
 			<td><html:checkbox property="newPageIsEditable"
@@ -216,27 +213,23 @@
 	</c:forEach>
 
 	<!-- Reflections -->
-	<c:if test="${not empty sessionDTO.userDTOs && sessionDTO.reflectOnActivity}">
-		
+	<c:if
+		test="${not empty sessionDTO.userDTOs && sessionDTO.reflectOnActivity}">
+
 		<br />
 		<hr />
 		<br />
-		
-		<h4>
-			<fmt:message key="monitor.notebooks"></fmt:message>
-		</h4>
+
+		<h4><fmt:message key="monitor.notebooks"></fmt:message></h4>
 		<br />
 		<table class="alternative-color">
 			<c:forEach var="user" items="${sessionDTO.userDTOs}">
 				<c:if test="${not empty user.notebookEntry}">
-				<tr>
-					<td>
-						${user.firstName} ${user.lastName}
-					</td>
-					<td> 
-						<lams:out escapeHtml="true" value="${user.notebookEntry}" />
-					</td>
-				</tr>
+					<tr>
+						<td>${user.firstName} ${user.lastName}</td>
+						<td><lams:out escapeHtml="true" value="${user.notebookEntry}" />
+						</td>
+					</tr>
 				</c:if>
 			</c:forEach>
 		</table>
