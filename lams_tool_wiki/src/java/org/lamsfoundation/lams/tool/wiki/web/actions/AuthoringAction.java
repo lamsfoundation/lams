@@ -67,7 +67,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * @author
+ * This action handles all the authoring actions, which include opening author,
+ * saving, uploading instruction files and all the wikipage actions
+ * 
+ * It inherits from the WikiPageAction which inherits from the 
+ * LamsDispatchAction so that common actions can be used in learner, monitor and
+ * author
+ * 
+ * @author lfoxton
  * @version
  * 
  * @struts.action path="/authoring" name="authoringForm" parameter="dispatch"
@@ -77,6 +84,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @struts.action-forward name="compareWiki" path="/pages/wiki/compare.jsp"
  * @struts.action-forward name="viewWiki" path="/pages/wiki/viewWiki.jsp"
  * @struts.action-forward name="message_page" path="tiles:/generic/message"
+ */
+/**
+ * @author lfoxton
+ *
  */
 public class AuthoringAction extends WikiPageAction {
 
@@ -189,18 +200,38 @@ public class AuthoringAction extends WikiPageAction {
 	return mapping.findForward("success");
     }
 
+    /**
+     * Wrapper method to make sure that the correct wiki is returned to from the
+     * WikiPageAction class
+     */
     protected ActionForward returnToWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response, Long currentWikiPageId) throws Exception {
 	AuthoringForm authForm = (AuthoringForm) form;
 	authForm.setCurrentWikiPageId(currentWikiPageId);
 	return unspecified(mapping, authForm, request, response);
     }
-
+    
+    /**
+     * Implements the abstract method, since this is author we return null here
+     * as there is no user
+     */
     public WikiUser getCurrentUser(Long toolSessionId) {
 	// return null here to signify that this is in author
 	return null;
     }
 
+    /**
+     * Saves the Wiki content including uploaded files and advance options
+     * 
+     * The WikiPage content is not saved here as that is done in the 
+     * WikiPageAction
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// TODO need error checking.
@@ -284,6 +315,9 @@ public class AuthoringAction extends WikiPageAction {
 
     /* ========== Private Methods ********** */
 
+    /**
+     * Upload a file
+     */
     private ActionForward uploadFile(ActionMapping mapping, AuthoringForm authForm, String type,
 	    HttpServletRequest request) {
 	SessionMap<String, Object> map = getSessionMap(request, authForm);
@@ -339,6 +373,14 @@ public class AuthoringAction extends WikiPageAction {
 	return mapping.findForward("success");
     }
 
+    /**
+     * Delete a file
+     * @param mapping
+     * @param authForm
+     * @param type
+     * @param request
+     * @return
+     */
     private ActionForward deleteFile(ActionMapping mapping, AuthoringForm authForm, String type,
 	    HttpServletRequest request) {
 	SessionMap<String, Object> map = getSessionMap(request, authForm);

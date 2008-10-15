@@ -48,7 +48,6 @@ import org.lamsfoundation.lams.tool.wiki.dto.WikiSessionDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiUserDTO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
-import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
@@ -60,6 +59,12 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
+/**
+ * This servlet does export portfolio for teachers and students
+ * 
+ * @author lfoxton
+ *
+ */
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private static final long serialVersionUID = -2829707715037631881L;
@@ -70,6 +75,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private IWikiService wikiService;
 
+    /**
+     * This is the doGet method, it determines whether this is a student or 
+     * teacher then does the appropriate export
+     */
     protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 
@@ -100,6 +109,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	return FILENAME;
     }
 
+    /**
+     * Do an offline export
+     */
     protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 	if (toolContentID == null && toolSessionID == null) {
@@ -124,6 +136,18 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	return super.doOfflineExport(request, response, directoryName, cookies);
     }
 
+    /**
+     * Do export for learners, outputs the wiki pages into one page
+     * which seperates each page into divs which are displayed onclick
+     * 
+     * @param request
+     * @param response
+     * @param directoryName
+     * @param basePath
+     * @param cookies
+     * @throws WikiException
+     * @throws IOException
+     */
     private void doLearnerExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    String basePath, Cookie[] cookies) throws WikiException, IOException {
 
@@ -195,6 +219,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
     }
 
+    /**
+     * Exports for teacher, does a main file and a file for each session so that 
+     * each session can have its own wiki page
+     * @param request
+     * @param response
+     * @param directoryName
+     * @param basePath
+     * @param cookies
+     * @throws WikiException
+     * @throws IOException
+     */
     private void doTeacherExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    String basePath, Cookie[] cookies) throws WikiException, IOException {
 
@@ -276,6 +311,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
     }
 
+    /**
+     * Goes through the content and changes the references to images so they can 
+     * be referenced locally
+     * @param body
+     * @param contentFolderID
+     * @return
+     */
     private String replaceImageFolderLinks(String body, String contentFolderID) {
 	String fckeditorpath = "/rams//www/secure/" + contentFolderID;
 	String fckeditorsmiley = "/rams//fckeditor/editor/images/smiley";

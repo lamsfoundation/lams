@@ -62,6 +62,13 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
+ * This action handles all the learning actions, which include opening learner,
+ * relection, going to the next activity, and all the wikipage actions
+ * 
+ * It inherits from the WikiPageAction which inherits from the 
+ * LamsDispatchAction so that common actions can be used in learner, monitor and
+ * author
+ * 
  * @author lfoxton
  * @version
  * 
@@ -82,6 +89,10 @@ public class LearningAction extends WikiPageAction {
 
     private IWikiService wikiService;
 
+    /**
+     * unspecified loads the learner window with the current wiki page
+     * as well as setting all the advanced options and user-specifice info
+     */
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -207,6 +218,10 @@ public class LearningAction extends WikiPageAction {
 	return mapping.findForward("wiki");
     }
 
+    /**
+     * Wrapper method to make sure that the correct wiki is returned to from the
+     * WikiPageAction class
+     */
     protected ActionForward returnToWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response, Long currentWikiPageId) throws Exception {
 	LearningForm learnForm = (LearningForm) form;
@@ -214,6 +229,11 @@ public class LearningAction extends WikiPageAction {
 	return unspecified(mapping, learnForm, request, response);
     }
 
+    /**
+     * Gets the current user by toolSessionId
+     * 
+     * @param toolSessionId
+     */
     protected WikiUser getCurrentUser(Long toolSessionId) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
@@ -228,7 +248,16 @@ public class LearningAction extends WikiPageAction {
 
 	return wikiUser;
     }
-
+    
+    /**
+     * Finish the activity, we dont need to save anything here, as that is
+     * done by the wikipage actions
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
     public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -237,20 +266,6 @@ public class LearningAction extends WikiPageAction {
 	WikiUser wikiUser = getCurrentUser(toolSessionID);
 
 	if (wikiUser != null) {
-
-	    LearningForm learningForm = (LearningForm) form;
-
-	    // TODO fix idType to use real value not 999
-	    /*
-	     * if (wikiUser.getEntryUID() == null) {
-	     * wikiUser.setEntryUID(wikiService.createNotebookEntry(toolSessionID,
-	     * CoreNotebookConstants.NOTEBOOK_TOOL,
-	     * WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId() .intValue(),
-	     * learningForm.getEntryText())); } else { // update existing entry.
-	     * wikiService.updateEntry(wikiUser.getEntryUID(),
-	     * learningForm.getEntryText()); }
-	     */
-
 	    wikiUser.setFinishedActivity(true);
 	    wikiService.saveOrUpdateWikiUser(wikiUser);
 	} else {
@@ -275,6 +290,14 @@ public class LearningAction extends WikiPageAction {
 	return null; // TODO need to return proper page.
     }
 
+    /**
+     * Opens the notebook page for reflections
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
     public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -296,6 +319,14 @@ public class LearningAction extends WikiPageAction {
 	return mapping.findForward("notebook");
     }
 
+    /**
+     * Submit reflections
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
     public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 

@@ -96,6 +96,62 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * ToolContentManager and ToolSessionManager.
  */
 
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
+/**
+ * @author lfoxton
+ * 
+ */
 public class WikiService implements ToolSessionManager, ToolContentManager, IWikiService, ToolContentImport102Manager {
 
     static Logger logger = Logger.getLogger(WikiService.class.getName());
@@ -134,6 +190,13 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /* ************ Methods from ToolSessionManager ************* */
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long,
+     *      java.lang.String, java.lang.Long)
+     */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
@@ -148,7 +211,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	// Get the wiki content to start a session
 	Wiki wiki = wikiDAO.getByContentId(toolContentId);
 	session.setWiki(wiki);
-	
+
 	// Generate a unique content folder id for the wiki
 	session.setContentFolderID(FileUtil.generateUniqueContentFolderID());
 
@@ -157,13 +220,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	// Here we need to clone wikipages and content for tool session versions
 	for (WikiPage childPage : wiki.getWikiPages()) {
-	    
+
 	    // check that this page does not already have a session
-	    if (childPage.getWikiSession() != null)
-	    {
+	    if (childPage.getWikiSession() != null) {
 		continue;
 	    }
-	    
+
 	    // Clone the wiki page
 	    WikiPage newChildPage = (WikiPage) childPage.clone();
 	    wikiPageDAO.saveOrUpdate(newChildPage);
@@ -209,8 +271,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * Get the tool output for the given tool output names.
-     * 
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>,
      *      java.lang.Long, java.lang.Long)
      */
@@ -225,8 +285,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * Get the tool output for the given tool output name.
-     * 
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String,
      *      java.lang.Long, java.lang.Long)
      */
@@ -257,6 +315,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     /* ************ Methods from ToolContentManager ************************* */
 
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long,
+     *      java.lang.Long)
+     */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (logger.isDebugEnabled()) {
@@ -280,41 +344,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	Wiki toContent = Wiki.newInstance(fromContent, toContentId, wikiToolContentHandler);
 
 	insertUnsavedWikiContent(toContent);
-	
-	/*
-	wikiDAO.saveOrUpdate(toContent);
-
-	// Go through and copy child pages and content
-	for (WikiPage childPage : fromContent.getWikiPages()) {
-	    // Clone the wiki page
-	    WikiPage newChildPage = (WikiPage) childPage.clone();
-	    wikiPageDAO.saveOrUpdate(newChildPage);
-
-	    // Clone the current content - leave the history null
-	    WikiPageContent newPageContent = (WikiPageContent) childPage.getCurrentWikiContent().clone();
-	    newPageContent.setWikiPage(newChildPage);
-	    // If the edit date is null, set it to now.
-	    if (newPageContent.getEditDate() == null) {
-		newPageContent.setEditDate(new Date());
-	    }
-	    wikiPageContentDAO.saveOrUpdate(newPageContent);
-
-	    // Set the current content
-	    newChildPage.setCurrentWikiContent(newPageContent);
-	    newChildPage.setParentWiki(toContent);
-	    newChildPage.getWikiContentVersions().add(newPageContent);
-
-	    if (newChildPage.getTitle().equals(fromContent.getMainPage().getTitle())) {
-		// This is the main page
-		toContent.setMainPage(newChildPage);
-	    }
-
-	    // Add page to the list
-	    toContent.getWikiPages().add(newChildPage);
-
-	}
-	wikiDAO.saveOrUpdate(toContent);
-	*/
     }
 
     public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
@@ -349,7 +378,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * @throws ToolException
      *                 if any other error occurs
      */
-
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Wiki wiki = wikiDAO.getByContentId(toolContentId);
 	if (wiki == null) {
@@ -420,32 +448,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    wiki.setCreateBy(new Long(newUserUid.longValue()));
 
 	    insertUnsavedWikiContent(wiki);
-	    
-	    /*
-	    // Go through the wiki object and save all the pages and content
-	    for (WikiPage wikiPage : wiki.getWikiPages()) {
-		WikiPageContent currentContent = wikiPage.getCurrentWikiContent();
-		currentContent.setEditDate(new Date());
-		wikiPageContentDAO.saveOrUpdate(currentContent);
-
-		currentContent.setWikiPage(wikiPage);
-		wikiPage.setCurrentWikiContent(currentContent);
-		wikiPageDAO.saveOrUpdate(wikiPage);
-
-		if (wiki.getMainPage().getTitle() == wikiPage.getTitle()) {
-		    wiki.setMainPage(wikiPage);
-		}
-
-		wiki.getWikiPages().add(wikiPage);
-	    }
-	    wikiDAO.saveOrUpdate(wiki);
-
-	    // Update the wiki pages to reference their parent
-	    for (WikiPage wikiPage : wiki.getWikiPages()) {
-		wikiPage.setParentWiki(wiki);
-		wikiPageDAO.saveOrUpdate(wikiPage);
-	    }
-	    */
 
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
@@ -454,10 +456,22 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     /* ********** IWikiService Methods ********************************* */
 
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#createNotebookEntry(java.lang.Long,
+     *      java.lang.Integer, java.lang.String, java.lang.Integer,
+     *      java.lang.String)
+     */
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getEntry(org.lamsfoundation.lams.notebook.model.NotebookEntry)
+     */
     public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
 	if (list == null || list.isEmpty()) {
@@ -468,12 +482,19 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * @param notebookEntry
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#updateEntry(org.lamsfoundation.lams.notebook.model.NotebookEntry)
      */
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
 
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#comparePages(String,String)
+     */
     public String comparePages(String old, String current) {
 	String oldArray[] = old.replaceAll("[\\t\\n\\r]", "").split("<div>");
 	String currentArray[] = current.replaceAll("[\\t\\n\\r]", "").split("<div>");
@@ -532,8 +553,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    retBuf.append(line);
 
 	    // fix up lines that dont have the div tag on them
-	    // if(!line.endsWith("</div>"))
-	    // retBuf.append("</div>");
 	    if (!line.contains("</div>"))
 		retBuf.append("</div>");
 	}
@@ -542,6 +561,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return retBuf.toString();
     }
 
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getDefaultContentIdBySignature(String)
+     */
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
@@ -553,6 +577,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return toolContentId;
     }
 
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getDefaultContent()
+     */
     public Wiki getDefaultContent() {
 	Long defaultContentID = getDefaultContentIdBySignature(WikiConstants.TOOL_SIGNATURE);
 	Wiki defaultContent = getWikiByContentId(defaultContentID);
@@ -564,6 +593,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return defaultContent;
     }
 
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#copyDefaultContent(Long)
+     */
     public Wiki copyDefaultContent(Long newContentID) {
 
 	if (newContentID == null) {
@@ -576,58 +610,18 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	Wiki newContent = Wiki.newInstance(defaultContent, newContentID, wikiToolContentHandler);
 
 	insertUnsavedWikiContent(newContent);
-	
-	// Go through the wiki object and save all the pages and content
-	/*
-	for (WikiPage wikiPage : newContent.getWikiPages()) {
-	    WikiPageContent currentContent = wikiPage.getCurrentWikiContent();
-	    currentContent.setEditDate(new Date());
-	    wikiPageContentDAO.saveOrUpdate(currentContent);
 
-	    currentContent.setWikiPage(wikiPage);
-	    wikiPage.setCurrentWikiContent(currentContent);
-	    wikiPageDAO.saveOrUpdate(wikiPage);
-
-	    if (newContent.getMainPage().getTitle() == wikiPage.getTitle()) {
-		newContent.setMainPage(wikiPage);
-	    }
-
-	    newContent.getWikiPages().add(wikiPage);
-	}
-	wikiDAO.saveOrUpdate(newContent);
-
-	// Update the wiki pages to reference their parent
-	for (WikiPage wikiPage : newContent.getWikiPages()) {
-	    wikiPage.setParentWiki(newContent);
-	    wikiPageDAO.saveOrUpdate(wikiPage);
-	}
-	*/
-
-	/*
-	 * // create new wiki using the newContentID 
-	 * Wiki newContent = new Wiki(); newContent = Wiki.newInstance(defaultContent, newContentID,
-	 * wikiToolContentHandler); wikiDAO.saveOrUpdate(newContent);
-	 * 
-	 * WikiPage newMainPage = (WikiPage)
-	 * defaultContent.getMainPage().clone();
-	 * wikiPageDAO.saveOrUpdate(newMainPage);
-	 * 
-	 * WikiPageContent newMainPageContent = (WikiPageContent)
-	 * defaultContent.getMainPage().getCurrentWikiContent() .clone();
-	 * newMainPageContent.setEditDate(new Date());
-	 * wikiPageContentDAO.saveOrUpdate(newMainPageContent);
-	 * 
-	 * newMainPageContent.setWikiPage(newMainPage);
-	 * newMainPage.setCurrentWikiContent(newMainPageContent);
-	 * newMainPage.setParentWiki(newContent);
-	 * newContent.setMainPage(newMainPage);
-	 * wikiDAO.saveOrUpdate(newContent);
-	 */
 	return newContent;
     }
-    
-    private Wiki insertUnsavedWikiContent(Wiki wiki)
-    {
+
+    /**
+     * Takes a transient wiki object and iterates down the tree ensureing each
+     * object is saved to the db and all references are maintained
+     * 
+     * @param wiki
+     * @return
+     */
+    private Wiki insertUnsavedWikiContent(Wiki wiki) {
 	// Go through the wiki object and save all the pages and content
 	for (WikiPage wikiPage : wiki.getWikiPages()) {
 	    WikiPageContent currentContent = wikiPage.getCurrentWikiContent();
@@ -651,7 +645,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    wikiPage.setParentWiki(wiki);
 	    wikiPageDAO.saveOrUpdate(wikiPage);
 	}
-	
+
 	return wiki;
     }
 
@@ -704,12 +698,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * Updates the wikiPage from the WikiPageForm, used in author, monitor and
-     * learner
+     * (non-Javadoc)
      * 
-     * @param wikiPageForm
-     * @param wikiPage
-     * @param user
+     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#updateWikiPage(org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm,
+     *      org.lamsfoundation.lams.tool.wiki.model.WikiPage,
+     *      org.lamsfoundation.lams.tool.wiki.model.WikiUser)
      */
     public void updateWikiPage(WikiPageForm wikiPageForm, WikiPage wikiPage, WikiUser user) {
 
@@ -742,12 +735,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * Inserts the wikiPage from the WikiPageForm, used in author, monitor and
-     * learner
+     * (non-Javadoc)
      * 
-     * @param wikiPageForm
-     * @param wikiPageUid
-     * @param user
+     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#insertWikiPage(org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm,
+     *      org.lamsfoundation.lams.tool.wiki.model.Wiki,
+     *      org.lamsfoundation.lams.tool.wiki.model.WikiUser,
+     *      org.lamsfoundation.lams.tool.wiki.model.WikiSession)
      */
     public Long insertWikiPage(WikiPageForm wikiPageForm, Wiki wiki, WikiUser user, WikiSession session) {
 
@@ -877,7 +870,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it
+     * This method verifies the credentials of the Wiki Tool and gives it
      * the <code>Ticket</code> to login and access the Content Repository.
      * 
      * A valid ticket is needed in order to access the content from the

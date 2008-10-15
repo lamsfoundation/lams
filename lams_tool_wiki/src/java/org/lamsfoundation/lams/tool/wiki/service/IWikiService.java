@@ -56,18 +56,24 @@ public interface IWikiService {
     public Wiki getDefaultContent();
 
     /**
+     * Returns an instance of the Wiki tools default content.
+     * 
      * @param toolSignature
      * @return
      */
     public Long getDefaultContentIdBySignature(String toolSignature);
 
     /**
+     * Gets a wiki instance by its content id
+     * 
      * @param toolContentID
      * @return
      */
     public Wiki getWikiByContentId(Long toolContentID);
 
     /**
+     * Uploads a file to a wiki
+     * 
      * @param toolContentId
      * @param file
      * @param type
@@ -76,12 +82,16 @@ public interface IWikiService {
     public WikiAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
 
     /**
+     * Deletes a file from the repository
+     * 
      * @param uuid
      * @param versionID
      */
     public void deleteFromRepository(Long uuid, Long versionID) throws WikiException;
 
     /**
+     * Deletes an instruction file from the repository
+     * 
      * @param contentID
      * @param uuid
      * @param versionID
@@ -90,17 +100,24 @@ public interface IWikiService {
     public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
     /**
+     * Saves or updates a wiki instance
+     * 
      * @param wiki
      */
     public void saveOrUpdateWiki(Wiki wiki);
 
     /**
+     * Saves or updates a wiki page
      * 
      * @param wikiPage
      */
     public void saveOrUpdateWikiPage(WikiPage wikiPage);
 
     /**
+     * Updates a wiki page with the given content in the WikiPageForm
+     * A new WikiPageContent is to be created for each edit so we have a history
+     * 
+     * If the user is null it signifies that this edit was done in author
      * 
      * @param wikiPageForm
      * @param wikiPage
@@ -109,6 +126,9 @@ public interface IWikiService {
     public void updateWikiPage(WikiPageForm wikiPageForm, WikiPage wikiPage, WikiUser user);
 
     /**
+     * Creates a new wiki page from the content in the WikiPageForm
+     * 
+     * If the user and session is null it signifies that this edit was done in author
      * 
      * @param wikiPageForm
      * @param wiki
@@ -118,13 +138,18 @@ public interface IWikiService {
     public Long insertWikiPage(WikiPageForm wikiPageForm, Wiki wiki, WikiUser user, WikiSession session);
 
     /**
+     * Delete an existing wiki page
      * 
      * @param wikiPage
      */
     public void deleteWikiPage(WikiPage wikiPage);
 
     /**
+     * Gets a wiki page by wiki and title
      * 
+     * This method should only be called by author as it will only retrieve
+     * wikipages where the toolSession is null
+     *
      * @param wiki
      * @param title
      * @return
@@ -132,6 +157,10 @@ public interface IWikiService {
     public WikiPage getWikiPageByWikiAndTitle(Wiki wiki, String title);
 
     /**
+     * Gets a wiki page by session and title
+     * 
+     * This method should only be called at runtime because it requires a tool 
+     * session
      * 
      * @param wikiSession
      * @param title
@@ -140,6 +169,7 @@ public interface IWikiService {
     public WikiPage getWikiBySessionAndTitle(WikiSession wikiSession, String title);
 
     /**
+     * Gets a wiki page by its uid
      * 
      * @param uid
      * @return
@@ -147,6 +177,7 @@ public interface IWikiService {
     public WikiPage getWikiPageByUid(Long uid);
 
     /**
+     * Gets a page content by its uid
      * 
      * @param uid
      * @return
@@ -154,23 +185,29 @@ public interface IWikiService {
     public WikiPageContent getWikiPageContent(Long uid);
 
     /**
+     * Saves or updates a wiki page content
      * 
      * @param wikiPageContent
      */
     public void saveOrUpdateWikiPageContent(WikiPageContent wikiPageContent);
 
     /**
+     * Gets a tool session
+     * 
      * @param toolSessionId
      * @return
      */
     public WikiSession getSessionBySessionId(Long toolSessionId);
 
     /**
+     * Saves or updates a wiki session
+     * 
      * @param wikiSession
      */
     public void saveOrUpdateWikiSession(WikiSession wikiSession);
 
     /**
+     * Gets a WikiUser from the session and thier LAMS user id
      * 
      * @param userId
      * @param toolSessionId
@@ -179,6 +216,7 @@ public interface IWikiService {
     public WikiUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
     /**
+     * Gets a WikiUser by their uid
      * 
      * @param uid
      * @return
@@ -186,12 +224,14 @@ public interface IWikiService {
     public WikiUser getUserByUID(Long uid);
 
     /**
+     * Saves or updates a wiki user
      * 
      * @param wikiUser
      */
     public void saveOrUpdateWikiUser(WikiUser wikiUser);
 
     /**
+     * Creates a new wiki user
      * 
      * @param user
      * @param wikiSession
@@ -224,6 +264,9 @@ public interface IWikiService {
     void updateEntry(NotebookEntry notebookEntry);
 
     /**
+     * This method compares two strings and returns a java html diff of the two
+     * The returned value will be a html div that prints unchanged lines as is
+     * new lines with a green background and removed lines with a red background
      * 
      * @param old
      * @param current
@@ -232,6 +275,8 @@ public interface IWikiService {
     String comparePages(String old, String current);
 
     /**
+     * this method gets the number of edits by a learner in a tool session, this
+     * is used for tool outputs
      * 
      * @param learnerId
      * @param toolSessionId
@@ -240,7 +285,8 @@ public interface IWikiService {
     int getEditsNum(Long learnerId, Long toolSessionId);
 
     /**
-     * 
+     * this method gets the number of added pages by a learner in a tool 
+     * session, this is used for tool outputs
      * @param learnerId
      * @param toolSessionId
      * @return

@@ -57,7 +57,14 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * @author
+ * This action handles all the monitoring actions, which include opening 
+ * monitor, and all the wikipage actions
+ * 
+ * It inherits from the WikiPageAction which inherits from the 
+ * LamsDispatchAction so that common actions can be used in learner, monitor and
+ * author
+ * 
+ * @author lfoxton
  * @version
  * 
  * @struts.action path="/monitoring" parameter="dispatch" scope="request"
@@ -76,6 +83,10 @@ public class MonitoringAction extends WikiPageAction {
 
     public IWikiService wikiService;
 
+    /**
+     * Sets up the main authoring page which lists the tool sessions and allows
+     * you to view their respective WikiPages
+     */
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -103,6 +114,10 @@ public class MonitoringAction extends WikiPageAction {
 	return mapping.findForward("success");
     }
 
+    /**
+     * Wrapper method to make sure that the correct wiki is returned to from the
+     * WikiPageAction class
+     */
     protected ActionForward returnToWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response, Long currentWikiPageId) throws Exception {
 	MonitoringForm monitoringForm = (MonitoringForm) form;
@@ -110,6 +125,11 @@ public class MonitoringAction extends WikiPageAction {
 	return showWiki(mapping, monitoringForm, request, response);
     }
 
+    /**
+     * Gets the current user by toolSessionId
+     * 
+     * @param toolSessionId
+     */
     protected WikiUser getCurrentUser(Long toolSessionId) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
@@ -125,6 +145,14 @@ public class MonitoringAction extends WikiPageAction {
 	return wikiUser;
     }
 
+    /**
+     * Shows a specific wiki based on the session id
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
     public ActionForward showWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
