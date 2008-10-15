@@ -1,8 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="lams">
+	<lams:LAMSURL/>
+</c:set>
+
 <!--  JsJaC Library -->
 <script type="text/javascript"
-	src="${tool}includes/javascript/jsjac-1.3.1/jsjac.js"></script>
+	src="${lams}includes/javascript/jsjac.packed.js"></script>
 <!--  <script language="JavaScript" type="text/javascript" src="Debugger.js"></script> -->
 
 <!--  Chat Config -->
