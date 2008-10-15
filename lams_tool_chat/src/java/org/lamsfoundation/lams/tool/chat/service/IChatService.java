@@ -185,12 +185,6 @@ public interface IChatService {
 
     /**
      * 
-     * @param chatSession
-     */
-    public void createJabberRoom(ChatSession chatSession);
-
-    /**
-     * 
      * @param messageElems
      */
     public void processIncomingMessages(NodeList messageElems);

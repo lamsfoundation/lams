@@ -51,12 +51,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDHexGenerator;
-import org.jivesoftware.smack.AccountManager;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.Form;
-import org.jivesoftware.smackx.FormField;
-import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -104,6 +98,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.XMPPUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
@@ -518,7 +513,12 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
     public synchronized ChatUser createChatUser(UserDTO user, ChatSession chatSession) {
 	ChatUser chatUser = new ChatUser(user, chatSession);
-	chatUser.setJabberId(createJabberId(user));
+	String jabberId = XMPPUtil.createId(user);
+	if (jabberId == null) {
+	    logger.error("Unable to create jabber id for user: " + user.getUserID());
+	    throw new RuntimeException();
+	}
+	chatUser.setJabberId(jabberId);
 	chatUser.setJabberNickname(createJabberNickname(chatUser));
 	saveOrUpdateChatUser(chatUser);
 	return chatUser;
@@ -543,55 +543,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	}
 
 	return jabberNickname;
-    }
-
-    public void createJabberRoom(ChatSession chatSession) {
-	try {
-	    XMPPConnection.DEBUG_ENABLED = false;
-	    XMPPConnection con = new XMPPConnection(Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
-
-	    con.login(Configuration.get(ConfigurationKeys.XMPP_ADMIN), Configuration
-		    .get(ConfigurationKeys.XMPP_PASSWORD));
-
-	    // Create a MultiUserChat using an XMPPConnection for a room
-	    // String jabberRoom = new Long(System.currentTimeMillis()).toString()
-	    // + "@"
-	    // + Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
-
-	    MultiUserChat muc = new MultiUserChat(con, chatSession.getJabberRoom());
-
-	    // Create the room
-	    muc.create("nick");
-
-	    // Get the the room's configuration form
-	    Form form = muc.getConfigurationForm();
-
-	    // Create a new form to submit based on the original form
-	    Form submitForm = form.createAnswerForm();
-
-	    // Add default answers to the form to submit
-	    for (Iterator fields = form.getFields(); fields.hasNext();) {
-		FormField field = (FormField) fields.next();
-		if (!FormField.TYPE_HIDDEN.equals(field.getType()) && field.getVariable() != null) {
-		    // Sets the default value as the answer
-		    submitForm.setDefaultAnswer(field.getVariable());
-		}
-	    }
-
-	    // Sets the new owner of the room
-	    submitForm.setAnswer("muc#roomconfig_persistentroom", true);
-	    // Send the completed form (with default values) to the server to
-	    // configure the room
-	    muc.sendConfigurationForm(submitForm);
-
-	    chatSession.setRoomCreated(true);
-	    con.close();
-
-	} catch (XMPPException e) {
-	    logger.error(e);
-	    logger.error(e.getXMPPError());
-	    // TODO should we continue ?
-	}
     }
 
     public void processIncomingMessages(NodeList messageElems) {
@@ -887,28 +838,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	    }
 	}
 	return body;
-    }
-
-    /**
-     * Registers a new Jabber Id on the jabber server using the users login as the jabber name and password TODO This is
-     * only temporary, most likely it will need to be moved to the lams core service since it will be used by both IM
-     * Chat Tool. Users in the system should only have a single jabber id
-     */
-    private String createJabberId(UserDTO user) {
-	try {
-	    XMPPConnection con = new XMPPConnection(Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
-
-	    AccountManager manager = con.getAccountManager();
-	    if (manager.supportsAccountCreation()) {
-		// using the lams userId as jabber username and password.
-		manager.createAccount(user.getUserID().toString(), user.getUserID().toString());
-	    }
-
-	} catch (XMPPException e) {
-	    logger.error(e);
-	    // TODO handle exception
-	}
-	return user.getUserID() + "@" + Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
     }
 
     private NodeKey processFile(FormFile file, String type) {

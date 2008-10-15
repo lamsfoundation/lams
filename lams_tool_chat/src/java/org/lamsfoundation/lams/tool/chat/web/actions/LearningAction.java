@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.XMPPUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -108,7 +109,13 @@ public class LearningAction extends LamsDispatchAction {
 	// Create the room if it doesnt exist
 	log.debug(chatSession.isRoomCreated());
 	if (!chatSession.isRoomCreated()) {
-	    chatService.createJabberRoom(chatSession);
+	    if (XMPPUtil.createMultiUserChat(chatSession.getJabberRoom())) {
+		chatSession.setRoomCreated(true);
+	    } else {
+		log.error("Unable to create chat room " + chatSession.getJabberRoom());
+		throw new RuntimeException();
+	    }
+
 	    chatService.saveOrUpdateChatSession(chatSession);
 	}
 
