@@ -6,7 +6,7 @@
 
 <!--  JsJaC Library -->
 <script type="text/javascript"
-	src="${lams}includes/javascript/jsjac.packed.js"></script>
+	src="${lams}includes/javascript/jsjac.js"></script>
 <!--  <script language="JavaScript" type="text/javascript" src="Debugger.js"></script> -->
 
 <!--  Chat Config -->
