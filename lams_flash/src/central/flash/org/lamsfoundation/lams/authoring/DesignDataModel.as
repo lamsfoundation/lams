@@ -646,7 +646,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @return  data obj
 	 */
 	
-	public static function getDataForInitializing(title:String, description:String, designID:Number, orgID:Number, lExportPortfolio:Boolean):Object{
+	public static function getDataForInitializing(title:String, description:String, designID:Number, orgID:Number, lExportPortfolio:Boolean, enablePresence:Boolean, enableIm:Boolean):Object{
 		var data:Object = new Object();
 	
 		if(title) { data.lessonName = title; }
@@ -658,6 +658,12 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		if(lExportPortfolio != null) { data.learnerExportPortfolio = lExportPortfolio }
 		else { data.learnerExportPortfolio = false }
+		
+		if(enablePresence != null) { data.enablePresence = enablePresence }
+		else { data.enablePresence = false }
+		
+		if(enableIm != null) { data.enableIm = enableIm }
+		else { data.enableIm = false }
 		
 		data.copyType = COPY_TYPE_ID_RUN;
 		
