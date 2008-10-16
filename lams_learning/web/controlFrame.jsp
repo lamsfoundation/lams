@@ -34,7 +34,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:set var="randomID">
 			<lams:generateID id="${param.lessonID}"/>
 		</c:set>
+
 		<script src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js" type="text/javascript"></script>
+		<script type="text/javascript" src="/lams/learning/includes/jsjac-1.3.1/jsjac.js"></script>
+		<script type="text/javascript" src="/lams/learning/includes/presence.js"></script> 
+		<script type="text/javascript" src="/lams/learning/includes/JavaScriptFlashGateway.js"></script> 
 		<script language="JavaScript" type="text/JavaScript">
 		<!--
 			
@@ -94,6 +98,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			function closeWindow() {
 				top.window.close();
 			}
+			
+			var HTTPBASE = "<lams:LAMSURL/>JHB";
+			var lcId = new Date().getTime();
+			var flashProxy = new FlashProxy(lcId, "/lams/learning/includes/JavaScriptFlashGateway.swf");
+			
 		//-->
 		</script>
 	</lams:head>
@@ -103,14 +112,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	String clientVersion = Configuration.get(ConfigurationKeys.LEARNER_CLIENT_VERSION);
 	String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 	String languageDate = Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED);
+	String jabberServer = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
 	%>
 
-	<c:set var="learnerurl_params">?userID=<lams:user property="userID"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if></c:set>
+	<c:set var="learnerurl_params">?userID=<lams:user property="userID"/>&firstName=<lams:user property="firstName"/>&lastName=<lams:user property="lastName"/>&serverURL=<lams:LAMSURL/>&presenceServerUrl=<%=jabberServer%>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if></c:set>
 	<c:set var="learnerurl_js">lams_learner<c:out value="${learnerurl_params}"/></c:set>
 	<c:set var="learnerurl_nojs">lams_learner.swf<c:out value="${learnerurl_params}"/></c:set>
 	
 	<script type="text/javascript">
-		AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${learnerurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#B3B7C8','name','learning', 'id', 'learning', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${learnerurl_js}" escapeXml="false"/>' );
+		breakPoint();
+	</script> 
+	
+	<script type="text/javascript">
+		AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${learnerurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#B3B7C8','name','learning', 'id', 'learning', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${learnerurl_js}" escapeXml="false"/>', 'flashvars', "lcId=" + lcId);
 	</script> 
 	
 	<noscript>
@@ -122,7 +136,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		 width="100%" height="100%" align="left" id="learning">
 		  <param name="allowScriptAccess" value="sameDomain" />
 	
-		  <param name="movie" value="<c:out value="${learnerurl}" escapeXml="false"/>"/>
+		  <param name="movie" value="<c:out value="${learnerurl_nojs}" escapeXml="false"/>"/>
 		  <param name="quality" value="high">
 		  <param name="scale" value="noscale">
 		  <param name="bgcolor" value="#B3B7C8">

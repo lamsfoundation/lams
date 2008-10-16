@@ -328,5 +328,15 @@ class StringUtils {
 			return 0;
 		}
 	}
+	
+	public static function scanString(s:String, char:String):Array {
+		var charArray:Array = new Array();
+		for(var i:Number = 0; i < s.length; i++) {
+			if(s.charAt(i) == char){
+				charArray.push(i);
+			}
+		}
+		return charArray;
+	}
     
 }

@@ -32,6 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<lams:head>
 		<lams:css/>
+				
         <link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
 		
 		<title><fmt:message key="learner.title"/></title>
@@ -39,6 +40,27 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
         <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox-compressed.js"></script>
         
+        <script type="text/javascript" src="/lams/learning/includes/jsjac-1.3.1/jsjac.js"></script>
+		<script type="text/javascript" src="/lams/learning/includes/presence.js"></script>
+
+      	<c:if test="${param.presenceEnabledPatch}"> 		 
+        <script type="text/javascript">
+     
+	    	window.onload=function(){
+				// if presence is enabled, attempt to login once the window is loaded
+				doLogin("${param.presenceUrl}", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "${param.lessonID}", "<lams:user property="firstName"/>" + "<lams:user property="lastName"/>", false, false);
+				
+			}
+			
+			function doPresenceClick() {
+				$("#roster").slideToggle("slow");
+			}
+			
+			var HTTPBASE = "<lams:LAMSURL/>JHB";
+	
+		</script>
+		</c:if>
+		
 	</lams:head>
 
 	<body>
@@ -48,12 +70,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<a target='_new' href="learner.do?method=displayProgress&lessonID=<c:out value="${param.lessonID}"/>&keepThis=true&TB_iframe=true&height=300&width=400" title="<c:out value="${param.title}"/> - <fmt:message key="label.my.progress"/>" class="thickbox"><fmt:message key="label.my.progress"/></a> &nbsp;&nbsp;
 		<a href="#" onclick="javascript:window.location.href='<lams:LAMSURL/>/home.do?method=learner&lessonID=<c:out value="${param.lessonID}"/>'"/><fmt:message key="label.resume"/></a> &nbsp;&nbsp;
 		<c:if test="${param.portfolioEnabled}"><a target='_new' href="exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${param.lessonID}"/>&hideClose=true&keepThis=true&TB_iframe=true&height=300&width=400" title="<fmt:message key="label.export.portfolio"/>" class="thickbox"><fmt:message key="label.export.portfolio"/></a> &nbsp;&nbsp;</c:if>
+		<c:if test="${param.presenceEnabledPatch}"><a href=javascript:doPresenceClick()><fmt:message key="label.presence"/></a></c:if> &nbsp;&nbsp;
 		<a href="#" onclick="javascript:window.open('notebook.do?method=viewAll&lessonID=<c:out value="${param.lessonID}"/>')"><fmt:message key="mynotes.title"/></a> &nbsp;&nbsp;
 		<lams:help style="small" page="learner"/>
 		</div> 
 		
+		<div id="roster" style="position: absolute; right: 18px; bottom: 0;background: #ffffff; display: none; border: 1px #000000 solid;"></div>
+		
 		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame"  frameborder="no" scrolling="yes"  src="learner.do?method=joinLesson&lessonID=<c:out value="${param.lessonID}"/>" width="100%" ></iframe>
 		<script type="text/javascript">
+		
 		function resizeIframe() {
 		    var height = top.window.innerHeight;
 		    if ( height == undefined || height == 0 ) {

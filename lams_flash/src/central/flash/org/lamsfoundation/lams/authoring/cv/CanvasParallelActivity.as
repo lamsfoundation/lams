@@ -45,6 +45,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private var CHILD1_OFFSET_Y:Number = 45;
 	private var CHILD2_OFFSET_Y:Number = 108;
 	
+	public static var PLUS_MARGIN_X:Number = 15;
+	public static var PLUS_MARGIN_Y:Number = 10;
+	
 	private var newContainerXCoord:Number; 
 	private var newContainerYCoord:Number;
 	
@@ -261,11 +264,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 			if (isLearnerCurrentAct){
 				var actX:Number = (mm.activeView instanceof CanvasComplexView) ? this._x : _activity.xCoord;
 					
-				if (learner_X > (actX + 112)){
+				if (learner_X > (actX + 92)){
 					learner_X = actX + learnerOffset_X 
 					learner_Y = 27
 					hasPlus = true;
 					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), this._parent.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
+					learnerContainer.attachMovie("plusIcon", "plusIcon", learnerContainer.getNextHighestDepth(), {_activity:_activity, _monitorController:_monitorController, _x:learner_X+PLUS_MARGIN_X, _y:learner_Y+PLUS_MARGIN_Y});
 					return;
 				}
 					

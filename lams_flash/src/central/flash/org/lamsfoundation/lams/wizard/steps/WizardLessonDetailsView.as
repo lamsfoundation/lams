@@ -58,6 +58,8 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 	
 	private var schedule_cb:CheckBox;
 	private var learner_expp_cb:CheckBox;
+	private var learner_enpres_cb:CheckBox;
+	private var learner_enim_cb:CheckBox;
 	private var start_btn:Button;
 	private var schedule_time:MovieClip;
 	private var summery_lbl:Label;
@@ -89,6 +91,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		schedule_btn.addEventListener('click', Delegate.create(this, scheduleNow));
 		schedule_cb.addEventListener("click", Delegate.create(this, scheduleChange));
 		learner_expp_cb.addEventListener("click", Delegate.create(this, toogleExpPortfolio));
+		learner_enpres_cb.addEventListener("click", Delegate.create(this, toggleEnableIm));
 		
 		learner_expp_cb.selected = true;
 	}
@@ -104,6 +107,8 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		
 		schedule_cb.label = Dictionary.getValue('schedule_cb_lbl');
 		learner_expp_cb.label = Dictionary.getValue('wizard_learner_expp_cb_lbl');
+		learner_enpres_cb.label = Dictionary.getValue('wizard_learner_enpres_cb_lbl');
+		learner_enim_cb.label = Dictionary.getValue('wizard_learner_enim_cb_lbl');
 	}
 	
 	public function setStyles(_tm:ThemeManager):Void {
@@ -139,6 +144,9 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		summery_scp.visible = true;
 		summery_lbl.visible = true;
 		learner_expp_cb.visible = true;
+		learner_enpres_cb.visible = true;
+		learner_enim_cb.visible = true;
+		learner_enim_cb.enabled = false;
 		schedule_cb.visible = true;
 		schedule_time._visible = true;
 		scheduleDate_dt.visible = true;
@@ -190,6 +198,8 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		summery_scp.visible = false;
 		summery_lbl.visible = false;
 		learner_expp_cb.visible = false;
+		learner_enpres_cb.visible = false;
+		learner_enim_cb.visible = false;
 		schedule_cb.visible = false;
 		schedule_time._visible = false;
 		scheduleDate_dt.visible = false;
@@ -216,6 +226,8 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 			
 		}
 		
+		_parent.resultDTO.enablePresence = learner_enpres_cb.selected;
+		_parent.resultDTO.enableIm = learner_enim_cb.selected;
 		_parent.resultDTO.learnerExpPortfolio = learner_expp_cb.selected;
 		
 		return valid;
@@ -369,6 +381,17 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 			
 			_parent.showButtons([false, true, true, true, true]);
 			_parent.positionButtons(true);
+		}
+	}
+
+	private function toggleEnableIm(evt:Object) {
+		Debugger.log("Enable instant messaging checkbox", Debugger.GEN, "toggleEnableIm", "WizardLessonDetailsView");
+		if (learner_enpres_cb.selected){
+			learner_enim_cb.enabled = true;
+		}
+		else{
+			learner_enim_cb.selected = false;
+			learner_enim_cb.enabled = false;
 		}
 	}
 	

@@ -249,6 +249,8 @@
 				<include name="layout/*"/>
 				<include name="branching/*"/>
 				<include name="sequence/*"/>
+				<include name="includes/*"/>
+				<include name="includes/jsjac-1.3.1/*"/>
 			</fileset>
 		</war>
 	</target>

@@ -42,6 +42,7 @@ class Application extends ApplicationParent {
 	private var _lesson:Lesson;
 	private var _header_mc:MovieClip;
 	private var _scratchpad_mc:MovieClip;
+	private var _presence_mc:MovieClip;
 
 	private static var SHOW_DEBUGGER:Boolean = false;
 	private static var MODULE:String = "learner";
@@ -55,6 +56,9 @@ class Application extends ApplicationParent {
 	public static var SPAD_X:Number = 0;
 	public static var SPAD_Y:Number = 554;
 	public static var SPAD_H:Number = 220;
+	public static var PRES_X:Number = 0;
+	public static var PRES_Y:Number = 554;
+	public static var PRES_H:Number = 220;
     
 	
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
@@ -77,21 +81,24 @@ class Application extends ApplicationParent {
     private var _DataLoadCheckIntervalID:Number;
 	
 	private var _dictionaryLoaded:Boolean;             //Dictionary loaded flag
-    private var _dictionaryEventDispatched:Boolean     //Event status flag
+    private var _dictionaryEventDispatched:Boolean;     //Event status flag
     private var _themeLoaded:Boolean;                  //Theme loaded flag
-    private var _themeEventDispatched:Boolean          //Dictionary loaded flag
+    private var _themeEventDispatched:Boolean;         //Dictionary loaded flag
 	
 	private var _UILoaded:Boolean;                     //UI Loading status
+	private var _userDataLoaded:Boolean;				//User data status
     
 	private var _lessonLoaded:Boolean;                  //Lesson loaded flag
   	private var _headerLoaded:Boolean;
 	private var _scratchpadLoaded:Boolean;
+	private var _presenceLoaded:Boolean;
     
 	
 	//Application instance is stored as a static in the application class
     private static var _instance:Application = null;     
 	private var _container_mc:MovieClip;               //Main container
 	private var _debugDialog:MovieClip;                //Reference to the debug dialog
+	private var chatDialogs:Array;
 
 	/**
     * Application - Constructor
@@ -102,8 +109,12 @@ class Application extends ApplicationParent {
         _lessonLoaded = false;
 		_headerLoaded = false;
 		_scratchpadLoaded = false;
+		_presenceLoaded = false;
+		
+		_userDataLoaded = false;
 		
 		_module = Application.MODULE;
+		chatDialogs = new Array();
     }
     
 	/**
@@ -169,10 +180,9 @@ class Application extends ApplicationParent {
         _themeManager.loadTheme(theme);
 		
 		Debugger.getInstance().crashDumpSeverityLevel = Number(_config.getItem('crashDumpSeverityLevelLog'));
-		Debugger.getInstance().severityLevel = Number(_config.getItem('severityLevelLog')); 
-		
+		Debugger.getInstance().severityLevel = Number(_config.getItem('severityLevelLog'));
     }
-	
+
 	/**
 	* Periodically checks if data has been loaded
 	*/
@@ -196,7 +206,9 @@ class Application extends ApplicationParent {
 		}
 	}
     
-	
+	/**
+	* Sets up UI
+	*/
 	private function setupUI():Void {
 		
 		//Create the application root
@@ -208,6 +220,9 @@ class Application extends ApplicationParent {
 
 		_lesson = new Lesson(_appRoot_mc,LESSON_X,LESSON_Y);
         _lesson.addEventListener('load',Proxy.create(this,UIElementLoaded));
+
+		_presence_mc = _container_mc.createChildAtDepth('LPresence', DepthManager.kTop, {_x:PRES_X, _y:PRES_Y, _lessonModel:_lesson.model, _lessonController:_lesson.view.getController()});
+		_presence_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		
 		_scratchpad_mc = _container_mc.createChildAtDepth('LScratchPad', DepthManager.kTop, {_x:SPAD_X, _y:SPAD_Y, _lessonModel:_lesson.model, _lessonController:_lesson.view.getController()});
 		_scratchpad_mc.addEventListener('load', Proxy.create(this, UIElementLoaded));
@@ -217,7 +232,6 @@ class Application extends ApplicationParent {
     * Runs periodically and dispatches events as they are ready
     */
     private function checkUILoaded() {
-		trace('checking UI loaded...');
         //If it's the first time through then set up the interval to keep polling this method
         if(!_UILoadCheckIntervalID) {
             _UILoadCheckIntervalID = setInterval(Proxy.create(this,checkUILoaded),UI_LOAD_CHECK_INTERVAL);
@@ -258,11 +272,16 @@ class Application extends ApplicationParent {
 				case 'Scratchpad' :
 					_scratchpadLoaded = true;
 					break;
+				case 'Presence' :
+					_presenceLoaded = true;
+					_presence_mc._visible = false;
+					Debugger.log('PRESENCE: presence loaded and set to not visible' ,Debugger.MED,'UIElementLoaded','Application');
+					break;
                 default:
             }
             
             //If all of them are loaded set UILoad accordingly
-            if(_lessonLoaded && _headerLoaded && _scratchpadLoaded){
+            if(_lessonLoaded && _headerLoaded && _scratchpadLoaded && _presenceLoaded){
                 _UILoaded=true;                
             } 
             
@@ -283,6 +302,7 @@ class Application extends ApplicationParent {
 		}
 		
 		// load lesson
+		//_lesson.getUserByID();
 		_lesson.getLesson();
 	}
     
@@ -295,18 +315,43 @@ class Application extends ApplicationParent {
         var w:Number = Stage.width;
         var h:Number = Stage.height;
 		
+		var resizeHeight:Number;
+		if(_presence_mc._visble) {
+			resizeHeight = LESSON_Y+_lesson.model.getSpadHeight() +_lesson.model.getPresenceHeight();
+		}
+		else {
+			resizeHeight = LESSON_Y+_lesson.model.getSpadHeight();
+		}		
+		
 		var someListener:Object = new Object();
+		
 		someListener.onMouseUp = function () {
-			_lesson.setSize(w,h-(LESSON_Y+_lesson.model.getSpadHeight()));
-			
+			_lesson.setSize(w,h-resizeHeight);
 			_scratchpad_mc._y = h - _lesson.model.getSpadHeight();
+			_presence_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getPresenceHeight();
 		}
 		
 		Header(_header_mc).resize(w);
 		
-		_lesson.setSize(w,h-(LESSON_Y+_lesson.model.getSpadHeight()));
+		_lesson.setSize(w,h-resizeHeight);
 		_scratchpad_mc._y = h - _lesson.model.getSpadHeight();
+		_presence_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getPresenceHeight();
 		
+	}
+	
+	/**
+    * Handles KEY presses for Application
+    */
+    private function onKeyDown(){
+		
+		// show/hide the debug window:
+        if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
+            if (!_debugDialog.content){
+                showDebugger();
+            }else {
+               hideDebugger();
+            }               
+        }
 	}
 	
 	/**
@@ -354,7 +399,6 @@ class Application extends ApplicationParent {
             return _instance._appRoot_mc;
         } else {
             //TODO DI 11/05/05 Raise error if _appRoot hasn't been created
-			
         }
     }
 	
@@ -370,6 +414,10 @@ class Application extends ApplicationParent {
 		return Scratchpad(_scratchpad_mc);
 	}
 	
+	public function getPresence():Presence{
+		return Presence(_presence_mc)
+	}
+	
 	public function showDebugger():Void{
 		_debugDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:'Debug',closeButton:true,scrollContentPath:'debugDialog'});
 	}
@@ -378,19 +426,7 @@ class Application extends ApplicationParent {
 		_debugDialog.deletePopUp();
 	}
 	
-	/**
-    * Handles KEY presses for Application
-    */
-    private function onKeyDown(){
-		
-		// show/hide the debug window:
-        if (Key.isDown(Key.CONTROL) && Key.isDown(Key.ALT) && Key.isDown(QUESTION_MARK_KEY)) {
-            if (!_debugDialog.content){
-                showDebugger();
-            }else {
-               hideDebugger();
-            }               
-        }
+	public function get userDataLoaded():Boolean{
+		return _userDataLoaded;
 	}
-
 }

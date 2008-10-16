@@ -63,6 +63,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	public static var HUB_CONNECTOR_MARGIN:Number = 25;
 	
+	public static var PLUS_MARGIN_X:Number = 15;
+	public static var PLUS_MARGIN_Y:Number = 10;
+	
 	//this is set by the init object
 	private var _canvasController:CanvasController;
 	private var _canvasView:CanvasView;
@@ -393,14 +396,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 				// We are unable to display all the users across the Activity's panel.
 				Debugger.log("learner_X: " + learner_X + " ref: " + learnerContainer + " xcoord: " + xCoord, Debugger.CRITICAL, "drawLearners", "CanvasActivity");
 				
-				if(learner_X > (xCoord + getVisibleWidth() - 10)) {
+				if(learner_X > (xCoord + getVisibleWidth() - 30)) {
 					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName()+activity.activityUIID, learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:true, _clone:false });
+					learnerContainer.attachMovie("plusIcon", "plusIcon", learnerContainer.getNextHighestDepth(), {_activity:_activity, _monitorController:_monitorController, _x:learner_X+PLUS_MARGIN_X, _y:learner_Y+PLUS_MARGIN_Y});
 					return;
 				}
 
 				// attach icon
 				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName()+activity.activityUIID, learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:false, _clone:false });
-						
+				
 				//  space icons
 				learner_X += 10;
 			}

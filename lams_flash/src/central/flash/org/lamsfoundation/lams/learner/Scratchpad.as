@@ -101,10 +101,10 @@ class Scratchpad extends MovieClip {
 		_lessonModel = _lessonModel;
 		_lessonController = _lessonController;
 		_scratchpad_mc = this;
-		_spadIsExpended = true;
+		_spadIsExpended = false;
 		maxIcon._visible = true;
 		minIcon._visible = false;
-		_lessonModel.setSpadHeight(spadHeightFull);
+		_lessonModel.setSpadHeight(spadHeightHide);
 		setLabels();
 		resize(Stage.width);
 		
@@ -136,14 +136,14 @@ class Scratchpad extends MovieClip {
 		
 		if (_spadIsExpended){
 			_spadIsExpended = false
-			minIcon._visible = true;
-			maxIcon._visible = false;
+			minIcon._visible = false;
+			maxIcon._visible = true;
 			_lessonModel.setSpadHeight(spadHeightHide);
 			
 		}else {
 			_spadIsExpended = true
-			minIcon._visible = false;
-			maxIcon._visible = true;
+			minIcon._visible = true;
+			maxIcon._visible = false;
 			_lessonModel.setSpadHeight(spadHeightFull);
 			//Application.getInstance().onResize();
 		}

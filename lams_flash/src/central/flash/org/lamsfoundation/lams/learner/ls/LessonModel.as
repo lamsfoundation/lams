@@ -42,6 +42,7 @@ class LessonModel extends Observable {
 	private var __x:Number;
 	private var __y:Number;
 	private var _spadHeight:Number;
+	private var _presenceHeight:Number;
 	private var _isDirty:Boolean;
 	private var infoObj:Object;
 	
@@ -61,6 +62,8 @@ class LessonModel extends Observable {
 	private var _lessonStateID:Number;
 	private var _learningDesignID:Number;
 	private var _learnerExportAvailable:Boolean;
+	private var _learnerPresenceAvailable:Boolean;
+	private var _learnerImAvailable:Boolean;
 	
 	/* the learningDesignModel gets set when you join a lesson */
 	private var _learningDesignModel:DesignDataModel;
@@ -72,6 +75,11 @@ class LessonModel extends Observable {
 	private var _activeSeq:Array;
 	
 	private var _eventsDisabled:Boolean;
+	
+	/* user data */
+	private var _userName:String = null;
+	private var _userFirstName:String = null;
+	private var _userLastName:String = null;
 	
 	/**
 	* Constructor.
@@ -98,8 +106,11 @@ class LessonModel extends Observable {
 		_lessonStateID = dto.lessonStateID;
 		_learningDesignID = dto.learningDesignID;
 		_learnerExportAvailable = dto.learnerExportAvailable;
+		_learnerPresenceAvailable = dto.learnerPresenceAvailable;
+		_learnerImAvailable = dto.learnerImAvailable;
 		
-		
+		Debugger.log("PRESENCE: " + dto.lessonID + " " + dto.lessonName + " " + dto.learnerExportAvailable + " " + dto.learnerPresenceAvailable + " " + dto.learnerImAvailable,Debugger.MED,'populateUserFromDTO','LessonModel');
+			
 		setChanged();
 		
 		// send update
@@ -107,7 +118,6 @@ class LessonModel extends Observable {
 		infoObj.updateType = "LESSON";
 		notifyObservers(infoObj);
 	}
-	
 	
 	public function setSpadHeight(h:Number){
 		_spadHeight = h
@@ -118,6 +128,14 @@ class LessonModel extends Observable {
 		return _spadHeight;
 	}
 	
+	public function setPresenceHeight(h:Number){
+		_presenceHeight = h
+		Application.getInstance().onResize();
+	}
+	
+	public function getPresenceHeight(){
+		return _presenceHeight;
+	}
 	/**
 	 * Set Lesson's unique ID
 	 * 
@@ -142,6 +160,98 @@ class LessonModel extends Observable {
 		return _lessonID;
 	}
     
+	/**
+	 * Set the userName
+	 * 
+	 * @param   userName
+	 */
+	
+	public function setUserName(userName:String){
+		_userName = userName;
+		
+		setChanged();
+		
+		// send update
+		infoObj = {};
+		infoObj.updateType = "USERNAME";
+		notifyObservers(infoObj);
+	}
+	
+	/**
+	 * Get the userName
+	 * 
+	 * @return userName
+	 */
+	
+	public function getUserName():String {
+		return _userName;
+	}
+	
+	public function get userName():String{
+		return _userName;
+	}
+
+	/**
+	 * Set the userFirstName
+	 * 
+	 * @param   userFirstName
+	 */
+	
+	public function setuserFirstName(userFirstName:String){
+		_userFirstName = userFirstName;
+		
+		setChanged();
+		
+		// send update
+		infoObj = {};
+		infoObj.updateType = "USERFIRSTNAME";
+		notifyObservers(infoObj);
+	}
+	
+	/**
+	 * Get the userFirstName
+	 * 
+	 * @return userFirstName
+	 */
+	
+	public function getuserFirstName():String {
+		return _userFirstName;
+	}
+	
+	public function get userFirstName():String{
+		return _userFirstName;
+	}
+	/**
+	 * Set the userLastName
+	 * 
+	 * @param   userLastName
+	 */
+	
+	public function setuserLastName(userLastName:String){
+		_userLastName = userLastName;
+		
+		setChanged();
+		
+		// send update
+		infoObj = {};
+		infoObj.updateType = "USERLASTNAME";
+		notifyObservers(infoObj);
+	}
+	
+	/**
+	 * Get the userLastName
+	 * 
+	 * @return userLastName
+	 */
+	
+	public function getuserLastName():String {
+		return _userLastName;
+	}
+	
+	public function get userLastName():String{
+		return _userLastName;
+	}
+
 	/**
 	 * Set the lesson's name
 	 * 
@@ -258,6 +368,22 @@ class LessonModel extends Observable {
 	
 	public function get learnerExportAvailable():Boolean {
 		return _learnerExportAvailable;
+	}
+	
+	public function set learnerPresenceAvailable(b:Boolean) {
+		_learnerPresenceAvailable = b;
+	}
+	
+	public function get learnerPresenceAvailable():Boolean {
+		return _learnerPresenceAvailable;
+	}
+
+	public function set learnerImAvailable(b:Boolean) {
+		_learnerImAvailable = b;
+	}
+	
+	public function get learnerImAvailable():Boolean {
+		return _learnerImAvailable;
 	}
 	
 	public function getLearningDesignModel():DesignDataModel{

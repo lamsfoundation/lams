@@ -46,10 +46,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 	private var CHILD_OFFSET_X:Number = 8;
 	private var CHILD_OFFSET_Y:Number = 57;
 	private var CHILD_INCRE:Number = 60;
+	private var MAX_LEARNER_ICONS:Number = 10;
 	
 	private var PANEL_OFFSET_X:Number = null;
 	
 	private var CONTAINER_PANEL_W:Number = 142.8;
+	
+	public static var PLUS_MARGIN_X:Number = 15;
+	public static var PLUS_MARGIN_Y:Number = 10;
 	
 	private var newContainerXCoord:Number; 
 	private var newContainerYCoord:Number;
@@ -320,7 +324,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		
 		var learner_X = (mm.activeView instanceof CanvasComplexView) ? this._x + learnerOffset_X : _activity.xCoord + learnerOffset_X;
 		var learner_Y = (mm.activeView instanceof CanvasComplexView) ? this._y + learnerOffset_Y : _activity.yCoord + learnerOffset_Y;
-			
+		
 		// get the length of learners from the Monitor Model and run a for loop.
 		for (var j=0; j<mm.allLearnersProgress.length; j++){
 			var learner:Object = new Object();
@@ -333,13 +337,13 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			if (isLearnerCurrentAct){
 				var actX:Number = (mm.activeView instanceof CanvasComplexView) ? this._x : _activity.xCoord;
 				
-				if (learner_X > (actX + 112)){
+				if (learner_X > (actX + 92)){
 					learner_X = actX + learnerOffset_X ;
 					learner_Y = 27;
 					hasPlus = true;
 					
 					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
-					
+					learnerContainer.attachMovie("plusIcon", "plusIcon", learnerContainer.getNextHighestDepth(), {_activity:_activity, _monitorController:_monitorController, _x:learner_X+PLUS_MARGIN_X, _y:learner_Y+PLUS_MARGIN_Y});
 					return;
 				}
 					

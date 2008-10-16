@@ -153,8 +153,16 @@ class LessonView extends AbstractView {
 				removeAll(lm);
 				break;
 			case 'LESSON' :
+				// if export is available in model, make button available
 				setLessonName(lm.name);
 				Application.getInstance().getHeader().showExportButton(lm.learnerExportAvailable);
+				
+				// if presence is available in model, make the panel visible and connect
+				if(lm.learnerPresenceAvailable) {
+					Application.getInstance().getPresence().showPresence(lm.learnerPresenceAvailable);
+					Application.getInstance().getPresence().attemptConnection();
+				}
+
 				break;
 			case 'DESIGNMODEL' :
 				lm.getLesson().finishedDesign = true;

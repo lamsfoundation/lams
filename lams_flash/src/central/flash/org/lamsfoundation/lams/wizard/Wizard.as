@@ -249,9 +249,14 @@ class Wizard {
 		var lessonDesc:String = resultDTO.resourceDescription;
 		var orgId:Number = resultDTO.organisationID;
 		var learnerExpPortfolio:Boolean = resultDTO.learnerExpPortfolio;
+		var enablePresence:Boolean = resultDTO.enablePresence;
+		var enableIm:Boolean = resultDTO.enableIm;
 		
 		// get data object to send to servlet
-		var data = DesignDataModel.getDataForInitializing(lessonName, lessonDesc, designId, orgId, learnerExpPortfolio);
+		var data = DesignDataModel.getDataForInitializing(lessonName, lessonDesc, designId, orgId, learnerExpPortfolio, enablePresence, enableIm);
+		
+		trace(data.lessonName + data.enablePresence + data.enableIm);
+		Debugger.log(data.lessonName + data.enablePresence + data.enableIm, Debugger.MED, "initializeLesson", "Wizard");
 		
 		// servlet call
 		Application.getInstance().getComms().sendAndReceive(data, 'monitoring/initializeLesson', callback, false);

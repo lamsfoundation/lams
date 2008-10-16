@@ -56,7 +56,7 @@ class Lesson {
 	private var _loadCheckCount = 0;
 	private var _loadCheckIntervalID:Number;
 	
-	private var dispatchEvent:Function;       
+	private var dispatchEvent:Function;
     public var addEventListener:Function;  
     public var removeEventListener:Function;
 	
@@ -93,10 +93,16 @@ class Lesson {
 		dispatchEvent({type:'init',target:this});		
 	}
  
+ 	/**
+	* gets lesson to populate its properties from server reponse dto
+	*/ 
 	public function populateFromDTO(dto:Object){
 		lessonModel.populateFromDTO(dto);
 	}
 	
+	/**
+	* redirects the view's load event
+	*/ 
 	private function viewLoaded(evt:Object){
         Debugger.log('viewLoaded called',Debugger.GEN,'viewLoaded','Lesson');
 		
@@ -106,7 +112,10 @@ class Lesson {
             //Raise error for unrecognized event
         }
     }
-     
+	
+	/**
+	* gets lesson from server given its ID
+	*/ 
 	public function getLesson():Boolean {
 		var callback:Function = Proxy.create(this,storeLessonData);
 		
@@ -118,7 +127,7 @@ class Lesson {
 			
 		return true;
 	}
-	 
+	
 	public function joinLesson():Boolean {
 		
 		var callback:Function = Proxy.create(this,startLesson);
@@ -173,14 +182,13 @@ class Lesson {
 		var exp_url:String = _root.serverURL + 'learning/exportWaitingPage.jsp?mode=learner&lessonID='+String(lessonModel.ID);
 		
 		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolioLearner', 410, 640, true, true, false, false, false);
-	
 	}
 	
 	private function storeLessonData(dto:Object){
 		lessonModel.populateFromDTO(dto);
 		openLearningDesign();			
 	}
-	
+		
 	private function startLesson(pkt:Object){
 		// set lesson as active
 		lessonModel.setActive();
