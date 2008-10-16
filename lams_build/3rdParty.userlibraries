@@ -105,7 +105,8 @@
 <archive path="/lams_build/lib/jfreechart/jcommon-1.0.0.jar"/>
 <archive path="/lams_build/lib/smack/smack.jar"/>
 <archive path="/lams_build/lib/smack/smackx.jar"/>
-<archive path="/lams_build/lib/flasgstone/transform.jar"/>
+<archive path="/lams_build/lib/flagstone/transform.jar"/>
 <archive path="/lams_build/lib/flagstone/translate.jar"/>
+<archive path="/lams_build/lib/jabber/JabberHTTPBind-1.1.1.jar"/>
 </library>
 </eclipse-userlibraries>

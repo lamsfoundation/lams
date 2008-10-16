@@ -125,6 +125,7 @@
 					<include name="fckeditor/*.jar" />
 					<include name="hibernate/*.jar" />
 					<include name="j2ee/*.jar" />
+					<include name="jabber/*.jar" />
 					<include name="jakarta-commons/*.jar" />
 					<include name="jakarta-poi/*.jar" />
 					<include name="jakarta-taglibs/*.jar" />
@@ -141,8 +142,8 @@
 					<include name="struts/*.jar" />
 					<include name="wddx/*.jar" />
 					<include name="concurrent/*.jar" />					
-					<include name="xstream/*.jar" />					
-					<include name="flagstone/*.jar" />	
+					<include name="xstream/*.jar" />		
+					<include name="flagstone/*.jar" />
 				</patternset>
 			</fileset> 
 			<fileset dir="..">

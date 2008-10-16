@@ -175,7 +175,9 @@ public class MonitoringAction extends LamsDispatchAction
     		Integer organisationId = WebUtil.readIntParam(request,"organisationID",true);
     		long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
     		Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null);
+    		Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresencePortfolio", false);
+    		Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImPortfolio", false);
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable);
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {

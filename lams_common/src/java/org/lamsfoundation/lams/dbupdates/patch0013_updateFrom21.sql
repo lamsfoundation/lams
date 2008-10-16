@@ -35,3 +35,9 @@ CREATE TABLE lams_text_search_condition (
 	 , CONSTRAINT TextSearchConditionInheritance FOREIGN KEY (condition_id)
                   REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 )TYPE=InnoDB;
+
+--  LDEV1929 - Updated script for lesson creation with presence --------------
+CREATE TABLE lams_lesson (
+       learner_presence_avail TINYINT(1) DEFAULT 0
+     , learner_im_avail TINYINT(1) DEFAULT 0
+)TYPE=InnoDB;

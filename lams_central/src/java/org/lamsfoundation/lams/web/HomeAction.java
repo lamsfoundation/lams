@@ -160,9 +160,13 @@ public class HomeAction extends DispatchAction {
 					req.setAttribute(AttributeNames.PARAM_MODE, mode);
 				
 				req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, lesson.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable(): Boolean.TRUE);
+				req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED, lesson.getLearnerPresenceAvailable());
+				req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
 				req.setAttribute(AttributeNames.PARAM_TITLE, lesson.getLessonName());
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 				req.setAttribute("serverUrl", serverUrl);
+				String presenceUrl = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
+				req.setAttribute("presenceUrl", presenceUrl);				
 				req.setAttribute(AttributeNames.PARAM_LESSON_ID,lessonId);
 				return mapping.findForward("learner");
 			}

@@ -248,7 +248,9 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
                                 testLearningDesign,
                                 testLessonClass,//lesson class
                                 testOrg,
-                                new HashSet());//learner progress
+                                new HashSet(),
+                                false,
+                                false);//learner progress
     }
   
 

@@ -27,7 +27,7 @@ function AC_Generateobj(objAttrs, params, embedAttrs)
 function AC_FL_RunContent(){
   var ret = 
     AC_GetArgs
-    (  arguments, ".swf", "movie", "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+    (  arguments, ".swf", "movie", "flashvars", "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
      , "application/x-shockwave-flash"
     );
   AC_Generateobj(ret.objAttrs, ret.params, ret.embedAttrs);
@@ -36,13 +36,13 @@ function AC_FL_RunContent(){
 function AC_SW_RunContent(){
   var ret = 
     AC_GetArgs
-    (  arguments, ".dcr", "src", "clsid:166B1BCA-3F9C-11CF-8075-444553540000"
+    (  arguments, ".dcr", "src", "flashvars", "clsid:166B1BCA-3F9C-11CF-8075-444553540000"
      , null
     );
   AC_Generateobj(ret.objAttrs, ret.params, ret.embedAttrs);
 }
 
-function AC_GetArgs(args, ext, srcParamName, classid, mimeType){
+function AC_GetArgs(args, ext, srcParamName, flashvarsParamName, classid, mimeType){
   var ret = new Object();
   ret.embedAttrs = new Object();
   ret.params = new Object();
@@ -114,6 +114,7 @@ function AC_GetArgs(args, ext, srcParamName, classid, mimeType){
       case "name":
       case "id":
       case "tabindex":
+	  case "flashvars":
         ret.embedAttrs[args[i]] = ret.objAttrs[args[i]] = args[i+1];
         break;
       default:

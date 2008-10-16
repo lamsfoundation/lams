@@ -125,7 +125,13 @@ public class Lesson implements Serializable {
     
     /** Persistent field. Defaults to FALSE - is not included in the constructor anywhere. */
     private Boolean lockedForEdit;
+    
+    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    private Boolean learnerPresenceAvailable;  
 
+    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    private Boolean learnerImAvailable;
+    
     //---------------------------------------------------------------------
     // constructors
     //---------------------------------------------------------------------
@@ -140,10 +146,10 @@ public class Lesson implements Serializable {
      */
     public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, 
     		Integer previousLessonStateId, Boolean learnerExportAvailable, 
-    		LearningDesign learningDesign,Set learnerProgresses) 
+    		LearningDesign learningDesign,Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable) 
     {
         this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
-        		learnerExportAvailable,false, learningDesign,null,null,learnerProgresses);
+        		learnerExportAvailable,false, learningDesign,null,null,learnerProgresses, learnerPresenceAvailable, learnerImAvailable);
     }     
     
     /** 
@@ -153,17 +159,17 @@ public class Lesson implements Serializable {
      */
     public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, Integer previousLessonStateId, 
     		Boolean learnerExportAvailable, LearningDesign learningDesign, LessonClass lessonClass, 
-    		Organisation organisation, Set learnerProgresses) 
+    		Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable) 
     {
         this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
-        		learnerExportAvailable, false, learningDesign,lessonClass,organisation,learnerProgresses);
+        		learnerExportAvailable, false, learningDesign,lessonClass,organisation,learnerProgresses, learnerPresenceAvailable, learnerImAvailable);
     }    
     
     /** full constructor */
     public Lesson(Long lessonId,String name,String description, Date createDateTime, Date startDateTime, Date endDateTime, User user, 
     		Integer lessonStateId, Integer previousLessonStateId, Boolean learnerExportAvailable,  Boolean lockedForEdit,
     		LearningDesign learningDesign, LessonClass lessonClass, 
-    		Organisation organisation, Set learnerProgresses) 
+    		Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable) 
     {
         this.lessonId = lessonId;
         this.lessonName = name;
@@ -175,6 +181,8 @@ public class Lesson implements Serializable {
         this.lessonStateId = lessonStateId;
         this.previousLessonStateId = previousLessonStateId;
         this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
+        this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : Boolean.FALSE;
+        this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : Boolean.FALSE;
         this.lockedForEdit = false;
         this.learningDesign = learningDesign;
         this.lessonClass = lessonClass;
@@ -199,7 +207,9 @@ public class Lesson implements Serializable {
                                          Organisation organisation, 
                                          Boolean learnerExportAvailable,
                                          LearningDesign ld, 
-                                         LessonClass newLessonClass)
+                                         LessonClass newLessonClass,
+                                         Boolean learnerPresenceAvailable,
+                                         Boolean learnerImAvailable)
     {
         //setup new lesson
         return new Lesson(lessonName,
@@ -212,7 +222,9 @@ public class Lesson implements Serializable {
                           ld,
                           newLessonClass,//lesson class
                           organisation,
-                          new HashSet());//learner progress
+                          new HashSet(), //learner progress
+                          false,
+                          false);
     }
 
     /**
@@ -229,7 +241,9 @@ public class Lesson implements Serializable {
                                                      String lessonDescription,
                                                      User user,
                                                      Boolean learnerExportAvailable,
-                                                     LearningDesign ld)
+                                                     LearningDesign ld,
+                                                     Boolean learnerPresenceAvailable,
+                                                     Boolean learnerImAvailable)
     {
         return new Lesson(lessonName,
                           lessonDescription,
@@ -239,7 +253,9 @@ public class Lesson implements Serializable {
                           null,
                           learnerExportAvailable,
                           ld,
-                          new HashSet());
+                          new HashSet(),
+                          learnerPresenceAvailable,
+                          learnerImAvailable);
     }
     //---------------------------------------------------------------------
     // Getters and Setters
@@ -416,6 +432,30 @@ public class Lesson implements Serializable {
 
 	public void setLearnerExportAvailable(Boolean learnerExportAvailable) {
 		this.learnerExportAvailable = learnerExportAvailable;
+	}
+	
+    /** 
+     * @hibernate.property type="java.lang.Boolean"  column="learner_presence_avail"
+     *            	       length="1"
+     */
+ 	public Boolean getLearnerPresenceAvailable() {
+		return learnerPresenceAvailable;
+	}
+
+	public void setLearnerPresenceAvailable(Boolean learnerPresenceAvailable) {
+		this.learnerPresenceAvailable = learnerPresenceAvailable;
+	}
+	
+    /**
+     * @hibernate.property type="java.lang.Boolean"  column="learner_exportport_avail"
+     *            	       length="1"
+     */
+ 	public Boolean getLearnerImAvailable() {
+		return learnerImAvailable;
+	}
+
+	public void setLearnerImAvailable(Boolean learnerImAvailable) {
+		this.learnerImAvailable = learnerImAvailable;
 	}
 
 	/** 

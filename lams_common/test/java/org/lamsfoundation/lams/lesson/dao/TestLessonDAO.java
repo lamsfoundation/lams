@@ -120,7 +120,9 @@ public class TestLessonDAO extends LessonDataAccessTestCase
                                                                       null,
                                                                       testUser,
                                                                       true,
-                                                                      testLearningDesign);
+                                                                      testLearningDesign,
+                                                                      false,
+                                                                      false);
         
         try
         {

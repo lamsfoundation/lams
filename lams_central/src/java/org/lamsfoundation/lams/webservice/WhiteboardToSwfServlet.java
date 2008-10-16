@@ -86,7 +86,12 @@ public class WhiteboardToSwfServlet extends HttpServlet {
 			String vShape =request.getParameter("vShape");
 			String vText =request.getParameter("vText");
 			String vLine =request.getParameter("vLine");
-
+			String xMaxInTwips = request.getParameter("xMaxInTwips");
+			String yMaxInTwips = request.getParameter("yMaxInTwips");
+			String bgColorR = request.getParameter("bgColorR");
+			String bgColorB = request.getParameter("bgColorB");			
+			String bgColorG = request.getParameter("bgColorG");
+			
 			Random r = new Random();
 
 			String filename = Long.toString(Math.abs(r.nextLong()), 50);
@@ -96,71 +101,34 @@ public class WhiteboardToSwfServlet extends HttpServlet {
 		        BufferedWriter outFile = new BufferedWriter(new FileWriter(completeFilename));
 		        String fromFlashToFile = trace + author + bgName + bgColor + nPages + nTexts + nLines + nShapes + nFigures + vText + vLine + vShape + vFigure;
 				String correctedFlashToFile = fromFlashToFile.replace("//,", "");
-		        outFile.write(correctedFlashToFile);
+				String correctedFlashToFileSecond = correctedFlashToFile.replace("//", "");
+		        outFile.write(correctedFlashToFileSecond);
 		        outFile.close();
 		        
-		        log.debug(correctedFlashToFile);
-		        out.write(correctedFlashToFile);
+		        log.debug(correctedFlashToFileSecond);
+		        out.write(correctedFlashToFileSecond);
 		    } catch (IOException e) {
 		    }
 			
 			FSMovie movie = new FSMovie();
-			movie.setFrameSize(new FSBounds(0, 0, 11000, 8000));
-			movie.add(new FSSetBackgroundColor(new FSColor(255,255,255)));
+			movie.setFrameSize(new FSBounds(0, 0, Integer.valueOf(xMaxInTwips), Integer.valueOf(yMaxInTwips)));
+			movie.add(new FSSetBackgroundColor(new FSColor(Integer.valueOf(bgColorR),Integer.valueOf(bgColorG),Integer.valueOf(bgColorB))));
 			movie.setFrameRate(12);
 			movie.setVersion(swfVersion);
-			
-			byte[] actionsFromFlash = parser.parse("trace('caca');").encode(swfVersion);
+						
+			importSwfFiles(movie, bgClip, Integer.parseInt(nTotal));
+						
+			String readFromFlash = readFile(completeFilename);
+			byte[] actionsFromFlash = parser.parse(readFromFlash).encode(swfVersion);
 			FSDoAction frameFromFlash = new FSDoAction(actionsFromFlash);
 			movie.add(frameFromFlash);
 			movie.add(new FSShowFrame());
-			
-			//importSwfFiles(movie, bgClip, Integer.parseInt(nTotal));
-			
-			/*
-			FSDefineMovieClip logoClip = new FSDefineMovieClip(movie.newIdentifier());
-			String actionsString = "createEmptyMovieClip('newShape', 5000);\nnewShape.attachMovie('logo', 'newShape_mc', 5000);\nnewShape._x = 0;\n newShape._y = 0;";
-			byte[] actionsLogo = parser.parse(actionsString).encode(swfVersion);
-			FSPlaceObject2 logoObject = new FSPlaceObject2(logoClip.getIdentifier(), 1, actionsLogo, "logoClip", movie.getFrameSize().getWidth()/2, movie.getFrameSize().getHeight()/2);
-			movie.add(logoClip);
-			movie.add(logoObject);
-			*/
-			
-			/*
-			String readFromFlash = readFile(completeFilename);
-			FSDefineMovieClip fromFlashClip = new FSDefineMovieClip(movie.newIdentifier());
-			byte[] actionsFromFlash = parser.parse(readFromFlash).encode(swfVersion);
-			FSPlaceObject2 fromFlashObject = new FSPlaceObject2(fromFlashClip.getIdentifier(), 1, actionsFromFlash, "fromFlashClip", movie.getFrameSize().getWidth()/2, movie.getFrameSize().getHeight()/2);
-			movie.add(fromFlashClip);
-			movie.add(fromFlashObject);
-			*/
 
-			/*
-			String readFromFlash = readFile(completeFilename);
-			byte[] actionsFromFlash = parser.parse(readFromFlash).encode(swfVersion);
-			FSDoAction frameFromFlash = new FSDoAction(actionsFromFlash);
-			movie.add(frameFromFlash);
-			movie.add(new FSShowFrame());
-			*/
-			
-			/*
-			String readFromDrawAs = readFile(FILEPATH + "draw.as");
-			FSDefineMovieClip fromDrawAsClip = new FSDefineMovieClip(movie.newIdentifier());
-			byte[] actionsFromDrawAs = parser.parse(readFromDrawAs).encode(swfVersion);
-			FSPlaceObject2 fromDrawAsObject = new FSPlaceObject2(fromDrawAsClip.getIdentifier(), 1, actionsFromDrawAs, "fromDrawAsClip", movie.getFrameSize().getWidth()/2, movie.getFrameSize().getHeight()/2);
-			movie.add(fromDrawAsClip);
-			movie.add(fromDrawAsObject);
-			
-			movie.add(new FSShowFrame());
-			*/
-			
-			/*
 			String readFromDrawAs = readFile(FILEPATH + "draw.as");
 			byte[] actionsFromDrawAs = parser.parse(readFromDrawAs).encode(swfVersion);
 			FSDoAction frameFromDrawAs = new FSDoAction(actionsFromDrawAs);
 			movie.add(frameFromDrawAs);
 			movie.add(new FSShowFrame());
-			*/
 			
 			writeFile(movie, FILEPATH, "test.swf");
 

@@ -69,7 +69,7 @@ public interface IMonitoringService {
 	 * @return the lesson initialized.
 	 */
 	public Lesson initializeLesson(String lessonName, String lessonDescription, Boolean learnerExportAvailable,
-			long learningDesignId, Integer organisationId, Integer userID, String customCSV);
+			long learningDesignId, Integer organisationId, Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable);
 
 	/**
 	 * Initialize a new lesson so as to start the learning process for a normal or preview learning session. 
@@ -89,7 +89,7 @@ public interface IMonitoringService {
 	 * The design is not assigned to any workspace folder.
 	 */
 	public Lesson initializeLessonForPreview(String lessonName, String lessonDescription, long learningDesignId, Integer userID,
-			String customCSV);
+			String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable);
 
 	/**
 	 * Create a lession according to the input lession WDDX package. The sample package is following:

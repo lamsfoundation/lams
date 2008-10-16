@@ -234,6 +234,9 @@
 	</module>	
 	<module>
 		<java>translate.jar</java>
+	</module>
+	<module>
+		<java>JabberHTTPBind-1.1.1.jar</java>
 	</module>	
 	<!--  END For xstream -->
     <!--  End Third Party JAR Files -->

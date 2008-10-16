@@ -649,6 +649,8 @@ CREATE TABLE lams_lesson (
      , schedule_end_date_time DATETIME
      , previous_state_id INT(3)
      , learner_exportport_avail TINYINT(1) DEFAULT 1
+     , learner_presence_avail TINYINT(1) DEFAULT 0
+     , learner_im_avail TINYINT(1) DEFAULT 0
      , locked_for_edit TINYINT DEFAULT 0
      , version INTEGER DEFAULT 1
      , PRIMARY KEY (lesson_id)

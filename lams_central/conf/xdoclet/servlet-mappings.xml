@@ -37,3 +37,8 @@
 	<servlet-name>LessonManager</servlet-name>
 	<url-pattern>/services/xml/LessonManager/*</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>JabberHTTPBindingServlet</servlet-name>
+	<url-pattern>/JHB/*</url-pattern>
+</servlet-mapping>

@@ -76,3 +76,10 @@
 		org.lamsfoundation.lams.webservice.xml.LessonManagerServlet
 	</servlet-class>
 </servlet>
+
+<servlet>
+    <servlet-name>JabberHTTPBindingServlet</servlet-name>
+    <servlet-class>org.jabber.JabberHTTPBind.JHBServlet</servlet-class>
+</servlet>
+
+   

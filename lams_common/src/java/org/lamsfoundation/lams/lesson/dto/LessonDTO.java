@@ -56,6 +56,8 @@ public class LessonDTO
 	private Date startDateTime;
 	private Long learningDesignID;
 	private Boolean learnerExportAvailable;
+	private Boolean learnerPresenceAvailable;
+	private Boolean learnerImAvailable;
 
     //---------------------------------------------------------------------
     // Construtors
@@ -76,6 +78,8 @@ public class LessonDTO
         this.createDateTime = lesson.getCreateDateTime();
         this.startDateTime = lesson.getStartDateTime();
 		this.learnerExportAvailable = lesson.getLearnerExportAvailable();
+		this.learnerPresenceAvailable = lesson.getLearnerPresenceAvailable();
+		this.learnerImAvailable = lesson.getLearnerImAvailable();
     }
     //---------------------------------------------------------------------
     // Getters
@@ -134,6 +138,14 @@ public class LessonDTO
 		return learnerExportAvailable;
 	}
 	
+	public Boolean getLearnerPresenceAvailable() {
+		return learnerPresenceAvailable;
+	}
+	
+	public Boolean getLearnerImAvailable() {
+		return learnerImAvailable;
+	}
+	
     /**
      * Returns the String representation of lesson data transfer object.
      * @see java.lang.Object#toString()
@@ -150,6 +162,8 @@ public class LessonDTO
         sb.append("createDateTime='" + getCreateDateTime() + "'; ");
         sb.append("startDateTime='" + getStartDateTime() + "'; ");
         sb.append("learnerExportAvailable='" + getLearnerExportAvailable() + "'; ");
+        sb.append("learnerPresenceAvailable='" + getLearnerPresenceAvailable() + "'; ");
+        sb.append("learnerImAvailable='" + getLearnerImAvailable() + "'; ");
         return sb.toString();
     }
 }
