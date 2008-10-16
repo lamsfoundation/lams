@@ -15,13 +15,13 @@ FCKConfig.ToolbarSets["Default-Learner"] = [
 	['FontFormat','FontName','FontSize']
 ] ;
 
-FCKConfig.ToolbarSets["Custom-Learner"] = [
+FCKConfig.ToolbarSets["Custom-Wiki"] = [
 	['Preview','PasteWord'],
 	['Undo','Redo'],
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['OrderedList','UnorderedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
-	['WikiLink','Image','Link'],
+	['WikiLink','Link','Image'],
 	['About'],
 	['TextColor','BGColor'],
 	['Table','Rule','Smiley','SpecialChar'],
@@ -36,4 +36,4 @@ FCKConfig.DefaultLinkTarget = "_blank";
 FCKConfig.TemplatesXmlPath = FCKConfig.BasePath + '../../www/htmltemplates.xml';
 FCKConfig.FontFormats	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 FCKConfig.EnterMode = 'div' ;
-FCKConfig.Plugins.Add('wikilink', 'en', FCKConfig.BasePath + '../../fckeditor/editor/plugins/');
+FCKConfig.Plugins.Add('wikilink', 'en', FCKConfig.BasePath + '../../tool/lawiki10/');

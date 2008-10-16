@@ -14,8 +14,6 @@ select {
 	width: 100%
 }
 </style>
-<script type="text/javascript"
-	src="../../../../includes/javascript/jquery-latest.pack.js"></script>
 <script type="text/javascript">
 <!--
 var xmlDoc;
