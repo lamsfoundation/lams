@@ -102,7 +102,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	
 	//Text Items
 	private var LSTitle_lbl:Label;
-	private var LSDescription_lbl:Label;
+	private var LSDescription_txa:TextArea;
 	
 	private var sessionStatus_txt:Label;
 	private var numLearners_txt:Label;
@@ -405,20 +405,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		LSTitle_lbl.text = "<b>" + s.name + "</b>";
 		
 		var charCount:Array = StringUtils.scanString(String(s.description), "\n");
-		s.
-		Debugger.log('DEBUG: '+ String(s.description) + ' with char count: ' + String(charCount.length), Debugger.MED,'populateLessonDetails','org.lamsfoundation.lams.LessonTabView');
-		if(charCount.length > 3) {
-			Debugger.log('DEBUG: '+ String(charCount[2]), Debugger.MED,'populateLessonDetails','org.lamsfoundation.lams.LessonTabView');
-			LSDescription_lbl.text = String(s.description).substr(0, charCount[2]);
-			LSDescription_lbl.text += "...";
-		}
-		else if(s.description.length > limit) {
-			LSDescription_lbl.text = String(s.description).substr(0, limit);
-			LSDescription_lbl.text += "...";
-		}
-		else {
-			LSDescription_lbl.text = String(s.description);
-		}
+		LSDescription_txa.text = String(s.description);
 		
 		sessionStatus_txt.text = showStatus(s.state);
 		numLearners_txt.text = String(s.noStartedLearners) + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
@@ -887,6 +874,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		//BG PANEL
 		styleObj = _tm.getStyleObject('BGPanel');
 		bkg_pnl.setStyle('styleName',styleObj);
+
+		//BlueTextArea
+		styleObj = _tm.getStyleObject('BlueTextArea');		
+		LSDescription_txa.setStyle('styleName',styleObj);
 		
 		//STEPPER
 		//styleObj = _tm.getStyleObject('numericstepper');
