@@ -142,7 +142,7 @@ class Presence extends MovieClip {
 		var resource = "LAMSPRESENCE"+h+""+m+""+s;
 		
 		Debugger.log("PRESENCE: with arguements - " + String(_root.presenceServerUrl) + " " + String(_root.userID) + " " + String(_root.userID) + " " + String(resource) + " " + String(_root.lessonID) + " " + _root.firstName + _root.lastName + " " + "false" + " " + "true",Debugger.MED,'attemptConnection','Presence');
-		_root.proxy.call("doLogin", _root.presenceServerUrl, _root.userID, _root.userID, resource, _root.lessonID, _root.firstName + _root.lastName, false, true);
+		_root.proxy.call("doLogin", _root.presenceServerUrl, _root.userID, _root.userID, resource, _root.lessonID, _root.firstName + " " + _root.lastName, false, true);
 	}
 	
 	public function isPresenceExpanded():Boolean{

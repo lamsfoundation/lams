@@ -48,7 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
      
 	    	window.onload=function(){
 				// if presence is enabled, attempt to login once the window is loaded
-				doLogin("${param.presenceUrl}", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "${param.lessonID}", "<lams:user property="firstName"/>" + "<lams:user property="lastName"/>", false, false);
+				doLogin("${param.presenceUrl}", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "${param.lessonID}", "<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>", false, false);
 				
 			}
 			
