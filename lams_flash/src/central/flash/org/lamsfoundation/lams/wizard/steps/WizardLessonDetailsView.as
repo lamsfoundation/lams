@@ -145,7 +145,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		summery_lbl.visible = true;
 		learner_expp_cb.visible = true;
 		learner_enpres_cb.visible = true;
-		learner_enim_cb.visible = true;
+		learner_enim_cb.visible = false;
 		learner_enim_cb.enabled = false;
 		schedule_cb.visible = true;
 		schedule_time._visible = true;
