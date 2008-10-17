@@ -211,6 +211,7 @@ Ant build file.
 				<include name="pages/**" />
 				<include name="template/**" />
 				<include name="wiki_client/**" />
+				<include name="wikilink/**" />
 				<!-- used by tiles -->
 			</fileset>
 		</war>

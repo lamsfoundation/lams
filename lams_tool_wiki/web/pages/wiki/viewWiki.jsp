@@ -17,7 +17,7 @@
 		<div id="header">
 		</div>
 		
-		<div id="content">
+		<div id="content" style="margin-right:75px;">
 			<h1>
 				${currentWikiPage.title}
 			</h1>

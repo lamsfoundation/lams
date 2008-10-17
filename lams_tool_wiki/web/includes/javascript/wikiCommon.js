@@ -65,3 +65,21 @@ function doCompareOrView(webAppUrl, historyId, currentPageId, dispatch)
 	compareWindow = window.open(url,'compareWindow','resizable,width=796,height=570,scrollbars');
 	compareWindow.window.focus();
 }
+
+function toggleWikiList(webUrl)
+{
+	
+	var wikiListDiv = document.getElementById("wikiList");
+	var wikiListImage = document.getElementById("wikiListImage");
+	
+	if (wikiListDiv.style.display=="block")
+	{
+		wikiListDiv.style.display = "none";
+		wikiListImage.src = webUrl +"/images/tree_closed.gif";
+	}
+	else
+	{
+		wikiListDiv.style.display = "block";
+		wikiListImage.src = webUrl + "/images/tree_open.gif";
+	}
+}
