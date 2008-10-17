@@ -691,6 +691,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		data.organisationID = Config.NUMERIC_NULL_VALUE;
 		
 		data.learnerExportPortfolio = false;
+		data.enablePresence = false;
+		data.enableIm = false;
 		data.copyType = COPY_TYPE_ID_PREVIEW;
 		
 		return data;
