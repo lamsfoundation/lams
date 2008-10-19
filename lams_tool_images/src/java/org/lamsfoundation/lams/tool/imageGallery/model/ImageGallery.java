@@ -516,7 +516,7 @@ public class ImageGallery implements Cloneable {
     }
 
     public void setNumberColumns(int numberColumns) {
-	numberColumns = numberColumns;
+	this.numberColumns = numberColumns;
     }
 
     /**

@@ -1,4 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
+<script type="text/javascript"> 
+	var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
+</script>
+<script type="text/javascript" src="<html:rewrite page='/includes/javascript/lightbox.js'/>" ></script>
+<link rel="stylesheet" href="<html:rewrite page='/includes/css/lightbox.css'/>"  type="text/css">
 <c:set var="formBean"
 	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">

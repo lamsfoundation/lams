@@ -30,9 +30,7 @@ import org.apache.struts.upload.FormFile;
  * ImageGallery Item Form.
  * 
  * @struts.form name="imageGalleryItemForm"
- * @author Steve.Ni
- * 
- * @version $Revision$
+ * @author Andrey Balan
  */
 public class ImageGalleryItemForm extends ActionForm {
     private String imageIndex;
@@ -43,8 +41,6 @@ public class ImageGalleryItemForm extends ActionForm {
 
     private String title;
     private String description;
-    private String url;
-    private boolean openUrlNewWindow;
     // flag of this item has attachment or not
     private boolean hasFile;
     private Long fileUuid;
@@ -76,28 +72,21 @@ public class ImageGalleryItemForm extends ActionForm {
 	this.title = title;
     }
 
-    public String getUrl() {
-	return url;
-    }
-
-    public void setUrl(String url) {
-	this.url = url;
-    }
-
-	/**
-	 * Returns ImageGallery order index.
-	 * 
-	 * @return ImageGallery order index
-	 */
+    /**
+     * Returns ImageGallery order index.
+     * 
+     * @return ImageGallery order index
+     */
     public String getImageIndex() {
 	return imageIndex;
     }
 
-	/**
-	 * Sets ImageGallery order index.
-	 * 
-	 * @param imageIndex ImageGallery order index
-	 */
+    /**
+     * Sets ImageGallery order index.
+     * 
+     * @param imageIndex
+     *                ImageGallery order index
+     */
     public void setImageIndex(String imageIndex) {
 	this.imageIndex = imageIndex;
     }
@@ -132,14 +121,6 @@ public class ImageGalleryItemForm extends ActionForm {
 
     public void setHasFile(boolean hasFile) {
 	this.hasFile = hasFile;
-    }
-
-    public boolean isOpenUrlNewWindow() {
-	return openUrlNewWindow;
-    }
-
-    public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
-	this.openUrlNewWindow = openUrlNewWindow;
     }
 
     public String getSessionMapID() {

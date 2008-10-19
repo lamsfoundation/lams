@@ -95,7 +95,7 @@ public class ImageGalleryAttachment implements Cloneable {
     // get/set methods
     // **********************************************************
     /**
-     * @hibernate.id column="uid" generator-class="native"
+     * @hibernate.id column="attachment_uid" generator-class="native"
      */
     public Long getUid() {
 	return uid;

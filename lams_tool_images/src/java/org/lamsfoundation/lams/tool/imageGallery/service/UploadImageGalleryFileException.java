@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.imageGallery.service;
 
 public class UploadImageGalleryFileException extends Exception {
 
+    private static final long serialVersionUID = 3993274086986425887L;
+
     public UploadImageGalleryFileException() {
 	super();
 

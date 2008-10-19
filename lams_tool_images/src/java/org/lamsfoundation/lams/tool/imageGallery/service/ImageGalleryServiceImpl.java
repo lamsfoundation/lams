@@ -27,6 +27,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -50,16 +51,20 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageInputStream;
 import javax.swing.ImageIcon;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
@@ -99,6 +104,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItemVisitLog;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
+import org.lamsfoundation.lams.tool.imageGallery.util.CircularByteBuffer;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler;
 import org.lamsfoundation.lams.tool.imageGallery.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -113,8 +119,11 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
+import sun.swing.ImageIconUIResource;
+
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
+import com.sun.imageio.plugins.common.ImageUtil;
 
 /**
  * 
@@ -160,15 +169,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
-
-    public IVersionedNode getFileNode(Long itemUid, String relPathString) throws ImageGalleryApplicationException {
-	ImageGalleryItem item = (ImageGalleryItem) imageGalleryItemDao.getObject(ImageGalleryItem.class, itemUid);
-	if (item == null) {
-	    throw new ImageGalleryApplicationException("Reource item " + itemUid + " not found.");
-	}
-
-	return getFile(item.getFileUuid(), item.getFileVersionId(), relPathString);
-    }
 
     // *******************************************************************************
     // Service method
@@ -267,13 +267,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     public ImageGalleryAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
 	    throws UploadImageGalleryFileException {
-	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getFileName())) {
-	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.upload.file.not.found",
-		    new Object[] { uploadFile }));
-	}
 
 	// upload file to repository
-	NodeKey nodeKey = processFile(uploadFile, fileType);
+	NodeKey nodeKey = uploadFormFile(uploadFile, fileType);
 
 	// create new attachement
 	ImageGalleryAttachment file = new ImageGalleryAttachment();
@@ -681,6 +677,24 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return contentId;
     }
 
+    public void uploadImageGalleryItemFile(ImageGalleryItem image, FormFile file) throws UploadImageGalleryFileException {
+
+	// upload file
+	NodeKey nodeKey = uploadFormFile(file, IToolContentHandler.TYPE_ONLINE);
+	image.setFileName(file.getFileName());
+	image.setFileType(file.getContentType());
+	image.setFileVersionId(nodeKey.getVersion());
+	image.setOriginalFileUuid(nodeKey.getUuid());
+
+	String mediumFileName = "medium_" + file.getFileName();
+	NodeKey mediumNodeKey = createScaledImage(nodeKey, mediumFileName, file.getContentType(), 640);
+	image.setMediumFileUuid(mediumNodeKey.getUuid());
+	
+	String thumbnailFileName = "thumbnail_" + file.getFileName();
+	NodeKey thumbnailNodeKey = createScaledImage(mediumNodeKey, thumbnailFileName, file.getContentType(), 100);
+	image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
+    }
+    
     /**
      * Process an uploaded file.
      * 
@@ -690,61 +704,27 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(FormFile file, String fileType) throws UploadImageGalleryFileException {
-	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
-	    String fileName = file.getFileName();
-	    try {
-		node = imageGalleryToolContentHandler.uploadFile(file.getInputStream(), fileName,
-			file.getContentType(), fileType);
-		String rr = imageGalleryToolContentHandler.getFileNode(node.getUuid()).getPath();
-		String ff = "";
-	    } catch (InvalidParameterException e) {
-		throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.invaid.param.upload"));
-	    } catch (FileNotFoundException e) {
-		throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.file.not.found"));
-	    } catch (RepositoryCheckedException e) {
-		throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.repository"));
-	    } catch (IOException e) {
-		throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.io.exception"));
-	    }
+    private NodeKey uploadFormFile(FormFile file, String fileType) throws UploadImageGalleryFileException {
+	if ((file == null) || StringUtils.isEmpty(file.getFileName())) {
+	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.upload.file.not.found",
+		    new Object[] { file }));
 	}
-	return node;
-    }
 
-    public void uploadImageGalleryItemFile(ImageGalleryItem item, FormFile file) throws UploadImageGalleryFileException {
+	NodeKey node = null;
 	try {
-	    InputStream is = file.getInputStream();
-	    String fileName = file.getFileName();
-	    String fileType = file.getContentType();
-
-	    //TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//		String packageDirectory = ZipFileUtil.expandZip(is, fileName);
-//		String initFile = findWebsiteInitialItem(packageDirectory);
-//		if (initFile == null) {
-//		    throw new UploadImageGalleryFileException(messageService
-//			    .getMessage("error.msg.website.no.initial.file"));
-//		}
-
-	    
-	    
-	    // upload file
-	    NodeKey nodeKey = processFile(file, IToolContentHandler.TYPE_ONLINE);
-	    item.setFileUuid(nodeKey.getUuid());
-	    item.setFileVersionId(nodeKey.getVersion());
-		
-	    // create the package from the directory contents
-	    item.setFileType(fileType);
-	    item.setFileName(fileName);
+	    node = imageGalleryToolContentHandler.uploadFile(file.getInputStream(), file.getFileName(), file
+		    .getContentType(), fileType);
+	} catch (InvalidParameterException e) {
+	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.invaid.param.upload"));
 	} catch (FileNotFoundException e) {
-	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.file.not.found") + ":"
-		    + e.toString());
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.file.not.found"));
+	} catch (RepositoryCheckedException e) {
+	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.repository"));
 	} catch (IOException e) {
-	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.io.exception"));
 	}
-    }
+	return node;
+    }    
     
     /**
      * Reads an image in a file and creates a thumbnail in another file.
@@ -755,85 +735,62 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      *                The name of thumbnail file. Will be created if necessary.
      * @param maxDim
      *                The width and height of the thumbnail must be maxDim pixels or less.
+     * @throws UploadImageGalleryFileException 
      */
-    private static void createThumbnail(String orig, String thumb, int maxDim) {
+    private NodeKey createScaledImage(NodeKey nodeKey, String fileName, String contentType, int maxDim) throws UploadImageGalleryFileException {
+	NodeKey scaledNodeKey = null;
 	try {
-	    // Get the image from a file.
-	    Image inImage = new ImageIcon(orig).getImage();
+	    // Read the original image from the repository
+	    InputStream is = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
+	    BufferedImage originalImage = ImageIO.read(is);
 
 	    // Determine the scale.
-	    double scale = (double) maxDim / (double) inImage.getHeight(null);
-	    if (inImage.getWidth(null) > inImage.getHeight(null)) {
-		scale = (double) maxDim / (double) inImage.getWidth(null);
+	    double scale = (double) maxDim / (double) originalImage.getHeight(null);
+	    if (originalImage.getWidth(null) > originalImage.getHeight(null)) {
+		scale = (double) maxDim / (double) originalImage.getWidth(null);
 	    }
 
-	    // Determine size of new image.
-	    // One of them
-	    // should equal maxDim.
-	    int scaledW = (int) (scale * inImage.getWidth(null));
-	    int scaledH = (int) (scale * inImage.getHeight(null));
+	    // Determine size of new image. One of them should equal maxDim.
+	    int scaledW = (int) (scale * originalImage.getWidth(null));
+	    int scaledH = (int) (scale * originalImage.getHeight(null));
 
-	    // Create an image buffer in
-	    // which to paint on.
-	    BufferedImage outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
+	    // Create an image buffer in which to paint on.
+	    BufferedImage mediumFile = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
 
 	    // Set the scale.
 	    AffineTransform tx = new AffineTransform();
 
-	    // If the image is smaller than
-	    // the desired image size,
-	    // don't bother scaling.
+	    // If the image is smaller than the desired image size, don't bother scaling.
 	    if (scale < 1.0d) {
 		tx.scale(scale, scale);
 	    }
 
 	    // Paint image.
-	    Graphics2D g2d = outImage.createGraphics();
-	    g2d.drawImage(inImage, tx, null);
+	    Graphics2D g2d = mediumFile.createGraphics();
+	    g2d.drawImage(originalImage, tx, null);
 	    g2d.dispose();
 
-	    // JPEG-encode the image
-	    // and write to file.
-	    OutputStream os = new FileOutputStream(thumb);
-	    JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(os);
-	    encoder.encode(outImage);
-	    os.close();
+	    // buffer all data in a circular buffer of infinite size
+	    CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
+	    ImageIO.write(mediumFile, "JPG", cbb.getOutputStream());
+	    cbb.getOutputStream().close();
+
+	    scaledNodeKey = imageGalleryToolContentHandler.uploadFile(cbb.getInputStream(), fileName, contentType, IToolContentHandler.TYPE_ONLINE);
+
+	} catch (FileException e) {
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.file.exception") + ":" + e.toString());
+	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.file.exception"));
+	} catch (ItemNotFoundException e) {
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.item.not.found.exception") + ":" + e.toString());
+	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.item.not.found.exception"));
+	} catch (RepositoryCheckedException e) {
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.repository.checked.exception") + ":" + e.toString());
+	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.repository.checked.exception"));
 	} catch (IOException e) {
-	    e.printStackTrace();
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
+	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.io.exception"));
 	}
-	System.exit(0);
-    }
-
-    /**
-     * Find out default.htm/html or index.htm/html in the given directory folder
-     * 
-     * @param packageDirectory
-     * @return
-     */
-    private String findWebsiteInitialItem(String packageDirectory) {
-	File file = new File(packageDirectory);
-	if (!file.isDirectory()) {
-	    return null;
-	}
-
-	File[] initFiles = file.listFiles(new FileFilter() {
-	    public boolean accept(File pathname) {
-		if ((pathname == null) || (pathname.getName() == null)) {
-		    return false;
-		}
-		String name = pathname.getName();
-		if (name.endsWith("default.html") || name.endsWith("default.htm") || name.endsWith("index.html")
-			|| name.endsWith("index.htm")) {
-		    return true;
-		}
-		return false;
-	    }
-	});
-	if ((initFiles != null) && (initFiles.length > 0)) {
-	    return initFiles[0].getName();
-	} else {
-	    return null;
-	}
+	return scaledNodeKey;
     }
 
     // *****************************************************************************

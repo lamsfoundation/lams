@@ -48,16 +48,6 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 public interface IImageGalleryService {
 
     /**
-     * Get file <code>IVersiondNode</code> by given package id and path.
-     * 
-     * @param packageId
-     * @param relPathString
-     * @return
-     * @throws ImageGalleryApplicationException
-     */
-    IVersionedNode getFileNode(Long packageId, String relPathString) throws ImageGalleryApplicationException;
-
-    /**
      * Get <code>ImageGallery</code> by toolContentID.
      * 
      * @param contentId

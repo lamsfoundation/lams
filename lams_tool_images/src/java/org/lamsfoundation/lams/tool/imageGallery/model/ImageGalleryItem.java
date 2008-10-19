@@ -33,12 +33,13 @@ import org.apache.log4j.Logger;
 /**
  * ImageGallery
  * 
- * @author Dapeng Ni
- * 
  * @hibernate.class table="tl_laimag10_imageGallery_item"
+ * 
+ * @author Andrey Balan
  * 
  */
 public class ImageGalleryItem implements Cloneable {
+
     private static final Logger log = Logger.getLogger(ImageGalleryItem.class);
 
     private Long uid;
@@ -49,11 +50,11 @@ public class ImageGalleryItem implements Cloneable {
 
     private int sequenceId;
 
-    private String url;
-
-    private boolean openUrlNewWindow;
-
-    private Long fileUuid;
+    private Long originalFileUuid;
+    
+    private Long mediumFileUuid;
+    
+    private Long thumbnailFileUuid;
 
     private Long fileVersionId;
 
@@ -73,20 +74,20 @@ public class ImageGalleryItem implements Cloneable {
 
     @Override
     public Object clone() {
-	ImageGalleryItem obj = null;
+	ImageGalleryItem image = null;
 	try {
-	    obj = (ImageGalleryItem) super.clone();
-	    (obj).setUid(null);
-	    // clone ReourceUser as well
+	    image = (ImageGalleryItem) super.clone();
+	    image.setUid(null);
+	    // clone ImageGalleryUser as well
 	    if (this.createBy != null) {
-		(obj).setCreateBy((ImageGalleryUser) this.createBy.clone());
+		image.setCreateBy((ImageGalleryUser) this.createBy.clone());
 	    }
 
 	} catch (CloneNotSupportedException e) {
 	    ImageGalleryItem.log.error("When clone " + ImageGalleryItem.class + " failed");
 	}
 
-	return obj;
+	return image;
     }
 
     // **********************************************************
@@ -109,28 +110,15 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="file_uuid"
-     * 
+     * @hibernate.property column="title" length="255"
      * @return
      */
-    public Long getFileUuid() {
-	return fileUuid;
+    public String getTitle() {
+	return title;
     }
 
-    public void setFileUuid(Long crUuid) {
-	this.fileUuid = crUuid;
-    }
-
-    /**
-     * @hibernate.property column="file_version_id"
-     * @return
-     */
-    public Long getFileVersionId() {
-	return fileVersionId;
-    }
-
-    public void setFileVersionId(Long crVersionId) {
-	this.fileVersionId = crVersionId;
+    public void setTitle(String title) {
+	this.title = title;
     }
 
     /**
@@ -146,9 +134,9 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * Returns taskListItem sequence number.
+     * Returns image sequence number.
      * 
-     * @return taskListItem sequence number
+     * @return image sequence number
      * 
      * @hibernate.property column="sequence_id"
      */
@@ -157,37 +145,86 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * Sets taskListItem sequence number.
+     * Sets image sequence number.
      * 
      * @param sequenceId
-     *                taskListItem sequence number
+     *                image sequence number
      */
     public void setSequenceId(int sequenceId) {
 	this.sequenceId = sequenceId;
     }
 
     /**
-     * @hibernate.property column="title" length="255"
+     * @hibernate.property column="original_file_uuid"
+     * 
      * @return
      */
-    public String getTitle() {
-	return title;
+    public Long getOriginalFileUuid() {
+	return originalFileUuid;
     }
 
-    public void setTitle(String title) {
-	this.title = title;
+    public void setOriginalFileUuid(Long originalFileUuid) {
+	this.originalFileUuid = originalFileUuid;
+    }
+    
+    /**
+     * @hibernate.property column="medium_file_uuid"
+     * 
+     * @return
+     */
+    public Long getMediumFileUuid() {
+	return mediumFileUuid;
+    }
+
+    public void setMediumFileUuid(Long mediumFileUuid) {
+	this.mediumFileUuid = mediumFileUuid;
     }
 
     /**
-     * @hibernate.property column="url" length="65535"
+     * @hibernate.property column="thumbnail_file_uuid"
+     * 
      * @return
      */
-    public String getUrl() {
-	return url;
+    public Long getThumbnailFileUuid() {
+	return thumbnailFileUuid;
     }
 
-    public void setUrl(String url) {
-	this.url = url;
+    public void setThumbnailFileUuid(Long thumbnailFileUuid) {
+	this.thumbnailFileUuid = thumbnailFileUuid;
+    }
+
+    /**
+     * @hibernate.property column="file_version_id"
+     * @return
+     */
+    public Long getFileVersionId() {
+	return fileVersionId;
+    }
+
+    public void setFileVersionId(Long crVersionId) {
+	this.fileVersionId = crVersionId;
+    }
+
+    /**
+     * @hibernate.property column="file_type"
+     */
+    public String getFileType() {
+	return fileType;
+    }
+
+    public void setFileType(String type) {
+	this.fileType = type;
+    }
+
+    /**
+     * @hibernate.property column="file_name"
+     */
+    public String getFileName() {
+	return fileName;
+    }
+
+    public void setFileName(String name) {
+	this.fileName = name;
     }
 
     /**
@@ -237,40 +274,6 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setHide(boolean isHide) {
 	this.isHide = isHide;
-    }
-
-    /**
-     * @hibernate.property column="file_type"
-     */
-    public String getFileType() {
-	return fileType;
-    }
-
-    public void setFileType(String type) {
-	this.fileType = type;
-    }
-
-    /**
-     * @hibernate.property column="file_name"
-     */
-    public String getFileName() {
-	return fileName;
-    }
-
-    public void setFileName(String name) {
-	this.fileName = name;
-    }
-
-    /**
-     * @hibernate.property column="open_url_new_window"
-     * @return
-     */
-    public boolean isOpenUrlNewWindow() {
-	return openUrlNewWindow;
-    }
-
-    public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
-	this.openUrlNewWindow = openUrlNewWindow;
     }
 
     public void setComplete(boolean complete) {

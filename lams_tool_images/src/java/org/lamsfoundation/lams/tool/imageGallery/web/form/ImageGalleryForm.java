@@ -60,6 +60,7 @@ public class ImageGalleryForm extends ActionForm {
     private FormFile onlineFile;
 
     private ImageGallery imageGallery;
+    private boolean allowRatingsOrVote;
 
     public ImageGalleryForm() {
 	imageGallery = new ImageGallery();
@@ -132,6 +133,14 @@ public class ImageGalleryForm extends ActionForm {
 
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
+    }
+    
+    public boolean isAllowRatingsOrVote() {
+	return allowRatingsOrVote;
+    }
+
+    public void setAllowRatingsOrVote(boolean allowRatingsOrVote) {
+	this.allowRatingsOrVote = allowRatingsOrVote;
     }
 
 }

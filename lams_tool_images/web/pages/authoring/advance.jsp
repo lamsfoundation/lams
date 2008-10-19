@@ -1,4 +1,21 @@
 <%@ include file="/common/taglibs.jsp"%>
+
+<script lang="javascript">
+	/**
+	 * Processes mouse click event on allowRatingsOrVote ckeckbox
+	 */
+	function allowRatingsOrVoteClicked() {
+		document.imageGalleryForm.allowVote.disabled = ! eval(document.imageGalleryForm.allowVote.disabled); 
+		document.imageGalleryForm.allowRank.disabled = ! eval(document.imageGalleryForm.allowRank.disabled);
+		if (document.imageGalleryForm.allowRatingsOrVote.checked) {
+			document.imageGalleryForm.allowVote.checked = true;
+		} else {
+			document.imageGalleryForm.allowVote.checked = false;
+			document.imageGalleryForm.allowRank.checked = false;
+		}		
+	}
+</script>
+	
 <c:set var="formBean"
 	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
@@ -30,16 +47,29 @@
 </p>
 
 <p class="small-space-top">
-	<input type="radio" name="imageGallery.allowVote" value="${true}" styleId="allowVote"
-		<c:if test="${formBean.imageGallery.allowVote}">checked="checked"</c:if> 
+	<html:checkbox property="allowRatingsOrVote" styleClass="noBorder" styleId="allowRatingsOrVote"
+		onclick="allowRatingsOrVoteClicked();"
+	>
+	</html:checkbox>
+	<label for="allowRatingsOrVote">
+		<fmt:message key="label.authoring.advance.allow.learner.ratings.or.vote" />
+	</label>
+	<br><br>
+	
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="radio" name="imageGallery.allowVote" value="${true}" id="allowVote"
+		<c:if test="${formBean.imageGallery.allowVote}">checked="checked"</c:if>
+		<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if> 
 	/>
 	<label for="allowVote">
 		<fmt:message key="label.authoring.advance.allow.learner.vote" />
 	</label>
 	<br><br>
 
-	<input type="radio" name="imageGallery.allowVote" value="${false}" styleId="allowRank"
-		<c:if test="${not formBean.imageGallery.allowVote}">checked="checked"</c:if> 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="radio" name="imageGallery.allowVote" value="${false}" id="allowRank"
+		<c:if test="${formBean.imageGallery.allowRank}">checked="checked"</c:if> 
+		<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>		
 	/>
 	<label for="allowRank">
 		<fmt:message key="label.authoring.advance.allow.learner.rank" />

@@ -204,6 +204,7 @@ public class AuthoringAction extends Action {
 	    }
 
 	    imageGalleryForm.setImageGallery(imageGallery);
+	    imageGalleryForm.setAllowRatingsOrVote(imageGallery.isAllowVote() || imageGallery.isAllowRank());
 
 	    // initialize instruction attachment list
 	    List attachmentList = getAttachmentList(sessionMap);
@@ -233,7 +234,7 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	// init imageGallery item list
-	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageGalleryItemList(sessionMap);
+	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
 	imageGalleryItemList.clear();
 	imageGalleryItemList.addAll(items);
 
@@ -381,14 +382,17 @@ public class AuthoringAction extends Action {
 		service.deleteImageGalleryAttachment(delAtt.getUid());
 	    }// end remove from persist value
 	}
-
 	// copy back
 	imageGalleryPO.setAttachments(attPOSet);
+	
+	// ************************* Handle imageGallery allowRank item *******************
+	imageGalleryPO.setAllowRank(imageGalleryForm.isAllowRatingsOrVote() && !imageGalleryPO.isAllowVote());
+	
 	// ************************* Handle imageGallery items *******************
 	// Handle imageGallery items
 	Set itemList = new LinkedHashSet();
-	SortedSet topics = getImageGalleryItemList(sessionMap);
-	iter = topics.iterator();
+	SortedSet imageList = getImageList(sessionMap);
+	iter = imageList.iterator();
 	while (iter.hasNext()) {
 	    ImageGalleryItem item = (ImageGalleryItem) iter.next();
 	    if (item != null) {
@@ -416,10 +420,6 @@ public class AuthoringAction extends Action {
 	    iter.remove();
 	}
 
-	// if miniview number is bigger than available items, then set it topics size
-	if (imageGalleryPO.getNumberColumns() > topics.size()) {
-	    imageGalleryPO.setNumberColumns((topics.size()));
-	}
 	// **********************************************
 	// finally persist imageGalleryPO again
 	service.saveOrUpdateImageGallery(imageGalleryPO);
@@ -634,7 +634,7 @@ public class AuthoringAction extends Action {
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
 	if (itemIdx != -1) {
-	    SortedSet<ImageGalleryItem> imageGalleryList = getImageGalleryItemList(sessionMap);
+	    SortedSet<ImageGalleryItem> imageGalleryList = getImageList(sessionMap);
 	    List<ImageGalleryItem> rList = new ArrayList<ImageGalleryItem>(imageGalleryList);
 	    ImageGalleryItem item = rList.remove(itemIdx);
 	    imageGalleryList.clear();
@@ -683,7 +683,7 @@ public class AuthoringAction extends Action {
 
 	int imageIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
 	if (imageIdx != -1) {
-	    SortedSet<ImageGalleryItem> taskListList = getImageGalleryItemList(sessionMap);
+	    SortedSet<ImageGalleryItem> taskListList = getImageList(sessionMap);
 	    List<ImageGalleryItem> rList = new ArrayList<ImageGalleryItem>(taskListList);
 	    // get current and the target item, and switch their sequnece
 	    ImageGalleryItem image = rList.get(imageIdx);
@@ -724,7 +724,7 @@ public class AuthoringAction extends Action {
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
 	ImageGalleryItem item = null;
 	if (itemIdx != -1) {
-	    SortedSet<ImageGalleryItem> imageGalleryList = getImageGalleryItemList(sessionMap);
+	    SortedSet<ImageGalleryItem> imageGalleryList = getImageList(sessionMap);
 	    List<ImageGalleryItem> rList = new ArrayList<ImageGalleryItem>(imageGalleryList);
 	    item = rList.get(itemIdx);
 	    if (item != null) {
@@ -827,7 +827,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<ImageGalleryItem> getImageGalleryItemList(SessionMap sessionMap) {
+    private SortedSet<ImageGalleryItem> getImageList(SessionMap sessionMap) {
 	SortedSet<ImageGalleryItem> list = (SortedSet<ImageGalleryItem>) sessionMap
 		.get(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
@@ -887,14 +887,12 @@ public class AuthoringAction extends Action {
 	    HttpServletRequest request) {
 	form.setDescription(item.getDescription());
 	form.setTitle(item.getTitle());
-	form.setUrl(item.getUrl());
-	form.setOpenUrlNewWindow(item.isOpenUrlNewWindow());
 	if (itemIdx >= 0) {
 	    form.setImageIndex(new Integer(itemIdx).toString());
 	}
 
-	if (item.getFileUuid() != null) {
-	    form.setFileUuid(item.getFileUuid());
+	if (item.getOriginalFileUuid() != null) {
+	    form.setFileUuid(item.getOriginalFileUuid());
 	    form.setFileVersionId(item.getFileVersionId());
 	    form.setFileName(item.getFileName());
 	    form.setHasFile(true);
@@ -907,80 +905,80 @@ public class AuthoringAction extends Action {
      * Extract web from content to imageGallery item.
      * 
      * @param request
-     * @param itemForm
+     * @param imageForm
      * @throws ImageGalleryApplicationException
      */
     private void extractFormToImageGalleryItem(HttpServletRequest request,
-	    ImageGalleryItemForm itemForm) throws Exception {
+	    ImageGalleryItemForm imageForm) throws Exception {
 	/*
 	 * BE CAREFUL: This method will copy nessary info from request form to a old or new ImageGalleryItem instance.
 	 * It gets all info EXCEPT ImageGalleryItem.createDate and ImageGalleryItem.createBy, which need be set when
 	 * persisting this imageGallery item.
 	 */
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(imageForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
-	SortedSet<ImageGalleryItem> imageGalleryList = getImageGalleryItemList(sessionMap);
-	int imageIdx = NumberUtils.stringToInt(itemForm.getImageIndex(), -1);
-	ImageGalleryItem item = null;
+	SortedSet<ImageGalleryItem> imageList = getImageList(sessionMap);
+	int imageIdx = NumberUtils.stringToInt(imageForm.getImageIndex(), -1);
+	ImageGalleryItem image = null;
 
 	if (imageIdx == -1) { // add
-	    item = new ImageGalleryItem();
-	    item.setCreateDate(new Timestamp(new Date().getTime()));
+	    image = new ImageGalleryItem();
+	    image.setCreateDate(new Timestamp(new Date().getTime()));
 	    int maxSeq = 1;
-	    if (imageGalleryList != null && imageGalleryList.size() > 0) {
-		ImageGalleryItem last = imageGalleryList.last();
+	    if (imageList != null && imageList.size() > 0) {
+		ImageGalleryItem last = imageList.last();
 		maxSeq = last.getSequenceId() + 1;
 	    }
-	    item.setSequenceId(maxSeq);
-	    imageGalleryList.add(item);
+	    image.setSequenceId(maxSeq);
+	    imageList.add(image);
 	} else { // edit
-	    List<ImageGalleryItem> rList = new ArrayList<ImageGalleryItem>(imageGalleryList);
-	    item = rList.get(imageIdx);
+	    List<ImageGalleryItem> rList = new ArrayList<ImageGalleryItem>(imageList);
+	    image = rList.get(imageIdx);
 	}
 
 	// uploadImageGalleryItemFile 
 	// and setting file properties' fields: item.setFileUuid(); item.setFileVersionId(); item.setFileType(); item.setFileName();
-	if (itemForm.getFile() != null) {
+	if (imageForm.getFile() != null) {
 	    // if it has old file, and upload a new, then save old to deleteList
-	    ImageGalleryItem delAttItem = new ImageGalleryItem();
+	    ImageGalleryItem delImage = new ImageGalleryItem();
 	    boolean hasOld = false;
-	    if (item.getFileUuid() != null) {
+	    if (image.getOriginalFileUuid() != null) {
 		hasOld = true;
 		// be careful, This new ImageGalleryItem object never be save into database
 		// just temporarily use for saving fileUuid and versionID use:
-		delAttItem.setFileUuid(item.getFileUuid());
-		delAttItem.setFileVersionId(item.getFileVersionId());
+		delImage.setOriginalFileUuid(image.getOriginalFileUuid());
+		delImage.setFileVersionId(image.getFileVersionId());
 	    }
 	    IImageGalleryService service = getImageGalleryService();
 	    try {
-		service.uploadImageGalleryItemFile(item, itemForm.getFile());
+		service.uploadImageGalleryItemFile(image, imageForm.getFile());
 	    } catch (UploadImageGalleryFileException e) {
 		// if it is new add , then remove it!
 		if (imageIdx == -1) {
-		    imageGalleryList.remove(item);
+		    imageList.remove(image);
 		}
 		throw e;
 	    }
 	    // put it after "upload" to ensure deleted file added into list only no exception happens during upload
 	    if (hasOld) {
 		List delAtt = getDeletedItemAttachmentList(sessionMap);
-		delAtt.add(delAttItem);
+		delAtt.add(delImage);
 	    }
 	}
 	
-	String title = itemForm.getTitle();
+	String title = imageForm.getTitle();
 	if (StringUtils.isBlank(title)) {
 	    Long nextConsecutiveImageTitle = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
 	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextConsecutiveImageTitle+1);
 	    String imageLocalized = getImageGalleryService().getLocalisedMessage("label.authoring.image", null);
 	    title = imageLocalized + " " + nextConsecutiveImageTitle;
 	}
-	item.setTitle(title);
+	image.setTitle(title);
 	
-	item.setDescription(itemForm.getDescription());	
-	item.setCreateByAuthor(true);
-	item.setHide(false);
+	image.setDescription(imageForm.getDescription());	
+	image.setCreateByAuthor(true);
+	image.setHide(false);
     }
 
     /**
@@ -1001,10 +999,12 @@ public class AuthoringAction extends Action {
 	}
 	
 	//check for allowed format : gif, png, jpg
-	String contentType = itemForm.getFile().getContentType();
-	if (StringUtils.isEmpty(contentType) || !(contentType.equals("image/gif") || contentType.equals("image/png") || contentType.equals("image/jpg"))) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
-	}	
+	if (itemForm.getFile() != null) {
+	    String contentType = itemForm.getFile().getContentType();
+	    if (StringUtils.isEmpty(contentType) || !(contentType.equals("image/gif") || contentType.equals("image/png") || contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType.equals("image/pjpeg"))) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
+	    }	
+	}
 
 	return errors;
     }

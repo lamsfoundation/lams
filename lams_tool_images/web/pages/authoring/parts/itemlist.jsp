@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+
 <c:set var="ctxPath" value="${pageContext.request.contextPath}"
 	scope="request" />
 
@@ -12,18 +13,24 @@
 		<img src="${ctxPath}/includes/images/indicator.gif"
 			style="display:none" id="imageGalleryListArea_Busy" />
 	</h2>
-
+	
 	<table class="alternative-color" id="itemTable" cellspacing="0">
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-		<c:forEach var="imageGallery" items="${sessionMap.imageGalleryList}"
-			varStatus="status">
+		<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
 			<tr>
-				<td class="field-name align-right" width="4%">
-					<fmt:message key="label.authoring.basic.resource.image" />
+				<td class="field-name align-center" width="4%">
+					<c:set var="thumbnailPath">
+					   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
+					</c:set>
+				 	<c:set var="mediumImagePath">
+	   					<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
+					</c:set>					
+					<a href="${mediumImagePath}" rel="lightbox" title="Enlarge image"><img src="${thumbnailPath}" /></a>
 				</td>
-				<td> 
-					${imageGallery.title}
+				
+				<td>
+					<a href="${mediumImagePath}" rel="lightbox" title="Enlarge image">${image.title}</a>
 				</td>
 
 <%--				
@@ -34,7 +41,7 @@
 				</td>
 --%>
 				
-				<td width="40px" align="center">
+				<td width="40px" style="valign:bottom;">
 					<c:if test="${not status.first}">
 						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
 							border="0" title="<fmt:message key="label.authoring.up"/>"
@@ -59,7 +66,7 @@
 					</c:if>
 				</td>
 				
-				<td width="20px">
+				<td width="20px" >
 					<img src="${tool}includes/images/edit.gif"
 						title="<fmt:message key="label.authoring.basic.resource.edit" />"
 						onclick="editItem(${status.index},'${sessionMapID}')" />

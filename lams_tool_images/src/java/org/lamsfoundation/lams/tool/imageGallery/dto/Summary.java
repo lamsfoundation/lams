@@ -60,7 +60,6 @@ public class Summary {
     private int viewNumber;
 
     // following is used for export portfolio programs:
-    private String url;
     private Long fileUuid;
     private Long fileVersionId;
     private String fileName;
@@ -90,9 +89,8 @@ public class Summary {
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
 	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
-	    this.url = ImageGalleryWebUtils.protocol(item.getUrl());
 	    this.fileName = item.getFileName();
-	    this.fileUuid = item.getFileUuid();
+	    this.fileUuid = item.getOriginalFileUuid();
 	    this.fileVersionId = item.getFileVersionId();
 	} else {
 	    this.itemUid = new Long(-1);
@@ -117,9 +115,8 @@ public class Summary {
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
 	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
-	    this.url = ImageGalleryWebUtils.protocol(item.getUrl());
 	    this.fileName = item.getFileName();
-	    this.fileUuid = item.getFileUuid();
+	    this.fileUuid = item.getOriginalFileUuid();
 	    this.fileVersionId = item.getFileVersionId();
 
 	} else {
@@ -206,14 +203,6 @@ public class Summary {
 
     public void setFileVersionId(Long fileVersionId) {
 	this.fileVersionId = fileVersionId;
-    }
-
-    public String getUrl() {
-	return url;
-    }
-
-    public void setUrl(String url) {
-	this.url = url;
     }
 
     public boolean isInitGroup() {

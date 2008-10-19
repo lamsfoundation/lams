@@ -6,14 +6,14 @@ drop table if exists tl_laimag10_imageGallery_item_visit_log;
 drop table if exists tl_laimag10_session;
 drop table if exists tl_laimag10_user;
 create table tl_laimag10_attachment (
-   uid bigint not null auto_increment,
+   attachment_uid bigint not null auto_increment,
    file_version_id bigint,
    file_type varchar(255),
    file_name varchar(255),
    file_uuid bigint,
    create_date datetime,
    imageGallery_uid bigint,
-   primary key (uid)
+   primary key (attachment_uid)
 )type=innodb;
 create table tl_laimag10_imageGallery (
    uid bigint not null auto_increment,
@@ -41,21 +41,21 @@ create table tl_laimag10_imageGallery (
 )type=innodb;
 create table tl_laimag10_imageGallery_item (
    uid bigint not null auto_increment,
-   file_uuid bigint,
-   file_version_id bigint,
    description varchar(255),
    title varchar(255),
-   url text,
    create_by bigint,
    create_date datetime,
    create_by_author tinyint,
    sequence_id integer,
    is_hide tinyint,
-   file_type varchar(255),
-   file_name varchar(255),
-   open_url_new_window tinyint,
    imageGallery_uid bigint,
    session_uid bigint,
+   original_file_uuid bigint,
+   medium_file_uuid bigint,
+   thumbnail_file_uuid bigint,
+   file_version_id bigint,
+   file_type varchar(255),
+   file_name varchar(255),
    primary key (uid)
 )type=innodb;
 create table tl_laimag10_item_log (
@@ -106,7 +106,4 @@ INSERT INTO `tl_laimag10_imageGallery` (`uid`, `create_date`, `update_date`, `cr
  `allow_share_images`, `allow_vote`, `allow_rank`, `reflect_on_activity`) VALUES
   (1,NULL,NULL,NULL,'ImageGallery','0','0','Instructions ',1,null,null,0,0,${default_content_id},0,0,0,0,0);
   
-INSERT INTO `tl_laimag10_imageGallery_item` (`uid`, `file_uuid`, `file_version_id`, `description`, `title`, `url`, `create_by`, `create_date`, `create_by_author`, `sequence_id`, `is_hide`, `file_type`, `file_name`, `open_url_new_window`, `imageGallery_uid`, `session_uid`) VALUES 
-  (1,NULL,NULL,NULL,'Web Search','http://www.google.com ',null,NOW(),1,1,0,NULL,NULL,0,1,NULL);
-    
 SET FOREIGN_KEY_CHECKS=1;

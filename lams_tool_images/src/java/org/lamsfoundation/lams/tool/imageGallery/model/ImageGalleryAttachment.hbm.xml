@@ -13,7 +13,7 @@
 
         <id
             name="uid"
-            column="uid"
+            column="attachment_uid"
             type="java.lang.Long"
         >
             <generator class="native">
