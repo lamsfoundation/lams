@@ -3,9 +3,12 @@ import org.lamsfoundation.lams.common.util.StringUtils;
 import com.macromedia.javascript.JavaScriptProxy;
 import org.lamsfoundation.lams.common.util.Debugger;
 
-//Temp values to be removed / repplaced at deployment
-/**/
+// Temp values to be removed / repplaced at deployment
 _global.myRoot = this;
+
+if(StringUtils.isEmpty(lcId)){
+	Debugger.log('lcId is not defined, actionscript will not be able to communicate with javascript',Debugger.CRITICAL,'main','ROOT');			
+}
 
 if(StringUtils.isEmpty(presenceServerUrl)){
 	_root.presenceServerUrl = "192.168.1.1";
