@@ -129,4 +129,6 @@ public class CentralConstants {
 	
 	public static final String ATTR_RESULT_TEXT = "resultText";
 	
+	public static final String PARAM_REDIRECT_URL  = "URL";
+	
 }
