@@ -221,6 +221,16 @@ public class TestReporter {
 			context.put("callRecords", callRecords);
 			context.put("testSuites", testSuites);
 			context.put("time", new SimpleDateFormat("HH:mm:ss dd MMM yyyy").format(new Date()));
+			long total = 0;
+			long count = 0;
+			for (CallRecord r : callRecords) {
+			    if (r.getHttpStatusCode() != null && r.getHttpStatusCode().equals(new Integer("200"))) {
+				total += r.getTimeInMillis();
+				count++;
+			    }
+			}
+			context.put("totalResponseTime", total/1000.0);
+			context.put("averageResponseTime", total/1000.0/count);
 		}
 		
 		static String load() throws IOException {
