@@ -297,19 +297,24 @@ function handleConnected() {
 	}
 }
 function handleError(e) {
-	//debug statement for error´
-	//alert("error" + e.getAttribute("code"));
-	
 	if(FROMFLASH){
 		// notify flash
 		flashProxy.call("sendMessageToFlash", "Code: " + e.getAttribute("code") + " Type: " + e.getAttribute("type"));
-	}
-	
-	switch(e.getAttribute("code")){
+		
+		switch(e.getAttribute("code")){
 		// unauthorized, try register
 		case "401":
-			doLogin(null, null, null, null, null, null, true, null);
+			flashProxy.call("attemptRegistration");
 			break;
+		}
+	}
+	else{
+		switch(e.getAttribute("code")){
+			// unauthorized, try register
+			case "401":
+				attemptRegistration();
+				break;
+		}
 	}
 }
 

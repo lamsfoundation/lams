@@ -145,6 +145,27 @@ class Presence extends MovieClip {
 		_root.proxy.call("doLogin", _root.presenceServerUrl, _root.userID, _root.userID, resource, _root.lessonID, _root.firstName + " " + _root.lastName, false, true);
 	}
 	
+	// Attempts to register to the Jabber server
+	public function attemptRegistration():Void{
+		Debugger.log('PRESENCE: attempting to register through Java call', Debugger.MED, 'attemptRegistration', 'Presence');
+		
+		var callback:Function = Proxy.create(this, handlePresenceRegistration);
+		Application.getInstance().getComms().getRequest('Presence.do?method=createXmppId', callback, false);
+	}
+
+	// Callback for Jabber server registration
+	public function handlePresenceRegistration(registrationInfo:Object):Void{
+		Debugger.log('PRESENCE: registration handled' + String(registrationInfo), Debugger.MED, 'handlePresenceRegistration', 'Presence');
+		
+		if (registrationInfo) {
+			Debugger.log('PRESENCE: registration succeeded', Debugger.MED, 'handlePresenceRegistration', 'Presence');
+			attemptConnection();
+		}
+		else {
+			Debugger.log('PRESENCE: registration failed', Debugger.MED, 'handlePresenceRegistration', 'Presence');
+		}
+	}
+	
 	public function isPresenceExpanded():Boolean{
 		return _presenceIsExpanded;
 	}
@@ -228,7 +249,8 @@ class Presence extends MovieClip {
 				//_debugDialog = PopUpManager.createPopUp(Application.root, LFWindow, false,{title:'Debug',closeButton:true,scrollContentPath:'debugDialog'});
 				
 				clearInterval(clickInterval);
-				clickInterval = null;			// First click
+				clickInterval = null;
+			// First click
 			} else {
 				clearInterval(clickInterval);
 				clickInterval = null;

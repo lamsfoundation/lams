@@ -45,19 +45,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
       	<c:if test="${param.presenceEnabledPatch}"> 		 
         <script type="text/javascript">
-     
+     		var HTTPBASE = "<lams:LAMSURL/>JHB";
+     		
 	    	window.onload=function(){
 				// if presence is enabled, attempt to login once the window is loaded
+				attemptLogin();
+			}
+			
+			function attemptLogin(){
 				doLogin("${param.presenceUrl}", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "${param.lessonID}", "<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>", false, false);
-				
+			}
+			
+			function attemptRegistration(){
+				$.get("<lams:LAMSURL/>Presence.do", {method: "createXmppId"}, handlePresenceRegistration);
+			}
+			
+			function handlePresenceRegistration(registrationInfo){
+				// if registrationInfo exists, registration worked
+				if (registrationInfo) {
+					// attempt to re-login
+					attemptLogin();
+				}
 			}
 			
 			function doPresenceClick() {
 				$("#roster").slideToggle("slow");
 			}
-			
-			var HTTPBASE = "<lams:LAMSURL/>JHB";
-	
 		</script>
 		</c:if>
 		

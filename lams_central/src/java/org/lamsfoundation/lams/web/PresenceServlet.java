@@ -50,10 +50,12 @@ import org.lamsfoundation.lams.util.XMPPUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
- * @author pgeorges
- *
- * @web:servlet name="XMPP"
- * @web:servlet-mapping url-pattern="/XMPP"
+ * @author Paul Georges
+ * @struts.action 
+ * 				  path = "/Presence"
+ * 				  parameter = "method"
+ * 				  validate = "false"
+ * @struts.action-forward name = "success" path = "/index.jsp"
  */
 
 public class PresenceServlet extends LamsDispatchAction{

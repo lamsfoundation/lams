@@ -84,6 +84,11 @@ function sendMessageToFlash(msg:String){
 	Debugger.log("PRESENCE: from javascript - " + msg, Debugger.MED, 'sendMessageToFlash', 'ROOT');
 }
 
+function attemptRegistration(){
+	Debugger.log("PRESENCE: registration caught in main", Debugger.MED, 'sendMessageToFlash', 'ROOT');
+	app.getPresence().attemptRegistration();
+}
+
 function sendUsersToFlash(users:Array){
 	Debugger.log('PRESENCE: ' + users, Debugger.MED, 'sendUsersToFlash', 'ROOT');
 	app.getPresence().setupDataGrid(users);
