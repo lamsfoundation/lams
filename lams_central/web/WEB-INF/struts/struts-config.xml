@@ -263,6 +263,23 @@
     >
     </action>
     <action
+      path="/r"
+      type="org.lamsfoundation.lams.web.RedirectAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+      <forward
+        name="message"
+        path=".message"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/authoring/importToolContent"
       type="org.lamsfoundation.lams.authoring.web.ImportToolContentAction"
       unknown="false"

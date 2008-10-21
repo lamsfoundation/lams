@@ -245,6 +245,11 @@
 
    </servlet>
    <servlet>
+      <servlet-name>XMPP</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.PresenceServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>BogoPogoServlet</servlet-name>
       <servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToJpgServlet</servlet-class>
 
@@ -379,6 +384,11 @@
 	</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>JabberHTTPBindingServlet</servlet-name>
+    <servlet-class>org.jabber.JabberHTTPBind.JHBServlet</servlet-class>
+</servlet>
+
   <servlet-mapping>
 	<servlet-name>action</servlet-name>
 	<url-pattern>*.do</url-pattern>
@@ -419,6 +429,11 @@
 	<url-pattern>/services/xml/LessonManager/*</url-pattern>
 </servlet-mapping>
 
+<servlet-mapping>
+	<servlet-name>JabberHTTPBindingServlet</servlet-name>
+	<url-pattern>/JHB/*</url-pattern>
+</servlet-mapping>
+
    <servlet-mapping>
       <servlet-name>forgotPasswordServlet</servlet-name>
       <url-pattern>/ForgotPasswordRequest</url-pattern>
@@ -442,6 +457,10 @@
    <servlet-mapping>
       <servlet-name>Connector</servlet-name>
       <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>XMPP</servlet-name>
+      <url-pattern>/XMPP</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>BogoPogoServlet</servlet-name>
@@ -620,6 +639,7 @@
     		<url-pattern>/fckeditor/*</url-pattern>
     		<url-pattern>/toolcontent/*</url-pattern>
     		<url-pattern>/development/*</url-pattern>
+    		<url-pattern>/JHB/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>

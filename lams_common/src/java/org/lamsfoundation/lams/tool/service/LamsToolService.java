@@ -41,79 +41,85 @@ import org.lamsfoundation.lams.util.FileUtilException;
 /**
  * 
  * @author Jacky Fang
- * @since  2005-3-17
+ * @since 2005-3-17
  * @version
  * 
  * @author Ozgur Demirtas 24/06/2005
  * 
  */
-public class LamsToolService implements ILamsToolService
-{
-	private static Logger log = Logger.getLogger(LamsToolService.class);
- 
-	public IToolDAO toolDAO;
-	public IToolSessionDAO toolSessionDAO;
-	
+public class LamsToolService implements ILamsToolService {
+    private static Logger log = Logger.getLogger(LamsToolService.class);
+
+    public IToolDAO toolDAO;
+    public IToolSessionDAO toolSessionDAO;
+
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getAllPotentialLearners(long)
      */
-    public Set<User> getAllPotentialLearners(long toolSessionId) throws LamsToolServiceException
-    {
-    	
-    	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
-    	if ( session != null ) {
-    		return session.getLearners();
-    	} else {
-    		log.error("No tool session found for "+toolSessionId+". No potential learners being returned.");
-    		return new HashSet<User>();
-    	}
+    public Set<User> getAllPotentialLearners(long toolSessionId) throws LamsToolServiceException {
+
+	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
+	if (session != null) {
+	    return session.getLearners();
+	} else {
+	    log.error("No tool session found for " + toolSessionId + ". No potential learners being returned.");
+	    return new HashSet<User>();
+	}
+    }
+
+    public IToolVO getToolBySignature(final String toolSignature) {
+	Tool tool = toolDAO.getToolBySignature(toolSignature);
+	return tool.createBasicToolVO();
+    }
+
+    public Tool getPersistToolBySignature(final String toolSignature) {
+	return toolDAO.getToolBySignature(toolSignature);
+    }
+
+    public long getToolDefaultContentIdBySignature(final String toolSignature) {
+	return toolDAO.getToolDefaultContentIdBySignature(toolSignature);
+    }
+
+    /**
+     * @return Returns the toolDAO.
+     */
+    public IToolDAO getToolDAO() {
+	return toolDAO;
+    }
+
+    /**
+     * @param toolDAO
+     *                The toolDAO to set.
+     */
+    public void setToolDAO(IToolDAO toolDAO) {
+	this.toolDAO = toolDAO;
+    }
+
+    public IToolSessionDAO getToolSessionDAO() {
+	return toolSessionDAO;
+    }
+
+    public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {
+	this.toolSessionDAO = toolSessionDAO;
+    }
+
+    public String generateUniqueContentFolder() throws FileUtilException, IOException {
+
+	return FileUtil.generateUniqueContentFolderID();
+
+    }
+
+    public void saveOrUpdateTool(Tool tool) {
+	toolDAO.saveOrUpdateTool(tool);
     }
     
-    public IToolVO getToolBySignature(final String toolSignature)
+    /**
+     * Get the tool session object using the toolSessionId
+     * @param toolSessionId
+     * @return
+     */
+    public ToolSession getToolSession(Long toolSessionId)
     {
-    	Tool tool = toolDAO.getToolBySignature(toolSignature);  	
-    	return tool.createBasicToolVO();    	
+	return toolSessionDAO.getToolSession(toolSessionId);
     }
-    
-    public Tool getPersistToolBySignature(final String toolSignature)
-    {
-    	return toolDAO.getToolBySignature(toolSignature);  	
-    }
-
-    public long getToolDefaultContentIdBySignature(final String toolSignature)
-    {
-    	return toolDAO.getToolDefaultContentIdBySignature(toolSignature);
-    }
-	
-	/**
-	 * @return Returns the toolDAO.
-	 */
-	public IToolDAO getToolDAO() {
-		return toolDAO;
-	}
-	/**
-	 * @param toolDAO The toolDAO to set.
-	 */
-	public void setToolDAO(IToolDAO toolDAO) {
-		this.toolDAO = toolDAO;
-	}
-
-	public IToolSessionDAO getToolSessionDAO() {
-		return toolSessionDAO;
-	}
-
-	public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {
-		this.toolSessionDAO = toolSessionDAO;
-	}
-	
-	public String generateUniqueContentFolder() throws FileUtilException, IOException {
-		
-		return FileUtil.generateUniqueContentFolderID();
-		
-	}
-	
-	public void saveOrUpdateTool(Tool tool)
-	{
-		toolDAO.saveOrUpdateTool(tool);
-	}
 }
