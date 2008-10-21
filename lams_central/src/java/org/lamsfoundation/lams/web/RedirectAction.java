@@ -55,7 +55,28 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * from outside sources. It must be done through central as it is the only
  * project that offers this functionality
  * 
- * Usage r.do?URL=<relURL> where rekURL = the URL-encoded relative LAMS url
+ * In order to prevent unauthorised access to learner and monitor pages, this 
+ * action also takes parameters for access mode and tool session. It can then
+ * check whether the current user is allowed to access the requested pages.
+ * This is a temporary fix until the tool's actions can be improved to directly
+ * handle permissions in all cases, see LDEV-1978
+ * 
+ * Parameters are shortened into single letters so that the entire URL is 
+ * shorter, this is so email notifications do not have to produce large URLs, 
+ * that may be cut off by email softwares
+ * 
+ * usage: 
+ * 	/lams/r.do?r=<relativeUrl>&t=<toolSessionID>&a=<accessMode>
+ * where:
+ * 	relativeUrl = relative path to the resource
+ * 	toolSessionID = tool session id valid for the lesson in question
+ * 	a = access mode of the user (l = learner, t = teacher/monitor)
+ * 
+ * eg: 
+ * 	/lams/r.do?
+ *	r=%2Ftool%2Flawiki10%2Flearning.do%3Fmode%3Dlearner%26toolSessionID%3D13
+ *	&t=13
+ *	&a=l
  * 
  * @struts:action path="/r" validate="false"
  * @struts:action-forward name="error" path=".error"
@@ -108,6 +129,7 @@ public class RedirectAction extends LamsAction {
 		    return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
 		}
 
+		// Check the learner is part of the group in question
 		if (toolSession.getLearners() == null || !toolSession.getLearners().contains(getRealUser(user))) {
 		    log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested group. Cannot access the lesson.");
@@ -116,6 +138,7 @@ public class RedirectAction extends LamsAction {
 		
 	    } else if (accessMode.equals(ACCESS_MODE_TEACHER)) {
 
+		// Check this is a monitor for the lesson in question
 		if (lesson.getLessonClass() == null || !lesson.getLessonClass().isStaffMember(getRealUser(user))) {
 		    log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested lesson. Cannot access the lesson.");
@@ -134,17 +157,6 @@ public class RedirectAction extends LamsAction {
 	    log.error("Failed redirect to url", e);
 	    return mapping.findForward("error");
 	}
-
-	/*
-	 * try { String relativePath = WebUtil.readStrParam(req,
-	 * CentralConstants.PARAM_REDIRECT_URL);
-	 * 
-	 * res.sendRedirect(Configuration.get(ConfigurationKeys.SERVER_URL) +
-	 * relativePath);
-	 * 
-	 * return null; } catch (Exception e) { log.error("Failed redirect to
-	 * url", e); return mapping.findForward("error"); }
-	 */
     }
 
     public ActionForward doLearner(ActionMapping mapping, HttpServletRequest req, HttpServletResponse res,
