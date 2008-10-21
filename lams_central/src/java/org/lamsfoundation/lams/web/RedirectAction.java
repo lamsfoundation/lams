@@ -26,13 +26,13 @@ package org.lamsfoundation.lams.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.codec.binary.Base64;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -47,36 +47,34 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+
 /**
  * @author lfoxton
  * 
- * Takes a relative path as a parameter and redirects the user there after they
- * have been authenticated. This allows direct linking to learner and monitor
- * from outside sources. It must be done through central as it is the only
- * project that offers this functionality
+ * This action is used for notification emails. It is designed to enable direct
+ * linking to either monitor or learner so that links can be sent in the email.
+ * This must be done through LAMS central so it correctly redirects the user
+ * to the login page (if they have no session) before returning them to the 
+ * correct location.
  * 
- * In order to prevent unauthorised access to learner and monitor pages, this 
- * action also takes parameters for access mode and tool session. It can then
- * check whether the current user is allowed to access the requested pages.
- * This is a temporary fix until the tool's actions can be improved to directly
- * handle permissions in all cases, see LDEV-1978
- * 
- * Parameters are shortened into single letters so that the entire URL is 
- * shorter, this is so email notifications do not have to produce large URLs, 
- * that may be cut off by email softwares
- * 
- * usage: 
- * 	/lams/r.do?r=<relativeUrl>&t=<toolSessionID>&a=<accessMode>
+ * This action takes one parameter "h" which is a Base64 hash of a 
+ * comma-separated value (relativeUrlPath, toolSessionID, accessMode)
  * where:
- * 	relativeUrl = relative path to the resource
- * 	toolSessionID = tool session id valid for the lesson in question
- * 	a = access mode of the user (l = learner, t = teacher/monitor)
+ * 	relativeUrlPath = Relative path to resource eg /tool/lawiki10/learner.do
+ * 	toolSessionID  = A valid tool session ID for the lesson 
+ * 	accessMode = l or t (learner or teacher)
  * 
- * eg: 
- * 	/lams/r.do?
- *	r=%2Ftool%2Flawiki10%2Flearning.do%3Fmode%3Dlearner%26toolSessionID%3D13
- *	&t=13
- *	&a=l
+ * The parameters are hashed to prevent people from identifying the url, and
+ * attempting to access content to which they are unauthorised, see LDEV-1978
+ * 
+ * The toolSessionID and accessMode are used to determine the permissions of 
+ * this user so it someone forwards the email to an unauthorised user, they
+ * still cannot access the link unless they are part of the correct group. These 
+ * checks may become unneccessary on the completion of LDEV-1978
+ * 
+ * Note that parameter names have been made as short as possible here to 
+ * attempt to shorten the entire link required, and hopefully prevent email 
+ * clients cutting them off and making a newline which sometimes breaks links.
  * 
  * @struts:action path="/r" validate="false"
  * @struts:action-forward name="error" path=".error"
@@ -87,12 +85,9 @@ public class RedirectAction extends LamsAction {
 
     private static Logger log = Logger.getLogger(RedirectAction.class);
 
-    public static final String PARAM_RELATIVE_URL = "r";
-    public static final String PARAM_TOOL_SESSION_ID = "t";
-    public static final String PARAM_ACCESS_MODE = "a";
+    public static final String PARAM_HASH = "h";
 
     public static final String ACCESS_MODE_TEACHER = "t";
-    // public static final String ACCESS_MODE_AUTHOR ="a";
     public static final String ACCESS_MODE_LEARNER = "l";
 
     private static ILamsToolService lamsToolService;
@@ -102,13 +97,22 @@ public class RedirectAction extends LamsAction {
 	    throws Exception {
 
 	try {
-	    String relativePath = WebUtil.readStrParam(req, PARAM_RELATIVE_URL);
-	    Long toolSessionID = WebUtil.readLongParam(req, PARAM_TOOL_SESSION_ID);
-	    String accessMode = WebUtil.readStrParam(req, PARAM_ACCESS_MODE);
-
-	    if (relativePath == null || toolSessionID == null || accessMode == null) {
-		throw new Exception("Parameters missing for LAMS redirect");
+	    String hash = WebUtil.readStrParam(req, PARAM_HASH);
+	    
+	    // Un-hash the string to gain all the paramters
+	    String fullParams = new String(Base64.decodeBase64(hash.getBytes()));
+	    
+	    // Split the CSV parameters
+	    String[] split = fullParams.split(",");
+	    
+	    if (split.length != 3) {
+		throw new Exception("Hash did not contain correct format (relative path, toolSessionID, toolaccess )");
 	    }
+	    
+	    // Getting the parameters from the hash
+	    String relativePath = split[0];
+	    Long toolSessionID = Long.parseLong(split[1]);
+	    String accessMode = split[2];
 
 	    // Get the user
 	    UserDTO user = getUser();
@@ -157,12 +161,6 @@ public class RedirectAction extends LamsAction {
 	    log.error("Failed redirect to url", e);
 	    return mapping.findForward("error");
 	}
-    }
-
-    public ActionForward doLearner(ActionMapping mapping, HttpServletRequest req, HttpServletResponse res,
-	    Long toolSessionID, String relativePath) throws Exception {
-
-	return null;
     }
 
     private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
