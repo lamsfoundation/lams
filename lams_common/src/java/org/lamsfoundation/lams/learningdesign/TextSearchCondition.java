@@ -24,9 +24,11 @@
 package org.lamsfoundation.lams.learningdesign;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -61,9 +63,25 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
     // ---- non-persistent fields ----------
     /**
-     * Regular expression that divides a string into single words.
+     * Regular expression that divides a string into single words. The meaning is "one or more whitespace characters or
+     * beginnings of a line or ends of a line".
      */
-    public static final String WORD_DELIMITER_REGEX = "\\s";
+    private static final String WORD_DELIMITER_REGEX = "(?:\\s|$|^)+";
+    /**
+     * Integer that sets flags for regex pattern matching.
+     */
+    private static final int PATTERN_MATCHING_OPTIONS = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+	    | Pattern.MULTILINE;
+    /**
+     * A regular expression pattern that matches HTML tags.
+     */
+    public static final String HTML_TAG_REGEX = "\\<.*?>";
+    /**
+     * A regular expression pattern that matches end-of-line HTML tags. If needed, it can extented to
+     * <code>(?:<BR>|<br>|<BR />|<br />)</code> . Right now FCKeditor creates only the first option.
+     */
+    public static final String BR_TAG_REGEX = "<BR>";
+
     private static Logger log = Logger.getLogger(TextSearchCondition.class);
     /**
      * Were the strings provided by user parsed into practical collections of words.
@@ -74,9 +92,10 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
      */
     protected List<String> allWordsCondition = new ArrayList<String>();
     /**
-     * Same as {@link #phrase}. Created for
+     * Property {@link #phrase} divided into words. Although we are looking for the whole phrase, spaces between words
+     * should be divided into something more regex'y.
      */
-    protected String phraseCondition;
+    protected List<String> phraseCondition;
     /**
      * Property {@link #anyWords} divided into words.
      */
@@ -153,7 +172,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	return phrase;
     }
 
-    public String getPhraseCondition() {
+    public List<String> getPhraseCondition() {
 	return phraseCondition;
     }
 
@@ -163,8 +182,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
     }
 
     /**
-     * Checks if the given text contain the words provided in the condition parameters. The search is done by using
-     * lower case both text and paramaters.
+     * Checks if the given text contain the words provided in the condition parameters (case insensitive).
      * 
      * @param text
      *                string to check
@@ -174,35 +192,61 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	if (text == null) {
 	    return false;
 	}
+	// we parse the condition strings to more useful arrays of words
 	if (!conditionsParsed) {
 	    parseConditionStrings();
 	}
-	String lowerCaseText = text.toLowerCase();
+
+	Pattern regexPattern = null;
+	StringBuilder stringPattern = null;
+	Matcher matcher = null;
+	// For each condition type we build a regular expression and try to find it in the text.
 	if (getExcludedWordsCondition() != null) {
+	    stringPattern = new StringBuilder();
 	    for (String excludedWord : getExcludedWordsCondition()) {
-		if (lowerCaseText.contains(excludedWord)) {
-		    return false;
-		}
+		stringPattern.append("(?:").append(TextSearchCondition.WORD_DELIMITER_REGEX).append(
+			Pattern.quote(excludedWord)).append(TextSearchCondition.WORD_DELIMITER_REGEX).append(")|");
 	    }
-	}
-	if (getAnyWordsCondition() != null) {
-	    boolean wordFound = false;
-	    for (String word : getAnyWordsCondition()) {
-		if (lowerCaseText.contains(word)) {
-		    wordFound = true;
-		    break;
-		}
-	    }
-	    if (!wordFound) {
+	    stringPattern.deleteCharAt(stringPattern.length() - 1);
+	    regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
+	    matcher = regexPattern.matcher(text);
+	    if (matcher.find()) {
 		return false;
 	    }
 	}
-	if (getPhraseCondition() != null && !lowerCaseText.contains(getPhraseCondition())) {
-	    return false;
+	if (getAnyWordsCondition() != null) {
+	    stringPattern = new StringBuilder();
+
+	    for (String word : getAnyWordsCondition()) {
+		stringPattern.append("(?:").append(TextSearchCondition.WORD_DELIMITER_REGEX)
+			.append(Pattern.quote(word)).append(TextSearchCondition.WORD_DELIMITER_REGEX).append(")|");
+	    }
+	    stringPattern.deleteCharAt(stringPattern.length() - 1);
+	    regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
+	    matcher = regexPattern.matcher(text);
+	    if (!matcher.find()) {
+		return false;
+	    }
 	}
+	if (getPhraseCondition() != null) {
+	    stringPattern = new StringBuilder(TextSearchCondition.WORD_DELIMITER_REGEX);
+	    for (String word : getPhraseCondition()) {
+		stringPattern.append(Pattern.quote(word)).append(TextSearchCondition.WORD_DELIMITER_REGEX);
+	    }
+	    regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
+	    matcher = regexPattern.matcher(text);
+	    if (!matcher.find()) {
+		return false;
+	    }
+	}
+
 	if (getAllWordsCondition() != null) {
 	    for (String word : getAllWordsCondition()) {
-		if (!lowerCaseText.contains(word)) {
+		stringPattern = new StringBuilder(TextSearchCondition.WORD_DELIMITER_REGEX).append(Pattern.quote(word))
+			.append(TextSearchCondition.WORD_DELIMITER_REGEX);
+		regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
+		matcher = regexPattern.matcher(text);
+		if (!matcher.find()) {
 		    return false;
 		}
 	    }
@@ -227,46 +271,11 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
      */
     public void parseConditionStrings(String allWordsString, String phraseString, String anyWordsString,
 	    String excludedWordsString) {
-
 	conditionsParsed = true;
-	String trimmed = null;
-	String[] splited = null;
-	if (allWordsString != null) {
-	    trimmed = allWordsString.trim();
-	    splited = trimmed.split(TextSearchCondition.WORD_DELIMITER_REGEX);
-	    for (int index = 0; index < splited.length; index++) {
-		splited[index] = splited[index].toLowerCase();
-	    }
-
-	    setAllWordsCondition(Arrays.asList(splited));
-	} else {
-	    setAllWordsCondition(null);
-	}
-	if (phraseString != null) {
-	    trimmed = phraseString.trim();
-	    setPhraseCondition(trimmed.toLowerCase());
-	}
-
-	if (anyWordsString != null) {
-	    trimmed = anyWordsString.trim();
-	    splited = trimmed.split(TextSearchCondition.WORD_DELIMITER_REGEX);
-	    for (int index = 0; index < splited.length; index++) {
-		splited[index] = splited[index].toLowerCase();
-	    }
-	    setAnyWordsCondition(Arrays.asList(splited));
-	} else {
-	    setAnyWordsCondition(null);
-	}
-	if (excludedWordsString != null) {
-	    trimmed = excludedWordsString.trim();
-	    splited = trimmed.split(TextSearchCondition.WORD_DELIMITER_REGEX);
-	    for (int index = 0; index < splited.length; index++) {
-		splited[index] = splited[index].toLowerCase();
-	    }
-	    setExcludedWordsCondition(Arrays.asList(splited));
-	} else {
-	    setExcludedWordsCondition(null);
-	}
+	setAllWordsCondition(splitSentence(allWordsString));
+	setPhraseCondition(splitSentence(phraseString));
+	setAnyWordsCondition(splitSentence(anyWordsString));
+	setExcludedWordsCondition(splitSentence(excludedWordsString));
     }
 
     /**
@@ -300,7 +309,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	conditionsParsed = false;
     }
 
-    public void setPhraseCondition(String phraseCondition) {
+    public void setPhraseCondition(List<String> phraseCondition) {
 	this.phraseCondition = phraseCondition;
     }
 
@@ -322,5 +331,42 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
     protected void setExcludedWordsCondition(List<String> excludedWordsCondition) {
 	this.excludedWordsCondition = excludedWordsCondition;
+    }
+
+    /**
+     * Splits the given string into words using configured delimiter.
+     * 
+     * @param sentence
+     *                string to split
+     * @return list of non-empty words
+     */
+    private List<String> splitSentence(String sentence) {
+	List<String> list = null;
+	if (!StringUtils.isEmpty(sentence)) {
+	    String[] splitted = sentence.trim().split(TextSearchCondition.WORD_DELIMITER_REGEX);
+	    list = new ArrayList<String>(splitted.length);
+	    // we don't need empty words
+	    for (String word : splitted) {
+		if (!StringUtils.isEmpty(word)) {
+		    list.add(word);
+		}
+	    }
+	    if (list.isEmpty()) {
+		list = null;
+	    }
+	}
+	return list;
+    }
+
+    /**
+     * Strips HTML tags and leave "pure" text. Useful for FCKeditor created text.
+     * 
+     * @param text
+     *                string to process
+     * @return string after stripping
+     */
+    public static String removeHTMLtags(String text) {
+	return text == null ? null : text.replaceAll(TextSearchCondition.BR_TAG_REGEX, " ").replaceAll(
+		TextSearchCondition.HTML_TAG_REGEX, "");
     }
 }

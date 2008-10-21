@@ -779,7 +779,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
      * @throws NoSuchBeanDefinitionException
      *                 if the tool is not the classpath or the supplied service name is wrong.
      */
-    private Object findToolService(Tool tool) throws NoSuchBeanDefinitionException {
+    public Object findToolService(Tool tool) throws NoSuchBeanDefinitionException {
 	return context.getBean(tool.getServiceName());
     }
 

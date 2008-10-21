@@ -26,18 +26,20 @@ package org.lamsfoundation.lams.learningdesign.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 
 /**
  * @author fiona
- *
+ * 
  */
 public interface IBranchActivityEntryDAO {
 
-	/**
-	 * Returns the list of BranchActivityEntries applicable for the given learning design, determined via the sequence 
-	 * activities (which form the related branches)
-	 */
-	public abstract List<BranchActivityEntry> getEntriesByLearningDesign(
-			Long learningDesignId);
+    /**
+     * Returns the list of BranchActivityEntries applicable for the given learning design, determined via the sequence
+     * activities (which form the related branches)
+     */
+    public abstract List<BranchActivityEntry> getEntriesByLearningDesign(Long learningDesignId);
+
+    BranchCondition getConditionByID(Long conditionID);
 
 }

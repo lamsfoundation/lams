@@ -10,10 +10,6 @@
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jsp.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/mail.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/flagstone/transform.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/flagstone/translate.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/autopatch/tk-autopatch-1.2.0-b2-cvs.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/autopatch/tk-discovery-1.0.0.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-central.jar" sourcepath="/lams_central/src"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -27,21 +27,35 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IBranchActivityEntryDAO;
 
 public class BranchActivityEntryDAO extends BaseDAO implements IBranchActivityEntryDAO {
-	
-	private final static String ENTRIES_FOR_LEARNING_DESIGN = "select entry from "
-		+ BranchActivityEntry.class.getName() + " entry, " + SequenceActivity.class.getName() + " sequenceActivity "
-		+ " where sequenceActivity.learningDesign.id = ? "
-		+ " and entry.branchSequenceActivity = sequenceActivity";
 
-    /* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.learningdesign.dao.hibernate.IBranchActivityEntryDAO#getEntriesByLearningDesign(java.lang.Long)
-	 */
-   public List<BranchActivityEntry> getEntriesByLearningDesign(Long learningDesignId){
-    	return (List<BranchActivityEntry>) this.getHibernateTemplate().find(ENTRIES_FOR_LEARNING_DESIGN,learningDesignId);
+    private final static String ENTRIES_FOR_LEARNING_DESIGN = "select entry from "
+	    + BranchActivityEntry.class.getName() + " entry, " + SequenceActivity.class.getName()
+	    + " sequenceActivity " + " where sequenceActivity.learningDesign.id = ? "
+	    + " and entry.branchSequenceActivity = sequenceActivity";
+
+    private final static String CONDITION_BY_ID = "FROM " + BranchCondition.class.getName()
+	    + " con WHERE con.conditionId = ?";
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.learningdesign.dao.hibernate.IBranchActivityEntryDAO#getEntriesByLearningDesign(java.lang.Long)
+     */
+    public List<BranchActivityEntry> getEntriesByLearningDesign(Long learningDesignId) {
+	return this.getHibernateTemplate().find(BranchActivityEntryDAO.ENTRIES_FOR_LEARNING_DESIGN, learningDesignId);
     }
 
+    public BranchCondition getConditionByID(Long conditionID) {
+	List<BranchCondition> result = this.getHibernateTemplate().find(BranchActivityEntryDAO.CONDITION_BY_ID,
+		conditionID);
+	if (result == null || result.isEmpty()) {
+	    return null;
+	}
+	return result.get(0);
+    }
 }

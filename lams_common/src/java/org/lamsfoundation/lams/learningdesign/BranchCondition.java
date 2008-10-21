@@ -41,6 +41,16 @@ import org.lamsfoundation.lams.tool.ToolOutputValue;
  */
 public class BranchCondition implements Comparable {
 
+    public static final String OUTPUT_TYPE_STRING = "OUTPUT_STRING";
+
+    public static final String OUTPUT_TYPE_BOOLEAN = "OUTPUT_BOOLEAN";
+
+    public static final String OUTPUT_TYPE_DOUBLE = "OUTPUT_DOUBLE";
+
+    public static final String OUTPUT_TYPE_LONG = "OUTPUT_LONG";
+
+    public static final String OUTPUT_TYPE_COMPLEX = "OUTPUT_COMPLEX";
+
     private static Logger log = Logger.getLogger(BranchCondition.class);
 
     protected Long conditionId;
@@ -211,6 +221,11 @@ public class BranchCondition implements Comparable {
 		exactMatchValue);
     }
 
+    @Override
+    public Object clone() {
+	return new BranchCondition(null, null, orderId, name, displayName, type, startValue, endValue, exactMatchValue);
+    }
+
     public int compareTo(Object arg0) {
 	BranchCondition other = (BranchCondition) arg0;
 	return new CompareToBuilder().append(orderId, other.getOrderId()).append(conditionId, other.getConditionId())
@@ -243,19 +258,19 @@ public class BranchCondition implements Comparable {
     }
 
     public boolean exactMatchMet(ToolOutputValue outputValue) {
-	if ("OUTPUT_LONG".equals(type)) {
+	if (BranchCondition.OUTPUT_TYPE_LONG.equals(type)) {
 	    Long exactMatchObj = exactMatchValue != null ? convertToLong(exactMatchValue) : null;
 	    Long actualValue = outputValue.getLong();
 	    return actualValue != null && actualValue.equals(exactMatchObj);
-	} else if ("OUTPUT_DOUBLE".equals(type)) {
+	} else if (BranchCondition.OUTPUT_TYPE_DOUBLE.equals(type)) {
 	    Double exactMatchObj = exactMatchValue != null ? Double.parseDouble(exactMatchValue) : null;
 	    Double actualValue = outputValue.getDouble();
 	    return actualValue != null && actualValue.equals(exactMatchObj);
-	} else if ("OUTPUT_BOOLEAN".equals(type)) {
+	} else if (BranchCondition.OUTPUT_TYPE_BOOLEAN.equals(type)) {
 	    Boolean exactMatchObj = exactMatchValue != null ? Boolean.parseBoolean(exactMatchValue) : null;
 	    Boolean actualValue = outputValue.getBoolean();
 	    return actualValue != null && actualValue.equals(exactMatchObj);
-	} else if ("OUTPUT_STRING".equals(type)) {
+	} else if (BranchCondition.OUTPUT_TYPE_STRING.equals(type)) {
 	    Double actualValue = outputValue.getDouble();
 	    return actualValue != null && actualValue.equals(exactMatchValue);
 	}
@@ -263,19 +278,19 @@ public class BranchCondition implements Comparable {
     }
 
     public boolean inRange(ToolOutputValue outputValue) {
-	if ("OUTPUT_LONG".equals(type)) {
+	if (BranchCondition.OUTPUT_TYPE_LONG.equals(type)) {
 	    Long startValueLong = startValue != null ? convertToLong(startValue) : null;
 	    Long endValueLong = endValue != null ? convertToLong(endValue) : null;
 	    Long actualValue = outputValue.getLong();
 	    return actualValue != null && (startValueLong == null || actualValue.compareTo(startValueLong) >= 0)
 		    && (endValueLong == null || actualValue.compareTo(endValueLong) <= 0);
-	} else if ("OUTPUT_DOUBLE".equals(type)) {
+	} else if (BranchCondition.OUTPUT_TYPE_DOUBLE.equals(type)) {
 	    Double startValueDouble = startValue != null ? Double.parseDouble(startValue) : null;
 	    Double endValueDouble = endValue != null ? Double.parseDouble(endValue) : null;
 	    Double actualValue = outputValue.getDouble();
 	    return actualValue != null && (startValueDouble == null || actualValue.compareTo(startValueDouble) >= 0)
 		    && (endValueDouble == null || actualValue.compareTo(endValueDouble) <= 0);
-	} else if ("OUTPUT_BOOLEAN".equals(type)) {
+	} else if (BranchCondition.OUTPUT_TYPE_BOOLEAN.equals(type)) {
 	    // this is a nonsense, but we'll code it just in case. What order is a boolean? True greater than false?
 	    Boolean startValueBoolean = startValue != null ? Boolean.parseBoolean(startValue) : null;
 	    Boolean endValueBoolean = endValue != null ? Boolean.parseBoolean(endValue) : null;
@@ -283,7 +298,7 @@ public class BranchCondition implements Comparable {
 	    return actualValue != null && (startValueBoolean == null || actualValue.compareTo(startValueBoolean) >= 0)
 		    && (endValueBoolean == null || actualValue.compareTo(endValueBoolean) <= 0);
 
-	} else if ("OUTPUT_STRING".equals(type)) {
+	} else if (BranchCondition.OUTPUT_TYPE_STRING.equals(type)) {
 	    String actualValue = outputValue.getString();
 	    return actualValue != null && (startValue == null || actualValue.compareTo(startValue) >= 0)
 		    && (endValue == null || actualValue.compareTo(endValue) <= 0);
@@ -353,17 +368,16 @@ public class BranchCondition implements Comparable {
     }
 
     private Comparable getTypedValue(String untypedValue) {
-	if ("OUTPUT_LONG".equals(type)) {
+	if (BranchCondition.OUTPUT_TYPE_LONG.equals(type)) {
 	    return convertToLong(untypedValue);
-	} else if ("OUTPUT_DOUBLE".equals(type)) {
+	} else if (BranchCondition.OUTPUT_TYPE_DOUBLE.equals(type)) {
 	    return Double.parseDouble(untypedValue);
-	} else if ("OUTPUT_BOOLEAN".equals(type)) {
+	} else if (BranchCondition.OUTPUT_TYPE_BOOLEAN.equals(type)) {
 	    return Boolean.parseBoolean(untypedValue);
-	} else if ("OUTPUT_STRING".equals(type)) {
+	} else if (BranchCondition.OUTPUT_TYPE_STRING.equals(type)) {
 	    return untypedValue;
 	} else {
 	    return null;
 	}
     }
-
 }
