@@ -30,6 +30,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.codec.binary.Base64;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -484,7 +485,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 		    IEventNotificationService.PERIODICITY_SINGLE);
 	}
 
-	// go to the new wiki page
+	// return to the wiki page
 	return returnToWiki(mapping, (WikiPageForm) form, request, response, currentPageUid);
 
     }
@@ -517,10 +518,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
 		    + "/monitoring.do?dispatch=showWiki&toolSessionID=" + toolSessionID.toString();
 	    
+	    String hash = relativePath + "," + toolSessionID.toString() + ",t";
+	    hash = new String(Base64.encodeBase64(hash.getBytes()));
+	    
 	    String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "r.do?" +
-	    		"r=" + URLEncoder.encode(relativePath, "UTF-8") +
-	    		"&t=" + toolSessionID.toString() +
-            		"&a=t"; 
+	    	"h=" + hash;
 	  
 	    String body = wikiService.getLocalisedMessage(bodyLangKey, new Object[] { fullName,
 		    wikiSession.getSessionName(), link });
@@ -535,11 +537,12 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	    String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
 	    	+ "/learning.do?mode=learner&toolSessionID=" + toolSessionID.toString();
-
-            String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "r.do?" +
-            		"r=" + URLEncoder.encode(relativePath, "UTF-8") +
-            		"&t=" + toolSessionID.toString() +
-            		"&a=l"; 
+	    
+	    String hash = relativePath + "," + toolSessionID.toString() + ",l";
+	    hash = new String(Base64.encodeBase64(hash.getBytes()));
+	    
+	    String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "r.do?" +
+            		"h=" + hash;
             
             String body = wikiService.getLocalisedMessage(bodyLangKey, new Object[] { fullName,
             	    wikiSession.getSessionName(), link });
@@ -547,8 +550,5 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    notificationService.trigger(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID,
 		    subject, body);
 	}
-
-
-
     }
 }
