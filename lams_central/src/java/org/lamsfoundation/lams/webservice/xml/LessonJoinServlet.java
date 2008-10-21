@@ -249,6 +249,8 @@ public class LessonJoinServlet extends HttpServlet {
 		String lessonName;
 		String lessonDescription;
 		Boolean learnerExportAvailable;
+		Boolean learnerPresenceAvailable;
+		Boolean learnerImAvailable;
 		Integer ownerUserId;
 		Organisation org = (Organisation)userService.findById(Organisation.class, orgId);
 		String learnerGroupName;
@@ -263,6 +265,8 @@ public class LessonJoinServlet extends HttpServlet {
 			lessonName = incrementLessonName(l.getLessonName());
 			lessonDescription = l.getLessonDescription();
 			learnerExportAvailable = l.getLearnerExportAvailable();
+			learnerPresenceAvailable = l.getLearnerPresenceAvailable();
+			learnerImAvailable = l.getLearnerImAvailable();
 			ownerUserId = l.getUser().getUserId();
 			learnerGroupName = l.getLessonClass().getLearnersGroup().getGroupName();
 			staffGroupName = l.getLessonClass().getStaffGroup().getGroupName();
@@ -273,6 +277,8 @@ public class LessonJoinServlet extends HttpServlet {
 			lessonName = ld.getTitle();
 			lessonDescription = ld.getDescription();
 			learnerExportAvailable = true;
+			learnerPresenceAvailable = false;
+			learnerImAvailable = false;
 			ownerUserId = ld.getUser().getUserId();
 			learnerGroupName = org.getName() + " Learners";
 			staffGroupName = org.getName() + " Staff";
@@ -280,7 +286,7 @@ public class LessonJoinServlet extends HttpServlet {
 			staffList = getUsersFromDTOs(userDTOs);
 		}
 		Lesson lesson = monitoringService.initializeLesson(lessonName, lessonDescription, learnerExportAvailable, 
-				ldId, orgId, ownerUserId, null);
+				ldId, orgId, ownerUserId, null, learnerPresenceAvailable, learnerImAvailable);
 		monitoringService.createLessonClassForLesson(lesson.getLessonId().longValue(), org, 
 				learnerGroupName, learnerList, staffGroupName, staffList, ownerUserId);
 		monitoringService.startLesson(lesson.getLessonId().longValue(), ownerUserId);
