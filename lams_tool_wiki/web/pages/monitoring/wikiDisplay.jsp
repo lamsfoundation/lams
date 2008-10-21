@@ -16,14 +16,14 @@
 			${sessionDTO.sessionName}
 		</h4>
 		<br />
-		<div id="breadcrumb" style="float: left; width: 30%;">
+		<div id="breadcrumb" style="float: left; width: 50%;">
 			<c:if test="${currentWikiPage.title != mainWikiPage.title}">
 				<a href="javascript:changeWikiPage('${mainWikiPage.javaScriptTitle}')">${mainWikiPage.title}</a> :
 			</c:if> 
 			<a href="javascript:changeWikiPage('${currentWikiPage.javaScriptTitle}')">${currentWikiPage.title}</a>
 		</div>
 
-		<div id="buttons" style="float: right; width: 70%; text-align:right;">
+		<div id="buttons" style="float: right; width: 50%; text-align:right;">
 			<a href="javascript:changeDiv('view');" title='<fmt:message key="label.wiki.view.toolTip"></fmt:message>'>
 				<fmt:message key="label.wiki.view"></fmt:message>
 			</a> 
