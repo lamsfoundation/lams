@@ -197,6 +197,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Updating the wikiPage, setting a null user which indicated this
 	// change was made in author
 	wikiService.updateWikiPage(wikiForm, currentPage, user);
+	
+	// Send revert notifications
+	if (toolSessionID != null && user != null) {
+	    notifyWikiChange(toolSessionID, "notify.pageEdited.subject", "notify.pageEdited.body", user, request);
+	}
 
 	return unspecified(mapping, wikiForm, request, response);
     }
@@ -382,6 +387,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// inserting the wiki page, null user and session indicates that this
 	// page was saved in author
 	Long currentPageUid = wikiService.insertWikiPage(wikiForm, wiki, user, session);
+	
+	// Send adding page notifications
+	if (toolSessionID != null && user != null) {
+	    notifyWikiChange(toolSessionID, "notify.pageAdded.subject", "notify.pageAdded.body", user, request);
+	}
 
 	// go to the new wiki page
 	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
@@ -401,6 +411,10 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// The page to be removed
 	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
 
+	// Get the session information for notifications
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
+	WikiUser user = getCurrentUser(toolSessionID);
+	
 	// set up wikiService
 	if (wikiService == null) {
 	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
@@ -411,6 +425,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Updating the wikiPage, setting a null user which indicated this
 	// change was made in author
 	wikiService.deleteWikiPage(wikiPage);
+	
+	// Send removed page notifications
+	if (toolSessionID != null && user != null) {
+	    notifyWikiChange(toolSessionID, "notify.pageRemoved.subject", "notify.pageRemoved.body", user, request);
+	}
 
 	// return to the main page, by setting the current page to null
 	return this.returnToWiki(mapping, form, request, response, null);
