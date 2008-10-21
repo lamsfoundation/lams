@@ -18,3 +18,8 @@ CREATE TABLE tl_laqa11_condition_questions (
 	 , CONSTRAINT QaConditionQuestionToQaQuestion FOREIGN KEY (question_uid)
                   REFERENCES tl_laqa11_que_content(uid) ON DELETE CASCADE ON UPDATE CASCADE	
 )TYPE=InnoDB;
+
+UPDATE lams_tool SET supports_outputs=1 WHERE tool_signature='lantbk11';
+
+-- Condition copies created for branch activity entries won't have links to any existing Q&A contents.
+ALTER TABLE tl_laqa11_que_content MODIFY COLUMN qa_content_id BIGINT(20);

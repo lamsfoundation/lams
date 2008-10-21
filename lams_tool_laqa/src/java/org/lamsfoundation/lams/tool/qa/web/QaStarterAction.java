@@ -145,6 +145,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
@@ -156,7 +157,6 @@ import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.tool.qa.util.QaConditionComparator;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -487,7 +487,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
-	SortedSet<QaCondition> conditionSet = new TreeSet<QaCondition>(new QaConditionComparator());
+	SortedSet<QaCondition> conditionSet = new TreeSet<QaCondition>(new TextSearchConditionComparator());
 	for (QaCondition condition : qaContent.getConditions()) {
 	    conditionSet.add(condition);
 	    for (QaQuestionContentDTO dto : (List<QaQuestionContentDTO>) listQuestionContentDTO) {
@@ -643,7 +643,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
     private SortedSet<QaCondition> getQaConditionList(SessionMap sessionMap) {
 	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
 	if (list == null) {
-	    list = new TreeSet<QaCondition>(new QaConditionComparator());
+	    list = new TreeSet<QaCondition>(new TextSearchConditionComparator());
 	    sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, list);
 	}
 	return list;

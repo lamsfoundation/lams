@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -45,7 +46,6 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.util.QaConditionComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -530,7 +530,7 @@ public class AuthoringUtil implements QaAppConstants {
 
 	}
 
-	qaContent.setConditions(new TreeSet<QaCondition>(new QaConditionComparator()));
+	qaContent.setConditions(new TreeSet<QaCondition>(new TextSearchConditionComparator()));
 	if (newContent) {
 	    AuthoringUtil.logger.debug("will create: " + qaContent);
 	    qaService.createQa(qaContent);

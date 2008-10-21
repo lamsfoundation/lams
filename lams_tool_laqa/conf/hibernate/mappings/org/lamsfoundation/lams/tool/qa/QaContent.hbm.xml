@@ -178,7 +178,7 @@
             name="qaQueContents"
             lazy="true"
             inverse="true"
-            cascade="all-delete-orphan"
+            cascade="all"
             sort="natural"
         >
               <key
@@ -230,7 +230,7 @@
             lazy="true"
             inverse="false"
             cascade="all"
-            sort="org.lamsfoundation.lams.tool.qa.util.QaConditionComparator"
+            sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
         >
 
             <key

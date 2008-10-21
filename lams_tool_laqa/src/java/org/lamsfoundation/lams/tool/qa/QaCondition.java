@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
 import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
@@ -62,10 +63,9 @@ public class QaCondition extends TextSearchCondition {
     }
 
     public QaCondition(Long conditionId, Integer conditionUIID, Integer orderId, String name, String displayName,
-	    String type, String startValue, String endValue, String exactMatchValue, String allWords, String phrase,
-	    String anyWords, String excludedWords, Set<QaQueContent> questions) {
-	super(conditionId, conditionUIID, orderId, name, displayName, type, startValue, endValue, exactMatchValue,
-		allWords, phrase, anyWords, excludedWords);
+	    String allWords, String phrase, String anyWords, String excludedWords, Set<QaQueContent> questions) {
+	super(conditionId, conditionUIID, orderId, name, displayName, BranchCondition.OUTPUT_TYPE_COMPLEX, null, null,
+		null, allWords, phrase, anyWords, excludedWords);
 	setQuestions(questions);
     }
 
@@ -81,6 +81,7 @@ public class QaCondition extends TextSearchCondition {
 		    result = true;
 		    for (QaQueContent question : questions) {
 			String textToMatch = answers[question.getDisplayOrder() - 1];
+			textToMatch = removeHTMLtags(textToMatch);
 			result &= matches(textToMatch);
 			// if at least one answer does not satisfy the condition, there is no need to look further
 			if (!result) {
@@ -103,21 +104,60 @@ public class QaCondition extends TextSearchCondition {
 	this.questions = questions;
     }
 
+    /**
+     * Notice that the original questions are assigned to the copy.
+     */
     @Override
     public Object clone() {
 	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
 	questionsCopy.addAll(questions);
-	return new QaCondition(null, null, orderId, name, displayName, type, null, null, null, allWords, phrase,
-		anyWords, excludedWords, questionsCopy);
+	return new QaCondition(null, null, orderId, name, displayName, allWords, phrase, anyWords, excludedWords,
+		questionsCopy);
     }
 
+    /**
+     * Notice that questions are copied with very little information and then they are assigned to the cloned object.
+     * This method is used when assigning BranchActivityEntry needs, so only basic information (in fact, only order ID)
+     * is needed. Also, there should be no link to Q&A content.
+     */
     @Override
     public QaCondition clone(int uiidOffset) {
 	Integer newConditionUIID = LearningDesign.addOffset(conditionUIID, uiidOffset);
 	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
-	questionsCopy.addAll(questions);
-	return new QaCondition(null, newConditionUIID, orderId, name, displayName, type, startValue, endValue,
-		exactMatchValue, allWords, phrase, anyWords, excludedWords, questionsCopy);
+
+	for (QaQueContent question : getQuestions()) {
+	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
+		    null, null, null);
+	    questionsCopy.add(questionCopy);
+	}
+	return new QaCondition(null, newConditionUIID, orderId, name, displayName, allWords, phrase, anyWords,
+		excludedWords, questionsCopy);
     }
 
+    /**
+     * Notice that questions from the cloned (and not the original) tool content are assigned to the cloned condition.
+     * This method is used for cloning tool content.
+     */
+    public QaCondition clone(QaContent qaContent) {
+
+	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
+	for (QaQueContent conditionQuestion : getQuestions()) {
+	    for (QaQueContent contentQuestion : (Set<QaQueContent>) qaContent.getQaQueContents()) {
+		if (conditionQuestion.getDisplayOrder() == contentQuestion.getDisplayOrder()) {
+		    questionsCopy.add(contentQuestion);
+		}
+	    }
+	}
+
+	return new QaCondition(null, null, orderId, name, displayName, allWords, phrase, anyWords, excludedWords,
+		questionsCopy);
+    }
+
+    /**
+     * The condition must be bound with at least one question.
+     */
+    @Override
+    protected boolean isValid() {
+	return getQuestions() != null && !getQuestions().isEmpty();
+    }
 }

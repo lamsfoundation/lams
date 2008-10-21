@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.qa.util.QaConditionComparator;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
 /**
  * @author Ozgur Demirtas
@@ -125,9 +125,7 @@ public class QaContent implements Serializable {
     /** persistent field */
     private Set qaUploadedFiles;
     /** persistent field */
-    private Set<QaCondition> conditions = new TreeSet<QaCondition>(new QaConditionComparator());
-
-    private String nonHTMLtitle;
+    private Set<QaCondition> conditions = new TreeSet<QaCondition>(new TextSearchConditionComparator());
 
     public QaContent() {
     };
@@ -185,7 +183,7 @@ public class QaContent implements Serializable {
 		.isQuestionsSequenced(), qa.isUsernameVisible(), qa.isSynchInMonitor(), qa.isLockWhenFinished(), qa
 		.isContentLocked(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(), qa
 		.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet(),
-		new TreeSet<QaCondition>(new QaConditionComparator()));
+		new TreeSet<QaCondition>(new TextSearchConditionComparator()));
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
 	QaContent.logger.debug(QaContent.logger + " " + "QaContent" + " " + "after doing deepCopyQaQueContent");
@@ -223,10 +221,10 @@ public class QaContent implements Serializable {
 
     public Set<QaCondition> deepCopyConditions(QaContent newQaContent) {
 
-	Set<QaCondition> newConditions = new TreeSet<QaCondition>(new QaConditionComparator());
+	Set<QaCondition> newConditions = new TreeSet<QaCondition>(new TextSearchConditionComparator());
 	if (getConditions() != null) {
 	    for (QaCondition condition : getConditions()) {
-		newConditions.add((QaCondition) condition.clone());
+		newConditions.add(condition.clone(newQaContent));
 	    }
 	}
 
@@ -653,12 +651,5 @@ public class QaContent implements Serializable {
 
     public void setConditions(Set<QaCondition> conditions) {
 	this.conditions = conditions;
-    }
-
-    public String getNonHTMLtitle() {
-	if (title == null) {
-	    return null;
-	}
-	return title.replaceAll("\\<.*?>", "");
     }
 }

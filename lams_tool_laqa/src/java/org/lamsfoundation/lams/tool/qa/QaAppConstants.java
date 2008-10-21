@@ -279,7 +279,6 @@ public interface QaAppConstants {
     public static final String PARAM_ORDER_ID = "orderId";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
     public static final int QUESTION_CUTOFF_INDEX = 40;
-    public static final String HTML_TAG_REGEX = "\\<.*?>";
     public static final String TEXT_SEARCH_DEFINITION_NAME = "text.search.output.definition.qa";
     public static final String TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "text.search.output.definition.qa.default.condition";
 }

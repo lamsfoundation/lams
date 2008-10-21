@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
 /**
@@ -71,8 +72,8 @@ public class QaOutputFactory extends OutputFactory {
 			.toString());
 		// Default condition checks if the first answer contains word "LAMS"
 		QaCondition defaultCondition = new QaCondition(null, null, 1, name, getI18NText(
-			QaAppConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "OUTPUT_COMPLEX", null,
-			null, null, "LAMS", null, null, null, questions);
+			QaAppConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
+			null, questions);
 		qaContent.getConditions().add(defaultCondition);
 
 		allAnswersDefinition.getDefaultConditions().add(defaultCondition);
@@ -134,14 +135,16 @@ public class QaOutputFactory extends OutputFactory {
     public ToolOutput getToolOutput(String name, IQaService qaService, Long toolSessionId, Long learnerId) {
 	if (isTextSearchConditionName(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME)) {
 	    // user answers are loaded from the DB and array of strings is created
-	    QaContent taskList = qaService.getQaContentBySessionId(toolSessionId);
-	    Set<QaQueContent> questions = taskList.getQaQueContents();
+
+	    QaSession session = qaService.retrieveQaSession(toolSessionId);
+	    QaContent qaContent = session.getQaContent();
+	    Set<QaQueContent> questions = qaContent.getQaQueContents();
 	    String[] answers = new String[questions.size()];
 	    for (QaQueContent question : questions) {
-		QaQueUsr user = qaService.getQaQueUsrById(learnerId);
+		QaQueUsr user = qaService.getQaUserBySession(learnerId, session.getUid());
 		List<QaUsrResp> attempts = null;
 		if (user != null) {
-		    attempts = qaService.getAttemptsForUserAndQuestionContent(user.getUid(), question.getQaContentId());
+		    attempts = qaService.getAttemptsForUserAndQuestionContent(user.getUid(), question.getUid());
 		}
 		if (attempts != null && !attempts.isEmpty()) {
 		    // only the last attempt is taken into consideration

@@ -43,12 +43,13 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.util.LabelValueBean;
+import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.tool.qa.util.QaConditionComparator;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -291,7 +292,7 @@ public class QaAuthoringConditionAction extends Action {
     private SortedSet<QaCondition> getQaConditionSet(SessionMap sessionMap) {
 	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
 	if (list == null) {
-	    list = new TreeSet<QaCondition>(new QaConditionComparator());
+	    list = new TreeSet<QaCondition>(new TextSearchConditionComparator());
 	    sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, list);
 	}
 	return list;
@@ -385,7 +386,9 @@ public class QaAuthoringConditionAction extends Action {
 	for (QaQuestionContentDTO question : questions) {
 	    String nonHTMLQuestion = question.getQuestion();
 	    if (nonHTMLQuestion != null) {
-		nonHTMLQuestion = nonHTMLQuestion.replaceAll(QaAppConstants.HTML_TAG_REGEX, "");
+		nonHTMLQuestion = TextSearchCondition.removeHTMLtags(nonHTMLQuestion);
+		// we don't want to cite the whole question, so we just leave some first characters; it should be enough
+		// to recognise the question by a teacher
 		if (nonHTMLQuestion.length() > QaAppConstants.QUESTION_CUTOFF_INDEX) {
 		    nonHTMLQuestion = nonHTMLQuestion.substring(0, QaAppConstants.QUESTION_CUTOFF_INDEX) + "...";
 		}
