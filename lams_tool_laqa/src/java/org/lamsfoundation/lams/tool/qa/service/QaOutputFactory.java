@@ -140,8 +140,8 @@ public class QaOutputFactory extends OutputFactory {
 	    QaContent qaContent = session.getQaContent();
 	    Set<QaQueContent> questions = qaContent.getQaQueContents();
 	    String[] answers = new String[questions.size()];
+	    QaQueUsr user = qaService.getQaUserBySession(learnerId, session.getUid());
 	    for (QaQueContent question : questions) {
-		QaQueUsr user = qaService.getQaUserBySession(learnerId, session.getUid());
 		List<QaUsrResp> attempts = null;
 		if (user != null) {
 		    attempts = qaService.getAttemptsForUserAndQuestionContent(user.getUid(), question.getUid());
