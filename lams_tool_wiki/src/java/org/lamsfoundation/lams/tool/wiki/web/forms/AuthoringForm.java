@@ -54,6 +54,8 @@ public class AuthoringForm extends WikiPageForm {
     boolean allowLearnerInsertLinks;
 
     boolean allowLearnerAttachImages;
+    
+    boolean notifyUpdates;
 
     boolean reflectOnActivity;
 
@@ -193,6 +195,14 @@ public class AuthoringForm extends WikiPageForm {
 
     public void setAllowLearnerAttachImages(boolean allowLearnerAttachImages) {
 	this.allowLearnerAttachImages = allowLearnerAttachImages;
+    }
+   
+    public boolean isNotifyUpdates() {
+        return notifyUpdates;
+    }
+
+    public void setNotifyUpdates(boolean notifyUpdates) {
+        this.notifyUpdates = notifyUpdates;
     }
 
     public boolean isReflectOnActivity() {

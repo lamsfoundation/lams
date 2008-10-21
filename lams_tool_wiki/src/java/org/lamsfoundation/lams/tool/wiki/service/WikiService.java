@@ -50,10 +50,12 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -84,8 +86,10 @@ import org.lamsfoundation.lams.tool.wiki.util.WikiToolContentHandler;
 import org.lamsfoundation.lams.tool.wiki.util.diff.Diff;
 import org.lamsfoundation.lams.tool.wiki.util.diff.Difference;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -94,63 +98,6 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * 
  * As a requirement, all LAMS tool's service bean must implement
  * ToolContentManager and ToolSessionManager.
- */
-
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
- */
-/**
- * @author lfoxton
- * 
  */
 public class WikiService implements ToolSessionManager, ToolContentManager, IWikiService, ToolContentImport102Manager {
 
@@ -183,6 +130,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     private ICoreNotebookService coreNotebookService;
 
     private WikiOutputFactory wikiOutputFactory;
+    
+    private IEventNotificationService eventNotificationService;
+    
+    private MessageService messageService;
+    
+    private ILessonService lessonService;
 
     public WikiService() {
 	super();
@@ -870,8 +823,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * This method verifies the credentials of the Wiki Tool and gives it
-     * the <code>Ticket</code> to login and access the Content Repository.
+     * This method verifies the credentials of the Wiki Tool and gives it the
+     * <code>Ticket</code> to login and access the Content Repository.
      * 
      * A valid ticket is needed in order to access the content from the
      * repository. This method would be called evertime the tool needs to
@@ -1098,4 +1051,37 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public void setWikiOutputFactory(WikiOutputFactory wikiOutputFactory) {
 	this.wikiOutputFactory = wikiOutputFactory;
     }
+
+    public IEventNotificationService getEventNotificationService() {
+        return eventNotificationService;
+    }
+
+    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+        this.eventNotificationService = eventNotificationService;
+    }
+
+    public MessageService getMessageService() {
+        return messageService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
+    }
+    
+    public String getLocalisedMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
+    }
+    
+    public List<User> getMonitorsByToolSessionId(Long sessionId) {
+	return getLessonService().getMonitorsByToolSessionId(sessionId);
+    }
+
+    public ILessonService getLessonService() {
+	return lessonService;
+    }
+
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
+    
 }

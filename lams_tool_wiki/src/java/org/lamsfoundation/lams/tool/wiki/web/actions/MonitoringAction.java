@@ -29,11 +29,13 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
@@ -108,7 +110,7 @@ public class MonitoringAction extends WikiPageAction {
 
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	wikiDT0.setCurrentTab(currentTab);
-
+	
 	request.setAttribute(WikiConstants.ATTR_WIKI_DTO, wikiDT0);
 	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 	return mapping.findForward("success");

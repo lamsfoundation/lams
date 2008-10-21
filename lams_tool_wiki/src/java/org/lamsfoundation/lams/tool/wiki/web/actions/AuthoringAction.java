@@ -54,15 +54,11 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
-import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy; // import
-								    // org.lamsfoundation.lams.tool.wiki.util.Diff;
-import org.lamsfoundation.lams.tool.wiki.util.diff.Diff;
-import org.lamsfoundation.lams.tool.wiki.util.diff.Difference;
+import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -70,7 +66,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * This action handles all the authoring actions, which include opening author,
  * saving, uploading instruction files and all the wikipage actions
  * 
- * It inherits from the WikiPageAction which inherits from the 
+ * It inherits from the WikiPageAction which inherits from the
  * LamsDispatchAction so that common actions can be used in learner, monitor and
  * author
  * 
@@ -79,15 +75,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * 
  * @struts.action path="/authoring" name="authoringForm" parameter="dispatch"
  *                scope="request" validate="false"
- * 
  * @struts.action-forward name="success" path="tiles:/authoring/main"
  * @struts.action-forward name="compareWiki" path="/pages/wiki/compare.jsp"
  * @struts.action-forward name="viewWiki" path="/pages/wiki/viewWiki.jsp"
  * @struts.action-forward name="message_page" path="tiles:/generic/message"
- */
-/**
- * @author lfoxton
- *
  */
 public class AuthoringAction extends WikiPageAction {
 
@@ -171,7 +162,7 @@ public class AuthoringAction extends WikiPageAction {
 	}
 	WikiPageDTO currentPageDTO = new WikiPageDTO(currentWikiPage);
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, currentPageDTO);
-	
+
 	// Reset the isEditable field for the form
 	authForm.setIsEditable(currentPageDTO.getEditable());
 
@@ -210,7 +201,7 @@ public class AuthoringAction extends WikiPageAction {
 	authForm.setCurrentWikiPageId(currentWikiPageId);
 	return unspecified(mapping, authForm, request, response);
     }
-    
+
     /**
      * Implements the abstract method, since this is author we return null here
      * as there is no user
@@ -223,7 +214,7 @@ public class AuthoringAction extends WikiPageAction {
     /**
      * Saves the Wiki content including uploaded files and advance options
      * 
-     * The WikiPage content is not saved here as that is done in the 
+     * The WikiPage content is not saved here as that is done in the
      * WikiPageAction
      * 
      * @param mapping
@@ -375,6 +366,7 @@ public class AuthoringAction extends WikiPageAction {
 
     /**
      * Delete a file
+     * 
      * @param mapping
      * @param authForm
      * @param type
@@ -470,6 +462,7 @@ public class AuthoringAction extends WikiPageAction {
 	    wiki.setAllowLearnerInsertLinks(authForm.isAllowLearnerInsertLinks());
 	    wiki.setReflectOnActivity(authForm.isReflectOnActivity());
 	    wiki.setReflectInstructions(authForm.getReflectInstructions());
+	    wiki.setNotifyUpdates(authForm.isNotifyUpdates());
 	    wiki.setMaximumEdits(authForm.getMaximumEdits());
 	    wiki.setMinimumEdits(authForm.getMinimumEdits());
 	}
@@ -494,6 +487,7 @@ public class AuthoringAction extends WikiPageAction {
 	authForm.setMaximumEdits(wiki.getMaximumEdits());
 	authForm.setMinimumEdits(wiki.getMinimumEdits());
 	authForm.setNewPageIsEditable(true);
+	authForm.setNotifyUpdates(wiki.isNotifyUpdates());
     }
 
     /**

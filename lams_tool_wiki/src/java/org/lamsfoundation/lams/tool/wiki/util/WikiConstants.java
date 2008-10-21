@@ -63,6 +63,10 @@ public interface WikiConstants {
     public static final String ATTR_FINISHED_ACTIVITY = "finishedActivity";
     public static final String ATTR_CONTENT_EDITAVLE = "contentEditable";
     public static final String ATTR_MAIN_PAGE_TITLE = "mainPageTitle";
+    
+    // Events 
+    public static final String EVENT_NOTIFY_TEACHERS = "wikiNotifyTeachers";
+    public static final String EVENT_NOTIFY_LEARNERS = "wikiNotifyLearners";
 
     // Parameter names
     public static final String PARAM_PARENT_PAGE = "parentPage";

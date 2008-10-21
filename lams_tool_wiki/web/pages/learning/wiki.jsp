@@ -188,6 +188,23 @@
 						<lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" />
 					</fmt:param>
 				</fmt:message> 
+				
+				<br />
+				
+				<fmt:message key="notify.learner.query">
+					<fmt:param>
+						<a href="javascript:submitWiki('toggleLearnerSubsciption');">
+							<c:choose>
+								<c:when test="${userDTO.notificationEnabled}">
+									<fmt:message key="notify.learner.unsubscribe" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="notify.learner.subscribe" />
+								</c:otherwise>
+							</c:choose>
+						</a>
+					</fmt:param>
+				</fmt:message>
 			</i> 
 			
 			<br />

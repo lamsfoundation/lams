@@ -60,6 +60,8 @@ public class WikiDTO {
     private boolean allowLearnerInsertLinks;
 
     private boolean allowLearnerAttachImages;
+    
+    private boolean notifyUpdates;
 
     private boolean reflectOnActivity;
 
@@ -92,6 +94,7 @@ public class WikiDTO {
 	allowLearnerCreatePages = wiki.isAllowLearnerCreatePages();
 	allowLearnerInsertLinks = wiki.isAllowLearnerInsertLinks();
 	allowLearnerAttachImages = wiki.isAllowLearnerAttachImages();
+	notifyUpdates = wiki.isNotifyUpdates();
 	reflectOnActivity = wiki.isReflectOnActivity();
 	reflectInstructions = wiki.getReflectInstructions();
 	minimumEdits = wiki.getMinimumEdits();
@@ -225,6 +228,14 @@ public class WikiDTO {
 
     public void setAllowLearnerAttachImages(boolean allowLearnerAttachImages) {
 	this.allowLearnerAttachImages = allowLearnerAttachImages;
+    }
+
+    public boolean isNotifyUpdates() {
+        return notifyUpdates;
+    }
+
+    public void setNotifyUpdates(boolean notifyUpdates) {
+        this.notifyUpdates = notifyUpdates;
     }
 
     public boolean isReflectOnActivity() {

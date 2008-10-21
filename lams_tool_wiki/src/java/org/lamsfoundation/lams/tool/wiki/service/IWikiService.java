@@ -24,7 +24,10 @@
 
 package org.lamsfoundation.lams.tool.wiki.service;
 
+import java.util.List;
+
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiAttachment;
@@ -34,6 +37,7 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -114,8 +118,8 @@ public interface IWikiService {
     public void saveOrUpdateWikiPage(WikiPage wikiPage);
 
     /**
-     * Updates a wiki page with the given content in the WikiPageForm
-     * A new WikiPageContent is to be created for each edit so we have a history
+     * Updates a wiki page with the given content in the WikiPageForm A new
+     * WikiPageContent is to be created for each edit so we have a history
      * 
      * If the user is null it signifies that this edit was done in author
      * 
@@ -128,7 +132,8 @@ public interface IWikiService {
     /**
      * Creates a new wiki page from the content in the WikiPageForm
      * 
-     * If the user and session is null it signifies that this edit was done in author
+     * If the user and session is null it signifies that this edit was done in
+     * author
      * 
      * @param wikiPageForm
      * @param wiki
@@ -149,7 +154,7 @@ public interface IWikiService {
      * 
      * This method should only be called by author as it will only retrieve
      * wikipages where the toolSession is null
-     *
+     * 
      * @param wiki
      * @param title
      * @return
@@ -159,7 +164,7 @@ public interface IWikiService {
     /**
      * Gets a wiki page by session and title
      * 
-     * This method should only be called at runtime because it requires a tool 
+     * This method should only be called at runtime because it requires a tool
      * session
      * 
      * @param wikiSession
@@ -285,11 +290,39 @@ public interface IWikiService {
     int getEditsNum(Long learnerId, Long toolSessionId);
 
     /**
-     * this method gets the number of added pages by a learner in a tool 
+     * this method gets the number of added pages by a learner in a tool
      * session, this is used for tool outputs
+     * 
      * @param learnerId
      * @param toolSessionId
      * @return
      */
     int getAddsNum(Long learnerId, Long toolSessionId);
+
+    /**
+     * Gets a message from resource bundle. Same as <code><fmt:message></code>
+     * in JSP pages.
+     * 
+     * @param key
+     *                key of the message
+     * @param args
+     *                arguments for the message
+     * @return message content
+     */
+    String getLocalisedMessage(String key, Object[] args);
+
+    /**
+     * Fetches the wiki notification service
+     * 
+     * @return
+     */
+    IEventNotificationService getEventNotificationService();
+    
+    /**
+     * Gets a list of monitors for the given tool session
+     * 
+     * @param sessionId
+     * @return
+     */
+    List<User> getMonitorsByToolSessionId(Long sessionId);
 }

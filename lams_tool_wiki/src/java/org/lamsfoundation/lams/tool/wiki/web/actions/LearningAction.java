@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -65,7 +66,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * This action handles all the learning actions, which include opening learner,
  * relection, going to the next activity, and all the wikipage actions
  * 
- * It inherits from the WikiPageAction which inherits from the 
+ * It inherits from the WikiPageAction which inherits from the
  * LamsDispatchAction so that common actions can be used in learner, monitor and
  * author
  * 
@@ -90,8 +91,8 @@ public class LearningAction extends WikiPageAction {
     private IWikiService wikiService;
 
     /**
-     * unspecified loads the learner window with the current wiki page
-     * as well as setting all the advanced options and user-specifice info
+     * unspecified loads the learner window with the current wiki page as well
+     * as setting all the advanced options and user-specifice info
      */
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -142,6 +143,7 @@ public class LearningAction extends WikiPageAction {
 	    return mapping.findForward("runOffline");
 	}
 
+	// get the user
 	WikiUser wikiUser;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
 	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
@@ -150,6 +152,7 @@ public class LearningAction extends WikiPageAction {
 	    wikiUser = getCurrentUser(toolSessionID);
 	}
 
+	// Create the userDTO
 	WikiUserDTO wikiUserDTO = new WikiUserDTO(wikiUser);
 	if (wikiUser.isFinishedActivity()) {
 	    // get the notebook entry.
@@ -159,8 +162,19 @@ public class LearningAction extends WikiPageAction {
 		wikiUserDTO.setNotebookEntry(notebookEntry.getEntry());
 	    }
 	}
+	
+	// Set whether the user has enabled notifications
+	if (wikiService.getEventNotificationService().eventExists(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
+		toolSessionID)
+		&& wikiService.getEventNotificationService().isSubscribed(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
+			toolSessionID, wikiUser.getUserId().longValue())) {
+	    
+	    wikiUserDTO.setNotificationEnabled(true);
+	}
+	
+	// add the userDTO to attributes
 	request.setAttribute(WikiConstants.ATTR_USER_DTO, wikiUserDTO);
-
+	
 	// Set whether user has reached maximum edits
 	int maxEdits = wiki.getMaximumEdits();
 	Boolean maxEditsReached = (maxEdits != 0 && wikiUser.getWikiEdits() >= maxEdits);
@@ -174,16 +188,11 @@ public class LearningAction extends WikiPageAction {
 
 	// Get the wikipages from the session and the main page
 	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
-	// WikiPage mainPage = null;
 	for (WikiPage wikiPage : wikiSession.getWikiPages()) {
 	    WikiPageDTO pageDTO = new WikiPageDTO(wikiPage);
 
 	    wikiPageDTOs.add(pageDTO);
 
-	    // Set the main page
-	    // if (wikiPage.getTitle().equals(wiki.getMainPage().getTitle())) {
-	    // mainPage = wikiPage;
-	    // }
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
 	request.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
@@ -206,7 +215,7 @@ public class LearningAction extends WikiPageAction {
 
 	// Set the content folder id
 	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, wikiSession.getContentFolderID());
-	
+
 	// set readOnly flag.
 	if (mode.equals(ToolAccessMode.TEACHER) || (wiki.isLockOnFinished() && wikiUser.isFinishedActivity())) {
 	    request.setAttribute(WikiConstants.ATTR_CONTENT_EDITAVLE, false);
@@ -248,10 +257,11 @@ public class LearningAction extends WikiPageAction {
 
 	return wikiUser;
     }
-    
+
     /**
-     * Finish the activity, we dont need to save anything here, as that is
-     * done by the wikipage actions
+     * Finish the activity, we dont need to save anything here, as that is done
+     * by the wikipage actions
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -292,6 +302,7 @@ public class LearningAction extends WikiPageAction {
 
     /**
      * Opens the notebook page for reflections
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -321,6 +332,7 @@ public class LearningAction extends WikiPageAction {
 
     /**
      * Submit reflections
+     * 
      * @param mapping
      * @param form
      * @param request

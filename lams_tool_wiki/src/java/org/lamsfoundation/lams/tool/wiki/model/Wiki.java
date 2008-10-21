@@ -76,6 +76,9 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     // Allow learners to attach images to the wiki page
     private boolean allowLearnerAttachImages;
+    
+    // Add notification for wiki updates
+    private boolean notifyUpdates;
 
     // Add notebook at the end of activity
     private boolean reflectOnActivity;
@@ -279,6 +282,18 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     public void setAllowLearnerAttachImages(boolean allowLearnerAttachImages) {
 	this.allowLearnerAttachImages = allowLearnerAttachImages;
+    }
+    
+    /**
+     * @hibernate.property column="notify_updates" length="1" default="0"
+     * 
+     */
+    public boolean isNotifyUpdates() {
+        return notifyUpdates;
+    }
+
+    public void setNotifyUpdates(boolean notifyUpdates) {
+        this.notifyUpdates = notifyUpdates;
     }
 
     /**

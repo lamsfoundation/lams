@@ -114,6 +114,15 @@
         />
 
         <property
+            name="notifyUpdates"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="notify_updates"
+            length="1"
+        />
+
+        <property
             name="reflectOnActivity"
             type="boolean"
             update="true"

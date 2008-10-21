@@ -45,6 +45,8 @@ public class WikiUserDTO implements Comparable {
     public String notebookEntry;
 
     public Long entryUID;
+    
+    public boolean notificationEnabled;
 
     public WikiUserDTO(WikiUser user) {
 	this.uid = user.getUid();
@@ -54,6 +56,7 @@ public class WikiUserDTO implements Comparable {
 	this.finishedActivity = user.isFinishedActivity();
 	this.entryUID = user.getEntryUID();
 	this.userId = user.getUserId();
+	notificationEnabled = false;
     }
 
     public int compareTo(Object o) {
@@ -128,6 +131,14 @@ public class WikiUserDTO implements Comparable {
 
     public void setNotebookEntry(String notebookEntry) {
         this.notebookEntry = notebookEntry;
+    }
+
+    public boolean isNotificationEnabled() {
+        return notificationEnabled;
+    }
+
+    public void setNotificationEnabled(boolean notificationEnabled) {
+        this.notificationEnabled = notificationEnabled;
     }
 
 }

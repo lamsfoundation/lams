@@ -24,13 +24,18 @@
 
 package org.lamsfoundation.lams.tool.wiki.web.actions;
 
+import java.net.URLEncoder;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageDTO;
@@ -43,8 +48,13 @@ import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -103,36 +113,44 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Get the current wiki page
 	WikiPage currentPage = wikiService.getWikiPageByUid(currentPageUid);
 
-	// Set up the wiki user if this is a tool session (learner)
-	// Also set the editable flag here
-	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
-	WikiUser user = null;
-	if (toolSessionID != null) {
-	    user = this.getCurrentUser(toolSessionID);
-	} 
+	// Check if the content is different
+	if (!currentPage.getCurrentWikiContent().getBody().equals(wikiForm.getWikiBody())) {
 
-	// Setting the editable flag based on call origin
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	if (mode == null || mode==ToolAccessMode.TEACHER)
-	{
-	    // Author/Monitor/Live edit 
-	    // If no editable flag came in the form (as in learner), set false
-	    if (wikiForm.getIsEditable() == null) {
-		wikiForm.setIsEditable(false);
+	    // Set up the wiki user if this is a tool session (learner)
+	    // Also set the editable flag here
+	    Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
+	    WikiUser user = null;
+	    if (toolSessionID != null) {
+		user = this.getCurrentUser(toolSessionID);
 	    }
-	}
-	else
-	{
-	    // Learner or preview
-	    // If no editable flag came in the form (as in learner), set true
-	    if (wikiForm.getIsEditable() == null) {
-		wikiForm.setIsEditable(true);
-	    }
-	}
-	// Updating the wikiPage, setting a null user which indicated this
-	// change was made in author
-	wikiService.updateWikiPage(wikiForm, currentPage, user);
 
+	    // Setting the editable flag based on call origin
+	    ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
+	    if (mode == null || mode == ToolAccessMode.TEACHER) {
+
+		// Author/Monitor/Live edit
+		// If no editable flag came in the form (as in learner), set
+		// false
+		if (wikiForm.getIsEditable() == null) {
+		    wikiForm.setIsEditable(false);
+		}
+	    } else {
+		// Learner or preview If no editable flag came in the form
+		// (as in learner), set true
+		if (wikiForm.getIsEditable() == null) {
+		    wikiForm.setIsEditable(true);
+		}
+	    }
+	    // Updating the wikiPage, setting a null user which indicated
+	    // this change was made in author
+	    wikiService.updateWikiPage(wikiForm, currentPage, user);
+
+	    // Send edit notifications
+	    if (toolSessionID != null && user != null) {
+		notifyWikiChange(toolSessionID, "notify.pageEdited.subject", "notify.pageEdited.body", user, request);
+	    }
+
+	}
 	// Make sure the current page is set correctly then return to the wiki
 	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
     }
@@ -295,10 +313,9 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    // Get the page to change to
 	    wikiPage = wikiService.getWikiBySessionAndTitle(session, newPageName);
 	}
-	
-	if (wikiPage == null)
-	{
-	    //TODO: Error handling page does not exist
+
+	if (wikiPage == null) {
+	    // TODO: Error handling page does not exist
 	}
 
 	// go through unspecified to display the author screen, using wrapper
@@ -343,22 +360,18 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    session = wikiService.getSessionBySessionId(toolSessionID);
 	    wiki = session.getWiki();
 	    user = getCurrentUser(toolSessionID);
-	   
-	    
+
 	}
-	
+
 	// Setting the editable flag based on call origin
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	if (mode == null || mode==ToolAccessMode.TEACHER)
-	{
-	    // Author/Monitor/Live edit 
+	if (mode == null || mode == ToolAccessMode.TEACHER) {
+	    // Author/Monitor/Live edit
 	    // If no editable flag came in the form (as in learner), set false
 	    if (wikiForm.getNewPageIsEditable() == null) {
 		wikiForm.setNewPageIsEditable(false);
 	    }
-	}
-	else
-	{
+	} else {
 	    // Learner or preview
 	    // If no editable flag came in the form (as in learner), set true
 	    if (wikiForm.getNewPageIsEditable() == null) {
@@ -368,10 +381,10 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	// inserting the wiki page, null user and session indicates that this
 	// page was saved in author
-	Long currentWikiPageUid = wikiService.insertWikiPage(wikiForm, wiki, user, session);
+	Long currentPageUid = wikiService.insertWikiPage(wikiForm, wiki, user, session);
 
 	// go to the new wiki page
-	return returnToWiki(mapping, wikiForm, request, response, currentWikiPageUid);
+	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
     }
 
     /**
@@ -401,6 +414,122 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	// return to the main page, by setting the current page to null
 	return this.returnToWiki(mapping, form, request, response, null);
+
+    }
+
+    /**
+     * Toggles whether a learner wants to receive notifications for wiki changes
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward toggleLearnerSubsciption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
+	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+
+	// Get the current user
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
+	// set up wikiService
+	if (wikiService == null) {
+	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
+	}
+
+	IEventNotificationService notificationService = wikiService.getEventNotificationService();
+
+	// first check whether the event exists and create it if it doesnt
+	if (!notificationService.eventExists(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
+		toolSessionID)) {
+	    notificationService.createEvent(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
+		    toolSessionID, null, null);
+	}
+
+	// Get whether the user is subscribed
+	boolean subscribed = notificationService.isSubscribed(WikiConstants.TOOL_SIGNATURE,
+		WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID, user.getUserID().longValue());
+
+	if (subscribed) {
+	    // unsubscribe the learner to the event
+	    notificationService.unsubscribe(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
+		    toolSessionID, user.getUserID().longValue());
+	} else {
+	    // subscribe the learner to the event
+	    notificationService.subscribe(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
+		    toolSessionID, user.getUserID().longValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
+		    IEventNotificationService.PERIODICITY_SINGLE);
+	}
+
+	// go to the new wiki page
+	return returnToWiki(mapping, (WikiPageForm) form, request, response, currentPageUid);
+
+    }
+
+    private void notifyWikiChange(Long toolSessionID, String subjectLangKey, String bodyLangKey, WikiUser wikiUser,
+	    HttpServletRequest request) throws Exception {
+
+	// set up wikiService
+	if (wikiService == null) {
+	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
+	}
+
+	WikiSession wikiSession = wikiService.getSessionBySessionId(toolSessionID);
+
+	IEventNotificationService notificationService = wikiService.getEventNotificationService();
+
+	String subject = wikiService.getLocalisedMessage(subjectLangKey, new Object[] { wikiSession
+		    .getSessionName() });
+	String fullName = wikiUser.getFirstName() + " " + wikiUser.getLastName();
+	
+	// Notify all the monitors
+	if (wikiSession.getWiki().isNotifyUpdates()) {
+
+	    List<User> users = wikiService.getMonitorsByToolSessionId(toolSessionID);
+	    Long[] monitoringUsersIds = new Long[users.size()];
+	    for (int i = 0; i < monitoringUsersIds.length; i++) {
+		monitoringUsersIds[i] = users.get(i).getUserId().longValue();
+	    }
+
+	    String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
+		    + "/monitoring.do?dispatch=showWiki&toolSessionID=" + toolSessionID.toString();
+	    
+	    String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "r.do?" +
+	    		"r=" + URLEncoder.encode(relativePath, "UTF-8") +
+	    		"&t=" + toolSessionID.toString() +
+            		"&a=t"; 
+	  
+	    String body = wikiService.getLocalisedMessage(bodyLangKey, new Object[] { fullName,
+		    wikiSession.getSessionName(), link });
+
+	    notificationService.sendMessage(monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL,
+		    subject, body);
+	}
+
+	// trigger the event if exists for all the learners who are subscribed
+	if (notificationService.eventExists(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
+		toolSessionID)) {
+
+	    String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
+	    	+ "/learning.do?mode=learner&toolSessionID=" + toolSessionID.toString();
+
+            String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "r.do?" +
+            		"r=" + URLEncoder.encode(relativePath, "UTF-8") +
+            		"&t=" + toolSessionID.toString() +
+            		"&a=l"; 
+            
+            String body = wikiService.getLocalisedMessage(bodyLangKey, new Object[] { fullName,
+            	    wikiSession.getSessionName(), link });
+	
+	    notificationService.trigger(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID,
+		    subject, body);
+	}
+
+
 
     }
 }

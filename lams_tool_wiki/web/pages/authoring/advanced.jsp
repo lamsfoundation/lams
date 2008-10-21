@@ -24,6 +24,12 @@
 	styleId="allowLearnerAttachImages"></html:checkbox> <label
 	for="allowLearnerAttachImages"> <fmt:message
 	key="advanced.allowLearnerAttachImages" /> </label></p>
+	
+<p class="small-space-top"><html:checkbox
+	property="notifyUpdates" value="1" styleClass="noBorder"
+	styleId="notifyUpdates"></html:checkbox> <label
+	for="notifyUpdates"> <fmt:message
+	key="advanced.notifyChange" /> </label></p>
 
 <p><html:checkbox property="reflectOnActivity" value="1"
 	styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox> <label

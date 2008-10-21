@@ -262,11 +262,12 @@
 				<br />
 			</c:if> 
 		</c:forEach>
+		
 	</div>
 
 	<!-- Reflections -->
 	<c:if test="${not empty sessionDTO.userDTOs && sessionDTO.reflectOnActivity}">
-
+		<br />
 		<br />
 		<hr />
 		<br />
