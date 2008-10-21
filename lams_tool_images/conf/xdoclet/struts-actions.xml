@@ -232,6 +232,25 @@
 			<forward name="success" path="/pages/monitoring/notebook.jsp" />
 		</action>
 		
+		<!-- ========== Admin Definitions ============================== -->		
+		
+		<action path="/laimag10admin/start"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AdminAction"
+			name="imageGalleryAdminForm" 
+			scope="request" 
+			parameter="start" 
+			validate="false">
+			<forward name="config" path="/pages/admin/config.jsp" />
+		</action>
+		<action path="/laimag10admin/saveContent"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AdminAction"
+			name="imageGalleryAdminForm" 
+			scope="request" 
+			parameter="saveContent" 
+			validate="false">
+			<forward name="config" path="/pages/admin/config.jsp" />
+		</action>
+		
 		<!-- ========== Common Definitions============================== -->
 		
 		<action path="/clearsession"

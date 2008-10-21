@@ -5,6 +5,8 @@ drop table if exists tl_laimag10_imageGallery_item;
 drop table if exists tl_laimag10_imageGallery_item_visit_log;
 drop table if exists tl_laimag10_session;
 drop table if exists tl_laimag10_user;
+drop table if exists tl_laimag10_configuration;
+
 create table tl_laimag10_attachment (
    attachment_uid bigint not null auto_increment,
    file_version_id bigint,
@@ -88,6 +90,13 @@ create table tl_laimag10_user (
    imageGallery_uid bigint,
    primary key (uid)
 )type=innodb;
+create table tl_laimag10_configuration (
+   uid bigint not null auto_increment,
+   config_key varchar(30) unique,
+   config_value varchar(255),
+   primary key (uid)
+)TYPE=InnoDB;
+
 alter table tl_laimag10_attachment add index FK_NEW_1821149711_1E7009430E79035 (imageGallery_uid), add constraint FK_NEW_1821149711_1E7009430E79035 foreign key (imageGallery_uid) references tl_laimag10_imageGallery (uid);
 alter table tl_laimag10_imageGallery add index FK_NEW_1821149711_89093BF758092FB (create_by), add constraint FK_NEW_1821149711_89093BF758092FB foreign key (create_by) references tl_laimag10_user (uid);
 alter table tl_laimag10_imageGallery_item add index FK_NEW_1821149711_F52D1F93758092FB (create_by), add constraint FK_NEW_1821149711_F52D1F93758092FB foreign key (create_by) references tl_laimag10_user (uid);
@@ -99,11 +108,15 @@ alter table tl_laimag10_session add index FK_NEW_1821149711_24AA78C530E79035 (im
 alter table tl_laimag10_user add index FK_NEW_1821149711_30113BFCEC0D3147 (session_uid), add constraint FK_NEW_1821149711_30113BFCEC0D3147 foreign key (session_uid) references tl_laimag10_session (uid);
 alter table tl_laimag10_user add index FK_NEW_1821149711_30113BFC309ED320 (imageGallery_uid), add constraint FK_NEW_1821149711_30113BFC309ED320 foreign key (imageGallery_uid) references tl_laimag10_imageGallery (uid);
 
-
-
 INSERT INTO `tl_laimag10_imageGallery` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`,
  `instructions`, `next_image_title`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `allow_comment_images`, 
  `allow_share_images`, `allow_vote`, `allow_rank`, `reflect_on_activity`) VALUES
   (1,NULL,NULL,NULL,'ImageGallery','0','0','Instructions ',1,null,null,0,0,${default_content_id},0,0,0,0,0);
+
+INSERT INTO `tl_laimag10_configuration` (`config_key`, `config_value`) VALUES
+  ('mediumImageDimensions',	'640');
+INSERT INTO `tl_laimag10_configuration` (`config_key`, `config_value`) VALUES
+  ('thumbnailImageDimensions', '100');
+
   
 SET FOREIGN_KEY_CHECKS=1;

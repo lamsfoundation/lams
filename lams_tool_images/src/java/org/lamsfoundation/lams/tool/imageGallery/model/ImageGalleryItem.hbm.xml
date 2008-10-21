@@ -50,6 +50,40 @@
             column="sequence_id"
         />
 
+        <many-to-one
+            name="createBy"
+            class="org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="create_by"
+        />
+
+        <property
+            name="createDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="create_date"
+        />
+
+        <property
+            name="createByAuthor"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="create_by_author"
+        />
+
+        <property
+            name="hide"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="is_hide"
+        />
+
         <property
             name="originalFileUuid"
             type="java.lang.Long"
@@ -96,40 +130,6 @@
             update="true"
             insert="true"
             column="file_name"
-        />
-
-        <many-to-one
-            name="createBy"
-            class="org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser"
-            cascade="none"
-            outer-join="auto"
-            update="true"
-            insert="true"
-            column="create_by"
-        />
-
-        <property
-            name="createDate"
-            type="java.util.Date"
-            update="true"
-            insert="true"
-            column="create_date"
-        />
-
-        <property
-            name="createByAuthor"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="create_by_author"
-        />
-
-        <property
-            name="hide"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="is_hide"
         />
 
         <!--

@@ -25,6 +25,7 @@
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryItemVisitLog.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGallerySession.hbm.xml</value>
+			   <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryConfigItem.hbm.xml</value>               
             </list>
         </property>
     </bean>
@@ -63,6 +64,12 @@
             <ref local="imageGallerySessionFactory"/>
         </property>
     </bean>
+    
+   <bean id="imageGalleryConfigItemDAO" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryConfigItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="imageGallerySessionFactory"/>
+        </property>
+    </bean>    
 
 
     <!-- Managers -->
@@ -88,6 +95,9 @@
         </property>
         <property name="imageGallerySessionDao">
             <ref local="imageGallerySessionDao"/>
+        </property>
+        <property name="imageGalleryConfigItemDAO">
+            <ref local="imageGalleryConfigItemDAO"/>
         </property>
         <property name="imageGalleryToolContentHandler">
             <ref local="imageGalleryToolContentHandler"/>

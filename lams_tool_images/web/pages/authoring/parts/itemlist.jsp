@@ -19,17 +19,17 @@
 
 		<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
 			<tr>
-				<td class="field-name align-center" width="4%">
+				<td width="4%" align="center">
 					<c:set var="thumbnailPath">
 					   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
 					</c:set>
 				 	<c:set var="mediumImagePath">
 	   					<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
 					</c:set>					
-					<a href="${mediumImagePath}" rel="lightbox" title="Enlarge image"><img src="${thumbnailPath}" /></a>
+					<a href="${mediumImagePath}" rel="lightbox" title="Enlarge image" ><img src="${thumbnailPath}" /></a>
 				</td>
 				
-				<td>
+				<td style="vertical-align:middle;">
 					<a href="${mediumImagePath}" rel="lightbox" title="Enlarge image">${image.title}</a>
 				</td>
 
@@ -41,7 +41,7 @@
 				</td>
 --%>
 				
-				<td width="40px" style="valign:bottom;">
+				<td width="40px" style="vertical-align:middle;">
 					<c:if test="${not status.first}">
 						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
 							border="0" title="<fmt:message key="label.authoring.up"/>"
@@ -66,13 +66,13 @@
 					</c:if>
 				</td>
 				
-				<td width="20px" >
+				<td width="20px" style="vertical-align:middle;">
 					<img src="${tool}includes/images/edit.gif"
 						title="<fmt:message key="label.authoring.basic.resource.edit" />"
 						onclick="editItem(${status.index},'${sessionMapID}')" />
                 </td>
                 
-				<td width="20px">
+				<td width="20px" style="vertical-align:middle;">
 					<img src="${tool}includes/images/cross.gif"
 						title="<fmt:message key="label.authoring.basic.resource.delete" />"
 						onclick="deleteItem(${status.index},'${sessionMapID}')" />

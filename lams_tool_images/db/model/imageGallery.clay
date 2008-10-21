@@ -14,7 +14,7 @@
 <table-list>
 <table alias="" name="tl_laimag10_attachment" remarks="" uid="120fac0:11c25acc4f7:-7ffd">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="344" y="-26"/>
+<table-figure-bounds height="-1" width="-1" x="435" y="-23"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7ffb">
 <column-description/>
@@ -114,82 +114,6 @@
 </index>
 </index-list>
 </table>
-<table alias="" name="tl_laimag10_item_instruction" remarks="" uid="120fac0:11c25acc4f7:-7ff2">
-<table-description/>
-<table-figure-bounds height="-1" width="-1" x="599" y="524"/>
-<column-list>
-<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7ff0">
-<column-description/>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="description" remarks="" uid="120fac0:11c25acc4f7:-7fef">
-<column-description/>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="sequence_id" remarks="" uid="120fac0:11c25acc4f7:-7fee">
-<column-description/>
-<data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
-<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
-<variant type-name-pattern="INT"/>
-<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
-<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
-<variant type-name-pattern="INT UNSIGNED"/>
-<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="INT ZEROFILL"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="item_uid" remarks="" uid="120fac0:11c25acc4f7:-7fed">
-<column-description/>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
-</column-list>
-<primary-key alias="" name="PRIMARY" remarks="" uid="120fac0:11c25acc4f7:-7ff1">
-<primary-key-description/>
-<primary-key-column name="uid"/>
-</primary-key>
-<unique-key-list/>
-<foreign-key-list>
-<foreign-key alias="" name="FK_NEW_1821149711_A5665013980570ED" on-delete="NO ACTION" on-update="NO ACTION" referenced-key="PRIMARY" referenced-table="tl_laimag10_imageGallery_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="120fac0:11c25acc4f7:-7f9c">
-<foreign-key-description/>
-<foreign-key-figure>
-<fk-fig-bendpoint-list/>
-</foreign-key-figure>
-<foreign-key-column column-name="item_uid" referenced-key-column-name="uid"/>
-</foreign-key>
-</foreign-key-list>
-<index-list>
-<index alias="" name="PRIMARY_ITEM_INSTRUCTION" remarks="" uid="120fac0:11c25acc4f7:-7fec" unique="true">
-<index-description/>
-<index-column name="uid" sort="ASC"/>
-</index>
-<index alias="" name="FK_NEW_1821149711_A5665013980570ED" remarks="" uid="120fac0:11c25acc4f7:-7feb" unique="false">
-<index-description/>
-<index-column name="item_uid" sort="ASC"/>
-</index>
-</index-list>
-</table>
 <table alias="" name="tl_laimag10_imageGallery" remarks="" uid="120fac0:11c25acc4f7:-7fea">
 <table-description/>
 <table-figure-bounds height="-1" width="-1" x="26" y="31"/>
@@ -207,19 +131,7 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="19" decimal-digits="0" default-value="" mandatory="false" name="create_date" remarks="" uid="120fac0:11c25acc4f7:-7fe7">
-<column-description/>
-<data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
-<variant type-name-pattern="DATETIME"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="19" decimal-digits="0" default-value="" mandatory="false" name="update_date" remarks="" uid="120fac0:11c25acc4f7:-7fe6">
-<column-description/>
-<data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
-<variant type-name-pattern="DATETIME"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="create_by" remarks="" uid="120fac0:11c25acc4f7:-7fe5">
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="content_id" remarks="" uid="120fac0:11c25acc4f7:-7fdc">
 <column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
@@ -239,49 +151,13 @@
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="run_offline" remarks="" uid="120fac0:11c25acc4f7:-7fe3">
-<column-description/>
-<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
-<variant type-name-pattern="BIT"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="lock_on_finished" remarks="" uid="120fac0:11c25acc4f7:-7fe2">
-<column-description/>
-<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
-<variant type-name-pattern="BIT"/>
-</data-type>
-</column>
 <column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="instructions" remarks="" uid="120fac0:11c25acc4f7:-7fe1">
 <column-description/>
 <data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
 <variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="online_instructions" remarks="" uid="120fac0:11c25acc4f7:-7fe0">
-<column-description/>
-<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
-<variant type-name-pattern="TEXT"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="offline_instructions" remarks="" uid="120fac0:11c25acc4f7:-7fdf">
-<column-description/>
-<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
-<variant type-name-pattern="TEXT"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="content_in_use" remarks="" uid="120fac0:11c25acc4f7:-7fde">
-<column-description/>
-<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
-<variant type-name-pattern="BIT"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="define_later" remarks="" uid="120fac0:11c25acc4f7:-7fdd">
-<column-description/>
-<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
-<variant type-name-pattern="BIT"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="content_id" remarks="" uid="120fac0:11c25acc4f7:-7fdc">
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="nextImageTitle" remarks="" uid="1dfbc7f:11d19d206fd:-7fed">
 <column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
@@ -294,23 +170,29 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="allow_add_files" remarks="" uid="120fac0:11c25acc4f7:-7fdb">
+<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="run_offline" remarks="" uid="120fac0:11c25acc4f7:-7fe3">
 <column-description/>
 <data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
 <variant type-name-pattern="BIT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="allow_add_urls" remarks="" uid="120fac0:11c25acc4f7:-7fda">
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="allow_vote" remarks="" uid="120fac0:11c25acc4f7:-7fdb">
 <column-description/>
 <data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
 <variant type-name-pattern="BIT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="min_view_imageGallery_number" remarks="" uid="120fac0:11c25acc4f7:-7fd9">
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="allow_rank" remarks="" uid="120fac0:11c25acc4f7:-7fda">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="number_columns" remarks="" uid="120fac0:11c25acc4f7:-7fd9">
 <column-description/>
 <data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
-<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
 <variant type-name-pattern="INT"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
@@ -319,23 +201,71 @@
 <variant type-name-pattern="INT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="allow_auto_run" remarks="" uid="120fac0:11c25acc4f7:-7fd8">
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="allow_comment_images" remarks="" uid="120fac0:11c25acc4f7:-7fd8">
 <column-description/>
 <data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
 <variant type-name-pattern="BIT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="0" mandatory="false" name="assigment_submit_notify" remarks="" uid="120fac0:11c25acc4f7:-7f91">
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="0" mandatory="false" name="allow_share_images" remarks="" uid="120fac0:11c25acc4f7:-7f91">
 <column-description/>
-<data-type jdbc-type="-6" name="TINYINT" selected-variant-pattern="TINYINT">
-<variant type-name-pattern="TINYINT"/>
-<variant type-name-pattern="TINYINT UNSIGNED"/>
-<variant type-name-pattern="TINYINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="TINYINT ZEROFILL"/>
-<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n)"/>
-<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED"/>
-<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="1" precision-min="0" precision-variable="%n" type-name-pattern="TINYINT(%n) ZEROFILL"/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="lock_when_finished" remarks="" uid="120fac0:11c25acc4f7:-7fe2">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="define_later" remarks="" uid="120fac0:11c25acc4f7:-7fdd">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="1" decimal-digits="0" default-value="" mandatory="false" name="content_in_use" remarks="" uid="120fac0:11c25acc4f7:-7fde">
+<column-description/>
+<data-type jdbc-type="-7" name="BIT" selected-variant-pattern="BIT">
+<variant type-name-pattern="BIT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="created" remarks="" uid="120fac0:11c25acc4f7:-7fe7">
+<column-description/>
+<data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="updated" remarks="" uid="120fac0:11c25acc4f7:-7fe6">
+<column-description/>
+<data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="create_by" remarks="" uid="120fac0:11c25acc4f7:-7fe5">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="online_instructions" remarks="" uid="120fac0:11c25acc4f7:-7fe0">
+<column-description/>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="offline_instructions" remarks="" uid="120fac0:11c25acc4f7:-7fdf">
+<column-description/>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
 </data-type>
 </column>
 </column-list>
@@ -385,59 +315,6 @@
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="file_uuid" remarks="" uid="120fac0:11c25acc4f7:-7fd1">
-<column-description/>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="file_version_id" remarks="" uid="120fac0:11c25acc4f7:-7fd0">
-<column-description/>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
-<variant type-name-pattern="BIGINT"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
-<variant type-name-pattern="BIGINT UNSIGNED"/>
-<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="BIGINT ZEROFILL"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="description" remarks="" uid="120fac0:11c25acc4f7:-7fcf">
-<column-description/>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="ims_schema" remarks="" uid="120fac0:11c25acc4f7:-7fce">
-<column-description/>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="init_item" remarks="" uid="120fac0:11c25acc4f7:-7fcd">
-<column-description/>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="organization_xml" remarks="" uid="120fac0:11c25acc4f7:-7fcc">
-<column-description/>
-<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
-<variant type-name-pattern="TEXT"/>
-</data-type>
-</column>
 <column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="title" remarks="" uid="120fac0:11c25acc4f7:-7fcb">
 <column-description/>
 <data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
@@ -445,10 +322,11 @@
 <variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="65535" decimal-digits="0" default-value="" mandatory="false" name="url" remarks="" uid="120fac0:11c25acc4f7:-7fca">
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="description" remarks="" uid="120fac0:11c25acc4f7:-7fcf">
 <column-description/>
-<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
-<variant type-name-pattern="TEXT"/>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="create_by" remarks="" uid="120fac0:11c25acc4f7:-7fc9">
@@ -482,33 +360,6 @@
 <variant type-name-pattern="BIT"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="6" decimal-digits="0" default-value="" mandatory="false" name="item_type" remarks="" uid="120fac0:11c25acc4f7:-7fc5">
-<column-description/>
-<data-type jdbc-type="5" name="SMALLINT" selected-variant-pattern="SMALLINT(%n)">
-<variant precision-max="5" precision-min="0" precision-variable="%n" type-name-pattern="SMALLINT(%n)"/>
-<variant type-name-pattern="SMALLINT"/>
-<variant precision-max="5" precision-min="0" precision-variable="%n" type-name-pattern="SMALLINT(%n) UNSIGNED"/>
-<variant precision-max="5" precision-min="0" precision-variable="%n" type-name-pattern="SMALLINT(%n) UNSIGNED ZEROFILL"/>
-<variant precision-max="5" precision-min="0" precision-variable="%n" type-name-pattern="SMALLINT(%n) ZEROFILL"/>
-<variant type-name-pattern="SMALLINT UNSIGNED"/>
-<variant type-name-pattern="SMALLINT UNSIGNED ZEROFILL"/>
-<variant type-name-pattern="SMALLINT ZEROFILL"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="file_type" remarks="" uid="120fac0:11c25acc4f7:-7fc4">
-<column-description/>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
-</data-type>
-</column>
-<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="file_name" remarks="" uid="120fac0:11c25acc4f7:-7fc3">
-<column-description/>
-<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
-<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
-</data-type>
-</column>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="imageGallery_uid" remarks="" uid="120fac0:11c25acc4f7:-7fc2">
 <column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
@@ -533,6 +384,67 @@
 <variant type-name-pattern="BIGINT UNSIGNED"/>
 <variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
 <variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="original_file_uuid" remarks="" uid="120fac0:11c25acc4f7:-7fd1">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="medium_file_uuid" remarks="" uid="1dfbc7f:11d19d206fd:-7ff7">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="10" decimal-digits="0" default-value="" mandatory="false" name="thumbnail_file_uuid" remarks="" uid="1dfbc7f:11d19d206fd:-7ff4">
+<column-description/>
+<data-type jdbc-type="1" literal-prefix="'" literal-suffix="'" name="CHAR" selected-variant-pattern="CHAR(%n)">
+<variant precision-max="255" precision-min="0" precision-variable="%n" type-name-pattern="CHAR(%n)"/>
+<variant type-name-pattern="CHAR"/>
+<variant precision-max="255" precision-min="0" precision-variable="%n" type-name-pattern="CHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="file_name" remarks="" uid="120fac0:11c25acc4f7:-7fc3">
+<column-description/>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="file_version_id" remarks="" uid="120fac0:11c25acc4f7:-7fd0">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="255" decimal-digits="0" default-value="" mandatory="false" name="file_type" remarks="" uid="120fac0:11c25acc4f7:-7fc4">
+<column-description/>
+<data-type jdbc-type="12" literal-prefix="'" literal-suffix="'" name="VARCHAR" selected-variant-pattern="VARCHAR(%n)">
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n)"/>
+<variant precision-max="255" precision-min="1" precision-variable="%n" type-name-pattern="VARCHAR(%n) BINARY"/>
 </data-type>
 </column>
 </column-list>
@@ -585,7 +497,7 @@
 </table>
 <table alias="" name="tl_laimag10_item_log" remarks="" uid="120fac0:11c25acc4f7:-7fbc">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="820" y="424"/>
+<table-figure-bounds height="-1" width="-1" x="810" y="464"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7fba">
 <column-description/>
@@ -677,7 +589,7 @@
 </table>
 <table alias="" name="tl_laimag10_session" remarks="" uid="120fac0:11c25acc4f7:-7fb2">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="308" y="193"/>
+<table-figure-bounds height="-1" width="-1" x="596" y="302"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7fb0">
 <column-description/>

@@ -50,6 +50,12 @@ public class ImageGalleryItem implements Cloneable {
 
     private int sequenceId;
 
+    private boolean isHide;
+    private boolean isCreateByAuthor;
+
+    private Date createDate;
+    private ImageGalleryUser createBy;
+    
     private Long originalFileUuid;
     
     private Long mediumFileUuid;
@@ -61,12 +67,6 @@ public class ImageGalleryItem implements Cloneable {
     private String fileName;
 
     private String fileType;
-
-    private boolean isHide;
-    private boolean isCreateByAuthor;
-
-    private Date createDate;
-    private ImageGalleryUser createBy;
 
     // ***********************************************
     // DTO fields:
@@ -155,6 +155,63 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
+     * @hibernate.many-to-one cascade="none" column="create_by"
+     * 
+     * @return
+     */
+    public ImageGalleryUser getCreateBy() {
+	return createBy;
+    }
+
+    public void setCreateBy(ImageGalleryUser createBy) {
+	this.createBy = createBy;
+    }
+
+    /**
+     * @hibernate.property column="create_date"
+     * @return
+     */
+    public Date getCreateDate() {
+	return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+	this.createDate = createDate;
+    }
+
+    /**
+     * @hibernate.property column="create_by_author"
+     * @return
+     */
+    public boolean isCreateByAuthor() {
+	return isCreateByAuthor;
+    }
+
+    public void setCreateByAuthor(boolean isCreateByAuthor) {
+	this.isCreateByAuthor = isCreateByAuthor;
+    }
+
+    /**
+     * @hibernate.property column="is_hide"
+     * @return
+     */
+    public boolean isHide() {
+	return isHide;
+    }
+
+    public void setHide(boolean isHide) {
+	this.isHide = isHide;
+    }
+
+    public void setComplete(boolean complete) {
+	this.complete = complete;
+    }
+
+    public boolean isComplete() {
+	return complete;
+    }
+    
+    /**
      * @hibernate.property column="original_file_uuid"
      * 
      * @return
@@ -226,61 +283,5 @@ public class ImageGalleryItem implements Cloneable {
     public void setFileName(String name) {
 	this.fileName = name;
     }
-
-    /**
-     * @hibernate.many-to-one cascade="none" column="create_by"
-     * 
-     * @return
-     */
-    public ImageGalleryUser getCreateBy() {
-	return createBy;
-    }
-
-    public void setCreateBy(ImageGalleryUser createBy) {
-	this.createBy = createBy;
-    }
-
-    /**
-     * @hibernate.property column="create_date"
-     * @return
-     */
-    public Date getCreateDate() {
-	return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-	this.createDate = createDate;
-    }
-
-    /**
-     * @hibernate.property column="create_by_author"
-     * @return
-     */
-    public boolean isCreateByAuthor() {
-	return isCreateByAuthor;
-    }
-
-    public void setCreateByAuthor(boolean isCreateByAuthor) {
-	this.isCreateByAuthor = isCreateByAuthor;
-    }
-
-    /**
-     * @hibernate.property column="is_hide"
-     * @return
-     */
-    public boolean isHide() {
-	return isHide;
-    }
-
-    public void setHide(boolean isHide) {
-	this.isHide = isHide;
-    }
-
-    public void setComplete(boolean complete) {
-	this.complete = complete;
-    }
-
-    public boolean isComplete() {
-	return complete;
-    }
+    
 }

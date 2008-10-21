@@ -29,13 +29,13 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryAttachment;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
@@ -287,4 +287,19 @@ public interface IImageGalleryService {
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
+
+    /**
+     * Get the ImageGallery config item by key
+     * 
+     * @param key
+     * @return
+     */
+    public ImageGalleryConfigItem getConfigItem(String key);
+
+    /**
+     * Save a ImageGallery configItem
+     * 
+     * @param item
+     */
+    public void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item);    
 }

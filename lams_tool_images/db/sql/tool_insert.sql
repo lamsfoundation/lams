@@ -30,7 +30,8 @@ language_file,
 classpath_addition,
 context_file,
 create_date_time,
-modified_date_time
+modified_date_time,
+admin_url
 )
 VALUES
 (
@@ -60,5 +61,6 @@ NULL,
 'lams-tool-laimag10.jar',
 '/org/lamsfoundation/lams/tool/imageGallery/imageGalleryApplicationContext.xml',
 NOW(),
-NOW()
+NOW(),
+'tool/laimag10/laimag10admin/start.do'
 )

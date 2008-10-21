@@ -23,8 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -91,6 +93,7 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryAttachmentDAO;
+import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryConfigItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemVisitDAO;
@@ -100,6 +103,7 @@ import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryAttachment;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItemVisitLog;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
@@ -111,6 +115,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -147,6 +152,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ImageGallerySessionDAO imageGallerySessionDao;
 
     private ImageGalleryItemVisitDAO imageGalleryItemVisitDao;
+    
+    private ImageGalleryConfigItemDAO imageGalleryConfigItemDAO;
 
     // tool service
     private ImageGalleryToolContentHandler imageGalleryToolContentHandler;
@@ -169,7 +176,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
-
+    
     // *******************************************************************************
     // Service method
     // *******************************************************************************
@@ -686,12 +693,20 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	image.setFileVersionId(nodeKey.getVersion());
 	image.setOriginalFileUuid(nodeKey.getUuid());
 
-	String mediumFileName = "medium_" + file.getFileName();
-	NodeKey mediumNodeKey = createScaledImage(nodeKey, mediumFileName, file.getContentType(), 640);
+	ImageGalleryConfigItem mediumImageDimensionsKey = getConfigItem(ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
+	int mediumImageDimensions = 640;
+	if (mediumImageDimensionsKey != null && mediumImageDimensionsKey.getConfigValue() != null) {
+	    mediumImageDimensions = Integer.parseInt(mediumImageDimensionsKey.getConfigValue());
+	}
+	NodeKey mediumNodeKey = createScaledImage(nodeKey, "medium_" + file.getFileName(), file.getContentType(), mediumImageDimensions);
 	image.setMediumFileUuid(mediumNodeKey.getUuid());
-	
-	String thumbnailFileName = "thumbnail_" + file.getFileName();
-	NodeKey thumbnailNodeKey = createScaledImage(mediumNodeKey, thumbnailFileName, file.getContentType(), 100);
+
+	ImageGalleryConfigItem thumbnailImageDimensionsKey = getConfigItem(ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
+	int thumbnailImageDimensions = 80;
+	if (thumbnailImageDimensionsKey != null && thumbnailImageDimensionsKey.getConfigValue() != null) {
+	    thumbnailImageDimensions = Integer.parseInt(thumbnailImageDimensionsKey.getConfigValue());
+	}
+	NodeKey thumbnailNodeKey = createScaledImage(mediumNodeKey, "thumbnail_" + file.getFileName(), file.getContentType(), thumbnailImageDimensions);
 	image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
     }
     
@@ -737,55 +752,137 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      *                The width and height of the thumbnail must be maxDim pixels or less.
      * @throws UploadImageGalleryFileException 
      */
-    private NodeKey createScaledImage(NodeKey nodeKey, String fileName, String contentType, int maxDim) throws UploadImageGalleryFileException {
+    /**
+     * Reads an image in a file and creates a thumbnail in another file.
+     * 
+     * @param orig
+     *                The name of image file.
+     * @param thumb
+     *                The name of thumbnail file. Will be created if necessary.
+     * @param maxDim
+     *                The width and height of the thumbnail must be maxDim pixels or less.
+     * @throws UploadImageGalleryFileException
+     */
+    /**
+     * Reads an image in a file and creates a thumbnail in another file. largestDimension is the largest dimension of
+     * the thumbnail, the other dimension is scaled accordingly. Utilises weighted stepping method to gradually reduce
+     * the image size for better results, i.e. larger steps to start with then smaller steps to finish with. Note:
+     * always writes a JPEG because GIF is protected or something - so always make your outFilename end in 'jpg' PNG's
+     * with transparency are given white backgrounds
+     */
+    private NodeKey createScaledImage(NodeKey nodeKey, String fileName, String contentType, int largestDimension)
+	    throws UploadImageGalleryFileException {
 	NodeKey scaledNodeKey = null;
 	try {
+	    double scale;
+	    int sizeDifference, originalImageLargestDim;
+
 	    // Read the original image from the repository
 	    InputStream is = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
-	    BufferedImage originalImage = ImageIO.read(is);
+	    BufferedImage inImage = ImageIO.read(is);
 
-	    // Determine the scale.
-	    double scale = (double) maxDim / (double) originalImage.getHeight(null);
-	    if (originalImage.getWidth(null) > originalImage.getHeight(null)) {
-		scale = (double) maxDim / (double) originalImage.getWidth(null);
+	    // find biggest dimension
+	    if (inImage.getWidth(null) > inImage.getHeight(null)) {
+		scale = (double) largestDimension / (double) inImage.getWidth(null);
+		sizeDifference = inImage.getWidth(null) - largestDimension;
+		originalImageLargestDim = inImage.getWidth(null);
+	    } else {
+		scale = (double) largestDimension / (double) inImage.getHeight(null);
+		sizeDifference = inImage.getHeight(null) - largestDimension;
+		originalImageLargestDim = inImage.getHeight(null);
 	    }
+	    // create an image buffer to draw to
+	    BufferedImage outImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB); // arbitrary init so
+	    // code compiles
+	    Graphics2D g2d;
+	    AffineTransform tx;
+	    if (scale < 1.0d) // only scale if desired size is smaller than original
+	    {
+		int numSteps = ((sizeDifference / 200) != 0) ? (sizeDifference / 200) : 1;
+		int stepSize = sizeDifference / numSteps;
+		int stepWeight = stepSize / 2;
+		int heavierStepSize = stepSize + stepWeight;
+		int lighterStepSize = stepSize - stepWeight;
+		int currentStepSize, centerStep;
+		double scaledW = inImage.getWidth(null);
+		double scaledH = inImage.getHeight(null);
+		if (numSteps % 2 == 1) {
+		    centerStep = (int) Math.ceil(numSteps / 2d); // find the center step
+		} else {
+		    centerStep = -1; // set it to -1 so it's ignored later
+		}
+		Integer intermediateSize = originalImageLargestDim, previousIntermediateSize = originalImageLargestDim;
+		Integer calculatedDim;
+		for (Integer i = 0; i < numSteps; i++) {
+		    if (i + 1 != centerStep) // if this isn't the center step
+		    {
+			if (i == numSteps - 1) // if this is the last step
+			{
+			    // fix the stepsize to account for decimal place errors previously
+			    currentStepSize = previousIntermediateSize - largestDimension;
+			} else {
+			    if (numSteps - i > numSteps / 2) {
+				currentStepSize = heavierStepSize;
+			    } else {
+				currentStepSize = lighterStepSize;
+			    }
+			}
+		    } else // center step, use natural step size
+		    {
+			currentStepSize = stepSize;
+		    }
+		    intermediateSize = previousIntermediateSize - currentStepSize;
+		    scale = (double) intermediateSize / (double) previousIntermediateSize;
+		    scaledW = (int) scaledW * scale;
+		    scaledH = (int) scaledH * scale;
+		    outImage = new BufferedImage((int) scaledW, (int) scaledH, BufferedImage.TYPE_INT_RGB);
+		    g2d = outImage.createGraphics();
+		    g2d.setBackground(Color.WHITE);
+		    g2d.clearRect(0, 0, outImage.getWidth(), outImage.getHeight());
+		    g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
-	    // Determine size of new image. One of them should equal maxDim.
-	    int scaledW = (int) (scale * originalImage.getWidth(null));
-	    int scaledH = (int) (scale * originalImage.getHeight(null));
-
-	    // Create an image buffer in which to paint on.
-	    BufferedImage mediumFile = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
-
-	    // Set the scale.
-	    AffineTransform tx = new AffineTransform();
-
-	    // If the image is smaller than the desired image size, don't bother scaling.
-	    if (scale < 1.0d) {
-		tx.scale(scale, scale);
+		    tx = new AffineTransform();
+		    tx.scale(scale, scale);
+		    g2d.drawImage(inImage, tx, null);
+		    g2d.dispose();
+		    inImage = outImage;
+		    previousIntermediateSize = intermediateSize;
+		}
+	    } else {
+		// just copy the original
+		outImage = new BufferedImage(inImage.getWidth(null), inImage.getHeight(null),
+			BufferedImage.TYPE_INT_RGB);
+		g2d = outImage.createGraphics();
+		g2d.setBackground(Color.WHITE);
+		g2d.clearRect(0, 0, outImage.getWidth(), outImage.getHeight());
+		tx = new AffineTransform();
+		tx.setToIdentity(); // use identity matrix so image is copied exactly
+		g2d.drawImage(inImage, tx, null);
+		g2d.dispose();
 	    }
-
-	    // Paint image.
-	    Graphics2D g2d = mediumFile.createGraphics();
-	    g2d.drawImage(originalImage, tx, null);
-	    g2d.dispose();
 
 	    // buffer all data in a circular buffer of infinite size
 	    CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
-	    ImageIO.write(mediumFile, "JPG", cbb.getOutputStream());
+	    ImageIO.write(outImage, "JPG", cbb.getOutputStream());
 	    cbb.getOutputStream().close();
 
-	    scaledNodeKey = imageGalleryToolContentHandler.uploadFile(cbb.getInputStream(), fileName, contentType, IToolContentHandler.TYPE_ONLINE);
+	    scaledNodeKey = imageGalleryToolContentHandler.uploadFile(cbb.getInputStream(), fileName, contentType,
+		    IToolContentHandler.TYPE_ONLINE);
 
 	} catch (FileException e) {
-	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.file.exception") + ":" + e.toString());
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.file.exception") + ":"
+		    + e.toString());
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.file.exception"));
 	} catch (ItemNotFoundException e) {
-	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.item.not.found.exception") + ":" + e.toString());
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.item.not.found.exception") + ":"
+		    + e.toString());
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.item.not.found.exception"));
 	} catch (RepositoryCheckedException e) {
-	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.repository.checked.exception") + ":" + e.toString());
-	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.repository.checked.exception"));
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.repository.checked.exception") + ":"
+		    + e.toString());
+	    throw new UploadImageGalleryFileException(messageService
+		    .getMessage("error.msg.repository.checked.exception"));
 	} catch (IOException e) {
 	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.io.exception"));
@@ -847,6 +944,14 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void setImageGalleryItemVisitDao(ImageGalleryItemVisitDAO imageGalleryItemVisitDao) {
 	this.imageGalleryItemVisitDao = imageGalleryItemVisitDao;
     }
+    
+    public ImageGalleryConfigItemDAO getImageGalleryConfigItemDAO() {
+	return imageGalleryConfigItemDAO;
+    }
+
+    public void setImageGalleryConfigItemDAO(ImageGalleryConfigItemDAO imageGalleryConfigItemDAO) {
+	this.imageGalleryConfigItemDAO = imageGalleryConfigItemDAO;
+    }    
 
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods
@@ -1122,5 +1227,13 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
+
+    public ImageGalleryConfigItem getConfigItem(String key) {
+	return imageGalleryConfigItemDAO.getConfigItemByKey(key);
+    }
+
+    public void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item) {
+	imageGalleryConfigItemDAO.saveOrUpdate(item);
+    }    
 
 }

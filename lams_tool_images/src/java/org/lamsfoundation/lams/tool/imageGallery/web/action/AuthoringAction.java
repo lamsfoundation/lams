@@ -139,11 +139,11 @@ public class AuthoringAction extends Action {
 	if (param.equals("editItemInit")) {
 	    return editItemInit(mapping, form, request, response);
 	}
+	if (param.equals("removeItemAttachment")) {
+	    return removeItemAttachment(mapping, form, request, response);
+	}
 	if (param.equals("saveOrUpdateItem")) {
 	    return saveOrUpdateItem(mapping, form, request, response);
-	}
-	if (param.equals("removeItem")) {
-	    return removeItem(mapping, form, request, response);
 	}
 	if (param.equals("upItem")) {
 	    return upImage(mapping, form, request, response);
@@ -151,9 +151,9 @@ public class AuthoringAction extends Action {
 	if (param.equals("downItem")) {
 	    return downImage(mapping, form, request, response);
 	}
-	if (param.equals("removeItemAttachment")) {
-	    return removeItemAttachment(mapping, form, request, response);
-	}
+	if (param.equals("removeItem")) {
+	    return removeItem(mapping, form, request, response);
+	}	
 
 	return mapping.findForward(ImageGalleryConstants.ERROR);
     }
@@ -597,7 +597,56 @@ public class AuthoringAction extends Action {
 
     }
     
+    // **********************************************************
+    // Add Image methods
+    // **********************************************************
 
+    /**
+     * Display empty page for new imageGallery item.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	((ImageGalleryItemForm) form).setSessionMapID(sessionMapID);
+
+	return mapping.findForward("file");
+    }
+    
+    /**
+     * Display edit page for existed imageGallery item.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	// get back sessionMAP
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+
+	int itemIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
+	ImageGalleryItem item = null;
+	if (itemIdx != -1) {
+	    SortedSet<ImageGalleryItem> imageGalleryList = getImageList(sessionMap);
+	    List<ImageGalleryItem> rList = new ArrayList<ImageGalleryItem>(imageGalleryList);
+	    item = rList.get(itemIdx);
+	    if (item != null) {
+		populateItemToForm(itemIdx, item, (ImageGalleryItemForm) form, request);
+	    }
+	}
+	return (item == null) ? null : mapping.findForward("file");
+    }    
+    
     /**
      * Remove imageGallery item attachment, such as single file, learning object ect. It is a ajax call and just
      * temporarily remove from page, all permenant change will happen only when user sumbit this imageGallery item
@@ -613,41 +662,48 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 	request.setAttribute("itemAttachment", null);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }
+    }    
 
     /**
-     * Remove imageGallery item from HttpSession list and update page display. As authoring rule, all persist only
-     * happen when user submit whole page. So this remove is just impact HttpSession values.
+     * This method will get necessary information from imageGallery item form and save or update into
+     * <code>HttpSession</code> ImageGalleryItemList. Notice, this save is not persist them into database, just save
+     * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
+     * persisted.
      * 
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
+     * @throws ServletException
      */
-    private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
+	ActionErrors errors = validateImageGalleryItem(itemForm);
 
-	int itemIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
-	if (itemIdx != -1) {
-	    SortedSet<ImageGalleryItem> imageGalleryList = getImageList(sessionMap);
-	    List<ImageGalleryItem> rList = new ArrayList<ImageGalleryItem>(imageGalleryList);
-	    ImageGalleryItem item = rList.remove(itemIdx);
-	    imageGalleryList.clear();
-	    imageGalleryList.addAll(rList);
-	    // add to delList
-	    List delList = getDeletedImageGalleryItemList(sessionMap);
-	    delList.add(item);
+	if (!errors.isEmpty()) {
+	    this.addErrors(request, errors);
+	    return mapping.findForward("file");
 	}
 
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	try {
+	    extractFormToImageGalleryItem(request, itemForm);
+	} catch (Exception e) {
+	    // any upload exception will display as normal error message rather then throw exception directly
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
+	    if (!errors.isEmpty()) {
+		this.addErrors(request, errors);
+		return mapping.findForward("file");
+	    }
+	}
+	// set session map ID so that itemlist.jsp can get sessionMAP
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
+	// return null to close this window
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
-
+    
     /**
      * Move up current item.
      * 
@@ -703,10 +759,11 @@ public class AuthoringAction extends Action {
 
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }
-
+    }    
+    
     /**
-     * Display edit page for existed imageGallery item.
+     * Remove imageGallery item from HttpSession list and update page display. As authoring rule, all persist only
+     * happen when user submit whole page. So this remove is just impact HttpSession values.
      * 
      * @param mapping
      * @param form
@@ -714,7 +771,7 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// get back sessionMAP
@@ -722,79 +779,23 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
-	ImageGalleryItem item = null;
 	if (itemIdx != -1) {
 	    SortedSet<ImageGalleryItem> imageGalleryList = getImageList(sessionMap);
 	    List<ImageGalleryItem> rList = new ArrayList<ImageGalleryItem>(imageGalleryList);
-	    item = rList.get(itemIdx);
-	    if (item != null) {
-		populateItemToForm(itemIdx, item, (ImageGalleryItemForm) form, request);
-	    }
-	}
-	return (item == null) ? null : mapping.findForward("file");
-    }
-
-    /**
-     * Display empty page for new imageGallery item.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	((ImageGalleryItemForm) form).setSessionMapID(sessionMapID);
-
-	return mapping.findForward("file");
-    }
-
-    /**
-     * This method will get necessary information from imageGallery item form and save or update into
-     * <code>HttpSession</code> ImageGalleryItemList. Notice, this save is not persist them into database, just save
-     * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
-     * persisted.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
-     */
-    private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
-	ActionErrors errors = validateImageGalleryItem(itemForm);
-
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
-	    return mapping.findForward("file");
+	    ImageGalleryItem item = rList.remove(itemIdx);
+	    imageGalleryList.clear();
+	    imageGalleryList.addAll(rList);
+	    // add to delList
+	    List delList = getDeletedImageGalleryItemList(sessionMap);
+	    delList.add(item);
 	}
 
-	try {
-	    extractFormToImageGalleryItem(request, itemForm);
-	} catch (Exception e) {
-	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
-	    if (!errors.isEmpty()) {
-		this.addErrors(request, errors);
-		return mapping.findForward("file");
-	    }
-	}
-	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
-	// return null to close this window
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }
-
-
+    }    
 
     // *************************************************************************************
-    // Private method
+    // Private methods
     // *************************************************************************************
     /**
      * Return ImageGalleryService bean.
@@ -1017,18 +1018,12 @@ public class AuthoringAction extends Action {
      */
     private ActionMessages validateImageGallery(ImageGalleryForm imageGalleryForm, HttpServletRequest request) {
 	ActionMessages errors = new ActionMessages();
-	// if (StringUtils.isBlank(imageGalleryForm.getImageGallery().getTitle())) {
-	// ActionMessage error = new ActionMessage("error.resource.item.title.blank");
-	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	// }
 
 	// define it later mode(TEACHER) skip below validation.
 	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
 	    return errors;
 	}
-
-	// Some other validation outside basic Tab.
 
 	return errors;
     }

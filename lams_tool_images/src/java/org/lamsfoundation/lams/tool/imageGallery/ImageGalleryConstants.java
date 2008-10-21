@@ -125,6 +125,10 @@ public class ImageGalleryConstants {
     public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
 
     public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
+    
+    public static final String ERROR_MSG_REQUIRED_FIELDS_MISSING = "error.required.fields.missing";
+    
+    public static final String ERROR_MSG_ENTERED_VALUES_NOT_INTEGERS = "error.entered.values.not.integers";
 
     public static final String PAGE_EDITABLE = "isPageEditable";
 
