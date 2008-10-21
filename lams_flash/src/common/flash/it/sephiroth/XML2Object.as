@@ -1,33 +1,33 @@
 /**
 * @class it.sephiroth.XML2Object
-* @author Alessandro Crugnola
+* @author Alessandro Crugnola
 * @version 1.0
-* @description return an object with the content of the XML translated
-* If a node has more than 1 child with the same name, an array is created with the children contents
-* The object created will have this structure:<br/>
-* 	- obj {<br/>
-*		nodeName : {<br/>
-*			attributes : an object containing the node attributes<br/>
-*			data : an object containing the node contents<br/>
-*	}<br/>
+* @description return an object with the content of the XML translated
+* If a node has more than 1 child with the same name, an array is created with the children contents
+* The object created will have this structure:<br/>
+* 	- obj {<br/>
+*		nodeName : {<br/>
+*			attributes : an object containing the node attributes<br/>
+*			data : an object containing the node contents<br/>
+*	}<br/>
 * @usage data = new XML2Object().parseXML( anXML);
 */
 class it.sephiroth.XML2Object extends XML {
 	private var oResult:Object = new Object ();
-	private var oXML:XML;
-	/**
-	* @method get xml
-	* @description return the xml passed in the parseXML method
-	* @usage theXML = XML2Object.xml
+	private var oXML:XML;
+	/**
+	* @method get xml
+	* @description return the xml passed in the parseXML method
+	* @usage theXML = XML2Object.xml
 	*/
 	public function get xml():XML{
 		return oXML
 	}
 	/**
-	* @method public parseXML
-	* @description return the parsed Object
-	* @usage XML2Object.parseXML( theXMLtoParse );
-	* @param sFile XML
+	* @method public parseXML
+	* @description return the parsed Object
+	* @usage XML2Object.parseXML( theXMLtoParse );
+	* @param sFile XML
 	* @returns an Object with the contents of the passed XML
 	*/
 	public function parseXML (sFile:XML):Object {
@@ -37,7 +37,7 @@ class it.sephiroth.XML2Object extends XML {
 		return this.oResult;
 	}
 	/**
-	* @method private translateXML
+	* @method private translateXML
 	* @description core of the XML2Object class
 	*/
 	private function translateXML (from, path, name, position) {

@@ -68,7 +68,6 @@ class ContributeActivity extends Activity {
         return ContributeActivity._instance;
 	}
 	
-	
 	public function populateFromDTO(dto:Object, id:String){
 		_activityID = dto.activityID;
 		_parentActivityID = dto.parentActivityID;

@@ -67,7 +67,7 @@ class Transition {
 		
 		Debugger.log('Created a new transition, transitionUIID:'+transitionUIID,Debugger.GEN,'Constructor','Transition');
 		
-	}
+	}
 	
 	public function isToGateActivity():Boolean{
 		var ddm = Application.getInstance().getDesignDataModel();
@@ -174,7 +174,7 @@ class Transition {
 	}
 	public function get mod_toUIID():Number{
 		return _mod_toUIID;
-	}
+	}
 	public function set title(a:String):Void{
 		_title = a;
 	}

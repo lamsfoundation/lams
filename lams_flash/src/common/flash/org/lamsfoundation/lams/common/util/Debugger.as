@@ -217,7 +217,7 @@ class org.lamsfoundation.lams.common.util.Debugger {
 			log("Recieved unsupported error type",Debugger.CRITICAL,"error","Debugger");
 		}
 		
-	}
+	}
 	/**
 	* Legacy Method to print a message to the output - trace or window...
 	* @param msg 			The actual message to be printed

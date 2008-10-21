@@ -353,7 +353,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		if (learnerListArr == null || learnerListArr == undefined){ 
 			learnerListArr = new Array();
-		}
+		}
 		this._activityLayer_mc.removeMovieClip();
 		this._nameLayer_mc.removeMovieClip();
 			

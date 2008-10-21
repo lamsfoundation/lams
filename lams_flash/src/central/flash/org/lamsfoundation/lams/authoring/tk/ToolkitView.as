@@ -31,12 +31,12 @@ import org.lamsfoundation.lams.authoring.tk.*;
 import org.lamsfoundation.lams.common.mvc.*;import org.lamsfoundation.lams.authoring.cv.*  
 
 import mx.managers.*;import mx.controls.*;
-import mx.events.*
+import mx.events.*
 /**
 * Authoring view for the toolkit
 * @author DC
 */
-class ToolkitView extends AbstractView {
+class ToolkitView extends AbstractView {
 	private var bkg_pnl:MovieClip;
 		private var toolkitLibraries_sp:MovieClip;
 	private var libraryActivityDesc_txa:TextArea;
@@ -270,7 +270,7 @@ class ToolkitView extends AbstractView {
 			yPos += templateActivity_mc._height;
 						
 			
-		}
+		}
 		_toolkitLoaded = true;
 		//toolkitLibraries_sp.refreshPane();		
 		
@@ -422,7 +422,7 @@ class ToolkitView extends AbstractView {
 	*/
 	public function getModel():ToolkitModel{
 			return ToolkitModel(model);
-	}
+	}
     /**
     * Returns the default controller for this view (ToolkitController).
 	* Overrides AbstractView.defaultController()

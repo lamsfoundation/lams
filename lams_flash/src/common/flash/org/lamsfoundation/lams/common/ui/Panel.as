@@ -46,7 +46,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 	private var boundingBox_mc : MovieClip;
 	private var border_mc : MovieClip;	//private var background_mc : MovieClip;	private var background_ct : Color;
 	private var _borderType : String;	private var _backgroundColour : Number; 
-	private var _borderColor : Number; 
+	private var _borderColor : Number; 
 	
 
 	/**
@@ -153,7 +153,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 		invalidate();
 	}
 	
-	
+	
 	/**
 	* Attaches the PanelAssets mc which contains all the actual
 	* mc's that make up the component
@@ -166,7 +166,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 		background_ct = new Color(panel.background_mc);		//the border is a MM rect border
 		border_mc = createClassObject(mx.skins.RectBorder,"border_mc", getNextHighestDepth()); //make sure this is the last
 		layoutChildren();
-	}
+	}
 	/**
 	* Lays out all the attached mcs.  Mainly handles re-sizes
 	* 
@@ -179,7 +179,7 @@ class org.lamsfoundation.lams.common.ui.Panel extends UIComponent
 		panel.background_mc._width = __width;
 		panel.background_mc._height = __height;		background_ct.setRGB(_backgroundColour);
 		
-		border_mc.setSize(__width, __height);
+		border_mc.setSize(__width, __height);
 		border_mc._x = panel.background_mc._x;
 		border_mc._y = panel.background_mc._y;
 				if(_borderType == "none"){

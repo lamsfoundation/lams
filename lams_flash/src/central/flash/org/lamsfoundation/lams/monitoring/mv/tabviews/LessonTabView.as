@@ -626,14 +626,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 			requiredTaskList[listCount].contributeActivity._width=reqTasks_scp._width-20
 			
 			Debugger.log("ca._parentActivityID: " + ca._parentActivityID, Debugger.CRITICAL, "drawIsRequiredTasks", "LessonTabView");
-		
+			Debugger.log("ca.title: " + ca.title, Debugger.MED, "drawIsRequiredTasks", "LessonTabView");
+			
 			if (ca._parentActivityID == null){
-				requiredTaskList[listCount].contributeActivity.text = "  "+ca.title
+				requiredTaskList[listCount].contributeActivity.text = "  " + ca.title;
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xD5E6FF;
 				listCount++;
 				
 			} else {
-				requiredTaskList[listCount].contributeActivity.text = "\t"+ca.title
+				requiredTaskList[listCount].contributeActivity.text = "\t" + ca.title;
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xF9F2DD;
 				listCount++;
 			}
@@ -673,7 +674,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		
 		requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
 		requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
-						
+		
+		Debugger.log("contributeEntry.text: " + requiredTaskList[listCount].contributeEntry.text , Debugger.MED, "drawContributeActivity", "LessonTabView");
+		
 		requiredTaskList[listCount].goContribute.onRelease = function (){
 			JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
 		}
@@ -997,7 +1000,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		
 		for (var i=0; i<requiredTaskList.length; i++){
 			requiredTaskList[i].goContribute._x = reqTasks_scp._width-50;
-		}	
+		}
+	
 	}
 	
 	/**

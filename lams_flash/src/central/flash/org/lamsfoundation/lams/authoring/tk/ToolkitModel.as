@@ -83,7 +83,7 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
 			//notify the view there has been a change
 			infoObj = {};
 			infoObj.updateType = "LIBRARIES_UPDATED";
-			//notify observer's this is "this" as if by magic
+			//notify observer's this is "this" as if by magic
 			notifyObservers(infoObj);
 		}
 		
@@ -109,7 +109,7 @@ class ToolkitModel extends Observable {	private var _className:String = "Toolki
 			_dispatchEvent = true;
 			toolkit.getToolkitLibraries();
 		}
-	}
+	}
 	/**
 	* Gets toolkit data
 	*/

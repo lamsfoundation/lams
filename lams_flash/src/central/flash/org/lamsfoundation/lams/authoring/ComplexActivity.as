@@ -103,7 +103,7 @@ class ComplexActivity extends Activity {
 		ca.populateFromDTO(dto);
 		
 		return ca;
-	}
+	}
 	
 	/**
 	 * Used by OPTIONAL_ACTIVITY_TYPE

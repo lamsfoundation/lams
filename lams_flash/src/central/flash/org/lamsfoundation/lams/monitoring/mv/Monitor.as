@@ -463,6 +463,7 @@ class Monitor {
 				seqStat = Dictionary.getValue("ls_seq_status_not_set"); 			// "Not yet set"
 		}
 		
+		Debugger.log("SeqStat: " + seqStat, Debugger.MED, "getCELiteral", "Monitor");
 		return seqStat;
 	}
 	
