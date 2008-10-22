@@ -746,7 +746,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				return Dictionary.getValue("to_conditions_dlg_defin_bool_type");
 				break;
 			case ToolOutputDefinition.COMPLEX:
-				return Dictionary.getValue("to_conditions_dlg_defin_complex_type");
+				//return Dictionary.getValue("to_conditions_dlg_defin_complex_type");
+				return Dictionary.getValue("to_conditions_dlg_defin_user_defined_type");
 				break;
 			case ToolOutputDefinition.LONG:
 				return Dictionary.getValue("to_conditions_dlg_defin_long_type");
