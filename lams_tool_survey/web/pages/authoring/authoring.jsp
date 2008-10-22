@@ -57,6 +57,7 @@
 			<lams:Tab id="1" key="label.authoring.heading.basic" />
 			<lams:Tab id="2" key="label.authoring.heading.advance" />
 			<lams:Tab id="3" key="label.authoring.heading.instructions" />
+			<lams:Tab id="4" key="label.authoring.heading.conditions" />
 		</lams:Tabs>
 </div>
 		<!-- start tabs -->
@@ -83,7 +84,10 @@
 			<!-- tab content 3 (Instructions) -->
 			<lams:TabBody id="3" titleKey="label.authoring.heading.instructions.desc" page="instructions.jsp" />
 			<!-- end of content (Instructions) -->
-
+			
+			<!-- tab content 4 (Conditions) -->
+			<lams:TabBody id="4" titleKey="label.authoring.heading.conditions.desc" page="conditions.jsp" />
+			<!-- end of content (Conditions) -->
 
 			<!-- Button Row -->
 			<%--  Default value 

@@ -91,7 +91,16 @@
 				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/NotebookSession.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/NotebookUser.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/NotebookAttachment.hbm.xml</value> 
-				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/NotebookCondition.hbm.xml</value> 
+				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/NotebookCondition.hbm.xml</value>
+					
+               <value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyUser.hbm.xml</value>
+               <value>classpath:org/lamsfoundation/lams/tool/survey/model/Survey.hbm.xml</value>
+               <value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyQuestion.hbm.xml</value>
+               <value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyOption.hbm.xml</value>
+               <value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyAnswer.hbm.xml</value>
+               <value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyAttachment.hbm.xml</value>
+               <value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveySession.hbm.xml</value>
+               <value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyCondition.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>

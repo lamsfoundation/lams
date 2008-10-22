@@ -95,6 +95,26 @@ session_finished smallint,
 primary key (uid)
 )type=innodb;
 
+CREATE TABLE tl_lasurv11_conditions (
+       condition_id BIGINT(20) NOT NULL
+	 , content_uid BIGINT(20)
+     , PRIMARY KEY (condition_id)
+	 , CONSTRAINT SurveyConditionInheritance FOREIGN KEY (condition_id)
+                  REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
+	 , CONSTRAINT SurveyConditionToSurvey FOREIGN KEY (content_uid)
+                  REFERENCES tl_lasurv11_survey(uid) ON DELETE CASCADE ON UPDATE CASCADE
+)TYPE=InnoDB;
+
+CREATE TABLE tl_lasurv11_condition_questions (
+ 	   condition_id BIGINT(20)
+ 	 , question_uid BIGINT(20)
+ 	 , PRIMARY KEY (condition_id,question_uid)
+	 , CONSTRAINT SurveyConditionQuestionToSurveyCondition FOREIGN KEY (condition_id)
+                  REFERENCES tl_lasurv11_conditions(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
+	 , CONSTRAINT SurveyConditionQuestionToSurveyQuestion FOREIGN KEY (question_uid)
+                  REFERENCES tl_lasurv11_question(uid) ON DELETE CASCADE ON UPDATE CASCADE	
+)TYPE=InnoDB;
+
 alter table tl_lasurv11_answer add index FK6DAAFE3BB1423DC1 (user_uid), add constraint FK6DAAFE3BB1423DC1 foreign key (user_uid) references tl_lasurv11_user (uid);
 alter table tl_lasurv11_answer add index FK6DAAFE3B25F3BB77 (question_uid), add constraint FK6DAAFE3B25F3BB77 foreign key (question_uid) references tl_lasurv11_question (uid);
 alter table tl_lasurv11_attachment add index FKD92A9120D14146E5 (survey_uid), add constraint FKD92A9120D14146E5 foreign key (survey_uid) references tl_lasurv11_survey (uid);

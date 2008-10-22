@@ -5881,9 +5881,9 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <variant type-name-pattern="BIGINT ZEROFILL"/>
 </data-type>
 </column>
-<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="user_id" remarks="" uid="12a32bf:11be7cf04bc:-7fa3">
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="user_id" remarks="" uid="12a32bf:11be7cf04bc:-7fa3">
 <column-description/>
-<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT">
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
 <variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
@@ -6122,8 +6122,8 @@ Each style may have a subset of properties, such as "_tf"</table-description>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="condition_id" remarks="" uid="1e71735:11d17f98ee7:-7fb1">
 <column-description/>
 <data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
-<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>

@@ -196,6 +196,24 @@
             column="answer_submit_notify"
         />
 
+        <set
+            name="conditions"
+            lazy="true"
+            cascade="all"
+            sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
+        >
+
+            <key
+                column="content_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.survey.model.SurveyCondition"
+            />
+
+        </set>
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Survey.xml

@@ -6,7 +6,110 @@
 <schema alias="" name="LAMS" remarks="" uid="120fac0:11c25acc4f7:-7f86">
 <schema-description/>
 <domain-list/>
-<table-list/>
+<table-list>
+<table alias="" name="tl_lasurv11_conditions" remarks="" uid="1ff7d6:11d21dcad16:-7ff1">
+<table-description/>
+<table-figure-bounds height="50" width="111" x="302" y="268"/>
+<column-list>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="condition_id" remarks="" uid="1ff7d6:11d21dcad16:-7fef">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="content_uid" remarks="" uid="1ff7d6:11d21dcad16:-7fee">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PK_TL_LASURV11_CONDITIONS" remarks="" uid="1ff7d6:11d21dcad16:-7fec">
+<primary-key-description/>
+<primary-key-column name="condition_id"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key alias="" name="FK_tl_lasurv11_conditions_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_lasurv11_survey" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="1ff7d6:11d21dcad16:-7f89">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="content_uid" referenced-key-column-name="uid"/>
+</foreign-key>
+</foreign-key-list>
+<index-list/>
+</table>
+<table alias="" name="tl_lasurv11_condition_questions" remarks="" uid="1ff7d6:11d21dcad16:-7feb">
+<table-description/>
+<table-figure-bounds height="-1" width="-1" x="321" y="375"/>
+<column-list>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="condition_id" remarks="" uid="1ff7d6:11d21dcad16:-7fe9">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="question_uid" remarks="" uid="1ff7d6:11d21dcad16:-7fe8">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PK_TL_LASURV11_CONDITION_QUESTIONS" remarks="" uid="1ff7d6:11d21dcad16:-7fe7">
+<primary-key-description/>
+<primary-key-column name="condition_id"/>
+<primary-key-column name="question_uid"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key alias="" name="FK_tl_lasurv11_condition_questions_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_lasurv11_question" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="1ff7d6:11d21dcad16:-7ee9">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="question_uid" referenced-key-column-name="uid"/>
+</foreign-key>
+<foreign-key alias="" name="FK_tl_lasurv11_condition_questions_2" on-delete="" on-update="" referenced-key="PK_TL_LASURV11_CONDITIONS" referenced-table="tl_lasurv11_conditions" referenced-table-schema="LAMS" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="1ff7d6:11d21dcad16:-7e60">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="condition_id" referenced-key-column-name="condition_id"/>
+</foreign-key>
+</foreign-key-list>
+<index-list/>
+</table>
+</table-list>
 </schema>
 <schema alias="" name="DEFAULT_SCHEMA" remarks="" uid="120fac0:11c25acc4f7:-7f85">
 <schema-description/>
@@ -14,7 +117,7 @@
 <table-list>
 <table alias="" name="tl_lasurv11_answer" remarks="" uid="120fac0:11c25acc4f7:-7f84">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="706" y="206"/>
+<table-figure-bounds height="-1" width="-1" x="800" y="553"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7f82">
 <column-description/>
@@ -228,7 +331,7 @@
 </table>
 <table alias="" name="tl_lasurv11_option" remarks="" uid="120fac0:11c25acc4f7:-7f6d">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="670" y="101"/>
+<table-figure-bounds height="-1" width="-1" x="377" y="-1"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7f6b">
 <column-description/>
@@ -304,7 +407,7 @@
 </table>
 <table alias="" name="tl_lasurv11_question" remarks="" uid="120fac0:11c25acc4f7:-7f65">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="394" y="114"/>
+<table-figure-bounds height="-1" width="-1" x="679" y="148"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7f63">
 <column-description/>
@@ -689,7 +792,7 @@
 </table>
 <table alias="" name="tl_lasurv11_user" remarks="" uid="120fac0:11c25acc4f7:-7f38">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="421" y="579"/>
+<table-figure-bounds height="-1" width="-1" x="386" y="659"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7f36">
 <column-description/>

@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -84,6 +86,7 @@ import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
+import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
@@ -149,6 +152,10 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     private IEventNotificationService eventNotificationService;
 
     private ILessonService lessonService;
+
+    private SurveyOutputFactory surveyOutputFactory;
+
+    private Random generator = new Random();
 
     // *******************************************************************************
     // Service method
@@ -730,7 +737,22 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	Survey survey = surveyDao.getByContentId(toolContentId);
+	if (survey == null) {
+	    try {
+		survey = getDefaultSurvey();
+	    } catch (SurveyApplicationException e) {
+		throw new ToolException(e);
+	    }
+	}
+	// If there are no user added conditions, the default condition will be added in the output factory. It also
+	// needs to be persisted.
+	boolean defaultConditionToBeAdded = survey.getConditions().isEmpty();
+	SortedMap<String, ToolOutputDefinition> map = getSurveyOutputFactory().getToolOutputDefinitions(survey);
+	if (defaultConditionToBeAdded && !survey.getConditions().isEmpty()) {
+	    saveOrUpdateSurvey(survey);
+	}
+	return map;
     }
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
@@ -835,7 +857,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
      *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return getSurveyOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     /**
@@ -845,7 +867,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
      *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	return getSurveyOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
@@ -959,7 +981,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 		    if (candidates != null && candidates.size() > 0) {
 			item.setOptions(new HashSet());
 			int dummyCandidateOrder = candidates.size(); // dummy number in case we can't convert
-									// question order
+			// question order
 			Iterator candIter = candidates.iterator();
 			while (candIter.hasNext()) {
 			    Hashtable candidateEntry = (Hashtable) candIter.next();
@@ -1111,5 +1133,30 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
+    }
+
+    public SurveyOutputFactory getSurveyOutputFactory() {
+	return surveyOutputFactory;
+    }
+
+    public void setSurveyOutputFactory(SurveyOutputFactory surveyOutputFactory) {
+	this.surveyOutputFactory = surveyOutputFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String createConditionName(Collection<SurveyCondition> existingConditions) {
+	String uniqueNumber = null;
+	do {
+	    uniqueNumber = String.valueOf(Math.abs(generator.nextInt()));
+	    for (SurveyCondition condition : existingConditions) {
+		String[] splitedName = getSurveyOutputFactory().splitConditionName(condition.getName());
+		if (uniqueNumber.equals(splitedName[1])) {
+		    uniqueNumber = null;
+		}
+	    }
+	} while (uniqueNumber == null);
+	return getSurveyOutputFactory().buildConditionName(uniqueNumber);
     }
 }

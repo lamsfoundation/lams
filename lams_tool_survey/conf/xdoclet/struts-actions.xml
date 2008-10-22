@@ -128,7 +128,47 @@
 			parameter="removeInstruction">
 			<forward name="success" path="/pages/authoring/parts/instructions.jsp" />
 		</action>
-	
+	<!-- ==========  Survey Conditions  ========== -->
+		<action path="/authoring/newConditionInit"
+			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringConditionAction"
+			name="surveyConditionForm" 
+			scope="request" 
+			validate="false"			
+			parameter="newConditionInit">
+			<forward name="addcondition" path="/pages/authoring/addCondition.jsp" />
+		</action>
+		<action path="/authoring/editCondition"
+			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringConditionAction"
+			name="surveyConditionForm" 
+			scope="request" 
+			parameter="editCondition" 
+			validate="false">
+			<forward name="addcondition" path="/pages/authoring/addCondition.jsp" />
+		</action>
+		<action path="/authoring/saveOrUpdateCondition"
+			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringConditionAction"
+			parameter="saveOrUpdateCondition"
+			name="surveyConditionForm" 
+			scope="request" 
+			validate="false">
+			<forward name="addcondition" path="/pages/authoring/addCondition.jsp" />
+			<forward name="success" path="/pages/authoring/conditionList.jsp" />
+		</action>
+		<action path="/authoring/removeCondition"
+			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringConditionAction"
+			parameter="removeCondition">
+			<forward name="success" path="/pages/authoring/conditionList.jsp" />
+		</action>
+		<action path="/authoring/upCondition"
+			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringConditionAction"
+			parameter="upCondition">
+			<forward name="success" path="/pages/authoring/conditionList.jsp" />
+		</action>
+		<action path="/authoring/downCondition"
+			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringConditionAction"
+			parameter="downCondition">
+			<forward name="success" path="/pages/authoring/conditionList.jsp" />
+		</action>
 		<!-- ========== BEGIN: Learning Definitions ============================== -->
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.survey.web.action.LearningAction"

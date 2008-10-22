@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAttachment;
+import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
@@ -308,4 +310,14 @@ public interface ISurveyService {
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId);
+
+    /**
+     * Creates an unique name for a SurveyCondition. It consists of the tool output definition name and a unique
+     * positive integer number.
+     * 
+     * @param existingConditions
+     *                existing conditions; required to check if a condition with the same name does not exist.
+     * @return unique SurveyCondition name
+     */
+    public String createConditionName(Collection<SurveyCondition> existingConditions);
 }
