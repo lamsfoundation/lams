@@ -1800,21 +1800,21 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	    if (BranchCondition.OUTPUT_TYPE_COMPLEX.equals(conditionType)
 		    || BranchCondition.OUTPUT_TYPE_STRING.equals(conditionType)) {
-		if (condition == null) {
-		    // This is different than "conditionID" !!!
-		    Long newConditionID = WDDXProcessor.convertToLong(conditionTable, "conditionId");
-		    BranchCondition originalCondition = branchActivityEntryDAO.getConditionByID(newConditionID);
-		    if (originalCondition == null) {
-			log.error("Could not find condition with given ID: " + conditionID);
-		    } else {
+		// This is different than "conditionID" !!!
+		Long newConditionID = condition == null ? WDDXProcessor.convertToLong(conditionTable, "conditionId")
+			: condition.getConditionId();
+		// we need to get the proper subclass, since the one provided by branch entry is not valid
+		BranchCondition originalCondition = branchActivityEntryDAO.getConditionByID(newConditionID);
+		if (originalCondition == null) {
+		    log.error("Could not find condition with given ID: " + conditionID);
+		} else {
+		    if (condition == null) {
 			condition = (BranchCondition) originalCondition.clone();
-			condition.setConditionUIID(conditionUIID);
+		    } else {
+			condition = originalCondition;
 		    }
-		}
-		else {
 		    condition.setConditionUIID(conditionUIID);
 		}
-		
 	    } else if (condition == null) {
 		condition = new BranchCondition(null, conditionUIID, WDDXProcessor.convertToInteger(conditionTable,
 			WDDXTAGS.ORDER_ID), WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_NAME),
