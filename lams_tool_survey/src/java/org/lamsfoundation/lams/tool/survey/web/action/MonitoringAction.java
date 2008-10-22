@@ -272,13 +272,13 @@ public class MonitoringAction extends Action {
 		row = sheet.createRow(idx++);
 		cell = row.createCell((short) 0);
 		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-		cell.setCellValue(survey.getTitle());
+		cell.setCellValue(removeHTMLTags(survey.getTitle()));
 
 		// survey instruction
 		row = sheet.createRow(idx++);
 		cell = row.createCell((short) 0);
 		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-		cell.setCellValue(survey.getInstructions());
+		cell.setCellValue(removeHTMLTags(survey.getInstructions()));
 
 		// display 2 empty row
 		row = sheet.createRow(idx++);
@@ -295,7 +295,7 @@ public class MonitoringAction extends Action {
 		cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_SESSION_NAME));
 		cell = row.createCell((short) 1);
 		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-		cell.setCellValue(session.getSessionName());
+		cell.setCellValue(removeHTMLTags(session.getSessionName()));
 
 		// begin to display question and its answers
 		Set<Entry<SurveyQuestion, List<AnswerDTO>>> questionEntries = map.entrySet();
@@ -317,7 +317,7 @@ public class MonitoringAction extends Action {
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_QUESTION) + " " + questionIdx);
 		    cell = row.createCell((short) 1);
 		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-		    cell.setCellValue(question.getDescription());
+		    cell.setCellValue(removeHTMLTags(question.getDescription()));
 
 		    // display options content
 		    Set<SurveyOption> options = question.getOptions();
@@ -335,7 +335,7 @@ public class MonitoringAction extends Action {
 			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
 			cell = row.createCell((short) 1);
 			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-			cell.setCellValue(option.getDescription());
+			cell.setCellValue(removeHTMLTags(option.getDescription()));
 		    }
 		    if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			optionIdx++;
@@ -397,7 +397,7 @@ public class MonitoringAction extends Action {
 			    cell = row.createCell((short) ++cellIdx);
 			    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 			    if (answer.getAnswer() != null) {
-				cell.setCellValue(answer.getAnswer().getAnswerText());
+				cell.setCellValue(removeHTMLTags(answer.getAnswer().getAnswerText()));
 			    }
 			}
 
@@ -430,6 +430,16 @@ public class MonitoringAction extends Action {
 	    }
 	}
 	return null;
+    }
+    
+    /**
+     * Removes all the html tags from a string
+     * @param string
+     * @return
+     */
+    private String removeHTMLTags(String string)
+    {
+	return string.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
     }
 
     // *************************************************************************************
