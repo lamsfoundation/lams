@@ -86,10 +86,10 @@
 				
 				<!-- Mapping files for tools with complex conditions -->
 				
-				<value>classpath:org/lamsfoundation/lams/tool/qa/*.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/*.hbm.xml</value>	
-                <value>classpath:org/lamsfoundation/lams/tool/survey/model/*.hbm.xml</value>
-
+				<value>classpath*:org/lamsfoundation/lams/tool/qa/*.hbm.xml</value>
+				<value>classpath*:org/lamsfoundation/lams/tool/notebook/model/*.hbm.xml</value>	
+                <value>classpath*:org/lamsfoundation/lams/tool/survey/model/*.hbm.xml</value>
+				<value>classpath*:org/lamsfoundation/lams/tool/forum/model/*.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
