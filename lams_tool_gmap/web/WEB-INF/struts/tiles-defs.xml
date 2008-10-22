@@ -95,9 +95,6 @@
 		<put name="body" value="/pages/learning/defineLater.jsp" />
 	</definition>
 	
-	<definition name="tiles:/learning/notebook" extends="tiles:/layout:learning">
-		<put name="body" value="/pages/learning/notebook.jsp" />
-	</definition>	
 	<!-- End: Learning -->
 
 
@@ -112,12 +109,6 @@
 		<put name="pageTitleKey" value="pageTitle.monitoring" />
 		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
 		<!--  put name="body" value="/pages/monitoring/gmapDisplay.jsp" />	-->
-	</definition>
-	
-	<definition name="tiles:/monitoring/notebook" extends="tiles:/layout:default">
-		<put name="pageTitleKey" value="pageTitle.monitoring.notebook"></put>
-		<put name="header" value="tiles:/header:learner"></put>
-		<put name="body" value="/pages/monitoring/notebook.jsp"></put>
 	</definition>
 
 	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:default">

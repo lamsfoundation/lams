@@ -106,7 +106,7 @@
       />
       <forward
         name="notebook"
-        path="tiles:/learning/notebook"
+        path="/pages/learning/notebook.jsp"
         redirect="false"
       />
     </action>
@@ -131,7 +131,7 @@
       />
       <forward
         name="notebook"
-        path="tiles:/monitoring/notebook"
+        path="/pages/monitoring/notebook.jsp"
         redirect="false"
       />
     </action>

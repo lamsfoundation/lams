@@ -62,7 +62,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
  * @struts.action-forward name="gmap_display"
  *                        path="tiles:/monitoring/gmap_display"
- * @struts.action-forward name="notebook" path="tiles:/monitoring/notebook"             
+ * @struts.action-forward name="notebook" path="/pages/monitoring/notebook.jsp"             
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {

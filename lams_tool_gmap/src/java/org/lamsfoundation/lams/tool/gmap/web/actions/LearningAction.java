@@ -66,7 +66,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="gmap" path="tiles:/learning/main"
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
- * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
+ * @struts.action-forward name="notebook" path="/pages/learning/notebook.jsp"
  */
 public class LearningAction extends LamsDispatchAction {
 
