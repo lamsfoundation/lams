@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
@@ -50,6 +51,7 @@ public class QaCondition extends TextSearchCondition {
      * parameters.
      */
     private Set<QaQueContent> questions = new TreeSet<QaQueContent>(new QaQueContentComparator());
+    private static Logger log = Logger.getLogger(QaCondition.class);
 
     public SortedSet<QaQuestionContentDTO> temporaryQuestionDTOSet = new TreeSet<QaQuestionContentDTO>(
 	    new QaQuestionContentDTOComparator());
