@@ -4,14 +4,14 @@
 <!--
   - Application context definition for LAMS. Used to deploy to JBOSS.
 -->
-<beans>
+<beans default-autowire="no">
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<import resource="messageContext.xml"/>
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-  
+
  	<!-- Hibernate SessionFactory -->
 	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="dataSource"/></property>
@@ -54,13 +54,6 @@
 				<value>classpath:org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
  				
-				<!-- Tool related mapping files-->
-				<value>classpath:org/lamsfoundation/lams/tool/SystemTool.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/tool/ToolImportSupport.hbm.xml</value>
-				
 				<!-- Workspace related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/workspace/WorkspaceFolderContent.hbm.xml</value>
 				
@@ -85,11 +78,11 @@
 				<value>classpath:org/lamsfoundation/lams/integration/ExtUserUseridMap.hbm.xml</value>
 				
 				<!-- Mapping files for tools with complex conditions -->
-				
-				<value>classpath*:org/lamsfoundation/lams/tool/qa/*.hbm.xml</value>
-				<value>classpath*:org/lamsfoundation/lams/tool/notebook/model/*.hbm.xml</value>	
-                <value>classpath*:org/lamsfoundation/lams/tool/survey/model/*.hbm.xml</value>
-				<value>classpath*:org/lamsfoundation/lams/tool/forum/model/*.hbm.xml</value>
+
+				<value>classpath*:org/lamsfoundation/lams/tool/**/*.hbm.xml</value>
+				<value>classpath*:org/lamsfoundation/lams/tool/**/model/*.hbm.xml</value>
+				<value>classpath*:org/lamsfoundation/lams/tool/**/persistence/*.hbm.xml</value>
+				<value>classpath*:org/lamsfoundation/lams/tool/**/pojos/*.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>

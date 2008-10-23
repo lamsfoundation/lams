@@ -267,7 +267,6 @@
 				<include name="fckeditor/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
-			<classes dir="${build.classes.java}"/>	
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="includes/**"/>

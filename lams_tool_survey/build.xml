@@ -266,7 +266,6 @@
 				<include name="tags/**"/>
 				<include name="tlds/**"/>
 			</webinf>
-			<classes dir="${build.classes.java}"/>	
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
 				<include name="includes/**"/>
