@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.survey.model;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
@@ -49,6 +50,7 @@ public class SurveyCondition extends TextSearchCondition {
      * parameters.
      */
     private Set<SurveyQuestion> questions = new TreeSet<SurveyQuestion>(new QuestionsComparator());
+    private static Logger log = Logger.getLogger(SurveyCondition.class);
 
     public SurveyCondition() {
 
