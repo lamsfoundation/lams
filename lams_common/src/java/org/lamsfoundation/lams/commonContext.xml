@@ -4,7 +4,7 @@
 <!--
   - Application context definition for LAMS. Used to deploy to JBOSS.
 -->
-<beans default-autowire="no">
+<beans>
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
