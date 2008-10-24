@@ -124,22 +124,16 @@ public class LoginRequestDispatcher {
 
 	    String parameters = "";
 
-	    if (customCSV != null && extLmsId != null) {
-		parameters += "&" + PARAM_CUSTOM_CSV + "=" + customCSV;
-		parameters += "&" + PARAM_EXT_LMS_ID + "=" + extLmsId;
-	    } else {
-		log.error("Parameter customCSV not present");
-	    }
-
-	    if (requestSrc != null && notifyCloseURL != null) {
-		try {
-		    parameters = "&" + PARAM_REQUEST_SRC + "=" + URLEncoder.encode(requestSrc, "UTF8");
-		    parameters += "&" + PARAM_NOTIFY_CLOSE_URL + "=" + URLEncoder.encode(notifyCloseURL, "UTF8");
-		} catch (UnsupportedEncodingException e) {
-		    log.error(e);
-		}
-	    } else {
-		log.error("Parameters 'requestSrc' and 'notifyCloseURL' are not present");
+	    // append the extra parameters if they are present in the request
+	    try {
+		parameters = customCSV != null ? parameters + "&" + PARAM_CUSTOM_CSV + "=" + customCSV : parameters;
+		parameters = extLmsId != null ? parameters + "&" + PARAM_EXT_LMS_ID + "=" + extLmsId : parameters;
+		parameters = requestSrc != null ? parameters + "&" + PARAM_REQUEST_SRC + "="
+			+ URLEncoder.encode(requestSrc, "UTF8") : parameters;
+		parameters = notifyCloseURL != null ? parameters + "&" + PARAM_NOTIFY_CLOSE_URL + "="
+			+ URLEncoder.encode(notifyCloseURL, "UTF8") : parameters;
+	    } catch (UnsupportedEncodingException e) {
+		log.error(e);
 	    }
 
 	    return request.getContextPath() + URL_AUTHOR + parameters;
