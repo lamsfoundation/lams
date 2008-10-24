@@ -41,150 +41,145 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class LoginRequestDispatcher {
 
-	private static Logger log = Logger.getLogger(LoginRequestDispatcher.class);
+    private static Logger log = Logger.getLogger(LoginRequestDispatcher.class);
 
-	public static final String PARAM_USER_ID = "uid";
+    public static final String PARAM_USER_ID = "uid";
 
-	public static final String PARAM_SERVER_ID = "sid";
+    public static final String PARAM_SERVER_ID = "sid";
 
-	public static final String PARAM_TIMESTAMP = "ts";
+    public static final String PARAM_TIMESTAMP = "ts";
 
-	public static final String PARAM_HASH = "hash";
+    public static final String PARAM_HASH = "hash";
 
-	public static final String PARAM_METHOD = "method";
+    public static final String PARAM_METHOD = "method";
 
-	public static final String PARAM_COURSE_ID = "courseid";
+    public static final String PARAM_COURSE_ID = "courseid";
 
-	public static final String PARAM_COUNTRY = "country";
+    public static final String PARAM_COUNTRY = "country";
 
-	public static final String PARAM_LANGUAGE = "lang";
-	
-	public static final String PARAM_REQUEST_SRC ="requestSrc";
-	
-	public static final String PARAM_NOTIFY_CLOSE_URL ="notifyCloseURL";
-	
-	public static final String PARAM_FIRST_NAME = "firstName";
-	
-	public static final String PARAM_LAST_NAME = "lastName";
-	
-	public static final String PARAM_EMAIL = "email";
-	
-	public static final String PARAM_CUSTOM_CSV = "customCSV";
-	
-	public static final String PARAM_EXT_LMS_ID = "extlmsid";
+    public static final String PARAM_LANGUAGE = "lang";
 
-	public static final String METHOD_AUTHOR = "author";
+    public static final String PARAM_REQUEST_SRC = "requestSrc";
 
-	public static final String METHOD_MONITOR = "monitor";
+    public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
 
-	public static final String METHOD_LEARNER = "learner";
+    public static final String PARAM_FIRST_NAME = "firstName";
 
-	private static final String PARAM_LESSON_ID = "lsid";
+    public static final String PARAM_LAST_NAME = "lastName";
 
-	private static final String URL_DEFAULT = "/index.jsp";
+    public static final String PARAM_EMAIL = "email";
 
-	private static final String URL_AUTHOR = "/home.do?method=author";
+    public static final String PARAM_CUSTOM_CSV = "customCSV";
 
-	private static final String URL_LEARNER = "/home.do?method=learner&lessonID=";
+    public static final String PARAM_EXT_LMS_ID = "extlmsid";
 
-	private static final String URL_MONITOR = "/home.do?method=monitorLesson&lessonID=";
+    public static final String METHOD_AUTHOR = "author";
 
-	private static IIntegrationService integrationService = null;
+    public static final String METHOD_MONITOR = "monitor";
 
-	private static ILessonService lessonService = null;
+    public static final String METHOD_LEARNER = "learner";
 
-	/**
-	 * This method is called within LoginRequestValve and LoginRequestServlet.
-	 * It simply fetch the method parameter from HttpServletRequest and build
-	 * the url to redirect user to.
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static String getRequestURL(HttpServletRequest request) throws ServletException {
+    private static final String PARAM_LESSON_ID = "lsid";
 
-		String method = request.getParameter(PARAM_METHOD);
-		String lessonId = request.getParameter(PARAM_LESSON_ID);
-		
+    private static final String URL_DEFAULT = "/index.jsp";
+
+    private static final String URL_AUTHOR = "/home.do?method=author";
+
+    private static final String URL_LEARNER = "/home.do?method=learner&lessonID=";
+
+    private static final String URL_MONITOR = "/home.do?method=monitorLesson&lessonID=";
+
+    private static IIntegrationService integrationService = null;
+
+    private static ILessonService lessonService = null;
+
+    /**
+     * This method is called within LoginRequestValve and LoginRequestServlet.
+     * It simply fetch the method parameter from HttpServletRequest and build
+     * the url to redirect user to.
+     * 
+     * @param request
+     * @return
+     */
+    public static String getRequestURL(HttpServletRequest request) throws ServletException {
+
+	String method = request.getParameter(PARAM_METHOD);
+	String lessonId = request.getParameter(PARAM_LESSON_ID);
+
+	try {
+	    addUserToLessonClass(request, lessonId, method);
+	} catch (UserInfoFetchException e) {
+	    throw new ServletException(e);
+	}
+
+	/** AUTHOR * */
+	if (METHOD_AUTHOR.equals(method)) {
+
+	    String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
+	    String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
+
+	    // Custom CSV string to be used for tool adapters
+	    String customCSV = request.getParameter(PARAM_CUSTOM_CSV);
+	    String extLmsId = request.getParameter(PARAM_SERVER_ID);
+
+	    String parameters = "";
+
+	    if (customCSV != null && extLmsId != null) {
+		parameters += "&" + PARAM_CUSTOM_CSV + "=" + customCSV;
+		parameters += "&" + PARAM_EXT_LMS_ID + "=" + extLmsId;
+	    } else {
+		log.error("Parameter customCSV not present");
+	    }
+
+	    if (requestSrc != null && notifyCloseURL != null) {
 		try {
-			addUserToLessonClass(request, lessonId, method);
-		} catch (UserInfoFetchException e) {
-			throw new ServletException(e);
+		    parameters = "&" + PARAM_REQUEST_SRC + "=" + URLEncoder.encode(requestSrc, "UTF8");
+		    parameters += "&" + PARAM_NOTIFY_CLOSE_URL + "=" + URLEncoder.encode(notifyCloseURL, "UTF8");
+		} catch (UnsupportedEncodingException e) {
+		    log.error(e);
 		}
+	    } else {
+		log.error("Parameters 'requestSrc' and 'notifyCloseURL' are not present");
+	    }
 
-		/** AUTHOR * */
-		if (METHOD_AUTHOR.equals(method)) {
-			
-			String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
-			String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
-			
-			// Custom CSV string to be used for tool adapters
-			String customCSV = request.getParameter(PARAM_CUSTOM_CSV);
-			String extLmsId = request.getParameter(PARAM_SERVER_ID);
-			
-			String parameters = "";
-			
-			if (customCSV != null && extLmsId != null)
-			{
-				parameters += "&" + PARAM_CUSTOM_CSV + "=" + customCSV;
-				parameters += "&" + PARAM_EXT_LMS_ID + "=" + extLmsId;
-			}
-			else
-			{
-				log.error("Parameter customCSV not present");
-			}
-			
-			if (requestSrc != null && notifyCloseURL != null) {
-				try {
-					parameters = "&" + PARAM_REQUEST_SRC + "=" + URLEncoder.encode(requestSrc, "UTF8");
-					parameters += "&" + PARAM_NOTIFY_CLOSE_URL + "=" + URLEncoder.encode(notifyCloseURL, "UTF8");				
-				} catch (UnsupportedEncodingException e) {
-					log.error(e);
-				}
-			} else {
-				log.error("Parameters 'requestSrc' and 'notifyCloseURL' are not present");
-			}
-			
-			return request.getContextPath() + URL_AUTHOR + parameters;
-		}
-		/** MONITOR * */
-		else if (METHOD_MONITOR.equals(method) && lessonId != null) {
-			return request.getContextPath() + URL_MONITOR + lessonId;
-		}
-		/** LEARNER * */
-		else if (METHOD_LEARNER.equals(method) && lessonId != null) {
-			return request.getContextPath() + URL_LEARNER + lessonId;
-		} else {
-			return request.getContextPath() + URL_DEFAULT;
-		}
+	    return request.getContextPath() + URL_AUTHOR + parameters;
+	}
+	/** MONITOR * */
+	else if (METHOD_MONITOR.equals(method) && lessonId != null) {
+	    return request.getContextPath() + URL_MONITOR + lessonId;
+	}
+	/** LEARNER * */
+	else if (METHOD_LEARNER.equals(method) && lessonId != null) {
+	    return request.getContextPath() + URL_LEARNER + lessonId;
+	} else {
+	    return request.getContextPath() + URL_DEFAULT;
+	}
+    }
+
+    private static void addUserToLessonClass(HttpServletRequest request, String lessonId, String method)
+	    throws UserInfoFetchException {
+	if (integrationService == null) {
+	    integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    request.getSession().getServletContext()).getBean("integrationService");
+	}
+	if (lessonService == null) {
+	    lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    request.getSession().getServletContext()).getBean("lessonService");
+	}
+	String serverId = request.getParameter(PARAM_SERVER_ID);
+	String extUsername = request.getParameter(PARAM_USER_ID);
+	ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+	ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, extUsername);
+	User user = userMap.getUser();
+	if (user == null) {
+	    String error = "Unable to add user to lesson class as user is missing from the user map";
+	    log.error(error);
+	    throw new UserInfoFetchException(error);
 	}
 
-	private static void addUserToLessonClass(HttpServletRequest request, String lessonId,
-			String method) throws UserInfoFetchException {
-		if (integrationService == null) {
-			integrationService = (IntegrationService) WebApplicationContextUtils
-					.getRequiredWebApplicationContext(request.getSession().getServletContext())
-					.getBean("integrationService");
-		}
-		if (lessonService == null) {
-			lessonService = (ILessonService) WebApplicationContextUtils
-					.getRequiredWebApplicationContext(request.getSession().getServletContext())
-					.getBean("lessonService");
-		}
-		String serverId = request.getParameter(PARAM_SERVER_ID);
-		String extUsername = request.getParameter(PARAM_USER_ID);
-		ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-		ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, extUsername);
-		User user = userMap.getUser();
-		if ( user == null ) {
-			String error = "Unable to add user to lesson class as user is missing from the user map";
-			log.error(error);
-			throw new UserInfoFetchException(error);
-		}
-		
-		if(METHOD_LEARNER.equals(method))
-			lessonService.addLearner(Long.parseLong(lessonId), user.getUserId());
-		else if(METHOD_MONITOR.equals(method))
-			lessonService.addStaffMember(Long.parseLong(lessonId), user.getUserId());
-	}
+	if (METHOD_LEARNER.equals(method))
+	    lessonService.addLearner(Long.parseLong(lessonId), user.getUserId());
+	else if (METHOD_MONITOR.equals(method))
+	    lessonService.addStaffMember(Long.parseLong(lessonId), user.getUserId());
+    }
 }
