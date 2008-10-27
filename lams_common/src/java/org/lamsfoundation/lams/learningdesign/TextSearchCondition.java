@@ -66,11 +66,11 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
      * Regular expression that divides a string into single words. The meaning is "one or more whitespace characters or
      * beginnings of a line or ends of a line".
      */
-    private static final String WORD_DELIMITER_REGEX = "(?:\\s|$|^)+";
+    protected static final String WORD_DELIMITER_REGEX = "(?:\\s|$|^)+";
     /**
      * Integer that sets flags for regex pattern matching.
      */
-    private static final int PATTERN_MATCHING_OPTIONS = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+    protected static final int PATTERN_MATCHING_OPTIONS = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
 	    | Pattern.MULTILINE;
     /**
      * A regular expression pattern that matches HTML tags.
@@ -189,14 +189,14 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
      * @return <code>true</code> if text satisfies this condition
      */
     public boolean matches(String text) {
-	if (text == null) {
-	    return false;
-	}
+
 	// we parse the condition strings to more useful arrays of words
 	if (!conditionsParsed) {
 	    parseConditionStrings();
 	}
-
+	if (text == null) {
+	    return getAllWordsCondition() == null && getAnyWordsCondition() == null && getPhraseCondition() == null;
+	}
 	Pattern regexPattern = null;
 	StringBuilder stringPattern = null;
 	Matcher matcher = null;
