@@ -614,9 +614,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	
 	private function loadCustomContextMenu(type:String):Void {
 		if (_module == "monitoring"){
-			_ccm.showCustomCM(_ccm.loadMenu(type, "monitoring"))
-		}else {
-			_ccm.showCustomCM(_ccm.loadMenu(type, "authoring"))
+			if (type.toString() == "activity") 
+				_ccm.showCustomCM(_ccm.loadMenu(type, "monitoring", this.activity));
+			else 
+				_ccm.showCustomCM(_ccm.loadMenu(type, "monitoring", null));
+		
+		} else {
+			if (type.toString() == "activity")
+				_ccm.showCustomCM(_ccm.loadMenu(type, "authoring", this.activity));
+			else
+				_ccm.showCustomCM(_ccm.loadMenu(type, "authoring", null))
 		}
 	}
 	
@@ -659,7 +666,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	private function onRelease():Void{
-		loadCustomContextMenu("activity");
+		//loadCustomContextMenu("activity");
 		
 		if(!_doubleClicking){
 			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');

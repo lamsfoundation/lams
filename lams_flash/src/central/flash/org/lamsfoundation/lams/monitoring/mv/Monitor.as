@@ -214,9 +214,14 @@ class Monitor {
 	
 	public function showMappedCompetences() {
 		
-		var controller:MonitorController = monitorView.getController();
-		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("mapped_competences_lbl"),closeButton:true,scrollContentPath:'CompetenceEditorDialog'});
-		dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
+		if (monitorModel.selectedItem != null && monitorModel.selectedItem != undefined) {
+			var controller:MonitorController = monitorView.getController();
+			var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue("mapped_competences_lbl"),closeButton:true,scrollContentPath:'CompetenceEditorDialog'});
+			dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
+		} else {
+
+			LFMessage.showMessageAlert(Dictionary.getValue("al_activity_view_competence_mappings_invalid"), null);
+		}
 	}
 
 	/**

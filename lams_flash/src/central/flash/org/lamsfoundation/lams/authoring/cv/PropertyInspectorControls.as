@@ -1199,8 +1199,13 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function onMapCompetenceClick(evt:Object){
-		// open group to competence mapping window
-		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue("competence_mappings_btn"), closeButton:true, resize:false, scrollContentPath:'CompetenceMappingDialog'});
+		// check that an activity is selected
+		if (_canvasModel.selectedItem != null && _canvasModel.selectedItem != undefined){ 
+			// open group to competence mapping window
+			_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue("competence_mappings_btn"), closeButton:true, resize:false, scrollContentPath:'CompetenceMappingDialog'});
+		}else {
+			LFMessage.showMessageAlert(Dictionary.getValue("al_activity_view_competence_mappings_invalid"), null);
+		}
 	}
 	
 	public function openConditionMatchDialog():Void {
@@ -1208,11 +1213,13 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function onConditionMatchClick(evt:Object){
+
 		// open group to branch matching window
 		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('condmatch_dlg_title_lbl'), closeButton:true, resize:false, scrollContentPath:'ConditionMatchingDialog'});
 		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, ConditionMatchDialogLoaded));
-		
+	
 		setModified();
+
 	}
 	
 	private function onConditionsSetupClick(evt:Object){

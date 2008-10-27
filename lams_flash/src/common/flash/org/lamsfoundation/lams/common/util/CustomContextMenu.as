@@ -39,7 +39,7 @@ class CustomContextMenu {
 	private var app:ApplicationParent;
 	
 	//ContextMenu instance is stored as a static in the CustomContextMenu class
-    private static var _instance:CustomContextMenu = null;    
+    private static var _instance:CustomContextMenu = null;	 
 	
     //Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -77,30 +77,41 @@ class CustomContextMenu {
 	* Load the dictionary for the language specified
 	* @param language (string) language parameter.
 	*/
-	public function loadMenu(cmType:String, moduleType:String):Array {
+	public function loadMenu(cmType:String, moduleType:String, activity:Activity):Array {
 	
 		var v:Boolean; 
 		var monitorC:Boolean;
 		var authorC:Boolean;
 		
 		var monitorCB:Boolean;
+		var isToolAct:Boolean;
 		
 		var mappings_cxt_mnu_lbl:String = null;
 		
 		var myCopy:Array = new Array();
 		var menuArr:Array = new Array();
 		
+		isToolAct = false;
+		
 		if (cmType == "activity"){
 			v = true;
+			
+			if (activity != null && activity != undefined) {
+				if (activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE) {
+					isToolAct = true;
+				}
+			}
+			
 		} else {
 			v = false;
 		}
-		
+
 		if (moduleType == "authoring"){
 			authorC = true;
-			monitorC = false
 			
+			monitorC = false
 			monitorCB = false;
+
 		}else{
 			authorC = false;
 			monitorC = true;
@@ -115,9 +126,10 @@ class CustomContextMenu {
 		menuArr[3] = [mappings_cxt_mnu_lbl, viewToolOutputConditions, false, true, monitorCB];
 		menuArr[4] = [Dictionary.getValue('ccm_monitor_activityhelp'),getMonitorHelp, false, v, monitorC];
 		menuArr[5] = [Dictionary.getValue('ccm_paste_activity'),getPaste, false, v, authorC];
-		menuArr[6] = [Dictionary.getValue('ccm_pi'),getPI, true, true, authorC];
-		menuArr[7] = [Dictionary.getValue('ccm_author_activityhelp'),getHelp, false, v, authorC];
-		menuArr[8] = [Dictionary.getValue('view_act_mapped_competences'),getMappedCompetences, false, v, monitorC];
+		menuArr[6] = [Dictionary.getValue('map_comptence_btn'),mapToCompetences, true, v, (authorC && isToolAct)];
+		menuArr[7] = [Dictionary.getValue('ccm_pi'),getPI, true, true, authorC];
+		menuArr[8] = [Dictionary.getValue('ccm_author_activityhelp'),getHelp, false, v, authorC];
+		menuArr[9] = [Dictionary.getValue('view_act_mapped_competences'),getMappedCompetences, false, v, (monitorC && isToolAct)];
 		
 		for (var i=0; i<menuArr.length; i++){
 			if (menuArr[i][4]) {
@@ -144,7 +156,7 @@ class CustomContextMenu {
 			var menuItem_cmi:ContextMenuItem = new ContextMenuItem(cmItems[i].cmlabel.toString(), cmItems[i].handler, cmItems[i].isSeparator, cmItems[i].isEnable, cmItems[i].isVisible);
 			authorMenu.customItems.push(menuItem_cmi);
 		}
-	
+		
 		_root.menu = authorMenu;
 	}
 	
@@ -170,6 +182,10 @@ class CustomContextMenu {
 	
 	public function getPaste(){
 		org.lamsfoundation.lams.authoring.Application.getInstance().paste();
+	}
+	
+	private function mapToCompetences() {
+		org.lamsfoundation.lams.authoring.Application.getInstance().pi.onMapCompetenceClick();
 	}
 	
 	public function getPI(){
