@@ -211,7 +211,6 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 		
 		if (competenceName.length == 0) {
 			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
-			
 		}
 		else if (app.getDesignDataModel().competences.containsKey(competenceName)) {
 			// entry already exists, do not add
@@ -233,36 +232,46 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 		var updatedCompetenceName:String = StringUtils.trim(competence_title_txt.text);
 		var updatedCompetenceDesc:String = StringUtils.trim(competence_description_txt.text);
 		
-		if (editingCompetence != null && editingCompetence != undefined && app.getDesignDataModel().competences.containsKey(editingCompetence)) {
-			if (updatedCompetenceName.length > 0) {
-				app.getDesignDataModel().competences.remove(editingCompetence);  // remove the original competencetitle
-				app.getDesignDataModel().competences.put(updatedCompetenceName, updatedCompetenceDesc);
-	
-				// if the competence title has changed, update the mappings for all activities to the new competence title
-				if (editingCompetence != updatedCompetenceName) { 
-					
-					var activityKeys:Array = app.getDesignDataModel().activities.keys(); // contains the activity UIIDs
-					
-					for (var i=0; i<activityKeys.length; ++i) {
+		if (updatedCompetenceName.length == 0) {
+			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
+		}
+		else if (app.getDesignDataModel().competences.containsKey(updatedCompetenceName)) {
+			// entry already exists, do not add
+			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_exists", [updatedCompetenceName]), null);
+		} 
+		else {
+		
+			if (editingCompetence != null && editingCompetence != undefined && app.getDesignDataModel().competences.containsKey(editingCompetence)) {
+				if (updatedCompetenceName.length > 0) {
+					app.getDesignDataModel().competences.remove(editingCompetence);  // remove the original competencetitle
+					app.getDesignDataModel().competences.put(updatedCompetenceName, updatedCompetenceDesc);
+		
+					// if the competence title has changed, update the mappings for all activities to the new competence title
+					if (editingCompetence != updatedCompetenceName) { 
+						
+						var activityKeys:Array = app.getDesignDataModel().activities.keys(); // contains the activity UIIDs
+						
+						for (var i=0; i<activityKeys.length; ++i) {
 
-						if (app.getDesignDataModel().activities.get(activityKeys[i]) instanceof ToolActivity) {
-							var competenceMappings:Array = ToolActivity(app.getDesignDataModel().activities.get(activityKeys[i])).competenceMappings;
-							for (var j=0; j<competenceMappings.length; ++j) {
-								if (competenceMappings[j] == editingCompetence) {
-									competenceMappings[j] = updatedCompetenceName;
+							if (app.getDesignDataModel().activities.get(activityKeys[i]) instanceof ToolActivity) {
+								var competenceMappings:Array = ToolActivity(app.getDesignDataModel().activities.get(activityKeys[i])).competenceMappings;
+								for (var j=0; j<competenceMappings.length; ++j) {
+									if (competenceMappings[j] == editingCompetence) {
+										competenceMappings[j] = updatedCompetenceName;
+									}
 								}
 							}
 						}
 					}
+					
+					CompetenceEditorDialog(app.dialog.scrollContent).clear();
+					CompetenceEditorDialog(app.dialog.scrollContent).draw();
 				}
-				
-				CompetenceEditorDialog(app.dialog.scrollContent).clear();
-				CompetenceEditorDialog(app.dialog.scrollContent).draw();
+				else {
+					LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
+				}
 			}
-			else {
-				LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
-			}
-		} 
+		}
 		
 		_container.deletePopUp();
 	}
