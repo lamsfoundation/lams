@@ -11,46 +11,45 @@ import org.apache.struts.action.ActionMessages;
 /**
  * @struts.form name="mdfrum10AdminForm"
  */
-public class AdminForm extends ActionForm
-{
-	private static final long serialVersionUID = 8872637862875198L;
-	
-	String toolAdapterServlet;
-	String extServerUrl;
-	String serverIdMapping;
-	
-	@Override
-	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-		ActionErrors ac = new ActionErrors();
-		ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-		return ac;
-	}
+public class AdminForm extends ActionForm {
+    private static final long serialVersionUID = 8872637862875198L;
 
-	public String getToolAdapterServlet() {
-		return toolAdapterServlet;
-	}
+    String toolAdapterServlet;
+    String extServerUrl;
+    String serverIdMapping;
 
-	public void setToolAdapterServlet(String toolAdapterServlet) {
-		this.toolAdapterServlet = toolAdapterServlet;
-	}
+    @Override
+    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
+	ActionErrors ac = new ActionErrors();
+	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
+	return ac;
+    }
 
-	public String getServerIdMapping() {
-		return serverIdMapping;
-	}
+    public String getToolAdapterServlet() {
+	return toolAdapterServlet;
+    }
 
-	public void setServerIdMapping(String serverIdMapping) {
-		this.serverIdMapping = serverIdMapping;
-	}
+    public void setToolAdapterServlet(String toolAdapterServlet) {
+	this.toolAdapterServlet = toolAdapterServlet;
+    }
 
-	public String getExtServerUrl() {
-		return extServerUrl;
-	}
+    public String getServerIdMapping() {
+	return serverIdMapping;
+    }
 
-	public void setExtServerUrl(String extServerUrl) {
-		this.extServerUrl = extServerUrl;
-	}
+    public void setServerIdMapping(String serverIdMapping) {
+	this.serverIdMapping = serverIdMapping;
+    }
 
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
-	}
+    public String getExtServerUrl() {
+	return extServerUrl;
+    }
+
+    public void setExtServerUrl(String extServerUrl) {
+	this.extServerUrl = extServerUrl;
+    }
+
+    public static long getSerialVersionUID() {
+	return serialVersionUID;
+    }
 }

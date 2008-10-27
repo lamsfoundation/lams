@@ -35,128 +35,129 @@ import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession;
 
 public class MdlForumDTO {
 
-	private Long uid;
-	private Date createDate;
-	private Date updateDate;
-	private boolean defineLater;
-	private Long toolContentId;
-	private Long extToolContentId;
-	private String extUsername;
-	private String extCourseId;
-	private String extSection;
+    private Long uid;
+    private Date createDate;
+    private Date updateDate;
+    private boolean defineLater;
+    private Long toolContentId;
+    private Long extToolContentId;
+    private String extUsername;
+    private String extCourseId;
+    private String extSection;
 
-	public Set<MdlForumSessionDTO> sessionDTOs = new TreeSet<MdlForumSessionDTO>();
-	
-	public Long currentTab;
-	
-	/* Constructors */
-	public MdlForumDTO(){}
-	
-	public MdlForumDTO(MdlForum mdlForum) {
-		uid = mdlForum.getUid();
-		createDate = mdlForum.getCreateDate();
-		updateDate = mdlForum.getUpdateDate();
-		defineLater = mdlForum.isDefineLater();
-		toolContentId = mdlForum.getToolContentId();
-		extToolContentId = mdlForum.getExtToolContentId();
-		extUsername = mdlForum.getExtUsername();
-		extCourseId = mdlForum.getExtCourseId();
-		extSection = mdlForum.getExtSection();
-		for (Iterator<MdlForumSession> iter = mdlForum.getMdlForumSessions().iterator(); iter.hasNext();) {
-			MdlForumSession session = (MdlForumSession) iter.next();
-			MdlForumSessionDTO sessionDTO = new MdlForumSessionDTO(session);
-			
-			sessionDTOs.add(sessionDTO);
-		}
-	}
+    public Set<MdlForumSessionDTO> sessionDTOs = new TreeSet<MdlForumSessionDTO>();
 
-	/* Getters / Setters */
-	public Set<MdlForumSessionDTO> getSessionDTOs() {
-		return sessionDTOs;
-	}
-	
-	public void setSessionDTOs(Set<MdlForumSessionDTO> sessionDTOs) {
-		this.sessionDTOs = sessionDTOs;
-	}
+    public Long currentTab;
 
-	public Long getToolContentId() {
-		return toolContentId;
-	}
+    /* Constructors */
+    public MdlForumDTO() {
+    }
 
-	public void setToolContentId(Long toolContentID) {
-		this.toolContentId = toolContentID;
-	}
+    public MdlForumDTO(MdlForum mdlForum) {
+	uid = mdlForum.getUid();
+	createDate = mdlForum.getCreateDate();
+	updateDate = mdlForum.getUpdateDate();
+	defineLater = mdlForum.isDefineLater();
+	toolContentId = mdlForum.getToolContentId();
+	extToolContentId = mdlForum.getExtToolContentId();
+	extUsername = mdlForum.getExtUsername();
+	extCourseId = mdlForum.getExtCourseId();
+	extSection = mdlForum.getExtSection();
+	for (Iterator<MdlForumSession> iter = mdlForum.getMdlForumSessions().iterator(); iter.hasNext();) {
+	    MdlForumSession session = (MdlForumSession) iter.next();
+	    MdlForumSessionDTO sessionDTO = new MdlForumSessionDTO(session);
 
-	public Long getCurrentTab() {
-		return currentTab;
+	    sessionDTOs.add(sessionDTO);
 	}
+    }
 
-	public void setCurrentTab(Long currentTab) {
-		this.currentTab = currentTab;
-	}
+    /* Getters / Setters */
+    public Set<MdlForumSessionDTO> getSessionDTOs() {
+	return sessionDTOs;
+    }
 
-	public Long getUid() {
-		return uid;
-	}
+    public void setSessionDTOs(Set<MdlForumSessionDTO> sessionDTOs) {
+	this.sessionDTOs = sessionDTOs;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    public Long getToolContentId() {
+	return toolContentId;
+    }
 
-	public Date getCreateDate() {
-		return createDate;
-	}
+    public void setToolContentId(Long toolContentID) {
+	this.toolContentId = toolContentID;
+    }
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
+    public Long getCurrentTab() {
+	return currentTab;
+    }
 
-	public Date getUpdateDate() {
-		return updateDate;
-	}
+    public void setCurrentTab(Long currentTab) {
+	this.currentTab = currentTab;
+    }
 
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
+    public Long getUid() {
+	return uid;
+    }
 
-	public boolean isDefineLater() {
-		return defineLater;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	public void setDefineLater(boolean defineLater) {
-		this.defineLater = defineLater;
-	}
+    public Date getCreateDate() {
+	return createDate;
+    }
 
-	public Long getExtToolContentId() {
-		return extToolContentId;
-	}
+    public void setCreateDate(Date createDate) {
+	this.createDate = createDate;
+    }
 
-	public void setExtToolContentId(Long extToolContentId) {
-		this.extToolContentId = extToolContentId;
-	}
+    public Date getUpdateDate() {
+	return updateDate;
+    }
 
-	public String getExtUsername() {
-		return extUsername;
-	}
+    public void setUpdateDate(Date updateDate) {
+	this.updateDate = updateDate;
+    }
 
-	public void setExtUsername(String extUsername) {
-		this.extUsername = extUsername;
-	}
+    public boolean isDefineLater() {
+	return defineLater;
+    }
 
-	public String getExtCourseId() {
-		return extCourseId;
-	}
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
 
-	public void setExtCourseId(String extCourseId) {
-		this.extCourseId = extCourseId;
-	}
+    public Long getExtToolContentId() {
+	return extToolContentId;
+    }
 
-	public String getExtSection() {
-		return extSection;
-	}
+    public void setExtToolContentId(Long extToolContentId) {
+	this.extToolContentId = extToolContentId;
+    }
 
-	public void setExtSection(String extSection) {
-		this.extSection = extSection;
-	}
-	
+    public String getExtUsername() {
+	return extUsername;
+    }
+
+    public void setExtUsername(String extUsername) {
+	this.extUsername = extUsername;
+    }
+
+    public String getExtCourseId() {
+	return extCourseId;
+    }
+
+    public void setExtCourseId(String extCourseId) {
+	this.extCourseId = extCourseId;
+    }
+
+    public String getExtSection() {
+	return extSection;
+    }
+
+    public void setExtSection(String extSection) {
+	this.extSection = extSection;
+    }
+
 }

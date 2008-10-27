@@ -39,292 +39,283 @@ import org.lamsfoundation.lams.tool.mdfrum.service.MdlForumService;
 
 public class MdlForum implements java.io.Serializable, Cloneable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4093029387948273849L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4093029387948273849L;
 
-	static Logger log = Logger.getLogger(MdlForumService.class.getName());
+    static Logger log = Logger.getLogger(MdlForumService.class.getName());
 
-	private static final String CUSTOM_CSV_MAP_PARAM_USER = "user";
-	private static final String CUSTOM_CSV_MAP_PARAM_COURSE = "course";
-	private static final String CUSTOM_CSV_MAP_PARAM_SECTION = "section";
-	
-	// Fields
-	/**
-	 * 
-	 */
-	private Long uid;
-	private Date createDate;
-	private Date updateDate;
-	private boolean defineLater;
-	private Long toolContentId;
-	private Long extToolContentId;
-	private Set<MdlForumSession> mdlForumSessions;
-	private boolean runOffline;
-	private boolean contentInUse;
-	private String extUsername;
-	private String extCourseId;
-	private String extSection;
-	
-	//*********** NON Persistent fields
-	private IToolContentHandler toolContentHandler;
+    private static final String CUSTOM_CSV_MAP_PARAM_USER = "user";
+    private static final String CUSTOM_CSV_MAP_PARAM_COURSE = "course";
+    private static final String CUSTOM_CSV_MAP_PARAM_SECTION = "section";
 
-	// Constructors
-	
-	
-	public MdlForum(Long uid, Date createDate, Date updateDate,
-			boolean defineLater, boolean runOffline, boolean contentInUse,
-			Long toolContentId, Long extToolContentId, String extUsername, 
-			String extCourseId, String extSection,
-			Set<MdlForumSession> mdlForumSessions,
-			IToolContentHandler toolContentHandler) {
-		super();
-		this.uid = uid;
-		this.createDate = createDate;
-		this.updateDate = updateDate;
-		this.defineLater = defineLater;
-		this.toolContentId = toolContentId;
-		this.extToolContentId = extToolContentId;
-		this.mdlForumSessions = mdlForumSessions;
-		this.toolContentHandler = toolContentHandler;
-		this.runOffline = runOffline;
-		this.contentInUse = contentInUse;
-		this.extCourseId = extCourseId;
-		this.extUsername = extUsername;
-		this.extSection = extSection;
+    // Fields
+    /**
+     * 
+     */
+    private Long uid;
+    private Date createDate;
+    private Date updateDate;
+    private boolean defineLater;
+    private Long toolContentId;
+    private Long extToolContentId;
+    private Set<MdlForumSession> mdlForumSessions;
+    private boolean runOffline;
+    private boolean contentInUse;
+    private String extUsername;
+    private String extCourseId;
+    private String extSection;
+
+    //*********** NON Persistent fields
+    private IToolContentHandler toolContentHandler;
+
+    // Constructors
+
+    public MdlForum(Long uid, Date createDate, Date updateDate, boolean defineLater, boolean runOffline,
+	    boolean contentInUse, Long toolContentId, Long extToolContentId, String extUsername, String extCourseId,
+	    String extSection, Set<MdlForumSession> mdlForumSessions, IToolContentHandler toolContentHandler) {
+	super();
+	this.uid = uid;
+	this.createDate = createDate;
+	this.updateDate = updateDate;
+	this.defineLater = defineLater;
+	this.toolContentId = toolContentId;
+	this.extToolContentId = extToolContentId;
+	this.mdlForumSessions = mdlForumSessions;
+	this.toolContentHandler = toolContentHandler;
+	this.runOffline = runOffline;
+	this.contentInUse = contentInUse;
+	this.extCourseId = extCourseId;
+	this.extUsername = extUsername;
+	this.extSection = extSection;
+    }
+
+    /** default constructor */
+    public MdlForum() {
+    }
+
+    // Property accessors
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * 
+     */
+    public Long getUid() {
+	return this.uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    /**
+     * @hibernate.property column="create_date"
+     * 
+     */
+    public Date getCreateDate() {
+	return this.createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+	this.createDate = createDate;
+    }
+
+    /**
+     * @hibernate.property column="update_date"
+     * 
+     */
+    public Date getUpdateDate() {
+	return this.updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+	this.updateDate = updateDate;
+    }
+
+    /**
+     * @hibernate.property column="define_later" length="1"
+     * 
+     */
+    public boolean isDefineLater() {
+	return this.defineLater;
+    }
+
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
+
+    /**
+     * @hibernate.property column="content_in_use" length="1"
+     * 
+     */
+    public boolean isContentInUse() {
+	return contentInUse;
+    }
+
+    public void setContentInUse(boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
+
+    /**
+     * @hibernate.property column="run_offline" length="1"
+     * 
+     */
+    public boolean isRunOffline() {
+	return runOffline;
+    }
+
+    public void setRunOffline(boolean runOffline) {
+	this.runOffline = runOffline;
+    }
+
+    /**
+     * @hibernate.property column="tool_content_id" length="20"
+     * 
+     */
+    public Long getToolContentId() {
+	return this.toolContentId;
+    }
+
+    public void setToolContentId(Long toolContentId) {
+	this.toolContentId = toolContentId;
+    }
+
+    /**
+     * @hibernate.property column="ext_tool_content_id" length="20"
+     * 
+     */
+    public Long getExtToolContentId() {
+	return extToolContentId;
+    }
+
+    public void setExtToolContentId(Long extToolContentId) {
+	this.extToolContentId = extToolContentId;
+    }
+
+    /**
+     * @hibernate.property column="ext_user_name" length="255"
+     * 
+     */
+    public String getExtUsername() {
+	return extUsername;
+    }
+
+    public void setExtUsername(String extUsername) {
+	this.extUsername = extUsername;
+    }
+
+    /**
+     * @hibernate.property column="ext_course_id" length="255"
+     * 
+     */
+    public String getExtCourseId() {
+	return extCourseId;
+    }
+
+    public void setExtCourseId(String extCourseId) {
+	this.extCourseId = extCourseId;
+    }
+
+    /**
+     * @hibernate.property column="ext_section" length="255"
+     * 
+     */
+    public String getExtSection() {
+	return extSection;
+    }
+
+    public void setExtSection(String extSection) {
+	this.extSection = extSection;
+    }
+
+    public static long getSerialVersionUID() {
+	return serialVersionUID;
+    }
+
+    /**
+     * @hibernate.set lazy="true" inverse="true" cascade="none"
+     * @hibernate.collection-key column="mdlforum_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession"
+     * 
+     */
+    public Set<MdlForumSession> getMdlForumSessions() {
+	return mdlForumSessions;
+    }
+
+    public void setMdlForumSessions(Set<MdlForumSession> mdlForumSessions) {
+	this.mdlForumSessions = mdlForumSessions;
+    }
+
+    public IToolContentHandler getToolContentHandler() {
+	return toolContentHandler;
+    }
+
+    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
+	this.toolContentHandler = toolContentHandler;
+    }
+
+    /**
+     * toString
+     * 
+     * @return String
+     */
+    public String toString() {
+	StringBuffer buffer = new StringBuffer();
+
+	buffer.append(getClass().getName()).append("@").append(Integer.toHexString(hashCode())).append(" [");
+	buffer.append("toolContentId").append("='").append(getToolContentId()).append("' ");
+	buffer.append("exttoolContentId").append("='").append(getExtToolContentId()).append("' ");
+	buffer.append("]");
+
+	return buffer.toString();
+    }
+
+    public boolean equals(Object other) {
+	if ((this == other))
+	    return true;
+	if ((other == null))
+	    return false;
+	if (!(other instanceof MdlForum))
+	    return false;
+	MdlForum castOther = (MdlForum) other;
+
+	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null && this
+		.getUid().equals(castOther.getUid())));
+    }
+
+    public int hashCode() {
+	int result = 17;
+	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());
+	return result;
+    }
+
+    public static MdlForum newInstance(MdlForum fromContent, Long toContentId,
+	    IToolContentHandler mdlForumToolContentHandler) {
+	MdlForum toContent = new MdlForum();
+	fromContent.toolContentHandler = mdlForumToolContentHandler;
+	toContent = (MdlForum) fromContent.clone();
+	toContent.setToolContentId(toContentId);
+	toContent.setCreateDate(new Date());
+	return toContent;
+    }
+
+    protected Object clone() {
+
+	MdlForum mdlForum = null;
+	try {
+	    mdlForum = (MdlForum) super.clone();
+	    mdlForum.setUid(null);
+	    mdlForum.mdlForumSessions = new HashSet<MdlForumSession>();
+
+	} catch (CloneNotSupportedException cnse) {
+	    log.error("Error cloning " + MdlForum.class);
 	}
+	return mdlForum;
+    }
 
-	/** default constructor */
-	public MdlForum() {
-	}
-
-	// Property accessors
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * 
-	 */
-	public Long getUid() {
-		return this.uid;
-	}
-
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
-
-	/**
-	 * @hibernate.property column="create_date"
-	 * 
-	 */
-	public Date getCreateDate() {
-		return this.createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
-	/**
-	 * @hibernate.property column="update_date"
-	 * 
-	 */
-	public Date getUpdateDate() {
-		return this.updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
-
-	/**
-	 * @hibernate.property column="define_later" length="1"
-	 * 
-	 */
-	public boolean isDefineLater() {
-		return this.defineLater;
-	}
-
-	public void setDefineLater(boolean defineLater) {
-		this.defineLater = defineLater;
-	}
-	
-	
-	
-	/**
-	 * @hibernate.property column="content_in_use" length="1"
-	 * 
-	 */
-	public boolean isContentInUse() {
-		return contentInUse;
-	}
-
-	public void setContentInUse(boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
-
-	/**
-	 * @hibernate.property column="run_offline" length="1"
-	 * 
-	 */
-	public boolean isRunOffline() {
-		return runOffline;
-	}
-
-	public void setRunOffline(boolean runOffline) {
-		this.runOffline = runOffline;
-	}
-
-	/**
-	 * @hibernate.property column="tool_content_id" length="20"
-	 * 
-	 */
-	public Long getToolContentId() {
-		return this.toolContentId;
-	}
-
-	public void setToolContentId(Long toolContentId) {
-		this.toolContentId = toolContentId;
-	}
-	
-	/**
-	 * @hibernate.property column="ext_tool_content_id" length="20"
-	 * 
-	 */
-	public Long getExtToolContentId() {
-		return extToolContentId;
-	}
-
-	public void setExtToolContentId(Long extToolContentId) {
-		this.extToolContentId = extToolContentId;
-	}
-	
-	/**
-	 * @hibernate.property column="ext_user_name" length="255"
-	 * 
-	 */
-	public String getExtUsername() {
-		return extUsername;
-	}
-
-	public void setExtUsername(String extUsername) {
-		this.extUsername = extUsername;
-	}
-
-	/**
-	 * @hibernate.property column="ext_course_id" length="255"
-	 * 
-	 */
-	public String getExtCourseId() {
-		return extCourseId;
-	}
-
-	public void setExtCourseId(String extCourseId) {
-		this.extCourseId = extCourseId;
-	}
-	
-	/**
-	 * @hibernate.property column="ext_section" length="255"
-	 * 
-	 */
-	public String getExtSection() {
-		return extSection;
-	}
-
-	public void setExtSection(String extSection) {
-		this.extSection = extSection;
-	}
-
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
-	}
-
-	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="none"
-	 * @hibernate.collection-key column="mdlforum_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession"
-	 * 
-	 */
-	public Set<MdlForumSession> getMdlForumSessions() {
-		return mdlForumSessions;
-	}
-
-	public void setMdlForumSessions(Set<MdlForumSession> mdlForumSessions) {
-		this.mdlForumSessions = mdlForumSessions;
-	}
-	
-	public IToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
-	}
-
-	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
-	}
-
-	/**
-	 * toString
-	 * 
-	 * @return String
-	 */
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append(getClass().getName()).append("@").append(Integer.toHexString(hashCode())).append(" [");
-		buffer.append("toolContentId").append("='").append(getToolContentId()).append("' ");
-		buffer.append("exttoolContentId").append("='").append(getExtToolContentId()).append("' ");
-		buffer.append("]");
-
-		return buffer.toString();
-	}
-
-	public boolean equals(Object other) {
-		if ((this == other))
-			return true;
-		if ((other == null))
-			return false;
-		if (!(other instanceof MdlForum))
-			return false;
-		MdlForum castOther = (MdlForum) other;
-
-		return ((this.getUid() == castOther.getUid()) || (this.getUid() != null
-				&& castOther.getUid() != null && this.getUid().equals(
-				castOther.getUid())));
-	}
-
-	public int hashCode() {
-		int result = 17;
-		result = 37 * result
-				+ (getUid() == null ? 0 : this.getUid().hashCode());
-		return result;
-	}
-
-	public static MdlForum newInstance(MdlForum fromContent, Long toContentId,
-			IToolContentHandler mdlForumToolContentHandler) {
-		MdlForum toContent = new MdlForum();
-		fromContent.toolContentHandler = mdlForumToolContentHandler;
-		toContent = (MdlForum) fromContent.clone();
-		toContent.setToolContentId(toContentId);
-		toContent.setCreateDate(new Date());
-		return toContent;
-	}
-
-	protected Object clone() {
-
-		MdlForum mdlForum = null;
-		try {
-			mdlForum = (MdlForum) super.clone();
-			mdlForum.setUid(null);
-			mdlForum.mdlForumSessions = new HashSet<MdlForumSession>();
-
-		} catch (CloneNotSupportedException cnse) {
-			log.error("Error cloning " + MdlForum.class);
-		}
-		return mdlForum;
-	}
-	
-	public void setByCustomCSVHashMap(HashMap<String, String> params)
-	{
-		this.extUsername = params.get(CUSTOM_CSV_MAP_PARAM_USER);
-		this.extCourseId = params.get(CUSTOM_CSV_MAP_PARAM_COURSE);
-		this.extSection = params.get(CUSTOM_CSV_MAP_PARAM_SECTION);
-	}
+    public void setByCustomCSVHashMap(HashMap<String, String> params) {
+	this.extUsername = params.get(CUSTOM_CSV_MAP_PARAM_USER);
+	this.extCourseId = params.get(CUSTOM_CSV_MAP_PARAM_COURSE);
+	this.extSection = params.get(CUSTOM_CSV_MAP_PARAM_SECTION);
+    }
 }

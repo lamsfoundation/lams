@@ -32,49 +32,45 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-
 /**
- * <p>This class act as the proxy between web layer and service layer. It is
- * designed to decouple the presentation logic and business logic completely.
- * In this way, the presentation tier will no longer be aware of the changes in
+ * <p>
+ * This class act as the proxy between web layer and service layer. It is
+ * designed to decouple the presentation logic and business logic completely. In
+ * this way, the presentation tier will no longer be aware of the changes in
  * service layer. Therefore we can feel free to switch the business logic
- * implementation.</p>
+ * implementation.
+ * </p>
  */
 
 public class MdlForumServiceProxy {
 
-	public static final IMdlForumService getMdlForumService(ServletContext servletContext)
-    {
-        return (IMdlForumService)getMdlForumDomainService(servletContext);
+    public static final IMdlForumService getMdlForumService(ServletContext servletContext) {
+	return (IMdlForumService) getMdlForumDomainService(servletContext);
     }
-	
-	private static Object getMdlForumDomainService(ServletContext servletContext)
-	{
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-	    return wac.getBean("mdlForumService");
-	}
-	
-	 /*
-     * Return the mdlForum tool version of tool session manager implementation. 
-     * It will delegate to the Spring helper method to retrieve the proper 
-     * bean from Spring bean factory.
-     * @param servletContext the servletContext for current application
-     * @return noticeboard service object.*/
-    public static final ToolSessionManager getMdlForumSessionManager(ServletContext servletContext)
-    {
-        return (ToolSessionManager)getMdlForumDomainService(servletContext);
+
+    private static Object getMdlForumDomainService(ServletContext servletContext) {
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+	return wac.getBean("mdlForumService");
     }
-     
-    
+
+    /*
+    * Return the mdlForum tool version of tool session manager implementation. 
+    * It will delegate to the Spring helper method to retrieve the proper 
+    * bean from Spring bean factory.
+    * @param servletContext the servletContext for current application
+    * @return noticeboard service object.*/
+    public static final ToolSessionManager getMdlForumSessionManager(ServletContext servletContext) {
+	return (ToolSessionManager) getMdlForumDomainService(servletContext);
+    }
+
     /*
      * Return the mdlForum tool version of tool content manager implementation. 
      * It will delegate to the Spring helper method to retrieve the proper 
      * bean from Spring bean factory.
      * @param servletContext the servletContext for current application
      * @return noticeboard service object. */
-    public static final ToolContentManager getMdlForumContentManager(ServletContext servletContext)
-    {
-        return (ToolContentManager)getMdlForumDomainService(servletContext);
+    public static final ToolContentManager getMdlForumContentManager(ServletContext servletContext) {
+	return (ToolContentManager) getMdlForumDomainService(servletContext);
     }
 
 }

@@ -31,46 +31,46 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
  */
 public class MdlForumToolContentHandler extends ToolContentHandler {
 
-	// TODO these three fields were changed to public, since accessor methods
-	// cannot be made static.  Check if we can do this a better way.
-	public static String repositoryWorkspaceName = "mdlForumworkspace";
+    // TODO these three fields were changed to public, since accessor methods
+    // cannot be made static.  Check if we can do this a better way.
+    public static String repositoryWorkspaceName = "mdlForumworkspace";
 
-	public static String repositoryUser = "mdlForum";
+    public static String repositoryUser = "mdlForum";
 
-	public static char[] repositoryId = { 'l', 'a', 'm', 's', '-', 'e', 'x' };
+    public static char[] repositoryId = { 'l', 'a', 'm', 's', '-', 'e', 'x' };
 
-	/**
-	 * 
-	 */
-	public MdlForumToolContentHandler() {
-		super();
-	}
+    /**
+     * 
+     */
+    public MdlForumToolContentHandler() {
+	super();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
-	 */
-	public String getRepositoryWorkspaceName() {
-		return repositoryWorkspaceName;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
+     */
+    public String getRepositoryWorkspaceName() {
+	return repositoryWorkspaceName;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
-	 */
-	public String getRepositoryUser() {
-		return repositoryUser;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
+     */
+    public String getRepositoryUser() {
+	return repositoryUser;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
-	 */
-	public char[] getRepositoryId() {
-		return repositoryId;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
+     */
+    public char[] getRepositoryId() {
+	return repositoryId;
+    }
 
 }

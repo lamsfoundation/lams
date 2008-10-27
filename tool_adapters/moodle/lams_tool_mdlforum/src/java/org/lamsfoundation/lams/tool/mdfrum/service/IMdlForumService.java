@@ -39,184 +39,170 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Defines the services available to the web layer from the MdlForum Service
  */
 public interface IMdlForumService {
-	
-	public static final String EXT_SERVER_METHOD_CLONE = "clone";
-	public static final String EXT_SERVER_METHOD_IMPORT = "import";
-	public static final String EXT_SERVER_METHOD_EXPORT = "export";
-	public static final String EXT_SERVER_METHOD_OUTPUT = "output";
-	public static final String EXT_SERVER_METHOD_EXPORT_PORTFOLIO = "export_portfolio";
-	
-	
-	/**
-	 * Makes a copy of the default content and assigns it a newContentID
-	 * 
-	 * @params newContentID
-	 * @return
-	 */
-	public MdlForum copyDefaultContent(Long newContentID);
 
-	/**
-	 * Returns an instance of the MdlForum tools default content.
-	 * 
-	 * @return
-	 */
-	public MdlForum getDefaultContent();
+    public static final String EXT_SERVER_METHOD_CLONE = "clone";
+    public static final String EXT_SERVER_METHOD_IMPORT = "import";
+    public static final String EXT_SERVER_METHOD_EXPORT = "export";
+    public static final String EXT_SERVER_METHOD_OUTPUT = "output";
+    public static final String EXT_SERVER_METHOD_EXPORT_PORTFOLIO = "export_portfolio";
 
-	/**
-	 * @param toolSignature
-	 * @return
-	 */
-	public Long getDefaultContentIdBySignature(String toolSignature);
+    /**
+     * Makes a copy of the default content and assigns it a newContentID
+     * 
+     * @params newContentID
+     * @return
+     */
+    public MdlForum copyDefaultContent(Long newContentID);
 
-	/**
-	 * @param toolContentID
-	 * @return
-	 */
-	public MdlForum getMdlForumByContentId(Long toolContentID);
+    /**
+     * Returns an instance of the MdlForum tools default content.
+     * 
+     * @return
+     */
+    public MdlForum getDefaultContent();
 
+    /**
+     * @param toolSignature
+     * @return
+     */
+    public Long getDefaultContentIdBySignature(String toolSignature);
 
-	/**
-	 * @param uuid
-	 * @param versionID
-	 */
-	public void deleteFromRepository(Long uuid, Long versionID)
-			throws MdlForumException;
+    /**
+     * @param toolContentID
+     * @return
+     */
+    public MdlForum getMdlForumByContentId(Long toolContentID);
 
+    /**
+     * @param uuid
+     * @param versionID
+     */
+    public void deleteFromRepository(Long uuid, Long versionID) throws MdlForumException;
 
-	/**
-	 * @param mdlForum
-	 */
-	public void saveOrUpdateMdlForum(MdlForum mdlForum);
+    /**
+     * @param mdlForum
+     */
+    public void saveOrUpdateMdlForum(MdlForum mdlForum);
 
-	/**
-	 * @param toolSessionId
-	 * @return
-	 */
-	public MdlForumSession getSessionBySessionId(Long toolSessionId);
+    /**
+     * @param toolSessionId
+     * @return
+     */
+    public MdlForumSession getSessionBySessionId(Long toolSessionId);
 
-	/**
-	 * @param mdlForumSession
-	 */
-	public void saveOrUpdateMdlForumSession(MdlForumSession mdlForumSession);
+    /**
+     * @param mdlForumSession
+     */
+    public void saveOrUpdateMdlForumSession(MdlForumSession mdlForumSession);
 
-	
-	/**
-	 * Get the mdlForum config item by key
-	 * @param key
-	 * @return
-	 */
-	public MdlForumConfigItem getConfigItem(String key);
-	
-	/**
-	 * Save a mdl configItem
-	 * @param item
-	 */
-	public void saveOrUpdateMdlForumConfigItem(MdlForumConfigItem item);
-	
-	/**
-	 * 
-	 * @param userId
-	 * @param toolSessionId
-	 * @return
-	 */
-	public MdlForumUser getUserByUserIdAndSessionId(Long userId,
-			Long toolSessionId);
+    /**
+     * Get the mdlForum config item by key
+     * 
+     * @param key
+     * @return
+     */
+    public MdlForumConfigItem getConfigItem(String key);
 
-	/**
-	 * 
-	 * @param uid
-	 * @return
-	 */
-	public MdlForumUser getUserByUID(Long uid);
-	
-	/**
-	 * Gets the external organisation map for this tool adapter
-	 * @return
-	 */
-	public ExtServerOrgMap getExtServerOrgMap();
-	
-	/**
-	 * Creates a hash for talking to the external server
-	 * @param serverMap
-	 * @param extUsername
-	 * @param timestamp
-	 * @return
-	 */
-	public String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp);
+    /**
+     * Save a mdl configItem
+     * 
+     * @param item
+     */
+    public void saveOrUpdateMdlForumConfigItem(MdlForumConfigItem item);
 
-	/**
-	 * 
-	 * @param mdlForumUser
-	 */
-	public void saveOrUpdateMdlForumUser(MdlForumUser mdlForumUser);
+    /**
+     * 
+     * @param userId
+     * @param toolSessionId
+     * @return
+     */
+    public MdlForumUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
-	/**
-	 * 
-	 * @param user
-	 * @param mdlForumSession
-	 * @return
-	 */
-	public MdlForumUser createMdlForumUser(UserDTO user,MdlForumSession mdlForumSession);
-	
-	
-	/**
-	 * 
-	 * @return toolService
-	 */
-	ILamsToolService getToolService();
-	
-	/**
-	 * gets the tool output for the external server
-	 * @param outputName
-	 * @param mdlForum
-	 * @param userId
-	 * @param extToolContentId
-	 * @param toolSessionId
-	 * @return
-	 */
-	public int getExternalToolOutputInt(String outputName, MdlForum mdlForum, Long userId, String extToolContentId, Long toolSessionId);
+    /**
+     * 
+     * @param uid
+     * @return
+     */
+    public MdlForumUser getUserByUID(Long uid);
 
-	
-	/**
-	 * Converts the customCSV parameter into a hashmap
-	 * @param customCSV
-	 * @return
-	 */
-	public HashMap<String,String> decodeCustomCSV(String customCSV);
-	
-	/**
-	 * Constructs a parameter hashmap to be used for the default parameters
-	 * required by the external LMS tool adapter servlet. For instance in mdlForum,
-	 * this constructs the following:
-	 * 
-	 * {
-	 * 		["un", username],
-	 * 		["cs", course],
-	 * 		["ts", timestamp],
-	 * 		["hs", hash],
-	 * }
-	 * 
-	 * @param mdlForum
-	 * @return
-	 */
-	public HashMap<String, String> getRequiredExtServletParams(MdlForum mdlForum);
-	
-	
-	/**
-	 * Constructs a parameter hashmap based off customCSV to be used for the default parameters
-	 * required by the external LMS tool adapter servlet. For instance in mdlForum,
-	 * this constructs the following:
-	 * 
-	 * {
-	 * 		["un", username],
-	 * 		["cs", course],
-	 * 		["ts", timestamp],
-	 * 		["hs", hash],
-	 * }
-	 * 
-	 * @param user
-	 * @param course
-	 * @return
-	 */
-	public HashMap<String, String> getRequiredExtServletParams(String customCSV);
+    /**
+     * Gets the external organisation map for this tool adapter
+     * 
+     * @return
+     */
+    public ExtServerOrgMap getExtServerOrgMap();
+
+    /**
+     * Creates a hash for talking to the external server
+     * 
+     * @param serverMap
+     * @param extUsername
+     * @param timestamp
+     * @return
+     */
+    public String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp);
+
+    /**
+     * 
+     * @param mdlForumUser
+     */
+    public void saveOrUpdateMdlForumUser(MdlForumUser mdlForumUser);
+
+    /**
+     * 
+     * @param user
+     * @param mdlForumSession
+     * @return
+     */
+    public MdlForumUser createMdlForumUser(UserDTO user, MdlForumSession mdlForumSession);
+
+    /**
+     * 
+     * @return toolService
+     */
+    ILamsToolService getToolService();
+
+    /**
+     * gets the tool output for the external server
+     * 
+     * @param outputName
+     * @param mdlForum
+     * @param userId
+     * @param extToolContentId
+     * @param toolSessionId
+     * @return
+     */
+    public int getExternalToolOutputInt(String outputName, MdlForum mdlForum, Long userId, String extToolContentId,
+	    Long toolSessionId);
+
+    /**
+     * Converts the customCSV parameter into a hashmap
+     * 
+     * @param customCSV
+     * @return
+     */
+    public HashMap<String, String> decodeCustomCSV(String customCSV);
+
+    /**
+     * Constructs a parameter hashmap to be used for the default parameters
+     * required by the external LMS tool adapter servlet. For instance in
+     * mdlForum, this constructs the following:
+     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * 
+     * @param mdlForum
+     * @return
+     */
+    public HashMap<String, String> getRequiredExtServletParams(MdlForum mdlForum);
+
+    /**
+     * Constructs a parameter hashmap based off customCSV to be used for the
+     * default parameters required by the external LMS tool adapter servlet. For
+     * instance in mdlForum, this constructs the following:
+     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * 
+     * @param user
+     * @param course
+     * @return
+     */
+    public HashMap<String, String> getRequiredExtServletParams(String customCSV);
 }

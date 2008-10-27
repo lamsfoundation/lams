@@ -1,3 +1,25 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
 package org.lamsfoundation.lams.tool.mdfrum.model;
 
 import org.apache.log4j.Logger;
@@ -5,61 +27,55 @@ import org.apache.log4j.Logger;
 /**
  * @hibernate.class table="tl_mdfrum10_configuration"
  */
-public class MdlForumConfigItem implements java.io.Serializable
-{
+public class MdlForumConfigItem implements java.io.Serializable {
 
-	private static final long serialVersionUID = 2910983748293847627L;
+    private static final long serialVersionUID = 2910983748293847627L;
 
-	static Logger log = Logger.getLogger(MdlForumConfigItem.class.getName());
-	
-	public static final String KEY_EXTERNAL_TOOL_SERVLET = "toolAdapterServlet";
-	public static final String KEY_EXTERNAL_SERVER_URL = "extServerUrl";
-	
-	Long id;
-	String configKey;
-	String configValue;
-	
-	// empty contsructor
-	public MdlForumConfigItem() {}
+    static Logger log = Logger.getLogger(MdlForumConfigItem.class.getName());
 
-	
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * 
-	 */
-	public Long getId() {
-		return id;
-	}
+    public static final String KEY_EXTERNAL_TOOL_SERVLET = "toolAdapterServlet";
+    public static final String KEY_EXTERNAL_SERVER_URL = "extServerUrl";
 
+    Long id;
+    String configKey;
+    String configValue;
 
+    // empty contsructor
+    public MdlForumConfigItem() {
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-
-
-	/** 
-     * @hibernate.property column="config_key" length="30"
-     *            		   not-null="false" unique="true"    
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * 
      */
-	public String getConfigKey() {
-		return configKey;
-	}
+    public Long getId() {
+	return id;
+    }
 
-	public void setConfigKey(String configKey) {
-		this.configKey = configKey;
-	}
+    public void setId(Long id) {
+	this.id = id;
+    }
 
-	/** 
-     * @hibernate.property column="config_value" length="255"
-     *            		   not-null="false"    
+    /**
+     * @hibernate.property column="config_key" length="30" not-null="false"
+     *                     unique="true"
      */
-	public String getConfigValue() {
-		return configValue;
-	}
+    public String getConfigKey() {
+	return configKey;
+    }
 
-	public void setConfigValue(String configValue) {
-		this.configValue = configValue;
-	}
+    public void setConfigKey(String configKey) {
+	this.configKey = configKey;
+    }
+
+    /**
+     * @hibernate.property column="config_value" length="255" not-null="false"
+     */
+    public String getConfigValue() {
+	return configValue;
+    }
+
+    public void setConfigValue(String configValue) {
+	this.configValue = configValue;
+    }
 }

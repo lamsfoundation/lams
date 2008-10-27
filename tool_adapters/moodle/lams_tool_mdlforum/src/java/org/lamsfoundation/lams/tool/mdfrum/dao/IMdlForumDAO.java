@@ -28,13 +28,13 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
 
 /**
- * DAO for accessing the MdlForum objects - interface defining
- * methods to be implemented by the Hibernate or other implementation.
+ * DAO for accessing the MdlForum objects - interface defining methods to be
+ * implemented by the Hibernate or other implementation.
  */
-public interface IMdlForumDAO extends IBaseDAO{
+public interface IMdlForumDAO extends IBaseDAO {
 
-	MdlForum getByContentId(Long toolContentId);
+    MdlForum getByContentId(Long toolContentId);
 
-	void saveOrUpdate(MdlForum toContent);
-	
+    void saveOrUpdate(MdlForum toContent);
+
 }

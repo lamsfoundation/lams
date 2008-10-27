@@ -35,54 +35,47 @@ import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumUser;
  */
 public class MdlForumUserDAO extends BaseDAO implements IMdlForumUserDAO {
 
-	public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from "
-			+ MdlForumUser.class.getName() + " as f"
-			+ " where user_id=? and f.mdlForumSession.sessionId=?";
+    public static final String SQL_QUERY_FIND_BY_USER_ID_SESSION_ID = "from " + MdlForumUser.class.getName() + " as f"
+	    + " where user_id=? and f.mdlForumSession.sessionId=?";
 
-	public static final String SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID = "from "
-			+ MdlForumUser.class.getName()
-			+ " as f where login_name=? and f.mdlForumSession.sessionId=?";
+    public static final String SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID = "from " + MdlForumUser.class.getName()
+	    + " as f where login_name=? and f.mdlForumSession.sessionId=?";
 
-	private static final String SQL_QUERY_FIND_BY_UID = "from "
-			+ MdlForumUser.class.getName() + " where uid=?";
+    private static final String SQL_QUERY_FIND_BY_UID = "from " + MdlForumUser.class.getName() + " where uid=?";
 
-	public MdlForumUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(
-				SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
-				new Object[] { userId, toolSessionId });
+    public MdlForumUser getByUserIdAndSessionId(Long userId, Long toolSessionId) {
+	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_USER_ID_SESSION_ID,
+		new Object[] { userId, toolSessionId });
 
-		if (list == null || list.isEmpty())
-			return null;
+	if (list == null || list.isEmpty())
+	    return null;
 
-		return (MdlForumUser) list.get(0);
-	}
+	return (MdlForumUser) list.get(0);
+    }
 
-	public MdlForumUser getByLoginNameAndSessionId(String loginName,
-			Long toolSessionId) {
+    public MdlForumUser getByLoginNameAndSessionId(String loginName, Long toolSessionId) {
 
-		List list = this.getHibernateTemplate().find(
-				SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
-				new Object[] { loginName, toolSessionId });
+	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_LOGIN_NAME_SESSION_ID,
+		new Object[] { loginName, toolSessionId });
 
-		if (list == null || list.isEmpty())
-			return null;
+	if (list == null || list.isEmpty())
+	    return null;
 
-		return (MdlForumUser) list.get(0);
+	return (MdlForumUser) list.get(0);
 
-	}
+    }
 
-	public void saveOrUpdate(MdlForumUser mdlForumUser) {
-		this.getHibernateTemplate().saveOrUpdate(mdlForumUser);
-		this.getHibernateTemplate().flush();
-	}
+    public void saveOrUpdate(MdlForumUser mdlForumUser) {
+	this.getHibernateTemplate().saveOrUpdate(mdlForumUser);
+	this.getHibernateTemplate().flush();
+    }
 
-	public MdlForumUser getByUID(Long uid) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID,
-				new Object[] { uid });
+    public MdlForumUser getByUID(Long uid) {
+	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_UID, new Object[] { uid });
 
-		if (list == null || list.isEmpty())
-			return null;
+	if (list == null || list.isEmpty())
+	    return null;
 
-		return (MdlForumUser) list.get(0);
-	}
+	return (MdlForumUser) list.get(0);
+    }
 }

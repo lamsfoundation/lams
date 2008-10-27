@@ -28,14 +28,14 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession;
 
 /**
- * DAO for accessing the MdlForumSession objects - interface defining
- * methods to be implemented by the Hibernate or other implementation.
+ * DAO for accessing the MdlForumSession objects - interface defining methods to
+ * be implemented by the Hibernate or other implementation.
  */
-public interface IMdlForumSessionDAO extends IBaseDAO{
+public interface IMdlForumSessionDAO extends IBaseDAO {
 
-	void saveOrUpdate(MdlForumSession session);
+    void saveOrUpdate(MdlForumSession session);
 
-	MdlForumSession getBySessionId(Long toolSessionId);
+    MdlForumSession getBySessionId(Long toolSessionId);
 
-	void deleteBySessionID(Long toolSessionID);
+    void deleteBySessionID(Long toolSessionID);
 }

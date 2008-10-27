@@ -34,67 +34,61 @@ import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
 /**
  * Creates the output definitions for mdlforum tool Adapter tool.
  */
-public class MdlForumOutputFactory extends OutputFactory{
-	
-	protected final static String OUTPUT_NAME_LEARNER_NUM_POSTS = "learner.number.of.posts";
-	protected final static String OUTPUT_NAME_LEARNER_NUM_WORDS = "learner.number.of.words";
-	
-	public MdlForumOutputFactory() {}
-	
-	/** 
-	 * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
-	 */
-	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(
-			Object toolContentObject) throws ToolException {
-		TreeMap<String, ToolOutputDefinition> definitionMap =  new TreeMap<String, ToolOutputDefinition>();
-		
-		ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_POSTS, new Long(0), null);
-		definitionMap.put(OUTPUT_NAME_LEARNER_NUM_POSTS, definition);
-		
-		ToolOutputDefinition definition2 = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_WORDS, new Long(0), null);
-		definitionMap.put(OUTPUT_NAME_LEARNER_NUM_WORDS, definition2);
+public class MdlForumOutputFactory extends OutputFactory {
 
-		return definitionMap;
-	}
-	
-	
-	public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IMdlForumService dlForumService,
-			Long toolSessionId, Long learnerId, MdlForum mdlForum, Long extSessionId) {
-		
-		TreeMap<String,ToolOutput> map = new TreeMap<String,ToolOutput>();
-		if ( names == null || names.contains(OUTPUT_NAME_LEARNER_NUM_POSTS)) {
-			map.put(OUTPUT_NAME_LEARNER_NUM_POSTS, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_POSTS, dlForumService, mdlForum, learnerId, extSessionId.toString(), toolSessionId));
-		}
-		if ( names.contains(OUTPUT_NAME_LEARNER_NUM_WORDS)) {
-			map.put(OUTPUT_NAME_LEARNER_NUM_WORDS, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_WORDS, dlForumService, mdlForum, learnerId, extSessionId.toString(), toolSessionId));
-		}
-		return map;
+    protected final static String OUTPUT_NAME_LEARNER_NUM_POSTS = "learner.number.of.posts";
+    protected final static String OUTPUT_NAME_LEARNER_NUM_WORDS = "learner.number.of.words";
 
-	}
+    public MdlForumOutputFactory() {
+    }
 
-	public ToolOutput getToolOutput(String name, IMdlForumService dlForumService, 
-			Long toolSessionId, Long learnerId, MdlForum getToolOutput, Long extSessionId) {
-		
-		/*
-		if ( name != null && name.equals(OUTPUT_NAME_LEARNER_NUM_POSTS)) {
-			return this.getExtToolOutput(name, dlForumService, extCourseId, learnerId, extSessionId.toString(), toolSessionId);
-		}
-		if ( name != null && name.equals(OUTPUT_NAME_LEARNER_NUM_WORDS)) {
-			return this.getExtToolOutput(name, dlForumService, extCourseId, learnerId, extSessionId.toString(), toolSessionId);
-		}
-		*/
-		if ( name != null)
-		{
-			return getExtToolOutput(name, dlForumService, getToolOutput, learnerId, extSessionId.toString(), toolSessionId);
-		}
-		return null;
+    /**
+     * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
+     */
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
+	    throws ToolException {
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
+	ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_POSTS, new Long(0), null);
+	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_POSTS, definition);
+
+	ToolOutputDefinition definition2 = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_WORDS, new Long(0), null);
+	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_WORDS, definition2);
+
+	return definitionMap;
+    }
+
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IMdlForumService dlForumService,
+	    Long toolSessionId, Long learnerId, MdlForum mdlForum, Long extSessionId) {
+
+	TreeMap<String, ToolOutput> map = new TreeMap<String, ToolOutput>();
+	if (names == null || names.contains(OUTPUT_NAME_LEARNER_NUM_POSTS)) {
+	    map.put(OUTPUT_NAME_LEARNER_NUM_POSTS, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_POSTS, dlForumService,
+		    mdlForum, learnerId, extSessionId.toString(), toolSessionId));
 	}
-	
-	public ToolOutput getExtToolOutput(String outputName, IMdlForumService mdlForumService, MdlForum mdlForum, Long userId, String extToolContentId, Long toolSessionId)
-	{
-		int number = mdlForumService.getExternalToolOutputInt(outputName, mdlForum, userId, extToolContentId, toolSessionId);
-		return new ToolOutput(outputName, getI18NText(outputName, true), new Long(number));
+	if (names.contains(OUTPUT_NAME_LEARNER_NUM_WORDS)) {
+	    map.put(OUTPUT_NAME_LEARNER_NUM_WORDS, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_WORDS, dlForumService,
+		    mdlForum, learnerId, extSessionId.toString(), toolSessionId));
 	}
+	return map;
+
+    }
+
+    public ToolOutput getToolOutput(String name, IMdlForumService dlForumService, Long toolSessionId, Long learnerId,
+	    MdlForum getToolOutput, Long extSessionId) {
+	if (name != null) {
+	    return getExtToolOutput(name, dlForumService, getToolOutput, learnerId, extSessionId.toString(),
+		    toolSessionId);
+	}
+	return null;
+
+    }
+
+    public ToolOutput getExtToolOutput(String outputName, IMdlForumService mdlForumService, MdlForum mdlForum,
+	    Long userId, String extToolContentId, Long toolSessionId) {
+	int number = mdlForumService.getExternalToolOutputInt(outputName, mdlForum, userId, extToolContentId,
+		toolSessionId);
+	return new ToolOutput(outputName, getI18NText(outputName, true), new Long(number));
+    }
 
 }

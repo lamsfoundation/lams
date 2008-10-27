@@ -35,20 +35,19 @@ import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
  */
 public class MdlForumDAO extends BaseDAO implements IMdlForumDAO {
 
-	private static final String FIND_FORUM_BY_CONTENTID = "from MdlForum mdlForum where mdlForum.toolContentId=?";
+    private static final String FIND_FORUM_BY_CONTENTID = "from MdlForum mdlForum where mdlForum.toolContentId=?";
 
+    public MdlForum getByContentId(Long toolContentId) {
+	List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID, toolContentId);
+	if (list != null && list.size() > 0)
+	    return (MdlForum) list.get(0);
+	else
+	    return null;
+    }
 
-	public MdlForum getByContentId(Long toolContentId) {
-		List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID,toolContentId);
-		if (list != null && list.size() > 0)
-			return (MdlForum) list.get(0);
-		else
-			return null;
-	}
-
-	public void saveOrUpdate(MdlForum mdlForum) {
-		this.getHibernateTemplate().saveOrUpdate(mdlForum);
-		this.getHibernateTemplate().flush();
-	}
+    public void saveOrUpdate(MdlForum mdlForum) {
+	this.getHibernateTemplate().saveOrUpdate(mdlForum);
+	this.getHibernateTemplate().flush();
+    }
 
 }

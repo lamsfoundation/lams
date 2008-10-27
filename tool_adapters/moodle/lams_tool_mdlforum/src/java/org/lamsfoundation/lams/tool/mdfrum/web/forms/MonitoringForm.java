@@ -32,52 +32,63 @@ import org.apache.struts.action.ActionForm;
  */
 public class MonitoringForm extends ActionForm {
 
-	private static final long serialVersionUID = 9096908688391850595L;
-	
-	String dispatch;
-	boolean teacherVisible;
-	Long toolSessionID;
-	
-	// editing message page.
-	Long messageUID;
-	String messageBody;	
-	boolean messageHidden;
-	
-	public String getMessageBody() {
-		return messageBody;
-	}
-	public void setMessageBody(String messageBody) {
-		this.messageBody = messageBody;
-	}
-	public Long getMessageUID() {
-		return messageUID;
-	}
-	public void setMessageUID(Long messageUID) {
-		this.messageUID = messageUID;
-	}
-	public String getDispatch() {
-		return dispatch;
-	}
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
-	public Long getToolSessionID() {
-		return toolSessionID;
-	}
-	public void setToolSessionID(Long toolSessionID) {
-		this.toolSessionID = toolSessionID;
-	}
-	public boolean isTeacherVisible() {
-		return teacherVisible;
-	}
-	public void setTeacherVisible(boolean visible) {
-		this.teacherVisible = visible;
-	}
-	public boolean isMessageHidden() {
-		return messageHidden;
-	}
-	public void setMessageHidden(boolean messageHidden) {
-		this.messageHidden = messageHidden;
-	}
+    private static final long serialVersionUID = 9096908688391850595L;
+
+    String dispatch;
+    boolean teacherVisible;
+    Long toolSessionID;
+
+    // editing message page.
+    Long messageUID;
+    String messageBody;
+    boolean messageHidden;
+
+    public String getMessageBody() {
+	return messageBody;
+    }
+
+    public void setMessageBody(String messageBody) {
+	this.messageBody = messageBody;
+    }
+
+    public Long getMessageUID() {
+	return messageUID;
+    }
+
+    public void setMessageUID(Long messageUID) {
+	this.messageUID = messageUID;
+    }
+
+    public String getDispatch() {
+	return dispatch;
+    }
+
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
+
+    public Long getToolSessionID() {
+	return toolSessionID;
+    }
+
+    public void setToolSessionID(Long toolSessionID) {
+	this.toolSessionID = toolSessionID;
+    }
+
+    public boolean isTeacherVisible() {
+	return teacherVisible;
+    }
+
+    public void setTeacherVisible(boolean visible) {
+	this.teacherVisible = visible;
+    }
+
+    public boolean isMessageHidden() {
+	return messageHidden;
+    }
+
+    public void setMessageHidden(boolean messageHidden) {
+	this.messageHidden = messageHidden;
+    }
 
 }

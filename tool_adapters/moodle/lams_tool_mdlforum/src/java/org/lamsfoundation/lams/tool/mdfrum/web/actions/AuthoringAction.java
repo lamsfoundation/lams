@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
 /**
  * @author
  * @version
@@ -59,179 +60,152 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class AuthoringAction extends LamsDispatchAction {
 
-	private static Logger logger = Logger.getLogger(AuthoringAction.class);
+    private static Logger logger = Logger.getLogger(AuthoringAction.class);
 
-	public IMdlForumService mdlForumService;
-	
-	public static final String RELATIVE_MOODLE_AUTHOR_URL = "/course/modedit-lams.php?";
+    public IMdlForumService mdlForumService;
 
-	// Authoring SessionMap key names
-	private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
-	
-	private static final String KEY_EXTERNAL_TOOL_CONTENT_ID = "extToolContentID";
+    public static final String RELATIVE_MOODLE_AUTHOR_URL = "/course/modedit-lams.php?";
 
-	private static final String KEY_MODE = "mode";
+    // Authoring SessionMap key names
+    private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
 
-	private static final String TOOL_APP_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/" + MdlForumConstants.TOOL_SIGNATURE + "/";
-	
-	
-	public IIntegrationService integrationService;
-	
-	/**
-	 * Default method when no dispatch parameter is specified. It is expected
-	 * that the parameter <code>toolContentID</code> will be passed in. This
-	 * will be used to retrieve content for this tool.
-	 * 
-	 */
-	protected ActionForward unspecified(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+    private static final String KEY_EXTERNAL_TOOL_CONTENT_ID = "extToolContentID";
 
-		// Extract toolContentID, contentFolderID and ToolAccessMode from parameters.
-		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		String contentFolderID = WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, KEY_MODE,true);
+    private static final String KEY_MODE = "mode";
 
-		// set up mdlForumService
-		if (mdlForumService == null) {
-			mdlForumService = MdlForumServiceProxy.getMdlForumService(this.getServlet().getServletContext());
-		}
-		
-		// retrieving MdlForum with given toolContentID
-		// if is a new instance, customCSV should be passed, and used for the course url, otherwise the saved value should be used
-		MdlForum mdlForum = mdlForumService.getMdlForumByContentId(toolContentID);
-		
-		// Getting the custom csv from the request
-		String customCSV = WebUtil.readStrParam(request, "customCSV", true);
-		String userFromCSV = null;
-		String courseFromCSV = null;
-		String sectionFromCSV = null;
-		if(customCSV==null && mdlForum==null)
-		{
-			logger.error("CustomCSV required if mdlForum is null");
-			throw new ToolException("CustomCSV required if mdlForum is null");
-		}
-		else if (customCSV!=null)
-		{
-			String splitCSV[] = customCSV.split(",");
-			if (splitCSV.length != 3)
-			{
-				logger.error("mdlForum tool customCSV not in required (user,course,courseURL) form: " + customCSV);
-				throw new ToolException("mdlForum tool cusomCSV not in required (user,course,courseURL) form: " + customCSV);
-			}
-			else
-			{
-				userFromCSV = splitCSV[0];
-				courseFromCSV = splitCSV[1];
-				sectionFromCSV = splitCSV[2];
-			}
-		}
-		
-		if (mdlForum == null) 
-		{
-			mdlForum = mdlForumService.copyDefaultContent(toolContentID);
-			mdlForum.setExtUsername(userFromCSV);
-			mdlForum.setExtCourseId(courseFromCSV);
-			mdlForum.setExtSection(sectionFromCSV);
-			mdlForum.setCreateDate(new Date());
-		}
-					 
+    private static final String TOOL_APP_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
+	    + MdlForumConstants.TOOL_SIGNATURE + "/";
 
-		if (mode != null && mode.isTeacher()) {
-			// Set the defineLater flag so that learners cannot use content
-			// while we
-			// are editing. This flag is released when updateContent is called.
-			mdlForum.setDefineLater(true);
-			mdlForumService.saveOrUpdateMdlForum(mdlForum);
-		}
-		
-		// if no external content id, open the mdl author page, otherwise, open the edit page
-		try{
-			
-			// If the mdlForum has a saved course url, use it, otherwise use the one giving in the request in customCSV
-			//String courseUrlToBeUsed = (mdlForum.getExtCourseUrl() != null) ? mdlForum.getExtCourseUrl() : courseUrlFromCSV;
-			
-			String responseUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_SERVER_URL).getConfigValue();
-			responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
-			String returnUpdateUrl = URLEncoder.encode(
-					TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&" 
-					+AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8"
-					);
-			responseUrl +=  "&lamsUpdateURL=" + returnUpdateUrl;	
-			
-			
-			if (mdlForum.getExtSection() != null)
-			{
-				responseUrl +=  "&section=" + mdlForum.getExtSection();
-			}
-			else
-			{
-				responseUrl +=  "&section=" + sectionFromCSV;
-			}	
-			
-			if (mdlForum.getExtToolContentId()!=null)
-			{
-				responseUrl += "&update=" + mdlForum.getExtToolContentId().toString();
-			}
-			else
-			{
-				responseUrl += "&add=forum";
-			}
-			
-			if (mdlForum.getExtCourseId() != null)
-			{
-				responseUrl +="&course=" + mdlForum.getExtCourseId();
-			}
-			else
-			{
-				responseUrl +="&course=" + courseFromCSV;
-			}
-			
-			log.debug("Sending to moodle forum edit page: " + responseUrl);
-			
-			response.sendRedirect(responseUrl);
-		}
-		catch (Exception e)
-		{
-			log.error("Could not redirect to mdl forum authoring", e);	
-		}
-		return null;
+    public IIntegrationService integrationService;
+
+    /**
+     * Default method when no dispatch parameter is specified. It is expected
+     * that the parameter <code>toolContentID</code> will be passed in. This
+     * will be used to retrieve content for this tool.
+     * 
+     */
+    protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	// Extract toolContentID, contentFolderID and ToolAccessMode from parameters.
+	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, KEY_MODE, true);
+
+	// set up mdlForumService
+	if (mdlForumService == null) {
+	    mdlForumService = MdlForumServiceProxy.getMdlForumService(this.getServlet().getServletContext());
 	}
 
-	public ActionForward updateContent(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
-		// TODO need error checking.
+	// retrieving MdlForum with given toolContentID
+	// if is a new instance, customCSV should be passed, and used for the course url, otherwise the saved value should be used
+	MdlForum mdlForum = mdlForumService.getMdlForumByContentId(toolContentID);
 
-		Long toolContentID = new Long(WebUtil.readLongParam(request,KEY_TOOL_CONTENT_ID));
-		Long externalToolContentID = new Long(WebUtil.readLongParam(request,KEY_EXTERNAL_TOOL_CONTENT_ID));
-		//String sessionMapID = WebUtil.readStrParam(request,"sessionMapID");
-		
-		// get mdlForum content.
-		MdlForum mdlForum = mdlForumService.getMdlForumByContentId(toolContentID);
-		mdlForum.setExtToolContentId(externalToolContentID);
-		mdlForum.setUpdateDate(new Date());
-		mdlForum.setDefineLater(false);
-		mdlForumService.saveOrUpdateMdlForum(mdlForum);
-		
-		String redirectString = Configuration.get(ConfigurationKeys.SERVER_URL)
-			+ "/tool/" + MdlForumConstants.TOOL_SIGNATURE + "/clearsession.do" 
-			+ "?action=confirm&mode=author"
-			+ "&signature=" + MdlForumConstants.TOOL_SIGNATURE
-			+ "&toolContentID=" + toolContentID.toString()
-			+ "&defineLater=no"
-			+ "&customiseSessionID=" 
-			+ "&contentFolderID=0";
-
-		log.debug("Manual redirect for MdlForum to: " + redirectString);
-		
-		try
-		{
-			response.sendRedirect(redirectString);
-		}
-		catch(Exception e)
-		{
-			log.error("Could not redirect to clear session action for MdlForum", e);	
-		}
-		
-		return null;
+	// Getting the custom csv from the request
+	String customCSV = WebUtil.readStrParam(request, "customCSV", true);
+	String userFromCSV = null;
+	String courseFromCSV = null;
+	String sectionFromCSV = null;
+	if (customCSV == null && mdlForum == null) {
+	    logger.error("CustomCSV required if mdlForum is null");
+	    throw new ToolException("CustomCSV required if mdlForum is null");
+	} else if (customCSV != null) {
+	    String splitCSV[] = customCSV.split(",");
+	    if (splitCSV.length != 3) {
+		logger.error("mdlForum tool customCSV not in required (user,course,courseURL) form: " + customCSV);
+		throw new ToolException("mdlForum tool cusomCSV not in required (user,course,courseURL) form: "
+			+ customCSV);
+	    } else {
+		userFromCSV = splitCSV[0];
+		courseFromCSV = splitCSV[1];
+		sectionFromCSV = splitCSV[2];
+	    }
 	}
+
+	if (mdlForum == null) {
+	    mdlForum = mdlForumService.copyDefaultContent(toolContentID);
+	    mdlForum.setExtUsername(userFromCSV);
+	    mdlForum.setExtCourseId(courseFromCSV);
+	    mdlForum.setExtSection(sectionFromCSV);
+	    mdlForum.setCreateDate(new Date());
+	}
+
+	if (mode != null && mode.isTeacher()) {
+	    // Set the defineLater flag so that learners cannot use content
+	    // while we
+	    // are editing. This flag is released when updateContent is called.
+	    mdlForum.setDefineLater(true);
+	    mdlForumService.saveOrUpdateMdlForum(mdlForum);
+	}
+
+	// if no external content id, open the mdl author page, otherwise, open the edit page
+	try {
+
+	    // If the mdlForum has a saved course url, use it, otherwise use the one giving in the request in customCSV
+	    //String courseUrlToBeUsed = (mdlForum.getExtCourseUrl() != null) ? mdlForum.getExtCourseUrl() : courseUrlFromCSV;
+
+	    String responseUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_SERVER_URL)
+		    .getConfigValue();
+	    responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
+	    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
+		    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
+	    responseUrl += "&lamsUpdateURL=" + returnUpdateUrl;
+
+	    if (mdlForum.getExtSection() != null) {
+		responseUrl += "&section=" + mdlForum.getExtSection();
+	    } else {
+		responseUrl += "&section=" + sectionFromCSV;
+	    }
+
+	    if (mdlForum.getExtToolContentId() != null) {
+		responseUrl += "&update=" + mdlForum.getExtToolContentId().toString();
+	    } else {
+		responseUrl += "&add=forum";
+	    }
+
+	    if (mdlForum.getExtCourseId() != null) {
+		responseUrl += "&course=" + mdlForum.getExtCourseId();
+	    } else {
+		responseUrl += "&course=" + courseFromCSV;
+	    }
+
+	    log.debug("Sending to moodle forum edit page: " + responseUrl);
+
+	    response.sendRedirect(responseUrl);
+	} catch (Exception e) {
+	    log.error("Could not redirect to mdl forum authoring", e);
+	}
+	return null;
+    }
+
+    public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	// TODO need error checking.
+
+	Long toolContentID = new Long(WebUtil.readLongParam(request, KEY_TOOL_CONTENT_ID));
+	Long externalToolContentID = new Long(WebUtil.readLongParam(request, KEY_EXTERNAL_TOOL_CONTENT_ID));
+	//String sessionMapID = WebUtil.readStrParam(request,"sessionMapID");
+
+	// get mdlForum content.
+	MdlForum mdlForum = mdlForumService.getMdlForumByContentId(toolContentID);
+	mdlForum.setExtToolContentId(externalToolContentID);
+	mdlForum.setUpdateDate(new Date());
+	mdlForum.setDefineLater(false);
+	mdlForumService.saveOrUpdateMdlForum(mdlForum);
+
+	String redirectString = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
+		+ MdlForumConstants.TOOL_SIGNATURE + "/clearsession.do" + "?action=confirm&mode=author" + "&signature="
+		+ MdlForumConstants.TOOL_SIGNATURE + "&toolContentID=" + toolContentID.toString() + "&defineLater=no"
+		+ "&customiseSessionID=" + "&contentFolderID=0";
+
+	log.debug("Manual redirect for MdlForum to: " + redirectString);
+
+	try {
+	    response.sendRedirect(redirectString);
+	} catch (Exception e) {
+	    log.error("Could not redirect to clear session action for MdlForum", e);
+	}
+
+	return null;
+    }
 }

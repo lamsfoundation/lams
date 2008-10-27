@@ -51,75 +51,72 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author
  * @version
  * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request" name="monitoringForm" validate="false"
+ * @struts.action path="/monitoring" parameter="dispatch" scope="request"
+ *                name="monitoringForm" validate="false"
  * 
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {
 
-	private static Logger log = Logger.getLogger(MonitoringAction.class);
-	
-	private static final String TOOL_APP_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/" + MdlForumConstants.TOOL_SIGNATURE + "/";
+    private static Logger log = Logger.getLogger(MonitoringAction.class);
 
-	public static final String RELATIVE_MONITOR_URL = "/mod/forum/view.php?";
+    private static final String TOOL_APP_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
+	    + MdlForumConstants.TOOL_SIGNATURE + "/";
 
-	public IMdlForumService mdlForumService;
+    public static final String RELATIVE_MONITOR_URL = "/mod/forum/view.php?";
 
-	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+    public IMdlForumService mdlForumService;
 
-		setupService();
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
-		Long toolContentID = new Long(WebUtil.readLongParam(request,AttributeNames.PARAM_TOOL_CONTENT_ID));
-		
-		String contentFolderID = WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID);
-				
-		MdlForum mdlForum = mdlForumService.getMdlForumByContentId(toolContentID);
+	setupService();
 
-		
-		if (mdlForum == null) {
-			// TODO error page.
-		}
+	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
-		MdlForumDTO mdlForumDT0 = new MdlForumDTO(mdlForum);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-		Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true);
-		mdlForumDT0.setCurrentTab(currentTab);
-		
-		
-		for (MdlForumSessionDTO  sessionDTO: mdlForumDT0.getSessionDTOs())
-		{
-			try {
-				String responseUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_SERVER_URL).getConfigValue();
-				responseUrl += RELATIVE_MONITOR_URL;
+	MdlForum mdlForum = mdlForumService.getMdlForumByContentId(toolContentID);
 
-				String returnUrl = TOOL_APP_URL + "learning.do?"
-					+ AttributeNames.PARAM_TOOL_SESSION_ID + "=" + sessionDTO.getSessionID().toString()
-					+ "&dispatch=finishActivity";
-				returnUrl = URLEncoder.encode(returnUrl, "UTF8");
-				
-				responseUrl += "&id=" + sessionDTO.getExtSessionID()
-					+ "&returnUrl=" + returnUrl;
-				
-				sessionDTO.setRunTimeUrl(responseUrl);
-			} catch (UnsupportedEncodingException e) {
-				log.error(e);
-			}
-		}
-		
-		request.setAttribute("mdlForumDTO", mdlForumDT0);
-		request.setAttribute("contentFolderID", contentFolderID);
-		return mapping.findForward("success");
+	if (mdlForum == null) {
+	    // TODO error page.
 	}
-	
-	/**
-	 * set up mdlForumService
-	 */
-	private void setupService() {
-		if (mdlForumService == null) {
-			mdlForumService = MdlForumServiceProxy.getMdlForumService(this
-					.getServlet().getServletContext());
-		}
+
+	MdlForumDTO mdlForumDT0 = new MdlForumDTO(mdlForum);
+
+	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
+	mdlForumDT0.setCurrentTab(currentTab);
+
+	for (MdlForumSessionDTO sessionDTO : mdlForumDT0.getSessionDTOs()) {
+	    try {
+		String responseUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_SERVER_URL)
+			.getConfigValue();
+		responseUrl += RELATIVE_MONITOR_URL;
+
+		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
+			+ sessionDTO.getSessionID().toString() + "&dispatch=finishActivity";
+		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
+
+		responseUrl += "&id=" + sessionDTO.getExtSessionID() + "&returnUrl=" + returnUrl;
+
+		sessionDTO.setRunTimeUrl(responseUrl);
+	    } catch (UnsupportedEncodingException e) {
+		log.error(e);
+	    }
 	}
+
+	request.setAttribute("mdlForumDTO", mdlForumDT0);
+	request.setAttribute("contentFolderID", contentFolderID);
+	return mapping.findForward("success");
+    }
+
+    /**
+     * set up mdlForumService
+     */
+    private void setupService() {
+	if (mdlForumService == null) {
+	    mdlForumService = MdlForumServiceProxy.getMdlForumService(this.getServlet().getServletContext());
+	}
+    }
 }

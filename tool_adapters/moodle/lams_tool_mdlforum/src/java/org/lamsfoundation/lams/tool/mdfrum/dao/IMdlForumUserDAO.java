@@ -28,33 +28,32 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumUser;
 
 /**
- * DAO for accessing the MdlForumUser objects - interface defining
- * methods to be implemented by the Hibernate or other implementation.
+ * DAO for accessing the MdlForumUser objects - interface defining methods to be
+ * implemented by the Hibernate or other implementation.
  */
-public interface IMdlForumUserDAO extends IBaseDAO{
-	/**
-	 * 
-	 * @param userId
-	 * @param toolSessionId
-	 * @return
-	 */
-	MdlForumUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
+public interface IMdlForumUserDAO extends IBaseDAO {
+    /**
+     * 
+     * @param userId
+     * @param toolSessionId
+     * @return
+     */
+    MdlForumUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
 
-	void saveOrUpdate(MdlForumUser mdlForumUser);
+    void saveOrUpdate(MdlForumUser mdlForumUser);
 
-	/**
-	 * 
-	 * @param loginName
-	 * @param sessionID
-	 * @return
-	 */
-	MdlForumUser getByLoginNameAndSessionId(String loginName, Long toolSessionId);
+    /**
+     * 
+     * @param loginName
+     * @param sessionID
+     * @return
+     */
+    MdlForumUser getByLoginNameAndSessionId(String loginName, Long toolSessionId);
 
-	
-	/**
-	 * 
-	 * @param uid 
-	 * @return
-	 */
-	MdlForumUser getByUID(Long uid);
+    /**
+     * 
+     * @param uid
+     * @return
+     */
+    MdlForumUser getByUID(Long uid);
 }

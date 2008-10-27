@@ -33,103 +33,103 @@ import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumUser;
 
 public class MdlForumSessionDTO implements Comparable {
-	
-	Long sessionID;
-	
-	Long extSessionID;
 
-	String sessionName;
-	
-	Set<MdlForumUserDTO> userDTOs = new TreeSet<MdlForumUserDTO>();
-	
-	int numberOfLearners;
-	
-	int numberOfFinishedLearners;
-	
-	String runTimeUrl;
-	
+    Long sessionID;
 
-	public MdlForumSessionDTO(MdlForumSession session) {
-		this.sessionID = session.getSessionId();
-		this.sessionName = session.getSessionName();
-		this.extSessionID = session.getExtSessionId();
-		numberOfFinishedLearners = 0;
-		
-		/*
-		for (Iterator iterator = session.getMdlForumUsers().iterator(); iterator.hasNext();) {
-			MdlForumUser user = (MdlForumUser) iterator.next();
-			MdlForumUserDTO userDTO = new MdlForumUserDTO(user);
-			userDTOs.add(userDTO);
-		}
-		numberOfLearners = userDTOs.size();	
-		*/
-	}
-	
-	public MdlForumSessionDTO() {}
-	
-	public Long getSessionID() {
-		return sessionID;
-	}
+    Long extSessionID;
 
-	public void setSessionID(Long sessionID) {
-		this.sessionID = sessionID;
-	}
+    String sessionName;
 
-	public String getSessionName() {
-		return sessionName;
-	}
+    Set<MdlForumUserDTO> userDTOs = new TreeSet<MdlForumUserDTO>();
 
-	public void setSessionName(String sessionName) {
-		this.sessionName = sessionName;
-	}
+    int numberOfLearners;
 
-	public int compareTo(Object o) {
-		int returnValue;
-		MdlForumSessionDTO toSession = (MdlForumSessionDTO)o;
-		returnValue = this.sessionName.compareTo(toSession.sessionName);
-		if (returnValue == 0) {
-			returnValue = this.sessionID.compareTo(toSession.sessionID);			
-		}
-		return returnValue;		
-	}
+    int numberOfFinishedLearners;
 
-	public Set<MdlForumUserDTO> getUserDTOs() {
-		return userDTOs;
-	}
+    String runTimeUrl;
 
-	public void setUserDTOs(Set<MdlForumUserDTO> mdlForumUsers) {
-		this.userDTOs = mdlForumUsers;
-	}
+    public MdlForumSessionDTO(MdlForumSession session) {
+	this.sessionID = session.getSessionId();
+	this.sessionName = session.getSessionName();
+	this.extSessionID = session.getExtSessionId();
+	numberOfFinishedLearners = 0;
 
-	public int getNumberOfLearners() {
-		return numberOfLearners;
+	/*
+	for (Iterator iterator = session.getMdlForumUsers().iterator(); iterator.hasNext();) {
+		MdlForumUser user = (MdlForumUser) iterator.next();
+		MdlForumUserDTO userDTO = new MdlForumUserDTO(user);
+		userDTOs.add(userDTO);
 	}
+	numberOfLearners = userDTOs.size();	
+	*/
+    }
 
-	public void setNumberOfLearners(int numberOfLearners) {
-		this.numberOfLearners = numberOfLearners;
-	}
+    public MdlForumSessionDTO() {
+    }
 
-	public int getNumberOfFinishedLearners() {
-		return numberOfFinishedLearners;
-	}
+    public Long getSessionID() {
+	return sessionID;
+    }
 
-	public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
-		this.numberOfFinishedLearners = numberOfFinishedLearners;
-	}
+    public void setSessionID(Long sessionID) {
+	this.sessionID = sessionID;
+    }
 
-	public Long getExtSessionID() {
-		return extSessionID;
-	}
+    public String getSessionName() {
+	return sessionName;
+    }
 
-	public void setExtSessionID(Long extSessionID) {
-		this.extSessionID = extSessionID;
-	}
+    public void setSessionName(String sessionName) {
+	this.sessionName = sessionName;
+    }
 
-	public String getRunTimeUrl() {
-		return runTimeUrl;
+    public int compareTo(Object o) {
+	int returnValue;
+	MdlForumSessionDTO toSession = (MdlForumSessionDTO) o;
+	returnValue = this.sessionName.compareTo(toSession.sessionName);
+	if (returnValue == 0) {
+	    returnValue = this.sessionID.compareTo(toSession.sessionID);
 	}
+	return returnValue;
+    }
 
-	public void setRunTimeUrl(String runTimeUrl) {
-		this.runTimeUrl = runTimeUrl;
-	}
+    public Set<MdlForumUserDTO> getUserDTOs() {
+	return userDTOs;
+    }
+
+    public void setUserDTOs(Set<MdlForumUserDTO> mdlForumUsers) {
+	this.userDTOs = mdlForumUsers;
+    }
+
+    public int getNumberOfLearners() {
+	return numberOfLearners;
+    }
+
+    public void setNumberOfLearners(int numberOfLearners) {
+	this.numberOfLearners = numberOfLearners;
+    }
+
+    public int getNumberOfFinishedLearners() {
+	return numberOfFinishedLearners;
+    }
+
+    public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
+	this.numberOfFinishedLearners = numberOfFinishedLearners;
+    }
+
+    public Long getExtSessionID() {
+	return extSessionID;
+    }
+
+    public void setExtSessionID(Long extSessionID) {
+	this.extSessionID = extSessionID;
+    }
+
+    public String getRunTimeUrl() {
+	return runTimeUrl;
+    }
+
+    public void setRunTimeUrl(String runTimeUrl) {
+	this.runTimeUrl = runTimeUrl;
+    }
 }

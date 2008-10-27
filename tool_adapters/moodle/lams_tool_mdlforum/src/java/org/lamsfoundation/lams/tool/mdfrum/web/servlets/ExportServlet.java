@@ -52,155 +52,143 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
-	private static final long serialVersionUID = -2829707715037631881L;
+    private static final long serialVersionUID = -2829707715037631881L;
 
-	private static Logger logger = Logger.getLogger(ExportServlet.class);
+    private static Logger logger = Logger.getLogger(ExportServlet.class);
 
-	private final String FILENAME = "mdlForum_main.html";
+    private final String FILENAME = "mdlForum_main.html";
 
-	private IMdlForumService mdlForumService;
+    private IMdlForumService mdlForumService;
 
-	protected String doExport(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies) {
+    protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
 
-		if (mdlForumService == null) {
-			mdlForumService = MdlForumServiceProxy.getMdlForumService(getServletContext());
-		}
-
-		try {
-			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
-						ToolAccessMode.LEARNER);
-				doLearnerExport(request, response, directoryName, cookies);
-			} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER
-					.toString())) {
-				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
-						ToolAccessMode.TEACHER);
-				doTeacherExport(request, response, directoryName, cookies);
-				String basePath = request.getScheme() + "://" + request.getServerName()
-						+ ":" + request.getServerPort() + request.getContextPath();
-				writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
-						directoryName, FILENAME, cookies);
-		
-				
-			}
-		} catch (MdlForumException e) {
-			logger.error("Cannot perform export for mdlForum tool.");
-		}
-		return FILENAME;
+	if (mdlForumService == null) {
+	    mdlForumService = MdlForumServiceProxy.getMdlForumService(getServletContext());
 	}
 
-	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-        if (toolContentID == null && toolSessionID == null) {
-            logger.error("Tool content Id or and session Id are null. Unable to activity title");
-        } else {
-    		if (mdlForumService == null) {
-    			mdlForumService = MdlForumServiceProxy.getMdlForumService(getServletContext());
-    		}
+	try {
+	    if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
+		request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.LEARNER);
+		doLearnerExport(request, response, directoryName, cookies);
+	    } else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
+		request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+		doTeacherExport(request, response, directoryName, cookies);
+		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+			+ request.getContextPath();
+		writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
 
-        	MdlForum content = null;
-            if ( toolContentID != null ) {
-            	content = mdlForumService.getMdlForumByContentId(toolContentID);
-            } else {
-            	MdlForumSession session=mdlForumService.getSessionBySessionId(toolSessionID);
-            	if ( session != null )
-            		content = session.getMdlForum();
-            }
-            if ( content != null ) {
-            	//activityTitle = content.getTitle();
-            }
-        }
-        return super.doOfflineExport(request, response, directoryName, cookies);
+	    }
+	} catch (MdlForumException e) {
+	    logger.error("Cannot perform export for mdlForum tool.");
 	}
-	
-	private void doLearnerExport(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies)
-			throws MdlForumException {
+	return FILENAME;
+    }
 
-		logger.debug("doExportLearner: toolContentID:" + toolSessionID);
+    protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
+	if (toolContentID == null && toolSessionID == null) {
+	    logger.error("Tool content Id or and session Id are null. Unable to activity title");
+	} else {
+	    if (mdlForumService == null) {
+		mdlForumService = MdlForumServiceProxy.getMdlForumService(getServletContext());
+	    }
 
-		// check if toolSessionID available
-		if (toolSessionID == null) {
-			String error = "Tool Session ID is missing. Unable to continue";
-			logger.error(error);
-			throw new MdlForumException(error);
-		}
+	    MdlForum content = null;
+	    if (toolContentID != null) {
+		content = mdlForumService.getMdlForumByContentId(toolContentID);
+	    } else {
+		MdlForumSession session = mdlForumService.getSessionBySessionId(toolSessionID);
+		if (session != null)
+		    content = session.getMdlForum();
+	    }
+	    if (content != null) {
+		//activityTitle = content.getTitle();
+	    }
+	}
+	return super.doOfflineExport(request, response, directoryName, cookies);
+    }
 
-		MdlForumSession mdlForumSession = mdlForumService.getSessionBySessionId(toolSessionID);
+    private void doLearnerExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) throws MdlForumException {
 
-		MdlForum mdlForum = mdlForumSession.getMdlForum();
+	logger.debug("doExportLearner: toolContentID:" + toolSessionID);
 
-		try{
-			exportFileFromExternalServer(request, response, 
-				mdlForumSession.getExtSessionId(), mdlForum, 
-				directoryName + "/" + FILENAME);
-		}
-		catch (Exception e)
-		{
-			logger.error("Could not fetch export file from external servlet", e);
-			throw new MdlForumException("Could not fetch export file from external servlet", e);
-		}
+	// check if toolSessionID available
+	if (toolSessionID == null) {
+	    String error = "Tool Session ID is missing. Unable to continue";
+	    logger.error(error);
+	    throw new MdlForumException(error);
 	}
 
-	private void doTeacherExport(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies)
-			throws MdlForumException {
+	MdlForumSession mdlForumSession = mdlForumService.getSessionBySessionId(toolSessionID);
 
-		logger.debug("doExportTeacher: toolContentID:" + toolContentID);
+	MdlForum mdlForum = mdlForumSession.getMdlForum();
 
-		// check if toolContentID available
-		if (toolContentID == null) {
-			String error = "Tool Content ID is missing. Unable to continue";
-			logger.error(error);
-			throw new MdlForumException(error);
-		}
-
-		MdlForum mdlForum = mdlForumService.getMdlForumByContentId(toolContentID);
-		MdlForumDTO mdlForumDTO = new MdlForumDTO(mdlForum);
-		request.getSession().setAttribute("mdlForumDTO", mdlForumDTO);
-		
-		Set <MdlForumSession> sessions = mdlForum.getMdlForumSessions();
-		for (MdlForumSession session : sessions)
-		{
-			try {
-				String fullPath = directoryName + "/"+ session.getSessionName();
-				exportFileFromExternalServer(request, response, session.getExtSessionId(), mdlForum,fullPath);
-			} catch (Exception e) {
-				logger.error("Could not fetch export file from external servlet", e);
-				throw new MdlForumException("Could not fetch export file from external servlet", e);
-			}
-		}
-		
-		request.getSession().setAttribute("sessions", sessions);
+	try {
+	    exportFileFromExternalServer(request, response, mdlForumSession.getExtSessionId(), mdlForum, directoryName
+		    + "/" + FILENAME);
+	} catch (Exception e) {
+	    logger.error("Could not fetch export file from external servlet", e);
+	    throw new MdlForumException("Could not fetch export file from external servlet", e);
 	}
-	
-	private void exportFileFromExternalServer(HttpServletRequest request,
-			HttpServletResponse response, Long extToolSessionId, MdlForum mdlForum, String fullPath) throws Exception
-	{
-		String exportPortFolioServletUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_TOOL_SERVLET).getConfigValue();
-		
-		String extUsername="user"; // setting user to arbitrary values since they are only used to construct the hash
+    }
 
-		HashMap<String, String> params = mdlForumService.getRequiredExtServletParams(mdlForum);
-		params.put("method", IMdlForumService.EXT_SERVER_METHOD_EXPORT_PORTFOLIO);
-		params.put("extToolContentID", extToolSessionId.toString());
+    private void doTeacherExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) throws MdlForumException {
 
-		InputStream in = WebUtility.getResponseInputStreamFromExternalServer(exportPortFolioServletUrl, params);
-		OutputStream out = new BufferedOutputStream(new FileOutputStream(fullPath));
-		byte[] buffer = new byte[1024];
-		int numRead;
-		long numWritten = 0;
-		logger.debug("Getting file...");
-		while ((numRead = in.read(buffer)) != -1) 
-		{
-			out.write(buffer, 0, numRead);
-			logger.debug(new String(buffer));
-			numWritten += numRead;
-		}
-		logger.debug("Path to mdlForum export portfolio content: " + fullPath);
-		out.flush();
-		out.close();
+	logger.debug("doExportTeacher: toolContentID:" + toolContentID);
+
+	// check if toolContentID available
+	if (toolContentID == null) {
+	    String error = "Tool Content ID is missing. Unable to continue";
+	    logger.error(error);
+	    throw new MdlForumException(error);
 	}
-	
+
+	MdlForum mdlForum = mdlForumService.getMdlForumByContentId(toolContentID);
+	MdlForumDTO mdlForumDTO = new MdlForumDTO(mdlForum);
+	request.getSession().setAttribute("mdlForumDTO", mdlForumDTO);
+
+	Set<MdlForumSession> sessions = mdlForum.getMdlForumSessions();
+	for (MdlForumSession session : sessions) {
+	    try {
+		String fullPath = directoryName + "/" + session.getSessionName();
+		exportFileFromExternalServer(request, response, session.getExtSessionId(), mdlForum, fullPath);
+	    } catch (Exception e) {
+		logger.error("Could not fetch export file from external servlet", e);
+		throw new MdlForumException("Could not fetch export file from external servlet", e);
+	    }
+	}
+
+	request.getSession().setAttribute("sessions", sessions);
+    }
+
+    private void exportFileFromExternalServer(HttpServletRequest request, HttpServletResponse response,
+	    Long extToolSessionId, MdlForum mdlForum, String fullPath) throws Exception {
+	String exportPortFolioServletUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_TOOL_SERVLET)
+		.getConfigValue();
+
+	String extUsername = "user"; // setting user to arbitrary values since they are only used to construct the hash
+
+	HashMap<String, String> params = mdlForumService.getRequiredExtServletParams(mdlForum);
+	params.put("method", IMdlForumService.EXT_SERVER_METHOD_EXPORT_PORTFOLIO);
+	params.put("extToolContentID", extToolSessionId.toString());
+
+	InputStream in = WebUtility.getResponseInputStreamFromExternalServer(exportPortFolioServletUrl, params);
+	OutputStream out = new BufferedOutputStream(new FileOutputStream(fullPath));
+	byte[] buffer = new byte[1024];
+	int numRead;
+	long numWritten = 0;
+	logger.debug("Getting file...");
+	while ((numRead = in.read(buffer)) != -1) {
+	    out.write(buffer, 0, numRead);
+	    logger.debug(new String(buffer));
+	    numWritten += numRead;
+	}
+	logger.debug("Path to mdlForum export portfolio content: " + fullPath);
+	out.flush();
+	out.close();
+    }
 
 }

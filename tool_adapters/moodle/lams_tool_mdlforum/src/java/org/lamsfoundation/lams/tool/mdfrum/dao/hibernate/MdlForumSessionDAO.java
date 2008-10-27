@@ -35,26 +35,26 @@ import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession;
  */
 public class MdlForumSessionDAO extends BaseDAO implements IMdlForumSessionDAO {
 
-	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
-			+ MdlForumSession.class.getName() + " where session_id=?";
+    public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from " + MdlForumSession.class.getName()
+	    + " where session_id=?";
 
-	public void saveOrUpdate(MdlForumSession session) {
-		this.getHibernateTemplate().saveOrUpdate(session);
-		this.getHibernateTemplate().flush();
-	}
+    public void saveOrUpdate(MdlForumSession session) {
+	this.getHibernateTemplate().saveOrUpdate(session);
+	this.getHibernateTemplate().flush();
+    }
 
-	public MdlForumSession getBySessionId(Long toolSessionId) {
-		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
-		if (list == null || list.isEmpty())
-			return null;
-		return (MdlForumSession) list.get(0);
-	}
+    public MdlForumSession getBySessionId(Long toolSessionId) {
+	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
+	if (list == null || list.isEmpty())
+	    return null;
+	return (MdlForumSession) list.get(0);
+    }
 
-	public void deleteBySessionID(Long toolSessionID) {
-		MdlForumSession session = getBySessionId(toolSessionID);
-		if(session != null){
-			this.getHibernateTemplate().delete(session);
-			this.getHibernateTemplate().flush();
-		}
+    public void deleteBySessionID(Long toolSessionID) {
+	MdlForumSession session = getBySessionId(toolSessionID);
+	if (session != null) {
+	    this.getHibernateTemplate().delete(session);
+	    this.getHibernateTemplate().flush();
 	}
+    }
 }

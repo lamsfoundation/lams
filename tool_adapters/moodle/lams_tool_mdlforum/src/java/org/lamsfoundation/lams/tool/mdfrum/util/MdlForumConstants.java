@@ -25,26 +25,26 @@
 package org.lamsfoundation.lams.tool.mdfrum.util;
 
 public interface MdlForumConstants {
-	public static final String TOOL_SIGNATURE = "mdfrum10";
-	
-	// MdlForum session status
-	public static final Integer SESSION_NOT_STARTED = new Integer(0);
-	public static final Integer SESSION_IN_PROGRESS = new Integer(1);
-	public static final Integer SESSION_COMPLETED = new Integer(2);	
-	
-	public static final String AUTHORING_DEFAULT_TAB = "1";
-	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
-	public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
-	public static final String AUTH_SESSION_ID = "authoringSessionId";
-	
-	public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
-	
-	// Attribute names
-	public static final String ATTR_MESSAGE = "message";
-	public static final String ATTR_SESSION_MAP = "sessionMap";
-	
-	// Parameter names
-	public static final String PARAM_PARENT_PAGE = "parentPage";
-	
-	static final String FILTER_REPLACE_TEXT = "***";
+    public static final String TOOL_SIGNATURE = "mdfrum10";
+
+    // MdlForum session status
+    public static final Integer SESSION_NOT_STARTED = new Integer(0);
+    public static final Integer SESSION_IN_PROGRESS = new Integer(1);
+    public static final Integer SESSION_COMPLETED = new Integer(2);
+
+    public static final String AUTHORING_DEFAULT_TAB = "1";
+    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
+    public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
+    public static final String AUTH_SESSION_ID = "authoringSessionId";
+
+    public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
+
+    // Attribute names
+    public static final String ATTR_MESSAGE = "message";
+    public static final String ATTR_SESSION_MAP = "sessionMap";
+
+    // Parameter names
+    public static final String PARAM_PARENT_PAGE = "parentPage";
+
+    static final String FILTER_REPLACE_TEXT = "***";
 }

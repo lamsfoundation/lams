@@ -27,75 +27,73 @@ package org.lamsfoundation.lams.tool.mdfrum.dto;
 
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumUser;
 
-public class MdlForumUserDTO{
-	
-	public Long uid;
-	
-	public String loginName;
-	
-	public String firstName;
-	
-	public String lastName;
-	
-	public boolean finishedActivity;
+public class MdlForumUserDTO {
 
-	
-	public MdlForumUserDTO(MdlForumUser user) {
-		this.uid = user.getUid();
-		this.loginName = user.getLoginName();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.finishedActivity = user.isFinishedActivity();
-	}
-	
+    public Long uid;
 
-	public int compareTo(Object o) {
-		int returnValue;
-		MdlForumUserDTO toUser = (MdlForumUserDTO)o;
-		returnValue = this.lastName.compareTo(toUser.lastName);
-		if (returnValue == 0) {
-			returnValue = this.uid.compareTo(toUser.uid);			
-		}
-		return returnValue;		
-	}
+    public String loginName;
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public String firstName;
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public String lastName;
 
-	public String getLastName() {
-		return lastName;
-	}
+    public boolean finishedActivity;
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public MdlForumUserDTO(MdlForumUser user) {
+	this.uid = user.getUid();
+	this.loginName = user.getLoginName();
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.finishedActivity = user.isFinishedActivity();
+    }
 
-	public String getLoginName() {
-		return loginName;
+    public int compareTo(Object o) {
+	int returnValue;
+	MdlForumUserDTO toUser = (MdlForumUserDTO) o;
+	returnValue = this.lastName.compareTo(toUser.lastName);
+	if (returnValue == 0) {
+	    returnValue = this.uid.compareTo(toUser.uid);
 	}
+	return returnValue;
+    }
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
-	}
+    public String getFirstName() {
+	return firstName;
+    }
 
-	public Long getUid() {
-		return uid;
-	}
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    public String getLastName() {
+	return lastName;
+    }
 
-	public boolean isFinishedActivity() {
-		return finishedActivity;
-	}
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
 
-	public void setFinishedActivity(boolean finishedActivity) {
-		this.finishedActivity = finishedActivity;
-	}
+    public String getLoginName() {
+	return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+	this.loginName = loginName;
+    }
+
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    public boolean isFinishedActivity() {
+	return finishedActivity;
+    }
+
+    public void setFinishedActivity(boolean finishedActivity) {
+	this.finishedActivity = finishedActivity;
+    }
 }

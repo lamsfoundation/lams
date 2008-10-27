@@ -27,31 +27,31 @@ package org.lamsfoundation.lams.tool.mdfrum.util;
 /**
  * 
  * @author lfoxton
- *
+ * 
  */
 public class MdlForumException extends RuntimeException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5518806968051758859L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5518806968051758859L;
 
-	public MdlForumException(String message) {
-		super(message);
-	}
+    public MdlForumException(String message) {
+	super(message);
+    }
 
-	public MdlForumException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public MdlForumException(String message, Throwable cause) {
+	super(message, cause);
+    }
 
-	public MdlForumException() {
-		super();
+    public MdlForumException() {
+	super();
 
-	}
+    }
 
-	public MdlForumException(Throwable cause) {
-		super(cause);
+    public MdlForumException(Throwable cause) {
+	super(cause);
 
-	}
+    }
 
 }

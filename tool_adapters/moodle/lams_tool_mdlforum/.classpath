@@ -4,7 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
-	<classpathentry kind="lib" path="/lams_build/lib/jakarta-commons/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar" sourcepath="/lams_common"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-admin.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-central.jar" sourcepath="/lams_central/src"/>

@@ -37,180 +37,177 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 public class MdlForumUser implements java.io.Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 928378476276354672L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 928378476276354672L;
 
-	// Fields
-	private Long uid;
+    // Fields
+    private Long uid;
 
-	private Long userId;
+    private Long userId;
 
-	private String lastName;
+    private String lastName;
 
-	private String firstName;
+    private String firstName;
 
-	private String loginName;
+    private String loginName;
 
-	private MdlForumSession mdlForumSession;
-	
-	private boolean finishedActivity;
-	
-	private Long entryUID;
+    private MdlForumSession mdlForumSession;
 
-	// Constructors
+    private boolean finishedActivity;
 
-	/** default constructor */
-	public MdlForumUser() {
-	}
+    private Long entryUID;
 
-	public MdlForumUser(UserDTO user, MdlForumSession mdlForumSession) {
-		this.userId = new Long(user.getUserID().intValue());
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.loginName = user.getLogin();
-		this.mdlForumSession = mdlForumSession;
-		this.finishedActivity = false;
-	}
+    // Constructors
 
-	/** full constructor */
-	public MdlForumUser(Long userId, String lastName, String firstName,
-			MdlForumSession mdlForumSession) {
-		this.userId = userId;
-		this.lastName = lastName;
-		this.firstName = firstName;
-		this.mdlForumSession = mdlForumSession;
-	}
+    /** default constructor */
+    public MdlForumUser() {
+    }
 
-	// Property accessors
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 */
-	public Long getUid() {
-		return this.uid;
-	}
+    public MdlForumUser(UserDTO user, MdlForumSession mdlForumSession) {
+	this.userId = new Long(user.getUserID().intValue());
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.loginName = user.getLogin();
+	this.mdlForumSession = mdlForumSession;
+	this.finishedActivity = false;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    /** full constructor */
+    public MdlForumUser(Long userId, String lastName, String firstName, MdlForumSession mdlForumSession) {
+	this.userId = userId;
+	this.lastName = lastName;
+	this.firstName = firstName;
+	this.mdlForumSession = mdlForumSession;
+    }
 
-	/**
-	 * @hibernate.property column="user_id" length="20"
-	 * 
-	 */
-	public Long getUserId() {
-		return this.userId;
-	}
+    // Property accessors
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     */
+    public Long getUid() {
+	return this.uid;
+    }
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-	/**
-	 * @hibernate.property column="last_name" length="255"
-	 * 
-	 */
-	public String getLastName() {
-		return this.lastName;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	
-	/**
-	 * @hibernate.property column="login_name" length="255"
-	 * 
-	 */
-	public String getLoginName() {
-		return loginName;
-	}
+    /**
+     * @hibernate.property column="user_id" length="20"
+     * 
+     */
+    public Long getUserId() {
+	return this.userId;
+    }
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
-	}
+    public void setUserId(Long userId) {
+	this.userId = userId;
+    }
 
-	/**
-	 * @hibernate.property column="first_name" length="255"
-	 * 
-	 */
-	public String getFirstName() {
-		return this.firstName;
-	}
+    /**
+     * @hibernate.property column="last_name" length="255"
+     * 
+     */
+    public String getLastName() {
+	return this.lastName;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	
-	/**
-	 * @hibernate.property column="finishedActivity" 
-	 */
-	public boolean isFinishedActivity() {
-		return finishedActivity;
-	}
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
 
-	public void setFinishedActivity(boolean finishedActivity) {
-		this.finishedActivity = finishedActivity;
-	}
-	
-	/**
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="mdlforum_session_uid"
-	 * 
-	 */
-	public MdlForumSession getMdlForumSession() {
-		return this.mdlForumSession;
-	}
+    /**
+     * @hibernate.property column="login_name" length="255"
+     * 
+     */
+    public String getLoginName() {
+	return loginName;
+    }
 
-	public void setMdlForumSession(MdlForumSession mdlForumSession) {
-		this.mdlForumSession = mdlForumSession;
-	}
+    public void setLoginName(String loginName) {
+	this.loginName = loginName;
+    }
 
-	/**
-	 * @hibernate.property column="entry_uid"
-	 */
-	public Long getEntryUID() {
-		return entryUID;
-	}
+    /**
+     * @hibernate.property column="first_name" length="255"
+     * 
+     */
+    public String getFirstName() {
+	return this.firstName;
+    }
 
-	public void setEntryUID(Long entryUID) {
-		this.entryUID = entryUID;
-	}
-	
-	/**
-	 * toString
-	 * 
-	 * @return String
-	 */
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
 
-		buffer.append(getClass().getName()).append("@").append(
-				Integer.toHexString(hashCode())).append(" [");
-		buffer.append("userId").append("='").append(getUserId()).append("' ");
-		buffer.append("]");
+    /**
+     * @hibernate.property column="finishedActivity"
+     */
+    public boolean isFinishedActivity() {
+	return finishedActivity;
+    }
 
-		return buffer.toString();
-	}
+    public void setFinishedActivity(boolean finishedActivity) {
+	this.finishedActivity = finishedActivity;
+    }
 
-	public boolean equals(Object other) {
-		if ((this == other))
-			return true;
-		if ((other == null))
-			return false;
-		if (!(other instanceof MdlForumUser))
-			return false;
-		MdlForumUser castOther = (MdlForumUser) other;
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="mdlforum_session_uid"
+     * 
+     */
+    public MdlForumSession getMdlForumSession() {
+	return this.mdlForumSession;
+    }
 
-		return ((this.getUid() == castOther.getUid()) || (this.getUid() != null
-				&& castOther.getUid() != null && this.getUid().equals(
-				castOther.getUid())));
-	}
+    public void setMdlForumSession(MdlForumSession mdlForumSession) {
+	this.mdlForumSession = mdlForumSession;
+    }
 
-	public int hashCode() {
-		int result = 17;
-		result = 37 * result
-				+ (getUid() == null ? 0 : this.getUid().hashCode());
-		return result;
-	}
+    /**
+     * @hibernate.property column="entry_uid"
+     */
+    public Long getEntryUID() {
+	return entryUID;
+    }
+
+    public void setEntryUID(Long entryUID) {
+	this.entryUID = entryUID;
+    }
+
+    /**
+     * toString
+     * 
+     * @return String
+     */
+    public String toString() {
+	StringBuffer buffer = new StringBuffer();
+
+	buffer.append(getClass().getName()).append("@").append(Integer.toHexString(hashCode())).append(" [");
+	buffer.append("userId").append("='").append(getUserId()).append("' ");
+	buffer.append("]");
+
+	return buffer.toString();
+    }
+
+    public boolean equals(Object other) {
+	if ((this == other))
+	    return true;
+	if ((other == null))
+	    return false;
+	if (!(other instanceof MdlForumUser))
+	    return false;
+	MdlForumUser castOther = (MdlForumUser) other;
+
+	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null && this
+		.getUid().equals(castOther.getUid())));
+    }
+
+    public int hashCode() {
+	int result = 17;
+	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());
+	return result;
+    }
 }

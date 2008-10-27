@@ -22,7 +22,7 @@
  */
 
 /* $Id$ */
- 
+
 package org.lamsfoundation.lams.tool.mdfrum.web.forms;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,179 +40,176 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  */
 public class AuthoringForm extends ActionForm {
 
-	private static final long serialVersionUID = 3950453134542135495L;
+    private static final long serialVersionUID = 3950453134542135495L;
 
-	// Properties
+    // Properties
 
-	String title;
+    String title;
 
-	String instructions;
+    String instructions;
 
-	String offlineInstruction;
+    String offlineInstruction;
 
-	String onlineInstruction;
+    String onlineInstruction;
 
-	boolean lockOnFinished;
-	
-	boolean allowRichEditor;
-	
-	boolean evalcomixEvaluationByLearners;
-	
-	boolean evalcomixEvaluationByTeachers;
-	
-	String evalcomixInstrumentFormAndViewUrl;
-	
-	FormFile onlineFile; 
+    boolean lockOnFinished;
 
-	FormFile offlineFile;
+    boolean allowRichEditor;
 
-	String currentTab;
+    boolean evalcomixEvaluationByLearners;
 
-	String dispatch;
-	
-	String sessionMapID;
-	
-	Long deleteFileUuid;
+    boolean evalcomixEvaluationByTeachers;
 
-	SessionMap sessionMap;
+    String evalcomixInstrumentFormAndViewUrl;
 
-	@Override
-	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-		ActionErrors ac = new ActionErrors();
-		ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-		
-		return ac;
-	}
-	
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
+    FormFile onlineFile;
 
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
+    FormFile offlineFile;
 
-	public String getCurrentTab() {
-		return currentTab;
-	}
+    String currentTab;
 
-	public void setCurrentTab(String currentTab) {
-		this.currentTab = currentTab;
-	}
+    String dispatch;
 
-	public String getDispatch() {
-		return dispatch;
-	}
+    String sessionMapID;
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+    Long deleteFileUuid;
 
-	public String getInstructions() {
-		return instructions;
-	}
+    SessionMap sessionMap;
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    @Override
+    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
+	ActionErrors ac = new ActionErrors();
+	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
 
-	public boolean isLockOnFinished() {
-		return lockOnFinished;
-	}
+	return ac;
+    }
 
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
-	}
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
 
-	public FormFile getOfflineFile() {
-		return offlineFile;
-	}
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
 
-	public void setOfflineFile(FormFile offlineFile) {
-		this.offlineFile = offlineFile;
-	}
+    public String getCurrentTab() {
+	return currentTab;
+    }
 
-	public String getOfflineInstruction() {
-		return offlineInstruction;
-	}
+    public void setCurrentTab(String currentTab) {
+	this.currentTab = currentTab;
+    }
 
-	public void setOfflineInstruction(String offlineInstruction) {
-		this.offlineInstruction = offlineInstruction;
-	}
+    public String getDispatch() {
+	return dispatch;
+    }
 
-	public FormFile getOnlineFile() {
-		return onlineFile;
-	}
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
 
-	public void setOnlineFile(FormFile onlineFile) {
-		this.onlineFile = onlineFile;
-	}
-	
-	public String getOnlineInstruction() {
-		return onlineInstruction;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public void setOnlineInstruction(String onlineInstruction) {
-		this.onlineInstruction = onlineInstruction;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public boolean isLockOnFinished() {
+	return lockOnFinished;
+    }
 
-	public void setSessionMap(SessionMap sessionMap) {
-		this.sessionMap = sessionMap;
-	}
+    public void setLockOnFinished(boolean lockOnFinished) {
+	this.lockOnFinished = lockOnFinished;
+    }
 
-	public SessionMap getSessionMap() {
-		return sessionMap;
-	}
+    public FormFile getOfflineFile() {
+	return offlineFile;
+    }
 
-	public Long getDeleteFileUuid() {
-		return deleteFileUuid;
-	}
+    public void setOfflineFile(FormFile offlineFile) {
+	this.offlineFile = offlineFile;
+    }
 
-	public void setDeleteFileUuid(Long deleteFile) {
-		this.deleteFileUuid = deleteFile;
-	}
+    public String getOfflineInstruction() {
+	return offlineInstruction;
+    }
 
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
-	}
+    public void setOfflineInstruction(String offlineInstruction) {
+	this.offlineInstruction = offlineInstruction;
+    }
 
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
-	}
+    public FormFile getOnlineFile() {
+	return onlineFile;
+    }
 
-	public String getEvalcomixInstrumentFormAndViewUrl() {
-		return evalcomixInstrumentFormAndViewUrl;
-	}
+    public void setOnlineFile(FormFile onlineFile) {
+	this.onlineFile = onlineFile;
+    }
 
-	public void setEvalcomixInstrumentFormAndViewUrl(
-			String evalcomixInstrumentFormAndViewUrl) {
-		this.evalcomixInstrumentFormAndViewUrl = evalcomixInstrumentFormAndViewUrl;
-	}
+    public String getOnlineInstruction() {
+	return onlineInstruction;
+    }
 
-	public boolean isEvalcomixEvaluationByLearners() {
-		return evalcomixEvaluationByLearners;
-	}
+    public void setOnlineInstruction(String onlineInstruction) {
+	this.onlineInstruction = onlineInstruction;
+    }
 
-	public void setEvalcomixEvaluationByLearners(
-			boolean evalcomixEvaluationByLearners) {
-		this.evalcomixEvaluationByLearners = evalcomixEvaluationByLearners;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public boolean isEvalcomixEvaluationByTeachers() {
-		return evalcomixEvaluationByTeachers;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public void setEvalcomixEvaluationByTeachers(
-			boolean evalcomixEvaluationByTeachers) {
-		this.evalcomixEvaluationByTeachers = evalcomixEvaluationByTeachers;
-	}
+    public void setSessionMap(SessionMap sessionMap) {
+	this.sessionMap = sessionMap;
+    }
+
+    public SessionMap getSessionMap() {
+	return sessionMap;
+    }
+
+    public Long getDeleteFileUuid() {
+	return deleteFileUuid;
+    }
+
+    public void setDeleteFileUuid(Long deleteFile) {
+	this.deleteFileUuid = deleteFile;
+    }
+
+    public boolean isAllowRichEditor() {
+	return allowRichEditor;
+    }
+
+    public void setAllowRichEditor(boolean allowRichEditor) {
+	this.allowRichEditor = allowRichEditor;
+    }
+
+    public String getEvalcomixInstrumentFormAndViewUrl() {
+	return evalcomixInstrumentFormAndViewUrl;
+    }
+
+    public void setEvalcomixInstrumentFormAndViewUrl(String evalcomixInstrumentFormAndViewUrl) {
+	this.evalcomixInstrumentFormAndViewUrl = evalcomixInstrumentFormAndViewUrl;
+    }
+
+    public boolean isEvalcomixEvaluationByLearners() {
+	return evalcomixEvaluationByLearners;
+    }
+
+    public void setEvalcomixEvaluationByLearners(boolean evalcomixEvaluationByLearners) {
+	this.evalcomixEvaluationByLearners = evalcomixEvaluationByLearners;
+    }
+
+    public boolean isEvalcomixEvaluationByTeachers() {
+	return evalcomixEvaluationByTeachers;
+    }
+
+    public void setEvalcomixEvaluationByTeachers(boolean evalcomixEvaluationByTeachers) {
+	this.evalcomixEvaluationByTeachers = evalcomixEvaluationByTeachers;
+    }
 
 }
