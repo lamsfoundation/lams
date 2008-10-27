@@ -28,9 +28,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
 
 /**
@@ -39,418 +41,440 @@ import org.lamsfoundation.lams.tool.chat.service.ChatService;
 
 public class Chat implements java.io.Serializable, Cloneable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 579733009969321015L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 579733009969321015L;
 
-	static Logger log = Logger.getLogger(ChatService.class.getName());
+    static Logger log = Logger.getLogger(ChatService.class.getName());
 
-	// Fields
-	/**
-	 * 
-	 */
-	private Long uid;
+    // Fields
+    /**
+     * 
+     */
+    private Long uid;
 
-	private Date createDate;
+    private Date createDate;
 
-	private Date updateDate;
+    private Date updateDate;
 
-	private Long createBy;
+    private Long createBy;
 
-	private String title;
+    private String title;
 
-	private String instructions;
+    private String instructions;
 
-	private boolean runOffline;
+    private boolean runOffline;
 
-	private boolean lockOnFinished;
-	
-	private boolean reflectOnActivity;
-	
-	private String reflectInstructions;
+    private boolean lockOnFinished;
 
-	private boolean filteringEnabled;
+    private boolean reflectOnActivity;
 
-	private String filterKeywords;
+    private String reflectInstructions;
 
-	private String onlineInstructions;
+    private boolean filteringEnabled;
 
-	private String offlineInstructions;
+    private String filterKeywords;
 
-	private boolean contentInUse;
+    private String onlineInstructions;
 
-	private boolean defineLater;
+    private String offlineInstructions;
 
-	private Long toolContentId;
+    private boolean contentInUse;
 
-	private Set chatAttachments;
+    private boolean defineLater;
 
-	private Set chatSessions;
-	
-	//*********** NON Persisit fields
-	private IToolContentHandler toolContentHandler;
+    private Long toolContentId;
 
-	// Constructors
+    private Set chatAttachments;
 
-	/** default constructor */
-	public Chat() {
+    private Set chatSessions;
+    private Set<ChatCondition> conditions = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
+
+    // *********** NON Persisit fields
+    private IToolContentHandler toolContentHandler;
+
+    // Constructors
+
+    /** default constructor */
+    public Chat() {
+    }
+
+    /** full constructor */
+    public Chat(Date createDate, Date updateDate, Long createBy, String title, String instructions, boolean runOffline,
+	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, String onlineInstructions,
+	    String offlineInstructions, boolean contentInUse, boolean defineLater, Long toolContentId,
+	    Set chatAttachments, Set chatSessions) {
+	this.createDate = createDate;
+	this.updateDate = updateDate;
+	this.createBy = createBy;
+	this.title = title;
+	this.instructions = instructions;
+	this.runOffline = runOffline;
+	this.lockOnFinished = lockOnFinished;
+	this.filteringEnabled = filteringEnabled;
+	this.filterKeywords = filterKeywords;
+	this.onlineInstructions = onlineInstructions;
+	this.offlineInstructions = offlineInstructions;
+	this.contentInUse = contentInUse;
+	this.defineLater = defineLater;
+	this.toolContentId = toolContentId;
+	this.chatAttachments = chatAttachments;
+	this.chatSessions = chatSessions;
+    }
+
+    // Property accessors
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * 
+     */
+
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    /**
+     * @hibernate.property column="create_date"
+     * 
+     */
+
+    public Date getCreateDate() {
+	return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+	this.createDate = createDate;
+    }
+
+    /**
+     * @hibernate.property column="update_date"
+     * 
+     */
+
+    public Date getUpdateDate() {
+	return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+	this.updateDate = updateDate;
+    }
+
+    /**
+     * @hibernate.property column="create_by" length="20"
+     * 
+     */
+
+    public Long getCreateBy() {
+	return createBy;
+    }
+
+    public void setCreateBy(Long createBy) {
+	this.createBy = createBy;
+    }
+
+    /**
+     * @hibernate.property column="title" length="255"
+     * 
+     */
+
+    public String getTitle() {
+	return title;
+    }
+
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
+    /**
+     * @hibernate.property column="instructions" length="65535"
+     * 
+     */
+
+    public String getInstructions() {
+	return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
+
+    /**
+     * @hibernate.property column="run_offline" length="1"
+     * 
+     */
+
+    public boolean isRunOffline() {
+	return runOffline;
+    }
+
+    public void setRunOffline(boolean runOffline) {
+	this.runOffline = runOffline;
+    }
+
+    /**
+     * @hibernate.property column="lock_on_finished" length="1"
+     * 
+     */
+
+    public boolean isLockOnFinished() {
+	return lockOnFinished;
+    }
+
+    public void setLockOnFinished(boolean lockOnFinished) {
+	this.lockOnFinished = lockOnFinished;
+    }
+
+    /**
+     * @hibernate.property column="reflect_on_activity" length="1"
+     */
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    /**
+     * @hibernate.property column="reflect_instructions" length="65535"
+     */
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
+
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
+
+    /**
+     * @hibernate.property column="online_instructions" length="65535"
+     * 
+     */
+
+    public String getOnlineInstructions() {
+	return onlineInstructions;
+    }
+
+    public void setOnlineInstructions(String onlineInstructions) {
+	this.onlineInstructions = onlineInstructions;
+    }
+
+    /**
+     * @hibernate.property column="offline_instructions" length="65535"
+     * 
+     */
+
+    public String getOfflineInstructions() {
+	return offlineInstructions;
+    }
+
+    public void setOfflineInstructions(String offlineInstructions) {
+	this.offlineInstructions = offlineInstructions;
+    }
+
+    /**
+     * @hibernate.property column="content_in_use" length="1"
+     * 
+     */
+
+    public boolean isContentInUse() {
+	return contentInUse;
+    }
+
+    public void setContentInUse(boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
+
+    /**
+     * @hibernate.property column="define_later" length="1"
+     * 
+     */
+
+    public boolean isDefineLater() {
+	return defineLater;
+    }
+
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
+
+    /**
+     * @hibernate.property column="tool_content_id" length="20"
+     * 
+     */
+
+    public Long getToolContentId() {
+	return toolContentId;
+    }
+
+    public void setToolContentId(Long toolContentId) {
+	this.toolContentId = toolContentId;
+    }
+
+    /**
+     * @hibernate.set lazy="false" inverse="false" cascade="all-delete-orphan"
+     * @hibernate.collection-key column="chat_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatAttachment"
+     * 
+     */
+
+    public Set getChatAttachments() {
+	return chatAttachments;
+    }
+
+    public void setChatAttachments(Set chatAttachments) {
+	this.chatAttachments = chatAttachments;
+    }
+
+    /**
+     * @hibernate.set lazy="true" inverse="true" cascade="none"
+     * @hibernate.collection-key column="chat_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatSession"
+     * 
+     */
+
+    public Set getChatSessions() {
+	return chatSessions;
+    }
+
+    public void setChatSessions(Set chatSessions) {
+	this.chatSessions = chatSessions;
+    }
+
+    /**
+     * @hibernate.property column="filtering_enabled" length="1"
+     */
+    public boolean isFilteringEnabled() {
+	return filteringEnabled;
+    }
+
+    public void setFilteringEnabled(boolean filteringEnabled) {
+	this.filteringEnabled = filteringEnabled;
+    }
+
+    /**
+     * @hibernate.property column="filter_keywords" length="65535"
+     */
+    public String getFilterKeywords() {
+	return filterKeywords;
+    }
+
+    public void setFilterKeywords(String filterKeywords) {
+	this.filterKeywords = filterKeywords;
+    }
+
+    /**
+     * toString
+     * 
+     * @return String
+     */
+    @Override
+    public String toString() {
+	StringBuffer buffer = new StringBuffer();
+
+	buffer.append(getClass().getName()).append("@").append(Integer.toHexString(hashCode())).append(" [");
+	buffer.append("title").append("='").append(getTitle()).append("' ");
+	buffer.append("instructions").append("='").append(getInstructions()).append("' ");
+	buffer.append("toolContentId").append("='").append(getToolContentId()).append("' ");
+	buffer.append("]");
+
+	return buffer.toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+	if (this == other) {
+	    return true;
 	}
-
-	/** full constructor */
-	public Chat(Date createDate, Date updateDate, Long createBy, String title,
-			String instructions, boolean runOffline, boolean lockOnFinished,
-			boolean filteringEnabled, String filterKeywords,
-			String onlineInstructions, String offlineInstructions,
-			boolean contentInUse, boolean defineLater, Long toolContentId,
-			Set chatAttachments, Set chatSessions) {
-		this.createDate = createDate;
-		this.updateDate = updateDate;
-		this.createBy = createBy;
-		this.title = title;
-		this.instructions = instructions;
-		this.runOffline = runOffline;
-		this.lockOnFinished = lockOnFinished;
-		this.filteringEnabled = filteringEnabled;
-		this.filterKeywords = filterKeywords;
-		this.onlineInstructions = onlineInstructions;
-		this.offlineInstructions = offlineInstructions;
-		this.contentInUse = contentInUse;
-		this.defineLater = defineLater;
-		this.toolContentId = toolContentId;
-		this.chatAttachments = chatAttachments;
-		this.chatSessions = chatSessions;
+	if (other == null) {
+	    return false;
 	}
-
-	// Property accessors
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * 
-	 */
-
-	public Long getUid() {
-		return this.uid;
+	if (!(other instanceof Chat)) {
+	    return false;
 	}
+	Chat castOther = (Chat) other;
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+	return this.getUid() == castOther.getUid() || this.getUid() != null && castOther.getUid() != null
+		&& this.getUid().equals(castOther.getUid());
+    }
 
-	/**
-	 * @hibernate.property column="create_date"
-	 * 
-	 */
+    @Override
+    public int hashCode() {
+	int result = 17;
+	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());
+	return result;
+    }
 
-	public Date getCreateDate() {
-		return this.createDate;
-	}
+    public static Chat newInstance(Chat fromContent, Long toContentId, IToolContentHandler chatToolContentHandler) {
+	Chat toContent = new Chat();
+	fromContent.toolContentHandler = chatToolContentHandler;
+	toContent = (Chat) fromContent.clone();
+	toContent.setToolContentId(toContentId);
+	toContent.setCreateDate(new Date());
+	return toContent;
+    }
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
+    @Override
+    protected Object clone() {
 
-	/**
-	 * @hibernate.property column="update_date"
-	 * 
-	 */
+	Chat chat = null;
+	try {
+	    chat = (Chat) super.clone();
+	    chat.setUid(null);
 
-	public Date getUpdateDate() {
-		return this.updateDate;
-	}
+	    if (chatAttachments != null) {
+		// create a copy of the attachments but do not duplicate node in repository
+		Iterator iter = chatAttachments.iterator();
+		Set<ChatAttachment> set = new HashSet<ChatAttachment>();
+		while (iter.hasNext()) {
+		    ChatAttachment originalFile = (ChatAttachment) iter.next();
+		    ChatAttachment newFile = (ChatAttachment) originalFile.clone();
 
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
-
-	/**
-	 * @hibernate.property column="create_by" length="20"
-	 * 
-	 */
-
-	public Long getCreateBy() {
-		return this.createBy;
-	}
-
-	public void setCreateBy(Long createBy) {
-		this.createBy = createBy;
-	}
-
-	/**
-	 * @hibernate.property column="title" length="255"
-	 * 
-	 */
-
-	public String getTitle() {
-		return this.title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	/**
-	 * @hibernate.property column="instructions" length="65535"
-	 * 
-	 */
-
-	public String getInstructions() {
-		return this.instructions;
-	}
-
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
-
-	/**
-	 * @hibernate.property column="run_offline" length="1"
-	 * 
-	 */
-
-	public boolean isRunOffline() {
-		return this.runOffline;
-	}
-
-	public void setRunOffline(boolean runOffline) {
-		this.runOffline = runOffline;
-	}
-
-	/**
-	 * @hibernate.property column="lock_on_finished" length="1"
-	 * 
-	 */
-
-	public boolean isLockOnFinished() {
-		return this.lockOnFinished;
-	}
-
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
-	}
-	
-	/**
-	 * @hibernate.property column="reflect_on_activity" length="1"
-	 */
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
-
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
-	
-	/**
-	 * @hibernate.property column="reflect_instructions" length="65535"
-	 */
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
-
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
-	
-	/**
-	 * @hibernate.property column="online_instructions" length="65535"
-	 * 
-	 */
-
-	public String getOnlineInstructions() {
-		return this.onlineInstructions;
-	}
-
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
-
-	/**
-	 * @hibernate.property column="offline_instructions" length="65535"
-	 * 
-	 */
-
-	public String getOfflineInstructions() {
-		return this.offlineInstructions;
-	}
-
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
-
-	/**
-	 * @hibernate.property column="content_in_use" length="1"
-	 * 
-	 */
-
-	public boolean isContentInUse() {
-		return this.contentInUse;
-	}
-
-	public void setContentInUse(boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
-
-	/**
-	 * @hibernate.property column="define_later" length="1"
-	 * 
-	 */
-
-	public boolean isDefineLater() {
-		return this.defineLater;
-	}
-
-	public void setDefineLater(boolean defineLater) {
-		this.defineLater = defineLater;
-	}
-
-	/**
-	 * @hibernate.property column="tool_content_id" length="20"
-	 * 
-	 */
-
-	public Long getToolContentId() {
-		return this.toolContentId;
-	}
-
-	public void setToolContentId(Long toolContentId) {
-		this.toolContentId = toolContentId;
-	}
-
-	/**
-	 * @hibernate.set lazy="false" inverse="false" cascade="all-delete-orphan"
-	 * @hibernate.collection-key column="chat_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatAttachment"
-	 * 
-	 */
-
-	public Set getChatAttachments() {
-		return this.chatAttachments;
-	}
-
-	public void setChatAttachments(Set chatAttachments) {
-		this.chatAttachments = chatAttachments;
-	}
-
-	/**
-	 * @hibernate.set lazy="true" inverse="true" cascade="none"
-	 * @hibernate.collection-key column="chat_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatSession"
-	 * 
-	 */
-
-	public Set getChatSessions() {
-		return this.chatSessions;
-	}
-
-	public void setChatSessions(Set chatSessions) {
-		this.chatSessions = chatSessions;
-	}
-
-	/**
-	 * @hibernate.property column="filtering_enabled" length="1"
-	 */
-	public boolean isFilteringEnabled() {
-		return filteringEnabled;
-	}
-
-	public void setFilteringEnabled(boolean filteringEnabled) {
-		this.filteringEnabled = filteringEnabled;
-	}
-
-	/**
-	 * @hibernate.property column="filter_keywords" length="65535"
-	 */
-	public String getFilterKeywords() {
-		return filterKeywords;
-	}
-
-	public void setFilterKeywords(String filterKeywords) {
-		this.filterKeywords = filterKeywords;
-	}
-
-	/**
-	 * toString
-	 * 
-	 * @return String
-	 */
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append(getClass().getName()).append("@").append(
-				Integer.toHexString(hashCode())).append(" [");
-		buffer.append("title").append("='").append(getTitle()).append("' ");
-		buffer.append("instructions").append("='").append(getInstructions())
-				.append("' ");
-		buffer.append("toolContentId").append("='").append(getToolContentId())
-				.append("' ");
-		buffer.append("]");
-
-		return buffer.toString();
-	}
-
-	public boolean equals(Object other) {
-		if ((this == other))
-			return true;
-		if ((other == null))
-			return false;
-		if (!(other instanceof Chat))
-			return false;
-		Chat castOther = (Chat) other;
-
-		return ((this.getUid() == castOther.getUid()) || (this.getUid() != null
-				&& castOther.getUid() != null && this.getUid().equals(
-				castOther.getUid())));
-	}
-
-	public int hashCode() {
-		int result = 17;
-		result = 37 * result
-				+ (getUid() == null ? 0 : this.getUid().hashCode());
-		return result;
-	}
-
-	public static Chat newInstance(Chat fromContent, Long toContentId,
-			IToolContentHandler chatToolContentHandler) {
-		Chat toContent = new Chat();
-		fromContent.toolContentHandler = chatToolContentHandler;
-		toContent = (Chat) fromContent.clone();
-		toContent.setToolContentId(toContentId);
-		toContent.setCreateDate(new Date());
-		return toContent;
-	}
-
-	protected Object clone() {
-
-		Chat chat = null;
-		try {
-			chat = (Chat) super.clone();
-			chat.setUid(null);
-
-			if (chatAttachments != null) {
-				// create a copy of the attachments but do not duplicate node in repository
-				Iterator iter = chatAttachments.iterator();
-				Set<ChatAttachment> set = new HashSet<ChatAttachment>();
-				while (iter.hasNext()) {
-					ChatAttachment originalFile = (ChatAttachment) iter.next();
-					ChatAttachment newFile = (ChatAttachment) originalFile
-							.clone();
-					
-					set.add(newFile);
-				}
-				chat.chatAttachments = set;
-			}
-			// create an empty set for the chatSession
-			chat.chatSessions = new HashSet();
-
-		} catch (CloneNotSupportedException cnse) {
-			log.error("Error cloning " + Chat.class);
+		    set.add(newFile);
 		}
-		return chat;
-	}
+		chat.chatAttachments = set;
+	    }
+	    // create an empty set for the chatSession
+	    chat.chatSessions = new HashSet();
 
-	public IToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
-	}
+	    if (conditions != null) {
+		Set<ChatCondition> set = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
+		for (ChatCondition condition : conditions) {
+		    set.add((ChatCondition) condition.clone());
+		}
+		chat.setConditions(set);
+	    }
 
-	public void setToolContentHandler(IToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
+	} catch (CloneNotSupportedException cnse) {
+	    Chat.log.error("Error cloning " + Chat.class);
 	}
+	return chat;
+    }
+
+    public IToolContentHandler getToolContentHandler() {
+	return toolContentHandler;
+    }
+
+    public void setToolContentHandler(IToolContentHandler toolContentHandler) {
+	this.toolContentHandler = toolContentHandler;
+    }
+
+    /**
+     * @hibernate.set lazy="true" cascade="all"
+     *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
+     * @hibernate.collection-key column="content_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatCondition"
+     * 
+     */
+    public Set<ChatCondition> getConditions() {
+	return conditions;
+    }
+
+    public void setConditions(Set<ChatCondition> conditions) {
+	this.conditions = conditions;
+    }
 }

@@ -20,6 +20,7 @@
 			<c:if test="${sessionMap.mode == 'author'}">
 				<lams:Tab id="2" key="button.advanced" />
 				<lams:Tab id="3" key="button.instructions" />
+				<lams:Tab id="4" key="button.conditions" />
 			</c:if>
 		</lams:Tabs>
 	</div>
@@ -55,6 +56,8 @@
 			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
 			<lams:TabBody id="3" titleKey="button.instructions"
 				page="instructions.jsp" />
+			<lams:TabBody id="4" titleKey="button.conditions"
+				page="conditions.jsp" />
 		</c:if>
 
 		<lams:AuthoringButton formID="authoringForm"

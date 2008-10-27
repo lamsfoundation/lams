@@ -38,41 +38,42 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
  */
 public class ChatDAO extends BaseDAO implements IChatDAO {
 
-	private static final String FIND_FORUM_BY_CONTENTID = "from Chat chat where chat.toolContentId=?";
+    private static final String FIND_FORUM_BY_CONTENTID = "from Chat chat where chat.toolContentId=?";
 
-	private static final String FIND_INSTRUCTION_FILE = "from "
-			+ ChatAttachment.class.getName()
-			+ " as i where tool_content_id=? and i.file_uuid=? and i.file_version_id=? and i.file_type=?";
+    private static final String FIND_INSTRUCTION_FILE = "from " + ChatAttachment.class.getName()
+	    + " as i where tool_content_id=? and i.file_uuid=? and i.file_version_id=? and i.file_type=?";
 
-	public Chat getByContentId(Long toolContentId) {
-		List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID,
-				toolContentId);
-		if (list != null && list.size() > 0)
-			return (Chat) list.get(0);
-		else
-			return null;
+    public Chat getByContentId(Long toolContentId) {
+	List list = getHibernateTemplate().find(ChatDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	if (list != null && list.size() > 0) {
+	    return (Chat) list.get(0);
+	} else {
+	    return null;
+	}
+    }
+
+    public void saveOrUpdate(Chat chat) {
+	this.getHibernateTemplate().saveOrUpdate(chat);
+	this.getHibernateTemplate().flush();
+    }
+
+    public void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	if (toolContentId != null && uuid != null && versionId != null) {
+	    List list = getSession().createQuery(ChatDAO.FIND_INSTRUCTION_FILE).setLong(0, toolContentId.longValue())
+		    .setLong(1, uuid.longValue()).setLong(2, versionId.longValue()).setString(3, type).list();
+	    if (list != null && list.size() > 0) {
+		ChatAttachment file = (ChatAttachment) list.get(0);
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		templ.delete(file);
+		templ.flush();
+	    }
 	}
 
-	public void saveOrUpdate(Chat chat) {
-		this.getHibernateTemplate().saveOrUpdate(chat);
-		this.getHibernateTemplate().flush();
-	}
+    }
 
-	public void deleteInstructionFile(Long toolContentId, Long uuid,
-			Long versionId, String type) {
-		HibernateTemplate templ = this.getHibernateTemplate();
-		if (toolContentId != null && uuid != null && versionId != null) {
-			List list = getSession().createQuery(FIND_INSTRUCTION_FILE)
-					.setLong(0, toolContentId.longValue()).setLong(1,
-							uuid.longValue()).setLong(2, versionId.longValue())
-					.setString(3, type).list();
-			if (list != null && list.size() > 0) {
-				ChatAttachment file = (ChatAttachment) list.get(0);
-				this.getSession().setFlushMode(FlushMode.AUTO);
-				templ.delete(file);
-				templ.flush();
-			}
-		}
+    public void releaseFromCache(Object o) {
+	getSession().evict(o);
 
-	}
+    }
 }

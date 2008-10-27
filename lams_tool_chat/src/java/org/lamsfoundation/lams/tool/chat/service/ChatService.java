@@ -27,15 +27,16 @@ package org.lamsfoundation.lams.tool.chat.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,6 +84,7 @@ import org.lamsfoundation.lams.tool.chat.dao.IChatUserDAO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
+import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
@@ -143,6 +145,10 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
     private ICoreNotebookService coreNotebookService;
 
+    private ChatOutputFactory chatOutputFactory;
+
+    private Random generator = new Random();
+
     //
     private IdentifierGenerator idGenerator;
 
@@ -156,8 +162,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
     /* Methods from ToolSessionManager */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
+	if (ChatService.logger.isDebugEnabled()) {
+	    ChatService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
 		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
@@ -240,7 +246,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return getChatOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     /**
@@ -250,16 +256,16 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	return getChatOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     /* Methods from ToolContentManager */
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
-	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
-		    + toContentId);
+	if (ChatService.logger.isDebugEnabled()) {
+	    ChatService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
+		    + " toContentId=" + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -306,17 +312,19 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
+     *                 if no tool content matches the toolSessionId
      * @throws ToolException
-     *             if any other error occurs
+     *                 if any other error occurs
      */
 
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Chat chat = chatDAO.getByContentId(toolContentId);
-	if (chat == null)
+	if (chat == null) {
 	    chat = getDefaultContent();
-	if (chat == null)
+	}
+	if (chat == null) {
 	    throw new DataMissingException("Unable to find default content for the chat tool");
+	}
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
@@ -340,7 +348,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *             if any other error occurs
+     *                 if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
@@ -350,9 +358,10 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, chatToolContentHandler,
 		    fromVersion, toVersion);
-	    if (!(toolPOJO instanceof Chat))
+	    if (!(toolPOJO instanceof Chat)) {
 		throw new ImportToolContentException("Import Chat tool content failed. Deserialized object is "
 			+ toolPOJO);
+	    }
 	    Chat chat = (Chat) toolPOJO;
 
 	    // reset it to new toolContentId
@@ -374,7 +383,19 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	Chat chat = getChatDAO().getByContentId(toolContentId);
+
+	if (chat == null) {
+	    chat = getDefaultContent();
+	}
+	// If there are no user added conditions, the default condition will be added in the output factory. It also
+	// needs to be persisted.
+	boolean defaultConditionToBeAdded = chat.getConditions().isEmpty();
+	SortedMap<String, ToolOutputDefinition> map = getChatOutputFactory().getToolOutputDefinitions(chat);
+	if (defaultConditionToBeAdded && !chat.getConditions().isEmpty()) {
+	    saveOrUpdateChat(chat);
+	}
+	return map;
     }
 
     /* IChatService Methods */
@@ -383,7 +404,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
 	if (toolContentId == null) {
 	    String error = "Could not retrieve default content id for this tool";
-	    logger.error(error);
+	    ChatService.logger.error(error);
 	    throw new ChatException(error);
 	}
 	return toolContentId;
@@ -394,7 +415,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	Chat defaultContent = getChatByContentId(defaultContentID);
 	if (defaultContent == null) {
 	    String error = "Could not retrieve default content record for this tool";
-	    logger.error(error);
+	    ChatService.logger.error(error);
 	    throw new ChatException(error);
 	}
 	return defaultContent;
@@ -404,7 +425,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
 	if (newContentID == null) {
 	    String error = "Cannot copy the Chat tools default content: + " + "newContentID is null";
-	    logger.error(error);
+	    ChatService.logger.error(error);
 	    throw new ChatException(error);
 	}
 
@@ -417,9 +438,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     }
 
     public Chat getChatByContentId(Long toolContentID) {
-	Chat chat = (Chat) chatDAO.getByContentId(toolContentID);
+	Chat chat = chatDAO.getByContentId(toolContentID);
 	if (chat == null) {
-	    logger.debug("Could not find the content with toolContentID:" + toolContentID);
+	    ChatService.logger.debug("Could not find the content with toolContentID:" + toolContentID);
 	}
 	return chat;
     }
@@ -427,7 +448,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     public ChatSession getSessionBySessionId(Long toolSessionId) {
 	ChatSession chatSession = chatSessionDAO.getBySessionId(toolSessionId);
 	if (chatSession == null) {
-	    logger.debug("Could not find the chat session with toolSessionID:" + toolSessionId);
+	    ChatService.logger.debug("Could not find the chat session with toolSessionID:" + toolSessionId);
 	}
 	return chatSession;
     }
@@ -435,7 +456,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     public ChatSession getSessionByJabberRoom(String jabberRoom) {
 	ChatSession chatSession = chatSessionDAO.getByJabberRoom(jabberRoom);
 	if (chatSession == null) {
-	    logger.debug("Could not find the chat session with jabberRoom:" + jabberRoom);
+	    ChatService.logger.debug("Could not find the chat session with jabberRoom:" + jabberRoom);
 	}
 	return chatSession;
     }
@@ -464,9 +485,17 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return chatMessageDAO.getForUser(chatUser);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public List<ChatMessage> getMessagesSentByUser(Long userUid) {
+	return chatMessageDAO.getSentByUser(userUid);
+    }
+
     public ChatAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName()))
+	if (file == null || StringUtils.isEmpty(file.getFileName())) {
 	    throw new ChatException("Could not find upload file: " + file);
+	}
 
 	NodeKey nodeKey = processFile(file, type);
 
@@ -515,7 +544,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	ChatUser chatUser = new ChatUser(user, chatSession);
 	String jabberId = XMPPUtil.createId(user);
 	if (jabberId == null) {
-	    logger.error("Unable to create jabber id for user: " + user.getUserID());
+	    ChatService.logger.error("Unable to create jabber id for user: " + user.getUserID());
 	    throw new RuntimeException();
 	}
 	chatUser.setJabberId(jabberId);
@@ -570,7 +599,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		// format is room@domain/nick
 		int index = to.getNodeValue().lastIndexOf("/");
 		if (index == -1) {
-		    logger.debug("processIncomingMessages: malformed 'to' attribute :" + to.getNodeValue());
+		    ChatService.logger.debug("processIncomingMessages: malformed 'to' attribute :" + to.getNodeValue());
 		    return; // somethings wrong, ignore packet
 		}
 		jabberRoom = to.getNodeValue().substring(0, index);
@@ -580,7 +609,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		// format is room@domain
 		jabberRoom = to.getNodeValue();
 	    } else {
-		logger.debug("processIncomingMessages: unknown type: " + type.getNodeValue());
+		ChatService.logger.debug("processIncomingMessages: unknown type: " + type.getNodeValue());
 		return;
 	    }
 
@@ -592,7 +621,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	    // setting from field
 	    int index = from.getNodeValue().lastIndexOf("@");
 	    if (index == -1) {
-		logger.debug("processIncomingMessages: malformed 'from' attribute :" + from.getNodeValue());
+		ChatService.logger.debug("processIncomingMessages: malformed 'from' attribute :" + from.getNodeValue());
 		return; // somethings wrong, ignore packet
 	    }
 	    String JidUsername = from.getNodeValue().substring(0, index);
@@ -601,7 +630,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	    try {
 		userId = new Long(JidUsername);
 	    } catch (NumberFormatException e) {
-		logger.debug("processIncomingMessages: malformed JID username: " + JidUsername);
+		ChatService.logger.debug("processIncomingMessages: malformed JID username: " + JidUsername);
 		return;
 	    }
 	    ChatUser fromUser = getUserByUserIdAndSessionId(userId, chatSession.getSessionId());
@@ -627,16 +656,15 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	Node to = nnm.getNamedItem("to");
 	if (from == null || to == null) {
 	    // somethings wrong, return empty list
-	    logger.debug("malformed presence xml: no from or to attributes present");
+	    ChatService.logger.debug("malformed presence xml: no from or to attributes present");
 	    return null;
 	}
 	/*
 	 * // Note: Removed xmlns check due to problems with firefox 3 // checking presence packet for correct values
-	 * Node xElem = presence.getFirstChild(); if (xElem == null) {
-	 * logger.debug("malformed presence xml: no x element present"); } nnm = xElem.getAttributes(); Node xmlns =
-	 * nnm.getNamedItem("xmlns"); if (xmlns == null || !xmlns.getNodeValue().equals(
-	 * "http://jabber.org/protocol/muc")) { logger
-	 * .debug("malformed presence xml: xmlns attribute for x element not available or incorrect"); return null; }
+	 * Node xElem = presence.getFirstChild(); if (xElem == null) { logger.debug("malformed presence xml: no x
+	 * element present"); } nnm = xElem.getAttributes(); Node xmlns = nnm.getNamedItem("xmlns"); if (xmlns == null ||
+	 * !xmlns.getNodeValue().equals( "http://jabber.org/protocol/muc")) { logger .debug("malformed presence xml:
+	 * xmlns attribute for x element not available or incorrect"); return null; }
 	 */
 
 	// get the Chat User
@@ -646,7 +674,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	ChatUser chatUser = getUserByJabberIDAndJabberRoom(jabberID, jabberRoom);
 
 	List chatMessageList = getMessagesForUser(chatUser);
-	logger.debug("MESSAGE COUNT" + chatMessageList.size());
+	ChatService.logger.debug("MESSAGE COUNT" + chatMessageList.size());
 
 	List<Node> xmlMessageList = new ArrayList<Node>();
 	try {
@@ -680,7 +708,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	    }
 	} catch (ParserConfigurationException e) {
 	    e.printStackTrace();
-	    logger.debug("parser configuration exception");
+	    ChatService.logger.debug("parser configuration exception");
 	    return null;
 	}
 	return xmlMessageList;
@@ -895,7 +923,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     }
 
     public void setChatAttachmentDAO(IChatAttachmentDAO attachmentDAO) {
-	this.chatAttachmentDAO = attachmentDAO;
+	chatAttachmentDAO = attachmentDAO;
     }
 
     public IChatDAO getChatDAO() {
@@ -919,7 +947,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     }
 
     public void setChatSessionDAO(IChatSessionDAO sessionDAO) {
-	this.chatSessionDAO = sessionDAO;
+	chatSessionDAO = sessionDAO;
     }
 
     public ILamsToolService getToolService() {
@@ -935,7 +963,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     }
 
     public void setChatUserDAO(IChatUserDAO userDAO) {
-	this.chatUserDAO = userDAO;
+	chatUserDAO = userDAO;
     }
 
     public IChatMessageDAO getChatMessageDAO() {
@@ -943,7 +971,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     }
 
     public void setChatMessageDAO(IChatMessageDAO messageDAO) {
-	this.chatMessageDAO = messageDAO;
+	chatMessageDAO = messageDAO;
     }
 
     public ILearnerService getLearnerService() {
@@ -1032,7 +1060,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		    ToolContentImport102Manager.CONTENT_REUSABLE);
 	    chat.setLockOnFinished(isReusable != null ? !isReusable.booleanValue() : true);
 	} catch (WDDXProcessorConversionException e) {
-	    logger.error("Unable to content for activity " + chat.getTitle()
+	    ChatService.logger.error("Unable to content for activity " + chat.getTitle()
 		    + "properly due to a WDDXProcessorConversionException.", e);
 	    throw new ToolException(
 		    "Invalid import data format for activity "
@@ -1060,6 +1088,42 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
 	chat.setReflectOnActivity(Boolean.TRUE);
 	chat.setReflectInstructions(description);
+    }
+
+    public ChatOutputFactory getChatOutputFactory() {
+	return chatOutputFactory;
+    }
+
+    public void setChatOutputFactory(ChatOutputFactory notebookOutputFactory) {
+	chatOutputFactory = notebookOutputFactory;
+    }
+
+    public String createConditionName(Collection<ChatCondition> existingConditions) {
+	String uniqueNumber = null;
+	do {
+	    uniqueNumber = String.valueOf(Math.abs(generator.nextInt()));
+	    for (ChatCondition condition : existingConditions) {
+		String[] splitedName = getChatOutputFactory().splitConditionName(condition.getName());
+		if (uniqueNumber.equals(splitedName[1])) {
+		    uniqueNumber = null;
+		}
+	    }
+	} while (uniqueNumber == null);
+	return getChatOutputFactory().buildConditionName(uniqueNumber);
+    }
+
+    public void deleteCondition(ChatCondition condition) {
+	if (condition != null && condition.getConditionId() != null) {
+	    chatDAO.delete(condition);
+	}
+    }
+
+    public void releaseConditionsFromCache(Chat chat) {
+	if (chat.getConditions() != null) {
+	    for (ChatCondition condition : chat.getConditions()) {
+		getChatDAO().releaseFromCache(condition);
+	    }
+	}
     }
 
     // =========================================================================================

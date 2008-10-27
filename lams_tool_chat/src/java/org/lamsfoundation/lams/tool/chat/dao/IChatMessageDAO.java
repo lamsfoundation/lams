@@ -34,20 +34,22 @@ import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 /**
- * DAO for accessing the ChatMessage objects - interface defining
- * methods to be implemented by the Hibernate or other implementation.
+ * DAO for accessing the ChatMessage objects - interface defining methods to be implemented by the Hibernate or other
+ * implementation.
  */
 public interface IChatMessageDAO extends IBaseDAO {
 
-	void saveOrUpdate(ChatMessage chatMessage);
+    void saveOrUpdate(ChatMessage chatMessage);
 
-	List getForUser(ChatUser chatUser);
+    List getForUser(ChatUser chatUser);
 
-	ChatMessage getByUID(Long uid);
+    ChatMessage getByUID(Long uid);
 
-	List getLatest(ChatSession chatSession, int max);
-	
-	Map<Long, Integer> getCountBySession(Long chatUID);
-	
-	Map<Long, Integer> getCountByFromUser(Long sessionUID);		
+    List getLatest(ChatSession chatSession, int max);
+
+    Map<Long, Integer> getCountBySession(Long chatUID);
+
+    Map<Long, Integer> getCountByFromUser(Long sessionUID);
+
+    List<ChatMessage> getSentByUser(Long userUid);
 }

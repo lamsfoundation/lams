@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.chat.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
+import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
@@ -244,4 +246,19 @@ public interface IChatService {
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
     public void updateEntry(NotebookEntry notebookEntry);
+
+    public String createConditionName(Collection<ChatCondition> existingConditions);
+
+    public void deleteCondition(ChatCondition condition);
+
+    /**
+     * Gets all messages sent by the given user.
+     * 
+     * @param userUid
+     *                UID of the user
+     * @return list of his/hers messages
+     */
+    public List<ChatMessage> getMessagesSentByUser(Long userUid);
+
+    void releaseConditionsFromCache(Chat chat);
 }
