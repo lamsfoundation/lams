@@ -648,6 +648,14 @@ public class AuthoringAction extends Action {
 	// finally persist surveyPO again
 	service.saveOrUpdateSurvey(surveyPO);
 
+	List delConditionList = getDeletedSurveyConditionList(sessionMap);
+	iter = delConditionList.iterator();
+	while (iter.hasNext()) {
+	    SurveyCondition condition = (SurveyCondition) iter.next();
+	    iter.remove();
+	    service.deleteCondition(condition);
+	}
+
 	// initialize attachmentList again
 	attachmentList = getAttachmentList(sessionMap);
 	attachmentList.addAll(survey.getAttachments());
@@ -1165,4 +1173,13 @@ public class AuthoringAction extends Action {
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
 
+    /**
+     * Get the deleted condition list, which could be persisted or non-persisted items.
+     * 
+     * @param request
+     * @return
+     */
+    private List getDeletedSurveyConditionList(SessionMap sessionMap) {
+	return getListFromSession(sessionMap, SurveyConstants.ATTR_DELETED_CONDITION_LIST);
+    }
 }

@@ -97,8 +97,8 @@ public class SurveyOutputFactory extends OutputFactory {
 	ToolOutput allAnswersOutput = null;
 	if (names == null) {
 	    // output will be set for all the existing conditions
-	    Survey qaContent = surveyService.getSurveyBySessionId(toolSessionId);
-	    Set<SurveyCondition> conditions = qaContent.getConditions();
+	    Survey survey = surveyService.getSurveyBySessionId(toolSessionId);
+	    Set<SurveyCondition> conditions = survey.getConditions();
 	    for (SurveyCondition condition : conditions) {
 		String name = condition.getName();
 		if (isTextSearchConditionName(name) && allAnswersOutput != null) {
@@ -107,7 +107,7 @@ public class SurveyOutputFactory extends OutputFactory {
 		    ToolOutput output = getToolOutput(name, surveyService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+			if (isTextSearchConditionName(name)) {
 			    allAnswersOutput = output;
 			}
 		    }
@@ -121,7 +121,7 @@ public class SurveyOutputFactory extends OutputFactory {
 		    ToolOutput output = getToolOutput(name, surveyService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+			if (isTextSearchConditionName(name)) {
 			    allAnswersOutput = output;
 			}
 		    }

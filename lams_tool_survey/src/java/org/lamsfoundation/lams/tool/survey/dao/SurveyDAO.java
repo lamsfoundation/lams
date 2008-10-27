@@ -24,13 +24,16 @@
 package org.lamsfoundation.lams.tool.survey.dao;
 
 import org.lamsfoundation.lams.tool.survey.model.Survey;
+import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 
-public interface SurveyDAO  extends DAO {
+public interface SurveyDAO extends DAO {
 
-	Survey getByContentId(Long contentId);
+    Survey getByContentId(Long contentId);
 
-	Survey getByUid(Long surveyUid);
+    Survey getByUid(Long surveyUid);
 
-	void delete(Survey survey);
+    void delete(Survey survey);
+
+    void deleteCondition(SurveyCondition condition);
 
 }

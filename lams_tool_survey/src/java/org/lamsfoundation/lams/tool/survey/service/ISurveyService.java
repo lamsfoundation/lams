@@ -320,4 +320,6 @@ public interface ISurveyService {
      * @return unique SurveyCondition name
      */
     public String createConditionName(Collection<SurveyCondition> existingConditions);
+
+    public void deleteCondition(SurveyCondition condition);
 }

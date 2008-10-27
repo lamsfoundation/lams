@@ -203,6 +203,11 @@ public class AuthoringConditionAction extends Action {
 	    SortedSet<SurveyCondition> conditionSet = getSurveyConditionSet(sessionMap);
 	    List<SurveyCondition> conditionList = new ArrayList<SurveyCondition>(conditionSet);
 	    SurveyCondition condition = conditionList.remove(orderId);
+	    for (SurveyCondition otherCondition : conditionSet) {
+		if (otherCondition.getOrderId() > orderId) {
+		    otherCondition.setOrderId(otherCondition.getOrderId() - 1);
+		}
+	    }
 	    conditionSet.clear();
 	    conditionSet.addAll(conditionList);
 	    // add to delList
@@ -285,7 +290,7 @@ public class AuthoringConditionAction extends Action {
     }
 
     /**
-     * List save current taskList items.
+     * List containing survey conditions.
      * 
      * @param request
      * @return
@@ -349,13 +354,6 @@ public class AuthoringConditionAction extends Action {
 	if (orderId >= 0) {
 	    form.setOrderId(orderId + 1);
 	}
-
-	Integer[] selectedItems = new Integer[condition.getQuestions().size()];
-	int i = 0;
-	for (SurveyQuestion question : condition.getQuestions()) {
-	    selectedItems[i++] = new Integer(question.getSequenceId());
-	}
-	form.setSelectedItems(selectedItems);
     }
 
     /**

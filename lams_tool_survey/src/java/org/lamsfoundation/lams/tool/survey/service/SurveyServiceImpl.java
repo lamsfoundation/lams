@@ -1159,4 +1159,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	} while (uniqueNumber == null);
 	return getSurveyOutputFactory().buildConditionName(uniqueNumber);
     }
+
+    public void deleteCondition(SurveyCondition condition) {
+	surveyDao.deleteCondition(condition);
+    }
 }

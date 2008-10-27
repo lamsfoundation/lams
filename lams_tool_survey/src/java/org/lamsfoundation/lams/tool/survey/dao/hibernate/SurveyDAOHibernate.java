@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.survey.dao.SurveyDAO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
+import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
 
 /**
  * 
@@ -34,23 +35,30 @@ import org.lamsfoundation.lams.tool.survey.model.Survey;
  * 
  * @version $Revision$
  */
-public class SurveyDAOHibernate extends BaseDAOHibernate implements SurveyDAO{
-	private static final String GET_RESOURCE_BY_CONTENTID = "from "+Survey.class.getName()+" as r where r.contentId=?";
-	
-	public Survey getByContentId(Long contentId) {
-		List list = getHibernateTemplate().find(GET_RESOURCE_BY_CONTENTID,contentId);
-		if(list.size() > 0)
-			return (Survey) list.get(0);
-		else
-			return null;
-	}
+public class SurveyDAOHibernate extends BaseDAOHibernate implements SurveyDAO {
+    private static final String GET_RESOURCE_BY_CONTENTID = "from " + Survey.class.getName()
+	    + " as r where r.contentId=?";
 
-	public Survey getByUid(Long surveyUid) {
-		return (Survey) getObject(Survey.class,surveyUid);
+    public Survey getByContentId(Long contentId) {
+	List list = getHibernateTemplate().find(SurveyDAOHibernate.GET_RESOURCE_BY_CONTENTID, contentId);
+	if (list.size() > 0) {
+	    return (Survey) list.get(0);
+	} else {
+	    return null;
 	}
+    }
 
-	public void delete(Survey survey) {
-		this.getHibernateTemplate().delete(survey);
+    public Survey getByUid(Long surveyUid) {
+	return (Survey) getObject(Survey.class, surveyUid);
+    }
+
+    public void delete(Survey survey) {
+	this.getHibernateTemplate().delete(survey);
+    }
+
+    public void deleteCondition(SurveyCondition condition) {
+	if (condition != null && condition.getConditionId() != null) {
+	    this.getHibernateTemplate().delete(condition);
 	}
-
+    }
 }
