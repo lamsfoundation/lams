@@ -18,6 +18,7 @@
 			<lams:Tab id="1" key="authoring.tab.basic" />
 			<lams:Tab id="2" key="authoring.tab.advanced" />
 			<lams:Tab id="3" key="authoring.tab.instructions" />
+			<lams:Tab id="4" key="authoring.tab.conditions" />
 		</lams:Tabs>
 	</div>
 	<div id="content">
@@ -31,6 +32,8 @@
 			page="advance.jsp" />
 		<lams:TabBody id="3" titleKey="authoring.tab.instructions"
 			page="instructions.jsp" />
+		<lams:TabBody id="4" titleKey="authoring.tab.conditions"
+			page="conditions.jsp" />
 		<!-- Button Row -->
 		<lams:AuthoringButton formID="authoringForm"
 			clearSessionActionUrl="/clearsession.do"

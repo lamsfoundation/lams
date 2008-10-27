@@ -8,6 +8,8 @@ drop table if exists tl_lafrum11_message;
 drop table if exists tl_lafrum11_message_seq;
 drop table if exists tl_lafrum11_tool_session;
 drop table if exists tl_lafrum11_report;
+drop table if exists tl_lafrum11_condition_topics;
+drop table if exists tl_lafrum11_conditions;
 SET FOREIGN_KEY_CHECKS=1;
 
 

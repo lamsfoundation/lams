@@ -103,6 +103,27 @@ create table tl_lafrum11_tool_session (
    session_name varchar(250),
    primary key (uid)
 )TYPE=InnoDB;
+
+CREATE TABLE tl_lafrum11_conditions (
+       condition_id BIGINT(20) NOT NULL
+	 , content_uid BIGINT(20)
+     , PRIMARY KEY (condition_id)
+	 , CONSTRAINT ForumConditionInheritance FOREIGN KEY (condition_id)
+                  REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
+	 , CONSTRAINT ForumConditionToForum FOREIGN KEY (content_uid)
+                  REFERENCES tl_lafrum11_forum(uid) ON DELETE CASCADE ON UPDATE CASCADE
+)TYPE=InnoDB;
+
+CREATE TABLE tl_lafrum11_condition_topics (
+ 	   condition_id BIGINT(20)
+ 	 , topic_uid BIGINT(20)
+ 	 , PRIMARY KEY (condition_id,topic_uid)
+	 , CONSTRAINT ForumConditionQuestionToForumCondition FOREIGN KEY (condition_id)
+                  REFERENCES tl_lafrum11_conditions(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
+	 , CONSTRAINT ForumConditionQuestionToForumQuestion FOREIGN KEY (topic_uid)
+                  REFERENCES tl_lafrum11_message(uid) ON DELETE CASCADE ON UPDATE CASCADE	
+)TYPE=InnoDB;
+
 alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);
 alter table tl_lafrum11_forum add index FK87917942E42F4351 (create_by), add constraint FK87917942E42F4351 foreign key (create_by) references tl_lafrum11_forum_user (uid);

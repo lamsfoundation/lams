@@ -260,6 +260,24 @@
             column="mark_release_notify"
         />
 
+        <set
+            name="conditions"
+            lazy="true"
+            cascade="all"
+            sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
+        >
+
+            <key
+                column="content_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.forum.persistence.ForumCondition"
+            />
+
+        </set>
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Forum.xml

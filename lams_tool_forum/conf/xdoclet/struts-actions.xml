@@ -125,7 +125,47 @@
 			<forward name="success" path="/jsps/authoring/message/topiclist.jsp" />
 		</action>
 
-
+		<!-- ==========  Survey Conditions  ========== -->
+		<action path="/authoring/newConditionInit"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringConditionAction"
+			name="forumConditionForm" 
+			scope="request" 
+			validate="false"			
+			parameter="newConditionInit">
+			<forward name="addcondition" path="/jsps/authoring/addCondition.jsp" />
+		</action>
+		<action path="/authoring/editCondition"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringConditionAction"
+			name="forumConditionForm" 
+			scope="request" 
+			parameter="editCondition" 
+			validate="false">
+			<forward name="addcondition" path="/jsps/authoring/addCondition.jsp" />
+		</action>
+		<action path="/authoring/saveOrUpdateCondition"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringConditionAction"
+			parameter="saveOrUpdateCondition"
+			name="forumConditionForm" 
+			scope="request" 
+			validate="false">
+			<forward name="addcondition" path="/jsps/authoring/addCondition.jsp" />
+			<forward name="success" path="/jsps/authoring/conditionList.jsp" />
+		</action>
+		<action path="/authoring/removeCondition"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringConditionAction"
+			parameter="removeCondition">
+			<forward name="success" path="/jsps/authoring/conditionList.jsp" />
+		</action>
+		<action path="/authoring/upCondition"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringConditionAction"
+			parameter="upCondition">
+			<forward name="success" path="/jsps/authoring/conditionList.jsp" />
+		</action>
+		<action path="/authoring/downCondition"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringConditionAction"
+			parameter="downCondition">
+			<forward name="success" path="/jsps/authoring/conditionList.jsp" />
+		</action>
 		
 		<!-- ========== END: Authroing Definitions ============================== -->
 		

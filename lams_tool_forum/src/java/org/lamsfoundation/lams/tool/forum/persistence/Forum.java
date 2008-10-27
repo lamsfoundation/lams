@@ -28,582 +28,596 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 
 /**
  * Forum
+ * 
  * @author conradb
- *
- * @hibernate.class  table="tl_lafrum11_forum"
- *
+ * 
+ * @hibernate.class table="tl_lafrum11_forum"
+ * 
  */
 public class Forum implements Cloneable {
 
-	private static final Logger log = Logger.getLogger(Forum.class);
+    private static final Logger log = Logger.getLogger(Forum.class);
 
-	//key 
-	private Long uid;
+    // key
+    private Long uid;
 
-	//tool contentID
-	private Long contentId;
+    // tool contentID
+    private Long contentId;
 
-	private String title;
+    private String title;
 
-	private boolean lockWhenFinished;
+    private boolean lockWhenFinished;
 
-	private boolean runOffline;
+    private boolean runOffline;
 
-	private boolean allowAnonym;
+    private boolean allowAnonym;
 
-	private boolean allowEdit;
+    private boolean allowEdit;
 
-	private boolean allowNewTopic;
+    private boolean allowNewTopic;
 
-	private boolean allowUpload;
+    private boolean allowUpload;
 
-	private int maximumReply;
+    private int maximumReply;
 
-	private int minimumReply;
+    private int minimumReply;
 
-	private boolean allowRichEditor;
+    private boolean allowRichEditor;
 
-	private String instructions;
+    private String instructions;
 
-	private String onlineInstructions;
+    private String onlineInstructions;
 
-	private String offlineInstructions;
+    private String offlineInstructions;
 
-	private boolean defineLater;
+    private boolean defineLater;
 
-	private boolean contentInUse;
+    private boolean contentInUse;
 
-	private Date created;
+    private Date created;
 
-	private Date updated;
+    private Date updated;
 
-	private ForumUser createdBy;
+    private ForumUser createdBy;
 
-	private Set messages;
+    private Set messages;
 
-	private Set attachments;
+    private Set attachments;
 
-	private int limitedChar;
+    private int limitedChar;
 
-	private boolean limitedInput;
+    private boolean limitedInput;
 
-	private boolean reflectOnActivity;
+    private boolean reflectOnActivity;
 
-	private String reflectInstructions;
+    private String reflectInstructions;
 
-	private boolean notifyLearnersOnMarkRelease;
+    private boolean notifyLearnersOnMarkRelease;
 
-	//********* Non Persist fields
-	private ForumToolContentHandler toolContentHandler;
+    // conditions
+    private Set<ForumCondition> conditions = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
 
-	/**
-	 * Default contruction method. 
-	 *
-	 */
-	public Forum() {
-		attachments = new HashSet();
-		messages = new HashSet();
-	}
+    // ********* Non Persist fields
+    private ForumToolContentHandler toolContentHandler;
 
-	//  **********************************************************
-	//		Function method for Forum
-	//  **********************************************************
-	@Override
-	public Object clone() {
+    /**
+     * Default contruction method.
+     * 
+     */
+    public Forum() {
+	attachments = new HashSet();
+	messages = new HashSet();
+    }
 
-		Forum forum = null;
-		try {
-			forum = (Forum) super.clone();
-			forum.setUid(null);
-			//clone message
-			if (messages != null) {
-				Iterator iter = messages.iterator();
-				Set set = new HashSet();
-				while (iter.hasNext()) {
-					set.add(Message.newInstance((Message) iter.next(), toolContentHandler));
-				}
-				forum.messages = set;
-			}
-			//clone attachment
-			if (attachments != null) {
-				Iterator iter = attachments.iterator();
-				Set set = new HashSet();
-				while (iter.hasNext()) {
-					Attachment file = (Attachment) iter.next();
-					Attachment newFile = (Attachment) file.clone();
-					//clone old file without duplicate it in repository
+    // **********************************************************
+    // Function method for Forum
+    // **********************************************************
+    @Override
+    public Object clone() {
 
-					set.add(newFile);
-				}
-				forum.attachments = set;
-			}
+	Forum forum = null;
+	try {
+	    forum = (Forum) super.clone();
+	    forum.setUid(null);
+	    // clone message
+	    if (messages != null) {
+		Iterator iter = messages.iterator();
+		Set set = new HashSet();
+		while (iter.hasNext()) {
+		    set.add(Message.newInstance((Message) iter.next(), toolContentHandler));
 		}
-		catch (CloneNotSupportedException e) {
-			Forum.log.error("When clone " + Forum.class + " failed");
+		forum.messages = set;
+	    }
+	    if (getConditions() != null) {
+		Set<ForumCondition> conditionsCopy = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
+		for (ForumCondition condition : getConditions()) {
+		    conditionsCopy.add(condition.clone(forum));
 		}
+		forum.setConditions(conditionsCopy);
+	    }
+	    // clone attachment
+	    if (attachments != null) {
+		Iterator iter = attachments.iterator();
+		Set set = new HashSet();
+		while (iter.hasNext()) {
+		    Attachment file = (Attachment) iter.next();
+		    Attachment newFile = (Attachment) file.clone();
+		    // clone old file without duplicate it in repository
 
-		return forum;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
+		    set.add(newFile);
 		}
-		if (!(o instanceof Forum)) {
-			return false;
-		}
+		forum.attachments = set;
+	    }
 
-		final Forum genericEntity = (Forum) o;
-
-		return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(instructions,
-				genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions).append(
-				offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created).append(updated,
-				genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
+	} catch (CloneNotSupportedException e) {
+	    Forum.log.error("When clone " + Forum.class + " failed");
 	}
 
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
-				offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
+	return forum;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+	if (this == o) {
+	    return true;
+	}
+	if (!(o instanceof Forum)) {
+	    return false;
 	}
 
-	//**********************************************************
-	// get/set methods
-	//**********************************************************
-	/**
-	 * Returns the object's creation date
-	 *
-	 * @return date
-	 * @hibernate.property column="create_date"
-	 */
-	public Date getCreated() {
-		return created;
-	}
+	final Forum genericEntity = (Forum) o;
 
-	/**
-	 * Sets the object's creation date
-	 *
-	 * @param created
-	 */
-	public void setCreated(Date created) {
-		this.created = created;
-	}
+	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(
+		instructions, genericEntity.instructions).append(onlineInstructions, genericEntity.onlineInstructions)
+		.append(offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created)
+		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
+    }
 
-	/**
-	 * Returns the object's date of last update
-	 *
-	 * @return date updated
-	 * @hibernate.property column="update_date"
-	 */
-	public Date getUpdated() {
-		return updated;
-	}
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions).append(
+		offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
+    }
 
-	/**
-	 * Sets the object's date of last update
-	 *
-	 * @param updated
-	 */
-	public void setUpdated(Date updated) {
-		this.updated = updated;
-	}
+    // **********************************************************
+    // get/set methods
+    // **********************************************************
+    /**
+     * Returns the object's creation date
+     * 
+     * @return date
+     * @hibernate.property column="create_date"
+     */
+    public Date getCreated() {
+	return created;
+    }
 
-	/**
-	 * @return Returns the userid of the user who created the Forum.
-	 *
-	 * @hibernate.many-to-one
-	 *      cascade="none"
-	 * 		column="create_by"
-	 *
-	 */
-	public ForumUser getCreatedBy() {
-		return createdBy;
-	}
+    /**
+     * Sets the object's creation date
+     * 
+     * @param created
+     */
+    public void setCreated(Date created) {
+	this.created = created;
+    }
 
-	/**
-	 * @param createdBy The userid of the user who created this Forum.
-	 */
-	public void setCreatedBy(ForumUser createdBy) {
-		this.createdBy = createdBy;
-	}
+    /**
+     * Returns the object's date of last update
+     * 
+     * @return date updated
+     * @hibernate.property column="update_date"
+     */
+    public Date getUpdated() {
+	return updated;
+    }
 
-	/**
-	 * @hibernate.id column="uid" generator-class="native"
-	 */
-	public Long getUid() {
-		return uid;
-	}
+    /**
+     * Sets the object's date of last update
+     * 
+     * @param updated
+     */
+    public void setUpdated(Date updated) {
+	this.updated = updated;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    /**
+     * @return Returns the userid of the user who created the Forum.
+     * 
+     * @hibernate.many-to-one cascade="none" column="create_by"
+     * 
+     */
+    public ForumUser getCreatedBy() {
+	return createdBy;
+    }
 
-	/**
-	 * @return Returns the title.
-	 *
-	 * @hibernate.property
-	 * 		column="title"
-	 *
-	 */
-	public String getTitle() {
-		return title;
-	}
+    /**
+     * @param createdBy
+     *                The userid of the user who created this Forum.
+     */
+    public void setCreatedBy(ForumUser createdBy) {
+	this.createdBy = createdBy;
+    }
 
-	/**
-	 * @param title The title to set.
-	 */
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    /**
+     * @hibernate.id column="uid" generator-class="native"
+     */
+    public Long getUid() {
+	return uid;
+    }
 
-	/**
-	 * @return Returns the allowAnonym.
-	 *
-	 * @hibernate.property 
-	 * 		column="allow_anonym"
-	 *  
-	 */
-	public boolean getAllowAnonym() {
-		return allowAnonym;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	/**
-	 * @param allowAnonym The allowAnonym to set.
-	 *
-	 */
-	public void setAllowAnonym(boolean allowAnnomity) {
-		allowAnonym = allowAnnomity;
-	}
+    /**
+     * @return Returns the title.
+     * 
+     * @hibernate.property column="title"
+     * 
+     */
+    public String getTitle() {
+	return title;
+    }
 
-	/**
-	 * @return Returns the runOffline.
-	 *
-	 * @hibernate.property 
-	 * 		column="run_offline"
-	 *
-	 */
-	public boolean getRunOffline() {
-		return runOffline;
-	}
+    /**
+     * @param title
+     *                The title to set.
+     */
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	/**
-	 * @param runOffline The forceOffLine to set.
-	 *
-	 *
-	 */
-	public void setRunOffline(boolean forceOffline) {
-		runOffline = forceOffline;
-	}
+    /**
+     * @return Returns the allowAnonym.
+     * 
+     * @hibernate.property column="allow_anonym"
+     * 
+     */
+    public boolean getAllowAnonym() {
+	return allowAnonym;
+    }
 
-	/**
-	 * @return Returns the lockWhenFinish.
-	 *
-	 * @hibernate.property
-	 * 		column="lock_on_finished"
-	 *
-	 */
-	public boolean getLockWhenFinished() {
-		return lockWhenFinished;
-	}
+    /**
+     * @param allowAnonym
+     *                The allowAnonym to set.
+     * 
+     */
+    public void setAllowAnonym(boolean allowAnnomity) {
+	allowAnonym = allowAnnomity;
+    }
 
-	/**
-	 * @param lockWhenFinished Set to true to lock the forum for finished users.
-	 */
-	public void setLockWhenFinished(boolean lockWhenFinished) {
-		this.lockWhenFinished = lockWhenFinished;
-	}
+    /**
+     * @return Returns the runOffline.
+     * 
+     * @hibernate.property column="run_offline"
+     * 
+     */
+    public boolean getRunOffline() {
+	return runOffline;
+    }
 
-	/**
-	 * @return Returns the instructions set by the teacher.
-	 *
-	 * @hibernate.property
-	 * 		column="instructions"
-	 *      type="text"
-	 */
-	public String getInstructions() {
-		return instructions;
-	}
+    /**
+     * @param runOffline
+     *                The forceOffLine to set.
+     * 
+     * 
+     */
+    public void setRunOffline(boolean forceOffline) {
+	runOffline = forceOffline;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    /**
+     * @return Returns the lockWhenFinish.
+     * 
+     * @hibernate.property column="lock_on_finished"
+     * 
+     */
+    public boolean getLockWhenFinished() {
+	return lockWhenFinished;
+    }
 
-	/**
-	 * @return Returns the onlineInstructions set by the teacher.
-	 *
-	 * @hibernate.property
-	 * 		column="online_instructions"
-	 *      type="text"
-	 */
-	public String getOnlineInstructions() {
-		return onlineInstructions;
-	}
+    /**
+     * @param lockWhenFinished
+     *                Set to true to lock the forum for finished users.
+     */
+    public void setLockWhenFinished(boolean lockWhenFinished) {
+	this.lockWhenFinished = lockWhenFinished;
+    }
 
-	public void setOnlineInstructions(String onlineInstructions) {
-		this.onlineInstructions = onlineInstructions;
-	}
+    /**
+     * @return Returns the instructions set by the teacher.
+     * 
+     * @hibernate.property column="instructions" type="text"
+     */
+    public String getInstructions() {
+	return instructions;
+    }
 
-	/**
-	 * @return Returns the onlineInstructions set by the teacher.
-	 *
-	 * @hibernate.property
-	 * 		column="offline_instructions"
-	 *      type="text"
-	 */
-	public String getOfflineInstructions() {
-		return offlineInstructions;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public void setOfflineInstructions(String offlineInstructions) {
-		this.offlineInstructions = offlineInstructions;
-	}
+    /**
+     * @return Returns the onlineInstructions set by the teacher.
+     * 
+     * @hibernate.property column="online_instructions" type="text"
+     */
+    public String getOnlineInstructions() {
+	return onlineInstructions;
+    }
 
-	/**
-	 *
-	 * @hibernate.set   lazy="true"
-	 * 					cascade="all"
-	 * 					inverse="false"
-	 * 					order-by="create_date desc"
-	 * @hibernate.collection-key column="forum_uid"
-	 * @hibernate.collection-one-to-many
-	 * 			class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
-	 *
-	 * @return a set of Attachments to this Message.
-	 */
-	public Set getAttachments() {
-		return attachments;
-	}
+    public void setOnlineInstructions(String onlineInstructions) {
+	this.onlineInstructions = onlineInstructions;
+    }
 
-	/*
-	 * @param attachments The attachments to set.
-	 */
-	public void setAttachments(Set attachments) {
-		this.attachments = attachments;
-	}
+    /**
+     * @return Returns the onlineInstructions set by the teacher.
+     * 
+     * @hibernate.property column="offline_instructions" type="text"
+     */
+    public String getOfflineInstructions() {
+	return offlineInstructions;
+    }
 
-	/**
-	 * NOTE: The reason that relation don't use save-update to persist message is MessageSeq table need save 
-	 * a record as well.   
-	 * 
-	 * @hibernate.set lazy="true"
-	 *                inverse="true"
-	 *                cascade="none"
-	 *                order-by="create_date desc"
-	 * @hibernate.collection-key column="forum_uid"
-	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
-	 * 
-	 * @return
-	 */
-	public Set getMessages() {
-		return messages;
-	}
+    public void setOfflineInstructions(String offlineInstructions) {
+	this.offlineInstructions = offlineInstructions;
+    }
 
-	public void setMessages(Set messages) {
-		this.messages = messages;
-	}
+    /**
+     * 
+     * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date desc"
+     * @hibernate.collection-key column="forum_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
+     * 
+     * @return a set of Attachments to this Message.
+     */
+    public Set getAttachments() {
+	return attachments;
+    }
 
-	/**
-	 * Updates the modification data for this entity.
-	 */
-	public void updateModificationData() {
+    /*
+     * @param attachments The attachments to set.
+     */
+    public void setAttachments(Set attachments) {
+	this.attachments = attachments;
+    }
 
-		long now = System.currentTimeMillis();
-		if (created == null) {
-			this.setCreated(new Date(now));
-		}
-		this.setUpdated(new Date(now));
-	}
+    /**
+     * NOTE: The reason that relation don't use save-update to persist message is MessageSeq table need save a record as
+     * well.
+     * 
+     * @hibernate.set lazy="true" inverse="true" cascade="none" order-by="create_date desc"
+     * @hibernate.collection-key column="forum_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
+     * 
+     * @return
+     */
+    public Set getMessages() {
+	return messages;
+    }
 
-	/**
-	 * @hibernate.property  column="content_in_use"
-	 * @return
-	 */
-	public boolean isContentInUse() {
-		return contentInUse;
-	}
+    public void setMessages(Set messages) {
+	this.messages = messages;
+    }
 
-	public void setContentInUse(boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
+    /**
+     * Updates the modification data for this entity.
+     */
+    public void updateModificationData() {
 
-	/**
-	 * @hibernate.property column="define_later"
-	 * @return
-	 */
-	public boolean isDefineLater() {
-		return defineLater;
+	long now = System.currentTimeMillis();
+	if (created == null) {
+	    this.setCreated(new Date(now));
 	}
+	this.setUpdated(new Date(now));
+    }
 
-	public void setDefineLater(boolean defineLater) {
-		this.defineLater = defineLater;
-	}
+    /**
+     * @hibernate.property column="content_in_use"
+     * @return
+     */
+    public boolean isContentInUse() {
+	return contentInUse;
+    }
 
-	/**
-	 * @hibernate.property column="content_id" unique="true" 
-	 * @return
-	 */
-	public Long getContentId() {
-		return contentId;
-	}
+    public void setContentInUse(boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
 
-	public void setContentId(Long contentId) {
-		this.contentId = contentId;
-	}
+    /**
+     * @hibernate.property column="define_later"
+     * @return
+     */
+    public boolean isDefineLater() {
+	return defineLater;
+    }
 
-	/**
-	 * @hibernate.property column="allow_edit"
-	 * @return
-	 */
-	public boolean isAllowEdit() {
-		return allowEdit;
-	}
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
 
-	public void setAllowEdit(boolean allowEdit) {
-		this.allowEdit = allowEdit;
-	}
+    /**
+     * @hibernate.property column="content_id" unique="true"
+     * @return
+     */
+    public Long getContentId() {
+	return contentId;
+    }
 
-	/**
-	 * @hibernate.property column="allow_rich_editor"
-	 * @return
-	 */
-	public boolean isAllowRichEditor() {
-		return allowRichEditor;
-	}
+    public void setContentId(Long contentId) {
+	this.contentId = contentId;
+    }
 
-	public void setAllowRichEditor(boolean allowRichEditor) {
-		this.allowRichEditor = allowRichEditor;
-	}
+    /**
+     * @hibernate.property column="allow_edit"
+     * @return
+     */
+    public boolean isAllowEdit() {
+	return allowEdit;
+    }
 
-	public static Forum newInstance(Forum fromContent, Long contentId, ForumToolContentHandler forumToolContentHandler) {
-		Forum toContent = new Forum();
-		fromContent.toolContentHandler = forumToolContentHandler;
-		toContent = (Forum) fromContent.clone();
-		toContent.setContentId(contentId);
-		return toContent;
-	}
+    public void setAllowEdit(boolean allowEdit) {
+	this.allowEdit = allowEdit;
+    }
 
-	/**
-	 * @hibernate.property column="limited_of_chars"
-	 * @return
-	 */
-	public int getLimitedChar() {
-		return limitedChar;
-	}
+    /**
+     * @hibernate.property column="allow_rich_editor"
+     * @return
+     */
+    public boolean isAllowRichEditor() {
+	return allowRichEditor;
+    }
 
-	public void setLimitedChar(int limitedChar) {
-		this.limitedChar = limitedChar;
-	}
+    public void setAllowRichEditor(boolean allowRichEditor) {
+	this.allowRichEditor = allowRichEditor;
+    }
 
-	/**
-	 * @hibernate.property column="limited_input_flag"
-	 * @return
-	 */
-	public boolean isLimitedInput() {
-		return limitedInput;
-	}
+    public static Forum newInstance(Forum fromContent, Long contentId, ForumToolContentHandler forumToolContentHandler) {
+	Forum toContent = new Forum();
+	fromContent.toolContentHandler = forumToolContentHandler;
+	toContent = (Forum) fromContent.clone();
+	toContent.setContentId(contentId);
+	return toContent;
+    }
 
-	public void setLimitedInput(boolean limitedInput) {
-		this.limitedInput = limitedInput;
-	}
+    /**
+     * @hibernate.property column="limited_of_chars"
+     * @return
+     */
+    public int getLimitedChar() {
+	return limitedChar;
+    }
 
-	public ForumToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
-	}
+    public void setLimitedChar(int limitedChar) {
+	this.limitedChar = limitedChar;
+    }
 
-	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
-	}
+    /**
+     * @hibernate.property column="limited_input_flag"
+     * @return
+     */
+    public boolean isLimitedInput() {
+	return limitedInput;
+    }
 
-	/**
-	 * @hibernate.property column="allow_new_topic"
-	 * @return
-	 */
-	public boolean isAllowNewTopic() {
-		return allowNewTopic;
-	}
+    public void setLimitedInput(boolean limitedInput) {
+	this.limitedInput = limitedInput;
+    }
 
-	public void setAllowNewTopic(boolean allowNewTopic) {
-		this.allowNewTopic = allowNewTopic;
-	}
+    public ForumToolContentHandler getToolContentHandler() {
+	return toolContentHandler;
+    }
 
-	/**
-	 * @hibernate.property column="allow_upload"
-	 * @return
-	 */
-	public boolean isAllowUpload() {
-		return allowUpload;
-	}
+    public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
+	this.toolContentHandler = toolContentHandler;
+    }
 
-	public void setAllowUpload(boolean allowUpload) {
-		this.allowUpload = allowUpload;
-	}
+    /**
+     * @hibernate.property column="allow_new_topic"
+     * @return
+     */
+    public boolean isAllowNewTopic() {
+	return allowNewTopic;
+    }
 
-	/**
-	 * @hibernate.property column="maximum_reply"
-	 * @return
-	 */
-	public int getMaximumReply() {
-		return maximumReply;
-	}
+    public void setAllowNewTopic(boolean allowNewTopic) {
+	this.allowNewTopic = allowNewTopic;
+    }
 
-	public void setMaximumReply(int maximumReply) {
-		this.maximumReply = maximumReply;
-	}
+    /**
+     * @hibernate.property column="allow_upload"
+     * @return
+     */
+    public boolean isAllowUpload() {
+	return allowUpload;
+    }
 
-	/**
-	 * @hibernate.property column="minimum_reply"
-	 * @return
-	 */
-	public int getMinimumReply() {
-		return minimumReply;
-	}
+    public void setAllowUpload(boolean allowUpload) {
+	this.allowUpload = allowUpload;
+    }
 
-	public void setMinimumReply(int minimumReply) {
-		this.minimumReply = minimumReply;
-	}
+    /**
+     * @hibernate.property column="maximum_reply"
+     * @return
+     */
+    public int getMaximumReply() {
+	return maximumReply;
+    }
 
-	/**
-	 * @hibernate.property column="reflect_instructions"
-	 * @return
-	 */
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
+    public void setMaximumReply(int maximumReply) {
+	this.maximumReply = maximumReply;
+    }
 
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
+    /**
+     * @hibernate.property column="minimum_reply"
+     * @return
+     */
+    public int getMinimumReply() {
+	return minimumReply;
+    }
 
-	/**
-	 * @hibernate.property column="reflect_on_activity"
-	 * @return
-	 */
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
+    public void setMinimumReply(int minimumReply) {
+	this.minimumReply = minimumReply;
+    }
 
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
+    /**
+     * @hibernate.property column="reflect_instructions"
+     * @return
+     */
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
 
-	/**
-	 * @hibernate.property column="mark_release_notify"
-	 * @return
-	 */
-	public boolean isNotifyLearnersOnMarkRelease() {
-		return notifyLearnersOnMarkRelease;
-	}
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
 
-	public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
-		this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
-	}
+    /**
+     * @hibernate.property column="reflect_on_activity"
+     * @return
+     */
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    /**
+     * @hibernate.property column="mark_release_notify"
+     * @return
+     */
+    public boolean isNotifyLearnersOnMarkRelease() {
+	return notifyLearnersOnMarkRelease;
+    }
+
+    public void setNotifyLearnersOnMarkRelease(boolean notifyLearnersOnMarkRelease) {
+	this.notifyLearnersOnMarkRelease = notifyLearnersOnMarkRelease;
+    }
+
+    /**
+     * @hibernate.set lazy="true" cascade="all"
+     *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
+     * @hibernate.collection-key column="content_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.ForumCondition"
+     * 
+     */
+    public Set<ForumCondition> getConditions() {
+	return conditions;
+    }
+
+    public void setConditions(Set<ForumCondition> conditions) {
+	this.conditions = conditions;
+    }
 }
