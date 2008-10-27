@@ -320,6 +320,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	}
 
 	QaContent qaContent = qaContentTest;
+
 	if (errors.isEmpty()) {
 	    QaAction.logger.debug("errors is empty: " + errors);
 	    /*
@@ -390,6 +391,14 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 			defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
 	    }
+	}
+
+	List delConditionList = getDeletedQaConditionList(sessionMap);
+	Iterator iter = delConditionList.iterator();
+	while (iter.hasNext()) {
+	    QaCondition condition = (QaCondition) iter.next();
+	    iter.remove();
+	    qaService.deleteCondition(condition);
 	}
 
 	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(1).toString());
@@ -1093,6 +1102,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		conditionIter.remove();
 	    }
 	}
+
 	QaAction.logger.debug("listQuestionContentDTO after remove:" + listQuestionContentDTO);
 
 	listQuestionContentDTO = AuthoringUtil.reorderListQuestionContentDTO(listQuestionContentDTO, questionIndex);
@@ -2129,4 +2139,18 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	return true;
     }
 
+    /**
+     * Get the deleted condition list, which could be persisted or non-persisted items.
+     * 
+     * @param request
+     * @return
+     */
+    private List getDeletedQaConditionList(SessionMap sessionMap) {
+	List list = (List) sessionMap.get(QaAppConstants.ATTR_DELETED_CONDITION_LIST);
+	if (list == null) {
+	    list = new ArrayList();
+	    sessionMap.put(QaAppConstants.ATTR_DELETED_CONDITION_LIST, list);
+	}
+	return list;
+    }
 }

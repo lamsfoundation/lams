@@ -23,38 +23,38 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dao;
 
+import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-
 
 /**
  * 
  * @author Ozgur Demirtas
- *
+ * 
  */
-public interface IQaContentDAO
-{
-	public QaContent getQaById(long qaId);
-	
-	public QaContent loadQaById(long qaId);
-    
-	public QaContent getQaContentByUID(Long uid);
-	
-	public QaContent getQaBySession(Long sessionId);
-    
-	public void saveOrUpdateQa(QaContent qa);
-	
+public interface IQaContentDAO {
+    public QaContent getQaById(long qaId);
+
+    public QaContent loadQaById(long qaId);
+
+    public QaContent getQaContentByUID(Long uid);
+
+    public QaContent getQaBySession(Long sessionId);
+
+    public void saveOrUpdateQa(QaContent qa);
+
     public void saveQa(QaContent qa);
-    
+
     public void updateQa(QaContent qa);
-    
+
     public void removeQa(Long qaContentId);
-    
+
     public void deleteQa(QaContent qa);
-    
+
     public void removeQaById(Long qaId);
-    
+
     public void removeAllQaSession(QaContent content);
-    
+
     public int countUserResponsed(QaContent content);
-    
+
+    public void deleteCondition(QaCondition condition);
 }

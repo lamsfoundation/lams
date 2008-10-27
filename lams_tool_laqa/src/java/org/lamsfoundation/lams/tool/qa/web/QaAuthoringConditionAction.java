@@ -202,6 +202,11 @@ public class QaAuthoringConditionAction extends Action {
 	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
 	    List<QaCondition> conditionList = new ArrayList<QaCondition>(conditionSet);
 	    QaCondition condition = conditionList.remove(orderId);
+	    for (QaCondition otherCondition : conditionSet) {
+		if (otherCondition.getOrderId() > orderId) {
+		    otherCondition.setOrderId(otherCondition.getOrderId() - 1);
+		}
+	    }
 	    conditionSet.clear();
 	    conditionSet.addAll(conditionList);
 	    // add to delList
@@ -354,13 +359,6 @@ public class QaAuthoringConditionAction extends Action {
 	if (orderId >= 0) {
 	    form.setOrderId(orderId + 1);
 	}
-
-	Integer[] selectedItems = new Integer[condition.temporaryQuestionDTOSet.size()];
-	int i = 0;
-	for (QaQuestionContentDTO question : condition.temporaryQuestionDTOSet) {
-	    selectedItems[i++] = new Integer(question.getDisplayOrder());
-	}
-	form.setSelectedItems(selectedItems);
     }
 
     /**

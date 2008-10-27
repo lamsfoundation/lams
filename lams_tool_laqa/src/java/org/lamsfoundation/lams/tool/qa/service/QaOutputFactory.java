@@ -107,7 +107,7 @@ public class QaOutputFactory extends OutputFactory {
 		    ToolOutput output = getToolOutput(name, qaService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+			if (isTextSearchConditionName(name)) {
 			    allAnswersOutput = output;
 			}
 		    }
@@ -121,7 +121,7 @@ public class QaOutputFactory extends OutputFactory {
 		    ToolOutput output = getToolOutput(name, qaService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+			if (isTextSearchConditionName(name)) {
 			    allAnswersOutput = output;
 			}
 		    }

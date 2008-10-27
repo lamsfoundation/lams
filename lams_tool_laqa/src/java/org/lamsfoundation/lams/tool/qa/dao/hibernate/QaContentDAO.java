@@ -29,154 +29,126 @@ import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
 /**
  * @author Ozgur Demirtas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code
+ * Templates
  */
 
 public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
-	 	static Logger logger = Logger.getLogger(QaContentDAO.class.getName());
-	 	
-	 	private static final String LOAD_QA_BY_SESSION = "select qa from QaContent qa left join fetch "
-            + "qa.qaSessions session where session.qaSessionId=:sessionId";
+    static Logger logger = Logger.getLogger(QaContentDAO.class.getName());
 
-    
-	 	private static final String COUNT_USER_RESPONSED = "select distinct u.userId from QaQueUsr u left join fetch"
-            + " u.qaQueContent as ques where ques.qaContent = :qa group by u.userId";
-	 	
-	 	
-	 	public QaContentDAO() {}
+    private static final String LOAD_QA_BY_SESSION = "select qa from QaContent qa left join fetch "
+	    + "qa.qaSessions session where session.qaSessionId=:sessionId";
 
-	 	
-	 	public QaContent getQaById(long qaId)
-	    {
-	 		return loadQaById(qaId);
-	    }
-	 	
+    private static final String COUNT_USER_RESPONSED = "select distinct u.userId from QaQueUsr u left join fetch"
+	    + " u.qaQueContent as ques where ques.qaContent = :qa group by u.userId";
 
-	 	public QaContent loadQaById(long qaId)
-	    {
-	 		String query = "from QaContent as qa where qa.qaContentId = ?";
-		    HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(query)
-				.setLong(0,qaId)
-				.list();
-			
-			if(list != null && list.size() > 0){
-				QaContent qa = (QaContent) list.get(0);
-				return qa;
-			}
-			return null;
-	    }
+    public QaContentDAO() {
+    }
 
+    public QaContent getQaById(long qaId) {
+	return loadQaById(qaId);
+    }
 
-	 	
-	 	public QaContent getQaContentByUID(Long uid)
-		{
-			return (QaContent) this.getHibernateTemplate().get(QaContent.class, uid);
-		}
-		
-	 	
-	 	public void updateQa(QaContent qa)
-	    {
-	 		this.getSession().setFlushMode(FlushMode.AUTO);
-			logger.debug("before updateQa: " + qa);
-	        this.getHibernateTemplate().update(qa);
-	    }
-	 	 
-	 	public QaContent getQaBySession(final Long sessionId)
-	    {
-	         return (QaContent) getHibernateTemplate().execute(new HibernateCallback()
-                              {
+    public QaContent loadQaById(long qaId) {
+	String query = "from QaContent as qa where qa.qaContentId = ?";
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(query).setLong(0, qaId).list();
 
-                                  public Object doInHibernate(Session session) throws HibernateException
-                                  {
-                                      return session.createQuery(LOAD_QA_BY_SESSION)
-                                                    .setLong("sessionId",
-                                                     sessionId.longValue())
-                                                    .uniqueResult();
-                                  }
-                              });
-	    }
+	if (list != null && list.size() > 0) {
+	    QaContent qa = (QaContent) list.get(0);
+	    return qa;
+	}
+	return null;
+    }
 
-	     
-	    public void saveQa(QaContent qa) 
-	    {
-	    	this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().save(qa);
-	    }
-	    
-	 	public void saveOrUpdateQa(QaContent qa)
-	    {
-	 		this.getSession().setFlushMode(FlushMode.AUTO);
-			logger.debug("before saveOrUpdateQa: " + qa);
-			this.getHibernateTemplate().saveOrUpdate(qa);
-	    }
+    public QaContent getQaContentByUID(Long uid) {
+	return (QaContent) this.getHibernateTemplate().get(QaContent.class, uid);
+    }
 
-	    
-	    public void createQa(QaContent qa) 
-	    {
-	    	this.getSession().setFlushMode(FlushMode.AUTO);
-			logger.debug("before createQa: " + qa);
-	    	this.getHibernateTemplate().save(qa);
-	    }
-	    
-	    public void UpdateQa(QaContent qa)
-	    {
-	    	this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().update(qa);	
-	    }
+    public void updateQa(QaContent qa) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	QaContentDAO.logger.debug("before updateQa: " + qa);
+	this.getHibernateTemplate().update(qa);
+    }
 
-	    public int countUserResponsed(QaContent qa)
-	    {
-    	   return (getHibernateTemplate().findByNamedParam(COUNT_USER_RESPONSED,
-                "qa",
-                qa)).size();
-	    }
-	    
-	    
-	    public void removeAllQaSession(QaContent qaContent){
-	    	this.getHibernateTemplate().deleteAll(qaContent.getQaSessions());	
-	    }
-	    
-	    public void removeQa(Long qaContentId)
-	    {
-	    	if ( qaContentId != null ) {
-		    	String query = "from qa in class org.lamsfoundation.lams.tool.qa.QaContent"
-		            + " where qa.qaContentId = ?";
-		    	Object obj = getSession().createQuery(query)
-					.setLong(0,qaContentId.longValue())
-					.uniqueResult();
-		    	this.getSession().setFlushMode(FlushMode.AUTO);
-		    	getHibernateTemplate().delete(obj);
-	    	}
-    	}
-	    
-	    public void deleteQa(QaContent qaContent)
-	    {
-	    	this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().delete(qaContent);
-    	}
+    public QaContent getQaBySession(final Long sessionId) {
+	return (QaContent) getHibernateTemplate().execute(new HibernateCallback() {
 
-	    public void removeQaById(Long qaId)
-	    {
-	    	this.getSession().setFlushMode(FlushMode.AUTO);
-	    	removeQa(qaId);
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(QaContentDAO.LOAD_QA_BY_SESSION).setLong("sessionId", sessionId.longValue())
+			.uniqueResult();
 	    }
+	});
+    }
 
-	    
-	    public void flush()
-	    {
-	        this.getHibernateTemplate().flush();
-	    }
-	    
-} 
+    public void saveQa(QaContent qa) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().save(qa);
+    }
+
+    public void saveOrUpdateQa(QaContent qa) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	QaContentDAO.logger.debug("before saveOrUpdateQa: " + qa);
+	this.getHibernateTemplate().saveOrUpdate(qa);
+    }
+
+    public void createQa(QaContent qa) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	QaContentDAO.logger.debug("before createQa: " + qa);
+	this.getHibernateTemplate().save(qa);
+    }
+
+    public void UpdateQa(QaContent qa) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().update(qa);
+    }
+
+    public int countUserResponsed(QaContent qa) {
+	return getHibernateTemplate().findByNamedParam(QaContentDAO.COUNT_USER_RESPONSED, "qa", qa).size();
+    }
+
+    public void removeAllQaSession(QaContent qaContent) {
+	this.getHibernateTemplate().deleteAll(qaContent.getQaSessions());
+    }
+
+    public void removeQa(Long qaContentId) {
+	if (qaContentId != null) {
+	    String query = "from qa in class org.lamsfoundation.lams.tool.qa.QaContent" + " where qa.qaContentId = ?";
+	    Object obj = getSession().createQuery(query).setLong(0, qaContentId.longValue()).uniqueResult();
+	    this.getSession().setFlushMode(FlushMode.AUTO);
+	    getHibernateTemplate().delete(obj);
+	}
+    }
+
+    public void deleteQa(QaContent qaContent) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(qaContent);
+    }
+
+    public void removeQaById(Long qaId) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	removeQa(qaId);
+    }
+
+    public void flush() {
+	this.getHibernateTemplate().flush();
+    }
+
+    public void deleteCondition(QaCondition condition) {
+	if (condition != null && condition.getConditionId() != null) {
+	    this.getSession().setFlushMode(FlushMode.AUTO);
+	    this.getHibernateTemplate().delete(condition);
+	}
+    }
+
+}

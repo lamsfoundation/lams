@@ -1845,4 +1845,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	} while (uniqueNumber == null);
 	return getQaOutputFactory().buildConditionName(uniqueNumber);
     }
+
+    public void deleteCondition(QaCondition condition) {
+	if (condition != null && condition.getConditionId() != null) {
+	    qaDAO.deleteCondition(condition);
+	}
+    }
 }

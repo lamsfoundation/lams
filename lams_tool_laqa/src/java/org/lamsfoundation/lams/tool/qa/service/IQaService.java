@@ -292,4 +292,6 @@ public interface IQaService {
      * @return unique QaCondition name
      */
     public String createConditionName(Collection<QaCondition> existingConditions);
+
+    public void deleteCondition(QaCondition condition);
 }
