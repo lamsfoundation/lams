@@ -236,9 +236,15 @@ class ToolActivity extends Activity{
 		n.supportsOutputs = _supportsOutputs;
 		n.extLmsId = _extLmsId;
 		
+		n.competenceMappings = new Array();
+		
+		if (competenceMappings.length > 0) {
+			for (var i=0; i<competenceMappings.length; i++) {
+				n.competenceMappings.push(competenceMappings[i]);
+			}
+		}
+		
 		return n;
-		
-		
 	}
 	
 	public function addDefinition(dto:Object):Void {
@@ -275,6 +281,10 @@ class ToolActivity extends Activity{
 	 */
 	public function get authoringURL ():String {
 		return _authoringURL;
+	}
+	
+	public function set competenceMappings(cMappings:Array) {
+		_competenceMappings = cMappings;
 	}
 
 	/**
