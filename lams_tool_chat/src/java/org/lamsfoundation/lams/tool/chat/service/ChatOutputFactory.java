@@ -125,7 +125,7 @@ public class ChatOutputFactory extends OutputFactory {
     }
 
     public ToolOutput getToolOutput(String name, IChatService chatService, Long toolSessionId, Long learnerId) {
-	if (isTextSearchConditionName(ChatConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+	if (isTextSearchConditionName(name)) {
 	    // entry is loaded from DB
 	    Chat chat = chatService.getSessionBySessionId(toolSessionId).getChat();
 

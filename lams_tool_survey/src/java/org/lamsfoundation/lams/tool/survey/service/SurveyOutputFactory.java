@@ -133,7 +133,7 @@ public class SurveyOutputFactory extends OutputFactory {
     }
 
     public ToolOutput getToolOutput(String name, ISurveyService surveyService, Long toolSessionId, Long learnerId) {
-	if (isTextSearchConditionName(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+	if (isTextSearchConditionName(name)) {
 	    // user answers are loaded from the DB and array of strings is created
 
 	    Survey survey = surveyService.getSurveyBySessionId(toolSessionId);

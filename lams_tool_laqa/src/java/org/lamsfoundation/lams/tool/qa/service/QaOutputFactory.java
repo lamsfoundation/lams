@@ -133,7 +133,7 @@ public class QaOutputFactory extends OutputFactory {
     }
 
     public ToolOutput getToolOutput(String name, IQaService qaService, Long toolSessionId, Long learnerId) {
-	if (isTextSearchConditionName(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+	if (isTextSearchConditionName(name)) {
 	    // user answers are loaded from the DB and array of strings is created
 
 	    QaSession session = qaService.retrieveQaSession(toolSessionId);

@@ -149,7 +149,7 @@ public class ForumOutputFactory extends OutputFactory {
 
     public ToolOutput getToolOutput(String name, IForumService forumService, Long toolSessionId, Long learnerId) {
 	ToolOutput toolOutput = null;
-	if (isTextSearchConditionName(ForumConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+	if (isTextSearchConditionName(name)) {
 	    // a map of "topic creation date" -> "all learner's answers to that topic"
 	    Map<Date, Set<String>> answers = new HashMap<Date, Set<String>>();
 
