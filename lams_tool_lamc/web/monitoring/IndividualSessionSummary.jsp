@@ -40,7 +40,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</tr>
 						
 				  	 		<tr>
-								 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.user"/>  </b> </td>  
+								 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.user"/>  </b> </td>
+								 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.attemptTime"/>  </b> </td>							
 					  	 		<c:set var="queIndex" scope="request" value="0"/>
 								<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
 								<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
@@ -68,7 +69,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							  	 				<td NOWRAP valign=top class="align-left"> 
 														<c:out value="${data.fullName}"/> 
 												</td>	
-			
+												<td NOWRAP valign=top class="align-left">
+													<lams:Date value="${data.attemptTime}"/>
+												</td>									
 												<c:forEach var="mark" items="${data.marks}">
 													<td NOWRAP valign=top class="align-left"> 
 															<c:out value="${mark}"/> 								
@@ -94,7 +97,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<td NOWRAP valign=top class="align-left"> 
 														<c:out value="${data.fullName}"/> 
 												</td>	
-			
+												
+												<td NOWRAP valign=top class="align-left">
+													<lams:Date value="${data.attemptTime}"/>
+												</td>
+												
 												<c:forEach var="mark" items="${data.marks}">
 													<td NOWRAP valign=top class="align-left"> 
 															<c:out value="${mark}"/> 								

@@ -22,7 +22,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.web;
 
-import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +37,6 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.mc.McAllGroupsDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.mc.McMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McMonitoredUserDTO;
@@ -220,6 +219,7 @@ public class MonitoringUtil implements McAppConstants{
             	// than one in the future and if so, we don't want to count the mark twice hence
             	// we need to check if we've already processed this question in the total.
             	Integer[] userMarks = new Integer[numQuestions];
+            	Date attemptTime = null;
             	Iterator attemptIterator = mcService.getLatestAttemptsForAUser(mcQueUsr.getUid()).iterator();
             	long totalMark = 0;
             	while (attemptIterator.hasNext())
@@ -236,9 +236,13 @@ public class MonitoringUtil implements McAppConstants{
         	    		userMarks[arrayIndex] = mark;
         	    		totalMark += mark.intValue();
         	    	}
+                	// get the attempt time, (NB all questions will have the same attempt time)
+        	    	// Not efficient, since we assign this value for each attempt
+        	    	attemptTime = attempt.getAttemptTime();
         	    }
-
+            	
             	mcUserMarkDTO.setMarks(userMarks);
+            	mcUserMarkDTO.setAttemptTime(attemptTime);
     	    	mcUserMarkDTO.setTotalMark(new Long(totalMark));
     	    	
             	mapSessionUsersData.put(mapIndex.toString(), mcUserMarkDTO);

@@ -22,8 +22,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -41,7 +40,8 @@ public class McUserMarkDTO implements Comparable
     private String queUsrId;
     private String userName;
     private String fullName;
-    private Integer[] marks; 
+    private Date attemptTime;
+	private Integer[] marks; 
     private Long totalMark;
 
 	public String toString() {
@@ -52,7 +52,8 @@ public class McUserMarkDTO implements Comparable
             .append("userName", userName)
             .append("fullName", fullName)
             .append("marks", marks)            
-            .append("totalMark", totalMark)            
+            .append("totalMark", totalMark)
+            .append("attemptTime", attemptTime)
             .toString();
     }
 
@@ -157,4 +158,16 @@ public class McUserMarkDTO implements Comparable
     public void setSessionName(String sessionName) {
         this.sessionName = sessionName;
     }
+    /**
+     * @return Returns the attemptTime.
+     */
+    public Date getAttemptTime() {
+		return attemptTime;
+	}
+    /**
+     * @param attemptTime The attemptTime to set.
+     */
+	public void setAttemptTime(Date attemptTime) {
+		this.attemptTime = attemptTime;
+	}
 }
