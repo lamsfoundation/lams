@@ -572,11 +572,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 			var branchesArray:Array = _cv.ddm.branches.values();
 			
 			for(var i=0;i<branchesArray.length;i++){
-				if(branchesArray[i].targetUIID == toAct && !branchesArray[i].isActivityless){
+				if(branchesArray[i].targetUIID == toAct && branchesArray[i].hubUIID == fromAct && !branchesArray[i].isActivityless){ // Have to check both end points
 					return new LFError(Dictionary.getValue("cv_invalid_branch_target_to_activity", [_connectionActivities[1].title]));
 				}
 				
-				if(branchesArray[i].targetUIID == fromAct && !branchesArray[i].isActivityless) {
+				if(branchesArray[i].targetUIID == fromAct && branchesArray[i].hubUIID == toAct && !branchesArray[i].isActivityless) {
 					if(!SequenceActivity(branchesArray[i].sequenceActivity).stopAfterActivity && (fromAct != activeView.startHub))
 						return new LFError(Dictionary.getValue("cv_invalid_branch_target_from_activity", [_connectionActivities[0].title]));
 				}
