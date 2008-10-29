@@ -96,7 +96,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		gateType_cmb.addEventListener("change", Delegate.create(this, gateTypeChange));
 		branchType_cmb.addEventListener("change", Delegate.create(this, onBranchTypeChange));
 		
-		toolActs_cmb.addEventListener("change", Delegate.create(this, onBranchToolInputChange));
+		toolActs_cmb.addEventListener("change", Delegate.create(this, onActivityInputChange)); // Branching and Gate Inputs
 		appliedGroupingActivity_cmb.addEventListener("change", Delegate.create(this, onAppliedGroupingChange));
 		
 		minAct_stp.addEventListener("change", Delegate.create(this, updateOptionalData));
@@ -132,6 +132,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		_group_naming_btn.addEventListener("click", Delegate.create(this, onGroupNamingClick));
 		_map_competence_btn.addEventListener("click", Delegate.create(this, onMapCompetenceClick));
 		_tool_output_match_btn.addEventListener("click", Delegate.create(this, onConditionMatchClick));
+		_tool_output_gate_match_btn.addEventListener("click", Delegate.create(this, onGateConditionMatchClick));
 		_conditions_setup_btn.addEventListener("click", Delegate.create(this, onConditionsSetupClick));
 		
 		_define_monitor_cb.addEventListener("click", Delegate.create(this, onDefineMonitorSelect));
@@ -190,11 +191,11 @@ class PropertyInspector extends PropertyInspectorControls {
 		_group_match_btn.label = Dictionary.getValue('pi_group_matching_btn_lbl');
 		_group_naming_btn.label = Dictionary.getValue('pi_group_naming_btn_lbl');
 		_tool_output_match_btn.label = Dictionary.getValue('pi_tool_output_matching_btn_lbl');
+		_tool_output_gate_match_btn.label = Dictionary.getValue('map_gate_conditions_btn');
 		_conditions_setup_btn.label = Dictionary.getValue('pi_condmatch_btn_lbl');
 
 		_define_monitor_cb.label = Dictionary.getValue('pi_define_monitor_cb_lbl');
-
-		//TODO Internationalise
+		
 		_map_competence_btn.label = Dictionary.getValue('map_comptence_btn');
 
 		// Branch 
@@ -716,7 +717,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		} else if(_canvasModel.selectedItem.activity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
 			if(toolActs_cmb.selectedIndex == 0) {
 				_canvasModel.selectedItem.activity.toolActivityUIID = null;
-				branchToolInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[0].data);
+				activityInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[0].data);
 			}
 		}
 	

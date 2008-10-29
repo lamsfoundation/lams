@@ -49,7 +49,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public static var COPY_TYPE_ID_AUTHORING:Number = 1;
 	public static var COPY_TYPE_ID_RUN:Number = 2;
-	public static var COPY_TYPE_ID_PREVIEW:Number = 3;	
+	public static var COPY_TYPE_ID_PREVIEW:Number = 3;
+	
 	//LearningDesign Properties:
 	private var _objectType:String;
 	private var _copyTypeID:Number;
@@ -339,7 +340,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		//dispatch an event to show the design has changed
 		dispatchEvent({type:'ddmBeforeUpdate',target:this});
 	
-		Debugger.log('Branch Mapping entry:' + entry.entryUIID,4,'addBranchMapping','DesignDataModel');
+		Debugger.log('Branch Mapping entryUIID:' + entry.entryUIID,4,'addBranchMapping','DesignDataModel');
 		_branchMappings.put(entry.entryUIID, entry);
 		
 		dispatchEvent({type:'ddmUpdate',target:this});
@@ -498,7 +499,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			} else if(dto.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || 
 			   dto.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || 
 			   dto.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE ||
-			   dto.activityTypeID == Activity.SYSTEM_GATE_ACTIVITY_TYPE ) {
+			   dto.activityTypeID == Activity.SYSTEM_GATE_ACTIVITY_TYPE ||
+			   dto.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE) {
 				
 				var newGateActivity:GateActivity = new GateActivity(dto.activityUIID);
 				newGateActivity.populateFromDTO(dto);				
@@ -564,7 +566,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		for(var i=0; i<design.branchMappings.length;i++){
 			var mdto = design.branchMappings[i];
-			var newMappingEntry:BranchActivityEntry;
+			var newMappingEntry; // BranchActivityEntry or ToolOutputGateActivityEntry
 			
 			Debugger.log("Branch Mapping groupUIID: " + mdto.groupUIID, Debugger.CRITICAL, "setDesign", "DDM");
 			
@@ -575,7 +577,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				condition.populateFromDTO(mdto.condition);
 				condition.toolActivity = ToolActivity(getActivityByUIID(mdto.condition.toolActivityUIID));
 				
-				newMappingEntry = new ToolOutputBranchActivityEntry(mdto.entryID, mdto.entryUIID, condition, SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchingActivityUIID)));
+				if (mdto.gateActivityUIID != null) // gate activity
+					newMappingEntry = new ToolOutputGateActivityEntry(mdto.entryID, mdto.entryUIID, GateActivity(getActivityByUIID(mdto.gateActivityUIID)), condition, mdto.gateOpenWhenConditionMet);
+				else // branching activity
+					newMappingEntry = new ToolOutputBranchActivityEntry(mdto.entryID, mdto.entryUIID, condition, SequenceActivity(getActivityByUIID(mdto.sequenceActivityUIID)), BranchingActivity(getActivityByUIID(mdto.branchingActivityUIID)));
 			}
 			
 			if(newMappingEntry != null)
@@ -816,16 +821,21 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		}
 		
 		if(classMappingEntries.length > 0)
-			for(var i=0; i<classMappingEntries.length; i++)
+			for(var i=0; i<classMappingEntries.length; i++) {
 				if((classMappingEntries[i].branchingActivity.activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE 
 						&& classMappingEntries[i].group != null) ||
 					(classMappingEntries[i].branchingActivity.activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE 
 						&& classMappingEntries[i].condition != null 
 						&& classMappingEntries[i].condition.toolActivity.activityUIID == classMappingEntries[i].branchingActivity.toolActivityUIID) || 
+					(classMappingEntries[i].gateActivity.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE 
+						&& classMappingEntries[i].condition != null 
+						&& classMappingEntries[i].condition.toolActivity.activityUIID == classMappingEntries[i].gateActivity.toolActivityUIID) || 
 					(classMappingEntries[i].branchingActivity.activityTypeID == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE
-						&& classMappingEntries[i].group != null))
+						&& classMappingEntries[i].group != null)) {
+							
 					design.branchMappings.push(classMappingEntries[i].toData());
-					
+				}	
+			}	
 		return design;
 	}
 	
@@ -1022,13 +1032,21 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		myMappings.all = new Array();
 		
 		for(var i=0; i<bMappings.length; i++)
-			if(bMappings[i].branchingActivity.activityUIID == activityUIID || bMappings[i].sequenceActivity.activityUIID == activityUIID) {
+			if(bMappings[i].branchingActivity.activityUIID == activityUIID || 
+				bMappings[i].sequenceActivity.activityUIID == activityUIID ||
+				bMappings[i].gateActivity.activityUIID == activityUIID) {
 				if(bMappings[i] instanceof GroupBranchActivityEntry && bMappings[i].isGroupType)
 					myMappings.groupBased.push(bMappings[i]);
 				else if(bMappings[i] instanceof GroupBranchActivityEntry && !bMappings[i].isGroupType)
 					myMappings.choosenBased.push(bMappings[i]);
-				else if(bMappings[i] instanceof ToolOutputBranchActivityEntry)
+				else if((bMappings[i] instanceof ToolOutputBranchActivityEntry) || (bMappings[i] instanceof ToolOutputGateActivityEntry)) {
+					if (bMappings[i] instanceof ToolOutputBranchActivityEntry)
+						Debugger.log("adding ToolOutputBranchingActivityEntry mapping for activity with UIID: "+activityUIID, Debugger.GEN, "getBranchMappingsByActivityUIIDAndType", "DesignDataModel");
+					else if (bMappings[i] instanceof ToolOutputGateActivityEntry)
+						Debugger.log("adding ToolOutputGateActivityEntry mapping for activity with UIID: "+activityUIID, Debugger.GEN, "getBranchMappingsByActivityUIIDAndType", "DesignDataModel");
+					
 					myMappings.toolBased.push(bMappings[i]);
+				}
 				else
 					myMappings.uncategorised.push(bMappings[i]);
 				
@@ -1153,14 +1171,24 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		return _outputConditions.values();
 	}
 	
-	public function getAllConditionsForToolOutput(branchingActivity:BranchingActivity):Array {
+	public function getAllConditionsForToolOutput(activity):Array { // activity might be instance of BranchingActivity or CONDITION_GATE_ACTIVITY_TYPE
 		var conditions:Array = getAllConditions();
 		var rConditions:Array = new Array();
 		
-		for(var i=0; i<conditions.length; i++) {
-			if(conditions[i].toolActivity.activityUIID == branchingActivity.toolActivityUIID &&
-				conditions[i].branchingActivity.activityUIID == branchingActivity.activityUIID)
-					rConditions.push(conditions[i]);
+		// the tool activity is the source of the condition
+		// the non-tool activity is either the selected branching or gate activity
+		if (activity instanceof BranchingActivity) {
+			for(var i=0; i<conditions.length; i++) {
+				if(conditions[i].toolActivity.activityUIID == activity.toolActivityUIID &&
+					conditions[i].branchingActivity.activityUIID == activity.activityUIID)
+						rConditions.push(conditions[i]);
+			}
+		} else if (activity.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE) {
+			for(var i=0; i<conditions.length; i++) {
+				if(conditions[i].toolActivity.activityUIID == activity.toolActivityUIID &&
+					conditions[i].gateActivity.activityUIID == activity.activityUIID)
+						rConditions.push(conditions[i]);
+			}
 		}
 		
 		return rConditions;
@@ -1306,7 +1334,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function set helpText(a:String):Void{
 		_helpText = a;
-	}	public function get version():String{
+	}
+
+	public function get version():String{
 		return _version;
 	}
 	
@@ -1394,13 +1424,17 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function set maxID(a:Number):Void{
 		_maxID = a;
-	}	public function get firstActivityID():Number{
+	}
+
+	public function get firstActivityID():Number{
 		return _firstActivityID;
 	}
 	
 	public function set firstActivityID(a:Number):Void{
 		_firstActivityID = a;
-	}	public function get activities():Hashtable{
+	}
+
+	public function get activities():Hashtable{
 		return _activities;
 	}
 	

@@ -164,7 +164,7 @@ class BranchMappingDialog extends MovieClip implements Dialog {
     * Called by the OK button 
     */
     private function close(){
-        Debugger.log('OK Clicked',Debugger.GEN,'ok','org.lamsfoundation.lams.GroupMatchingDialog');
+        Debugger.log('OK Clicked',Debugger.GEN,'ok','org.lamsfoundation.lams.authoring.br.BranchMappingDialog');
         
         //close popup
         _container.deletePopUp();

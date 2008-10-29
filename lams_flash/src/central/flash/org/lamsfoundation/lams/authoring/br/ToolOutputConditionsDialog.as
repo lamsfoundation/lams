@@ -20,10 +20,12 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
- 
+
+import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.authoring.Application;
 import org.lamsfoundation.lams.authoring.BranchingActivity;
+import org.lamsfoundation.lams.authoring.GateActivity;
 import org.lamsfoundation.lams.authoring.ToolActivity;
 import org.lamsfoundation.lams.authoring.ToolOutputDefinition;
 import org.lamsfoundation.lams.authoring.ToolOutputCondition;
@@ -105,6 +107,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private var _itemCount:Number;
 	
 	private var _branchingActivity:BranchingActivity;
+	private var _gateActivity:GateActivity;
+	
 	private var _toolActivity:ToolActivity;
 
     //These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
@@ -161,8 +165,6 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		//work out offsets from bottom RHS of panel
         xOkOffset = _bgpanel._width - close_btn._x;
         yOkOffset = _bgpanel._height - close_btn._y;
-		
-		_condition_item_dgd.selectable = false;
 		
 		 //Register as listener with StyleManager and set Styles
         themeManager.addEventListener('themeChanged',this);
@@ -333,11 +335,11 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	private function addButton_onPress():Void {
 		if(validateCondition(_selectedDefinition))
 			if(_toolOutputLongOptions_cmb.selectedItem.data == OPTION_GTE) 
-				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, null));
+				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _gateActivity, _start_value_stp.value, null));
 			else if(_toolOutputLongOptions_cmb.selectedItem.data == OPTION_LTE)
-				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, null, _start_value_stp.value));
+				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _gateActivity, null, _start_value_stp.value));
 			else 
-				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _start_value_stp.value, _end_value_stp.value));
+				addCondition(ToolOutputCondition.createLongCondition(app.getCanvas().ddm.newUIID(), Dictionary.getValue("to_condition_untitled_item_lbl", [Number(_condition_item_dgd.length+1)]), _selectedDefinition, _toolActivity, _branchingActivity, _gateActivity, _start_value_stp.value, _end_value_stp.value));
 	}
 	
 	private function helpButton_onPress():Void {
@@ -533,8 +535,13 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	}
 	
 	private function itemChanged(evt:Object):Void {
+		
+		
+		
 		if(_selectedIndex == _toolOutputDefin_cmb.selectedIndex)
 			return;
+		
+
 		
 		_toolOutputLongOptions_cmb.selectedIndex = 0;
 		
@@ -576,6 +583,16 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 		
 		_selectedDefinition = _toolOutputDefin_cmb.dataProvider[_toolOutputDefin_cmb.selectedIndex];
 		Debugger.log("select definition: " + _selectedDefinition.description, Debugger.CRITICAL, "selectDefinition", "ToolOutputConditionsDialog");
+		
+		if (_selectedDefinition.type == ToolOutputDefinition.COMPLEX) {
+			_condition_item_dgd.selectable = false;
+			
+		} else {
+			if (_condition_item_dgd.selectable == false){
+				_condition_item_dgd.selectable = true;
+			}
+		}
+			
 		
 		if(_selectedDefinition.showConditionNameOnly)
 			addConditionItemColumns(true);
@@ -686,6 +703,7 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				condition.conditionUIID = ddm.newUIID();
 				condition.toolActivity = _toolActivity;
 				condition.branchingActivity = _branchingActivity;
+				condition.gateActivity = _gateActivity;
 				condition.isDefault = true;
 				
 				addCondition(condition);
@@ -763,7 +781,12 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
     * Called by the CLOSE button 
     */
     private function close(){
-		app.pi.openConditionMatchDialog();
+		var selectedAct = app.canvas.model.selectedItem.activity;
+		if (selectedAct instanceof BranchingActivity) {
+			app.pi.openConditionMatchDialog();
+		} else if (selectedAct.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE) {
+			app.pi.onGateConditionMatchClick();
+		}
 		 
         _container.deletePopUp();
     }
@@ -858,6 +881,10 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 	
 	public function set branchingActivity(a:BranchingActivity) {
 		_branchingActivity = a;
+	}
+	
+	public function set gateActivity(a:GateActivity) {
+		_gateActivity = a;
 	}
 	
 	public function set toolActivity(a:ToolActivity) {

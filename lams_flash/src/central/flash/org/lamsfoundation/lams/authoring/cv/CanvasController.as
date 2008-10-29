@@ -1017,7 +1017,15 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
 	
 	private function ToolOutputConditionsDialogLoaded(evt:Object, ta:ToolActivity) {
-		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
+		if (_canvasModel.selectedItem.activity instanceof BranchingActivity) {
+			Debugger.log("ToolOutputConditionsDialogLoaded->we have a branching activity", Debugger.GEN, "ToolOutputConditionsDialogLoaded", "CanvasController");
+			evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
+		}
+		else if (_canvasModel.selectedItem.activity.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE) {
+			Debugger.log("ToolOutputConditionsDialogLoaded->we have a Condition gate activity", Debugger.GEN, "ToolOutputConditionsDialogLoaded", "CanvasController");
+			evt.target.scrollContent.gateActivity = GateActivity(_canvasModel.selectedItem.activity);
+		}
+
 		evt.target.scrollContent.toolActivity = ta;
 		evt.target.scrollContent.setupContent();
 	}

@@ -186,6 +186,8 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 		
 		_root.preloader.start(COMMON_COMPONENT_NO + layout_component_no);
 		
+		_root._quality = "HIGH";
+		
 		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
 		//add the cursors:

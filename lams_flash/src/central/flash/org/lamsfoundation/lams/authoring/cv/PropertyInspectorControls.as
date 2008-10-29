@@ -108,6 +108,7 @@ class PropertyInspectorControls extends MovieClip {
 	
 	private var _group_match_btn:Button;
 	private var _tool_output_match_btn:Button;
+	private var _tool_output_gate_match_btn:Button;
 	private var _conditions_setup_btn:Button;
 	private var _define_monitor_cb:CheckBox;
 
@@ -183,6 +184,9 @@ class PropertyInspectorControls extends MovieClip {
 		
 		btn_text.htmlText = _tool_output_match_btn.label;
 		_tool_output_match_btn.setSize(btn_text.textWidth + offset, 22);
+		
+		btn_text.htmlText = _tool_output_gate_match_btn.label;
+		_tool_output_gate_match_btn.setSize(btn_text.textWidth + offset, 22);
 		
 		btn_text.htmlText = _conditions_setup_btn.label;
 		_conditions_setup_btn.setSize(btn_text.textWidth + offset, 22);
@@ -371,6 +375,7 @@ class PropertyInspectorControls extends MovieClip {
 	private function showGateControls(v:Boolean, e:Boolean){
 		 		
 		var steppers_visible:Boolean = (_canvasModel.selectedItem.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE);
+		var tool_controls_visible:Boolean = (_canvasModel.selectedItem.activity.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE);
 
 		days_lbl.visible = (steppers_visible && v);
 		hours_lbl.visible = (steppers_visible && v);
@@ -383,6 +388,9 @@ class PropertyInspectorControls extends MovieClip {
 		gateType_lbl.visible = v;
 		gateType_cmb.visible = v;
 		startOffset_lbl.visible = (steppers_visible && v);
+		
+		_tool_output_gate_match_btn.visible = (tool_controls_visible && (toolActs_cmb.selectedIndex > 0) && v);
+		// and the conditons definition length > 0
 		
 		if(e != null) {
 			days_lbl.enabled = e;
@@ -398,6 +406,7 @@ class PropertyInspectorControls extends MovieClip {
 			startOffset_lbl.enabled = e;
 		}
 		
+		if (tool_controls_visible) showToolBasedGateControls(v, e);
 	}
 	
 	private function showBranchingControls(v:Boolean, e:Boolean){
@@ -430,7 +439,7 @@ class PropertyInspectorControls extends MovieClip {
 							
 					if(toolActs_cmb.selectedIndex == 0) {
 						_canvasModel.selectedItem.activity.toolActivityUIID = null;
-						branchToolInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[0].data);
+						activityInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[0].data);
 					}
 				}
 			}
@@ -551,8 +560,6 @@ class PropertyInspectorControls extends MovieClip {
 				numGroups_lbl.enabled = e;
 				numLearners_lbl.enabled = e;
 				equalGroupSizes_lbl.enabled = e;
-				//numGroups_stp.enabled = e;
-				//numLearners_stp.enabled = e;
 				numLearners_rdo.enabled = e;
 				numGroups_rdo.enabled = e;
 				equalGroupSizes_chk.enabled = e;
@@ -849,6 +856,7 @@ class PropertyInspectorControls extends MovieClip {
 		_group_naming_btn.setStyle('styleName', styleObj);
 		
 		_tool_output_match_btn.setStyle('styleName', styleObj);
+		_tool_output_gate_match_btn.setStyle('styleName', styleObj);
 		_conditions_setup_btn.setStyle('styleName', styleObj);
 		
 		_map_competence_btn.setStyle('styleName', styleObj);
@@ -922,7 +930,7 @@ class PropertyInspectorControls extends MovieClip {
 	/////////////////////////////////////////////////
 	
 	/**
-	 *Handles change event fired from the gateType_cmb
+	 * Handles change event fired from the gateType_cmb
 	 * @usage   
 	 * @param   evt 
 	 * @return  
@@ -930,7 +938,20 @@ class PropertyInspectorControls extends MovieClip {
 	private function onGateTypeChange(evt:Object){
 		_canvasModel.selectedItem.activity.activityTypeID = evt.target.value;
 		Debugger.log('Set gate type to: _canvasModel.selectedItem.activity.activityTypeID:'+_canvasModel.selectedItem.activity.activityTypeID,Debugger.GEN,'onGateTypeChange','PropertyInspector');
-		checkEnableGateControls(!_canvasModel.selectedItem.activity.readOnly);
+		Debugger.log('Set gate type to: _canvasModel.selectedItem.activity.title:'+_canvasModel.selectedItem.activity.title,Debugger.GEN,'onGateTypeChange','PropertyInspector');
+		checkEnableGateControls(!_canvasModel.selectedItem.activity.readOnly); // show/hide schedule steppers
+		
+		if(evt.target.value == Activity.CONDITION_GATE_ACTIVITY_TYPE) {
+				
+			Debugger.log("Activity is of CONDITION_GATE_TYPE", Debugger.CRITICAL, "onGateTypeChange", "PropertyInspectorControls");
+			
+			showToolBasedGateControls(true, !_canvasModel.selectedItem.activity.readOnly);
+			_canvasModel.selectedItem.activity.groupingUIID = null;
+			
+			showGroupBasedBranchingControls(false);
+			showAppliedGroupingControls(false);
+			
+		}
 		
 		setModified();
 	}
@@ -988,17 +1009,19 @@ class PropertyInspectorControls extends MovieClip {
 		setModified();
 	}
 	
+	
+	// for each element in the tool activity combo box do this
 	private function selectToolActivityItem(index:Number, UIID:Number):Void {
 		
 		var mappings:Array = _canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(_canvasModel.selectedItem.activity.activityUIID).toolBased;
 		
-		Debugger.log("Loading Lists: mappings length: " + mappings.length, Debugger.CRITICAL, "loadLists", "ConditionMatchingDialog");
+		Debugger.log("Loading Lists: mappings length: " + mappings.length, Debugger.CRITICAL, "loadLists", "PropertyInspectorControls");
 		
 		for(var i=0; i < mappings.length; i++) {
 			if(mappings[i].condition.toolActivity.activityUIID == UIID &&
 				mappings[i].condition.branchingActivity.activityUIID == _canvasModel.selectedItem.activity.activityUIID) {
 				toolActs_cmb.selectedIndex = index;
-				branchToolInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[index].data);
+				activityInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[index].data);
 			}
 		}
 	}
@@ -1058,25 +1081,40 @@ class PropertyInspectorControls extends MovieClip {
 		setModified();
 	}
 	
-	private function onBranchToolInputChange(evt:Object) {
-		Debugger.log('branch input change: ' + evt.target.value, Debugger.CRITICAL, "onBranchToolInputChange", "PIC*");
+	private function onActivityInputChange(evt:Object) {
+		Debugger.log('branch input change: ' + evt.target.value, Debugger.CRITICAL, "onActivityInputChange", "PropertyInspectorControls");
 		
-		branchToolInputChange(_canvasModel.selectedItem, evt.target.value);
+		activityInputChange(_canvasModel.selectedItem, evt.target.value);
 	}
 	
-	private function branchToolInputChange(ca, toolActivityUIID) {
-		var mappings:Array = _canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(ca.activity.activityUIID).toolBased;
-		
+	/*
+	* Invoked when the tool output (input activity) to a Branching/Gate activity changes
+	* @param ca.activity is the activity which will recieve inputs
+	*/
+	private function activityInputChange(ca, toolActivityUIID) {
+
 		ca.activity.toolActivityUIID = (toolActivityUIID != 0) ? toolActivityUIID : null;
 		ca.refresh();
-			
-		var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
-	
-		if(hasConnectedSequences(sequences)) {
-			_conditions_setup_btn.visible = (ca.activity.toolActivityUIID != null) ? true : false;
-			_tool_output_match_btn.visible = (ca.activity.toolActivityUIID != null) ? true : false;
-		}
 		
+		if (ca.activity.isGateActivity()) {
+			if (_canvasModel.selectedItem.activity.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE && toolActs_cmb.selectedIndex > 0) {
+				_conditions_setup_btn.visible = true;
+				_tool_output_gate_match_btn.visible = true;			
+			}
+			else {
+				_conditions_setup_btn.visible = false;
+				_tool_output_gate_match_btn.visible = false;
+			}
+		} else { // branching activity
+			var mappings:Array = _canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(ca.activity.activityUIID).toolBased; //necessary?
+			var sequences:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID);
+		
+			if(hasConnectedSequences(sequences)) {
+				_conditions_setup_btn.visible = (ca.activity.toolActivityUIID != null) ? true : false;
+				_tool_output_match_btn.visible = (ca.activity.toolActivityUIID != null) ? true : false;
+			}
+		}
+
 		setModified();
 	}
 	
@@ -1091,6 +1129,58 @@ class PropertyInspectorControls extends MovieClip {
 		}
 		
 		return false;
+	}
+	
+	private function showToolBasedGateControls(v:Boolean, e:Boolean) {
+		
+		var selectedActIsConditionGate:Boolean = (_canvasModel.selectedItem.activity.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE);
+		
+		if(!v) { _tool_output_gate_match_btn.visible = false; _conditions_setup_btn.visible = false; return; }
+		
+		toolActs_cmb.visible = v;
+		branchToolActs_lbl.visible = v;
+		
+		branchToolActs_lbl.visible = (selectedActIsConditionGate && v);
+		toolActs_cmb.visible = (selectedActIsConditionGate && v);
+		_conditions_setup_btn.visible = (selectedActIsConditionGate && (toolActs_cmb.selectedIndex > 0) && v);
+		_tool_output_gate_match_btn.visible = (selectedActIsConditionGate && (toolActs_cmb.selectedIndex > 0) && v);
+				
+		if (selectedActIsConditionGate) {
+			
+			toolActs_cmb.dataProvider = _canvasModel.getDownstreamActivities(ToolActivity, true);
+			
+			if(_canvasModel.selectedItem.activity.toolActivityUIID != null) {
+				var dp = toolActs_cmb.dataProvider;
+			
+				for(var i=0; i < dp.length; i++)
+					if(dp[i].data == _canvasModel.selectedItem.activity.toolActivityUIID)
+						toolActs_cmb.selectedIndex = i;
+						
+				if(toolActs_cmb.selectedIndex == 0) {
+					_canvasModel.selectedItem.activity.toolActivityUIID = null;
+					activityInputChange(_canvasModel.selectedItem, toolActs_cmb.dataProvider[0].data);
+				}
+			}
+			
+			if (toolActs_cmb.selectedIndex > 0) {
+			
+				_conditions_setup_btn.visible = v;
+				_tool_output_gate_match_btn.visible = v;
+			}			
+		}
+		else {
+			_conditions_setup_btn.visible = false;
+			_tool_output_gate_match_btn.visible = false;
+		}
+			
+		if(e != null) {
+			toolActs_cmb.enabled = e;
+			_tool_output_gate_match_btn.enabled = e;
+			_conditions_setup_btn.enabled = e;
+			
+			branchToolActs_lbl.enabled = e;
+			toolActs_cmb.enabled = e;
+		}
 	}
 	
 	private function showToolBasedBranchingControls(v:Boolean, e:Boolean) {
@@ -1222,6 +1312,14 @@ class PropertyInspectorControls extends MovieClip {
 
 	}
 	
+	private function onGateConditionMatchClick(evt:Object){
+		
+		_app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true, {title:Dictionary.getValue('map_gate_conditions_btn'), closeButton:true, resize:false, scrollContentPath:'GateConditionMatchingDialog'});
+		_app.dialog.addEventListener('contentLoaded', Delegate.create(this, GateConditionMatchDialogLoaded));
+		
+		setModified();
+	}
+	
 	private function onConditionsSetupClick(evt:Object){
 		// show tool outputs to branch mappings dialog
 		var ta:ToolActivity = ToolActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(_canvasModel.selectedItem.activity.toolActivityUIID));
@@ -1256,6 +1354,14 @@ class PropertyInspectorControls extends MovieClip {
 		evt.target.scrollContent.branchingActivity = BranchingActivity(_canvasModel.selectedItem.activity);
 		evt.target.scrollContent.conditions = conditions;
 		evt.target.scrollContent.sequences = getValidSequences(_canvasModel.getCanvas().ddm.getComplexActivityChildren(_canvasModel.selectedItem.activity.activityUIID));
+		evt.target.scrollContent.loadLists();
+	}
+	
+	private function GateConditionMatchDialogLoaded(evt:Object) {
+		var conditions:Array = _canvasModel.getCanvas().ddm.getAllConditionsForToolOutput(_canvasModel.selectedItem.activity);
+		evt.target.scrollContent.branchingActivity = null;
+		evt.target.scrollContent.gateActivity = GateActivity(_canvasModel.selectedItem.activity);
+		evt.target.scrollContent.conditions = conditions;
 		evt.target.scrollContent.loadLists();
 	}
 	

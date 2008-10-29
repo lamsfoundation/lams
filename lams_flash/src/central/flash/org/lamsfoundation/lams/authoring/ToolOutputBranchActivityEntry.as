@@ -26,17 +26,15 @@ import org.lamsfoundation.lams.authoring.*;
 /**
  *
  * @author Mitchell Seaton
- * @version 2.1
+ * @author Daniel Carlier
+ * @version 2.1.1
  **/
 class ToolOutputBranchActivityEntry extends BranchActivityEntry {
 	
 	private var _condition:ToolOutputCondition;
 	
 	function ToolOutputBranchActivityEntry(entryID:Number, entryUIID:Number, condition:ToolOutputCondition, sequenceActivity:SequenceActivity, branchingActivity:BranchingActivity){
-		this.entryID = entryID;
-		this.entryUIID = entryUIID;
-		this.sequenceActivity = sequenceActivity;
-		this.branchingActivity = branchingActivity;
+		super(entryID, entryUIID, sequenceActivity, branchingActivity);
 		
 		this.condition = condition;
 		this.condition.branchingActivity = branchingActivity;
@@ -66,5 +64,4 @@ class ToolOutputBranchActivityEntry extends BranchActivityEntry {
 	public function get displayName():String {
 		return _condition.displayName;
 	}
-	
 }

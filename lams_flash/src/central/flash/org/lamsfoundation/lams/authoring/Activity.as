@@ -92,6 +92,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var SYNCH_GATE_ACTIVITY_TYPE:Number = 3;
 	public static var SCHEDULE_GATE_ACTIVITY_TYPE:Number = 4;
 	public static var PERMISSION_GATE_ACTIVITY_TYPE:Number = 5;
+	public static var CONDITION_GATE_ACTIVITY_TYPE:Number = 14;
 	public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
 	public static var OPTIONAL_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
@@ -100,7 +101,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var GROUP_BRANCHING_ACTIVITY_TYPE:Number = 11;
 	public static var TOOL_BRANCHING_ACTIVITY_TYPE:Number = 12;
 	public static var OPTIONS_WITH_SEQUENCES_TYPE:Number = 13; 
-	
+
 	/******************************************************************/
 	
 	/**
@@ -207,6 +208,7 @@ class org.lamsfoundation.lams.authoring.Activity {
 	 */
 	public static function getGateActivityTypes():Array{
 		var types:Array = [];
+		types.addItem({label: Dictionary.getValue('branch_mapping_dlg_condition_col_lbl'), data: CONDITION_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('synch_act_lbl'), data: SYNCH_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('sched_act_lbl'), data: SCHEDULE_GATE_ACTIVITY_TYPE});
 		types.addItem({label: Dictionary.getValue('perm_act_lbl'), data: PERMISSION_GATE_ACTIVITY_TYPE});
@@ -237,6 +239,8 @@ class org.lamsfoundation.lams.authoring.Activity {
 		}else if (_activityTypeID == PERMISSION_GATE_ACTIVITY_TYPE){
 			return true;
 		}else if (_activityTypeID == SYSTEM_GATE_ACTIVITY_TYPE){
+			return true;
+		}else if (_activityTypeID == CONDITION_GATE_ACTIVITY_TYPE){
 			return true;
 		}else{
 			return false;
@@ -492,7 +496,9 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	public function get learningLibraryID():Number{
 		return _learningLibraryID;
-	}	public function set learningDesignID(a:Number):Void{
+	}
+
+	public function set learningDesignID(a:Number):Void{
 		_learningDesignID = a;
 	}
 	public function get learningDesignID():Number{

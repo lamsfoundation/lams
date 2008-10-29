@@ -26,32 +26,19 @@ import org.lamsfoundation.lams.authoring.*;
 /**
  *
  * @author Mitchell Seaton
- * @version 2.1
+ * @author Daniel Carlier
+ * @version 2.1.1
  **/
-class BranchActivityEntry   {
+class BranchActivityEntry extends ActivityEntry  {
 	
-	private var _entryID:Number;
-	private var _entryUIID:Number;
 	private var _sequenceActivity:SequenceActivity;
 	private var _branchingActivity:BranchingActivity;
 	
-	function BranchActivityEntry(){
-	}
-	
-	public function set entryID(a:Number) {
-		_entryID = a;
-	}
-	
-	public function get entryID():Number {
-		return _entryID;
-	}
-	
-	public function set entryUIID(a:Number) {
-		_entryUIID = a;
-	}
-	
-	public function get entryUIID():Number {
-		return _entryUIID;
+	function BranchActivityEntry(entryID:Number, entryUIID:Number, sequenceActivity:SequenceActivity, branchingActivity:BranchingActivity){
+		super(entryID, entryUIID);
+		
+		this.sequenceActivity = sequenceActivity;
+		this.branchingActivity = branchingActivity;
 	}
 	
 	public function set sequenceActivity(a:SequenceActivity) {

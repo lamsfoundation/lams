@@ -43,8 +43,11 @@ class ToolOutputCondition   {
 	private var _endValue:Object;
 	private var _exactMatchValue:Object;
 	
+	// the activity which takes the condition and uses it will either be a gate activity or a branching activity
+	private var _gateActivity:GateActivity;
 	private var _branchingActivity:BranchingActivity;
-	private var _toolActivity:ToolActivity;
+	
+	private var _toolActivity:ToolActivity; // the source of the condition
 	
 	private var _isDefault:Boolean;
 	
@@ -63,7 +66,7 @@ class ToolOutputCondition   {
 		_isDefault = false;
 	}
 	
-	public static function createBoolCondition(UIID:Number, definition:ToolOutputDefinition, toolActivity:ToolActivity, branchingActivity:BranchingActivity, value:Boolean):ToolOutputCondition {
+	public static function createBoolCondition(UIID:Number, definition:ToolOutputDefinition, toolActivity:ToolActivity, branchingActivity:BranchingActivity, gateActivity:GateActivity, value:Boolean):ToolOutputCondition {
 		var condition:ToolOutputCondition = new ToolOutputCondition();
 		condition.conditionUIID = UIID;
 		
@@ -73,13 +76,16 @@ class ToolOutputCondition   {
 			condition.displayName = definition.type + " (" + String(value) + ") ";
 			condition.exactMatchValue = value;
 			condition.toolActivity = toolActivity;
-			condition.branchingActivity = branchingActivity;
+			
+			// only one of these (branchingActivity/gateActivity) will be valid for a particular condition, might be an idea to abstact to activity later
+			condition.branchingActivity = branchingActivity; 
+			condition.gateActivity = gateActivity;
 		}
 		
 		return condition;
 	}
 	
-	public static function createLongCondition(UIID:Number, displayName:String, definition:ToolOutputDefinition, toolActivity:ToolActivity, branchingActivity:BranchingActivity, startValue:Number, endValue:Number):ToolOutputCondition {
+	public static function createLongCondition(UIID:Number, displayName:String, definition:ToolOutputDefinition, toolActivity:ToolActivity, branchingActivity:BranchingActivity, gateActivity:GateActivity, startValue:Number, endValue:Number):ToolOutputCondition {
 		var condition:ToolOutputCondition = new ToolOutputCondition();
 		condition.conditionUIID = UIID;
 		
@@ -97,6 +103,7 @@ class ToolOutputCondition   {
 			
 			condition.toolActivity = toolActivity;
 			condition.branchingActivity = branchingActivity;
+			condition.gateActivity = gateActivity;
 		}
 		
 		return condition;
@@ -223,6 +230,14 @@ class ToolOutputCondition   {
 	
 	public function get branchingActivity():BranchingActivity {
 		return _branchingActivity;
+	}
+	
+	public function set gateActivity(a:GateActivity) {
+		_gateActivity = a;
+	}
+	
+	public function get gateActivity():GateActivity {
+		return _gateActivity;
 	}
 
 	public function set isDefault(a:Boolean) {

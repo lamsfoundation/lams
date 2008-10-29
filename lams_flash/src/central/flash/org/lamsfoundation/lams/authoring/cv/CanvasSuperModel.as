@@ -169,6 +169,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		}			
 	}
 	
+	/*
+	* Gets all the tool activities that come before the activity from which this method was invoked
+	* @param: _class the activity type
+	* @param: _isBranching set true if you only want downstream activities with tool outputs
+	*/
 	public function getDownstreamActivities(_class, isBranching:Boolean):Array {
 		var _activity;
 		var _activityUIID:Number = selectedItem.activity.activityUIID;
