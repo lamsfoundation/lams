@@ -26,17 +26,16 @@ package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
-import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IBranchActivityEntryDAO;
 
 public class BranchActivityEntryDAO extends BaseDAO implements IBranchActivityEntryDAO {
 
     private final static String ENTRIES_FOR_LEARNING_DESIGN = "select entry from "
-	    + BranchActivityEntry.class.getName() + " entry, " + SequenceActivity.class.getName()
-	    + " sequenceActivity " + " where sequenceActivity.learningDesign.id = ? "
-	    + " and entry.branchSequenceActivity = sequenceActivity";
+	    + BranchActivityEntry.class.getName() + " entry, " + Activity.class.getName() + " branchingActivity "
+	    + " where branchingActivity.learningDesign.id = ? " + " and entry.branchingActivity = branchingActivity";
 
     private final static String CONDITION_BY_ID = "FROM " + BranchCondition.class.getName()
 	    + " con WHERE con.conditionId = ?";

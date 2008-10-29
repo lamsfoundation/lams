@@ -1626,10 +1626,15 @@ public class ObjectExtractor implements IObjectExtractor {
 	Iterator iter = oldbranchActivityEntryList.iterator();
 	while (iter.hasNext()) {
 	    BranchActivityEntry oldEntry = (BranchActivityEntry) iter.next();
+
 	    SequenceActivity sequenceActivity = oldEntry.getBranchSequenceActivity();
-	    if (sequenceActivity != null) {
+	    if (sequenceActivity == null) {
+		oldEntry.getBranchingActivity().getBranchActivityEntries().remove(oldEntry);
+
+	    } else {
 		sequenceActivity.getBranchEntries().remove(oldEntry);
 	    }
+
 	    Group group = oldEntry.getGroup();
 	    if (group != null) {
 		group.getBranchActivities().remove(oldEntry);
@@ -1653,7 +1658,14 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	Integer sequenceActivityUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_SEQUENCE_ACTIVITY_UIID);
-	Integer branchingActivityUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_ACTIVITY_UIID);
+	Boolean gateOpenWhenConditionMet = WDDXProcessor.convertToBoolean(details,
+		WDDXTAGS.BRANCH_GATE_OPENS_WHEN_CONDITION_MET);
+	Integer branchingActivityUIID = null;
+	if (gateOpenWhenConditionMet != null) {
+	    branchingActivityUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_GATE_ACTIVITY_UIID);
+	} else {
+	    branchingActivityUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_ACTIVITY_UIID);
+	}
 
 	Activity branchingActivity = newActivityMap.get(branchingActivityUIID);
 	if (branchingActivity == null) {
@@ -1694,12 +1706,15 @@ public class ObjectExtractor implements IObjectExtractor {
 	BranchActivityEntry uiid_match = null;
 	BranchActivityEntry id_match = null;
 	Iterator iter = null;
-	if (sequenceActivity != null) {
+	if (sequenceActivity == null) {
+	    ConditionGateActivity conditionGateActitivity = (ConditionGateActivity) branchingActivity;
+	    if (conditionGateActitivity.getBranchActivityEntries() != null) {
+		iter = conditionGateActitivity.getBranchActivityEntries().iterator();
+	    }
+	} else {
 	    if (sequenceActivity.getBranchEntries() != null) {
 		iter = sequenceActivity.getBranchEntries().iterator();
 	    }
-	} else {
-	    iter = ((ConditionGateActivity) branchingActivity).getOpeningGateBranchEntries().iterator();
 	}
 
 	if (iter != null) {
@@ -1740,7 +1755,8 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	if (entry == null) {
 	    if (condition != null) {
-		entry = condition.allocateBranchToCondition(entryUIID, sequenceActivity, branchingActivity);
+		entry = condition.allocateBranchToCondition(entryUIID, sequenceActivity, branchingActivity,
+			gateOpenWhenConditionMet);
 	    } else {
 		entry = group.allocateBranchToGroup(entryUIID, sequenceActivity, (BranchingActivity) branchingActivity);
 	    }
@@ -1748,11 +1764,19 @@ public class ObjectExtractor implements IObjectExtractor {
 	    entry.setEntryUIID(entryUIID);
 	    entry.setBranchSequenceActivity(sequenceActivity);
 	    entry.setBranchingActivity(branchingActivity);
+	    entry.setGateOpenWhenConditionMet(gateOpenWhenConditionMet);
 	}
 
 	entry.setGroup(group);
 	entry.setCondition(condition);
-	if (sequenceActivity != null) {
+
+	if (branchingActivity.isConditionGate()) {
+	    ConditionGateActivity conditionGateActitivity = (ConditionGateActivity) branchingActivity;
+	    if (conditionGateActitivity.getBranchActivityEntries() == null) {
+		conditionGateActitivity.setBranchActivityEntries(new HashSet());
+	    }
+	    conditionGateActitivity.getBranchActivityEntries().add(entry);
+	} else {
 	    if (sequenceActivity.getBranchEntries() == null) {
 		sequenceActivity.setBranchEntries(new HashSet());
 	    }

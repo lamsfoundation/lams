@@ -20,7 +20,11 @@
     
     <property name="entryUIID" type="java.lang.Integer" column="entry_ui_id" length="11">
 				        <meta attribute="field-description">@hibernate.property column="group_branch_activity_ui_id" length="11"</meta>    
-	</property>				
+	</property>	
+	
+	<property name="gateOpenWhenConditionMet" type="java.lang.Boolean" column="open_gate">
+				        <meta attribute="field-description">@hibernate.property column="open_gate"</meta>    
+	</property>			
     
     <!-- Associations -->
     <!-- bi-directional many-to-one association from Group -->

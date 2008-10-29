@@ -1076,15 +1076,16 @@ public class LearnerService implements ICoreLearnerService {
 
 	    if (toolSession != null) {
 
-		Set<BranchActivityEntry> openingGateConditions = conditionGate.getOpeningGateBranchEntries();
+		Set<BranchActivityEntry> branchEntries = conditionGate.getBranchActivityEntries();
 
 		// Go through each condition until we find one that passes and that opens the gate.
 		// Cache the tool output so that we aren't calling it over an over again.
 		Map<String, ToolOutput> toolOutputMap = new HashMap<String, ToolOutput>();
-		Iterator<BranchActivityEntry> conditionIterator = openingGateConditions.iterator();
+		Iterator<BranchActivityEntry> entryIterator = branchEntries.iterator();
 
-		while (!shouldOpenGate && conditionIterator.hasNext()) {
-		    BranchCondition condition = conditionIterator.next().getCondition();
+		while (entryIterator.hasNext()) {
+		    BranchActivityEntry entry = entryIterator.next();
+		    BranchCondition condition = entry.getCondition();
 		    String conditionName = condition.getName();
 		    ToolOutput toolOutput = toolOutputMap.get(conditionName);
 		    if (toolOutput == null) {
@@ -1103,10 +1104,14 @@ public class LearnerService implements ICoreLearnerService {
 		    }
 
 		    if (toolOutput != null && condition.isMet(toolOutput)) {
-			shouldOpenGate = true;
-			// save the learner to the "allowed to pass" list so we don't check the conditions over and over
-			// again (maybe we should??)
-			conditionGate.addLeaner(learner, true);
+			shouldOpenGate = entry.getGateOpenWhenConditionMet();
+			if (shouldOpenGate) {
+			    // save the learner to the "allowed to pass" list so we don't check the conditions over and
+			    // over
+			    // again (maybe we should??)
+			    conditionGate.addLeaner(learner, true);
+			}
+			break;
 		    }
 		}
 	    }

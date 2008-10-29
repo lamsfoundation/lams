@@ -112,6 +112,7 @@ import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ToolOutputBranchActivityEntryDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ToolOutputGateActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.tool.SystemTool;
@@ -2216,11 +2217,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Map<Integer, Group> groupByUIIDMapper, Map<Integer, Activity> activityByUIIDMapper) {
 
 	SequenceActivity branch = (SequenceActivity) activityByUIIDMapper.get(entryDto.getSequenceActivityUIID());
-	if (branch == null) {
-	    log.error("Unable to find matching sequence activity for group to branch mapping " + entryDto
-		    + " Skipping entry");
-	    return null;
-	}
 
 	Activity branchingActivity = activityByUIIDMapper.get(entryDto.getBranchingActivityUIID());
 	if (branchingActivity == null) {
@@ -2232,26 +2228,38 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	Group group = groupByUIIDMapper.get(entryDto.getGroupUIID());
 
 	BranchCondition condition = null;
+	Boolean gateOpenWhenConditionMet = null;
 	if (entryDto instanceof ToolOutputBranchActivityEntryDTO) {
 	    BranchConditionDTO dto = ((ToolOutputBranchActivityEntryDTO) entryDto).getCondition();
 	    if (dto != null) {
 		condition = new BranchCondition(dto);
 		condition.setConditionId(null);
 	    }
+	    if (entryDto instanceof ToolOutputGateActivityEntryDTO) {
+		gateOpenWhenConditionMet = ((ToolOutputGateActivityEntryDTO) entryDto).getGateOpenWhenConditionMet();
+	    }
 	}
 
 	BranchActivityEntry entry = null;
 	if (condition != null) {
-	    entry = condition.allocateBranchToCondition(entryDto.getEntryUIID(), branch, branchingActivity);
+	    entry = condition.allocateBranchToCondition(entryDto.getEntryUIID(), branch, branchingActivity,
+		    gateOpenWhenConditionMet);
 	} else if (group != null) {
 	    entry = group.allocateBranchToGroup(entryDto.getEntryUIID(), branch, (BranchingActivity) branchingActivity);
 	}
 
 	if (entry != null) {
-	    if (branch.getBranchEntries() == null) {
-		branch.setBranchEntries(new HashSet());
+	    if (branch == null) {
+		if (branchingActivity.getBranchActivityEntries() == null) {
+		    branchingActivity.setBranchActivityEntries(new HashSet());
+		}
+		branchingActivity.getBranchActivityEntries().add(entry);
+	    } else {
+		if (branch.getBranchEntries() == null) {
+		    branch.setBranchEntries(new HashSet());
+		}
+		branch.getBranchEntries().add(entry);
 	    }
-	    branch.getBranchEntries().add(entry);
 	    return entry;
 	} else {
 	    log.error("Unable to find group or condition for branch mapping " + entryDto + " Skipping entry");

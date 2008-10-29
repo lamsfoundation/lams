@@ -1,6 +1,7 @@
 <c:set var="formAction" value="/gate?method=knockGate&activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }"/>
-
-<p><fmt:message key="label.gate.refresh.message"/></p>
+<c:if test="${GateForm.map.monitorCanOpenGate}">
+	<p><fmt:message key="label.gate.refresh.message"/></p>
+</c:if>
 
 <c:if test="${GateForm.map.previewLesson == true}">
 	<p>&nbsp;</p>

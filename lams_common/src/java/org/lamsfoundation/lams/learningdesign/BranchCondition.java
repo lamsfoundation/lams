@@ -209,8 +209,9 @@ public class BranchCondition implements Comparable {
      * populated if this is called from authoring
      */
     public BranchActivityEntry allocateBranchToCondition(Integer entryUIID, SequenceActivity branch,
-	    Activity outputBasedActivity) {
-	BranchActivityEntry entry = new BranchActivityEntry(null, entryUIID, branch, outputBasedActivity, this);
+	    Activity outputBasedActivity, Boolean gateOpenWhenConditionMet) {
+	BranchActivityEntry entry = new BranchActivityEntry(null, entryUIID, branch, outputBasedActivity, this,
+		gateOpenWhenConditionMet);
 	return entry;
     }
 

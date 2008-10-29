@@ -41,3 +41,14 @@ CREATE TABLE lams_lesson (
        learner_presence_avail TINYINT(1) DEFAULT 0
      , learner_im_avail TINYINT(1) DEFAULT 0
 )TYPE=InnoDB;
+
+-- LDEV-1299 - Instead of mapping the conditions that open a gate to fictional sequences, there is only a boolean value ------------- 
+ALTER TABLE lams_branch_activity_entry ADD COLUMN open_gate TINYINT;
+INSERT INTO lams_learning_activity_type VALUES (14, 'GATE_CONDITION');
+INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
+	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
+	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met', 
+	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
+	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
+	'monitoring/gate.do?method=viewGate', now()	);

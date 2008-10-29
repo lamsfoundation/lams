@@ -315,7 +315,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 	} else if (activity.isToolActivity()) {
 	    addToolActivityAttributes((ToolActivity) activity);
 	} else if (activity.isGateActivity()) {
-	    addGateActivityAttributes(activity);
+	    addGateActivityAttributes(activity, branchMappings);
 	} else {
 	    addComplexActivityAttributes(activity, branchMappings);
 	}
@@ -369,7 +369,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 	    ArrayList<BranchActivityEntryDTO> branchMappings) {
 
 	Activity parentActivity = activity.getParentActivity();
-	Integer toolActivityUIID = parentActivity != null ? parentActivity.getToolInputActivityUIID() : null;
+	Integer toolActivityUIID = parentActivity == null ? null : parentActivity.getToolInputActivityUIID();
 
 	Iterator iter = activity.getBranchEntries().iterator();
 	while (iter.hasNext()) {
@@ -406,13 +406,13 @@ public class AuthoringActivityDTO extends BaseDTO {
 	}
     }
 
-    private void addGateActivityAttributes(Object activity) {
+    private void addGateActivityAttributes(Object activity, ArrayList<BranchActivityEntryDTO> branchMappings) {
 	if (activity instanceof SynchGateActivity) {
 	    addSynchGateActivityAttributes((SynchGateActivity) activity);
 	} else if (activity instanceof PermissionGateActivity) {
 	    addPermissionGateActivityAttributes((PermissionGateActivity) activity);
 	} else if (activity instanceof ConditionGateActivity) {
-	    addConditionGateActivityAttributes((ConditionGateActivity) activity);
+	    addConditionGateActivityAttributes((ConditionGateActivity) activity, branchMappings);
 	} else if (activity instanceof SystemGateActivity) {
 	    addSystemGateActivityAttributes((SystemGateActivity) activity);
 	} else {
@@ -425,7 +425,13 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     }
 
-    private void addConditionGateActivityAttributes(ConditionGateActivity activity) {
+    private void addConditionGateActivityAttributes(ConditionGateActivity activity,
+	    ArrayList<BranchActivityEntryDTO> branchMappings) {
+	Iterator iter = activity.getBranchActivityEntries().iterator();
+	while (iter.hasNext()) {
+	    BranchActivityEntry ba = (BranchActivityEntry) iter.next();
+	    branchMappings.add(ba.getBranchActivityEntryDTO(toolActivityUIID));
+	}
     }
 
     private void addSynchGateActivityAttributes(SynchGateActivity activity) {
