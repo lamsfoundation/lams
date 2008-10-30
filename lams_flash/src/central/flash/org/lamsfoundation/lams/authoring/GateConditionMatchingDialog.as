@@ -106,7 +106,7 @@ class GateConditionMatchingDialog extends BranchMappingDialog {
 		
 		var gateStates:Array = new Array();
 		var openState:ObjState = new ObjState(Dictionary.getValue("gate_open"), "open");
-		var closedState:ObjState = new ObjState(Dictionary.getValue("gate_closed"), "closed");
+		var closedState:ObjState = new ObjState(Dictionary.getValue("gate_closed")+" ("+Dictionary.getValue('pi_defaultBranch_cb_lbl')+")", "closed");
 		
 		gateStates.push(openState);
 		gateStates.push(closedState);
