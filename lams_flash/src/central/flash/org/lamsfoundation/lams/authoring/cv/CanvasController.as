@@ -505,6 +505,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			}else{
 				_canvasModel.selectedItem = ca;
 				if(ca.activity.activityTypeID == Activity.GROUPING_ACTIVITY_TYPE || 
+				   ca.activity.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE || 
 				   ca.activity.activityTypeID == Activity.SYNCH_GATE_ACTIVITY_TYPE || 
 				   ca.activity.activityTypeID == Activity.SCHEDULE_GATE_ACTIVITY_TYPE || 
 				   ca.activity.activityTypeID == Activity.PERMISSION_GATE_ACTIVITY_TYPE || 
