@@ -26,7 +26,8 @@ import org.lamsfoundation.lams.authoring.*;
 /**
  *
  * @author Mitchell Seaton
- * @version 2.1
+ * @author Daniel Carlier
+ * @version 2.1.1
  **/
 class ToolOutputDefinition  {
 	
@@ -34,6 +35,7 @@ class ToolOutputDefinition  {
 	public static var BOOL:String = "OUTPUT_BOOLEAN";
 	public static var USER_DEFINED:String = "OUTPUT_SET_BOOLEAN";
 	public static var COMPLEX:String = "OUTPUT_COMPLEX";
+	public static var STRING:String = "OUTPUT_STRING";
 	
 	private var _name:String;
 	private var _description:String;

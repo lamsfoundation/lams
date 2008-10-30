@@ -419,7 +419,10 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				break;
 			case ToolOutputDefinition.COMPLEX:
 				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition, orderID: condition.orderID});
-				break;	
+				break;
+			case ToolOutputDefinition.STRING:
+				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition, orderID: condition.orderID});
+				break;			
 			case ToolOutputDefinition.USER_DEFINED:
 				_condition_item_dgd.addItem({conditionName: condition.displayName, conditionValue: String(condition.exactMatchValue), data: condition, orderID: condition.orderID});
 				break;
@@ -471,6 +474,8 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 			case ToolOutputDefinition.BOOL:
 				return true;
 			case ToolOutputDefinition.COMPLEX:
+				return true;
+			case ToolOutputDefinition.STRING:
 				return true;
 			case ToolOutputDefinition.USER_DEFINED:
 				return true;
@@ -666,6 +671,21 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				
 				addDefaultConditions(_selectedDefinition.defaultConditions); // _selectedDefinition object the same when working/not working
 				break;
+			case ToolOutputDefinition.STRING:
+				_condition_item_dgd.visible = true;
+				_toolOutputLongOptions_cmb.visible = false;
+				
+				add_btn.visible = false;
+				remove_item_btn.visible = false;
+				clear_all_btn.visible = false;
+				
+				refresh_btn.visible = true;
+				
+				showSteppers(false, false);
+				
+				addDefaultConditions(_selectedDefinition.defaultConditions);
+				
+				break;
 			case ToolOutputDefinition.USER_DEFINED:
 				_condition_item_dgd.visible = true;
 				_toolOutputLongOptions_cmb.visible = false;
@@ -769,6 +789,10 @@ class ToolOutputConditionsDialog extends MovieClip implements Dialog {
 				break;
 			case ToolOutputDefinition.LONG:
 				return Dictionary.getValue("to_conditions_dlg_defin_long_type");
+				break;
+			case ToolOutputDefinition.STRING:
+				//return Dictionary.getValue("to_conditions_dlg_defin_string_type");
+				return Dictionary.getValue("to_conditions_dlg_defin_user_defined_type");
 				break;
 			case ToolOutputDefinition.USER_DEFINED:
 				return Dictionary.getValue("to_conditions_dlg_defin_user_defined_type");
