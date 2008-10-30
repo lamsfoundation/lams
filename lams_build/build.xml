@@ -406,6 +406,13 @@
 
 		<ant antfile="../${lams_common}/build.xml" target="copy-shared-session-jar" inheritAll="false"/>
 		<ant antfile="../${lams_common}/build.xml" target="copy-lams-valve-jar" inheritAll="false"/>
+		<copy overwrite="yes" todir="${jboss.server.instance.lib}">	
+			<fileset dir="${lib}/jboss">
+				<include name="jboss-cache.jar" />
+				<include name="jgroups.jar" />
+				<include name="jboss-serialization.jar" />
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="test-report" description="Run all the test cases across the system. Takes a long time.">
