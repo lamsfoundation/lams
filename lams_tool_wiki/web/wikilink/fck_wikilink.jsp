@@ -114,7 +114,7 @@ function Ok()
 							var i;
 							for (i=0; i<wikiArray.length; ++i) 
 							{	
-								var wikiURL="javascript:changeWikiPage(\'" + wikiArray[i] + "\')";
+								var wikiURL="javascript:changeWikiPage(&quot;" + wikiArray[i] + "&quot;)";
 								addOption(document.getElementById('existingWikiDropDownMenu'), prettyWikiLink(wikiArray[i]), wikiURL);
 							}
 						//-->		
