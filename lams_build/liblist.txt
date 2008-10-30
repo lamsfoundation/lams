@@ -35,11 +35,12 @@ jakarta-poi       poi-2.5.1-final-20040804.jar          2.5.1-final-20040804
 
 jakarta-taglibs   standard.jar                          1.1.2                                                Apache Software Foundation       JavaServer Pages Standard Tag Library (JSTL)
 
-jboss             jboss-cache.jar                       4.0.2                                                JBoss Inc.                       JBoss
+jboss             jboss-cache.jar                       1.4.1.SP9                                            JBoss Inc.                       JBoss
                   jboss-common.jar                      4.0.2                                                JBoss Inc.                       JBoss
                   jboss-jmx.jar                         4.0.2                                                JBoss Inc.                       JBoss
                   jboss-system.jar                      4.0.2                                                JBoss Inc.                       JBoss
-                  jgroups.jar                           4.0.2                                                JBoss Inc.                       JBoss
+                  jgroups.jar                           1.4.1.SP9                                            JBoss Inc.                       JBoss
+                  jboss-serialization.jar				1.4.1.SP9											 JBoss Inc.						  JBoss
 
 jdom              jdom.jar                                                                                                                    
 

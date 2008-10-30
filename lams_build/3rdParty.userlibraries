@@ -31,6 +31,7 @@
 <archive path="/lams_build/lib/jboss/jboss-system.jar"/>
 <archive path="/lams_build/lib/jboss/jboss-common.jar"/>
 <archive path="/lams_build/lib/jboss/jgroups.jar"/>
+<archive path="/lams_build/lib/jboss/jboss-serialization.jar"/>
 <archive path="/lams_build/lib/jdom/jdom.jar"/>
 <archive path="/lams_build/lib/junit/junit.jar"/>
 <archive path="/lams_build/lib/jfreechart/gnujaxp.jar"/>
