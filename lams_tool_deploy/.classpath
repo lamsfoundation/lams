@@ -14,5 +14,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jakarta-commmons/commons-collections.jar"/>
 	<classpathentry kind="lib" path="lib/xstream/xstream-1.1.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

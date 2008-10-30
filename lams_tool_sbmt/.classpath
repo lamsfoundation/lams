@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
-	<classpathentry output="build/classes/test/java" kind="src" path="test/java"/>
+	<classpathentry kind="src" output="build/classes/test/java" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-learning.jar"/>
-	<classpathentry sourcepath="/lams_central/src" kind="lib" path="/lams_build/lib/lams/lams-central.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jsp.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>
