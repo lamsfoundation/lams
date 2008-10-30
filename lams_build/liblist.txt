@@ -40,7 +40,7 @@ jboss             jboss-cache.jar                       1.4.1.SP9               
                   jboss-jmx.jar                         4.0.2                                                JBoss Inc.                       JBoss
                   jboss-system.jar                      4.0.2                                                JBoss Inc.                       JBoss
                   jgroups.jar                           1.4.1.SP9                                            JBoss Inc.                       JBoss
-                  jboss-serialization.jar				1.4.1.SP9											 JBoss Inc.						  JBoss
+                  jboss-serialization.jar				1.0.3.GA											 JBoss Inc.						  JBoss
 
 jdom              jdom.jar                                                                                                                    
 
