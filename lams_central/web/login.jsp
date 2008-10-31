@@ -36,11 +36,7 @@ j_security_login_page
 	<lams:css  style="core"/>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<script language="javascript" type="text/javascript" src="includes/javascript/flash_detect.js">
-		<!--
-		function getFlashVersion() { return null; };
-		//-->
-	</script>
+	<script language="javascript" type="text/javascript" src="includes/javascript/AC_OETags.js"></script>
 	<script language="javascript" type="text/javascript" src="includes/javascript/browser_detect.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/sha1.js"></script>
 	<script>
@@ -79,15 +75,18 @@ j_security_login_page
 			    <h1><img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt="LAMS - Learning Activity Management System" /></h1>
 			  	<!--Test if the browsers flash player meets requirements-->
 			  	<script language="JavaScript" type="text/javascript">
-			  		<!--
-						var minimumFlashVersion = 7;
-						var flashVersion = getFlashVersion();
-						if(flashVersion < minimumFlashVersion) {
+			  		<!--			  		
+						var minFlashMajorVersion = 7; // Major version of Flash required
+						var minFlashMinorVersion = 0; // Minor version of Flash required
+						var minFlashRevision = 0; // Minor version of Flash required
+						
+						var hasRequiredFlashVersion = DetectFlashVer(minFlashMajorVersion, minFlashMinorVersion, minFlashRevision);
+						
+						if (!hasRequiredFlashVersion) {
 							// show error message
 							document.write('<div class=\"warning\"><fmt:message key="flash.min.error"/>');
-							document.write('<br><a href=\"http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash\" target=\"_blank\"><fmt:message key="flash.download.player"/></a></div>');
+							document.write('<br>It worked<a href=\"http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash\" target=\"_blank\"><fmt:message key="flash.download.player"/></a></div>');
 						}
-						
 						
 						if(isBrowserNotCompatable()) {
 							// incompatable browser - show warning message
