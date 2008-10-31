@@ -182,7 +182,7 @@
             name="conditions"
             lazy="true"
             cascade="all"
-            sort="unsorted"
+            sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
         >
 
             <key

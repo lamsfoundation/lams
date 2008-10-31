@@ -8,3 +8,5 @@ CREATE TABLE tl_lantbk11_conditions (
 	 , CONSTRAINT NotebookConditionToNotebook FOREIGN KEY (content_uid)
                   REFERENCES tl_lantbk11_notebook(uid) ON DELETE CASCADE ON UPDATE CASCADE
 )TYPE=InnoDB;
+
+UPDATE lams_tool SET supports_outputs=1 WHERE tool_signature='lantbk11';

@@ -18,6 +18,10 @@
       type="org.lamsfoundation.lams.tool.notebook.web.forms.MonitoringForm"
     />
     <form-bean
+      name="notebookConditionForm"
+      type="org.lamsfoundation.lams.tool.notebook.web.forms.NotebookConditionForm"
+    />
+    <form-bean
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.notebook.web.forms.AuthoringForm"
     />
@@ -114,7 +118,46 @@
       />
     </action>
 
-    <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+   <action path="/authoring/newConditionInit"
+	type="org.lamsfoundation.lams.tool.notebook.web.actions.AuthoringNotebookConditionAction"
+	name="notebookConditionForm" 
+	scope="request" 
+	validate="false"			
+	parameter="newConditionInit">
+	<forward name="addcondition" path="/pages/authoring/addCondition.jsp" />
+</action>
+<action path="/authoring/editCondition"
+	type="org.lamsfoundation.lams.tool.notebook.web.actions.AuthoringNotebookConditionAction"
+	name="notebookConditionForm" 
+	scope="request" 
+	parameter="editCondition" 
+	validate="false">
+	<forward name="addcondition" path="/pages/authoring/addCondition.jsp" />
+</action>
+<action path="/authoring/saveOrUpdateCondition"
+	type="org.lamsfoundation.lams.tool.notebook.web.actions.AuthoringNotebookConditionAction"
+	parameter="saveOrUpdateCondition"
+	name="notebookConditionForm" 
+	scope="request" 
+	validate="false">
+	<forward name="addcondition" path="/pages/authoring/addCondition.jsp" />
+	<forward name="success" path="/pages/authoring/conditionList.jsp" />
+</action>
+<action path="/authoring/removeCondition"
+	type="org.lamsfoundation.lams.tool.notebook.web.actions.AuthoringNotebookConditionAction"
+	parameter="removeCondition">
+	<forward name="success" path="/pages/authoring/conditionList.jsp" />
+</action>
+<action path="/authoring/upCondition"
+	type="org.lamsfoundation.lams.tool.notebook.web.actions.AuthoringNotebookConditionAction"
+	parameter="upCondition">
+	<forward name="success" path="/pages/authoring/conditionList.jsp" />
+</action>
+<action path="/authoring/downCondition"
+	type="org.lamsfoundation.lams.tool.notebook.web.actions.AuthoringNotebookConditionAction"
+	parameter="downCondition">
+	<forward name="success" path="/pages/authoring/conditionList.jsp" />
+</action>
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

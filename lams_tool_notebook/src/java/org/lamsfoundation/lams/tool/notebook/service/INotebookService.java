@@ -161,7 +161,17 @@ public interface INotebookService {
      */
     void updateEntry(Long uid, String entry);
 
+    /**
+     * Creates an unique name for a ChatCondition. It consists of the tool output definition name and a unique positive
+     * integer number.
+     * 
+     * @param existingConditions
+     *                existing conditions; required to check if a condition with the same name does not exist.
+     * @return unique ChatCondition name
+     */
     String createConditionName(Collection<NotebookCondition> existingConditions);
 
     void releaseConditionsFromCache(Notebook notebook);
+
+    void deleteCondition(NotebookCondition condition);
 }

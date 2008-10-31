@@ -66,8 +66,8 @@ public class NotebookOutputFactory extends OutputFactory {
 			.getToolContentId().toString());
 		// Default condition checks if the text contains word "LAMS"
 		NotebookCondition defaultCondition = new NotebookCondition(null, null, 1, name, getI18NText(
-			NotebookConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "OUTPUT_STRING",
-			null, null, null, "LAMS", null, null, null);
+			NotebookConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
+			null);
 		notebook.getConditions().add(defaultCondition);
 		notebookEntryDefinition.getDefaultConditions().add(defaultCondition);
 	    }
@@ -79,7 +79,7 @@ public class NotebookOutputFactory extends OutputFactory {
     }
 
     /**
-     * Follows {@link QaServicePOJO#getToolOutput(List, Long, Long)}.
+     * Follows {@link NotebookService#getToolOutput(List, Long, Long)}.
      * 
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, INotebookService notebookService,
@@ -90,8 +90,8 @@ public class NotebookOutputFactory extends OutputFactory {
 	ToolOutput notebookEntryOutput = null;
 	if (names == null) {
 	    // output will be set for all the existing conditions
-	    Notebook qaContent = notebookService.getSessionBySessionId(toolSessionId).getNotebook();
-	    Set<NotebookCondition> conditions = qaContent.getConditions();
+	    Notebook notebook = notebookService.getSessionBySessionId(toolSessionId).getNotebook();
+	    Set<NotebookCondition> conditions = notebook.getConditions();
 	    for (NotebookCondition condition : conditions) {
 		String name = condition.getName();
 		if (isTextSearchConditionName(name) && notebookEntryOutput != null) {
@@ -100,7 +100,7 @@ public class NotebookOutputFactory extends OutputFactory {
 		    ToolOutput output = getToolOutput(name, notebookService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+			if (isTextSearchConditionName(name)) {
 			    notebookEntryOutput = output;
 			}
 		    }
@@ -114,7 +114,7 @@ public class NotebookOutputFactory extends OutputFactory {
 		    ToolOutput output = getToolOutput(name, notebookService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+			if (isTextSearchConditionName(name)) {
 			    notebookEntryOutput = output;
 			}
 		    }
@@ -125,13 +125,13 @@ public class NotebookOutputFactory extends OutputFactory {
 
     }
 
-    public ToolOutput getToolOutput(String name, INotebookService qaService, Long toolSessionId, Long learnerId) {
-	if (isTextSearchConditionName(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME)) {
+    public ToolOutput getToolOutput(String name, INotebookService chatService, Long toolSessionId, Long learnerId) {
+	if (isTextSearchConditionName(name)) {
 	    // entry is loaded from DB
-	    Notebook taskList = qaService.getSessionBySessionId(toolSessionId).getNotebook();
+	    Notebook notebook = chatService.getSessionBySessionId(toolSessionId).getNotebook();
 
-	    NotebookUser user = qaService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
-	    NotebookEntry entry = qaService.getEntry(user.getEntryUID());
+	    NotebookUser user = chatService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	    NotebookEntry entry = chatService.getEntry(user.getEntryUID());
 
 	    String value = entry == null ? null : entry.getEntry();
 

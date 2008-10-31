@@ -40,10 +40,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
-import org.lamsfoundation.lams.tool.notebook.util.NotebookConditionComparator;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.notebook.web.forms.AuthoringForm;
@@ -199,6 +199,11 @@ public class AuthoringNotebookConditionAction extends Action {
 	    SortedSet<NotebookCondition> conditionSet = getNotebookConditionSet(sessionMap);
 	    List<NotebookCondition> conditionList = new ArrayList<NotebookCondition>(conditionSet);
 	    NotebookCondition condition = conditionList.remove(orderId);
+	    for (NotebookCondition otherCondition : conditionSet) {
+		if (otherCondition.getOrderId() > orderId) {
+		    otherCondition.setOrderId(otherCondition.getOrderId() - 1);
+		}
+	    }
 	    conditionSet.clear();
 	    conditionSet.addAll(conditionList);
 	    // add to delList
@@ -282,7 +287,7 @@ public class AuthoringNotebookConditionAction extends Action {
 	SortedSet<NotebookCondition> set = (SortedSet<NotebookCondition>) sessionMap
 		.get(NotebookConstants.ATTR_CONDITION_SET);
 	if (set == null) {
-	    set = new TreeSet<NotebookCondition>(new NotebookConditionComparator());
+	    set = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
 	    sessionMap.put(NotebookConstants.ATTR_CONDITION_SET, set);
 	}
 	return set;

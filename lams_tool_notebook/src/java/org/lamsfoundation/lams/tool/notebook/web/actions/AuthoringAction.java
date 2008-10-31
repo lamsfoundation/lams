@@ -46,13 +46,13 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookAttachment;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
-import org.lamsfoundation.lams.tool.notebook.util.NotebookConditionComparator;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
@@ -177,7 +177,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	Set<NotebookCondition> conditions = notebook.getConditions();
 	if (conditions == null) {
-	    conditions = new TreeSet<NotebookCondition>(new NotebookConditionComparator());
+	    conditions = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
 	}
 	SortedSet<NotebookCondition> conditionSet = (SortedSet<NotebookCondition>) map
 		.get(NotebookConstants.ATTR_CONDITION_SET);
@@ -189,6 +189,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    for (NotebookCondition condition : deletedConditionList) {
 		// remove from db, leave in repository
 		conditions.remove(condition);
+		notebookService.deleteCondition(condition);
 	    }
 	}
 
@@ -432,7 +433,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    }
 	}
 
-	SortedSet<NotebookCondition> set = new TreeSet<NotebookCondition>(new NotebookConditionComparator());
+	SortedSet<NotebookCondition> set = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
 
 	if (notebook.getConditions() != null) {
 	    set.addAll(notebook.getConditions());
@@ -479,5 +480,21 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request, AuthoringForm authForm) {
 	return (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
+    }
+
+    /**
+     * Lists deleted Notebook conditions, which could be persisted or non-persisted items.
+     * 
+     * @param request
+     * @return
+     */
+    private List getDeletedNotebookConditionList(SessionMap sessionMap) {
+	List list = (List) sessionMap.get(NotebookConstants.ATTR_DELETED_CONDITION_LIST);
+	if (list == null) {
+	    list = new ArrayList();
+	    sessionMap.put(NotebookConstants.ATTR_DELETED_CONDITION_LIST, list);
+	}
+	return list;
+
     }
 }

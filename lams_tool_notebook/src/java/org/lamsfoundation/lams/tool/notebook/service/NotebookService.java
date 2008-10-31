@@ -651,4 +651,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	    }
 	}
     }
+
+    public void deleteCondition(NotebookCondition condition) {
+	if (condition != null && condition.getConditionId() != null) {
+	    notebookDAO.delete(condition);
+	}
+    }
 }

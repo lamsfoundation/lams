@@ -32,8 +32,8 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookService;
-import org.lamsfoundation.lams.tool.notebook.util.NotebookConditionComparator;
 
 /**
  * @hibernate.class table="tl_lantbk11_notebook"
@@ -84,7 +84,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 
     private Set notebookSessions;
 
-    private Set<NotebookCondition> conditions = new TreeSet<NotebookCondition>(new NotebookConditionComparator());
+    private Set<NotebookCondition> conditions = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
 
     // *********** NON Persisit fields
     private IToolContentHandler toolContentHandler;
@@ -330,6 +330,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.set lazy="true" cascade="all"
+     *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
      * @hibernate.collection-key column="content_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.notebook.model.NotebookCondition"
      * 
@@ -417,7 +418,7 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	    notebook.notebookSessions = new HashSet();
 
 	    if (conditions != null) {
-		Set<NotebookCondition> set = new TreeSet<NotebookCondition>(new NotebookConditionComparator());
+		Set<NotebookCondition> set = new TreeSet<NotebookCondition>(new TextSearchConditionComparator());
 		for (NotebookCondition condition : conditions) {
 		    set.add((NotebookCondition) condition.clone());
 		}

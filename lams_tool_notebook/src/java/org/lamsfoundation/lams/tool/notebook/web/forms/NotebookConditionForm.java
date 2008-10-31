@@ -4,7 +4,7 @@ import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.web.TextSearchActionForm;
 
 /**
- * A text search form with additional parameters for Q&A needs.
+ * A text search form with additional parameters for Notebook needs.
  * 
  * @author Marcin Cieslak
  * @struts.form name="notebookConditionForm"
@@ -46,8 +46,8 @@ public class NotebookConditionForm extends TextSearchActionForm {
      * @return created condition
      */
     public NotebookCondition extractCondition() {
-	return new NotebookCondition(null, null, getOrderId(), null, getDisplayName(), "OUTPUT_STRING", null, null,
-		null, getAllWords(), getPhrase(), getAnyWords(), getExcludedWords());
+	return new NotebookCondition(null, null, getOrderId(), null, getDisplayName(), getAllWords(), getPhrase(),
+		getAnyWords(), getExcludedWords());
     }
 
     public void extractCondition(NotebookCondition condition) {
