@@ -91,9 +91,6 @@
 			<c:forEach var="wikiPage" items="${wikiPages}">
 				<a href="javascript:changeWikiPage('${wikiPage.javaScriptTitle}')">
 					${wikiPage.title}
-					<c:if test="${wikiPage.title == mainWikiPage.title}">
-						<fmt:message key="label.wiki.main"></fmt:message>
-					</c:if>
 				</a><br />
 			</c:forEach>
 		
