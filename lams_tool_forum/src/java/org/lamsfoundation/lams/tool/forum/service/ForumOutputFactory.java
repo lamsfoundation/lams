@@ -67,23 +67,9 @@ public class ForumOutputFactory extends OutputFactory {
 	    Forum forum = (Forum) toolContentObject;
 	    // adding all existing conditions
 	    chosenTopicAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));
-	    // if no conditions were created in the tool instance, a default condition is added; the condition is
-	    // persisted in ForumService.
+	    // if no conditions were created in the tool instance, a default condition is added;
 	    if (chosenTopicAnswersDefinition.getDefaultConditions().isEmpty() && !forum.getMessages().isEmpty()) {
-		Set<Message> messages = new HashSet<Message>();
-		for (Message message : (Set<Message>) forum.getMessages()) {
-		    if (message.getIsAuthored()) {
-			messages.add(message);
-			break;
-		    }
-		}
-
-		String name = buildConditionName(ForumConstants.TEXT_SEARCH_DEFINITION_NAME, forum.getContentId()
-			.toString());
-		// Default condition checks if the answers for the first topic contain word "LAMS"
-		ForumCondition defaultCondition = new ForumCondition(null, null, 1, name, getI18NText(
-			ForumConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
-			null, messages);
+		ForumCondition defaultCondition = createDefaultComplexCondition(forum);
 		forum.getConditions().add(defaultCondition);
 		chosenTopicAnswersDefinition.getDefaultConditions().add(defaultCondition);
 	    }
@@ -201,5 +187,32 @@ public class ForumOutputFactory extends OutputFactory {
 
     private boolean isTextSearchConditionName(String name) {
 	return name != null && name.startsWith(ForumConstants.TEXT_SEARCH_DEFINITION_NAME);
+    }
+
+    /**
+     * Creates a default condition so teachers know how to use complex conditions for this tool.
+     * 
+     * @param forum
+     *                content of the tool
+     * @return default Forum condition
+     */
+    protected ForumCondition createDefaultComplexCondition(Forum forum) {
+
+	if (forum.getMessages().isEmpty()) {
+	    return null;
+	}
+	Set<Message> messages = new HashSet<Message>();
+	for (Message message : (Set<Message>) forum.getMessages()) {
+	    if (message.getIsAuthored()) {
+		messages.add(message);
+		break;
+	    }
+	}
+
+	String name = buildConditionName(ForumConstants.TEXT_SEARCH_DEFINITION_NAME, forum.getContentId().toString());
+	// Default condition checks if the answers for the first topic contain word "LAMS"
+	return new ForumCondition(null, null, 1, name, getI18NText(
+		ForumConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null,
+		messages);
     }
 }

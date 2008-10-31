@@ -63,17 +63,10 @@ public class QaOutputFactory extends OutputFactory {
 	    QaContent qaContent = (QaContent) toolContentObject;
 	    // adding all existing conditions
 	    allAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
-	    // if no conditions were created in the tool instance, a default condition is added; the condition is
-	    // persisted in QaService.
+	    // if no conditions were created in the tool instance, a default condition is added;
 	    if (allAnswersDefinition.getDefaultConditions().isEmpty() && !qaContent.getQaQueContents().isEmpty()) {
-		Set<QaQueContent> questions = new HashSet<QaQueContent>();
-		questions.add((QaQueContent) qaContent.getQaQueContents().iterator().next());
-		String name = buildConditionName(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME, qaContent.getQaContentId()
-			.toString());
-		// Default condition checks if the first answer contains word "LAMS"
-		QaCondition defaultCondition = new QaCondition(null, null, 1, name, getI18NText(
-			QaAppConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
-			null, questions);
+
+		QaCondition defaultCondition = createDefaultComplexCondition(qaContent);
 		qaContent.getConditions().add(defaultCondition);
 
 		allAnswersDefinition.getDefaultConditions().add(defaultCondition);
@@ -168,5 +161,26 @@ public class QaOutputFactory extends OutputFactory {
 
     private boolean isTextSearchConditionName(String name) {
 	return name != null && name.startsWith(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME);
+    }
+
+    /**
+     * Creates a default condition so teachers know how to use complex conditions for this tool.
+     * 
+     * @param qaContent
+     *                content of the tool
+     * @return default Q&A condition
+     */
+    protected QaCondition createDefaultComplexCondition(QaContent qaContent) {
+	if (qaContent.getQaQueContents().isEmpty()) {
+	    return null;
+	}
+	Set<QaQueContent> questions = new HashSet<QaQueContent>();
+	questions.add((QaQueContent) qaContent.getQaQueContents().iterator().next());
+	String name = buildConditionName(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME, qaContent.getQaContentId()
+		.toString());
+	// Default condition checks if the first answer contains word "LAMS"
+	return new QaCondition(null, null, 1, name, getI18NText(
+		QaAppConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null,
+		questions);
     }
 }

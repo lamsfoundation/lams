@@ -388,14 +388,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	if (chat == null) {
 	    chat = getDefaultContent();
 	}
-	// If there are no user added conditions, the default condition will be added in the output factory. It also
-	// needs to be persisted.
-	boolean defaultConditionToBeAdded = chat.getConditions().isEmpty();
-	SortedMap<String, ToolOutputDefinition> map = getChatOutputFactory().getToolOutputDefinitions(chat);
-	if (defaultConditionToBeAdded && !chat.getConditions().isEmpty()) {
-	    saveOrUpdateChat(chat);
-	}
-	return map;
+
+	return getChatOutputFactory().getToolOutputDefinitions(chat);
     }
 
     /* IChatService Methods */
@@ -417,6 +411,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	    String error = "Could not retrieve default content record for this tool";
 	    ChatService.logger.error(error);
 	    throw new ChatException(error);
+	}
+	if (defaultContent.getConditions().isEmpty()) {
+	    defaultContent.getConditions().add(getChatOutputFactory().createDefaultComplexCondition(defaultContent));
 	}
 	return defaultContent;
     }

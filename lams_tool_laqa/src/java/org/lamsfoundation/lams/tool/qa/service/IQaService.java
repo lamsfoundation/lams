@@ -294,4 +294,6 @@ public interface IQaService {
     public String createConditionName(Collection<QaCondition> existingConditions);
 
     public void deleteCondition(QaCondition condition);
+
+    public QaCondition createDefaultComplexCondition(QaContent qaContent);
 }

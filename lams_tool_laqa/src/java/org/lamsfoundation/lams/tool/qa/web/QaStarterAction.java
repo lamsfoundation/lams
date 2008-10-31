@@ -409,6 +409,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	QaStarterAction.logger.debug("getting content with id:" + toolContentID);
 	QaContent qaContent = qaService.retrieveQa(toolContentID);
+	if (isDefaultContent && qaContent.getConditions().isEmpty()) {
+	    qaContent.getConditions().add(qaService.createDefaultComplexCondition(qaContent));
+	}
 	QaStarterAction.logger.debug("QaContent: " + qaContent);
 
 	QaUtils.populateAuthoringDTO(request, qaContent, qaGeneralAuthoringDTO);

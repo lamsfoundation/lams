@@ -59,15 +59,9 @@ public class NotebookOutputFactory extends OutputFactory {
 	    Notebook notebook = (Notebook) toolContentObject;
 	    // adding all existing conditions
 	    notebookEntryDefinition.setDefaultConditions(new ArrayList<BranchCondition>(notebook.getConditions()));
-	    // if no conditions were created in the tool instance, a default condition is added; the condition is
-	    // persisted in NotebookService.
+	    // if no conditions were created in the tool instance, a default condition is added;
 	    if (notebookEntryDefinition.getDefaultConditions().isEmpty()) {
-		String name = buildConditionName(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME, notebook
-			.getToolContentId().toString());
-		// Default condition checks if the text contains word "LAMS"
-		NotebookCondition defaultCondition = new NotebookCondition(null, null, 1, name, getI18NText(
-			NotebookConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
-			null);
+		NotebookCondition defaultCondition = createDefaultComplexCondition(notebook);
 		notebook.getConditions().add(defaultCondition);
 		notebookEntryDefinition.getDefaultConditions().add(defaultCondition);
 	    }
@@ -152,5 +146,20 @@ public class NotebookOutputFactory extends OutputFactory {
 
     private boolean isTextSearchConditionName(String name) {
 	return name != null && name.startsWith(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME);
+    }
+
+    /**
+     * Creates a default condition so teachers know how to use complex conditions for this tool.
+     * 
+     * @param notebook
+     *                content of the tool
+     * @return default notebook condition
+     */
+    protected NotebookCondition createDefaultComplexCondition(Notebook notebook) {
+	String name = buildConditionName(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME, notebook.getToolContentId()
+		.toString());
+	// Default condition checks if the text contains word "LAMS"
+	return new NotebookCondition(null, null, 1, name, getI18NText(
+		NotebookConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
     }
 }

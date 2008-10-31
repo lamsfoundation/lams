@@ -851,15 +851,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	Forum forum = getForumByContentId(toolContentId);
 	if (forum == null) {
 	    forum = getDefaultForum();
-	} // If there are no user added conditions, the default condition will be added in the output factory. It
-	// also
-	// needs to be persisted.
-	boolean defaultConditionToBeAdded = forum.getConditions().isEmpty();
-	SortedMap<String, ToolOutputDefinition> map = getForumOutputFactory().getToolOutputDefinitions(forum);
-	if (defaultConditionToBeAdded && !forum.getConditions().isEmpty()) {
-	    updateForum(forum);
 	}
-	return map;
+	return getForumOutputFactory().getToolOutputDefinitions(forum);
     }
 
     /**
@@ -964,6 +957,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	Forum defaultContent = getDefaultForum();
+	if (defaultContent.getConditions().isEmpty()) {
+	    defaultContent.getConditions().add(getForumOutputFactory().createDefaultComplexCondition(defaultContent));
+	}
 	// get default content by given ID.
 	Forum content = new Forum();
 	content = Forum.newInstance(defaultContent, contentID, forumToolContentHandler);

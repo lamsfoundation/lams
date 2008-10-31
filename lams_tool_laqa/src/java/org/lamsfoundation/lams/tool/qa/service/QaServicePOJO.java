@@ -740,12 +740,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     {
 	QaServicePOJO.logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
-
+	long defaultContentId = 0;
 	if (fromContentId == null) {
 	    QaServicePOJO.logger.debug("fromContentId is null.");
 	    QaServicePOJO.logger.debug("attempt retrieving tool's default content id with signatute : "
 		    + QaAppConstants.MY_SIGNATURE);
-	    long defaultContentId = 0;
+
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 		fromContentId = new Long(defaultContentId);
@@ -770,7 +770,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		QaServicePOJO.logger.debug("fromContent is null.");
 		QaServicePOJO.logger.debug("attempt retrieving tool's default content id with signatute : "
 			+ QaAppConstants.MY_SIGNATURE);
-		long defaultContentId = 0;
 		try {
 		    defaultContentId = getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 		    fromContentId = new Long(defaultContentId);
@@ -782,9 +781,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		}
 
 		fromContent = qaDAO.loadQaById(fromContentId.longValue());
+
 		QaServicePOJO.logger.debug("using fromContent: " + fromContent);
 	    }
-
+	    if (fromContentId.equals(defaultContentId) && fromContent != null && fromContent.getConditions().isEmpty()) {
+		fromContent.getConditions().add(getQaOutputFactory().createDefaultComplexCondition(fromContent));
+	    }
 	    QaServicePOJO.logger.debug("final - retrieved fromContent: " + fromContent);
 	    QaServicePOJO.logger.debug("final - before new instance using " + fromContent + " and " + toContentId);
 
@@ -1059,6 +1061,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	if (toolContentObj == null) {
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    toolContentObj = retrieveQa(defaultToolContentId);
+	    if (toolContentObj != null && toolContentObj.getConditions().isEmpty()) {
+		toolContentObj.getConditions().add(getQaOutputFactory().createDefaultComplexCondition(toolContentObj));
+	    }
 	}
 	if (toolContentObj == null) {
 	    throw new DataMissingException("Unable to find default content for the question and answer tool");
@@ -1149,15 +1154,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	if (qaContent == null) {
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    qaContent = retrieveQa(defaultToolContentId);
+	    if (qaContent != null && qaContent.getConditions().isEmpty()) {
+		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexCondition(qaContent));
+	    }
 	}
-	// If there are no user added conditions, the default condition will be added in the output factory. It also
-	// needs to be persisted.
-	boolean defaultConditionToBeAdded = qaContent.getConditions().isEmpty();
-	SortedMap<String, ToolOutputDefinition> map = getQaOutputFactory().getToolOutputDefinitions(qaContent);
-	if (defaultConditionToBeAdded && !qaContent.getConditions().isEmpty()) {
-	    updateQa(qaContent);
-	}
-	return map;
+	return getQaOutputFactory().getToolOutputDefinitions(qaContent);
     }
 
     /**
@@ -1236,6 +1237,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    }
 
 	    qaContent = qaDAO.loadQaById(toolContentID.longValue());
+	    if (qaContent.getConditions().isEmpty()) {
+		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexCondition(qaContent));
+	    }
 	}
 	QaServicePOJO.logger.debug("final - retrieved qaContent: " + qaContent);
 
@@ -1850,5 +1854,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	if (condition != null && condition.getConditionId() != null) {
 	    qaDAO.deleteCondition(condition);
 	}
+    }
+
+    public QaCondition createDefaultComplexCondition(QaContent qaContent) {
+	return getQaOutputFactory().createDefaultComplexCondition(qaContent);
     }
 }

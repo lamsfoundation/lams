@@ -305,18 +305,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
 	Notebook notebook = getNotebookDAO().getByContentId(toolContentId);
-
 	if (notebook == null) {
 	    notebook = getDefaultContent();
 	}
-	// If there are no user added conditions, the default condition will be added in the output factory. It also
-	// needs to be persisted.
-	boolean defaultConditionToBeAdded = notebook.getConditions().isEmpty();
-	SortedMap<String, ToolOutputDefinition> map = getNotebookOutputFactory().getToolOutputDefinitions(notebook);
-	if (defaultConditionToBeAdded && !notebook.getConditions().isEmpty()) {
-	    saveOrUpdateNotebook(notebook);
-	}
-	return map;
+	return getNotebookOutputFactory().getToolOutputDefinitions(notebook);
     }
 
     /* ********** INotebookService Methods ********************************* */
@@ -351,6 +343,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	    String error = "Could not retrieve default content record for this tool";
 	    NotebookService.logger.error(error);
 	    throw new NotebookException(error);
+	}
+	if (defaultContent.getConditions().isEmpty()) {
+	    defaultContent.getConditions()
+		    .add(getNotebookOutputFactory().createDefaultComplexCondition(defaultContent));
 	}
 	return defaultContent;
     }

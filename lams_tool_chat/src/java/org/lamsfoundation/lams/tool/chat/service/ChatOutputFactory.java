@@ -59,14 +59,9 @@ public class ChatOutputFactory extends OutputFactory {
 	    Chat chat = (Chat) toolContentObject;
 	    // adding all existing conditions
 	    chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));
-	    // if no conditions were created in the tool instance, a default condition is added; the condition is
-	    // persisted in ChatService.
+	    // if no conditions were created in the tool instance, a default condition is added;
 	    if (chatMessagesDefinition.getDefaultConditions().isEmpty()) {
-		String name = buildConditionName(ChatConstants.TEXT_SEARCH_DEFINITION_NAME, chat.getToolContentId()
-			.toString());
-		// Default condition checks if messages contain word "LAMS"
-		ChatCondition defaultCondition = new ChatCondition(null, null, 1, name, getI18NText(
-			ChatConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
+		ChatCondition defaultCondition = createDefaultComplexCondition(chat);
 		chat.getConditions().add(defaultCondition);
 		chatMessagesDefinition.getDefaultConditions().add(defaultCondition);
 	    }
@@ -158,5 +153,19 @@ public class ChatOutputFactory extends OutputFactory {
 
     private boolean isTextSearchConditionName(String name) {
 	return name != null && name.startsWith(ChatConstants.TEXT_SEARCH_DEFINITION_NAME);
+    }
+
+    /**
+     * Creates a default condition so teachers know how to use complex conditions for this tool.
+     * 
+     * @param chat
+     *                content of the tool
+     * @return default chat condition
+     */
+    protected ChatCondition createDefaultComplexCondition(Chat chat) {
+	String name = buildConditionName(ChatConstants.TEXT_SEARCH_DEFINITION_NAME, chat.getToolContentId().toString());
+	// Default condition checks if messages contain word "LAMS"
+	return new ChatCondition(null, null, 1, name, getI18NText(
+		ChatConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
     }
 }

@@ -177,6 +177,9 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
 
 	Survey defaultContent = getDefaultSurvey();
+	if (defaultContent.getConditions().isEmpty()) {
+	    defaultContent.getConditions().add(getSurveyOutputFactory().createDefaultComplexCondition(defaultContent));
+	}
 	// save default content by given ID.
 	Survey content = new Survey();
 	content = Survey.newInstance(defaultContent, contentId, surveyToolContentHandler);
@@ -745,14 +748,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 		throw new ToolException(e);
 	    }
 	}
-	// If there are no user added conditions, the default condition will be added in the output factory. It also
-	// needs to be persisted.
-	boolean defaultConditionToBeAdded = survey.getConditions().isEmpty();
-	SortedMap<String, ToolOutputDefinition> map = getSurveyOutputFactory().getToolOutputDefinitions(survey);
-	if (defaultConditionToBeAdded && !survey.getConditions().isEmpty()) {
-	    saveOrUpdateSurvey(survey);
-	}
-	return map;
+	return getSurveyOutputFactory().getToolOutputDefinitions(survey);
     }
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
