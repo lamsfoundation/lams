@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.IndexUtils;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -196,10 +197,12 @@ public class ProfileAction extends LamsDispatchAction {
             HttpServletResponse response) throws Exception {
 		
 		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
-		log.debug("editing profile of userId: "+requestor.getUserId());
 		DynaActionForm userForm = (DynaActionForm)form;
 		BeanUtils.copyProperties(userForm, requestor);
 		SupportedLocale locale = requestor.getLocale();
+		if (locale == null) {
+		    locale = LanguageUtil.getDefaultLocale();
+		}
 		userForm.set("localeId",locale.getLocaleId());
 		request.setAttribute("locales", locales);
 		request.setAttribute("tab", "profile");
