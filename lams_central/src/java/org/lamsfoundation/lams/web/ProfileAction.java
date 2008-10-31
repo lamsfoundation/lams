@@ -54,176 +54,170 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @version
- *
+ * 
  * <p>
  * <a href="ProfileAction.java.html"><i>View Source</i></a>
  * </p>
- *
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
+ * 
  * Created at 14:21:53 on 28/06/2006
  */
 
 /**
- * @struts:action path="/profile"
- *                name="UserForm"
- * 	              scope="request"
- *                parameter="method"
- * 				  validate="false"
+ * @struts:action path="/profile" name="UserForm" scope="request"
+ *                parameter="method" validate="false"
  * 
  * @struts:action-forward name="view" path=".profile"
  * @struts:action-forward name="lessons" path=".lessons"
  * @struts:action-forward name="edit" path=".editprofile"
  */
 public class ProfileAction extends LamsDispatchAction {
-	
-	private static Logger log = Logger.getLogger(ProfileAction.class);
-	private static IUserManagementService service;
-	private static List<SupportedLocale> locales;
-	private static ICoreLearnerService learnerService;
 
-	public ActionForward view(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
-		String fullName = (requestor.getTitle()!=null?requestor.getTitle()+" ":"")+requestor.getFirstName()+" "+requestor.getLastName();
-		String email = requestor.getEmail();
-		
-		request.setAttribute("fullName", fullName);
-		request.setAttribute("email", (email!=null ? email : ""));
-		request.setAttribute("portraitUuid", (requestor.getPortraitUuid()==null ? 0 : requestor.getPortraitUuid()));
-		request.setAttribute("tab", "profile");
-		
-		return mapping.findForward("view");
-	}
-	
-	public ActionForward lessons(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		// list all active lessons for this learner (single sql query)
-		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());		
-		LessonDTO[] lessons = getLearnerService().getActiveLessonsFor(requestor.getUserId());
-		
-		// make org-sorted beans out of the lessons
-		HashMap<Integer, IndexOrgBean> orgBeansMap = new HashMap<Integer, IndexOrgBean>();
-		for (LessonDTO lesson : lessons) {
-			Integer orgId = lesson.getOrganisationID();
-			Organisation org = (Organisation)getService().findById(Organisation.class, orgId);
-			Integer orgTypeId = org.getOrganisationType().getOrganisationTypeId();
-			IndexLessonBean lessonBean = new IndexLessonBean(
-				lesson.getLessonName(), 
-				"javascript:openLearner("+lesson.getLessonID()+")"
-			);
-			lessonBean.setId(lesson.getLessonID());
-			log.debug("Lesson: "+lesson.getLessonName());
-			
-			// insert or update bean if it is a course
-			if (orgTypeId.equals(OrganisationType.COURSE_TYPE)) {
-				IndexOrgBean orgBean = (!orgBeansMap.containsKey(orgId))
-					? new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId)
-					: orgBeansMap.get(orgId);
-				orgBean.addLesson(lessonBean);
-				orgBeansMap.put(orgId, orgBean);
-			} else if (orgTypeId.equals(OrganisationType.CLASS_TYPE)) {
-				
-				// if it is a class, find existing or create new parent bean
-				Organisation parentOrg = org.getParentOrganisation();
-				Integer parentOrgId = parentOrg.getOrganisationId();
-				IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId))
-					? new IndexOrgBean(parentOrg.getOrganisationId(), parentOrg.getName(), OrganisationType.COURSE_TYPE)
-					: orgBeansMap.get(parentOrgId);
-				// create new bean for class, or use existing bean
-				IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId);
-				List<IndexOrgBean> childOrgBeans = parentOrgBean.getChildIndexOrgBeans();
-				if (childOrgBeans.contains(orgBean)) {
-					// use existing org bean
-					orgBean = getOrgBean(org.getName(), childOrgBeans);
-					childOrgBeans.remove(orgBean);
-					orgBean.addLesson(lessonBean);
-					childOrgBeans.add(orgBean);
-					parentOrgBean.setChildIndexOrgBeans(childOrgBeans);
-				} else {
-					// using new org bean
-					orgBean.addLesson(lessonBean);
-					parentOrgBean.addChildOrgBean(orgBean);
-				}
-				orgBeansMap.put(parentOrgId, parentOrgBean);
-			}
-		}
-		
-		// sort group and subgroup names
-		ArrayList<IndexOrgBean> beans = new ArrayList<IndexOrgBean>(orgBeansMap.values());
-		Collections.sort(beans);
-		for (IndexOrgBean b : beans) {
-			Collections.sort(b.getChildIndexOrgBeans());
-		}
-		
-		// sort lessons inside each org bean
-		for (Object o : beans) {
-			IndexOrgBean bean = (IndexOrgBean)o;
-			Organisation org = (Organisation)service.findById(Organisation.class, bean.getId());
-			
-			// put lesson beans into id-indexed map
-			HashMap<Long, IndexLessonBean> map = new HashMap<Long, IndexLessonBean>();
-			for (IndexLessonBean lbean : bean.getLessons()) {
-				map.put(lbean.getId(), lbean);
-			}
+    private static Logger log = Logger.getLogger(ProfileAction.class);
 
-			bean.setLessons(IndexUtils.sortLessonBeans(org.getOrderedLessonIds(), map));
+    private static IUserManagementService service;
+
+    private static List<SupportedLocale> locales;
+
+    private static ICoreLearnerService learnerService;
+
+    public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
+	String fullName = (requestor.getTitle() != null ? requestor.getTitle() + " " : "") + requestor.getFirstName()
+		+ " " + requestor.getLastName();
+	String email = requestor.getEmail();
+
+	request.setAttribute("fullName", fullName);
+	request.setAttribute("email", (email != null ? email : ""));
+	request.setAttribute("portraitUuid", (requestor.getPortraitUuid() == null ? 0 : requestor.getPortraitUuid()));
+	request.setAttribute("tab", "profile");
+
+	return mapping.findForward("view");
+    }
+
+    public ActionForward lessons(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	// list all active lessons for this learner (single sql query)
+	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
+	LessonDTO[] lessons = getLearnerService().getActiveLessonsFor(requestor.getUserId());
+
+	// make org-sorted beans out of the lessons
+	HashMap<Integer, IndexOrgBean> orgBeansMap = new HashMap<Integer, IndexOrgBean>();
+	for (LessonDTO lesson : lessons) {
+	    Integer orgId = lesson.getOrganisationID();
+	    Organisation org = (Organisation) getService().findById(Organisation.class, orgId);
+	    Integer orgTypeId = org.getOrganisationType().getOrganisationTypeId();
+	    IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(), "javascript:openLearner("
+		    + lesson.getLessonID() + ")");
+	    lessonBean.setId(lesson.getLessonID());
+	    log.debug("Lesson: " + lesson.getLessonName());
+
+	    // insert or update bean if it is a course
+	    if (orgTypeId.equals(OrganisationType.COURSE_TYPE)) {
+		IndexOrgBean orgBean = (!orgBeansMap.containsKey(orgId)) ? new IndexOrgBean(org.getOrganisationId(),
+			org.getName(), orgTypeId) : orgBeansMap.get(orgId);
+		orgBean.addLesson(lessonBean);
+		orgBeansMap.put(orgId, orgBean);
+	    } else if (orgTypeId.equals(OrganisationType.CLASS_TYPE)) {
+
+		// if it is a class, find existing or create new parent bean
+		Organisation parentOrg = org.getParentOrganisation();
+		Integer parentOrgId = parentOrg.getOrganisationId();
+		IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId)) ? new IndexOrgBean(parentOrg
+			.getOrganisationId(), parentOrg.getName(), OrganisationType.COURSE_TYPE) : orgBeansMap
+			.get(parentOrgId);
+		// create new bean for class, or use existing bean
+		IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId);
+		List<IndexOrgBean> childOrgBeans = parentOrgBean.getChildIndexOrgBeans();
+		if (childOrgBeans.contains(orgBean)) {
+		    // use existing org bean
+		    orgBean = getOrgBean(org.getName(), childOrgBeans);
+		    childOrgBeans.remove(orgBean);
+		    orgBean.addLesson(lessonBean);
+		    childOrgBeans.add(orgBean);
+		    parentOrgBean.setChildIndexOrgBeans(childOrgBeans);
+		} else {
+		    // using new org bean
+		    orgBean.addLesson(lessonBean);
+		    parentOrgBean.addChildOrgBean(orgBean);
 		}
-		
-		request.setAttribute("beans", beans);
-		request.setAttribute("tab", "profile");
-		
-		return mapping.findForward("lessons");
+		orgBeansMap.put(parentOrgId, parentOrgBean);
+	    }
 	}
-	
-	private IndexOrgBean getOrgBean(String name, List<IndexOrgBean> list) {
-		for (IndexOrgBean bean : list) {
-			if (StringUtils.equals(name, bean.getName())) {
-				return bean;
-			}
-		}
-		return null;
+
+	// sort group and subgroup names
+	ArrayList<IndexOrgBean> beans = new ArrayList<IndexOrgBean>(orgBeansMap.values());
+	Collections.sort(beans);
+	for (IndexOrgBean b : beans) {
+	    Collections.sort(b.getChildIndexOrgBeans());
 	}
-	
-	public ActionForward edit(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		User requestor = (User)getService().getUserByLogin(request.getRemoteUser());
-		DynaActionForm userForm = (DynaActionForm)form;
-		BeanUtils.copyProperties(userForm, requestor);
-		SupportedLocale locale = requestor.getLocale();
-		if (locale == null) {
-		    locale = LanguageUtil.getDefaultLocale();
-		}
-		userForm.set("localeId",locale.getLocaleId());
-		request.setAttribute("locales", locales);
-		request.setAttribute("tab", "profile");
-		return mapping.findForward("edit");
+
+	// sort lessons inside each org bean
+	for (Object o : beans) {
+	    IndexOrgBean bean = (IndexOrgBean) o;
+	    Organisation org = (Organisation) service.findById(Organisation.class, bean.getId());
+
+	    // put lesson beans into id-indexed map
+	    HashMap<Long, IndexLessonBean> map = new HashMap<Long, IndexLessonBean>();
+	    for (IndexLessonBean lbean : bean.getLessons()) {
+		map.put(lbean.getId(), lbean);
+	    }
+
+	    bean.setLessons(IndexUtils.sortLessonBeans(org.getOrderedLessonIds(), map));
 	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementService");
-			locales = getService().findAll(SupportedLocale.class);
-			Collections.sort(locales);
-		}
-		return service;
+
+	request.setAttribute("beans", beans);
+	request.setAttribute("tab", "profile");
+
+	return mapping.findForward("lessons");
+    }
+
+    private IndexOrgBean getOrgBean(String name, List<IndexOrgBean> list) {
+	for (IndexOrgBean bean : list) {
+	    if (StringUtils.equals(name, bean.getName())) {
+		return bean;
+	    }
 	}
-	
-	private ICoreLearnerService getLearnerService(){
-		if(learnerService==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
-		}
-		return learnerService;
+	return null;
+    }
+
+    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
+	DynaActionForm userForm = (DynaActionForm) form;
+	BeanUtils.copyProperties(userForm, requestor);
+	SupportedLocale locale = requestor.getLocale();
+	if (locale == null) {
+	    locale = LanguageUtil.getDefaultLocale();
 	}
+	userForm.set("localeId", locale.getLocaleId());
+	request.setAttribute("locales", locales);
+	request.setAttribute("tab", "profile");
+	return mapping.findForward("edit");
+    }
+
+    private IUserManagementService getService() {
+	if (service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    service = (IUserManagementService) ctx.getBean("userManagementService");
+	    locales = getService().findAll(SupportedLocale.class);
+	    Collections.sort(locales);
+	}
+	return service;
+    }
+
+    private ICoreLearnerService getLearnerService() {
+	if (learnerService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+	}
+	return learnerService;
+    }
 }
