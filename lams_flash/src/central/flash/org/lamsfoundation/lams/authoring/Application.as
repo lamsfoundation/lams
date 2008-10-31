@@ -497,16 +497,21 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
         }else if (Key.isDown(Key.CONTROL) && Key.isDown(X_KEY)) {
 			//for copy and paste
 			//assuming that we are in the canvas...
-             cut();
+			if (dialog.getDepth() == null) { // only cut activity if dialogs not open
+				cut();
+			}
         }else if (Key.isDown(Key.CONTROL) && Key.isDown(C_KEY)) {
-           copy();
+			if (dialog.getDepth() == null) { // only copy activity if dialogs not open
+				copy();
+			}
         }else if (Key.isDown(F12_KEY)) {
 			trace("P Pressed")
 			PropertyInspector(_pi_mc).localOnRelease();
 			
         }else if (Key.isDown(Key.CONTROL) && Key.isDown(V_KEY)) {
-			paste();
-			
+			if (dialog.getDepth() == null) { // only paste activity if dialogs not open
+				paste();
+			}
         }else if (Key.isDown(Key.CONTROL) && Key.isDown(Z_KEY)) {
 			//undo
 			_canvas.undo();
