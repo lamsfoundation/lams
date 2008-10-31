@@ -85,7 +85,7 @@ j_security_login_page
 						if (!hasRequiredFlashVersion) {
 							// show error message
 							document.write('<div class=\"warning\"><fmt:message key="flash.min.error"/>');
-							document.write('<br>It worked<a href=\"http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash\" target=\"_blank\"><fmt:message key="flash.download.player"/></a></div>');
+							document.write('<br><a href=\"http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash\" target=\"_blank\"><fmt:message key="flash.download.player"/></a></div>');
 						}
 						
 						if(isBrowserNotCompatable()) {
