@@ -268,17 +268,17 @@ public class GateAction extends LamsDispatchAction {
 	    return mapping.findForward(GateAction.VIEW_SYNCH_GATE);
 	} else if (gate.isScheduleGate()) {
 	    return viewScheduleGate(mapping, gateForm, (ScheduleGateActivity) gate);
-	} else if (gate.isConditionGate()) {
-	    gateForm.set("allowedToPassLearnerList", gate.getAllowedToPassLearners());
-	    gateForm.set(GateAction.READ_ONLY, Boolean.TRUE);
-	    return mapping.findForward(GateAction.VIEW_CONDITION_GATE);
-	} else if (gate.isPermissionGate() || gate.isSystemGate()) {
+	} else if (gate.isPermissionGate() || gate.isSystemGate() || gate.isConditionGate()) {
 	    gateForm.set("waitingLearnerList", waitingLearnersList);
 	    gateForm.set("allowedToPassLearnerList", gate.getAllowedToPassLearners());
 	    Collection<User> forbiddenUsers = learnerService.getLearnersForGate(gate);
 	    forbiddenUsers.removeAll(gate.getAllowedToPassLearners());
 	    gateForm.set("forbiddenLearnerList", forbiddenUsers);
-	    return mapping.findForward(GateAction.VIEW_PERMISSION_GATE);
+	    if (gate.isConditionGate()) {
+		return mapping.findForward(GateAction.VIEW_CONDITION_GATE);
+	    } else {
+		return mapping.findForward(GateAction.VIEW_PERMISSION_GATE);
+	    }
 	} else {
 	    throw new MonitoringServiceException("Invalid gate activity. " + "gate id [" + gate.getActivityId()
 		    + "] - the type [" + gate.getActivityTypeId() + "] is not a gate type");

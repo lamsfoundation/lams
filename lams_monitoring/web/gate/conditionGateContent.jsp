@@ -24,16 +24,86 @@
 	<%@ taglib uri="tags-logic" prefix="logic" %>
 	<%@ taglib uri="tags-core" prefix="c" %>		
 	<%@ taglib uri="tags-fmt" prefix="fmt" %>
-
+	<script type="text/javascript">
+		function onSubmitForm(){
+			var select = document.getElementById(document.pressed);
+			if (select.selectedIndex==-1){
+				return false;
+			}
+			else {
+				document.getElementById("userId").value=select.options[select.selectedIndex].value;
+				return true;
+			}
+		}
+	</script>
 	<div id="content">
 		<h1><fmt:message key="label.condition.gate.title"/></h1>
 		
 		<%@ include file="gateInfo.jsp" %>
+		<c:if test="${not GateForm.map.gate.gateOpen and not GateForm.map.readOnly}" >
+			<p><fmt:message key="label.gate.you.open.message"/><br />
+			   <fmt:message key="message.gate.condition.force.pass" /></p>
+		</c:if>
 		
-		<p><fmt:message key="label.gate.list.allowed.learners"/></p>
-		<select style="width: 160px" size="10" disabled="disabled">
-			<c:forEach var="learner" items="${GateForm.map.allowedToPassLearnerList}">
-				<option>${learner.lastName} ${learner.firstName}</option>
-			</c:forEach>
-		</select>
+		<%@ include file="gateStatus.jsp" %>
+		<c:if test="${not GateForm.map.gate.gateOpen}" >
+			<hr />
+			<c:if test="${not GateForm.map.readOnly}" >
+				<p><fmt:message key="label.gate.open.single.learner"/></p>
+			</c:if>
+			<html:form action="/gate?method=openGateForSingleUser" onsubmit="return onSubmitForm();" target="_self">
+			<input type="hidden" id="userId" name="userId" />
+			<table>
+				<tr>
+					<th><fmt:message key="label.gate.list.have.not.met.conditions.learners"/></th>
+					<th><fmt:message key="label.gate.list.waiting.learners"/></th>
+					<th><fmt:message key="label.gate.list.allowed.learners"/></th>
+		   		 </tr>
+				<tr>
+					<td width="34%">
+						<select style="width: 160px" id="forbidden" name="forbidden" size="10"
+						<c:if test="${GateForm.map.readOnly}" >
+							 disabled="disabled"
+						</c:if>
+						>
+							<c:forEach var="learner" items="${GateForm.map.forbiddenLearnerList}">
+								<option value="${learner.userId}">${learner.lastName} ${learner.firstName}</option>
+							</c:forEach>
+						</select>
+					</td >
+					<td width="33%">
+						<select style="width: 160px"  id="waiting" name="waiting" size="10"
+						<c:if test="${GateForm.map.readOnly}" >
+							 disabled="disabled"
+						</c:if>
+						>
+							<c:forEach var="learner" items="${GateForm.map.waitingLearnerList}">
+								<option value="${learner.userId}">${learner.lastName} ${learner.firstName}</option>
+							</c:forEach>
+						</select>
+					</td>
+					<td width="33%">
+						<select style="width: 160px" id="allowed" name="allowed" size="10" disabled="disabled">
+							<c:forEach var="learner" items="${GateForm.map.allowedToPassLearnerList}">
+								<option>${learner.lastName} ${learner.firstName}</option>
+							</c:forEach>
+						</select>
+					</td>
+				</tr>
+				<c:if test="${not GateForm.map.readOnly}" >	
+					<tr>
+						<td>
+							<input style="width: 160px" type="submit"  class="button"  value="<fmt:message key="label.gate.allow"/>" onclick="document.pressed='forbidden'"/>
+						</td>
+						<td>
+							<input style="width: 160px" type="submit" class="button"  value="<fmt:message key="label.gate.allow"/>" onclick="document.pressed='waiting'"/>
+						</td>
+						<td>
+							 &nbsp;
+						</td>
+					</tr>
+				</c:if>
+			</table>
+			</html:form>
+		</c:if>
 	</div>  <!--closes content-->
