@@ -158,7 +158,7 @@ public class MainExportServlet extends HttpServlet {
 		    exportService.generateNotebookPage(request, portfolios, cookies);
 
 	    //correct all image links in created htmls.
-	    replaceImageFolderLinks(portfolios.getContentFolderID());
+	    replaceImageFolderLinks(portfolios.getContentFolderID(), getLamsOrRamsContext(request));
 
 	    //bundle the stylesheet with the package
 	    CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir, exportService.getUserThemes());
@@ -198,10 +198,10 @@ public class MainExportServlet extends HttpServlet {
      * Corrects links in all html files in temporary directory and its
      * subdirectories.
      * 
-     * @param contentFolderID
-     *                32-character content folder name
+     * @param contentFolderI 32-character content folder name
+     * @param lamsOrRams "/rams" if we are running rams and "/lams" otherwise
      */
-    private void replaceImageFolderLinks(String contentFolderID) {
+    private void replaceImageFolderLinks(String contentFolderID, String lamsOrRams) {
 	File tempDir = new File(exportTmpDir);
 
 	// finds all the html extension files
@@ -211,23 +211,22 @@ public class MainExportServlet extends HttpServlet {
 	for (Iterator it = jspFiles.iterator(); it.hasNext();) {
 	    Object element = it.next();
 	    log.debug("Correcting links in file " + element.toString());
-	    replaceImageFolderLinks(element.toString(), contentFolderID);
+	    replaceImageFolderLinks(element.toString(), contentFolderID, lamsOrRams);
 	}
     }
 
     /**
      * Corrects links in current particular html file.
      * 
-     * @param filename
-     *                filename
-     * @param contentFolderID
-     *                32-character content folder name
+     * @param filename filename
+     * @param contentFolderID 32-character content folder name
+     * @param lamsOrRams "/rams" if we are running rams and "/lams" otherwise
      */
-    private void replaceImageFolderLinks(String filename, String contentFolderID) {
+    private void replaceImageFolderLinks(String filename, String contentFolderID, String lamsOrRams) {
 	try {
 	    // String to find
-	    String fckeditorpath = "/lams//www/secure/" + contentFolderID;
-	    String fckeditorsmiley = "/lams//fckeditor/editor/images/smiley";
+	    String fckeditorpath = lamsOrRams + "//www/secure/" + contentFolderID;
+	    String fckeditorsmiley = lamsOrRams + "//fckeditor/editor/images/smiley";
 
 	    // Replacing string
 	    String newfckeditorpath = "../" + contentFolderID;
@@ -275,6 +274,15 @@ public class MainExportServlet extends HttpServlet {
 	} catch (IOException e) {
 	    log.error("Unable to correct imagefolder links in file " + filename, e);
 	}
+    }
+    
+    /**
+     * Returns "/rams" if we are running rams and "/lams" if we are running lams
+     * @return
+     */
+    private String getLamsOrRamsContext(HttpServletRequest request)
+    {
+	return request.getContextPath().substring(0, 5);
     }
 
 }
