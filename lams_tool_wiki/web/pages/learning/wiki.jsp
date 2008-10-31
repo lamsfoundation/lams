@@ -379,10 +379,12 @@
 		</div>
 	</html:form> 
 
-	<c:if test="${mode == 'learner' || mode == 'author'}">
+	<div id="finishButtonDiv"></div>
+	
+	<c:if test="${ (mode == 'learner' && minEditsReached ) || mode == 'author'}">
 		<%@ include file="parts/finishButton.jsp"%>
 	</c:if>
-
+	
 </div>
 
 <script type="text/javascript">
