@@ -2232,7 +2232,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	if (entryDto instanceof ToolOutputBranchActivityEntryDTO) {
 	    BranchConditionDTO dto = ((ToolOutputBranchActivityEntryDTO) entryDto).getCondition();
 	    if (dto != null) {
-		condition = new BranchCondition(dto);
+		condition = dto.getCondition();
 		condition.setConditionId(null);
 	    }
 	    if (entryDto instanceof ToolOutputGateActivityEntryDTO) {

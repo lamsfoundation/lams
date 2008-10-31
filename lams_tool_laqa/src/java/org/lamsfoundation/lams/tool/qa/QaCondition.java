@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
-import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputFormatException;
@@ -60,8 +59,13 @@ public class QaCondition extends TextSearchCondition {
 
     }
 
-    public QaCondition(BranchConditionDTO conditionDTO) {
+    public QaCondition(QaConditionDTO conditionDTO) {
 	super(conditionDTO);
+	for (QaQueContent question : conditionDTO.getQuestions()) {
+	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
+		    null, null, null);
+	    getQuestions().add(questionCopy);
+	}
     }
 
     public QaCondition(Long conditionId, Integer conditionUIID, Integer orderId, String name, String displayName,
@@ -161,5 +165,10 @@ public class QaCondition extends TextSearchCondition {
     @Override
     protected boolean isValid() {
 	return getQuestions() != null && !getQuestions().isEmpty();
+    }
+
+    @Override
+    public QaConditionDTO getBranchConditionDTO(Integer toolActivityUIID) {
+	return new QaConditionDTO(this, toolActivityUIID);
     }
 }

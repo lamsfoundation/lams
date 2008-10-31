@@ -30,11 +30,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
-import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputFormatException;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
+import org.lamsfoundation.lams.tool.survey.dto.SurveyConditionDTO;
 import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 
 /**
@@ -56,8 +56,16 @@ public class SurveyCondition extends TextSearchCondition {
 
     }
 
-    public SurveyCondition(BranchConditionDTO conditionDTO) {
+    public SurveyCondition(SurveyConditionDTO conditionDTO) {
 	super(conditionDTO);
+
+	for (SurveyQuestion question : conditionDTO.getQuestions()) {
+	    SurveyQuestion questionCopy = new SurveyQuestion();
+	    questionCopy.setSequenceId(question.getSequenceId());
+	    questionCopy.setShortTitle(question.getShortTitle());
+	    questionCopy.setType(question.getType());
+	    getQuestions().add(questionCopy);
+	}
     }
 
     public SurveyCondition(Long conditionId, Integer conditionUIID, Integer orderId, String name, String displayName,
@@ -159,5 +167,10 @@ public class SurveyCondition extends TextSearchCondition {
     @Override
     protected boolean isValid() {
 	return getQuestions() != null && !getQuestions().isEmpty();
+    }
+
+    @Override
+    public SurveyConditionDTO getBranchConditionDTO(Integer toolActivityUIID) {
+	return new SurveyConditionDTO(this, toolActivityUIID);
     }
 }

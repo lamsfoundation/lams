@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
+import org.lamsfoundation.lams.learningdesign.dto.TextSearchConditionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.web.TextSearchActionForm;
 
@@ -114,8 +114,12 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
      * 
      * @param conditionDTO
      */
-    public TextSearchCondition(BranchConditionDTO conditionDTO) {
+    public TextSearchCondition(TextSearchConditionDTO conditionDTO) {
 	super(conditionDTO);
+	allWords = conditionDTO.getAllWords();
+	phrase = conditionDTO.getPhrase();
+	anyWords = conditionDTO.getAnyWords();
+	excludedWords = conditionDTO.getExcludedWords();
     }
 
     /**
@@ -368,5 +372,10 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
     public static String removeHTMLtags(String text) {
 	return text == null ? null : text.replaceAll(TextSearchCondition.BR_TAG_REGEX, " ").replaceAll(
 		TextSearchCondition.HTML_TAG_REGEX, "");
+    }
+
+    @Override
+    public TextSearchConditionDTO getBranchConditionDTO(Integer toolActivityUIID) {
+	return new TextSearchConditionDTO(this, toolActivityUIID);
     }
 }

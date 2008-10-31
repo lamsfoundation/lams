@@ -7,11 +7,12 @@ import java.util.regex.Pattern;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
-import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
+import org.lamsfoundation.lams.learningdesign.dto.TextSearchConditionDTO;
 import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputFormatException;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
+import org.lamsfoundation.lams.tool.chat.dto.ChatConditionDTO;
 
 /**
  * A text search condition with a set of messages on which the search should be performed.
@@ -26,7 +27,7 @@ public class ChatCondition extends TextSearchCondition {
 	super();
     }
 
-    public ChatCondition(BranchConditionDTO conditionDTO) {
+    public ChatCondition(TextSearchConditionDTO conditionDTO) {
 	super(conditionDTO);
     }
 
@@ -111,5 +112,10 @@ public class ChatCondition extends TextSearchCondition {
 	Pattern regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
 	Matcher matcher = regexPattern.matcher(textToMatch);
 	return matcher.find();
+    }
+
+    @Override
+    public ChatConditionDTO getBranchConditionDTO(Integer toolActivityUIID) {
+	return new ChatConditionDTO(this, toolActivityUIID);
     }
 }

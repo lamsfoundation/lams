@@ -34,11 +34,11 @@ import java.util.regex.Pattern;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
-import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputFormatException;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
+import org.lamsfoundation.lams.tool.forum.dto.ForumConditionDTO;
 import org.lamsfoundation.lams.tool.forum.util.ConditionTopicComparator;
 
 /**
@@ -59,8 +59,14 @@ public class ForumCondition extends TextSearchCondition {
 
     }
 
-    public ForumCondition(BranchConditionDTO conditionDTO) {
+    public ForumCondition(ForumConditionDTO conditionDTO) {
 	super(conditionDTO);
+	for (Message topic : conditionDTO.getTopics()) {
+	    Message topicCopy = new Message();
+	    topicCopy.setCreated(topic.getCreated());
+	    topicCopy.setSubject(topic.getSubject());
+	    topics.add(topicCopy);
+	}
     }
 
     public ForumCondition(Long conditionId, Integer conditionUIID, Integer orderId, String name, String displayName,
@@ -152,16 +158,16 @@ public class ForumCondition extends TextSearchCondition {
     @Override
     public ForumCondition clone(int uiidOffset) {
 	Integer newConditionUIID = LearningDesign.addOffset(conditionUIID, uiidOffset);
-	Set<Message> questionsCopy = new TreeSet<Message>(new ConditionTopicComparator());
+	Set<Message> topicsCopy = new TreeSet<Message>(new ConditionTopicComparator());
 
 	for (Message topic : getTopics()) {
 	    Message topicCopy = new Message();
 	    topicCopy.setCreated(topic.getCreated());
 	    topicCopy.setSubject(topic.getSubject());
-	    questionsCopy.add(topicCopy);
+	    topicsCopy.add(topicCopy);
 	}
 	return new ForumCondition(null, newConditionUIID, orderId, name, displayName, allWords, phrase, anyWords,
-		excludedWords, questionsCopy);
+		excludedWords, topicsCopy);
     }
 
     /**
@@ -213,5 +219,10 @@ public class ForumCondition extends TextSearchCondition {
 	Pattern regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
 	Matcher matcher = regexPattern.matcher(textToMatch);
 	return matcher.find();
+    }
+
+    @Override
+    public ForumConditionDTO getBranchConditionDTO(Integer toolActivityUIID) {
+	return new ForumConditionDTO(this, toolActivityUIID);
     }
 }

@@ -47,18 +47,16 @@ public class BranchConditionDTO {
     private Integer toolActivityUIID;
 
     public BranchConditionDTO(BranchCondition condition, Integer toolActivityUIID) {
-	conditionId = condition.getConditionId();
-	conditionUIID = condition.getConditionUIID();
-	orderID = condition.getOrderId();
-	name = condition.getName();
-	displayName = condition.getDisplayName();
-	type = condition.getType();
-
-	startValue = condition.getStartValue();
-	endValue = condition.getEndValue();
-
-	exactMatchValue = condition.getExactMatchValue();
-	this.toolActivityUIID = toolActivityUIID;
+	setConditionId(condition.getConditionId());
+	setConditionUIID(condition.getConditionUIID());
+	setOrderID(condition.getOrderId());
+	setName(condition.getName());
+	setDisplayName(condition.getDisplayName());
+	setType(condition.getType());
+	setStartValue(condition.getStartValue());
+	setEndValue(condition.getEndValue());
+	setExactMatchValue(condition.getExactMatchValue());
+	setToolActivityUIID(toolActivityUIID);
     }
 
     public Long getConditionId() {
@@ -156,4 +154,7 @@ public class BranchConditionDTO {
 	this.toolActivityUIID = toolActivityUIID;
     }
 
+    public BranchCondition getCondition() {
+	return new BranchCondition(this);
+    }
 }
