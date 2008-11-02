@@ -248,7 +248,7 @@
 									<td>
 										<c:choose>
 											<c:when test="${wikiContentPageVersion.editorDTO != null}">
-												${wikiContentPageVersion.editorDTO.firstName} ${wikiContentPageVersion.editorDTO.firstName}
+												${wikiContentPageVersion.editorDTO.firstName} ${wikiContentPageVersion.editorDTO.lastName}
 											</c:when>
 											<c:otherwise>
 												<fmt:message key="label.wiki.history.editor.author"></fmt:message>
