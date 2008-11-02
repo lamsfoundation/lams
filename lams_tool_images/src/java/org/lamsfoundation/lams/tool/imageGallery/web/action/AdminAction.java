@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.imageGallery.web.action;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -34,17 +33,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryServiceProxy;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.AdminForm;
-import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Andrey Balan

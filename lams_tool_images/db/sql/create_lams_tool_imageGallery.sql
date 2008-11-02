@@ -2,6 +2,7 @@ SET FOREIGN_KEY_CHECKS=0;
 drop table if exists tl_laimag10_attachment;
 drop table if exists tl_laimag10_imageGallery;
 drop table if exists tl_laimag10_imageGallery_item;
+drop table if exists tl_laimag10_image_comment;
 drop table if exists tl_laimag10_imageGallery_item_visit_log;
 drop table if exists tl_laimag10_session;
 drop table if exists tl_laimag10_user;
@@ -60,6 +61,14 @@ create table tl_laimag10_imageGallery_item (
    file_name varchar(255),
    primary key (uid)
 )type=innodb;
+create table tl_laimag10_image_comment (
+   uid bigint not null auto_increment,
+   comment text,
+   imageGallery_item_uid bigint,
+   create_by bigint,
+   create_date datetime,
+   primary key (uid)
+)TYPE=InnoDB;
 create table tl_laimag10_item_log (
    uid bigint not null auto_increment,
    access_date datetime,
@@ -102,6 +111,8 @@ alter table tl_laimag10_imageGallery add index FK_NEW_1821149711_89093BF758092FB
 alter table tl_laimag10_imageGallery_item add index FK_NEW_1821149711_F52D1F93758092FB (create_by), add constraint FK_NEW_1821149711_F52D1F93758092FB foreign key (create_by) references tl_laimag10_user (uid);
 alter table tl_laimag10_imageGallery_item add index FK_NEW_1821149711_F52D1F9330E79035 (imageGallery_uid), add constraint FK_NEW_1821149711_F52D1F9330E79035 foreign key (imageGallery_uid) references tl_laimag10_imageGallery (uid);
 alter table tl_laimag10_imageGallery_item add index FK_NEW_1821149711_F52D1F93EC0D3147 (session_uid), add constraint FK_NEW_1821149711_F52D1F93EC0D3147 foreign key (session_uid) references tl_laimag10_session (uid);
+alter table tl_laimag10_image_comment add index FK_tl_laimag10_image_comment_3 (imageGallery_item_uid), add constraint FK_tl_laimag10_image_comment_3 foreign key (imageGallery_item_uid) references tl_laimag10_imageGallery_item (uid);
+alter table tl_laimag10_image_comment add index FK_tl_laimag10_image_comment_2 (create_by), add constraint FK_tl_laimag10_image_comment_2 foreign key (create_by) references tl_laimag10_user (uid);
 alter table tl_laimag10_item_log add index FK_NEW_1821149711_693580A438BF8DFE (imageGallery_item_uid), add constraint FK_NEW_1821149711_693580A438BF8DFE foreign key (imageGallery_item_uid) references tl_laimag10_imageGallery_item (uid);
 alter table tl_laimag10_item_log add index FK_NEW_1821149711_693580A441F9365D (user_uid), add constraint FK_NEW_1821149711_693580A441F9365D foreign key (user_uid) references tl_laimag10_user (uid);
 alter table tl_laimag10_session add index FK_NEW_1821149711_24AA78C530E79035 (imageGallery_uid), add constraint FK_NEW_1821149711_24AA78C530E79035 foreign key (imageGallery_uid) references tl_laimag10_imageGallery (uid);

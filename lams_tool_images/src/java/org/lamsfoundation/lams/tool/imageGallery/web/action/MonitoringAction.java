@@ -90,7 +90,7 @@ public class MonitoringAction extends Action {
     private ActionForward hideitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID);
+	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 	IImageGalleryService service = getImageGalleryService();
 	service.setItemVisible(itemUid, false);
 
@@ -117,7 +117,7 @@ public class MonitoringAction extends Action {
 
     private ActionForward showitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID);
+	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 	IImageGalleryService service = getImageGalleryService();
 	service.setItemVisible(itemUid, true);
 
@@ -187,7 +187,7 @@ public class MonitoringAction extends Action {
     private ActionForward listuser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID);
+	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 
 	// get user list by given item uid
 	IImageGalleryService service = getImageGalleryService();

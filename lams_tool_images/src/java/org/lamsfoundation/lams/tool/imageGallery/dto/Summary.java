@@ -24,12 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryWebUtils;
 
 /**
  * List contains following element: <br>

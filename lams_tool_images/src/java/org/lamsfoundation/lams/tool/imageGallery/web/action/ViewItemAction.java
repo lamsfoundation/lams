@@ -25,14 +25,10 @@
 package org.lamsfoundation.lams.tool.imageGallery.web.action;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
@@ -48,11 +44,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
-import org.lamsfoundation.lams.tool.imageGallery.dto.InstructionNavDTO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -197,8 +191,8 @@ public class ViewItemAction extends Action {
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX));
 	request.setAttribute(ImageGalleryConstants.PARAM_IMAGE_INDEX, itemIdx);
-	Long itemUid = NumberUtils.createLong(request.getParameter(ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID));
-	request.setAttribute(ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID, itemUid);
+	Long itemUid = NumberUtils.createLong(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
+	request.setAttribute(ImageGalleryConstants.PARAM_IMAGE_UID, itemUid);
 	request.setAttribute(ImageGalleryConstants.ATTR_TOOL_SESSION_ID, sessionId);
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
@@ -226,7 +220,7 @@ public class ViewItemAction extends Action {
 		    getImageGalleryItemList(sessionMap));
 	    item = imageGalleryList.get(itemIdx);
 	} else {
-	    Long itemUid = NumberUtils.createLong(request.getParameter(ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID));
+	    Long itemUid = NumberUtils.createLong(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	    // get back the imageGallery and item list and display them on page
 	    IImageGalleryService service = getImageGalleryService();
 	    item = service.getImageGalleryItemByUid(itemUid);

@@ -75,7 +75,7 @@
 						<c:choose>
 							<c:when test="${item.viewNumber > 0}">
 								<c:set var="listUrl">
-									<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&itemUid=${item.itemUid}' />
+									<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&imageUid=${item.itemUid}' />
 								</c:set>
 								<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
 							</c:when>

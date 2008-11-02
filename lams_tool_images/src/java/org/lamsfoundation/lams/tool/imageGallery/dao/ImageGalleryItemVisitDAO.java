@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.imageGallery.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItemVisitLog;
 
 public interface ImageGalleryItemVisitDAO extends DAO {

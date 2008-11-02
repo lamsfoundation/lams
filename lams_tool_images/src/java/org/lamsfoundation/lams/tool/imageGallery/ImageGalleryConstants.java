@@ -50,7 +50,7 @@ public class ImageGalleryConstants {
 
     public static final String PARAM_IMAGE_INDEX = "imageIndex";
 
-    public static final String PARAM_RESOURCE_ITEM_UID = "itemUid";
+    public static final String PARAM_IMAGE_UID = "imageUid";
 
     public static final String PARAM_CURRENT_INSTRUCTION_INDEX = "insIdx";
 
@@ -59,6 +59,10 @@ public class ImageGalleryConstants {
     public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
 
     public static final String PARAM_TITLE = "title";
+    
+    public static final String PARAM_COMMENTS = "comments";
+    
+    public static final String PARAM_CURRENT_IMAGE = "currentImage";
 
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
@@ -81,11 +85,7 @@ public class ImageGalleryConstants {
 
     public static final String ATTR_RESOURCE = "imageGallery";
 
-    public static final String ATTR_RUN_AUTO = "runAuto";
-
     public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
-
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 
     public static final String ATTR_SUMMARY_LIST = "summaryList";
 
@@ -110,7 +110,11 @@ public class ImageGalleryConstants {
     public static final String ATTR_INSTRUCTIONS = "instructions";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
-
+    
+    public static final String ATTR_COMMENT = "comment";
+    
+    public static final String ATTR_CURRENT_IMAGE_UID = "currentImageUid";
+    
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
     

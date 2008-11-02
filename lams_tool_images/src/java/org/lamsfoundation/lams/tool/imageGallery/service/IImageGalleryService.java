@@ -152,6 +152,15 @@ public interface IImageGalleryService {
     List<ImageGalleryItem> getImageGalleryItemsBySessionId(Long sessionId);
 
     /**
+     * Save/update current ImageGalleryItem.
+     * 
+     * @param item
+     *            current ImageGalleryItem
+     * @return
+     */
+    void saveOrUpdateImageGalleryItem(ImageGalleryItem item);
+
+    /**
      * Get imageGallery which is relative with the special toolSession.
      * 
      * @param sessionId
@@ -179,14 +188,6 @@ public interface IImageGalleryService {
     void setItemComplete(Long imageGalleryItemUid, Long userId, Long sessionId);
 
     void setItemAccess(Long imageGalleryItemUid, Long userId, Long sessionId);
-
-    /**
-     * the reqired number minus the count of view of the given user.
-     * 
-     * @param userUid
-     * @return
-     */
-    int checkMiniView(Long toolSessionId, Long userId);
 
     /**
      * If success return next activity's url, otherwise return null.

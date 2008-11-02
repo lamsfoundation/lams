@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItemInstruction"
-        table="tl_laimag10_item_instruction"
+        name="org.lamsfoundation.lams.tool.imageGallery.model.ImageComment"
+        table="tl_laimag10_image_comment"
     >
 
         <id
@@ -19,31 +19,41 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-ImageGalleryItemInstruction.xml 
+                  hibernate-generator-params-ImageComment.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <property
-            name="description"
-            type="java.lang.String"
+            name="createDate"
+            type="java.util.Date"
             update="true"
             insert="true"
-            column="description"
+            column="create_date"
+        />
+
+        <many-to-one
+            name="createBy"
+            class="org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="create_by"
         />
 
         <property
-            name="sequenceId"
-            type="int"
+            name="comment"
+            type="text"
             update="true"
             insert="true"
-            column="sequence_id"
+            column="comment"
         />
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-ImageGalleryItemInstruction.xml
+                hibernate-properties-ImageComment.xml
             containing the additional properties and place it in your merge dir.
         -->
 

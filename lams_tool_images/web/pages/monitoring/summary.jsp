@@ -223,7 +223,7 @@
 						<c:choose>
 							<c:when test="${item.viewNumber > 0}">
 								<c:set var="listUrl">
-									<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&itemUid=${item.itemUid}' />
+									<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&imageUid=${item.itemUid}' />
 								</c:set>
 								<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
 							</c:when>
@@ -235,10 +235,10 @@
 					<td align="center">
 						<c:choose>
 							<c:when test="${item.itemHide}">
-								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
+								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
 							</c:when>
 							<c:otherwise>
-								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&itemUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
+								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${item.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
 							</c:otherwise>
 						</c:choose>
 					</td>

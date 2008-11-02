@@ -23,11 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.imageGallery.web.form;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,9 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryAttachment;
 
 /**
  * 
@@ -45,7 +38,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryAttachment;
  * 
  * @struts.form name="imageGalleryForm"
  * 
- * User: Dapeng.Ni
+ * User: Andrey Balan
  */
 public class ImageGalleryForm extends ActionForm {
     private static final long serialVersionUID = 3599879328307492312L;

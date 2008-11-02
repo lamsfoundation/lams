@@ -23,17 +23,13 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.imageGallery.web.action;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -153,11 +149,11 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("removeItem")) {
 	    return removeItem(mapping, form, request, response);
-	}	
+	}
 
 	return mapping.findForward(ImageGalleryConstants.ERROR);
     }
-    
+
     /**
      * Read imageGallery data from database and put them into HttpSession. It will redirect to init.do directly after
      * this method run successfully.
@@ -328,9 +324,9 @@ public class AuthoringAction extends Action {
 	    }
 	    imageGalleryPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
-	
+
 	// *******************************Handle nextImageTitle*******************
-	Long nextConsecutiveImageTitle = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);	
+	Long nextConsecutiveImageTitle = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
 	imageGalleryPO.setNextImageTitle(nextConsecutiveImageTitle);
 
 	// *******************************Handle user*******************
@@ -384,10 +380,10 @@ public class AuthoringAction extends Action {
 	}
 	// copy back
 	imageGalleryPO.setAttachments(attPOSet);
-	
+
 	// ************************* Handle imageGallery allowRank item *******************
 	imageGalleryPO.setAllowRank(imageGalleryForm.isAllowRatingsOrVote() && !imageGalleryPO.isAllowVote());
-	
+
 	// ************************* Handle imageGallery items *******************
 	// Handle imageGallery items
 	Set itemList = new LinkedHashSet();
@@ -596,7 +592,7 @@ public class AuthoringAction extends Action {
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
 
     }
-    
+
     // **********************************************************
     // Add Image methods
     // **********************************************************
@@ -617,7 +613,7 @@ public class AuthoringAction extends Action {
 
 	return mapping.findForward("file");
     }
-    
+
     /**
      * Display edit page for existed imageGallery item.
      * 
@@ -645,8 +641,8 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	return (item == null) ? null : mapping.findForward("file");
-    }    
-    
+    }
+
     /**
      * Remove imageGallery item attachment, such as single file, learning object ect. It is a ajax call and just
      * temporarily remove from page, all permenant change will happen only when user sumbit this imageGallery item
@@ -662,7 +658,7 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 	request.setAttribute("itemAttachment", null);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }    
+    }
 
     /**
      * This method will get necessary information from imageGallery item form and save or update into
@@ -692,7 +688,8 @@ public class AuthoringAction extends Action {
 	    extractFormToImageGalleryItem(request, itemForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    e.getMessage()));
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 		return mapping.findForward("file");
@@ -703,7 +700,7 @@ public class AuthoringAction extends Action {
 	// return null to close this window
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
-    
+
     /**
      * Move up current item.
      * 
@@ -759,8 +756,8 @@ public class AuthoringAction extends Action {
 
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }    
-    
+    }
+
     /**
      * Remove imageGallery item from HttpSession list and update page display. As authoring rule, all persist only
      * happen when user submit whole page. So this remove is just impact HttpSession values.
@@ -792,7 +789,7 @@ public class AuthoringAction extends Action {
 
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }    
+    }
 
     // *************************************************************************************
     // Private methods
@@ -909,8 +906,8 @@ public class AuthoringAction extends Action {
      * @param imageForm
      * @throws ImageGalleryApplicationException
      */
-    private void extractFormToImageGalleryItem(HttpServletRequest request,
-	    ImageGalleryItemForm imageForm) throws Exception {
+    private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm)
+	    throws Exception {
 	/*
 	 * BE CAREFUL: This method will copy nessary info from request form to a old or new ImageGalleryItem instance.
 	 * It gets all info EXCEPT ImageGalleryItem.createDate and ImageGalleryItem.createBy, which need be set when
@@ -938,8 +935,9 @@ public class AuthoringAction extends Action {
 	    image = rList.get(imageIdx);
 	}
 
-	// uploadImageGalleryItemFile 
-	// and setting file properties' fields: item.setFileUuid(); item.setFileVersionId(); item.setFileType(); item.setFileName();
+	// uploadImageGalleryItemFile
+	// and setting file properties' fields: item.setFileUuid(); item.setFileVersionId(); item.setFileType();
+	// item.setFileName();
 	if (imageForm.getFile() != null) {
 	    // if it has old file, and upload a new, then save old to deleteList
 	    ImageGalleryItem delImage = new ImageGalleryItem();
@@ -967,17 +965,17 @@ public class AuthoringAction extends Action {
 		delAtt.add(delImage);
 	    }
 	}
-	
+
 	String title = imageForm.getTitle();
 	if (StringUtils.isBlank(title)) {
 	    Long nextConsecutiveImageTitle = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
-	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextConsecutiveImageTitle+1);
+	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextConsecutiveImageTitle + 1);
 	    String imageLocalized = getImageGalleryService().getLocalisedMessage("label.authoring.image", null);
 	    title = imageLocalized + " " + nextConsecutiveImageTitle;
 	}
 	image.setTitle(title);
-	
-	image.setDescription(imageForm.getDescription());	
+
+	image.setDescription(imageForm.getDescription());
 	image.setCreateByAuthor(true);
 	image.setHide(false);
     }
@@ -990,7 +988,7 @@ public class AuthoringAction extends Action {
      */
     private ActionErrors validateImageGalleryItem(ImageGalleryItemForm itemForm) {
 	ActionErrors errors = new ActionErrors();
-	
+
 	// validate file size
 	FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
 	// for edit validate: file already exist
@@ -998,13 +996,17 @@ public class AuthoringAction extends Action {
 		&& ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_FILE_BLANK));
 	}
-	
-	//check for allowed format : gif, png, jpg
+
+	// check for allowed format : gif, png, jpg
 	if (itemForm.getFile() != null) {
 	    String contentType = itemForm.getFile().getContentType();
-	    if (StringUtils.isEmpty(contentType) || !(contentType.equals("image/gif") || contentType.equals("image/png") || contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType.equals("image/pjpeg"))) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
-	    }	
+	    if (StringUtils.isEmpty(contentType)
+		    || !(contentType.equals("image/gif") || contentType.equals("image/png")
+			    || contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
+			    .equals("image/pjpeg"))) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
+	    }
 	}
 
 	return errors;
@@ -1027,7 +1029,7 @@ public class AuthoringAction extends Action {
 
 	return errors;
     }
-    
+
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
      * 

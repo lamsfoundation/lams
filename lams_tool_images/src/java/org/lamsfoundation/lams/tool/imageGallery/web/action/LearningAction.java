@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
@@ -48,18 +49,21 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
-import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryApplicationException;
 import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
+import org.lamsfoundation.lams.tool.imageGallery.util.ImageCommentComparator;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
+import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageCommentForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -74,9 +78,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * 
- * @author Steve.Ni
- * 
- * @version $Revision$
+ * @author Andrey Balan
  */
 public class LearningAction extends Action {
 
@@ -84,7 +86,7 @@ public class LearningAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) {
 
 	String param = mapping.getParameter();
 	// -----------------------ImageGallery Learner function ---------------------------
@@ -94,19 +96,23 @@ public class LearningAction extends Action {
 	if (param.equals("complete")) {
 	    return complete(mapping, form, request, response);
 	}
-
 	if (param.equals("finish")) {
 	    return finish(mapping, form, request, response);
 	}
-	if (param.equals("addfile")) {
-	    return addItem(mapping, form, request, response);
+	if (param.equals("addimage")) {
+	    return addImage(mapping, form, request, response);
 	}
-	if (param.equals("addurl")) {
-	    return addItem(mapping, form, request, response);
+	if (param.equals("saveOrUpdateImage")) {
+	    return saveOrUpdateImage(mapping, form, request, response);
 	}
-	if (param.equals("saveOrUpdateItem")) {
-	    return saveOrUpdateItem(mapping, form, request, response);
-	}
+	
+	// ================ Comments =======================	
+	if (param.equals("showComments")) {
+	    return showComments(mapping, form, request, response);
+	}	
+	if (param.equals("addNewComment")) {
+	    return addNewComment(mapping, form, request, response);
+	}	
 
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
@@ -120,27 +126,9 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Initial page for add imageGallery item (single file or URL).
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward addItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
-	itemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
-	itemForm.setSessionMapID(WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID));
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }
-
-    /**
      * Read imageGallery data from database and put them into HttpSession. It will redirect to init.do directly after
-     * this method run successfully.
-     * 
-     * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
+     * this method run successfully. This method will avoid read database again and lost un-saved resouce item lost when
+     * user "refresh page",
      * 
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -180,21 +168,6 @@ public class LearningAction extends Action {
 	boolean lock = imageGallery.getLockWhenFinished() && (imageGalleryUser != null)
 		&& imageGalleryUser.isSessionFinished();
 
-	// check whether there is only one imageGallery item and run auto flag is true or not.
-	boolean runAuto = false;
-	int itemsNumber = 0;
-	if (imageGallery.getImageGalleryItems() != null) {
-	    itemsNumber = imageGallery.getImageGalleryItems().size();
-	    if (imageGallery.isAllowVote() && (itemsNumber == 1)) {
-		ImageGalleryItem item = (ImageGalleryItem) imageGallery.getImageGalleryItems().iterator().next();
-		// only visible item can be run auto.
-		if (!item.isHide()) {
-		    runAuto = true;
-		    request.setAttribute(ImageGalleryConstants.ATTR_RESOURCE_ITEM_UID, item.getUid());
-		}
-	    }
-	}
-
 	// get notebook entry
 	String entryText = new String();
 	if (imageGalleryUser != null) {
@@ -219,7 +192,6 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, imageGallery.isReflectOnActivity());
 	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_INSTRUCTION, imageGallery.getReflectInstructions());
 	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ENTRY, entryText);
-	sessionMap.put(ImageGalleryConstants.ATTR_RUN_AUTO, new Boolean(runAuto));
 
 	// add define later support
 	if (imageGallery.isDefineLater()) {
@@ -240,7 +212,7 @@ public class LearningAction extends Action {
 	}
 
 	// init imageGallery item list
-	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageGalleryItemList(sessionMap);
+	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
 	imageGalleryItemList.clear();
 	if (items != null) {
 	    // remove hidden items.
@@ -306,36 +278,35 @@ public class LearningAction extends Action {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	// auto run mode, when use finish the only one imageGallery item, mark it as complete then finish this activity
-	// as well.
-	String imageGalleryItemUid = request.getParameter(ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID);
-	if (imageGalleryItemUid != null) {
-	    doComplete(request);
-	    // NOTE:So far this flag is useless(31/08/2006).
-	    // set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
-	    request.setAttribute(ImageGalleryConstants.ATTR_RUN_AUTO, true);
-	} else {
-	    request.setAttribute(ImageGalleryConstants.ATTR_RUN_AUTO, false);
-	}
+	//	// auto run mode, when use finish the only one imageGallery item, mark it as complete then finish this activity
+	//	// as well.
+	//	String imageGalleryItemUid = request.getParameter(ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID);
+	//	if (imageGalleryItemUid != null) {
+	//	    doComplete(request);
+	//	    // NOTE:So far this flag is useless(31/08/2006).
+	//	    // set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
+	//	    request.setAttribute(ImageGalleryConstants.ATTR_IS_ALLOW_VOTE, true);
+	//	} else {
+	//	    request.setAttribute(ImageGalleryConstants.ATTR_IS_ALLOW_VOTE, false);
+	//	}
 
-	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return mapping.getInputForward();
-	}
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }
 
-	IImageGalleryService service = getImageGalleryService();
-	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
-
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
-	    request.setAttribute(ImageGalleryConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (ImageGalleryApplicationException e) {
-	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
+    /**
+     * Initial page for add imageGallery item (single file or URL).
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward addImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
+	itemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
+	itemForm.setSessionMapID(WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID));
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
 
@@ -348,7 +319,7 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward saveOrUpdateImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
@@ -377,12 +348,12 @@ public class LearningAction extends Action {
 	item.setCreateBy(imageGalleryUser);
 
 	// special attribute for URL or FILE
-	    try {
-		service.uploadImageGalleryItemFile(item, itemForm.getFile());
-	    } catch (UploadImageGalleryFileException e) {
-		LearningAction.log.error("Failed upload ImageGallery File " + e.toString());
-		return mapping.findForward(ImageGalleryConstants.ERROR);
-	    }
+	try {
+	    service.uploadImageGalleryItemFile(item, itemForm.getFile());
+	} catch (UploadImageGalleryFileException e) {
+	    LearningAction.log.error("Failed upload ImageGallery File " + e.toString());
+	    return mapping.findForward(ImageGalleryConstants.ERROR);
+	}
 	// save and update session
 
 	ImageGallerySession resSession = service.getImageGallerySessionBySessionId(sessionId);
@@ -399,24 +370,112 @@ public class LearningAction extends Action {
 	service.saveOrUpdateImageGallerySession(resSession);
 
 	// update session value
-	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageGalleryItemList(sessionMap);
+	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
 	imageGalleryItemList.add(item);
 
 	// URL or file upload
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 
-	ImageGallery imageGallery = resSession.getImageGallery();
-	if (imageGallery.isAllowRank()
-		&& service.getEventNotificationService().eventExists(ImageGalleryConstants.TOOL_SIGNATURE,
-			ImageGalleryConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT,
-			imageGallery.getContentId())) {
-	    String fullName = imageGalleryUser.getLastName() + " " + imageGalleryUser.getFirstName();
-	    service.getEventNotificationService().trigger(ImageGalleryConstants.TOOL_SIGNATURE,
-		    ImageGalleryConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT, imageGallery.getContentId(),
-		    new Object[] { fullName });
-	}
+	//	ImageGallery imageGallery = resSession.getImageGallery();
+	//	if (imageGallery.isAllowRank()
+	//		&& service.getEventNotificationService().eventExists(ImageGalleryConstants.TOOL_SIGNATURE,
+	//			ImageGalleryConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT,
+	//			imageGallery.getContentId())) {
+	//	    String fullName = imageGalleryUser.getLastName() + " " + imageGalleryUser.getFirstName();
+	//	    service.getEventNotificationService().trigger(ImageGalleryConstants.TOOL_SIGNATURE,
+	//		    ImageGalleryConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT, imageGallery.getContentId(),
+	//		    new Object[] { fullName });
+	//	}
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
+    
+    
+    /**
+     * Move down current item.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward showComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	// get back sessionMAP
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+
+	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
+	ImageGalleryItem image = getImageGalleryService().getImageGalleryItemByUid(imageUid);
+	TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
+	comments.addAll(image.getComments());
+	sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
+	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, image);
+	
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }
+    
+    /**
+     * Move down current item.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward addNewComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	
+
+	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
+
+	String commentMessage = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_COMMENT);
+	if(commentMessage == null || StringUtils.isBlank(commentMessage))
+		return mapping.findForward(ImageGalleryConstants.SUCCESS);
+	
+	//TODO fix error system
+//	ActionErrors errors = validateImageGalleryItem(itemForm);
+//	if (!errors.isEmpty()) {
+//	    ActionErrors errors = new ActionErrors();
+//	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_FILE_BLANK));
+//	    
+//	    this.addErrors(request, errors);
+//	    return mapping.findForward("file");
+//	}
+	
+	
+	ImageComment comment = new ImageComment();
+	comment.setComment(commentMessage);
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	IImageGalleryService service = getImageGalleryService();
+	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
+	comment.setCreateBy(imageGalleryUser);
+	comment.setCreateDate(new Timestamp(new Date().getTime()));
+	
+	//persist ImageGallery changes in DB 
+	Long currentImageUid =  new Long(request.getParameter(ImageGalleryConstants.ATTR_CURRENT_IMAGE_UID));
+	ImageGalleryItem dbItem = service.getImageGalleryItemByUid(currentImageUid);
+	Set<ImageComment> dbComments = dbItem.getComments();
+	dbComments.add(comment);
+	service.saveOrUpdateImageGalleryItem(dbItem);
+			
+//	//to make available new changes be visible in jsp page
+//	sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM, dbItem);
+	
+	TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
+	comments.addAll(dbItem.getComments());
+	sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
+	
+//	form.reset(mapping, request);
+	
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }
+   
 
     /**
      * Display empty reflection form.
@@ -432,9 +491,6 @@ public class LearningAction extends Action {
 
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return mapping.getInputForward();
-	}
 
 	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
@@ -497,32 +553,8 @@ public class LearningAction extends Action {
     }
 
     // *************************************************************************************
-    // Private method
+    // Private methods
     // *************************************************************************************
-    private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userID = new Long(user.getUserID().longValue());
-
-	IImageGalleryService service = getImageGalleryService();
-	int miniViewFlag = service.checkMiniView(sessionId, userID);
-	// if current user view less than reqired view count number, then just return error message.
-	// if it is runOffline content, then need not check minimum view count
-	Boolean runOffline = (Boolean) sessionMap.get(ImageGalleryConstants.PARAM_RUN_OFFLINE);
-	if ((miniViewFlag > 0) && !runOffline) {
-	    ActionErrors errors = new ActionErrors();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("lable.learning.minimum.view.number.less",
-		    miniViewFlag));
-	    this.addErrors(request, errors);
-	    return false;
-	}
-
-	return true;
-    }
-
     private IImageGalleryService getImageGalleryService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
@@ -535,28 +567,12 @@ public class LearningAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<ImageGalleryItem> getImageGalleryItemList(SessionMap sessionMap) {
+    private SortedSet<ImageGalleryItem> getImageList(SessionMap sessionMap) {
 	SortedSet<ImageGalleryItem> list = (SortedSet<ImageGalleryItem>) sessionMap
 		.get(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
 	    list = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());
 	    sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST, list);
-	}
-	return list;
-    }
-
-    /**
-     * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
-     * @param request
-     * @param name
-     * @return
-     */
-    private List getListFromSession(SessionMap sessionMap, String name) {
-	List list = (List) sessionMap.get(name);
-	if (list == null) {
-	    list = new ArrayList();
-	    sessionMap.put(name, list);
 	}
 	return list;
     }
@@ -597,41 +613,19 @@ public class LearningAction extends Action {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_TITLE_BLANK));
 	}
 
-	//BYYYYYY MEEEEEE
-//	if (itemForm.getItemType() == ImageGalleryConstants.RESOURCE_TYPE_URL) {
-//	    if (StringUtils.isBlank(itemForm.getUrl())) {
-//		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_URL_BLANK));
-//		// URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://address:port
-//		// format!!!
-//		// UrlValidator validator = new UrlValidator();
-//		// if(!validator.isValid(itemForm.getUrl()))
-//		// errors.add(ActionMessages.GLOBAL_MESSAGE,new
-//		// ActionMessage(ImageGalleryConstants.ERROR_MSG_INVALID_URL));
-//	    }
-//	}
-	
-	// if(itemForm.getItemType() == ImageGalleryConstants.RESOURCE_TYPE_WEBSITE
-	// ||itemForm.getItemType() == ImageGalleryConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-	// if(StringUtils.isBlank(itemForm.getDescription()))
-	// errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(ImageGalleryConstants.ERROR_MSG_DESC_BLANK));
-	// }
+	if ((itemForm.getFile() != null) && FileUtil.isExecutableFile(itemForm.getFile().getFileName())) {
+	    ActionMessage msg = new ActionMessage("error.attachment.executable");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
+	}
 
+	// validate item size
+	FileValidatorUtil.validateFileSize(itemForm.getFile(), false, errors);
 
-	    if ((itemForm.getFile() != null) && FileUtil.isExecutableFile(itemForm.getFile().getFileName())) {
-		ActionMessage msg = new ActionMessage("error.attachment.executable");
-		errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
-	    }
-
-	    // validate item size
-	    FileValidatorUtil.validateFileSize(itemForm.getFile(), false, errors);
-
-	    // for edit validate: file already exist
-	    if (!itemForm.isHasFile()
-		    && ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
-		errors
-			.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				ImageGalleryConstants.ERROR_MSG_FILE_BLANK));
-	    }
+	// for edit validate: file already exist
+	if (!itemForm.isHasFile()
+		&& ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_FILE_BLANK));
+	}
 	return errors;
     }
 
@@ -646,7 +640,7 @@ public class LearningAction extends Action {
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-	Long imageGalleryItemUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID));
+	Long imageGalleryItemUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	IImageGalleryService service = getImageGalleryService();
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
@@ -656,7 +650,7 @@ public class LearningAction extends Action {
 	service.setItemComplete(imageGalleryItemUid, new Long(user.getUserID().intValue()), sessionId);
 
 	// set imageGallery item complete tag
-	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageGalleryItemList(sessionMap);
+	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
 	for (ImageGalleryItem item : imageGalleryItemList) {
 	    if (item.getUid().equals(imageGalleryItemUid)) {
 		item.setComplete(true);

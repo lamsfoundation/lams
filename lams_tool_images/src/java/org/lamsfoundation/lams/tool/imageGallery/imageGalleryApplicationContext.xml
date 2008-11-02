@@ -22,6 +22,7 @@
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryUser.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGallery.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryItem.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageComment.hbm.xml</value>               
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryItemVisitLog.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGallerySession.hbm.xml</value>
@@ -41,6 +42,11 @@
             <ref local="imageGallerySessionFactory"/>
         </property>
     </bean>
+    <bean id="imageCommentDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageCommentDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="imageGallerySessionFactory"/>
+        </property>
+    </bean>    
     <bean id="imageGalleryItemVisitDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryItemVisitDAOHibernate">
         <property name="sessionFactory">
             <ref local="imageGallerySessionFactory"/>

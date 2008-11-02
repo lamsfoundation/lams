@@ -104,8 +104,6 @@ public class ImageGallery implements Cloneable {
     // *************** NON Persist Fields ********************
     private IToolContentHandler toolContentHandler;
 
-    private String miniViewNumberStr;
-
     private List<ImageGalleryAttachment> onlineFileList;
 
     private List<ImageGalleryAttachment> offlineFileList;
@@ -529,19 +527,6 @@ public class ImageGallery implements Cloneable {
 
     public void setAllowVote(boolean allowVote) {
 	this.allowVote = allowVote;
-    }
-
-    /**
-     * For display use
-     * 
-     * @return
-     */
-    public String getMiniViewNumberStr() {
-	return miniViewNumberStr;
-    }
-
-    public void setMiniViewNumberStr(String minViewNumber) {
-	miniViewNumberStr = minViewNumber;
     }
 
     public List<ImageGalleryAttachment> getOfflineFileList() {

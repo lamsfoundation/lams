@@ -43,7 +43,9 @@ package org.lamsfoundation.lams.tool.imageGallery.util;
  */
 
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Implements the Circular Buffer producer/consumer model for bytes.

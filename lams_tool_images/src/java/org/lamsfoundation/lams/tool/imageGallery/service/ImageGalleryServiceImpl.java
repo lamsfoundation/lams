@@ -25,23 +25,16 @@ package org.lamsfoundation.lams.tool.imageGallery.service;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -51,11 +44,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageInputStream;
-import javax.swing.ImageIcon;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -92,6 +82,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
+import org.lamsfoundation.lams.tool.imageGallery.dao.ImageCommentDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryAttachmentDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryConfigItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryDAO;
@@ -115,20 +106,8 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
-
-import sun.swing.ImageIconUIResource;
-
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
-import com.sun.imageio.plugins.common.ImageUtil;
 
 /**
  * 
@@ -144,7 +123,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ImageGalleryDAO imageGalleryDao;
 
     private ImageGalleryItemDAO imageGalleryItemDao;
-
+    
+    private ImageCommentDAO imageCommentDao;
+    
     private ImageGalleryAttachmentDAO imageGalleryAttachmentDao;
 
     private ImageGalleryUserDAO imageGalleryUserDao;
@@ -428,10 +409,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	// to skip CGLib problem
 	Long contentId = session.getImageGallery().getContentId();
 	ImageGallery res = imageGalleryDao.getByContentId(contentId);
-	int miniView = res.getNumberColumns();
-	// construct dto fields;
-	res.setMiniViewNumberStr(messageService.getMessage("label.learning.minimum.review", new Object[] { new Integer(
-		miniView) }));
 	return res;
     }
 
@@ -503,18 +480,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    throw new ImageGalleryApplicationException(e);
 	}
 	return nextUrl;
-    }
-
-    public int checkMiniView(Long toolSessionId, Long userUid) {
-	int miniView = imageGalleryItemVisitDao.getUserViewLogCount(toolSessionId, userUid);
-	ImageGallerySession session = imageGallerySessionDao.getSessionBySessionId(toolSessionId);
-	if (session == null) {
-	    ImageGalleryServiceImpl.log.error("Failed get session by ID [" + toolSessionId + "]");
-	    return 0;
-	}
-	int reqView = session.getImageGallery().getNumberColumns();
-
-	return reqView - miniView;
     }
 
     public ImageGalleryItem getImageGalleryItemByUid(Long itemUid) {
@@ -753,17 +718,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      * @throws UploadImageGalleryFileException 
      */
     /**
-     * Reads an image in a file and creates a thumbnail in another file.
-     * 
-     * @param orig
-     *                The name of image file.
-     * @param thumb
-     *                The name of thumbnail file. Will be created if necessary.
-     * @param maxDim
-     *                The width and height of the thumbnail must be maxDim pixels or less.
-     * @throws UploadImageGalleryFileException
-     */
-    /**
      * Reads an image in a file and creates a thumbnail in another file. largestDimension is the largest dimension of
      * the thumbnail, the other dimension is scaled accordingly. Utilises weighted stepping method to gradually reduce
      * the image size for better results, i.e. larger steps to start with then smaller steps to finish with. Note:
@@ -921,6 +875,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	this.imageGalleryItemDao = imageGalleryItemDao;
     }
 
+    public void setImageCommentDao(ImageCommentDAO imageCommentDao) {
+	this.imageCommentDao = imageCommentDao;
+    }
+    
+
     public void setImageGallerySessionDao(ImageGallerySessionDAO imageGallerySessionDao) {
 	this.imageGallerySessionDao = imageGallerySessionDao;
     }
@@ -975,7 +934,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	toolContentObj.setToolContentHandler(null);
 	toolContentObj.setOfflineFileList(null);
 	toolContentObj.setOnlineFileList(null);
-	toolContentObj.setMiniViewNumberStr(null);
 	try {
 	    exportContentService.registerFileClassForExport(ImageGalleryAttachment.class.getName(), "fileUuid",
 		    "fileVersionId");

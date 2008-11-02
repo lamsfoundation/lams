@@ -23,17 +23,21 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.imageGallery.util;  
  
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.Kernel;
-import java.awt.image.ConvolveOp;
+
+import javax.swing.ImageIcon;
+
+import com.sun.image.codec.jpeg.JPEGCodec;
+import com.sun.image.codec.jpeg.JPEGEncodeParam;
+import com.sun.image.codec.jpeg.JPEGImageEncoder;
  
 public class ImageUtil {
  
