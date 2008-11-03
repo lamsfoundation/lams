@@ -147,7 +147,7 @@ public class ImageGalleryItem implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="description"
+     * @hibernate.property column="description" type="text"
      * @return
      */
     public String getDescription() {

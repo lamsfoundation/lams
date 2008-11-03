@@ -44,7 +44,7 @@ create table tl_laimag10_imageGallery (
 )type=innodb;
 create table tl_laimag10_imageGallery_item (
    uid bigint not null auto_increment,
-   description varchar(255),
+   description text,
    title varchar(255),
    create_by bigint,
    create_date datetime,
