@@ -1259,8 +1259,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		ToolContent newContent = new ToolContent(newTool);
 		toolContentDAO.saveToolContent(newContent);
 
-		// put new toolContent and it is old toolContentID into
-		toolMapper.put(activity.getToolContentID(), newContent);
+		// store new toolContent mapped by original activity id
+		toolMapper.put(activity.getActivityID(), newContent);
 
 		// Invoke tool's importToolContent() method.
 		try {
@@ -2321,7 +2321,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	switch (act.getActivityTypeId()) {
 	case Activity.TOOL_ACTIVITY_TYPE:
 	    // get back the toolContent in new system by toolContentID in old system.
-	    ToolContent content = toolMapper.get(actDto.getToolContentID());
+	    ToolContent content = toolMapper.get(actDto.getActivityID());
 	    // if activity can not find matching tool, the content should be null.
 	    if (content != null) {
 		((ToolActivity) act).setTool(content.getTool());
