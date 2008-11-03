@@ -21,122 +21,144 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.export;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Models the portfolio for any type of activity, including tools, groupings, gates, optional and parallel activities
+ * 
  * @author mtruong, fmalikoff
- *
+ * 
  */
 public class ActivityPortfolio {
-	
-	private Long activityId;
-	private String activityDescription;
-	private String activityName;
-	private String exportUrl;
-	private List childPortfolios;
-	/* The link to the tool page from the main export page */
-	private String toolLink;
-	private boolean headingNoPage;
-		
-	/**
-	 * @return Returns the toolLink.
-	 */
-	public String getToolLink() {
-		return toolLink;
-	}
-	/**
-	 * @param toolLink The toolLink to set.
-	 */
-	public void setToolLink(String toolLink) {
-		this.toolLink = toolLink;
-	}
 
-	public ActivityPortfolio()
-	{
-		this.activityId = null;	
-		this.activityDescription = null;
-		this.activityName = null;
-		this.exportUrl = null;
-		this.toolLink = null;
-		this.childPortfolios = null;
-		this.headingNoPage = false;
-	}
-	
-	
+    private Long activityId;
+    private String activityDescription;
+    private String activityName;
+    private String exportUrl;
+    private List childPortfolios;
+    /* The link to the tool page from the main export page */
+    private String toolLink;
+    private boolean headingNoPage;
+    private Set<String> competencesCovered = new TreeSet<String>();
 
-	/**
-	 * @return Returns the activityName.
-	 */
-	public String getActivityName() {
-		return activityName;
-	}
-	/**
-	 * @param activityName The activityName to set.
-	 */
-	public void setActivityName(String activityName) {
-		this.activityName = activityName;
-	}
-	
-	/**
-	 * @return Returns the exportUrl.
-	 */
-	public String getExportUrl() {
-		return exportUrl;
-	}
-	/**
-	 * @param exportUrl The exportUrl to set.
-	 */
-	public void setExportUrl(String exportUrl) {
-		this.exportUrl = exportUrl;
-	}
-		
-	/**
-	 * @return Returns the activityId.
-	 */
-	public Long getActivityId() {
-		return activityId;
-	}
-	/**
-	 * @param activityId The activityId to set.
-	 */
-	public void setActivityId(Long activityId) {
-		this.activityId = activityId;
-	}
-		
-	/**
-	 * @return Returns the activityDescription.
-	 */
-	public String getActivityDescription() {
-		return activityDescription;
-	}
-	/**
-	 * @param activityDescription The activityDescription to set.
-	 */
-	public void setActivityDescription(String activityDescription) {
-		this.activityDescription = activityDescription;
-	}
-	/** Get the portfolios for any sub activities. Will return null for tool portfolios */
-	public List getChildPortfolios() {
-		return childPortfolios;
-	}
-	public void setChildPortfolios(List childPortfolios) {
-		this.childPortfolios = childPortfolios;
-	}
-	/** Generate just a heading for this portfolio, don't try to link to a page. This is 
-	 * used for Parallel and Sequence activities in both learner and teacher modes,
-	 * and for Branching in learner mode.
-	 * @return
-	 */
-	public boolean isHeadingNoPage() {
-		return headingNoPage;
-	}
-	public void setHeadingNoPage(boolean headingNoPage) {
-		this.headingNoPage = headingNoPage;
-	}
-	
-	
+    /**
+     * @return Returns the toolLink.
+     */
+    public String getToolLink() {
+	return toolLink;
+    }
+
+    /**
+     * @param toolLink
+     *                The toolLink to set.
+     */
+    public void setToolLink(String toolLink) {
+	this.toolLink = toolLink;
+    }
+
+    public ActivityPortfolio() {
+	activityId = null;
+	activityDescription = null;
+	activityName = null;
+	exportUrl = null;
+	toolLink = null;
+	childPortfolios = null;
+	headingNoPage = false;
+    }
+
+    /**
+     * @return Returns the activityName.
+     */
+    public String getActivityName() {
+	return activityName;
+    }
+
+    /**
+     * @param activityName
+     *                The activityName to set.
+     */
+    public void setActivityName(String activityName) {
+	this.activityName = activityName;
+    }
+
+    /**
+     * @return Returns the exportUrl.
+     */
+    public String getExportUrl() {
+	return exportUrl;
+    }
+
+    /**
+     * @param exportUrl
+     *                The exportUrl to set.
+     */
+    public void setExportUrl(String exportUrl) {
+	this.exportUrl = exportUrl;
+    }
+
+    /**
+     * @return Returns the activityId.
+     */
+    public Long getActivityId() {
+	return activityId;
+    }
+
+    /**
+     * @param activityId
+     *                The activityId to set.
+     */
+    public void setActivityId(Long activityId) {
+	this.activityId = activityId;
+    }
+
+    /**
+     * @return Returns the activityDescription.
+     */
+    public String getActivityDescription() {
+	return activityDescription;
+    }
+
+    /**
+     * @param activityDescription
+     *                The activityDescription to set.
+     */
+    public void setActivityDescription(String activityDescription) {
+	this.activityDescription = activityDescription;
+    }
+
+    /** Get the portfolios for any sub activities. Will return null for tool portfolios */
+    public List getChildPortfolios() {
+	return childPortfolios;
+    }
+
+    public void setChildPortfolios(List childPortfolios) {
+	this.childPortfolios = childPortfolios;
+    }
+
+    /**
+     * Generate just a heading for this portfolio, don't try to link to a page. This is used for Parallel and Sequence
+     * activities in both learner and teacher modes, and for Branching in learner mode.
+     * 
+     * @return
+     */
+    public boolean isHeadingNoPage() {
+	return headingNoPage;
+    }
+
+    public void setHeadingNoPage(boolean headingNoPage) {
+	this.headingNoPage = headingNoPage;
+    }
+
+    public Set<String> getCompetencesCovered() {
+	return competencesCovered;
+    }
+
+    public void setCompetencesCovered(Set<String> competencesCovered) {
+	this.competencesCovered = competencesCovered;
+    }
 }

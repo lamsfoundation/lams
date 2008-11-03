@@ -61,13 +61,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${not empty portfolio.lessonDescription}">
 			<p><c:out value="${portfolio.lessonDescription}"/></p>
 		</c:if>
+		
 
 		<p><fmt:message key="export.portfolio.lesson.started.date.label"/> 
 			<lams:Date value="${portfolio.lessonStartDate}"/></p>
 
 		<p><fmt:message key="export.portfolio.generated.date.label"/> 
 			<lams:Date value="${portfolio.portfolioCreatedDate}"/></p>
-
+			
+		<c:if test="${not empty portfolio.competencesDefined}">
+			<h3><fmt:message key="export.portfolio.competences.defined.table.title"/></h3>
+			<table class="alternative-color">
+				<tr>
+					<th><fmt:message key="export.portfolio.competences.defined.title"/></th>
+					<th><fmt:message key="export.portfolio.competences.defined.description"/></th>
+				</tr>
+				<c:forEach var="competence" items="${portfolio.competencesDefined}">
+					<tr>
+						<td>${competence.title}</td>
+						<td>${competence.description}</td>
+					</tr>
+				</c:forEach>
+			</table>
+			<br />
+		</c:if>
+		
 		<c:if test="${!empty portfolio.notebookPortfolios}">
 			<p>
 				<a href="${portfolio.notebookLink}" target="_blank">
