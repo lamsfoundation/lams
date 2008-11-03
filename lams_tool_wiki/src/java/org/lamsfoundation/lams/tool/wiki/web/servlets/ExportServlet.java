@@ -55,6 +55,8 @@ import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -180,7 +182,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	    // Update image links
 	    WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
-	    contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(),getLamsOrRamsContext(request)));
+	    contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(), Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH)));
 	    wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
 	    
 	    wikiPageDTOs.add(wikiPageDTO);
@@ -281,7 +283,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		// Update image links
 		WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
-		contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(), getLamsOrRamsContext(request)));
+		contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(), Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH)));
 		wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
 		
 		wikiPageDTOs.add(wikiPageDTO);
@@ -318,10 +320,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
      * @return
      */
     private String replaceImageFolderLinks(String body, String contentFolderID, String lamsOrRams) {
-	String fckeditorpath = lamsOrRams + "//www/secure/" + contentFolderID;
+	String fckeditorpath = "/" + lamsOrRams + "/www/secure/" + contentFolderID;
 	String newfckeditorpath = "./" + contentFolderID;
 	
-	String fckeditorsmiley = lamsOrRams + "//fckeditor/editor/images/smiley";
+	String fckeditorsmiley = "/" + lamsOrRams + "/fckeditor/editor/images/smiley";
 	String newfckeditorsmiley = "./fckeditor/editor/images/smiley";
 	
 
@@ -340,15 +342,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	result = m2.replaceAll(newfckeditorsmiley);
 	
 	return result;
-    }
-    
-    /**
-     * Returns "/rams" if we are running rams and "/lams" if we are running lams
-     * @return
-     */
-    private String getLamsOrRamsContext(HttpServletRequest request)
-    {
-	return request.getContextPath().substring(0, 5);
     }
 
 }
