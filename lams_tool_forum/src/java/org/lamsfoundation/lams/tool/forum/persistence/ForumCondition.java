@@ -212,8 +212,8 @@ public class ForumCondition extends TextSearchCondition {
 	}
 	StringBuilder stringPattern = new StringBuilder();
 	for (String excludedWord : excludedWords) {
-	    stringPattern.append("(?:").append(TextSearchCondition.WORD_DELIMITER_REGEX).append(
-		    Pattern.quote(excludedWord)).append(TextSearchCondition.WORD_DELIMITER_REGEX).append(")|");
+	    stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(
+		    Pattern.quote(excludedWord)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(")|");
 	}
 	stringPattern.deleteCharAt(stringPattern.length() - 1);
 	Pattern regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
