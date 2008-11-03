@@ -55,6 +55,8 @@ import org.lamsfoundation.lams.learning.export.service.ExportPortfolioServicePro
 import org.lamsfoundation.lams.learning.export.service.IExportPortfolioService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -158,7 +160,7 @@ public class MainExportServlet extends HttpServlet {
 		    exportService.generateNotebookPage(request, portfolios, cookies);
 
 	    //correct all image links in created htmls.
-	    replaceImageFolderLinks(portfolios.getContentFolderID(), getLamsOrRamsContext(request));
+	    replaceImageFolderLinks(portfolios.getContentFolderID(), Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH));
 
 	    //bundle the stylesheet with the package
 	    CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir, exportService.getUserThemes());
@@ -220,13 +222,13 @@ public class MainExportServlet extends HttpServlet {
      * 
      * @param filename filename
      * @param contentFolderID 32-character content folder name
-     * @param lamsOrRams "/rams" if we are running rams and "/lams" otherwise
+     * @param lamsOrRams "rams/" if we are running rams and "lams/" otherwise
      */
     private void replaceImageFolderLinks(String filename, String contentFolderID, String lamsOrRams) {
 	try {
 	    // String to find
-	    String fckeditorpath = lamsOrRams + "//www/secure/" + contentFolderID;
-	    String fckeditorsmiley = lamsOrRams + "//fckeditor/editor/images/smiley";
+	    String fckeditorpath = "/" + lamsOrRams + "/www/secure/" + contentFolderID;
+	    String fckeditorsmiley = "/" + lamsOrRams + "/fckeditor/editor/images/smiley";
 
 	    // Replacing string
 	    String newfckeditorpath = "../" + contentFolderID;
@@ -275,14 +277,5 @@ public class MainExportServlet extends HttpServlet {
 	    log.error("Unable to correct imagefolder links in file " + filename, e);
 	}
     }
-    
-    /**
-     * Returns "/rams" if we are running rams and "/lams" if we are running lams
-     * @return
-     */
-    private String getLamsOrRamsContext(HttpServletRequest request)
-    {
-	return request.getContextPath().substring(0, 5);
-    }
-
+   
 }
