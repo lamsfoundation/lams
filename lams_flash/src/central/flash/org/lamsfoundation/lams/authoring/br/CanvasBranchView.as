@@ -576,9 +576,8 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		}
 		else if(a.isBranchingActivity()) {	
 			BranchingActivity(a).clear = activity.clear;
-			
 			var newActivity_mc = (_module != "monitoring") ? activityLayer.createChildAtDepth("CanvasBranchingActivity",DepthManager.kTop,{_activity:a, _canvasController:cbc,_canvasBranchView:cbv, showDiagram: true})
-															: activityLayer.createChildAtDepth("CanvasBranchingActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc,_canvasBranchView:cbv, _module:_module, learnerContainer:_learnerContainer_mc});
+															: activityLayer.createChildAtDepth("CanvasBranchingActivity",DepthManager.kTop,{_activity:a, _monitorController:cbc,_canvasBranchView:cbv, _module:_module, learnerContainer:_learnerContainer_mc, showDiagram: true});
 															
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 			Debugger.log('Branching activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasBranchView');

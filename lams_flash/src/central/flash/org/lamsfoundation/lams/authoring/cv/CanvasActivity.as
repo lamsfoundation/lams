@@ -209,10 +209,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			_isSelected = false;
 			refresh();
 		}
-		
-		if(!_activity.isGateActivity() && !_activity.isGroupActivity() && !_activity.isBranchingActivity() || _branchConnector){
+
+		if (!_activity.isGateActivity() && !_activity.isGroupActivity() && !_activity.isBranchingActivity() || _branchConnector) {
 			loadIcon();
-		} else if(_activity.isBranchingActivity() && showDiagram) {
+		} else if (_activity.isBranchingActivity() && showDiagram) {
 			loadDiagram();
 		}
 		
@@ -313,7 +313,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	}
 	
 	private function loadDiagram():Void {
-		diagram_mc = CanvasBranchingDiagram(this.attachMovie("CanvasBranchingDiagram", "diagram_mc", this.getNextHighestDepth(), {_ddm: getDDM(), _branchingActivity: activity, _visible: false}));
+		diagram_mc = CanvasBranchingDiagram(this.attachMovie("CanvasBranchingDiagram", "diagram_mc", this.getNextHighestDepth(), {_ddm: getDDM(), _branchingActivity: _activity, _visible: false}));
 
 		// swap depths if transparent layer visible
 		if(fade_mc._visible) {
@@ -321,7 +321,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 	}
 	
-	private function loadIcon():Void{
+	private function loadIcon():Void {
 		icon_mc = this.createEmptyMovieClip("icon_mc", this.getNextHighestDepth());
 		var ml = new MovieLoader(Config.getInstance().serverUrl+_activity.libraryActivityUIImage,setUpActIcon,this,icon_mc);	
 
@@ -858,12 +858,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	public function get actChildren():Array {
 		return getDDM().getComplexActivityChildren(activity.activityUIID)
 	}
-	
+		
 	private function getDDM():DesignDataModel {
-		if(_module == "monitoring") {
-			return _monitorView.ddm;
-		} else if(_canvasBranchView != null){
+		if (_canvasBranchView != null) {
 			return _canvasBranchView.ddm;
+		} else if (_module == "monitoring") {
+			return _monitorView.ddm;
 		} else {
 			return _canvasView.ddm;
 		}
