@@ -63,10 +63,17 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
     // ---- non-persistent fields ----------
     /**
-     * Regular expression that divides a string into single words. The meaning is "one or more whitespace characters or
-     * beginnings of a line or ends of a line".
+     * Regular expression that divides a string into single words with optional punctuation. For example "lams" will be
+     * considered a word according to this delimiter, but ":lams," will not. The meaning is "one or more non-word
+     * characters or beginnings of a line or ends of a line".
      */
-    protected static final String WORD_DELIMITER_REGEX = "(?:\\s|$|^)+";
+    protected static final String NON_WORD_DELIMITER_REGEX = "(?:\\W|$|^)+";
+    /**
+     * Regular expression that divides a string into single words without optional punctuation. For example "lams" will
+     * be considered a word according to this delimiter as well as ":lams,". The meaning is "one or more whitespace
+     * characters or beginnings of a line or ends of a line".
+     */
+    protected static final String WHITESPACE_DELIMITER_REGEX = "(?:\\s|$|^)+";
     /**
      * Integer that sets flags for regex pattern matching.
      */
@@ -208,8 +215,8 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	if (getExcludedWordsCondition() != null) {
 	    stringPattern = new StringBuilder();
 	    for (String excludedWord : getExcludedWordsCondition()) {
-		stringPattern.append("(?:").append(TextSearchCondition.WORD_DELIMITER_REGEX).append(
-			Pattern.quote(excludedWord)).append(TextSearchCondition.WORD_DELIMITER_REGEX).append(")|");
+		stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(
+			Pattern.quote(excludedWord)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(")|");
 	    }
 	    stringPattern.deleteCharAt(stringPattern.length() - 1);
 	    regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
@@ -222,8 +229,8 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	    stringPattern = new StringBuilder();
 
 	    for (String word : getAnyWordsCondition()) {
-		stringPattern.append("(?:").append(TextSearchCondition.WORD_DELIMITER_REGEX)
-			.append(Pattern.quote(word)).append(TextSearchCondition.WORD_DELIMITER_REGEX).append(")|");
+		stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(
+			Pattern.quote(word)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(")|");
 	    }
 	    stringPattern.deleteCharAt(stringPattern.length() - 1);
 	    regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
@@ -233,9 +240,9 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	    }
 	}
 	if (getPhraseCondition() != null) {
-	    stringPattern = new StringBuilder(TextSearchCondition.WORD_DELIMITER_REGEX);
+	    stringPattern = new StringBuilder(TextSearchCondition.WHITESPACE_DELIMITER_REGEX);
 	    for (String word : getPhraseCondition()) {
-		stringPattern.append(Pattern.quote(word)).append(TextSearchCondition.WORD_DELIMITER_REGEX);
+		stringPattern.append(Pattern.quote(word)).append(TextSearchCondition.WHITESPACE_DELIMITER_REGEX);
 	    }
 	    regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
 	    matcher = regexPattern.matcher(text);
@@ -246,8 +253,8 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
 	if (getAllWordsCondition() != null) {
 	    for (String word : getAllWordsCondition()) {
-		stringPattern = new StringBuilder(TextSearchCondition.WORD_DELIMITER_REGEX).append(Pattern.quote(word))
-			.append(TextSearchCondition.WORD_DELIMITER_REGEX);
+		stringPattern = new StringBuilder(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(
+			Pattern.quote(word)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX);
 		regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
 		matcher = regexPattern.matcher(text);
 		if (!matcher.find()) {
@@ -276,10 +283,10 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
     public void parseConditionStrings(String allWordsString, String phraseString, String anyWordsString,
 	    String excludedWordsString) {
 	conditionsParsed = true;
-	setAllWordsCondition(splitSentence(allWordsString));
-	setPhraseCondition(splitSentence(phraseString));
-	setAnyWordsCondition(splitSentence(anyWordsString));
-	setExcludedWordsCondition(splitSentence(excludedWordsString));
+	setAllWordsCondition(splitSentence(allWordsString, TextSearchCondition.NON_WORD_DELIMITER_REGEX));
+	setPhraseCondition(splitSentence(phraseString, TextSearchCondition.WHITESPACE_DELIMITER_REGEX));
+	setAnyWordsCondition(splitSentence(anyWordsString, TextSearchCondition.NON_WORD_DELIMITER_REGEX));
+	setExcludedWordsCondition(splitSentence(excludedWordsString, TextSearchCondition.NON_WORD_DELIMITER_REGEX));
     }
 
     /**
@@ -344,10 +351,10 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
      *                string to split
      * @return list of non-empty words
      */
-    private List<String> splitSentence(String sentence) {
+    private List<String> splitSentence(String sentence, String regex) {
 	List<String> list = null;
 	if (!StringUtils.isEmpty(sentence)) {
-	    String[] splitted = sentence.trim().split(TextSearchCondition.WORD_DELIMITER_REGEX);
+	    String[] splitted = sentence.trim().split(regex);
 	    list = new ArrayList<String>(splitted.length);
 	    // we don't need empty words
 	    for (String word : splitted) {
