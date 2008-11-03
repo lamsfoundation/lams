@@ -2484,7 +2484,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	Activity act = Activity.getActivityInstance(type);
 	switch (act.getActivityTypeId()) {
 	case Activity.TOOL_ACTIVITY_TYPE:
-	    // get back the toolContent in new system by toolContentID in
+	    // get back the toolContent in new system by activityID in
                 // old system.
 	    ToolContent content = toolMapper.get(actDto.getActivityID());
 	    // if activity can not find matching tool, the content should be
