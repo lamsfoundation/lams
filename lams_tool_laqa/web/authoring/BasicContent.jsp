@@ -64,9 +64,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         submitMonitoringMethod('removeQuestion');
 	}
 	
-	function resizeIframeHeight(heightOffSet, widthOffSet)
+	function resizeIframe(heightOffSet, widthOffSet)
 	{
-		//alert(document.getElementById("messageArea").style.height);
 		var iframe = document.getElementById("messageArea");
 		iframe.style.height = parseInt(iframe.style.height) + heightOffSet + "px";
 		iframe.style.width = parseInt(iframe.style.width) + widthOffSet + "px";

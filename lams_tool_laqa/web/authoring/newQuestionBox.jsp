@@ -95,7 +95,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					$(document).ready(function() {
 						$("a#gwizard").click(function() {
 							$("div.wizard").toggle("fast");
-							window.top.resizeIframeHeight(heightOffSet,0);
+							window.top.resizeIframe(heightOffSet,0);
 							heightOffSet = heightOffSet * -1;
 						});
 					});
