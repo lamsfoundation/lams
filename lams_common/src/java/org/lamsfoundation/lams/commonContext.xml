@@ -280,7 +280,7 @@
 				<prop key="subscribe">PROPAGATION_REQUIRED</prop>
 				<prop key="unsubscribe">PROPAGATION_REQUIRED</prop>
 				<prop key="trigger*">PROPAGATION_REQUIRED</prop>
-				<prop key="saveEvent">PROPAGATION_REQUIRED</prop>
+				<prop key="saveEvent">PROPAGATION_SUPPORTS</prop>
 			</props>
 		</property>
 	</bean>
