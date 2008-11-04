@@ -164,7 +164,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
 		var _isMapped:Boolean = isCompetenceMapped();
 		
 		if (_isMapped) {
-			LFMessage.showMessageConfirm(Dictionary.getValue("competence_editor_warning_competence_mapped"), null);
+			LFMessage.showMessageConfirm(Dictionary.getValue("competence_editor_warning_competence_mapped"), Proxy.create(this, deleteMappedCompetences));
 		} else {
 			deleteCompetence();
 		}
@@ -193,7 +193,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
 	/*
 	* Deletes competence mappings to where an activity is mapped to the competence
 	*/
-	private function deleteMappedCompetences(competenceTitle:String) {
+	private function deleteMappedCompetences() {
 		
 		// remove applied mappings
 		var activityKeys = app.getDesignDataModel().activities.keys();
@@ -204,7 +204,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
 			if (app.getDesignDataModel().activities.get(activityKeys[i]) instanceof ToolActivity) {
 				var competenceMappings:Array = ToolActivity(app.getDesignDataModel().activities.get(activityKeys[i])).competenceMappings;
 				for (var j=0; j<competenceMappings.length; j++) {
-					if (competenceMappings[j] == competenceTitle) {
+					if (competenceMappings[j] == _competenceTitle) {
 						competenceMappings.splice(j,1); // remove the competence mapping from the activity
 					}
 				}
