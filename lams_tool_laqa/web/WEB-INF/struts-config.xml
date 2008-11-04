@@ -17,6 +17,8 @@
 	   	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
 	   	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
 	   <form-bean name="QaConditionForm" type="org.lamsfoundation.lams.tool.qa.web.QaConditionForm"/>
+	   
+	   <form-bean name="laqa11AdminForm" type="org.lamsfoundation.lams.tool.qa.web.QaAdminForm"/>
 	</form-beans>
 	
 	  <!-- ========== Global Exceptions Definitions =================================== -->
@@ -432,7 +434,23 @@
 	
 	<action path="/clearsession"
 		type="org.lamsfoundation.lams.tool.qa.web.ClearSessionAction">
-	</action>    
+	</action>   
+	
+	<action
+      path="/laqa11admin"
+      type="org.lamsfoundation.lams.tool.qa.web.QaAdminAction"
+      name="laqa11AdminForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="config"
+        path="/admin/config.jsp"
+        redirect="false"
+      />
+    </action> 
  </action-mappings>
 
   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

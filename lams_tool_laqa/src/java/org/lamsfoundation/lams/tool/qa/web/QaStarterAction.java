@@ -150,6 +150,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
+import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
@@ -165,8 +166,8 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * 
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code
- * Templates
+ * TODO To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Style - Code Templates
  * 
  * A Map data structure is used to present the UI.
  */
@@ -389,9 +390,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
     }
 
     /**
-     * retrives the existing content information from the db and prepares the data for presentation purposes.
-     * ActionForward retrieveExistingContent(HttpServletRequest request, ActionMapping mapping, QaAuthoringForm
-     * qaAuthoringForm, Map mapQuestionContent, long toolContentID)
+     * retrives the existing content information from the db and prepares the
+     * data for presentation purposes. ActionForward
+     * retrieveExistingContent(HttpServletRequest request, ActionMapping
+     * mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long
+     * toolContentID)
      * 
      * @param request
      * @param mapping
@@ -521,7 +524,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	qaAuthoringForm.setOfflineInstructions(qaContent.getOfflineInstructions());
 	sessionMap.put(QaAppConstants.ONLINE_INSTRUCTIONS_KEY, qaContent.getOnlineInstructions());
 	sessionMap.put(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY, qaContent.getOfflineInstructions());
-
+	
 	QaStarterAction.logger.debug("ACTIVITY_TITLE_KEY set to:" + sessionMap.get(QaAppConstants.ACTIVITY_TITLE_KEY));
 
 	qaAuthoringForm.resetUserAction();
@@ -530,9 +533,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
     }
 
     /**
-     * each tool has a signature. QA tool's signature is stored in MY_SIGNATURE. The default tool content id and other
-     * depending content ids are obtained in this method. if all the default content has been setup properly the method
-     * persists DEFAULT_CONTENT_ID in the session.
+     * each tool has a signature. QA tool's signature is stored in MY_SIGNATURE.
+     * The default tool content id and other depending content ids are obtained
+     * in this method. if all the default content has been setup properly the
+     * method persists DEFAULT_CONTENT_ID in the session.
      * 
      * readSignature(HttpServletRequest request, ActionMapping mapping)
      * 
@@ -596,7 +600,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
      * 
      * @param long
      *                toolContentID
-     * @return boolean determine whether a specific toolContentID exists in the db
+     * @return boolean determine whether a specific toolContentID exists in the
+     *         db
      */
     protected boolean existsContent(long toolContentID, IQaService qaService) {
 	QaContent qaContent = qaService.loadQa(toolContentID);
@@ -610,8 +615,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
     /**
      * bridges define later url request to authoring functionality
      * 
-     * executeDefineLater(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response, IQaService qaService) throws IOException, ServletException, QaApplicationException
+     * executeDefineLater(ActionMapping mapping, ActionForm form,
+     * HttpServletRequest request, HttpServletResponse response, IQaService
+     * qaService) throws IOException, ServletException, QaApplicationException
      * 
      * @param mapping
      * @param form

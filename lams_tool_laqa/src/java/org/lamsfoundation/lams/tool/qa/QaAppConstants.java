@@ -281,4 +281,6 @@ public interface QaAppConstants {
     public static final int QUESTION_CUTOFF_INDEX = 40;
     public static final String TEXT_SEARCH_DEFINITION_NAME = "text.search.output.definition.qa";
     public static final String TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "text.search.output.definition.qa.default.condition";
+    public static final String ATTR_WIZARD_CATEGORIES = "wizardCategories";
+    public static final String ATTR_WIZARD_ENABLED = "wizardEnabled";
 }

@@ -50,7 +50,8 @@ classpath_addition,
 context_file,
 create_date_time,
 modified_date_time,
-supports_outputs
+supports_outputs,
+admin_url
 )
 VALUES
 (
@@ -81,5 +82,6 @@ NULL,
 '/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml',
 NOW(),
 NOW(),
-1
+1,
+'tool/laqa11/laqa11admin.do'
 )

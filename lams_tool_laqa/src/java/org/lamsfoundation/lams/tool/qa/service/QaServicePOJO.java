@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -69,18 +70,22 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
+import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
+import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
+import org.lamsfoundation.lams.tool.qa.dao.IQaConfigItemDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUploadedFileDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
+import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -133,6 +138,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     private IAuditService auditService;
     private IExportToolContentService exportContentService;
     private QaOutputFactory qaOutputFactory;
+    private IQaConfigItemDAO qaConfigItemDAO;
+    private IQaWizardDAO qaWizardDAO;
 
     private ICoreNotebookService coreNotebookService;
 
@@ -1824,6 +1831,24 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public void setQaOutputFactory(QaOutputFactory qaOutputFactory) {
 	this.qaOutputFactory = qaOutputFactory;
     }
+    
+    
+
+    public IQaConfigItemDAO getQaConfigItemDAO() {
+        return qaConfigItemDAO;
+    }
+
+    public void setQaConfigItemDAO(IQaConfigItemDAO qaConfigItemDAO) {
+        this.qaConfigItemDAO = qaConfigItemDAO;
+    }
+    
+    public IQaWizardDAO getQaWizardDAO() {
+        return qaWizardDAO;
+    }
+
+    public void setQaWizardDAO(IQaWizardDAO qaWizardDAO) {
+        this.qaWizardDAO = qaWizardDAO;
+    }
 
     public QaContent getQaContentBySessionId(Long sessionId) {
 	QaSession session = qaSessionDAO.getQaSessionOrNullById(sessionId);
@@ -1855,8 +1880,71 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    qaDAO.deleteCondition(condition);
 	}
     }
-
+    
     public QaCondition createDefaultComplexCondition(QaContent qaContent) {
 	return getQaOutputFactory().createDefaultComplexCondition(qaContent);
+    }
+    
+    /**
+     * Gets the qa config item with the given key
+     * @param configKey
+     * @return
+     */
+    public QaConfigItem getConfigItem(String configKey)
+    {
+	return qaConfigItemDAO.getConfigItemByKey(configKey);
+    }
+    
+    /**
+     * Saves or updates a qa config item
+     * @param configItem
+     */
+    public void saveOrUpdateConfigItem(QaConfigItem configItem)
+    {
+	qaConfigItemDAO.saveOrUpdate(configItem);
+    }
+    
+    /**
+     * Gets the set of wizard categories from the database
+     * @return
+     */
+    public SortedSet<QaWizardCategory> getWizardCategories()
+    {
+	return qaWizardDAO.getWizardCategories();
+    }
+    
+    /**
+     * Saves the entire set of QaWizardCategories (including the child cognitive skills and questions)
+     * @param categories
+     */
+    public void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories)
+    {
+	qaWizardDAO.saveOrUpdateCategories(categories);
+    }
+    
+    /**
+     * Deletes a wizard category from the db
+     * @param uid
+     */
+    public void deleteWizardCategoryByUID(Long uid)
+    {
+	qaWizardDAO.deleteWizardCategoryByUID(uid);
+    }
+    
+    /**
+     * Deletes a wizard cognitive skill from the db
+     * @param uid
+     */
+    public void deleteWizardSkillByUID(Long uid)
+    {
+	qaWizardDAO.deleteWizardSkillByUID(uid);
+    }
+    
+    /**
+     * Deletes a wizard question from the db
+     * @param uid
+     */
+    public void deleteWizardQuestionByUID(Long uid){
+	qaWizardDAO.deleteWizardQuestionByUID(uid);
     }
 }

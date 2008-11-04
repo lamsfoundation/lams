@@ -116,3 +116,29 @@ INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date
 
 -- data for content questions table
 INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('Sample Question 1?',1,1);
+
+SET FOREIGN_KEY_CHECKS=0;
+-- insert scripts for the wizard tables
+drop table if exists tl_laqa11_configuration;
+drop table if exists tl_laqa11_wizard_category;
+drop table if exists tl_laqa11_wizard_cognitive_skill;
+drop table if exists tl_laqa11_wizard_question;
+create table tl_laqa11_configuration (uid bigint not null auto_increment, config_key varchar(30) unique, config_value varchar(255), primary key (uid))TYPE=InnoDB;
+create table tl_laqa11_wizard_category (uid bigint not null auto_increment, title varchar(255) not null, primary key (uid))TYPE=InnoDB;
+create table tl_laqa11_wizard_cognitive_skill (uid bigint not null auto_increment, title varchar(255) not null, category_uid bigint, primary key (uid))TYPE=InnoDB;
+create table tl_laqa11_wizard_question (uid bigint not null auto_increment, cognitive_skill_uid bigint, title text not null, primary key (uid))TYPE=InnoDB;
+alter table tl_laqa11_wizard_cognitive_skill add index FK3BA4132BCBB0DC8D (category_uid), add constraint FK3BA4132BCBB0DC8D foreign key (category_uid) references tl_laqa11_wizard_category (uid);
+alter table tl_laqa11_wizard_question add index FKAF08A0C7EFF77FD4 (cognitive_skill_uid), add constraint FKAF08A0C7EFF77FD4 foreign key (cognitive_skill_uid) references tl_laqa11_wizard_cognitive_skill (uid);
+
+-- Inserting the required config item into the config table
+-- Gmap API key is added here for shaun so the Gmap works there automatically for each build
+INSERT INTO tl_laqa11_configuration (
+	config_key, 
+	config_value
+)
+VALUES(
+	"enableQaWizard",
+	"false"
+);
+SET FOREIGN_KEY_CHECKS=1;
+

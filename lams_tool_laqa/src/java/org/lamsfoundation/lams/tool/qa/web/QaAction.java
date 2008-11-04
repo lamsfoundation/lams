@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.tool.qa.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
+import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
@@ -915,6 +916,13 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
+	// Adding in the qa wizard data if it is turned on
+	if (qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD) != null
+		&& qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD).getConfigValue().equals("true")) {
+	    request.setAttribute(QaAppConstants.ATTR_WIZARD_ENABLED, true);
+	    request.setAttribute(QaAppConstants.ATTR_WIZARD_CATEGORIES, qaService.getWizardCategories());
+	}
+	
 	QaAction.logger.debug("fwd ing to newQuestionBox: ");
 	return mapping.findForward("newQuestionBox");
     }

@@ -25,8 +25,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
+		<%@ include file="/includes/jsp/qaWizardCommon.jsp"%>
+		
 		<lams:css style="tabbed" />
-
+		<script src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
 		<script language="JavaScript" type="text/JavaScript">
 
 			function submitMethod() {
@@ -38,10 +40,91 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				document.QaAuthoringForm.submit();
 			}
 			
+			<c:choose>
+				<c:when test="${wizardEnabled == true}">
+
+					// Creating a 3-dimentional javascript array for category/cognitive skill/question
+					// -------------------------------------------------------------------------------
+					var categoryArray = new Array();
+					var categoryIndex = 0;
+					var skillIndex = 0;
+					var qIndex = 0;
+					<c:forEach var="category" items="${wizardCategories}">
+						categoryIndex = categoryArray.length;
+						addCategory(unescape("${category.title}"), "${category.uid}",  categoryArray.length);
+						<c:forEach var="skill" items="${category.cognitiveSkills}">
+							skillIndex = categoryArray[categoryIndex].skills.length;
+							addSkill(unescape("${skill.title}"), "${skill.uid}", categoryIndex , skillIndex);
+							<c:forEach var="question" items="${skill.questions}">
+								qIndex = categoryArray[categoryIndex].skills[skillIndex].questions.length;
+								addQuestion(unescape("${question.question}"), "${question.uid}", categoryIndex, skillIndex, qIndex)
+							</c:forEach>
+						</c:forEach>
+					</c:forEach>
+					// -------------------------------------------------------------------------------
+				
+					// the menus
+					var catMenu = null;
+					var skillMenu = null;
+					var qMenu = null;
+				
+					// Sets up the triple menu with the appropriate data
+					function setUpTripleMenu() {
+						var qaWizardEnabledBox = document.QaAuthoringForm.qaWizardEnabled;
+
+						catMenu = document.QaAuthoringForm.catMenu;
+						skillMenu = document.QaAuthoringForm.skillMenu;
+						qMenu = document.QaAuthoringForm.qMenu;
+						
+						nullOptions(catMenu);
+						nullOptions(skillMenu);
+						nullOptions(qMenu);
+						
+						var i;
+						with (catMenu) {
+							options[0] = new Option('<fmt:message key="wizard.selectCategory" />', "none");
+							for(i = 0; i < categoryArray.length; i++)
+							{
+								options[i+1] = new Option(categoryArray[i].title, i);
+							} 
+							options[0].selected = true;
+						}
+					}
+
+					$(document).ready(function() {
+			
+						$("a#gwizard").click(function() {
+							$("div.wizard").toggle("fast");
+						});
+					});
+					
+					// Inserts the question template into the new question fckeditor area
+					function useQuestionTemplate(aMenu) {
+						if (aMenu.selectedIndex > 0) {
+							var obj = document.getElementById("newQuestion");
+							obj.value += aMenu.options[aMenu.selectedIndex].text;
+							var oEditor = FCKeditorAPI.GetInstance("newQuestion");
+							oEditor.InsertHtml(aMenu.options[aMenu.selectedIndex].text);
+						} 
+					}
+				
+				</c:when>
+				<c:otherwise>
+					function setUpTripleMenu() {}
+				</c:otherwise>
+			</c:choose>
 		</script>
+		
+		<style>
+			.wizard {
+				background:url('../../images/css/greyfade_bg.jpg') repeat-x 3px 0px;
+				border: 2px solid #EEEEEE;
+			}
+		</style> 
 	</lams:head>
 
-	<body>
+	
+	<body onload="javascript:setUpTripleMenu();">
 		<html:form action="/authoring?validate=false"
 			styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
 			<html:hidden property="dispatch" value="addSingleQuestion" />
@@ -53,6 +136,50 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="defineLaterInEditMode" />
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="editQuestionBoxRequest" value="false" />
+			
+			<c:if test="${wizardEnabled == true}">
+				<a style="float:right;" id="gwizard" href="#"><fmt:message key="wizard.author.wizardTitle" /></a>
+				<div class="wizard" style="display:block;">
+					<h3>
+						<fmt:message key="wizard.author.wizardTitle" />
+					</h3>
+					
+					<table border="0">
+						<tr>
+							<td colspan="3" valign="top" style="font-size:11px">
+							    <fmt:message key="wizard.author.info1" /><br />
+							    <fmt:message key="wizard.author.info2" /><br />
+							    <fmt:message key="wizard.author.info3" /><br />	
+							</td>
+						</tr>  
+						<tr align="center">
+							<td align="center" valign="top" width="171" style="font-size:11px">
+								<fmt:message key="wizard.selectCategory" />
+							</td>
+							<td align="center" valign="top" width="176" style="font-size:11px">
+								 <fmt:message key="wizard.selectSkill" />
+							</td>
+							<td align="center" valign="top" width="169" style="font-size:11px">
+								 <fmt:message key="wizard.selectQuestion" />
+							</td>
+						</tr>
+						<tr align="center">
+							<td align="center" valign="top" width="171">
+								<select name="catMenu" onchange="changeCategory()" size="1" style="font-size:10px; width:100%;">
+								</select> 
+							</td>
+							<td align="center" valign="top" width="176">
+							    <select name="skillMenu" onchange="changeSkill()" size="1" style="font-size:10px; width:100%;">
+								</select> 
+							</td>
+							<td align="center" valign="top" width="169">
+							    <select name="qMenu" onchange="useQuestionTemplate(this)" size="1" style="font-size:10px; width:100%;">
+								</select>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</c:if>
 
 			<div class="field-name space-top">
 				<fmt:message key="label.add.new.question"></fmt:message>
@@ -74,6 +201,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<a href="#" onclick="javascript:window.parent.hideMessage()"
 					class="button space-left"> <fmt:message key="label.cancel" /> </a>
 			</lams:ImgButtonWrapper>
+			
+			
 		</html:form>
 	</body>
 </lams:html>
