@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.daco.model.DacoAttachment;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Marcin Cieslak
@@ -47,239 +48,261 @@ import org.lamsfoundation.lams.tool.daco.model.DacoUser;
  */
 public interface IDacoService {
 
-	/**
-	 * Get file <code>IVersiondNode</code> by given package id and path.
-	 * 
-	 * @param packageId
-	 * @param relPathString
-	 * @return
-	 * @throws DacoApplicationException
-	 */
-	IVersionedNode getFileNode(Long packageId, String relPathString) throws DacoApplicationException;
+    /**
+     * Get file <code>IVersiondNode</code> by given package id and path.
+     * 
+     * @param packageId
+     * @param relPathString
+     * @return
+     * @throws DacoApplicationException
+     */
+    IVersionedNode getFileNode(Long packageId, String relPathString) throws DacoApplicationException;
 
-	/**
-	 * Get <code>Daco</code> by toolContentID.
-	 * 
-	 * @param contentId
-	 * @return
-	 */
-	Daco getDacoByContentId(Long contentId);
+    /**
+     * Get <code>Daco</code> by toolContentID.
+     * 
+     * @param contentId
+     * @return
+     */
+    Daco getDacoByContentId(Long contentId);
 
-	/**
-	 * Get a cloned copy of tool default tool content (Daco) and assign the toolContentId of that copy as the given
-	 * <code>contentId</code>
-	 * 
-	 * @param contentId
-	 * @return
-	 * @throws DacoApplicationException
-	 */
-	Daco getDefaultContent(Long contentId) throws DacoApplicationException;
+    /**
+     * Get a cloned copy of tool default tool content (Daco) and assign the toolContentId of that copy as the given
+     * <code>contentId</code>
+     * 
+     * @param contentId
+     * @return
+     * @throws DacoApplicationException
+     */
+    Daco getDefaultContent(Long contentId) throws DacoApplicationException;
 
-	/**
-	 * Upload instruciton file into repository.
-	 * 
-	 * @param file
-	 * @param type
-	 * @return
-	 * @throws UploadDacoFileException
-	 */
-	DacoAttachment uploadInstructionFile(FormFile file, String type) throws UploadDacoFileException;
+    /**
+     * Upload instruciton file into repository.
+     * 
+     * @param file
+     * @param type
+     * @return
+     * @throws UploadDacoFileException
+     */
+    DacoAttachment uploadInstructionFile(FormFile file, String type) throws UploadDacoFileException;
 
-	/**
-	 * Upload daco answer file to repository
-	 * 
-	 * @param answer
-	 * @param file
-	 * @throws UploadDacoFileException
-	 */
-	void uploadDacoAnswerFile(DacoAnswer answer, FormFile file) throws UploadDacoFileException;
+    /**
+     * Upload daco answer file to repository
+     * 
+     * @param answer
+     * @param file
+     * @throws UploadDacoFileException
+     */
+    void uploadDacoAnswerFile(DacoAnswer answer, FormFile file) throws UploadDacoFileException;
 
-	// ********** for user methods *************
-	/**
-	 * Create a new user in database.
-	 */
-	void createUser(DacoUser dacoUser);
+    // ********** for user methods *************
+    /**
+     * Create a new user in database.
+     */
+    void createUser(DacoUser dacoUser);
 
-	/**
-	 * Get user by given userID and toolContentID.
-	 * 
-	 * @param long1
-	 * @return
-	 */
-	DacoUser getUserByUserIdAndContentId(Long userID, Long contentId);
+    /**
+     * Get user by given userID and toolContentID.
+     * 
+     * @param long1
+     * @return
+     */
+    DacoUser getUserByUserIdAndContentId(Long userID, Long contentId);
 
-	/**
-	 * Get user by sessionID and UserID
-	 * 
-	 * @param long1
-	 * @param sessionId
-	 * @return
-	 */
-	DacoUser getUserByUserIdAndSessionId(Long long1, Long sessionId);
+    /**
+     * Get user by sessionID and UserID
+     * 
+     * @param long1
+     * @param sessionId
+     * @return
+     */
+    DacoUser getUserByUserIdAndSessionId(Long long1, Long sessionId);
 
-	// ********** Repository methods ***********************
-	/**
-	 * Delete file from repository.
-	 */
-	void deleteFromRepository(Long fileUuid, Long fileVersionId) throws DacoApplicationException;
+    // ********** Repository methods ***********************
+    /**
+     * Delete file from repository.
+     */
+    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws DacoApplicationException;
 
-	/**
-	 * Save or update daco into database.
-	 * 
-	 * @param Daco
-	 */
-	void saveOrUpdateDaco(Daco Daco);
+    /**
+     * Save or update daco into database.
+     * 
+     * @param Daco
+     */
+    void saveOrUpdateDaco(Daco Daco);
 
-	void saveOrUpdateAnswer(DacoAnswer answer);
+    void saveOrUpdateAnswer(DacoAnswer answer);
 
-	/**
-	 * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the file from
-	 * repository.
-	 * 
-	 * @param attachmentUid
-	 */
-	void deleteDacoAttachment(Long attachmentUid);
+    /**
+     * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the
+     * file from repository.
+     * 
+     * @param attachmentUid
+     */
+    void deleteDacoAttachment(Long attachmentUid);
 
-	/**
-	 * Delete question from database.
-	 * 
-	 * @param uid
-	 */
-	void deleteDacoQuestion(Long uid);
+    /**
+     * Delete question from database.
+     * 
+     * @param uid
+     */
+    void deleteDacoQuestion(Long uid);
 
-	void deleteDacoAnswer(Long uid);
+    void deleteDacoAnswer(Long uid);
 
-	void deleteDacoRecord(List<DacoAnswer> record);
+    void deleteDacoRecord(List<DacoAnswer> record);
 
-	/**
-	 * Return all reource questions within the given toolSessionID.
-	 * @param sessionId
-	 * 
-	 * @return
-	 */
-	List<List<DacoAnswer>> getDacoAnswersByUserUid(Long userUid);
+    /**
+     * Return all reource questions within the given toolSessionID.
+     * 
+     * @param sessionId
+     * 
+     * @return
+     */
+    List<List<DacoAnswer>> getDacoAnswersByUserUid(Long userUid);
 
-	/**
-	 * Get daco which is relative with the special toolSession.
-	 * 
-	 * @param sessionId
-	 * @return
-	 */
-	Daco getDacoBySessionId(Long sessionId);
+    /**
+     * Get daco which is relative with the special toolSession.
+     * 
+     * @param sessionId
+     * @return
+     */
+    Daco getDacoBySessionId(Long sessionId);
 
-	/**
-	 * Get daco toolSession by toolSessionId
-	 * 
-	 * @param sessionId
-	 * @return
-	 */
-	DacoSession getSessionBySessionId(Long sessionId);
+    /**
+     * Get daco toolSession by toolSessionId
+     * 
+     * @param sessionId
+     * @return
+     */
+    DacoSession getSessionBySessionId(Long sessionId);
 
-	/**
-	 * Save or update daco session.
-	 * 
-	 * @param resSession
-	 */
-	void saveOrUpdateDacoSession(DacoSession resSession);
+    /**
+     * Save or update daco session.
+     * 
+     * @param resSession
+     */
+    void saveOrUpdateDacoSession(DacoSession resSession);
 
-	/**
-	 * If success return next activity's url, otherwise return null.
-	 * 
-	 * @param toolSessionId
-	 * @param userId
-	 * @return
-	 */
-	String finishToolSession(Long toolSessionId, Long userId) throws DacoApplicationException;
+    /**
+     * If success return next activity's url, otherwise return null.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    String finishToolSession(Long toolSessionId, Long userId) throws DacoApplicationException;
 
-	DacoQuestion getDacoQuestionByUid(Long questionUid);
+    DacoQuestion getDacoQuestionByUid(Long questionUid);
 
-	/**
-	 * Create refection entry into notebook tool.
-	 * 
-	 * @param sessionId
-	 * @param notebook_tool
-	 * @param tool_signature
-	 * @param userId
-	 * @param entryText
-	 */
-	Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId, String entryText);
+    /**
+     * Create refection entry into notebook tool.
+     * 
+     * @param sessionId
+     * @param notebook_tool
+     * @param tool_signature
+     * @param userId
+     * @param entryText
+     */
+    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+	    String entryText);
 
-	/**
-	 * Get reflection entry from notebook tool.
-	 * 
-	 * @param sessionId
-	 * @param idType
-	 * @param signature
-	 * @param userID
-	 * @return
-	 */
-	NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+    /**
+     * Get reflection entry from notebook tool.
+     * 
+     * @param sessionId
+     * @param idType
+     * @param signature
+     * @param userID
+     * @return
+     */
+    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
-	/**
-	 * @param notebookEntry
-	 */
-	void updateEntry(NotebookEntry notebookEntry);
+    /**
+     * @param notebookEntry
+     */
+    void updateEntry(NotebookEntry notebookEntry);
 
-	/**
-	 * Get user by UID
-	 * 
-	 * @param uid
-	 * @return
-	 */
-	DacoUser getUser(Long uid);
+    /**
+     * Get user by UID
+     * 
+     * @param uid
+     * @return
+     */
+    DacoUser getUser(Long uid);
 
-	/**
-	 * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages. 
-	 * @param key key of the message
-	 * @param args arguments for the message
-	 * @return message content
-	 */
-	String getLocalisedMessage(String key, Object[] args);
+    /**
+     * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
+     * 
+     * @param key
+     *                key of the message
+     * @param args
+     *                arguments for the message
+     * @return message content
+     */
+    String getLocalisedMessage(String key, Object[] args);
 
-	/**
-	 * Returns summaries for particular questions. A list of {@link QuestionSummaryDTO question summaries} is created,
-	 * one for each question. They are filled with default, blank data.
-	 * Then the proper summaries are {@link DacoAnswerDAO#getQuestionSummaries(Long, List) read} from the database.
-	 * @param userUid user for who the summary should be created
-	 * @return list of question summaries
-	 */
-	List<QuestionSummaryDTO> getQuestionSummaries(Long userUid);
+    /**
+     * Returns summaries for particular questions. A list of {@link QuestionSummaryDTO question summaries} is created,
+     * one for each question. They are filled with default, blank data. Then the proper summaries are
+     * {@link DacoAnswerDAO#getQuestionSummaries(Long, List) read} from the database.
+     * 
+     * @param userUid
+     *                user for who the summary should be created
+     * @return list of question summaries
+     */
+    List<QuestionSummaryDTO> getQuestionSummaries(Long userUid);
 
-	/**
-	 * Removes a Daco object and all of its Questions from Hibernate cache.
-	 * It is required to avoid errors when same object was read from the database twice and one of the copies is being saved.
-	 * @param daco object to release
-	 */
-	void releaseDacoFromCache(Daco daco);
+    /**
+     * Removes a Daco object and all of its Questions from Hibernate cache. It is required to avoid errors when same
+     * object was read from the database twice and one of the copies is being saved.
+     * 
+     * @param daco
+     *                object to release
+     */
+    void releaseDacoFromCache(Daco daco);
 
-	/**
-	 * Removes Answers from Hibernate cache.
-	 * It is required to avoid errors when same object was read from the database twice and one of the copies is being saved.
-	 * @param answers collection of answers to remove from cache
-	 */
-	void releaseAnswersFromCache(Collection<DacoAnswer> answers);
+    /**
+     * Removes Answers from Hibernate cache. It is required to avoid errors when same object was read from the database
+     * twice and one of the copies is being saved.
+     * 
+     * @param answers
+     *                collection of answers to remove from cache
+     */
+    void releaseAnswersFromCache(Collection<DacoAnswer> answers);
 
-	/**
-	 * Gets the number of records in the group. It uses database connection.
-	 * @param sessionId session ID of the group
-	 * @return number of records in that group
-	 */
-	Integer getGroupRecordCount(Long sessionId);
+    /**
+     * Gets the number of records in the group. It uses database connection.
+     * 
+     * @param sessionId
+     *                session ID of the group
+     * @return number of records in that group
+     */
+    Integer getGroupRecordCount(Long sessionId);
 
-	/**
-	 * Gets the number of records in the group. It uses provided monitoring summary.
-	 * @param monitoringSummary summary which will be iterated through and the records counted
-	 * @return number of records in that group
-	 */
-	Integer getGroupRecordCount(MonitoringSummarySessionDTO monitoringSummary);
+    /**
+     * Gets the number of records in the group. It uses provided monitoring summary.
+     * 
+     * @param monitoringSummary
+     *                summary which will be iterated through and the records counted
+     * @return number of records in that group
+     */
+    Integer getGroupRecordCount(MonitoringSummarySessionDTO monitoringSummary);
 
-	/**
-	 * Creates summary that is later used in the monitoring.
-	 * @param contentId ID of Daco for which the summary should be created
-	 * @param userUid ID of the user for who the summary details should be created; <code>null</code> if the summary details should be created for all users; <code>< 0 </code> if the summary details should be created for noone  
-	 * @return list of monitoring summaries, one for each session
-	 */
-	List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid);
+    /**
+     * Creates summary that is later used in the monitoring.
+     * 
+     * @param contentId
+     *                ID of Daco for which the summary should be created
+     * @param userUid
+     *                ID of the user for who the summary details should be created; <code>null</code> if the summary
+     *                details should be created for all users; <code>< 0 </code> if the summary details should be
+     *                created for noone
+     * @return list of monitoring summaries, one for each session
+     */
+    List<MonitoringSummarySessionDTO> getMonitoringSummary(Long contentId, Long userUid);
 
-	IEventNotificationService getEventNotificationService();
+    IEventNotificationService getEventNotificationService();
+
+    public List<User> getMonitorsByToolSessionId(Long sessionId);
 }
