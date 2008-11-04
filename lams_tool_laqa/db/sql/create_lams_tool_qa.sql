@@ -131,7 +131,6 @@ alter table tl_laqa11_wizard_cognitive_skill add index FK3BA4132BCBB0DC8D (categ
 alter table tl_laqa11_wizard_question add index FKAF08A0C7EFF77FD4 (cognitive_skill_uid), add constraint FKAF08A0C7EFF77FD4 foreign key (cognitive_skill_uid) references tl_laqa11_wizard_cognitive_skill (uid);
 
 -- Inserting the required config item into the config table
--- Gmap API key is added here for shaun so the Gmap works there automatically for each build
 INSERT INTO tl_laqa11_configuration (
 	config_key, 
 	config_value
