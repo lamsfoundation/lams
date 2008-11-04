@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -128,6 +127,7 @@
 						
 						categoryArray.splice(catMenu.selectedIndex-1, 1);
 						setUpTripleMenu();
+						disableExport();
 					}
 				}
 			}
@@ -152,6 +152,7 @@
 						
 						categoryArray[catMenu.selectedIndex-1].skills.splice(skillMenu.selectedIndex-1, 1);
 						changeCategory();
+						disableExport();
 					}
 				}
 			}
@@ -176,6 +177,7 @@
 						
 						categoryArray[catMenu.selectedIndex-1].skills[skillMenu.selectedIndex-1].questions.splice(qMenu.selectedIndex-1, 1);
 						changeSkill();
+						disableExport();
 					}
 				}
 			}
@@ -204,6 +206,8 @@
 			function openDialog(inputType, isAdd, titleStr)
 			{
 
+				disableExport();
+				
 				$("#catDialog").dialog(
 					{ 
 				    	buttons: 
@@ -227,7 +231,7 @@
 					    title: titleStr
 					}
 				);
-	
+				document.getElementById("inputText").focus();
 			}
 			
 			function handleDialogInput(inputType, isAdd)
@@ -404,6 +408,33 @@
 				
 				document.laqa11AdminForm.submit();
 			}
+			
+			function customSubmit(dispatch)
+			{
+				document.getElementById("dispatch").value = dispatch;
+				document.laqa11AdminForm.submit();
+			}
+			
+			function disableExport()
+			{
+				msg = '<fmt:message key="wizard.export.savefirst" />'
+				document.getElementById("exportButton").href = "javascript:alert('" + msg + "');";
+			}
+			
+			function importFile()
+			{
+				if (document.getElementById("importFile").value.length == 0)	
+				{
+					alert("<fmt:message key='wizard.import.nofile'/>");
+				}
+				else
+				{
+					if(confirm('<fmt:message key="wizard.import.warn" />'))
+					{
+						customSubmit("importWizard");
+					}
+				}
+			}
 		//-->
 		</script>
 	
@@ -425,7 +456,7 @@
 
 		<c:if test="${error}">
 			<p class="warning">
-				<fmt:message key="admin.formError" />
+				<fmt:message key="${errorKey}" />
 			</p>
 		</c:if>
 		<c:if test="${savedSuccess}">
@@ -502,9 +533,17 @@
 					      		<a href='javascript:deleteQuestion();' class="button"  ><fmt:message key="wizard.delete" /></a>
 					      	</td>
 					    </tr>
-					  </tbody>
-				  </table>
-				  <br />
+					</tbody>
+				</table>
+				<br />
+				<a href="javascript:customSubmit('exportWizard')" id="exportButton" class="button"  ><fmt:message key="wizard.export.export" /></a>
+				&nbsp;
+				<a href="javascript:importFile()" class="button"  ><fmt:message key="wizard.import.import" /></a>
+				<html:file property="importFile" styleId="importFile" />
+				<br />
+				<br />
+				<br />
+				<br />
 			</div>
 		
 			<a href="javascript:submitForm()" class="button"  ><fmt:message key="label.save" /></a>

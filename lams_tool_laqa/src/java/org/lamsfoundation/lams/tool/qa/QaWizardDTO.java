@@ -21,20 +21,31 @@
  */ 
  
 /* $Id$ */ 
-package org.lamsfoundation.lams.tool.qa.dao; 
-
+package org.lamsfoundation.lams.tool.qa; 
+ 
+import java.io.Serializable;
 import java.util.SortedSet;
 
-import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
-import org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill;
-import org.lamsfoundation.lams.tool.qa.QaWizardQuestion;
-public interface IQaWizardDAO extends IBaseDAO{
-    void saveOrUpdateCategories(SortedSet<QaWizardCategory> categories);
-    SortedSet<QaWizardCategory> getWizardCategories();
-    void deleteWizardCategoryByUID(Long uid);
-    void deleteWizardSkillByUID(Long uid);
-    void deleteWizardQuestionByUID(Long uid);
-    void deleteAllWizardCategories();
+public class QaWizardDTO implements Serializable{
+    
+    public static final long serialVersionUID = 3481234912412784515L;
+    
+    SortedSet<QaWizardCategory> qaWizardCategories;
+    
+    public QaWizardDTO() {}
+    
+    public QaWizardDTO(SortedSet<QaWizardCategory> categories) 
+    {
+	
+	
+    }
+
+    public SortedSet<QaWizardCategory> getQaWizardCategories() {
+        return qaWizardCategories;
+    }
+
+    public void setQaWizardCategories(SortedSet<QaWizardCategory> qaWizardCategories) {
+        this.qaWizardCategories = qaWizardCategories;
+    }
 }
  

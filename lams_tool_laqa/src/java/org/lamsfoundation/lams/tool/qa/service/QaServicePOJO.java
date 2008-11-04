@@ -1947,4 +1947,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public void deleteWizardQuestionByUID(Long uid){
 	qaWizardDAO.deleteWizardQuestionByUID(uid);
     }
+    
+    /**
+     * Deletes all categories, sub skills and sub questions
+     */
+    public void deleteAllWizardCategories()
+    {
+	qaWizardDAO.deleteAllWizardCategories();
+    }
 }

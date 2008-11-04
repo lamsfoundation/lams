@@ -18,28 +18,34 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
 
 /**
- * This class maps to a single category in the q&a wizard, it
- * contains a set of cognitive skills
+ * This class maps to a single category in the q&a wizard, it contains a set of
+ * cognitive skills
  * 
  * @hibernate.class table="tl_laqa11_wizard_category"
- */ 
-public class QaWizardCategory implements Serializable, Comparable<QaWizardCategory> {
-    
+ */
+public class QaWizardCategory implements Serializable, Comparable<QaWizardCategory>, Cloneable {
+
     public static final long serialVersionUID = 1234165196523665452L;
-    
+    private static Logger logger = Logger.getLogger(QaWizardCategory.class.getName());
+
     private Long uid;
     private String title;
     private Set<QaWizardCognitiveSkill> cognitiveSkills;
-    
+
     public QaWizardCategory() {
     }
 
@@ -55,22 +61,22 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
      * 
      */
     public Long getUid() {
-        return uid;
+	return uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     /**
      * @hibernate.property column="title" length="255" not-null="true"
      */
     public String getTitle() {
-        return title;
+	return title;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+	this.title = title;
     }
 
     /**
@@ -80,22 +86,42 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
      * 
      */
     public Set<QaWizardCognitiveSkill> getCognitiveSkills() {
-        return cognitiveSkills;
+	return cognitiveSkills;
     }
 
     public void setCognitiveSkills(Set<QaWizardCognitiveSkill> cognitiveSkills) {
-        this.cognitiveSkills = cognitiveSkills;
+	this.cognitiveSkills = cognitiveSkills;
     }
-    
+
     public int compareTo(QaWizardCategory category) {
-	if (category.getUid()!=null && uid != null)
-	{
+	if (category.getUid() != null && uid != null) {
 	    return category.getUid().compareTo(uid) * -1;
-	}
-	else
-	{
+	} else {
 	    return 1;
 	}
     }
+
+    public Object clone() {
+
+	QaWizardCategory category = null;
+	try {
+	    category = (QaWizardCategory) super.clone();
+	    category.setUid(null);
+	    category.setTitle(getTitle());
+	    Set<QaWizardCognitiveSkill> skills = new TreeSet<QaWizardCognitiveSkill>();
+
+	    if (cognitiveSkills != null) {
+		// create a copy of the skills
+		for(QaWizardCognitiveSkill skill : cognitiveSkills)
+		{
+		    QaWizardCognitiveSkill newSkill = (QaWizardCognitiveSkill)skill.clone();
+		    skills.add(newSkill);
+		}
+		category.setCognitiveSkills(skills);
+	    }
+	} catch (CloneNotSupportedException cnse) {
+	    logger.error("Error cloning " + QaWizardCategory.class, cnse);
+	}
+	return category;
+    }
 }
- 

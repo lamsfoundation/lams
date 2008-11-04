@@ -23,8 +23,17 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.qa.web;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -34,17 +43,20 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill;
 import org.lamsfoundation.lams.tool.qa.QaWizardQuestion;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,6 +65,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Handles the admin page for question and answer which includes the settings
@@ -73,6 +87,7 @@ public class QaAdminAction extends LamsDispatchAction {
     public static final String ATTR_TITLE = "title";
     public static final String ATTR_UID = "uid";
     public static final String NULL = "null";
+    public static final String FILE_EXPORT = "qa-wizard.xml";
 
     IQaService qaService;
 
@@ -81,7 +96,7 @@ public class QaAdminAction extends LamsDispatchAction {
      */
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	// set up mdlForumService
+	// set up qaService
 	if (qaService == null) {
 	    qaService = QaServiceProxy.getQaService(this.getServlet().getServletContext());
 	}
@@ -100,6 +115,7 @@ public class QaAdminAction extends LamsDispatchAction {
 
     /**
      * Saves admin page, if the wizard is enabled, saves the wizard content
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -114,12 +130,12 @@ public class QaAdminAction extends LamsDispatchAction {
 	if (qaService == null) {
 	    qaService = QaServiceProxy.getQaService(this.getServlet().getServletContext());
 	}
-	
+
 	QaConfigItem enableQaWizard = qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD);
 
 	if (adminForm.getQaWizardEnabled() != null && adminForm.getQaWizardEnabled()) {
 	    enableQaWizard.setConfigValue(QaAdminForm.TRUE);
-	
+
 	    // get the wizard content and save
 	    if (adminForm.getSerialiseXML() != null && !adminForm.getSerialiseXML().trim().equals("")) {
 		updateWizardFromXML(adminForm.getSerialiseXML().trim());
@@ -128,8 +144,7 @@ public class QaAdminAction extends LamsDispatchAction {
 	    // remove any wizard items that were removed
 	    removeWizardItems(adminForm.getDeleteCategoriesCSV(), adminForm.getDeleteSkillsCSV(), adminForm
 		    .getDeleteQuestionsCSV());
-	} 
-	else {
+	} else {
 	    enableQaWizard.setConfigValue(QaAdminForm.FALSE);
 	}
 	qaService.saveOrUpdateConfigItem(enableQaWizard);
@@ -137,11 +152,12 @@ public class QaAdminAction extends LamsDispatchAction {
 	request.setAttribute(ATTR_CATEGORIES, getQaWizardCategories());
 	request.setAttribute("savedSuccess", true);
 	return mapping.findForward("config");
-	
+
     }
 
     /**
      * Gets the complete set of wizard categories
+     * 
      * @return
      */
     public SortedSet<QaWizardCategory> getQaWizardCategories() {
@@ -156,7 +172,7 @@ public class QaAdminAction extends LamsDispatchAction {
      * @param questionsCSV
      */
     public void removeWizardItems(String categoriesCSV, String skillsCSV, String questionsCSV) {
-	
+
 	// remove categories
 	if (categoriesCSV != null && !categoriesCSV.equals("")) {
 	    String categoryUIDs[] = categoriesCSV.split(",");
@@ -184,6 +200,7 @@ public class QaAdminAction extends LamsDispatchAction {
 
     /**
      * Saves all the wizard items from the xml serialisation sent from the form
+     * 
      * @param xmlStr
      */
     @SuppressWarnings("unchecked")
@@ -268,4 +285,117 @@ public class QaAdminAction extends LamsDispatchAction {
 
 	qaService.saveOrUpdateQaWizardCategories(newCategories);
     }
+
+    /**
+     * Exports the wizard categories list so it can be imported elsewhere The
+     * export format is the same xml format used by the export ld servlet
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward exportWizard(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	// set up mdlForumService
+	if (qaService == null) {
+	    qaService = QaServiceProxy.getQaService(this.getServlet().getServletContext());
+	}
+
+	// now start the export
+	SortedSet<QaWizardCategory> exportCategories = new TreeSet<QaWizardCategory>();
+	for (QaWizardCategory category : getQaWizardCategories()) {
+	    exportCategories.add((QaWizardCategory) category.clone());
+	}
+
+	// exporting XML
+	XStream designXml = new XStream();
+	String exportXml = designXml.toXML(exportCategories);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + FILE_EXPORT);
+	OutputStream out = null;
+	try {
+	    out = response.getOutputStream();
+	    out.write(exportXml.getBytes());
+	    response.setContentLength(exportXml.getBytes().length);
+	    out.flush();
+	} catch (Exception e) {
+	    log.error("Exception occured writing out file:" + e.getMessage());
+	    throw new ExportToolContentException(e);
+	} finally {
+	    try {
+		if (out != null)
+		    out.close();
+	    } catch (Exception e) {
+		log.error("Error Closing file. File already written out - no exception being thrown.", e);
+	    }
+	}
+
+	return null;
+    }
+
+    /**
+     * Imports the wizard model from an xml file and replaces the current model
+     * First, saves the configurations, then performs the import using xstream
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward importWizard(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response){
+	QaAdminForm adminForm = (QaAdminForm) form;
+
+	if (qaService == null) {
+	    qaService = QaServiceProxy.getQaService(this.getServlet().getServletContext());
+	}
+	
+	// First save the config items
+	QaConfigItem enableQaWizard = qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD);
+
+	if (adminForm.getQaWizardEnabled() != null && adminForm.getQaWizardEnabled()) {
+	    enableQaWizard.setConfigValue(QaAdminForm.TRUE);
+
+	    // get the wizard content and save
+	    if (adminForm.getSerialiseXML() != null && !adminForm.getSerialiseXML().trim().equals("")) {
+		updateWizardFromXML(adminForm.getSerialiseXML().trim());
+	    }
+
+	    // remove any wizard items that were removed
+	    removeWizardItems(adminForm.getDeleteCategoriesCSV(), adminForm.getDeleteSkillsCSV(), adminForm
+		    .getDeleteQuestionsCSV());
+	} else {
+	    enableQaWizard.setConfigValue(QaAdminForm.FALSE);
+	}
+	qaService.saveOrUpdateConfigItem(enableQaWizard);
+	
+
+	// Now perform the import
+	try {
+	    String xml = new String(adminForm.getImportFile().getFileData());
+	    XStream conversionXml = new XStream();
+	    SortedSet<QaWizardCategory> exportCategories = (SortedSet<QaWizardCategory>)conversionXml.fromXML(xml);
+
+	    qaService.deleteAllWizardCategories();
+	    qaService.saveOrUpdateQaWizardCategories(exportCategories);
+	} catch (Exception e) {
+	    logger.error("Failed to import wizard model", e);
+	    request.setAttribute("error", true);
+	    request.setAttribute("errorKey", "wizard.import.error"); 
+	    request.setAttribute(ATTR_CATEGORIES, getQaWizardCategories());
+	    return mapping.findForward("config");
+	}	
+	
+	request.setAttribute(ATTR_CATEGORIES, getQaWizardCategories());
+	request.setAttribute("savedSuccess", true);
+	return mapping.findForward("config");
+
+    }
+
 }

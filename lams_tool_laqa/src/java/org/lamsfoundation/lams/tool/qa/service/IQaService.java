@@ -342,4 +342,9 @@ public interface IQaService {
      * @param uid
      */
     public void deleteWizardQuestionByUID(Long uid);
+    
+    /**
+     * Deletes all categories, sub skills and sub questions
+     */
+    public void deleteAllWizardCategories();
 }

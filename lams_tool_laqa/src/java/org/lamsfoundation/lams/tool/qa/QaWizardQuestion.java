@@ -18,27 +18,32 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
 
 /**
- * This class maps to a sample question in the q&a wizard, it has a parent 
+ * This class maps to a sample question in the q&a wizard, it has a parent
  * cognitive skill which in turn has a parent category
  * 
  * @hibernate.class table="tl_laqa11_wizard_question"
- */ 
-public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuestion>{
+ */
+public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuestion>, Cloneable {
 
     public static final long serialVersionUID = 4353787904539453783L;
-    
+    private static Logger logger = Logger.getLogger(QaWizardQuestion.class.getName());
+
     private Long uid;
     private QaWizardCognitiveSkill cognitiveSkill;
     private String question;
-    
+
     public QaWizardQuestion() {
     }
 
@@ -54,49 +59,58 @@ public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuesti
      * 
      */
     public Long getUid() {
-        return uid;
+	return uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     /**
      * 
      * @hibernate.many-to-one cascade="none"
-     * 		class="org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill"
-     *          column="cognitive_skill_uid"
+     *                        class="org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill"
+     *                        column="cognitive_skill_uid"
      * 
      */
     public QaWizardCognitiveSkill getCognitiveSkill() {
-        return cognitiveSkill;
+	return cognitiveSkill;
     }
 
     public void setCognitiveSkill(QaWizardCognitiveSkill cognitiveSkill) {
-        this.cognitiveSkill = cognitiveSkill;
+	this.cognitiveSkill = cognitiveSkill;
     }
 
     /**
      * @hibernate.property column="title" length="1027" not-null="true"
      */
     public String getQuestion() {
-        return question;
+	return question;
     }
 
     public void setQuestion(String question) {
-        this.question = question;
+	this.question = question;
     }
-    
+
     public int compareTo(QaWizardQuestion question) {
-	if (question.getUid() != null && uid != null)
-	{
+	if (question.getUid() != null && uid != null) {
 	    return question.getUid().compareTo(uid) * -1;
-	}
-	else
-	{
+	} else {
 	    return 1;
 	}
     }
     
+    public Object clone() {
+	QaWizardQuestion question = null;
+	try {
+	    question = (QaWizardQuestion) super.clone();
+	    question.setUid(null);
+	    question.setCognitiveSkill(null);
+	    question.setQuestion(getQuestion());
+	} catch (CloneNotSupportedException cnse) {
+	    logger.error("Error cloning " + QaWizardQuestion.class, cnse);
+	}
+	return question;
+    }
+
 }
- 

@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.upload.FormFile;
 
 public class QaAdminForm extends ActionForm {
 
@@ -37,6 +38,7 @@ public class QaAdminForm extends ActionForm {
     private String deleteCategoriesCSV;
     private String deleteSkillsCSV;
     private String deleteQuestionsCSV;
+    private FormFile importFile;
     
     public QaAdminForm() {}
 
@@ -83,6 +85,12 @@ public class QaAdminForm extends ActionForm {
     public void setDeleteQuestionsCSV(String deleteQuestionsCSV) {
         this.deleteQuestionsCSV = deleteQuestionsCSV;
     }
-    
-    
+
+    public FormFile getImportFile() {
+        return importFile;
+    }
+
+    public void setImportFile(FormFile importFile) {
+        this.importFile = importFile;
+    }
 }
