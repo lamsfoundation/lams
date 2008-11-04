@@ -330,7 +330,7 @@
 			}
 			
 			// Serialises the javascript data befor performing the submit
-			function submitForm()
+			function submitForm(dispatch)
 			{
 				// Serialise the categores, skills an questions in the 3d array
 				// into an xml string
@@ -406,6 +406,7 @@
 					document.getElementById("deleteQuestionsCSV").value = CSV;
 				}
 				
+				document.getElementById("dispatch").value = dispatch;
 				document.laqa11AdminForm.submit();
 			}
 			
@@ -546,7 +547,7 @@
 				<br />
 			</div>
 		
-			<a href="javascript:submitForm()" class="button"  ><fmt:message key="label.save" /></a>
+			<a href="javascript:submitForm('saveContent')" class="button"  ><fmt:message key="label.save" /></a>
 
 		
 			<div id="dialogDiv" style="display: none;">
