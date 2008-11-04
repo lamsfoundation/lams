@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
 <script type="text/javascript">
 <!--
 	var mode = "${mode}";
@@ -43,7 +43,11 @@
 
 
 <div id="content">
-
+	<div style="float: right; margin-left: 10px; padding-top: 4px" class="help">
+		<lams:help toolSignature="<%=WikiConstants.TOOL_SIGNATURE%>" module="learning" />
+	</div>
+	
+	
 	<!-- Display the advanced option warnings -->
 	<div class="info" id="messageDiv" style="display: none;">
 		<c:if test="${wikiDTO.lockOnFinish and mode == 'learner'}">

@@ -1,4 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
+
+<div style="float: right; margin-left: 10px; padding-top: 4px" class="help">
+	<lams:help toolSignature="<%=WikiConstants.TOOL_SIGNATURE%>" module="monitoring" />
+</div>
 
 <html:form action="/monitoring" styleId="monitoringForm" method="post" enctype="multipart/form-data">
 
@@ -10,7 +15,7 @@
 	<input type="hidden" id="wikiLinks" />
 	<html:hidden property="newPageName" styleId="newPageName" />
 	<html:hidden property="historyPageContentId" styleId="historyPageContentId" />
-
+	
 	<div id="wikimenu" style="margin-right:75px;">
 		<h4>
 			${sessionDTO.sessionName}
