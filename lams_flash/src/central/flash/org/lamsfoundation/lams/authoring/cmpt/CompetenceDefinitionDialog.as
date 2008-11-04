@@ -235,7 +235,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 		if (updatedCompetenceName.length == 0) {
 			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
 		}
-		else if (app.getDesignDataModel().competences.containsKey(updatedCompetenceName)) {
+		else if (editingCompetence != updatedCompetenceName && app.getDesignDataModel().competences.containsKey(updatedCompetenceName)) {
 			// entry already exists, do not add
 			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_exists", [updatedCompetenceName]), null);
 		} 
