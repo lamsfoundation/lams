@@ -1717,7 +1717,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	FlashMessage flashMessage;
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(activityID);
 	Lesson lesson = lessonDAO.getLesson(lessonID); // used to calculate the
-						       // total learners.
+	// total learners.
 
 	if (gate == null || lesson == null) {
 	    flashMessage = new FlashMessage("checkGateStatus", messageService.getMessage("INVALID.ACTIVITYID.LESSONID",
@@ -2234,9 +2234,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 				    + grouping
 				    + " we have been asked to add a group in excess of the max number of groups (probably via the Chosen Grouping screen).");
 		    grouping.setMaxNumberOfGroups(null); // must be null and not
-							 // 0 or the groups will
-							 // be lost via Live
-							 // Edit.
+		    // 0 or the groups will
+		    // be lost via Live
+		    // Edit.
 		} else {
 		    MonitoringService.log
 			    .error("Request made to add a group which would be more than the max number of groups for the grouping "
@@ -2707,6 +2707,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			    staffGroupName + " " + i, staffList, creatorUserId);
 		} else {
 		    // run out of lessons (shouldn't reach here)
+		    log.error("Not enough lessons created for numLessons value of numLessons=" + numLessons
+			    + " (got up to " + i + ")");
 		    return false;
 		}
 	    }
