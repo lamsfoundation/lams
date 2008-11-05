@@ -2103,7 +2103,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return numDeleted;
     }
 
-    /*  Grouping and branching related calls */
+    /* Grouping and branching related calls */
     /**
      * Get all the active learners in the lesson who are not in a group/branch
      * 
@@ -2652,8 +2652,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    // todo: convert:data type:
 	    Integer orgId = WDDXProcessor.convertToInteger(MonitoringConstants.KEY_ORGANISATION_ID, table
 		    .get(MonitoringConstants.KEY_ORGANISATION_ID));
-	    long lessonId = WDDXProcessor.convertToLong(MonitoringConstants.KEY_LESSON_ID,
-		    table.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
 
 	    // get learner group info
 	    Hashtable learnerMap = (Hashtable) table.get(MonitoringConstants.KEY_LEARNER);
@@ -2697,14 +2695,20 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    }
 
 	    for (int i = 0; i < numLessons; i++) {
+		Long lessonId = lessonIds.get(i);
 		List<User> learnerList = new LinkedList<User>();
 		// get every numLessons'th learner
 		for (int j = i; j < allLearners.size(); j += numLessons) {
 		    learnerList.add(allLearners.get(j));
 		}
 		// Create Lesson class
-		createLessonClassForLesson(lessonId, organisation, learnerGroupName + " " + i, learnerList,
-			staffGroupName + " " + i, staffList, creatorUserId);
+		if (lessonId != null) {
+		    createLessonClassForLesson(lessonId, organisation, learnerGroupName + " " + i, learnerList,
+			    staffGroupName + " " + i, staffList, creatorUserId);
+		} else {
+		    // run out of lessons (shouldn't reach here)
+		    return false;
+		}
 	    }
 
 	    return true;
