@@ -81,6 +81,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
@@ -2410,5 +2411,150 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	public LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId) {
 		return learnerService.getProgress(learnerId, lessonId);
 	}
+	
+
+    /**
+     * Same as initializeLesson, but for multiple lessons, returning multiple lesson ids.
+     * Used internally by startLessons
+     */
+    private List<Long> initializeLessons(Integer creatorUserId, String lessonPacket) throws Exception {
+	ArrayList<Long> lessonIds = new ArrayList<Long>();
+
+	try {
+	    Hashtable table = (Hashtable) WDDXProcessor.deserialize(lessonPacket);
+
+	    // parse WDDX values
+
+	    String title = WDDXProcessor.convertToString("lessonName", table.get("lessonName"));
+	    String desc = WDDXProcessor.convertToString("lessonDescription", table.get("lessonDescription"));
+	    int copyType = WDDXProcessor.convertToInt("copyType", table.get("copyType"));
+	    Integer organisationId = WDDXProcessor.convertToInteger("organisationID", table.get("organisationID"));
+	    long ldId = WDDXProcessor.convertToLong(AttributeNames.PARAM_LEARNINGDESIGN_ID, table
+		    .get(AttributeNames.PARAM_LEARNINGDESIGN_ID));
+	    boolean learnerExportAvailable = WDDXProcessor.convertToBoolean("learnerExportPortfolio", table
+		    .get("learnerExportPortfolio"));
+	    boolean learnerPresenceAvailable = WDDXProcessor.convertToBoolean("enablePresence", table
+		    .get("enablePresence"));
+	    boolean learnerImAvailable = WDDXProcessor.convertToBoolean("enableIm", table.get("enableIm"));
+	    String customCSV = WDDXProcessor.convertToString(WDDXTAGS.CUSTOM_CSV, table.get(WDDXTAGS.CUSTOM_CSV));
+	    boolean multiple = WDDXProcessor.convertToBoolean("multiple", table.get("multiple"));
+	    int numLessons = WDDXProcessor.convertToInt("numLessons", table.get("numLessons"));
+
+	    // initialise multiple lessons
+
+	    if (multiple) {
+		if (numLessons > 0) {
+		    for (int i = 1; i <= numLessons; i++) {
+			Lesson newLesson = initializeLesson(title + " " + i, desc, learnerExportAvailable, ldId,
+				organisationId, creatorUserId, customCSV, learnerPresenceAvailable, learnerImAvailable);
+			lessonIds.add(newLesson.getLessonId());
+		    }
+		}
+	    }
+
+	} catch (Exception e) {
+	    MonitoringService.log.error("Exception occured trying to initialise lessons ", e);
+	    throw new Exception(e);
+	}
+
+	return lessonIds;
+    }
+
+    /**
+     * Same as create, but for multiple lessons, returning multiple lesson ids.
+     * Used internally by startLessons
+     */
+    private boolean createLessonClasses(Integer creatorUserId, String lessonPacket, List<Long> lessonIds) {
+	try {
+	    Hashtable table = (Hashtable) WDDXProcessor.deserialize(lessonPacket);
+
+	    // multiple lesson info
+	    int numLessons = WDDXProcessor.convertToInt("numLessons", table.get("numLessons"));
+	    int learnersPerLesson = WDDXProcessor.convertToInt("learnersPerLesson", table.get("learnersPerLesson"));
+
+	    // todo: convert:data type:
+	    Integer orgId = WDDXProcessor.convertToInteger(MonitoringConstants.KEY_ORGANISATION_ID, table
+		    .get(MonitoringConstants.KEY_ORGANISATION_ID));
+	    long lessonId = WDDXProcessor.convertToLong(MonitoringConstants.KEY_LESSON_ID,
+		    table.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
+
+	    // get learner group info
+	    Hashtable learnerMap = (Hashtable) table.get(MonitoringConstants.KEY_LEARNER);
+	    //ignored
+	    //List learners = (List) learnerMap.get(MonitoringConstants.KEY_USERS);
+	    String learnerGroupName = WDDXProcessor.convertToString(learnerMap, MonitoringConstants.KEY_GROUP_NAME);
+	    // get staff group info
+	    Hashtable staffMap = (Hashtable) table.get(MonitoringConstants.KEY_STAFF);
+	    List staffs = (List) staffMap.get(MonitoringConstants.KEY_USERS);
+	    String staffGroupName = WDDXProcessor.convertToString(staffMap, MonitoringConstants.KEY_GROUP_NAME);
+
+	    if (staffs == null) {
+		staffs = new LinkedList();
+	    }
+
+	    Organisation organisation = (Organisation) baseDAO.find(Organisation.class, orgId);
+	    User creator = (User) baseDAO.find(User.class, creatorUserId);
+
+	    // prepare staff list
+	    List<User> staffList = new LinkedList<User>();
+	    staffList.add(creator);
+	    Iterator iter = staffs.iterator();
+	    while (iter.hasNext()) {
+		try {
+		    int id = ((Double) iter.next()).intValue();
+		    staffList.add((User) baseDAO.find(User.class, id));
+		} catch (Exception e) {
+		    MonitoringService.log.error("Error parsing staff ID from " + lessonPacket);
+		    continue;
+		}
+	    }
+
+	    // get all learners
+	    List<User> allLearners = new LinkedList<User>();
+	    Set userOrgs = organisation.getUserOrganisations();
+	    iter = userOrgs.iterator();
+	    while (iter.hasNext()) {
+		UserOrganisation userOrg = (UserOrganisation) iter.next();
+		allLearners.add(userOrg.getUser());
+	    }
+
+	    for (int i = 0; i < numLessons; i++) {
+		List<User> learnerList = new LinkedList<User>();
+		// get every numLessons'th learner
+		for (int j = i; j < allLearners.size(); j += numLessons) {
+		    learnerList.add(allLearners.get(j));
+		}
+		// Create Lesson class
+		createLessonClassForLesson(lessonId, organisation, learnerGroupName + " " + i, learnerList,
+			staffGroupName + " " + i, staffList, creatorUserId);
+	    }
+
+	    return true;
+	} catch (Exception e) {
+	    MonitoringService.log.error("Exception occured trying to create a lesson class ", e);
+	    return false;
+	}
+
+    }
+
+    /**
+     * Start multiple lessons in one call.
+     */
+    public boolean startLessons(Integer creatorUserId, String lessonPacket) throws Exception {
+
+	try {
+	    List<Long> lessonIds = new ArrayList<Long>();
+	    lessonIds = initializeLessons(creatorUserId, lessonPacket);
+	    if (createLessonClasses(creatorUserId, lessonPacket, lessonIds)) {
+		for (Long lessonId : lessonIds) {
+		    startLesson(lessonId, creatorUserId);
+		}
+	    }
+	    return true;
+	} catch (Exception e) {
+	    MonitoringService.log.error("Exception occured trying to start lessons ", e);
+	    throw new Exception(e);
+	}
+    }
 
 }

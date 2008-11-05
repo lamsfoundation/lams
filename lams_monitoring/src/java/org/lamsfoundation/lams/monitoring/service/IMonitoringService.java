@@ -638,4 +638,8 @@ public interface IMonitoringService {
 	/** Get the record of the learner's progress for a particular lesson */
 	public LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
 
+	/**
+	 * Start multiple lessons in one call.
+	 */
+	public boolean startLessons(Integer creatorUserId, String lessonPacket) throws Exception;
 }
