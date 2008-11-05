@@ -6,5 +6,6 @@
 cd build
 find . -name CVS | xargs rm -rf
 find . -name *.bak | xargs rm -rf
+find . -name repository*.tar.gz | xargs rm -rf
 
 tar -czf lams-unix-installer-$LAMS_VERSION.tar.gz lams-unix-installer-$LAMS_VERSION
