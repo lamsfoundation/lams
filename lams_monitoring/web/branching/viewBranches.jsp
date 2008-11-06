@@ -26,6 +26,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	var requiredMajorVersion = 9;
+	var requiredMinorVersion = 0;
+	var requiredRevision = 124;
+
+	function closeWindow(){
+		window.close();
+	}
+</script>
 
 <div id="content">
 
@@ -36,34 +47,82 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p><c:out value="${description}"/></p>
 	</c:if>
 
-	<table class="alternative-color" cellspacing="0">
-		<tr>
-			<th><fmt:message key="label.branching.branch.heading"/></th>
-			<th>&nbsp;</th>
-		</tr>
-			
-		<c:forEach items="${branching.branches}" var="branch">
-		<tr>
-			<td width="25%" class="first">
-				<c:out value="${branch.branchName}"/>
-			</td>
-			<td>
-				<c:forEach items="${branch.groups}" var="group" varStatus="status">
- 					<c:if test="${showGroupName}">
-						<strong><c:out value="${group.groupName}"/></strong><BR>
-					</c:if>
-					<c:forEach items="${group.users}" var="user">
-						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/><BR>
-					</c:forEach>
-				</c:forEach>
-			</td>
-		</tr>
-		</c:forEach>
-	</table>
+	<div align="center">
+		<script language="JavaScript" type="text/javascript">
+		<!--
+		// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
+		var hasProductInstall = DetectFlashVer(6, 0, 65);
 		
-	<c:if test="${not localFiles}">
-		<%@ include file="../template/finishbutton.jsp" %>
-	</c:if>
+		// Version check based upon the values defined in globals
+		var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
+		
+		if ( hasProductInstall && !hasRequestedVersion ) {
+			// DO NOT MODIFY THE FOLLOWING FOUR LINES
+			// Location visited after installation is complete if installation is required
+			var MMPlayerType = (isIE == true) ? "ActiveX" : "PlugIn";
+			var MMredirectURL = window.location;
+		    document.title = document.title.slice(0, 47) + " - Flash Player Installation";
+		    var MMdoctitle = document.title;
+		
+			AC_FL_RunContent(
+				"src", "playerProductInstall",
+				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+'&lessonID='+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
+				"width", "793",
+				"height", "454",
+				"align", "middle",
+				"id", "BranchManager",
+				"quality", "high",
+				"bgcolor", "#ffffff",
+				"name", "BranchManager",
+				"allowScriptAccess","sameDomain",
+				"type", "application/x-shockwave-flash",
+				"pluginspage", "http://www.adobe.com/go/getflashplayer"
+			);
+		} else if (hasRequestedVersion) {
+			// if we've detected an acceptable version
+			// embed the Flash Content SWF when all tests are passed
+			AC_FL_RunContent(
+					"src", "BranchManager",
+					"FlashVars", "lessonID="+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
+					"width", "793",
+					"height", "454",
+					"align", "middle",
+					"id", "BranchManager",
+					"quality", "high",
+					"bgcolor", "#ffffff",
+					"name", "BranchManager",
+					"allowScriptAccess","sameDomain",
+					"type", "application/x-shockwave-flash",
+					"pluginspage", "http://www.adobe.com/go/getflashplayer"
+			);
+		  } else {  // flash is too old or we can't detect the plugin
+		    var alternateContent = 'Alternate HTML content should be placed here. '
+		  	+ 'This content requires the Adobe Flash Player. '
+		   	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
+		    document.write(alternateContent);  // insert non-flash content
+		  }
+		// -->
+		</script>
+		<noscript>
+		  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+					id="BranchManager" width="793" height="454"
+					codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+					<param name="movie" value="BranchManager.swf" />
+					<param name="quality" value="high" />
+					<param name="bgcolor" value="#869ca7" />
+					<param name="allowScriptAccess" value="sameDomain" />
+					<embed src="BranchManager.swf" quality="high" bgcolor="#869ca7"
+						width="793" height="454" name="BranchManager" align="middle"
+						play="true"
+						loop="false"
+						quality="high"
+						allowScriptAccess="sameDomain"
+						type="application/x-shockwave-flash"
+						pluginspage="http://www.adobe.com/go/getflashplayer">
+					</embed>
+			</object>
+		</noscript>
+	</div>
 </div>  <!--closes content-->
 
 

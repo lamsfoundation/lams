@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
@@ -53,6 +55,7 @@ import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -91,6 +94,8 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	public static final String PARAM_MEMBERS = "members";
 	public static final String PARAM_MAY_DELETE = "mayDelete";
 	public static final String PARAM_USED_FOR_BRANCHING = "usedForBranching";
+	public static final String PARAM_MODULE_LANGUAGE_XML = "languageXML";
+	public static final String PARAM_VIEW_MODE = "viewMode";
 	
 	private Integer getUserId(HttpServletRequest request) {
 		HttpSession ss = SessionManager.getSession();
@@ -128,11 +133,12 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 			log.error(error);
 			throw new MonitoringServiceException(error);
 		}
-
+		
 		request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
 		request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 		request.setAttribute(PARAM_ACTIVITY_TITLE, activity.getTitle());
 		request.setAttribute(PARAM_ACTIVITY_DESCRIPTION, activity.getDescription());
+		request.setAttribute(PARAM_MODULE_LANGUAGE_XML, getLanguageXML());
 		
 		if ( grouping.isChosenGrouping() ) {
 			// can I remove groups/users - can't if tool sessions have been created
@@ -153,15 +159,15 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 			request.setAttribute(PARAM_MAY_DELETE, mayDelete);
 			request.setAttribute(PARAM_USED_FOR_BRANCHING, usedForBranching);
 			request.setAttribute(PARAM_MAX_NUM_GROUPS, grouping.getMaxNumberOfGroups());
+			request.setAttribute(PARAM_VIEW_MODE, Boolean.FALSE);
 
 			return mapping.findForward(CHOSEN_GROUPING_SCREEN);
 			
 		} else {
 			
 			// go to a view only screen for random grouping
-	        SortedSet groups = new TreeSet(new GroupComparator());
-	        groups.addAll(grouping.getGroups());
-	        request.setAttribute(PARAM_GROUPS,groups);
+			request.setAttribute(PARAM_MAY_DELETE, Boolean.FALSE);
+			request.setAttribute(PARAM_VIEW_MODE, Boolean.TRUE);
 			return mapping.findForward(VIEW_GROUPS_SCREEN);
 		}
     	
@@ -185,21 +191,8 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Grouping grouping = getGrouping(activity);
 		Set<Group> sortedGroups = new TreeSet<Group>(new GroupComparator());
 		sortedGroups.addAll(grouping.getGroups());
-
-		// build the output string to return to the chosen grouping page.
-		String groupOutput = "";
-		boolean first = true;
-		for ( Group group: sortedGroups ) {
-			Long groupId = group.getGroupId();
-			String name = group.getGroupName();
-			Integer numberOfMembers = group.getUsers().size();
-			if ( ! first ) {
-				groupOutput=groupOutput+";";
-			} else {
-				first = false;
-			}
-			groupOutput=groupOutput+groupId+","+name+","+numberOfMembers;
-		}
+		
+		String groupOutput = buildGroupsStringXML(sortedGroups);
 		writeAJAXResponse(response, groupOutput);
 		return null;
 	}
@@ -220,7 +213,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 		SortedSet<User> users = monitoringService.getClassMembersNotGrouped(lessonID, activityID, true);
-		String groupOutput = buildUserString(users);
+		String groupOutput = buildUserStringXML(-1 ,users);
 		writeAJAXResponse(response, groupOutput);
 		return null;
 		
@@ -261,7 +254,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		Set users = group.getUsers();
 		SortedSet<User> sortedUsers = new TreeSet<User>(new LastNameAlphabeticComparator());
 		sortedUsers.addAll(users);
-		String userOutput = buildUserString(sortedUsers);
+		String userOutput = buildUserStringXML(groupID, sortedUsers);
 		writeAJAXResponse(response, userOutput);
 		return null;
 	}
@@ -289,6 +282,144 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		return userOutput;
 	}
 	
+	/**
+	 * @param sortedUsers
+	 * @return String of users
+	 */ 
+	private String buildUserStringXML(long groupId, SortedSet<User> sortedUsers) {
+		String userOutput = "<xml>";
+		userOutput += "<groupID>" + groupId + "</groupID>";
+		userOutput += "<users>";
+		for ( User user : sortedUsers ) {
+			Integer userID = user.getUserId();
+			String lastName = user.getLastName();
+			String firstName = user.getFirstName();
+	
+			userOutput+="<user>";
+			userOutput+="<id>" + userID + "</id>";
+			userOutput+="<firstName>" + firstName + "</firstName>";
+			userOutput+="<lastName>" + lastName + "</lastName>";
+			userOutput+="<displayName>" + firstName + " " + lastName + "</displayName>";
+			userOutput+="</user>";
+		}
+		userOutput += "</users></xml>";
+		return userOutput;
+	}
+
+	/**
+	 * @param sortedGroups
+	 * @return String of groups
+	 */ 
+	private String buildGroupsString(Set<Group> sortedGroups) {
+		String groupOutput = "";
+
+		boolean first = true;
+		for ( Group group: sortedGroups ) {
+			Long groupId = group.getGroupId();
+			String name = group.getGroupName();
+			Integer numberOfMembers = group.getUsers().size();
+			if ( ! first ) {
+				groupOutput=groupOutput+";";
+			} else {
+				first = false;
+			}
+			groupOutput=groupOutput+groupId+","+name+","+numberOfMembers;
+		}
+		
+		return groupOutput;
+	}
+	
+	/**
+	 * @param sortedGroups
+	 * @return String of groups
+	 */ 
+	private String buildGroupsStringXML(Set<Group> sortedGroups) {
+		String groupOutput = "<xml><groups>";
+		for ( Group group: sortedGroups ) {
+			Long groupId = group.getGroupId();
+			String name = group.getGroupName();
+			Integer numberOfMembers = group.getUsers().size();
+			
+			groupOutput+="<group>";
+			groupOutput+="<id>" + groupId + "</id>";
+			groupOutput+="<name>" + name + "</name>";
+			groupOutput+="<numberOfMembers>" + numberOfMembers + "</numberOfMembers>";
+			groupOutput+="</group>";
+		}
+		groupOutput += "</groups></xml>";
+		
+		return groupOutput;
+	}
+
+	/**
+	 * @param group
+	 * @return String of xml with group added
+	 */ 
+	private String buildAddGroupStringXML(Group group) {
+		String groupOutput = "<xml><group>";
+		groupOutput += "<id>" + group.getGroupId() + "</id>";
+		groupOutput += "<name>" + group.getGroupName() + "</name>";
+		groupOutput += "</group></xml>";
+		return groupOutput;
+	}	
+	
+	/**
+	 * @param group
+	 * @return String of xml with group added
+	 */ 
+	private String buildRemoveGroupStringXML(Long groupID) {
+		String groupOutput = "<xml><group>";
+		groupOutput += "<id>" + groupID + "</id>";
+		groupOutput += "</group></xml>";
+		return groupOutput;
+	}
+	
+	/**
+	 * @param group
+	 * @return String of xml with group added
+	 */ 
+	private String buildChangeGroupNameStringXML(Long groupID, String name) {
+		String groupOutput = "<xml><group>";
+		groupOutput += "<id>" + groupID + "</id>";
+		groupOutput += "<newName>" + name + "</newName>";
+		groupOutput += "</group></xml>";
+		return groupOutput;
+	}	
+	
+	/**
+	 * @return String of xml with all needed language elements
+	 */ 
+	private String getLanguageXML(){
+		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+		MessageService messageService = monitoringService.getMessageService();
+		ArrayList<String> languageCollection = new ArrayList<String>();		
+		languageCollection.add(new String("button.finished"));
+		languageCollection.add(new String("label.grouping.non.grouped.users.heading"));
+		languageCollection.add(new String("label.grouping.status"));
+		languageCollection.add(new String("label.grouping.functions"));
+		languageCollection.add(new String("label.grouping.popup.change.group.name"));
+		languageCollection.add(new String("label.grouping.popup.change.group.name.field"));
+		languageCollection.add(new String("label.grouping.learners"));
+		languageCollection.add(new String("label.grouping.popup.delete.group"));
+		languageCollection.add(new String("label.grouping.popup.delete.group.message"));
+		languageCollection.add(new String("button.ok"));
+		languageCollection.add(new String("button.cancel"));
+		languageCollection.add(new String("button.yes"));
+		languageCollection.add(new String("button.no"));
+		languageCollection.add(new String("error.title"));
+		languageCollection.add(new String("label.grouping.max.num.in.group.heading"));
+		
+		String languageOutput = "<xml><language>";
+		
+		for(int i = 0; i < languageCollection.size(); i++){
+			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
+		}
+		
+		languageOutput += "</language></xml>";
+		
+		return languageOutput;
+	}
+	
 	/** 
 	 * Add a new group. Designed to respond to an AJAX call.
      * If the teacher wants to add more groups than the number of groups set in authoring, and this grouping
@@ -305,8 +436,9 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
     	String name = WebUtil.readStrParam(request, PARAM_NAME);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
-		monitoringService.addGroup(activityID, name, true);
-		writeAJAXResponse(response,"");
+		Group group = monitoringService.addGroup(activityID, name, true);
+		String groupResponse = buildAddGroupStringXML(group);
+		writeAJAXResponse(response,groupResponse);
 		return null;
 	}
 
@@ -326,7 +458,8 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 		monitoringService.removeGroup(activityID, groupID);
-		writeAJAXOKResponse(response);
+		String responseString = buildRemoveGroupStringXML(groupID);
+		writeAJAXResponse(response, responseString);
 		return null;
 	}
 
@@ -345,11 +478,33 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
     	String members = WebUtil.readStrParam(request, PARAM_MEMBERS, true);
     	if ( members != null ) {
-        	String[] membersSplit = members.split(","); 
+        	String[] membersSplit = members.split(",");
 			IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 			monitoringService.addUsersToGroup(activityID,  groupID, membersSplit);
     	}
 		writeAJAXOKResponse(response);
+		return null;
+	}
+	
+	/** 
+	 * Add learners to a group. Designed to respond to an AJAX call.
+     *
+	 * Input parameters: activityID, name: group name, members: comma separated list of users 
+	 * 
+	 * Output format: no data returned - just the header 
+	 */
+	public ActionForward changeGroupName(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
+
+    	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
+    	String name = WebUtil.readStrParam(request, PARAM_NAME, true);
+    	if ( name != null ) {
+			IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+			monitoringService.setGroupName(groupID, name);
+    	}
+    	String reponseSting = buildChangeGroupNameStringXML(groupID, name);
+		writeAJAXResponse(response, reponseSting);
 		return null;
 	}
 
@@ -375,5 +530,4 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		writeAJAXOKResponse(response);
 		return null;
 	}
-
 }

@@ -26,7 +26,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+	var requiredMajorVersion = 9;
+	var requiredMinorVersion = 0;
+	var requiredRevision = 124;
+
+	function closeWindow(){
+		window.close();
+	}
+</script>
+	
 <div id="content">
 
 	<h1><c:out value="${title}"/></h1>
@@ -36,31 +47,80 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<p><c:out value="${description}"/></p>
 	</c:if>
 
-	<c:choose>
-	<c:when test="${empty groups}">
-		<p><fmt:message key="label.grouping.no.groups.created"/></p>
-	</c:when>
-	<c:otherwise>
-	
-	
-		<table class="alternative-color" cellspacing="0">
-			<c:forEach items="${groups}" var="group">
-			<tr>
-				<td width="25%" class="first">
-					<c:out value="${group.groupName}"/>
-				</td>
-				<td>
-					<c:forEach items="${group.users}" var="user">
-						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/><br />
-					</c:forEach>
-				</td>
-			</tr>
-			</c:forEach>
-		</table>
-	</c:otherwise>
-	</c:choose>
+	<div align="center">
+	<script language="JavaScript" type="text/javascript">
+		// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
+		var hasProductInstall = DetectFlashVer(6, 0, 65);
 		
-	<%@ include file="../template/finishbutton.jsp" %>
+		// Version check based upon the values defined in globals
+		var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
+		
+		if ( hasProductInstall && !hasRequestedVersion ) {
+			// DO NOT MODIFY THE FOLLOWING FOUR LINES
+			// Location visited after installation is complete if installation is required
+			var MMPlayerType = (isIE == true) ? "ActiveX" : "PlugIn";
+			var MMredirectURL = window.location;
+		    document.title = document.title.slice(0, 47) + " - Flash Player Installation";
+		    var MMdoctitle = document.title;
+		
+			AC_FL_RunContent(
+				"src", "playerProductInstall",
+				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+'&lessonID='+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
+				"width", "827",
+				"height", "502",
+				"align", "middle",
+				"id", "LamsLessonGroupManager",
+				"quality", "high",
+				"bgcolor", "#ffffff",
+				"name", "GroupManager",
+				"allowScriptAccess","sameDomain",
+				"type", "application/x-shockwave-flash",
+				"pluginspage", "http://www.adobe.com/go/getflashplayer"
+			);
+		} else if (hasRequestedVersion) {
+			// if we've detected an acceptable version
+			// embed the Flash Content SWF when all tests are passed
+			AC_FL_RunContent(
+					"src", "GroupManager",
+					"FlashVars", "lessonID="+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
+					"width", "827",
+					"height", "502",
+					"align", "middle",
+					"id", "GroupManager",
+					"quality", "high",
+					"bgcolor", "#ffffff",
+					"name", "GroupManager",
+					"allowScriptAccess","sameDomain",
+					"type", "application/x-shockwave-flash",
+					"pluginspage", "http://www.adobe.com/go/getflashplayer"
+			);
+		  } else {  // flash is too old or we can't detect the plugin
+		    var alternateContent = 'Alternate HTML content should be placed here. '
+		  	+ 'This content requires the Adobe Flash Player. '
+		   	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
+		    document.write(alternateContent);  // insert non-flash content
+		  }
+	</script>
+	<noscript>
+	  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+				id="LamsLessonGroupManager" width="827" height="502"
+				codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+				<param name="movie" value="LamsLessonGroupManager.swf" />
+				<param name="quality" value="high" />
+				<param name="bgcolor" value="#ffffff" />
+				<param name="allowScriptAccess" value="sameDomain" />
+				<embed src="LamsLessonGroupManager.swf" quality="high" bgcolor="#869ca7"
+					width="827" height="502" name="LamsLessonGroupManager" align="middle"
+					play="true"
+					loop="false"
+					quality="high"
+					allowScriptAccess="sameDomain"
+					type="application/x-shockwave-flash"
+					pluginspage="http://www.adobe.com/go/getflashplayer">
+				</embed>
+		</object>
+	</noscript>
+	</div>
 
 </div>  <!--closes content-->
 

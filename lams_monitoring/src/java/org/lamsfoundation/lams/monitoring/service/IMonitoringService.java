@@ -804,4 +804,9 @@ public interface IMonitoringService {
      * Start multiple lessons in one call.
      */
     public boolean startLessons(Integer creatorUserId, String lessonPacket) throws Exception;
+    
+    /**
+     * Set a groups name
+     */
+	public void setGroupName(Long groupID, String name);
 }

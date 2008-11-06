@@ -34,290 +34,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
       <title><c:out value="${title}"/></title>
 
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/error.js"></script>
-
+	<script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
+	
 	<script type="text/javascript">
-	<!-- 
-		function init(){
-			getBranchesAndNonmembers();
+		var requiredMajorVersion = 9;
+		var requiredMinorVersion = 0;
+		var requiredRevision = 124;
+
+		function closeWindow(){
+			window.close();
 		}
-
-		function adjustButtonStatus(){
-			if(document.getElementById("branches").selectedIndex==-1){
-				document.getElementById("nonmembersadd").disabled=true;
-				document.getElementById("membersremove").disabled=true;
-			}else{
-				if(document.getElementById("nonmembers[]").selectedIndex==-1){
-					document.getElementById("nonmembersadd").disabled=true;
-				}else{
-					document.getElementById("nonmembersadd").disabled=false;
-				}
-				if(document.getElementById("members[]").selectedIndex==-1 || ! <c:out value="${mayDelete}"/> ){
-					document.getElementById("membersremove").disabled=true;
-				}else{
-					document.getElementById("membersremove").disabled=false;
-				}
-			}
-		}
-
-		function getBranchesAndNonmembers(){
-			getBranches();
-			getNonmembers();
-			document.getElementById("members[]").options.length = 0;
-			adjustButtonStatus();
-		}
-
-		function getBranches(){
-			displayLoadingMessage();
-			url="<lams:LAMSURL/>monitoring/chosenBranching.do?method=getBranches&activityID=<c:out value="${activityID}"/>";
-			if (window.XMLHttpRequest) { // Non-IE browsers
-				branchRequest = new XMLHttpRequest();
-				branchRequest.onreadystatechange = updateBranches;
-				try {
-						branchRequest.open("GET", url, true);
-				} catch (e) {
-						alert(e);
-				}
-				branchRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-				branchRequest = new ActiveXObject("Microsoft.XMLHTTP");
-				if (branchRequest) {
-						branchRequest.onreadystatechange = updateBranches;
-						branchRequest.open("GET", url, true);
-						branchRequest.send();
-				}
-			}
-		}
-
-		function updateBranches(){
-			if (branchRequest.readyState == 4) { // Complete
-				clearMessage();
-				if (branchRequest.status == 200) { // OK response
-					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", branchRequest.responseText);
-					var branchSelectObj = document.getElementById("branches");
-					branchSelectObj.options.length = 0;
-					var res = branchRequest.responseText.replace(/^\s*|\s*$/g,"");
-					if(res.length>0){
-						var branches = res.split(";");
-						for (i=0; i<branches.length; i++){
-							var branch = branches[i].split(",");
-							branchSelectObj.options[branchSelectObj.length] = new Option(branch[1]+" ("+branch[2]+")",branch[0]);
-						}
-					}
-				}else{
-					alert("<fmt:message key="error.grouping.data"/>"+" "+branchRequest.status+".");
-				}
-				adjustButtonStatus();
-			}
-		}
-
-		function getNonmembers(){
-			displayLoadingMessage();
-			url="<lams:LAMSURL/>monitoring/chosenBranching.do?method=getClassMembersNotGrouped&lessonID=<c:out value="${lessonID}"/>&activityID=<c:out value="${activityID}"/>";
-			if (window.XMLHttpRequest) { // Non-IE browsers
-				nonmembersRequest = new XMLHttpRequest();
-				nonmembersRequest.onreadystatechange = updateNonmembers;
-				try {
-					nonmembersRequest.open("GET", url, true);
-				} catch (e) {
-					alert(e);
-				}
-				nonmembersRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-				nonmembersRequest = new ActiveXObject("Microsoft.XMLHTTP");
-				if (nonmembersRequest) {
-					nonmembersRequest.onreadystatechange = updateNonmembers;
-					nonmembersRequest.open("GET", url, true);
-					nonmembersRequest.send();
-				}
-			}
-		}
-
-		function updateNonmembers(){
-			if (nonmembersRequest.readyState == 4) { // Complete
-				clearMessage();
-				if (nonmembersRequest.status == 200) { // OK response
-					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", nonmembersRequest.responseText);
-					var nonmembersSelectObj = document.getElementById("nonmembers[]");
-					nonmembersSelectObj.options.length = 0;
-					var res = nonmembersRequest.responseText.replace(/^\s*|\s*$/g,"");
-					if(res.length>0){
-						var nonmembers = res.split(";");
-						for (i=0; i<nonmembers.length; i++){
-							var nonmember = nonmembers[i].split(",");
-							nonmembersSelectObj.options[nonmembersSelectObj.length] = new Option(nonmember[2]+" "+nonmember[1],nonmember[0]);
-						}
-					}
-				}else{
-					alert("<fmt:message key="error.grouping.data"/>"+" "+branchRequest.status+".");
-				}
-				adjustButtonStatus();
-			}
-		}
-
-		function getMembers(branch){
-			displayLoadingMessage();
-			url="<lams:LAMSURL/>monitoring/chosenBranching.do?method=getBranchMembers&branchID="+branch.value;
-			if (window.XMLHttpRequest) { // Non-IE browsers
-				memberRequest = new XMLHttpRequest();
-				memberRequest.onreadystatechange = updateMembers;
-				try {
-					memberRequest.open("GET", url, true);
-				} catch (e) {
-					alert(e);
-				}
-				memberRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-				memberRequest = new ActiveXObject("Microsoft.XMLHTTP");
-				if (memberRequest) {
-					memberRequest.onreadystatechange = updateMembers;
-					memberRequest.open("GET", url, true);
-					memberRequest.send();
-				}
-			}
-		}
-
-		function updateMembers(){
-			if (memberRequest.readyState == 4) { // Complete
-				clearMessage();
-				if (memberRequest.status == 200) { // OK response
-					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", memberRequest.responseText);
-					var membersSelectObj = document.getElementById("members[]");
-					membersSelectObj.options.length = 0;
-					var res = memberRequest.responseText.replace(/^\s*|\s*$/g,"");
-					if(res.length>0){
-						var members = res.split(";");
-						for (i=0; i<members.length; i++){
-							var member = members[i].split(",");
-							membersSelectObj.options[membersSelectObj.length] = new Option(member[2]+" "+member[1],member[0]);
-						}
-					}
-				}else{
-					alert("<fmt:message key="error.grouping.data"/>"+" "+memberRequest.status);
-				}
-				adjustButtonStatus();
-			}
-		}
-
-		
-		var count = 0;
-
-		function addMembersToBranch(){
-			var nonmembersSelectObj = document.getElementById("nonmembers[]");
-			var members = "";
-			for(i=0; i<nonmembersSelectObj.length; i++){
-				if(nonmembersSelectObj.options[i].selected){
-					count++;
-					members = members + "," + nonmembersSelectObj.options[i].value;
-				}	
-			}
-			url="<lams:LAMSURL/>monitoring/chosenBranching.do?method=addMembers&branchID="+document.getElementById("branches").value+"&members="+members.substr(1);
-			if (window.XMLHttpRequest) { // Non-IE browsers
-					addmbrsRequest = new XMLHttpRequest();
-					addmbrsRequest.onreadystatechange = membersAdded;
-					try {
-							addmbrsRequest.open("GET", url, true);
-					} catch (e) {
-							alert(e);
-					}
-					addmbrsRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-					addmbrsRequest = new ActiveXObject("Microsoft.XMLHTTP");
-					if (addmbrsRequest) {
-							addmbrsRequest.onreadystatechange = membersAdded;
-							addmbrsRequest.open("GET", url, true);
-							addmbrsRequest.send();
-					}
-			}
-		}
-
-		function membersAdded(){
-				if (addmbrsRequest.readyState == 4) { // Complete
-						if (addmbrsRequest.status == 200) { // OK response
-							checkForErrorScreen("<fmt:message key="error.grouping.data"/>", addmbrsRequest.responseText);
-							getNonmembers(document.getElementById("branches"));
-							getMembers(document.getElementById("branches"));
-							var branchSelectObj = document.getElementById("branches");
-							var branchName = branchSelectObj.options[branchSelectObj.selectedIndex].text;
-							var index1 = branchName.lastIndexOf("(");
-							var index2 = branchName.lastIndexOf(")");
-							var num = branchName.substring(index1+1,index2);
-							num = parseInt(num) + count;
-							branchSelectObj.options[branchSelectObj.selectedIndex].text = branchName.substring(0,index1)+"("+num+")";
-							count = 0;
-						}else{
-							alert("<fmt:message key="error.grouping.data"/>"+" "+addmbrsRequest.status);
-						}
-					adjustButtonStatus();
-				}
-		}
-
-		
-		function removeMembersFromBranch(){
-			var membersSelectObj = document.getElementById("members[]");
-			var nonmembers = "";
-			for(i=0; i<membersSelectObj.length; i++){
-				if(membersSelectObj.options[i].selected){
-					count++;
-					nonmembers = nonmembers + "," + membersSelectObj.options[i].value;
-				}	
-			}
-			url="<lams:LAMSURL/>monitoring/chosenBranching.do?method=removeMembers&branchID="+document.getElementById("branches").value+"&members="+nonmembers.substr(1);
-			if (window.XMLHttpRequest) { // Non-IE browsers
-					rmmbrsRequest = new XMLHttpRequest();
-					rmmbrsRequest.onreadystatechange = membersRemoved;
-					try {
-							rmmbrsRequest.open("GET", url, true);
-					} catch (e) {
-							alert(e);
-					}
-					rmmbrsRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-					rmmbrsRequest = new ActiveXObject("Microsoft.XMLHTTP");
-					if (rmmbrsRequest) {
-							rmmbrsRequest.onreadystatechange = membersRemoved;
-							rmmbrsRequest.open("GET", url, true);
-							rmmbrsRequest.send();
-					}
-			}
-		}
-
-		function membersRemoved(){
-			if (rmmbrsRequest.readyState == 4) { // Complete
-					if (rmmbrsRequest.status == 200) { // OK response
-						checkForErrorScreen("<fmt:message key="error.grouping.data"/>", rmmbrsRequest.responseText);
-						getMembers(document.getElementById("branches"));
-						getNonmembers(document.getElementById("branches"));
-						var branchSelectObj = document.getElementById("branches");
-						var branchName = branchSelectObj.options[branchSelectObj.selectedIndex].text;
-						var index1 = branchName.lastIndexOf("(");
-						var index2 = branchName.lastIndexOf(")");
-						var num = branchName.substring(index1+1,index2);
-						num = parseInt(num) - count;
-						branchSelectObj.options[branchSelectObj.selectedIndex].text = branchName.substring(0,index1)+"("+num+")";
-						count = 0;
-					}else{
-						alert("<fmt:message key="error.grouping.data"/>"+" "+rmmbrsRequest.status);
-					}
-			adjustButtonStatus();
-			}
-		}	
-
-		function displayLoadingMessage() {
-			document.getElementById("message").innerHTML = "<fmt:message key="label.grouping.loading"/>";
-		}
-
-		function clearMessage() {
-			document.getElementById("message").innerHTML = "";
-		}
-		
-	//-->
 	</script>
-
-	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
 	
 </lams:head>
 
-<body class="stripes" onLoad="init()">
+<body class="stripes">
 
 	<div id="content">
 
@@ -334,42 +65,83 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<p>&nbsp;<span id="message" align="right"></span></p>
 
 	<P><STRONG><fmt:message key="label.grouping.general.instructions.heading"/></STRONG> <fmt:message key="label.branching.general.instructions"/></P>
-
-	<table class="chosenbranching">
-		<tr>
-			<th><fmt:message key="label.branching.branch.heading"/></th>
-			<th><fmt:message key="label.branching.non.allocated.users.heading"/></th>
-			<th><fmt:message key="label.branching.allocated.users.heading"/></th>
-   		 </tr>
-		<tr>
-			<td width="34%">
-				<select id="branches" name="branches" size="15" onChange="getMembers(this)">
-				</select>
-			</td >
-			<td width="33%">
-				<select  id="nonmembers[]" name="nonmembers[]" size="15" multiple="multiple" onChange="adjustButtonStatus()">
-				</select>
-			</td>
-			<td width="33%">
-				<select  id="members[]" name="members[]" size="15" multiple="multiple" onChange="adjustButtonStatus()">
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td width="34%">
-				&nbsp;
-			</td >
-			<td width="33%">
-				<input type="button" class="button"  id="nonmembersadd" name="nonmembersadd" value="<fmt:message key="button.branching.add.user.to.branch"/>" onclick="addMembersToBranch()" disabled="true"/>
-			</td>
-			<td width="33%">
-				   <input type="button" class="button" id="membersremove" name="membersremove" value="<fmt:message key="button.branching.remove.user.from.branch"/>" onclick="removeMembersFromBranch()" disabled="true"/>
-			</td>
-		</tr>
-	</table>
-	<%@ include file="../template/finishbutton.jsp" %>
-	</form>
-
+	
+	<div align="center">
+		<script language="JavaScript" type="text/javascript">
+		<!--
+		// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
+		var hasProductInstall = DetectFlashVer(6, 0, 65);
+		
+		// Version check based upon the values defined in globals
+		var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
+		
+		if ( hasProductInstall && !hasRequestedVersion ) {
+			// DO NOT MODIFY THE FOLLOWING FOUR LINES
+			// Location visited after installation is complete if installation is required
+			var MMPlayerType = (isIE == true) ? "ActiveX" : "PlugIn";
+			var MMredirectURL = window.location;
+		    document.title = document.title.slice(0, 47) + " - Flash Player Installation";
+		    var MMdoctitle = document.title;
+		
+			AC_FL_RunContent(
+				"src", "playerProductInstall",
+				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+'&lessonID='+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
+				"width", "793",
+				"height", "454",
+				"align", "middle",
+				"id", "BranchManager",
+				"quality", "high",
+				"bgcolor", "#ffffff",
+				"name", "BranchManager",
+				"allowScriptAccess","sameDomain",
+				"type", "application/x-shockwave-flash",
+				"pluginspage", "http://www.adobe.com/go/getflashplayer"
+			);
+		} else if (hasRequestedVersion) {
+			// if we've detected an acceptable version
+			// embed the Flash Content SWF when all tests are passed
+			AC_FL_RunContent(
+					"src", "BranchManager",
+					"FlashVars", "lessonID="+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
+					"width", "793",
+					"height", "454",
+					"align", "middle",
+					"id", "BranchManager",
+					"quality", "high",
+					"bgcolor", "#ffffff",
+					"name", "BranchManager",
+					"allowScriptAccess","sameDomain",
+					"type", "application/x-shockwave-flash",
+					"pluginspage", "http://www.adobe.com/go/getflashplayer"
+			);
+		  } else {  // flash is too old or we can't detect the plugin
+		    var alternateContent = 'Alternate HTML content should be placed here. '
+		  	+ 'This content requires the Adobe Flash Player. '
+		   	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
+		    document.write(alternateContent);  // insert non-flash content
+		  }
+		// -->
+		</script>
+		<noscript>
+		  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+					id="BranchManager" width="793" height="454"
+					codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+					<param name="movie" value="BranchManager.swf" />
+					<param name="quality" value="high" />
+					<param name="bgcolor" value="#869ca7" />
+					<param name="allowScriptAccess" value="sameDomain" />
+					<embed src="BranchManager.swf" quality="high" bgcolor="#869ca7"
+						width="793" height="454" name="BranchManager" align="middle"
+						play="true"
+						loop="false"
+						quality="high"
+						allowScriptAccess="sameDomain"
+						type="application/x-shockwave-flash"
+						pluginspage="http://www.adobe.com/go/getflashplayer">
+					</embed>
+			</object>
+		</noscript>
+	</div>
 	</div>
 
 	<div id="footer">

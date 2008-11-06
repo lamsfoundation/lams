@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
@@ -153,6 +154,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     private ILearningDesignDAO learningDesignDAO;
 
     private IGroupingDAO groupingDAO;
+    
+    private IGroupDAO groupDAO;
 
     private ILearnerProgressDAO learnerProgressDAO;
 
@@ -2740,5 +2743,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    throw new Exception(e);
 	}
     }
-
+    
+    /**
+     * Set a group's name
+     */
+	public void setGroupName(Long groupID, String name) {
+		Group group = groupDAO.getGroupById(groupID);
+		group.setGroupName(name);
+		groupDAO.saveGroup(group);
+	}
 }

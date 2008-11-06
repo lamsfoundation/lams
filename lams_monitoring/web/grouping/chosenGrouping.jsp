@@ -34,422 +34,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
       <title><c:out value="${title}"/></title>
 
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/error.js"></script>
-
+	<script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
+	
 	<script type="text/javascript">
-	<!-- 
-		<c:choose>
-		<c:when test="${empty maxNumberOfGroups}">
-			var maxNumberOfGroups = 0;
-		</c:when>
-		<c:otherwise>
-			var maxNumberOfGroups = ${maxNumberOfGroups};
-		</c:otherwise>
-		</c:choose>
-		
-		<c:choose>
-		<c:when test="${empty mayDelete}">
-			var mayDelete = false;
-		</c:when>
-		<c:otherwise>
-			var mayDelete = ${mayDelete};
-		</c:otherwise>
-		</c:choose>
+		var requiredMajorVersion = 9;
+		var requiredMinorVersion = 0;
+		var requiredRevision = 124;
 
-		<c:choose>
-		<c:when test="${empty usedForBranching}">
-			var usedForBranching = true;
-		</c:when>
-		<c:otherwise>
-			var usedForBranching = ${usedForBranching};
-		</c:otherwise>
-		</c:choose>
-
-		function init(){
-			getGroupsAndNonmembers();
+		function closeWindow(){
+			window.close();
 		}
-
-		function ajustButtonStatus(){
-			if (usedForBranching) {
-				document.getElementById("groupremove").style.visibility = "hidden";
-				document.getElementById("groupadd").style.visibility = "hidden";
-				document.getElementById("newgroupname").style.visibility = "hidden";
-			} 
-									
-			if(document.getElementById("groups").selectedIndex==-1){
-				document.getElementById("groupremove").disabled=true;
-				document.getElementById("nonmembersadd").disabled=true;
-				document.getElementById("membersremove").disabled=true;
-			}else{
-				if ( mayDelete ) {
-					document.getElementById("groupremove").disabled=false;
-				}
-				if(document.getElementById("nonmembers[]").selectedIndex==-1){
-					document.getElementById("nonmembersadd").disabled=true;
-				}else{
-					document.getElementById("nonmembersadd").disabled=false;
-				}
-				if(document.getElementById("members[]").selectedIndex==-1 || ! mayDelete ){
-					document.getElementById("membersremove").disabled=true;
-				}else{
-					document.getElementById("membersremove").disabled=false;
-				}
-			}
-		}
-
-		function getGroupsAndNonmembers(){
-			getGroups();
-			getNonmembers();
-			document.getElementById("members[]").options.length = 0;
-			ajustButtonStatus();
-		}
-
-		function getGroups(){
-			displayLoadingMessage();
-			url="<lams:LAMSURL/>monitoring/grouping.do?method=getGroups&activityID=<c:out value="${activityID}"/>";
-			if (window.XMLHttpRequest) { // Non-IE browsers
-				groupRequest = new XMLHttpRequest();
-				groupRequest.onreadystatechange = updateGroups;
-				try {
-						groupRequest.open("GET", url, true);
-				} catch (e) {
-						alert(e);
-				}
-				groupRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
-				groupRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-				groupRequest = new ActiveXObject("Microsoft.XMLHTTP");
-				if (groupRequest) {
-						groupRequest.onreadystatechange = updateGroups;
-						groupRequest.open("GET", url, true);
-						groupRequest.send();
-				}
-			}
-		}
-
-		function updateGroups(){
-			if (groupRequest.readyState == 4) { // Complete
-				clearMessage();
-				if (groupRequest.status == 200) { // OK response
-					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", groupRequest.responseText);
-					var grpSelectObj = document.getElementById("groups");
-					grpSelectObj.options.length = 0;
-					var res = groupRequest.responseText.replace(/^\s*|\s*$/g,"");
-					if(res.length>0){
-						var groups = res.split(";");
-						for (i=0; i<groups.length; i++){
-							var group = groups[i].split(",");
-							grpSelectObj.options[grpSelectObj.length] = new Option(group[1]+" ("+group[2]+")",group[0]);
-						}
-					}
-				}else{
-					alert("<fmt:message key="error.grouping.data"/>"+" "+groupRequest.status+".");
-				}
-				ajustButtonStatus();
-			}
-		}
-
-		function getNonmembers(){
-			displayLoadingMessage();
-			url="<lams:LAMSURL/>monitoring/grouping.do?method=getClassMembersNotGrouped&lessonID=<c:out value="${lessonID}"/>&activityID=<c:out value="${activityID}"/>";
-			if (window.XMLHttpRequest) { // Non-IE browsers
-				nonmembersRequest = new XMLHttpRequest();
-				nonmembersRequest.onreadystatechange = updateNonmembers;
-				try {
-					nonmembersRequest.open("GET", url, true);
-				} catch (e) {
-					alert(e);
-				}
-				nonmembersRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
-				nonmembersRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-				nonmembersRequest = new ActiveXObject("Microsoft.XMLHTTP");
-				if (nonmembersRequest) {
-					nonmembersRequest.onreadystatechange = updateNonmembers;
-					nonmembersRequest.open("GET", url, true);
-					nonmembersRequest.send();
-				}
-			}
-		}
-
-		function updateNonmembers(){
-			if (nonmembersRequest.readyState == 4) { // Complete
-				clearMessage();
-				if (nonmembersRequest.status == 200) { // OK response
-					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", nonmembersRequest.responseText);
-					var nonmembersSelectObj = document.getElementById("nonmembers[]");
-					nonmembersSelectObj.options.length = 0;
-					var res = nonmembersRequest.responseText.replace(/^\s*|\s*$/g,"");
-					if(res.length>0){
-						var nonmembers = res.split(";");
-						for (i=0; i<nonmembers.length; i++){
-							var nonmember = nonmembers[i].split(",");
-							nonmembersSelectObj.options[nonmembersSelectObj.length] = new Option(nonmember[2]+" "+nonmember[1],nonmember[0]);
-						}
-					}
-				}else{
-					alert("<fmt:message key="error.grouping.data"/>"+" "+nonmembersRequest.status+".");
-				}
-				ajustButtonStatus();
-			}
-		}
-
-		function getMembers(group){
-			displayLoadingMessage();
-			url="<lams:LAMSURL/>monitoring/grouping.do?method=getGroupMembers&activityID=<c:out value="${activityID}"/>&groupID="+group.value;
-			if (window.XMLHttpRequest) { // Non-IE browsers
-				memberRequest = new XMLHttpRequest();
-				memberRequest.onreadystatechange = updateMembers;
-				try {
-					memberRequest.open("GET", url, true);
-				} catch (e) {
-					alert(e);
-				}
-				memberRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
-				memberRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-				memberRequest = new ActiveXObject("Microsoft.XMLHTTP");
-				if (memberRequest) {
-					memberRequest.onreadystatechange = updateMembers;
-					memberRequest.open("GET", url, true);
-					memberRequest.send();
-				}
-			}
-		}
-
-		function updateMembers(){
-			if (memberRequest.readyState == 4) { // Complete
-				clearMessage();
-				if (memberRequest.status == 200) { // OK response
-					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", memberRequest.responseText);
-					var membersSelectObj = document.getElementById("members[]");
-					membersSelectObj.options.length = 0;
-					var res = memberRequest.responseText.replace(/^\s*|\s*$/g,"");
-					if(res.length>0){
-						var members = res.split(";");
-						for (i=0; i<members.length; i++){
-							var member = members[i].split(",");
-							membersSelectObj.options[membersSelectObj.length] = new Option(member[2]+" "+member[1],member[0]);
-						}
-					}
-				}else{
-					alert("<fmt:message key="error.grouping.data"/>"+" "+memberRequest.status);
-				}
-				ajustButtonStatus();
-			}
-		}
-
-		
-		function addGroup(){
-			if(document.getElementById("newgroupname").value.replace(/^\s*|\s*$/g,"").length==0){
-				alert("<fmt:message key="error.grouping.add.group"/>");
-				document.getElementById("newgroupname").focus();
-			}else{
-				
-				url="<lams:LAMSURL/>monitoring/grouping.do";
-				var params = "method=addGroup&activityID=<c:out value="${activityID}"/>&name="+document.getElementById("newgroupname").value;
-				
-				if (window.XMLHttpRequest) { // Non-IE browsers
-						addgrpRequest = new XMLHttpRequest();
-						addgrpRequest.onreadystatechange = grpAdded;
-						try {
-								addgrpRequest.open("POST", url, true);
-						} catch (e) {
-								alert(e);
-						}
-						addgrpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-						addgrpRequest.setRequestHeader("Content-length", params.length);
-						addgrpRequest.setRequestHeader("Connection", "close");
-						addgrpRequest.send(params);
-				} else if (window.ActiveXObject) { // IE
-						addgrpRequest = new ActiveXObject("Microsoft.XMLHTTP");
-						if (addgrpRequest) {
-								addgrpRequest.onreadystatechange = grpAdded;
-								addgrpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-								addgrpRequest.setRequestHeader("Content-length", params.length);
-								addgrpRequest.setRequestHeader("Connection", "close");
-								addgrpRequest.open("POST", url, true);
-								addgrpRequest.send(params);
-						}
-				}
-			}
-		}
-
-		function grpAdded(){
-			if (addgrpRequest.readyState == 4) { // Complete
-				if (addgrpRequest.status == 200) { // OK response
-					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", addgrpRequest.responseText);
-					getGroups();
-					document.getElementById("newgroupname").value = "";
-					document.getElementById("members[]").options.length=0;
-				}else{
-					alert("<fmt:message key="error.grouping.data"/>"+" "+addgrpRequest.status);
-				}
-				ajustButtonStatus();
-			}
-		}
-
-		function removeGroup(){
-			if(document.getElementById("groups").selectedIndex == -1){
-				alert("<fmt:message key="${error.grouping.remove.group}"/>");
-			}else{
-				url="<lams:LAMSURL/>monitoring/grouping.do?method=removeGroup&activityID=<c:out value="${activityID}"/>&groupID="+document.getElementById("groups").value;
-				if (window.XMLHttpRequest) { // Non-IE browsers
-						rmgrpRequest = new XMLHttpRequest();
-						rmgrpRequest.onreadystatechange = grpRemoved;
-						try {
-								rmgrpRequest.open("GET", url, true);
-						} catch (e) {
-								alert(e);
-						}
-						rmgrpRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
-						rmgrpRequest.send(null);
-				} else if (window.ActiveXObject) { // IE
-						rmgrpRequest = new ActiveXObject("Microsoft.XMLHTTP");
-						if (rmgrpRequest) {
-								rmgrpRequest.onreadystatechange = grpRemoved;
-								rmgrpRequest.open("GET", url, true);
-								rmgrpRequest.send();
-						}
-				}
-			}
-		}
-
-		function grpRemoved(){
-			if (rmgrpRequest.readyState == 4) { // Complete
-				if (rmgrpRequest.status == 200) { // OK response
-					checkForErrorScreen("<fmt:message key="error.grouping.data"/>", rmgrpRequest.responseText);
-					var grpSelectObj = document.getElementById("groups");
-					grpSelectObj.remove(grpSelectObj.selectedIndex);
-					document.getElementById("members[]").options.length = 0;
-					getNonmembers(document.getElementById("groupings"));
-				}else{
-					alert("<fmt:message key="error.grouping.data"/>"+" "+rmgrpRequest.status);
-				}
-				ajustButtonStatus();
-			}
-		}
-
-		var count = 0;
-
-		function addMembersToGroup(){
-			var nonmembersSelectObj = document.getElementById("nonmembers[]");
-			var members = "";
-			for(i=0; i<nonmembersSelectObj.length; i++){
-				if(nonmembersSelectObj.options[i].selected){
-					count++;
-					members = members + "," + nonmembersSelectObj.options[i].value;
-				}	
-			}
-			url="<lams:LAMSURL/>monitoring/grouping.do?method=addMembers&activityID=<c:out value="${activityID}"/>&groupID="+document.getElementById("groups").value+"&members="+members.substr(1);
-			if (window.XMLHttpRequest) { // Non-IE browsers
-					addmbrsRequest = new XMLHttpRequest();
-					addmbrsRequest.onreadystatechange = membersAdded;
-					try {
-							addmbrsRequest.open("GET", url, true);
-					} catch (e) {
-							alert(e);
-					}
-					addmbrsRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
-					addmbrsRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-					addmbrsRequest = new ActiveXObject("Microsoft.XMLHTTP");
-					if (addmbrsRequest) {
-							addmbrsRequest.onreadystatechange = membersAdded;
-							addmbrsRequest.open("GET", url, true);
-							addmbrsRequest.send();
-					}
-			}
-		}
-
-		function membersAdded(){
-				if (addmbrsRequest.readyState == 4) { // Complete
-						if (addmbrsRequest.status == 200) { // OK response
-							checkForErrorScreen("<fmt:message key="error.grouping.data"/>", addmbrsRequest.responseText);
-							getNonmembers(document.getElementById("groupings"));
-							getMembers(document.getElementById("groups"));
-							var groupSelectObj = document.getElementById("groups");
-							var groupName = groupSelectObj.options[groupSelectObj.selectedIndex].text;
-							var index1 = groupName.lastIndexOf("(");
-							var index2 = groupName.lastIndexOf(")");
-							var num = groupName.substring(index1+1,index2);
-							num = parseInt(num) + count;
-							groupSelectObj.options[groupSelectObj.selectedIndex].text = groupName.substring(0,index1)+"("+num+")";
-							count = 0;
-						}else{
-							alert("<fmt:message key="error.grouping.data"/>"+" "+addmbrsRequest.status);
-						}
-					ajustButtonStatus();
-				}
-		}
-
-		
-		function removeMembersFromGroup(){
-			var membersSelectObj = document.getElementById("members[]");
-			var nonmembers = "";
-			for(i=0; i<membersSelectObj.length; i++){
-				if(membersSelectObj.options[i].selected){
-					count++;
-					nonmembers = nonmembers + "," + membersSelectObj.options[i].value;
-				}	
-			}
-			url="<lams:LAMSURL/>monitoring/grouping.do?method=removeMembers&activityID=<c:out value="${activityID}"/>&groupID="+document.getElementById("groups").value+"&members="+nonmembers.substr(1);
-			if (window.XMLHttpRequest) { // Non-IE browsers
-					rmmbrsRequest = new XMLHttpRequest();
-					rmmbrsRequest.onreadystatechange = membersRemoved;
-					try {
-							rmmbrsRequest.open("GET", url, true);
-					} catch (e) {
-							alert(e);
-					}
-					rmmbrsRequest.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
-					rmmbrsRequest.send(null);
-			} else if (window.ActiveXObject) { // IE
-					rmmbrsRequest = new ActiveXObject("Microsoft.XMLHTTP");
-					if (rmmbrsRequest) {
-							rmmbrsRequest.onreadystatechange = membersRemoved;
-							rmmbrsRequest.open("GET", url, true);
-							rmmbrsRequest.send();
-					}
-			}
-		}
-
-		function membersRemoved(){
-			if (rmmbrsRequest.readyState == 4) { // Complete
-					if (rmmbrsRequest.status == 200) { // OK response
-						checkForErrorScreen("<fmt:message key="error.grouping.data"/>", rmmbrsRequest.responseText);
-						getMembers(document.getElementById("groups"));
-						getNonmembers(document.getElementById("groupings"));
-						var groupSelectObj = document.getElementById("groups");
-						var groupName = groupSelectObj.options[groupSelectObj.selectedIndex].text;
-						var index1 = groupName.lastIndexOf("(");
-						var index2 = groupName.lastIndexOf(")");
-						var num = groupName.substring(index1+1,index2);
-						num = parseInt(num) - count;
-						groupSelectObj.options[groupSelectObj.selectedIndex].text = groupName.substring(0,index1)+"("+num+")";
-						count = 0;
-					}else{
-						alert("<fmt:message key="error.grouping.data"/>"+" "+rmmbrsRequest.status);
-					}
-			ajustButtonStatus();
-			}
-		}	
-
-		function displayLoadingMessage() {
-			document.getElementById("message").innerHTML = "<fmt:message key="label.grouping.loading"/>";
-		}
-
-		function clearMessage() {
-			document.getElementById("message").innerHTML = "";
-		}
-		
-	//-->
 	</script>
-
-	  <NOSCRIPT><!--This browser doesn't supports scripting--></NOSCRIPT>
 	
 </lams:head>
 
-<body class="stripes" onLoad="init()">
+<body class="stripes">
 
 	<div id="content">
 
@@ -476,48 +75,81 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:if test="${usedForBranching}">
 	<p><fmt:message key="label.grouping.general.instructions.branching"/></p>
 	</c:if>
-
-	<table class="chosengrouping">
-		<tr>
-			<th><fmt:message key="label.grouping.group.heading"/></th>
-			<th><fmt:message key="label.grouping.non.grouped.users.heading"/></th>
-			<th><fmt:message key="label.grouping.grouped.users.heading"/></th>
-   		 </tr>
-		<tr>
-			<td width="34%">
-				<select id="groups" name="groups" size="15" onChange="getMembers(this)">
-				</select>
-			</td >
-			<td width="33%">
-				<select  id="nonmembers[]" name="nonmembers[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
-				</select>
-			</td>
-			<td width="33%">
-				<select  id="members[]" name="members[]" size="15" multiple="multiple" onChange="ajustButtonStatus()">
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td width="34%">
-				<input type="button" class="button" id="groupremove" name="groupremove" value="<fmt:message key="button.grouping.remove.selected.group"/>" onclick="removeGroup()" disabled="true"/>
-			</td>
-			<td width="33%">
-				<input type="button" class="button"  id="nonmembersadd" name="nonmembersadd" value="<fmt:message key="button.grouping.add.user.to.group"/>" onclick="addMembersToGroup()" disabled="true"/>
-			</td>
-			<td width="33%">
-				   <input type="button" class="button" id="membersremove" name="membersremove" value="<fmt:message key="button.grouping.remove.user.from.group"/>" onclick="removeMembersFromGroup()" disabled="true"/>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="3">
-				<input type="text" name="newgroupname" id="newgroupname" size="25"  /><br>
-				<input type="button" class="button" id="groupadd" name="groupadd" value="<fmt:message key="button.grouping.add.group"/>" onclick="addGroup()"  />
-			</td>
-		</tr>
-	</table>
-	<%@ include file="../template/finishbutton.jsp" %>
-	</form>
-
+	
+	<div align="center">
+	<script language="JavaScript" type="text/javascript">
+		// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
+		var hasProductInstall = DetectFlashVer(6, 0, 65);
+		
+		// Version check based upon the values defined in globals
+		var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
+		
+		if ( hasProductInstall && !hasRequestedVersion ) {
+			// DO NOT MODIFY THE FOLLOWING FOUR LINES
+			// Location visited after installation is complete if installation is required
+			var MMPlayerType = (isIE == true) ? "ActiveX" : "PlugIn";
+			var MMredirectURL = window.location;
+		    document.title = document.title.slice(0, 47) + " - Flash Player Installation";
+		    var MMdoctitle = document.title;
+		
+			AC_FL_RunContent(
+				"src", "playerProductInstall",
+				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+'&lessonID='+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
+				"width", "827",
+				"height", "502",
+				"align", "middle",
+				"id", "LamsLessonGroupManager",
+				"quality", "high",
+				"bgcolor", "#ffffff",
+				"name", "GroupManager",
+				"allowScriptAccess","sameDomain",
+				"type", "application/x-shockwave-flash",
+				"pluginspage", "http://www.adobe.com/go/getflashplayer"
+			);
+		} else if (hasRequestedVersion) {
+			// if we've detected an acceptable version
+			// embed the Flash Content SWF when all tests are passed
+			AC_FL_RunContent(
+					"src", "GroupManager",
+					"FlashVars", "lessonID="+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
+					"width", "827",
+					"height", "502",
+					"align", "middle",
+					"id", "GroupManager",
+					"quality", "high",
+					"bgcolor", "#ffffff",
+					"name", "GroupManager",
+					"allowScriptAccess","sameDomain",
+					"type", "application/x-shockwave-flash",
+					"pluginspage", "http://www.adobe.com/go/getflashplayer"
+			);
+		  } else {  // flash is too old or we can't detect the plugin
+		    var alternateContent = 'Alternate HTML content should be placed here. '
+		  	+ 'This content requires the Adobe Flash Player. '
+		   	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
+		    document.write(alternateContent);  // insert non-flash content
+		  }
+	</script>
+	<noscript>
+	  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+				id="LamsLessonGroupManager" width="827" height="502"
+				codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+				<param name="movie" value="LamsLessonGroupManager.swf" />
+				<param name="quality" value="high" />
+				<param name="bgcolor" value="#ffffff" />
+				<param name="allowScriptAccess" value="sameDomain" />
+				<embed src="LamsLessonGroupManager.swf" quality="high" bgcolor="#869ca7"
+					width="827" height="502" name="LamsLessonGroupManager" align="middle"
+					play="true"
+					loop="false"
+					quality="high"
+					allowScriptAccess="sameDomain"
+					type="application/x-shockwave-flash"
+					pluginspage="http://www.adobe.com/go/getflashplayer">
+				</embed>
+		</object>
+	</noscript>
+	</div>
 	</div>
 
 	<div id="footer">

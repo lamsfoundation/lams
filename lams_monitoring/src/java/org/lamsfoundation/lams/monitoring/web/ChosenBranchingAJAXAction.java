@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -45,6 +46,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -70,9 +72,7 @@ public class ChosenBranchingAJAXAction extends BranchingAction {
 
     //---------------------------------------------------------------------
 
-	private static final String CHOSEN_SELECTION_SCREEN = "chosenSelection";
 	public static final String PARAM_BRANCH_ID = "branchID";
-	public static final String PARAM_MAY_DELETE = "mayDelete";
 	public static final String PARAM_MEMBERS = "members";
 	
 	/** 
@@ -86,6 +86,7 @@ public class ChosenBranchingAJAXAction extends BranchingAction {
 
     	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
         Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+        
 
         IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	BranchingActivity activity = (BranchingActivity) monitoringService.getActivityById(activityID, BranchingActivity.class);
@@ -97,6 +98,8 @@ public class ChosenBranchingAJAXAction extends BranchingAction {
 			request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
 			request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 			request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
+			request.setAttribute(PARAM_MODULE_LANGUAGE_XML, getLanguageXML());
+			request.setAttribute(PARAM_VIEW_MODE, Boolean.FALSE);
 
 			// can we still move users? 
 			boolean usersStartedBranching = monitoringService.isActivityAttempted(activity); 
@@ -133,29 +136,7 @@ public class ChosenBranchingAJAXAction extends BranchingAction {
 
 		// build the output string to return to the chosen branching page.
 		// there should only ever be one group for each branch in chosen branching
-		String branchesOutput = "";
-
-		boolean first = true;
-		for ( Activity childActivity : sortedBranches ) {
-
-			SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(childActivity.getActivityId(), SequenceActivity.class);
-
-			Long branchId = branch.getActivityId();
-			String name = branch.getTitle();
-			int numberOfMembers = 0;
-
-			Group group = branch.getSoleGroupForBranch();
-			if ( group != null )
-				numberOfMembers = group.getUsers().size();
-
-			if ( ! first ) {
-				branchesOutput=branchesOutput+";";
-			} else {
-				first = false;
-			}
-
-			branchesOutput=branchesOutput+branchId+","+name+","+numberOfMembers;
-		}
+		String branchesOutput = buildBranchStringXML(sortedBranches, monitoringService);
 
 		if ( log.isDebugEnabled() ) {
 			log.debug("getBranches activity id "+activityID+" returning "+branchesOutput);
@@ -181,7 +162,7 @@ public class ChosenBranchingAJAXAction extends BranchingAction {
 		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
 		SortedSet<User> users = monitoringService.getClassMembersNotGrouped(lessonID, activityID, false);
-		String groupOutput = buildUserString(users);
+		String groupOutput = buildUserStringXML(-1, users);
 		writeAJAXResponse(response, groupOutput);
 		return null;
 		
@@ -208,7 +189,7 @@ public class ChosenBranchingAJAXAction extends BranchingAction {
 		if ( group != null ) {
 			SortedSet<User> sortedUsers = new TreeSet<User>(new LastNameAlphabeticComparator());
 			sortedUsers.addAll(group.getUsers());
-			userOutput = buildUserString(sortedUsers);
+			userOutput = buildUserStringXML(branchID, sortedUsers);
 		}
 		
 		if ( log.isDebugEnabled() ) {
@@ -240,6 +221,97 @@ public class ChosenBranchingAJAXAction extends BranchingAction {
 			userOutput=userOutput+userID+","+lastName+","+firstName;
 		}
 		return userOutput;
+	}
+
+	/**
+	 *  Output format: xml
+	 * @param branchId
+	 * @param sortedUsers
+	 * @return String of users
+	 */ 
+	private String buildUserStringXML(long branchId, SortedSet<User> sortedUsers) {
+		String userOutput = "<xml>";
+		userOutput += "<branchID>" + branchId + "</branchID>";
+		userOutput += "<users>";
+		for ( User user : sortedUsers ) {
+			Integer userID = user.getUserId();
+			String lastName = user.getLastName();
+			String firstName = user.getFirstName();
+	
+			userOutput+="<user>";
+			userOutput+="<id>" + userID + "</id>";
+			userOutput+="<firstName>" + firstName + "</firstName>";
+			userOutput+="<lastName>" + lastName + "</lastName>";
+			userOutput+="<displayName>" + firstName + " " + lastName + "</displayName>";
+			userOutput+="</user>";
+		}
+		userOutput += "</users></xml>";
+		return userOutput;
+	}
+
+	/**
+	 *  Output format:
+	 * @param TreeSet<Activity> sortedBranches
+	 * @param IMonitoringService monitoringService
+	 * @return String of branches in some strange format
+	 */ 
+	private String buildBranchString(TreeSet<Activity> sortedBranches, IMonitoringService monitoringService){
+		String branchesOutput = "";
+
+		boolean first = true;
+		for ( Activity childActivity : sortedBranches ) {
+
+			SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(childActivity.getActivityId(), SequenceActivity.class);
+
+			Long branchId = branch.getActivityId();
+			String name = branch.getTitle();
+			int numberOfMembers = 0;
+
+			Group group = branch.getSoleGroupForBranch();
+			if ( group != null )
+				numberOfMembers = group.getUsers().size();
+
+			if ( ! first ) {
+				branchesOutput=branchesOutput+";";
+			} else {
+				first = false;
+			}
+
+			branchesOutput=branchesOutput+branchId+","+name+","+numberOfMembers;
+		}
+		
+		return branchesOutput;
+	}
+	
+	/**
+	 *  Output format: xml
+	 * @param TreeSet<Activity> sortedBranches
+	 * @param IMonitoringService monitoringService
+	 * @return String of branches in xml format
+	 */ 
+	private String buildBranchStringXML(TreeSet<Activity> sortedBranches, IMonitoringService monitoringService){
+		String branchOutput = "<xml><branches>";
+		for (Activity childActivity : sortedBranches) {
+
+			SequenceActivity branch = (SequenceActivity) monitoringService.getActivityById(childActivity.getActivityId(), SequenceActivity.class);
+
+			Long branchId = branch.getActivityId();
+			String name = branch.getTitle();
+			int numberOfMembers = 0;
+
+			Group group = branch.getSoleGroupForBranch();
+			if ( group != null )
+				numberOfMembers = group.getUsers().size();
+			
+			branchOutput+="<branch>";
+			branchOutput+="<id>" + branchId + "</id>";
+			branchOutput+="<name>" + name + "</name>";
+			branchOutput+="<numberOfMembers>" + numberOfMembers + "</numberOfMembers>";
+			branchOutput+="</branch>";
+		}
+		branchOutput += "</branches></xml>";
+		
+		return branchOutput;
 	}
 	
 	/** 

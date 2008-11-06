@@ -33,6 +33,7 @@
 	>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
 		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>	
 		<property name="authoringService"><ref bean="authoringService"/></property>	

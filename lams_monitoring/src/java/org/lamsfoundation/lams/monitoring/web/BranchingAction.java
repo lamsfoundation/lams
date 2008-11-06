@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.lamsfoundation.lams.monitoring.BranchingDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -70,11 +72,15 @@ public class BranchingAction extends LamsDispatchAction {
 
     //---------------------------------------------------------------------
 
-	private static final String VIEW_BRANCHES_SCREEN = "viewBranches";
+	protected static final String VIEW_BRANCHES_SCREEN = "viewBranches";
+	protected static final String CHOSEN_SELECTION_SCREEN = "chosenSelection";
 	public static final String PARAM_BRANCHING_DTO = "branching";
 	public static final String PARAM_SHOW_GROUP_NAME = "showGroupName";
 	/** If localFiles = true will be written to a local file for export portfolio */
-	public static final String PARAM_LOCAL_FILES= "localFiles"; 
+	public static final String PARAM_LOCAL_FILES= "localFiles";
+	public static final String PARAM_MAY_DELETE = "mayDelete";
+	public static final String PARAM_MODULE_LANGUAGE_XML = "languageXML";
+	protected static final String PARAM_VIEW_MODE = "viewMode";
 	
    /**
      * Export Portfolio Page
@@ -119,6 +125,9 @@ public class BranchingAction extends LamsDispatchAction {
 		request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 		request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
 		request.setAttribute(PARAM_LOCAL_FILES, useLocalFiles);
+		request.setAttribute(PARAM_MODULE_LANGUAGE_XML, getLanguageXML());
+		request.setAttribute(PARAM_MAY_DELETE, Boolean.FALSE);
+		request.setAttribute(PARAM_VIEW_MODE, Boolean.TRUE);
 	    	
 		// only show the group names if this is a group based branching activity - the names
 		// are meaningless for chosen and tool based branching
@@ -128,7 +137,7 @@ public class BranchingAction extends LamsDispatchAction {
 		if ( log.isDebugEnabled() ) {
 			log.debug("viewBranching: Branching activity "+dto);
 		}
-		return mapping.findForward(VIEW_BRANCHES_SCREEN);
+		return mapping.findForward(CHOSEN_SELECTION_SCREEN);
 	}
     	
 	// Can't do this in BranchingDTO (although that's where it should be) as we have
@@ -170,6 +179,29 @@ public class BranchingAction extends LamsDispatchAction {
 		dto.setBranches(branches);
 		return dto;
 	}
-
+	
+	/**
+	 * @return String of xml with all needed language elements
+	 */ 
+	protected String getLanguageXML(){
+		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+		MessageService messageService = monitoringService.getMessageService();
+		ArrayList<String> languageCollection = new ArrayList<String>();
+		languageCollection.add(new String("button.finished"));
+		languageCollection.add(new String("label.branching.non.allocated.users.heading"));
+		languageCollection.add(new String("label.grouping.status"));
+		languageCollection.add(new String("label.grouping.learners"));
+		languageCollection.add(new String("error.title"));
+		
+		String languageOutput = "<xml><language>";
+		
+		for(int i = 0; i < languageCollection.size(); i++){
+			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
+		}
+		
+		languageOutput += "</language></xml>";
+		
+		return languageOutput;
+	}
 
  }
