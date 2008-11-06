@@ -617,9 +617,17 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	
 	private function drawIsRequiredTasks(ca:Object, array:Array, x:Number):Void{
 		Debugger.log("array length: " + array.length, Debugger.CRITICAL, "drawIsRequiredTasks", "LessonTabView");
-		if(array.length > 0){
+		if (array.length > 0) {
+			
+			var textLabel:String = "";
+			if (ca._parentActivityID == null){
+				textLabel = "  " + ca.title;
+			} else {
+				textLabel = "\t\t" + ca.title;
+			}
+			
 			// write ca title / details to screen with x position
-			requiredTaskList[listCount] = _monitorReqTask_mc.attachMovie("contributeActivityRow", "contributeActivityRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount})
+			requiredTaskList[listCount] = _monitorReqTask_mc.attachMovie("contributeActivityRow", "contributeActivityRow" + listCount, this._monitorReqTask_mc.getNextHighestDepth(), { _x:x, _y:19 * listCount, textLabel:textLabel } );
 			reqTasks_scp.redraw(true);
 			
 			requiredTaskList[listCount].contributeActivity.background = true;
@@ -627,17 +635,18 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 			
 			Debugger.log("ca._parentActivityID: " + ca._parentActivityID, Debugger.CRITICAL, "drawIsRequiredTasks", "LessonTabView");
 			Debugger.log("ca.title: " + ca.title, Debugger.MED, "drawIsRequiredTasks", "LessonTabView");
-			
+						
 			if (ca._parentActivityID == null){
-				requiredTaskList[listCount].contributeActivity.text = "  " + ca.title;
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xD5E6FF;
 				listCount++;
 				
 			} else {
-				requiredTaskList[listCount].contributeActivity.text = "\t" + ca.title;
 				requiredTaskList[listCount].contributeActivity.backgroundColor = 0xF9F2DD;
 				listCount++;
 			}
+			
+			Debugger.log("contributeActivityText: " + requiredTaskList[listCount].contributeActivityText.text , Debugger.MED, "drawContributeActivity", "LessonTabView");
+			
 			for(var i=0; i<array.length; i++){
 				var o:Object = array[i];
 				if (o instanceof ContributeActivity) {
@@ -669,13 +678,13 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		if(requiredTaskList[listCount-1]._o == o) return;
 		
 		// normal CA entries
-		requiredTaskList[listCount] =_monitorReqTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow"+listCount, this._monitorReqTask_mc.getNextHighestDepth(), {_x:x, _y:19*listCount, buttonLabel:btnLabel, _o:o})
+		var textLabel:String = "\t\t\t\t" + mm.getMonitor().getCELiteral(o._contributionType);
+		requiredTaskList[listCount] = _monitorReqTask_mc.attachMovie("contributeEntryRow", "contributeEntryRow" + listCount, this._monitorReqTask_mc.getNextHighestDepth(), { _x:x, _y:19 * listCount, buttonLabel:btnLabel, textLabel:textLabel, _o:o} );
 		reqTasks_scp.redraw(true);
 		
-		requiredTaskList[listCount].contributeEntry.text = "\t\t"+mm.getMonitor().getCELiteral(o._contributionType);
 		requiredTaskList[listCount].goContribute._x = reqTasks_scp._width-50
 		
-		Debugger.log("contributeEntry.text: " + requiredTaskList[listCount].contributeEntry.text , Debugger.MED, "drawContributeActivity", "LessonTabView");
+		Debugger.log("contributeEntry.text: " + requiredTaskList[listCount].contributeEntryText.text , Debugger.MED, "drawContributeActivity", "LessonTabView");
 		
 		requiredTaskList[listCount].goContribute.onRelease = function (){
 			JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
