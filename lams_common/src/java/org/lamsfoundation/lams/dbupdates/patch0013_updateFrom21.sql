@@ -1,4 +1,10 @@
 -- SQL statements to update from LAMS 2.1/2.1.1
+
+-- Turn off autocommit, so nothing is committed if there is an error
+SET AUTOCOMMIT = 0;
+
+----------------------Put all sql statements below here-------------------------
+
 -- LDEV1909 - Competence Editor Update Scripts ---------------------------------
 CREATE TABLE lams_competence (
        competence_id BIGINT NOT NULL UNIQUE auto_increment
@@ -50,3 +56,9 @@ VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met',
 	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
 	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
+
+----------------------Put all sql statements above here-------------------------
+
+-- If there were no errors, commit and restore autocommit to on
+COMMIT;
+SET AUTOCOMMIT = 0
