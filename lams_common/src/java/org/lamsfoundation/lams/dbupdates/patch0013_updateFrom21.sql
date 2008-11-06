@@ -37,10 +37,8 @@ CREATE TABLE lams_text_search_condition (
 )TYPE=InnoDB;
 
 --  LDEV1929 - Updated script for lesson creation with presence --------------
-CREATE TABLE lams_lesson (
-       learner_presence_avail TINYINT(1) DEFAULT 0
-     , learner_im_avail TINYINT(1) DEFAULT 0
-)TYPE=InnoDB;
+ALTER TABLE lams_lesson ADD COLUMN learner_presence_avail TINYINT(1) DEFAULT 0;
+ALTER TABLE lams_lesson ADD COLUMN learner_im_avail TINYINT(1) DEFAULT 0;
 
 -- LDEV-1299 - Instead of mapping the conditions that open a gate to fictional sequences, there is only a boolean value ------------- 
 ALTER TABLE lams_branch_activity_entry ADD COLUMN open_gate TINYINT;
