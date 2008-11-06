@@ -287,6 +287,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     /**
+     * @param groupDAO
+     */
+    public void setGroupDAO(IGroupDAO groupDAO) {
+	this.groupDAO = groupDAO;
+    }
+    
+    /**
      * @param groupingDAO
      */
     public void setGroupingDAO(IGroupingDAO groupingDAO) {
