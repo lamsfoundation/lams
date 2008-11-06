@@ -1,5 +1,10 @@
 -- SQL statements to update from LAMS 2.1/2.1.1
 
+-- Turn off autocommit, so nothing is committed if there is an error
+SET AUTOCOMMIT = 0;
+
+----------------------Put all sql statements below here-------------------------
+
 CREATE TABLE tl_lafrum11_conditions (
        condition_id BIGINT(20) NOT NULL
 	 , content_uid BIGINT(20)
@@ -19,3 +24,9 @@ CREATE TABLE tl_lafrum11_condition_topics (
 	 , CONSTRAINT ForumConditionQuestionToForumQuestion FOREIGN KEY (topic_uid)
                   REFERENCES tl_lafrum11_message(uid) ON DELETE CASCADE ON UPDATE CASCADE	
 )TYPE=InnoDB;
+
+----------------------Put all sql statements above here-------------------------
+
+-- If there were no errors, commit and restore autocommit to on
+COMMIT;
+SET AUTOCOMMIT = 1;

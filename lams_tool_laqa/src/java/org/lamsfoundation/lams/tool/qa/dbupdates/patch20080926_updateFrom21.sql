@@ -1,4 +1,12 @@
 -- SQL statements to update from LAMS 2.1/2.1.1
+
+-- Turn off autocommit, so nothing is committed if there is an error
+SET AUTOCOMMIT = 0;
+
+----------------------Put all sql statements below here-------------------------
+
+
+-- SQL statements to update from LAMS 2.1/2.1.1
 CREATE TABLE tl_laqa11_conditions (
        condition_id BIGINT(20) NOT NULL
 	 , content_uid BIGINT(20)
@@ -25,11 +33,8 @@ UPDATE lams_tool SET supports_outputs=1 WHERE tool_signature='laqa11';
 ALTER TABLE tl_laqa11_que_content MODIFY COLUMN qa_content_id BIGINT(20);
 
 SET FOREIGN_KEY_CHECKS=0;
+
 -- insert scripts for the wizard tables
-drop table if exists tl_laqa11_configuration;
-drop table if exists tl_laqa11_wizard_category;
-drop table if exists tl_laqa11_wizard_cognitive_skill;
-drop table if exists tl_laqa11_wizard_question;
 create table tl_laqa11_configuration (uid bigint not null auto_increment, config_key varchar(30) unique, config_value varchar(255), primary key (uid))TYPE=InnoDB;
 create table tl_laqa11_wizard_category (uid bigint not null auto_increment, title varchar(255) not null, primary key (uid))TYPE=InnoDB;
 create table tl_laqa11_wizard_cognitive_skill (uid bigint not null auto_increment, title varchar(255) not null, category_uid bigint, primary key (uid))TYPE=InnoDB;
@@ -50,3 +55,10 @@ SET FOREIGN_KEY_CHECKS=1;
 
 -- updating q&a to have an admin page for the qa wizard
 UPDATE lams_tool SET admin_url='tool/laqa11/laqa11admin.do' WHERE tool_signature='laqa11';
+
+
+----------------------Put all sql statements above here-------------------------
+
+-- If there were no errors, commit and restore autocommit to on
+COMMIT;
+SET AUTOCOMMIT = 1;
