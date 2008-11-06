@@ -2220,7 +2220,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @throws LessonServiceException
      *             , MonitoringServiceException
      */
-    public void addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups)
+    public Group addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups)
 	    throws LessonServiceException, MonitoringServiceException {
 	Activity activity = getActivityById(activityID);
 	Grouping grouping = getGroupingForActivity(activity, true, "addGroup");
@@ -2250,7 +2250,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		}
 	    }
 	}
-	lessonService.createGroup(grouping, name);
+	return lessonService.createGroup(grouping, name);
     }
 
     /**

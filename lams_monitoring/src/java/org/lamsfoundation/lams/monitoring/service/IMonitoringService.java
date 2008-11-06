@@ -693,7 +693,7 @@ public interface IMonitoringService {
      *            group name
      * @throws LessonServiceException
      */
-    public abstract void addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups)
+    public abstract Group addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups)
 	    throws LessonServiceException, MonitoringServiceException;
 
     /**
