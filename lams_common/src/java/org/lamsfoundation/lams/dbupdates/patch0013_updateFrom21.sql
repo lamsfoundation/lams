@@ -61,4 +61,4 @@ VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met',
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
-SET AUTOCOMMIT = 0
+SET AUTOCOMMIT = 1;
