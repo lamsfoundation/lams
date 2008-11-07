@@ -25,6 +25,7 @@ CREATE TABLE tl_lafrum11_condition_topics (
                   REFERENCES tl_lafrum11_message(uid) ON DELETE CASCADE ON UPDATE CASCADE	
 )TYPE=InnoDB;
 
+ALTER TABLE tl_lafrum11_forum ADD COLUMN mark_release_notify tinyint DEFAULT 0;
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
