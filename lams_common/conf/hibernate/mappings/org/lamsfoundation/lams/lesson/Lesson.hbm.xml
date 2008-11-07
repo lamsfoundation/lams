@@ -48,7 +48,13 @@
 		</property>
 		<property name="learnerExportAvailable" type="java.lang.Boolean"
         	column="learner_exportport_avail" length="1">
-    </property>
+        </property>
+		<property name="learnerPresenceAvailable" type="java.lang.Boolean"
+        	column="learner_presence_avail" length="1">
+        </property>
+		<property name="learnerImAvailable" type="java.lang.Boolean"
+        	column="learner_im_avail" length="1">
+    	</property>
 		<property name="lockedForEdit" type="java.lang.Boolean"
         	column="locked_for_edit" length="1">
     </property>
