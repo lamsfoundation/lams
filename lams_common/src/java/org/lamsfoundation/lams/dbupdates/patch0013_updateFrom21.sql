@@ -57,6 +57,9 @@ VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met',
 	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
 
+-- LDEV-1871 Creating extra column in lams_tool table for tool adapters
+ALTER TABLE lams_tool ADD COLUMN ext_lms_id VARCHAR(255);
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
