@@ -110,8 +110,8 @@
 			// total number of branches add (even after removal)
 			private var totalBranchesAdded:int = 0;
 			
-			// last remove event stored
-			private var lastRemoveEvent:Event;
+			// last drag event stored
+			private var lastDragEvent:DragEvent;
 			
 			// variables grabbed from flashvars
 			private var lessonID:int;
@@ -147,6 +147,10 @@
 					application.enabled = false;
 				}
 				else {
+					// if may not delete, alert the monitor that learners can be added but not removed from branches
+					if(!mayDelete){
+						Alert.show(languageXML.language.entry.(@key=="label.branching.popup.drag.selection.message").name);
+					}
 					initServices();
 					initButtonsAndDragging();
 					initLabels();
@@ -159,16 +163,15 @@
 			private function initLabels():void{
 				finish_btn.label = languageXML.language.entry.(@key=="button.finished").name;
 				mainDataGridCol1_col.headerText = languageXML.language.entry.(@key=="label.branching.non.allocated.users.heading").name;
-				status_lbl.text = languageXML.language.entry.(@key=="label.grouping.status").name;
 			}
 			
 			// initialize buttons and dragging depending on jsp conditions
 			private function initButtonsAndDragging():void {
 				// allow movement of students if deleting is allowed
-				mainDataGrid_dg.dragEnabled = mayDelete;
-				mainDataGrid_dg.dropEnabled = mayDelete;
-				mainDataGrid_dg.dragMoveEnabled = mayDelete;
-				mainDataGrid_dg.allowDragSelection = mayDelete;
+				mainDataGrid_dg.dragEnabled = true;
+				mainDataGrid_dg.dropEnabled = true;
+				mainDataGrid_dg.dragMoveEnabled = true;
+				mainDataGrid_dg.allowDragSelection = true;
 			}
 			
 			// set request parameters
@@ -226,7 +229,7 @@
                	}
 
 				// set new column attributes
-				newDataGridColumn.headerText = languageXML.language.entry.(@key=="label.branching.learners").name;
+				newDataGridColumn.headerText = languageXML.language.entry.(@key=="label.grouping.learners").name;
 				newDataGridColumn.dataField = "displayName";
 				
 				// set new datagrid attributes
@@ -237,10 +240,10 @@
                	newDataGrid.addEventListener(DragEvent.DRAG_DROP, dragDropHandler);
                	newDataGrid.dataProvider = newLearnersCollection;
 				
-				newDataGrid.dropEnabled = mayDelete;
                	newDataGrid.dragEnabled = mayDelete;
                	newDataGrid.dragMoveEnabled= mayDelete;
                	newDataGrid.allowDragSelection = mayDelete;
+               	newDataGrid.dropEnabled = true;
                	
 				// add elements to the panel
 				newPanel.addChild(newDataGrid);
@@ -282,8 +285,8 @@
 	        private function closeWindowHandler(e:MouseEvent):void{
 	        	ExternalInterface.call("closeWindow");
 	        }
-	        
-	        // drag drop handler
+	              
+	        // handler to complete dragging users
 	        private function dragDropHandler(e:DragEvent):void {
 	        	// if the drag and drop source and destination are not the same
 	        	if(e.dragInitiator != e.currentTarget){
@@ -410,8 +413,6 @@
 	<mx:Tile verticalScrollPolicy="auto" id="learnerBranches_tile" right="10" top="10" bottom="48" left="203">
 	</mx:Tile>
 	<mx:HBox verticalAlign="middle" bottom="10" right="10" height="30" left="203">
-		<mx:Label id="status_lbl"/>
-		<mx:SWFLoader source="../bin-debug/loading_small.swf" autoLoad="true" id="working_swf" visible="false"/>
 		<mx:Spacer width="100%"/>
 		<mx:Button id="finish_btn"/>
 		<mx:SWFLoader visible="false">

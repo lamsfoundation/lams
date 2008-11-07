@@ -192,6 +192,7 @@ public class BranchingAction extends LamsDispatchAction {
 		languageCollection.add(new String("label.grouping.status"));
 		languageCollection.add(new String("label.grouping.learners"));
 		languageCollection.add(new String("error.title"));
+		languageCollection.add(new String("label.branching.popup.drag.selection.message"));
 		
 		String languageOutput = "<xml><language>";
 		

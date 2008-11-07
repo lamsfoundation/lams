@@ -159,6 +159,9 @@
 			// last remove event stored
 			private var lastRemoveEvent:Event;
 			
+			// last drag event stored
+			private var lastDragEvent:DragEvent;
+			
 			// variables grabbed from flashvars
 			private var lessonID:int;
 			private var activityID:int;
@@ -197,6 +200,11 @@
 					application.enabled = false;
 				}
 				else {
+					// if may not delete, alert the monitor that learners can be added but not removed from groups
+					if(!mayDelete){
+						Alert.show(languageXML.language.entry.(@key=="label.grouping.popup.drag.selection.message").name);
+					}
+					
 					initServices();
 					initButtonsAndDragging();
 					initLabels();
@@ -210,7 +218,6 @@
 				groupFunctions_lbl.text = languageXML.language.entry.(@key=="label.grouping.functions").name;
 				finish_btn.label = languageXML.language.entry.(@key=="button.finished").name;
 				mainDataGridCol1_col.headerText = languageXML.language.entry.(@key=="label.grouping.non.grouped.users.heading").name;
-				status_lbl.text = languageXML.language.entry.(@key=="label.grouping.status").name;
 				globalAddPanel_btn.label = "+";
 				globalRemovePanel_btn.label = "-";
 			}
@@ -218,10 +225,10 @@
 			// initialize buttons and dragging depending on jsp conditions
 			private function initButtonsAndDragging():void {
 				// allow movement of students if deleting is allowed
-				mainDataGrid_dg.dragEnabled = mayDelete;
-				mainDataGrid_dg.dropEnabled = mayDelete;
-				mainDataGrid_dg.dragMoveEnabled = mayDelete;
-				mainDataGrid_dg.allowDragSelection = mayDelete;
+				mainDataGrid_dg.dragEnabled = true;
+				mainDataGrid_dg.dropEnabled = true;
+				mainDataGrid_dg.dragMoveEnabled = true;
+				mainDataGrid_dg.allowDragSelection = true;
 				
 				// if groups are being used for branching, if deletion is a nono or if branching/grouping is in view mode, disable add and remove buttons
 				if(usedForBranching || !mayDelete || viewMode) {
@@ -273,6 +280,14 @@
                	var newPanelRemoveButton:Button = new Button();
 				var horizontalSpacer:Spacer = new Spacer();
 				
+				/*
+				// check current number of groups against max numbers of groups
+				if(totalGroupsAdded >= maxNumberOfGroups) {
+					Alert.show(languageXML.language.entry.(@key=="error.title").name);
+					return false;
+				}
+				*/
+				
 				// increment total number of group panels added
 				totalGroupsAdded++;
 				
@@ -292,10 +307,13 @@
              	newControlBar.percentWidth = 100;
              	newControlBar.height = 40;
              	
-             	// add only if conditions are alright
-             	if(!usedForBranching && mayDelete && !viewMode) {
-             		newControlBar.addChild(horizontalSpacer);
-             		newControlBar.addChild(newPanelRemoveButton);
+             	// add the control bar's components
+             	newControlBar.addChild(horizontalSpacer);
+             	newControlBar.addChild(newPanelRemoveButton);
+             	
+             	// disactivate if deletion is not allowed
+             	if(usedForBranching || !mayDelete || viewMode) {
+					newPanelRemoveButton.enabled = false;
              	}
 
              	// set new panel attributes
@@ -329,10 +347,11 @@
                	newDataGrid.addEventListener(DragEvent.DRAG_DROP, dragDropHandler);
                	newDataGrid.dataProvider = newLearnersCollection;
 				
-				newDataGrid.dropEnabled = mayDelete;
-               	newDataGrid.dragEnabled = mayDelete;
-               	newDataGrid.dragMoveEnabled= mayDelete;
-               	newDataGrid.allowDragSelection = mayDelete;
+				// set dragging properties depending
+				newDataGrid.dragEnabled = mayDelete;
+				newDataGrid.dragMoveEnabled= mayDelete;
+				newDataGrid.allowDragSelection = mayDelete;
+				newDataGrid.dropEnabled = true;
                	
 				// add elements to the panel
 				newPanel.addChild(newDataGrid);
@@ -447,12 +466,12 @@
             private function removePanelHandler(event:Event):void {
             	if(panels.length != 0) {
 	            	lastRemoveEvent = event;
-	                Alert.show(languageXML.language.entry.(@key=="label.grouping.popup.delete.group.message").name, languageXML.language.entry.(@key=="label.grouping.popup.delete.group").name, 3, this, alertClickHandler);    	
+	                Alert.show(languageXML.language.entry.(@key=="label.grouping.popup.delete.group.message").name, languageXML.language.entry.(@key=="label.grouping.popup.delete.group").name, 3, this, deleteAlertClickHandler);    	
             	}
             }
             
             // click handler to confirm removing a panel
-            private function alertClickHandler(event:CloseEvent):void {
+            private function deleteAlertClickHandler(event:CloseEvent):void {
                 if (event.detail==Alert.YES){
                 	removePanelHandlerComplete(lastRemoveEvent);
                 }
@@ -475,7 +494,7 @@
 	        	ExternalInterface.call("closeWindow");
 	        }
 	        
-	        // drag drop handler
+	        // handler to complete dragging users
 	        private function dragDropHandler(e:DragEvent):void {
 	        	// if the drag and drop source and destination are not the same
 	        	if(e.dragInitiator != e.currentTarget){
@@ -512,15 +531,14 @@
 	        // -- httpservice handlers --
 	        private function getGroupsSuccessHandler(e:ResultEvent):void {
 	        	var xmlResult:XMLListCollection = new XMLListCollection(XMLList(e.result).groups.group);
+	        	var amountGroupsAdded:int = 0;
 	        	
+	        	// for each group returned, add a group panel and get its learners
 	        	for(var i:int = 0; i < xmlResult.length; i++){
 					addGroupPanel(xmlResult.getItemAt(i).id.toString(), xmlResult.getItemAt(i).name.toString());
-	        	}
-	        	
-	        	for(var i:int = 0; i < xmlResult.length; i++){
-	        		getGroupMembersService.request.groupID = xmlResult.getItemAt(i).id.toString();
+					getGroupMembersService.request.groupID = xmlResult.getItemAt(i).id.toString();
 	        		getGroupMembersService.send();
-	        	}
+				}
 	        }
 	        
 	      	private function getGroupsFaultHandler(e:Event):void {
@@ -620,8 +638,6 @@
 		<mx:Label id="groupFunctions_lbl"/>
 		<mx:Button id="globalAddPanel_btn" />
 		<mx:Button id="globalRemovePanel_btn" />
-		<mx:Label id="status_lbl"/>
-		<mx:SWFLoader source="../bin-debug/loading_small.swf" autoLoad="true" id="working_swf" visible="false"/>
 		<mx:Spacer width="100%"/>
 		<mx:Button id="finish_btn"/>
 		<mx:SWFLoader visible="false">
