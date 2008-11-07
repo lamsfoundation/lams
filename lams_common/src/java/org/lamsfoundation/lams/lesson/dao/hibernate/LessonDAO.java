@@ -122,7 +122,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      *                the desired organisation.
      * @return a List with all active lessons in it.
      */
-    public List getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId) {
+    public List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId) {
 	List lessons = null;
 
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
@@ -135,7 +135,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 		return result;
 	    }
 	});
-	return lessons;
+	return (List<Lesson>)lessons;
     }
 
     /**
@@ -293,6 +293,25 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	    public Object doInHibernate(Session session) throws HibernateException {
 		Query query = session.getNamedQuery(isStaff ? "staffLessonsByOrgAndUserWithCompletedFlag"
 			: "learnerLessonsByOrgAndUserWithCompletedFlag");
+		query.setInteger("userId", userId.intValue());
+		query.setInteger("orgId", orgId.intValue());
+		List result = query.list();
+		return result;
+	    }
+	});
+	return dtos;
+    }
+    
+    /**
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOrgAndUserWithCompletedFlag(Integer, Integer,
+     *      boolean)
+     */
+    public List getLessonsByOrgAndUser(final Integer userId, final Integer orgId) {
+	List dtos = null;
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	dtos = (List) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.getNamedQuery("lessonsByOrgAndUser");
 		query.setInteger("userId", userId.intValue());
 		query.setInteger("orgId", orgId.intValue());
 		List result = query.list();

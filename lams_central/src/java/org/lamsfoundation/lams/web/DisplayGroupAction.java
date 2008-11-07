@@ -139,6 +139,7 @@ public class DisplayGroupAction extends Action {
 				}
 				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')", "add-lesson-button"));
+					links.add(new IndexLinkBean("index.searchlesson", "javascript:openSearchLesson(" + org.getOrganisationId()+",'')", "search-lesson-button")); 
 			}else{//CLASS_TYPE
 				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")", "add-lesson-button"));

@@ -69,7 +69,7 @@ public interface ILessonDAO extends IBaseDAO {
      *                the desired organisation .
      * @return a List with all active lessons in it.
      */
-    public List getActiveLessonsForLearner(final Integer learnerId, final Integer organisationID);
+    public List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationID);
 
     /**
      * Saves or Updates a Lesson.
@@ -161,15 +161,20 @@ public interface ILessonDAO extends IBaseDAO {
      * Gets all non-removed lessons for a user in an org; set isStaff flag whether you want lessons where user is in the
      * staff list, or just in the learner list.
      * 
-     * @param userId
-     *                a user id that identifies the user.
-     * @param orgId
-     *                an org id that identifies the organisation.
-     * @param isStaff
-     *                boolean flag for whether user is staff in returned lessons.
+     * @param userId a user id that identifies the user.
+     * @param orgId an org id that identifies the organisation.
      * @return a List containing a list of tuples containing lesson details and the lesson completed flag for the user.
      */
     public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final boolean isStaff);
+    
+    /**
+     * Gets all non-removed lessons for a user in an org; 
+     * 
+     * @param userId a user id that identifies the user.
+     * @param orgId an org id that identifies the organisation.
+     * @return a List containing a list of tuples containing lesson details and the lesson completed flag for the user.
+     */
+    public List getLessonsByOrgAndUser(final Integer userId, final Integer orgId);
 
     /**
      * Get lessons based on learning designs where the original learning design has the given id.

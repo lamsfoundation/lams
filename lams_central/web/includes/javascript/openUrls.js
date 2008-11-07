@@ -292,5 +292,9 @@
 			}
 		}
 		
+		function openSearchLesson( courseID, classID ) {
+			window.open('findUserLessons.do?dispatch=getResults&courseID='+courseID+'&classID='+classID,'slWindow','width=610,height=480,scrollbars');			
+		}
+		
 			
 	//-->
