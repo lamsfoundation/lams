@@ -60,6 +60,16 @@ VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met',
 -- LDEV-1871 Creating extra column in lams_tool table for tool adapters
 ALTER TABLE lams_tool ADD COLUMN ext_lms_id VARCHAR(255);
 
+-- LDEV-1581 Add a collumn to the lams_grouping table for learner's choice grouping
+ALTER TABLE lams_grouping ADD COLUMN equal_number_of_learners_per_group TINYINT DEFAULT 0;
+
+
+
+-- Update the configuration table to have the current version of LAMS
+UPDATE lams_configuration SET config_value='2.2' WHERE config_key='Version';
+UPDATE lams_configuration SET config_value='2.2.0.200811310000' WHERE config_key='AuthoringClientVersion' OR config_key='MonitorClientVersion' OR config_key='LearnerClientVersion' OR config_key='ServerVersionNumber';
+UPDATE lams_configuration SET config_value='2008-11-31' WHERE config_key='DictionaryDateCreated';
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
