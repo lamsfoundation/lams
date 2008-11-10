@@ -16,9 +16,6 @@
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
-		<fileset dir="lib">
-			<include name="**/*.jar"/>
-		</fileset>
 		<fileset dir="${j2eelibs}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -52,7 +49,6 @@
         <mkdir dir="${build.classes.test}"/>
         <mkdir dir="${build.report}"/>
 	</target>
-
 
 	<target name="clean" description="Delete all generated files">
 		<echo>+------------------------------------------+</echo>
