@@ -31,200 +31,214 @@ package org.lamsfoundation.lams.util;
  */
 public class ConfigurationKeys {
 
-	public static String ROOT = "Lams";
+    public static String ROOT = "Lams";
 
-	public static String SERVER_URL = "ServerURL";
-	public static String SERVER_URL_CONTEXT_PATH = "ServerURLContextPath";
+    public static String SERVER_URL = "ServerURL";
 
-	public static String VERSION = "Version";
+    public static String SERVER_URL_CONTEXT_PATH = "ServerURLContextPath";
 
-	public static String LAMS_TEMP_DIR = "TempDir";
+    public static String VERSION = "Version";
 
-	/**
-	 * Directory in which lams.ear is deployed. Usually
-	 * {JBOSS}/server/default/deploy/lams.ear
-	 */
-	public static String LAMS_EAR_DIR = "EARDir";
+    public static String LAMS_TEMP_DIR = "TempDir";
 
-	public static String SMTP_SERVER = "SMTPServer";
+    /**
+     * Directory in which lams.ear is deployed. Usually
+     * {JBOSS}/server/default/deploy/lams.ear
+     */
+    public static String LAMS_EAR_DIR = "EARDir";
 
-	public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
+    public static String SMTP_SERVER = "SMTPServer";
 
-	/**
-	 * Flash crash dump files (see FlashCrashDump servlet) are written to the
-	 * Dump directory
-	 */
-	public static String LAMS_DUMP_DIR = "DumpDir";
+    public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
 
-	public static String CONTENT_REPOSITORY_PATH = "ContentRepositoryPath";
+    /**
+     * Flash crash dump files (see FlashCrashDump servlet) are written to the
+     * Dump directory
+     */
+    public static String LAMS_DUMP_DIR = "DumpDir";
 
-	public static String UPLOAD_FILE_MAX_SIZE = "UploadFileMaxSize";
+    public static String CONTENT_REPOSITORY_PATH = "ContentRepositoryPath";
 
-	public static String UPLOAD_FILE_LARGE_MAX_SIZE = "UploadLargeFileMaxSize";
+    public static String UPLOAD_FILE_MAX_SIZE = "UploadFileMaxSize";
 
-	public static String UPLOAD_FILE_MAX_MEMORY_SIZE = "UploadFileMaxMemorySize";
+    public static String UPLOAD_FILE_LARGE_MAX_SIZE = "UploadLargeFileMaxSize";
 
-	public static String CHAT_SERVER_NAME = "ChatServerName";
+    public static String UPLOAD_FILE_MAX_MEMORY_SIZE = "UploadFileMaxMemorySize";
 
-	public static String CHAT_PORT_NUMBER = "ChatPortNumber";
+    public static String CHAT_SERVER_NAME = "ChatServerName";
 
-	public static String EXE_EXTENSIONS = "ExecutableExtensions";
+    public static String CHAT_PORT_NUMBER = "ChatPortNumber";
 
-	public static String LICENSE_TICKET_FILE = "TicketFile";
+    public static String EXE_EXTENSIONS = "ExecutableExtensions";
 
-	public static String PREVIEW_CLEANUP_NUM_DAYS = "CleanupPreviewOlderThanDays";
+    public static String LICENSE_TICKET_FILE = "TicketFile";
 
-	/**
-	 * Number of milliseconds before a user is considered "inactive".
-	 * "Anonymous" sessions are ended after this period (ie ones that haven't
-	 * ever access one of the clients )
-	 */
-	public static String INACTIVE_TIME = "UserInactiveTimeout";
+    public static String PREVIEW_CLEANUP_NUM_DAYS = "CleanupPreviewOlderThanDays";
 
-	/**
-	 * Allow more than one session to exist for one user. Needed for the test
-	 * harness Do not set this parameter to true in production.
-	 */
-	public static String ALLOW_MULTIPLE_LOGIN = "AllowMultipleLogin";
+    /**
+     * Number of milliseconds before a user is considered "inactive".
+     * "Anonymous" sessions are ended after this period (ie ones that haven't
+     * ever access one of the clients )
+     */
+    public static String INACTIVE_TIME = "UserInactiveTimeout";
 
-	/**
-	 * Turn on the cache debugging listener. Logs whenever an item is
-	 * added/removed/evicted to/from the cache. Not on in production. Must be
-	 * set to a boolean value
-	 */
-	public static String USE_CACHE_DEBUG_LISTENER = "UseCacheDebugListener";
+    /**
+     * Allow more than one session to exist for one user. Needed for the test
+     * harness Do not set this parameter to true in production.
+     */
+    public static String ALLOW_MULTIPLE_LOGIN = "AllowMultipleLogin";
 
-	/** Value for controlling style colour on Canvas Activities */
-	public static String AUTHORING_ACTS_COLOUR = "AuthoringActivitiesColour";
-	
-	/** Values for client updates */
-	public static String AUTHORING_CLIENT_VERSION = "AuthoringClientVersion";
+    /**
+     * Turn on the cache debugging listener. Logs whenever an item is
+     * added/removed/evicted to/from the cache. Not on in production. Must be
+     * set to a boolean value
+     */
+    public static String USE_CACHE_DEBUG_LISTENER = "UseCacheDebugListener";
 
-	public static String LEARNER_CLIENT_VERSION = "LearnerClientVersion";
+    /** Value for controlling style colour on Canvas Activities */
+    public static String AUTHORING_ACTS_COLOUR = "AuthoringActivitiesColour";
 
-	public static String MONITOR_CLIENT_VERSION = "MonitorClientVersion";
+    /** Values for client updates */
+    public static String AUTHORING_CLIENT_VERSION = "AuthoringClientVersion";
 
-	public static String SERVER_VERSION_NUMBER = "ServerVersionNumber";
+    public static String LEARNER_CLIENT_VERSION = "LearnerClientVersion";
 
-	/** Default locale for the server. Originally en_AU */
-	public static String SERVER_LANGUAGE = "ServerLanguage";
+    public static String MONITOR_CLIENT_VERSION = "MonitorClientVersion";
 
-	/** Direction (left to right, right to left) for writing on HTML pages. Originally LTR */
-	public static String SERVER_PAGE_DIRECTION = "ServerPageDirection";
+    public static String SERVER_VERSION_NUMBER = "ServerVersionNumber";
 
-	/** universal date of dictionary updates */
-	public static String DICTIONARY_DATE_CREATED = "DictionaryDateCreated";
+    /** Default locale for the server. Originally en_AU */
+    public static String SERVER_LANGUAGE = "ServerLanguage";
 
-	public static String HELP_URL = "HelpURL";
-	
-	public static String XMPP_DOMAIN = "XmppDomain";
+    /**
+     * Direction (left to right, right to left) for writing on HTML pages.
+     * Originally LTR
+     */
+    public static String SERVER_PAGE_DIRECTION = "ServerPageDirection";
 
-	public static String XMPP_CONFERENCE = "XmppConference";
+    /** universal date of dictionary updates */
+    public static String DICTIONARY_DATE_CREATED = "DictionaryDateCreated";
 
-	public static String XMPP_ADMIN = "XmppAdmin";
+    public static String HELP_URL = "HelpURL";
 
-	public static String XMPP_PASSWORD = "XmppPassword";
+    public static String XMPP_DOMAIN = "XmppDomain";
 
-	public static String DEFAULT_FLASH_THEME = "DefaultFlashTheme";
-	
-	public static String DEFAULT_HTML_THEME = "DefaultHTMLTheme";
-	
-	public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
-	
-	public static String LAMS_COMMUNITY_ENABLE = "LAMS_Community_enable";
+    public static String XMPP_CONFERENCE = "XmppConference";
 
-	public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
-	
-	public static String LDAP_PROVISIONING_ENABLED = "LDAPProvisioningEnabled";
-	
-	public static String LDAP_PROVIDER_URL = "LDAPProviderURL";
-	
-	public static String LDAP_SECURITY_AUTHENTICATION = "LDAPSecurityAuthentication";
-	
-	public static String LDAP_PRINCIPAL_DN_PREFIX = "LDAPPrincipalDNPrefix";
-	
-	public static String LDAP_PRINCIPAL_DN_SUFFIX = "LDAPPrincipalDNSuffix";
-	
-	public static String LDAP_SECURITY_PROTOCOL = "LDAPSecurityProtocol";
-	
-	public static String TRUSTSTORE_PATH = "TruststorePath";
-	
-	public static String TRUSTSTORE_PASSWORD = "TruststorePassword";
-	
-	public static String LDAP_LOGIN_ATTR = "LDAPLoginAttr";
-	
-	public static String LDAP_FIRST_NAME_ATTR = "LDAPFNameAttr";
-	
-	public static String LDAP_LAST_NAME_ATTR = "LDAPLNameAttr";
-	
-	public static String LDAP_EMAIL_ATTR = "LDAPEmailAttr";
-	
-	public static String LDAP_ADDR1_ATTR = "LDAPAddr1Attr";
-	
-	public static String LDAP_ADDR2_ATTR = "LDAPAddr2Attr";
-	
-	public static String LDAP_ADDR3_ATTR = "LDAPAddr3Attr";
-	
-	public static String LDAP_CITY_ATTR = "LDAPCityAttr";
-	
-	public static String LDAP_STATE_ATTR = "LDAPStateAttr";
-	
-	public static String LDAP_POSTCODE_ATTR = "LDAPPostcodeAttr";
-	
-	public static String LDAP_COUNTRY_ATTR = "LDAPCountryAttr";
-	
-	public static String LDAP_DAY_PHONE_ATTR = "LDAPDayPhoneAttr";
-	
-	public static String LDAP_EVENING_PHONE_ATTR = "LDAPEveningPhoneAttr";
-	
-	public static String LDAP_FAX_ATTR = "LDAPFaxAttr";
-	
-	public static String LDAP_MOBILE_ATTR = "LDAPMobileAttr";
-	
-	public static String LDAP_LOCALE_ATTR = "LDAPLocaleAttr";
-	
-	public static String LDAP_DISABLED_ATTR = "LDAPDisabledAttr";
-	
-	public static String LDAP_ORG_ATTR = "LDAPOrgAttr";
-	
-	public static String LDAP_ROLES_ATTR = "LDAPRolesAttr";
-	
-	public static String LDAP_LEARNER_MAP = "LDAPLearnerMap";
-	
-	public static String LDAP_MONITOR_MAP = "LDAPMonitorMap";
-	
-	public static String LDAP_AUTHOR_MAP = "LDAPAuthorMap";
-	
-	public static String LDAP_GROUP_ADMIN_MAP = "LDAPGroupAdminMap";
-	
-	public static String LDAP_GROUP_MANAGER_MAP = "LDAPGroupManagerMap";
-	
-	public static String LDAP_UPDATE_ON_LOGIN = "LDAPUpdateOnLogin";
-	
-	public static String LDAP_ORG_FIELD = "LDAPOrgField";
-	
-	public static String LDAP_ONLY_ONE_ORG = "LDAPOnlyOneOrg";
-	
-	public static String LDAP_ENCRYPT_PASSWORD_FROM_BROWSER = "LDAPEncryptPasswordFromBrowser";
-	
-	public static String LDAP_SEARCH_RESULTS_PAGE_SIZE = "LDAPSearchResultsPageSize";
-	
-	/** Number of learners to be displayed on the learner progress screen in monitoring. */
-	public static String LEARNER_PROGRESS_BATCH_SIZE = "LearnerProgressBatchSize";
-	
-	/** Custom tab for the main page */
-	public static String CUSTOM_TAB_LINK = "CustomTabLink";
-	public static String CUSTOM_TAB_TITLE = "CustomTabTitle";
-	
-	/** Disable Flash altogether for the learner interface (LDEV-1005) */
-	public static String FLASH_ENABLE = "EnableFlash";
-	
-	/** Configurable screen sizes for authoring, monitor, learner and admin (LDEV-1598) */
-	public static String AUTHORING_SCREEN_SIZE = "AuthoringScreenSize";
-	public static String MONITOR_SCREEN_SIZE = "MonitorScreenSize";
-	public static String LEARNER_SCREEN_SIZE = "LearnerScreenSize";
-	public static String ADMIN_SCREEN_SIZE = "AdminScreenSize";
-	
-	public static String GMAP_KEY = "GmapKey";
-	
+    public static String XMPP_ADMIN = "XmppAdmin";
+
+    public static String XMPP_PASSWORD = "XmppPassword";
+
+    public static String DEFAULT_FLASH_THEME = "DefaultFlashTheme";
+
+    public static String DEFAULT_HTML_THEME = "DefaultHTMLTheme";
+
+    public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
+
+    public static String LAMS_COMMUNITY_ENABLE = "LAMS_Community_enable";
+
+    public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
+
+    public static String LDAP_PROVISIONING_ENABLED = "LDAPProvisioningEnabled";
+
+    public static String LDAP_PROVIDER_URL = "LDAPProviderURL";
+
+    public static String LDAP_SECURITY_AUTHENTICATION = "LDAPSecurityAuthentication";
+
+    public static String LDAP_PRINCIPAL_DN_PREFIX = "LDAPPrincipalDNPrefix";
+
+    public static String LDAP_PRINCIPAL_DN_SUFFIX = "LDAPPrincipalDNSuffix";
+
+    public static String LDAP_SECURITY_PROTOCOL = "LDAPSecurityProtocol";
+
+    public static String TRUSTSTORE_PATH = "TruststorePath";
+
+    public static String TRUSTSTORE_PASSWORD = "TruststorePassword";
+
+    public static String LDAP_LOGIN_ATTR = "LDAPLoginAttr";
+
+    public static String LDAP_FIRST_NAME_ATTR = "LDAPFNameAttr";
+
+    public static String LDAP_LAST_NAME_ATTR = "LDAPLNameAttr";
+
+    public static String LDAP_EMAIL_ATTR = "LDAPEmailAttr";
+
+    public static String LDAP_ADDR1_ATTR = "LDAPAddr1Attr";
+
+    public static String LDAP_ADDR2_ATTR = "LDAPAddr2Attr";
+
+    public static String LDAP_ADDR3_ATTR = "LDAPAddr3Attr";
+
+    public static String LDAP_CITY_ATTR = "LDAPCityAttr";
+
+    public static String LDAP_STATE_ATTR = "LDAPStateAttr";
+
+    public static String LDAP_POSTCODE_ATTR = "LDAPPostcodeAttr";
+
+    public static String LDAP_COUNTRY_ATTR = "LDAPCountryAttr";
+
+    public static String LDAP_DAY_PHONE_ATTR = "LDAPDayPhoneAttr";
+
+    public static String LDAP_EVENING_PHONE_ATTR = "LDAPEveningPhoneAttr";
+
+    public static String LDAP_FAX_ATTR = "LDAPFaxAttr";
+
+    public static String LDAP_MOBILE_ATTR = "LDAPMobileAttr";
+
+    public static String LDAP_LOCALE_ATTR = "LDAPLocaleAttr";
+
+    public static String LDAP_DISABLED_ATTR = "LDAPDisabledAttr";
+
+    public static String LDAP_ORG_ATTR = "LDAPOrgAttr";
+
+    public static String LDAP_ROLES_ATTR = "LDAPRolesAttr";
+
+    public static String LDAP_LEARNER_MAP = "LDAPLearnerMap";
+
+    public static String LDAP_MONITOR_MAP = "LDAPMonitorMap";
+
+    public static String LDAP_AUTHOR_MAP = "LDAPAuthorMap";
+
+    public static String LDAP_GROUP_ADMIN_MAP = "LDAPGroupAdminMap";
+
+    public static String LDAP_GROUP_MANAGER_MAP = "LDAPGroupManagerMap";
+
+    public static String LDAP_UPDATE_ON_LOGIN = "LDAPUpdateOnLogin";
+
+    public static String LDAP_ORG_FIELD = "LDAPOrgField";
+
+    public static String LDAP_ONLY_ONE_ORG = "LDAPOnlyOneOrg";
+
+    public static String LDAP_ENCRYPT_PASSWORD_FROM_BROWSER = "LDAPEncryptPasswordFromBrowser";
+
+    public static String LDAP_SEARCH_RESULTS_PAGE_SIZE = "LDAPSearchResultsPageSize";
+
+    /**
+     * Number of learners to be displayed on the learner progress screen in
+     * monitoring.
+     */
+    public static String LEARNER_PROGRESS_BATCH_SIZE = "LearnerProgressBatchSize";
+
+    /** Custom tab for the main page */
+    public static String CUSTOM_TAB_LINK = "CustomTabLink";
+
+    public static String CUSTOM_TAB_TITLE = "CustomTabTitle";
+
+    /** Disable Flash altogether for the learner interface (LDEV-1005) */
+    public static String FLASH_ENABLE = "EnableFlash";
+
+    /**
+     * Configurable screen sizes for authoring, monitor, learner and admin
+     * (LDEV-1598)
+     */
+    public static String AUTHORING_SCREEN_SIZE = "AuthoringScreenSize";
+
+    public static String MONITOR_SCREEN_SIZE = "MonitorScreenSize";
+
+    public static String LEARNER_SCREEN_SIZE = "LearnerScreenSize";
+
+    public static String ADMIN_SCREEN_SIZE = "AdminScreenSize";
+
+    public static String GMAP_KEY = "GmapKey";
+
 }

@@ -44,137 +44,143 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class LDAPAuthenticator {
-	
-	private static Logger log = Logger.getLogger(LDAPAuthenticator.class);
-	private static UserManagementService service;
-	private static LdapService ldapService;
-	private static final String INITIAL_CONTEXT_FACTORY_VALUE = "com.sun.jndi.ldap.LdapCtxFactory";
-	private Attributes attrs = null;
-	
-	public LDAPAuthenticator() {
+
+    private static Logger log = Logger.getLogger(LDAPAuthenticator.class);
+
+    private static UserManagementService service;
+
+    private static LdapService ldapService;
+
+    private static final String INITIAL_CONTEXT_FACTORY_VALUE = "com.sun.jndi.ldap.LdapCtxFactory";
+
+    private Attributes attrs = null;
+
+    public LDAPAuthenticator() {
+    }
+
+    private UserManagementService getService() {
+	if (service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
+		    .getInstance().getServletContext());
+	    service = (UserManagementService) ctx.getBean("userManagementService");
 	}
-	
-	private UserManagementService getService() {
-		if (service==null) {
-			WebApplicationContext ctx = WebApplicationContextUtils
-				.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-			service = (UserManagementService) ctx.getBean("userManagementService");
+	return service;
+    }
+
+    private LdapService getLdapService() {
+	if (ldapService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
+		    .getInstance().getServletContext());
+	    ldapService = (LdapService) ctx.getBean("ldapService");
+	}
+	return ldapService;
+    }
+
+    public Attributes getAttrs() {
+	return attrs;
+    }
+
+    public void setAttrs(Attributes attrs) {
+	this.attrs = attrs;
+    }
+
+    public boolean authenticate(String username, String inputPassword) {
+	return authentication(username, inputPassword);
+    }
+
+    private boolean authentication(String username, Object credential) {
+	Properties env = new Properties();
+
+	// Load all authentication method parameters into env
+	env.setProperty(Context.INITIAL_CONTEXT_FACTORY, INITIAL_CONTEXT_FACTORY_VALUE);
+	env.setProperty(Context.SECURITY_AUTHENTICATION, Configuration
+		.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
+
+	String principalDNPrefix = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_PREFIX);
+	String[] principalDNSuffixes = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_SUFFIX).split(";");
+
+	env.setProperty(Context.PROVIDER_URL, Configuration.get(ConfigurationKeys.LDAP_PROVIDER_URL));
+	env.put(Context.SECURITY_CREDENTIALS, credential);
+
+	Object originalTrustStore = System.getProperty("javax.net.ssl.trustStore");
+	Object originalTrustPass = System.getProperty("javax.net.ssl.trustStorePassword");
+
+	String securityProtocol = Configuration.get(ConfigurationKeys.LDAP_SECURITY_PROTOCOL);
+	if (StringUtils.equals("ssl", securityProtocol)) {
+	    env.setProperty(Context.SECURITY_PROTOCOL, securityProtocol);
+	}
+
+	boolean isValid = false;
+	InitialLdapContext ctx = null;
+
+	for (String principalDNSuffix : principalDNSuffixes) {
+	    if (!principalDNSuffix.startsWith(",")) {
+		principalDNSuffix = "," + principalDNSuffix;
+	    }
+	    String userDN = principalDNPrefix + username + principalDNSuffix;
+	    env.setProperty(Context.SECURITY_PRINCIPAL, userDN);
+	    try {
+		ctx = new InitialLdapContext(env, null);
+		log.debug("===> LDAP context created using DN: " + userDN);
+		isValid = true;
+		Attributes attrs = ctx.getAttributes(userDN);
+		setAttrs(attrs);
+
+		if (log.isDebugEnabled()) {
+		    NamingEnumeration enumAttrs = attrs.getAll();
+		    while (enumAttrs.hasMoreElements()) {
+			log.debug(enumAttrs.next());
+		    }
 		}
-		return service;
-	}
-	
-	private LdapService getLdapService() {
-		if (ldapService==null) {
-			WebApplicationContext ctx = WebApplicationContextUtils
-				.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-			ldapService = (LdapService) ctx.getBean("ldapService");
-		}
-		return ldapService;
-	}
 
-	public Attributes getAttrs() {
-		return attrs;
-	}
-	
-	public void setAttrs(Attributes attrs) {
-		this.attrs = attrs;
-	}
-	
-	public boolean authenticate(String username, String inputPassword) {
-		return authentication(username, inputPassword);
-	}
-
-	private boolean authentication(String username, Object credential) {
-		Properties env = new Properties();
-
-		// Load all authentication method parameters into env
-		env.setProperty(Context.INITIAL_CONTEXT_FACTORY, INITIAL_CONTEXT_FACTORY_VALUE);
-		env.setProperty(Context.SECURITY_AUTHENTICATION, Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
-
-		String principalDNPrefix = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_PREFIX);
-		String[] principalDNSuffixes = Configuration.get(ConfigurationKeys.LDAP_PRINCIPAL_DN_SUFFIX).split(";");
-
-		env.setProperty(Context.PROVIDER_URL, Configuration.get(ConfigurationKeys.LDAP_PROVIDER_URL));
-		env.put(Context.SECURITY_CREDENTIALS, credential);
-		
-		Object originalTrustStore = System.getProperty("javax.net.ssl.trustStore");
-		Object originalTrustPass = System.getProperty("javax.net.ssl.trustStorePassword");
-		
-		String securityProtocol = Configuration.get(ConfigurationKeys.LDAP_SECURITY_PROTOCOL);
-		if (StringUtils.equals("ssl", securityProtocol)) {
-			env.setProperty(Context.SECURITY_PROTOCOL, securityProtocol);
+		// check user is disabled in ldap
+		if (getLdapService().getDisabledBoolean(attrs)) {
+		    log.debug("===> User is disabled in LDAP.");
+		    User user = getService().getUserByLogin(username);
+		    if (user != null) {
+			getService().disableUser(user.getUserId());
+		    }
+		    return false;
 		}
 
-		boolean isValid = false;
-		InitialLdapContext ctx = null;
-		
-		for (String principalDNSuffix : principalDNSuffixes) {
-			if (!principalDNSuffix.startsWith(",")) {
-				principalDNSuffix = "," + principalDNSuffix;
-			}
-			String userDN = principalDNPrefix + username + principalDNSuffix;
-			env.setProperty(Context.SECURITY_PRINCIPAL, userDN);
-			try {
-				ctx = new InitialLdapContext(env, null);
-				log.debug("===> LDAP context created using DN: "+userDN);
-				isValid = true;
-				Attributes attrs = ctx.getAttributes(userDN);
-				setAttrs(attrs);
-				
-				if (log.isDebugEnabled()) {
-					NamingEnumeration enumAttrs = attrs.getAll();
-					while (enumAttrs.hasMoreElements()) {
-						log.debug(enumAttrs.next());
-					}
-				}
-			
-				// check user is disabled in ldap
-				if (getLdapService().getDisabledBoolean(attrs)) {
-					log.debug("===> User is disabled in LDAP.");
-					User user = getService().getUserByLogin(username);
-					if (user != null) {
-						getService().disableUser(user.getUserId());
-					}
-					return false;
-				}
-			
-				if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_UPDATE_ON_LOGIN)) {
-					User user = getService().getUserByLogin(username);
-					if (user != null) {
-						// update user's attributes and org membership
-						getLdapService().updateLDAPUser(user, attrs);
-						getLdapService().addLDAPUser(attrs, user.getUserId());
-					}
-				}
-			
-				return true;
-			} catch (AuthenticationNotSupportedException e) {
-				log.error("===> Authentication mechanism not supported.  Check your "
-						+ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION+" parameter: "
-						+Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
-			} catch (AuthenticationException e) {
-				log.info("===> Incorrect username ("+userDN+") or password. "+e.getMessage());
-			} catch (Exception e) {
-				log.error("===> LDAP exception: " + e, e);
-			} finally {
-
-				try {
-					// FIXME: synchronization issue -- dynamically load certificate
-					// instead of overwritting system properties
-					//System.setProperty("javax.net.ssl.trustStore",(String)originalTrustStore
-					// );
-					//System.setProperty("javax.net.ssl.trustStorePassword",(String)originalTrustPass
-					// );
-
-					if (ctx != null)
-						ctx.close();
-				} catch (Exception e) {
-					log.error("===> gettting problem when closing context. Exception: "+e);
-				}
-			}
+		if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_UPDATE_ON_LOGIN)) {
+		    User user = getService().getUserByLogin(username);
+		    if (user != null) {
+			// update user's attributes and org membership
+			getLdapService().updateLDAPUser(user, attrs);
+			getLdapService().addLDAPUser(attrs, user.getUserId());
+		    }
 		}
-		
-		return isValid;
+
+		return true;
+	    } catch (AuthenticationNotSupportedException e) {
+		log.error("===> Authentication mechanism not supported.  Check your "
+			+ ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION + " parameter: "
+			+ Configuration.get(ConfigurationKeys.LDAP_SECURITY_AUTHENTICATION));
+	    } catch (AuthenticationException e) {
+		log.info("===> Incorrect username (" + userDN + ") or password. " + e.getMessage());
+	    } catch (Exception e) {
+		log.error("===> LDAP exception: " + e, e);
+	    } finally {
+
+		try {
+		    // FIXME: synchronization issue -- dynamically load
+		    // certificate
+		    // instead of overwritting system properties
+		    // System.setProperty("javax.net.ssl.trustStore",(String)originalTrustStore
+		    // );
+		    // System.setProperty("javax.net.ssl.trustStorePassword",(String)originalTrustPass
+		    // );
+
+		    if (ctx != null)
+			ctx.close();
+		} catch (Exception e) {
+		    log.error("===> gettting problem when closing context. Exception: " + e);
+		}
+	    }
 	}
+
+	return isValid;
+    }
 
 }
