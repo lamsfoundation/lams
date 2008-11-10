@@ -128,21 +128,21 @@ public class DisplayGroupAction extends Action {
 		List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
 		if(isSysAdmin && stateId.equals(OrganisationState.ACTIVE)){
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-				links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button"));
+				links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button", null));
 			}
 		}
 		if ((contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 				&& stateId.equals(OrganisationState.ACTIVE)) {
 			if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 				if((!isSysAdmin)&&(contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER))){
-					links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button"));
+					links.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + org.getOrganisationId()+")", "manage-group-button", null));
 				}
 				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
-					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')", "add-lesson-button"));
-					links.add(new IndexLinkBean("index.searchlesson", "javascript:openSearchLesson(" + org.getOrganisationId()+",'')", "search-lesson-button")); 
+					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')", "add-lesson-button", null));
+					links.add(new IndexLinkBean("index.searchlesson", "javascript:openSearchLesson(" + org.getOrganisationId()+",'')", "search-lesson-button", "index.searchlesson.tooltip")); 
 			}else{//CLASS_TYPE
 				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
-					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")", "add-lesson-button"));
+					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")", "add-lesson-button", null));
 			}
 		}
 		orgBean.setLinks(links);

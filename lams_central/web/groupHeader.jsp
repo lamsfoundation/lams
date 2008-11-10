@@ -10,8 +10,15 @@
 		</h2>
 	</div>
 	<c:forEach var="link" items="${orgBean.links}">
+		<c:set var="tooltip" value="" />
+		<c:if test="${link.tooltip ne null}">
+			<c:set var="tooltip">
+				<fmt:message key="${link.tooltip}" />
+			</c:set>
+		</c:if>
+		
 		<div class="mycourses-right-buttons">
-			<a class="<c:out value='${link.style}'/>" href="<c:out value='${link.url}'/>"> 
+			<a class="<c:out value='${link.style}'/>" href="<c:out value='${link.url}'/>" title="${tooltip}"> 
 				<fmt:message key="${link.name}" /> 
 			</a>
 		</div>	

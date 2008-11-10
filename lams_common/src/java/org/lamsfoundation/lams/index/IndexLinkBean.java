@@ -38,12 +38,14 @@ public class IndexLinkBean {
 	private String name;
 	private String url;
 	private String style;
+	private String tooltip;
 	
-	public IndexLinkBean(String name, String url, String style) {
+	public IndexLinkBean(String name, String url, String style, String tooltip) {
 		super();
 		this.name = name;
 		this.url = url;
 		this.style = style;
+		this.tooltip = tooltip;
 	}
 	
 	public IndexLinkBean(String name, String url) {
@@ -81,6 +83,14 @@ public class IndexLinkBean {
 	
 	public void setStyle(String style) {
 		this.style = style;
+	}
+	
+	public String getTooltip() {
+	    return tooltip;
+	}
+
+	public void setTooltip(String tooltip) {
+	    this.tooltip = tooltip;
 	}
 
 }
