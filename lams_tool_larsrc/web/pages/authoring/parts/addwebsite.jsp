@@ -72,7 +72,7 @@
 			<a href="javascript:;" onclick="cancelResourceItem()" class="button space-left"><fmt:message
 					key="label.cancel" /> </a>
 		</lams:ImgButtonWrapper>
-
+		<br />
 
 
 	</body>
