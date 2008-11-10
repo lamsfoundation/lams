@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO;
@@ -72,6 +73,14 @@ public class Configuration implements InitializingBean {
 				Iterator it = mapitems.iterator();
 				while(it.hasNext()) {
 					ConfigurationItem item = (ConfigurationItem) it.next();
+					
+					// init ssl truststore path and password
+					if (StringUtils.equals(item.getKey(), ConfigurationKeys.TRUSTSTORE_PATH)) {
+					    setSystemProperty(item.getKey(), item.getValue());
+					} else if (StringUtils.equals(item.getKey(), ConfigurationKeys.TRUSTSTORE_PASSWORD)) {
+					    setSystemProperty(item.getKey(), item.getValue());
+					}
+					
 					itemsmap.put(item.getKey(), item);
 				}	
 			}
@@ -141,6 +150,9 @@ public class Configuration implements InitializingBean {
 	}
 	
 	public void persistUpdate() {
+	    	// update ssl truststore path and password
+		setSystemProperty(ConfigurationKeys.TRUSTSTORE_PATH, get(ConfigurationKeys.TRUSTSTORE_PATH));
+		setSystemProperty(ConfigurationKeys.TRUSTSTORE_PASSWORD, get(ConfigurationKeys.TRUSTSTORE_PASSWORD));
 		configurationDAO.insertOrUpdateAll(items.values());
 	}
 	
@@ -148,6 +160,16 @@ public class Configuration implements InitializingBean {
 	{
 		return "Configuration items:"
 			+ ( items!=null ? items.toString() : "none" ) ;
+	}
+	
+	// update jvm system property
+	private void setSystemProperty(String key, String value) {
+	    if (StringUtils.isBlank(key)) {
+		// use default
+		System.clearProperty(key);
+	    } else {
+		System.setProperty(key, value);
+	    }
 	}
 	
 }

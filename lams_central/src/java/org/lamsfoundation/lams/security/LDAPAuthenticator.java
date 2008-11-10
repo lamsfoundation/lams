@@ -103,10 +103,6 @@ public class LDAPAuthenticator {
 		String securityProtocol = Configuration.get(ConfigurationKeys.LDAP_SECURITY_PROTOCOL);
 		if (StringUtils.equals("ssl", securityProtocol)) {
 			env.setProperty(Context.SECURITY_PROTOCOL, securityProtocol);
-			// FIXME: synchronization issue: dynamically load certificate into
-			// system instead of overwritting it.
-			System.setProperty("javax.net.ssl.trustStore", Configuration.get(ConfigurationKeys.LDAP_TRUSTSTORE_PATH));
-			System.setProperty("javax.net.ssl.trustStorePassword", Configuration.get(ConfigurationKeys.LDAP_TRUSTSTORE_PASSWORD));
 		}
 
 		boolean isValid = false;

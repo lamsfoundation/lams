@@ -147,9 +147,9 @@ public class ConfigurationKeys {
 	
 	public static String LDAP_SECURITY_PROTOCOL = "LDAPSecurityProtocol";
 	
-	public static String LDAP_TRUSTSTORE_PATH = "LDAPTruststorePath";
+	public static String TRUSTSTORE_PATH = "TruststorePath";
 	
-	public static String LDAP_TRUSTSTORE_PASSWORD = "LDAPTruststorePassword";
+	public static String TRUSTSTORE_PASSWORD = "TruststorePassword";
 	
 	public static String LDAP_LOGIN_ATTR = "LDAPLoginAttr";
 	

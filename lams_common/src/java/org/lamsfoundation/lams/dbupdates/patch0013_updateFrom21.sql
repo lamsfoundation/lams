@@ -63,6 +63,10 @@ ALTER TABLE lams_tool ADD COLUMN ext_lms_id VARCHAR(255);
 -- LDEV-1581 Add a collumn to the lams_grouping table for learner's choice grouping
 ALTER TABLE lams_grouping ADD COLUMN equal_number_of_learners_per_group TINYINT DEFAULT 0;
 
+-- LDEV-2006 - make configuration keys truststorePath and truststorePassword system wide
+UPDATE lams_configuration SET config_key='TruststorePath' WHERE config_key='LDAPTruststorePath';
+UPDATE lams_configuration SET config_key='TruststorePassword' WHERE config_key='LDAPTruststorePassword';
+
 
 
 -- Update the configuration table to have the current version of LAMS

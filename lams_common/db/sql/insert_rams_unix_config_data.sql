@@ -119,10 +119,10 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('LDAPSecurityProtocol','', 'config.ldap.security.protocol', 'config.header.ldap', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LDAPTruststorePath','', 'config.ldap.truststore.path', 'config.header.ldap', 'STRING', 0);
+values ('TruststorePath','', 'config.ldap.truststore.path', 'config.header.system', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LDAPTruststorePassword','', 'config.ldap.truststore.password', 'config.header.ldap', 'STRING', 0);
+values ('TruststorePassword','', 'config.ldap.truststore.password', 'config.header.system', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPLoginAttr','uid', 'admin.user.login', 'config.header.ldap.attributes', 'STRING', 0);
