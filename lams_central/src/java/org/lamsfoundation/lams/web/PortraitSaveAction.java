@@ -24,7 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.web;
 
-import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,92 +49,92 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
- *
- * @struts:action path="/saveportrait"
- *                name="PortraitActionForm"
- *                input=".portrait"
- * 	              scope="request"
- * 				  validate="false"
+ * @author Andrey Balan
+ * 
+ * @struts:action path="/saveportrait" name="PortraitActionForm" input=".portrait" scope="request" validate="false"
  * 
  * @struts:action-forward name="profile" path="/index.do?state=active&amp;tab=profile"
  * @struts:action-forward name="errors" path="/index.do?state=active&amp;tab=portrait"
  */
 public class PortraitSaveAction extends Action {
-	
-	private static Logger log = Logger.getLogger(PortraitSaveAction.class);
-	private static IUserManagementService service;
-	private static CentralToolContentHandler centralToolContentHandler;
-	private static int THUMBNAIL_WIDTH = 120;
-	private static int THUMBNAIL_HEIGHT = 120;
 
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		if(isCancelled(request)){
-			return mapping.findForward("profile");
-		}
-		
-		ActionMessages errors = new ActionMessages();
-		
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-    	centralToolContentHandler = (CentralToolContentHandler)wac.getBean("centralToolContentHandler");
-		
-		PortraitActionForm portraitForm = (PortraitActionForm)form;
-		FormFile file = portraitForm.getFile();
-		String fileName = file.getFileName();
-		log.debug("got file: "+fileName+" of type: "+file.getContentType()+" with size: "+file.getFileSize());
-		
-		User user = (User)getService().getUserByLogin(request.getRemoteUser());
+    private static Logger log = Logger.getLogger(PortraitSaveAction.class);
+    private static IUserManagementService service;
+    private static CentralToolContentHandler centralToolContentHandler;
+    private static int LARGEST_DIMENSION = 120;
 
-		// check if file is an image using the MIME content type
-		String mediaType = file.getContentType().split("/",2)[0];
-		if (!mediaType.equals("image")) {
-			errors.add("file",new ActionMessage("error.portrait.not.image"));
-			saveErrors(request, errors);
-			return mapping.findForward("errors");
-		}
-		
-		// resize picture into new buffer
-		//String fileType = file.getFileName().split(".",2)[1];
-		String fileType = fileName.substring(fileName.lastIndexOf('.')+1);
-		log.debug("fileType: "+fileType);
-		ByteArrayInputStream is = PortraitUtils.resizePicture(file.getInputStream(), THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, fileType);
-		if (is==null) {
-			errors.add("file",new ActionMessage("error.general.1"));
-			saveErrors(request, errors);
-			return mapping.findForward("errors");
-		}
-    	
-		// write to content repository
-		NodeKey node = null;
-		if (file!= null && !StringUtils.isEmpty(fileName)) {
-            try {
-            	//InputStream is = file.getInputStream();
-				node = centralToolContentHandler.uploadFile(is, fileName, file.getContentType(), IToolContentHandler.TYPE_ONLINE);
-				is.close();
-			} catch (Exception e) {
-				request.setAttribute("errorMessage", e.getMessage());
-				return mapping.findForward("error.system");
-			}
-        }
-		
-		log.debug("saved file with uuid: "+node.getUuid()+" and version: "+node.getVersion());
-		
-		// delete old portrait file (we only want to keep the user's current portrait)
-		if (user.getPortraitUuid()!=null) centralToolContentHandler.deleteFile(user.getPortraitUuid());
-		user.setPortraitUuid(node.getUuid());
-		getService().save(user);
-		
-		return mapping.findForward("profile");
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	if (isCancelled(request)) {
+	    return mapping.findForward("profile");
 	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementService");
-		}
-		return service;
+
+	ActionMessages errors = new ActionMessages();
+
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		.getServletContext());
+	PortraitSaveAction.centralToolContentHandler = (CentralToolContentHandler) wac
+		.getBean("centralToolContentHandler");
+
+	PortraitActionForm portraitForm = (PortraitActionForm) form;
+	FormFile file = portraitForm.getFile();
+	String fileName = file.getFileName();
+	PortraitSaveAction.log.debug("got file: " + fileName + " of type: " + file.getContentType() + " with size: "
+		+ file.getFileSize());
+
+	User user = getService().getUserByLogin(request.getRemoteUser());
+
+	// check if file is an image using the MIME content type
+	String mediaType = file.getContentType().split("/", 2)[0];
+	if (!mediaType.equals("image")) {
+	    errors.add("file", new ActionMessage("error.portrait.not.image"));
+	    saveErrors(request, errors);
+	    return mapping.findForward("errors");
 	}
+
+	// resize picture
+	InputStream is = PortraitUtils.resizePicture(file.getInputStream(), PortraitSaveAction.LARGEST_DIMENSION);
+	if (is == null) {
+	    errors.add("file", new ActionMessage("error.general.1"));
+	    saveErrors(request, errors);
+	    return mapping.findForward("errors");
+	}
+
+	// write to content repository
+	NodeKey node = null;
+	if ((file != null) && !StringUtils.isEmpty(fileName)) {
+	    try {
+		fileName = fileName.substring(0, fileName.indexOf('.')) + ".jpg";		
+		node = PortraitSaveAction.centralToolContentHandler.uploadFile(is, fileName, file.getContentType(),
+			IToolContentHandler.TYPE_ONLINE);
+		is.close();
+	    } catch (Exception e) {
+		request.setAttribute("errorMessage", e.getMessage());
+		return mapping.findForward("error.system");
+	    }
+	}
+
+	PortraitSaveAction.log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+
+	// delete old portrait file (we only want to keep the user's current portrait)
+	if (user.getPortraitUuid() != null) {
+	    PortraitSaveAction.centralToolContentHandler.deleteFile(user.getPortraitUuid());
+	}
+	user.setPortraitUuid(node.getUuid());
+	getService().save(user);
+
+	return mapping.findForward("profile");
+    }
+
+    private IUserManagementService getService() {
+	if (PortraitSaveAction.service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    PortraitSaveAction.service = (IUserManagementService) ctx.getBean("userManagementService");
+	}
+	return PortraitSaveAction.service;
+    }
 }
+
