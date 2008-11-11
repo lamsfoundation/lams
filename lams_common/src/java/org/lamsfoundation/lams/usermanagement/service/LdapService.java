@@ -325,19 +325,7 @@ public class LdapService implements ILdapService {
 		}
 		// if the user is a member of any other groups, remove them
 		if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_ONLY_ONE_ORG)) {
-		    List uos = service.findByProperty(UserOrganisation.class, "user", user);
-		    if (uos != null) {
-			for (Object obj : uos) {
-			    UserOrganisation uo = (UserOrganisation) obj;
-			    Organisation currentOrg = uo.getOrganisation();
-			    if (currentOrg.getOrganisationType().getOrganisationTypeId().equals(
-				    OrganisationType.COURSE_TYPE)) {
-				if (!currentOrg.equals(org)) {
-				    service.deleteUserOrganisation(user, currentOrg);
-				}
-			    }
-			}
-		    }
+		    service.removeUserFromOtherGroups(userId, org.getOrganisationId());
 		}
 		// now convert the roles to lams roles and add the user to the
 		// org
@@ -520,8 +508,7 @@ public class LdapService implements ILdapService {
 				break;
 			    }
 			} else {
-			    log
-				    .error("Couldn't find login attribute for user using attribute name: "
+			    log.error("Couldn't find login attribute for user using attribute name: "
 					    + Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR)
 					    + ".  Dumping attributes...");
 			    NamingEnumeration enumAttrs = attrs.getAll();

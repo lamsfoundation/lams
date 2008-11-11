@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
+import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dto.CollapsedOrgDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
@@ -92,6 +93,7 @@ public class UserManagementService implements IUserManagementService {
 	private IGroupDAO groupDAO; 
 	private IRoleDAO roleDAO;
 	private IOrganisationDAO organisationDAO;
+	private IUserOrganisationDAO userOrganisationDAO;
 	protected MessageService messageService;
 	private static IAuditService auditService;
 	
@@ -131,6 +133,10 @@ public class UserManagementService implements IUserManagementService {
 	
 	public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
 		this.organisationDAO = organisationDAO; 
+	}
+	
+	public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
+	    	this.userOrganisationDAO = userOrganisationDAO;
 	}
 
 	public void save(Object object) {
@@ -1121,5 +1127,11 @@ public class UserManagementService implements IUserManagementService {
 	public ForgotPasswordRequest getForgotPasswordRequest(String key) {
 		List results = baseDAO.findByProperty(ForgotPasswordRequest.class,"requestKey",key);
 		return results.isEmpty() ? null : (ForgotPasswordRequest)results.get(0);
+	}
+	
+	public int removeUserFromOtherGroups(Integer userId, Integer orgId) {
+	    	List uos = userOrganisationDAO.userOrganisationsNotById(userId, orgId);
+	    	deleteAll(uos);
+	    	return uos.size();
 	}
 }

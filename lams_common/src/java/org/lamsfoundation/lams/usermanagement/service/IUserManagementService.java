@@ -489,4 +489,13 @@ public interface IUserManagementService {
 	 * @return
 	 */
 	public ForgotPasswordRequest getForgotPasswordRequest(String key);
+	
+	/**
+	 * Remove given user from groups other than the specified one.  Doesn't remove
+	 * user from subgroups of the specified group if any.
+	 * @param userId
+	 * @param orgId
+	 * @return number of deleted rows.
+	 */
+	public int removeUserFromOtherGroups(Integer userId, Integer orgId);
 }
