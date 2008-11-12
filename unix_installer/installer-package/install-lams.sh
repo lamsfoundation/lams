@@ -25,7 +25,7 @@
 # Usage: sudo ./install.sh
 	
 # The version of this lams installer
-LAMS_VERSION=2.1
+LAMS_VERSION=2.2
 MYSQL_VERSION_STR=5.
 JAVA_REQ_VERSION=1.5
 # Transform the required version string into a number that can be used in comparisons
@@ -406,6 +406,7 @@ fi
 # Add the sample lessons to the repository as of 2.1
 mkdir -p $REPOSITORY_DIR
 cp -r repository/* $REPOSITORY_DIR
+cp -r secure/* $EAR_DIR/lams-www.war/secure
 
 # configure the wrapper
 printf "\nConfiguring the java Wrapper\n"
