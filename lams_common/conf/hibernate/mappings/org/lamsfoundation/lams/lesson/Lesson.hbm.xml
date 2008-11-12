@@ -267,20 +267,15 @@
 	</sql-query>
 	
 	<sql-query name="lessonsByOrgAndUserWithChildOrgs">
-		<return-scalar column="lesson_id" type="long" />
-		<return-scalar column="name" type="string" />
-		<return-scalar column="description" type="string" />
-		<return-scalar column="lesson_state_id" type="integer" />
-		<return-scalar column="lesson_completed_flag" type="boolean" />
-		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag
-		  FROM (lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_organisation lo)
-		    LEFT JOIN lams_learner_progress lp ON lp.user_id = ug.user_id AND lp.lesson_id = l.lesson_id	    
-		  WHERE l.learning_design_id = ld.learning_design_id
+		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
+		SELECT DISTINCT {lesson.*}
+		  FROM (lams_lesson {lesson}, lams_learning_design ld, lams_group g, lams_user_group ug, lams_organisation lo)
+		  WHERE {lesson}.learning_design_id = ld.learning_design_id
 		    AND ld.copy_type_id != 3
-			AND (l.organisation_id = lo.organisation_id)
+			AND ({lesson}.organisation_id = lo.organisation_id)
 			AND (lo.organisation_id = :orgId or lo.parent_organisation_id = :orgId)
-			AND l.class_grouping_id = g.grouping_id
-			AND l.lesson_state_id != 7
+			AND {lesson}.class_grouping_id = g.grouping_id
+			AND {lesson}.lesson_state_id != 7
 			AND ug.group_id = g.group_id
 			AND ug.user_id = :userId
 	</sql-query>

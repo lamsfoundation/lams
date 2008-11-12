@@ -16,8 +16,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -73,24 +73,14 @@ public class FindUserLessonsAction extends DispatchAction {
 
 	    Set<User> users = getUserSet(query, group);
 
-	    Map<User, Set<IndexLessonBean>> userLessonsMap = new HashMap<User, Set<IndexLessonBean>>();
+	    Map<User, List<Lesson>> userLessonsMap = new HashMap<User, List<Lesson>>();
 	    for (User user : users) {
 
-		Set<IndexLessonBean> lessons = userLessonsMap.get(user);
-		
-		boolean addLessonsToMap = false;
-		if (lessons == null) {
-		    addLessonsToMap = true;
-		    lessons = new HashSet<IndexLessonBean>();
-		}
-
 		// get all lessons for 'user' in 'group' and add to lessons map
-		lessons.addAll(lessonService.getLessonsByGroupAndUser(user.getUserId(), group
-			.getOrganisationId()).values());
-
-		if (addLessonsToMap) {
-		    userLessonsMap.put(user, lessons);
-		}
+		List<Lesson> lessons = (lessonService.getLessonsByGroupAndUser(user.getUserId(), group
+			.getOrganisationId()));
+		
+		userLessonsMap.put(user, lessons);
 	    }
 
 	    request.setAttribute("userLessonsMap", userLessonsMap);

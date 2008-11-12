@@ -331,7 +331,7 @@ public interface ILessonService {
      * @param organisationId
      * @return map of lesson beans
      */
-    public abstract Map<Long, IndexLessonBean> getLessonsByGroupAndUser(Integer userId, Integer organisationId);
+    public abstract List<Lesson> getLessonsByGroupAndUser(Integer userId, Integer organisationId);
 
     /**
      * Gets the learner's progress details for a particular lesson. Will return null if the user has not started the

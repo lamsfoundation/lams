@@ -745,24 +745,10 @@ public class LessonService implements ILessonService {
 	return map;
     }
 
-    public Map<Long, IndexLessonBean> getLessonsByGroupAndUser(Integer userId, Integer organisationId) {
+    public List<Lesson> getLessonsByGroupAndUser(Integer userId, Integer organisationId) {
 	TreeMap<Long, IndexLessonBean> map = new TreeMap<Long, IndexLessonBean>();
-	List list = lessonDAO.getLessonsByGroupAndUser(userId, organisationId);
-	if (list != null) {
-	    Iterator iterator = list.iterator();
-	    while (iterator.hasNext()) {
-		Object[] tuple = (Object[]) iterator.next();
-		Long lessonId = (Long) tuple[0];
-		String lessonName = (String) tuple[1];
-		String lessonDescription = (String) tuple[2];
-		Integer lessonState = (Integer) tuple[3];
-		Boolean lessonCompleted = (Boolean) tuple[4];
-		IndexLessonBean bean = new IndexLessonBean(lessonId, lessonName, lessonDescription, lessonState,
-			(lessonCompleted == null ? false : lessonCompleted.booleanValue()));
-		map.put(new Long(lessonId), bean);
-	    }
-	}
-	return map;
+	List<Lesson> list = lessonDAO.getLessonsByGroupAndUser(userId, organisationId);
+	return list;
     }
 
     /**
