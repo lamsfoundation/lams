@@ -325,13 +325,13 @@ public interface ILessonService {
 
     /**
      * 
-     * Returns map of lessons in an organisation for a particular user
+     * Returns map of lessons in a group (including sub-groups) for a particular user
      * 
      * @param userId
      * @param organisationId
      * @return map of lesson beans
      */
-    public abstract Map<Long, IndexLessonBean> getLessonsByOrgAndUser(Integer userId, Integer organisationId);
+    public abstract Map<Long, IndexLessonBean> getLessonsByGroupAndUser(Integer userId, Integer organisationId);
 
     /**
      * Gets the learner's progress details for a particular lesson. Will return null if the user has not started the

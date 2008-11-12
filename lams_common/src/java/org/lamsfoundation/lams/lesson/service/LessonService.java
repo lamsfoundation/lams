@@ -745,9 +745,9 @@ public class LessonService implements ILessonService {
 	return map;
     }
 
-    public Map<Long, IndexLessonBean> getLessonsByOrgAndUser(Integer userId, Integer organisationId) {
+    public Map<Long, IndexLessonBean> getLessonsByGroupAndUser(Integer userId, Integer organisationId) {
 	TreeMap<Long, IndexLessonBean> map = new TreeMap<Long, IndexLessonBean>();
-	List list = lessonDAO.getLessonsByOrgAndUser(userId, organisationId);
+	List list = lessonDAO.getLessonsByGroupAndUser(userId, organisationId);
 	if (list != null) {
 	    Iterator iterator = list.iterator();
 	    while (iterator.hasNext()) {

@@ -168,13 +168,13 @@ public interface ILessonDAO extends IBaseDAO {
     public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final boolean isStaff);
     
     /**
-     * Gets all non-removed lessons for a user in an org; 
+     * Gets all non-removed lessons for a user in a group including sub-groups 
      * 
      * @param userId a user id that identifies the user.
      * @param orgId an org id that identifies the organisation.
      * @return a List containing a list of tuples containing lesson details and the lesson completed flag for the user.
      */
-    public List getLessonsByOrgAndUser(final Integer userId, final Integer orgId);
+    public List getLessonsByGroupAndUser(final Integer userId, final Integer orgId);
 
     /**
      * Get lessons based on learning designs where the original learning design has the given id.

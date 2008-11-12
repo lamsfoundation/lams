@@ -306,12 +306,12 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOrgAndUserWithCompletedFlag(Integer, Integer,
      *      boolean)
      */
-    public List getLessonsByOrgAndUser(final Integer userId, final Integer orgId) {
+    public List getLessonsByGroupAndUser(final Integer userId, final Integer orgId) {
 	List dtos = null;
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	dtos = (List) hibernateTemplate.execute(new HibernateCallback() {
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery("lessonsByOrgAndUser");
+		Query query = session.getNamedQuery("lessonsByOrgAndUserWithChildOrgs");
 		query.setInteger("userId", userId.intValue());
 		query.setInteger("orgId", orgId.intValue());
 		List result = query.list();
