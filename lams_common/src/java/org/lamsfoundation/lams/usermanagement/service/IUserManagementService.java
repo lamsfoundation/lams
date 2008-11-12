@@ -435,6 +435,17 @@ public interface IUserManagementService {
 	 */
 	public List searchUserSingleTerm(String term, Integer filteredOrgId);
 	
+	
+	/**
+	 * Search users across login, first name, last name and email fields using the search term.
+	 * Filters out disabled users.  Optionally include child organisations in the results.
+	 * @param term
+	 * @param OrgId
+	 * @param includeChildOrgs
+	 * @return list of Users
+	 */
+	public List searchUserSingleTerm(String term, Integer orgId, boolean includeChildOrgs);
+	
 	/**
 	 * Search user members in orgId across login, first name, last name and email fields using the search term.
 	 * Filters out disabled users, and users that are members of filteredOrg.

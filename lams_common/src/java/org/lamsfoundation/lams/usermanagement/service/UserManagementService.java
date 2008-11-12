@@ -76,9 +76,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <a href="UserManagementService.java.html"> <i>View Source </i> </a>
  * </p>
  * 
- * Manually caches the user objects (by user id) in the shared cache. Whenever a
- * user object is modified, the cached version must be removed. TODO complete
- * the caching - need to remove the user from the cache on modification of
+ * Manually caches the user objects (by user id) in the shared cache. Whenever a user object is modified, the cached
+ * version must be removed. TODO complete the caching - need to remove the user from the cache on modification of
  * user/organisation details.
  * 
  * @author Fei Yang, Manpreet Minhas
@@ -152,7 +151,7 @@ public class UserManagementService implements IUserManagementService {
 		User user = (User) object;
 		if (user.getUserId() == null) {
 		    baseDAO.insertOrUpdate(user); // creating a workspace needs
-						  // a userId
+		    // a userId
 		    object = createWorkspaceForUser(user);
 		}
 	    }
@@ -166,7 +165,7 @@ public class UserManagementService implements IUserManagementService {
 	for (Object o : objects) {
 	    if (o instanceof User) {
 		baseDAO.insertOrUpdate((User) o); // creating a workspace needs
-						  // a userId
+		// a userId
 		o = createWorkspaceForUser((User) o);
 	    }
 	}
@@ -226,10 +225,8 @@ public class UserManagementService implements IUserManagementService {
     }
 
     /**
-     * @see 
-     *      org.lamsfoundation.lams.usermanagement.service.IUserManagementService
-     *      #getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.
-     *      User, java.util.List<String>)
+     * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService
+     *      #getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement. User, java.util.List<String>)
      */
     public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames) {
 	List<OrganisationDTO> list = new ArrayList<OrganisationDTO>();
@@ -247,10 +244,9 @@ public class UserManagementService implements IUserManagementService {
     }
 
     /**
-     * @see 
-     *      org.lamsfoundation.lams.usermanagement.service.IUserManagementService
-     *      #getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement.
-     *      User, java.util.List<String>, java.util.Integer)
+     * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService
+     *      #getOrganisationRolesForUser(org.lamsfoundation.lams.usermanagement. User, java.util.List<String>,
+     *      java.util.Integer)
      */
     public OrganisationDTO getOrganisationsForUserByRole(User user, List<String> restrictToRoleNames, Integer courseId,
 	    List<Integer> restrictToClassIds) {
@@ -294,8 +290,7 @@ public class UserManagementService implements IUserManagementService {
     }
 
     /**
-     * Go through the roles for this user organisation and add the roles to the
-     * dto.
+     * Go through the roles for this user organisation and add the roles to the dto.
      * 
      * @param restrictToRoleNames
      * @param userOrganisation
@@ -321,9 +316,8 @@ public class UserManagementService implements IUserManagementService {
     }
 
     /**
-     * Gets an organisation for a user, with the user's roles. Doesn't not
-     * return a tree of organisations. Will not return the organisation if there
-     * isn't any roles for this user.
+     * Gets an organisation for a user, with the user's roles. Doesn't not return a tree of organisations. Will not
+     * return the organisation if there isn't any roles for this user.
      */
     public OrganisationDTO getOrganisationForUserWithRole(User user, Integer organisationId) {
 	if (user != null && organisationId != null) {
@@ -648,8 +642,8 @@ public class UserManagementService implements IUserManagementService {
     }
 
     /**
-     * Remove a user from the system completely. Only able to be done if they
-     * don't have any related learning designs, etc.
+     * Remove a user from the system completely. Only able to be done if they don't have any related learning designs,
+     * etc.
      * 
      * @param userId
      */
@@ -1108,6 +1102,21 @@ public class UserManagementService implements IUserManagementService {
 		+ " and uo.organisation.organisationId=" + orgId + " and uo.user.userId not in"
 		+ " (select uo.user.userId from UserOrganisation uo" + " where uo.organisation.organisationId="
 		+ filteredOrgId + ")" + " order by uo.user.login";
+	List list = baseDAO.find(query);
+	return list;
+    }
+
+    public List searchUserSingleTerm(String term, Integer orgId, boolean includeChildOrgs) {
+
+	String whereClause = "";
+	if (includeChildOrgs) {
+	    whereClause = " or uo.organisation.parentOrganisation.organisationId=" + orgId;
+	}
+
+	String query = "select u from User u where" + " (u.login like '%" + term + "%'" + " or u.firstName like '%"
+		+ term + "%'" + " or u.lastName like '%" + term + "%'" + " or u.email like '%" + term + "%')"
+		+ " and u.disabledFlag=0" + " and u.userId in" + " (select uo.user.userId from UserOrganisation uo"
+		+ " where uo.organisation.organisationId=" + orgId + whereClause + ")" + " order by u.login";
 	List list = baseDAO.find(query);
 	return list;
     }
