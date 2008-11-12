@@ -53,7 +53,7 @@
     	
 
         <antcall target="language-pack" />
-        <!--<antcall target="set-lams-configuration" />-->
+        <antcall target="set-lams-configuration" />
     </target>
 
 
