@@ -542,7 +542,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	String jabberId = XMPPUtil.createId(user);
 	if (jabberId == null) {
 	    ChatService.logger.error("Unable to create jabber id for user: " + user.getUserID());
-	    throw new RuntimeException();
 	}
 	chatUser.setJabberId(jabberId);
 	chatUser.setJabberNickname(createJabberNickname(chatUser));

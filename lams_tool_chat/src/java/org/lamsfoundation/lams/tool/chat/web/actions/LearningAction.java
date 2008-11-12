@@ -106,14 +106,14 @@ public class LearningAction extends LamsDispatchAction {
 
 	request.setAttribute("MODE", mode.toString());
 
-	// Create the room if it doesnt exist
+	// Create the room if it doesn't exist
 	log.debug(chatSession.isRoomCreated());
 	if (!chatSession.isRoomCreated()) {
 	    if (XMPPUtil.createMultiUserChat(chatSession.getJabberRoom())) {
-		chatSession.setRoomCreated(true);
+	    	chatSession.setRoomCreated(true);
 	    } else {
-		log.error("Unable to create chat room " + chatSession.getJabberRoom());
-		throw new RuntimeException();
+		chatSession.setRoomCreated(false);
+	    	log.error("Unable to create chat room " + chatSession.getJabberRoom());
 	    }
 
 	    chatService.saveOrUpdateChatSession(chatSession);
