@@ -303,10 +303,11 @@ public interface IAuthoringService {
 	 * 
 	 * @param learningDesignID The learning_design_id of the design for which editing has finished.
 	 * @param userID user_id of the User who has finished editing the design.
+	 * @param cancelled flag specifying whether user cancelled or saved the edit
 	 * @return wddx packet.
 	 * @throws IOException
 	 */
-	public String finishEditOnFly(Long learningDesignID, Integer userID) throws IOException;
+	public String finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws IOException;
 	
 	/**
 	 * 

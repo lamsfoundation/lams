@@ -474,7 +474,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	/**
 	 * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#finishEditOnFly(java.lang.Long, java.lang.Integer)
 	 */
-	public String finishEditOnFly(Long learningDesignID, Integer userID) throws IOException {
+	public String finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws IOException {
 		FlashMessage flashMessage = null;
 		Lesson lesson = null;
 
@@ -515,7 +515,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 					design = removeTempSystemGate(gate, design); /* remove inputted system gate */
 				}
 
-				lessonService.performMarkLessonUncompleted(lesson.getLessonId()); /* the lesson may now have additional activities on the end, so clear any completed flags */
+				// LDEV-1899 only mark learners uncompleted if a change was saved
+				if (!cancelled) {
+				    lessonService.performMarkLessonUncompleted(lesson.getLessonId()); /* the lesson may now have additional activities on the end, so clear any completed flags */
+				}
 
 				initialiseToolActivityForRuntime(design, lesson);
 				learningDesignDAO.insertOrUpdate(design);

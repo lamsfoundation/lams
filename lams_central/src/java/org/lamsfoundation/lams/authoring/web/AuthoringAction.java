@@ -143,8 +143,9 @@ public class AuthoringAction extends LamsDispatchAction{
 		IAuthoringService authoringService = getAuthoringService();
 		try {
 			Long learningDesignID = WebUtil.readLongParam(request,"learningDesignID",false);
+			boolean cancelled = WebUtil.readBooleanParam(request, "cancelled", false);
 			
-			wddxPacket = authoringService.finishEditOnFly(learningDesignID, getUserId());
+			wddxPacket = authoringService.finishEditOnFly(learningDesignID, getUserId(), cancelled);
 			
 		} catch (Exception e) {
 			wddxPacket = handleException(e, "getLearningDesignDetails", authoringService, true).serializeMessage();
