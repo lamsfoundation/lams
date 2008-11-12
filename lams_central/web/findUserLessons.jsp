@@ -86,9 +86,9 @@
 				test="${user.value ne null and not empty user.value}">
 				<ul>
 					<c:forEach var="lesson" items="${user.value}">
-						<li>${lesson.lessonName}<a
-							href="javascript:openMonitorLesson(${lesson.lessonId})"> <fmt:message
-							key="index.monitor" /> </a></li>
+						<li>${lesson.lessonName} <a
+							href="javascript:openMonitorLesson(${lesson.lessonId})"><fmt:message
+							key="index.monitor" /></a></li>
 					</c:forEach>
 				</ul>
 				<br>
