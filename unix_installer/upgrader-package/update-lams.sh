@@ -23,12 +23,6 @@
 
 # Usage: sudo ./update-lams.sh
 	
-# The version of this LAMS updater
-LAMS_VERSION=2.1
-LAMS_SERVER_VERSION=2.1.0.200806190000 
-LAMS_LANGUAGE_VERSION=2008-06-19
-REQ_LAMS_VERSION=2.0.4
-
 JAVA_REQ_VERSION=1.5
 
 # Transform the required version string into a number that can be used in comparisons
@@ -71,18 +65,7 @@ then
         y)
         printf "\nUsing lams.properties from /etc/lams2.\n"
         cp /etc/lams2/lams.properties .     
-		
-		
-		############## 2.1 Specific Code ##################
-		echo "# The version numbers for this LAMS updater" >> lams.properties
-		echo "LAMS_VERSION=$LAMS_VERSION" >> lams.properties
-		echo "LAMS_SERVER_VERSION=$LAMS_SERVER_VERSION" >> lams.properties
-		echo "LAMS_LANGUAGE_VERSION=$LAMS_LANGUAGE_VERSION" >> lams.properties
-		echo "SQL_PORT=3306" >> lams.properties
-		echo "" >> lams.properties
-		############## End 2.1 Specific Code ##################
-        
-        
+
         # backup the lams.properties
         cp lams.properties docs/lams.properties.backup.etc
         sleep 1
@@ -99,7 +82,12 @@ fi
 # getting all the lams.properties variables into the variable space
 . ./lams.properties
 
-# New variables introduced with 2.0.4 updater
+# The version of this LAMS updater
+LAMS_VERSION=2.2
+LAMS_SERVER_VERSION=2.2.0.200811060000 
+LAMS_LANGUAGE_VERSION=2008-11-06
+REQ_LAMS_VERSION=2.1
+
 SQL_HOST=localhost
 SQL_URL=jdbc:mysql://$SQL_HOST/$DB_NAME?characterEncoding=utf8&autoReconnect=true
 
@@ -359,6 +347,13 @@ getMysqlHost
 checkMysql
 checklams
 backup
+
+
+printf "\nUpdating lams.ear with new jars and wars...\n"
+cp -rv assembly/lams.ear/*.jar $EAR_DIR > log/update-files.log
+cp -rv assembly/lams.ear/*.war $EAR_DIR >> log/update-files.log
+cp -rv assembly/lams-session.jar assembly/lams-valve.jar $DEFAULT_DIR/lib >> log/update-files.log
+
 printf "\nBeginning ant scripts, check log/install.log for install log. This may take a few minutes...\n"
 ant/bin/ant -logfile log/install.log -buildfile ant-scripts/update-lams.xml update-lams
 if [  "$?" -ne  "0" ]
@@ -375,7 +370,6 @@ then
     printf "$failed\n"
     installfailed
 fi
-
 
 # creating the repository, dump and temp dirs if they dont already exist
 if [ ! -d $LAMS_DIR ]
@@ -395,14 +389,8 @@ then
         mkdir $LAMS_DIR/dump
 fi
 
-##### 2.1 Update Specific Java Program, DELETE for later updates
-$JAVA_HOME/bin/java -cp  bin:tools/lib/mysql-connector-java-3.1.12-bin.jar Alter21Integration "$DB_NAME" "$DB_USER" "$DB_PASS" "$SQL_URL" > log/Alter21Integration.log
-if [  "$?" -ne  "0" ]
-then
-        echo "Update failed, problem while updating Integration tables. Check log/Alter21Integration.log for details.\n"
-        installfailed
-fi
-#####
+# removing jboss tmp and work directories
+rm -r $DEFAULT_DIR/work/* $DEFAULT_DIR/tmp/*
 
 # copying lams.properties to /etc/lams2
 printf "\nCopying lams.properties to /etc/lams2"
