@@ -1,0 +1,33 @@
+<Deploy>
+  <toolSignature>lasprd10</toolSignature>
+  <toolWebUri>lams-tool-lasprd10.war</toolWebUri>
+  <toolContext>/lams/tool/lasprd10</toolContext>
+  <toolUpdateScriptPath>@toolDeployPackageDir@/sql/updatescripts/updateTo20080612.sql</toolUpdateScriptPath>
+  <toolInsertScriptPath>@toolDeployPackageDir@/sql/tool_insert.sql</toolInsertScriptPath>
+  <toolLibraryInsertScriptPath>@toolDeployPackageDir@/sql/library_insert.sql</toolLibraryInsertScriptPath>
+  <hideTool>false</hideTool>
+  <toolActivityInsertScriptPath>@toolDeployPackageDir@/sql/activity_insert.sql</toolActivityInsertScriptPath>
+  <toolTablesScriptPath>@toolDeployPackageDir@/sql/create_lams_tool_spreadsheet.sql</toolTablesScriptPath>
+  <toolTablesDeleteScriptPath>@toolDeployPackageDir@/sql/drop_lams_tool_spreadsheet.sql</toolTablesDeleteScriptPath>
+  <toolDBVersionScriptPath>@toolDeployPackageDir@/sql/db_version_insert.sql</toolDBVersionScriptPath>
+  <toolApplicationContextPath>/org/lamsfoundation/lams/tool/spreadsheet/spreadsheetApplicationContext.xml</toolApplicationContextPath>
+  <toolJarFileName>lams-tool-lasprd10.jar</toolJarFileName>
+  <minServerVersionNumber>2.0</minServerVersionNumber>
+  <deployFiles>
+    <string>@toolDeployPackageDir@/lams-tool-lasprd10.war</string>
+    <string>@toolDeployPackageDir@/lams-tool-lasprd10.jar</string>
+  </deployFiles>
+  <languageFiles>
+    <string>@toolDeployPackageDir@/language/ApplicationResources.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_el_GR.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_en_AU.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_no_NO.properties</string>
+  </languageFiles>
+  <toolVersion>20080612</toolVersion>
+  <dbDriverClass>@dbDriverClass@</dbDriverClass>
+  <dbDriverUrl>@dbDriverUrl@</dbDriverUrl>
+  <dbUsername>@dbUsername@</dbUsername>
+  <dbPassword>@dbPassword@</dbPassword>
+  <lamsEarPath>@lamsear@</lamsEarPath>
+  <languageFilesPackage>org.lamsfoundation.lams.tool.spreadsheet</languageFilesPackage>
+</Deploy>
