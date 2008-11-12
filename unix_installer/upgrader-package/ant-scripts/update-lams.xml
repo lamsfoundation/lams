@@ -162,11 +162,9 @@
         </copy>
 		
 		<!-- Overwrite flash language files-->
-		<target name="copy-flash-xml" description="Copies the language files for flash">
-	        <copy todir="${DEPLOY_DIR}/lams.ear/lams-central.war/flashxml" overwrite="true">
+		<copy todir="${DEPLOY_DIR}/lams.ear/lams-central.war/flashxml" overwrite="true">
 	            <fileset dir="../assembly/lams.ear/lams-central.war/flashxml/"/>
-	        </copy>
-	    </target>
+	   	</copy>
     	
 		<!-- Copy combined activity language files to appropriate directory -->
     	<java classname="copyllid" failonerror="true" fork="true">

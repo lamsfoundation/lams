@@ -88,9 +88,6 @@ LAMS_SERVER_VERSION=2.2.0.200811060000
 LAMS_LANGUAGE_VERSION=2008-11-06
 REQ_LAMS_VERSION=2.1
 
-SQL_HOST=localhost
-SQL_URL=jdbc:mysql://$SQL_HOST/$DB_NAME?characterEncoding=utf8&autoReconnect=true
-
 # Checking that the lams.properties points to a lams installation
 if [ ! -r "$JBOSS_DIR/server/default/deploy/lams.ear/lams.jar" ]
 then
@@ -174,8 +171,11 @@ checkJava()
 
 checkMysql()
 {
+    DB_URL=jdbc:mysql://${SQL_HOST}:${SQL_PORT}/${DB_NAME}?characterEncoding=utf8
     printf "Checking LAMS database...\n"
-        $JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$SQL_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION"
+    printf "$DB_URL\n"   
+        
+    $JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION"
 
     if [  "$?" -ne  "0" ]
     then
@@ -183,48 +183,48 @@ checkMysql()
     fi
 }
 
-getMysqlHost()
-{
-    SQL_HOST=""
-        SQL_URL=""
-        continue=""
-        printf "Please enter the location of your MySql Host (Default: localhost)\n> "
-        read SQL_HOST
-        if [ -z "$SQL_HOST" ]
-    then    
-                SQL_HOST=localhost
-    fi
-
-        SQL_URL="jdbc:mysql://$SQL_HOST/$DB_NAME?characterEncoding=utf8&autoReconnect=true"
-
-        printf "\nAll LAMS database update connections will be done through: \n$SQL_URL.\n"
-        printf "Is this correct? (y)es, (n)o, (q)uit.\n> "
-        read continue
-
-        case $continue in
-        q)
-                printf "\nTo set up MySql on a separate server, follow the instructions in the readme.\n\n"
-                printf "LAMS update aborted by user.\n\n"
-                installexit
-                ;;
-        y)
-    
-        # append SQL_HOST and SQL_URL to lams.properties
-        echo "# Updater-generated properties, used instead of default localhost" >> lams.properties
-        echo "SQL_HOST=$SQL_HOST" >> lams.properties
-        echo "SQL_URL=jdbc:mysql://${SQL_HOST}/${DB_NAME}?characterEncoding=utf8&autoReconnect=true" >> lams.properties
-        printf "\n"
-        ;;
-    n)
-                printf "\n"
-                getMysqlHost
-                ;;
-        *)
-                printf "\nPlease enter your MySql host and then enter (y).\n"
-                getMysqlHost
-                ;;
-        esac
-}
+#getMysqlHost()
+#{
+#    SQL_HOST=""
+#       SQL_URL=""
+#        continue=""
+#        printf "Please enter the location of your MySql Host (Default: localhost)\n> "
+#        read SQL_HOST
+#        if [ -z "$SQL_HOST" ]
+#    then    
+#                SQL_HOST=localhost
+#    fi
+#
+#        SQL_URL="jdbc:mysql://$SQL_HOST/$DB_NAME?characterEncoding=utf8&autoReconnect=true"
+#
+#        printf "\nAll LAMS database update connections will be done through: \n$SQL_URL.\n"
+#        printf "Is this correct? (y)es, (n)o, (q)uit.\n> "
+#        read continue
+#
+#        case $continue in
+#       q)
+#                printf "\nTo set up MySql on a separate server, follow the instructions in the readme.\n\n"
+#                printf "LAMS update aborted by user.\n\n"
+#                installexit
+#                ;;
+#        y)
+#    
+#        # append SQL_HOST and SQL_URL to lams.properties
+#        echo "# Updater-generated properties, used instead of default localhost" >> lams.properties
+#        echo "SQL_HOST=$SQL_HOST" >> lams.properties
+#        echo "SQL_URL=jdbc:mysql://${SQL_HOST}/${DB_NAME}?characterEncoding=utf8&autoReconnect=true" >> lams.properties
+#        printf "\n"
+#        ;;
+#    n)
+#                printf "\n"
+#                getMysqlHost
+#                ;;
+#        *)
+#                printf "\nPlease enter your MySql host and then enter (y).\n"
+#                getMysqlHost
+#                ;;
+#        esac
+#}
 
 checklams()
 {
@@ -343,16 +343,16 @@ printf "4) Dump the database by executing the following command. Fill in your ow
 printf "> $sqldir/mysqldump -u$DB_USER -p$DB_PASS $DB_NAME > (backup dir)/dump.sql\n"
 printf "\n--------------------------------------------------------------------------------\n\n"
 
-getMysqlHost
+#getMysqlHost
 checkMysql
 checklams
 backup
 
 
 printf "\nUpdating lams.ear with new jars and wars...\n"
-cp -rv assembly/lams.ear/*.jar $EAR_DIR > log/update-files.log
-cp -rv assembly/lams.ear/*.war $EAR_DIR >> log/update-files.log
-cp -rv assembly/lams-session.jar assembly/lams-valve.jar $DEFAULT_DIR/lib >> log/update-files.log
+cp -r assembly/lams.ear/*.jar $EAR_DIR > log/update-files.log
+cp -r assembly/lams.ear/*.war $EAR_DIR >> log/update-files.log
+cp -r assembly/lams-session.jar assembly/lams-valve.jar $DEFAULT_DIR/lib >> log/update-files.log
 
 printf "\nBeginning ant scripts, check log/install.log for install log. This may take a few minutes...\n"
 ant/bin/ant -logfile log/install.log -buildfile ant-scripts/update-lams.xml update-lams
