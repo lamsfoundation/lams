@@ -46,6 +46,9 @@
 			var skillMenu = null;
 			var qMenu = null;
 			
+			// Offset for the dialog box
+			var dialogOffSet=0;
+			
 			// Sets up the triple menu with the appropriate data
 			function setUpTripleMenu() {
 				var qaWizardEnabledBox = document.laqa11AdminForm.qaWizardEnabled;
@@ -207,7 +210,7 @@
 			{
 
 				disableExport();
-				
+				$("#catDialog").dialog("close");
 				$("#catDialog").dialog(
 					{ 
 				    	buttons: 
@@ -227,8 +230,9 @@
 					        } 
 					    },
 					    height: 120,
-					    width: 350,
-					    title: titleStr
+					    width: 725,
+					    title: titleStr,
+					    position: [33,290 + dialogOffSet]
 					}
 				);
 				document.getElementById("inputText").focus();
@@ -459,16 +463,31 @@
 			<p class="warning">
 				<fmt:message key="${errorKey}" />
 			</p>
+			<script type="text/javascript">
+			<!--
+				dialogOffSet += 60;
+			//-->
+			</script>
 		</c:if>
 		<c:if test="${savedSuccess}">
 			<p class="info">
 				<fmt:message key="admin.success" />
 			</p>
+			<script type="text/javascript">
+			<!--
+				dialogOffSet += 60;
+			//-->
+			</script>
 		</c:if>
 		<c:if test="${deleteSuccess}">
 			<p class="info">
 				<fmt:message key="${deleteLangKey}" />
 			</p>
+			<script type="text/javascript">
+			<!--
+				dialogOffSet += 60;
+			//-->
+			</script>
 		</c:if>
 		
 		
@@ -551,8 +570,8 @@
 
 		
 			<div id="dialogDiv" style="display: none;">
-				<div id="catDialog" class="ui-dialog ui-draggable ui-resizable"  >
-					<input type="text" id="inputText" width="255" size="40">
+				<div id="catDialog" class="ui-dialog ui-draggable ui-resizable">
+					<input type="text" id="inputText" width="255" size="90">
 				</div>	
 			</div>
 		</html:form>	
