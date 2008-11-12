@@ -24,6 +24,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.monitoring.web;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -40,13 +42,11 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Servlet for flash to call in order to initialise, create lesson classes for,
- * and start multiple lessons.
+ * Servlet for flash to call in order to initialise and create lesson classes for
+ *  multiple lessons.
  * 
- * @author Jun-Dir Liew
- * 
- * @web:servlet name="startLessons"
- * @web:servlet-mapping url-pattern="/startLessons"
+ * @web:servlet name="initializeAndCreateLessons"
+ * @web:servlet-mapping url-pattern="/initializeAndCreateLessons"
  */
 public class StartLessonsServlet extends AbstractStoreWDDXPacketServlet {
     // ---------------------------------------------------------------------
@@ -57,13 +57,13 @@ public class StartLessonsServlet extends AbstractStoreWDDXPacketServlet {
     private static final long serialVersionUID = 2349582345234543680L;
 
     private static IAuditService auditService;
-    
+
     private static String messageKey = "startLessons";
 
     protected String process(String lessonPackage, HttpServletRequest request) throws Exception {
 	FlashMessage flashMessage;
 	auditService = getAuditService();
-	
+
 	// get User infomation from shared session.
 	HttpSession ss = SessionManager.getSession();
 
@@ -72,8 +72,7 @@ public class StartLessonsServlet extends AbstractStoreWDDXPacketServlet {
 
 	if (userID == null) {
 	    log.error("Can not find valid login user information");
-	    flashMessage = new FlashMessage(messageKey, "Can not find valid login user information",
-		    FlashMessage.ERROR);
+	    flashMessage = new FlashMessage(messageKey, "Can not find valid login user information", FlashMessage.ERROR);
 	}
 
 	if (log.isDebugEnabled()) {
@@ -82,17 +81,22 @@ public class StartLessonsServlet extends AbstractStoreWDDXPacketServlet {
 
 	try {
 	    IMonitoringService monitoringService = getMonitoringService();
-	    if (monitoringService.startLessons(userID, lessonPackage)) {
-		flashMessage = new FlashMessage(messageKey, Boolean.TRUE);
+	    List<Long> lessonIds = monitoringService.initializeAndCreateLessons(userID, lessonPackage);
+	    if (lessonIds != null && lessonIds.size() > 0) {
+		String lessonIdsCSV = "";
+		for (Long lessonId: lessonIds) {
+		    lessonIdsCSV += lessonId + ",";
+		}
+		flashMessage = new FlashMessage(messageKey, lessonIdsCSV);
 	    } else {
-		flashMessage = new FlashMessage(messageKey, Boolean.FALSE);
+		flashMessage = new FlashMessage(messageKey, "");
 	    }
 	} catch (Exception e) {
 	    log.error("Exception thrown while starting lessons.", e);
 	    flashMessage = FlashMessage.getExceptionOccured(messageKey, e.getMessage());
 	    auditService.log(StartLessonsServlet.class.getName(), e.getMessage());
 	}
-	
+
 	return flashMessage.serializeMessage();
     }
 

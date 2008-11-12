@@ -154,7 +154,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     private ILearningDesignDAO learningDesignDAO;
 
     private IGroupingDAO groupingDAO;
-    
+
     private IGroupDAO groupDAO;
 
     private ILearnerProgressDAO learnerProgressDAO;
@@ -292,7 +292,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     public void setGroupDAO(IGroupDAO groupDAO) {
 	this.groupDAO = groupDAO;
     }
-    
+
     /**
      * @param groupingDAO
      */
@@ -2624,18 +2624,15 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		    .get("enablePresence"));
 	    boolean learnerImAvailable = WDDXProcessor.convertToBoolean("enableIm", table.get("enableIm"));
 	    String customCSV = WDDXProcessor.convertToString(WDDXTAGS.CUSTOM_CSV, table.get(WDDXTAGS.CUSTOM_CSV));
-	    boolean multiple = WDDXProcessor.convertToBoolean("multiple", table.get("multiple"));
-	    int numLessons = WDDXProcessor.convertToInt("numLessons", table.get("numLessons"));
+	    int numLessons = WDDXProcessor.convertToInt("numberLessonsSplit", table.get("numberLessonsSplit"));
 
 	    // initialise multiple lessons
 
-	    if (multiple) {
-		if (numLessons > 0) {
-		    for (int i = 1; i <= numLessons; i++) {
-			Lesson newLesson = initializeLesson(title + " " + i, desc, learnerExportAvailable, ldId,
-				organisationId, creatorUserId, customCSV, learnerPresenceAvailable, learnerImAvailable);
-			lessonIds.add(newLesson.getLessonId());
-		    }
+	    if (numLessons > 0) {
+		for (int i = 1; i <= numLessons; i++) {
+		    Lesson newLesson = initializeLesson(title + " " + i, desc, learnerExportAvailable, ldId,
+			    organisationId, creatorUserId, customCSV, learnerPresenceAvailable, learnerImAvailable);
+		    lessonIds.add(newLesson.getLessonId());
 		}
 	    }
 
@@ -2656,8 +2653,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    Hashtable table = (Hashtable) WDDXProcessor.deserialize(lessonPacket);
 
 	    // multiple lesson info
-	    int numLessons = WDDXProcessor.convertToInt("numLessons", table.get("numLessons"));
-	    int learnersPerLesson = WDDXProcessor.convertToInt("learnersPerLesson", table.get("learnersPerLesson"));
+	    int numLessons = WDDXProcessor.convertToInt("numberLessonsSplit", table.get("numberLessonsSplit"));
+	    int learnersPerLesson = WDDXProcessor.convertToInt("numberLearnersSplit", table.get("numberLearnersSplit"));
 
 	    // todo: convert:data type:
 	    Integer orgId = WDDXProcessor.convertToInteger(MonitoringConstants.KEY_ORGANISATION_ID, table
@@ -2734,29 +2731,25 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * Start multiple lessons in one call.
      */
-    public boolean startLessons(Integer creatorUserId, String lessonPacket) throws Exception {
+    public List<Long> initializeAndCreateLessons(Integer creatorUserId, String lessonPacket) throws Exception {
 
+	List<Long> lessonIds = new ArrayList<Long>();
 	try {
-	    List<Long> lessonIds = new ArrayList<Long>();
 	    lessonIds = initializeLessons(creatorUserId, lessonPacket);
-	    if (createLessonClasses(creatorUserId, lessonPacket, lessonIds)) {
-		for (Long lessonId : lessonIds) {
-		    startLesson(lessonId, creatorUserId);
-		}
-	    }
-	    return true;
+	    createLessonClasses(creatorUserId, lessonPacket, lessonIds);
 	} catch (Exception e) {
 	    MonitoringService.log.error("Exception occured trying to start lessons ", e);
 	    throw new Exception(e);
 	}
+	return lessonIds;
     }
-    
+
     /**
      * Set a group's name
      */
-	public void setGroupName(Long groupID, String name) {
-		Group group = groupDAO.getGroupById(groupID);
-		group.setGroupName(name);
-		groupDAO.saveGroup(group);
-	}
+    public void setGroupName(Long groupID, String name) {
+	Group group = groupDAO.getGroupById(groupID);
+	group.setGroupName(name);
+	groupDAO.saveGroup(group);
+    }
 }

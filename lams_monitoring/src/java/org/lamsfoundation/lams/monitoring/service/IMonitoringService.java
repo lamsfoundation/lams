@@ -801,9 +801,9 @@ public interface IMonitoringService {
     public LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
 
     /**
-     * Start multiple lessons in one call.
+     * Initialize and create multiple lessons in one call.
      */
-    public boolean startLessons(Integer creatorUserId, String lessonPacket) throws Exception;
+    public List<Long> initializeAndCreateLessons(Integer creatorUserId, String lessonPacket) throws Exception;
     
     /**
      * Set a groups name
