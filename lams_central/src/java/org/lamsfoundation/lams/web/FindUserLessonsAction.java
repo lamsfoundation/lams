@@ -69,32 +69,27 @@ public class FindUserLessonsAction extends DispatchAction {
 	}
 
 	if (query != null) {
-	    Organisation rootOrg = (Organisation) userManagementService.findById(Organisation.class, courseID);
+	    Organisation group = (Organisation) userManagementService.findById(Organisation.class, courseID);
 
-	    Set<Organisation> orgSet = getOrgSet(rootOrg);
-
-	    Set<User> userSet = getUserSet(query, orgSet);
+	    Set<User> users = getUserSet(query, group);
 
 	    Map<User, Set<IndexLessonBean>> userLessonsMap = new HashMap<User, Set<IndexLessonBean>>();
-	    for (User user : userSet) {
+	    for (User user : users) {
 
-		for (Organisation org : orgSet) {
+		Set<IndexLessonBean> lessons = userLessonsMap.get(user);
+		
+		boolean addLessonsToMap = false;
+		if (lessons == null) {
+		    addLessonsToMap = true;
+		    lessons = new HashSet<IndexLessonBean>();
+		}
 
-		    // get all lessons for 'user' in 'org'
-		    Map<Long, IndexLessonBean> lessons = lessonService.getLessonsByOrgAndUser(user.getUserId(), org
-			    .getOrganisationId());
+		// get all lessons for 'user' in 'group' and add to lessons map
+		lessons.addAll(lessonService.getLessonsByGroupAndUser(user.getUserId(), group
+			.getOrganisationId()).values());
 
-		    // add lessons to map
-		    Set<IndexLessonBean> userLessons = userLessonsMap.get(user);
-
-		    if (userLessons == null) {
-			userLessons = new HashSet<IndexLessonBean>();
-		    }
-
-		    userLessons.addAll(lessons.values());
-
-		    userLessonsMap.put(user, userLessons);
-
+		if (addLessonsToMap) {
+		    userLessonsMap.put(user, lessons);
 		}
 	    }
 
@@ -116,18 +111,16 @@ public class FindUserLessonsAction extends DispatchAction {
 	return orgSet;
     }
 
-    private Set<User> getUserSet(String query, Set<Organisation> orgSet) {
+    private Set<User> getUserSet(String query, Organisation rootOrg) {
 
 	Set<User> userSet = new HashSet<User>();
 
 	String[] tokens = query.trim().split("\\s+"); // Separated by "whitespace"
 
-	// subgroups
-	for (Organisation org : orgSet) {
-	    for (String token : tokens) {
-		userSet.addAll(userManagementService.searchUserSingleTerm(token, org.getOrganisationId()));
-	    }
+	for (String token : tokens) {
+	    userSet.addAll(userManagementService.searchUserSingleTerm(token, rootOrg.getOrganisationId(), true));
 	}
+
 	return userSet;
     }
 
@@ -139,7 +132,7 @@ public class FindUserLessonsAction extends DispatchAction {
 
 	Organisation rootOrg = (Organisation) userManagementService.findById(Organisation.class, courseID);
 
-	Set<User> userSet = getUserSet(query, getOrgSet(rootOrg));
+	Set<User> userSet = getUserSet(query, rootOrg);
 
 	List<String> list = new LinkedList<String>();
 
