@@ -39,6 +39,7 @@
                         encoding="utf8"
                         onerror="continue">
                         <transaction src="../database/dump.sql" />
+						<transaction src="../sql-scripts/removeConfigs.sql"/>
                         <transaction src="../sql-scripts/setLamsConfiguration.sql"/>
                 </sql>
 	</target>
