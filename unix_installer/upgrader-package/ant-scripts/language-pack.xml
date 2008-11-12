@@ -18,8 +18,33 @@
                 <pathelement path="../bin:../tools/lib/mysql-connector-java-3.1.12-bin.jar"/>
             </classpath>
         </java>
-    	
     </target>
     
+	<!--
+    <target name="copy-languages" description="Copies the language files for all the core LAMS projects">
+        <copy todir="${lams.dictionary.dir}" overwrite="true">
+            <fileset dir="../language-pack/lams-dictionary.jar/"/>
+        </copy>
+    </target>
+
+    <target name="copy-flash-xml" description="Copies the language files for flash">
+        <copy todir="${flashxml.deploy.dir}" overwrite="true">
+            <fileset dir="../language-pack/flashxml/"/>
+        </copy>
+    </target>
+
+    <target name="update-database" description="Updates the database to record the current language pack">
+        <sql driver="com.mysql.jdbc.Driver" 
+            classpath="${sql.classpath}" 
+            url="${SQL_URL}" 
+            userid="${DB_USER}" 
+            password="${DB_PASS}"
+            encoding="utf8"
+            onerror="abort"
+            >
+            <transaction src="updateLocales.sql" />
+        </sql>
+    </target>
+    -->
 
 </project>
