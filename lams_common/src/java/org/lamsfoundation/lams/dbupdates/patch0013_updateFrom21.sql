@@ -67,13 +67,6 @@ ALTER TABLE lams_grouping ADD COLUMN equal_number_of_learners_per_group TINYINT 
 UPDATE lams_configuration SET config_key='TruststorePath' WHERE config_key='LDAPTruststorePath';
 UPDATE lams_configuration SET config_key='TruststorePassword' WHERE config_key='LDAPTruststorePassword';
 
-
-
--- Update the configuration table to have the current version of LAMS
-UPDATE lams_configuration SET config_value='2.2' WHERE config_key='Version';
-UPDATE lams_configuration SET config_value='2.2.0.200811310000' WHERE config_key='AuthoringClientVersion' OR config_key='MonitorClientVersion' OR config_key='LearnerClientVersion' OR config_key='ServerVersionNumber';
-UPDATE lams_configuration SET config_value='2008-11-31' WHERE config_key='DictionaryDateCreated';
-
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
