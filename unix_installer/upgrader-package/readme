@@ -12,6 +12,10 @@ the message "Unknown toolbar item "UniversalKey" or if the user is sees the
 message "Congratulations, your content saved successfully!" but the close button
 doesn't work, then please tell them to clear their cache.
 
+NOTE TO SYSADMINS: If you have installed the FCKEditor flvPlayer previous to 
+running this update, you will need to re-install to the current version. Follow 
+the instructions at http://wiki.lamsfoundation.org/display/lams/flvPlayer.
+
 CONTENTS
 ========
 
