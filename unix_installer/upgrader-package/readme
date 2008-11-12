@@ -1,9 +1,9 @@
-LAMS 2.1 - Learning Activity Management System Upgrader
+LAMS 2.2 - Learning Activity Management System Upgrader
 --------------------------------------------------------------------------------
 
-This is an upgrader package for LAMS 2.0.4 to LAMS 2.1. Please read this 
+This is an upgrader package for LAMS 2.1 to LAMS 2.2. Please read this 
 document carefully before upgrading and make sure that you have a valid 
-installation of LAMS 2.0.4 on your machine. Please also ensure that you have 
+installation of LAMS 2.1 on your machine. Please also ensure that you have 
 read and understood the terms of the license agreement.
 
 NOTE TO SYSADMINS: If you are doing an upgrade and your users report problems in 
@@ -27,7 +27,7 @@ CONTENTS
 1. Required Software
 ====================
 
-You will require some software to be installed and/or running for LAMS 2.1 to 
+You will require some software to be installed and/or running for LAMS 2.2 to 
 install and run properly. These are listed below
 
 LAMS 2.0.4
@@ -78,12 +78,12 @@ jboss-4.0.2/server/default/jmx-console.war directory.
 3. Languages and Locales
 ========================
 
-In LAMS 2.1 you can set the defualt language of your server to be one of many
+In LAMS 2.2 you can set the default language of your server to be one of many
 languages, and more to come, see http://lamscommunity.org
 
-Look out for unix language packs to add to your list of language locales
+Look out for UNIX language packs to add to your list of language locales
 
-The locale options for LAMS 2.1 available are listed below, simply put in
+The locale options for LAMS available are listed below, simply put in
 your lams.properties file (under Installation Options):
 
 LOCALE - (locale)
@@ -133,17 +133,17 @@ http://wiki.lamsfoundation.org/display/lamsdocs/Production+Server+Settings
 5. Startup and Shutdown
 =======================
 
-To start LAMS 2.1 go to (jboss directory)/bin and type:
+To start LAMS go to (jboss directory)/bin and type:
 >sudo ./run-lams.sh 
 
-After a couple of minutes LAMS 2.1 will have started. In your browser type the 
+After a couple of minutes LAMS will have started. In your browser type the 
 server URL that you specified in the lams.configuration file, and you should be 
 at the lams homepage.
 
-To shutdown LAMS 2.1 go to (jboss directory)/bin and type;
+To shutdown LAMS go to (jboss directory)/bin and type;
 > sudo ./shutdown.sh -S
 
-LAMS 2.1 will take a few moments to shut down. To check if LAMS 2.1 has shut 
+LAMS will take a few moments to shut down. To check if LAMS has shut 
 down correctly, type the following on Linux:
 > ps -ef | grep java
 
@@ -154,9 +154,9 @@ If you aren't sure which version of 'ps' to use, try the '-ef' version and if
 that gives and error 'ps: illegal option --f" then try the -A version.
 
 
-If you can see the LAMS 2.1 process still running, type:
+If you can see the LAMS process still running, type:
 > sudo kill (pid) 
-Where pid is the process id listed next to the LAMS 2.1 process
+Where pid is the process id listed next to the LAMS process
 
 Be careful to type the correct (pid). If you type the wrong number, you will 
 stop another process on your server, and as you are using sudo you could stop 
@@ -192,11 +192,11 @@ Backing up LAMS and reverting LAMS
 
     http://wiki.lamsfoundation.org/display/lamsdocs/Revert+To+Other+Backup
 	
-LAMS 2.1 developer-oriented information
+LAMS developer-oriented information
 
 	http://wiki.lamsfoundation.org/display/lams
 
-LAMS 2.1 help documents
+LAMS help documents
 
 	http://wiki.lamsfoundation.org/display/lamsdocs
 
@@ -204,7 +204,7 @@ Educational and technical forums for help and discussion
 				
 	http://www.lamscommunity.org
 
-LAMS 2.1 bug tracker			
+LAMS bug tracker			
 
 	https://bugs.lamsfoundation.org
 
