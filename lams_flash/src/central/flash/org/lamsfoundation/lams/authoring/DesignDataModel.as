@@ -721,6 +721,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		data.learnerExportPortfolio = false;
 		data.enablePresence = false;
+		data.enableLiveEdit = false;
 		data.enableIm = false;
 		data.copyType = COPY_TYPE_ID_PREVIEW;
 		
