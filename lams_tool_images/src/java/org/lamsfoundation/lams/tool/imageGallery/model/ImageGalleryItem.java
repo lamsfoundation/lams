@@ -75,11 +75,6 @@ public class ImageGalleryItem implements Cloneable {
     
     private int numberRatings;
 
-    // ***********************************************
-    // DTO fields:
-    // ***********************************************	
-    private boolean complete;
-    
     /**
      * Default contruction method.
      * 
@@ -230,14 +225,6 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setHide(boolean isHide) {
 	this.isHide = isHide;
-    }
-
-    public void setComplete(boolean complete) {
-	this.complete = complete;
-    }
-
-    public boolean isComplete() {
-	return complete;
     }
     
     /**

@@ -119,6 +119,8 @@ public class ImageGalleryConstants {
     
     public static final String ATTR_CURRENT_IMAGE_UID = "currentImageUid";
     
+    public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
+    
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
     

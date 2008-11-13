@@ -144,14 +144,9 @@
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
 			parameter="start" >
-			<forward name="success" path="/pages/learning/start.jsp" />
+			<forward name="success" path="/pages/learning/learning.jsp" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />			
-		</action>
-		<action path="/learning/completeItem"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
-			parameter="complete" >
-			<forward name="success" path="/pages/learning/learning.jsp" />
 		</action>
 		<action path="/learning/finish"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
@@ -159,22 +154,22 @@
 			parameter="finish" >
 			<forward name="success" path="/pages/learning/finish.jsp" />
 		</action>
-		<action path="/learning/addimage"
+		<action path="/learning/newImageInit"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
-			parameter="addimage"
+			parameter="newImageInit"
 			name="imageGalleryItemForm" 
 			scope="request" 
 			validate="false">
-			<forward name="success" path="/pages/learning/addimage.jsp" />
+			<forward name="success" path="/pages/learning/parts/addimage.jsp" />
 		</action>
-		<action path="/learning/saveOrUpdateImage"
+		<action path="/learning/saveNewImage"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
-			parameter="saveOrUpdateImage"
+			parameter="saveNewImage"
 			name="imageGalleryItemForm" 
 			scope="request" 
 			validate="false">
-			<forward name="image" path="/pages/learning/addimage.jsp" />
-			<forward name="success" path="/pages/learning/success.jsp" />
+			<forward name="image" path="/pages/learning/parts/addimage.jsp" />
+			<forward name="success" path="/pages/learning/start.jsp" />
 		</action>
 		
 		<action path="/learning/loadImageData"

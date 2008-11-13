@@ -203,10 +203,6 @@ public interface IImageGalleryService {
      */
     void saveOrUpdateImageGallerySession(ImageGallerySession resSession);
 
-    void retrieveComplete(SortedSet<ImageGalleryItem> imageGalleryItemList, ImageGalleryUser user);
-
-    void setItemComplete(Long imageGalleryItemUid, Long userId, Long sessionId);
-
     void setItemAccess(Long imageGalleryItemUid, Long userId, Long sessionId);
 
     /**

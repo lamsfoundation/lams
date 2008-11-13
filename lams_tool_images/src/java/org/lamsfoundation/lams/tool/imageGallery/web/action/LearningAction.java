@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
+import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryApplicationException;
 import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageCommentComparator;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
@@ -95,17 +96,14 @@ public class LearningAction extends Action {
 	if (param.equals("start")) {
 	    return start(mapping, form, request, response);
 	}
-	if (param.equals("complete")) {
-	    return complete(mapping, form, request, response);
-	}
 	if (param.equals("finish")) {
 	    return finish(mapping, form, request, response);
 	}
-	if (param.equals("addimage")) {
-	    return addImage(mapping, form, request, response);
+	if (param.equals("newImageInit")) {
+	    return newImageInit(mapping, form, request, response);
 	}
-	if (param.equals("saveOrUpdateImage")) {
-	    return saveOrUpdateImage(mapping, form, request, response);
+	if (param.equals("saveNewImage")) {
+	    return saveNewImage(mapping, form, request, response);
 	}
 	
 	// ================ Comments =======================	
@@ -145,18 +143,17 @@ public class LearningAction extends Action {
 	// initial Session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	Long sessionId = new Long(request.getParameter(ImageGalleryConstants.PARAM_TOOL_SESSION_ID));
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
+	IImageGalleryService service = getImageGalleryService();	
+	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);
 
 	// save toolContentID into HTTPSession
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-
-	Long sessionId = new Long(request.getParameter(ImageGalleryConstants.PARAM_TOOL_SESSION_ID));
-
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 
 	// get back the imageGallery and item list and display them on page
-	IImageGalleryService service = getImageGalleryService();
 	ImageGalleryUser imageGalleryUser = null;
 	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
@@ -166,11 +163,10 @@ public class LearningAction extends Action {
 	} else {
 	    imageGalleryUser = getCurrentUser(service, sessionId);
 	}
-
-	List<ImageGalleryItem> items = null;
-	ImageGallery imageGallery;
-	items = service.getImageGalleryItemsBySessionId(sessionId);
-	imageGallery = service.getImageGalleryBySessionId(sessionId);
+	
+	// Get contentFolderID and save to form.
+//	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+//	sessionMap.put(ImageGalleryConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 
 	// check whehter finish lock is on/off
 	boolean lock = imageGallery.getLockWhenFinished() && (imageGalleryUser != null)
@@ -185,21 +181,6 @@ public class LearningAction extends Action {
 		entryText = notebookEntry.getEntry();
 	    }
 	}
-
-	// basic information
-	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, imageGallery.getTitle());
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_INSTRUCTION, imageGallery.getInstructions());
-	sessionMap.put(ImageGalleryConstants.ATTR_FINISH_LOCK, lock);
-	sessionMap.put(ImageGalleryConstants.ATTR_LOCK_ON_FINISH, imageGallery.getLockWhenFinished());
-	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED, (imageGalleryUser != null)
-		&& imageGalleryUser.isSessionFinished());
-
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	// reflection information
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, imageGallery.isReflectOnActivity());
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_INSTRUCTION, imageGallery.getReflectInstructions());
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	// add define later support
 	if (imageGallery.isDefineLater()) {
@@ -220,49 +201,40 @@ public class LearningAction extends Action {
 	}
 
 	// init imageGallery item list
-	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
-	imageGalleryItemList.clear();
+	List<ImageGalleryItem> items = service.getImageGalleryItemsBySessionId(sessionId);	
+	SortedSet<ImageGalleryItem> imageGalleryItemList = new TreeSet<ImageGalleryItem>(
+		new ImageGalleryItemComparator());
 	if (items != null) {
-	    // remove hidden items.
 	    for (ImageGalleryItem item : items) {
 		// becuase in webpage will use this login name. Here is just
 		// initial it to avoid session close error in proxy object.
 		if (item.getCreateBy() != null) {
 		    item.getCreateBy().getLoginName();
 		}
+		// remove hidden items.		
 		if (!item.isHide()) {
 		    imageGalleryItemList.add(item);
 		}
 	    }
 	}
+	// basic information
+	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, imageGallery.getTitle());
+	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_INSTRUCTION, imageGallery.getInstructions());
+	sessionMap.put(ImageGalleryConstants.ATTR_FINISH_LOCK, lock);
+	sessionMap.put(ImageGalleryConstants.ATTR_LOCK_ON_FINISH, imageGallery.getLockWhenFinished());
+	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED, (imageGalleryUser != null)
+		&& imageGalleryUser.isSessionFinished());
 
-	// set complete flag for display purpose
-	if (imageGalleryUser != null) {
-	    service.retrieveComplete(imageGalleryItemList, imageGalleryUser);
-	}
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	// reflection information
+	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, imageGallery.isReflectOnActivity());
+	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_INSTRUCTION, imageGallery.getReflectInstructions());
+	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ENTRY, entryText);	
+	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST, imageGalleryItemList);	
+
 	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, imageGallery);
 
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }
-
-    /**
-     * Mark imageGallery item as complete status.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-
-	doComplete(request);
-
-	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
 
@@ -310,10 +282,9 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward addImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward newImageInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
-	itemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
 	itemForm.setSessionMapID(WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID));
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
@@ -327,73 +298,36 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward saveOrUpdateImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward saveNewImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	// get back SessionMap
-	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-
-	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
-
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
 	ActionErrors errors = validateImageGalleryItem(itemForm);
 
 	if (!errors.isEmpty()) {
 	    this.addErrors(request, errors);
-	    return mapping.findForward("file");
+	    return mapping.findForward("image");
 	}
 
-	// create a new ImageGalleryItem
-	ImageGalleryItem item = new ImageGalleryItem();
-	IImageGalleryService service = getImageGalleryService();
-	ImageGalleryUser imageGalleryUser = getCurrentUser(service, sessionId);
-	item.setTitle(itemForm.getTitle());
-	item.setDescription(itemForm.getDescription());
-	item.setCreateDate(new Timestamp(new Date().getTime()));
-	item.setCreateByAuthor(false);
-	item.setCreateBy(imageGalleryUser);
-
-	// special attribute for URL or FILE
 	try {
-	    service.uploadImageGalleryItemFile(item, itemForm.getFile());
-	} catch (UploadImageGalleryFileException e) {
-	    LearningAction.log.error("Failed upload ImageGallery File " + e.toString());
-	    return mapping.findForward(ImageGalleryConstants.ERROR);
+	    extractFormToImageGalleryItem(request, itemForm);
+	} catch (Exception e) {
+	    // any upload exception will display as normal error message rather then throw exception directly
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    e.getMessage()));
+	    if (!errors.isEmpty()) {
+		this.addErrors(request, errors);
+		return mapping.findForward("image");
+	    }
 	}
-	// save and update session
-
-	ImageGallerySession resSession = service.getImageGallerySessionBySessionId(sessionId);
-	if (resSession == null) {
-	    LearningAction.log.error("Failed update ImageGallerySession by ID[" + sessionId + "]");
-	    return mapping.findForward(ImageGalleryConstants.ERROR);
-	}
-	Set<ImageGalleryItem> items = resSession.getImageGalleryItems();
-	if (items == null) {
-	    items = new HashSet<ImageGalleryItem>();
-	    resSession.setImageGalleryItems(items);
-	}
-	items.add(item);
-	service.saveOrUpdateImageGallerySession(resSession);
-
-	// update session value
-	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
-	imageGalleryItemList.add(item);
-
-	// URL or file upload
+	
+	//redirect
+	String sessionMapID = itemForm.getSessionMapID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);	
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);	
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 
-	//	ImageGallery imageGallery = resSession.getImageGallery();
-	//	if (imageGallery.isAllowRank()
-	//		&& service.getEventNotificationService().eventExists(ImageGalleryConstants.TOOL_SIGNATURE,
-	//			ImageGalleryConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT,
-	//			imageGallery.getContentId())) {
-	//	    String fullName = imageGalleryUser.getLastName() + " " + imageGalleryUser.getFirstName();
-	//	    service.getEventNotificationService().trigger(ImageGalleryConstants.TOOL_SIGNATURE,
-	//		    ImageGalleryConstants.EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT, imageGallery.getContentId(),
-	//		    new Object[] { fullName });
-	//	}
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
     
@@ -698,61 +632,92 @@ public class LearningAction extends Action {
 	}
 	return imageGalleryUser;
     }
+    
+    /**
+     * Extract web form content to imageGallery item.
+     * 
+     * @param request
+     * @param imageForm
+     * @throws ImageGalleryApplicationException
+     */
+    private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm)
+	    throws Exception {
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(imageForm.getSessionMapID());
+	IImageGalleryService service = getImageGalleryService();
+	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_RESOURCE);	
+
+	ImageGalleryItem image = new ImageGalleryItem();
+	image.setCreateDate(new Timestamp(new Date().getTime()));
+	
+	// upload ImageGalleryItem file
+	// and setting file properties' fields: item.setFileUuid(); item.setFileVersionId(); item.setFileType(); item.setFileName();
+	if (imageForm.getFile() != null) {
+	    try {
+		service.uploadImageGalleryItemFile(image, imageForm.getFile());
+	    } catch (UploadImageGalleryFileException e) {
+		// remove new image!
+		throw e;
+	    }
+	}
+
+	String title = imageForm.getTitle();
+	if (StringUtils.isBlank(title)) {
+	    Long nextConsecutiveImageTitle = imageGallery.getNextImageTitle(); 
+	    imageGallery.setNextImageTitle(nextConsecutiveImageTitle + 1);
+	    
+	    String imageLocalized = service.getLocalisedMessage("label.authoring.image", null);
+	    title = imageLocalized + " " + nextConsecutiveImageTitle;
+	}
+	image.setTitle(title);
+
+	image.setDescription(imageForm.getDescription());
+	image.setCreateByAuthor(true);
+	image.setHide(false);
+	
+	//setting SequenceId
+	Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
+	int maxSeq = 0;
+	for (ImageGalleryItem dbImage : imageList) {
+		if (dbImage.getSequenceId() > maxSeq) maxSeq = dbImage.getSequenceId();
+	}
+	maxSeq++;
+	image.setSequenceId(maxSeq);
+	
+	imageList.add(image);
+	service.saveOrUpdateImageGallery(imageGallery);
+
+	service.saveOrUpdateImageGalleryItem(image);
+    }
 
     /**
+     * Validate imageGallery item.
+     * 
      * @param itemForm
      * @return
      */
     private ActionErrors validateImageGalleryItem(ImageGalleryItemForm itemForm) {
 	ActionErrors errors = new ActionErrors();
-	if (StringUtils.isBlank(itemForm.getTitle())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_TITLE_BLANK));
-	}
 
-	if ((itemForm.getFile() != null) && FileUtil.isExecutableFile(itemForm.getFile().getFileName())) {
-	    ActionMessage msg = new ActionMessage("error.attachment.executable");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
-	}
-
-	// validate item size
-	FileValidatorUtil.validateFileSize(itemForm.getFile(), false, errors);
-
+	// validate file size
+	FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
 	// for edit validate: file already exist
-	if (!itemForm.isHasFile()
-		&& ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
+	if ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName())) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_FILE_BLANK));
 	}
-	return errors;
-    }
 
-    /**
-     * Set complete flag for given imageGallery item.
-     * 
-     * @param request
-     * @param sessionId
-     */
-    private void doComplete(HttpServletRequest request) {
-	// get back sessionMap
-	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	Long imageGalleryItemUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
-	IImageGalleryService service = getImageGalleryService();
-	HttpSession ss = SessionManager.getSession();
-	// get back login user DTO
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
-	service.setItemComplete(imageGalleryItemUid, new Long(user.getUserID().intValue()), sessionId);
-
-	// set imageGallery item complete tag
-	SortedSet<ImageGalleryItem> imageGalleryItemList = getImageList(sessionMap);
-	for (ImageGalleryItem item : imageGalleryItemList) {
-	    if (item.getUid().equals(imageGalleryItemUid)) {
-		item.setComplete(true);
-		break;
+	// check for allowed format : gif, png, jpg
+	if (itemForm.getFile() != null) {
+	    String contentType = itemForm.getFile().getContentType();
+	    if (StringUtils.isEmpty(contentType)
+		    || !(contentType.equals("image/gif") || contentType.equals("image/png")
+			    || contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
+			    .equals("image/pjpeg"))) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
 	    }
 	}
+
+	return errors;
     }
 
 }

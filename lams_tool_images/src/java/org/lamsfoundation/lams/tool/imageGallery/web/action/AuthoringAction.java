@@ -900,7 +900,7 @@ public class AuthoringAction extends Action {
     }
 
     /**
-     * Extract web from content to imageGallery item.
+     * Extract web form content to imageGallery item.
      * 
      * @param request
      * @param imageForm

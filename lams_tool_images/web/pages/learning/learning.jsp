@@ -4,7 +4,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
+	<title>
+		<fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
 
@@ -22,6 +23,7 @@
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.skin.css'/>" />
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/galleria.css'/>" >
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.rating.css'/>"/>
+	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
 	<style media="screen,projection" type="text/css">
 		#content{width:1000;}
 		body{width:1000;}
@@ -45,13 +47,17 @@
 		
 		.after_main_image{text-align: left; margin: 30px 0; padding-top: 30px; clear:both;}
     </style>
-
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>" ></script>
+    
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>" ></script>    
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.galleria.js'/>" ></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jcarousel.pack.js'/>"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.MetaData.js'/>"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.rating.1.1.js'/>"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
+	<script type="text/javascript"> 
+		var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
+	</script>
+ 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
  	
 	<script type="text/javascript">
 	$(document).ready(function(){
@@ -314,16 +320,16 @@
 				</c:forEach>
 			</ul>
 			
-			<c:if test="${(mode != 'teacher') }"> <!--&& imageGallery.allowShareImages-->
-					<a href="#" onclick="return checkNew()" class="button check_for_new"> 
-						<fmt:message key="label.check.for.new" /> 
-					</a>
+			<c:if test="${imageGallery.allowShareImages && (mode != 'teacher')}">
+				<a href="#" onclick="return checkNew()" class="button check_for_new"> 
+					<fmt:message key="label.check.for.new" /> 
+				</a>
 			</c:if>
-			<c:if test="${mode != 'teacher' && (not finishedLock)}"> <!--&& imageGallery.allowShareImages-->
+			<c:if test="${imageGallery.allowShareImages && (mode != 'teacher') && (not finishedLock)}">
 				<br>
-					<a href="#" onclick="return checkNew()" class="button add_new_image"> 
-						<fmt:message key="label.learning.add.new.image" />
-					</a>
+				<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=500&width=480&modal=true" class="button add_new_image thickbox">  
+					<fmt:message key="label.learning.add.new.image" />
+				</a>
 			</c:if>		
 			
 		</div>

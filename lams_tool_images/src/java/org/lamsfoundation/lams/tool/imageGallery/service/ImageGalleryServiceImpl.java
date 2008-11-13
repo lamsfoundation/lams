@@ -433,33 +433,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	imageGallerySessionDao.saveObject(resSession);
     }
 
-    public void retrieveComplete(SortedSet<ImageGalleryItem> imageGalleryItemList, ImageGalleryUser user) {
-	for (ImageGalleryItem item : imageGalleryItemList) {
-	    ImageGalleryItemVisitLog log = imageGalleryItemVisitDao.getImageGalleryItemLog(item.getUid(), user
-		    .getUserId());
-	    if (log == null) {
-		item.setComplete(false);
-	    } else {
-		item.setComplete(log.isComplete());
-	    }
-	}
-    }
-
-    public void setItemComplete(Long imageGalleryItemUid, Long userId, Long sessionId) {
-	ImageGalleryItemVisitLog log = imageGalleryItemVisitDao.getImageGalleryItemLog(imageGalleryItemUid, userId);
-	if (log == null) {
-	    log = new ImageGalleryItemVisitLog();
-	    ImageGalleryItem item = imageGalleryItemDao.getByUid(imageGalleryItemUid);
-	    log.setImageGalleryItem(item);
-	    ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	    log.setUser(user);
-	    log.setSessionId(sessionId);
-	    log.setAccessDate(new Timestamp(new Date().getTime()));
-	}
-	log.setComplete(true);
-	imageGalleryItemVisitDao.saveObject(log);
-    }
-
     public void setItemAccess(Long imageGalleryItemUid, Long userId, Long sessionId) {
 	ImageGalleryItemVisitLog log = imageGalleryItemVisitDao.getImageGalleryItemLog(imageGalleryItemUid, userId);
 	if (log == null) {
