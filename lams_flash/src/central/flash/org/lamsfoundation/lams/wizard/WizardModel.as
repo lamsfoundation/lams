@@ -62,6 +62,9 @@ class WizardModel extends Observable{
 	private var _org:Organisation;
 	private var _lessonID:Number;
 	
+	private var _lessonIDs:Array;
+	private var _startedLessonsCount:Number = 0;
+	
 	private var selectedTab:Number;
 	
 	// state data
@@ -435,6 +438,22 @@ class WizardModel extends Observable{
 	
 	public function set lessonID(a:Number){
 		_lessonID = a;
+	}
+	
+	public function get lessonIDs():Array{
+		return _lessonIDs;
+	}
+	
+	public function set lessonIDs(a:Array){
+		_lessonIDs = a;
+	}
+	
+	public function get startedLessonsCount():Number{
+		return _startedLessonsCount;
+	}
+	
+	public function set startedLessonsCount(a:Number){
+		_startedLessonsCount = a;
 	}
 	
 	//Accessors for x + y coordinates

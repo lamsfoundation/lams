@@ -80,7 +80,7 @@ public interface IMonitoringService {
      */
     public Lesson initializeLesson(String lessonName, String lessonDescription, Boolean learnerExportAvailable,
 	    long learningDesignId, Integer organisationId, Integer userID, String customCSV,
-	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable);
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled);
 
     /**
      * Initialize a new lesson so as to start the learning process for a normal
@@ -104,7 +104,7 @@ public interface IMonitoringService {
      * design is not assigned to any workspace folder.
      */
     public Lesson initializeLessonForPreview(String lessonName, String lessonDescription, long learningDesignId,
-	    Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable);
+	    Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled);
 
     /**
      * Create a lession according to the input lession WDDX package. The sample

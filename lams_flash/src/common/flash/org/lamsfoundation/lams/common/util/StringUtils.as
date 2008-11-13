@@ -338,5 +338,31 @@ class StringUtils {
 		}
 		return charArray;
 	}
+	
+	public static function isANumber(s:String):Boolean {
+		for (var i:Number = 0; i < s.length; i++) {
+			Debugger.log("stringUtils isANumber char at " + i + ": " + s.charCodeAt(i), Debugger.MED, "isANumber", "StringUtils");
+			if (s.charCodeAt(i) > 57 || s.charCodeAt(i) < 48) {
+				Debugger.log("stringUtils isANumber false strlen: " + s.length, Debugger.MED, "isANumber", "StringUtils");
+				return false;
+			}
+		}
+		Debugger.log("stringUtils isANumber true with strlen: " + s.length, Debugger.MED, "isANumber", "StringUtils");
+		return true;
+	}
     
+	public static function stringToBool(string:String):Boolean{
+		switch(string){
+			case "1":
+			case "true":
+			case "yes":
+				return true;
+			case "0":
+			case "false":
+			case "no":
+				return false;
+			default:
+			return Boolean(string);
+		}
+	}
 }

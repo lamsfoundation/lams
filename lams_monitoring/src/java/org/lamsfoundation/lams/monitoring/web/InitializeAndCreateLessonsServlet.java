@@ -83,11 +83,7 @@ public class InitializeAndCreateLessonsServlet extends AbstractStoreWDDXPacketSe
 	    IMonitoringService monitoringService = getMonitoringService();
 	    List<Long> lessonIds = monitoringService.initializeAndCreateLessons(userID, lessonPackage);
 	    if (lessonIds != null && lessonIds.size() > 0) {
-		String lessonIdsCSV = "";
-		for (Long lessonId : lessonIds) {
-		    lessonIdsCSV += lessonId + ",";
-		}
-		flashMessage = new FlashMessage(messageKey, lessonIdsCSV);
+		flashMessage = new FlashMessage(messageKey, lessonIds);
 	    } else {
 		flashMessage = new FlashMessage(messageKey, "");
 	    }

@@ -122,6 +122,7 @@ public class TestLessonDAO extends LessonDataAccessTestCase
                                                                       true,
                                                                       testLearningDesign,
                                                                       false,
+                                                                      false,
                                                                       false);
         
         try

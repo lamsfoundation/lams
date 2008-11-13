@@ -177,7 +177,8 @@ public class MonitoringAction extends LamsDispatchAction
     		Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
     		Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresencePortfolio", false);
     		Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImPortfolio", false);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable);
+    		Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {

@@ -615,10 +615,16 @@ class WizardView extends AbstractView {
 				updateScreen(wm.stepID, wm.stepID+1);
 				break;
 			case START_MODE :
-				wm.getWizard().startLesson(false, wm.lessonID);
+				if(wm.resultDTO.learnerSelectMode == "learnerSelectIndiv")
+					wm.getWizard().startLesson(false, wm.lessonID);
+				else if (wm.resultDTO.learnerSelectMode == "learnerSelectSplit")
+					wm.getWizard().startMultipleLessons();
 				break;
 			case START_SCH_MODE :
-				wm.getWizard().startLesson(true, wm.lessonID, wm.resultDTO.scheduleDateTime);
+				if(wm.resultDTO.learnerSelectMode == "learnerSelectIndiv")
+					wm.getWizard().startLesson(true, wm.lessonID, wm.resultDTO.scheduleDateTime);
+				else if (wm.resultDTO.learnerSelectMode == "learnerSelectSplit")
+					wm.getWizard().startMultipleScheduledLessons();	
 				break;
 			default:
 				break;

@@ -53,7 +53,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 	private var org_treeview:Tree;
 	
 	private var _staffList:Array;
-	private var _learnerList:Array;
+	private var _learnerList:Array = null;
 	private var _learner_mc:MovieClip;
 	private var _staff_mc:MovieClip;
 	private var staff_scp:MovieClip;		// staff/teachers container
@@ -62,6 +62,19 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 	private var learner_lbl:Label;
 	private var staff_selAll_cb:CheckBox;
 	private var learner_selAll_cb:CheckBox;
+	private var learner_split_cb:CheckBox;
+	
+	private var splitLearners_mc:MovieClip;
+	private var splitNbLearnersTotal_lbl:Label;
+	private var splitLearnersPerLesson_lbl:Label;
+	private var splitLearnersPerLesson_txi:TextInput;
+	private var splitSummary_txa:TextArea;
+	
+	private var intervalSetupSplitLabels:Number = 0;
+	private static var DATA_LOAD_CHECK_INTERVAL:Number = 500;
+	public static var LEARNER_SELECT_INDIV:String = "learnerSelectIndiv";
+	public static var LEARNER_SELECT_SPLIT:String = "learnerSelectSplit";
+	private var nbLessonsSplit:Number = 0;
 	
 	private var _wizardController:WizardController;
 	
@@ -70,18 +83,25 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
     public var addEventListener:Function;
     public var removeEventListener:Function;
 	
+	
 	function WizardOrganisationView(){
 		mx.events.EventDispatcher.initialize(this);
-		
 	}
 	
 	public function init(m:Observable,c:Controller) {
 		super(m, c)
+		
+		splitNbLearnersTotal_lbl = splitLearners_mc["splitNbLearnersTotal_lbl"];
+		splitLearnersPerLesson_lbl = splitLearners_mc["splitLearnersPerLesson_lbl"];
+		splitLearnersPerLesson_txi = splitLearners_mc["splitLearnersPerLesson_txi"];
+		splitSummary_txa = splitLearners_mc["splitSummary_txa"];
 	}
 	
 	public function setupContent():Void {
 		staff_selAll_cb.addEventListener("click", Delegate.create(this, toogleStaffSelection));
 		learner_selAll_cb.addEventListener("click", Delegate.create(this, toogleLearnerSelection));
+		learner_split_cb.addEventListener("click", Delegate.create(this, toggleSplitLesson));
+		splitLearnersPerLesson_txi.addEventListener("keyUp", Delegate.create(this, updateSplitSummaryLabel));
 	}
 	
 	public function setupLabels():Void {
@@ -89,6 +109,54 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 		learner_lbl.text = Dictionary.getValue('learner_lbl');
 		staff_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
 		learner_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
+		
+		intervalSetupSplitLabels = setInterval(Proxy.create(this, setupSplitLabels), DATA_LOAD_CHECK_INTERVAL);
+	}
+	
+	private function setupSplitLabels():Void {
+		if (_learnerList) {
+			splitNbLearnersTotal_lbl.text = Dictionary.getValue('wizard_splitLearners_leanersInGroup_lbl') + " " + String(_learnerList.length);
+			splitLearnersPerLesson_lbl.text = Dictionary.getValue('wizard_splitLearners_LearnersPerLesson_lbl');
+			splitLearnersPerLesson_txi.text = "1";
+			updateSplitSummaryLabel();
+			clearInterval(intervalSetupSplitLabels);
+		}
+	}
+	
+	private function updateSplitSummaryLabel() {
+		Debugger.log("updateSplitSummaryLabel _learnerList length: " + _learnerList.length, Debugger.CRITICAL, "updateSplitSummaryLabel", "WizardOrganisationView");
+		
+		Debugger.log("updateSplitSummaryLabel", Debugger.CRITICAL, "updateSplitSummaryLabel", "WizardOrganisationView");
+		if (Number(splitLearnersPerLesson_txi.text) > _learnerList.length) {
+			Debugger.log("updateSplitSummaryLabel too high", Debugger.CRITICAL, "updateSplitSummaryLabel", "WizardOrganisationView");
+			splitLearnersPerLesson_txi.text = String(_learnerList.length);
+		}
+		else if (splitLearnersPerLesson_txi.text == "") {
+			Debugger.log("updateSplitSummaryLabel is blank", Debugger.CRITICAL, "updateSplitSummaryLabel", "WizardOrganisationView");
+		}
+		else if (Number(splitLearnersPerLesson_txi.text) < 1) {
+			Debugger.log("updateSplitSummaryLabel too low", Debugger.CRITICAL, "updateSplitSummaryLabel", "WizardOrganisationView");
+			splitLearnersPerLesson_txi.text = "1";
+		}
+		else if (!StringUtils.isANumber(splitLearnersPerLesson_txi.text)) {
+			Debugger.log("updateSplitSummaryLabel is not a number", Debugger.CRITICAL, "updateSplitSummaryLabel", "WizardOrganisationView");
+			splitLearnersPerLesson_txi.text = "1";
+		}
+		
+		nbLessonsSplit = Math.floor(_learnerList.length / Number(splitLearnersPerLesson_txi.text));
+		
+		if (_learnerList.length % Number(splitLearnersPerLesson_txi.text) != 0) {
+			nbLessonsSplit++;
+		}
+		
+		if (splitLearnersPerLesson_txi.text == "" || nbLessonsSplit == NaN) {
+			splitSummary_txa.text = Dictionary.getValue('wizard_splitLearners_splitSum', ["-", "-"]);
+		}
+		else {
+			splitSummary_txa.text = Dictionary.getValue('wizard_splitLearners_splitSum', [String(nbLessonsSplit), splitLearnersPerLesson_txi.text]);
+		}
+		
+		Debugger.log("updateSplitSummaryLabel nbLessonsSplit = " + nbLessonsSplit, Debugger.CRITICAL, "updateSplitSummaryLabel", "WizardOrganisationView");
 	}
 	
 	public function setStyles(_tm:ThemeManager) {
@@ -99,11 +167,16 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 
 		styleObj = _tm.getStyleObject('scrollpane');
 		staff_scp.setStyle('styleName',styleObj);
-		learner_scp.setStyle('styleName',styleObj);
+		learner_scp.setStyle('styleName', styleObj);
 		
+		styleObj = _tm.getStyleObject('LightBlueTextArea');
+		splitSummary_txa.setStyle('styleName', styleObj);
 	}
 	
 	public function show(v:Boolean):Void {
+		splitLearners_mc._visible = false;
+		learner_split_cb.selected = false;
+		
 		org_treeview.visible = v;
 		
 		staff_lbl.visible = v;
@@ -113,6 +186,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 		learner_scp.visible = v;
 		staff_selAll_cb.visible = v;
 		learner_selAll_cb.visible = v;
+		learner_split_cb.visible = v;
 		
 		if(_parent.resultDTO.selectedJointLessonID != null) {
 			staff_selAll_cb.enabled = false;
@@ -155,14 +229,20 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 				}
 			}
 			
-			if(selectedLearners.length <= 0){
-				valid = false;
-			}
-			
 			if(selectedStaff.length <= 0){
 				valid = false;
 			}
 			
+			if (learner_split_cb.selected) {
+				if (nbLessonsSplit < 1 || nbLessonsSplit > _learnerList.length || splitLearnersPerLesson_txi.text == "" || nbLessonsSplit == NaN || !StringUtils.isANumber(splitLearnersPerLesson_txi.text)) {
+					valid = false;
+				}
+			}
+			else {
+				if(selectedLearners.length <= 0){
+					valid = false;
+				}
+			}
 		}
 		
 		if(valid){
@@ -177,10 +257,21 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 				_parent.resultDTO.courseName = pnode.attributes.data.name;
 			}
 			
-			_parent.resultDTO.selectedStaff = selectedStaff;
-			_parent.resultDTO.selectedLearners = selectedLearners;
+			if (learner_split_cb.selected) {
+				Debugger.log("adding lesson split variables to dto: " + LEARNER_SELECT_SPLIT + nbLessonsSplit + splitLearnersPerLesson_txi.text, Debugger.MED, "validate", "WizardOrganisationView");
+				_parent.resultDTO.learnerSelectMode = LEARNER_SELECT_SPLIT;
+				_parent.resultDTO.learnersNbLessonsSplit = nbLessonsSplit;
+				_parent.resultDTO.learnersNbLearnersSplit = Number(splitLearnersPerLesson_txi.text);
+			}
+			else {
+				Debugger.log("adding lesson indiv variables to dto", Debugger.MED, "validate", "WizardOrganisationView");
+				_parent.resultDTO.learnerSelectMode = LEARNER_SELECT_INDIV;
+				_parent.resultDTO.selectedLearners = selectedLearners;
+				_parent.resultDTO.learnersListTotal = learnerList.length;
+			}
+			
+			_parent.resultDTO.selectedStaff = selectedStaff;			
 			_parent.resultDTO.staffListTotal = staffList.length;
-			_parent.resultDTO.learnersListTotal = learnerList.length;
 			
 			var orgName:String = snode.attributes.data.name;
 			_parent.resultDTO.staffGroupName = Dictionary.getValue('staff_group_name', [orgName]);
@@ -202,7 +293,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 	 * @param   users Users to load
 	 */
 	
-	public function loadLearners(users:Array, _selected:Boolean):Void{
+	public function loadLearners(users:Array, _selected:Boolean):Void {
 		_learnerList = WizardView.clearScp(_learnerList);
 		_learner_mc = learner_scp.content;
 		
@@ -223,7 +314,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 		
 		learner_scp.redraw(true);
 	}
-	
+
 	public function enableUsers(e:Boolean):Void {
 		for(var i=0; i < _learnerList.length; i++) {
 			if(e && !_learnerList[i].user_cb.enabled) _learnerList[i].user_cb.enabled = e;
@@ -326,6 +417,24 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 		var wm:WizardModel = WizardModel(getModel());
 		
 		loadLearners(wm.organisation.getLearners(), target.selected);
+	}
+	
+	private function toggleSplitLesson(evt:Object) {
+		Debugger.log("Toggle split lesson", Debugger.GEN, "toogleSplitLesson", "WizardView");
+		var wm:WizardModel = WizardModel(getModel());
+		
+		if (!learner_split_cb.selected) {
+			Debugger.log("learner_split_cb.enabled - load learners", Debugger.GEN, "toogleSplitLesson", "WizardView");
+			splitLearners_mc._visible = false;
+			learner_scp._visible = true;
+			learner_selAll_cb.visible = true;
+		}
+		else {
+			Debugger.log("!learner_split_cb.enabled - show movieclip", Debugger.GEN, "toogleSplitLesson", "WizardView");
+			learner_selAll_cb.visible = false;
+			learner_scp._visible = false;
+			splitLearners_mc._visible = true;
+		}
 	}
 	
 	/**

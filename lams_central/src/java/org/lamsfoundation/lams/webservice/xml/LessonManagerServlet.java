@@ -288,7 +288,7 @@ public class LessonManagerServlet extends HttpServlet {
 			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, 
 							orgMap.getOrganisation().getOrganisationId(), 
 							userMap.getUser().getUserId(),
-							customCSV, Boolean.FALSE, Boolean.FALSE);
+							customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap
 					.getUser());
@@ -319,7 +319,7 @@ public class LessonManagerServlet extends HttpServlet {
 			Lesson lesson = monitoringService
 					.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
 							.getOrganisation().getOrganisationId(), userMap
-							.getUser().getUserId(), customCSV, false, false);
+							.getUser().getUserId(), customCSV, false, false, false);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap
 					.getUser());
@@ -530,7 +530,7 @@ public class LessonManagerServlet extends HttpServlet {
 					serverMap, userMap, courseId, countryIsoCode, langIsoCode, null);
 			// 1. init lesson
 			Lesson lesson = monitoringService
-					.initializeLessonForPreview(title, desc, ldId, userMap.getUser().getUserId(), customCSV, false, false);
+					.initializeLessonForPreview(title, desc, ldId, userMap.getUser().getUserId(), customCSV, false, false, false);
 			// 2. create lessonClass for lesson
 			monitoringService.createPreviewClassForLesson(userMap.getUser().getUserId(), lesson.getLessonId());
 			

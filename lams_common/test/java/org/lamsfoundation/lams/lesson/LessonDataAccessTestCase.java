@@ -250,7 +250,8 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
                                 testOrg,
                                 new HashSet(),
                                 false,
-                                false);//learner progress
+                                false,
+                                false);
     }
   
 

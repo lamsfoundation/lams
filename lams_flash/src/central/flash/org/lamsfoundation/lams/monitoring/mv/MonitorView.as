@@ -235,7 +235,11 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private function editFlyShowHide(v:Boolean):Void{
 		Debugger.log("test root val: " + _root.editOnFly, Debugger.CRITICAL, "editFlyShowHide", "MonitorView");
 		
-		editFly_btn.visible = (v && _root.editOnFly == 'true') ? true : false;
+		var editOnFlyLocal:Boolean = Application.getInstance().sequence.liveEditEnabled;
+		
+		Debugger.log("test editOnFlyLocal val: " + editOnFlyLocal, Debugger.CRITICAL, "editFlyShowHide", "MonitorView");
+		
+		editFly_btn.visible = (v && _root.editOnFly == 'true' && editOnFlyLocal) ? true : false;
 
 		Debugger.log("visible: " + editFly_btn.visible, Debugger.CRITICAL, "editFlyShowHide", "MonitorView");
 	}

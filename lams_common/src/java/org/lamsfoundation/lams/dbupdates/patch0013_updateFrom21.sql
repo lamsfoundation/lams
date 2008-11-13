@@ -67,6 +67,9 @@ ALTER TABLE lams_grouping ADD COLUMN equal_number_of_learners_per_group TINYINT 
 UPDATE lams_configuration SET config_key='TruststorePath' WHERE config_key='LDAPTruststorePath';
 UPDATE lams_configuration SET config_key='TruststorePassword' WHERE config_key='LDAPTruststorePassword';
 
+-- LDEV-1260 - local live edit field added
+ALTER TABLE lams_lesson ADD COLUMN live_edit_enabled TINYINT(1) DEFAULT 0;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

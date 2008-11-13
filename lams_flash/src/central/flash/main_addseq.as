@@ -1,5 +1,6 @@
 ﻿import org.lamsfoundation.lams.wizard.Application;
 import org.lamsfoundation.lams.common.util.StringUtils;
+import org.lamsfoundation.lams.common.util.Debugger;
 
 //Temp values to be removed / repplaced at deployment
 /**/
@@ -30,7 +31,6 @@ if(StringUtils.isEmpty(classID)){
 	Debugger.log('ClassID is not defined, using defualt:'+_root.classID,Debugger.CRITICAL,'main','ROOT');			
 }
 
-
 if(StringUtils.isEmpty(build)){
 	_root.build = 2.0;
 	Debugger.log('Build is not defined, using defualt:'+_root.build,Debugger.CRITICAL,'main','ROOT');			
@@ -38,6 +38,11 @@ if(StringUtils.isEmpty(build)){
 
 if(StringUtils.isEmpty(langDate)){
 	_root.langDate = "01-01-1970";
+}
+
+if(StringUtils.isEmpty(editOnFly)){
+	_root.editOnFly = false;
+	Debugger.log('editOnFly is not defined, using defualt:'+_root.allowEditOnFly,Debugger.CRITICAL,'main','ROOT');			
 }
 
 //Set stage alignment to top left and prent scaling

@@ -251,24 +251,45 @@ class Wizard {
 		var learnerExpPortfolio:Boolean = resultDTO.learnerExpPortfolio;
 		var enablePresence:Boolean = resultDTO.enablePresence;
 		var enableIm:Boolean = resultDTO.enableIm;
+		var enableLiveEdit:Boolean = resultDTO.enableLiveEdit;
+		
+		var learnerSelectMode:String = resultDTO.learnerSelectMode;
+		var learnersNbLessonsSplit:Number = resultDTO.learnersNbLessonsSplit;
+		var learnersNbLearnersSplit:Number = resultDTO.learnersNbLearnersSplit;
+		
+		var modelDto:Object = wizardModel.getLessonClassData();
+		Debugger.log('modelDto: ' + modelDto,Debugger.MED,' initializeLesson','Wizard');
+		var learners:Hashtable = modelDto.learners;
+		Debugger.log('learners: ' + learners,Debugger.MED,' initializeLesson','Wizard');
+		var learnerGroupName:String = modelDto.groupName;
+		Debugger.log('learnerGroupName: ' + learnerGroupName,Debugger.MED,' initializeLesson','Wizard');
+		var staff:Hashtable = modelDto.staff;
+		Debugger.log('staff: ' + staff,Debugger.MED,' initializeLesson','Wizard');
 		
 		// get data object to send to servlet
-		var data = DesignDataModel.getDataForInitializing(lessonName, lessonDesc, designId, orgId, learnerExpPortfolio, enablePresence, enableIm);
+		var data = DesignDataModel.getDataForInitializing(lessonName, lessonDesc, designId, orgId, learnerExpPortfolio, enablePresence, enableIm, enableLiveEdit, learnersNbLearnersSplit, learnersNbLessonsSplit, learners, learnerGroupName, staff);
 		
-		trace(data.lessonName + data.enablePresence + data.enableIm);
-		Debugger.log(data.lessonName + data.enablePresence + data.enableIm, Debugger.MED, "initializeLesson", "Wizard");
+		Debugger.log("calling servlet with data - lesson name: " + data.lessonName + " presence enabled: " +data.enablePresence + " im enabled: " +data.enableIm + " live edit enabled: " + data.enableLiveEdit + " learnersNbLessonsSplit: " + data.learnersNbLessonsSplit + " learnersNbLearnersSplit: " + data.learnersNbLearnersSplit, Debugger.MED, "initializeLesson", "Wizard");
 		
 		// servlet call
-		Application.getInstance().getComms().sendAndReceive(data, 'monitoring/initializeLesson', callback, false);
-
+		if (learnerSelectMode == "learnerSelectIndiv") {
+			Debugger.log("calling indiv initializeLesson servlet", Debugger.MED, "initializeLesson", "Wizard");
+			Application.getInstance().getComms().sendAndReceive(data, 'monitoring/initializeLesson', callback, false);
+		}
+		else if (learnerSelectMode == "learnerSelectSplit") {
+			Debugger.log("calling split initializeLesson servlet (start lessons)", Debugger.MED, "initializeLesson", "Wizard");
+			Application.getInstance().getComms().sendAndReceive(data, 'monitoring/initializeAndCreateLessons', callback, false);
+		}
 	}
 	
 	public function startLesson(isScheduled:Boolean, lessonID:Number, datetime:String){
 		var callback:Function = Proxy.create(this, onStartLesson);
 		
-		if(isScheduled){
+		if (isScheduled) {
+			Debugger.log("calling start lesson scheduled", Debugger.MED, "startLesson", "Wizard");
 			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startOnScheduleLesson&lessonStartDate=' + datetime + '&lessonID=' + lessonID + '&userID=' + _root.userID, callback);
 		} else {
+			Debugger.log("calling start lesson non-scheduled", Debugger.MED, "startLesson", "Wizard");
 			Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startLesson&lessonID=' + lessonID + '&userID=' + _root.userID, callback);
 		}
 	}
@@ -290,6 +311,7 @@ class Wizard {
 		var dto:Object = wizardModel.getLessonClassData();
 		var callback:Function = Proxy.create(this,onCreateLessonClass);
 		
+		Debugger.log("calling createLessonClass", Debugger.MED, "createLessonClass", "Wizard");
 		Application.getInstance().getComms().sendAndReceive(dto,"monitoring/createLessonClass?userID=" + _root.userID,callback,false);
 		
 	}
@@ -297,14 +319,65 @@ class Wizard {
 	public function onCreateLessonClass(r):Void{
 		if(r instanceof LFError) {
 			r.showErrorAlert();
-		} else if(r) {
+		} else if (r) {
+			Debugger.log("callback onCreateLessonClass called", Debugger.MED, "onCreateLessonClass", "Wizard");
 			// lesson class created
 			wizardModel.broadcastViewUpdate("SAVED_LC", wizardModel.resultDTO.mode);
 		} else {
 			// failed creating lesson class
 		}
 	}
+	
+	public function startMultipleLessons():Void {
+		var callback:Function = Proxy.create(this, onStartMultipleLessons);
+		var lessonIDs:Array = wizardModel.lessonIDs;
+		var startedLessonsCount:Number = wizardModel.startedLessonsCount;
+		
+		Debugger.log("calling start lesson non-scheduled", Debugger.MED, "startMultipleLessons", "Wizard");
+		Debugger.log("monitoring/monitoring.do?method=startLesson&lessonID=" + lessonIDs[startedLessonsCount] + '&userID=' + _root.userID, Debugger.MED, "startMultipleLessons", "Wizard");
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startLesson&lessonID=' + lessonIDs[startedLessonsCount] + '&userID=' + _root.userID, callback);
+	}
+	
+	public function onStartMultipleLessons(b:Boolean):Void {
+		if (b) {
+			wizardModel.startedLessonsCount++;
+			Debugger.log("callback onStartMultipleLessons called:" + wizardModel.startedLessonsCount, Debugger.MED, "onStartMultipleLessons", "Wizard");
+			if (wizardModel.startedLessonsCount == wizardModel.lessonIDs.length) {
+				Debugger.log("onStartMultipleLessons complete" + wizardModel.startedLessonsCount, Debugger.MED, "onStartMultipleLessons", "Wizard");
+				wizardModel.broadcastViewUpdate("LESSON_STARTED", WizardView.FINISH_MODE);
+			}
+			else {
+				Debugger.log("calling startMultipleLessons " + (wizardModel.startedLessonsCount + 1), Debugger.MED, "onStartMultipleLessons", "Wizard");
+				startMultipleLessons();
+			}
+		}
+	}
 
+	public function startMultipleScheduledLessons():Void {
+		var callback:Function = Proxy.create(this, onStartMultipleScheduledLessons);
+		var lessonIDs:Array = wizardModel.lessonIDs;
+		var startedLessonsCount:Number = wizardModel.startedLessonsCount;
+		var scheduleDateTime:String = wizardModel.resultDTO.scheduleDateTime
+		
+		Debugger.log("calling start lesson scheduled", Debugger.MED, "startMultipleScheduledLessons", "Wizard");
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startOnScheduleLesson&lessonStartDate=' + scheduleDateTime + '&lessonID=' + lessonIDs[startedLessonsCount] + '&userID=' + _root.userID, callback);
+	}
+	
+	public function onStartMultipleScheduledLessons(b:Boolean):Void {
+		if (b) {
+			wizardModel.startedLessonsCount++;
+			Debugger.log("callback onStartMultipleScheduledLessons called:" + wizardModel.startedLessonsCount, Debugger.MED, "onStartMultipleLessons", "Wizard");
+			if (wizardModel.startedLessonsCount == wizardModel.lessonIDs.length) {
+				Debugger.log("onStartMultipleScheduledLessons complete" + wizardModel.startedLessonsCount, Debugger.MED, "onStartMultipleLessons", "Wizard");
+				wizardModel.broadcastViewUpdate("LESSON_STARTED", WizardView.FINISH_MODE);
+			}
+			else {
+				Debugger.log("calling startMultipleScheduledLessons " + (wizardModel.startedLessonsCount + 1), Debugger.MED, "onStartMultipleLessons", "Wizard");
+				startMultipleScheduledLessons();
+			}
+		}
+	}	
+	
 	/**
 	 * 
 	 * @usage   

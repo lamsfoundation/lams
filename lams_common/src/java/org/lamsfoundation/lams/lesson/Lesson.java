@@ -132,6 +132,9 @@ public class Lesson implements Serializable {
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean learnerImAvailable;
     
+    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    private Boolean liveEditEnabled;
+    
     //---------------------------------------------------------------------
     // constructors
     //---------------------------------------------------------------------
@@ -146,10 +149,10 @@ public class Lesson implements Serializable {
      */
     public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, 
     		Integer previousLessonStateId, Boolean learnerExportAvailable, 
-    		LearningDesign learningDesign,Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable) 
+    		LearningDesign learningDesign, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled) 
     {
         this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
-        		learnerExportAvailable,false, learningDesign,null,null,learnerProgresses, learnerPresenceAvailable, learnerImAvailable);
+        		learnerExportAvailable,false, learningDesign,null,null,learnerProgresses, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
     }     
     
     /** 
@@ -159,17 +162,17 @@ public class Lesson implements Serializable {
      */
     public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, Integer previousLessonStateId, 
     		Boolean learnerExportAvailable, LearningDesign learningDesign, LessonClass lessonClass, 
-    		Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable) 
+    		Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled) 
     {
         this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
-        		learnerExportAvailable, false, learningDesign,lessonClass,organisation,learnerProgresses, learnerPresenceAvailable, learnerImAvailable);
+        		learnerExportAvailable, false, learningDesign,lessonClass,organisation,learnerProgresses, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
     }    
     
     /** full constructor */
     public Lesson(Long lessonId,String name,String description, Date createDateTime, Date startDateTime, Date endDateTime, User user, 
     		Integer lessonStateId, Integer previousLessonStateId, Boolean learnerExportAvailable,  Boolean lockedForEdit,
     		LearningDesign learningDesign, LessonClass lessonClass, 
-    		Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable) 
+    		Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled) 
     {
         this.lessonId = lessonId;
         this.lessonName = name;
@@ -187,7 +190,8 @@ public class Lesson implements Serializable {
         this.learningDesign = learningDesign;
         this.lessonClass = lessonClass;
         this.organisation = organisation;
-        this.learnerProgresses = learnerProgresses;        
+        this.learnerProgresses = learnerProgresses;
+        this.liveEditEnabled = liveEditEnabled;
     }
     /**
      * Factory method that create a new lesson. It initialized all necessary
@@ -209,7 +213,8 @@ public class Lesson implements Serializable {
                                          LearningDesign ld, 
                                          LessonClass newLessonClass,
                                          Boolean learnerPresenceAvailable,
-                                         Boolean learnerImAvailable)
+                                         Boolean learnerImAvailable,
+                                         Boolean liveEditEnabled)
     {
         //setup new lesson
         return new Lesson(lessonName,
@@ -223,6 +228,7 @@ public class Lesson implements Serializable {
                           newLessonClass,//lesson class
                           organisation,
                           new HashSet(), //learner progress
+                          false,
                           false,
                           false);
     }
@@ -243,7 +249,8 @@ public class Lesson implements Serializable {
                                                      Boolean learnerExportAvailable,
                                                      LearningDesign ld,
                                                      Boolean learnerPresenceAvailable,
-                                                     Boolean learnerImAvailable)
+                                                     Boolean learnerImAvailable,
+                                                     Boolean liveEditEnabled)
     {
         return new Lesson(lessonName,
                           lessonDescription,
@@ -255,7 +262,8 @@ public class Lesson implements Serializable {
                           ld,
                           new HashSet(),
                           learnerPresenceAvailable,
-                          learnerImAvailable);
+                          learnerImAvailable,
+                          liveEditEnabled);
     }
     //---------------------------------------------------------------------
     // Getters and Setters
@@ -458,6 +466,18 @@ public class Lesson implements Serializable {
 		this.learnerImAvailable = learnerImAvailable;
 	}
 
+    /**
+     * @hibernate.property type="java.lang.Boolean"  column="live_edit_enabled"
+     *            	       length="1"
+     */
+ 	public Boolean getLiveEditEnabled() {
+		return liveEditEnabled;
+	}
+
+	public void setLiveEditEnabled(Boolean liveEditEnabled) {
+		this.liveEditEnabled = liveEditEnabled;
+	}
+	
 	/** 
      * @hibernate.property type="java.lang.Boolean"  column="locked_for_edit"
      *            	       length="1"

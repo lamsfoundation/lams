@@ -199,12 +199,22 @@ class WizardController extends AbstractController {
 	 *  
 	 */
 	
-	public function initializeLesson(resultDTO:Object){
+	public function initializeLesson(resultDTO:Object) {
+		var callback:Function;
 		_wizardModel.resultDTO = resultDTO;
-		var callback:Function = Proxy.create(this,saveLessonClass);
+		
+		if (resultDTO.learnerSelectMode == "learnerSelectIndiv") {
+			Debugger.log("Calling initializeLesson with indiv callback" ,Debugger.GEN,'initializeLesson','org.lamsfoundation.lams.MonitorController');
+			callback = Proxy.create(this, saveLessonClass);
+		}
+		else if (resultDTO.learnerSelectMode == "learnerSelectSplit") {
+			Debugger.log("Calling initializeLesson with split callback" ,Debugger.GEN,'initializeLesson','org.lamsfoundation.lams.MonitorController');
+			callback = Proxy.create(this, onCreateAndInitMultipleLessons);
+		}
+			
 		_wizardModel.getWizard().initializeLesson(resultDTO, callback);
 	}
-	
+
 	/**
 	 * Save Lesson Class after Lesson is initialized
 	 *  
@@ -212,12 +222,24 @@ class WizardController extends AbstractController {
 	 * @return  
 	 */
 	
-	public function saveLessonClass(r){
+	public function saveLessonClass(r) {
+		Debugger.log("Callback saveLessonClass called" ,Debugger.GEN,'saveLessonClass','org.lamsfoundation.lams.MonitorController');
 		if(r instanceof LFError) {
 			r.showMessageConfirm();
 		} else {
 			_wizardModel.lessonID = r;
 			_wizardModel.getWizard().createLessonClass();
+		}
+	}
+	
+	public function onCreateAndInitMultipleLessons(r) {
+		Debugger.log("Callback onCreateAndInitMultipleLessons called" + r,Debugger.GEN,'onCreateAndInitMultipleLessons','org.lamsfoundation.lams.MonitorController');
+		if(r instanceof LFError) {
+			r.showMessageConfirm();
+		} else {
+			_wizardModel.lessonIDs = r;
+			Debugger.log("lessonIDs " + _wizardModel.lessonIDs + _wizardModel.lessonIDs[0], Debugger.GEN,'onCreateAndInitMultipleLessons','org.lamsfoundation.lams.MonitorController');
+			_wizardModel.broadcastViewUpdate("SAVED_LC", _wizardModel.resultDTO.mode);
 		}
 	}
 	

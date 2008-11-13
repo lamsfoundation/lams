@@ -89,6 +89,13 @@ class Sequence {
     public var addEventListener:Function;
     public var removeEventListener:Function;
 	
+	// presence data
+	private var _learnerPresenceAvailable:Boolean;
+	private var _learnerImAvailable:Boolean;
+	
+	// live edit
+	private var _liveEditEnabled:Boolean;
+	
 	/**
 	* Constructor.
 	*/
@@ -126,7 +133,9 @@ class Sequence {
 		trace('populating seq object for start date:' + dto.scheduleStartDate);
 		Debugger.log('populating seq schedule date:'+dto.scheduleStartDate,Debugger.CRITICAL,'populateFromDTO','Sequence');
 		Debugger.log('populating seq start date:'+dto.startDateTime,Debugger.CRITICAL,'populateFromDTO','Sequence');
-		Debugger.log('populating seq locked for eidt:'+dto.lockedForEdit,Debugger.CRITICAL,'populateFromDTO','Sequence');
+		Debugger.log('populating seq locked for eidt:' + dto.lockedForEdit, Debugger.CRITICAL, 'populateFromDTO', 'Sequence');
+		Debugger.log('populating seq presence:' + dto.learnerPresenceAvailable + "/" + dto.learnerImAvailable, Debugger.CRITICAL, 'populateFromDTO', 'Sequence');
+		Debugger.log('populating seq liveEdit:'+dto.liveEditEnabled + "/" + dto.learnerImAvailable,Debugger.CRITICAL,'populateFromDTO','Sequence');
 		
 		_seqID = dto.lessonID;
 		_seqName = dto.lessonName;
@@ -158,6 +167,11 @@ class Sequence {
 		_learnerExportAvailable = dto.learnerExportAvailable;
 		
 		_locked_for_edit = dto.lockedForEdit;
+		
+		_learnerPresenceAvailable = dto.learnerPresenceAvailable;
+		_learnerImAvailable = dto.learnerImAvailable;
+		
+		_liveEditEnabled = dto.liveEditEnabled;
 	}
 	
 	
@@ -472,6 +486,30 @@ class Sequence {
 	
 	public function get learnerExportAvailable():Boolean {
 		return _learnerExportAvailable;
+	}
+	
+	public function set learnerPresenceAvailable(b:Boolean) {
+		_learnerPresenceAvailable = b;
+	}
+	
+	public function get learnerPresenceAvailable():Boolean {
+		return _learnerPresenceAvailable;
+	}
+	
+	public function set learnerImAvailable(b:Boolean) {
+		_learnerImAvailable = b;
+	}
+	
+	public function get learnerImAvailable():Boolean {
+		return _learnerImAvailable;
+	}
+	
+	public function set liveEditEnabled(b:Boolean) {
+		_liveEditEnabled = b;
+	}
+	
+	public function get liveEditEnabled():Boolean {
+		return _liveEditEnabled;
 	}
 	
 	public function set locked_for_edit(b:Boolean) {

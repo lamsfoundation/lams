@@ -51,13 +51,14 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
     private var resourceDesc_txa:TextArea;
 	
 	public static var SUMMERY_X:Number = 11;
-	public static var SUMMERY_Y:Number = 140;
+	public static var SUMMERY_Y:Number = 114;
 	public static var SUMMERY_W:Number = 500;
 	public static var SUMMERY_H:Number = 20;
 	public static var SUMMERY_OFFSET:Number = 2;
 	
 	private var schedule_cb:CheckBox;
 	private var learner_expp_cb:CheckBox;
+	private var learner_eliveedit_cb:CheckBox;
 	private var learner_enpres_cb:CheckBox;
 	private var learner_enim_cb:CheckBox;
 	private var start_btn:Button;
@@ -151,6 +152,14 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		schedule_time._visible = true;
 		scheduleDate_dt.visible = true;
 		
+		if (StringUtils.stringToBool(_root.editOnFly)) {
+			learner_eliveedit_cb.selected = true;
+			learner_eliveedit_cb.visible = true;
+		}
+		else {
+			learner_eliveedit_cb.selected = false;
+		}
+		
 		// check for NULL value
 		if(resourceDesc_txa.text == WizardView.STRING_NULL){
 			resourceDesc_txa.text = "";
@@ -198,6 +207,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		summery_scp.visible = false;
 		summery_lbl.visible = false;
 		learner_expp_cb.visible = false;
+		learner_eliveedit_cb.visible = false;
 		learner_enpres_cb.visible = false;
 		learner_enim_cb.visible = false;
 		schedule_cb.visible = false;
@@ -229,6 +239,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		_parent.resultDTO.enablePresence = learner_enpres_cb.selected;
 		_parent.resultDTO.enableIm = learner_enim_cb.selected;
 		_parent.resultDTO.learnerExpPortfolio = learner_expp_cb.selected;
+		_parent.resultDTO.enableLiveEdit = learner_eliveedit_cb.selected;
 		
 		return valid;
 	}
@@ -276,7 +287,12 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		summery_lbl = this['wizardSummery_lbl_staff'];
 			
 		// learners label
-		summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_learners', this.getNextHighestDepth(), {_x:SUMMERY_X+_parent.panel._x - this._x, _y:summery_lbl._y + summery_lbl._height+ SUMMERY_OFFSET, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_learners_lbl') + ' ' + String(_parent.resultDTO.selectedLearners.length) + '/' + _parent.resultDTO.learnersListTotal}));
+		if (_parent.resultDTO.learnerSelectMode == "learnerSelectIndiv") {
+			summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_learners', this.getNextHighestDepth(), {_x:SUMMERY_X+_parent.panel._x - this._x, _y:summery_lbl._y + summery_lbl._height+ SUMMERY_OFFSET, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_learners_lbl') + ' ' + String(_parent.resultDTO.selectedLearners.length) + '/' + _parent.resultDTO.learnersListTotal}));
+		}
+		else {
+			summery_lbl_arr.push(this.attachMovie('Label', 'wizardSummery_lbl_learners', this.getNextHighestDepth(), {_x:SUMMERY_X+_parent.panel._x - this._x, _y:summery_lbl._y + summery_lbl._height+ SUMMERY_OFFSET, _width: SUMMERY_W, _height: SUMMERY_H, styleName: _tm.getStyleObject('label'), text:Dictionary.getValue('summery_learners_lbl') + ' ' + Dictionary.getValue('wizard_splitLearners_splitSumShort', [String(_parent.resultDTO.learnersNbLessonsSplit), String(_parent.resultDTO.learnersNbLearnersSplit)])}));
+		}
 	}
 	
 	public function getScheduleDateTime(date:Date, timeStr:String):Object{

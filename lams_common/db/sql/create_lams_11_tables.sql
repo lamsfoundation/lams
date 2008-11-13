@@ -652,6 +652,7 @@ CREATE TABLE lams_lesson (
      , learner_exportport_avail TINYINT(1) DEFAULT 1
      , learner_presence_avail TINYINT(1) DEFAULT 0
      , learner_im_avail TINYINT(1) DEFAULT 0
+	 , live_edit_enabled TINYINT(1) DEFAULT 0
      , locked_for_edit TINYINT DEFAULT 0
      , version INTEGER DEFAULT 1
      , PRIMARY KEY (lesson_id)

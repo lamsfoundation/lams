@@ -69,12 +69,19 @@ class org.lamsfoundation.lams.wizard.steps.WizardSummaryView  extends AbstractVi
 	public function showConfirmMessage(mode:Number){
 		var msg:String = "";
 		var lessonName:String = "<b>" + _parent.resultDTO.resourceTitle +"</b>";
+		var nbLessons:String = "<b>" + _parent.resultDTO.learnersNbLessonsSplit +"</b>";
 		switch(mode){
 			case WizardView.FINISH_MODE : 
 				msg = Dictionary.getValue('confirmMsg_3_txt', [lessonName]);
 				break;
 			case WizardView.START_MODE :
-				msg = Dictionary.getValue('confirmMsg_1_txt', [lessonName]);
+				if (_parent.resultDTO.learnerSelectMode == "learnerSelectIndiv") {
+					Debugger.log("showConfirmMessage confirmMessage3 indiv", Debugger.MED, "showConfirmMessage", "WizardSummaryView");
+					msg = Dictionary.getValue('confirmMsg_1_txt', [lessonName]);
+				}
+				else {
+					msg = Dictionary.getValue('confirmMsg_4_txt', [nbLessons, lessonName]);
+				}
 				break;
 			case WizardView.START_SCH_MODE :
 				msg = Dictionary.getValue('confirmMsg_2_txt', [lessonName, unescape(_parent.resultDTO.scheduleDateTime)]);

@@ -57,6 +57,9 @@ public class LessonDetailsDTO {
 	private Integer numberStartedLearners;
 	private Boolean learnerExportAvailable;
 	private Boolean locked_for_edit;
+	private Boolean learnerPresenceAvailable;
+	private Boolean learnerImAvailable;
+	private Boolean liveEditEnabled;
 	
 	/** Create the DTO based on the lesson. Sets up all the fields except numberStartedLearners */
 	public LessonDetailsDTO(Lesson lesson){
@@ -114,6 +117,11 @@ public class LessonDetailsDTO {
 		this.numberStartedLearners = new Integer(0);
 	
 		this.learnerExportAvailable = lesson.getLearnerExportAvailable();
+		
+		this.learnerPresenceAvailable = lesson.getLearnerPresenceAvailable();
+		this.learnerImAvailable = lesson.getLearnerImAvailable();
+		
+		this.liveEditEnabled = lesson.getLiveEditEnabled();
 		
 		this.locked_for_edit = lesson.getLockedForEdit();
 	}	
@@ -236,7 +244,16 @@ public class LessonDetailsDTO {
 	public Boolean getLearnerExportAvailable() {
 		return learnerExportAvailable;
 	}
+	public Boolean getLearnerPresenceAvailable() {
+		return learnerPresenceAvailable;
+	}
+	public Boolean getLearnerImAvailable() {
+		return learnerImAvailable;
+	}
 	public Boolean getLockedForEdit() {
 		return locked_for_edit;
+	}
+	public Boolean getLiveEditEnabled() {
+		return liveEditEnabled;
 	}
 }

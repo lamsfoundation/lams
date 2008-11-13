@@ -647,11 +647,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	 * @param   designID         
 	 * @param   orgID            
 	 * @param   lExportPortfolio 
+	 * @param   enablePresence
+	 * @param   enableIm
+	 * @param   enableLiveEdit
 	 * 
 	 * @return  data obj
 	 */
 	
-	public static function getDataForInitializing(title:String, description:String, designID:Number, orgID:Number, lExportPortfolio:Boolean, enablePresence:Boolean, enableIm:Boolean):Object{
+	public static function getDataForInitializing(title:String, description:String, designID:Number, orgID:Number, lExportPortfolio:Boolean, enablePresence:Boolean, enableIm:Boolean, enableLiveEdit:Boolean, numberLearnersSplit:Number, numberLessonsSplit:Number, learners:Hashtable, learnerGroupName:String, staff:Hashtable):Object{
 		var data:Object = new Object();
 	
 		if(title) { data.lessonName = title; }
@@ -661,14 +664,35 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(orgID) { data.organisationID = orgID; } 
 		else { data.organisationID = Config.NUMERIC_NULL_VALUE; }
 		
-		if(lExportPortfolio != null) { data.learnerExportPortfolio = lExportPortfolio }
-		else { data.learnerExportPortfolio = false }
+		if (lExportPortfolio != null) { data.learnerExportPortfolio = lExportPortfolio; }
+		else { data.learnerExportPortfolio = false; }
 		
-		if(enablePresence != null) { data.enablePresence = enablePresence }
-		else { data.enablePresence = false }
+		if (enablePresence != null) { data.enablePresence = enablePresence; }
+		else { data.enablePresence = false; }
 		
-		if(enableIm != null) { data.enableIm = enableIm }
-		else { data.enableIm = false }
+		if (enableIm != null) { data.enableIm = enableIm; }
+		else { data.enableIm = false; }
+
+		if (enableLiveEdit != null) { data.enableLiveEdit = enableLiveEdit; }
+		else { data.enableLiveEdit = false; }
+		
+		if (enableLiveEdit != null) { data.enableLiveEdit = enableLiveEdit; }
+		else { data.enableLiveEdit = false; }
+
+		if (numberLearnersSplit != null) { data.numberLearnersSplit = numberLearnersSplit; }
+		else { data.numberLearnersSplit = Config.NUMERIC_NULL_VALUE; }
+		
+		if (numberLessonsSplit != null) { data.numberLessonsSplit = numberLessonsSplit; }
+		else { data.numberLessonsSplit = Config.NUMERIC_NULL_VALUE; }	
+		
+		if (learners != null) { data.learners = learners; }
+		else { data.learners = null; }
+		
+		if (learnerGroupName != null) { data.learnerGroupName = learnerGroupName; }
+		else { data.learnerGroupName = ""; }	
+		
+		if (staff != null) { data.staff = staff; }
+		else { data.staff = null; }
 		
 		data.copyType = COPY_TYPE_ID_RUN;
 		
