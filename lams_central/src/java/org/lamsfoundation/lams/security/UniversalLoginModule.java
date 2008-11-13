@@ -63,6 +63,9 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -95,16 +98,25 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 
 			try {
 				String username = getUsername();
+				log.debug("===> authenticating user: " + username);
+				
 				WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
 				UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
 				User user = service.getUserByLogin(username);
-
-				log.debug("===> authenticating user: " + username);
+				
 				// LDAP user provisioning
 				if (user == null) {
 					// provision a new user by checking ldap server
 					if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_PROVISIONING_ENABLED)) {
-						LdapService ldapService = (LdapService) ctx.getBean("ldapService");
+					    	LdapService ldapService;
+						try {
+						    ldapService = (LdapService) ctx.getBean("ldapService");
+						} catch (NoSuchBeanDefinitionException e) {
+						    // LDEV-1937
+						    log.error("NoSuchBeanDefinitionException while getting ldapService bean, will try another method...", e);
+						    ApplicationContext context = new ClassPathXmlApplicationContext("org/lamsfoundation/lams/usermanagement/ldapContext.xml");
+						    ldapService = (LdapService) context.getBean("ldapService");
+						}
 						log.debug("===> LDAP provisioning is enabled, checking username against LDAP server...");
 						LDAPAuthenticator ldap = new LDAPAuthenticator();
 						isValid = ldap.authenticate(username, inputPassword);
