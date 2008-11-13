@@ -18,49 +18,49 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */
-
-/* $Id$ */
-package org.lamsfoundation.lams.tool.imageGallery.model;
+ */  
+ 
+/* $Id$ */  
+package org.lamsfoundation.lams.tool.imageGallery.model;  
 
 import java.util.Date;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-
+ 
 /**
- * ImageComment
+ * ImageRating
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laimag10_image_comment"
+ * @hibernate.class table="tl_laimag10_image_rating"
  */
-public class ImageComment implements Cloneable {
+public class ImageRating implements Cloneable {
 
-    private static final Logger log = Logger.getLogger(ImageComment.class);
+    private static final Logger log = Logger.getLogger(ImageRating.class);
 
     private Long uid;
-    private String comment;
+    private int rating;
     private ImageGalleryUser createBy;
-    private Date createDate;
+    private ImageGalleryItem imageGalleryItem;
 
     // **********************************************************
-    // Function method for TaskListItemComment
+    // Function method for ImageRating
     // **********************************************************
 
     public Object clone() {
-	ImageComment imageComment = null;
+	ImageRating imageComment = null;
 	try {
-	    imageComment = (ImageComment) super.clone();
-	    ((ImageComment) imageComment).setUid(null);
+	    imageComment = (ImageRating) super.clone();
+	    ((ImageRating) imageComment).setUid(null);
 
 	    // clone ImageGalleryUser as well
 	    if (this.createBy != null) {
 		imageComment.setCreateBy((ImageGalleryUser) this.createBy.clone());
 	    }
 	} catch (CloneNotSupportedException e) {
-	    log.error("When clone " + ImageComment.class + " failed");
+	    log.error("When clone " + ImageRating.class + " failed");
 	}
 
 	return imageComment;
@@ -69,17 +69,17 @@ public class ImageComment implements Cloneable {
     public boolean equals(Object o) {
 	if (this == o)
 	    return true;
-	if (!(o instanceof ImageComment))
+	if (!(o instanceof ImageRating))
 	    return false;
 
-	final ImageComment genericEntity = (ImageComment) o;
+	final ImageRating genericEntity = (ImageRating) o;
 
-	return new EqualsBuilder().append(this.uid, genericEntity.uid).append(this.comment, genericEntity.comment)
+	return new EqualsBuilder().append(this.uid, genericEntity.uid).append(this.rating, genericEntity.rating)
 		.append(this.createBy, genericEntity.createBy).isEquals();
     }
 
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(comment).append(createBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(rating).append(createBy).toHashCode();
     }
 
     // **********************************************************
@@ -96,18 +96,6 @@ public class ImageComment implements Cloneable {
 
     public void setUid(Long uid) {
 	this.uid = uid;
-    }    
-
-    /**
-     * @hibernate.property column="create_date"
-     * @return
-     */
-    public Date getCreateDate() {
-	return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-	this.createDate = createDate;
     }
 
     /**
@@ -123,14 +111,29 @@ public class ImageComment implements Cloneable {
     }
 
     /**
-     * @hibernate.property column="comment" type="text"
+     * @hibernate.property column="rating"
      * @return
      */
-    public String getComment() {
-	return comment;
+    public int getRating() {
+	return rating;
     }
 
-    public void setComment(String comment) {
-	this.comment = comment;
+    public void setRating(int rating) {
+	this.rating = rating;
     }
+    
+    /**
+     * @hibernate.many-to-one column="imageGallery_item_uid" cascade="none"
+     * @return
+     */
+    public ImageGalleryItem getImageGalleryItem() {
+	return imageGalleryItem;
+    }
+
+    public void setImageGalleryItem(ImageGalleryItem item) {
+	this.imageGalleryItem = item;
+    }    
+    
 }
+
+ 

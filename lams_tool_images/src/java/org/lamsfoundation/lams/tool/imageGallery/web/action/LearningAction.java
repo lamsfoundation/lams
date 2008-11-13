@@ -59,12 +59,14 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageCommentComparator;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageCommentForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
+import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageRatingForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -107,12 +109,18 @@ public class LearningAction extends Action {
 	}
 	
 	// ================ Comments =======================	
-	if (param.equals("showComments")) {
-	    return showComments(mapping, form, request, response);
+	if (param.equals("loadImageData")) {
+	    return loadImageData(mapping, form, request, response);
 	}	
 	if (param.equals("addNewComment")) {
 	    return addNewComment(mapping, form, request, response);
 	}	
+ 	if (param.equals("saveOrUpdateRating")) {
+	    return saveOrUpdateRating(mapping, form, request, response);
+	} 
+ 	if (param.equals("vote")) {
+	    return vote(mapping, form, request, response);
+	}  	
 
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
@@ -389,9 +397,8 @@ public class LearningAction extends Action {
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
     
-    
     /**
-     * Move down current item.
+     * Sets Image data to session variable, to be shown on main learning page.
      * 
      * @param mapping
      * @param form
@@ -399,18 +406,36 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward showComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward loadImageData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
+	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
+	IImageGalleryService service = getImageGalleryService();
+	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);	
+	
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
-	ImageGalleryItem image = getImageGalleryService().getImageGalleryItemByUid(imageUid);
-	TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
-	comments.addAll(image.getComments());
-	sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
+	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
 	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, image);
+	
+	if (imageGallery.isAllowCommentImages()) {
+	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
+	    comments.addAll(image.getComments());
+	    sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
+	}
+
+	if (imageGallery.isAllowRank()) {
+	    UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	    ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
+	    ImageRating imageRating = service.getImageRatingByImageAndUser(imageUid, imageGalleryUser.getUserId());
+	    int rating = (imageRating == null) ? 0 : imageRating.getRating();
+	    sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_RATING, rating);	    
+	}
+
+	if (imageGallery.isAllowVote()) {
+	    sessionMap.put(ImageGalleryConstants.PARAM_VOTED_IMAGE_UID, imageGallery.getVotedImageUid());	    
+	}
 	
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
@@ -429,24 +454,15 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	
-
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
-
-	String commentMessage = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_COMMENT);
-	if(commentMessage == null || StringUtils.isBlank(commentMessage))
-		return mapping.findForward(ImageGalleryConstants.SUCCESS);
+	String commentMessage = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_COMMENT, true);
 	
-	//TODO fix error system
-//	ActionErrors errors = validateImageGalleryItem(itemForm);
-//	if (!errors.isEmpty()) {
-//	    ActionErrors errors = new ActionErrors();
-//	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_FILE_BLANK));
-//	    
-//	    this.addErrors(request, errors);
-//	    return mapping.findForward("file");
-//	}
-	
+	if (StringUtils.isBlank(commentMessage)) {
+	    ActionErrors errors = new ActionErrors();
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_COMMENT_BLANK));
+	    this.addErrors(request, errors);
+	    return mapping.findForward(ImageGalleryConstants.SUCCESS);
+	}
 	
 	ImageComment comment = new ImageComment();
 	comment.setComment(commentMessage);
@@ -463,19 +479,99 @@ public class LearningAction extends Action {
 	dbComments.add(comment);
 	service.saveOrUpdateImageGalleryItem(dbItem);
 			
-//	//to make available new changes be visible in jsp page
-//	sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM, dbItem);
-	
+	//to make available new changes be visible in jsp page
 	TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
 	comments.addAll(dbItem.getComments());
 	sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
 	
-//	form.reset(mapping, request);
+	form.reset(mapping, request);
 	
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
-   
+    
+    /**
+     * Move down current item.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward saveOrUpdateRating(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
+	IImageGalleryService service = getImageGalleryService();
+
+	int rating = NumberUtils.stringToInt(((ImageRatingForm)form).getRating());
+	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
+	ImageRating imageRating = service.getImageRatingByImageAndUser(imageUid, imageGalleryUser.getUserId());
+
+	//persist ImageGalleryItem changes in DB
+	ImageGalleryItem dbImage = service.getImageGalleryItemByUid(imageUid);	
+	int numberRatings;
+	float summary;
+	if (imageRating == null) {
+	    summary = dbImage.getAverageRating()*dbImage.getNumberRatings() + rating;
+	    numberRatings = dbImage.getNumberRatings() + 1;
+	} else {
+	    summary = dbImage.getAverageRating()*dbImage.getNumberRatings() + rating - imageRating.getRating();
+	    numberRatings = dbImage.getNumberRatings();
+	}
+	float newAverageRating = summary / numberRatings;
+	
+	dbImage.setNumberRatings(numberRatings);
+	dbImage.setAverageRating(newAverageRating);
+	service.saveOrUpdateImageGalleryItem(dbImage);	
+	
+	if (imageRating == null) { // add
+	    imageRating = new ImageRating();
+	    imageRating.setCreateBy(imageGalleryUser);
+	    imageRating.setImageGalleryItem(dbImage);
+	}
+	imageRating.setRating(rating);
+	service.saveOrUpdateImageRating(imageRating);
+	
+	//to make available new changes be visible in jsp page
+	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, dbImage);
+	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_RATING, rating);
+	
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }   
+    
+    /**
+     * Move down current item.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward vote(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
+	IImageGalleryService service = getImageGalleryService();
+	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
+
+	//persist ImageGalleryItem changes in DB
+	boolean vote = (((ImageRatingForm)form).getVote());
+	Long votedImageUid = vote ? imageUid : 0;
+	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);	
+	imageGallery.setVotedImageUid(votedImageUid);
+	service.saveOrUpdateImageGallery(imageGallery);	
+	
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }    
 
     /**
      * Display empty reflection form.

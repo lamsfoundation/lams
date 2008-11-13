@@ -23,70 +23,50 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.imageGallery.web.form;  
 
-import java.util.Set;
-import java.util.TreeSet;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageCommentComparator;
  
 /**
- * ImageComment Form.
+ * Image star rating Form.
  * 
- * @struts.form name="imageCommentForm"
+ * @struts.form name="imageRatingForm"
  * @author Andrey Balan
  */
-public class ImageCommentForm extends ActionForm {
+public class ImageRatingForm extends ActionForm {
 
-    private static final long serialVersionUID = 4594113811270724745L;
+    private static final long serialVersionUID = -8962161058929959289L;
+
+    private String sessionMapID;    
+    private String rating;
+    private boolean vote;
     
-    private ImageGalleryItem image;
-    private String sessionMapID;
-    private String comment;
-    
-    public void reset(ActionMapping mapping, HttpServletRequest request){
-	comment = "";
-    }
-
-    /**
-     * Returns ImageGallery order index.
-     * 
-     * @return ImageGallery order index
-     */
-    public ImageGalleryItem getImage() {
-	return image;
-    }
-
-    /**
-     * Sets ImageGallery order index.
-     * 
-     * @param imageUid
-     *                ImageGallery order index
-     */
-    public void setImage(ImageGalleryItem image) {
-	this.image = image;
-    }
-
     public String getSessionMapID() {
 	return sessionMapID;
     }
 
     public void setSessionMapID(String sessionMapID) {
 	this.sessionMapID = sessionMapID;
+    }     
+    
+    public String getRating() {
+	return rating;
     }
 
-    public String getComment() {
-	return comment;
+    public void setRating(String rating) {
+	this.rating = rating;
+    }
+    
+    public boolean getVote() {
+	return vote;
     }
 
-    public void setComment(String comment) {
-	this.comment = comment;
+    public void setVote(boolean vote) {
+	this.vote = vote;
     }
 }
+
 
  

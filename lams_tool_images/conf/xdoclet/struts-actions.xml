@@ -177,9 +177,9 @@
 			<forward name="success" path="/pages/learning/success.jsp" />
 		</action>
 		
-		<action path="/learning/showComments"
+		<action path="/learning/loadImageData"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
-			parameter="showComments">
+			parameter="loadImageData">
 			<forward name="success" path="/pages/learning/parts/commentsarea.jsp" />
 		</action>
 		<action path="/learning/addNewComment"
@@ -189,8 +189,23 @@
 			scope="request" 
 			validate="false">			
 			<forward name="success" path="/pages/learning/parts/commentsarea.jsp" />
-		</action>			
-		
+		</action>
+		<action path="/learning/saveOrUpdateRating"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
+			parameter="saveOrUpdateRating"
+			name="imageRatingForm" 
+			scope="request" 
+			validate="false">			
+			<forward name="success" path="/pages/learning/parts/commentsarea.jsp" />
+		</action>
+		<action path="/learning/vote"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
+			parameter="vote"
+			name="imageRatingForm" 
+			scope="request" 
+			validate="false">			
+			<forward name="success" path="/pages/learning/parts/commentsarea.jsp" />
+		</action>						
 		
 		<action path="/learning/newReflection"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"

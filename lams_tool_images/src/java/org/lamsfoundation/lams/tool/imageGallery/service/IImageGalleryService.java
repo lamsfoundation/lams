@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 
 /**
  * @author Dapeng.Ni
@@ -46,14 +47,6 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
  * Interface that defines the contract that all ShareImageGallery service provider must follow.
  */
 public interface IImageGalleryService {
-
-    /**
-     * Get <code>ImageGallery</code> by toolContentID.
-     * 
-     * @param contentId
-     * @return
-     */
-    ImageGallery getImageGalleryByContentId(Long contentId);
 
     /**
      * Get a cloned copy of tool default tool content (ImageGallery) and assign the toolContentId of that copy as the
@@ -159,6 +152,16 @@ public interface IImageGalleryService {
      * @return
      */
     void saveOrUpdateImageGalleryItem(ImageGalleryItem item);
+    
+    /**
+     * Save/update ImageRating.
+     * 
+     * @param rating
+     *            ImageRating
+     * @return
+     */
+    void saveOrUpdateImageRating(ImageRating rating);
+    
 
     /**
      * Get imageGallery which is relative with the special toolSession.
@@ -175,6 +178,23 @@ public interface IImageGalleryService {
      * @return
      */
     ImageGallerySession getImageGallerySessionBySessionId(Long sessionId);
+    
+    /**
+     * Get <code>ImageGallery</code> by toolContentID.
+     * 
+     * @param contentId
+     * @return
+     */
+    ImageGallery getImageGalleryByContentId(Long contentId);
+    
+    /**
+     * Returns imageRating by the given imageUid and userId
+     * 
+     * @param imageUid
+     * @param userId
+     * @return
+     */
+    ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId);
 
     /**
      * Save or update imageGallery session.

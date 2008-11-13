@@ -69,7 +69,11 @@ public class ImageGalleryItem implements Cloneable {
     private String fileType;
     
     //Set of user comments
-    private Set comments;    
+    private Set comments;
+    
+    private float averageRating;
+    
+    private int numberRatings;
 
     // ***********************************************
     // DTO fields:
@@ -95,7 +99,7 @@ public class ImageGalleryItem implements Cloneable {
 		image.setCreateBy((ImageGalleryUser) this.createBy.clone());
 	    }
 
-	    // clone set of taskListItemsComment
+	    // clone set of ImageComment
 	    if (comments != null) {
 		Iterator iter = comments.iterator();
 		Set set = new HashSet();
@@ -106,7 +110,7 @@ public class ImageGalleryItem implements Cloneable {
 		    set.add(newComment);
 		}
 		image.comments = set;
-	    }	    
+	    }	
 
 	} catch (CloneNotSupportedException e) {
 	    ImageGalleryItem.log.error("When clone " + ImageGalleryItem.class + " failed");
@@ -323,5 +327,46 @@ public class ImageGalleryItem implements Cloneable {
     public void setComments(Set comments) {
 	this.comments = comments;
     }
+    
+    /**
+     * Returns image average rating.
+     * 
+     * @return image average rating
+     * 
+     * @hibernate.property column="average_rating"
+     */
+    public float getAverageRating() {
+	return averageRating;
+    }
 
+    /**
+     * Sets image average rating.
+     * 
+     * @param averageRating
+     *                image average rating
+     */
+    public void setAverageRating(float averageRating) {
+	this.averageRating = averageRating;
+    }
+    
+    /**
+     * Returns image sequence number.
+     * 
+     * @return image sequence number
+     * 
+     * @hibernate.property column="number_ratings"
+     */
+    public int getNumberRatings() {
+	return numberRatings;
+    }
+
+    /**
+     * Sets image number of rates.
+     * 
+     * @param numberRates
+     *                image number of rates
+     */
+    public void setNumberRatings(int numberRatings) {
+	this.numberRatings = numberRatings;
+    }
 }

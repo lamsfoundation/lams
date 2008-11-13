@@ -90,6 +90,7 @@ import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemVisitDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGallerySessionDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryUserDAO;
+import org.lamsfoundation.lams.tool.imageGallery.dao.ImageRatingDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
@@ -99,9 +100,11 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItemVisitLog;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 import org.lamsfoundation.lams.tool.imageGallery.util.CircularByteBuffer;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler;
 import org.lamsfoundation.lams.tool.imageGallery.util.ReflectDTOComparator;
+import org.lamsfoundation.lams.tool.imageGallery.util.ResizePictureUtil;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -123,9 +126,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ImageGalleryDAO imageGalleryDao;
 
     private ImageGalleryItemDAO imageGalleryItemDao;
-    
+
     private ImageCommentDAO imageCommentDao;
-    
+
+    private ImageRatingDAO imageRatingDao;
+
     private ImageGalleryAttachmentDAO imageGalleryAttachmentDao;
 
     private ImageGalleryUserDAO imageGalleryUserDao;
@@ -133,7 +138,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ImageGallerySessionDAO imageGallerySessionDao;
 
     private ImageGalleryItemVisitDAO imageGalleryItemVisitDao;
-    
+
     private ImageGalleryConfigItemDAO imageGalleryConfigItemDAO;
 
     // tool service
@@ -157,7 +162,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
-    
+
     // *******************************************************************************
     // Service method
     // *******************************************************************************
@@ -245,7 +250,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	// save default content by given ID.
 	ImageGallery content = new ImageGallery();
 	content = ImageGallery.newInstance(defaultContent, contentId, imageGalleryToolContentHandler);
-//	content.setNextImageTitle(new Long(1));
+	// content.setNextImageTitle(new Long(1));
 	return content;
     }
 
@@ -305,8 +310,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     }
 
-    public void saveOrUpdateImageGalleryItem(ImageGalleryItem item) {
-	imageGalleryItemDao.saveObject(item);
+    public void saveOrUpdateImageGalleryItem(ImageGalleryItem image) {
+	imageGalleryItemDao.saveObject(image);
+    }
+
+    public void saveOrUpdateImageRating(ImageRating rating) {
+	imageRatingDao.saveObject(rating);
     }
 
     public void deleteImageGalleryItem(Long uid) {
@@ -328,6 +337,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	items.addAll(session.getImageGalleryItems());
 
 	return items;
+    }
+
+    public ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId) {
+	return imageRatingDao.getImageRatingByImageAndUser(imageUid, userId);
     }
 
     public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
@@ -649,32 +662,49 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return contentId;
     }
 
-    public void uploadImageGalleryItemFile(ImageGalleryItem image, FormFile file) throws UploadImageGalleryFileException {
+    public void uploadImageGalleryItemFile(ImageGalleryItem image, FormFile file)
+	    throws UploadImageGalleryFileException {
+	try {
+	    // upload file
+	    NodeKey nodeKey = uploadFormFile(file, IToolContentHandler.TYPE_ONLINE);
+	    image.setFileName(file.getFileName());
+	    image.setFileType(file.getContentType());
+	    image.setFileVersionId(nodeKey.getVersion());
+	    image.setOriginalFileUuid(nodeKey.getUuid());
 
-	// upload file
-	NodeKey nodeKey = uploadFormFile(file, IToolContentHandler.TYPE_ONLINE);
-	image.setFileName(file.getFileName());
-	image.setFileType(file.getContentType());
-	image.setFileVersionId(nodeKey.getVersion());
-	image.setOriginalFileUuid(nodeKey.getUuid());
+	    String fileName = file.getFileName();
+	    
+	    ImageGalleryConfigItem mediumImageDimensionsKey = getConfigItem(ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
+	    int mediumImageDimensions = Integer.parseInt(mediumImageDimensionsKey.getConfigValue());
 
-	ImageGalleryConfigItem mediumImageDimensionsKey = getConfigItem(ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
-	int mediumImageDimensions = 640;
-	if (mediumImageDimensionsKey != null && mediumImageDimensionsKey.getConfigValue() != null) {
-	    mediumImageDimensions = Integer.parseInt(mediumImageDimensionsKey.getConfigValue());
+	    // Read the original image from the repository
+	    InputStream originalIS = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
+	    InputStream mediumIS = ResizePictureUtil.resizePicture(originalIS, mediumImageDimensions);
+	    String mediumFileName = "medium_" + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
+	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName,
+		    file.getContentType(), IToolContentHandler.TYPE_ONLINE);
+	    image.setMediumFileUuid(mediumNodeKey.getUuid());
+	    
+	    ImageGalleryConfigItem thumbnailImageDimensionsKey = getConfigItem(ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
+	    int thumbnailImageDimensions = Integer.parseInt(thumbnailImageDimensionsKey.getConfigValue());
+
+	    // Read the original image from the repository
+	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileNode(mediumNodeKey.getUuid()).getFile();
+	    InputStream thumbnailIS = ResizePictureUtil.resizePicture(mediumIS2, thumbnailImageDimensions);
+	    String thumbnailFileName = "thumbnail_" + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
+	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName,
+		    file.getContentType(), IToolContentHandler.TYPE_ONLINE);
+	    image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
+	    
+	} catch (RepositoryCheckedException e) {
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.repository.checked.exception") + ":" + e.toString());
+	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.repository.checked.exception"));
+	} catch (NumberFormatException e) {
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.number.format.exception") + ":"  + e.toString());
+	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.number.format.exception"));
 	}
-	NodeKey mediumNodeKey = createScaledImage(nodeKey, "medium_" + file.getFileName(), file.getContentType(), mediumImageDimensions);
-	image.setMediumFileUuid(mediumNodeKey.getUuid());
-
-	ImageGalleryConfigItem thumbnailImageDimensionsKey = getConfigItem(ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
-	int thumbnailImageDimensions = 80;
-	if (thumbnailImageDimensionsKey != null && thumbnailImageDimensionsKey.getConfigValue() != null) {
-	    thumbnailImageDimensions = Integer.parseInt(thumbnailImageDimensionsKey.getConfigValue());
-	}
-	NodeKey thumbnailNodeKey = createScaledImage(mediumNodeKey, "thumbnail_" + file.getFileName(), file.getContentType(), thumbnailImageDimensions);
-	image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
     }
-    
+
     /**
      * Process an uploaded file.
      * 
@@ -704,144 +734,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.io.exception"));
 	}
 	return node;
-    }    
-    
-    /**
-     * Reads an image in a file and creates a thumbnail in another file.
-     * 
-     * @param orig
-     *                The name of image file.
-     * @param thumb
-     *                The name of thumbnail file. Will be created if necessary.
-     * @param maxDim
-     *                The width and height of the thumbnail must be maxDim pixels or less.
-     * @throws UploadImageGalleryFileException 
-     */
-    /**
-     * Reads an image in a file and creates a thumbnail in another file. largestDimension is the largest dimension of
-     * the thumbnail, the other dimension is scaled accordingly. Utilises weighted stepping method to gradually reduce
-     * the image size for better results, i.e. larger steps to start with then smaller steps to finish with. Note:
-     * always writes a JPEG because GIF is protected or something - so always make your outFilename end in 'jpg' PNG's
-     * with transparency are given white backgrounds
-     */
-    private NodeKey createScaledImage(NodeKey nodeKey, String fileName, String contentType, int largestDimension)
-	    throws UploadImageGalleryFileException {
-	NodeKey scaledNodeKey = null;
-	try {
-	    double scale;
-	    int sizeDifference, originalImageLargestDim;
-
-	    // Read the original image from the repository
-	    InputStream is = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
-	    BufferedImage inImage = ImageIO.read(is);
-
-	    // find biggest dimension
-	    if (inImage.getWidth(null) > inImage.getHeight(null)) {
-		scale = (double) largestDimension / (double) inImage.getWidth(null);
-		sizeDifference = inImage.getWidth(null) - largestDimension;
-		originalImageLargestDim = inImage.getWidth(null);
-	    } else {
-		scale = (double) largestDimension / (double) inImage.getHeight(null);
-		sizeDifference = inImage.getHeight(null) - largestDimension;
-		originalImageLargestDim = inImage.getHeight(null);
-	    }
-	    // create an image buffer to draw to
-	    BufferedImage outImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB); // arbitrary init so
-	    // code compiles
-	    Graphics2D g2d;
-	    AffineTransform tx;
-	    if (scale < 1.0d) // only scale if desired size is smaller than original
-	    {
-		int numSteps = ((sizeDifference / 200) != 0) ? (sizeDifference / 200) : 1;
-		int stepSize = sizeDifference / numSteps;
-		int stepWeight = stepSize / 2;
-		int heavierStepSize = stepSize + stepWeight;
-		int lighterStepSize = stepSize - stepWeight;
-		int currentStepSize, centerStep;
-		double scaledW = inImage.getWidth(null);
-		double scaledH = inImage.getHeight(null);
-		if (numSteps % 2 == 1) {
-		    centerStep = (int) Math.ceil(numSteps / 2d); // find the center step
-		} else {
-		    centerStep = -1; // set it to -1 so it's ignored later
-		}
-		Integer intermediateSize = originalImageLargestDim, previousIntermediateSize = originalImageLargestDim;
-		Integer calculatedDim;
-		for (Integer i = 0; i < numSteps; i++) {
-		    if (i + 1 != centerStep) // if this isn't the center step
-		    {
-			if (i == numSteps - 1) // if this is the last step
-			{
-			    // fix the stepsize to account for decimal place errors previously
-			    currentStepSize = previousIntermediateSize - largestDimension;
-			} else {
-			    if (numSteps - i > numSteps / 2) {
-				currentStepSize = heavierStepSize;
-			    } else {
-				currentStepSize = lighterStepSize;
-			    }
-			}
-		    } else // center step, use natural step size
-		    {
-			currentStepSize = stepSize;
-		    }
-		    intermediateSize = previousIntermediateSize - currentStepSize;
-		    scale = (double) intermediateSize / (double) previousIntermediateSize;
-		    scaledW = (int) scaledW * scale;
-		    scaledH = (int) scaledH * scale;
-		    outImage = new BufferedImage((int) scaledW, (int) scaledH, BufferedImage.TYPE_INT_RGB);
-		    g2d = outImage.createGraphics();
-		    g2d.setBackground(Color.WHITE);
-		    g2d.clearRect(0, 0, outImage.getWidth(), outImage.getHeight());
-		    g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-
-		    tx = new AffineTransform();
-		    tx.scale(scale, scale);
-		    g2d.drawImage(inImage, tx, null);
-		    g2d.dispose();
-		    inImage = outImage;
-		    previousIntermediateSize = intermediateSize;
-		}
-	    } else {
-		// just copy the original
-		outImage = new BufferedImage(inImage.getWidth(null), inImage.getHeight(null),
-			BufferedImage.TYPE_INT_RGB);
-		g2d = outImage.createGraphics();
-		g2d.setBackground(Color.WHITE);
-		g2d.clearRect(0, 0, outImage.getWidth(), outImage.getHeight());
-		tx = new AffineTransform();
-		tx.setToIdentity(); // use identity matrix so image is copied exactly
-		g2d.drawImage(inImage, tx, null);
-		g2d.dispose();
-	    }
-
-	    // buffer all data in a circular buffer of infinite size
-	    CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
-	    ImageIO.write(outImage, "JPG", cbb.getOutputStream());
-	    cbb.getOutputStream().close();
-
-	    scaledNodeKey = imageGalleryToolContentHandler.uploadFile(cbb.getInputStream(), fileName, contentType,
-		    IToolContentHandler.TYPE_ONLINE);
-
-	} catch (FileException e) {
-	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.file.exception") + ":"
-		    + e.toString());
-	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.file.exception"));
-	} catch (ItemNotFoundException e) {
-	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.item.not.found.exception") + ":"
-		    + e.toString());
-	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.item.not.found.exception"));
-	} catch (RepositoryCheckedException e) {
-	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.repository.checked.exception") + ":"
-		    + e.toString());
-	    throw new UploadImageGalleryFileException(messageService
-		    .getMessage("error.msg.repository.checked.exception"));
-	} catch (IOException e) {
-	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
-	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.io.exception"));
-	}
-	return scaledNodeKey;
     }
 
     // *****************************************************************************
@@ -878,7 +770,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void setImageCommentDao(ImageCommentDAO imageCommentDao) {
 	this.imageCommentDao = imageCommentDao;
     }
-    
+
+    public void setImageRatingDao(ImageRatingDAO imageRatingDao) {
+	this.imageRatingDao = imageRatingDao;
+    }
 
     public void setImageGallerySessionDao(ImageGallerySessionDAO imageGallerySessionDao) {
 	this.imageGallerySessionDao = imageGallerySessionDao;
@@ -903,14 +798,14 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void setImageGalleryItemVisitDao(ImageGalleryItemVisitDAO imageGalleryItemVisitDao) {
 	this.imageGalleryItemVisitDao = imageGalleryItemVisitDao;
     }
-    
+
     public ImageGalleryConfigItemDAO getImageGalleryConfigItemDAO() {
 	return imageGalleryConfigItemDAO;
     }
 
     public void setImageGalleryConfigItemDAO(ImageGalleryConfigItemDAO imageGalleryConfigItemDAO) {
 	this.imageGalleryConfigItemDAO = imageGalleryConfigItemDAO;
-    }    
+    }
 
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods
@@ -1132,7 +1027,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     /**
      * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
      */
-    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {}
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
+    }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
@@ -1192,6 +1088,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     public void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item) {
 	imageGalleryConfigItemDAO.saveOrUpdate(item);
-    }    
+    }
 
 }

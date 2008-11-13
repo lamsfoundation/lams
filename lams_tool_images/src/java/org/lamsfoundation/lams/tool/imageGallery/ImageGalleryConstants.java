@@ -63,6 +63,10 @@ public class ImageGalleryConstants {
     public static final String PARAM_COMMENTS = "comments";
     
     public static final String PARAM_CURRENT_IMAGE = "currentImage";
+    
+    public static final String PARAM_CURRENT_RATING = "currentRating";
+    
+    public static final String PARAM_VOTED_IMAGE_UID = "votedImageUid";
 
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
@@ -125,7 +129,9 @@ public class ImageGalleryConstants {
     public static final String ERROR_MSG_DESC_BLANK = "error.resource.item.desc.blank";
 
     public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
-
+    
+    public static final String ERROR_MSG_COMMENT_BLANK = "error.resource.image.comment.blank";
+    
     public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
 
     public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";

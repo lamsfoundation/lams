@@ -35,7 +35,7 @@
 		
 		.caption{position:absolute;top:0px;left:0px;width:150px;font-size:12px;color:#0087e5;}
 		#description{position:absolute; top:1000px; left:1000px; width:150px; font-style:italic;}
-		.rating_stars{position: absolute; top: 1000px; left: 1000px; margin-top: 10}		
+		#rating_stars{position: absolute; top: 1000px; left: 1000px; width:150px; margin-top: 10}		
 		
 		#main_image{margin: 0 auto 20 0; height: 500px; width: 640px;}
 		#main_image img{margin-bottom: 10px; border: 1px solid #111;}
@@ -50,17 +50,17 @@
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.galleria.js'/>" ></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jcarousel.pack.js'/>"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.MetaData.js'/>"></script>
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.rating.pack.js'/>"></script>
+ 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.rating.1.1.js'/>"></script>
+ 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
  	
 	<script type="text/javascript">
 	$(document).ready(function(){
 
 		$('ul.gallery_demo').galleria({
 			history   : true, // activates the history object for bookmarking, back-button etc.
-			clickNext : true, // helper for making the image clickable
+			clickNext : ${fn:length(sessionMap.imageGalleryList) > 1}, // sets helper for making the image clickable only if there is more than 1 image
 			insert    : '#main_image', // the containing selector for our main image
 			onImage   : function(image,caption,thumb) {
-
 				// fetch the thumbnail container
 				var _li = thumb.parents('li');
 				// fade out inactive thumbnail
@@ -74,23 +74,20 @@
 				caption.css('left',image.width() + 20);
 				$("#description").css('left', image.width() + 20);
 				$("#description").css('top', caption.height() + 10);
-				$(".rating_stars").css('left', image.width() + 20);
-				//adjust .rating_stars top position to description height 
+				$("#rating_stars").css('left', image.width() + 20);
+				//adjust #rating_stars top position to description height 
 				var newTopPosition = (image.height() > caption.height() + $("#description").height() + 60) 
 					? image.height() - 40 
 					: caption.height() + $("#description").height() + 20;
-				$(".rating_stars").css('top', newTopPosition);
+				$("#rating_stars").css('top', newTopPosition);
 				
 				//adjust #main_image height to real image size
 				var newHeight = (image.height() >= 480) ? 640 : 480;
 			    $('#main_image').css('height', newHeight + 20);
 
-
-			    showComments(thumb.attr('id'));
-
+			    loadImageData(thumb.attr('id'));
 			},
 			onThumb : function(thumb) { // thumbnail effects goes here
-				
 				// fetch the thumbnail container
 				var _li = thumb.parents('li');
 				// if thumbnail is active, fade all the way.
@@ -106,12 +103,20 @@
 		});
 		
 		$('#mycarousel').jcarousel();
+
+		$('#votingForm_vote').click(function() {
+	    	var options = { 
+	    		success: afterRatingSubmit  // post-submit callback
+	        }; 				
+		    				
+			$('#votingForm').ajaxSubmit(options);
+			return false;
+		});		
 	});
 
 	<!--
 		function checkNew(){
- 		    var reqIDVar = new Date();
-			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
+			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}";
  		    return false;
 		}
 		function finishSession(){
@@ -125,20 +130,86 @@
 
 		//The panel of imageGallery list panel
 		var commentsAreaTargetDiv = "#commentsArea";
-		function showComments(imageUid){
-			var url = "<c:url value="/learning/showComments.do"/>";
+		function loadImageData(imageUid){
+			var url = "<c:url value="/learning/loadImageData.do"/>";
 			$(commentsAreaTargetDiv).load(
 				url,
 				{
 					imageUid: imageUid, 
 					sessionMapID: "${sessionMapID}"
-				}
+				},
+				afterImageDataLoaded
 			);
 		}
+
+		function afterImageDataLoaded() {
+		//	alert($('#commentsArea_imageUid').val());
+			$('#description').html($('#commentsArea_description').val());
+
+			var imageUid = $('#commentsArea_imageUid').val();
+			if (${imageGallery.allowRank && (mode != 'teacher')}) {	
+				var numberRatings = $('#commentsArea_numberRatings').val();
+				$('#numberRatings').html(numberRatings);
+				
+				var currentRating = $('#commentsArea_currentRating').val();
+				$('#rating_stars_inputs').empty();
+				for (var i = 1; i <= 5; i = i + 1) {
+					var checked = (currentRating == i) ? "checked = 'checked' " : "";
+					$('#rating_stars_inputs').append('<input class="star" type="radio" name="rating" value="' + i + '"' + checked + '/>');
+				}
+				$('input[@type=radio].star').rating({
+					callback: function() {
+				    	var options = { 
+				    		success: afterRatingSubmit  // post-submit callback
+				        }; 				
+				    				
+						$('#ratingForm').ajaxSubmit(options);
+						return false;
+					}
+				});
+
+				var title = "<fmt:message key='label.learning.average.rating'/> " + $('#commentsArea_averageRating').val();
+				$('.star a').attr('title', title);
+
+				$('#ratingForm_imageUid').attr('value', imageUid);
+			}
+
+			if (${imageGallery.allowVote && (mode != 'teacher')}) {	
+				var votedImageUid = $('#commentsArea_votedImageUid').val();
+				var votingFormLabel;
+				if (votedImageUid == 0) {
+					
+					$('#votingForm_vote').attr('disabled', false);
+					$('#votingForm_vote').attr('checked', false);
+					votingFormLabel = "<fmt:message key='label.learning.vote.here'/>";
+					 
+				} else if (imageUid == votedImageUid) {
+					
+					$('#votingForm_vote').attr('disabled', false);
+					$('#votingForm_vote').attr('checked', true);
+					votingFormLabel = "<fmt:message key='label.learning.unvote'/>";
+										
+				} else {
+					
+					$('#votingForm_vote').attr('disabled', true);
+					$('#votingForm_vote').attr('checked', false);
+					votingFormLabel = "<fmt:message key='label.learning.already.voted'/>";
+				}
+				$('#votingForm_label').text(votingFormLabel);
+				$('#votingForm_imageUid').attr('value', imageUid);
+			}
+			
+		}
+		
+
+		// post-submit callback 
+		function afterRatingSubmit(responseText, statusText)  { 
+			var imageUid = $('#commentsArea_imageUid').val();
+			loadImageData(imageUid);
+		} 
+		
 		function addNewComment(currentImageUid, comment){
 			var url = "<c:url value="/learning/addNewComment.do"/>";
-			var param = "currentImageUid=" + currentImageUid + "&comment=" + comment + "&sessionMapID=${sessionMapID}";
-
 			$(commentsAreaTargetDiv).load(
 				url,
 				{
@@ -148,17 +219,14 @@
 				}
 			);
 		}
-		
-				
 	-->        
     </script>
    
 </lams:head>
 <body class="stripes">
+	<div id="content" >
 
-
-	<div id="content" width="1000" style="width:1000;">
-		<h1  width="1000" style="width:1000;">
+		<h1>
 			${imageGallery.title}
 		</h1>
 
@@ -184,24 +252,48 @@
 		
 	
 
-		
-
 		<div class="galleria_container">
 			<div id="description">
 				Description
 			</div>		
 			<div id="main_image"></div>
 			
-			<div class="rating_stars">
-				<input class="star {required: true}" type="radio" name="test-2-rating-4" value="1" title="" checked="checked"/>
-				<input class="star" type="radio" name="test-2-rating-4" value="2" title=""/>
-				<input class="star" type="radio" name="test-2-rating-4" value="3" title=""/>
-				<input class="star" type="radio" name="test-2-rating-4" value="4" title=""/>
-				<input class="star" type="radio" name="test-2-rating-4" value="5" title=""/>
-				<br>
-				<p>
-					15 <fmt:message key="label.learning.ratings" />
-				</p>
+			<div id="rating_stars">
+				<c:if test="${imageGallery.allowRank && (mode != 'teacher')}">
+					<html:form action="learning/saveOrUpdateRating" method="post" styleId="ratingForm">
+						<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+						<input type="hidden" name="imageUid" id="ratingForm_imageUid"/>
+						
+						<div id="rating_stars_inputs"> 
+							<input class="star" type="radio" name="rating" value="1" />
+							<input class="star" type="radio" name="rating" value="2" />
+							<input class="star" type="radio" name="rating" value="3" />
+							<input class="star" type="radio" name="rating" value="4" />
+							<input class="star" type="radio" name="rating" value="5" />						
+						</div>
+						
+						<br>
+						<p>
+							<span id="numberRatings"></span>
+							<fmt:message key="label.learning.ratings" />
+						</p>						
+					</html:form>							
+				</c:if>
+				
+				<c:if test="${imageGallery.allowVote && (mode != 'teacher')}">
+					<html:form action="learning/vote" method="post" styleId="votingForm">
+						<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+						<input type="hidden" name="imageUid" id="votingForm_imageUid"/>
+						
+						<p class="small-space-top">
+							<html:checkbox property="vote" styleClass="noBorder" styleId="votingForm_vote" >	</html:checkbox>
+
+							<label for="votingForm_vote" id="votingForm_label">	aa </label>
+						</p>
+						
+					</html:form>							
+				</c:if> 			
+				 			
 			</div>			
 			
 			<ul class="gallery_demo jcarousel-skin-tango" id="mycarousel">

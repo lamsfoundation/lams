@@ -28,17 +28,16 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 
-public class ImageGalleryItemDAOHibernate extends BaseDAOHibernate implements ImageGalleryItemDAO{
-	
-	private static final String FIND_AUTHORING_ITEMS = "from " + ImageGalleryItem.class.getName() + " where imageGallery_uid = ? order by create_date asc";
-	
-	public List getAuthoringItems(Long imageGalleryUid) {
-		
-		return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS,imageGalleryUid); 
-	}
+public class ImageGalleryItemDAOHibernate extends BaseDAOHibernate implements ImageGalleryItemDAO {
 
-	public ImageGalleryItem getByUid(Long imageGalleryItemUid) {
-		return (ImageGalleryItem) this.getObject(ImageGalleryItem.class,imageGalleryItemUid);
-	}
+    private static final String FIND_AUTHORING_ITEMS = "from " + ImageGalleryItem.class.getName()
+	    + " where imageGallery_uid = ? order by create_date asc";
 
+    public List getAuthoringItems(Long imageGalleryUid) {
+	return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS, imageGalleryUid);
+    }
+
+    public ImageGalleryItem getByUid(Long imageGalleryItemUid) {
+	return (ImageGalleryItem) this.getObject(ImageGalleryItem.class, imageGalleryItemUid);
+    }
 }

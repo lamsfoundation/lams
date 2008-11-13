@@ -9,7 +9,7 @@
 
 		<div>
 			<table cellspacing="0" class="forum">
-				<tr>
+				<tr >
 					<th >
 						<fmt:message key="label.learning.by" />
 						<c:set var="author" value="${comment.createBy.loginName}" />

@@ -6,7 +6,193 @@
 <schema alias="" name="LAMS" remarks="" uid="120fac0:11c25acc4f7:-7fff">
 <schema-description/>
 <domain-list/>
-<table-list/>
+<table-list>
+<table alias="" name="tl_laimag10_item_comment" remarks="" uid="16f4e52:11d7686e8e8:-7ffa">
+<table-description/>
+<table-figure-bounds height="-1" width="-1" x="614" y="505"/>
+<column-list>
+<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="16f4e52:11d7686e8e8:-7ff8">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="create_date" remarks="" uid="16f4e52:11d7686e8e8:-7ff7">
+<column-description/>
+<data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="imageGallery_item_uid" remarks="" uid="16f4e52:11d7686e8e8:-7ff6">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="create_by" remarks="" uid="16f4e52:11d7686e8e8:-7ff5">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="comment" remarks="" uid="16f4e52:11d7686e8e8:-7ff4">
+<column-description/>
+<data-type jdbc-type="-1" literal-prefix="'" literal-suffix="'" name="TEXT" selected-variant-pattern="TEXT">
+<variant type-name-pattern="TEXT"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PRIMARY" remarks="" uid="16f4e52:11d7686e8e8:-7ff3">
+<primary-key-description/>
+<primary-key-column name="uid"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key alias="" name="FK_tl_laimag10_item_comment_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_laimag10_imageGallery_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="16f4e52:11d7686e8e8:-7f6d">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="imageGallery_item_uid" referenced-key-column-name="uid"/>
+</foreign-key>
+<foreign-key alias="" name="FK_tl_laimag10_item_comment_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_laimag10_user" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="16f4e52:11d7686e8e8:-7fb2">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="create_by" referenced-key-column-name="uid"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index alias="" name="PRIMARY_ITEM_LOG1" remarks="" uid="16f4e52:11d7686e8e8:-7ff2" unique="true">
+<index-description/>
+<index-column name="uid" sort="ASC"/>
+</index>
+<index alias="" name="FK_NEW_1821149711_693580A438BF8DFE1" remarks="" uid="16f4e52:11d7686e8e8:-7ff1" unique="false">
+<index-description/>
+<index-column name="imageGallery_item_uid" sort="ASC"/>
+</index>
+<index alias="" name="FK_NEW_1821149711_693580A441F9365D1" remarks="" uid="16f4e52:11d7686e8e8:-7ff0" unique="false">
+<index-description/>
+<index-column name="create_by" sort="ASC"/>
+</index>
+</index-list>
+</table>
+<table alias="" name="tl_laimag10_item_rating" remarks="" uid="16f4e52:11d7686e8e8:-7f62">
+<table-description/>
+<table-figure-bounds height="-1" width="-1" x="436" y="599"/>
+<column-list>
+<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="16f4e52:11d7686e8e8:-7f60">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="imageGallery_item_uid" remarks="" uid="16f4e52:11d7686e8e8:-7f5e">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="false" name="create_by" remarks="" uid="16f4e52:11d7686e8e8:-7f5d">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="false" name="rating" remarks="" uid="16f4e52:11d7686e8e8:-7f5c">
+<column-description/>
+<data-type jdbc-type="4" name="INT" selected-variant-pattern="INT">
+<variant type-name-pattern="INT"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
+<variant type-name-pattern="INT UNSIGNED"/>
+<variant type-name-pattern="INT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="INT ZEROFILL"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PRIMARY" remarks="" uid="16f4e52:11d7686e8e8:-7f5b">
+<primary-key-description/>
+<primary-key-column name="uid"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key alias="" name="FK_tl_laimag10_item_rating_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_laimag10_imageGallery_item" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="16f4e52:11d7686e8e8:-7f46">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="imageGallery_item_uid" referenced-key-column-name="uid"/>
+</foreign-key>
+<foreign-key alias="" name="FK_tl_laimag10_item_rating_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_laimag10_user" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="16f4e52:11d7686e8e8:-7f34">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="create_by" referenced-key-column-name="uid"/>
+</foreign-key>
+</foreign-key-list>
+<index-list>
+<index alias="" name="PRIMARY_ITEM_LOG" remarks="" uid="16f4e52:11d7686e8e8:-7f5a" unique="true">
+<index-description/>
+<index-column name="uid" sort="ASC"/>
+</index>
+<index alias="" name="FK_NEW_1821149711_693580A438BF8DFE" remarks="" uid="16f4e52:11d7686e8e8:-7f59" unique="false">
+<index-description/>
+<index-column name="imageGallery_item_uid" sort="ASC"/>
+</index>
+<index alias="" name="FK_NEW_1821149711_693580A441F9365D" remarks="" uid="16f4e52:11d7686e8e8:-7f58" unique="false">
+<index-description/>
+<index-column name="create_by" sort="ASC"/>
+</index>
+</index-list>
+</table>
+</table-list>
 </schema>
 <schema alias="" name="DEFAULT_SCHEMA" remarks="" uid="120fac0:11c25acc4f7:-7ffe">
 <schema-description/>
@@ -14,7 +200,7 @@
 <table-list>
 <table alias="" name="tl_laimag10_attachment" remarks="" uid="120fac0:11c25acc4f7:-7ffd">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="435" y="-23"/>
+<table-figure-bounds height="-1" width="-1" x="276" y="-11"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7ffb">
 <column-description/>
@@ -191,8 +377,8 @@
 <column alias="" auto-increment="false" column-size="11" decimal-digits="0" default-value="" mandatory="false" name="number_columns" remarks="" uid="120fac0:11c25acc4f7:-7fd9">
 <column-description/>
 <data-type jdbc-type="4" name="INT" selected-variant-pattern="INT(%n)">
-<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n)"/>
+<variant type-name-pattern="INT"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) UNSIGNED ZEROFILL"/>
 <variant precision-max="10" precision-min="0" precision-variable="%n" type-name-pattern="INT(%n) ZEROFILL"/>
@@ -497,7 +683,7 @@
 </table>
 <table alias="" name="tl_laimag10_item_log" remarks="" uid="120fac0:11c25acc4f7:-7fbc">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="810" y="464"/>
+<table-figure-bounds height="-1" width="-1" x="793" y="441"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7fba">
 <column-description/>
@@ -571,6 +757,13 @@
 </foreign-key-figure>
 <foreign-key-column column-name="imageGallery_item_uid" referenced-key-column-name="uid"/>
 </foreign-key>
+<foreign-key alias="" name="FK_tl_laimag10_item_log_3" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_laimag10_item_log" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="16f4e52:11d7686e8e8:-7f21">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="uid" referenced-key-column-name="uid"/>
+</foreign-key>
 </foreign-key-list>
 <index-list>
 <index alias="" name="PRIMARY_ITEM_LOG" remarks="" uid="120fac0:11c25acc4f7:-7fb5" unique="true">
@@ -589,7 +782,7 @@
 </table>
 <table alias="" name="tl_laimag10_session" remarks="" uid="120fac0:11c25acc4f7:-7fb2">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="596" y="302"/>
+<table-figure-bounds height="-1" width="-1" x="304" y="250"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="120fac0:11c25acc4f7:-7fb0">
 <column-description/>

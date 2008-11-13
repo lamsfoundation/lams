@@ -29,7 +29,7 @@ import java.util.Date;
 /**
  * ImageGallery
  * 
- * @author Dapeng Ni
+ * @author Andrey Balan
  * 
  * @hibernate.class table="tl_laimag10_item_log"
  * 
