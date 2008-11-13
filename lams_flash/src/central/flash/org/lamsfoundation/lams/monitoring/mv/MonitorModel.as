@@ -141,6 +141,8 @@ class MonitorModel extends Observable{
 	
 	private var _openBranchingActivity:Number;
 	
+	private var _learnerSortingMechanism:String;
+	
 	private var dispatchEvent:Function;       
     public var addEventListener:Function;  
     public var removeEventListener:Function;
@@ -285,7 +287,6 @@ class MonitorModel extends Observable{
 		infoObj.updateType = "DRAW_DESIGN";
 		infoObj.tabID = getSelectedTab();
 		notifyObservers(infoObj);
-		
 	}
 	
 	/**
@@ -610,6 +611,28 @@ class MonitorModel extends Observable{
 		return _numPreferredIndexButtons;
 	}
 	
+	/**
+	* Searches for learners by name, and returns an array of learners whose full names contain the search string (case insensitive).
+	* 
+	* @param searchStr	The learner name to search
+	* @return matches   Array of Learners whose names contain the search string
+	*/
+	public function searchForLearners(searchStr:String):Array {
+		Debugger.log("searchForLearners invoked, searching for "+searchStr, Debugger.CRITICAL, "searchForLearners", "MonitorModel");
+
+		var len:Number = progressArrBackup.length;
+			
+		var matches:Array = new Array();
+		for (var i = 0; i < len; i++) {
+			var fullName:String = progressArrBackup[i].getFullName();
+			if (fullName.toLowerCase().indexOf(searchStr.toLowerCase()) != -1){
+				Debugger.log("Match Found With: "+ fullName, Debugger.CRITICAL, "searchForLearners", "MonitorModel");
+				matches.push(progressArrBackup[i]);
+			}
+		}
+		return matches;
+	}
+	
 	public function set searchResults(matchesArr:Array) {
 		if (!_inSearchView) {
 			_currentLearnerIndex = 1;
@@ -617,6 +640,17 @@ class MonitorModel extends Observable{
 		_inSearchView = true;
 		setLessonProgressData(matchesArr);
 		_searchResultsBackup = matchesArr;
+	}
+	
+	public function setLearnerSortingMechanism(m:String) {
+		Debugger.log("Learner sorting mechanism set to: "+m, Debugger.CRITICAL, "setLearnerSortingMechanism", "MonitorModel");
+		_learnerSortingMechanism = m;
+		
+		broadcastViewUpdate("DRAW_DESIGN", null, getSelectedTab(), null);
+	}
+	
+	public function getLearnerSortingMechanism():String {
+		return (_learnerSortingMechanism == undefined) ? "alphabetically" : _learnerSortingMechanism; 
 	}
 	
 	// invoked on refresh
@@ -1330,8 +1364,50 @@ class MonitorModel extends Observable{
 	}
 	
 	public function get allLearnersProgress():Array{
-		learnerTabActArr.sortOn(["_learnerLName", "_learnerFName"], Array.CASEINSENSITIVE); 
+		//TODO: add order boolean param, to indicate whether or not to apply ordering or just return the array as is
+		if (getLearnerSortingMechanism() == "alphabetically") {
+			learnerTabActArr.sortOn(["_learnerLName", "_learnerFName"], Array.CASEINSENSITIVE);
+		} 
+		else if (getLearnerSortingMechanism() == "completion") {
+			learnerTabActArr = orderByCompletion();
+		}
 		return learnerTabActArr;
+	}
+	
+	private function orderByCompletion():Array {
+		var completedLearnersArr:Array = new Array();
+		var unfinishedLearnersArr:Array = new Array();
+		var retArray:Array = new Array();
+		
+		var largestNumCompletedActs:Number = 0; // the most acts completed by an unfinished learner
+		
+		// seperate learners into completed and unfinished arrays
+		for (var index in learnerTabActArr) {
+			if (learnerTabActArr[index].isLessonComplete()) {
+				completedLearnersArr.push(learnerTabActArr[index]);
+			} else {
+				
+				if (learnerTabActArr[index].getCompletedActivities().length > largestNumCompletedActs) {
+					largestNumCompletedActs = learnerTabActArr[index].getCompletedActivities().length;
+				}
+				unfinishedLearnersArr.push(learnerTabActArr[index]);
+			}
+		}
+			
+		completedLearnersArr.sortOn(["_learnerLName", "_learnerFName"], Array.CASEINSENSITIVE);
+		unfinishedLearnersArr.sortOn(["_learnerLName", "_learnerFName"], Array.CASEINSENSITIVE);
+		
+		for (var i=0; i<completedLearnersArr.length; i++) {
+			retArray.push(completedLearnersArr[i]);
+		}
+		for (var i=largestNumCompletedActs; i>=0; i--) {
+			for (var j=0; j<unfinishedLearnersArr.length; j++) {
+				if (unfinishedLearnersArr[j].getCompletedActivities().length == i) {
+					retArray.push(unfinishedLearnersArr[j]);
+				}
+			}
+		}
+		return retArray;
 	}
 	
 	public function backupLearnersProgress(learnersProgArr:Array):Void {

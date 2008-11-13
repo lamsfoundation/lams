@@ -665,28 +665,6 @@ class MonitorController extends AbstractController {
 	}
 	
 	/**
-	* Searches for learners by name, and returns an array of learners whose full names contain the search string (case insensitive).
-	* 
-	* @param searchStr	The learner name to search
-	* @return matches   Array of Learners whose names contain the search string
-	*/
-	public function searchForLearners(searchStr:String):Array {
-		Debugger.log("searchForLearners invoked, searching for "+searchStr, Debugger.CRITICAL, "searchForLearners", "MonitorController");
-
-		var len:Number = _monitorModel.progressArrBackup.length;
-			
-		var matches:Array = new Array();
-		for (var i = 0; i < len; i++) {
-			var fullName:String = _monitorModel.progressArrBackup[i].getFullName();
-			if (fullName.toLowerCase().indexOf(searchStr.toLowerCase()) != -1){
-				Debugger.log("Match Found With: "+ fullName, Debugger.CRITICAL, "searchForLearners", "MonitorController");
-				matches.push(_monitorModel.progressArrBackup[i]);
-			}
-		}
-		return matches;
-	}
-	
-	/**
 	* Alert message after applying the remove action on a archived lesson.
 	* 
 	* @param msg		Message to display

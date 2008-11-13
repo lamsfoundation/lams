@@ -213,12 +213,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		rangeLabel.text = Dictionary.getValue('mv_search_current_page_lbl', [mm.currentLearnerIndex, mm.numIndexButtons]);
 		Debugger.log("displayedButtons.length: "+displayedButtons.length, Debugger.CRITICAL, "setupButtons", "LearnerIndexView");
 		if (!navigationButtonsDrawn	&& mm.numIndexButtons > displayedButtons.length && displayedButtons.length == mm.numPreferredIndexButtons)
-			mm.drawIndexButtons = true;	
+			mm.drawIndexButtons = true;
 			
 		if ((displayedButtons.length > 0) && (mm.drawIndexButtons)) {
 			removeButtons();
 		}
-		
+
 		if (mm.drawIndexButtons) {
 			_buttonsPanel_mc = this.createEmptyMovieClip("_buttonsPanel_mc", DepthManager.kTop);
 			addRangeLabel(mm);
@@ -246,39 +246,23 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 				direction = null;
 			}
 		}
-		
+
+		if (mm.drawIndexButtons) {
+			addOrderCheckBox(mm);
+		}
+	
 		nextPosition = 0;
 	}
 	
 	public function removeButtons(){
-		Debugger.log("Removing Index Buttons", Debugger.GEN, "removeButtons", "LearnerIndexView");
 		
-		_buttonsPanel_mc.removeMovieClip(rangeLabel);
-		
-		//need to remove the text field from the background
-		textFieldBackground_mc.removeMovieClip(idxTextField);
-		_buttonsPanel_mc.removeMovieClip(textFieldBackground_mc);
-		
-		if (mm.numIndexButtons > mm.numPreferredIndexButtons)
-			_buttonsPanel_mc.removeMovieClip(backBtn);
-		
-		while (displayedButtons.length != 0) {
-			var idxBtn:MovieClip = MovieClip(displayedButtons.pop());
-			_buttonsPanel_mc.removeMovieClip(idxBtn);
-		}
-		
-		if (mm.numIndexButtons > mm.numPreferredIndexButtons) {
-			_buttonsPanel_mc.removeMovieClip(nextBtn);
-			navigationButtonsDrawn = false;
-		}
-			
-		_buttonsPanel_mc.removeMovieClip(goBtn);
-		_buttonsPanel_mc.removeMovieClip(indexViewBtn);
+		_buttonsPanel_mc.removeMovieClip();
+		_buttonsPanel_mc = null;
 	}
 	
 	private function addRangeLabel(mm:MonitorModel):Void {
 		// Label that displays 'Page # of #'
-		var idxLabel_mc:MovieClip = _buttonsPanel_mc.attachMovie("Label", "rangeLabel", _buttonsPanel_mc.getNextHighestDepth());
+		_buttonsPanel_mc.attachMovie("Label", "rangeLabel", _buttonsPanel_mc.getNextHighestDepth());
 		rangeLabel = _buttonsPanel_mc["rangeLabel"];
 		
 		// style info
@@ -348,6 +332,28 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		nextBtn._x = nextPosition;
 		nextPosition += (forwardIdxBtnWidth);
 	}
+
+	private function addOrderCheckBox(mm:MonitorModel):Void {
+		
+		var checkBoxWidth:Number = Math.ceil(StringUtils.getButtonWidthForStr(Dictionary.getValue('order_learners_by_completion_lbl')) * fontWidthVariance) + 20; 	
+		_buttonsPanel_mc.attachMovie("CheckBox", "orderByCompletion_chk", _buttonsPanel_mc.getNextHighestDepth(), {_x:Stage.width-checkBoxWidth, _y:0, _width: checkBoxWidth, label:Dictionary.getValue('order_learners_by_completion_lbl')});
+		var orderByCompletion_chk = _buttonsPanel_mc['orderByCompletion_chk'];
+		orderByCompletion_chk.selected = (mm.getLearnerSortingMechanism() == "completion");
+		orderByCompletion_chk.addEventListener("click", Delegate.create(this, setSortingMechanism));
+		
+		// TODO: this should go in the setStyles method
+		var styleObj = _tm.getStyleObject('label');
+		orderByCompletion_chk.setStyle('styleName',styleObj);
+	}
+	
+	private function setSortingMechanism(evt:Object):Void {
+
+		if (evt.target.selected) {
+			mm.setLearnerSortingMechanism("completion");
+		} else {
+			mm.setLearnerSortingMechanism("alphabetically");
+		}
+	}
 	
 	private function addIndexTextField(mm:MonitorModel):Void {
 		
@@ -412,10 +418,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		_indexButton.init(mm, undefined);
 		_indexButton.btnType = "IndexView";
 		indexViewBtn._x = nextPosition;
-		Debugger.log("addIndexButton1_nextPosition: "+nextPosition, Debugger.CRITICAL, "addIndexButton", "LearnerIndexView");
-		Debugger.log("addIndexButton1_indexViewBtnWidth: "+indexViewBtnWidth, Debugger.CRITICAL, "addIndexButton", "LearnerIndexView");
 		nextPosition += indexViewBtnWidth;
-		Debugger.log("addIndexButton2_nextPosition: "+nextPosition, Debugger.CRITICAL, "addIndexButton", "LearnerIndexView");
 		nextPosition--;
 	}
 

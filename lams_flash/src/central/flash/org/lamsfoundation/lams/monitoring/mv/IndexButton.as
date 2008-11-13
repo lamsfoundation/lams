@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
- 
+
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.ui.*;
 import org.lamsfoundation.lams.common.style.*;
@@ -111,8 +111,7 @@ class org.lamsfoundation.lams.monitoring.mv.IndexButton extends MovieClip {
 				LFMessage.showMessageAlert(Dictionary.getValue('mv_search_error_msg', [mm.numIndexButtons]), null);
 			}
 			else {
-				var mc:MonitorController = mm.getMonitor().getMV().getController();
-				matchesArr = mc.searchForLearners(String(mm.learnerIndexView.getIdxTextField().text));
+				matchesArr = mm.searchForLearners(String(mm.learnerIndexView.getIdxTextField().text));
 				if (matchesArr.length > 0) {
 					mm.drawIndexButtons = true;
 					mm.currentLearnerIndexNoRedraw = 1;
