@@ -90,6 +90,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	private var buttonsShown:Boolean;
 	private var navigationButtonsDrawn:Boolean;
 	
+	private var orderByCompletion_chk:MovieClip;
+	private var checkBoxWidth:Number;
+	
 	private var direction:String;
 
 	/**
@@ -108,7 +111,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 		buttonsShown = false;
 		navigationButtonsDrawn = false;
 		defaultString = Dictionary.getValue("mv_search_default_txt");
-		untranslatedWidth = Math.ceil(StringUtils.getButtonWidthForStr('?') * fontWidthVariance); 		
+		untranslatedWidth = Math.ceil(StringUtils.getButtonWidthForStr('?') * fontWidthVariance);
+		checkBoxWidth= Math.ceil(StringUtils.getButtonWidthForStr(Dictionary.getValue('order_learners_by_completion_lbl')) * fontWidthVariance) + 20;
 		this._visible = false;
 		displayedButtons = new Array();
 		
@@ -335,9 +339,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 
 	private function addOrderCheckBox(mm:MonitorModel):Void {
 		
-		var checkBoxWidth:Number = Math.ceil(StringUtils.getButtonWidthForStr(Dictionary.getValue('order_learners_by_completion_lbl')) * fontWidthVariance) + 20; 	
 		_buttonsPanel_mc.attachMovie("CheckBox", "orderByCompletion_chk", _buttonsPanel_mc.getNextHighestDepth(), {_x:Stage.width-checkBoxWidth, _y:0, _width: checkBoxWidth, label:Dictionary.getValue('order_learners_by_completion_lbl')});
-		var orderByCompletion_chk = _buttonsPanel_mc['orderByCompletion_chk'];
+		orderByCompletion_chk = _buttonsPanel_mc['orderByCompletion_chk'];
 		orderByCompletion_chk.selected = (mm.getLearnerSortingMechanism() == "completion");
 		orderByCompletion_chk.addEventListener("click", Delegate.create(this, setSortingMechanism));
 		
@@ -432,6 +435,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	public function setSize(mm:MonitorModel):Void{
 		var panelOffset:Number = mm.getSize().w/100;
 		_bgPanel._width = Math.round(mm.getSize().w + panelOffset);
+		orderByCompletion_chk._x = Stage.width-checkBoxWidth;
 	}
 
 	public function getController():MonitorController{
