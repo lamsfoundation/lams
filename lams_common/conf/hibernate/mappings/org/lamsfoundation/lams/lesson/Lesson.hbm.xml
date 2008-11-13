@@ -55,9 +55,12 @@
 		<property name="learnerImAvailable" type="java.lang.Boolean"
         	column="learner_im_avail" length="1">
     	</property>
+    	<property name="liveEditEnabled" type="java.lang.Boolean"
+        	column="live_edit_enabled" length="1">
+    	</property>
 		<property name="lockedForEdit" type="java.lang.Boolean"
         	column="locked_for_edit" length="1">
-    </property>
+    	</property>
 		
 		<!-- Associations -->
 		
@@ -264,20 +267,6 @@
 			AND ug.user_id = :userId
 			AND gi.grouping_id = g.grouping_id
 			AND g.group_id = gi.staff_group_id
-	</sql-query>
-	
-	<sql-query name="lessonsByOrgAndUserWithChildOrgs">
-		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
-		SELECT DISTINCT {lesson.*}
-		  FROM (lams_lesson {lesson}, lams_learning_design ld, lams_group g, lams_user_group ug, lams_organisation lo)
-		  WHERE {lesson}.learning_design_id = ld.learning_design_id
-		    AND ld.copy_type_id != 3
-			AND ({lesson}.organisation_id = lo.organisation_id)
-			AND (lo.organisation_id = :orgId or lo.parent_organisation_id = :orgId)
-			AND {lesson}.class_grouping_id = g.grouping_id
-			AND {lesson}.lesson_state_id != 7
-			AND ug.group_id = g.group_id
-			AND ug.user_id = :userId
 	</sql-query>
 
 </hibernate-mapping>
