@@ -1066,7 +1066,6 @@ public class UserManagementService implements IUserManagementService {
 	    } else {
 		Object[] array = (Object[]) obj;
 		if (array.length > 1) {
-		    log.debug(array[0] + " " + array[1]);
 		    if (array[1] != null) {
 			dtoList.add(new CollapsedOrgDTO((Integer) array[0], (Boolean) array[1]));
 		    } else {

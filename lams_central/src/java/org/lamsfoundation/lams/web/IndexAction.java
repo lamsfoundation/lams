@@ -127,7 +127,6 @@ public class IndexAction extends Action {
 	private void setHeaderLinks(HttpServletRequest request) {
 		List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
 		if (request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
-			log.debug("user is author");
 			headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
 		}
 		headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?tab=profile"));
@@ -142,7 +141,6 @@ public class IndexAction extends Action {
 		if ( customTabLink != null && customTabLink.trim().length() > 0 ) 
 			headerLinks.add(new IndexLinkBean(customTabText,"javascript:openCustom(\""+customTabLink+"\")"));
 		
-		log.debug("set headerLinks in request");
 		request.setAttribute("headerLinks", headerLinks);
 	}
 	
