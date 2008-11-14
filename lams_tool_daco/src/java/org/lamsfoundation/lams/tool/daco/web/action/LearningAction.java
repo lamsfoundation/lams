@@ -769,7 +769,7 @@ public class LearningAction extends Action {
 				    DacoConstants.ERROR_MSG_RECORD_DATE_YEAR_INT, questionNumber));
 			}
 		    }
-
+		    boolean monthValid = false;
 		    if (StringUtils.isBlank(month)) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 				DacoConstants.ERROR_MSG_RECORD_DATE_MONTH_BLANK, questionNumber));
@@ -779,6 +779,8 @@ public class LearningAction extends Action {
 			    if (monthNum < 1 || monthNum > 12) {
 				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 					DacoConstants.ERROR_MSG_RECORD_DATE_MONTH_LIMIT, questionNumber));
+			    } else {
+				monthValid = true;
 			    }
 			} catch (NumberFormatException e) {
 			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
@@ -789,7 +791,7 @@ public class LearningAction extends Action {
 		    if (StringUtils.isBlank(day)) {
 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 				DacoConstants.ERROR_MSG_RECORD_DATE_DAY_BLANK, questionNumber));
-		    } else {
+		    } else if (monthValid) {
 			try {
 
 			    int dayNum = Integer.parseInt(day);
