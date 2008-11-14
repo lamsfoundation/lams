@@ -64,7 +64,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public IMdlForumService mdlForumService;
 
-    public static final String RELATIVE_MOODLE_AUTHOR_URL = "/course/modedit-lams.php?";
+    public static final String RELATIVE_MOODLE_AUTHOR_URL = "course/modedit-lams.php?";
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
