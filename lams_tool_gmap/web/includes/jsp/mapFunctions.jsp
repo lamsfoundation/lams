@@ -96,7 +96,7 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     marker.removeLink = "<a href='javascript:removeMarker(" + markers.length + ")'><fmt:message key='button.remove'/></a>" ;
    	marker.editLink = "<a href='javascript:editMarker(" + markers.length + ")'><fmt:message key='button.edit'/></a>";
    	marker.saveFuncStr = "saveMarkerInfo(" + markers.length + ");";
-   	marker.saveLink = "<a href='javascript:" +marker.saveFuncStr+ "'><fmt:message key='button.save'/></a>";
+   	marker.saveLink = "<a href='javascript:" +marker.saveFuncStr+ "'><fmt:message key='button.placeMarker'/></a>";
    	marker.cancelLink = "<a href='javascript:cancelEditMarkerInfo(" + markers.length + ")'><fmt:message key='button.cancel'/></a>";
     updateMarkerInfoWindowHtml(marker);
     markers[markers.length] = marker;
