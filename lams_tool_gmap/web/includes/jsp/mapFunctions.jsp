@@ -407,13 +407,6 @@ function confirmLeavePage()
 	return true;
 }
 
-
-// refreshes the page
-function refresh()
-{
-	location.reload(true);
-}
-
 // Serialises the marker array into an xml string for processing on the back end
 function serialiseMarkers()
 {

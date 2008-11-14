@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="tool"><lams:WebAppURL /></c:set>
+<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script type="text/javascript">
 <!--	
 	function validateForm() {
@@ -7,6 +8,12 @@
 
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
+	}
+	
+	function refreshPage()
+	{
+		var url = "<lams:WebAppURL/>/learning.do?mode=${mode}&toolSessionID=${gmapSessionDTO.sessionID}";
+		window.location = url;
 	}
 -->
 </script>
@@ -21,7 +28,7 @@
 		${gmapDTO.instructions}
 	</p>
 
-	<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	
 
 	<br />
 	
@@ -43,7 +50,7 @@
 					</c:when>
 				</c:choose>
 				<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-				<a href="javascript:if(confirmLeavePage()){refresh();}" class="button"/><fmt:message key="button.refresh"/></a>
+				<a href="javascript:if(confirmLeavePage()){refreshPage();}" class="button"/><fmt:message key="button.refresh"/></a>
 			</td>
 		</tr>
 	</table>

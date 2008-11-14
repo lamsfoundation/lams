@@ -233,9 +233,9 @@
 		</tr>
 		<tr>
 			<td>
-			<a href="javascript:addMarkerToCenterMonitoring()" class="button"/><fmt:message key="button.addMarker"/></a>
-			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-			<a href="javascript:if(confirmLeavePage()){refresh();}" class="button"/><fmt:message key="button.refresh"/></a>
+				<a href="javascript:addMarkerToCenterMonitoring()" class="button"/><fmt:message key="button.addMarker"/></a>
+				<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
+				<a href="javascript:if(confirmLeavePage()){refreshPage();}" class="button"/><fmt:message key="button.refresh"/></a>
 			</td>
 		</tr>
 	</table>
@@ -341,6 +341,12 @@
 		document.getElementById(id).style.display = "block";
 		}
 	}	
+	
+	function refreshPage()
+	{
+		var url = "<lams:WebAppURL/>/monitoring.do?toolContentID=${dto.toolContentId}&contentFolderID=${contentFolderID}";
+		window.location = url;
+	}
 	
 //-->
 </script>
