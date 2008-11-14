@@ -64,6 +64,10 @@
 	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean> 
 	
+	<bean id="dacoOutputFactory" class="org.lamsfoundation.lams.tool.daco.service.DacoOutputFactory">
+ 		<property name="toolMessageService"><ref bean="messageService"/></property>
+ 	</bean>
+	
     <bean id="dacoManagerTarget" class="org.lamsfoundation.lams.tool.daco.service.DacoServiceImpl">
         <property name="dacoDao">
             <ref local="dacoDao"/>
@@ -111,6 +115,7 @@
 			<ref bean="eventNotificationService"/>
 		</property>   
 		<property name="lessonService"><ref bean="lessonService"/></property> 
+		<property name="dacoOutputFactory"><ref bean="dacoOutputFactory"/></property>
     </bean>
 
     <bean id="dacoService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

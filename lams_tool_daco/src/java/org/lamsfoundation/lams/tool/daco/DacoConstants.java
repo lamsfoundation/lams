@@ -286,4 +286,6 @@ public class DacoConstants {
     public static final String ERROR_MSG_RECORD_TOOMUCH = "error.record.toomuch";
 
     public static final String PAGE_EDITABLE = "isPageEditable";
+
+    public final static String LEARNER_NUM_POSTS_DEFINITION_NAME = "learner.number.of.posts";
 }

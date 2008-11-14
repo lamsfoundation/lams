@@ -33,7 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -134,6 +133,8 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     private IEventNotificationService eventNotificationService;
 
     private ILessonService lessonService;
+
+    private DacoOutputFactory dacoOutputFactory;
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
@@ -537,7 +538,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
      *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return dacoOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     /**
@@ -547,7 +548,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
      *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	return dacoOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     /**
@@ -559,7 +560,15 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	Daco daco = getDacoByContentId(toolContentId);
+	if (daco == null) {
+	    try {
+		daco = getDefaultDaco();
+	    } catch (DacoApplicationException e) {
+		DacoServiceImpl.log.error(e.getMessage());
+	    }
+	}
+	return getDacoOutputFactory().getToolOutputDefinitions(daco);
     }
 
     public DacoUser getUser(Long uid) {
@@ -890,5 +899,17 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
+    }
+
+    public int getRecordNum(Long userID, Long sessionId) {
+	return dacoAnswerDao.getUserRecordCount(userID, sessionId);
+    }
+
+    public DacoOutputFactory getDacoOutputFactory() {
+	return dacoOutputFactory;
+    }
+
+    public void setDacoOutputFactory(DacoOutputFactory dacoOutputFactory) {
+	this.dacoOutputFactory = dacoOutputFactory;
     }
 }

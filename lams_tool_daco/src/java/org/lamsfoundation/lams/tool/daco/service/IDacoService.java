@@ -305,4 +305,13 @@ public interface IDacoService {
     IEventNotificationService getEventNotificationService();
 
     public List<User> getMonitorsByToolSessionId(Long sessionId);
+
+    /**
+     * Get how many records has the given user posted.
+     * 
+     * @param userID
+     * @param sessionId
+     * @return
+     */
+    public int getRecordNum(Long userID, Long sessionId);
 }
