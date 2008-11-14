@@ -34,6 +34,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
  
 /**
  * @author Andrey Balan 

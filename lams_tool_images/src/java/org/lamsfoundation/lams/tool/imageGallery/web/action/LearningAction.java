@@ -24,17 +24,13 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.web.action;
 
-import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -49,7 +45,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -65,12 +60,10 @@ import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryApplication
 import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageCommentComparator;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
-import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageCommentForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageRatingForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -258,17 +251,19 @@ public class LearningAction extends Action {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	//	// auto run mode, when use finish the only one imageGallery item, mark it as complete then finish this activity
-	//	// as well.
-	//	String imageGalleryItemUid = request.getParameter(ImageGalleryConstants.PARAM_RESOURCE_ITEM_UID);
-	//	if (imageGalleryItemUid != null) {
-	//	    doComplete(request);
-	//	    // NOTE:So far this flag is useless(31/08/2006).
-	//	    // set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
-	//	    request.setAttribute(ImageGalleryConstants.ATTR_IS_ALLOW_VOTE, true);
-	//	} else {
-	//	    request.setAttribute(ImageGalleryConstants.ATTR_IS_ALLOW_VOTE, false);
-	//	}
+	IImageGalleryService service = getImageGalleryService();
+	// get sessionId from HttpServletRequest
+	String nextActivityUrl = null;
+	try {
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    Long userID = new Long(userDTO.getUserID().longValue());
+
+	    nextActivityUrl = service.finishToolSession(sessionId, userID);
+	    request.setAttribute(ImageGalleryConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
+	} catch (ImageGalleryApplicationException e) {
+	    log.error("Failed get next activity url:" + e.getMessage());
+	}
 
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
@@ -353,6 +348,13 @@ public class LearningAction extends Action {
 	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
 	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, image);
 	
+	// becuase in webpage will use this login name. Here is just
+	// initial it to avoid session close error in proxy object.
+	if (image.getCreateBy() != null) {
+	    image.getCreateBy().getLoginName();
+	}
+	sessionMap.put("aa", image.getUid());
+
 	if (imageGallery.isAllowCommentImages()) {
 	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
 	    comments.addAll(image.getComments());
@@ -670,8 +672,11 @@ public class LearningAction extends Action {
 	}
 	image.setTitle(title);
 
+	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);	
+	ImageGalleryUser imageGalleryUser = getCurrentUser(service, sessionId);
+	image.setCreateBy(imageGalleryUser);
 	image.setDescription(imageForm.getDescription());
-	image.setCreateByAuthor(true);
+	image.setCreateByAuthor(false);
 	image.setHide(false);
 	
 	//setting SequenceId

@@ -23,11 +23,7 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.imageGallery.web.form;  
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
  
 /**
  * Image star rating Form.

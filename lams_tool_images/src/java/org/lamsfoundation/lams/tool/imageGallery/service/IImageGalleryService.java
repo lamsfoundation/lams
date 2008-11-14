@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.imageGallery.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;

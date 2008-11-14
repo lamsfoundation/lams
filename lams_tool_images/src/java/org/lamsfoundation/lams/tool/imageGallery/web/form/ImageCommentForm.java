@@ -23,17 +23,11 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.imageGallery.web.form;  
 
-import java.util.Set;
-import java.util.TreeSet;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageCommentComparator;
  
 /**
  * ImageComment Form.

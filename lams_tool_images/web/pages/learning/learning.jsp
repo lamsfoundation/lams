@@ -25,10 +25,6 @@
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.rating.css'/>"/>
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
 	<style media="screen,projection" type="text/css">
-		#content{width:1000;}
-		body{width:1000;}
-		.stripes{width:1000;}
-	
 		.galleria_container{position:relative;margin-top:2em;}
 		.gallery_demo{width:702px;margin:0 auto 0 0;}
 		.gallery_demo li{width:100px;height:100px;border:3px double #111;margin: 0 2px;background:#000;}
@@ -126,7 +122,7 @@
  		    return false;
 		}
 		function finishSession(){
-			document.getElementById("finishButton").disabled = true;
+			$('#finishButton').attr('disabled', true);
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
@@ -149,8 +145,8 @@
 		}
 
 		function afterImageDataLoaded() {
-		//	alert($('#commentsArea_imageUid').val());
-			$('#description').html($('#commentsArea_description').val());
+			var description = $('#commentsArea_addedBy').val() + $('#commentsArea_description').val();
+			$('#description').html(description);
 
 			var imageUid = $('#commentsArea_imageUid').val();
 			if (${imageGallery.allowRank && (mode != 'teacher')}) {	
@@ -180,7 +176,7 @@
 				$('#ratingForm_imageUid').attr('value', imageUid);
 			}
 
-			if (${imageGallery.allowVote && (mode != 'teacher')}) {	
+			if (${imageGallery.allowVote && (mode != 'teacher') && (not finishedLock)}) {	
 				var votedImageUid = $('#commentsArea_votedImageUid').val();
 				var votingFormLabel;
 				if (votedImageUid == 0) {
@@ -203,6 +199,13 @@
 				}
 				$('#votingForm_label').text(votingFormLabel);
 				$('#votingForm_imageUid').attr('value', imageUid);
+			} else if (${finishedLock}) {
+				var votedImageUid = $('#commentsArea_votedImageUid').val();
+				if (imageUid == votedImageUid) {
+					$('#votingForm_vote').attr('checked', true);
+				} else {
+					$('#votingForm_vote').attr('checked', false);
+				}
 			}
 			
 		}
@@ -232,14 +235,14 @@
 <body class="stripes">
 	<div id="content" >
 
+		<%--ImageGallery information-----------------------------------%>
+
 		<h1>
 			${imageGallery.title}
 		</h1>
-
 		<p>
 			${imageGallery.instructions}
 		</p>
-
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
 				<div class="info">
 					<c:choose>
@@ -252,55 +255,57 @@
 					</c:choose>
 				</div>
 		</c:if>
-
 		<%@ include file="/common/messages.jsp"%>
 		
+		<%--Main image---------------------------------------------------%>
 		
-	
-
 		<div class="galleria_container">
-			<div id="description">
-				Description
-			</div>		
+			<div id="description"></div>
+					
 			<div id="main_image"></div>
 			
-			<div id="rating_stars">
-				<c:if test="${imageGallery.allowRank && (mode != 'teacher')}">
-					<html:form action="learning/saveOrUpdateRating" method="post" styleId="ratingForm">
-						<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-						<input type="hidden" name="imageUid" id="ratingForm_imageUid"/>
-						
-						<div id="rating_stars_inputs"> 
-							<input class="star" type="radio" name="rating" value="1" />
-							<input class="star" type="radio" name="rating" value="2" />
-							<input class="star" type="radio" name="rating" value="3" />
-							<input class="star" type="radio" name="rating" value="4" />
-							<input class="star" type="radio" name="rating" value="5" />						
-						</div>
-						
-						<br>
-						<p>
-							<span id="numberRatings"></span>
-							<fmt:message key="label.learning.ratings" />
-						</p>						
-					</html:form>							
-				</c:if>
-				
-				<c:if test="${imageGallery.allowVote && (mode != 'teacher')}">
-					<html:form action="learning/vote" method="post" styleId="votingForm">
-						<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-						<input type="hidden" name="imageUid" id="votingForm_imageUid"/>
-						
-						<p class="small-space-top">
-							<html:checkbox property="vote" styleClass="noBorder" styleId="votingForm_vote" >	</html:checkbox>
+			<%--Ranking/Voting area---------------------------------------%>
 
-							<label for="votingForm_vote" id="votingForm_label">	aa </label>
-						</p>
-						
-					</html:form>							
-				</c:if> 			
-				 			
-			</div>			
+			<c:if test="${(mode != 'teacher') && (not empty sessionMap.imageGalleryList)}">				
+				<div id="rating_stars">
+					<c:if test="${imageGallery.allowRank}">
+						<html:form action="learning/saveOrUpdateRating" method="post" styleId="ratingForm">
+							<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+							<input type="hidden" name="imageUid" id="ratingForm_imageUid"/>
+							
+							<div id="rating_stars_inputs"> 
+								<input class="star" type="radio" name="rating" value="1" />
+								<input class="star" type="radio" name="rating" value="2" />
+								<input class="star" type="radio" name="rating" value="3" />
+								<input class="star" type="radio" name="rating" value="4" />
+								<input class="star" type="radio" name="rating" value="5" />						
+							</div>
+							
+							<br>
+							<p>
+								<span id="numberRatings"></span>
+								<fmt:message key="label.learning.ratings" />
+							</p>						
+						</html:form>							
+					</c:if>
+					
+					<c:if test="${imageGallery.allowVote && (mode != 'teacher')}">
+						<html:form action="learning/vote" method="post" styleId="votingForm">
+							<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+							<input type="hidden" name="imageUid" id="votingForm_imageUid"/>
+							
+							<p class="small-space-top">
+								<html:checkbox property="vote" styleClass="noBorder" styleId="votingForm_vote" >	</html:checkbox>
+	
+								<label for="votingForm_vote" id="votingForm_label"></label>
+							</p>
+							
+						</html:form>							
+					</c:if> 			
+				</div>
+			</c:if>		
+			
+			<%--Image scroller-------------------------------------------------%>			
 			
 			<ul class="gallery_demo jcarousel-skin-tango" id="mycarousel">
 				<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
@@ -320,6 +325,8 @@
 				</c:forEach>
 			</ul>
 			
+			<%--"Check for new" and "Add new image" buttons---------------%>
+			
 			<c:if test="${imageGallery.allowShareImages && (mode != 'teacher')}">
 				<a href="#" onclick="return checkNew()" class="button check_for_new"> 
 					<fmt:message key="label.check.for.new" /> 
@@ -335,60 +342,13 @@
 		</div>
 		<div class="after_main_image"></div>
 
-	
-
-
-	
-		
-		
-
-
-
-
-
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-			
-		
-		
-
-
-		
-		
-		
+		<%--Comments area----------------------------------------------%>	
  		
-<div id="commentsArea">
-	<%@ include file="/pages/learning/parts/commentsarea.jsp"%> 
-</div>
+		<div id="commentsArea">
+			<%@ include file="/pages/learning/parts/commentsarea.jsp"%> 
+		</div>
  
-		
-		
-		
-
+		<%--Reflection--------------------------------------------------%>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
@@ -418,6 +378,8 @@
 				</c:if>
 			</div>
 		</c:if>
+		
+		<%--Bottom buttons-------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right" >
@@ -440,11 +402,11 @@
 		</c:if>
 
 	</div>
-	<!--closes content-->
+	<%--closes content--%>
 
 	<div id="footer">
 	</div>
-	<!--closes footer-->
+	<%--closes footer--%>
 
 </body>
 </lams:html>
