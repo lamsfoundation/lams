@@ -34,7 +34,7 @@
 	<script type="text/javascript">
 	 	var currentTab = ${learningCurrentTab};
 	 	var changeViewUrl = "<c:url value='/learning/changeView.do' />";
-	 	var finishUrl = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
+	 	var finishUrl = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&displayedRecordNumber=${displayedRecordNumber}"/>';
 	 	var continueReflectUrl = '<c:url value="/learning/startReflection.do?sessionMapID=${sessionMapID}&displayedRecordNumber=${displayedRecordNumber}"/>';
 	 	var refreshQuestionSummariesUrl = '<c:url value="/learning/refreshQuestionSummaries.do"/>';
     </script>

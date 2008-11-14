@@ -275,6 +275,8 @@ public class LearningAction extends Action {
 	ActionErrors errors = validateBeforeFinish(request, sessionMapID);
 	if (!errors.isEmpty()) {
 	    this.addErrors(request, errors);
+	    request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, request
+		    .getParameter(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
 	    return mapping.getInputForward();
 	}
 
@@ -989,7 +991,7 @@ public class LearningAction extends Action {
 				e.printStackTrace();
 			    }
 
-			    dateParts[0] = String.valueOf(calendar.get(Calendar.DAY_OF_YEAR));
+			    dateParts[0] = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
 			    dateParts[1] = String.valueOf(calendar.get(Calendar.MONTH) + 1);
 			    dateParts[2] = String.valueOf(calendar.get(Calendar.YEAR));
 			}
