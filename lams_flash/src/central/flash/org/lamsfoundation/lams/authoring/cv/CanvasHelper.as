@@ -393,7 +393,7 @@ class CanvasHelper {
 	 * @return  
 	 */
 	
-	public function finishEditOnFly(forced:Boolean) {
+	public function finishEditOnFly(forced:Boolean, cancelled:Boolean) {
 		Debugger.log('finishing and closing Edit On The Fly',Debugger.CRITICAL,'finishEditOnFly','Canvas');
 		Debugger.log('valid design: ' + _ddm.validDesign,Debugger.CRITICAL,'finishEditOnFly','Canvas');
 		Debugger.log('modified: ' + _ddm.modified,Debugger.CRITICAL,'finishEditOnFly','Canvas');
@@ -403,18 +403,19 @@ class CanvasHelper {
 		
 		if(forced) {
 			ApplicationParent.extCall("setSaved", "true");
-			finishLearningDesignCall(callback);
+			finishLearningDesignCall(callback, cancelled);
 			return;
 		}
 		
 		if(!_ddm.modified) {
-			if(_ddm.validDesign) finishLearningDesignCall(callback);
+			if(_ddm.validDesign) finishLearningDesignCall(callback, cancelled);
 			else LFMessage.showMessageAlert(Dictionary.getValue("cv_eof_finish_invalid_msg"));
-		} else LFMessage.showMessageConfirm(Dictionary.getValue("cv_eof_finish_modified_msg"), Proxy.create(this,finishEditOnFly, true), null);
+		} else LFMessage.showMessageConfirm(Dictionary.getValue("cv_eof_finish_modified_msg"), Proxy.create(this,finishEditOnFly, true, cancelled), null);
 	}
 	
-	private function finishLearningDesignCall(callback:Function) {
-		Application.getInstance().getComms().getRequest('authoring/author.do?method=finishLearningDesignEdit&learningDesignID='+_ddm.learningDesignID,callback, false);
+	private function finishLearningDesignCall(callback:Function, cancelled:Boolean) {
+		Debugger.log('finishLearningDesignCall with cancelled: ' + String(cancelled),Debugger.MED,'finishLearningDesignCall','CanvasHelper');
+		Application.getInstance().getComms().getRequest('authoring/author.do?method=finishLearningDesignEdit&learningDesignID='+_ddm.learningDesignID+'&cancelled='+String(cancelled),callback, false);
 	}
 	
 	/**

@@ -291,7 +291,7 @@ class Canvas extends CanvasHelper {
 					var saveConfirmDialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('al_alert'),closeButton:false,scrollContentPath:"SaveConfirmDialog",msg:msg, requestSrc:_requestSrc, canvasModel:canvasModel,canvasController:cc});
 	
 				} else if(_ddm.editOverrideLock) {
-					var finishEditHandler = Proxy.create(this,finishEditOnFly);
+					var finishEditHandler = Proxy.create(this,finishEditOnFly, false, false);
 					msg = Dictionary.getValue('cv_eof_changes_applied');
 					LFMessage.showMessageAlert(msg, finishEditHandler);
 				} else {

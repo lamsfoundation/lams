@@ -123,7 +123,7 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		}else if(tgt.indexOf("preview") != -1){
 			_app.getCanvas().launchPreviewWindow();
 		}else if(tgt.indexOf("cancel") != -1){
-			_app.getCanvas().finishEditOnFly();
+			_app.getCanvas().finishEditOnFly(false, true);
 		}
 	}
      
