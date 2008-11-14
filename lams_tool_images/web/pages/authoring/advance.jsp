@@ -77,28 +77,6 @@
 </p>
 
 <p>
-	<html:select property="imageGallery.numberColumns"	styleId="numberColumns" style="width:50px">
-		<c:forEach begin="1" end="6" varStatus="status">
-			<c:choose>
-				<c:when
-					test="${formBean.imageGallery.numberColumns == status.index}">
-					<option value="${status.index}" selected="true">
-						${status.index}
-					</option>
-				</c:when>
-				<c:otherwise>
-					<option value="${status.index}">
-						${status.index}
-					</option>
-				</c:otherwise>
-			</c:choose>
-		</c:forEach>
-	</html:select>
-
-	<fmt:message key="label.authoring.advance.number.columns" />
-</p>
-
-<p>
 	<html:checkbox property="imageGallery.reflectOnActivity"
 		styleClass="noBorder" styleId="reflectOn">
 	</html:checkbox>

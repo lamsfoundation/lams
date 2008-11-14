@@ -36,7 +36,6 @@ create table tl_laimag10_imageGallery (
    content_id bigint unique,
    allow_comment_images tinyint,
    allow_share_images tinyint,
-   number_columns integer DEFAULT 3,
    allow_vote tinyint,
    voted_image_uid bigint DEFAULT 0,
    reflect_instructions varchar(255), 

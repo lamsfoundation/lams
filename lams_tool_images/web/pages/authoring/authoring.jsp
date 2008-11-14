@@ -46,7 +46,7 @@
 
  
 </lams:head>
-<body class="stripes" onLoad="init()">
+<body class="stripes" onLoad="init();">
 <div id="page">
 		<h1>
 			<fmt:message key="label.authoring.heading" />

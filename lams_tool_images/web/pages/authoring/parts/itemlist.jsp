@@ -7,14 +7,14 @@
 	<lams:WebAppURL />
 </c:set>
 
-<div id="itemList">
+
+<div id="itemList" >
 	<h2 class="spacer-left">
 		<fmt:message key="label.authoring.basic.image.list" />
-		<img src="${ctxPath}/includes/images/indicator.gif"
-			style="display:none" id="imageGalleryListArea_Busy" />
+		<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="imageGalleryListArea_Busy" />
 	</h2>
-	
-	<table class="alternative-color" id="itemTable" cellspacing="0">
+
+	<table class="alternative-color" id="itemTable" cellspacing="0" > 
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 		<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
@@ -26,21 +26,13 @@
 				 	<c:set var="mediumImagePath">
 	   					<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
 					</c:set>					
-					<a href="${mediumImagePath}" rel="lightbox" title="Enlarge image" ><img src="${thumbnailPath}" /></a>
+					<a href="${mediumImagePath}" rel="lightbox" title="${image.title}" ><img src="${thumbnailPath}" alt="${image.title}"/></a>
 				</td>
 				
 				<td style="vertical-align:middle;">
 					<a href="${mediumImagePath}" rel="lightbox" title="Enlarge image">${image.title}</a>
 				</td>
 
-<%--				
-				<td>
-						<a href="#"
-							onclick="previewItem(${status.index},'${sessionMapID}')"> <fmt:message
-								key="label.authoring.basic.resource.preview" /> </a>
-				</td>
---%>
-				
 				<td width="40px" style="vertical-align:middle;">
 					<c:if test="${not status.first}">
 						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
@@ -84,10 +76,11 @@
 
 <%-- This script will works when a new resoruce item submit in order to refresh "ImageGallery List" panel. --%>
 <script lang="javascript">
-
 	if(window.top != null){
 		window.top.hideMessage();
 		var obj = window.top.document.getElementById('imageGalleryListArea');
 		obj.innerHTML= document.getElementById("itemList").innerHTML;
+	} else {
+		initLightbox();
 	}
 </script>

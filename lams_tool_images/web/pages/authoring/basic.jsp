@@ -1,11 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
+
 <script type="text/javascript"> 
 	var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
 </script>
 <script type="text/javascript" src="<html:rewrite page='/includes/javascript/lightbox.js'/>" ></script>
 <link rel="stylesheet" href="<html:rewrite page='/includes/css/lightbox.css'/>"  type="text/css">
-<c:set var="formBean"
-	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">
 <!-- Common Javascript functions for LAMS -->
 
@@ -64,7 +65,7 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
+		    		evalScripts:false
 		    	}
 	    );
 	}
@@ -73,6 +74,7 @@
 	}
 	function deleteItemComplete(){
 		hideBusy(imageGalleryListTargetDiv);
+		initLightbox();
 	}
 	
 	function upImage(idx, sessionMapID){
@@ -87,7 +89,7 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
+		    		evalScripts:false
 		    	}
 	    );
 	}
@@ -103,7 +105,7 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
+		    		evalScripts:false
 		    	}
 	    );
 	}
@@ -145,7 +147,7 @@
 
 <p>
 	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px';initLightbox();"
 		id="reourceInputArea" name="reourceInputArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">

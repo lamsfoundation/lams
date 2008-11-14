@@ -68,8 +68,6 @@ public class ImageGallery implements Cloneable {
     
     private Long votedImageUid;
 
-    private int numberColumns;
-
     private boolean allowCommentImages;
 
     private boolean allowShareImages;
@@ -505,18 +503,6 @@ public class ImageGallery implements Cloneable {
 
     public void setAllowShareImages(boolean allowShareImages) {
 	this.allowShareImages = allowShareImages;
-    }
-
-    /**
-     * @hibernate.property column="number_columns"
-     * @return
-     */
-    public int getNumberColumns() {
-	return numberColumns;
-    }
-
-    public void setNumberColumns(int numberColumns) {
-	this.numberColumns = numberColumns;
     }
 
     /**
