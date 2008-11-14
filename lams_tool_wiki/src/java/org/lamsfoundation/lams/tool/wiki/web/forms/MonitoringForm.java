@@ -35,7 +35,8 @@ public class MonitoringForm extends WikiPageForm {
     String dispatch;
     boolean teacherVisible;
     Long toolSessionID;
-
+    String contentFolderID;
+    
     // editing message page.
     Long messageUID;
     String messageBody;
@@ -96,5 +97,13 @@ public class MonitoringForm extends WikiPageForm {
 
     public void setMode(String mode) {
         this.mode = mode;
+    }
+
+    public String getContentFolderID() {
+        return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
     }
 }

@@ -203,7 +203,7 @@
 			<c:forEach var="session" items="${dto.sessionDTOs}">
 			<tr>
 				<td>
-					<a href='javascript:openViewWindow("./monitoring.do?dispatch=showWiki&amp;toolSessionID=${session.sessionID}");'>${session.sessionName}</a>
+					<a href='javascript:openViewWindow("./monitoring.do?dispatch=showWiki&amp;toolSessionID=${session.sessionID}&contentFolderID=${contentFolderID}");'>${session.sessionName}</a>
 				</td>	
 				<td>
 					${session.numberOfLearners}

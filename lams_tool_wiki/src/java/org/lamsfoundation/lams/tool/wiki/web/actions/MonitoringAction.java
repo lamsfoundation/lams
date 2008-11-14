@@ -159,6 +159,7 @@ public class MonitoringAction extends WikiPageAction {
 	    HttpServletResponse response) {
 
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	if (wikiService == null) {
 	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
@@ -216,6 +217,7 @@ public class MonitoringAction extends WikiPageAction {
 	    currentWikiPageHistoryDTOs.add(new WikiPageContentDTO(wikiPageContentHistoryItem));
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGE_CONTENT_HISTORY, currentWikiPageHistoryDTOs);
+	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 
 	return mapping.findForward("wiki_display");
     }

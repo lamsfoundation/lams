@@ -130,7 +130,12 @@
 			
 				<c:if test="${contentEditable}">
 				
+					<a href="javascript:refreshPage();" title='<fmt:message key="label.wiki.refresh.toolTip"></fmt:message>'>
+						<fmt:message key="label.wiki.refresh"></fmt:message>
+					</a> 
+					
 					<c:if test="${editableFlag or addFlag}">
+						&nbsp;
 						<a href="javascript:changeDiv('view');" title='<fmt:message key="label.wiki.view.toolTip"></fmt:message>'>
 							<fmt:message key="label.wiki.view"></fmt:message>
 						</a>
@@ -475,6 +480,12 @@
 		}
 		
 		editorInstance.wikiLinkArray = wikiLinkArray;
+	}
+	
+	function refreshPage()
+	{
+		var url = "<lams:WebAppURL/>/learning.do?mode=${mode}&toolSessionID=${lrnForm.toolSessionID}&currentWikiPageId=${currentWikiPage.uid}"
+		window.location=url;
 	}
 
 -->

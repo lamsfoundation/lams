@@ -10,6 +10,7 @@
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<html:hidden property="dispatch" styleId="dispatch" />
 	<html:hidden property="toolSessionID" />
+	<html:hidden property="contentFolderID" />
 	<!--<html:hidden property="mode"/>-->
 	<html:hidden property="currentWikiPage" value="${currentWikiPage.uid}" styleId="currentWikiPage" />
 	<input type="hidden" id="wikiLinks" />
@@ -29,6 +30,10 @@
 		</div>
 
 		<div id="buttons" style="float: right; width: 50%; text-align:right;">
+			<a href="javascript:refreshPage();" title='<fmt:message key="label.wiki.refresh.toolTip"></fmt:message>'>
+				<fmt:message key="label.wiki.refresh"></fmt:message>
+			</a> 
+			&nbsp;
 			<a href="javascript:changeDiv('view');" title='<fmt:message key="label.wiki.view.toolTip"></fmt:message>'>
 				<fmt:message key="label.wiki.view"></fmt:message>
 			</a> 
@@ -302,7 +307,6 @@
 	<div id="finishButtonDiv"></div>
 </html:form>
 
-
 <script type="text/javascript">
 <!--
 	var wikiLinkArray = new Array();
@@ -363,6 +367,12 @@
 	function FCKeditor_OnComplete(editorInstance) 
 	{ 	
 		editorInstance.wikiLinkArray = wikiLinkArray;
+	}
+	
+	function refreshPage()
+	{
+		var url = "<lams:WebAppURL/>/monitoring.do?dispatch=showWiki&toolSessionID=${sessionDTO.sessionID}&currentWikiPageId=${currentWikiPage.uid}&contentFolderID=${contentFolderID}"
+		window.location=url;
 	}
 	
 -->
