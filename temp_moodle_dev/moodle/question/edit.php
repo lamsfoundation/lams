@@ -29,8 +29,8 @@
         $navlinks[] = array('name' => format_string($module->name), 'link' => "$CFG->wwwroot/mod/{$cm->modname}/view.php?id={$cm->id}", 'type' => 'title');
         $navlinks[] = array('name' => $streditingquestions, 'link' => '', 'type' => 'title');
         $navigation = build_navigation($navlinks);
-        print_header_simple($streditingquestions, '', $navigation, "", "", true, $strupdatemodule);
-
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+        print_header_simple($streditingquestions, '', $navigation, "", "", true, $strupdatemodule,'',false,'',false,$cm->is_lams);
         $currenttab = 'edit';
         $mode = 'questions';
         ${$cm->modname} = $module;
@@ -40,9 +40,9 @@
         $navlinks = array();
         $navlinks[] = array('name' => $streditingquestions, 'link' => '', 'type' => 'title');
         $navigation = build_navigation($navlinks);
-
-        print_header_simple($streditingquestions, '', $navigation);
-
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+        print_header_simple($streditingquestions, '', $navigation, "", "", true, '','',false,'',false,$cm->is_lams);
+        
         // print tabs
         $currenttab = 'questions';
         include('tabs.php');
@@ -52,11 +52,11 @@
     echo '<table class="boxaligncenter" border="0" cellpadding="2" cellspacing="0">';
     echo '<tr><td valign="top">';
 
-    question_showbank('questions', $contexts, $thispageurl, $cm, $pagevars['qpage'], $pagevars['qperpage'], $pagevars['qsortorder'], $pagevars['qsortorderdecoded'],
+    question_showbank('questions', $conheadertexts, $thispageurl, $cm, $pagevars['qpage'], $pagevars['qperpage'], $pagevars['qsortorder'], $pagevars['qsortorderdecoded'],
                     $pagevars['cat'], $pagevars['recurse'], $pagevars['showhidden'], $pagevars['showquestiontext']);
 
     echo '</td></tr>';
     echo '</table>';
-
-    print_footer($COURSE);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer($COURSE,null, false,$cm->is_lams);
 ?>

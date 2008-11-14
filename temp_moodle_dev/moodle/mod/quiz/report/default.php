@@ -14,7 +14,6 @@
 ////////////////////////////////////////////////////////////////////
 
 // Included by ../report.php
-
 class quiz_default_report {
 
     function display($cm, $course, $quiz) {     /// This function just displays the report
@@ -28,17 +27,24 @@ class quiz_default_report {
         $strquiz  = get_string("modulename", "quiz");
     /// Print the page header
         $navigation = build_navigation('', $cm);
-        
-        print_header_simple(format_string($quiz->name), "", $navigation,
-                     '', $meta, true, update_module_button($cm->id, $course->id, $strquiz), navmenu($course, $cm));
-    /// Print the tabs    
+    //if Lams we include a parameter to the header function so it won't we displayed
+    print_header_simple(format_string($quiz->name), "", $navigation,
+                     '', $meta, true, update_module_button($cm->id, $course->id, $strquiz), navmenu($course, $cm),false,'',false,$cm->is_lams);
+	//old print_header_simple(format_string($quiz->name), "", $navigation,
+                    // '', $meta, true, update_module_button($cm->id, $course->id, $strquiz), navmenu($course, $cm));
+	    
+    /// Print the tabs 
+
         $currenttab = 'reports';
         $mode = $reportmode;
         require($CFG->dirroot . '/mod/quiz/tabs.php');
         $course_context = get_context_instance(CONTEXT_COURSE, $course->id);
         if (has_capability('gradereport/grader:view', $course_context) && has_capability('moodle/grade:viewall', $course_context)) {
-            echo '<div class="allcoursegrades"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id . '">' 
+            //If is Lams we don't need to display 'see all course grades' 
+            if($cm->is_lams!=1){
+        	 echo '<div class="allcoursegrades"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id . '">' 
                 . get_string('seeallcoursegrades', 'grades') . '</a></div>';
+            }
         }
 
     }

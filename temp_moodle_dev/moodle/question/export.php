@@ -41,8 +41,8 @@
         $navlinks[] = array('name' => format_string($module->name), 'link' => "$CFG->wwwroot/mod/{$cm->modname}/view.php?id={$cm->id}", 'type' => 'title');
         $navlinks[] = array('name' => $strexportquestions, 'link' => '', 'type' => 'title');
         $navigation = build_navigation($navlinks);
-        print_header_simple($strexportquestions, '', $navigation, "", "", true, $strupdatemodule);
-
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+        print_header_simple($strexportquestions, '', $navigation, "", "", true, $strupdatemodule,'',false,'',false,$cm->is_lams);	
         $currenttab = 'edit';
         $mode = 'export';
         ${$cm->modname} = $module;
@@ -52,8 +52,8 @@
         $navlinks = array();
         $navlinks[] = array('name' => $strexportquestions, 'link' => '', 'type' => 'title');
         $navigation = build_navigation($navlinks);
-
-        print_header_simple($strexportquestions, '', $navigation);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+        print_header_simple($strexportquestions, '', $navigation, "", "", true, '','',false,'',false,$cm->is_lams);
         // print tabs
         $currenttab = 'export';
         include('tabs.php');
@@ -132,7 +132,8 @@
         }
 
         print_continue('edit.php?' . $thispageurl->get_query_string());
-        print_footer($COURSE);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+		print_footer($COURSE,null, false,$cm->is_lams);
         exit;
     }
 
@@ -141,5 +142,6 @@
 
     $export_form->display();
 
-    print_footer($COURSE);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer($COURSE,null, false,$cm->is_lams);
 ?>

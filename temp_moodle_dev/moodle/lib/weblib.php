@@ -2835,32 +2835,38 @@ function force_strict_header($output) {
  * @param string $bodytags This text will be included verbatim in the <body> tag (useful for onload() etc)
  * @param bool   $return If true, return the visible elements of the header instead of echoing them.
  */
+//we pass a new parameter (is_lams) so it will be useful for lams navigation
 function print_header_simple($title='', $heading='', $navigation='', $focus='', $meta='',
-                       $cache=true, $button='&nbsp;', $menu='', $usexml=false, $bodytags='', $return=false) {
+                       $cache=true, $button='&nbsp;', $menu='', $usexml=false, $bodytags='', $return=false,$is_lams=null) {
 
     global $COURSE, $CFG;
-
-    // if we have no navigation specified, build it
-    if( empty($navigation) ){
-       $navigation = build_navigation('');
-    }
-
-    // If old style nav prepend course short name otherwise leave $navigation object alone
-    if (!is_newnav($navigation)) {
-        if ($COURSE->id != SITEID) {
-            $shortname = '<a href="'.$CFG->wwwroot.'/course/view.php?id='. $COURSE->id .'">'. $COURSE->shortname .'</a> ->';
-            $navigation = $shortname.' '.$navigation;
-        }
-    }
-
-    $output = print_header($COURSE->shortname .': '. $title, $COURSE->fullname .' '. $heading, $navigation, $focus, $meta,
-                           $cache, $button, $menu, $usexml, $bodytags, true);
-
-    if ($return) {
-        return $output;
-    } else {
-        echo $output;
-    }
+    //If is lams don't print top navigation menu (just let the header be blank)
+    if($is_lams==1){
+        	print_header();
+    }else{ // print the header normally
+	    // if we have no navigation specified, build it
+	    if( empty($navigation) ){
+	       $navigation = build_navigation('');
+	    }
+	
+	    // If old style nav prepend course short name otherwise leave $navigation object alone
+	    if (!is_newnav($navigation)) {
+	        if ($COURSE->id != SITEID) {
+	            $shortname = '<a href="'.$CFG->wwwroot.'/course/view.php?id='. $COURSE->id .'">'. $COURSE->shortname .'</a> ->';
+	            $navigation = $shortname.' '.$navigation;
+	        }
+	    }
+	
+	   $output = print_header($COURSE->shortname .': '. $title, $COURSE->fullname .' '. $heading, $navigation, $focus, $meta,
+	                           $cache, $button, $menu, $usexml, $bodytags, true);
+	
+	
+	    if ($return) {
+	        return $output;
+	    } else {
+	        echo $output;
+	    }
+  }
 }
 
 
@@ -2876,110 +2882,113 @@ function print_header_simple($title='', $heading='', $navigation='', $focus='', 
  * @param boolean $return output as string
  * @return mixed string or void
  */
-function print_footer($course=NULL, $usercourse=NULL, $return=false) {
-    global $USER, $CFG, $THEME, $COURSE;
-
-    if (defined('ADMIN_EXT_HEADER_PRINTED') and !defined('ADMIN_EXT_FOOTER_PRINTED')) {
-        admin_externalpage_print_footer();
-        return;
-    }
-
-/// Course links or special footer
-    if ($course) {
-        if ($course === 'empty') {
-            // special hack - sometimes we do not want even the docs link in footer
-            $output = '';
-            if (!empty($THEME->open_header_containers)) {
-                for ($i=0; $i<$THEME->open_header_containers; $i++) {
-                    $output .= print_container_end_all(); // containers opened from header
-                }
-            } else {
-                //1.8 theme compatibility
-                $output .= "\n</div>"; // content div
-            }
-            $output .= "\n</div>\n</body>\n</html>"; // close page div started in header
-            if ($return) {
-                return $output;
-            } else {
-                echo $output;
-                return;
-            }
-
-        } else if ($course === 'none') {          // Don't print any links etc
-            $homelink = '';
-            $loggedinas = '';
-            $home  = false;
-
-        } else if ($course === 'home') {   // special case for site home page - please do not remove
-            $course = get_site();
-            $homelink  = '<div class="sitelink">'.
-               '<a title="Moodle '. $CFG->release .'" href="http://moodle.org/">'.
-               '<img style="width:100px;height:30px" src="pix/moodlelogo.gif" alt="moodlelogo" /></a></div>';
-            $home  = true;
-
-        } else {
-            $homelink = '<div class="homelink"><a '.$CFG->frametarget.' href="'.$CFG->wwwroot.
-                        '/course/view.php?id='.$course->id.'">'.format_string($course->shortname).'</a></div>';
-            $home  = false;
-        }
-
-    } else {
-        $course = get_site();  // Set course as site course by default
-        $homelink = '<div class="homelink"><a '.$CFG->frametarget.' href="'.$CFG->wwwroot.'/">'.get_string('home').'</a></div>';
-        $home  = false;
-    }
-
-/// Set up some other navigation links (passed from print_header by ugly hack)
-    $menu        = isset($THEME->menu) ? str_replace('navmenu', 'navmenufooter', $THEME->menu) : '';
-    $title       = isset($THEME->title) ? $THEME->title : '';
-    $button      = isset($THEME->button) ? $THEME->button : '';
-    $heading     = isset($THEME->heading) ? $THEME->heading : '';
-    $navigation  = isset($THEME->navigation) ? $THEME->navigation : '';
-    $navmenulist = isset($THEME->navmenulist) ? $THEME->navmenulist : '';
-
-
-/// Set the user link if necessary
-    if (!$usercourse and is_object($course)) {
-        $usercourse = $course;
-    }
-
-    if (!isset($loggedinas)) {
-        $loggedinas = user_login_string($usercourse, $USER);
-    }
-
-    if ($loggedinas == $menu) {
-        $menu = '';
-    }
-
-/// there should be exactly the same number of open containers as after the header
-    if ($THEME->open_header_containers != open_containers()) {
-        debugging('Unexpected number of open containers: '.open_containers().', expecting '.$THEME->open_header_containers, DEBUG_DEVELOPER);
-    }
-
-/// Provide some performance info if required
-    $performanceinfo = '';
-    if (defined('MDL_PERF') || (!empty($CFG->perfdebug) and $CFG->perfdebug > 7)) {
-        $perf = get_performance_info();
-        if (defined('MDL_PERFTOLOG') && !function_exists('register_shutdown_function')) {
-            error_log("PERF: " . $perf['txt']);
-        }
-        if (defined('MDL_PERFTOFOOT') || debugging() || $CFG->perfdebug > 7) {
-            $performanceinfo = $perf['html'];
-        }
-    }
-
-/// Include the actual footer file
-
-    ob_start();
-    include($CFG->footer);
-    $output = ob_get_contents();
-    ob_end_clean();
-
-    if ($return) {
-        return $output;
-    } else {
-        echo $output;
-    }
+//we pass a new parameter (is_lams) so it will be useful for lams navigation
+function print_footer($course=NULL, $usercourse=NULL, $return=false,$is_lams=null) {
+//If is lams don't print bottom navigation menu, else, print it normally
+ if($is_lams!=1){
+	    global $USER, $CFG, $THEME, $COURSE;
+	    if (defined('ADMIN_EXT_HEADER_PRINTED') and !defined('ADMIN_EXT_FOOTER_PRINTED')) {
+	        admin_externalpage_print_footer();
+	        return;
+	    }
+	
+	/// Course links or special footer
+	    if ($course) {
+	        if ($course === 'empty') {
+	            // special hack - sometimes we do not want even the docs link in footer
+	            $output = '';
+	            if (!empty($THEME->open_header_containers)) {
+	                for ($i=0; $i<$THEME->open_header_containers; $i++) {
+	                    $output .= print_container_end_all(); // containers opened from header
+	                }
+	            } else {
+	                //1.8 theme compatibility
+	                $output .= "\n</div>"; // content div
+	            }
+	            $output .= "\n</div>\n</body>\n</html>"; // close page div started in header
+	            if ($return) {
+	                return $output;
+	            } else {
+	                echo $output;
+	                return;
+	            }
+	
+	        } else if ($course === 'none') {          // Don't print any links etc
+	            $homelink = '';
+	            $loggedinas = '';
+	            $home  = false;
+	
+	        } else if ($course === 'home') {   // special case for site home page - please do not remove
+	            $course = get_site();
+	            $homelink  = '<div class="sitelink">'.
+	               '<a title="Moodle '. $CFG->release .'" href="http://moodle.org/">'.
+	               '<img style="width:100px;height:30px" src="pix/moodlelogo.gif" alt="moodlelogo" /></a></div>';
+	            $home  = true;
+	
+	        } else {
+	            $homelink = '<div class="homelink"><a '.$CFG->frametarget.' href="'.$CFG->wwwroot.
+	                        '/course/view.php?id='.$course->id.'">'.format_string($course->shortname).'</a></div>';
+	            $home  = false;
+	        }
+	
+	    } else {
+	        $course = get_site();  // Set course as site course by default
+	        $homelink = '<div class="homelink"><a '.$CFG->frametarget.' href="'.$CFG->wwwroot.'/">'.get_string('home').'</a></div>';
+	        $home  = false;
+	    }
+	
+	/// Set up some other navigation links (passed from print_header by ugly hack)
+	    $menu        = isset($THEME->menu) ? str_replace('navmenu', 'navmenufooter', $THEME->menu) : '';
+	    $title       = isset($THEME->title) ? $THEME->title : '';
+	    $button      = isset($THEME->button) ? $THEME->button : '';
+	    $heading     = isset($THEME->heading) ? $THEME->heading : '';
+	    $navigation  = isset($THEME->navigation) ? $THEME->navigation : '';
+	    $navmenulist = isset($THEME->navmenulist) ? $THEME->navmenulist : '';
+	
+	
+	/// Set the user link if necessary
+	    if (!$usercourse and is_object($course)) {
+	        $usercourse = $course;
+	    }
+	
+	    if (!isset($loggedinas)) {
+	        $loggedinas = user_login_string($usercourse, $USER);
+	    }
+	
+	    if ($loggedinas == $menu) {
+	        $menu = '';
+	    }
+	
+	/// there should be exactly the same number of open containers as after the header
+	    if ($THEME->open_header_containers != open_containers()) {
+	        debugging('Unexpected number of open containers: '.open_containers().', expecting '.$THEME->open_header_containers, DEBUG_DEVELOPER);
+	    }
+	
+	/// Provide some performance info if required
+	    $performanceinfo = '';
+	    if (defined('MDL_PERF') || (!empty($CFG->perfdebug) and $CFG->perfdebug > 7)) {
+	        $perf = get_performance_info();
+	        if (defined('MDL_PERFTOLOG') && !function_exists('register_shutdown_function')) {
+	            error_log("PERF: " . $perf['txt']);
+	        }
+	        if (defined('MDL_PERFTOFOOT') || debugging() || $CFG->perfdebug > 7) {
+	            $performanceinfo = $perf['html'];
+	        }
+	    }
+	
+	/// Include the actual footer file
+	
+	    ob_start();
+	    include($CFG->footer);
+	    $output = ob_get_contents();
+	    ob_end_clean();
+	
+	    if ($return) {
+	        return $output;
+	    } else {
+	        echo $output;
+	    }
+	}
 }
 
 /**
@@ -4231,7 +4240,7 @@ function print_single_button($link, $options, $label='OK', $method='get', $targe
     $output .= '<div>';
     if ($options) {
         foreach ($options as $name => $value) {
-            $output .= '<input type="hidden" name="'. $name .'" value="'. s($value) .'" />';
+            $output .= '<input type="hidden" name="'. $name .'" value="'. s($value).'" />';
         }
     }
     if ($tooltip) {
@@ -6618,7 +6627,7 @@ function print_maintenance_message () {
     global $CFG, $SITE;
 
     $CFG->pagepath = "index.php";
-    print_header(strip_tags($SITE->fullname), $SITE->fullname, 'home');
+    print_er(strip_tags($SITE->fullname), $SITE->fullname, 'home');
     print_box_start();
     print_heading(get_string('sitemaintenance', 'admin'));
     @include($CFG->dataroot.'/1/maintenance.html');
@@ -6751,6 +6760,7 @@ function convert_tree_to_html($tree, $row=0) {
 
         $str .= ' </li>'."\n";
     }
+
     $str .= '</ul>'."\n";
 
     return $str;

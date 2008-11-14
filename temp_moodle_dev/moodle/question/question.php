@@ -223,8 +223,9 @@ if ($mform->is_cancelled()){
         }
         $navlinks[] = array('name' => $streditingquestion, 'link' => '', 'type' => 'title');
         $navigation = build_navigation($navlinks);
-        print_header_simple($streditingquestion, '', $navigation, "", "", true, $strupdatemodule);
-
+        //m
+        print_header_simple($streditingquestion, '', $navigation, "", "", true, $strupdatemodule,'',false,'',false,$cm->is_lams);
+        
     } else {
         $navlinks = array();
         $navlinks[] = array('name' => get_string('editquestions', "quiz"), 'link' => $returnurl, 'type' => 'title');
@@ -232,13 +233,16 @@ if ($mform->is_cancelled()){
         $strediting = '<a href="edit.php?courseid='.$COURSE->id.'">'.
                 get_string("editquestions", "quiz").'</a> -> '.$streditingquestion;
         $navigation = build_navigation($navlinks);
-        print_header_simple($streditingquestion, '', $navigation);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+        print_header_simple($streditingquestion, '', $navigation, "", "", true, $strupdatemodule,'',false,'',false,$cm->is_lams);
+
     }
 
 
     // Display a heading, question editing form and possibly some extra content needed for
     // for this question type.
     $QTYPES[$question->qtype]->display_question_editing_page($mform, $question, $wizardnow);
-    print_footer($COURSE);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer($COURSE,null, false,$cm->is_lams);
 }
 ?>

@@ -5,6 +5,7 @@
     require_once("../config.php");
     require_once("lib.php");
     require_once($CFG->libdir.'/gradelib.php');
+    
 
     require_login();
 
@@ -12,7 +13,8 @@
     $update        = optional_param('update', 0, PARAM_INT);
     $return        = optional_param('return', 0, PARAM_BOOL); //return to course/view.php if false or mod/modname/view.php if true
     $type          = optional_param('type', '', PARAM_ALPHANUM);
-    $lamsupdateurl = required_param('lamsUpdateURL', PARAM_TEXT);
+    $lamsupdateurl = optional_param('lamsUpdateURL', PARAM_TEXT); //get lamsupdateurl variable if coming from a Lams activity
+    $is_learner  = optional_param('is_learner', 0, PARAM_INT);
 
     if (!empty($add)) {
         $section = required_param('section', PARAM_INT);
@@ -29,7 +31,7 @@
         if (! $module = get_record("modules", "name", $add)) {
             error("This module type doesn't exist");
         }
-
+        
         $cw = get_course_section($section, $course->id);
 
         if (!course_allowed_module($course, $module->id)) {
@@ -39,7 +41,7 @@
         $cm = null;
 
         $form->section          = $section;  // The section number itself - relative!!! (section column in course_sections)
-        $form->visible          = $cw->visible;
+        $form->visible          = 1;// We always mark as visible our Lams Courses because we have our is_lams variable to hide/unhide them if necessary    old $cw->visible;
         $form->course           = $course->id;
         $form->module           = $module->id;
         $form->modulename       = $module->name;
@@ -101,7 +103,7 @@
 
         $form->coursemodule     = $cm->id;
         $form->section          = $cw->section;  // The section number itself - relative!!! (section column in course_sections)
-        $form->visible          = $cm->visible; //??  $cw->visible ? $cm->visible : 0; // section hiding overrides
+        $form->visible          = 1;// We always mark as visible our Lams Courses because we have our is_lams variable to hide/unhide them if necessary, old $cm->visible; //??  $cw->visible ? $cm->visible : 0; // section hiding overrides
         $form->cmidnumber       = $cm->idnumber;          // The cm IDnumber
         $form->groupmode        = groups_get_activity_groupmode($cm); // locked later if forced
         $form->groupingid       = $cm->groupingid;
@@ -300,6 +302,7 @@
             }
             if (! $sectionid = add_mod_to_section($fromform) ) {
                 error("Could not add the new course module to that section");
+               
             }
 
             if (! set_field("course_modules", "section", $sectionid, "id", $fromform->coursemodule)) {
@@ -414,8 +417,14 @@
 
         rebuild_course_cache($course->id);
         grade_regrade_final_grades($course->id);
-
-        redirect("$lamsupdateurl&extToolContentID=$fromform->coursemodule");
+		
+        //LAMS: one you submit if you are in a Quiz you continue editing the 	quiz, if you're finished then return to Lams
+        if (isset($fromform->submitbutton)) { 
+        	// If is a Lams activity we add editing variable to know in the sequence when to display Next activity button or back to Lams button, we also passes is_learner variable so we know if teacher is acting as a learner or as a teacher
+          	redirect("$CFG->wwwroot/mod/$module->name/view.php?id=$fromform->coursemodule&is_learner=$is_learner&editing=1");     
+        } else {     
+            redirect("$lamsupdateurl&extToolContentID=$fromform->coursemodule");
+        }
         exit;
 
     } else {
@@ -428,31 +437,33 @@
 
         $streditinga = get_string("editinga", "moodle", $fullmodulename);
         $strmodulenameplural = get_string("modulenameplural", $module->name);
-
-	/*
-        $navlinks = array();
-        $navlinks[] = array('name' => $strmodulenameplural, 'link' => "$CFG->wwwroot/mod/$module->name/index.php?id=$course->id", 'type' => 'activity');
-        if ($navlinksinstancename) {
-            $navlinks[] = $navlinksinstancename;
-        }
-        $navlinks[] = array('name' => $streditinga, 'link' => '', 'type' => 'title');
-	*/
-
+		/*
+	        $navlinks = array();
+	        $navlinks[] = array('name' => $strmodulenameplural, 'link' => "$CFG->wwwroot/mod/$module->name/index.php?id=$course->id", 'type' => 'activity');
+	        if ($navlinksinstancename) {
+	            $navlinks[] = $navlinksinstancename;
+	        }
+	        $navlinks[] = array('name' => $streditinga, 'link' => '', 'type' => 'title');
+		*/
         $navigation = ''; //build_navigation($navlinks);
-
-	print_header_simple($streditinga, "LAMS", $navigation, $mform->focus(), "", false);
-
-        if (!empty($cm->id)) {
+		
+        //We don't want to display Moodle navigation top menus in Lams
+        print_header();
+        //old print_header_simple($streditinga, "LAMS", $navigation, $mform->focus(), "", false,$strupdatemodule);
+        
+        // In Lams we don't need horitzontal extra tabs while editing      
+        /*if (!empty($cm->id)) {
             $context = get_context_instance(CONTEXT_MODULE, $cm->id);
             $overridableroles = get_overridable_roles($context);
             $assignableroles  = get_assignable_roles($context);
             $currenttab = 'update';
             include_once($CFG->dirroot.'/'.$CFG->admin.'/roles/tabs.php');
-        }
+        }*/
         $icon = '<img src="'.$CFG->modpixpath.'/'.$module->name.'/icon.gif" alt=""/>';
 
 	print_heading_with_help($pageheading, "mods", $module->name, $icon);
 	$mform->display();
-        //print_footer($course);
+	 //We don't want to display Moodle navigation bottom menu in Lams
+     //print_footer($course);
     }
 ?>

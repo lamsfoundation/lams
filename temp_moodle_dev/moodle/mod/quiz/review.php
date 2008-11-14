@@ -121,7 +121,10 @@
                     : "";
         get_string('reviewofattempt', 'quiz', $attempt->attempt);
         $navigation = build_navigation($strreviewtitle, $cm);
-        print_header_simple(format_string($quiz->name), "", $navigation, "", $headtags, true, $strupdatemodule);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+	    print_header_simple(format_string($quiz->name), "", $navigation, "", $headtags, true, $strupdatemodule,'',false,'',false,$quiz->is_lams);
+		//old print_header_simple(format_string($quiz->name), "", $navigation, "", $headtags, true, $strupdatemodule);
+        
     }
     echo '<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>'; // for overlib
 
@@ -150,9 +153,10 @@
     print_heading($strreviewtitle);
 
     // print javascript button to close the window, if necessary
-    if (!$isteacher) {
+	//always include attempt_close_js.php so when we are doing a preview we can access to appearbutton() function in lams
+    //old if (!$isteacher) {
         include('attempt_close_js.php');
-    }
+    //old }
 
 /// Work out some time-related things.
     $timelimit = (int)$quiz->timelimit * 60;
@@ -291,12 +295,13 @@
         print_paging_bar($numpages, $page, 1, 'review.php?attempt='.$attempt->id.'&amp;');
     }
 
-    // print javascript button to close the window, if necessary
-    if (!$isteacher) {
+    // print javascript button to close the window always, so we can access to the appearbutton function
+   //m if (!$isteacher) {
         include('attempt_close_js.php');
-    }
+    //m}
 
     if (empty($popup)) {
-        print_footer($course);
+    		//we pass a new parameter to the function so it won't we printed if is_lams=1
+			print_footer($course,null, false,$quiz->is_lams);
     }
 ?>

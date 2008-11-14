@@ -1,16 +1,13 @@
 <?php  // $Id$
 
 // This script uses installed report plugins to print quiz reports
-
+	
     require_once('../../config.php');
     require_once($CFG->dirroot.'/mod/quiz/locallib.php');
     require_once($CFG->dirroot.'/mod/quiz/report/reportlib.php');
-
     $id = optional_param('id',0,PARAM_INT);    // Course Module ID, or
     $q = optional_param('q',0,PARAM_INT);     // quiz ID
-
     $mode = optional_param('mode', 'overview', PARAM_ALPHA);        // Report mode
-
     if ($id) {
         if (! $cm = get_coursemodule_from_id('quiz', $id)) {
             error("There is no coursemodule with id $id");
@@ -35,14 +32,13 @@
             error("The course module for the quiz with id $q is missing");
         }
     }
-
     require_login($course, false, $cm);
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
     require_capability('mod/quiz:viewreports', $context);
 
     // if no questions have been set up yet redirect to edit.php
     if (!$quiz->questions and has_capability('mod/quiz:manage', $context)) {
-        redirect('edit.php?cmid='.$cm->id);
+    		redirect('edit.php?cmid='.$cm->id);	
     }
 
     // Upgrade any attempts that have not yet been upgraded to the
@@ -54,9 +50,7 @@
             quiz_upgrade_states($attempt);
         }
     }
-
-    add_to_log($course->id, "quiz", "report", "report.php?id=$cm->id", "$quiz->id", "$cm->id");
-
+	add_to_log($course->id, "quiz", "report", 'report.php?id='.$cm->id, "$quiz->id", "$cm->id");
 /// Open the selected quiz report and display it
 
     $mode = clean_param($mode, PARAM_SAFEDIR);
@@ -75,7 +69,6 @@
     }
 
 /// Print footer
-
-    print_footer($course);
-
+		//we pass a new parameter to the function so it won't we printed if is_lams=1
+	    print_footer($course,null, false,$quiz->is_lams);
 ?>
