@@ -46,7 +46,7 @@
 	<select id="longlatMaps" name="longlatMaps" multiple="multiple" size="<%=DacoConstants.LONGLAT_MAPS_LIST.length %>">
 
 		<c:forEach var="map" items="<%=DacoConstants.LONGLAT_MAPS_LIST %>">
-			<option value="${map}"
+			<option value="<c:out  value='${map}'/>"
 				<c:forEach var="selectedMap" items="${longlatMapsSelected}">
 					<c:if test="${selectedMap==map}">
 						selected="selected"

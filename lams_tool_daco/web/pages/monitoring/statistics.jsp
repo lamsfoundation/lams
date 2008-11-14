@@ -26,7 +26,7 @@
 										<c:if test="${userUid==nextUser.uid}">
 											selected="selected"
 											<c:set var="recordList" value="${nextUser.records}" />
-											<c:set var="userFullName" value="${nextUser.fullName}" />
+											<c:set var="userFullName" value="<c:out value='${nextUser.fullName}'/>" />
 										</c:if>
 										>${nextUser.fullName}</option>
 									</c:forEach>

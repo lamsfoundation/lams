@@ -139,7 +139,7 @@
 										 >
 										<c:choose>
 											<c:when test="${question.type==1}">
-												<input type="text" size="45" readonly="readonly" value="${answer.answer}" />
+												<input type="text" size="45" readonly="readonly" value="<c:out  value='${answer.answer}'/>" />
 											</c:when>
 											<c:when test="${question.type==2}">
 												<textarea cols="35" 
@@ -154,7 +154,7 @@
 												 readonly="readonly">${answer.answer}</textarea>
 											</c:when>
 											<c:when test="${question.type==3}">
-												<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
+												<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
 											</c:when>
 											<c:when test="${question.type==4}">
 												<c:set var="date">
@@ -238,8 +238,8 @@
 														<label><fmt:message key="label.learning.longlat.longitude" /></label>
 														</td>
 														<td>
-															<c:set var="longitude" value="${answer.answer}" />
-															<input type="text" size="10" readonly="readonly" value="${answer.answer}"/>
+															<c:set var="longitude" value="<c:out  value='${answer.answer}'/>" />
+															<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
 															<label><fmt:message key="label.learning.longlat.longitude.unit" /></label><br />
 														</td>
 														<c:if test="${not empty question.answerOptions and not empty longitude}">
