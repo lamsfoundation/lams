@@ -231,6 +231,7 @@ class Presence extends MovieClip {
 		}
 		// Initialize dataprovider from javascript
 		else {
+			presenceTitle_lbl.text = Dictionary.getValue('pres_panel_lbl') + " (" + dataProvider.length + ")";
 			_users_dg.dataProvider = dataProvider;
 			_users_dg.sortItemsBy("nick");
 			_users_dg.invalidate();

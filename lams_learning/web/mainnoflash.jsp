@@ -83,7 +83,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<a target='_new' href="learner.do?method=displayProgress&lessonID=<c:out value="${param.lessonID}"/>&keepThis=true&TB_iframe=true&height=300&width=400" title="<c:out value="${param.title}"/> - <fmt:message key="label.my.progress"/>" class="thickbox"><fmt:message key="label.my.progress"/></a> &nbsp;&nbsp;
 		<a href="#" onclick="javascript:window.location.href='<lams:LAMSURL/>/home.do?method=learner&lessonID=<c:out value="${param.lessonID}"/>'"/><fmt:message key="label.resume"/></a> &nbsp;&nbsp;
 		<c:if test="${param.portfolioEnabled}"><a target='_new' href="exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${param.lessonID}"/>&hideClose=true&keepThis=true&TB_iframe=true&height=300&width=400" title="<fmt:message key="label.export.portfolio"/>" class="thickbox"><fmt:message key="label.export.portfolio"/></a> &nbsp;&nbsp;</c:if>
-		<c:if test="${param.presenceEnabledPatch}"><a href=javascript:doPresenceClick()><fmt:message key="label.presence"/></a></c:if> &nbsp;&nbsp;
+		<c:if test="${param.presenceEnabledPatch}"><a href=javascript:doPresenceClick()><fmt:message key="label.presence"/></a>&nbsp;&nbsp;</c:if>
 		<a href="#" onclick="javascript:window.open('notebook.do?method=viewAll&lessonID=<c:out value="${param.lessonID}"/>')"><fmt:message key="mynotes.title"/></a> &nbsp;&nbsp;
 		<lams:help style="small" page="learner"/>
 		</div> 
