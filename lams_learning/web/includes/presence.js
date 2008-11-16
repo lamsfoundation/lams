@@ -97,6 +97,7 @@ function UpdateRosterDisplay() {
 		// send roster to no flash version
 		var rosterDiv = document.getElementById("roster");
 		rosterDiv.innerHTML = "";
+		this.users.sort(sortFunction);
 		for (var i = 0; i < this.users.length; i++) {
 			if (this.users[i].status != "unavailable") {
 				var className = "unselected";
@@ -110,6 +111,15 @@ function UpdateRosterDisplay() {
 		}
 	}
 }
+
+function sortFunction(a, b){
+  if (a.nick < b.nick)
+    return -1;
+  if (a.nick > b.nick)
+    return 1;
+  return 0;
+}
+
 function Roster() {
 	this.users = [];
 	this.currentIndex = null;
