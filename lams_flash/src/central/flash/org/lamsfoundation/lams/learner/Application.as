@@ -316,12 +316,20 @@ class Application extends ApplicationParent {
         var h:Number = Stage.height;
 		
 		var resizeHeight:Number;
-		if(_presence_mc._visble) {
-			resizeHeight = LESSON_Y+_lesson.model.getSpadHeight() +_lesson.model.getPresenceHeight();
+		
+		Debugger.log('_presence_mc: ' +_presence_mc, Debugger.MED, 'onResize', 'Application');
+		Debugger.log('_presence_mc._visible: ' +_presence_mc._visible, Debugger.MED, 'onResize', 'Application');
+		
+		if (_presence_mc._visible) {
+			Debugger.log('resizeHeight set to Presence height', Debugger.MED, 'onResize', 'Application');
+			resizeHeight = LESSON_Y+_lesson.model.getPresenceHeight()+_lesson.model.getSpadHeight();
 		}
 		else {
+			Debugger.log('resizeHeight set to Spad height', Debugger.MED, 'onResize', 'Application');
 			resizeHeight = LESSON_Y+_lesson.model.getSpadHeight();
 		}		
+		
+		Debugger.log('resizeHeight: ' + resizeHeight, Debugger.MED, 'onResize', 'Application');
 		
 		var someListener:Object = new Object();
 		

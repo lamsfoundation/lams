@@ -235,8 +235,6 @@ class Presence extends MovieClip {
 			_users_dg.sortItemsBy("nick");
 			_users_dg.invalidate();
 		}
-		
-
 	}
 
 	private function cellPress(event) {
@@ -282,6 +280,7 @@ class Presence extends MovieClip {
 	public function showPresence(v:Boolean) {
 		Debugger.log("Show/Hide Presence: " + v, Debugger.GEN, "showPresence", "Presence");
 		this._visible = v;
+		Application.getInstance().onResize();
 	}
 	
 }

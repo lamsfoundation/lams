@@ -99,6 +99,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				top.window.close();
 			}
 			
+			breakPoint();
+			
 			var HTTPBASE = "<lams:LAMSURL/>JHB";
 			var lcId = new Date().getTime();
 			var flashProxy = new FlashProxy(lcId, "/lams/learning/includes/JavaScriptFlashGateway.swf");
