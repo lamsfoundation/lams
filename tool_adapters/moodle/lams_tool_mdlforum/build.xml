@@ -180,9 +180,6 @@ Ant build file.
 				<include name="struts/*" />
 				<include name="tags/*.tag" />
 			</webinf>
-			<lib dir="${build.lib}">
-				<include name="${product}.jar" />
-			</lib>
 			<fileset dir="${conf.web.dir}">
 				<include name="*" />
 				<include name="common/**" />
@@ -216,7 +213,6 @@ Ant build file.
 			<fileset dir="${jboss.deploy}/work" />
 		</delete>
 		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" />
-		<copy file="${build.lib}/${product}.war" todir="${jboss.deploy}" />
 		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/tool/mdfrum">
 		   <fileset dir="${conf.language.dir}">
 		    <include name="**/*.properties"/>

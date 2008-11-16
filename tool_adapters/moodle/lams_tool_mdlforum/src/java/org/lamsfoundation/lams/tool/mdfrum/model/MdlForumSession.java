@@ -175,7 +175,7 @@ public class MdlForumSession implements java.io.Serializable {
 
     /**
      * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="mdlForum_uid"
+     * @hibernate.column name="mdlforum_uid"
      * 
      */
 
@@ -189,7 +189,7 @@ public class MdlForumSession implements java.io.Serializable {
 
     /**
      * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="mdlForum_session_uid"
+     * @hibernate.collection-key column="mdlforum_session_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.mdfrum.model.MdlForumUser"
      * 
      */
