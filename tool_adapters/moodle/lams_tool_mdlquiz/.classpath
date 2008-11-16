@@ -10,6 +10,6 @@
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar" sourcepath="/lams_contentrepository"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-learning.jar" sourcepath="/lams_learning"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-monitoring.jar"/>
-	<classpathentry kind="lib" path="/usr/local/jboss-4.0.2/server/default/lib/javax.servlet.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jar"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>
