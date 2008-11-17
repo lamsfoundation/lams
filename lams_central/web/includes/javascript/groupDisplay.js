@@ -16,6 +16,7 @@
 							toggleGroupContents(element, stateId);
 							registerToolTip(element);
 							jQuery(element).css("display", "block");
+							tb_init('a.thickbox'+jQuery(element).attr("id"));
 						}
 					);
 				}

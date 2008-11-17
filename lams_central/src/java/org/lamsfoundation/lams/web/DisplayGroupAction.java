@@ -52,6 +52,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.web.context.WebApplicationContext;
@@ -139,7 +141,7 @@ public class DisplayGroupAction extends Action {
 				}
 				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')", "add-lesson-button", null));
-					links.add(new IndexLinkBean("index.searchlesson", "javascript:openSearchLesson(" + org.getOrganisationId()+",'')", "search-lesson-button", "index.searchlesson.tooltip")); 
+					links.add(new IndexLinkBean("index.searchlesson",  Configuration.get(ConfigurationKeys.SERVER_URL) + "/findUserLessons.do?dispatch=getResults&courseID=" + org.getOrganisationId()+"&KeepThis=true&TB_iframe=true&height=400&width=600", "thickbox"+org.getOrganisationId(), "index.searchlesson.tooltip")); 
 			}else{//CLASS_TYPE
 				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")", "add-lesson-button", null));
