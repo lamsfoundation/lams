@@ -63,7 +63,6 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
 	private var delete_competence_btn:Button;
 	
     private var _bgpanel:MovieClip;       //The underlaying panel base
-	private var definitionDialog:MovieClip;
 	
 	private var app:Application;
     private var fm:FocusManager;            //Reference to focus manager
@@ -152,10 +151,9 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
 	
 	public function editHandler():Void {
 		Debugger.log("editCompetence clicked: _competenceTitle "+_competenceTitle, Debugger.CRITICAL, "editHandler", "CompetenceContainer");
-		CompetenceEditorDialog(app.dialog.scrollContent).editingCompetence = _competenceTitle;
-		
-		definitionDialog = app.getCanvas().openCompetenceDefinitionWindow();
-		Selection.setFocus(definitionDialog.scrollContent);
+		CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).editingCompetence = _competenceTitle;
+		app.getCanvas().openCompetenceDefinitionWindow(); // sets app.dialog to the definition dialog
+		Selection.setFocus(app.dialog.scrollContent);
 	}
 	
 	public function deleteHandler():Void {
@@ -215,8 +213,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceContainer extends MovieCl
 	
 	
 	private function deleteCompetence() {
-		// app.dialog.scrollContent must be an instance of CompetenceEditorDialog
-		var competenceEditorDialog:CompetenceEditorDialog = CompetenceEditorDialog(app.dialog.scrollContent);
+		var competenceEditorDialog:CompetenceEditorDialog = CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent);
 		app.getDesignDataModel().competences.remove(_competenceTitle);
 			
 		competenceEditorDialog.clear();

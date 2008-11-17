@@ -62,7 +62,6 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
 	private var competenceContainer:MovieClip;
 	private var main_mc:MovieClip
 	private var competenceContainerLayer:MovieClip;
-	private var definitionDialog:MovieClip;
 	
 	private var containerArray:Array;
 	
@@ -232,8 +231,8 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
 		
 		_editingCompetence = null;
 		
-		definitionDialog = app.getCanvas().openCompetenceDefinitionWindow();
-		Selection.setFocus(definitionDialog.scrollContent);
+		app.getCanvas().openCompetenceDefinitionWindow(); // sets app.dialog to the definition window
+		Selection.setFocus(app.dialog.scrollContent);
 	}
 
 	/**
@@ -277,6 +276,8 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
     * Called by the close button 
     */
     private function close(){
+		if (model instanceof CanvasModel)
+			app.canvas.model.competenceEditorDialog = null;
 		
 		_container.deletePopUp();
     }
@@ -285,7 +286,10 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
     * Event dispatched by parent container when close button clicked
     */
     public function click(e:Object):Void{
-        e.target.deletePopUp();
+		if (model instanceof CanvasModel)
+			app.canvas.model.competenceEditorDialog = null;
+        
+		e.target.deletePopUp();
     }
 	
 	/**

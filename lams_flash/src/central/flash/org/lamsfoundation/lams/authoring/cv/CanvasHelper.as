@@ -79,7 +79,7 @@ class CanvasHelper {
 	private static var AUTOSAVE_CONFIG:String = "autosave";
 	private static var AUTOSAVE_TAG:String = "cv.ddm.autosave.user.";
    
-   private var _bin:MovieClip;
+	private var _bin:MovieClip;
 	
 	private var _target_mc:MovieClip;
 	
@@ -826,17 +826,18 @@ class CanvasHelper {
 
 		app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('competence_editor_dlg'), closeButton:true, resize:false, scrollContentPath:'CompetenceEditorDialog'});
 		app.dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
+		
+		canvasModel.competenceEditorDialog = app.dialog; // store a reference to the competence editor dialog
 	}	
 	
 	/**
     * Opens the competence definition dialog
     */
-    public function openCompetenceDefinitionWindow():MovieClip {
+    public function openCompetenceDefinitionWindow() {
 		var controller:CanvasController = canvasView.getController();
-		var dialog:MovieClip = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('competence_def_dlg'), closeButton:true, scrollContentPath:'CompetenceDefinitionDialog'});			
-		
-		dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
-		return dialog;
+	
+		app.dialog = PopUpManager.createPopUp(Application.root, LFWindow, true,{title:Dictionary.getValue('competence_def_dlg'), closeButton:true, scrollContentPath:'CompetenceDefinitionDialog'});	
+		app.dialog.addEventListener('contentLoaded',Delegate.create(controller, controller.openDialogLoaded));
 	}
 	
 	public function openBranchView(ba, visible:Boolean){

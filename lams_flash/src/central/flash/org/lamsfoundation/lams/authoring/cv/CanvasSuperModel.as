@@ -81,6 +81,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	private var _openBranchingActivities:Array;
 	private var _openBranchingActivity:Number;
 	
+	private var _competenceEditorDialog:MovieClip;
+	
 	//These are defined so that the compiler can 'see' the events that are added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
     public var addEventListener:Function;
@@ -1190,6 +1192,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	
 	public function get openBranchingActivity():Number {
 		return _openBranchingActivity;
+	}
+	
+	public function set competenceEditorDialog(dialog:MovieClip) {
+		_competenceEditorDialog = dialog;
+	}
+	
+	public function get competenceEditorDialog():MovieClip {
+		return _competenceEditorDialog;
 	}
 	
 	public function get openBranchingActivities():Array {

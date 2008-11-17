@@ -114,7 +114,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 		add_competence_btn.label = Dictionary.getValue("competence_editor_add_competence_btn");
 		save_competence_btn.label = Dictionary.getValue("mnu_file_save");
 		
-		editingCompetence = CompetenceEditorDialog(app.dialog.scrollContent).editingCompetence;
+		editingCompetence = CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).editingCompetence;
 		
         //EVENTS
         //Add event listeners for ok, cancel and close buttons
@@ -210,20 +210,19 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 		var competenceDesc:String = StringUtils.trim(competence_description_txt.text);
 		
 		if (competenceName.length == 0) {
-			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
+			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), Delegate.create(this, selectAndHighlightTitle));
 		}
 		else if (app.getDesignDataModel().competences.containsKey(competenceName)) {
 			// entry already exists, do not add
-			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_exists", [competenceName]), null);
+			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_exists", [competenceName]), Delegate.create(this, selectAndHighlightTitle));
 		} 
 		else {
 			// add the new competence to the hashtable			app.getDesignDataModel().competences.put(competenceName, competenceDesc);
 
-			CompetenceEditorDialog(app.dialog.scrollContent).clear();
-			CompetenceEditorDialog(app.dialog.scrollContent).draw();
+			CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).clear();
+			CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).draw();
+			_container.deletePopUp();
 		}
-		
-		_container.deletePopUp();
 	}
 	
 	// used for updating an existing competence
@@ -233,54 +232,52 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 		var updatedCompetenceDesc:String = StringUtils.trim(competence_description_txt.text);
 		
 		if (updatedCompetenceName.length == 0) {
-			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
+			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), Delegate.create(this, selectAndHighlightTitle));
 		}
 		else if (editingCompetence != updatedCompetenceName && app.getDesignDataModel().competences.containsKey(updatedCompetenceName)) {
 			// entry already exists, do not add
-			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_exists", [updatedCompetenceName]), null);
+			LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_exists", [updatedCompetenceName]), Delegate.create(this, selectAndHighlightTitle));
 		} 
 		else {
-		
 			if (editingCompetence != null && editingCompetence != undefined && app.getDesignDataModel().competences.containsKey(editingCompetence)) {
-				if (updatedCompetenceName.length > 0) {
-					app.getDesignDataModel().competences.remove(editingCompetence);  // remove the original competencetitle
-					app.getDesignDataModel().competences.put(updatedCompetenceName, updatedCompetenceDesc);
+				
+				app.getDesignDataModel().competences.remove(editingCompetence);  // remove the original competencetitle
+				app.getDesignDataModel().competences.put(updatedCompetenceName, updatedCompetenceDesc);
 		
-					// if the competence title has changed, update the mappings for all activities to the new competence title
-					if (editingCompetence != updatedCompetenceName) { 
+				// if the competence title has changed, update the mappings for all activities to the new competence title
+				if (editingCompetence != updatedCompetenceName) { 
 						
-						var activityKeys:Array = app.getDesignDataModel().activities.keys(); // contains the activity UIIDs
+					var activityKeys:Array = app.getDesignDataModel().activities.keys(); // contains the activity UIIDs
 						
-						for (var i=0; i<activityKeys.length; ++i) {
+					for (var i=0; i<activityKeys.length; ++i) {
 
-							if (app.getDesignDataModel().activities.get(activityKeys[i]) instanceof ToolActivity) {
-								var competenceMappings:Array = ToolActivity(app.getDesignDataModel().activities.get(activityKeys[i])).competenceMappings;
-								for (var j=0; j<competenceMappings.length; ++j) {
-									if (competenceMappings[j] == editingCompetence) {
-										competenceMappings[j] = updatedCompetenceName;
-									}
+						if (app.getDesignDataModel().activities.get(activityKeys[i]) instanceof ToolActivity) {
+							var competenceMappings:Array = ToolActivity(app.getDesignDataModel().activities.get(activityKeys[i])).competenceMappings;
+							for (var j=0; j<competenceMappings.length; ++j) {
+								if (competenceMappings[j] == editingCompetence) {
+									competenceMappings[j] = updatedCompetenceName;
 								}
 							}
 						}
 					}
 					
-					CompetenceEditorDialog(app.dialog.scrollContent).clear();
-					CompetenceEditorDialog(app.dialog.scrollContent).draw();
+					CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).clear();
+					CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).draw();
 				}
-				else {
-					LFMessage.showMessageAlert(Dictionary.getValue("competence_editor_warning_title_blank"), null);
-				}
+				_container.deletePopUp();
 			}
 		}
-		
-		_container.deletePopUp();
+	}
+	
+	private function selectAndHighlightTitle():Void {
+		Selection.setFocus(competence_title_txt);
 	}
 	
     /**
     * Called by the OK button 
     */
     private function close(){
-
+		app.dialog = app.canvas.model.competenceEditorDialog;
 		_container.deletePopUp();
 
     }
@@ -289,6 +286,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
     * Event dispatched by parent container when close button clicked
     */
     public function click(e:Object):Void{
+		app.dialog = app.canvas.model.competenceEditorDialog;
         e.target.deletePopUp();
     }
     
