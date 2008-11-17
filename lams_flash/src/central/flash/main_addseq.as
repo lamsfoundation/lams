@@ -11,6 +11,11 @@ if(StringUtils.isEmpty(serverURL)){
 	Debugger.log('serverURL is not defined, using defualt:'+_root.serverURL ,Debugger.CRITICAL,'main','ROOT');			
 }
 
+if(StringUtils.isEmpty(presenceServerUrl)){
+	_root.presenceServerUrl = "172.20.100.18";
+	Debugger.log('presenceServerUrl is not defined, using defualt:'+_root.presenceServerUrl ,Debugger.CRITICAL,'main','ROOT');			
+}
+
 if(StringUtils.isEmpty(userID)){
 	_root.userID = 4;
 	Debugger.log('userID is not defined, using defualt:'+_root.userID ,Debugger.CRITICAL,'main','ROOT');			
