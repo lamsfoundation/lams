@@ -25,9 +25,9 @@
 				<c:if test="${not empty lesson.url}">
 					<a title="<c:out value="${lesson.description}"/>" href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
 				</c:if>
-				<c:if test="${lesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" ></span> </c:if>
-				<c:if test="${lesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" ></span> </c:if>
-				<c:if test="${lesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" ></span> </c:if>
+				<c:if test="${lesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
+				<c:if test="${lesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
+				<c:if test="${lesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
 				<c:forEach var="lessonlink" items="${lesson.links}">
 					<a href="<c:out value='${lessonlink.url}'/>" class="sequence-action-link"> 
 						<span class="mycourses-monitor-img"> 
@@ -66,9 +66,9 @@
 					<c:if test="${not empty childLesson.url}">
 						<a title="<c:out value="${childLesson.description}"/>" href="<c:out value='${childLesson.url}'/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
 					</c:if>
-					<c:if test="${childLesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" ></span> </c:if>
-					<c:if test="${childLesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" ></span> </c:if>
-					<c:if test="${childLesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" ></span> </c:if>
+					<c:if test="${childLesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
+					<c:if test="${childLesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
+					<c:if test="${childLesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
 					<c:forEach var="childlessonlink" items="${childLesson.links}">
 					<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link"> 
 						<span class="mycourses-monitor-img"> 
