@@ -173,14 +173,31 @@ checkMysql()
 {
     DB_URL=jdbc:mysql://${SQL_HOST}:${SQL_PORT}/${DB_NAME}?characterEncoding=utf8
     printf "Checking LAMS database...\n"
-    printf "$DB_URL\n"   
         
-    $JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION"
-
+    # COMMENTING THIS SECTION FOR 2.2 BECAUSE IT REQUIRES ONE OF TWO PREVIOUS
+    # LAMS VERSIONS. UN-COMMENT FOR NEXT UPDATER
+    ############################################################################
+    #$JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION" 
+    #if [  "$?" -ne  "0" ]
+    #then
+    #	installfailed
+    #fi
+    ############################################################################
+    
+    # REMOVE AFTER 2.2
+    ############################################################################
+    $JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION" > log/checkmysql.log
     if [  "$?" -ne  "0" ]
     then
-    	installfailed
+    	$JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "2.1.1" >> log/checkmysql.log
+	    if [  "$?" -ne  "0" ]
+	    then
+	    	printf "\nThis updater requires LAMS 2.1 or 2.1.1, neither were found so aborting update.\nSee log/checkmysql.log for further details.\n"
+	    	installfailed
+	    fi
     fi
+    printf "\n"
+    ############################################################################
 }
 
 #getMysqlHost()
