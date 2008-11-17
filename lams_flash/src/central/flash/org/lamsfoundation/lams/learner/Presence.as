@@ -217,6 +217,7 @@ class Presence extends MovieClip {
 			
 			_users_dg.addEventListener("cellPress", Proxy.create(this, cellPress));
 			_users_dg.columnNames = ["nick"];
+			_users_dg.showHeaders = false;
 			
 			var col:mx.controls.gridclasses.DataGridColumn;
 			col = _users_dg.getColumnAt(0);
