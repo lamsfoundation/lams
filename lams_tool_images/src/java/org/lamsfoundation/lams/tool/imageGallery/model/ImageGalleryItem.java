@@ -26,9 +26,11 @@ package org.lamsfoundation.lams.tool.imageGallery.model;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
  * ImageGallery
@@ -82,6 +84,13 @@ public class ImageGalleryItem implements Cloneable {
     public ImageGalleryItem() {
 	comments = new HashSet();
     }    
+    
+    // *************** NON Persist Fields (used only for export needs) ********************
+    private ImageGalleryAttachment originalFile;
+
+    private ImageGalleryAttachment mediumFile;
+
+    private ImageGalleryAttachment thumbnailFile;
 
     @Override
     public Object clone() {
@@ -355,5 +364,31 @@ public class ImageGalleryItem implements Cloneable {
      */
     public void setNumberRatings(int numberRatings) {
 	this.numberRatings = numberRatings;
+    }
+    
+    // *************** NON Persist Fields (used only for export needs) ********************
+    
+    public ImageGalleryAttachment getOriginalFile() {
+	return originalFile;
+    }
+
+    public void setOriginalFile(ImageGalleryAttachment originalFile) {
+	this.originalFile = originalFile;
+    }
+    
+    public ImageGalleryAttachment getMediumFile() {
+	return mediumFile;
+    }
+
+    public void setMediumFile(ImageGalleryAttachment mediumFile) {
+	this.mediumFile = mediumFile;
+    }
+
+    public ImageGalleryAttachment getThumbnailFile() {
+	return thumbnailFile;
+    }
+
+    public void setThumbnailFile(ImageGalleryAttachment thumbnailFile) {
+	this.thumbnailFile = thumbnailFile;
     }
 }

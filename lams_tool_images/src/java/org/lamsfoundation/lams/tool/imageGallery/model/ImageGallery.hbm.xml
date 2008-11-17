@@ -189,14 +189,6 @@
         />
 
         <property
-            name="numberColumns"
-            type="int"
-            update="true"
-            insert="true"
-            column="number_columns"
-        />
-
-        <property
             name="allowVote"
             type="boolean"
             update="true"

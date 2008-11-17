@@ -107,9 +107,12 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * 
  */
 public class ImageGalleryServiceImpl implements IImageGalleryService, ToolContentManager, ToolSessionManager,
-	ToolContentImport102Manager
-
-{
+	ToolContentImport102Manager {
+    
+    private final static String MEDIUM_FILENAME_PREFIX = "medium_";
+    
+    private final static String THUMBNAIL_FILENAME_PREFIX = "thumbnail_";
+    
     static Logger log = Logger.getLogger(ImageGalleryServiceImpl.class.getName());
 
     private ImageGalleryDAO imageGalleryDao;
@@ -642,7 +645,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    // Read the original image from the repository
 	    InputStream originalIS = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
 	    InputStream mediumIS = ResizePictureUtil.resizePicture(originalIS, mediumImageDimensions);
-	    String mediumFileName = "medium_" + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
+	    String mediumFileName = MEDIUM_FILENAME_PREFIX + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName,
 		    file.getContentType(), IToolContentHandler.TYPE_ONLINE);
 	    image.setMediumFileUuid(mediumNodeKey.getUuid());
@@ -653,7 +656,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    // Read the original image from the repository
 	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileNode(mediumNodeKey.getUuid()).getFile();
 	    InputStream thumbnailIS = ResizePictureUtil.resizePicture(mediumIS2, thumbnailImageDimensions);
-	    String thumbnailFileName = "thumbnail_" + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
+	    String thumbnailFileName = THUMBNAIL_FILENAME_PREFIX + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName,
 		    file.getContentType(), IToolContentHandler.TYPE_ONLINE);
 	    image.setThumbnailFileUuid(thumbnailNodeKey.getUuid());
@@ -791,10 +794,34 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	toolContentObj.setToolContentHandler(null);
 	toolContentObj.setOfflineFileList(null);
 	toolContentObj.setOnlineFileList(null);
+	Set<ImageGalleryItem> images = toolContentObj.getImageGalleryItems();
+	for (ImageGalleryItem image : images) {
+	    image.setComments(null);
+	    
+	    ImageGalleryAttachment originalFile = new ImageGalleryAttachment();
+	    originalFile.setFileUuid(image.getOriginalFileUuid());
+	    originalFile.setFileVersionId(image.getFileVersionId());
+	    originalFile.setFileName(image.getFileName());
+	    originalFile.setFileType(IToolContentHandler.TYPE_ONLINE);
+	    image.setOriginalFile(originalFile);
+	    
+	    ImageGalleryAttachment mediumFile = new ImageGalleryAttachment();
+	    mediumFile.setFileUuid(image.getMediumFileUuid());
+	    mediumFile.setFileVersionId(image.getFileVersionId());
+	    mediumFile.setFileName(MEDIUM_FILENAME_PREFIX + image.getFileName());
+	    mediumFile.setFileType(IToolContentHandler.TYPE_ONLINE);	    
+	    image.setMediumFile(mediumFile);
+
+	    ImageGalleryAttachment thumbnailFile = new ImageGalleryAttachment();
+	    thumbnailFile.setFileUuid(image.getThumbnailFileUuid());
+	    thumbnailFile.setFileVersionId(image.getFileVersionId());
+	    thumbnailFile.setFileName(THUMBNAIL_FILENAME_PREFIX + image.getFileName());
+	    thumbnailFile.setFileType(IToolContentHandler.TYPE_ONLINE);	    
+	    image.setThumbnailFile(thumbnailFile);
+	}
+	
 	try {
 	    exportContentService.registerFileClassForExport(ImageGalleryAttachment.class.getName(), "fileUuid",
-		    "fileVersionId");
-	    exportContentService.registerFileClassForExport(ImageGalleryItem.class.getName(), "fileUuid",
 		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, imageGalleryToolContentHandler,
 		    rootPath);
@@ -809,14 +836,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	try {
 	    exportContentService.registerFileClassForImport(ImageGalleryAttachment.class.getName(), "fileUuid",
 		    "fileVersionId", "fileName", "fileType", null, null);
-	    exportContentService.registerFileClassForImport(ImageGalleryItem.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, "initialItem");
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, imageGalleryToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof ImageGallery)) {
 		throw new ImportToolContentException(
-			"Import Share imageGallery tool content failed. Deserialized object is " + toolPOJO);
+			"Import ImageGallery tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    ImageGallery toolContentObj = (ImageGallery) toolPOJO;
 
@@ -836,9 +861,17 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    toolContentObj.setCreatedBy(user);
 
 	    // reset all imageGalleryItem createBy user
-	    Set<ImageGalleryItem> items = toolContentObj.getImageGalleryItems();
-	    for (ImageGalleryItem item : items) {
-		item.setCreateBy(user);
+	    Set<ImageGalleryItem> images = toolContentObj.getImageGalleryItems();
+	    for (ImageGalleryItem image : images) {
+		image.setCreateBy(user);
+		
+		image.setOriginalFileUuid(image.getOriginalFile().getFileUuid());
+		image.setMediumFileUuid(image.getMediumFile().getFileUuid());
+		image.setThumbnailFileUuid(image.getThumbnailFile().getFileUuid());
+		
+		image.setOriginalFile(null);
+		image.setMediumFile(null);
+		image.setThumbnailFile(null);
 	    }
 	    imageGalleryDao.saveObject(toolContentObj);
 	} catch (ImportToolContentException e) {

@@ -272,7 +272,6 @@ function hideLightbox()
 //
 function initLightbox()
 {
-	
 	if (!document.getElementsByTagName){ return; }
 	var anchors = document.getElementsByTagName("a");
 
