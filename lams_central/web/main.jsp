@@ -31,6 +31,9 @@
 	<script language="javascript" type="text/javascript" src="loadVars.jsp"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.1.4.pack.js"></script>
+	<script type="text/javascript">
+		var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
+	</script>
     <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox-compressed.js"></script>
 	<c:if test="${empty tab}">
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.dimensions.pack.js"></script>

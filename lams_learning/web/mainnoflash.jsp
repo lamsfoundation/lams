@@ -38,6 +38,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><fmt:message key="learner.title"/></title>
 
         <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
+        <script type="text/javascript">
+			var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
+		</script>
         <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox-compressed.js"></script>
         
         <script type="text/javascript" src="/lams/learning/includes/jsjac-1.3.1/jsjac.js"></script>
