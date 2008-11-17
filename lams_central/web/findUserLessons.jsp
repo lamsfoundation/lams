@@ -96,8 +96,5 @@
 		</c:forEach>
 	</c:otherwise>
 </c:choose>
-<div class="align-right"><a href="#" onclick="window.close();"
-	class="button"><fmt:message key="button.close" /> </a></div>
-</body>
 
 </lams:html>
