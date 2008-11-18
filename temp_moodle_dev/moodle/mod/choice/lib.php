@@ -747,7 +747,7 @@ function choice_get_extra_capabilities() {
 
 /**
  * LAMS Function
- * This function clones an existing instance of Moodle quiz
+ * This function clones an existing instance of Moodle choice
  * replacing the course and the userid
  */
 function choice_clone_instance($id, $sectionref, $courseid) {
@@ -788,7 +788,7 @@ function choice_clone_instance($id, $sectionref, $courseid) {
     
     $cm->id = insert_record('course_modules', $cm);
 	
-    
+    //copy the old choice's options and create new records for the new choice's options
 	if ($options = get_records("choice_options", "choiceid", $existingchoice->old_id, "id")) {
             foreach ($options as $option) {
                 $option->choiceid = $existingchoice->id;
@@ -837,7 +837,7 @@ function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
 
     // escape text columns for saving into database
     $choice->name = addslashes($choice->name);
-    $choice->intro = addslashes($choice->intro);
+    $choice->text = addslashes($choice->text);
 
     if ( ! $choice->id = insert_record('choice', $choice) ) {
         return 0; 
