@@ -16,6 +16,7 @@
     $is_learner  = optional_param('is_learner',0, PARAM_INT);
     $editing  = optional_param('editing', 0, PARAM_INT);
     $returnurl   = optional_param('returnUrl', '', PARAM_TEXT);  // lams url to proceed to next in sequence 
+   
     if ($id) {
         if (! $cm = get_coursemodule_from_id('quiz', $id)) {
             error("There is no coursemodule with id $id");
@@ -220,9 +221,10 @@
 	    	if($editing==1){
 	    		include('showlamsfinish.php');
 	        }else{
-	        	//if($is_learner==1){
-	        		include('showlamsnext.php');
-	        	//}
+	        	 $isteacher = has_capability('mod/quiz:preview', get_context_instance(CONTEXT_MODULE, $cm->id)); // indicates if is a teacher, useful in lams
+	        	 if($isteacher){	
+	        	 	include('showlamsnext.php');
+	        	}
 	        }
     	}
         print_heading(get_string('summaryofattempts', 'quiz'));
@@ -409,17 +411,8 @@
         	
         	// print next button to continue next activity in lams
         	
-        	if($quiz->is_lams==1){
-        		//m acabar
-        		//if($is_learner==1){
-        			//finish is_learner
-        			//include('showlamsnext.php');
-        		//}else{
-        			if($editing==1){
+        	if($quiz->is_lams==1&&$editing==1){
         				include('showlamsfinish.php');
-        			}
-        		//}
-        		
         	}
 
             // Work out the appropriate button caption.
