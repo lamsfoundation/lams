@@ -15,6 +15,7 @@
     $type          = optional_param('type', '', PARAM_ALPHANUM);
     $lamsupdateurl = optional_param('lamsUpdateURL', PARAM_TEXT); //get lamsupdateurl variable if coming from a Lams activity
     $is_learner  = optional_param('is_learner', 0, PARAM_INT);
+    $returnurl = urlencode(optional_param('returnUrl', PARAM_TEXT));
 
     if (!empty($add)) {
         $section = required_param('section', PARAM_INT);
@@ -185,7 +186,7 @@
     $mform =& new $mformclassname($form->instance, $cw->section, $cm);
     $mform->set_data($form);
     $mform->_form->_attributes['action'] = 'modedit-lams.php';
-    $mform->_form->addElement('hidden', 'lamsUpdateURL', $lamsupdateurl);
+    $mform->_form->addElement('hidden', 'lamsUpdateURL', urlencode($lamsupdateurl));
     $mform->_form->setType('lamsUpdateURL', PARAM_TEXT);
 
     if ($mform->is_cancelled()) {
@@ -418,7 +419,7 @@
         rebuild_course_cache($course->id);
         grade_regrade_final_grades($course->id);
 		
-        //LAMS: one you submit if you are in a Quiz you continue editing the 	quiz, if you're finished then return to Lams
+        //LAMS: one you submit if you are in a activity you continue editing the 	activity, if you're finished then return to Lams
         if (isset($fromform->submitbutton)) { 
         	// If is a Lams activity we add editing variable to know in the sequence when to display Next activity button or back to Lams button, we also passes is_learner variable so we know if teacher is acting as a learner or as a teacher
           	redirect("$CFG->wwwroot/mod/$module->name/view.php?id=$fromform->coursemodule&is_learner=$is_learner&editing=1");     

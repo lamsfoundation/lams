@@ -15,6 +15,7 @@
 	<?php  require_once("../config.php");
 		$id   = optional_param('id', PARAM_INT);
 		$lamsupdateurl = optional_param('lamsUpdateURL', PARAM_TEXT);
+		$returnurl   = optional_param('returnUrl', PARAM_TEXT);  // lams url to proceed to next in sequence 
 		
 	?> 		/* Function to display Next or Finish button in LAMS sequence*/
 			function toggle(id) {  
@@ -47,7 +48,6 @@
 	
 	<div id="next">
 	<?php //Creates button that passes returnurl variable to be able to go to the Lams Next Activity
-		$returnurl   = optional_param('returnUrl', PARAM_TEXT);  // lams url to proceed to next in sequence 
 		echo '<div align="right"><p><input id="nextbutton" type="button" value="Next Activity" onclick="window.parent.location=\''.$returnurl.'\'" /></p></div>';
 	?>
 	</div>
