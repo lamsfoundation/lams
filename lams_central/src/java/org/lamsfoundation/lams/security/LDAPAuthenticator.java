@@ -105,6 +105,12 @@ public class LDAPAuthenticator {
 	    env.setProperty(Context.SECURITY_PROTOCOL, securityProtocol);
 	}
 
+	// setup initial bind user credentials if configured
+	if (StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.LDAP_BIND_USER_DN))) {
+	    env.setProperty(Context.SECURITY_PRINCIPAL, Configuration.get(ConfigurationKeys.LDAP_BIND_USER_DN));
+	    env.setProperty(Context.SECURITY_CREDENTIALS, Configuration.get(ConfigurationKeys.LDAP_BIND_USER_PASSWORD));
+	}
+
 	String login = "";
 	String dn = "";
 	boolean isValid = false;
@@ -141,16 +147,19 @@ public class LDAPAuthenticator {
 		if (StringUtils.equals(login, username)) {
 		    // now we can try to authenticate
 		    dn = result.getNameInNamespace();
+		    setAttrs(attrs);
 		    ctx.close();
 		    break;
 		}
 	    }
 	    if (StringUtils.isBlank(login)) {
-		log.error("===> No LDAP user found with username: " + username);
+		log.error("===> No LDAP user found with username: " + username
+			+ ". This could mean that the user doesn't exist or that an initial bind user is required.");
 	    }
+	    
 	    // authenticate
 	    env.setProperty(Context.SECURITY_PRINCIPAL, dn);
-	    env.put(Context.SECURITY_CREDENTIALS, credential);
+	    env.setProperty(Context.SECURITY_CREDENTIALS, credential.toString());
 	    ctx = new InitialLdapContext(env, null);
 
 	    // if no exception, success
@@ -159,18 +168,15 @@ public class LDAPAuthenticator {
 
 	    // start checking whether we need to update user depending on its
 	    // attributes
-	    Attributes attrs = ctx.getAttributes(dn);
-	    setAttrs(attrs);
-
 	    if (log.isDebugEnabled()) {
-		NamingEnumeration enumAttrs = attrs.getAll();
+		NamingEnumeration enumAttrs = this.attrs.getAll();
 		while (enumAttrs.hasMoreElements()) {
 		    log.debug(enumAttrs.next());
 		}
 	    }
 
 	    // check user is disabled in ldap
-	    if (getLdapService().getDisabledBoolean(attrs)) {
+	    if (getLdapService().getDisabledBoolean(this.attrs)) {
 		log.debug("===> User is disabled in LDAP.");
 		User user = getService().getUserByLogin(username);
 		if (user != null) {
@@ -183,8 +189,8 @@ public class LDAPAuthenticator {
 		User user = getService().getUserByLogin(username);
 		if (user != null) {
 		    // update user's attributes and org membership
-		    getLdapService().updateLDAPUser(user, attrs);
-		    getLdapService().addLDAPUser(attrs, user.getUserId());
+		    getLdapService().updateLDAPUser(user, this.attrs);
+		    getLdapService().addLDAPUser(this.attrs, user.getUserId());
 		}
 	    }
 

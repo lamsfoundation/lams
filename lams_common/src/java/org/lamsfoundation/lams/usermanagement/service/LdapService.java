@@ -434,6 +434,12 @@ public class LdapService implements ILdapService {
 	if (StringUtils.equals("ssl", securityProtocol)) {
 	    env.setProperty(Context.SECURITY_PROTOCOL, securityProtocol);
 	}
+	
+	// setup initial bind user credentials if configured
+	if (StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.LDAP_BIND_USER_DN))) {
+	    env.setProperty(Context.SECURITY_PRINCIPAL, Configuration.get(ConfigurationKeys.LDAP_BIND_USER_DN));
+	    env.setProperty(Context.SECURITY_CREDENTIALS, Configuration.get(ConfigurationKeys.LDAP_BIND_USER_PASSWORD));
+	}
 
 	// get base DN to search on
 	String baseDN = Configuration.get(ConfigurationKeys.LDAP_BASE_DN);

@@ -74,6 +74,12 @@ ALTER TABLE lams_lesson ADD COLUMN live_edit_enabled TINYINT(1) DEFAULT 0;
 UPDATE lams_configuration SET config_value='LDAPSearchFilter', description_key='config.ldap.search.filter' WHERE config_key='LDAPPrincipalDNPrefix';
 UPDATE lams_configuration SET config_value='LDAPBaseDN', description_key='config.ldap.base.dn' WHERE config_key='LDAPPrincipalDNSuffix';
 
+-- LDEV-2029 - configurable initial bind user for ldap
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPBindUserDN','', 'config.ldap.bind.user.dn', 'config.header.ldap', 'STRING', 0);
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPBindUserPassword','', 'config.ldap.bind.user.password', 'config.header.ldap', 'STRING', 0);
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

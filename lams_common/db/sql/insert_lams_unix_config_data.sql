@@ -113,7 +113,13 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('LDAPSearchFilter','(cn={0})', 'config.ldap.search.filter', 'config.header.ldap', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LDAPBaseDN',',ou=Users,dc=melcoe,dc=mq,dc=edu,dc=au', 'config.ldap.base.dn', 'config.header.ldap', 'STRING', 0);
+values ('LDAPBaseDN','ou=Users,dc=melcoe,dc=mq,dc=edu,dc=au', 'config.ldap.base.dn', 'config.header.ldap', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPBindUserDN','', 'config.ldap.bind.user.dn', 'config.header.ldap', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LDAPBindUserPassword','', 'config.ldap.bind.user.password', 'config.header.ldap', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPSecurityProtocol','', 'config.ldap.security.protocol', 'config.header.ldap', 'STRING', 0);
