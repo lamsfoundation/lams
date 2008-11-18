@@ -1,36 +1,37 @@
 <%@ include file="/common/taglibs.jsp"%>
 	
-<c:set var="sessionMapID" value="${param.sessionMapID}" />
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<c:set var="imageGallery" value="${sessionMap.imageGallery}" />
-<c:set var="image" value="${sessionMap.currentImage}" />
-<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
-<c:if test="${!image.createByAuthor && (image.createBy != null)}">
-	<c:set var="addedBy_" >
+<c:set var="commentsSessionMapID" value="${param.sessionMapID}" />
+<c:set var="commentsSessionMap" value="${sessionScope[commentsSessionMapID]}" />
+<c:set var="commentsMode" value="${commentsSessionMap.mode}" />
+<c:set var="commentsImageGallery" value="${commentsSessionMap.imageGallery}" />
+<c:set var="commentsImage" value="${commentsSessionMap.currentImage}" />
+<c:set var="commentsFinishedLock" value="${commentsSessionMap.finishedLock}" />
+<c:if test="${!commentsImage.createByAuthor && (commentsImage.createBy != null)}">
+	<c:set var="commentsAddedBy" >
 		<fmt:message key="label.learning.added.by" /> 
 		<br>
-		${image.createBy.loginName}
+			${commentsImage.createBy.loginName}
 		<br>
 	</c:set>
 </c:if>
 
 
-<input type="hidden" name="imageUid" id="commentsArea_imageUid" value="${image.uid}"/>
-<input type="hidden" name="imageDescription" id="commentsArea_description" value="${image.description}"/>
-<input type="hidden" name="averageRating" id="commentsArea_averageRating" value="${image.averageRating}"/>
-<input type="hidden" name="numberRatings" id="commentsArea_numberRatings" value="${image.numberRatings}"/>
-<input type="hidden" name="currentRating" id="commentsArea_currentRating" value="${sessionMap.currentRating}"/>
-<input type="hidden" name="votedImageUid" id="commentsArea_votedImageUid" value="${sessionMap.votedImageUid}"/>
-<input type="hidden" name="addedBy" id="commentsArea_addedBy" value="${addedBy_}"/>
+<input type="hidden" name="imageUid" id="commentsArea_imageUid" value="${commentsImage.uid}"/>
+<input type="hidden" name="imageDescription" id="commentsArea_description" value="${commentsImage.description}"/>
+<input type="hidden" name="averageRating" id="commentsArea_averageRating" value="${commentsImage.averageRating}"/>
+<input type="hidden" name="numberRatings" id="commentsArea_numberRatings" value="${commentsImage.numberRatings}"/>
+<input type="hidden" name="currentRating" id="commentsArea_currentRating" value="${commentsSessionMap.currentRating}"/>
+<input type="hidden" name="votedImageUid" id="commentsArea_votedImageUid" value="${commentsSessionMap.votedImageUid}"/>
+<input type="hidden" name="addedBy" id="commentsArea_addedBy" value="${commentsAddedBy}"/>
 
 
-<c:if test="${imageGallery.allowCommentImages && (not empty sessionMap.imageGalleryList)}">
+<c:if test="${commentsImageGallery.allowCommentImages && (not empty commentsSessionMap.imageGalleryList)}">
 
 	<%@ include file="/common/messages.jsp"%>
 
 	<%@ include file="commentlist.jsp"%>
 
-	<c:if test="${mode != 'teacher' && (not finishedLock)}">
+	<c:if test="${commentsMode != 'teacher' && (not commentsFinishedLock)}">
 		<div class="field-name">
 			<fmt:message key="label.learning.add.comment" />
 		</div>
@@ -39,7 +40,7 @@
 			<html:form action="learning/addNewComment" method="post">
 				<lams:STRUTS-textarea property="comment" rows="3" cols="75" styleId="comment_textarea" style="margin-right:10px;"/>		
 		
-				<html:button property="commentButton" onclick="javascript:addNewComment(${sessionMap.currentImage.uid}, document.getElementById('comment__lamshidden').value);" styleClass="button" style="vertical-align:bottom;">
+				<html:button property="commentButton" onclick="javascript:addNewComment(${commentsSessionMap.currentImage.uid}, document.getElementById('comment__lamshidden').value);" styleClass="button" style="vertical-align:bottom;">
 					<fmt:message key="label.learning.post" />
 				</html:button>
 			</html:form>					

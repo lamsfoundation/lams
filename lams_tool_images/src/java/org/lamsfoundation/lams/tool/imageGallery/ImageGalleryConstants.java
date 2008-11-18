@@ -78,6 +78,8 @@ public class ImageGalleryConstants {
     public static final String ATTR_COMMENT = "comment";
     public static final String ATTR_CURRENT_IMAGE_UID = "currentImageUid";
     public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
+    public static final String ATTR_MEDIUM_IMAGE_DIMENSIONS = "mediumImageDimensions";
+    public static final String ATTR_THUMBNAIL_IMAGE_DIMENSIONS = "thumbnailImageDimensions";
     
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

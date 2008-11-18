@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
@@ -175,6 +176,26 @@ public class LearningAction extends Action {
 	    }
 	}
 
+	// basic information
+	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, imageGallery.getTitle());
+	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_INSTRUCTION, imageGallery.getInstructions());
+	sessionMap.put(ImageGalleryConstants.ATTR_FINISH_LOCK, lock);
+	sessionMap.put(ImageGalleryConstants.ATTR_LOCK_ON_FINISH, imageGallery.getLockWhenFinished());
+	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED, (imageGalleryUser != null)
+		&& imageGalleryUser.isSessionFinished());
+
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	// reflection information
+	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, imageGallery.isReflectOnActivity());
+	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_INSTRUCTION, imageGallery.getReflectInstructions());
+	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ENTRY, entryText);	
+	
+	ImageGalleryConfigItem mediumImageDimensionsKey = service.getConfigItem(ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
+	ImageGalleryConfigItem thumbnailImageDimensionsKey = service.getConfigItem(ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
+	sessionMap.put(ImageGalleryConstants.ATTR_MEDIUM_IMAGE_DIMENSIONS, Integer.parseInt(mediumImageDimensionsKey.getConfigValue()));	
+	sessionMap.put(ImageGalleryConstants.ATTR_THUMBNAIL_IMAGE_DIMENSIONS, Integer.parseInt(thumbnailImageDimensionsKey.getConfigValue()));	
+	
 	// add define later support
 	if (imageGallery.isDefineLater()) {
 	    return mapping.findForward("defineLater");
@@ -210,22 +231,8 @@ public class LearningAction extends Action {
 		}
 	    }
 	}
-	// basic information
-	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, imageGallery.getTitle());
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_INSTRUCTION, imageGallery.getInstructions());
-	sessionMap.put(ImageGalleryConstants.ATTR_FINISH_LOCK, lock);
-	sessionMap.put(ImageGalleryConstants.ATTR_LOCK_ON_FINISH, imageGallery.getLockWhenFinished());
-	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED, (imageGalleryUser != null)
-		&& imageGalleryUser.isSessionFinished());
-
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	// reflection information
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, imageGallery.isReflectOnActivity());
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_INSTRUCTION, imageGallery.getReflectInstructions());
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ENTRY, entryText);	
+	
 	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST, imageGalleryItemList);	
-
 	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, imageGallery);
 
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
@@ -353,7 +360,6 @@ public class LearningAction extends Action {
 	if (image.getCreateBy() != null) {
 	    image.getCreateBy().getLoginName();
 	}
-	sessionMap.put("aa", image.getUid());
 
 	if (imageGallery.isAllowCommentImages()) {
 	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());

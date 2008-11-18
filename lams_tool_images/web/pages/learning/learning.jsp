@@ -18,6 +18,8 @@
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="imageGallery" value="${sessionMap.imageGallery}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
+	<c:set var="thumbnailImageDimensions" value="${sessionMap.thumbnailImageDimensions}" />
 
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.css'/>" />
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.skin.css'/>" />
@@ -26,8 +28,8 @@
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
 	<style media="screen,projection" type="text/css">
 		.galleria_container{position:relative;margin-top:2em;}
-		.gallery_demo{width:702px;margin:0 auto 0 0;}
-		.gallery_demo li{width:100px;height:100px;border:3px double #111;margin: 0 2px;background:#000;}
+		.gallery_demo{width:${mediumImageDimensions + 62}px;margin:0 auto 0 0;}
+		.gallery_demo li{width:${thumbnailImageDimensions}px;height:${thumbnailImageDimensions}px;border:3px double #111;margin: 0 2px;background:#000;}
 		.gallery_demo li div{left:240px}
 		.gallery_demo li div .caption{font:italic 0.7em/1.4 georgia,serif;}
 		
@@ -35,7 +37,7 @@
 		#description{position:absolute; top:1000px; left:1000px; width:150px; font-style:italic;}
 		#rating_stars{position: absolute; top: 1000px; left: 1000px; width:150px; margin-top: 10}		
 		
-		#main_image{margin: 0 auto 20 0; height: 500px; width: 640px;}
+		#main_image{margin: 0 auto 20 0; height: ${(mediumImageDimensions*3)/4 + 20}px; width: ${mediumImageDimensions}px;}
 		#main_image img{margin-bottom: 10px; border: 1px solid #111;}
 		
 		.check_for_new{position: relative; top: -123px; left: 660px;}
@@ -74,17 +76,16 @@
 
 				//positioning image title, description and rating
 				caption.css('left',image.width() + 20);
+				$('#description').html("");
 				$("#description").css('left', image.width() + 20);
 				$("#description").css('top', caption.height() + 10);
-				$("#rating_stars").css('left', image.width() + 20);
-				//adjust #rating_stars top position to description height 
-				var newTopPosition = (image.height() > caption.height() + $("#description").height() + 60) 
-					? image.height() - 40 
-					: caption.height() + $("#description").height() + 20;
-				$("#rating_stars").css('top', newTopPosition);
+				setStarRatingChecked(0);
+				$("#rating_stars").css('left', image.width() + 20);					
+				$("#rating_stars").css('top', image.height() - 40);
 				
 				//adjust #main_image height to real image size
-				var newHeight = (image.height() >= 480) ? 640 : 480;
+				var newHeight = (image.height() >= ${(mediumImageDimensions*3)/4}) ? ${mediumImageDimensions} : ${(mediumImageDimensions*3)/4};
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODO for the JIRA
 			    $('#main_image').css('height', newHeight + 20);
 
 			    loadImageData(thumb.attr('id'));
@@ -130,6 +131,18 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 
+		function addNewComment(currentImageUid, comment){
+			var url = "<c:url value="/learning/addNewComment.do"/>";
+			$(commentsAreaTargetDiv).load(
+				url,
+				{
+					currentImageUid: currentImageUid, 
+					comment: comment,
+					sessionMapID: "${sessionMapID}"
+				}
+			);
+		}
+
 		//The panel of imageGallery list panel
 		var commentsAreaTargetDiv = "#commentsArea";
 		function loadImageData(imageUid){
@@ -149,26 +162,17 @@
 			$('#description').html(description);
 
 			var imageUid = $('#commentsArea_imageUid').val();
-			if (${imageGallery.allowRank && (mode != 'teacher')}) {	
+			if (${imageGallery.allowRank && (mode != 'teacher')}) {
+				//adjust #rating_stars top position to description height 
+				if ($('#main_image img').height() < $('span.caption').height() + $("#description").height() + 60) {
+					$("#rating_stars").css('top', $('span.caption').height() + $("#description").height() + 20);	
+				}
+
 				var numberRatings = $('#commentsArea_numberRatings').val();
 				$('#numberRatings').html(numberRatings);
 				
 				var currentRating = $('#commentsArea_currentRating').val();
-				$('#rating_stars_inputs').empty();
-				for (var i = 1; i <= 5; i = i + 1) {
-					var checked = (currentRating == i) ? "checked = 'checked' " : "";
-					$('#rating_stars_inputs').append('<input class="star" type="radio" name="rating" value="' + i + '"' + checked + '/>');
-				}
-				$('input[@type=radio].star').rating({
-					callback: function() {
-				    	var options = { 
-				    		success: afterRatingSubmit  // post-submit callback
-				        }; 				
-				    				
-						$('#ratingForm').ajaxSubmit(options);
-						return false;
-					}
-				});
+				setStarRatingChecked(currentRating);
 
 				var title = "<fmt:message key='label.learning.average.rating'/> " + $('#commentsArea_averageRating').val();
 				$('.star a').attr('title', title);
@@ -209,25 +213,30 @@
 			}
 			
 		}
-		
+		function setStarRatingChecked(currentRating){
+			$('#rating_stars_inputs').empty();
+			for (var i = 1; i <= 5; i = i + 1) {
+				var checked = (currentRating == i) ? "checked = 'checked' " : "";
+				$('#rating_stars_inputs').append('<input class="star" type="radio" name="rating" value="' + i + '"' + checked + '/>');
+			}
+			$('input[@type=radio].star').rating({
+				readOnly: ${finishedLock},
+				callback: function() {
+			    	var options = { 
+			    		success: afterRatingSubmit  // post-submit callback
+			        }; 				
+			    				
+					$('#ratingForm').ajaxSubmit(options);
+					return false;
+				}
+			});
+		}		
 
 		// post-submit callback 
 		function afterRatingSubmit(responseText, statusText)  { 
 			var imageUid = $('#commentsArea_imageUid').val();
 			loadImageData(imageUid);
 		} 
-		
-		function addNewComment(currentImageUid, comment){
-			var url = "<c:url value="/learning/addNewComment.do"/>";
-			$(commentsAreaTargetDiv).load(
-				url,
-				{
-					currentImageUid: currentImageUid, 
-					comment: comment,
-					sessionMapID: "${sessionMapID}"
-				}
-			);
-		}
 	-->        
     </script>
    
@@ -341,7 +350,7 @@
 			
 		</div>
 		<div class="after_main_image"></div>
-
+		
 		<%--Comments area----------------------------------------------%>	
  		
 		<div id="commentsArea">
@@ -359,7 +368,8 @@
 				<c:choose>
 					<c:when test="${empty sessionMap.reflectEntry}">
 						<p>
-							<em> <fmt:message key="message.no.reflection.available" />
+							<em> 
+								<fmt:message key="message.no.reflection.available" />
 							</em>
 						</p>
 					</c:when>
@@ -371,8 +381,7 @@
 				</c:choose>
 
 				<c:if test="${mode != 'teacher'}">
-					<html:button property="FinishButton"
-						onclick="return continueReflect()" styleClass="button">
+					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
 						<fmt:message key="label.edit" />
 					</html:button>
 				</c:if>
@@ -384,16 +393,13 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right" >
 				<c:choose>
-					<c:when
-						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton"
-							onclick="return continueReflect()" styleClass="button" >
+					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button" >
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:button property="FinishButton" styleId="finishButton"
-							onclick="return finishSession()" styleClass="button" >
+						<html:button property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button" >
 							<fmt:message key="label.finished" />
 						</html:button>
 					</c:otherwise>
@@ -410,4 +416,3 @@
 
 </body>
 </lams:html>
-

@@ -11,7 +11,7 @@
 	<!--
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
-			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&runOffline=true"/>';
+			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
 			return false;
 		}
 		function continueReflect(){
@@ -24,6 +24,7 @@
 
 <body class="stripes">
 	<div id="content">
+
 		<h1>
 			${sessionMap.title}
 		</h1>
@@ -63,14 +64,12 @@
 			<c:choose>
 				<c:when
 					test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-					<html:button property="FinishButton"
-						onclick="return continueReflect()" styleClass="button">
+					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
 						<fmt:message key="label.continue" />
 					</html:button>
 				</c:when>
 				<c:otherwise>
-					<html:button property="FinishButton" styleId="finishButton"
-						onclick="return finishSession()" styleClass="button">
+					<html:button property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button">
 						<fmt:message key="label.finished" />
 					</html:button>
 				</c:otherwise>

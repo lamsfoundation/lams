@@ -1,4 +1,4 @@
-<c:set var="comments" value="${sessionMap.comments}" />
+<c:set var="comments" value="${commentsSessionMap.comments}" />
 <c:if test="${not empty comments}">
 	<div class="field-name">
 		<fmt:message key="label.learning.comments" />

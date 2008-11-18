@@ -99,29 +99,35 @@ $.fn.rating = function(settings) {
       };
       
       //insert rating option right after preview element
-      preElemTemp  = $('<div class="star"><a href="javascript:;" title="' + this.title + '">' + this.value + '</a></div>');
-      $(prevElem).after(preElemTemp);
-      $(preElemTemp)
-        .mouseover(function(){
-           event.drain(n);
-           event.fill(n, this);
-           
-         })
-         .mouseout(function(){
-           event.drain(n);
-           event.reset(n);
-         })
-         .click(function(){
-           groups[n].currentValue = $(this).children('a').text();
-           $(groups[n].valueElem).val(groups[n].currentValue);
-           event.drain(n);
-           
-           // callback function, as requested here: http://plugins.jquery.com/node/1655
-           if(settings.callback) settings.callback.apply($(groups[n].valueElem)[0], [groups[n].currentValue, this]);
-           
-           //event.reset();
-           event.fill(n, this);
-         });      
+      if (settings.readOnly) {
+          preElemTemp = $('<div class="star star_readonly"><a href="javascript:;" title="' + this.title + '">' + this.value + '</a></div>');
+          $(prevElem).after(preElemTemp);
+      } else {
+          preElemTemp = $('<div class="star"><a href="javascript:;" title="' + this.title + '">' + this.value + '</a></div>');
+          $(prevElem).after(preElemTemp);
+   	  
+          $(preElemTemp)
+          .mouseover(function(){
+             event.drain(n);
+             event.fill(n, this);
+             
+           })
+           .mouseout(function(){
+             event.drain(n);
+             event.reset(n);
+           })
+           .click(function(){
+             groups[n].currentValue = $(this).children('a').text();
+             $(groups[n].valueElem).val(groups[n].currentValue);
+             event.drain(n);
+             
+             // callback function, as requested here: http://plugins.jquery.com/node/1655
+             if(settings.callback) settings.callback.apply($(groups[n].valueElem)[0], [groups[n].currentValue, this]);
+             
+             //event.reset();
+             event.fill(n, this);
+           });      
+      }
       
       //if(console) console.log(['###', n, this.checked, groups[n].initial]);
       if(this.checked) groups[n].initial = preElemTemp;
