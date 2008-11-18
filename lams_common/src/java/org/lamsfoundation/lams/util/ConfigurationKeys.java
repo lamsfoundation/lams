@@ -145,9 +145,13 @@ public class ConfigurationKeys {
 
     public static String LDAP_SECURITY_AUTHENTICATION = "LDAPSecurityAuthentication";
 
-    public static String LDAP_PRINCIPAL_DN_PREFIX = "LDAPPrincipalDNPrefix";
+    public static String LDAP_SEARCH_FILTER = "LDAPSearchFilter";
 
-    public static String LDAP_PRINCIPAL_DN_SUFFIX = "LDAPPrincipalDNSuffix";
+    public static String LDAP_BASE_DN = "LDAPBaseDN";
+    
+    public static String LDAP_BIND_USER_DN = "LDAPBindUserDN";
+    
+    public static String LDAP_BIND_USER_PASSWORD = "LDAPBindUserPassword";
 
     public static String LDAP_SECURITY_PROTOCOL = "LDAPSecurityProtocol";
 

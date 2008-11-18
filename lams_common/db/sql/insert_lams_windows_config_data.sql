@@ -110,10 +110,10 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('LDAPSecurityAuthentication','simple', 'config.ldap.security.authentication', 'config.header.ldap', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LDAPPrincipalDNPrefix','cn=', 'config.ldap.principal.dn.prefix', 'config.header.ldap', 'STRING', 0);
+values ('LDAPSearchFilter','(cn={0})', 'config.ldap.search.filter', 'config.header.ldap', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LDAPPrincipalDNSuffix',',ou=Users,dc=melcoe,dc=mq,dc=edu,dc=au', 'config.ldap.principal.dn.suffix', 'config.header.ldap', 'STRING', 0);
+values ('LDAPBaseDN',',ou=Users,dc=melcoe,dc=mq,dc=edu,dc=au', 'config.ldap.base.dn', 'config.header.ldap', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPSecurityProtocol','', 'config.ldap.security.protocol', 'config.header.ldap', 'STRING', 0);

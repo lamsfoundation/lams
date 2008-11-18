@@ -60,7 +60,7 @@ VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met',
 -- LDEV-1871 Creating extra column in lams_tool table for tool adapters
 ALTER TABLE lams_tool ADD COLUMN ext_lms_id VARCHAR(255);
 
--- LDEV-1581 Add a collumn to the lams_grouping table for learner's choice grouping
+-- LDEV-1581 Add a column to the lams_grouping table for learner's choice grouping
 ALTER TABLE lams_grouping ADD COLUMN equal_number_of_learners_per_group TINYINT DEFAULT 0;
 
 -- LDEV-2006 - make configuration keys truststorePath and truststorePassword system wide
@@ -69,6 +69,10 @@ UPDATE lams_configuration SET config_key='TruststorePassword', header_name='conf
 
 -- LDEV-1260 - local live edit field added
 ALTER TABLE lams_lesson ADD COLUMN live_edit_enabled TINYINT(1) DEFAULT 0;
+
+-- LDEV-2028 - ldap now uses a general search filter
+UPDATE lams_configuration SET config_value='LDAPSearchFilter', description_key='config.ldap.search.filter' WHERE config_key='LDAPPrincipalDNPrefix';
+UPDATE lams_configuration SET config_value='LDAPBaseDN', description_key='config.ldap.base.dn' WHERE config_key='LDAPPrincipalDNSuffix';
 
 ----------------------Put all sql statements above here-------------------------
 
