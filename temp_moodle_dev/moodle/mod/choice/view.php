@@ -1,12 +1,16 @@
 <?php  // $Id$
 
     require_once("../../config.php");
-    require_once("lib.php");
+    require_once("lib.php");//add  new library so Lams can use their functions
+    require_once($CFG->libdir.'/weblib.php');
+    //
 
     $id         = required_param('id', PARAM_INT);                 // Course Module ID
     $action     = optional_param('action', '', PARAM_ALPHA);
     $attemptids = optional_param('attemptid', array(), PARAM_INT); // array of attempt ids for delete action
     $returnurl   = optional_param('returnUrl', '', PARAM_TEXT);  // lams url to proceed to next in sequence
+    $editing  = optional_param('editing', 0, PARAM_INT);
+    $lamsupdateurl = optional_param('lamsUpdateURL', PARAM_TEXT); //get lamsupdateurl variable if coming from a Lams activity
     
     if (! $cm = get_coursemodule_from_id('choice', $id)) {
         error("Course Module ID was incorrect");
@@ -60,6 +64,13 @@
 
 /// Display the choice and possibly results
     $navigation = build_navigation('', $cm);
+    
+    
+    
+    $isteacher = has_capability('mod/choice:preview', get_context_instance(CONTEXT_MODULE, $cm->id)); // indicates if is a teacher, useful in lams
+	if($isteacher&&$editing==0&&$cm->is_lams==1){//lams: if the teachers view the choice as a learner, display the next activity button so he hasn't to attempt the choice if he don't want to
+	       include('showlamsnext.php');
+	}
     //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_header_simple(format_string($choice->name), "", $navigation, "", "", true,
                   update_module_button($cm->id, $course->id, $strchoice), navmenu($course, $cm),false,'',false,$cm->is_lams);
@@ -90,6 +101,10 @@
     //if user has already made a selection, and they are not allowed to update it, show their selected answer.
     if (!empty($USER->id) && ($current = get_record('choice_answers', 'choiceid', $choice->id, 'userid', $USER->id)) &&
         empty($choice->allowupdate) ) {
+        	// lams: if you have submited an option then you can go to next activity (shows button)
+        	if($cm->is_lams==1&&$editing==0){
+        		include('showlamsnext.php');
+        	}
         print_simple_box(get_string("yourselection", "choice", userdate($choice->timeopen)).": ".format_string(choice_get_option_text($choice, $current->optionid)), "center");
     }
 
@@ -99,7 +114,9 @@
     if ($choice->timeclose !=0) {
         if ($choice->timeopen > $timenow ) {
             print_simple_box(get_string("notopenyet", "choice", userdate($choice->timeopen)), "center");
-            print_footer($course);
+            
+            //we pass a new parameter to the function so it won't we printed if is_lams=1
+			print_footer($course,null, false,$choice->is_lams);
             exit;
         } else if ($timenow > $choice->timeclose) {
             print_simple_box(get_string("expired", "choice", userdate($choice->timeclose)), "center");
@@ -109,7 +126,7 @@
 
     if ( (!$current or $choice->allowupdate) and $choiceopen and
           has_capability('mod/choice:choose', $context) ) {
-    // They haven't made their choice yet or updates allowed and choice is open
+    	// They haven't made their choice yet or updates allowed and choice is open
 
         echo '<form id="form" method="post" action="view.php">';        
 
@@ -163,11 +180,15 @@
         print_simple_box(get_string('noresultsviewable', 'choice'), 'center');
     } 
     if ($choice->is_lams) {
- 	        echo '<div align="right"><p><input type="button" value="Next Activity" onclick="window.location=\''.$returnurl.'\'" /></p></div>';
+    		//print buttons to return to lams if you are editing
+    		if($editing==1){
+    			include('showlamsfinish.php');
+    		}
+    		
     }
 
     //we pass a new parameter to the function so it won't we printed if is_lams=1
-	print_footer($course,null, false,$quiz->is_lams);
+	print_footer($course,null, false,$choice->is_lams);
 
 
 ?>
