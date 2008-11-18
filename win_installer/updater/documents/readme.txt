@@ -1,14 +1,14 @@
-LAMS 2.1 - Learning Activity Management System
+LAMS 2.2 - Learning Activity Management System
 ----------------------------------------------
 
-This is a pre-packaged copy of LAMS 2.1 for Windows 2000, XP, or 2003.
+This is a pre-packaged copy of LAMS 2.2 for Windows 2000, XP, or 2003.
 For the source code, please see the 'Building LAMS' wiki at 
 
 	http://wiki.lamsfoundation.org/display/lams/Building+LAMS 
 
 for more information.
 
-For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.1
+For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.2
 
 NOTE TO SYSADMINS: If you are doing an upgrade and your users report problems in 
 authoring, they may need to clear their browser cache. If you have a user see 
@@ -16,6 +16,10 @@ the message "Unknown toolbar item "UniversalKey" or if the user is sees the
 message "Congratulations, your content saved successfully!" but the close button
 doesn't work, then please tell them to clear their cache.
 
+NOTE TO SYSADMINS: If you are updating and you have installed the FCKEditor 
+flvPlayer previous to running an update, you will need to re-install to the 
+current version. Follow the instructions at:
+http://wiki.lamsfoundation.org/display/lams/flvPlayer.
 
 1. Startup and Shutdown
 =======================
