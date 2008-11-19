@@ -1725,7 +1725,8 @@ function get_all_instances_in_courses($modulename, $courses, $userid=NULL, $incl
                                             cm.instance = m.id AND
                                             cm.section = cw.id AND
                                             md.name = '$modulename' AND
-                                            md.id = cm.module")) {
+                                            md.id = cm.module".(($modulename=="quiz"||$modulename=="choice"||$modulename=="glossary")?" AND m.is_lams = 0":""))) { // to show just activities that are created outside Lams
+										    //old md.id = cm.module")) { 
         return $outputarray;
     }
 
