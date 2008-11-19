@@ -48,12 +48,13 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.1"
-!define PREVIOUS_VERSION "2.0.4"
-!define LANGUAGE_PACK_VERSION "2008-06-19"
-!define LANGUAGE_PACK_VERSION_INT "20080619"
-!define DATE_TIME_STAMP "200806190000"
-######################## Added in the extra .0 for 2.1 for constitency 
+!define VERSION "2.2"
+!define PREVIOUS_VERSION "2.1"
+!define PREVIOUS_VERSION_2 "2.1.1" # FOR 2.2 ONLY
+!define LANGUAGE_PACK_VERSION "2008-12-05"
+!define LANGUAGE_PACK_VERSION_INT "20081205"
+!define DATE_TIME_STAMP "200812050000"
+######################## Added in the extra .0 for 2.2 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
@@ -175,6 +176,7 @@ Var RETAIN_FILES        ; bool value to devide whether to retain files
 Var IS_UPDATE           ; bool value to determine whether this is an update
 Var INCLUDE_JSMATH      ; bool value to determine whether to include JBOSS
 Var TOOL_SIG            ; tool signature used for tool deployer
+Var TOOL_DIR            ; tool directory used for tool deployer
 Var TIMESTAMP           ; timestamp
 Var BACKUP              ; bool value to determine whether the updater will backup
 Var OLD_LANG_VERSION    ; int to that gets the old language version from the regestry
@@ -226,8 +228,8 @@ SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
             ; Updating lams-www.war
             call updateLamswww
             
-            ; Updating the database to support version
-            call updateCoreDatabase
+            ; Call specific update method for this version
+            call update22Specific
         ${endif}
     SectionEnd
     
@@ -240,18 +242,20 @@ SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
             ; Then Calls deploy tools 
             call createAndDeployTools
             
-            ; Call specific update method for this version
-            ;call update203Specific
-            call update21Specific
-            
             ;updates tool contexts for non-default tools
             call insertCustomToolContexts
-
+            
+            # update application.xml 
+            call updateApplicationXML
             
             ; get the language files locations specific to this server from the database 
             ; for combined activities eg forum and scribe
             ; unpack to $INSTDIR\library\llidx
             call copyllid
+            
+            ; Updating the database to support version
+            ; from 2.2 on, this only handles no auto-patch scripts
+            call updateCoreDatabase 
                             
             # changing the instdir back to the original inst dir
             ReadRegStr $INSTDIR HKLM "${REG_HEAD}" "dir_inst"
@@ -484,6 +488,9 @@ Function checkRegistry
         ${elseif} $0 == ${PREVIOUS_VERSION}
             # This is the correct version to update to
             strcpy $IS_UPDATE "1" 
+        ${elseif} $0 == ${PREVIOUS_VERSION_2} ############################# REMOVE AFTER 2.2
+            # This is the correct version to update to
+            strcpy $IS_UPDATE "1" 
         ${else}
             MessageBox MB_OK|MB_ICONSTOP "Your existing version of LAMS ($0) is not compatible with this update. $\r$\n$\r$\nPlease update to LAMS-${PREVIOUS_VERSION} before running this update."
             Abort 
@@ -529,11 +536,11 @@ Function CheckMySQL
         #StrLen $9 $MYSQL_ROOT_PASS
         
         ${if} $IS_UPDATE == "1" 
-           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"'
+           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"'
         ${elseif} $MYSQL_HOST != "localhost"
-           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"' 
+           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"' 
         ${else}
-           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/?characterEncoding=utf8" "root" "$MYSQL_ROOT_PASS"'
+           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/?characterEncoding=utf8" "root" "$MYSQL_ROOT_PASS"'
         ${endif}
         
         File "${BUILD_DIR}\checkmysqlversion.class"
@@ -749,13 +756,14 @@ Function PostLAMSConfig
         Setoutpath "$TEMP\lams\"
         File "${BUILD_DIR}\checkmysql.class"
         File "${LIB}\mysql-connector-java-3.1.12-bin.jar"
-        nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS ${PREVIOUS_VERSION}'
+        nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS ${PREVIOUS_VERSION}'
         Pop $0
         Pop $1
         ${If} $0 != 0
             ${StrStr} $3 $1 "UnknownHostException"
             
             ${if} $3 == "" 
+                goto done ##################### REMOVE AFTER 2.2
                 MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: $1"
             ${else}
                 MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: Could not connect to MySql host: $MYSQL_HOST. Please check your database configurations and try again."
@@ -767,6 +775,8 @@ Function PostLAMSConfig
         Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"
         
     ${endif}
+    
+    done:
     
 FunctionEnd
 
@@ -920,6 +930,7 @@ FunctionEnd
 ################################################################################
 
 # Updates specific to the 2.1 release
+/*
 Function update21Specific
 
     # Update the log4j.xml and the login-config.xml files
@@ -1012,6 +1023,109 @@ Function update21Specific
         Detailprint "Problem updating index.html"
     end:
 FunctionEnd
+*/
+
+Function update22Specific
+
+    # update context.xml
+    # update wrapper.conf 
+    # create autopatch table
+    # update jboss-cache and jgroups and jboss-serialization jars
+    # delete jmx console wars once and for all
+    
+    # delete jmx console wars --------------------------------------------------
+    RMDir /r "$INSTDIR\jboss-4.0.2\server\default\deploy\jmx-console.war"
+    RMDir /r "$INSTDIR\jboss-4.0.2\server\default\deploy\management"
+    #---------------------------------------------------------------------------
+    
+    # update jboss-cache and jgroups and jboss-serialization jars --------------
+    SetOutPath "$INSTDIR\jboss-4.0.2\server\default\lib\"
+    File /a "${BASE_PROJECT_DIR}\lams_build\lib\jboss\jboss-cache.jar"
+    File /a "${BASE_PROJECT_DIR}\lams_build\lib\jboss\jgroups.jar"
+    File /a "${BASE_PROJECT_DIR}\lams_build\lib\jboss\jboss-serialization.jar"
+    #---------------------------------------------------------------------------
+    
+    # update context.xml -------------------------------------------------------
+    SetOutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\"
+    File /a "${CONF}\context.xml"
+    #---------------------------------------------------------------------------
+    
+    setoutpath "$TEMP\lams\"
+    File "${ANT}\update-2.2-specific.xml"
+    File /a "${CONF}\wrapper.conf"
+    File /a "${SQL}\addAutoPatchTable.sql"
+
+    #---------------------------------------------------------------------------
+    
+    # set up the ant script ----------------------------------------------------
+    FileOpen $0 "$TEMP\lams\update-2.2-specific.properties" w
+    IfErrors 0 +3
+        Detailprint "Problem opening update-mysql-ds.properties to write"
+        goto error
+    
+    # Add inst dir
+    Push $INSTDIR
+    Push "\"
+    Call StrSlash
+    Pop $3
+    FileWrite $0 "INSTDIR=$3$\r$\n"
+    
+    # Use unix slashes for config in wrapper.conf
+    Push $JDK_DIR
+    Push "\"
+    Call StrSlash
+    Pop $4
+    FileWrite $0 "JDK_DIR_UNIX_SLASH=$4$\r$\n" 
+    
+    # Use unix slashes for config in wrapper.conf
+    Push $TEMP
+    Push "\"
+    Call StrSlash
+    Pop $5
+    FileWrite $0 "TEMP=$5$\r$\n"          
+    
+    FileWrite $0 "db.name=$DB_NAME$\r$\n"
+    FileWrite $0 "db.username=$DB_USER$\r$\n"
+    FileWrite $0 "db.password=$DB_PASS$\r$\n"
+    FileWrite $0 "db.driver=com.mysql.jdbc.Driver$\r$\n"
+    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+
+    Fileclose $0
+    IfErrors 0 +2
+        goto error
+    #---------------------------------------------------------------------------
+    
+    
+    # update wrapper.conf and create autopatch table----------------------------
+    # Running the ant scripts to create deploy.xml for the normal tools 
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\update-2.2-specific.log -buildfile $TEMP\lams\update-2.2-specific.xml copy-wrapper.conf add-autopatch-table'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    DetailPrint "Result: $1"
+    ${if} $0 == "fail"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    push "$INSTDIR\update-logs\update-mysql-ds.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    StrCmp $3 yes 0 +2
+        goto error
+    #---------------------------------------------------------------------------
+
+    goto done
+    error:
+        DetailPrint "Problem while running 2.2 specific update scripts."
+        MessageBox MB_OK|MB_ICONSTOP "Problem while running 2.2 specific update scripts."
+        Abort "LAMS configuration failed."
+    done:
+    
+FunctionEnd
 
 Function setupant
     
@@ -1097,7 +1211,7 @@ FunctionEnd
 Function updateCoreJarsWars
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear"
     ;File "${SOURCE_LAMS_EAR}\*.*"
-    File /a /r /x tmp /x lams-www.war /x META-INF /x jsMath.war /x *.bak ${SOURCE_LAMS_EAR}\*
+    File /a /r /x tmp /x lams-www.war /x lams-central.war /x META-INF /x jsMath.war /x *.bak ${SOURCE_LAMS_EAR}\*.*
     
     Setoutpath "$INSTDIR\jboss-4.0.2\server\default\lib"
     File "${SOURCE_JBOSS_LIB}\lams-session.jar"
@@ -1110,7 +1224,7 @@ FunctionEnd
 Function updateLamsCentral
     strcpy $0 "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war"
     SetoutPath $0
-    File /r "${SOURCE_LAMS_EAR}\lams-central.war\*"
+    File /r /x MANIFEST.MF "${SOURCE_LAMS_EAR}\lams-central.war\*"
 FunctionEnd
 
 ; Updating lams-www.war
@@ -1142,8 +1256,8 @@ Function updateLamswww
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
     File "${SOURCE_LAMS_EAR}\lams-www.war\copyright.jsp"
     
-    SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
-    File "${DOCUMENTS}\news-${PREVIOUS_VERSION}.html"
+    ;SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-www.war\"
+    ;File "${DOCUMENTS}\news-${PREVIOUS_VERSION}.html"
     ;if news and news-${PREVIOUS_VERSION} are the same
 
     # Commented out below, see LI-157
@@ -1217,8 +1331,9 @@ Function updateCoreDatabase
     setoutpath "$TEMP\lams\sql"
     ;file "${BASE_PROJECT_DIR}\lams_common\db\sql\updatescripts\alter_${VERSION}*.sql" 
     ;file "${BASE_PROJECT_DIR}\lams_common\db\sql\updatescripts\alter_203*.sql" 
-    file "${BASE_PROJECT_DIR}\lams_common\db\sql\updatescripts\alter_21*.sql" 
+    ;file "${BASE_PROJECT_DIR}\lams_common\db\sql\updatescripts\alter_21*.sql" 
     file "${SQL}\updateLocales.sql" 
+    file "${SQL}\removeConfigs.sql" 
      
     setoutpath "$TEMP\lams\"
     file "${ANT}\update-core-database.xml"
@@ -1253,12 +1368,13 @@ Function updateCoreDatabase
 FunctionEnd 
 
 ; Updating application.xml
-Function updateApplicationXML
+; ANT code implemented in update-deploy-tools.xml
+; CODE is version specific
 
-    #############THIS CODE FOR 2.1 ONLY##############
+Function updateApplicationXML
     
     # Running the ant scripts to update web.xmls and manifests
-    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-application-xml.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -D"prop.path=$TOOL_SIG" update-application-xml'
+    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-application-xml.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" update-application-xml'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -1270,7 +1386,7 @@ Function updateApplicationXML
     DetailPrint "Result: $1"
     
     push "$INSTDIR\update-logs\ant-update-application-xml.log"
-    push "FAILED"
+    push "DeployException"
     Call FileSearch
     Pop $0 #Number of times found throughout
     Pop $3 #Found at all? yes/no
@@ -1284,44 +1400,6 @@ Function updateApplicationXML
         MessageBox MB_OK|MB_ICONSTOP "Application.xml update failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
         Abort "LAMS configuration failed"
     done:
-    
-    
-    
-    
-    
-    /*iffileexists "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\ehcache-1.1.jar" fileExists continue
-    fileExists:
-        delete "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear\ehcache-1.1.jar"
-    continue:  
-    
-    # Running the ant scripts to update web.xmls and manifests
-    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-application-xml.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -D"prop.path=$TOOL_SIG" update-application-xml'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    ${if} $0 == "error"
-    ${orif} $0 == 1
-        goto error
-    ${endif}
-    DetailPrint "Result: $1"
-    
-    push "$INSTDIR\update-logs\ant-update-application-xml.log"
-    push "FAILED"
-    Call FileSearch
-    Pop $0 #Number of times found throughout
-    Pop $3 #Found at all? yes/no
-    Pop $2 #Number of lines found in
-    StrCmp $3 yes 0 +2
-        goto error
-    
-    goto done
-    error:
-        DetailPrint "Application.xml update failed"
-        MessageBox MB_OK|MB_ICONSTOP "Application.xml update failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
-        Abort "LAMS configuration failed"
-    done:
-    */
 FunctionEnd
         
 ; Updating the deploy.xml of the tools to support this version using the tool deployer, called by create-deploy-package ant task
@@ -1329,37 +1407,29 @@ FunctionEnd
 Function createAndDeployTools
     
     ; setting the first tool sig for properties files
-    strcpy $TOOL_SIG "lachat11"
+    #strcpy $TOOL_SIG "lachat11"
     
-    # Copying tool-specific build.property files
-    call copyToolBuildProperties
-
     # Generate the tools.properties for properties common to all tools
     call generateToolProperties
     
+    # Creating all tool packages, and copying to temp/lams
+    call createNewToolPackages
+    
+    /*
+    # Copying tool-specific build.property files
+    call copyToolBuildProperties
+    
     # Get the jars and wars required for each tool
     call extractToolJars
+    */
     
     # Get the java libraries needed for the tool deployer
     SetOutPath "$TEMP\lams\lib"
     File "${BASE_PROJECT_DIR}\lams_build\deploy-tool\lib\*.jar"
+    
 
-    ; Updating application.xml
-    call updateApplicationXML
-    
-    DetailPrint "Result: $1"
-    push "$INSTDIR\update-logs\ant-explode-wars.log"
-    push "FAILED"
-    Call FileSearch
-    Pop $0 #Number of times found throughout
-    Pop $3 #Found at all? yes/no
-    Pop $2 #Number of lines found in
-    StrCmp $3 yes 0 +2
-        goto error
-    
-    
     # Exploding the lams-learning.war and lams-monitoring.war
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-explode-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG explode-wars'
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-explode-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml explode-wars'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -1380,67 +1450,35 @@ Function createAndDeployTools
     
     
     # Creating all the tools, then deploying them
-    strcpy $TOOL_SIG "lachat11"
-    call runCreateDeployPackage
+    strcpy $TOOL_SIG "ladaco10"
+    strcpy $TOOL_DIR "lams_tool_daco"
+    ;call createNewToolPackage
+    call filterDeployXML
     call deployTool
     call runUpdateToolContext
     
-    strcpy $TOOL_SIG "lafrum11"
-    call runCreateDeployPackage
+    strcpy $TOOL_SIG "lagmap10"
+    strcpy $TOOL_DIR "lams_tool_gmap"
+    ;call createNewToolPackage
+    call filterDeployXML
     call deployTool
     call runUpdateToolContext
     
-    strcpy $TOOL_SIG "lamc11"
-    call runCreateDeployPackage
+    strcpy $TOOL_SIG "lawiki10"
+    strcpy $TOOL_DIR "lams_tool_wiki"
+    ;call createNewToolPackage
+    call filterDeployXML
     call deployTool
     call runUpdateToolContext
     
-    strcpy $TOOL_SIG "laqa11"
-    call runCreateDeployPackage
+    strcpy $TOOL_SIG "lasprd10"
+    strcpy $TOOL_DIR "lams_tool_spreadsheet"
+    ;call createNewToolPackage
+    call filterDeployXML
     call deployTool
     call runUpdateToolContext
     
-    strcpy $TOOL_SIG "larsrc11"
-    call runCreateDeployPackage
-    call deployTool
-    call runUpdateToolContext
-    
-    strcpy $TOOL_SIG "lanb11"
-    call runCreateDeployPackage
-    call deployTool
-    call runUpdateToolContext
-    
-    strcpy $TOOL_SIG "lantbk"
-    call runCreateDeployPackage
-    call deployTool
-    call runUpdateToolContext
-    
-    strcpy $TOOL_SIG "lasbmt11"
-    call runCreateDeployPackage
-    call deployTool
-    call runUpdateToolContext
-    
-    strcpy $TOOL_SIG "lascrb11"
-    call runCreateDeployPackage
-    call deployTool
-    call runUpdateToolContext
-    
-    strcpy $TOOL_SIG "lasurv11"
-    call runCreateDeployPackage
-    call deployTool
-    call runUpdateToolContext
-    
-    strcpy $TOOL_SIG "latask10"
-    call runCreateDeployPackage
-    call deployTool
-    call runUpdateToolContext
-    
-    strcpy $TOOL_SIG "lavote11"
-    call runCreateDeployPackage
-    call deployTool
-    call runUpdateToolContext
-    
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-compress-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG compress-wars'
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-compress-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml compress-wars'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -1471,9 +1509,9 @@ FunctionEnd
 
 # Running the ant scripts to create deploy.xml for the normal tools 
 # Tool created depends on the value of $TOOL_SIG
-Function runCreateDeployPackage
+Function filterDeployXML
     # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-create-deploy-package-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG create-deploy-package'
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-create-deploy-package-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -propertyfile $TEMP\lams\$TOOL_SIG\build.properties create-deploy-package'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -1505,7 +1543,7 @@ FunctionEnd
 # Tool created depends on the value of $TOOL_SIG
 Function runUpdateToolContext
     # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-update-tool-context-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG update-tool-context'
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-update-tool-context-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -propertyfile $TEMP\lams\$TOOL_SIG\build.properties update-tool-context'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -1535,7 +1573,7 @@ FunctionEnd
 # Deploying the updated tools
 Function deployTool
     # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-deploy-tool-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -Dprop.path=$TEMP\lams\$TOOL_SIG deploy-tool'
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-deploy-tool-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -propertyfile $TEMP\lams\$TOOL_SIG\build.properties deploy-tool'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -1612,7 +1650,116 @@ Function generateToolProperties
         
 FunctionEnd
 
+# Creates tool packages for new tools so they can be deployed by the tool deployer
+Function createNewToolPackages
+    
+    ############################## 2.2 TOOLS ###################################
+    
+    # Adding the daco package --------------------------------------------------
+    strcpy $1 "$TEMP\lams\ladaco10"
+    
+    SetoutPath "$1"
+    File "${BASE_PROJECT_DIR}\lams_tool_daco\build.properties"
+    
+    SetoutPath "$1\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_daco\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_daco\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_daco\build\deploy\deploy.xml"
+    
+    SetoutPath "$1\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_daco\build\deploy\sql\*"
+    
+    SetoutPath "$1\build\deploy\language"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_daco\build\deploy\language\*.properties"
+    
+    # --------------------------------------------------------------------------
+    
+    
+    # Adding the gmap package --------------------------------------------------
+    strcpy $1 "$TEMP\lams\lagmap10"
+    
+    SetoutPath "$1"
+    File "${BASE_PROJECT_DIR}\lams_tool_gmap\build.properties"
+    
+    SetoutPath "$1\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_gmap\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_gmap\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_gmap\build\deploy\deploy.xml"
+    
+    SetoutPath "$1\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_gmap\build\deploy\sql\*"
+    
+    SetoutPath "$1\build\deploy\language"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_gmap\build\deploy\language\*.properties"
+    # --------------------------------------------------------------------------
+    
+    
+    # Adding the wiki package --------------------------------------------------
+    strcpy $1 "$TEMP\lams\lawiki10"
+    
+    SetoutPath "$1"
+    File "${BASE_PROJECT_DIR}\lams_tool_wiki\build.properties"
+    
+    SetoutPath "$1\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_wiki\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_wiki\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_wiki\build\deploy\deploy.xml"
+    
+    SetoutPath "$1\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_wiki\build\deploy\sql\*"
+    
+    SetoutPath "$1\build\deploy\language"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_wiki\build\deploy\language\*.properties"
+    
+    # --------------------------------------------------------------------------
+    
+    # Adding the spreadsheet package -------------------------------------------
+  
+    strcpy $1 "$TEMP\lams\lasprd10"
+    
+    SetoutPath "$1"
+    File "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build.properties"
+    
+    SetoutPath "$1\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\deploy\deploy.xml"
+    
+    SetoutPath "$1\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\deploy\sql\*"
+    
+    SetoutPath "$1\build\deploy\language"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\deploy\language\*.properties"
+    
+    # --------------------------------------------------------------------------
+
+    ############################## 2.2 TOOLS ###################################
+
+FunctionEnd
+
+
+/*
+# Creates a tool package based on $TOOL_SIG and $TOOL_DIR paramas
+Function createToolPackage
+    SetoutPath "$TEMP\lams\$TOOL_SIG"
+    File "$TOOL_DIR\build.properties"
+    
+    SetoutPath "$TEMP\lams\$TOOL_SIG\build\deploy\"
+    File "$TOOL_DIR\build\lib\*.jar"
+    File "$TOOL_DIR\build\lib\*.war"
+    File "$TOOL_DIR\build\deploy\deploy.xml"
+    
+    SetoutPath "$TEMP\lams\$TOOL_SIG\build\deploy\sql"
+    File /r "$TOOL_DIR\build\deploy\sql\*"
+    
+    SetoutPath "$TEMP\lams\$TOOL_SIG\build\deploy\language"
+    File "$TOOL_DIR\build\deploy\language\*.properties"
+FunctionEnd
+*/
+
+
 # Copying the tool-specific build.property files
+/*
 Function copyToolBuildProperties
     
     SetoutPath "$TEMP\lams\lachat11"
@@ -1766,11 +1913,12 @@ Function extractToolJars
     
     
 FunctionEnd
+*/
 
 Function insertCustomToolContexts
 
     # Running the ant scripts to update web.xmls and manifests
-    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-custom-tool-contexts.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -D"prop.path=$TOOL_SIG" update-custom-tool-contexts'
+    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-custom-tool-contexts.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -propertyfile $TEMP\lams\$TOOL_SIG\build.properties update-custom-tool-contexts'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -2002,6 +2150,7 @@ FunctionEnd
 Function ImportDatabase
     SetOutPath $TEMP
     File "${DATABASE}\dump.sql"
+    File "${SQL}\removeConfigs.sql"
     
     # Only do this if mysql is set up on local host 
     #######################################################

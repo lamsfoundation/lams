@@ -3,7 +3,7 @@
 	<!-- begin properties *******************************************************************************************-->
 	<!-- import properties from the specified file -->
 	
-	<property file="${prop.path}/build.properties" />
+	<!-- <property file="${prop.path}/build.properties" /> -->
 	<property file="tools.properties"/>
 
 	
@@ -119,12 +119,29 @@
 			</fileset>
 		</path>
 		
-		<echo>Updating application.xml ###2.1 SPECIFIC###</echo>
-		
-		<java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
-			<arg value="${jboss.deploy}" />
-			<arg value="commons-io-1.4.jar" />
-		</java>
+		<!-- 2.2 SPECIFIC UPDATE!!!!!!!!!!!! -->
+        <echo>BEGIN Updating application.xml</echo>
+        <java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="transform.jar" />
+        </java>
+        <java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="translate.jar" />
+        </java>
+        <java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="JabberHTTPBind-1.1.1.jar" />
+        </java>
+        <java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="tk-autopatch-1.2.0-b2-cvs.jar" />
+        </java>
+        <java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="tk-discovery-1.0.0.jar" />
+        </java>
+        <!-- END 2.2 SPECIFIC UPDATE!!!!!!!!!!!! -->
 		
 	</target>
 	

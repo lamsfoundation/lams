@@ -73,22 +73,6 @@
 				<filter token="URL" value="${URL}" />
 			</filterset>
 		</copy>
-		<copy overwrite="yes" todir="${INSTDIR}/jboss-4.0.2/server/default/conf">
-			<fileset dir="${TEMP}">
-				<include name="lamsauthentication.xml" />
-			</fileset>
-			<filterset>
-				<filter token="confdir" value="${INSTDIR}/jboss-4.0.2/server/default/conf" />
-			</filterset>
-		</copy>
-		<copy overwrite="yes" todir="${INSTDIR}/jboss-4.0.2/server/default/conf">
-			<fileset dir="${TEMP}">
-				<include name="login-config.xml" />
-			</fileset>
-			<filterset>
-				<filter token="confdir" value="${INSTDIR}/jboss-4.0.2/server/default/conf" />
-			</filterset>
-		</copy>
 	</target>
 	
 	<target name="import-db">
@@ -100,6 +84,7 @@
 			encoding="utf8">
 			<transaction src="${TEMP}/dump.sql" />
 			<transaction src="${TEMP}/lams/update_lams_configuration.sql" />
+			<transaction src="${TEMP}/lams/removeConfigs.sql" />
 		</sql>
 	</target>	
 </project>
