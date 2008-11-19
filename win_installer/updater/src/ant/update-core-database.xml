@@ -15,7 +15,6 @@
 			onerror="abort">
 			<transaction src="${temp}/lams/sql/updateConfiguration.sql" />
 			<transaction src="${temp}/lams/sql/updateLocales.sql" />
-			<transaction src="${temp}/lams/sql/removeConfigs.sql" />
 		</sql>
 	</target>
 </project>
