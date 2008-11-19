@@ -73,6 +73,8 @@ var isWriteable = true;
 var tab = String.fromCharCode(9);
 var printstyle = "print.css";
 
+var isFirstTime = true;
+
 function trans(key) {
   if (strings[key]) return strings[key]; else return "["+key+"]";
 }
@@ -275,8 +277,8 @@ function display() {
     scrollX = getObj("content").scrollLeft;
     scrollY = getObj("content").scrollTop;
   }
-  var out = "<div class='header'><table cellpadding='0' cellspacing='0' style='width:100%;'><tr><td nowrap>";
-  out += "<textarea id='focus' onfocus='this.blur();'></textarea>";
+  var out = "<div class='header'><table cellpadding='0' cellspacing='0' style='width:100%;'><tr><td nowrap>";  
+  out += "<textarea id='focus' onfocus='this.blur();'></textarea>"; 
   out += "&nbsp;";
   if (isWriteable) {
     out += "<a href='#' onclick='if (confirm(\""+trans("Really close without saving changes ?")+"\")) load(init_data); return false;' accesskey='n'>"+trans("New")+"</a> - ";
@@ -428,7 +430,12 @@ function display() {
 	  if (obj) obj.style.backgroundColor = color;
 	}
   }
-  getObj("focus").focus();
+  
+  if (isFirstTime) {
+	  isFirstTime = false;
+  } else {
+	  getObj("focus").focus();
+  }
 }
 
 function previewValue() {
@@ -626,8 +633,10 @@ function load(code) {
   active = "content";
   getObj("source").style.display = "none";
   getObj("data").style.display = "inline";
+
   display();
 }
+
 function cancelLoad() {
   active = "content";
   getObj("source").style.display = "none";
