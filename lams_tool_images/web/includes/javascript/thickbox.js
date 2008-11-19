@@ -65,8 +65,12 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 	   var urlString = /\.jpg$|\.jpeg$|\.png$|\.gif$|\.bmp$/;
 	   var urlType = baseURL.toLowerCase().match(urlString);
 
-		if(urlType == '.jpg' || urlType == '.jpeg' || urlType == '.png' || urlType == '.gif' || urlType == '.bmp'){//code to show images
-				
+	var queryString = url.replace(/^[^\?]+\??/,'');
+	var params = tb_parseQuery( queryString );
+
+
+		if((!params['modal'])){//code to show images
+
 			TB_PrevCaption = "";
 			TB_PrevURL = "";
 			TB_PrevHTML = "";
@@ -123,10 +127,10 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			}
 			// End Resizing
 			
-			TB_WIDTH = imageWidth + 30;
-			TB_HEIGHT = imageHeight + 60;
-			$("#TB_window").append("<a href='' id='TB_ImageOff' title='Close'><img id='TB_Image' src='"+url+"' width='"+imageWidth+"' height='"+imageHeight+"' alt='"+caption+"'/></a>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>"); 		
-			
+			TB_WIDTH = imageWidth + 50;
+			TB_HEIGHT = imageHeight + 80;
+			$("#TB_window").append("<a href='' id='TB_ImageOff' title='Close'>	<iframe id='TB_Image' style='border:0px;' frameborder='no' src='"+url+"' width='"+eval(imageWidth + 20)+"' height='"+eval(imageHeight + 20)+"'/></iframe></a>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>"); 		
+		
 			$("#TB_closeWindowButton").click(tb_remove);
 			
 			if (!(TB_PrevHTML === "")) {
@@ -180,9 +184,6 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			
 			imgPreloader.src = url;
 		}else{//code to show html
-			
-			var queryString = url.replace(/^[^\?]+\??/,'');
-			var params = tb_parseQuery( queryString );
 
 			TB_WIDTH = (params['width']*1) + 30 || 630; //defaults to 630 if no paramaters were added to URL
 			TB_HEIGHT = (params['height']*1) + 40 || 440; //defaults to 440 if no paramaters were added to URL

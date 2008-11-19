@@ -30,7 +30,7 @@
 				</td>
 				
 				<td style="vertical-align:middle;">
-					<a href="${mediumImagePath}" rel="lightbox" title="Enlarge image">${image.title}</a>
+					<a href="${mediumImagePath}" rel="lightbox" title="${image.title}">${image.title}</a>
 				</td>
 
 				<td width="40px" style="vertical-align:middle;">

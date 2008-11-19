@@ -35,9 +35,10 @@
 		
 		.caption{position:absolute;top:0px;left:0px;width:150px;font-size:12px;color:#0087e5;}
 		#description{position:absolute; top:1000px; left:1000px; width:150px; font-style:italic;}
+		#openOriginalSizeLink{position:absolute; top:1000px; left:1000px;}
 		#rating_stars{position: absolute; top: 1000px; left: 1000px; width:150px; margin-top: 10}		
 		
-		#main_image{margin: 0 auto 20 0; height: ${(mediumImageDimensions*3)/4 + 20}px; width: ${mediumImageDimensions}px;}
+		#main_image{margin: 0 auto 20 0; height: ${(mediumImageDimensions*3)/4 + 40}px; width: ${mediumImageDimensions}px;}
 		#main_image img{margin-bottom: 10px; border: 1px solid #111;}
 		
 		.check_for_new{position: relative; top: -123px; left: 660px;}
@@ -79,14 +80,19 @@
 				$('#description').html("");
 				$("#description").css('left', image.width() + 20);
 				$("#description").css('top', caption.height() + 10);
+
+				var linkLeftPosition = ($("#openOriginalSizeLink_size").width() >= image.width()) ? 0 : ((image.width() - $("#openOriginalSizeLink_size").width())/2);
+				$("#openOriginalSizeLink").css('left', linkLeftPosition);
+				$("#openOriginalSizeLink").css('top', image.height() + 10);
+				$("#openOriginalSizeLink").width(image.width());
+						
 				setStarRatingChecked(0);
 				$("#rating_stars").css('left', image.width() + 20);					
 				$("#rating_stars").css('top', image.height() - 40);
 				
 				//adjust #main_image height to real image size
 				var newHeight = (image.height() >= ${(mediumImageDimensions*3)/4}) ? ${mediumImageDimensions} : ${(mediumImageDimensions*3)/4};
-				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODO for the JIRA
-			    $('#main_image').css('height', newHeight + 20);
+			    $('#main_image').css('height', newHeight + 40);
 
 			    loadImageData(thumb.attr('id'));
 			},
@@ -161,6 +167,13 @@
 			var description = $('#commentsArea_addedBy').val() + $('#commentsArea_description').val();
 			$('#description').html(description);
 
+			var title = $('#commentsArea_title').val();
+			$("#openOriginalSizeLink a").attr('title', title);
+			
+			var href = "<html:rewrite page='/download/?preferDownload=false'/>";
+			href = href + "&uuid=" + $('#commentsArea_originalFileUuid').val();
+			$("#openOriginalSizeLink a").attr('href', href);
+			
 			var imageUid = $('#commentsArea_imageUid').val();
 			if (${imageGallery.allowRank && (mode != 'teacher')}) {
 				//adjust #rating_stars top position to description height 
@@ -272,6 +285,12 @@
 			<div id="description"></div>
 					
 			<div id="main_image"></div>
+			
+			<div id="openOriginalSizeLink">
+				<a href="" title="Enlarge" class="thickbox" >
+					<fmt:message key="label.learning.open.original.size" />
+				</a>
+			</div>
 			
 			<%--Ranking/Voting area---------------------------------------%>
 
@@ -406,6 +425,10 @@
 				</c:choose>
 			</div>
 		</c:if>
+		
+		<div id="openOriginalSizeLink_size" style="display:none;" >
+			<fmt:message key="label.learning.open.original.size" />
+		</div>		
 
 	</div>
 	<%--closes content--%>
