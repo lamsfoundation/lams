@@ -759,17 +759,42 @@ Function PostLAMSConfig
         nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS ${PREVIOUS_VERSION}'
         Pop $0
         Pop $1
+        
+        ########################################################################
+        #THIS SECTION IS FOR 2.2 ONLY REMVE AFTER AND REPLACE WITH COMMENTED SECTION BELOW
+        #NEED TO CHECK FOR 2.1 and 2.1.1 datbase versions
+        ${If} $0 != 0
+            Setoutpath "$TEMP\lams\"
+            File "${BUILD_DIR}\checkmysql.class"
+            File "${LIB}\mysql-connector-java-3.1.12-bin.jar"
+            nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS ${PREVIOUS_VERSION_2}'
+            Pop $0
+            Pop $1            
+            ${If} $0 != 0
+                ${StrStr} $3 $1 "UnknownHostException"
+                ${if} $3 == "" 
+                    MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: $1"
+                ${else}
+                    MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: Could not connect to MySql host: $MYSQL_HOST. Please check your database configurations and try again."
+                ${endif} 
+                Abort 
+            ${endif}              
+        ${EndIf}
+        ########################################################################
+        
+        
+        /***************** REMOVE COMMENT AFTER 2.2
         ${If} $0 != 0
             ${StrStr} $3 $1 "UnknownHostException"
             
             ${if} $3 == "" 
-                goto done ##################### REMOVE AFTER 2.2
                 MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: $1"
             ${else}
                 MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: Could not connect to MySql host: $MYSQL_HOST. Please check your database configurations and try again."
             ${endif}               
             Abort
         ${EndIf}
+        */
         
         Delete "$TEMP\lams\checkmysql.class"
         Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"
@@ -1088,7 +1113,7 @@ Function update22Specific
     FileWrite $0 "db.username=$DB_USER$\r$\n"
     FileWrite $0 "db.password=$DB_PASS$\r$\n"
     FileWrite $0 "db.driver=com.mysql.jdbc.Driver$\r$\n"
-    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
 
     Fileclose $0
     IfErrors 0 +2
@@ -1181,7 +1206,7 @@ Function backupLams
             
             DetailPrint 'Dumping database to: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak'
             setoutpath "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak"
-            Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" -r "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
+            Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" -h "$MYSQL_HOST" -P "$MYSQL_PORT" -r "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
             DetailPrint $4
             nsExec::ExecToStack $4
             Pop $0
@@ -1319,7 +1344,7 @@ Function updateCoreDatabase
     FileWrite $0 "db.username=$DB_USER$\r$\n"
     FileWrite $0 "db.password=$DB_PASS$\r$\n"
     FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
-    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
     FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
 
     Fileclose $0
@@ -1333,7 +1358,6 @@ Function updateCoreDatabase
     ;file "${BASE_PROJECT_DIR}\lams_common\db\sql\updatescripts\alter_203*.sql" 
     ;file "${BASE_PROJECT_DIR}\lams_common\db\sql\updatescripts\alter_21*.sql" 
     file "${SQL}\updateLocales.sql" 
-    file "${SQL}\removeConfigs.sql" 
      
     setoutpath "$TEMP\lams\"
     file "${ANT}\update-core-database.xml"
@@ -1632,9 +1656,9 @@ Function generateToolProperties
     FileWrite $0 "db.username=$DB_USER$\r$\n"
     FileWrite $0 "db.password=$DB_PASS$\r$\n"
     FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
-    FileWrite $0 "db.urlDeployXML=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true&amp;useUnicode=true$\r$\n"
-    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
-    ;FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8$\r$\n"
+    FileWrite $0 "db.urlDeployXML=jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true&amp;useUnicode=true$\r$\n"
+    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+    ;FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$${db.name}?characterEncoding=utf8$\r$\n"
     FileWrite $0 "conf.language.dir=$${build.deploy}/language/$\r$\n"
     FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
     FileWrite $0 "deploy.tool.dir=$${temp}/lams/$\r$\n"
@@ -2134,16 +2158,18 @@ Function readRegistry
     ReadRegStr $WILDFIRE_PASS HKLM "${REG_HEAD}" "wildfire_pass"
     ReadRegStr $WILDFIRE_USER HKLM "${REG_HEAD}" "wildfire_user"
     ReadRegStr $OLD_LANG_VERSION HKLM "${REG_HEAD}" "language_pack"
-    ; Getting the mysql_ip from the registry (2.0.3)
+    
+    ; Getting the mysql_ip from the registry 
     ReadRegStr $MYSQL_HOST HKLM "${REG_HEAD}" "mysql_host"
     ${if} $MYSQL_HOST == ""
         strcpy $MYSQL_HOST "localhost"
     ${endif}
     
-    ; TODO Change for 2.2, get the port from the registry instead or hard coding it
-    ;ReadRegStr $MYSQL_PORT HKLM "${REG_HEAD}" "mysql_port"
-    strcpy $MYSQL_PORT 3306
-    
+    ; Getting the mysql port from the registry
+    ReadRegStr $MYSQL_PORT HKLM "${REG_HEAD}" "mysql_port"
+    ${if} $MYSQL_PORT == ""
+        strcpy $MYSQL_PORT 3306
+    ${endif}
 FunctionEnd
 
 
@@ -2428,7 +2454,7 @@ Function copyllid
     setoutpath "$TEMP\lams"
     File "${BUILD_DIR}\GetLlidFolderNames.class"
     
-    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
     # execute llid finder
     Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
@@ -2443,7 +2469,7 @@ Function copyllid
     setoutpath "$TEMP\lams"
     File "${BUILD_DIR}\GetLlidFolderNames.class"
     
-    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
     # execute llid finder
     Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
@@ -2455,7 +2481,7 @@ Function copyllid
         Abort
     ${endif}
     
-    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
+    strcpy $1 "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
     # execute llid finder
     Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Resource and Forum" "$1" "$DB_USER" "$DB_PASS"'
@@ -2627,6 +2653,8 @@ Section "Uninstall"
     CreateDirectory $RETAIN_DIR
 
     ReadRegStr $MYSQL_HOST HKLM "${REG_HEAD}" "mysql_host"
+    ReadRegStr $MYSQL_PORT HKLM "${REG_HEAD}" "mysql_port"
+    
     ;Now copy files that are to be retained to the temp folder
     ${If} $UNINSTALL_RETAIN == 1
         #MessageBox MB_OK|MB_ICONEXCLAMATION "retaining repository"
@@ -2693,20 +2721,18 @@ Section "Uninstall"
     RMDir /r "$WINTEMP\lams"
     
     StrLen $9 $3
-    ${if} $MYSQL_HOST == 'localhost'
-        StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2'
-        DetailPrint $4
-        ${If} $9 != 0
-            StrCpy $4 '$0\bin\mysql -e "DROP DATABASE $1" -u $2 -p$3' 
-        ${EndIf}
-        nsExec::ExecToStack $4
-        Pop $0
-        Pop $1
-        ${If} $0 == 1
-            MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
-            DetailPrint "Failed to remove LAMS database."
-        ${EndIf}        
-    ${endif}
+    StrCpy $4 '$0\bin\mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -e "DROP DATABASE $1" -u $2'
+    DetailPrint $4
+    ${If} $9 != 0
+        StrCpy $4 '$0\bin\mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -e "DROP DATABASE $1" -u $2 -p$3' 
+    ${EndIf}
+    nsExec::ExecToStack $4
+    Pop $0
+    Pop $1
+    ${If} $0 == 1
+        MessageBox MB_OK|MB_ICONEXCLAMATION "Couldn't remove LAMS database:$\r$\n$\r$\n$1"
+        DetailPrint "Failed to remove LAMS database."
+    ${EndIf} 
     
     ; batch file doesn't want to work when called with ExecToStack
     ; nsExec::ExecToStack '$INSTDIR\jboss-4.0.2\bin\UninstallLAMS-NT.bat'
