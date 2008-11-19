@@ -21,6 +21,11 @@ flvPlayer previous to running an update, you will need to re-install to the
 current version. Follow the instructions at:
 http://wiki.lamsfoundation.org/display/lams/flvPlayer.
 
+NOTE TO SYSADMINS: If you are updating LAMS 2.1 to LAMS 2.2, and you currently 
+use LDAP authentication, please check the LDAP wiki page for changes to the 
+configuration values in LAMS 2.2:
+http://wiki.lamsfoundation.org/display/lamsdocs/LDAP+Configuration
+
 1. Startup and Shutdown
 =======================
 To use LAMS 2, first make sure it is started - use the 'Start LAMS' shortcut
