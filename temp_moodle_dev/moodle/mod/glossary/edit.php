@@ -190,8 +190,10 @@ if ($mform->is_cancelled()){
 
 $stredit = empty($e) ? get_string('addentry', 'glossary') : get_string("edit");
 $navigation = build_navigation($stredit, $cm);
+ //we pass a new parameter to the function so it won't we printed if is_lams=1	
 print_header_simple(format_string($glossary->name), "", $navigation, "",
-              "", true, "", navmenu($course, $cm));
+              "", true, "", navmenu($course, $cm),false,'',false,$cm->is_lams);	
+
 
 print_heading(format_string($glossary->name));
 
@@ -214,6 +216,7 @@ $mform->display();
 ///glossary_print_tabbed_table_end();
 
 
-print_footer($course);
+//we pass a new parameter to the function so it won't we printed if is_lams=1
+print_footer($course,null, false,$glossary->is_lams);
 
 ?>

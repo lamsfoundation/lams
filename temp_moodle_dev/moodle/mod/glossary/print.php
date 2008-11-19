@@ -180,6 +180,6 @@
             glossary_print_entry($course, $cm, $glossary, $entry, $mode, $hook,1,$displayformat,false,true);
         }
     }
-
-    print_footer('empty');
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer('empty',null, false,$glossary->is_lams);
 ?>
