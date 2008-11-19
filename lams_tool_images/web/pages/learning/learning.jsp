@@ -22,7 +22,7 @@
 	<c:set var="thumbnailImageDimensions" value="${sessionMap.thumbnailImageDimensions}" />
 
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.css'/>" />
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.skin.css'/>" />
+	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.skin.css' />" />
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/galleria.css'/>" >
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.rating.css'/>"/>
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
@@ -41,10 +41,29 @@
 		#main_image{margin: 0 auto 20 0; height: ${(mediumImageDimensions*3)/4 + 40}px; width: ${mediumImageDimensions}px;}
 		#main_image img{margin-bottom: 10px; border: 1px solid #111;}
 		
-		.check_for_new{position: relative; top: -123px; left: 660px;}
-		.add_new_image{position: relative; top: -90px; left: 660px;}
+		.check_for_new{position: relative; top: ${-thumbnailImageDimensions - 23}px; left: ${thumbnailImageDimensions*5 + 160}px;}
+		.add_new_image{position: relative; top: ${-thumbnailImageDimensions + 10}px; left: ${thumbnailImageDimensions*5 + 160}px;}
 		
 		.after_main_image{text-align: left; margin: 30px 0; padding-top: 30px; clear:both;}
+		
+		/* parameters borrowed from jquery.jcarousel.skin.css */
+		.jcarousel-skin-tango .jcarousel-container-horizontal {
+    		width: ${thumbnailImageDimensions*5 + 75}px;
+    	}
+    	.jcarousel-skin-tango .jcarousel-clip-horizontal {
+		    width:  ${thumbnailImageDimensions*5 + 75}px;
+		    height: ${thumbnailImageDimensions + 8}px;
+		}
+		.jcarousel-skin-tango .jcarousel-item {
+		    width: ${thumbnailImageDimensions}px;
+		    height: ${thumbnailImageDimensions}px;
+		}
+		.jcarousel-skin-tango .jcarousel-next-horizontal {
+	    	top: ${thumbnailImageDimensions/2}px;
+	    }	
+		.jcarousel-skin-tango .jcarousel-prev-horizontal {
+    		top: ${thumbnailImageDimensions/2}px;
+    	}	    
     </style>
     
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>" ></script>    
