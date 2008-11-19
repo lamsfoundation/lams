@@ -35,7 +35,6 @@
     print_header_simple("$strglossarys", "", $navigation, "", "", true, "", navmenu($course));
 
 /// Get all the appropriate data
-
     if (! $glossarys = get_all_instances_in_course("glossary", $course)) {
         notice(get_string('thereareno', 'moodle', $strglossarys), "../../course/view.php?id=$course->id");
         die;
