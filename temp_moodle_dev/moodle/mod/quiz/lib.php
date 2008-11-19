@@ -1176,8 +1176,6 @@ function quiz_num_attempt_summary($quiz, $cm, $returnzero = false, $currentgroup
     return '';
 }
 
-//new
-
 /**
  * LAMS Function
  * This function clones an existing instance of Moodle quiz
@@ -1222,20 +1220,19 @@ function quiz_clone_instance($id, $sectionref, $courseid) {
     $cm->course = $courseid;
     $cm->id = insert_record('course_modules', $cm);
 	
-    //adds the new forum to the sequence variable in section table
-    $existingquiz->section = $sectionref;//new
-    $existingquiz->coursemodule = $cm->id;//new
+    //adds the new quiz to the sequence variable in section table
+    $existingquiz->section = $sectionref;
+    $existingquiz->coursemodule = $cm->id;
     $existingquiz->instance = $cm->instance;
           
-    require_once($CFG->dirroot.'/course/lib.php');//new
-    add_mod_to_section($existingquiz);//new
+    require_once($CFG->dirroot.'/course/lib.php');
+   // add_mod_to_section($existingquiz);
     
-    //add_questions  mirar si hi ha la funció que afegeixi una nova questio a la taula quiz/questions
+    //add_questions  
     $quizquestions = explode(",", $existingquiz->questions);
     $numberquestions=count($quizquestions);
     for($up=0;$up<$numberquestions;$up++){ 
-    	
-    	//posar max nota per a cada pregunta inicialmente haviem posat 0
+    	//set maxgrade to each question
     	$question_maxgrade = get_field('quiz_question_instances', 'grade', 'quiz', $existingquiz->old_id, 'question',$quizquestions[$up]);
     	quiz_update_question_instance($question_maxgrade, $quizquestions[$up], $existingquiz->id);
     }
@@ -1286,7 +1283,6 @@ function quiz_import_instance($filepath, $userid, $courseid, $sectionid) {
     if ( ! $quiz->id = insert_record('quiz', $quiz) ) {
         return 0; 
     }
-
     $module = get_record('modules', 'name', 'quiz');
     $section = get_course_section($sectionid, $courseid);
 
@@ -1297,6 +1293,7 @@ function quiz_import_instance($filepath, $userid, $courseid, $sectionid) {
     $cm->section = $section->id;
 	$cm->is_lams = 1; 
     $cm->id = insert_record('course_modules', $cm);
+    
 
     return $cm->id;
 }
@@ -1307,9 +1304,7 @@ function quiz_import_instance($filepath, $userid, $courseid, $sectionid) {
  */
 function quiz_get_tool_output($id, $userid) {
     $cm = get_record('course_modules', 'id', $id);
-	//$quiz=get_record('quiz', 'id', $cm->instance);
     if ($cm) {
-		//$grade=quiz_get_user_grades($quiz, $userid);
 		$grade = get_record('quiz_grades', 'userid', $userid, 'quiz', $cm->instance);
 		if ($grade) {
 			return $grade->grade;
@@ -1332,5 +1327,4 @@ function quiz_export_portfolio($id, $userid) {
 
 }
 
-//fi new
 ?>
