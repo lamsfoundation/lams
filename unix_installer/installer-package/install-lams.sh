@@ -423,7 +423,7 @@ mkdir -p ${DEFAULT_DIR}/lib
 
 
 cp $JBOSS_DIR/server/all/lib/jgroups.jar $JBOSS_DIR/server/all/lib/jboss-cache.jar ${DEFAULT_DIR}/lib
-cp assembly/lams-session.jar  assembly/lams-valve.jar ${DEFAULT_DIR}/lib
+cp assembly/lams-session.jar  assembly/lams-valve.jar assembly/jgroups.jar assembly/jboss-cache.jar assembly/jboss-serialization.jar ${DEFAULT_DIR}/lib
 if [  "$?" -ne  "0" ]
         then
         echo "\nInstall Failed. Problem while configuring JBoss, please ensure you have the correct version of JBoss (4.0.2).\n\n"
