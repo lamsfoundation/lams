@@ -289,7 +289,7 @@ checklams()
 
 backup()
 {
-    printf "\nDo you wish to automatically backup lams before updating? (Recommended. NOTE: Requires MySql to be installed at localhost)\n"
+    printf "\nDo you wish to automatically backup lams before updating? (Recommended. NOTE: Requires MySql to be installed locally)\n"
     printf "Please check the below directories are correct before running this backup. If they are not, quit the installer and backup LAMS manually.\n"
     printf "The space required to backup your LAMS installation:\n"
     du -chs $LAMS_DIR $JBOSS_DIR

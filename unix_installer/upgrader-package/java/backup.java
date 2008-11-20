@@ -9,7 +9,7 @@ public class backup
 	
 	private String backupdir, jbossdir, repositoryDir, etcdir;
 
-	public String mysqldir, dbuser, dbname, dbpass, dburl;
+	public String mysqldir, dbuser, dbname, dbpass, dburl, dbport, dbhost;
 
 	public static void main(String args[])
 	{
@@ -60,6 +60,9 @@ public class backup
 			dbname = lamsProperties.getProperty("DB_NAME");
 			dbuser = lamsProperties.getProperty("DB_USER");
 			dbpass = lamsProperties.getProperty("DB_PASS");
+			dbport = lamsProperties.getProperty("SQL_PORT");
+			dbhost = lamsProperties.getProperty("SQL_HOST");
+			
 			dburl = "jdbc:mysql://localhost/" +dbname+ "?characterEncoding=utf8";
 			
 			File lams = new File(jbossdir + "/server/default/deploy/lams.ear/lams.jar");
@@ -197,9 +200,9 @@ public class backup
 	{
 		try
 		{
-
 			FileWriter outfile = new FileWriter("bin/lamsdump.sql");
-			outfile.write(mysqldir+ "/mysqldump -u" +dbuser+ " -p" +dbpass+ " " +dbname+ " > " +backupdir+ "/dump.sql");
+			outfile.write(mysqldir+ "/mysqldump -u" +dbuser+ " -p" +dbpass+ " -h" +dbhost+ " -P" +dbport+
+					" " +dbname+ " > " +backupdir+ "/dump.sql");
 			outfile.close();
 		}
 		catch (Exception e)
