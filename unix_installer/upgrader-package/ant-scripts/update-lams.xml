@@ -26,20 +26,13 @@
 <project name="update-lams" basedir=".">
     <property file="../lams.properties" />
     <property file="lang.properties"/>
-
-	<!-- LI-157 Do not overwrite news.html - commented out -->
-    <!--
-	<condition property="files.match">
-        <filesmatch file1="${DEPLOY_DIR}/lams.ear/lams-www.war/news.html" file2="../assembly/lams.ear/lams-www.war/news-2.0.2.html" />
-        
-         <filesmatch file1="${DEPLOY_DIR}/lams.ear/lams-www.war/news.html" file2="${DEPLOY_DIR}/lams.ear/lams-www.war/news-unmodified.html" /> 
-    </condition>
-	-->
 	
     <!-- Main Task, calls all the other tasks -->
     <target name="update-lams" description="Runs the entire update process">
         <!--<antcall target="configure-jboss" />-->
         <!--<antcall target="copy-core-jars-wars" />-->
+    	
+    	
         <antcall target="update-core-database" />
         <!-- <target="update-mysql-ds" /> -->
         <antcall target="update-lams-www-war" />
@@ -49,9 +42,8 @@
     	
     	<antcall target="update-application-xml" />
     	
-    	<antcall target="update-conf-files"/>
+    	<antcall target="update-2.2-specific"/>
     	
-
         <antcall target="language-pack" />
         <antcall target="set-lams-configuration" />
     </target>
@@ -240,15 +232,26 @@
             <property name="prop.path" value="lachat11"/>
         </ant>
 	</target>
-    	
-	<target name="update-conf-files" description="Updates conf files, must be updated each release">
-		<!-- FOR 2.2 only, copy the context.xml to the jbossweb dir -->
-		<copy todir="${DEFAULT_DIR}/jbossweb-tomcat55.sar" overwrite="true">
+	
+	<target name="update-2.2-specific" description="Does updates specific to 2.2, delete after 2.2">
+		
+		<!-- Copy new context.xml -->
+		<copy todir="${DEPLOY_DIR}/jbossweb-tomcat55.sar" overwrite="true">
             <fileset dir="../conf">
                 <include name="context.xml"/>
             </fileset>
         </copy>
+		
+		<!-- update jboss-cache and jgroups and jboss-serialization jars -->
+		<copy todir="${DEFAULT_DIR}/lib" overwrite="true">
+            <fileset dir="../assembly">
+                <include name="jboss-cache.jar"/>
+            	<include name="jgroups.jar"/>
+                <include name="jboss-serialization.jar"/>
+            </fileset>
+        </copy>
 	</target>
+	
 
     <target name="set-lams-configuration" description="Updates the lams_configuration table with all the settings from lams.properties">
         <sql driver="com.mysql.jdbc.Driver" 
