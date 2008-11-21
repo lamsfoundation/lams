@@ -102,6 +102,14 @@
         </set>
 
         <property
+            name="meetingCreated"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="meeting_created"
+        />
+
+        <property
             name="meetingKey"
             type="java.lang.String"
             update="true"

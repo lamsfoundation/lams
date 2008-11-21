@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.dimdim.web.actions;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -41,6 +42,7 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
 import org.lamsfoundation.lams.tool.dimdim.util.Constants;
+import org.lamsfoundation.lams.tool.dimdim.util.DimdimException;
 import org.lamsfoundation.lams.tool.dimdim.util.DimdimUtil;
 import org.lamsfoundation.lams.tool.dimdim.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -58,8 +60,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class MonitoringAction extends DispatchAction {
 
-    // private static final Logger logger =
-    // Logger.getLogger(MonitoringAction.class);
+    private static final Logger logger = Logger.getLogger(MonitoringAction.class);
 
     private IDimdimService dimdimService;
 
@@ -83,7 +84,8 @@ public class MonitoringAction extends DispatchAction {
 	Dimdim dimdim = dimdimService.getDimdimByContentId(toolContentID);
 
 	if (dimdim == null) {
-	    // TODO error page.
+	    logger.error("Unable to find tool content with id :" + toolContentID);
+	    throw new DimdimException("Invalid value for " + AttributeNames.PARAM_TOOL_CONTENT_ID);
 	}
 
 	ContentDTO contentDT0 = new ContentDTO(dimdim);
@@ -91,8 +93,6 @@ public class MonitoringAction extends DispatchAction {
 	MonitoringForm monitoringForm = (MonitoringForm) form;
 	// populate using authoring values
 	monitoringForm.setMaxAttendeeMikes((contentDT0.getMaxAttendeeMikes()));
-
-	// TODO may need to populate using session values if they already exist
 
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	contentDT0.setCurrentTab(currentTab);
@@ -117,7 +117,7 @@ public class MonitoringAction extends DispatchAction {
 	return mapping.findForward("dimdim_display");
     }
 
-    public ActionForward startDimdim(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward startMeeting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	MonitoringForm monitoringForm = (MonitoringForm) form;
@@ -132,18 +132,59 @@ public class MonitoringAction extends DispatchAction {
 	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
 		.getSession().getAttribute(AttributeNames.USER);
 
-	String meetingKey = DimdimUtil.generateMeetingKey();
-	session.setMeetingKey(meetingKey);
+	// Get dimdim version
+	String version = dimdimService.getConfigValue(Constants.CFG_VERSION);
+	
+	if (version == null) {
+	    logger.error("Config value " + Constants.CFG_VERSION + " returned null");
+	    throw new DimdimException("Server version not defined");
+	}
+	
+	if (version.equals(Constants.CFG_VERSION_STANDARD)) {
+	    // Standard Version
+	    String meetingKey = DimdimUtil.generateMeetingKey();
+	    session.setMeetingCreated(true);
+	    session.setMeetingKey(meetingKey);
+
+	    String returnURL = DimdimUtil.getReturnURL(request);
+
+	    String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey(),
+		    returnURL, session.getMaxAttendeeMikes());
+
+	    response.sendRedirect(startConferenceURL);
+	} else if (version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
+	    // Enterprise Version
+
+	    // Create new user on enterprise dimdim server using the toolSessionId as the name.
+	    // NB User may already exist
+	    String returnCode = dimdimService.createUser(session.getSessionId());
+
+	    if (!returnCode.equals("200") && !returnCode.equals("302")) {
+		// 200 = success, 302 = user already exists
+		logger.error("Could not create dimdim enterprise user with id :" + session.getSessionId());
+		throw new DimdimException("Unable to start dimdim enterprise meeting");
+	    }
+
+	    // Start a new dimdim web meeting
+	    String meetingStartURL = dimdimService.startAction(session.getSessionId().toString(), session
+		    .getSessionId().toString(), DimdimUtil.getReturnURL(request), session.getMaxAttendeeMikes());
+
+	    if (meetingStartURL != null) {
+		session.setMeetingCreated(true);
+		response.sendRedirect(meetingStartURL);
+	    } else {
+		logger.error("startAction did not return a url to start the meeting");
+		throw new DimdimException("Unable to start meeting");
+	    }
+
+	} else {
+	    // Illegal version value.
+	    logger.error("Unknown dimdim version :'" + version + "'");
+	    throw new DimdimException("Unknown dimdim version");
+	}
+
 	dimdimService.saveOrUpdateDimdimSession(session);
 
-	String returnURL = DimdimUtil.generateReturnURL(request);
-
-	String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey(),
-		returnURL, session.getMaxAttendeeMikes());
-
-	response.sendRedirect(startConferenceURL);
-
 	return null;
-
     }
 }

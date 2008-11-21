@@ -64,8 +64,8 @@
 
 	<p>
 		<c:choose>
-			<c:when test="${conferenceOpen}">
-				<html:link href="${conferenceURL}" target="_blank">
+			<c:when test="${meetingOpen}">
+				<html:link href="${meetingURL}" target="dimdimLearner${toolSessionID}" onclick="window.open('${meetingURL}', 'dimdimLearner${toolSessionID}', 'resizable=yes,scrollbars=yes')">
 					<fmt:message key="label.learning.joinConference" />
 				</html:link>
 			</c:when>

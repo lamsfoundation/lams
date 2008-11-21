@@ -25,7 +25,7 @@
 package org.lamsfoundation.lams.tool.dimdim.model;
 
 /**
- * @hibernate.class table="tl_laddim10_dimdim_config"
+ * @hibernate.class table="tl_laddim10_config"
  */
 public class DimdimConfig {
 
@@ -35,6 +35,15 @@ public class DimdimConfig {
 
     private String value;
 
+    public DimdimConfig() {
+	// default constructor
+    }
+    
+    public DimdimConfig(String key, String value) {
+	this.key = key;
+	this.value = value;
+    }
+    
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
      */

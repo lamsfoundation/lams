@@ -25,6 +25,8 @@
 package org.lamsfoundation.lams.tool.dimdim.util;
 
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,7 +36,7 @@ public class DimdimUtil {
 	return new Long(System.currentTimeMillis()).toString() + "-" + (new Random().nextInt());
     }
 
-    public static String generateReturnURL(HttpServletRequest request) {
+    public static String getReturnURL(HttpServletRequest request) {
 	String protocol = request.getProtocol();
 	if (protocol.startsWith("HTTPS")) {
 	    protocol = "https://";
@@ -50,5 +52,44 @@ public class DimdimUtil {
 	path += "endMeeting.do";
 
 	return path;
+    }
+
+    // helper functions to extract info from json response.
+
+
+    // get return code -- enterprise version
+    private static Pattern patternCode = Pattern.compile("code:\"(.*?)\"");
+
+    public static String getCode(String json) {
+	Matcher matcher = patternCode.matcher(json);
+	matcher.find();
+	return matcher.group(1);
+    }
+    
+    // get result -- standard version
+    private static Pattern patternResult = Pattern.compile("result:\"(.*?)\"");
+    
+    public static String getResult(String json) {
+	Matcher matcher = patternResult.matcher(json);
+	matcher.find();
+	return matcher.group(1);
+    }
+
+    // enterprise version
+    private static Pattern patternEnterpriseURL = Pattern.compile("data:\\{text:\"(.*?)\"");
+
+    public static String getEnterpriseURL(String json) {
+	Matcher matcherUrl = patternEnterpriseURL.matcher(json);
+	matcherUrl.find();
+	return matcherUrl.group(1);
+    }
+
+    // standard version
+    private static Pattern patternStandardURL = Pattern.compile("url:\"(.*?)\"");
+    
+    public static String getStandardURL(String response) throws Exception {
+	Matcher matcher = patternStandardURL.matcher(response);
+	matcher.find();
+	return matcher.group(1);
     }
 }

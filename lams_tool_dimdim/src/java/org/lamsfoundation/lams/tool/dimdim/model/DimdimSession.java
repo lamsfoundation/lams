@@ -61,6 +61,8 @@ public class DimdimSession implements java.io.Serializable {
 
     private Set<DimdimUser> dimdimUsers;
 
+    private boolean meetingCreated;
+    
     private String meetingKey;
 
     private Integer maxAttendeeMikes;
@@ -164,6 +166,18 @@ public class DimdimSession implements java.io.Serializable {
 
     public void setDimdimUsers(Set<DimdimUser> dimdimUsers) {
 	this.dimdimUsers = dimdimUsers;
+    }
+    
+    /**
+     * @hibernate.property column="meeting_created"
+     * @return
+     */
+    public boolean isMeetingCreated() {
+        return meetingCreated;
+    }
+
+    public void setMeetingCreated(boolean meetingCreated) {
+        this.meetingCreated = meetingCreated;
     }
 
     /**

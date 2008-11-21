@@ -26,33 +26,43 @@ package org.lamsfoundation.lams.tool.dimdim.util;
 
 public final class Constants {
 
-    // Tool signature
-    public static final String TOOL_SIGNATURE = "laddim10";
-
-    // Configuration keys
-    public static final String CONFIG_SERVER_URL = "server_url";
-
-    // Authoring SessionMap key names
-    public static final String KEY_TOOL_CONTENT_ID = "toolContentID";
-    public static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
-    public static final String KEY_MODE = "mode";
-    public static final String KEY_ONLINE_FILES = "onlineFiles";
-    public static final String KEY_OFFLINE_FILES = "offlineFiles";
-    public static final String KEY_UNSAVED_ONLINE_FILES = "unsavedOnlineFiles";
-    public static final String KEY_UNSAVED_OFFLINE_FILES = "unsavedOfflineFiles";
-    public static final String KEY_DELETED_FILES = "deletedFiles";
+    public static final String APP_RESOURCES = "org.lamsfoundation.lams.tool.dimdim.ApplicationResources";
 
     // Attribute names
+    public static final String ATTR_ALLOW_VERSION_CHANGE = "allowVersionChange";
+    public static final String ATTR_CONFIG_DTO = "configDTO";
     public static final String ATTR_CONTENT_DTO = "contentDTO";
     public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
+    public static final String ATTR_MEETING_OPEN = "meetingOpen";
+    public static final String ATTR_MEETING_URL = "meetingURL";
+    public static final String ATTR_MESSAGE_KEY = "messageKey";
     public static final String ATTR_SESSION_MAP = "sessionMap";
-    public static final String ATTR_USER_DTO = "userDTO";
-    public static final String ATTR_CONFERENCE_URL = "conferenceURL";
-    public static final String ATTR_CONFERENCE_OPEN = "conferenceOpen";
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
+    public static final String ATTR_USER_DTO = "userDTO";
+
+    // Configuration keys
+    public static final String CFG_ADMIN_PASSWORD = "admin_password";
+    public static final String CFG_ENTERPRISE_SERVER_URL = "enterprise_server_url";
+    public static final String CFG_STANDARD_SERVER_URL = "standard_server_url";
+    public static final String CFG_VERSION = "version";
+    public static final String CFG_VERSION_ENTERPRISE = "enterprise";
+    public static final String CFG_VERSION_STANDARD = "standard";
+
+    // Authoring SessionMap key names
+    public static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
+    public static final String KEY_DELETED_FILES = "deletedFiles";
+    public static final String KEY_MODE = "mode";
+    public static final String KEY_OFFLINE_FILES = "offlineFiles";
+    public static final String KEY_ONLINE_FILES = "onlineFiles";
+    public static final String KEY_TOOL_CONTENT_ID = "toolContentID";
+    public static final String KEY_UNSAVED_OFFLINE_FILES = "unsavedOfflineFiles";
+    public static final String KEY_UNSAVED_ONLINE_FILES = "unsavedOnlineFiles";
 
     // Parameter names
     public static final String PARAM_USER_UID = "userUID";
+
+    // Tool signature
+    public static final String TOOL_SIGNATURE = "laddim10";
 
     private Constants() {
 	// prevent construction

@@ -30,7 +30,6 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -54,6 +53,8 @@ import org.lamsfoundation.lams.tool.dimdim.util.DimdimUtil;
 import org.lamsfoundation.lams.tool.dimdim.web.forms.LearningForm;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -66,6 +67,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
+ * @struts.action-forward name="generalMessage" path="tiles:/general/message"
  */
 public class LearningAction extends DispatchAction {
 
@@ -83,24 +85,197 @@ public class LearningAction extends DispatchAction {
 	return super.execute(mapping, form, request, response);
     }
 
+    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	DimdimUser user = getCurrentUser(toolSessionID);
+
+	if (user != null) {
+
+	    LearningForm learningForm = (LearningForm) form;
+
+	    if (user.getNotebookEntryUID() == null) {
+		user.setNotebookEntryUID(dimdimService.createNotebookEntry(toolSessionID,
+			CoreNotebookConstants.NOTEBOOK_TOOL, Constants.TOOL_SIGNATURE, user.getUserId().intValue(),
+			learningForm.getEntryText()));
+	    } else {
+		// update existing entry.
+		dimdimService.updateNotebookEntry(user.getNotebookEntryUID(), learningForm.getEntryText());
+	    }
+
+	    user.setFinishedActivity(true);
+	    dimdimService.saveOrUpdateDimdimUser(user);
+	} else {
+	    logger.error("finishActivity(): couldn't find/create DimdimUser in toolSessionID: " + toolSessionID);
+	}
+
+	ToolSessionManager sessionMgrService = DimdimServiceProxy.getDimdimSessionManager(getServlet()
+		.getServletContext());
+
+	String nextActivityUrl;
+	try {
+	    nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, user.getUserId());
+	    response.sendRedirect(nextActivityUrl);
+	} catch (DataMissingException e) {
+	    throw new DimdimException(e);
+	} catch (ToolException e) {
+	    throw new DimdimException(e);
+	} catch (IOException e) {
+	    throw new DimdimException(e);
+	}
+
+	return null;
+    }
+
+    private DimdimUser getCurrentUser(Long toolSessionId) {
+	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
+		.getSession().getAttribute(AttributeNames.USER);
+
+	// attempt to retrieve user using userId and toolSessionId
+	DimdimUser user = dimdimService.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID().intValue()),
+		toolSessionId);
+
+	if (user == null) {
+	    DimdimSession dimdimSession = dimdimService.getSessionBySessionId(toolSessionId);
+	    user = dimdimService.createDimdimUser(lamsUserDTO, dimdimSession);
+	}
+
+	return user;
+    }
+
+    private static final String CODE_OK = "200";
+    private static final String CODE_USER_EXISTS = "302";
+
+    public ActionForward openLearnerMeeting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	// get user uid parameter
+	Long uid = WebUtil.readLongParam(request, Constants.PARAM_USER_UID);
+	DimdimUser user = dimdimService.getUserByUID(uid);
+	DimdimSession session = user.getDimdimSession();
+
+	// Create new user on enterprise dimdim server using the toolSessionId as the name.
+	String returnCode = dimdimService.createUser(session.getSessionId());
+
+	if (!returnCode.equals(CODE_OK) && !returnCode.equals(CODE_USER_EXISTS)) {
+	    logger.error("Could not create dimdim enterprise user with id :" + session.getSessionId());
+	    throw new DimdimException("Unable to start dimdim enterprise meeting");
+	}
+
+	// Start a new dimdim web meeting
+	String meetingURL = dimdimService.joinMeeting(user);
+
+	if (meetingURL != null) {
+	    response.sendRedirect(meetingURL);
+	} else {
+	    logger.error("startAction did not return a url to start the meeting");
+	    request.setAttribute(Constants.ATTR_MESSAGE_KEY, "message.unableToStartLesson");
+	    return mapping.findForward("generalMessage");
+	}
+
+	return null;
+    }
+
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	// set the finished flag
+	DimdimUser user = getCurrentUser(lrnForm.getToolSessionID());
+	ContentDTO contentDTO = new ContentDTO(user.getDimdimSession().getDimdim());
+
+	request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDTO);
+
+	NotebookEntry notebookEntry = dimdimService.getNotebookEntry(user.getNotebookEntryUID());
+
+	if (notebookEntry != null) {
+	    lrnForm.setEntryText(notebookEntry.getEntry());
+	}
+
+	return mapping.findForward("notebook");
+
+    }
+
+    public ActionForward openPreviewMeeting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	// get user uid parameter
+	Long uid = WebUtil.readLongParam(request, Constants.PARAM_USER_UID);
+	DimdimUser user = dimdimService.getUserByUID(uid);
+	DimdimSession session = user.getDimdimSession();
+
+	// Create new user on enterprise dimdim server using the toolSessionId as the name.
+	String returnCode = dimdimService.createUser(session.getSessionId());
+
+	if (!returnCode.equals(CODE_OK) && !returnCode.equals(CODE_USER_EXISTS)) {
+	    logger.error("Could not create dimdim enterprise user with id :" + session.getSessionId());
+	    throw new DimdimException("Unable to start dimdim enterprise meeting");
+	}
+
+	// Start a new dimdim web meeting
+	String meetingURL = dimdimService.startAction(session.getSessionId().toString(), session.getSessionId()
+		.toString(), DimdimUtil.getReturnURL(request), session.getDimdim().getMaxAttendeeMikes());
+
+	if (meetingURL != null) {
+	    response.sendRedirect(meetingURL);
+	} else {
+	    logger.error("startAction did not return a url to start the meeting");
+	    throw new DimdimException("Unable to start meeting");
+	}
+
+	return null;
+    }
+
+    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	// save the reflection entry and call the notebook.
+
+	LearningForm lrnForm = (LearningForm) form;
+
+	DimdimUser user = getCurrentUser(lrnForm.getToolSessionID());
+	Long toolSessionID = user.getDimdimSession().getSessionId();
+	Integer userID = user.getUserId().intValue();
+
+	// check for existing notebook entry
+	NotebookEntry entry = dimdimService.getNotebookEntry(user.getNotebookEntryUID());
+
+	if (entry == null) {
+	    // create new entry
+	    Long entryUID = dimdimService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    Constants.TOOL_SIGNATURE, userID, lrnForm.getEntryText());
+	    user.setNotebookEntryUID(entryUID);
+	    dimdimService.saveOrUpdateDimdimUser(user);
+	} else {
+	    // update existing entry
+	    entry.setEntry(lrnForm.getEntryText());
+	    entry.setLastModified(new Date());
+	    dimdimService.updateNotebookEntry(entry);
+	}
+
+	return finishActivity(mapping, form, request, response);
+    }
+
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	LearningForm learningForm = (LearningForm) form;
 
 	// 'toolSessionID' and 'mode' parameters are expected to be present.
-	// TODO need to catch exceptions and handle errors.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// Retrieve the session and content.
-	DimdimSession dimdimSession = dimdimService.getSessionBySessionId(toolSessionID);
-	if (dimdimSession == null) {
+	DimdimSession session = dimdimService.getSessionBySessionId(toolSessionID);
+	if (session == null) {
 	    throw new DimdimException("Cannot retrieve session with toolSessionID" + toolSessionID);
 	}
 
-	Dimdim dimdim = dimdimSession.getDimdim();
+	Dimdim dimdim = session.getDimdim();
 
 	// check defineLater
 	if (dimdim.isDefineLater()) {
@@ -112,11 +287,11 @@ public class LearningAction extends DispatchAction {
 	learningForm.setToolSessionID(toolSessionID);
 
 	ContentDTO contentDTO = new ContentDTO();
-	contentDTO.title = dimdim.getTitle();
-	contentDTO.instructions = dimdim.getInstructions();
-	contentDTO.lockOnFinish = dimdim.isLockOnFinished();
-	contentDTO.reflectOnActivity = dimdim.isReflectOnActivity();
-	contentDTO.reflectInstructions = dimdim.getReflectInstructions();
+	contentDTO.setTitle(dimdim.getTitle());
+	contentDTO.setInstructions(dimdim.getInstructions());
+	contentDTO.setLockOnFinish(dimdim.isLockOnFinished());
+	contentDTO.setReflectOnActivity(dimdim.isReflectOnActivity());
+	contentDTO.setReflectInstructions(dimdim.getReflectInstructions());
 
 	request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDTO);
 
@@ -131,17 +306,17 @@ public class LearningAction extends DispatchAction {
 	    return mapping.findForward("runOffline");
 	}
 
-	DimdimUser dimdimUser;
+	DimdimUser user;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
 	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
-	    dimdimUser = dimdimService.getUserByUserIdAndSessionId(userID, toolSessionID);
+	    user = dimdimService.getUserByUserIdAndSessionId(userID, toolSessionID);
 	} else {
-	    dimdimUser = getCurrentUser(toolSessionID);
+	    user = getCurrentUser(toolSessionID);
 	}
 
 	// get any existing notebook entries and create userDTO
-	NotebookEntry entry = dimdimService.getNotebookEntry(dimdimUser.getNotebookEntryUID());
-	UserDTO userDTO = new UserDTO(dimdimUser);
+	NotebookEntry entry = dimdimService.getNotebookEntry(user.getNotebookEntryUID());
+	UserDTO userDTO = new UserDTO(user);
 	if (entry != null) {
 	    userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
 	}
@@ -151,141 +326,59 @@ public class LearningAction extends DispatchAction {
 	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
 		.getSession().getAttribute(AttributeNames.USER);
 
-	String connectURL = "";
-	if (mode.isAuthor()) {
-	    String meetingKey = DimdimUtil.generateMeetingKey();
-	    String returnURL = DimdimUtil.generateReturnURL(request);
-	    connectURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, meetingKey, returnURL, dimdim
-		    .getMaxAttendeeMikes());
-	} else {
-	    if (dimdimSession.getMeetingKey() != null) {
-		connectURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO, dimdimSession.getMeetingKey());
-	    } // otherwise, meeting has not been started in monitoring
+	String meetingURL = new String();
+	boolean meetingOpen = false;
+
+	String version = dimdimService.getConfigValue(Constants.CFG_VERSION);
+	if (version == null) {
+	    logger.error("Config value " + Constants.CFG_VERSION + " returned null");
+	    throw new DimdimException("Server version not defined");
 	}
 
-	boolean conferenceOpen = StringUtils.isEmpty(connectURL) ? false : true;
-	request.setAttribute(Constants.ATTR_CONFERENCE_OPEN, conferenceOpen);
+	if (version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
+	    // Enterprise Version
+	    if (mode.isAuthor()) {
 
-	if (conferenceOpen) {
-	    request.setAttribute(Constants.ATTR_CONFERENCE_URL, connectURL);
-	}
-
-	// set toolSessionID in request
-	request.setAttribute(Constants.ATTR_TOOL_SESSION_ID, dimdimSession.getSessionId());
-
-	return mapping.findForward("dimdim");
-    }
-
-    private DimdimUser getCurrentUser(Long toolSessionId) {
-	org.lamsfoundation.lams.usermanagement.dto.UserDTO user = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
-		.getSession().getAttribute(AttributeNames.USER);
-
-	// attempt to retrieve user using userId and toolSessionId
-	DimdimUser dimdimUser = dimdimService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
-		toolSessionId);
-
-	if (dimdimUser == null) {
-	    DimdimSession dimdimSession = dimdimService.getSessionBySessionId(toolSessionId);
-	    dimdimUser = dimdimService.createDimdimUser(user, dimdimSession);
-	}
-
-	return dimdimUser;
-    }
-
-    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	LearningForm lrnForm = (LearningForm) form;
-
-	// set the finished flag
-	DimdimUser dimdimUser = getCurrentUser(lrnForm.getToolSessionID());
-	ContentDTO contentDTO = new ContentDTO(dimdimUser.getDimdimSession().getDimdim());
-
-	request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDTO);
-
-	NotebookEntry notebookEntry = dimdimService.getNotebookEntry(dimdimUser.getNotebookEntryUID());
-
-	if (notebookEntry != null) {
-	    lrnForm.setEntryText(notebookEntry.getEntry());
-	}
-
-	return mapping.findForward("notebook");
-
-    }
-
-    public ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	// save the reflection entry and call the notebook.
-
-	LearningForm lrnForm = (LearningForm) form;
-
-	DimdimUser dimdimUser = getCurrentUser(lrnForm.getToolSessionID());
-	Long toolSessionID = dimdimUser.getDimdimSession().getSessionId();
-	Integer userID = dimdimUser.getUserId().intValue();
-
-	// check for existing notebook entry
-	NotebookEntry entry = dimdimService.getNotebookEntry(dimdimUser.getNotebookEntryUID());
-
-	if (entry == null) {
-	    // create new entry
-	    Long entryUID = dimdimService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    Constants.TOOL_SIGNATURE, userID, lrnForm.getEntryText());
-	    dimdimUser.setNotebookEntryUID(entryUID);
-	    dimdimService.saveOrUpdateDimdimUser(dimdimUser);
-	} else {
-	    // update existing entry
-	    entry.setEntry(lrnForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    dimdimService.updateNotebookEntry(entry);
-	}
-
-	return finishActivity(mapping, form, request, response);
-    }
-
-    public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	DimdimUser dimdimUser = getCurrentUser(toolSessionID);
-
-	if (dimdimUser != null) {
-
-	    LearningForm learningForm = (LearningForm) form;
-
-	    // TODO fix idType to use real value not 999
-
-	    if (dimdimUser.getNotebookEntryUID() == null) {
-		dimdimUser.setNotebookEntryUID(dimdimService.createNotebookEntry(toolSessionID,
-			CoreNotebookConstants.NOTEBOOK_TOOL, Constants.TOOL_SIGNATURE, dimdimUser.getUserId()
-				.intValue(), learningForm.getEntryText()));
+		meetingURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/" + Constants.TOOL_SIGNATURE
+			+ "/learning.do?dispatch=openPreviewMeeting&" + Constants.PARAM_USER_UID + "="
+			+ user.getUid();
+		meetingOpen = true;
 	    } else {
-		// update existing entry.
-		dimdimService.updateNotebookEntry(dimdimUser.getNotebookEntryUID(), learningForm.getEntryText());
+		if (session.isMeetingCreated()) {
+		    meetingURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/" + Constants.TOOL_SIGNATURE
+			    + "/learning.do?dispatch=openLearnerMeeting&" + Constants.PARAM_USER_UID + "="
+			    + user.getUid();
+		    meetingOpen = true;
+		} // otherwise, meeting has not been started in monitoring
 	    }
 
-	    dimdimUser.setFinishedActivity(true);
-	    dimdimService.saveOrUpdateDimdimUser(dimdimUser);
+	} else if (version.equals(Constants.CFG_VERSION_STANDARD)) {
+	    // Standard Version
+
+	    if (mode.isAuthor()) {
+		String meetingKey = DimdimUtil.generateMeetingKey();
+		String returnURL = DimdimUtil.getReturnURL(request);
+		meetingURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, meetingKey, returnURL, dimdim
+			.getMaxAttendeeMikes());
+		meetingOpen = true;
+	    } else {
+		if (session.isMeetingCreated()) {
+		    meetingURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO, session.getMeetingKey());
+		    meetingOpen = true;
+		} // otherwise, meeting has not been started in monitoring
+	    }
 	} else {
-	    logger.error("finishActivity(): couldn't find/create DimdimUser in toolSessionID: " + toolSessionID);
+	    // Illegal version value.
+	    logger.error("Unknown dimdim version :'" + version + "'");
+	    throw new DimdimException("Unknown dimdim version");
 	}
 
-	ToolSessionManager sessionMgrService = DimdimServiceProxy.getDimdimSessionManager(getServlet()
-		.getServletContext());
+	request.setAttribute(Constants.ATTR_MEETING_OPEN, meetingOpen);
+	request.setAttribute(Constants.ATTR_MEETING_URL, meetingURL);
 
-	String nextActivityUrl;
-	try {
-	    nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, dimdimUser.getUserId());
-	    response.sendRedirect(nextActivityUrl);
-	} catch (DataMissingException e) {
-	    throw new DimdimException(e);
-	} catch (ToolException e) {
-	    throw new DimdimException(e);
-	} catch (IOException e) {
-	    throw new DimdimException(e);
-	}
+	// set toolSessionID in request
+	request.setAttribute(Constants.ATTR_TOOL_SESSION_ID, session.getSessionId());
 
-	return null; // TODO need to return proper page.
+	return mapping.findForward("dimdim");
     }
 }

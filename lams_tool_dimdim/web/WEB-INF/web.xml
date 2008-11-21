@@ -16,7 +16,8 @@
             	classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
-				classpath:/org/lamsfoundation/lams/tool/dimdim/dimdimApplicationContext.xml			
+				classpath:/org/lamsfoundation/lams/tool/dimdim/dimdimApplicationContext.xml
+				classpath:/org/lamsfoundation/lams/tool/dimdim/dbupdates/autopatchContext.xml			
 	</param-value>
 </context-param>
 
@@ -61,6 +62,11 @@
 		org.springframework.web.context.ContextLoaderListener
 	</listener-class>
 </listener>	
+<listener>
+	<listener-class>
+		org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
+	</listener-class>
+</listener>
 
  <servlet>
 	<servlet-name>action</servlet-name>
@@ -138,6 +144,10 @@
 	<servlet-name>exportPortfolio</servlet-name>
 	<url-pattern>/exportPortfolio</url-pattern>
 </servlet-mapping>
+
+   <session-config>
+      <session-timeout>120</session-timeout>
+   </session-config>
 
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.

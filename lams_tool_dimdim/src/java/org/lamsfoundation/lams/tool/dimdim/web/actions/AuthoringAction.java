@@ -135,7 +135,6 @@ public class AuthoringAction extends DispatchAction {
 
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	// TODO need error checking.
 
 	// get authForm and session map.
 	AuthoringForm authForm = (AuthoringForm) form;
@@ -347,8 +346,8 @@ public class AuthoringAction extends DispatchAction {
 	    dimdim.setReflectOnActivity(authForm.isReflectOnActivity());
 	    dimdim.setReflectInstructions(authForm.getReflectInstructions());
 	    dimdim.setLockOnFinished(authForm.isLockOnFinished());
-
-	    // TODO check whether these fields should be in here
+	    
+	    // dimdim fields
 	    dimdim.setMaxAttendeeMikes(authForm.getMaxAttendeeMikes());
 	}
     }

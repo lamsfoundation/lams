@@ -31,8 +31,6 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
  */
 public class DimdimToolContentHandler extends ToolContentHandler {
 
-    // TODO these three fields were changed to public, since accessor methods
-    // cannot be made static. Check if we can do this a better way.
     public static String repositoryWorkspaceName = "dimdimworkspace";
 
     public static String repositoryUser = "dimdim";
@@ -40,8 +38,8 @@ public class DimdimToolContentHandler extends ToolContentHandler {
     public static char[] repositoryId = { 'l', 'a', 'm', 's', '-', 'e', 'x' };
 
     /**
-	 * 
-	 */
+     * 
+     */
     public DimdimToolContentHandler() {
 	super();
     }

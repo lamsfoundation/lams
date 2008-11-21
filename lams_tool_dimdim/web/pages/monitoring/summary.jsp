@@ -48,93 +48,82 @@
 	</table>
 </div>
 
-<c:choose>
-	<c:when test="${fn:length(dto.sessionDTOs) gt 1}">
-		<!-- Dimdim only supports one conference session at a time -->
-	</c:when>
-	<c:when test="${fn:length(dto.sessionDTOs) eq 0}">
-		<!-- No Tool Sessions available -->
-	</c:when>
-	<c:otherwise>
+
+	<c:forEach var="session" items="${dto.sessionDTOs}">
+	
 		<h1>
-			<fmt:message key="monitor.summary.dimdimSettings" />
+			${session.sessionName}
 		</h1>
-
-		<c:forEach var="session" items="${dto.sessionDTOs}">
-			<html:form action="monitoring" target="_blank">
-				<html:hidden property="dispatch" value="startDimdim" />
-				<html:hidden property="toolSessionID" value="${session.sessionID}" />
-
-				<table>
-					<tr>
-						<td>
-							<fmt:message key="label.authoring.basic.maxAttendeeMikes" />
-							:
-							<html:select property="maxAttendeeMikes">
-								<html:option value="1"></html:option>
-								<html:option value="2"></html:option>
-								<html:option value="3"></html:option>
-								<html:option value="4"></html:option>
-								<html:option value="5"></html:option>
-							</html:select>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<html:submit styleClass="button">
-								<fmt:message key="label.monitoring.startConference" />
-							</html:submit>
-						</td>
-					</tr>
-				</table>
-			</html:form>
-		</c:forEach>
-	</c:otherwise>
-</c:choose>
-
-<c:forEach var="session" items="${dto.sessionDTOs}">
-
-	<h2>
-		${session.sessionName}
-	</h2>
-
-	<p>
-		<span class="field-name"> <fmt:message
-				key="heading.totalLearners" /> </span> ${session.numberOfLearners}
-	</p>
-
-	<table cellspacing="0" class="alternative-color">
-
-		<tr>
-			<th style="width: 30%;">
-				<fmt:message key="heading.learner" />
-			</th>
-			<th style="width: 70%;">
-				<fmt:message key="heading.notebookEntry" />
-			</th>
-		</tr>
-
-
-		<c:forEach var="user" items="${session.userDTOs}">
+	
+		<h2>
+			<fmt:message key="monitor.summary.dimdimSettings" />
+		</h2>
+	
+		
+		<html:form action="monitoring"  target="dimdimMonitor${session.sessionID}" onsubmit="window.open('', 'dimdimMonitor${session.sessionID}', 'resizable=yes,scrollbars=yes')"> 
+			<html:hidden property="dispatch" value="startMeeting" />
+			<html:hidden property="toolSessionID" value="${session.sessionID}" />
+			
+			<p>
+				<fmt:message key="label.authoring.basic.maxAttendeeMikes" />
+					:
+				<html:select property="maxAttendeeMikes">
+					<html:option value="1"></html:option>
+					<html:option value="2"></html:option>
+					<html:option value="3"></html:option>
+					<html:option value="4"></html:option>
+						<html:option value="5"></html:option>
+				</html:select>
+			</p>
+			
+			<p>
+				<html:submit styleClass="button">
+				<fmt:message key="label.monitoring.startConference" />
+				</html:submit>
+			</p>
+		</html:form>
+		
+	
+		<p>
+			<span class="field-name"> <fmt:message
+					key="heading.totalLearners" /> </span> ${session.numberOfLearners}
+		</p>
+	
+		<table cellspacing="0" class="alternative-color">
+	
 			<tr>
-				<td>
-					${user.firstName} ${user.lastName}
-				</td>
-				<td>
-					<c:choose>
-						<c:when test="${user.notebookEntryUID == null}">
-							<fmt:message key="label.notAvailable" />
-						</c:when>
-
-						<c:otherwise>
-							<a
-								href="./monitoring.do?dispatch=openNotebook&amp;userUID=${user.uid}">
-								<fmt:message key="label.view" /> </a>
-						</c:otherwise>
-					</c:choose>
-
-				</td>
+				<th style="width: 30%;">
+					<fmt:message key="heading.learner" />
+				</th>
+				<th style="width: 70%;">
+					<fmt:message key="heading.notebookEntry" />
+				</th>
 			</tr>
-		</c:forEach>
-	</table>
-</c:forEach>
+	
+	
+			<c:forEach var="user" items="${session.userDTOs}">
+				<tr>
+					<td>
+						${user.firstName} ${user.lastName}
+					</td>
+					<td>
+						<c:choose>
+							<c:when test="${user.notebookEntryUID == null}">
+								<fmt:message key="label.notAvailable" />
+							</c:when>
+	
+							<c:otherwise>
+								<a
+									href="./monitoring.do?dispatch=openNotebook&amp;userUID=${user.uid}">
+									<fmt:message key="label.view" /> </a>
+							</c:otherwise>
+						</c:choose>
+	
+					</td>
+				</tr>
+			</c:forEach>
+		</table>
+		
+		
+	</c:forEach>
+

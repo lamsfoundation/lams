@@ -30,6 +30,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.apache.struts.util.MessageResources;
+import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 
 /**
  * @struts.form name="adminForm"
@@ -41,25 +45,77 @@ public class AdminForm extends ActionForm {
 
     // Fields
 
-    private String dimdimServerURL;
+    private String adminPassword;
+
+    private String enterpriseServerURL;
+
+    private String standardServerURL;
+
+    private String version;
+
+    public String getAdminPassword() {
+	return adminPassword;
+    }
+
+    public String getEnterpriseServerURL() {
+	return enterpriseServerURL;
+    }
+
+    public String getStandardServerURL() {
+	return standardServerURL;
+    }
+
+    public String getVersion() {
+	return version;
+    }
+
+    public void setAdminPassword(String adminPassword) {
+	this.adminPassword = adminPassword;
+    }
+
+    public void setEnterpriseServerURL(String enterpriseServerURL) {
+	this.enterpriseServerURL = enterpriseServerURL;
+    }
+
+    public void setStandardServerURL(String standardServerURL) {
+	this.standardServerURL = standardServerURL;
+    }
+
+    public void setVersion(String version) {
+	this.version = version;
+    }
 
     @Override
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
 
 	ActionErrors errors = new ActionErrors();
 
-	if (StringUtils.isBlank(this.dimdimServerURL)) {
-	    // TODO add error messages;
+	MessageResources resources = MessageResources.getMessageResources(Constants.APP_RESOURCES);
+
+	if (this.version.equals(Constants.CFG_VERSION_STANDARD)) {
+	    // check standard options
+	    if (StringUtils.isBlank(this.standardServerURL)) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
+			.getMessage("config.standardServerURL")));
+	    }
+
+	} else if (this.version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
+	    // check enterprise options
+
+	    if (StringUtils.isBlank(this.enterpriseServerURL)) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
+			.getMessage("config.enterpriseServerURL")));
+	    }
+
+	    if (StringUtils.isBlank(this.adminPassword)) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
+			.getMessage("config.adminPassword")));
+	    }
+	} else {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
+		    .getMessage("config.version")));
 	}
 	return errors;
-    }
-
-    public String getDimdimServerURL() {
-	return dimdimServerURL;
-    }
-
-    public void setDimdimServerURL(String dimdimServerURL) {
-	this.dimdimServerURL = dimdimServerURL;
     }
 
 }

@@ -31,4 +31,5 @@ import org.lamsfoundation.lams.tool.dimdim.dao.IDimdimDAO;
  * DAO for accessing the Dimdim objects - Hibernate specific code.
  */
 public class DimdimDAO extends BaseDAO implements IDimdimDAO {
+
 }

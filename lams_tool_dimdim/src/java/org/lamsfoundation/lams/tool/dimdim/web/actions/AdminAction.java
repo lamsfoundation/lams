@@ -31,6 +31,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.MappingDispatchAction;
+import org.lamsfoundation.lams.tool.dimdim.dto.ConfigDTO;
 import org.lamsfoundation.lams.tool.dimdim.model.DimdimConfig;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
@@ -38,11 +39,15 @@ import org.lamsfoundation.lams.tool.dimdim.util.Constants;
 import org.lamsfoundation.lams.tool.dimdim.web.forms.AdminForm;
 
 /**
- * @struts.action path="/admin/main" name="adminForm" parameter="main" scope="request" validate="false"
- * @struts.action-forward name="main-success" path="tiles:/admin/main"
+ * @struts.action path="/admin/view" name="adminForm" parameter="view" scope="request" validate="false"
+ * @struts.action-forward name="view-success" path="tiles:/admin/view"
  * 
- * @struts.action path="/admin/save" name="adminForm" parameter="save" scope="request" validate="false"
- * @struts.action-forward name="save-success" redirect="true" path="/admin/main.do"
+ * @struts.action path="/admin/edit" name="adminForm" parameter="edit" scope="request" validate="false"
+ * @struts.action-forward name="edit-success" path="tiles:/admin/edit"
+ * 
+ * @struts.action path="/admin/save" name="adminForm" parameter="save" scope="request" validate="true"
+ *                input="tiles:/admin/edit"
+ * @struts.action-forward name="save-success" redirect="true" path="/admin/view.do"
  * 
  * @author Anthony Sukkar
  * 
@@ -63,34 +68,77 @@ public class AdminAction extends MappingDispatchAction {
 	return super.execute(mapping, form, request, response);
     }
 
-    public ActionForward main(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
+	ConfigDTO configDTO = new ConfigDTO();
+
+	configDTO.setStandardServerURL(dimdimService.getConfigValue(Constants.CFG_STANDARD_SERVER_URL));
+	configDTO.setEnterpriseServerURL(dimdimService.getConfigValue(Constants.CFG_ENTERPRISE_SERVER_URL));
+	configDTO.setAdminPassword(dimdimService.getConfigValue(Constants.CFG_ADMIN_PASSWORD));
+	configDTO.setVersion(dimdimService.getConfigValue(Constants.CFG_VERSION));
+
+	request.setAttribute(Constants.ATTR_CONFIG_DTO, configDTO);
+	return mapping.findForward("view-success");
+    }
+
+    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
 	AdminForm adminForm = (AdminForm) form;
-	DimdimConfig serverURL = dimdimService.getConfigEntry(Constants.CONFIG_SERVER_URL);
 
-	if (serverURL != null) {
-	    adminForm.setDimdimServerURL(serverURL.getValue());
+	adminForm.setStandardServerURL(dimdimService.getConfigValue(Constants.CFG_STANDARD_SERVER_URL));
+	adminForm.setEnterpriseServerURL(dimdimService.getConfigValue(Constants.CFG_ENTERPRISE_SERVER_URL));
+	adminForm.setAdminPassword(dimdimService.getConfigValue(Constants.CFG_ADMIN_PASSWORD));
+	adminForm.setVersion(dimdimService.getConfigValue(Constants.CFG_VERSION));
+
+	String version = adminForm.getVersion();
+	boolean allowVersionChange = true;
+	if (isVersionSet(version)) {
+	    allowVersionChange = false;
 	}
+	request.setAttribute(Constants.ATTR_ALLOW_VERSION_CHANGE, allowVersionChange);
 
-	return mapping.findForward("main-success");
+	return mapping.findForward("edit-success");
     }
 
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	AdminForm adminForm = (AdminForm) form;
+	if (!isCancelled(request)) {
 
-	DimdimConfig dimdimConfig = dimdimService.getConfigEntry(Constants.CONFIG_SERVER_URL);
+	    AdminForm adminForm = (AdminForm) form;
 
-	if (dimdimConfig == null) {
-	    dimdimConfig = new DimdimConfig();
-	    dimdimConfig.setKey(Constants.CONFIG_SERVER_URL);
+	    // if version is already set, do not update
+	    String version = dimdimService.getConfigValue(Constants.CFG_VERSION);
+	    if (!isVersionSet(version)) {
+		updateConfig(Constants.CFG_VERSION, adminForm.getVersion());
+	    }
+
+	    updateConfig(Constants.CFG_STANDARD_SERVER_URL, adminForm.getStandardServerURL());
+	    updateConfig(Constants.CFG_ENTERPRISE_SERVER_URL, adminForm.getEnterpriseServerURL());
+	    updateConfig(Constants.CFG_ADMIN_PASSWORD, adminForm.getAdminPassword());
+
 	}
 
-	dimdimConfig.setValue(adminForm.getDimdimServerURL());
-	dimdimService.saveOrUpdateConfigEntry(dimdimConfig);
-
 	return mapping.findForward("save-success");
+    }
+
+    private void updateConfig(String key, String value) {
+
+	DimdimConfig config = dimdimService.getConfig(key);
+
+	if (config == null) {
+	    config = new DimdimConfig(key, value);
+	} else {
+	    config.setValue(value);
+	}
+
+	dimdimService.saveOrUpdateConfigEntry(config);
+    }
+
+    private boolean isVersionSet(String version) {
+	return version != null
+		&& (version.equals(Constants.CFG_VERSION_STANDARD) || version.equals(Constants.CFG_VERSION_ENTERPRISE));
     }
 }

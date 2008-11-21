@@ -14,7 +14,7 @@
   <form-beans>
 
     <form-bean
-      name=""
+      name="adminForm"
       type="org.lamsfoundation.lams.tool.dimdim.web.forms.AdminForm"
     />
     <form-bean
@@ -59,50 +59,81 @@
         path="tiles:/authoring/main"
         redirect="false"
       />
-      <forward
-        name="message_page"
-        path="tiles:/generic/message"
-        redirect="false"
-      />
     </action>
     <action
-      path="/admin/editConfig"
+      path="/admin/view"
       type="org.lamsfoundation.lams.tool.dimdim.web.actions.AdminAction"
       name="adminForm"
       scope="request"
-      parameter="editConfig"
+      parameter="view"
       unknown="false"
       validate="false"
     >
       <forward
-        name="editConfig-success"
-        path="tiles:/admin/editConfig"
+        name="view-success"
+        path="tiles:/admin/view"
         redirect="false"
       />
       <forward
-        name="saveConfig"
-        path="tiles:/admin/saveConfig"
+        name="edit-success"
+        path="tiles:/admin/edit"
         redirect="false"
+      />
+      <forward
+        name="save-success"
+        path="/admin/view.do"
+        redirect="true"
       />
     </action>
     <action
-      path="/admin/saveConfig"
+      path="/admin/edit"
       type="org.lamsfoundation.lams.tool.dimdim.web.actions.AdminAction"
       name="adminForm"
       scope="request"
-      parameter="saveConfig"
+      parameter="edit"
       unknown="false"
       validate="false"
     >
       <forward
-        name="editConfig-success"
-        path="tiles:/admin/editConfig"
+        name="view-success"
+        path="tiles:/admin/view"
         redirect="false"
       />
       <forward
-        name="saveConfig"
-        path="tiles:/admin/saveConfig"
+        name="edit-success"
+        path="tiles:/admin/edit"
         redirect="false"
+      />
+      <forward
+        name="save-success"
+        path="/admin/view.do"
+        redirect="true"
+      />
+    </action>
+    <action
+      path="/admin/save"
+      type="org.lamsfoundation.lams.tool.dimdim.web.actions.AdminAction"
+      name="adminForm"
+      scope="request"
+      input="tiles:/admin/edit"
+      parameter="save"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="view-success"
+        path="tiles:/admin/view"
+        redirect="false"
+      />
+      <forward
+        name="edit-success"
+        path="tiles:/admin/edit"
+        redirect="false"
+      />
+      <forward
+        name="save-success"
+        path="/admin/view.do"
+        redirect="true"
       />
     </action>
     <action
@@ -147,6 +178,11 @@
         redirect="false"
       />
       <forward
+        name="notebook"
+        path="tiles:/learning/notebook"
+        redirect="false"
+      />
+      <forward
         name="runOffline"
         path="tiles:/learning/runOffline"
         redirect="false"
@@ -156,9 +192,16 @@
         path="tiles:/learning/defineLater"
         redirect="false"
       />
+      <forward
+        name="generalMessage"
+        path="tiles:/general/message"
+        redirect="false"
+      />
     </action>
 
-    <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->
+   <action path="/endMeeting"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter="tiles:/dimdim/end_meeting" />
   </action-mappings>
 
    <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->

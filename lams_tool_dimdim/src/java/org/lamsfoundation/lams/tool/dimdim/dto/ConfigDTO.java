@@ -4,8 +4,8 @@
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,56 +24,43 @@
 
 package org.lamsfoundation.lams.tool.dimdim.dto;
 
-import java.util.Date;
+public class ConfigDTO {
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+    String adminPassword;
+    String enterpriseServerURL;
+    String standardServerURL;
+    String version;
 
-public class NotebookEntryDTO {
-
-    Long uid;
-
-    String entry;
-
-    Date createDate;
-
-    Date lastModified;
-
-    public NotebookEntryDTO(NotebookEntry notebookEntry) {
-	this.uid = notebookEntry.getUid();
-	this.entry = notebookEntry.getEntry();
-	this.createDate = notebookEntry.getCreateDate();
-	this.lastModified = notebookEntry.getLastModified();
+    public String getAdminPassword() {
+	return adminPassword;
     }
 
-    public Date getCreateDate() {
-	return createDate;
+    public String getEnterpriseServerURL() {
+	return enterpriseServerURL;
     }
 
-    public void setCreateDate(Date createDate) {
-	this.createDate = createDate;
+    public String getStandardServerURL() {
+	return standardServerURL;
     }
 
-    public String getEntry() {
-	return entry;
+    public String getVersion() {
+	return version;
     }
 
-    public void setEntry(String entry) {
-	this.entry = entry;
+    public void setAdminPassword(String adminPassword) {
+	this.adminPassword = adminPassword;
     }
 
-    public Date getLastModified() {
-	return lastModified;
+    public void setEnterpriseServerURL(String enterpriseServerURL) {
+	this.enterpriseServerURL = enterpriseServerURL;
     }
 
-    public void setLastModified(Date lastModified) {
-	this.lastModified = lastModified;
+    public void setStandardServerURL(String standardServerURL) {
+	this.standardServerURL = standardServerURL;
     }
 
-    public Long getUid() {
-	return uid;
+    public void setVersion(String version) {
+	this.version = version;
     }
 
-    public void setUid(Long uid) {
-	this.uid = uid;
-    }
 }

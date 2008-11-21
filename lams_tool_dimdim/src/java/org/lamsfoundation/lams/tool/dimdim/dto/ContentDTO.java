@@ -37,35 +37,35 @@ public class ContentDTO {
 
     private static final Logger logger = Logger.getLogger(ContentDTO.class);
 
-    public Long toolContentId;
+    Long toolContentId;
 
-    public String title;
+    String title;
 
-    public String instructions;
+    String instructions;
 
-    public String onlineInstructions;
+    String onlineInstructions;
 
-    public String offlineInstructions;
+    String offlineInstructions;
 
-    public boolean reflectOnActivity;
+    boolean reflectOnActivity;
 
-    public String reflectInstructions;
+    String reflectInstructions;
 
-    public boolean defineLater;
+    boolean defineLater;
 
-    public boolean contentInUse;
+    boolean contentInUse;
 
-    public boolean lockOnFinish;
+    boolean lockOnFinish;
 
-    public Set<AttachmentDTO> onlineInstructionsFiles;
+    Set<AttachmentDTO> onlineInstructionsFiles;
 
-    public Set<AttachmentDTO> offlineInstructionsFiles;
+    Set<AttachmentDTO> offlineInstructionsFiles;
 
-    public Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
+    Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
 
-    public Long currentTab;
+    Long currentTab;
 
-    private Integer maxAttendeeMikes;
+    Integer maxAttendeeMikes;
 
     /* Constructors */
     public ContentDTO() {

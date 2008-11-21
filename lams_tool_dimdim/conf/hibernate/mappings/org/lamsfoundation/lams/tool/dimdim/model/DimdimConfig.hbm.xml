@@ -8,7 +8,7 @@
 >
     <class
         name="org.lamsfoundation.lams.tool.dimdim.model.DimdimConfig"
-        table="tl_laddim10_dimdim_config"
+        table="tl_laddim10_config"
     >
 
         <id

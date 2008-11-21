@@ -28,19 +28,19 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimUser;
 
 public class UserDTO implements Comparable<UserDTO> {
 
-    public Long uid;
+    Long uid;
 
-    public String loginName;
+    String loginName;
 
-    public String firstName;
+    String firstName;
 
-    public String lastName;
+    String lastName;
 
-    public boolean finishedActivity;
+    boolean finishedActivity;
 
-    public NotebookEntryDTO notebookEntryDTO;
+    NotebookEntryDTO notebookEntryDTO;
 
-    public Long notebookEntryUID;
+    Long notebookEntryUID;
 
     public UserDTO(DimdimUser user) {
 	this.uid = user.getUid();

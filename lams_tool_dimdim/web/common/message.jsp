@@ -1,10 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<h1>
-	<%-- TODO check if message exists	--%>
-	<fmt:message key="pageTitle.message"></fmt:message>
-</h1>
+<div id="content">
+<div class="info"><fmt:message key="${messageKey}" /></div>
 
-<p>
-	${requestScope.message};
-</p>
+<br>
+
+<a href="#" class="button" onclick="window.close();"
+	style="float: right"> <fmt:message key="button.close" /> </a> <br>
+</div>
+
