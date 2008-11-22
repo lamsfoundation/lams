@@ -88,41 +88,43 @@
 			<span class="field-name"> <fmt:message
 					key="heading.totalLearners" /> </span> ${session.numberOfLearners}
 		</p>
-	
-		<table cellspacing="0" class="alternative-color">
-	
-			<tr>
-				<th style="width: 30%;">
-					<fmt:message key="heading.learner" />
-				</th>
-				<th style="width: 70%;">
-					<fmt:message key="heading.notebookEntry" />
-				</th>
-			</tr>
-	
-	
-			<c:forEach var="user" items="${session.userDTOs}">
+		
+		<c:if test="${contentDTO.reflectOnActivity}">
+			<table cellspacing="0" class="alternative-color">
+		
 				<tr>
-					<td>
-						${user.firstName} ${user.lastName}
-					</td>
-					<td>
-						<c:choose>
-							<c:when test="${user.notebookEntryUID == null}">
-								<fmt:message key="label.notAvailable" />
-							</c:when>
-	
-							<c:otherwise>
-								<a
-									href="./monitoring.do?dispatch=openNotebook&amp;userUID=${user.uid}">
-									<fmt:message key="label.view" /> </a>
-							</c:otherwise>
-						</c:choose>
-	
-					</td>
+					<th style="width: 30%;">
+						<fmt:message key="heading.learner" />
+					</th>
+					<th style="width: 70%;">
+						<fmt:message key="heading.notebookEntry" />
+					</th>
 				</tr>
-			</c:forEach>
-		</table>
+		
+		
+				<c:forEach var="user" items="${session.userDTOs}">
+					<tr>
+						<td>
+							${user.firstName} ${user.lastName}
+						</td>
+						<td>
+							<c:choose>
+								<c:when test="${user.notebookEntryUID == null}">
+									<fmt:message key="label.notAvailable" />
+								</c:when>
+		
+								<c:otherwise>
+									<a
+										href="./monitoring.do?dispatch=openNotebook&amp;userUID=${user.uid}">
+										<fmt:message key="label.view" /> </a>
+								</c:otherwise>
+							</c:choose>
+		
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
+		</c:if>
 		
 		
 	</c:forEach>
