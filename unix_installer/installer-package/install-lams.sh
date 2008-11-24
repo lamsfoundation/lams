@@ -304,6 +304,9 @@ configureWrapper()
 		fi
 		ln -s "$JBOSS_DIR/bin/lams2" /etc/init.d/lams2
 		printf "Done.\n\n"
+		
+	else
+		cp conf/run.conf "$JBOSS_DIR/bin"
 	fi
 }
 
