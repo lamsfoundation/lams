@@ -49,6 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
       	<c:if test="${param.presenceEnabledPatch}"> 		 
         <script type="text/javascript">
      		var HTTPBASE = "<lams:LAMSURL/>JHB";
+     		var presenceLabel = "<fmt:message key='label.presence'/>";
      		
 	    	window.onload=function(){
 				// if presence is enabled, attempt to login once the window is loaded
@@ -91,7 +92,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:help style="small" page="learner"/>
 		</div> 
 		
-		<div id="roster" style="position: absolute; right: 18px; bottom: 0;background: #ffffff; display: none; border: 1px #000000 solid;"></div>
+		<div id="roster" style="position: absolute; width: 150px; right: 18px; bottom: 0;background: #ffffff; display: none; padding: 5px; border: 1px #000000 solid;"></div>
 		
 		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame"  frameborder="no" scrolling="yes"  src="learner.do?method=joinLesson&lessonID=<c:out value="${param.lessonID}"/>" width="100%" ></iframe>
 		<script type="text/javascript">

@@ -99,6 +99,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	private var btnLabel:String;
 	private var learner_expp_cb:CheckBox;
 	private var learner_expp_cb_lbl:Label;
+	private var learner_epres_cb:CheckBox;
+	private var learner_epres_cb_lbl:Label;	
 	
 	//Text Items
 	private var LSTitle_lbl:Label;
@@ -255,7 +257,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		schedule_btn.addEventListener("click", Delegate.create(this, scheduleLessonStart));
 		start_btn.addEventListener("click", _monitorController);
 		statusApply_btn.addEventListener("click", Proxy.create(this, changeStatus));
-		learner_expp_cb.addEventListener("click", Delegate.create(this, toogleExpPortfolio));
+		learner_expp_cb.addEventListener("click", Delegate.create(this, toggleExpPortfolio));
+		learner_epres_cb.addEventListener("click", Delegate.create(this, togglePresence));
+		
 		this.addEventListener("apply", Proxy.create(_monitorController, _monitorController.changeStatus));
 		
 		editClass_btn.onRollOver = Proxy.create(this,this['showToolTip'], editClass_btn, "ls_manage_editclass_btn_tooltip");
@@ -392,6 +396,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		reqTasks_scp._y = reqTasks_scp._y - 30
 		learner_expp_cb._y = learner_expp_cb._y - 30
 		learner_expp_cb_lbl._y = learner_expp_cb_lbl._y - 30
+		learner_epres_cb._y = learner_epres_cb._y - 30
+		learner_epres_cb_lbl._y = learner_epres_cb_lbl._y - 30
 	}
 	
 	/**
@@ -413,6 +419,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 
 		class_txt.text = s.organisationName;
 		learner_expp_cb.selected = s.learnerExportAvailable;
+		learner_epres_cb.selected = s.learnerPresenceAvailable;
 	}
 	
 	private function populateStatusList(stateID:Number):Void{
@@ -780,6 +787,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		manageDate_lbl.text = Dictionary.getValue('ls_manage_date_lbl');
 		manageTime_lbl.text = Dictionary.getValue('ls_manage_time_lbl');
 		learner_expp_cb_lbl.text = Dictionary.getValue('ls_manage_learnerExpp_lbl');
+		learner_epres_cb_lbl.text = Dictionary.getValue('ls_manage_presenceEnabled_lbl');
 		
 		//Button
 		viewLearners_btn.label = Dictionary.getValue('ls_manage_learners_btn');
@@ -812,31 +820,49 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 			
 	}
 	
-	
-	private function toogleExpPortfolio(evt:Object) {
-		Debugger.log("Toogle Staff Selection", Debugger.GEN, "toogleStaffSelection", "WizardView");
+	private function toggleExpPortfolio(evt:Object) {
+		Debugger.log("Toggle Staff Selection", Debugger.GEN, "toggleStaffSelection", "WizardView");
 		var target:CheckBox = CheckBox(evt.target);
 		
 		var callback:Function = Proxy.create(this,confirmOutput);
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=learnerExportPortfolioAvailable&lessonID='+_root.lessonID+'&learnerExportPortfolio='+target.selected, callback, false);
 	}
 	
+	private function togglePresence(evt:Object) {
+		Debugger.log("Toggle presence", Debugger.GEN, "togglePresence", "WizardView");
+		var target:CheckBox = CheckBox(evt.target);
+		
+		var callback:Function = Proxy.create(this,confirmOutput);
+		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=presenceAvailable&lessonID='+_root.lessonID+'&presenceAvailable='+target.selected, callback, false);
+	}
 	
 	public function confirmOutput(r):Void{
 		if(r instanceof LFError) {
 				r.showErrorAlert();
 		} else {
-			if (learner_expp_cb.selected){
-				var msg:String = Dictionary.getValue('ls_confirm_expp_enabled') ;
-				LFMessage.showMessageAlert(msg);
+			if (r == "learnerExportPortfolioAvailable") {
+				if (learner_expp_cb.selected){
+					var msg:String = Dictionary.getValue('ls_confirm_expp_enabled') ;
+					LFMessage.showMessageAlert(msg);
 
-			}else {
-				var msg:String = Dictionary.getValue('ls_confirm_expp_disabled') ;
-				LFMessage.showMessageAlert(msg);
+				}else {
+					var msg:String = Dictionary.getValue('ls_confirm_expp_disabled') ;
+					LFMessage.showMessageAlert(msg);
+				}
 			}
-			
+			else if (r == "presenceAvailable") {
+				if (learner_epres_cb.selected){
+					var msg:String = Dictionary.getValue('ls_confirm_presence_enabled') ;
+					LFMessage.showMessageAlert(msg);
+
+				}else {
+					var msg:String = Dictionary.getValue('ls_confirm_presence_disabled') ;
+					LFMessage.showMessageAlert(msg);
+				}
+			}
 		}
 	}
+	
 	/**
 	 * Get the CSSStyleDeclaration objects for each component and apply them
 	 * directly to the instance
@@ -862,13 +888,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		
 		// Check box label
 		learner_expp_cb_lbl.setStyle('styleName', styleObj);
-		
+		learner_epres_cb_lbl.setStyle('styleName', styleObj);
 		
 		//SMALL LABELS
 		styleObj = _tm.getStyleObject('PIlabel');
 		manageDate_lbl.setStyle('styleName',styleObj);
 		manageTime_lbl.setStyle('styleName',styleObj);
-		
 		
 		//BUTTONS
 		styleObj = _tm.getStyleObject('button');

@@ -1092,6 +1092,57 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setPresenceAvailable(long,
+     *      java.lang.Integer, boolean)
+     */
+    public Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean presenceAvailable) {
+	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	if (requestedLesson == null) {
+	    throw new MonitoringServiceException("Lesson for id=" + lessonId
+		    + " is missing. Unable to set learner presence available to " + presenceAvailable);
+	}
+	checkOwnerOrStaffMember(userId, requestedLesson, "set presence available");
+	requestedLesson.setLearnerPresenceAvailable(presenceAvailable != null ? presenceAvailable
+		: Boolean.FALSE);
+	lessonDAO.updateLesson(requestedLesson);
+	return requestedLesson.getLearnerPresenceAvailable();
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setPresenceImAvailable(long,
+     *      java.lang.Integer, boolean)
+     */
+    public Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean presenceImAvailable) {
+	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	if (requestedLesson == null) {
+	    throw new MonitoringServiceException("Lesson for id=" + lessonId
+		    + " is missing. Unable to set learner im to " + presenceImAvailable);
+	}
+	checkOwnerOrStaffMember(userId, requestedLesson, "set presence available");
+	requestedLesson.setLearnerImAvailable(presenceImAvailable != null ? presenceImAvailable
+		: Boolean.FALSE);
+	lessonDAO.updateLesson(requestedLesson);
+	return requestedLesson.getLearnerImAvailable();
+    }    
+   
+    /**
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setLiveEditEnabled(long,
+     *      java.lang.Integer, boolean)
+     */
+    public Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled) {
+	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+	if (requestedLesson == null) {
+	    throw new MonitoringServiceException("Lesson for id=" + lessonId
+		    + " is missing. Unable to set live edit enabled to " + liveEditEnabled);
+	}
+	checkOwnerOrStaffMember(userId, requestedLesson, "set live edit available");
+	requestedLesson.setLiveEditEnabled(liveEditEnabled!= null ? liveEditEnabled
+		: Boolean.FALSE);
+	lessonDAO.updateLesson(requestedLesson);
+	return requestedLesson.getLiveEditEnabled();
+    }
+    
+    /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */
     public GateActivity openGate(Long gateId) {

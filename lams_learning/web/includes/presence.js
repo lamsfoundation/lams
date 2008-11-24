@@ -31,6 +31,51 @@ function htmlEnc(str) {
 	return str;
 }
 
+function correctPresenceName(o){
+	var s = o.nick;
+	var newNick = new String("");
+	for (var i = 0; i < s.length; i++) {
+		var char = s.charCodeAt(i);
+		if (char >= 192 && char <= 197)
+			newNick += "A";
+		else if (char == 199)
+			newNick += "C";
+		else if (char >= 200 && char <= 203)
+			newNick += "E";
+		else if (char >= 204 && char <= 207)
+			newNick += "I";
+		else if (char == 209)
+			newNick += "N";
+		else if ((char >= 210 && char <= 214) || char == 216)
+			newNick += "O";
+		else if (char >= 217 && char <= 220)
+			newNick += "U";
+		else if (char == 221)
+			newNick += "Y";
+		else if (char >= 224 && char <= 229)
+			newNick += "a";
+		else if (char == 231)
+			newNick += "c";
+		else if (char >= 232 && char <= 235)
+			newNick += "e";
+		else if (char >= 236 && char <= 239)
+			newNick += "i";
+		else if (char == 241)
+			newNick += "n";
+		else if ((char >= 242 && char <= 246) || char == 240 || char == 248)
+			newNick += "o";
+		else if (char >= 249 && char <= 252)
+			newNick += "u";
+		else if (char == 253 || char == 255)
+			newNick += "y";
+		else
+			newNick += s.charAt(i);
+	}
+	
+	o.nick = newNick;
+	return o;
+}
+
 function createElem(name, attrs, style, text) {
 	var e = document.createElement(name);
 	if (attrs) {
@@ -88,7 +133,7 @@ function UpdateRosterDisplay() {
 		var availableUsers = [];
 		for (var i = 0; i < this.users.length; i++) {
 			if (this.users[i].status != "unavailable") {
-				availableUsers[availableUsers.length] = this.users[i];
+				availableUsers[availableUsers.length] = correctPresenceName(this.users[i]);
 			}
 		}
 		flashProxy.call("sendUsersToFlash", availableUsers);
@@ -96,16 +141,23 @@ function UpdateRosterDisplay() {
 	else {
 		// send roster to no flash version
 		var rosterDiv = document.getElementById("roster");
-		rosterDiv.innerHTML = "";
 		this.users.sort(sortFunction);
+		var availableCount = 0;
+		
+		// so sorry about this
 		for (var i = 0; i < this.users.length; i++) {
 			if (this.users[i].status != "unavailable") {
-				var className = "unselected";
-				if (i == this.currentIndex) {
-					className = "selected";
-				}
+				availableCount++;
+			}
+		}
+		
+		var presenceString = presenceLabel + " (" + availableCount + ")";
+		rosterDiv.innerHTML = "<h5>" + presenceString + "</h5>";
+		
+		for (var i = 0; i < this.users.length; i++) {
+			if (this.users[i].status != "unavailable") {
 				var nick = this.users[i].nick;
-				var userDiv = createElem("div", {attrId:"user-" + i, attrClass:className, onClick:"selectUser(this);"}, {width:"100%", color:"#0000FF"}, this.users[i].nick);
+				var userDiv = createElem("div", {attrId:"user-" + i}, {width:"100%", color:"#0000FF"}, this.users[i].nick);
 				rosterDiv.appendChild(userDiv);
 			}
 		}

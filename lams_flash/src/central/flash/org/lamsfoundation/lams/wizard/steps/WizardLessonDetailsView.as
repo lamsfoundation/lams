@@ -120,6 +120,9 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		title_lbl.setStyle('styleName',styleObj);
 		desc_lbl.setStyle('styleName',styleObj);
 		schedule_cb.setStyle('styleName', styleObj);
+		learner_eliveedit_cb.setStyle('styleName', styleObj);
+		learner_enpres_cb.setStyle('styleName', styleObj);
+		learner_enim_cb.setStyle('styleName', styleObj);
 		learner_expp_cb.setStyle('styleName', styleObj);
 		date_lbl.setStyle('styleName', styleObj);
 		time_lbl.setStyle('styleName', styleObj);

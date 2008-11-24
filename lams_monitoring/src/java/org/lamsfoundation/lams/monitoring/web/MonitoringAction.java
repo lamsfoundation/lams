@@ -914,7 +914,7 @@ public class MonitoringAction extends LamsDispatchAction
 	    	Boolean learnerExportPortfolioAvailable = WebUtil.readBooleanParam(request,"learnerExportPortfolio",false); 
     		monitoringService.setLearnerPortfolioAvailable(lessonID, userID, learnerExportPortfolioAvailable);
     		
-    		flashMessage = new FlashMessage("learnerExportPortfolioAvailable",Boolean.TRUE);
+    		flashMessage = new FlashMessage("learnerExportPortfolioAvailable", "learnerExportPortfolioAvailable");
        	} catch (Exception e) {
 			flashMessage = handleException(e, "renameLesson", monitoringService);
 		}
@@ -923,4 +923,91 @@ public class MonitoringAction extends LamsDispatchAction
         writer.println(wddxPacket);
         return null;
     }
+    
+	/**
+     * Set whether or not the presence available button is available in learner. Expects parameters lessonID
+     * and presenceAvailable.
+     */
+    public ActionForward presenceAvailable(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        FlashMessage flashMessage = null;
+    	try {
+      		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+	    	Integer userID = getUserId();
+	    	Boolean presenceAvailable = WebUtil.readBooleanParam(request,"presenceAvailable",false); 
+    		monitoringService.setPresenceAvailable(lessonID, userID, presenceAvailable);
+
+    		flashMessage = new FlashMessage("presenceAvailable", "presenceAvailable");
+       	} catch (Exception e) {
+			flashMessage = handleException(e, "presenceAvailable", monitoringService);
+		}
+       	String wddxPacket = flashMessage.serializeMessage();
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+    }
+
+	/**
+     * Set whether or not the presence available button is available in learner. Expects parameters lessonID
+     * and presenceImAvailable.
+     */
+    public ActionForward presenceImAvailable(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        FlashMessage flashMessage = null;
+    	try {
+      		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+	    	Integer userID = getUserId();
+	    	Boolean presenceImAvailable = WebUtil.readBooleanParam(request,"presenceImAvailable",false); 
+    		monitoringService.setPresenceImAvailable(lessonID, userID, presenceImAvailable);
+    
+    		flashMessage = new FlashMessage("presenceImAvailable", "presenceImAvailable");
+       	} catch (Exception e) {
+			flashMessage = handleException(e, "presenceImAvailable", monitoringService);
+		}
+       	String wddxPacket = flashMessage.serializeMessage();
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+    }
+    
+	/**
+     * Set whether or not the presence available button is available in learner. Expects parameters lessonID
+     * and presenceAvailable.
+     */
+    public ActionForward liveEditAvailable(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException,
+                                                                          ServletException
+    {
+
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+        FlashMessage flashMessage = null;
+    	try {
+      		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
+	    	Integer userID = getUserId();
+	    	Boolean liveEditAvailable = WebUtil.readBooleanParam(request,"liveEditAvailable",false); 
+    		monitoringService.setLiveEditEnabled(lessonID, userID, liveEditAvailable);
+    		
+    		flashMessage = new FlashMessage("liveEditAvailable", "liveEditAvailable");
+       	} catch (Exception e) {
+			flashMessage = handleException(e, "liveEditAvailable", monitoringService);
+		}
+       	String wddxPacket = flashMessage.serializeMessage();
+        PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+    }  
 }

@@ -84,10 +84,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    var MMdoctitle = document.title;
 		
 			AC_FL_RunContent(
-				"src", "playerProductInstall",
+				"src", "<lams:LAMSURL/>/monitoring/branching/playerProductInstall",
 				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+'&lessonID='+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
-				"width", "793",
-				"height", "454",
+				"width", "640",
+				"height", "460",
 				"align", "middle",
 				"id", "BranchManager",
 				"quality", "high",
@@ -101,10 +101,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			// if we've detected an acceptable version
 			// embed the Flash Content SWF when all tests are passed
 			AC_FL_RunContent(
-					"src", "BranchManager",
+					"src", "<lams:LAMSURL/>/monitoring/branching/BranchManager",
 					"FlashVars", "lessonID="+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
-					"width", "793",
-					"height", "454",
+					"width", "640",
+					"height", "460",
 					"align", "middle",
 					"id", "BranchManager",
 					"quality", "high",
@@ -124,14 +124,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</script>
 		<noscript>
 		  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-					id="BranchManager" width="793" height="454"
+					id="BranchManager" width="640" height="460"
 					codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
-					<param name="movie" value="BranchManager.swf" />
+					<param name="movie" value="<lams:LAMSURL/>/monitoring/branching/BranchManager.swf" />
 					<param name="quality" value="high" />
 					<param name="bgcolor" value="#869ca7" />
 					<param name="allowScriptAccess" value="sameDomain" />
-					<embed src="BranchManager.swf" quality="high" bgcolor="#869ca7"
-						width="793" height="454" name="BranchManager" align="middle"
+					<embed src="<lams:LAMSURL/>/monitoring/branching/BranchManager.swf" quality="high" bgcolor="#869ca7"
+						width="640" height="460" name="BranchManager" align="middle"
 						play="true"
 						loop="false"
 						quality="high"

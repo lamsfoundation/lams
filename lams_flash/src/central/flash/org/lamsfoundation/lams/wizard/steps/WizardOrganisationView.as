@@ -109,6 +109,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 		learner_lbl.text = Dictionary.getValue('learner_lbl');
 		staff_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
 		learner_selAll_cb.label = Dictionary.getValue('wizard_selAll_cb_lbl');
+		learner_split_cb.label = Dictionary.getValue('wizard_splitLearners_cb_lbl');
 		
 		intervalSetupSplitLabels = setInterval(Proxy.create(this, setupSplitLabels), DATA_LOAD_CHECK_INTERVAL);
 	}
@@ -165,12 +166,15 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 		staff_lbl.setStyle('styleName',styleObj);
 		learner_lbl.setStyle('styleName',styleObj);
 
+		learner_split_cb.setStyle('styleName', styleObj);
+		
 		styleObj = _tm.getStyleObject('scrollpane');
 		staff_scp.setStyle('styleName',styleObj);
 		learner_scp.setStyle('styleName', styleObj);
 		
 		styleObj = _tm.getStyleObject('LightBlueTextArea');
 		splitSummary_txa.setStyle('styleName', styleObj);
+		splitSummary_txa.border_mc.setStyle('_visible',false);
 	}
 	
 	public function show(v:Boolean):Void {

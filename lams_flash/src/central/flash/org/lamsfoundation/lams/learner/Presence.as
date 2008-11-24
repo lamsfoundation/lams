@@ -140,9 +140,10 @@ class Presence extends MovieClip {
 		var myDate = new Date();
 		var h = myDate.getHours().toString(), m = myDate.getMinutes().toString(), s = myDate.getSeconds().toString();
 		var resource = "LAMSPRESENCE"+h+""+m+""+s;
-		
-		Debugger.log("PRESENCE: with arguements - " + String(_root.presenceServerUrl) + " " + String(_root.userID) + " " + String(_root.userID) + " " + String(resource) + " " + String(_root.lessonID) + " " + _root.firstName + _root.lastName + " " + "false" + " " + "true",Debugger.MED,'attemptConnection','Presence');
-		_root.proxy.call("doLogin", _root.presenceServerUrl, _root.userID, _root.userID, resource, _root.lessonID, _root.firstName + " " + _root.lastName, false, true);
+		var nickName:String = _root.firstName + " " + _root.lastName;
+		nickName = StringUtils.correctPresenceName(nickName);
+		Debugger.log("PRESENCE: with arguements - " + String(_root.presenceServerUrl) + " " + String(_root.userID) + " " + String(_root.userID) + " " + String(resource) + " " + String(_root.lessonID) + " " + nickName + " " + "false" + " " + "true",Debugger.MED,'attemptConnection','Presence');
+		_root.proxy.call("doLogin", _root.presenceServerUrl, _root.userID, _root.userID, resource, _root.lessonID, nickName, false, true);
 	}
 	
 	// Attempts to register to the Jabber server

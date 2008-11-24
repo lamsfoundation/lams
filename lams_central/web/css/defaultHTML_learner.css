@@ -69,6 +69,12 @@ h4 {color:#0087e5;
 	margin-bottom:10px;
 	padding:0;
 	}
+	
+h5 {color:#47bc23; 
+	font-size:14px;
+	margin-right:40px;
+	margin-bottom:8px;
+	}
 
 /*defines when instructions are given and places a blue arrow before the text */
 p.instructions {

@@ -285,12 +285,11 @@ class Wizard {
 	public function startLesson(isScheduled:Boolean, lessonID:Number, datetime:String){
 		var callback:Function = Proxy.create(this, onStartLesson);
 		
-		if (wizardModel.resultDTO.enablePresence) {
-			Debugger.log("presence enabled, creating xmpp room", Debugger.MED, "startLesson", "Wizard");
-			//var callback:Function = Proxy.create(this, onCreateXmppRoom);
-			var roomName:String = String(lessonID) + "@conference." + _root.presenceServerUrl;
-			Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&xmppRoomName=' + roomName, null, false);
-		}
+		//if (wizardModel.resultDTO.enablePresence) {
+		Debugger.log("presence enabled, creating xmpp room", Debugger.MED, "startLesson", "Wizard");
+		//var callback:Function = Proxy.create(this, onCreateXmppRoom);
+		var roomName:String = String(lessonID) + "@conference." + _root.presenceServerUrl;
+		Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&xmppRoomName=' + roomName, null, false);
 		
 		if (isScheduled) {
 			Debugger.log("calling start lesson scheduled", Debugger.MED, "startLesson", "Wizard");
@@ -342,12 +341,12 @@ class Wizard {
 		var lessonIDs:Array = wizardModel.lessonIDs;
 		var startedLessonsCount:Number = wizardModel.startedLessonsCount;
 		
-		if (wizardModel.resultDTO.enablePresence) {
-			Debugger.log("presence enabled, creating xmpp room", Debugger.MED, "startMultipleLessons", "Wizard");
-			//var callback:Function = Proxy.create(this, onCreateXmppRoom);
-			var roomName:String = String(lessonIDs[startedLessonsCount]) + "@conference." + _root.presenceServerUrl;
-			Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&xmppRoomName=' + roomName, null, false);
-		}
+		//if (wizardModel.resultDTO.enablePresence) {
+		Debugger.log("presence enabled, creating xmpp room", Debugger.MED, "startMultipleLessons", "Wizard");
+		//var callback:Function = Proxy.create(this, onCreateXmppRoom);
+		var roomName:String = String(lessonIDs[startedLessonsCount]) + "@conference." + _root.presenceServerUrl;
+		Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&xmppRoomName=' + roomName, null, false);
+
 		
 		Debugger.log("calling start lesson non-scheduled", Debugger.MED, "startMultipleLessons", "Wizard");
 		Debugger.log("monitoring/monitoring.do?method=startLesson&lessonID=" + lessonIDs[startedLessonsCount] + '&userID=' + _root.userID, Debugger.MED, "startMultipleLessons", "Wizard");
@@ -375,12 +374,11 @@ class Wizard {
 		var startedLessonsCount:Number = wizardModel.startedLessonsCount;
 		var scheduleDateTime:String = wizardModel.resultDTO.scheduleDateTime
 		
-		if (wizardModel.resultDTO.enablePresence) {
-			Debugger.log("presence enabled, creating xmpp room", Debugger.MED, "startMultipleScheduledLessons", "Wizard");
-			//var callback:Function = Proxy.create(this, onCreateXmppRoom);
-			var roomName:String = String(lessonIDs[startedLessonsCount]) + "@conference." + _root.presenceServerUrl;
-			Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&xmppRoomName=' + roomName, null, false);
-		}
+		//if (wizardModel.resultDTO.enablePresence) {
+		Debugger.log("presence enabled, creating xmpp room", Debugger.MED, "startMultipleScheduledLessons", "Wizard");
+		//var callback:Function = Proxy.create(this, onCreateXmppRoom);
+		var roomName:String = String(lessonIDs[startedLessonsCount]) + "@conference." + _root.presenceServerUrl;
+		Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&xmppRoomName=' + roomName, null, false);
 		
 		Debugger.log("calling start lesson scheduled", Debugger.MED, "startMultipleScheduledLessons", "Wizard");
 		Application.getInstance().getComms().getRequest('monitoring/monitoring.do?method=startOnScheduleLesson&lessonStartDate=' + scheduleDateTime + '&lessonID=' + lessonIDs[startedLessonsCount] + '&userID=' + _root.userID, callback);

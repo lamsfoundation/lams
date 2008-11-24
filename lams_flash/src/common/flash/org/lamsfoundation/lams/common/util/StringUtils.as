@@ -365,4 +365,50 @@ class StringUtils {
 			return Boolean(string);
 		}
 	}
+	
+	public static function correctPresenceName(s:String):String {
+		var newNick:String = new String("");
+		for (var i:Number = 0; i < s.length; i++) {
+			Debugger.log("stringUtils isANumber char at " + i + ": " + s.charCodeAt(i), Debugger.MED, "isANumber", "StringUtils");
+			var char:Number = s.charCodeAt(i);
+			if (char >= 192 && char <= 197)
+				newNick += "A";
+			else if (char == 199)
+				newNick += "C";
+			else if (char >= 200 && char <= 203)
+				newNick += "E";
+			else if (char >= 204 && char <= 207)
+				newNick += "I";
+			else if (char == 209)
+				newNick += "N";
+			else if ((char >= 210 && char <= 214) || char == 216)
+				newNick += "O";
+			else if (char >= 217 && char <= 220)
+				newNick += "U";
+			else if (char == 221)
+				newNick += "Y";
+			else if (char >= 224 && char <= 229)
+				newNick += "a";
+			else if (char == 231)
+				newNick += "c";
+			else if (char >= 232 && char <= 235)
+				newNick += "e";
+			else if (char >= 236 && char <= 239)
+				newNick += "i";
+			else if (char == 241)
+				newNick += "n";
+			else if ((char >= 242 && char <= 246) || char == 240 || char == 248)
+				newNick += "o";
+			else if (char >= 249 && char <= 252)
+				newNick += "u";
+			else if (char == 253 || char == 255)
+				newNick += "y";
+			else
+				newNick += s.charAt(i);
+				
+		}
+
+		Debugger.log("correctPresenceName originalNick: " + s + " correctedNick: " + newNick, Debugger.MED, "isANumber", "StringUtils");
+		return newNick;
+	}
 }

@@ -64,10 +64,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    var MMdoctitle = document.title;
 		
 			AC_FL_RunContent(
-				"src", "playerProductInstall",
+				"src", "<lams:LAMSURL/>/monitoring/grouping/playerProductInstall",
 				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+'&lessonID='+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
-				"width", "827",
-				"height", "502",
+				"width", "640",
+				"height", "460",
 				"align", "middle",
 				"id", "LamsLessonGroupManager",
 				"quality", "high",
@@ -81,10 +81,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			// if we've detected an acceptable version
 			// embed the Flash Content SWF when all tests are passed
 			AC_FL_RunContent(
-					"src", "GroupManager",
+					"src", "<lams:LAMSURL/>/monitoring/grouping/GroupManager",
 					"FlashVars", "lessonID="+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
-					"width", "827",
-					"height", "502",
+					"width", "640",
+					"height", "460",
 					"align", "middle",
 					"id", "GroupManager",
 					"quality", "high",
@@ -103,14 +103,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</script>
 	<noscript>
 	  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-				id="LamsLessonGroupManager" width="827" height="502"
+				id="GroupManager" width="640" height="460"
 				codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
-				<param name="movie" value="LamsLessonGroupManager.swf" />
+				<param name="movie" value="<lams:LAMSURL/>/monitoring/grouping/GroupManager.swf" />
 				<param name="quality" value="high" />
 				<param name="bgcolor" value="#ffffff" />
 				<param name="allowScriptAccess" value="sameDomain" />
-				<embed src="LamsLessonGroupManager.swf" quality="high" bgcolor="#869ca7"
-					width="827" height="502" name="LamsLessonGroupManager" align="middle"
+				<embed src="<lams:LAMSURL/>/monitoring/branching/GroupManager.swf" quality="high" bgcolor="#869ca7"
+					width="640" height="460" name="LamsLessonGroupManager" align="middle"
 					play="true"
 					loop="false"
 					quality="high"

@@ -253,6 +253,48 @@ public interface IMonitoringService {
     public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean learnerExportAvailable);
 
     /**
+     * Set whether or not the learner presence button is available in monitor.
+     * Sets it to FALSE if learnerExportAvailable is null. Checks that the user
+     * is a staff member of this lesson before updating.
+     * 
+     * @param lessonId
+     * @param userId
+     * @param learnerPresenceAvailable
+     * @return new value for learnerPresenceAvailable. Normally will be same as
+     *         input parameter, will only be different if the value cannot be
+     *         updated for some reason.
+     */
+    public Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean learnerPresenceAvailable);
+
+    /**
+     * Set whether or not the learner IM button is available in monitor.
+     * Sets it to FALSE if learnerExportAvailable is null. Checks that the user
+     * is a staff member of this lesson before updating.
+     * 
+     * @param lessonId
+     * @param userId
+     * @param learnerImPresenceAvailable
+     * @return new value for learnerPresenceImAvailable. Normally will be same as
+     *         input parameter, will only be different if the value cannot be
+     *         updated for some reason.
+     */
+    public Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean learnerPresenceImAvailable);
+
+    /**
+     * Set whether or not the live edit is available in monitor.
+     * Sets it to FALSE if learnerExportAvailable is null. Checks that the user
+     * is a staff member of this lesson before updating.
+     * 
+     * @param lessonId
+     * @param userId
+     * @param liveEditEnabled
+     * @return new value for liveEditEnabled. Normally will be same as
+     *         input parameter, will only be different if the value cannot be
+     *         updated for some reason.
+     */
+    public Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
+    
+    /**
      * Force Complete works on an individual user. The teacher may complete it
      * up to a particular activity, or till the end of the sequence which
      * activity id is null indicating complete to end. Note, the give activity
