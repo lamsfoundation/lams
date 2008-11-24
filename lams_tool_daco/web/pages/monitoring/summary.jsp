@@ -137,7 +137,9 @@
 				<th><fmt:message key="label.monitoring.fullname" /></th>
 				<th><fmt:message key="label.monitoring.loginname" /></th>
 				<th><fmt:message key="label.monitoring.recordcount" /></th>
-				<th><fmt:message key="label.monitoring.notebook" /></th>
+				<c:if test="${daco.reflectOnActivity}">
+					<th><fmt:message key="label.monitoring.notebook" /></th>
+				</c:if>
 			</tr>
 			<c:forEach var="sessionSummary" items="${monitoringSummary}">
 				<tr>
@@ -170,23 +172,25 @@
 								</c:otherwise>
 							</c:choose>
 						</td>
-						<td style="text-align: center">
-							<c:choose>
-								<c:when test="${empty user.reflectionEntry}">
-									<fmt:message key="label.monitoring.notebook.none" />
-								</c:when>
-								<c:otherwise>
-									<c:url var="viewReflection"	value="/monitoring/viewReflection.do">
-										<c:param name="toolSessionID" value="${sessionSummary.sessionId}" />
-										<c:param name="userId" value="${user.userId}" />
-										<c:param name="sessionMapID" value="${sessionMapID}" />
-									</c:url>
-									<a href="#" onclick="javascript:launchPopup('${viewReflection }','Reflection')">
-										<fmt:message key="label.monitoring.notebook.view" />
-									</a>
-								</c:otherwise>
-							</c:choose>
-						</td>
+						<c:if test="${daco.reflectOnActivity}">
+							<td style="text-align: center">
+								<c:choose>
+									<c:when test="${empty user.reflectionEntry}">
+										<fmt:message key="label.monitoring.notebook.none" />
+									</c:when>
+									<c:otherwise>
+										<c:url var="viewReflection"	value="/monitoring/viewReflection.do">
+											<c:param name="toolSessionID" value="${sessionSummary.sessionId}" />
+											<c:param name="userId" value="${user.userId}" />
+											<c:param name="sessionMapID" value="${sessionMapID}" />
+										</c:url>
+										<a href="#" onclick="javascript:launchPopup('${viewReflection }','Reflection')">
+											<fmt:message key="label.monitoring.notebook.view" />
+										</a>
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</c:if>
 					</tr>
 				</c:forEach>
 			</c:forEach>
