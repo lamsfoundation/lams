@@ -16,7 +16,7 @@
 <lams:head>
 	<lams:css />
 	<title>
-		<fmt:message key="index.searchLesson" />
+		<fmt:message key="index.searchlesson" />
 	</title>
 
 	<link rel="stylesheet"
