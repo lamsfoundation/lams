@@ -38,6 +38,9 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -45,6 +48,8 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.XMPPUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -101,7 +106,13 @@ public class PresenceServlet extends LamsDispatchAction{
 			  HttpServletRequest request,
 			  HttpServletResponse response)throws Exception{
 		
-		String xmppRoomName = (String)WebUtil.readStrParam(request,"xmppRoomName");
+		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+		
+		Long lessonId = (Long)WebUtil.readLongParam(request,"lessonId");
+		LessonDTO dto = learnerService.getLessonData(lessonId);
+		String xmppRoomName = lessonId + dto.getCreateDateTimeString() + "@" + Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
+		xmppRoomName = xmppRoomName.replace(" ", "_");
+		xmppRoomName = xmppRoomName.replace(":", "_");
 		Boolean xmppRoomCreated = XMPPUtil.createMultiUserChat(xmppRoomName);
 		
 		FlashMessage flashMessage = null; 

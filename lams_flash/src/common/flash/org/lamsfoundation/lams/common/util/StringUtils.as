@@ -408,7 +408,28 @@ class StringUtils {
 				
 		}
 
-		Debugger.log("correctPresenceName originalNick: " + s + " correctedNick: " + newNick, Debugger.MED, "isANumber", "StringUtils");
+		Debugger.log("correctPresenceName originalNick: " + s + " correctedNick: " + newNick, Debugger.MED, "correctPresenceName", "StringUtils");
 		return newNick;
+	}
+	
+	public static function correctPresenceRoomName(s:String):String {
+		var newRoomName:String = new String("");
+		for (var i:Number = 0; i < s.length; i++) {
+			switch(s.charAt(i)) {
+				case " ": {
+					newRoomName += "_";
+					break;
+				}
+				case ":": {
+					newRoomName += "_";
+					break;
+				}
+				default: {
+					newRoomName += s.charAt(i);
+				}
+			}
+		}
+		Debugger.log("correctPresenceRoomName originalRoomName: " + s + " correctedRoomName: " + newRoomName, Debugger.MED, "correctPresenceRoomName", "StringUtils");
+		return newRoomName;
 	}
 }

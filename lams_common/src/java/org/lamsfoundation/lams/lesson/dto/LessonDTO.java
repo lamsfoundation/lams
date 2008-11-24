@@ -53,6 +53,7 @@ public class LessonDTO
     private Integer lessonStateID;
 	private Integer organisationID;
 	private Date createDateTime;
+	private String createDateTimeString;
 	private Date startDateTime;
 	private Long learningDesignID;
 	private Boolean learnerExportAvailable;
@@ -76,6 +77,7 @@ public class LessonDTO
         Organisation org = lesson.getOrganisation();
         this.organisationID = org != null ? org.getOrganisationId() : null;
         this.createDateTime = lesson.getCreateDateTime();
+        this.createDateTimeString = lesson.getCreateDateTime().toString();
         this.startDateTime = lesson.getStartDateTime();
 		this.learnerExportAvailable = lesson.getLearnerExportAvailable();
 		this.learnerPresenceAvailable = lesson.getLearnerPresenceAvailable();
@@ -126,7 +128,11 @@ public class LessonDTO
 	public Date getStartDateTime() {
 		return startDateTime;
 	}
-
+	
+	public String getCreateDateTimeString() {
+		return createDateTimeString;
+	}
+	
 	public Integer getOrganisationID() {
 		return organisationID;
 	}
@@ -160,6 +166,7 @@ public class LessonDTO
         sb.append("learningDesignID='" + getLearningDesignID() + "'; ");
         sb.append("organisationID='" + getOrganisationID() + "'; ");
         sb.append("createDateTime='" + getCreateDateTime() + "'; ");
+        sb.append("createDateTimeString='" + getCreateDateTimeString() + "'; ");
         sb.append("startDateTime='" + getStartDateTime() + "'; ");
         sb.append("learnerExportAvailable='" + getLearnerExportAvailable() + "'; ");
         sb.append("learnerPresenceAvailable='" + getLearnerPresenceAvailable() + "'; ");

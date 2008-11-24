@@ -64,6 +64,8 @@ class LessonModel extends Observable {
 	private var _learnerExportAvailable:Boolean;
 	private var _learnerPresenceAvailable:Boolean;
 	private var _learnerImAvailable:Boolean;
+	private var _createDateTime:String;
+	private var _createDateTimeString:String;
 	
 	/* the learningDesignModel gets set when you join a lesson */
 	private var _learningDesignModel:DesignDataModel;
@@ -108,6 +110,8 @@ class LessonModel extends Observable {
 		_learnerExportAvailable = dto.learnerExportAvailable;
 		_learnerPresenceAvailable = dto.learnerPresenceAvailable;
 		_learnerImAvailable = dto.learnerImAvailable;
+		_createDateTime = dto.createDateTime;
+		_createDateTimeString = dto.createDateTimeString;
 		
 		Debugger.log("PRESENCE: " + dto.lessonID + " " + dto.lessonName + " " + dto.learnerExportAvailable + " " + dto.learnerPresenceAvailable + " " + dto.learnerImAvailable,Debugger.MED,'populateUserFromDTO','LessonModel');
 			
@@ -221,7 +225,8 @@ class LessonModel extends Observable {
 	public function get userFirstName():String{
 		return _userFirstName;
 	}
-	/**
+
+	/**
 	 * Set the userLastName
 	 * 
 	 * @param   userLastName
@@ -311,6 +316,30 @@ class LessonModel extends Observable {
 	
 	public function get description():String{
 		return _lessonDescription;
+	}
+	
+	public function getCreateDateTime():String {
+		return _createDateTime;
+	}
+	
+	public function get createDateTime():String{
+		return _createDateTime;
+	}
+	
+	public function setCreateDateTime(s:String) {
+		_createDateTime= s;
+	}
+
+	public function getCreateDateTimeString():String {
+		return _createDateTimeString;
+	}
+	
+	public function get createDateTimeString():String{
+		return _createDateTimeString;
+	}
+	
+	public function setCreateDateTimeString(s:String) {
+		_createDateTimeString = s;
 	}
 	
 	public function setLessonStateID(lessonStateID:Number) {
