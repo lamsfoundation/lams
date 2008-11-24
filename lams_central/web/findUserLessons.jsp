@@ -15,10 +15,13 @@
 <lams:html>
 <lams:head>
 	<lams:css />
+	<title>
+		<fmt:message key="index.searchLesson" />
+	</title>
 
 	<link rel="stylesheet"
 		href="${lams}/includes/javascript/jquery-ui/themes/default/ui.all.css"
-		type="text/css" media="screen" title="Flora (Default)" />
+		type="text/css" media="screen" title="Flora (Default)" >
 
 	<script type="text/javascript"
 		src="${lams}/includes/javascript/getSysInfo.js"></script>
@@ -59,8 +62,8 @@
 
 <form action="${lams}/findUserLessons.do"><input type="hidden"
 	name="dispatch" value="getResults"> <input type="text"
-	id="query" name="query" /> <input type="submit" value="Search"
-	class="button" /> <input type="hidden" name="courseID"
+	id="query" name="query"> <input type="submit" value="Search"
+	class="button"> <input type="hidden" name="courseID"
 	value="${courseID}"></form>
 
 <div class="space-bottom-top"></div>
@@ -82,19 +85,23 @@
 
 		<c:forEach var="user" items="${userLessonsMap}">
 			<div><strong>${user.key.firstName}
-			${user.key.lastName}</strong> <c:if
-				test="${user.value ne null and not empty user.value}">
-				<ul>
-					<c:forEach var="lesson" items="${user.value}">
-						<li>${lesson.lessonName} <a
-							href="javascript:openMonitorLesson(${lesson.lessonId})"><fmt:message
-							key="index.monitor" /></a></li>
-					</c:forEach>
-				</ul>
-				<br>
-			</c:if></div>
+			${user.key.lastName}</strong> <c:choose>
+				<c:when test="${user.value ne null and not empty user.value}">
+					<ul>
+						<c:forEach var="lesson" items="${user.value}">
+							<li>${lesson.lessonName} <a
+								href="javascript:openMonitorLesson(${lesson.lessonId})"><fmt:message
+								key="index.monitor" /></a></li>
+						</c:forEach>
+					</ul>
+					<br>
+				</c:when>
+				<c:otherwise>
+					<p><span style="font-style: italic"><fmt:message
+						key="lessonsearch.noresults" /></span></p>
+				</c:otherwise>
+			</c:choose></div>
 		</c:forEach>
 	</c:otherwise>
-</c:choose>
-
+</c:choose></div>
 </lams:html>
