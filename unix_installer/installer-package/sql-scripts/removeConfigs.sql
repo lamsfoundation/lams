@@ -16,6 +16,3 @@ update lams_learning_library set valid_flag=0 where title="SpreadSheet";
 delete from lams_qtz_SIMPLE_TRIGGERS;
 delete from lams_qtz_TRIGGERS;
 delete from lams_qtz_JOB_DETAILS;
-
-
-
