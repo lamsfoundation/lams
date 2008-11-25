@@ -12,3 +12,10 @@ update tl_lagmap10_configuration set config_value="" where config_key="GmapKey";
 -- From 2.2 onwards. Ensure spreadsheet is set to disabled
 update lams_learning_library set valid_flag=0 where title="SpreadSheet";
 
+-- From 2.2 onwards. Remove lams_qtz event entires
+delete from lams_qtz_SIMPLE_TRIGGERS;
+delete from lams_qtz_TRIGGERS;
+delete from lams_qtz_JOB_DETAILS;
+
+
+

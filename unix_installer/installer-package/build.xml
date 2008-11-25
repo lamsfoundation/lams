@@ -17,6 +17,7 @@
 		     output="${basedir}/database/dump.sql" failonerror="true">
 		      <arg line="-u${db.username}" />
 		      <arg line="--password=${db.password}" />
+			  <arg line="--hex-blob" />
 		      <arg line="${db.name}" />
 		</exec>
 	</target>
