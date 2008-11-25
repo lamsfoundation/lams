@@ -76,6 +76,13 @@ function correctPresenceName(o){
 	return o;
 }
 
+function correctPresenceRoomName(s){
+	s = s.replace(/ /g, "_");
+	s = s.replace(/:/g, "_");
+	
+	return s;
+}
+
 function createElem(name, attrs, style, text) {
 	var e = document.createElement(name);
 	if (attrs) {

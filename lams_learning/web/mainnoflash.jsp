@@ -50,6 +50,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         <script type="text/javascript">
      		var HTTPBASE = "<lams:LAMSURL/>JHB";
      		var presenceLabel = "<fmt:message key='label.presence'/>";
+     		var roomName = "${param.lessonID}" + "${param.createDateTime}";
+     		roomName = correctPresenceRoomName(roomName);
      		
 	    	window.onload=function(){
 				// if presence is enabled, attempt to login once the window is loaded
@@ -57,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 			
 			function attemptLogin(){
-				doLogin("${param.presenceUrl}", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "${param.lessonID}", "<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>", false, false);
+				doLogin("${param.presenceUrl}", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "<lams:user property="userID"/>", roomName, "<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>", false, false);
 			}
 			
 			function attemptRegistration(){

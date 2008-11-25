@@ -163,6 +163,7 @@ public class HomeAction extends DispatchAction {
 				req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED, lesson.getLearnerPresenceAvailable());
 				req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
 				req.setAttribute(AttributeNames.PARAM_TITLE, lesson.getLessonName());
+				req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, lesson.getCreateDateTime());
 				String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 				req.setAttribute("serverUrl", serverUrl);
 				String presenceUrl = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
