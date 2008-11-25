@@ -400,6 +400,7 @@ if [  "$?" -ne  "0" ]
 fi
 
 chmod 755 $JBOSS_DIR/bin/run-lams.sh
+chmod 755 $JBOSS_DIR/bin/run.sh
 
 if [ -f $JBOSS_DIR/bin/wrapper ]
 	then
