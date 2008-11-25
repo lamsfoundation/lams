@@ -140,6 +140,13 @@
 			$('#votingForm').ajaxSubmit(options);
 			return false;
 		});		
+
+		//to prevent scroll bars overlapping
+		//var nav = navigator.appName;
+		//if (nav == "Microsoft Internet Explorer") {
+			//alert(parent.document.getElementById("contentFrame").width);
+			//parent.document.getElementById("contentFrame").width = "2000px";
+		//}
 	});
 
 	<!--
@@ -274,7 +281,7 @@
    
 </lams:head>
 <body class="stripes">
-	<div id="content" >
+	<div id="content">
 
 		<%--ImageGallery information-----------------------------------%>
 

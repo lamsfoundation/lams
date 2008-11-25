@@ -127,9 +127,16 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			}
 			// End Resizing
 			
-			TB_WIDTH = imageWidth + 50;
-			TB_HEIGHT = imageHeight + 80;
-			$("#TB_window").append("<a href='' id='TB_ImageOff' title='Close'>	<iframe id='TB_Image' style='border:0px;' frameborder='no' src='"+url+"' width='"+eval(imageWidth + 20)+"' height='"+eval(imageHeight + 20)+"'/></iframe></a>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>"); 		
+			TB_WIDTH = imageWidth + 30;
+			TB_HEIGHT = imageHeight + 60;
+
+			alert(imgPreloader.width);
+			alert(imgPreloader.height);
+			if ((imgPreloader.width > x) ||(imgPreloader.height > y)) {
+				$("#TB_window").append("<iframe id='TB_Image' style='border:0px;' frameborder='no' src='"+url+"' width='"+imageWidth+"' height='"+imageHeight+"'/></iframe>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>");
+			} else {
+				$("#TB_window").append("<a href='' id='TB_ImageOff' title='Close'><img id='TB_Image' src='"+url+"' width='"+imageWidth+"' height='"+imageHeight+"' alt='"+caption+"'/></a>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>");				
+			}
 		
 			$("#TB_closeWindowButton").click(tb_remove);
 			

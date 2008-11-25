@@ -722,7 +722,7 @@ public class LearningAction extends Action {
 	    if (StringUtils.isEmpty(contentType)
 		    || !(contentType.equals("image/gif") || contentType.equals("image/png")
 			    || contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
-			    .equals("image/pjpeg"))) {
+			    .equals("image/pjpeg") || contentType.equals("image/x-png"))) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
 	    }
