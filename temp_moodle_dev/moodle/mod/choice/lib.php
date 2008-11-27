@@ -806,18 +806,13 @@ function choice_clone_instance($id, $sectionref, $courseid) {
 function choice_export_instance($id) {
     $cm = get_record('course_modules', 'id', $id);
     if ($cm) {
-   
         if ($choice = get_record("choice", "id",$cm->instance)) {
-            	
         		//copy all its options from database
          		$choiceoptions = get_records("choice_options", "choiceid", $choice->id, "id");
-    			$choice->numberoptions=count($choiceoptions);
-    			for($up=0;$up<$choice->numberoptions;$up++){ 
-			    	$choice->options[$up]=$choiceoptions[$up];
-			    }
 				// serialize choice into a string; assuming choice object
            		// doesn't contain binary data in any of its columns
-        		$s = serialize($choice);
+           		$all=array($choice,$choiceoptions);
+				$s = serialize($all);
 	            header('Content-Description: File Transfer');
 	            header('Content-Type: text/plain');
 	            header('Content-Length: ' . strlen($s));
@@ -838,7 +833,9 @@ function choice_export_instance($id) {
 function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
     // file contents contains serialized choice object
     $filestr = file_get_contents($filepath);
-    $choice = unserialize($filestr);
+    $all=unserialize($filestr);
+    $choice = $all[0];
+    $options= $all[1];
 
     // import this choice into a new course
     $choice->course = $courseid;
@@ -863,18 +860,10 @@ function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
 	$cm->is_lams = 1; 
     $cm->id = insert_record('course_modules', $cm);
 	//add choice's options
-	/*if ($options = get_records("choice_options", "choiceid", $oldchoiceid, "id")) {
-		foreach ($options as $option) {
-				$option->choiceid = $choice->id;
-                insert_record("choice_options", $option);
+     foreach ($options as $option) {
+			$option->choiceid=$choice->id;
+			insert_record("choice_options", $option);
 		}
-					           
-	}*/
-    $options=$choice->options;
-    for($up=0;$up<$choice->numberoptions;$up++){ 
-			$options[$up]->choiceid=$choice->id;
-			 insert_record("choice_options", $options[$up]);
-	}
 
     return $cm->id;
 }
