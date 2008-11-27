@@ -134,15 +134,26 @@ function GetAllRosterUsers() {
 	return this.users;
 }
 
+function CloneAndEncodeUser(user){
+	var newUser = new Object();
+	var newUserNick;
+	newUser.status = "" + user.status;
+	newUser.nick = "" + user.nick;
+	newUser.nick = encodeURI(newUser.nick);
+	return newUser;
+}
+
 function UpdateRosterDisplay() {
 	if(FROMFLASH){
 		// send users to flash
 		var availableUsers = [];
+		
 		for (var i = 0; i < this.users.length; i++) {
 			if (this.users[i].status != "unavailable") {
-				availableUsers[availableUsers.length] = correctPresenceName(this.users[i]);
+				availableUsers[availableUsers.length] = CloneAndEncodeUser(this.users[i]);
 			}
 		}
+		
 		flashProxy.call("sendUsersToFlash", availableUsers);
 	}
 	else {
@@ -400,9 +411,10 @@ function doLogin(presenceServerUrl, userID, password, resource, chatroom, nickna
 			PASSWORD = password;
 			RESOURCE = resource;
 			XMPPDOMAIN = presenceServerUrl;
-			NICK = nickname;
+			NICK = unescape(nickname);
 			CONFERENCEROOM = chatroom + "@conference." + presenceServerUrl;
 			FROMFLASH = fromFlash;
+			
 			// debug statement for connection information
 			//alert(HTTPBASE + USERNAME + PASSWORD + RESOURCE + XMPPDOMAIN + NICK + CONFERENCEROOM + FROMFLASH);
 		}
