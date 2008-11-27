@@ -136,15 +136,21 @@ class Presence extends MovieClip {
 	// Attempts a connection with a given Jabber server
 	public function attemptConnection():Void{
 		Debugger.log('PRESENCE: attempting to connect through Javascript',Debugger.MED,'attemptConnection','Presence');
-		
+
 		var myDate = new Date();
 		var h = myDate.getHours().toString(), m = myDate.getMinutes().toString(), s = myDate.getSeconds().toString();
-		var resource = "LAMSPRESENCE"+h+""+m+""+s;
+		var resource = "LAMSPRESENCE" + h + "" + m + "" + s;
 		var nickName:String = _root.firstName + " " + _root.lastName;
+		// IE seems to urlEncode it's stuff automatically when calling getUrl, therefore urlEncode if any other browser
+		if(!StringUtils.stringToBool(_root.isIe)) {
+			Debugger.log('PRESENCE: escaping nickname for non-ie browsers',Debugger.MED,'attemptConnection','Presence');
+			nickName = escape(nickName);
+		}
+		
 		var roomName:String = _root.lessonID + _lessonModel.createDateTimeString;
-		nickName = StringUtils.correctPresenceName(nickName);
 		roomName = StringUtils.correctPresenceRoomName(roomName);
-		Debugger.log("PRESENCE: with arguements - " + String(_root.presenceServerUrl) + " " + String(_root.userID) + " " + String(_root.userID) + " " + String(resource) + " " + roomName + " " + nickName + " " + "false" + " " + "true",Debugger.MED,'attemptConnection','Presence');
+		Debugger.log("PRESENCE: with arguements - " + String(_root.presenceServerUrl) + " " + String(_root.userID) + " " + String(_root.userID) + " " + String(resource) + " " + roomName + " " + nickName + " " + "false" + " " + "true", Debugger.MED, 'attemptConnection', 'Presence');
+		// Call the FlashJavascript proxy in root
 		_root.proxy.call("doLogin", _root.presenceServerUrl, _root.userID, _root.userID, resource, roomName, nickName, false, true);
 	}
 	
@@ -216,7 +222,7 @@ class Presence extends MovieClip {
 	public function setupDataGrid(dataProvider:Array){
 		// If datagrid is not initialized, do so
 		if(!dataGridInitialized) {
-			Debugger.log('PRESENCE: setting up dataGrid',Debugger.MED,'setLabels','Presence');
+			Debugger.log('PRESENCE: setting up dataGrid',Debugger.MED,'setupDataGrid','Presence');
 			
 			_users_dg.addEventListener("cellPress", Proxy.create(this, cellPress));
 			_users_dg.columnNames = ["nick"];
@@ -237,6 +243,9 @@ class Presence extends MovieClip {
 		else {
 			presenceTitle_lbl.text = Dictionary.getValue('pres_panel_lbl') + " (" + dataProvider.length + ")";
 			_users_dg.dataProvider = dataProvider;
+			for (var i:Number = 0; i < dataProvider.length; i++) {
+				Debugger.log(dataProvider[i].nick , Debugger.MED, 'setupDataGrid', 'Presence');
+			}
 			_users_dg.sortItemsBy("nick");
 			_users_dg.invalidate();
 		}

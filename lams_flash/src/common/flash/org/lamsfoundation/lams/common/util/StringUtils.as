@@ -366,50 +366,50 @@ class StringUtils {
 		}
 	}
 	
-	public static function correctPresenceName(s:String):String {
-		var newNick:String = new String("");
+	public static function removeAccents(s:String):String {
+		var newString:String = new String("");
 		for (var i:Number = 0; i < s.length; i++) {
-			Debugger.log("stringUtils isANumber char at " + i + ": " + s.charCodeAt(i), Debugger.MED, "isANumber", "StringUtils");
+			//Debugger.log("stringUtils isANumber char at " + i + ": " + s.charCodeAt(i), Debugger.MED, "isANumber", "StringUtils");
 			var char:Number = s.charCodeAt(i);
 			if (char >= 192 && char <= 197)
-				newNick += "A";
+				newString += "A";
 			else if (char == 199)
-				newNick += "C";
+				newString += "C";
 			else if (char >= 200 && char <= 203)
-				newNick += "E";
+				newString += "E";
 			else if (char >= 204 && char <= 207)
-				newNick += "I";
+				newString += "I";
 			else if (char == 209)
-				newNick += "N";
+				newString += "N";
 			else if ((char >= 210 && char <= 214) || char == 216)
-				newNick += "O";
+				newString += "O";
 			else if (char >= 217 && char <= 220)
-				newNick += "U";
+				newString += "U";
 			else if (char == 221)
-				newNick += "Y";
+				newString += "Y";
 			else if (char >= 224 && char <= 229)
-				newNick += "a";
+				newString += "a";
 			else if (char == 231)
-				newNick += "c";
+				newString += "c";
 			else if (char >= 232 && char <= 235)
-				newNick += "e";
+				newString += "e";
 			else if (char >= 236 && char <= 239)
-				newNick += "i";
+				newString += "i";
 			else if (char == 241)
-				newNick += "n";
+				newString += "n";
 			else if ((char >= 242 && char <= 246) || char == 240 || char == 248)
-				newNick += "o";
+				newString += "o";
 			else if (char >= 249 && char <= 252)
-				newNick += "u";
+				newString += "u";
 			else if (char == 253 || char == 255)
-				newNick += "y";
+				newString += "y";
 			else
-				newNick += s.charAt(i);
+				newString += s.charAt(i);
 				
 		}
 
-		Debugger.log("correctPresenceName originalNick: " + s + " correctedNick: " + newNick, Debugger.MED, "correctPresenceName", "StringUtils");
-		return newNick;
+		//Debugger.log("originalString: " + s + " newString: " + newString, Debugger.MED, "correctPresenceName", "StringUtils");
+		return newString;
 	}
 	
 	public static function correctPresenceRoomName(s:String):String {

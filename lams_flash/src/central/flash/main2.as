@@ -54,6 +54,11 @@ if(StringUtils.isEmpty(langDate)){
 	_root.langDate = "01-01-1970";
 }
 
+if(StringUtils.isEmpty(isIe)){
+	_root.isIe = "false";
+	Debugger.log('browser is not defined, using defualt:'+_root.isIe,Debugger.CRITICAL,'main','ROOT');
+}
+
 Debugger.log("PRESENCE: connection info from controlFrame - " + userID + " " + firstName + " " + lastName + " " + presenceServerUrl, Debugger.MED,'main','ROOT');
 
 //Set stage alignment to top left and prent scaling
@@ -91,6 +96,13 @@ function attemptRegistration(){
 
 function sendUsersToFlash(users:Array){
 	Debugger.log('PRESENCE: ' + users, Debugger.MED, 'sendUsersToFlash', 'ROOT');
+	
+	for (var i:Number = 0; i < users.length; i++) {
+		trace("1: " + users[i].nick);
+		users[i].nick = unescape(users[i].nick);
+		trace("2: " + users[i].nick);
+	}
+	
 	app.getPresence().setupDataGrid(users);
 }
 
