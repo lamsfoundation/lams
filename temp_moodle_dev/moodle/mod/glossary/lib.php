@@ -356,7 +356,7 @@ function glossary_update_grades($glossary=null, $userid=0, $nullifnone=true) {
         $sql = "SELECT g.*, cm.idnumber as cmidnumber
                   FROM {$CFG->prefix}glossary g, {$CFG->prefix}course_modules cm, {$CFG->prefix}modules m
                  WHERE m.name='glossary' AND m.id=cm.module AND cm.instance=g.id";
-        if ($rs = get_recordset_sql($sql)) {
+        if ($rs = get_et_sql($sql)) {
             while ($glossary = rs_fetch_next_record($rs)) {
                 if ($glossary->assessed) {
                     glossary_update_grades($glossary, 0, false);
@@ -2331,5 +2331,251 @@ function glossary_reset_userdata($data) {
 function glossary_get_extra_capabilities() {
     return array('moodle/site:accessallgroups', 'moodle/site:viewfullnames', 'moodle/site:trustcontent');
 }
+
+/**
+ * LAMS Function
+ * This function clones an existing instance of Moodle glossary
+ * replacing the course and the userid
+ */
+function glossary_clone_instance($id, $sectionref, $courseid) {
+	global $CFG;
+	$cm = get_record('course_modules', 'id', $id);
+	
+	
+	if ( ! $cm ) {
+        // create a new glossary with default content
+        $existingglossary->course = $courseid;
+        $existingglossary->name = "Glossary";
+        $existingglossary->intro = "";
+        $existingglossary->is_lams = 1;
+        
+    } else {
+        // make a copy of an existing glossary
+        $existingglossary = get_record('glossary', 'id', $cm->instance);
+        $existingglossary->oldid = $existingglossary->id;
+    	unset($existingglossary->id);
+        $existingglossary->name = addslashes($existingglossary->name);
+        $existingglossary->intro = addslashes($existingglossary->intro);
+        $existingglossary->course = $courseid;
+        $existingglossary->is_lams = 1;
+        
+    }
+	$existingglossary->id = insert_record('glossary', $existingglossary);
+    $module = get_record('modules', 'name', 'glossary');
+    $section = get_course_section($sectionref, $courseid);
+
+    
+    // module parameters
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $existingglossary->id;
+    $cm->added = time();
+    $cm->section = $section->id;
+	$cm->is_lams = 1; 
+    $cm->course = $courseid;
+    $cm->id = insert_record('course_modules', $cm);
+	
+    //adds the new glossary to the sequence variable in section table
+    $existingglossary->section = $sectionref;
+    $existingglossary->coursemodule = $cm->id;
+    $existingglossary->instance = $cm->instance;
+          
+    require_once($CFG->dirroot.'/course/lib.php');
+   // add_mod_to_section($existingglossary);
+    
+    //add entries  
+	
+    //$entries=glossary_get_entries($existingglossary->id);
+    $entries= get_records("glossary_entries","glossaryid",$existingglossary->oldid);
+  	if ( $entries ) {
+          foreach ($entries as $entry) {
+                $entry->glossaryid = $existingglossary->id;
+                $entry->oldid=$entry->id;
+                unset($entry->id);
+                $entry->id=insert_record("glossary_entries", $entry);
+                
+                //Search and insert the category and alias of the new entry
+                $alias = get_record("glossary_alias", "entryid",  $entry->oldid);
+                if ( $alias ) {
+	                $alias->entryid=$entry->id;
+	                insert_record("glossary_alias", $alias, false);
+                }
+                $category = get_record("glossary_entries_categories", "entryid",  $entry->oldid);
+                if ( $category ) { 
+	                $category->entryid=$entry->id;
+	                $category->oldid=$category->id;
+	                $category->id=insert_record("glossary_entries_categories", $category);
+                }
+          }
+          //search for new categories and insert them with the new glossary Id
+          $categories = get_records("glossary_categories","glossaryid",$existingglossary->oldid);
+          if ( $categories ) {
+	          foreach ($categories as $newcategory) {
+	          		$newcategory->glossaryid=$existingglossary->id;
+	          		$newcategory->oldid=$newcategory->id;
+                	unset($newcategory->id);
+	          		$newcategory->id=insert_record("glossary_categories", $newcategory);
+
+	          		$newentries= get_records("glossary_entries","glossaryid",$existingglossary->id);
+	          		foreach ($newentries as $newentry) {
+		          		$newglossarycategories = get_record("glossary_entries_categories","categoryid",$newcategory->oldid,"entryid",$newentry->id);
+				          if ( $newglossarycategories ) {
+					         // foreach ($newglossarycategories as $glossarycategories) {
+					          		$newglossarycategories->categoryid=$newcategory->id;
+					          		 update_record("glossary_entries_categories",$newglossarycategories);
+					         //}
+				          }
+	          		}
+	          		
+	          }
+          } 
+  	}
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Serialize a glossary instance and return serialized string to LAMS
+ */
+function glossary_export_instance($id) {
+    $cm = get_record('course_modules', 'id', $id);
+    if ($cm) {
+        if ($glossary = get_record('glossary', 'id', $cm->instance)) {
+           //get all entries from the glossary
+            $entries = get_records('glossary_entries', 'glossaryid', $glossary->id);
+            foreach ($entries as $entry) {
+            	
+           		$aliases = get_record('glossary_alias','entryid',$entry->id);
+           		//if the entry has an alias we link it to the entry
+           		if($aliases){  	
+		           	$entry->alias=$aliases->alias;	
+           		}else{
+           			$entry->alias="";	
+           		}
+				$category = get_record('glossary_entries_categories', 'entryid', $entry->id);
+				//if the entry belongs to a category we link it to the entry
+	            if($category){      		
+			        $entry->category=$category->categoryid;	
+	           	}else{
+	           		$entry->category="";	
+	           	}	
+            }
+            //if the glossary is linked to categories we pass them trough a variable
+            $categories=get_records('glossary_categories', 'glossaryid', $glossary->id);
+            //our file will contain the glossary, its entries and categories 
+            $all=array($glossary,$entries,$categories);
+             // serialize glossary into a string; assuming glossary object
+            // doesn't contain binary data in any of its columns
+			$s = serialize($all);
+            header('Content-Description: File Transfer');
+            header('Content-Type: text/plain');
+            header('Content-Length: ' . strlen($s));
+            echo $s;
+            exit;
+        }
+    }
+
+    header('HTTP/1.1 500 Internal Error');
+    exit;
+}
+
+/**
+ * LAMS Function
+ * Deserializes a serialized Moodle glossary, and creates a new instance of it
+ */
+function glossary_import_instance($filepath, $userid, $courseid, $sectionid) {
+    // file contents contains serialized glossary object
+     $filestr = file_get_contents($filepath);
+     $all=unserialize($filestr);
+    
+    //we split the array so we can get the glossary, entries and categories values
+    $glossary = $all[0];
+    $entries = $all[1];
+    $categories = $all[2];
+    
+    // import this glossary into a new course
+    $glossary->course = $courseid;
+
+    // escape text columns for saving into database
+    $glossary->name = addslashes($glossary->name);
+    $glossary->intro = addslashes($glossary->intro);
+    
+
+    if ( ! $glossary->id = insert_record('glossary', $glossary) ) {
+        return 0; 
+    }
+    
+    $module = get_record('modules', 'name', 'glossary');
+    $section = get_course_section($sectionid, $courseid);
+
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $glossary->id;
+    $cm->added = time();
+    $cm->section = $section->id;
+	$cm->is_lams = 1; 
+    $cm->id = insert_record('course_modules', $cm);
+    
+    //if the glossary have categories we copy them and insert them to the database with the new glossary id
+    $newcategoryid=array();
+    foreach ($categories as $category) {
+    	$category->glossaryid=$glossary->id;
+    	$oldid =$category->id;
+    	$newcategoryid[$oldid]=insert_record('glossary_categories', $category);
+    }
+     //new the glossary have entries we copy them and insert them to the database with the new glossary id
+     foreach ($entries as $entry) {
+     	$entry->glossaryid=$glossary->id;
+     	$entry->id = insert_record('glossary_entries', $entry);
+   		
+	     if($entry->alias!=""){
+	     		$newalias->alias=$entry->alias;
+				$newalias->entryid=$entry->id;
+			    insert_record('glossary_alias', $newalias);
+	     }
+	     //if those entries have a category linked we change its categoryid for the new one linked to the new glossary 
+	     if($entry->category!=""){
+		    $oldcategoryid=$entry->category;
+			$entrycategory->categoryid=$newcategoryid[$oldcategoryid];
+			$entrycategory->entryid=$entry->id;
+			insert_record('glossary_entries_categories', $entrycategory);
+     	 } 
+     
+	    
+     }
+    
+
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Return a statistic for a given user in this Moodle glossary for use in branching
+ */
+function glossary_get_tool_output($id, $userid) {
+    $cm = get_record('course_modules', 'id', $id);
+    if ($cm) {
+		$grade = get_record('glossary_grades', 'userid', $userid, 'glossary', $cm->instance);
+		if ($grade) {
+			return $grade->grade;
+		}else{
+			return 0;	
+		}
+    }
+    return 0;
+}
+
+/**
+ * LAMS Function
+ * Return an HTML representation of a user's activity in this glossary
+ */
+function glossary_export_portfolio($id, $userid) {
+    global $CFG;
+    $text = 'This tool does not support export portfolio.  It may be accessible via ';
+    $text .= '<a href="'.$CFG->wwwroot.'/mod/glossary/view.php?id='.$id.'">this</a> link.';
+    return $text;
+
+}
+
 
 ?>
