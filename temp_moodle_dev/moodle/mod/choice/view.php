@@ -3,13 +3,12 @@
     require_once("../../config.php");
     require_once("lib.php");//add  new library so Lams can use their functions
     require_once($CFG->libdir.'/weblib.php');
-    //
 
     $id         = required_param('id', PARAM_INT);                 // Course Module ID
     $action     = optional_param('action', '', PARAM_ALPHA);
     $attemptids = optional_param('attemptid', array(), PARAM_INT); // array of attempt ids for delete action
     $returnurl   = optional_param('returnUrl', '', PARAM_TEXT);  // lams url to proceed to next in sequence
-    $editing  = optional_param('editing', 0, PARAM_INT);
+    $editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
     $lamsupdateurl = optional_param('lamsUpdateURL', PARAM_TEXT); //get lamsupdateurl variable if coming from a Lams activity
     
     if (! $cm = get_coursemodule_from_id('choice', $id)) {
