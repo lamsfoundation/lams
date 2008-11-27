@@ -116,6 +116,11 @@ if ($mform->is_cancelled()){
             }
             add_to_log($course->id, "glossary", "add entry",
                        "view.php?id=$cm->id&amp;mode=entry&amp;hook=$todb->id", $todb->id,$cm->id);
+            //in lams: if student or teacher in student mode, display the next activity button when insert a new entry
+            $editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
+            if($cm->is_lams==1&&$editing==0){
+            	include('showlamsnext.php');
+        	}
         } else {
             error("Could not insert this new entry");
         }
