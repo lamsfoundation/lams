@@ -806,17 +806,25 @@ function choice_clone_instance($id, $sectionref, $courseid) {
 function choice_export_instance($id) {
     $cm = get_record('course_modules', 'id', $id);
     if ($cm) {
-        if ($choice = get_record('choice', 'id', $cm->instance)) {
-            // serialize choice into a string; assuming choice object
-            // doesn't contain binary data in any of its columns
-            $s = serialize($choice);
-
-            header('Content-Description: File Transfer');
-            header('Content-Type: text/plain');
-            header('Content-Length: ' . strlen($s));
-            echo $s;
-            exit;
+   
+        if ($choice = get_record("choice", "id",$cm->instance)) {
+            	
+        		//copy all its options from database
+         		$choiceoptions = get_records("choice_options", "choiceid", $choice->id, "id");
+    			$choice->numberoptions=count($choiceoptions);
+    			for($up=0;$up<$choice->numberoptions;$up++){ 
+			    	$choice->options[$up]=$choiceoptions[$up];
+			    }
+				// serialize choice into a string; assuming choice object
+           		// doesn't contain binary data in any of its columns
+        		$s = serialize($choice);
+	            header('Content-Description: File Transfer');
+	            header('Content-Type: text/plain');
+	            header('Content-Length: ' . strlen($s));
+	            echo $s;
+	            exit;
         }
+       
     }
 
     header('HTTP/1.1 500 Internal Error');
@@ -826,7 +834,7 @@ function choice_export_instance($id) {
 /**
  * LAMS Function
  * Deserializes a serialized Moodle choice, and creates a new instance of it
- */
+ */ 
 function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
     // file contents contains serialized choice object
     $filestr = file_get_contents($filepath);
@@ -838,6 +846,7 @@ function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
     // escape text columns for saving into database
     $choice->name = addslashes($choice->name);
     $choice->text = addslashes($choice->text);
+    $oldchoiceid=$choice->id;
 
     if ( ! $choice->id = insert_record('choice', $choice) ) {
         return 0; 
@@ -853,6 +862,19 @@ function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
     $cm->section = $section->id;
 	$cm->is_lams = 1; 
     $cm->id = insert_record('course_modules', $cm);
+	//add choice's options
+	/*if ($options = get_records("choice_options", "choiceid", $oldchoiceid, "id")) {
+		foreach ($options as $option) {
+				$option->choiceid = $choice->id;
+                insert_record("choice_options", $option);
+		}
+					           
+	}*/
+    $options=$choice->options;
+    for($up=0;$up<$choice->numberoptions;$up++){ 
+			$options[$up]->choiceid=$choice->id;
+			 insert_record("choice_options", $options[$up]);
+	}
 
     return $cm->id;
 }
@@ -861,7 +883,7 @@ function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
  * LAMS Function
  * Return a statistic for a given user in this Moodle choice for use in branching
  */
-function choice_get_tool_output($id, $userid) {
+/*function choice_get_tool_output($id, $userid) {
     $cm = get_record('course_modules', 'id', $id);
 	//$choice=get_record('choice', 'id', $cm->instance);
     if ($cm) {
@@ -874,7 +896,7 @@ function choice_get_tool_output($id, $userid) {
 		}
     }
     return 0;
-}
+}*/
 
 /**
  * LAMS Function
