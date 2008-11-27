@@ -18,7 +18,8 @@
     $offset     = optional_param('offset', 0,PARAM_INT);             // entries to bypass (for paging purposes)
     $page       = optional_param('page', 0,PARAM_INT);               // Page to show (for paging purposes)
     $show       = optional_param('show', '', PARAM_ALPHA);           // [ concept | alias ] => mode=term hook=$show
-
+    $returnurl   = optional_param('returnUrl', '', PARAM_TEXT);  // lams url to proceed to next in sequence
+	$editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
     if (!empty($id)) {
         if (! $cm = get_coursemodule_from_id('glossary', $id)) {
             error("Course Module ID was incorrect");
@@ -52,7 +53,8 @@
 
 /// redirecting if adding a new entry
     if ($tab == GLOSSARY_ADDENTRY_VIEW ) {
-        redirect("edit.php?id=$cm->id&amp;mode=$mode");
+    //if lams pass editing variable to know if the user is a teacher editing the activity
+        redirect("edit.php?id=$cm->id&amp;mode=$mode&amp;editing=$editing");
     }
 
 /// setting the defaut number of entries per page if not set
@@ -211,8 +213,16 @@
     default:
         $showcommonelements = 1;
     break;
+    
     }
-
+//if Lams print navigation buttons to finish editing the Glossary
+	if($cm->is_lams==1&&$editing==1){
+        		include('showlamsfinish.php');
+  	}
+  	$isteacher = has_capability('mod/glossary:preview', get_context_instance(CONTEXT_MODULE, $cm->id)); // indicates if is a teacher, useful in lams
+	if($isteacher&&$editing==0&&$cm->is_lams==1){//lams: if the teachers view the choice as a learner, display the next activity button so he hasn't to attempt the choice if he don't want to
+	       include('showlamsnext.php');
+	}
 /// Printing the heading
     $strglossaries = get_string("modulenameplural", "glossary");
     $strglossary = get_string("modulename", "glossary");
@@ -229,14 +239,16 @@
         require_capability('mod/glossary:approve', $context);
 
         $navigation = build_navigation($strwaitingapproval, $cm);
+         //we pass a new parameter to the function so it won't we printed if is_lams=1	
         print_header_simple(format_string($glossary->name), "", $navigation, "", "", true,
-            update_module_button($cm->id, $course->id, $strglossary), navmenu($course, $cm));
-
+            update_module_button($cm->id, $course->id, $strglossary), navmenu($course, $cm),false,'',false,$cm->is_lams);
+            
         print_heading($strwaitingapproval);
     } else { /// Print standard header
         $navigation = build_navigation('', $cm);
+         //we pass a new parameter to the function so it won't we printed if is_lams=1	
         print_header_simple(format_string($glossary->name), "", $navigation, "", "", true,
-            update_module_button($cm->id, $course->id, $strglossary), navmenu($course, $cm));
+            update_module_button($cm->id, $course->id, $strglossary), navmenu($course, $cm),false,'',false,$cm->is_lams);
     }
 
 /// All this depends if whe have $showcommonelements
@@ -357,7 +369,8 @@
 /// Show the add entry button if allowed
     if (has_capability('mod/glossary:write', $context) && $showcommonelements ) {
         echo '<div class="singlebutton glossaryaddentry">';
-        echo "<form id=\"newentryform\" method=\"get\" action=\"$CFG->wwwroot/mod/glossary/edit.php\">";
+         //if lams pass editing variable to know if the user is a teacher editing the activity
+        echo "<form id=\"newentryform\" method=\"get\" action=\"$CFG->wwwroot/mod/glossary/edit.php?editing=$editing\">";
         echo '<div>';
         echo "<input type=\"hidden\" name=\"id\" value=\"$cm->id\" />";
         echo '<input type="submit" value="';
@@ -519,6 +532,8 @@
 
 /// Finish the page
 
-    print_footer($course);
+    
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer($course,null, false,$glossary->is_lams);
 
 ?>
