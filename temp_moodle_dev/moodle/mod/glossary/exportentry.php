@@ -37,7 +37,6 @@
     $strglossaries   = get_string('modulenameplural', 'glossary');
     $entryalreadyexist = get_string('entryalreadyexist','glossary');
     $entryexported = get_string('entryexported','glossary');
-
     $navigation = build_navigation('', $cm);
     print_header_simple(format_string($glossary->name), '', $navigation, '', '', true, '', navmenu($course, $cm));
 
@@ -98,5 +97,6 @@
             print_simple_box_end();
     }
 
-    print_footer();
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer(null,null, false,$glossary->is_lams);
 ?>

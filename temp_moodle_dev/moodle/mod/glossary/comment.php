@@ -79,7 +79,8 @@ function glossary_comment_add() {
     } else {
         glossary_comment_print_header($course, $cm, $glossary, $entry, 'add');
         $mform->display();
-        print_footer($course);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+    	print_footer($course,null, false,$glossary->is_lams);
         die;
     }
 }
@@ -133,7 +134,8 @@ function glossary_comment_delete() {
         glossary_comment_print_header($course, $cm, $glossary, $entry, 'delete');
         glossary_print_comment($course, $cm, $glossary, $entry, $comment);
         notice_yesno($strdeletewarning, $linkyes, $linkno, $optionsyes, $optionsno, 'post', 'get');
-        print_footer($course);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+    	print_footer($course,null, false,$glossary->is_lams);
         die;
     }
 }
@@ -198,7 +200,8 @@ function glossary_comment_edit() {
     } else {
         glossary_comment_print_header($course, $cm, $glossary, $entry, 'edit');
         $mform->display();
-        print_footer($course);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+    	print_footer($course,null, false,$glossary->is_lams);
         die;
     }
 }
@@ -227,10 +230,12 @@ function glossary_comment_print_header($course, $cm, $glossary, $entry, $action)
     $navlinks[] = array('name' => $strcomments, 'link' => "comments.php?id=$cm->id&amp;eid=$entry->id", 'type' => 'title');
     $navlinks[] = array('name' => $straction, 'link' => '', 'type' => 'action');
     $navigation = build_navigation($navlinks, $cm);
-
+	 //we pass a new parameter to the function so it won't we printed if is_lams=1	
     print_header_simple(format_string($glossary->name), '', $navigation,
         '', '', true, update_module_button($cm->id, $course->id, $strglossary),
-        navmenu($course, $cm));
+        navmenu($course, $cm),false,'',false,$cm->is_lams);
+        
+        
 /// print original glossary entry for any comment action (add, update, delete)
     glossary_print_entry($course, $cm, $glossary, $entry, 'approval', '', false);
 }
