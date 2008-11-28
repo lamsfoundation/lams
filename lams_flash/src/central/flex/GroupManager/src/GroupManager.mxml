@@ -187,6 +187,8 @@
 				languageXML = XML(Application.application.parameters.languageXML);
 				viewMode = stringToBool(Application.application.parameters.viewMode);
 				
+				//Alert.show("lessonID: " + lessonID + " activityID: " + activityID + " usedForBranching: " + usedForBranching + " mayDelete: " + mayDelete + " viewMode: " + viewMode);
+				
 				// initialize misc. stuff including events
 				mainDataGrid_dg.dataProvider = intialLearners;
 				mainDataGrid_dg.addEventListener(DragEvent.DRAG_DROP, dragDropHandler);
@@ -200,8 +202,11 @@
 					application.enabled = false;
 				}
 				else {
+					if(viewMode){
+						Alert.show(languageXML.language.entry.(@key=="label.grouping.popup.viewmode.message").name);
+					}
 					// if may not delete, alert the monitor that learners can be added but not removed from groups
-					if(!mayDelete){
+					else if(!mayDelete){
 						Alert.show(languageXML.language.entry.(@key=="label.grouping.popup.drag.selection.message").name);
 					}
 					
@@ -225,10 +230,10 @@
 			// initialize buttons and dragging depending on jsp conditions
 			private function initButtonsAndDragging():void {
 				// allow movement of students if deleting is allowed
-				mainDataGrid_dg.dragEnabled = true;
-				mainDataGrid_dg.dropEnabled = true;
-				mainDataGrid_dg.dragMoveEnabled = true;
-				mainDataGrid_dg.allowDragSelection = true;
+				mainDataGrid_dg.dragEnabled = !viewMode;
+				mainDataGrid_dg.dropEnabled = !viewMode;
+				mainDataGrid_dg.dragMoveEnabled = !viewMode;
+				mainDataGrid_dg.allowDragSelection = !viewMode;
 				
 				// if groups are being used for branching, if deletion is a nono or if branching/grouping is in view mode, disable add and remove buttons
 				if(usedForBranching || !mayDelete || viewMode) {

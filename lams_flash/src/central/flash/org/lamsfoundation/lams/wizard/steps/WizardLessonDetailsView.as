@@ -105,7 +105,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardLessonDetailsView  extends Abst
 		time_lbl.text = Dictionary.getValue('time_lbl');
 		
 		schedule_btn.label = Dictionary.getValue('schedule_cb_lbl');
-		
+		learner_eliveedit_cb.label = Dictionary.getValue('wizard_learner_enLiveEdit_cb_lbl');
 		schedule_cb.label = Dictionary.getValue('schedule_cb_lbl');
 		learner_expp_cb.label = Dictionary.getValue('wizard_learner_expp_cb_lbl');
 		learner_enpres_cb.label = Dictionary.getValue('wizard_learner_enpres_cb_lbl');

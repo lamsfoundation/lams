@@ -63,12 +63,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:if>
 	
 	<P><STRONG><fmt:message key="label.grouping.general.instructions.heading"/></STRONG> <fmt:message key="label.grouping.general.instructions.line1"/></P>
-
-	<p><fmt:message key="label.grouping.general.instructions.line2"/></p>
-
-	<c:if test="${usedForBranching}">
-	<p><fmt:message key="label.grouping.general.instructions.branching"/></p>
-	</c:if>
+	
+	<c:choose>
+		<c:when test="${usedForBranching}"><p><fmt:message key="label.grouping.general.instructions.branching"/></p></c:when>
+		<c:otherwise><p><fmt:message key="label.grouping.general.instructions.line2"/></p></c:otherwise>
+	</c:choose>
 	
 	<div align="center">
 	<script language="JavaScript" type="text/javascript">

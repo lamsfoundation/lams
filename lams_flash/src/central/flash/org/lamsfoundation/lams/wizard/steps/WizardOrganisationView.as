@@ -118,7 +118,9 @@ class org.lamsfoundation.lams.wizard.steps.WizardOrganisationView extends Abstra
 		if (_learnerList) {
 			splitNbLearnersTotal_lbl.text = Dictionary.getValue('wizard_splitLearners_leanersInGroup_lbl') + " " + String(_learnerList.length);
 			splitLearnersPerLesson_lbl.text = Dictionary.getValue('wizard_splitLearners_LearnersPerLesson_lbl');
+			splitLearnersPerLesson_lbl.invalidate();
 			splitLearnersPerLesson_txi.text = "1";
+			splitLearnersPerLesson_txi._x = splitLearnersPerLesson_lbl._x + splitLearnersPerLesson_lbl._width + 8;
 			updateSplitSummaryLabel();
 			clearInterval(intervalSetupSplitLabels);
 		}
