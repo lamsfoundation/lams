@@ -20,8 +20,7 @@
 			<c:when test="${allowVersionChange}">
 				<tr>
 					<td><fmt:message key="config.version" /></td>
-					<td><html:select property="version"
-						onchange="onSelectChange()">
+					<td><html:select property="version">
 						<html:option value="">
 							<fmt:message key="label.version.pleaseSelect" />
 						</html:option>
