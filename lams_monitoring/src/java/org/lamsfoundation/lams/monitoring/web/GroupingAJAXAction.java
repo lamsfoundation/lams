@@ -409,6 +409,8 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		languageCollection.add(new String("error.title"));
 		languageCollection.add(new String("label.grouping.max.num.in.group.heading"));
 		languageCollection.add(new String("label.grouping.popup.drag.selection.message"));
+		languageCollection.add(new String("label.grouping.general.instructions.branching"));
+		languageCollection.add(new String("label.grouping.popup.viewmode.message"));
 		
 		String languageOutput = "<xml><language>";
 		
