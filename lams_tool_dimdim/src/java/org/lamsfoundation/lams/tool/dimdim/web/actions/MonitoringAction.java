@@ -132,55 +132,17 @@ public class MonitoringAction extends DispatchAction {
 	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
 		.getSession().getAttribute(AttributeNames.USER);
 
-	// Get dimdim version
-	String version = dimdimService.getConfigValue(Constants.CFG_VERSION);
-	
-	if (version == null) {
-	    logger.error("Config value " + Constants.CFG_VERSION + " returned null");
-	    throw new DimdimException("Server version not defined");
-	}
-	
-	if (version.equals(Constants.CFG_VERSION_STANDARD)) {
-	    // Standard Version
-	    String meetingKey = DimdimUtil.generateMeetingKey();
+	// Enterprise Version
+	String meetingStartURL = dimdimService
+		.getDimdimStartConferenceURL(lamsUserDTO, DimdimUtil.getMeetingKey(session.getSessionId()), DimdimUtil
+			.getReturnURL(request), session.getMaxAttendeeMikes());
+
+	if (meetingStartURL != null) {
 	    session.setMeetingCreated(true);
-	    session.setMeetingKey(meetingKey);
-
-	    String returnURL = DimdimUtil.getReturnURL(request);
-
-	    String startConferenceURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, session.getMeetingKey(),
-		    returnURL, session.getMaxAttendeeMikes());
-
-	    response.sendRedirect(startConferenceURL);
-	} else if (version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
-	    // Enterprise Version
-
-	    // Create new user on enterprise dimdim server using the toolSessionId as the name.
-	    // NB User may already exist
-	    String returnCode = dimdimService.createUser(session.getSessionId());
-
-	    if (!returnCode.equals("200") && !returnCode.equals("302")) {
-		// 200 = success, 302 = user already exists
-		logger.error("Could not create dimdim enterprise user with id :" + session.getSessionId());
-		throw new DimdimException("Unable to start dimdim enterprise meeting");
-	    }
-
-	    // Start a new dimdim web meeting
-	    String meetingStartURL = dimdimService.startAction(session.getSessionId().toString(), session
-		    .getSessionId().toString(), DimdimUtil.getReturnURL(request), session.getMaxAttendeeMikes());
-
-	    if (meetingStartURL != null) {
-		session.setMeetingCreated(true);
-		response.sendRedirect(meetingStartURL);
-	    } else {
-		logger.error("startAction did not return a url to start the meeting");
-		throw new DimdimException("Unable to start meeting");
-	    }
-
+	    response.sendRedirect(meetingStartURL);
 	} else {
-	    // Illegal version value.
-	    logger.error("Unknown dimdim version :'" + version + "'");
-	    throw new DimdimException("Unknown dimdim version");
+	    logger.error("startAction did not return a url to start the meeting");
+	    throw new DimdimException("Unable to start meeting");
 	}
 
 	dimdimService.saveOrUpdateDimdimSession(session);

@@ -145,27 +145,17 @@ public class LearningAction extends DispatchAction {
 	return user;
     }
 
-    private static final String CODE_OK = "200";
-    private static final String CODE_USER_EXISTS = "302";
-
     public ActionForward openLearnerMeeting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	// get user uid parameter
 	Long uid = WebUtil.readLongParam(request, Constants.PARAM_USER_UID);
 	DimdimUser user = dimdimService.getUserByUID(uid);
-	DimdimSession session = user.getDimdimSession();
 
-	// Create new user on enterprise dimdim server using the toolSessionId as the name.
-	String returnCode = dimdimService.createUser(session.getSessionId());
-
-	if (!returnCode.equals(CODE_OK) && !returnCode.equals(CODE_USER_EXISTS)) {
-	    logger.error("Could not create dimdim enterprise user with id :" + session.getSessionId());
-	    throw new DimdimException("Unable to start dimdim enterprise meeting");
-	}
-
-	// Start a new dimdim web meeting
-	String meetingURL = dimdimService.joinMeeting(user);
+	String meetingKey = DimdimUtil.getMeetingKey(user.getDimdimSession().getSessionId());
+	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
+		.getSession().getAttribute(AttributeNames.USER);
+	String meetingURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO, meetingKey);
 
 	if (meetingURL != null) {
 	    response.sendRedirect(meetingURL);
@@ -207,17 +197,18 @@ public class LearningAction extends DispatchAction {
 	DimdimUser user = dimdimService.getUserByUID(uid);
 	DimdimSession session = user.getDimdimSession();
 
-	// Create new user on enterprise dimdim server using the toolSessionId as the name.
-	String returnCode = dimdimService.createUser(session.getSessionId());
-
-	if (!returnCode.equals(CODE_OK) && !returnCode.equals(CODE_USER_EXISTS)) {
-	    logger.error("Could not create dimdim enterprise user with id :" + session.getSessionId());
-	    throw new DimdimException("Unable to start dimdim enterprise meeting");
-	}
+	// Get LAMS userDTO
+	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
+		.getSession().getAttribute(AttributeNames.USER);
 
 	// Start a new dimdim web meeting
-	String meetingURL = dimdimService.startAction(session.getSessionId().toString(), session.getSessionId()
-		.toString(), DimdimUtil.getReturnURL(request), session.getDimdim().getMaxAttendeeMikes());
+
+	String meetingKey = DimdimUtil.getMeetingKey(session.getSessionId());
+	String returnURL = DimdimUtil.getReturnURL(request);
+	Integer maxAttendeeMikes = session.getDimdim().getMaxAttendeeMikes();
+
+	String meetingURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, meetingKey, returnURL,
+		maxAttendeeMikes);
 
 	if (meetingURL != null) {
 	    response.sendRedirect(meetingURL);
@@ -322,12 +313,7 @@ public class LearningAction extends DispatchAction {
 	}
 	request.setAttribute(Constants.ATTR_USER_DTO, userDTO);
 
-	// Get LAMS userDTO
-	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
-		.getSession().getAttribute(AttributeNames.USER);
 
-	String meetingURL = new String();
-	boolean meetingOpen = false;
 
 	String version = dimdimService.getConfigValue(Constants.CFG_VERSION);
 	if (version == null) {
@@ -335,43 +321,20 @@ public class LearningAction extends DispatchAction {
 	    throw new DimdimException("Server version not defined");
 	}
 
-	if (version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
-	    // Enterprise Version
-	    if (mode.isAuthor()) {
-
-		meetingURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/" + Constants.TOOL_SIGNATURE
-			+ "/learning.do?dispatch=openPreviewMeeting&" + Constants.PARAM_USER_UID + "="
-			+ user.getUid();
-		meetingOpen = true;
-	    } else {
-		if (session.isMeetingCreated()) {
-		    meetingURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/" + Constants.TOOL_SIGNATURE
-			    + "/learning.do?dispatch=openLearnerMeeting&" + Constants.PARAM_USER_UID + "="
-			    + user.getUid();
-		    meetingOpen = true;
-		} // otherwise, meeting has not been started in monitoring
-	    }
-
-	} else if (version.equals(Constants.CFG_VERSION_STANDARD)) {
-	    // Standard Version
-
-	    if (mode.isAuthor()) {
-		String meetingKey = DimdimUtil.generateMeetingKey();
-		String returnURL = DimdimUtil.getReturnURL(request);
-		meetingURL = dimdimService.getDimdimStartConferenceURL(lamsUserDTO, meetingKey, returnURL, dimdim
-			.getMaxAttendeeMikes());
-		meetingOpen = true;
-	    } else {
-		if (session.isMeetingCreated()) {
-		    meetingURL = dimdimService.getDimdimJoinConferenceURL(lamsUserDTO, session.getMeetingKey());
-		    meetingOpen = true;
-		} // otherwise, meeting has not been started in monitoring
-	    }
+	String dispatchValue = new String();
+	boolean meetingOpen = false;
+	if (mode.isAuthor()) {
+	    dispatchValue = "openPreviewMeeting";
+	    meetingOpen = true;
 	} else {
-	    // Illegal version value.
-	    logger.error("Unknown dimdim version :'" + version + "'");
-	    throw new DimdimException("Unknown dimdim version");
+	    if (session.isMeetingCreated()) {
+		dispatchValue = "openLearnerMeeting";
+		meetingOpen = true;
+	    } // otherwise, meeting has not been started in monitoring
 	}
+
+	String meetingURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/" + Constants.TOOL_SIGNATURE
+		+ "/learning.do?dispatch=" + dispatchValue + "&" + Constants.PARAM_USER_UID + "=" + user.getUid();
 
 	request.setAttribute(Constants.ATTR_MEETING_OPEN, meetingOpen);
 	request.setAttribute(Constants.ATTR_MEETING_URL, meetingURL);

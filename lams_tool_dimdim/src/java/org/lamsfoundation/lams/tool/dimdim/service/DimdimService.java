@@ -444,13 +444,13 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     public String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey) throws Exception {
 
 	// Get Dimdim server url
-	String standardServerURL = getConfigValue(Constants.CFG_STANDARD_SERVER_URL);
-	if (standardServerURL == null) {
-	    logger.error("Config item : '" + Constants.CFG_STANDARD_SERVER_URL + "' not defined");
+	String serverURL = getConfigValue(Constants.CFG_SERVER_URL);
+	if (serverURL == null) {
+	    logger.error("Config item : '" + Constants.CFG_SERVER_URL + "' not defined");
 	    throw new DimdimException("Standard server url not defined");
 	}
 
-	URL url = new URL(standardServerURL + "/dimdim/JoinConferenceCheck.action?" + "email="
+	URL url = new URL(serverURL + "/dimdim/JoinConferenceCheck.action?" + "email="
 		+ URLEncoder.encode(userDTO.getEmail(), "UTF8") + "&displayName="
 		+ URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confKey="
 		+ URLEncoder.encode(meetingKey, "UTF8"));
@@ -460,9 +460,9 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	String result = DimdimUtil.getResult(response);
 
 	if (result.equals("success")) {
-	    String path = DimdimUtil.getStandardURL(response);
+	    String path = DimdimUtil.getURL(response);
 
-	    return standardServerURL + path;
+	    return serverURL + path;
 	} else {
 	    logger.error("getDimdimJoinConferenceURL: result: " + result);
 	}
@@ -472,118 +472,50 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     public String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey, String returnURL, int maxAttendeeMikes)
 	    throws Exception {
 
-	// Get Standard Dimdim Server URL
-	String standardServerURL = getConfigValue(Constants.CFG_STANDARD_SERVER_URL);
-	if (standardServerURL == null) {
-	    logger.error("Config item : '" + Constants.CFG_STANDARD_SERVER_URL + "' not defined");
+	String serverURL = getConfigValue(Constants.CFG_SERVER_URL);
+	if (serverURL == null) {
+	    logger.error("Config item : '" + Constants.CFG_SERVER_URL + "' not defined");
 	    throw new DimdimException("Standard server url not defined");
 	}
 
-	// get dimdim url
-
-	URL url = new URL(standardServerURL + "/dimdim/StartNewConferenceCheck.action?" + "email="
-		+ URLEncoder.encode(userDTO.getEmail(), "UTF8") + "&displayName="
-		+ URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confKey="
-		+ URLEncoder.encode(meetingKey, "UTF8") + "&lobby=false" + "&networkProfile=3" + "&meetingHours=99"
-		+ "&maxAttendeeMikes=" + maxAttendeeMikes + "&returnUrl=" + URLEncoder.encode(returnURL, "UTF8")
-		+ "&presenterAV=av" + "&privateChatEnabled=true" + "&publicChatEnabled=true"
-		+ "&screenShareEnabled=true" + "&whiteboardEnabled=true");
-
-	String response = sendRequest(url);
-
-	String path = DimdimUtil.getStandardURL(response);
-
-	return standardServerURL + path;
-    }
-
-    /**
-     * Create user for enterprise version.
-     */
-    public String createUser(Long toolSessionID) throws Exception {
-
-	String enterpriseServerURL = getConfigValue(Constants.CFG_ENTERPRISE_SERVER_URL);
-	if (enterpriseServerURL == null) {
-	    logger.error("Config item : '" + Constants.CFG_ENTERPRISE_SERVER_URL + "' not defined");
-	    throw new DimdimException("Enterprise server url not defined");
+	String version = getConfigValue(Constants.CFG_VERSION);
+	if (version == null) {
+	    logger.error("Config value " + Constants.CFG_VERSION + " returned null");
+	    throw new DimdimException("Server version not defined");
 	}
 
-	String adminPassword = getConfigValue(Constants.CFG_ADMIN_PASSWORD);
-	if (adminPassword == null) {
-	    logger.error("Config item : '" + Constants.CFG_ADMIN_PASSWORD + "' not defined");
-	    throw new DimdimException("Administrator credentials not defined");
-	}
+	String response;
+	URL url;
+	if (version.equals(Constants.CFG_VERSION_STANDARD)) {
 
-	URL url = new URL(enterpriseServerURL + "/portal/enterprise/CreateUser.action?" + "adminpassword="
-		+ adminPassword + "&name=" + "dimdim_" + toolSessionID + "&password=" + "dimdim_" + toolSessionID
-		+ "&email=TODO@mail.com" + "&userType=Premium");
+	    url = new URL(serverURL + "/dimdim/StartNewConferenceCheck.action?" + "email="
+		    + URLEncoder.encode(userDTO.getEmail(), "UTF8") + "&displayName="
+		    + URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confKey="
+		    + URLEncoder.encode(meetingKey, "UTF8") + "&lobby=false" + "&networkProfile=3" + "&meetingHours=99"
+		    + "&maxAttendeeMikes=" + maxAttendeeMikes + "&returnUrl=" + URLEncoder.encode(returnURL, "UTF8")
+		    + "&presenterAV=av" + "&privateChatEnabled=true" + "&publicChatEnabled=true"
+		    + "&screenShareEnabled=true" + "&whiteboardEnabled=true");
 
-	String response = sendRequest(url);
+	} else if (version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
 
-	return DimdimUtil.getCode(response);
-    }
+	    url = new URL(serverURL + "/dimdim/StartNewConferenceCheck.action?" + "email="
+		    + URLEncoder.encode(userDTO.getEmail(), "UTF8") + "&meetingRoomName="
+		    + URLEncoder.encode(meetingKey, "UTF8") + "&displayName="
+		    + URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confName="
+		    + "QandA" + "&lobby=" + "false" + "&networkProfile=" + "3" + "&meetingHours" + "=2"
+		    + "&meetingMinutes=" + "0" + "&presenterAV=" + "av" + "&maxAttendeeMikes=" + maxAttendeeMikes
+		    + "&returnUrl=" + URLEncoder.encode(returnURL, "UTF8") + "&whiteboardEnabled=" + "true"
+		    + "&screenShareEnabled=" + "true" + "&participantListEnabled=true" + "&dialInfoVisible=true");
 
-    public String startAction(String username, String password, String returnURL, Integer maxAttendeeMikes)
-	    throws Exception {
-
-	String enterpriseServerURL = getConfigValue(Constants.CFG_ENTERPRISE_SERVER_URL);
-	if (enterpriseServerURL == null) {
-	    logger.error("Config item : '" + Constants.CFG_ENTERPRISE_SERVER_URL + "' not defined");
-	    throw new DimdimException("Enterprise server url not defined");
-	}
-
-	String adminPassword = getConfigValue(Constants.CFG_ADMIN_PASSWORD);
-	if (adminPassword == null) {
-	    logger.error("Config item : '" + Constants.CFG_ADMIN_PASSWORD + "' not defined");
-	    throw new DimdimException("Administrator credentials not defined");
-	}
-
-	URL url = new URL(enterpriseServerURL + "/portal/start.action?" + "name="
-		+ URLEncoder.encode("dimdim_" + username, "UTF8") + "&password="
-		+ URLEncoder.encode("dimdim_" + password, "UTF8") + "&returnurl="
-		+ URLEncoder.encode(returnURL, "UTF8") + "&waitingarea=false" + "&network=H" + "&hours=99" + "&mikes="
-		+ maxAttendeeMikes + "&audioVideo=V" + "&featurePrivateChat=true" + "&featurePublicChat=true"
-		+ "&featurePublisher=true" + "&featureWhiteboard=true" + "&response=json");
-
-	String response = sendRequest(url);
-
-	String returnCode = DimdimUtil.getCode(response);
-
-	if (returnCode.equals("200")) {
-	    return DimdimUtil.getEnterpriseURL(response);
 	} else {
-	    logger.error("startAction: unsuccessfull return code: " + returnCode);
-	}
-	return null;
-    }
-
-    public String joinMeeting(DimdimUser user) throws Exception {
-
-	String enterpriseServerURL = getConfigValue(Constants.CFG_ENTERPRISE_SERVER_URL);
-	if (enterpriseServerURL == null) {
-	    logger.error("Config item : '" + Constants.CFG_ENTERPRISE_SERVER_URL + "' not defined");
-	    throw new DimdimException("Enterprise server url not defined");
+	    logger.error("Unknown version type: " + version);
+	    throw new DimdimException("Unknown version type");
 	}
 
-	String adminPassword = getConfigValue(Constants.CFG_ADMIN_PASSWORD);
-	if (adminPassword == null) {
-	    logger.error("Config item : '" + Constants.CFG_ADMIN_PASSWORD + "' not defined");
-	    throw new DimdimException("Administrator credentials not defined");
-	}
+	response = sendRequest(url);
+	String path = DimdimUtil.getURL(response);
 
-	URL url = new URL(enterpriseServerURL + "/portal/join.action?" + "meetingRoomName="
-		+ URLEncoder.encode("dimdim_" + user.getDimdimSession().getSessionId(), "UTF8") + "&displayname="
-		+ URLEncoder.encode(user.getFirstName() + " " + user.getLastName(), "UTF8") + "&response=json");
-
-	String response = sendRequest(url);
-
-	String returnCode = DimdimUtil.getCode(response);
-
-	if (returnCode.equals("200")) {
-	    return DimdimUtil.getEnterpriseURL(response);
-	} else {
-	    logger.error("startAction: unsuccessfull return code: " + returnCode);
-	}
-	return null;
+	return serverURL + path;
     }
 
     public void saveOrUpdateDimdim(Dimdim dimdim) {

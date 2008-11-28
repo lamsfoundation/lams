@@ -4,28 +4,6 @@
 	<lams:LAMSURL />
 </c:set>
 
-<script type="text/javascript">
-	window.onload = function() {
-		onSelectChange();
-
-		var version = document.forms[0].version.value;
-	}
-
-	function onSelectChange() {
-		var version = document.forms[0].version.value;
-
-		if (version == 'enterprise') {
-			document.forms[0].standardServerURL.disabled = "disabled";
-			document.forms[0].enterpriseServerURL.disabled = "";
-			document.forms[0].adminPassword.disabled = "";
-		} else if (version == 'standard') {
-			document.forms[0].standardServerURL.disabled = "";
-			document.forms[0].enterpriseServerURL.disabled = "disabled";
-			document.forms[0].adminPassword.disabled = "disabled";
-		}
-	}
-</script>
-
 <div id="content">
 
 <h1><fmt:message key="admin.title" /></h1>
@@ -62,18 +40,9 @@
 		</c:choose>
 
 		<tr>
-			<td><fmt:message key="config.standardServerURL" /></td>
-			<td><html:text property="standardServerURL" /></td>
+			<td><fmt:message key="config.serverURL" /></td>
+			<td><html:text property="serverURL" /></td>
 		</tr>
-		<tr>
-			<td><fmt:message key="config.enterpriseServerURL" /></td>
-			<td><html:text property="enterpriseServerURL" /></td>
-		</tr>
-		<tr>
-			<td><fmt:message key="config.adminPassword" /></td>
-			<td><html:text property="adminPassword" /></td>
-		</tr>
-
 	</table>
 
 	<div class="align-right"><html:submit styleClass="button">

@@ -162,13 +162,13 @@ public interface IDimdimService {
      * @param key
      */
     DimdimConfig getConfig(String key);
-    
+
     /**
      * 
      * @param key
      */
     String getConfigValue(String key);
-    
+
     /**
      * 
      * @param key
@@ -178,6 +178,7 @@ public interface IDimdimService {
 
     /**
      * Start a standard meeting
+     * 
      * @param userDTO
      * @param meetingKey
      * @param maxAttendeeMikes
@@ -189,37 +190,32 @@ public interface IDimdimService {
 
     /**
      * Join a standard meeting
+     * 
      * @param userDTO
      * @param meetingKey
      * @return Meeting url
      */
     String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey) throws Exception;
 
-    /**
-     * Create a user on an enterprise server
-     * @param toolSessionID
-     * @return Return code
-     */
-    public String createUser(Long toolSessionID) throws Exception;
-
-    
-    /**
-     * Start an enterprise meeting.
-     * @param username
-     * @param password
-     * @param returnURL
-     * @param maxAttendeeMikes
-     * @return Meeting url
-     * @throws Exception
-     */
-    public String startAction(String username, String password, String returnURL,
-	    Integer maxAttendeeMikes) throws Exception;
-    
-    /**
-     * Join an enterprise meeting.
-     * @param userDTO
-     * @return Meeting url
-     */
-    public String joinMeeting(DimdimUser user) throws Exception;
+    // /**
+    // * Start an enterprise meeting.
+    // *
+    // * @param username
+    // * @param password
+    // * @param returnURL
+    // * @param maxAttendeeMikes
+    // * @return Meeting url
+    // * @throws Exception
+    // */
+    // public String startAction(UserDTO user, Long toolSessionId, String returnURL, Integer maxAttendeeMikes)
+    // throws Exception;
+    //
+    // /**
+    // * Join an enterprise meeting.
+    // *
+    // * @param userDTO
+    // * @return Meeting url
+    // */
+    // public String joinMeeting(DimdimUser user) throws Exception;
 
 }

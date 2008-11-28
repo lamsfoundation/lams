@@ -73,9 +73,7 @@ public class AdminAction extends MappingDispatchAction {
 
 	ConfigDTO configDTO = new ConfigDTO();
 
-	configDTO.setStandardServerURL(dimdimService.getConfigValue(Constants.CFG_STANDARD_SERVER_URL));
-	configDTO.setEnterpriseServerURL(dimdimService.getConfigValue(Constants.CFG_ENTERPRISE_SERVER_URL));
-	configDTO.setAdminPassword(dimdimService.getConfigValue(Constants.CFG_ADMIN_PASSWORD));
+	configDTO.setServerURL(dimdimService.getConfigValue(Constants.CFG_SERVER_URL));
 	configDTO.setVersion(dimdimService.getConfigValue(Constants.CFG_VERSION));
 
 	request.setAttribute(Constants.ATTR_CONFIG_DTO, configDTO);
@@ -87,9 +85,7 @@ public class AdminAction extends MappingDispatchAction {
 
 	AdminForm adminForm = (AdminForm) form;
 
-	adminForm.setStandardServerURL(dimdimService.getConfigValue(Constants.CFG_STANDARD_SERVER_URL));
-	adminForm.setEnterpriseServerURL(dimdimService.getConfigValue(Constants.CFG_ENTERPRISE_SERVER_URL));
-	adminForm.setAdminPassword(dimdimService.getConfigValue(Constants.CFG_ADMIN_PASSWORD));
+	adminForm.setServerURL(dimdimService.getConfigValue(Constants.CFG_SERVER_URL));
 	adminForm.setVersion(dimdimService.getConfigValue(Constants.CFG_VERSION));
 
 	String version = adminForm.getVersion();
@@ -115,9 +111,7 @@ public class AdminAction extends MappingDispatchAction {
 		updateConfig(Constants.CFG_VERSION, adminForm.getVersion());
 	    }
 
-	    updateConfig(Constants.CFG_STANDARD_SERVER_URL, adminForm.getStandardServerURL());
-	    updateConfig(Constants.CFG_ENTERPRISE_SERVER_URL, adminForm.getEnterpriseServerURL());
-	    updateConfig(Constants.CFG_ADMIN_PASSWORD, adminForm.getAdminPassword());
+	    updateConfig(Constants.CFG_SERVER_URL, adminForm.getServerURL());
 
 	}
 

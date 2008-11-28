@@ -55,10 +55,7 @@ VALUES(
 );
 
 -- default configuration values
-INSERT INTO tl_laddim10_config (config_key, config_value) VALUES ("standard_server_url", "http://172.20.100.253/");
-INSERT INTO tl_laddim10_config (config_key, config_value) VALUES ("enterprise_server_url", "http://209.217.107.183/");
-INSERT INTO tl_laddim10_config (config_key, config_value) VALUES ("admin_login", "Administrator");
--- INSERT INTO tl_laddim10_config (config_key, config_value) VALUES ("admin_password", "dimdim123");
+INSERT INTO tl_laddim10_config (config_key, config_value) VALUES ("server_url", "http://172.20.100.253/");
 -- INSERT INTO tl_laddim10_config (config_key, config_value) VALUES ("version", "enterprise");
 
 

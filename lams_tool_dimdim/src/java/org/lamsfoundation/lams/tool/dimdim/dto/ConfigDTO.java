@@ -26,37 +26,19 @@ package org.lamsfoundation.lams.tool.dimdim.dto;
 
 public class ConfigDTO {
 
-    String adminPassword;
-    String enterpriseServerURL;
-    String standardServerURL;
+    String serverURL;
+
     String version;
 
-    public String getAdminPassword() {
-	return adminPassword;
+    public String getServerURL() {
+        return serverURL;
     }
-
-    public String getEnterpriseServerURL() {
-	return enterpriseServerURL;
-    }
-
-    public String getStandardServerURL() {
-	return standardServerURL;
-    }
-
     public String getVersion() {
 	return version;
     }
 
-    public void setAdminPassword(String adminPassword) {
-	this.adminPassword = adminPassword;
-    }
-
-    public void setEnterpriseServerURL(String enterpriseServerURL) {
-	this.enterpriseServerURL = enterpriseServerURL;
-    }
-
-    public void setStandardServerURL(String standardServerURL) {
-	this.standardServerURL = standardServerURL;
+    public void setServerURL(String serverURL) {
+        this.serverURL = serverURL;
     }
 
     public void setVersion(String version) {

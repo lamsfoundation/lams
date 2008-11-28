@@ -24,7 +24,6 @@
 
 package org.lamsfoundation.lams.tool.dimdim.util;
 
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,8 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class DimdimUtil {
 
-    public static String generateMeetingKey() {
-	return new Long(System.currentTimeMillis()).toString() + "-" + (new Random().nextInt());
+    public static String getMeetingKey(Long toolSessionId) {
+	return "dimdim_" + toolSessionId;
     }
 
     public static String getReturnURL(HttpServletRequest request) {
@@ -56,7 +55,6 @@ public class DimdimUtil {
 
     // helper functions to extract info from json response.
 
-
     // get return code -- enterprise version
     private static Pattern patternCode = Pattern.compile("code:\"(.*?)\"");
 
@@ -75,20 +73,11 @@ public class DimdimUtil {
 	return matcher.group(1);
     }
 
-    // enterprise version
-    private static Pattern patternEnterpriseURL = Pattern.compile("data:\\{text:\"(.*?)\"");
-
-    public static String getEnterpriseURL(String json) {
-	Matcher matcherUrl = patternEnterpriseURL.matcher(json);
-	matcherUrl.find();
-	return matcherUrl.group(1);
-    }
-
     // standard version
-    private static Pattern patternStandardURL = Pattern.compile("url:\"(.*?)\"");
+    private static Pattern patternURL = Pattern.compile("url:\"(.*?)\"");
     
-    public static String getStandardURL(String response) throws Exception {
-	Matcher matcher = patternStandardURL.matcher(response);
+    public static String getURL(String response) throws Exception {
+	Matcher matcher = patternURL.matcher(response);
 	matcher.find();
 	return matcher.group(1);
     }

@@ -10,16 +10,8 @@
 		<td><c:out value="${configDTO.version}" /></td>
 	</tr>
 	<tr>
-		<td><fmt:message key="config.standardServerURL" /></td>
-		<td><c:out value="${configDTO.standardServerURL}" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="config.enterpriseServerURL" /></td>
-		<td><c:out value="${configDTO.enterpriseServerURL}" /></td>
-	</tr>
-	<tr>
-		<td><fmt:message key="config.adminPassword" /></td>
-		<td><c:out value="${configDTO.adminPassword}" /></td>
+		<td><fmt:message key="config.serverURL" /></td>
+		<td><c:out value="${configDTO.serverURL}" /></td>
 	</tr>
 </table>
 

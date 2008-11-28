@@ -41,9 +41,7 @@ public final class Constants {
     public static final String ATTR_USER_DTO = "userDTO";
 
     // Configuration keys
-    public static final String CFG_ADMIN_PASSWORD = "admin_password";
-    public static final String CFG_ENTERPRISE_SERVER_URL = "enterprise_server_url";
-    public static final String CFG_STANDARD_SERVER_URL = "standard_server_url";
+    public static final String CFG_SERVER_URL = "server_url";
     public static final String CFG_VERSION = "version";
     public static final String CFG_VERSION_ENTERPRISE = "enterprise";
     public static final String CFG_VERSION_STANDARD = "standard";

@@ -43,42 +43,22 @@ public class AdminForm extends ActionForm {
 
     private static final long serialVersionUID = 8367278543453322252L;
 
-    // Fields
-
-    private String adminPassword;
-
-    private String enterpriseServerURL;
-
-    private String standardServerURL;
+    private String serverURL;
 
     private String version;
 
-    public String getAdminPassword() {
-	return adminPassword;
-    }
+    // Fields
 
-    public String getEnterpriseServerURL() {
-	return enterpriseServerURL;
-    }
-
-    public String getStandardServerURL() {
-	return standardServerURL;
+    public String getServerURL() {
+	return serverURL;
     }
 
     public String getVersion() {
 	return version;
     }
 
-    public void setAdminPassword(String adminPassword) {
-	this.adminPassword = adminPassword;
-    }
-
-    public void setEnterpriseServerURL(String enterpriseServerURL) {
-	this.enterpriseServerURL = enterpriseServerURL;
-    }
-
-    public void setStandardServerURL(String standardServerURL) {
-	this.standardServerURL = standardServerURL;
+    public void setServerURL(String serverURL) {
+	this.serverURL = serverURL;
     }
 
     public void setVersion(String version) {
@@ -92,29 +72,17 @@ public class AdminForm extends ActionForm {
 
 	MessageResources resources = MessageResources.getMessageResources(Constants.APP_RESOURCES);
 
-	if (this.version.equals(Constants.CFG_VERSION_STANDARD)) {
-	    // check standard options
-	    if (StringUtils.isBlank(this.standardServerURL)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
-			.getMessage("config.standardServerURL")));
-	    }
-
-	} else if (this.version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
-	    // check enterprise options
-
-	    if (StringUtils.isBlank(this.enterpriseServerURL)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
-			.getMessage("config.enterpriseServerURL")));
-	    }
-
-	    if (StringUtils.isBlank(this.adminPassword)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
-			.getMessage("config.adminPassword")));
-	    }
-	} else {
+	if (!this.version.equals(Constants.CFG_VERSION_STANDARD)
+		&& !this.version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
 		    .getMessage("config.version")));
 	}
+
+	if (StringUtils.isBlank(this.serverURL)) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
+		    .getMessage("config.serverURL")));
+	}
+
 	return errors;
     }
 
