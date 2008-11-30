@@ -228,6 +228,39 @@
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
+		<action path="/monitoring/imageSummary"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
+			parameter="imageSummary"
+			name="imageGalleryItemForm" 
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/pages/monitoring/imagesummary.jsp" />
+		</action>
+		<action path="/monitoring/updateImage"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
+			parameter="updateImage"
+			name="imageGalleryItemForm" 
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/pages/monitoring/start.jsp" />
+		</action>
+		<action path="/monitoring/editComment"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
+			parameter="editComment"
+			name="imageCommentForm" 
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/pages/monitoring/parts/editcomment.jsp" />
+		</action>
+		<action path="/monitoring/saveComment"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
+			parameter="saveComment"
+			name="imageCommentForm" 
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/pages/monitoring/parts/editcomment.jsp" />
+			<forward name="success" path="/pages/monitoring/imagesummary.jsp" />
+		</action>		
 		<action path="/monitoring/listuser"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
 			parameter="listuser" >

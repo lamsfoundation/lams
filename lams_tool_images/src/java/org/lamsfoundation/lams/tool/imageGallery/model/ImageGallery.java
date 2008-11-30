@@ -66,8 +66,6 @@ public class ImageGallery implements Cloneable {
 
     private boolean allowVote;
     
-    private Long votedImageUid;
-
     private boolean allowCommentImages;
 
     private boolean allowShareImages;
@@ -515,18 +513,6 @@ public class ImageGallery implements Cloneable {
 
     public void setAllowVote(boolean allowVote) {
 	this.allowVote = allowVote;
-    }
-    
-    /**
-     * @hibernate.property column="voted_image_uid"
-     * @return
-     */
-    public Long getVotedImageUid() {
-	return votedImageUid;
-    }
-
-    public void setVotedImageUid(Long votedImageUid) {
-	this.votedImageUid = votedImageUid;
     }
         
     public List<ImageGalleryAttachment> getOfflineFileList() {

@@ -350,6 +350,9 @@ public class LearningAction extends Action {
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 	IImageGalleryService service = getImageGalleryService();
 	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);	
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
+
 	
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
@@ -368,15 +371,13 @@ public class LearningAction extends Action {
 	}
 
 	if (imageGallery.isAllowRank()) {
-	    UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	    ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
 	    ImageRating imageRating = service.getImageRatingByImageAndUser(imageUid, imageGalleryUser.getUserId());
 	    int rating = (imageRating == null) ? 0 : imageRating.getRating();
 	    sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_RATING, rating);	    
 	}
 
 	if (imageGallery.isAllowVote()) {
-	    sessionMap.put(ImageGalleryConstants.PARAM_VOTED_IMAGE_UID, imageGallery.getVotedImageUid());	    
+	    sessionMap.put(ImageGalleryConstants.PARAM_VOTED_IMAGE_UID, imageGalleryUser.getVotedImageUid());	    
 	}
 	
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -503,13 +504,14 @@ public class LearningAction extends Action {
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 	IImageGalleryService service = getImageGalleryService();
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
 
 	//persist ImageGalleryItem changes in DB
 	boolean vote = (((ImageRatingForm)form).getVote());
 	Long votedImageUid = vote ? imageUid : 0;
-	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);	
-	imageGallery.setVotedImageUid(votedImageUid);
-	service.saveOrUpdateImageGallery(imageGallery);	
+	imageGalleryUser.setVotedImageUid(votedImageUid);
+	service.saveUser(imageGalleryUser);	
 	
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
@@ -626,7 +628,7 @@ public class LearningAction extends Action {
 	if (imageGalleryUser == null) {
 	    ImageGallerySession session = service.getImageGallerySessionBySessionId(sessionId);
 	    imageGalleryUser = new ImageGalleryUser(user, session);
-	    service.createUser(imageGalleryUser);
+	    service.saveUser(imageGalleryUser);
 	}
 	return imageGalleryUser;
     }

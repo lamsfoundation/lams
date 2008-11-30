@@ -48,7 +48,7 @@ public class ImageGalleryItemVisitDAOHibernate extends BaseDAOHibernate implemen
 	    + ImageGallery.class.getName() + "  as r " + " where v.sessionId = s.sessionId "
 	    + " and s.imageGallery.uid = r.uid " + " and r.contentId =? "
 	    + " group by v.sessionId, v.imageGalleryItem.uid ";
-
+    
     public ImageGalleryItemVisitLog getImageGalleryItemLog(Long itemUid, Long userId) {
 	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
 	if (list == null || list.size() == 0)

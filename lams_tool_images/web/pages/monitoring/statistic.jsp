@@ -22,9 +22,6 @@
 					</td>
 				</tr>
 				<tr>
-					<th width="20%" align="center">
-						<fmt:message key="monitoring.label.type" />
-					</th>
 					<th width="35%">
 						<fmt:message key="monitoring.label.title" />
 					</th>
@@ -47,22 +44,6 @@
 			</c:if>
 			<c:if test="${item.itemUid != -1}">
 				<tr>
-					<td>
-						<c:choose>
-							<c:when test="${item.itemType == 1}">
-								<fmt:message key="label.authoring.basic.resource.url" />
-							</c:when>
-							<c:when test="${item.itemType == 2}">
-								<fmt:message key="label.authoring.basic.resource.image" />
-							</c:when>
-							<c:when test="${item.itemType == 3}">
-								<fmt:message key="label.authoring.basic.resource.website" />
-							</c:when>
-							<c:when test="${item.itemType == 4}">
-								<fmt:message key="label.authoring.basic.resource.learning.object" />
-							</c:when>
-						</c:choose>
-					</td>
 					<td>
 						${item.itemTitle}
 					</td>

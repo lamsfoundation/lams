@@ -37,7 +37,6 @@ create table tl_laimag10_imageGallery (
    allow_comment_images tinyint,
    allow_share_images tinyint,
    allow_vote tinyint,
-   voted_image_uid bigint DEFAULT 0,
    reflect_instructions varchar(255), 
    reflect_on_activity smallint,
    allow_rank tinyint,
@@ -107,6 +106,7 @@ create table tl_laimag10_user (
    session_finished smallint,
    session_uid bigint,
    imageGallery_uid bigint,
+   voted_image_uid bigint DEFAULT 0,
    primary key (uid)
 )type=innodb;
 create table tl_laimag10_configuration (

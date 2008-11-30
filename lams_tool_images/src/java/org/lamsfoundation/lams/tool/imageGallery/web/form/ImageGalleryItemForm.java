@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.imageGallery.web.form;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 
 /**
  * ImageGallery Item Form.
@@ -48,30 +49,9 @@ public class ImageGalleryItemForm extends ActionForm {
     private String fileName;
     private FormFile file;
 
-    public String getDescription() {
-	return description;
-    }
-
-    public void setDescription(String description) {
-	this.description = description;
-    }
-
-    public FormFile getFile() {
-	return file;
-    }
-
-    public void setFile(FormFile file) {
-	this.file = file;
-    }
-
-    public String getTitle() {
-	return title;
-    }
-
-    public void setTitle(String title) {
-	this.title = title;
-    }
-
+    //used only in monitoring
+    private String imageUid;
+    
     /**
      * Returns ImageGallery order index.
      * 
@@ -85,10 +65,42 @@ public class ImageGalleryItemForm extends ActionForm {
      * Sets ImageGallery order index.
      * 
      * @param imageIndex
-     *                ImageGallery order index
+     *            ImageGallery order index
      */
     public void setImageIndex(String imageIndex) {
 	this.imageIndex = imageIndex;
+    }
+    
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
+
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
+
+    public String getMode() {
+	return mode;
+    }
+
+    public void setMode(String mode) {
+	this.mode = mode;
+    }
+    
+    public String getTitle() {
+	return title;
+    }
+
+    public void setTitle(String title) {
+	this.title = title;
+    }
+    
+    public String getDescription() {
+	return description;
+    }
+
+    public void setDescription(String description) {
+	this.description = description;
     }
 
     public String getFileName() {
@@ -123,19 +135,19 @@ public class ImageGalleryItemForm extends ActionForm {
 	this.hasFile = hasFile;
     }
 
-    public String getSessionMapID() {
-	return sessionMapID;
+    public FormFile getFile() {
+	return file;
     }
 
-    public void setSessionMapID(String sessionMapID) {
-	this.sessionMapID = sessionMapID;
+    public void setFile(FormFile file) {
+	this.file = file;
+    }
+    
+    public String getImageUid() {
+	return imageUid;
     }
 
-    public String getMode() {
-	return mode;
-    }
-
-    public void setMode(String mode) {
-	this.mode = mode;
+    public void setImageUid(String imageUid) {
+	this.imageUid = imageUid;
     }
 }

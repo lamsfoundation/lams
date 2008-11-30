@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
  * <li>User.login_name</li>
  * <li>count(imageGallery_item_uid)</li>
  * 
- * @author Steve.Ni
+ * @author Andrey Balan
  * 
  * @version $Revision$
  */
@@ -48,11 +48,13 @@ public class Summary {
     private Long sessionId;
     private String sessionName;
     private Long itemUid;
+    private ImageGalleryItem item;
     private boolean itemCreateByAuthor;
     private boolean itemHide;
     private String itemTitle;
     private String username;
     private int viewNumber;
+    private int numberOfVotes;
 
     // following is used for export portfolio programs:
     private Long fileUuid;
@@ -80,6 +82,7 @@ public class Summary {
 	this.sessionName = sessionName;
 	if (item != null) {
 	    this.itemUid = item.getUid();
+	    this.item = item;
 	    this.itemCreateByAuthor = item.isCreateByAuthor();
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
@@ -106,6 +109,7 @@ public class Summary {
 	this.sessionName = sessionName;
 	if (item != null) {
 	    this.itemUid = item.getUid();
+	    this.item = item;	    
 	    this.itemCreateByAuthor = item.isCreateByAuthor();
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
@@ -151,6 +155,14 @@ public class Summary {
     public void setItemUid(Long itemUid) {
 	this.itemUid = itemUid;
     }
+    
+    public ImageGalleryItem getItem() {
+	return item;
+    }
+
+    public void setItem(ImageGalleryItem item) {
+	this.item = item;
+    }
 
     public Long getSessionId() {
 	return sessionId;
@@ -183,6 +195,14 @@ public class Summary {
     public void setViewNumber(int viewNumber) {
 	this.viewNumber = viewNumber;
     }
+    
+    public int getNumberOfVotes() {
+	return numberOfVotes;
+    }
+
+    public void setNumberOfVotes(int numberOfVotes) {
+	this.numberOfVotes = numberOfVotes;
+    }    
 
     public Long getFileUuid() {
 	return fileUuid;

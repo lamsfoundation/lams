@@ -69,7 +69,7 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 	var params = tb_parseQuery( queryString );
 
 
-		if((!params['modal'])){//code to show images
+		if((!params['TB_iframe'])){//code to show images
 
 			TB_PrevCaption = "";
 			TB_PrevURL = "";
@@ -200,11 +200,16 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			if(url.indexOf('TB_iframe') != -1){// either iframe or ajax window		
 					urlNoQuery = url.split('TB_');
 					$("#TB_iframeContent").remove();
+					
+					var resize = "";
+					if(params['resizeIframe']){
+						resize = "resizeIframe();"
+					}
 					if(params['modal'] != "true"){//iframe no modal
-						$("#TB_window").append("<div id='TB_title'><div id='TB_ajaxWindowTitle'>"+caption+"</div><div id='TB_closeAjaxWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div></div><iframe frameborder='0' hspace='0' src='"+urlNoQuery[0]+"' id='TB_iframeContent' name='TB_iframeContent"+Math.round(Math.random()*1000)+"' onload='tb_showIframe()' style='width:"+(ajaxContentW + 29)+"px;height:"+(ajaxContentH + 17)+"px;' > </iframe>");
+						$("#TB_window").append("<div id='TB_title'><div id='TB_ajaxWindowTitle'>"+caption+"</div><div id='TB_closeAjaxWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div></div><iframe frameborder='0' hspace='0' src='"+urlNoQuery[0]+"' id='TB_iframeContent' name='TB_iframeContent"+Math.round(Math.random()*1000)+"' onload='resizeIframe();tb_showIframe();' style='width:"+(ajaxContentW + 29)+"px;height:"+(ajaxContentH + 17)+"px;' > </iframe>");
 					}else{//iframe modal
 					$("#TB_overlay").unbind();
-						$("#TB_window").append("<iframe frameborder='0' hspace='0' src='"+urlNoQuery[0]+"' id='TB_iframeContent' name='TB_iframeContent"+Math.round(Math.random()*1000)+"' onload='tb_showIframe()' style='width:"+(ajaxContentW + 29)+"px;height:"+(ajaxContentH + 17)+"px;'> </iframe>");
+						$("#TB_window").append("<iframe frameborder='0' hspace='0' src='"+urlNoQuery[0]+"' id='TB_iframeContent' name='TB_iframeContent"+Math.round(Math.random()*1000)+"' onload='"+resize+"tb_showIframe();' style='width:"+(ajaxContentW + 29)+"px;height:"+(ajaxContentH + 17)+"px;'> </iframe>");
 					}
 			}else{// not an iframe, ajax
 					if($("#TB_window").css("display") != "block"){

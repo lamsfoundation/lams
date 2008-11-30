@@ -197,14 +197,6 @@
         />
 
         <property
-            name="votedImageUid"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="voted_image_uid"
-        />
-
-        <property
             name="reflectInstructions"
             type="java.lang.String"
             update="true"

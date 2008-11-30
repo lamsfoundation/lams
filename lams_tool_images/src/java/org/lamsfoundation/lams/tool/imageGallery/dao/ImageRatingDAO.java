@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 public interface ImageRatingDAO extends DAO {
     
 	/**
-	 * Return imageRating by the given imageUid.
+	 * Return imageRating by the given imageUid and userId.
 	 * @param imageUid
 	 * @param userId 
 	 * @return

@@ -34,4 +34,6 @@ public interface ImageGalleryUserDAO extends DAO {
 	ImageGalleryUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
 	List<ImageGalleryUser> getBySessionID(Long sessionId);
+	
+	int getNumberOfVotes(Long votedImageUid, Long sessionId);
 }

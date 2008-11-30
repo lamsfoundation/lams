@@ -18,10 +18,15 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.tool.imageGallery.dao;  
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.imageGallery.dao;
+
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 
 /**
  * DAO interface for <code>ImageComment</code>.
@@ -31,5 +36,13 @@ package org.lamsfoundation.lams.tool.imageGallery.dao;
  */
 public interface ImageCommentDAO extends DAO {
 
+    /**
+     * Return imageComment by the given commentUid.
+     * 
+     * @param commentUid
+     * @param userId
+     * @return
+     */
+    public ImageComment getCommentByUid(Long commentUid);
+
 }
- 

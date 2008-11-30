@@ -42,6 +42,7 @@ public class ImageCommentForm extends ActionForm {
     private ImageGalleryItem image;
     private String sessionMapID;
     private String comment;
+    private String commentUid;
     
     public void reset(ActionMapping mapping, HttpServletRequest request){
 	comment = "";
@@ -80,6 +81,14 @@ public class ImageCommentForm extends ActionForm {
 
     public void setComment(String comment) {
 	this.comment = comment;
+    }
+    
+    public String getCommentUid() {
+	return commentUid;
+    }
+
+    public void setCommentUid(String commentUid) {
+	this.commentUid = commentUid;
     }
 }
 

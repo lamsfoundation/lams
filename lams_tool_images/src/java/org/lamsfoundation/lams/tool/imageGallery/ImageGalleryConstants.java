@@ -61,9 +61,11 @@ public class ImageGalleryConstants {
     public static final String ATT_LEARNING_OBJECT = "cpPackage";
     public static final String ATTR_RESOURCE_REVIEW_URL = "imageGalleryItemReviewUrl";
     public static final String ATTR_RESOURCE = "imageGallery";
+    public static final String ATTR_IMAGE = "image";
     public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
     public static final String ATTR_SUMMARY_LIST = "summaryList";
+    public static final String ATTR_IMAGE_SUMMARY = "imageSummary";
     public static final String ATTR_USER_LIST = "userList";
     public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";
     public static final String ATTR_FINISH_LOCK = "finishedLock";
@@ -75,6 +77,7 @@ public class ImageGalleryConstants {
     public static final String ATTR_TITLE = "title";
     public static final String ATTR_INSTRUCTIONS = "instructions";
     public static final String ATTR_USER_FINISHED = "userFinished";
+    public static final String ATTR_COMMENT_UID = "commentUid";
     public static final String ATTR_COMMENT = "comment";
     public static final String ATTR_CURRENT_IMAGE_UID = "currentImageUid";
     public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";

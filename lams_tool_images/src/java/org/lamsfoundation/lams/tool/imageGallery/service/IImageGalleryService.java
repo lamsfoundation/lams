@@ -32,6 +32,8 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
+import org.lamsfoundation.lams.tool.imageGallery.dto.UserImageContributionDTO;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryAttachment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryConfigItem;
@@ -88,7 +90,7 @@ public interface IImageGalleryService {
     /**
      * Create a new user in database.
      */
-    void createUser(ImageGalleryUser imageGalleryUser);
+    void saveUser(ImageGalleryUser imageGalleryUser);
 
     /**
      * Get user by given userID and toolContentID.
@@ -169,6 +171,21 @@ public interface IImageGalleryService {
      * @return
      */
     ImageGallery getImageGalleryBySessionId(Long sessionId);
+    
+    /**
+     * Get imageComment by the given uid.
+     * 
+     * @param commentUid
+     * @return
+     */
+    ImageComment getImageCommentByUid(Long commentUid);
+    
+    /**
+     * Updates imageComment by the given uid.
+     * 
+     * @param comment
+     */
+    void updateImageComment(ImageComment comment);
 
     /**
      * Get imageGallery toolSession by toolSessionId
@@ -222,6 +239,15 @@ public interface IImageGalleryService {
      * @return
      */
     List<List<Summary>> getSummary(Long contentId);
+
+    /**
+     * Return monitoring image summary. The return value is list of UserImageContributionDTOs for each groups.
+     * 
+     * @param contentId
+     * @param imageUid
+     * @return
+     */
+    List<List<UserImageContributionDTO>> getImageSummary(Long contentId, Long imageUid);
 
     List<ImageGalleryUser> getUserListBySessionItem(Long sessionId, Long itemUid);
 

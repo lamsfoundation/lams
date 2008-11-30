@@ -28,30 +28,40 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryUserDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 
+public class ImageGalleryUserDAOHibernate extends BaseDAOHibernate implements ImageGalleryUserDAO {
 
-public class ImageGalleryUserDAOHibernate extends BaseDAOHibernate implements ImageGalleryUserDAO{
-	
-	private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ImageGalleryUser.class.getName() + " as u where u.userId =? and u.imageGallery.contentId=?";
-	private static final String FIND_BY_USER_ID_SESSION_ID = "from " + ImageGalleryUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
-	private static final String FIND_BY_SESSION_ID = "from " + ImageGalleryUser.class.getName() + " as u where u.session.sessionId=?";
+    private static final String FIND_BY_USER_ID_CONTENT_ID = "from " + ImageGalleryUser.class.getName()
+	    + " as u where u.userId =? and u.imageGallery.contentId=?";
+    private static final String FIND_BY_USER_ID_SESSION_ID = "from " + ImageGalleryUser.class.getName()
+	    + " as u where u.userId =? and u.session.sessionId=?";
+    private static final String FIND_BY_SESSION_ID = "from " + ImageGalleryUser.class.getName()
+	    + " as u where u.session.sessionId=?";
+    private static final String FIND_COUNT_OF_VOTES = "select count(*) from "
+	    + ImageGalleryUser.class.getName() + " as u where  u.votedImageUid =? and u.session.sessionId=?";
 
-	public ImageGalleryUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID,new Object[]{userID,sessionId});
-		if(list == null || list.size() == 0)
-			return null;
-		return (ImageGalleryUser) list.get(0);
-	}
+    public ImageGalleryUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
+	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
+	if (list == null || list.size() == 0)
+	    return null;
+	return (ImageGalleryUser) list.get(0);
+    }
 
-	public ImageGalleryUser getUserByUserIDAndContentID(Long userId, Long contentId) {
-		List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID,new Object[]{userId,contentId});
-		if(list == null || list.size() == 0)
-			return null;
-		return (ImageGalleryUser) list.get(0);
-	}
+    public ImageGalleryUser getUserByUserIDAndContentID(Long userId, Long contentId) {
+	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
+	if (list == null || list.size() == 0)
+	    return null;
+	return (ImageGalleryUser) list.get(0);
+    }
 
-	public List<ImageGalleryUser> getBySessionID(Long sessionId) {
-		return this.getHibernateTemplate().find(FIND_BY_SESSION_ID,sessionId);
-	}
-
+    public List<ImageGalleryUser> getBySessionID(Long sessionId) {
+	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
+    }
+    
+    public int getNumberOfVotes(Long votedImageUid, Long sessionId) {
+	List list = getHibernateTemplate().find(FIND_COUNT_OF_VOTES, new Object[] {votedImageUid, sessionId});
+	if (list == null || list.size() == 0)
+	    return 0;
+	return ((Number) list.get(0)).intValue();
+    }
 
 }
