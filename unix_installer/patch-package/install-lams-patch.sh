@@ -253,7 +253,13 @@ else
 fi
 
 printf "\nUpdating database...\n"
-ant/bin/ant -logfile update_db.log -buildfile ant-scripts/update_db.xml update_db
+if [ $USE_ETC_PROPERTIES -ne 1 ]
+then 
+	ant/bin/ant -logfile update_db.log -buildfile ant-scripts/update_db.xml -Dpropertiesfile=../lams.properties update_db
+else
+	ant/bin/ant -logfile update_db.log -buildfile ant-scripts/update_db.xml -Dpropertiesfile=/etc/lams2/lams.properties update_db
+fi
+
 if [  "$?" -ne  "0" ]
 then
 	printf "\nDatabase update failed, check update_db.log."
