@@ -180,9 +180,6 @@ Ant build file.
 				<include name="struts/*" />
 				<include name="tags/*.tag" />
 			</webinf>
-			<lib dir="${build.lib}">
-				<include name="${product}.jar" />
-			</lib>
 			<fileset dir="${conf.web.dir}">
 				<include name="*" />
 				<include name="common/**" />
