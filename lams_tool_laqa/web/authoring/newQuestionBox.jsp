@@ -91,10 +91,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						}
 					}
 
-					var heightOffSet = 180;
+					var heightOffSet = 0;
 					$(document).ready(function() {
 						$("a#gwizard").click(function() {
-							$("div.wizard").toggle("fast");
+							$("div.wizard").toggle();
+							
+							if (heightOffSet == 0)
+							{
+								heightOffSet = document.getElementById('wizardDiv').offsetHeight;
+							}
 							window.top.resizeIframe(heightOffSet,0);
 							heightOffSet = heightOffSet * -1;
 						});
@@ -141,7 +146,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			<c:if test="${wizardEnabled == true}">
 				<a style="float:right;" id="gwizard" href="#"><fmt:message key="wizard.author.wizardTitle" /></a>
-				<div class="wizard" style="display:none;">
+				<div class="wizard" id="wizardDiv" style="display:none;">
 					<h3>
 						<fmt:message key="wizard.author.wizardTitle" />
 					</h3>
