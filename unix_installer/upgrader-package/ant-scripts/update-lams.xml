@@ -218,6 +218,9 @@
     	<antcall target="deploy-new-tool">
     	   	<param name="signature" value="lawiki10"/>
     	</antcall>
+    	<antcall target="deploy-new-tool">
+    	   	<param name="signature" value="laddim10"/>
+    	</antcall>
     	<!-- ============= 2.2 Tools ============== -->
     	
     	<antcall target="compress-wars"/>
