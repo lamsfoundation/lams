@@ -660,9 +660,28 @@ Function PostMySQLConfig
         !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_HOST "mysql.ini" "Field 14" "State"
         !insertmacro MUI_INSTALLOPTIONS_READ $MYSQL_PORT "mysql.ini" "Field 16" "State"
         
+        
         #TODO should automatically check presence of database on remote computer
         ${if} $MYSQL_HOST != 'localhost'
-            MessageBox MB_OK|MB_ICONINFORMATION  "Please ensure that you have created the $DB_NAME database on your MySQL host $MYSQL_HOST before proceeding, otherwise the installation will not work."
+            ; check the length of the root password to see if we need it
+            StrLen $9 $MYSQL_ROOT_PASS
+       
+            ; TRY ACCESSING LAMS DATABASE USING USER
+            DetailPrint "Cannot access remote mysql using root user"
+            DetailPrint "Attempting to access LAMS database using LAMS user"
+            
+            StrCpy $0 '$MYSQL_DIR\bin\mysql -h$MYSQL_HOST -P$MYSQL_PORT -sN -u$DB_USER -p$DB_PASS -e "select 1" $DB_NAME' 
+            DetailPrint $0
+            nsExec::ExecToStack $0
+            Pop $0
+            Pop $1
+            ${If} $0 == 1
+                DetailPrint "Cannot access remote lams database using lams mysql user"
+                MessageBox MB_OK|MB_ICONINFORMATION  "Could not find '$DB_NAME' database on remote host using user '$DB_USER'. $\r$\n\
+                  Please ensure that you have created the $DB_NAME database on your MySQL host $MYSQL_HOST \
+                  and you have given the '$DB_USER' user remote permissions before proceeding."                
+                Abort
+            ${EndIf}
         ${endif}
         
         #Call CheckMySQL
@@ -676,7 +695,7 @@ Function PostMySQLConfig
         # Checking if the given database name already exists in the mysql database list
         ifFileExists "$MYSQL_DIR\data\$DB_NAME\*.*" continue NoDatabaseNameExists
         NoDatabaseNameExists:
-            MessageBox MB_OK|MB_ICONSTOP "Could not find database $DB_NAME. Please check your database settings and try again"
+                MessageBox MB_OK|MB_ICONSTOP "Could not find database $DB_NAME. Please check your database settings and try again"
             quit   
         continue:
         */
@@ -1502,6 +1521,13 @@ Function createAndDeployTools
     call deployTool
     call runUpdateToolContext
     
+    strcpy $TOOL_SIG "laddim10"
+    strcpy $TOOL_DIR "lams_tool_dimdim"
+    ;;call createNewToolPackage
+    call filterDeployXML
+    call deployTool
+    call runUpdateToolContext
+    
     strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-compress-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml compress-wars'
     DetailPrint $0
     nsExec::ExecToStack $0
@@ -1754,6 +1780,26 @@ Function createNewToolPackages
     
     SetoutPath "$1\build\deploy\language"
     File /r "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\deploy\language\*.properties"
+    
+    # --------------------------------------------------------------------------
+    
+    # Adding the dimdim package -------------------------------------------
+  
+    strcpy $1 "$TEMP\lams\laddim10"
+    
+    SetoutPath "$1"
+    File "${BASE_PROJECT_DIR}\lams_tool_dimdim\build.properties"
+    
+    SetoutPath "$1\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\deploy\deploy.xml"
+    
+    SetoutPath "$1\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\deploy\sql\*"
+    
+    SetoutPath "$1\build\deploy\language"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\deploy\language\*.properties"
     
     # --------------------------------------------------------------------------
 
@@ -2183,11 +2229,11 @@ Function ImportDatabase
     ${If} $MYSQL_HOST == 'localhost'
         # $9 == 0 for empty password
         StrLen $9 $MYSQL_ROOT_PASS
-        
-        StrCpy $0 '$MYSQL_DIR\bin\mysql -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8" -u root'
+    
+        StrCpy $0 '$MYSQL_DIR\bin\mysql -h$MYSQL_HOST -P$MYSQL_PORT -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8" -u root'
         DetailPrint $0
         ${If} $9 != 0
-            StrCpy $0 '$MYSQL_DIR\bin\mysql -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8" -u root -p$MYSQL_ROOT_PASS' 
+            StrCpy $0 '$MYSQL_DIR\bin\mysql -h$MYSQL_HOST -P$MYSQL_PORT -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8" -u root -p$MYSQL_ROOT_PASS' 
         ${EndIf}
         
         nsExec::ExecToStack $0
@@ -2197,10 +2243,10 @@ Function ImportDatabase
             goto error
         ${EndIf}
         
-        StrCpy $0 `$MYSQL_DIR\bin\mysql -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'" -u root`
+        StrCpy $0 `$MYSQL_DIR\bin\mysql -h$MYSQL_HOST -P$MYSQL_PORT -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'" -u root`
         DetailPrint $0
         ${If} $9 != 0
-            StrCpy $0 `$MYSQL_DIR\bin\mysql -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'" -u root -p$MYSQL_ROOT_PASS`
+            StrCpy $0 `$MYSQL_DIR\bin\mysql -h$MYSQL_HOST -P$MYSQL_PORT -e "GRANT ALL PRIVILEGES ON *.* TO $DB_USER@localhost IDENTIFIED BY '$DB_PASS'" -u root -p$MYSQL_ROOT_PASS`
         ${EndIf}
         nsExec::ExecToStack $0
         Pop $0
@@ -2209,10 +2255,10 @@ Function ImportDatabase
             goto error
         ${EndIf}
         
-        StrCpy $0 '$MYSQL_DIR\bin\mysql -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost" -u root'
+        StrCpy $0 '$MYSQL_DIR\bin\mysql -h$MYSQL_HOST -P$MYSQL_PORT -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost" -u root'
         DetailPrint $0
         ${If} $9 != 0
-            StrCpy $0 '$MYSQL_DIR\bin\mysql -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost" -u root -p$MYSQL_ROOT_PASS' 
+            StrCpy $0 '$MYSQL_DIR\bin\mysql -h$MYSQL_HOST -P$MYSQL_PORT -e "REVOKE PROCESS,SUPER ON *.* from $DB_USER@localhost" -u root -p$MYSQL_ROOT_PASS' 
         ${EndIf}
         nsExec::ExecToStack $0
         Pop $0
@@ -2221,10 +2267,10 @@ Function ImportDatabase
             goto error
         ${EndIf}
         
-        StrCpy $0 '$MYSQL_DIR\bin\mysqladmin flush-privileges -u root'
+        StrCpy $0 '$MYSQL_DIR\bin\mysqladmin -h$MYSQL_HOST -P$MYSQL_PORT flush-privileges -u root'
         DetailPrint $0
         ${If} $9 != 0
-            StrCpy $0 '$MYSQL_DIR\bin\mysqladmin flush-privileges -u root -p$MYSQL_ROOT_PASS' 
+            StrCpy $0 '$MYSQL_DIR\bin\mysqladmin -h$MYSQL_HOST -P$MYSQL_PORT flush-privileges -u root -p$MYSQL_ROOT_PASS' 
         ${EndIf}
         nsExec::ExecToStack $0
         Pop $0
