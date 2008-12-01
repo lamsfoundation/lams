@@ -169,6 +169,17 @@
                 <pathelement path="../bin:../tools/lib/mysql-connector-java-3.1.12-bin.jar"/>
             </classpath>
         </java>
+		
+        <sql driver="com.mysql.jdbc.Driver" 
+            classpath="../tools/lib/mysql-connector-java-3.1.12-bin.jar" 
+            url="${SQL_URL}" 
+            userid="${DB_USER}" 
+            password="${DB_PASS}"
+            encoding="utf8"
+            onerror="abort"
+            >
+            <transaction src="../sql-scripts/updateLocales.sql" />
+        </sql>
 
 		<!--
     	<ant antfile="language-pack.xml" output="../log/language-pack.log" target="update-languages" inheritAll="true">

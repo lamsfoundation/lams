@@ -116,6 +116,7 @@ Arabic (عربي) (Jordan)		ar_JO	RTL
 日本語 (Japanese)		ja_JP	LTR
 Malay (Malaysian)		ms_MY	LTR
 Русский (Russian)		ru_RU	LTR
+Türkçe (Turkish)		tr_TR	LTR
 
 
 4. Setting up MySql on a Different Server
