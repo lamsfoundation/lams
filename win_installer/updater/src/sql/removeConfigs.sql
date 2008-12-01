@@ -17,14 +17,14 @@ delete from lams_qtz_SIMPLE_TRIGGERS;
 delete from lams_qtz_TRIGGERS;
 delete from lams_qtz_JOB_DETAILS;
 
--- From 2.2 onwards. WINDOWS ONLY. Make sure quatz tables are set as capitals
+-- From 2.2 onwards. WINDOWS ONLY. Make sure quartz tables are set as capitals
 rename table lams_qtz_blob_triggers to lams_qtz_BLOB_TRIGGERS;
 rename table lams_qtz_calendars to lams_qtz_CALENDARS;
 rename table lams_qtz_cron_triggers to lams_qtz_CRON_TRIGGERS;
 rename table lams_qtz_fired_triggers to lams_qtz_FIRED_TRIGGERS;
 rename table lams_qtz_job_details to lams_qtz_JOB_DETAILS;
 rename table lams_qtz_job_listeners to lams_qtz_JOB_LISTENERS;
-rename table lams_qtz_locks to ams_qtz_LOCKS;
+rename table lams_qtz_locks to lams_qtz_LOCKS;
 rename table lams_qtz_paused_trigger_grps to lams_qtz_PAUSED_TRIGGER_GRPS;
 rename table lams_qtz_scheduler_state to lams_qtz_SCHEDULER_STATE;
 rename table lams_qtz_simple_triggers to lams_qtz_SIMPLE_TRIGGERS;

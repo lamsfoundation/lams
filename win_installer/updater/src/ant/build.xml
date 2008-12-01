@@ -84,7 +84,17 @@
 			encoding="utf8">
 			<transaction src="${TEMP}/dump.sql" />
 			<transaction src="${TEMP}/lams/update_lams_configuration.sql" />
-			<transaction src="${TEMP}/lams/removeConfigs.sql" />
 		</sql>
-	</target>	
+		
+		<!-- Make this script failable -->
+        <sql driver="com.mysql.jdbc.Driver" 
+            classpath="${EARDIR}/mysql-connector-java-3.1.12-bin.jar" 
+            url="jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?characterEncoding=UTF-8" 
+            userid="${DB_USER}" 
+            password="${DB_PASS}"
+            encoding="utf8"
+            onerror="continue">
+            <transaction src="${TEMP}/removeConfigs.sql" />
+        </sql>
+    </target>	
 </project>
