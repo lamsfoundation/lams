@@ -2,9 +2,9 @@
 -- directly without the need to remove anything (apart from unused users)
 
 -- Remove configs 
-update lams_configuration set config_value="" where config_key="STMPServer";
+update lams_configuration set config_value="" where config_key="SMTPServer";
 update lams_configuration set config_value="" where config_key="XmppPassword";
-update lams_configuration set config_value="ldap://192.158.1.1" where config_key="LDAPProvierURL";
+update lams_configuration set config_value="ldap://192.158.1.1" where config_key="LDAPProviderURL";
 
 -- From 2.2 onwards. Remove gmap key
 update tl_lagmap10_configuration set config_value="" where config_key="GmapKey";
