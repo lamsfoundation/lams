@@ -71,8 +71,8 @@ UPDATE lams_configuration SET config_key='TruststorePassword', header_name='conf
 ALTER TABLE lams_lesson ADD COLUMN live_edit_enabled TINYINT(1) DEFAULT 0;
 
 -- LDEV-2028 - ldap now uses a general search filter
-UPDATE lams_configuration SET config_value='LDAPSearchFilter', description_key='config.ldap.search.filter' WHERE config_key='LDAPPrincipalDNPrefix';
-UPDATE lams_configuration SET config_value='LDAPBaseDN', description_key='config.ldap.base.dn' WHERE config_key='LDAPPrincipalDNSuffix';
+UPDATE lams_configuration SET config_key='LDAPSearchFilter', config_value='(cn={0})', description_key='config.ldap.search.filter' WHERE config_key='LDAPPrincipalDNPrefix';
+UPDATE lams_configuration SET config_key='LDAPBaseDN', config_value='ou=Users,dc=melcoe,dc=mq,dc=edu,dc=au', description_key='config.ldap.base.dn' WHERE config_key='LDAPPrincipalDNSuffix';
 
 -- LDEV-2029 - configurable initial bind user for ldap
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
