@@ -25,10 +25,10 @@ package org.lamsfoundation.lams.dbupdates;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
@@ -42,7 +42,8 @@ import com.tacitknowledge.util.migration.jdbc.DataSourceMigrationContext;
 /**
  * @author jliew
  * 
- * Fix workspace folder names for groups that have been renamed - LDEV1447.
+ *         Fix workspace folder names for groups that have been renamed -
+ *         LDEV1447.
  */
 public class Patch0012FixWorkspaceNames extends MigrationTaskSupport {
 
@@ -90,7 +91,7 @@ public class Patch0012FixWorkspaceNames extends MigrationTaskSupport {
 	    log.info("Updated " + numUpdatedFolderNames + " workspace folder names.");
 
 	    // update run sequences workspace folder names
-	    String i18nMessage = getI18nMessage();
+	    String i18nMessage = getI18nMessage(conn);
 	    query = conn.prepareStatement(updateRunSeqFolderName);
 	    query.setString(1, i18nMessage);
 	    int numUpdatedRunSeqFolderNames = query.executeUpdate();
@@ -105,13 +106,25 @@ public class Patch0012FixWorkspaceNames extends MigrationTaskSupport {
 	}
     }
 
-    private String getI18nMessage() {
+    private String getI18nMessage(Connection conn) throws MigrationException {
 	// get spring bean
 	ApplicationContext context = new ClassPathXmlApplicationContext("org/lamsfoundation/lams/messageContext.xml");
 	MessageService messageService = (MessageService) context.getBean("commonMessageService");
 
 	// get server locale
-	String[] tokenisedLocale = LanguageUtil.getDefaultLangCountry();
+	String defaultLocale = "en_AU";
+	String getDefaultLocaleStmt = "select config_value from lams_configuration where config_key='ServerLanguage'";
+	try {
+	    PreparedStatement query = conn.prepareStatement(getDefaultLocaleStmt);
+	    ResultSet results = query.executeQuery();
+	    while (results.next()) {
+		defaultLocale = results.getString("config_value");
+	    }
+	} catch (Exception e) {
+	    throw new MigrationException("Problem running update; ", e);
+	}
+
+	String[] tokenisedLocale = defaultLocale.split("_");
 	Locale locale = new Locale(tokenisedLocale[0], tokenisedLocale[1]);
 
 	// get i18n'd message for text 'run sequences'
