@@ -92,12 +92,15 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
  * @author Manpreet Minhas
  * @author Mailing Truong
  * 
- * This is a utility class for extracting the information from the WDDX packet sent by the FLASH.
+ * This is a utility class for extracting the information from the WDDX packet
+ * sent by the FLASH.
  * 
- * The following rules are applied: The client sends a subset of all possible data. If a field is included, then the
- * value associated with this field should be persisted (the value maybe a new value or an unchanged value) If a field
- * is not included then the server should assume that the value is unchanged. If the value of a field is one of the
- * special null values, then null should be persisted.
+ * The following rules are applied: The client sends a subset of all possible
+ * data. If a field is included, then the value associated with this field
+ * should be persisted (the value maybe a new value or an unchanged value) If a
+ * field is not included then the server should assume that the value is
+ * unchanged. If the value of a field is one of the special null values, then
+ * null should be persisted.
  * 
  * Object extractor has member data, so it should not be used as a singleton.
  * 
@@ -462,7 +465,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	parseActivitiesToMatchUpParentandInputActivities((Vector) table.get(WDDXTAGS.ACTIVITIES));
 	parseTransitions((Vector) table.get(WDDXTAGS.TRANSITIONS));
 	parseBranchMappings((Vector) table.get(WDDXTAGS.BRANCH_MAPPINGS));
-	parseCompetenceMappings((Vector) table.get(WDDXTAGS.ACTIVITIES));
+
 	progressDefaultChildActivities();
 
 	learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
@@ -470,15 +473,17 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	deleteUnwantedGroupings();
 	deleteUnwantedToolSessions(learningDesign);
-
+	parseCompetenceMappings((Vector) table.get(WDDXTAGS.ACTIVITIES));
+	learningDesignDAO.insertOrUpdate(learningDesign);
 	return learningDesign;
     }
 
     /**
-     * Link SequenceActivities up with their firstActivity entries and BranchingActivities with their default branch.
-     * Also tidy up the order ids for sequence activities so that they are in the same order as the transitions - needed
-     * for the IMSLD export conversion to work. Not all the transitions may be drawn yet, so number off the others best
-     * we can.
+     * Link SequenceActivities up with their firstActivity entries and
+     * BranchingActivities with their default branch. Also tidy up the order ids
+     * for sequence activities so that they are in the same order as the
+     * transitions - needed for the IMSLD export conversion to work. Not all the
+     * transitions may be drawn yet, so number off the others best we can.
      * 
      * @throws WDDXProcessorConversionException
      */
@@ -534,8 +539,9 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Initialise the map of groupings with those in the db from a previous save. This must be called as soon as the
-     * learning design is read from the db and before it is changed.
+     * Initialise the map of groupings with those in the db from a previous
+     * save. This must be called as soon as the learning design is read from the
+     * db and before it is changed.
      */
     private void initialiseGroupings() {
 	List dbGroupings = groupingDAO.getGroupingsByLearningDesign(learningDesign.getLearningDesignId());
@@ -553,8 +559,9 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Initialise the map of tool sessions already in the database. Used to work out what will be deleted by Hibernate
-     * later - useful to clean up any unwanted tool sessions for edit on the fly.
+     * Initialise the map of tool sessions already in the database. Used to work
+     * out what will be deleted by Hibernate later - useful to clean up any
+     * unwanted tool sessions for edit on the fly.
      */
     @SuppressWarnings("unchecked")
     private void initialiseToolSessionMap(LearningDesign learningDesign) {
@@ -579,10 +586,12 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Delete the old tool session. Won't be done via Hibernate cascades as we only want to do it for edit on fly. The
-     * progress engine pre-generates the tool sessions for class level activities, so if we edit the design, we need to
-     * delete the tool sessions. If we encounter evidence that this is a grouped activity - either more than one tool
-     * session exists or the activity is grouped, then abort.
+     * Delete the old tool session. Won't be done via Hibernate cascades as we
+     * only want to do it for edit on fly. The progress engine pre-generates the
+     * tool sessions for class level activities, so if we edit the design, we
+     * need to delete the tool sessions. If we encounter evidence that this is a
+     * grouped activity - either more than one tool session exists or the
+     * activity is grouped, then abort.
      */
     private void deleteUnwantedToolSessions(LearningDesign learningDesign) throws ObjectExtractorException {
 	if (learningDesign.getEditOverrideLock() && learningDesign.getEditOverrideUser() != null) {
@@ -628,9 +637,10 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Parses the groupings array sent from the WDDX packet. It will create the groupings object (ChosenGrouping,
-     * RandomGrouping) so that when the GroupingActivity is processed, it can link to the grouping object that has been
-     * created by this method.
+     * Parses the groupings array sent from the WDDX packet. It will create the
+     * groupings object (ChosenGrouping, RandomGrouping) so that when the
+     * GroupingActivity is processed, it can link to the grouping object that
+     * has been created by this method.
      * 
      * @param groupingsList
      * @throws WDDXProcessorConversionException
@@ -810,10 +820,12 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Parses the list of activities sent from the WDDX packet. The current activities that belong to this learning
-     * design will be compared with the new list of activities. Any new activities will be added to the database,
-     * existing activities will be updated, and any activities that are not present in the list of activities from the
-     * wddx packet (but appear in the list of current activities) are deleted.
+     * Parses the list of activities sent from the WDDX packet. The current
+     * activities that belong to this learning design will be compared with the
+     * new list of activities. Any new activities will be added to the database,
+     * existing activities will be updated, and any activities that are not
+     * present in the list of activities from the wddx packet (but appear in the
+     * list of current activities) are deleted.
      * 
      * @param activitiesList
      *                The list of activities from the WDDX packet.
@@ -850,8 +862,9 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Parses the list of activities sent from the WDDX packet for competence mappings. Each activity's new set of
-     * competenceMapping is compared against the old set and the db is updated accordingly
+     * Parses the list of activities sent from the WDDX packet for competence
+     * mappings. Each activity's new set of competenceMapping is compared
+     * against the old set and the db is updated accordingly
      * 
      * @param activitiesList
      *                The list of activities from the WDDX packet.
@@ -879,8 +892,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		// Get the tool activity using the UIID and the learningDesignID
 		ToolActivity toolActivity = null;
 		if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_UIID)) {
-		    toolActivity = (ToolActivity) activityDAO.getActivityByUIID(WDDXProcessor.convertToInteger(
-			    activityDetails, WDDXTAGS.ACTIVITY_UIID), learningDesign);
+		    Activity activity = activityDAO.getActivityByUIID(WDDXProcessor.convertToInteger(activityDetails,
+			    WDDXTAGS.ACTIVITY_UIID), learningDesign);
+		    toolActivity = (ToolActivity) activity;
 		} else {
 		    continue;
 		}
@@ -957,10 +971,12 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Parses the list of competences sent from the WDDX packet. The current competences that belong to this learning
-     * design will be compared with the new list of competences. Any new competences will be added to the database,
-     * existing competences will be updated, and any competences that are not present in the list of competences from
-     * the wddx packet (but appear in the list of current competences) are deleted.
+     * Parses the list of competences sent from the WDDX packet. The current
+     * competences that belong to this learning design will be compared with the
+     * new list of competences. Any new competences will be added to the
+     * database, existing competences will be updated, and any competences that
+     * are not present in the list of competences from the wddx packet (but
+     * appear in the list of current competences) are deleted.
      * 
      * @param activitiesList
      *                The list of activities from the WDDX packet.
@@ -1030,9 +1046,10 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Because the activities list was processed before by the method parseActivities, it is assumed that all activities
-     * have already been saved into the database. So now we can go through and find the any parent activity or input
-     * activities for an activity.
+     * Because the activities list was processed before by the method
+     * parseActivities, it is assumed that all activities have already been
+     * saved into the database. So now we can go through and find the any parent
+     * activity or input activities for an activity.
      * 
      * @param activitiesList
      * @param learningDesign
@@ -1098,8 +1115,9 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Like parseActivities, parseTransitions parses the list of transitions from the wddx packet. New transitions will
-     * be added, existing transitions updated and any transitions that are no longer needed are deleted.
+     * Like parseActivities, parseTransitions parses the list of transitions
+     * from the wddx packet. New transitions will be added, existing transitions
+     * updated and any transitions that are no longer needed are deleted.
      * 
      * @param transitionsList
      *                The list of transitions from the wddx packet
@@ -1338,7 +1356,8 @@ public class ObjectExtractor implements IObjectExtractor {
     private void buildGroupingActivity(GroupingActivity groupingActivity, Hashtable activityDetails)
 	    throws WDDXProcessorConversionException, ObjectExtractorException {
 	/**
-	 * read the createGroupingUUID, get the Grouping Object, and set CreateGrouping to that object
+	 * read the createGroupingUUID, get the Grouping Object, and set
+	 * CreateGrouping to that object
 	 */
 	Integer createGroupingUIID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.CREATE_GROUPING_UIID);
 	Grouping grouping = groupings.get(createGroupingUIID);
@@ -1455,13 +1474,15 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Create the transition from a WDDX based hashtable. It is easier to go straight to the data object rather than
-     * going via the DTO, as the DTO returns the special null values from the getter methods. This makes it hard to set
-     * up the transaction object from the transitionDTO.
+     * Create the transition from a WDDX based hashtable. It is easier to go
+     * straight to the data object rather than going via the DTO, as the DTO
+     * returns the special null values from the getter methods. This makes it
+     * hard to set up the transaction object from the transitionDTO.
      * <p>
-     * Assumes that all the activities have been read and are in the newActivityMap. The toActivity and fromActivity are
-     * only set if the activity exists in the newActivityMap. If this leaves the transition with no to/from activities
-     * then null is returned.
+     * Assumes that all the activities have been read and are in the
+     * newActivityMap. The toActivity and fromActivity are only set if the
+     * activity exists in the newActivityMap. If this leaves the transition with
+     * no to/from activities then null is returned.
      * 
      * @param transitionDetails
      * @throws WDDXProcessorConversionException
@@ -1537,8 +1558,9 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Wipe out any links fromany activities that may be linked to it (e.g. the case where a transition has an from
-     * activity but not a too activity. These cases should be picked up by Flash, but just in case.
+     * Wipe out any links fromany activities that may be linked to it (e.g. the
+     * case where a transition has an from activity but not a too activity.
+     * These cases should be picked up by Flash, but just in case.
      */
     private void cleanupTransition(Transition transition) {
 	if (transition.getFromActivity().getTransitionFrom().equals(transition)) {
@@ -1550,12 +1572,15 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Search in learning design for existing object. Can't go to database as that will trigger a Flush, and we haven't
-     * updated the rest of the design, so this would trigger a "deleted object would be re-saved by cascade" error.
+     * Search in learning design for existing object. Can't go to database as
+     * that will trigger a Flush, and we haven't updated the rest of the design,
+     * so this would trigger a "deleted object would be re-saved by cascade"
+     * error.
      * 
-     * Check both the UUID for a match, and the to and from for a match. If the user deletes a transition then redraws
-     * it between the same activities, then inserting a new one in the db will trigger a duplicate key exception. So we
-     * need to reuse any that have the same to/from.
+     * Check both the UUID for a match, and the to and from for a match. If the
+     * user deletes a transition then redraws it between the same activities,
+     * then inserting a new one in the db will trigger a duplicate key
+     * exception. So we need to reuse any that have the same to/from.
      */
     private Transition findTransition(Integer transitionUUID, Integer toUIID, Integer fromUIID) {
 	Transition existingTransition = null;
@@ -1574,8 +1599,9 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Checks whether the hashtable contains the key specified by <code>key</code> If the key exists, returns true,
-     * otherwise return false.
+     * Checks whether the hashtable contains the key specified by
+     * <code>key</code> If the key exists, returns true, otherwise return
+     * false.
      * 
      * @param table
      *                The hashtable to check
@@ -1600,10 +1626,11 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Parses the mappings used for branching. They map groups to the sequence activities that form a branch within a
-     * branching activity.
+     * Parses the mappings used for branching. They map groups to the sequence
+     * activities that form a branch within a branching activity.
      * 
-     * Must be done after all the other parsing as we need to match up activities and groups.
+     * Must be done after all the other parsing as we need to match up
+     * activities and groups.
      * 
      * Will also delete any old (now unused) mappings
      * 
@@ -1645,8 +1672,8 @@ public class ObjectExtractor implements IObjectExtractor {
 
     @SuppressWarnings("unchecked")
     /**
-     * Get the BranchActivityEntry details. This may be either for group based branching, or it may be for tool output
-     * based branching
+     * Get the BranchActivityEntry details. This may be either for group based
+     * branching, or it may be for tool output based branching
      */
     private BranchActivityEntry extractBranchActivityEntry(Hashtable details) throws WDDXProcessorConversionException {
 
