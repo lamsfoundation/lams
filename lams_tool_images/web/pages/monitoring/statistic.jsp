@@ -9,14 +9,14 @@
 			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
 		</div>
 	</c:if>
+	
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
-		<c:set var="groupSize" value="${fn:length(group)}" />
-		<c:forEach var="item" items="${group}" varStatus="status">
+		<c:forEach var="summary" items="${group}" varStatus="status">
 			<%-- display group name on first row--%>
 			<c:if test="${status.index == 0}">
 				<tr>
 					<td colspan="4">
-						<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> <SPAN style="font-size: 12px;"> <c:if test="${firstGroup.index==0}">
+						<B><fmt:message key="monitoring.label.group" /> ${summary.sessionName}</B> <SPAN style="font-size: 12px;"> <c:if test="${firstGroup.index==0}">
 								<fmt:message key="monitoring.summary.note" />
 							</c:if> </SPAN>
 					</td>
@@ -28,12 +28,24 @@
 					<th width="25%">
 						<fmt:message key="monitoring.label.suggest" />
 					</th>
-					<th width="20%" align="center">
-						<fmt:message key="monitoring.label.number.learners" />
-					</th>
+					<c:choose>
+						<c:when test="${sessionMap.imageGallery.allowRank == true}">
+							<th width="85px" style="padding-left:0px; text-align:center;">
+								<fmt:message key="label.monitoring.number.rated" />
+							</th>				
+							<th width="70px" style="padding-left:0px; text-align:center;">
+								<fmt:message key="label.monitoring.average.rating" />
+							</th>
+						</c:when>
+						<c:when test="${sessionMap.imageGallery.allowVote == true}">
+							<th width="70px" style="padding-left:0px; text-align:center;">
+								<fmt:message key="label.monitoring.number.votes" />
+							</th>
+						</c:when>
+					</c:choose>						
 				</tr>
 			</c:if>
-			<c:if test="${item.itemUid == -1}">
+			<c:if test="${summary.itemUid == -1}">
 				<tr>
 					<td colspan="4">
 						<div align="left">
@@ -42,29 +54,31 @@
 					</td>
 				</tr>
 			</c:if>
-			<c:if test="${item.itemUid != -1}">
+			<c:if test="${summary.itemUid != -1}">
 				<tr>
 					<td>
-						${item.itemTitle}
+						${summary.itemTitle}
 					</td>
 					<td>
-						<c:if test="${!item.itemCreateByAuthor}">
-										${item.username}
-									</c:if>
+						<c:if test="${!summary.itemCreateByAuthor}">
+							${summary.username}
+						</c:if>
 					</td>
-					<td align="center">
-						<c:choose>
-							<c:when test="${item.viewNumber > 0}">
-								<c:set var="listUrl">
-									<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&imageUid=${item.itemUid}' />
-								</c:set>
-								<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
-							</c:when>
-							<c:otherwise>
-											0
-										</c:otherwise>
-						</c:choose>
-					</td>
+					<c:choose>
+						<c:when test="${sessionMap.imageGallery.allowRank == true}">
+							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
+								${summary.numberRatings}
+							</td>				
+							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
+								${summary.averageRating}
+							</td>
+						</c:when>
+						<c:when test="${sessionMap.imageGallery.allowVote == true}">
+							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
+								${summary.numberOfVotes}
+							</td>
+						</c:when>
+					</c:choose>	
 				</tr>
 			</c:if>
 		</c:forEach>

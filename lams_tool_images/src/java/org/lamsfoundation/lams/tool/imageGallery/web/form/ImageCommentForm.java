@@ -23,10 +23,13 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.imageGallery.web.form;  
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
  
 /**
@@ -43,6 +46,9 @@ public class ImageCommentForm extends ActionForm {
     private String sessionMapID;
     private String comment;
     private String commentUid;
+    
+    private String createBy;
+    private String createDate;
     
     public void reset(ActionMapping mapping, HttpServletRequest request){
 	comment = "";
@@ -89,6 +95,22 @@ public class ImageCommentForm extends ActionForm {
 
     public void setCommentUid(String commentUid) {
 	this.commentUid = commentUid;
+    }
+    
+    public String getCreateBy() {
+	return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+	this.createBy = createBy;
+    }
+    
+    public String getCreateDate() {
+	return createDate;
+    }
+
+    public void setCreateDate(String createDate) {
+	this.createDate = createDate;
     }
 }
 

@@ -185,7 +185,14 @@ public interface IImageGalleryService {
      * 
      * @param comment
      */
-    void updateImageComment(ImageComment comment);
+    void saveImageComment(ImageComment comment);
+    
+    /**
+     * Delete imageComment by the given uid.
+     * 
+     * @param commentUid
+     */
+    void deleteImageComment(Long uid);
 
     /**
      * Get imageGallery toolSession by toolSessionId

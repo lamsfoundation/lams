@@ -55,6 +55,8 @@ public class Summary {
     private String username;
     private int viewNumber;
     private int numberOfVotes;
+    private float averageRating;
+    private int numberRatings;    
 
     // following is used for export portfolio programs:
     private Long fileUuid;
@@ -202,7 +204,45 @@ public class Summary {
 
     public void setNumberOfVotes(int numberOfVotes) {
 	this.numberOfVotes = numberOfVotes;
-    }    
+    }  
+    
+    /**
+     * Returns image average rating.
+     * 
+     * @return image average rating
+     */
+    public float getAverageRating() {
+	return averageRating;
+    }
+
+    /**
+     * Sets image average rating.
+     * 
+     * @param averageRating
+     *                image average rating
+     */
+    public void setAverageRating(float averageRating) {
+	this.averageRating = averageRating;
+    }
+    
+    /**
+     * Returns image sequence number.
+     * 
+     * @return image sequence number
+     */
+    public int getNumberRatings() {
+	return numberRatings;
+    }
+
+    /**
+     * Sets image number of rates.
+     * 
+     * @param numberRates
+     *                image number of rates
+     */
+    public void setNumberRatings(int numberRatings) {
+	this.numberRatings = numberRatings;
+    }
 
     public Long getFileUuid() {
 	return fileUuid;

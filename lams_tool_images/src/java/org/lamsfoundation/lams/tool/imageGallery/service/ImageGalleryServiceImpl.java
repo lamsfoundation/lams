@@ -323,8 +323,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return imageCommentDao.getCommentByUid(commentUid);
     }
 
-    public void updateImageComment(ImageComment comment) {
+    public void saveImageComment(ImageComment comment) {
 	imageCommentDao.saveObject(comment);
+    }
+    
+    public void deleteImageComment(Long uid) {
+	imageCommentDao.removeObject(ImageComment.class, uid);
     }
 
     public void deleteImageGalleryItem(Long uid) {
@@ -497,6 +501,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(item.getUid(), session.getUid());
 		sum.setNumberOfVotes(numberOfVotes);
 		
+		Object[] ratingForGroup = getRatingForGroup(item.getUid(),session.getSessionId());
+		sum.setNumberRatings(((Long)ratingForGroup[0]).intValue());
+		sum.setAverageRating(((Float)ratingForGroup[1]).floatValue());
+		
 		// set viewNumber according visit log
 		if (visitCountMap.containsKey(item.getUid())) {
 		    sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
@@ -514,6 +522,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		    int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(item.getUid(), session.getUid());
 		    sum.setNumberOfVotes(numberOfVotes);
 		    
+		    Object[] ratingForGroup = getRatingForGroup(item.getUid(),session.getSessionId());
+		    sum.setNumberRatings(((Long)ratingForGroup[0]).intValue());
+		    sum.setAverageRating(((Float)ratingForGroup[1]).floatValue());
+		    
 		    // set viewNumber according visit log
 		    if (visitCountMap.containsKey(item.getUid())) {
 			sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
@@ -529,7 +541,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 
 	return groupList;
-
     }
     
     public List<List<UserImageContributionDTO>> getImageSummary(Long contentId, Long imageUid) {
@@ -543,11 +554,18 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	for (ImageGallerySession session : sessionList) {
 	    // one new group for one session.
 	    group = new ArrayList<UserImageContributionDTO>();
+	    Object[] ratingForGroup = getRatingForGroup(image.getUid(),session.getSessionId());
+	    int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(image.getUid(), session.getUid());
 	    
 	    List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(session.getSessionId());
 	    // firstly, put all initial imageGallery item into this group.
 	    for (ImageGalleryUser user : users) {
 		UserImageContributionDTO sum = new UserImageContributionDTO(session.getSessionName(), user);
+		
+		sum.setNumberOfVotes(numberOfVotes);
+		
+		sum.setNumberRatings(((Long)ratingForGroup[0]).intValue());
+		sum.setAverageRating(((Float)ratingForGroup[1]).floatValue());
 		
 		ImageRating rating = imageRatingDao.getImageRatingByImageAndUser(image.getUid(), user.getUserId());
 		if (rating != null) {
@@ -1146,6 +1164,28 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     public void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item) {
 	imageGalleryConfigItemDAO.saveOrUpdate(item);
+    }
+    
+    private Object[] getRatingForGroup(Long imageUid, Long sessionId) {
+	List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(sessionId);
+	Long numberRatings = new Long(0);
+	Float averageRating = new Float(0);
+	List<ImageRating> ratings = imageRatingDao.getImageRatingsByImageUid(imageUid);
+	for (ImageRating rating : ratings) {
+	    for (ImageGalleryUser user : users) {
+		if (rating.getCreateBy().getUserId().equals(user.getUserId())) {
+		    numberRatings++;
+		    averageRating += rating.getRating();
+		}
+	    }
+	}
+
+	
+	if (! numberRatings.equals(new Long(0))) {
+	    averageRating = averageRating / numberRatings;
+	}
+	
+	return  new Object[] {numberRatings, averageRating};
     }
 
 }

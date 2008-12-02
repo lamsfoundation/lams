@@ -48,6 +48,28 @@
 			<c:forEach var="groupSummary" items="${imageSummary}">
 				<h1><fmt:message key="monitoring.label.group" /> ${groupSummary[0].sessionName}	</h1>
 				
+				<c:choose>
+					<c:when test="${imageGallery.allowRank == true}">
+						<ul>							
+							<li>
+								<fmt:message key="label.monitoring.number.rated" />: ${groupSummary[0].numberRatings}
+							</li>				
+							<li>
+								<fmt:message key="label.monitoring.average.rating" />: ${groupSummary[0].averageRating}
+							</li>
+						</ul>
+						<br>
+					</c:when>
+					<c:when test="${imageGallery.allowVote == true}">
+						<ul>
+							<li>
+								<fmt:message key="label.monitoring.number.votes" />: ${groupSummary[0].numberOfVotes}
+							</li>
+						</ul>
+						<br>						
+					</c:when>
+				</c:choose>			
+				
 				<table cellpadding="0" class="alternative-color" >
 			
 					<tr>
@@ -94,8 +116,8 @@
 							</c:if>
 							
 							<c:if test="${imageGallery.allowRank}">								
-								<td>
-									<lams:Date value="${userImageContribution.rating}" />
+								<td style="padding-left:0px; text-align:center;">
+									${userImageContribution.rating}
 								</td>
 							</c:if>
 										
@@ -105,14 +127,21 @@
 									<ul>
 										<c:forEach var="comment" items="${userImageContribution.comments}">
 											<li>
-												<c:out value="${comment.comment}"></c:out>
+												<c:out value="${comment.comment}" escapeXml="false" />
 												
 												<c:set var="editCommentUrl" >
-													<c:url value='/monitoring/editComment.do'/>?toolContentID=${toolContentID}&sessionMapID=${sessionMapID}&commentUid=${comment.uid}&TB_iframe=true&height=300&width=300
+													<c:url value='/monitoring/editComment.do'/>?sessionMapID=${sessionMapID}&commentUid=${comment.uid}&TB_iframe=true&height=300&width=300
 												</c:set>		
-												<a href="${editCommentUrl}" class="thickbox" style="margin-left: 20px; border: none;"> 
+												<a href="${editCommentUrl}" class="thickbox" style="margin-left: 20px;"> 
 													<img src="<html:rewrite page='/includes/images/edit.gif'/>" 
-															title="<fmt:message key="label.authoring.basic.resource.edit" />" />
+															title="<fmt:message key="label.authoring.basic.resource.edit" />" style="border-style: none;"/>
+												</a>
+												<c:set var="removeCommentUrl" >
+													<c:url value='/monitoring/removeComment.do'/>?sessionMapID=${sessionMapID}&commentUid=${comment.uid}&TB_iframe=true&height=300&width=300
+												</c:set>		
+												<a href="${removeCommentUrl}" class="thickbox" style="margin-left: 15px;">
+													<img src="<html:rewrite page='/includes/images/cross.gif'/>" 												 
+															title="<fmt:message key="label.authoring.basic.resource.delete" />" style="border-style: none;"/>												
 												</a>
 											</li>
 										</c:forEach>

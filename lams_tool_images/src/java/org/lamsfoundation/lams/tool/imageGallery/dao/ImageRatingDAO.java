@@ -23,6 +23,8 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.imageGallery.dao;  
 
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
  
 /**
@@ -33,13 +35,23 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
  */
 public interface ImageRatingDAO extends DAO {
     
-	/**
-	 * Return imageRating by the given imageUid and userId.
-	 * @param imageUid
-	 * @param userId 
-	 * @return
-	 */
-	 public ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId);
+    /**
+     * Return imageRating by the given imageUid and userId.
+     * 
+     * @param imageUid
+     * @param userId
+     * @return
+     */
+    public ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId);
+
+    /**
+     * Return list of imageRatings by the the given imageUid.
+     * 
+     * @param imageUid
+     * @param userId
+     * @return
+     */
+    public List<ImageRating> getImageRatingsByImageUid(Long imageUid);
 
 }
  

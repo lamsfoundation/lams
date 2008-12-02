@@ -174,21 +174,6 @@
 			<th>
 				<fmt:message key="monitoring.label.title" />
 			</th>
-			<c:choose>
-				<c:when test="${sessionMap.imageGallery.allowRank == true}">
-					<th width="85px" style="padding-left:0px; text-align:center;">
-						<fmt:message key="label.monitoring.number.rated" />
-					</th>				
-					<th width="70px" style="padding-left:0px; text-align:center;">
-						<fmt:message key="label.monitoring.average.rating" />
-					</th>
-				</c:when>
-				<c:when test="${sessionMap.imageGallery.allowVote == true}">
-					<th width="70px" style="padding-left:0px; text-align:center;">
-						<fmt:message key="label.monitoring.number.votes" />
-					</th>
-				</c:when>
-			</c:choose>				
 			<th width="75px" >
 				<!--hide/show-->
 			</th>
@@ -215,10 +200,10 @@
 						   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
 						</c:set>
 						<c:set var="url" >
-							<c:url value='/monitoring/imageSummary.do'/>?toolContentID=${toolContentID}&sessionMapID=${sessionMapID}&imageUid=${image.uid}&resizeIframe=true&TB_iframe=true&height=640&width=740
+							<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${image.uid}&resizeIframe=true&TB_iframe=true&height=640&width=740
 						</c:set>				
-						<a href="${url}" class="thickbox" title="<fmt:message key='label.monitoring.imagesummary.image.summary' />"> 
-							<img src="${thumbnailPath}" alt="${image.title}"/>
+						<a href="${url}" class="thickbox" title="<fmt:message key='label.monitoring.imagesummary.image.summary' />" style="border-style: none;"> 
+							<img src="${thumbnailPath}" alt="${image.title}" style="border-style: none;"/>
 						</a>
 					</td>
 					
@@ -234,22 +219,6 @@
 						</a>
 					</td>
 					
-					<c:choose>
-						<c:when test="${sessionMap.imageGallery.allowRank == true}">
-							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
-								${image.numberRatings}
-							</td>				
-							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
-								${image.averageRating}
-							</td>
-						</c:when>
-						<c:when test="${sessionMap.imageGallery.allowVote == true}">
-							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
-								${summary.numberOfVotes}
-							</td>
-						</c:when>
-					</c:choose>	
-				
 					<td style="vertical-align:middle; padding-left: 0px; text-align: center;">
 						<c:choose>
 							<c:when test="${summary.itemHide}">
@@ -297,7 +266,7 @@
 					</td>
 					<td>
 						<c:set var="viewReflection">
-							<c:url value="/monitoring/viewReflection.do?toolSessionID=${summary.sessionId}&userUid=${user.userUid}"/>
+							<c:url value="/monitoring/viewReflection.do?toolSessionID=${sessionId}&userUid=${user.userUid}"/>
 						</c:set>
 						<html:link href="javascript:launchPopup('${viewReflection}')">
 							<fmt:message key="label.view" />

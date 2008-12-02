@@ -9,8 +9,7 @@
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 		<script type="text/javascript">
-			window.parent.location.href = "<c:url value="/monitoring/summary.do"/>?toolContentID=${sessionMap.toolContentID}&contentFolderID=${sessionMap.contentFolderID}"
+			window.location.href = "<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${sessionMap.itemUid}&resizeIframe=true&TB_iframe=true&height=640&width=740"
 		</script>
 	<body class="stripes">
 </html>
-

@@ -75,7 +75,7 @@ public class ImageComment implements Cloneable {
 	final ImageComment genericEntity = (ImageComment) o;
 
 	return new EqualsBuilder().append(this.uid, genericEntity.uid).append(this.comment, genericEntity.comment)
-		.append(this.createBy, genericEntity.createBy).isEquals();
+		.append(this.createBy.getUserId(), genericEntity.createBy.getUserId()).isEquals();
     }
 
     public int hashCode() {

@@ -44,6 +44,9 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 public class UserImageContributionDTO {
 
     private String sessionName;
+    private float averageRating;
+    private int numberRatings;  
+    private int numberOfVotes;
     
     private ImageGalleryUser user;
     private int rating;
@@ -72,6 +75,63 @@ public class UserImageContributionDTO {
 
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
+    }
+    
+    /**
+     * Returns image average rating.
+     * 
+     * @return image average rating
+     */
+    public float getAverageRating() {
+	return averageRating;
+    }
+
+    /**
+     * Sets image average rating.
+     * 
+     * @param averageRating
+     *                image average rating
+     */
+    public void setAverageRating(float averageRating) {
+	this.averageRating = averageRating;
+    }
+    
+    /**
+     * Returns image sequence number.
+     * 
+     * @return image sequence number
+     */
+    public int getNumberRatings() {
+	return numberRatings;
+    }
+
+    /**
+     * Sets image number of rates.
+     * 
+     * @param numberRates
+     *                image number of rates
+     */
+    public void setNumberRatings(int numberRatings) {
+	this.numberRatings = numberRatings;
+    }
+    
+    /**
+     * Returns image sequence number.
+     * 
+     * @return image sequence number
+     */
+    public int getNumberOfVotes() {
+	return numberOfVotes;
+    }
+
+    /**
+     * Sets image number of rates.
+     * 
+     * @param numberRates
+     *                image number of rates
+     */
+    public void setNumberOfVotes(int numberOfVotes) {
+	this.numberOfVotes = numberOfVotes;
     }
 
     public ImageGalleryUser getUser() {

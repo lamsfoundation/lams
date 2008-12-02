@@ -39,11 +39,18 @@ public class ImageRatingDAOHibernate extends BaseDAOHibernate implements ImageRa
     private static final String FIND_BY_IMAGE_AND_USER = "from " + ImageRating.class.getName()
 	    + " as r where r.createBy.userId = ? and r.imageGalleryItem.uid=?";
 
+    private static final String FIND_BY_IMAGE_UID = "from " + ImageRating.class.getName()
+	    + " as r where r.imageGalleryItem.uid=?";
+
     public ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId) {
 	List list = getHibernateTemplate().find(FIND_BY_IMAGE_AND_USER, new Object[] { userId, imageUid });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ImageRating) list.get(0);
+    }
+
+    public List<ImageRating> getImageRatingsByImageUid(Long imageUid) {
+	return getHibernateTemplate().find(FIND_BY_IMAGE_UID, imageUid);
     }
 
 }

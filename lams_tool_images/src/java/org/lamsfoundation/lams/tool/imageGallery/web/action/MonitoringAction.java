@@ -106,6 +106,9 @@ public class MonitoringAction extends Action {
 	if (param.equals("saveComment")) {
 	    return saveComment(mapping, form, request, response);
 	}
+	if (param.equals("removeComment")) {
+	    return removeComment(mapping, form, request, response);
+	}	
 	if (param.equals("viewReflection")) {
 	    return viewReflection(mapping, form, request, response);
 	}
@@ -167,6 +170,7 @@ public class MonitoringAction extends Action {
 	    request.setAttribute(ImageGalleryConstants.ATTR_IMAGE_SUMMARY, imageSummary);
 	}
 	request.setAttribute(ImageGalleryConstants.ATTR_IMAGE, image);
+	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_UID, imageUid);
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());	
 	
 	ImageGalleryItemForm imageForm = (ImageGalleryItemForm) form;
@@ -197,7 +201,8 @@ public class MonitoringAction extends Action {
 	ImageGalleryItemForm imageForm = (ImageGalleryItemForm) form;
 	String sessionMapID = imageForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap
+		.get(AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	extractFormToImageGalleryItem(request, imageForm);
 
@@ -277,11 +282,13 @@ public class MonitoringAction extends Action {
 	Long commentUid = new Long(request.getParameter(ImageGalleryConstants.ATTR_COMMENT_UID));
 	ImageComment comment = service.getImageCommentByUid(commentUid);
 	ImageCommentForm commentForm = (ImageCommentForm) form;
+	commentForm.setSessionMapID(sessionMapID);
 	commentForm.setCommentUid(commentUid.toString());
 	commentForm.setComment(comment.getComment());
-	commentForm.setSessionMapID(sessionMapID);
-
-	request.setAttribute(ImageGalleryConstants.ATTR_COMMENT, comment);
+	commentForm.setCreateBy(comment.getCreateBy().getLoginName());
+	commentForm.setCreateDate(comment.getCreateDate().toString());
+	
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward("success");
     }
     
@@ -300,6 +307,7 @@ public class MonitoringAction extends Action {
 	ImageCommentForm commentForm = (ImageCommentForm) form;
 	String sessionMapID = commentForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	
 	String commentMessage = commentForm.getComment();
 	if (StringUtils.isBlank(commentMessage)) {
@@ -312,8 +320,38 @@ public class MonitoringAction extends Action {
 	Long commentUid = NumberUtils.createLong(commentForm.getCommentUid());
 	ImageComment comment = service.getImageCommentByUid(commentUid);
 	comment.setComment(commentMessage);
-	service.updateImageComment(comment);
+	service.saveImageComment(comment);
 			
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }
+    
+    /**
+     * Delete user comment.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward removeComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	
+	// get back sessionMAP
+	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	IImageGalleryService service = getImageGalleryService();
+	
+	Long commentUid = new Long(request.getParameter(ImageGalleryConstants.ATTR_COMMENT_UID));
+	ImageComment comment = service.getImageCommentByUid(commentUid);
+	
+	Long imageUid = (Long) sessionMap.get(ImageGalleryConstants.ATTR_RESOURCE_ITEM_UID);
+	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
+	Set<ImageComment> dbComments = image.getComments();
+	dbComments.remove(comment);
+	service.saveOrUpdateImageGalleryItem(image);
+	service.deleteImageComment(commentUid);
+	
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
