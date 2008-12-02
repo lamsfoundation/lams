@@ -1,4 +1,7 @@
 <listener>
+    <listener-class>com.tacitknowledge.util.migration.jdbc.WebAppJNDIMigrationLauncher</listener-class>
+</listener>
+<listener>
 	<listener-class>
 		org.springframework.web.context.ContextLoaderListener
 	</listener-class>
