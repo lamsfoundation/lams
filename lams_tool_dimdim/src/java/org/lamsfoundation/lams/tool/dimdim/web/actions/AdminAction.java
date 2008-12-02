@@ -111,7 +111,7 @@ public class AdminAction extends MappingDispatchAction {
 		updateConfig(Constants.CFG_VERSION, adminForm.getVersion());
 	    }
 
-	    updateConfig(Constants.CFG_SERVER_URL, adminForm.getServerURL());
+	    updateConfig(Constants.CFG_SERVER_URL, adminForm.getServerURL().trim());
 
 	}
 
