@@ -941,11 +941,13 @@ class PropertyInspectorControls extends MovieClip {
 		Debugger.log('Set gate type to: _canvasModel.selectedItem.activity.title:'+_canvasModel.selectedItem.activity.title,Debugger.GEN,'onGateTypeChange','PropertyInspector');
 		checkEnableGateControls(!_canvasModel.selectedItem.activity.readOnly); // show/hide schedule steppers
 		
-		if(evt.target.value == Activity.CONDITION_GATE_ACTIVITY_TYPE) {
+		var isConditionGate:Boolean = (evt.target.value == Activity.CONDITION_GATE_ACTIVITY_TYPE);
+		showToolBasedGateControls(isConditionGate, !_canvasModel.selectedItem.activity.readOnly);
+		
+		if(isConditionGate) {
 				
 			Debugger.log("Activity is of CONDITION_GATE_TYPE", Debugger.CRITICAL, "onGateTypeChange", "PropertyInspectorControls");
 			
-			showToolBasedGateControls(true, !_canvasModel.selectedItem.activity.readOnly);
 			_canvasModel.selectedItem.activity.groupingUIID = null;
 			
 			showGroupBasedBranchingControls(false);
@@ -1135,7 +1137,14 @@ class PropertyInspectorControls extends MovieClip {
 		
 		var selectedActIsConditionGate:Boolean = (_canvasModel.selectedItem.activity.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE);
 		
-		if(!v) { _tool_output_gate_match_btn.visible = false; _conditions_setup_btn.visible = false; return; }
+		if(!v) {
+			_tool_output_gate_match_btn.visible = false;
+			_conditions_setup_btn.visible = false;
+			branchToolActs_lbl.visible = false;
+			toolActs_cmb.visible = false;
+			
+			return;
+		}
 		
 		toolActs_cmb.visible = v;
 		branchToolActs_lbl.visible = v;
