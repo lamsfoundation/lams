@@ -411,7 +411,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		LSTitle_lbl.text = "<b>" + s.name + "</b>";
 		
 		var charCount:Array = StringUtils.scanString(String(s.description), "\n");
-		LSDescription_txa.text = String(s.description);
+		LSDescription_txa.text = (s.description != null) ? String(s.description) : "";
 		
 		sessionStatus_txt.text = showStatus(s.state);
 		numLearners_txt.text = String(s.noStartedLearners) + " "  + Dictionary.getValue('ls_of_text')+" "+String(s.noPossibleLearners);
