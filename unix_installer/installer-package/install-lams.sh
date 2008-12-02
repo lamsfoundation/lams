@@ -22,7 +22,7 @@
 
 # Installer shell script for LAMS
 
-# Usage: sudo ./install.sh
+# Usage: sudo ./install.sh 
 	
 # The version of this lams installer
 LAMS_VERSION=2.2
