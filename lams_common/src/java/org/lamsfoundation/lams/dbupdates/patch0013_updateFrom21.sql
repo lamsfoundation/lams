@@ -79,6 +79,7 @@ ALTER TABLE lams_lesson ADD COLUMN learner_presence_avail TINYINT(1) DEFAULT 0;
 ALTER TABLE lams_lesson ADD COLUMN learner_im_avail TINYINT(1) DEFAULT 0;
 
 -- LDEV-1299 - Instead of mapping the conditions that open a gate to fictional sequences, there is only a boolean value ------------- 
+ALTER TABLE lams_branch_activity_entry MODIFY COLUMN sequence_activity_id BIGINT(20);
 ALTER TABLE lams_branch_activity_entry ADD COLUMN open_gate TINYINT;
 INSERT INTO lams_learning_activity_type VALUES (14, 'GATE_CONDITION');
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
@@ -89,11 +90,15 @@ VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met',
 	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
 
+-- LDEV-1896 - extend permission gate
+ALTER TABLE lams_activity_learners ADD COLUMN allowed_to_pass TINYINT NOT NULL DEFAULT 0;
+
 -- LDEV-1871 Creating extra column in lams_tool table for tool adapters
 ALTER TABLE lams_tool ADD COLUMN ext_lms_id VARCHAR(255);
 
 -- LDEV-1581 Add a column to the lams_grouping table for learner's choice grouping
 ALTER TABLE lams_grouping ADD COLUMN equal_number_of_learners_per_group TINYINT DEFAULT 0;
+INSERT INTO lams_grouping_type VALUES (4, 'LEARNER_CHOICE_GROUPING');
 
 -- LDEV-2006 - make configuration keys truststorePath and truststorePassword system wide
 UPDATE lams_configuration SET config_key='TruststorePath', header_name='config.header.system' WHERE config_key='LDAPTruststorePath';
