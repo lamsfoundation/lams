@@ -26,7 +26,9 @@
 				 	<c:set var="mediumImagePath">
 	   					<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
 					</c:set>					
-					<a href="${mediumImagePath}" rel="lightbox" title="${image.title}" ><img src="${thumbnailPath}" alt="${image.title}"/></a>
+					<a href="${mediumImagePath}" rel="lightbox" title="${image.title}" style="border-style: none;">
+						<img src="${thumbnailPath}" alt="${image.title}" style="border-style: none;"/>
+					</a>
 				</td>
 				
 				<td style="vertical-align:middle;">

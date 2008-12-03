@@ -54,21 +54,26 @@
 	//The panel of imageGallery list panel
 	var imageGalleryListTargetDiv = "imageGalleryListArea";
 	function deleteItem(idx,sessionMapID){
-		var url = "<c:url value="/authoring/removeItem.do"/>";
-	    var reqIDVar = new Date();
-		var param = "imageIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
-		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	imageGalleryListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:false
-		    	}
-	    );
+
+		var	deletionConfirmed = confirm('<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>');
+		
+		if (deletionConfirmed) {
+			var url = "<c:url value="/authoring/removeItem.do"/>";
+			var param = "imageIndex=" + idx +"&sessionMapID="+sessionMapID;;
+			deleteItemLoading();
+		    var myAjax = new Ajax.Updater(
+			    	imageGalleryListTargetDiv,
+			    	url,
+			    	{
+			    		method:'get',
+			    		parameters:param,
+			    		onComplete:deleteItemComplete,
+			    		evalScripts:false
+			    	}
+		    );
+		}
 	}
+	
 	function deleteItemLoading(){
 		showBusy(imageGalleryListTargetDiv);
 	}
