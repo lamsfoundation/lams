@@ -176,8 +176,6 @@
 	   			<webinf dir="${conf.webinf.dir}">
 	   				<include name=".xml"/>
 	   				<include name="**/*.*"/>
-	   				<!-- this dir expected by autopatch discovery -->
-	   				<include name="lib"/>
 	   				<exclude name="web.xml"/>
 	   				<exclude name="classes/**"/>
 	   			</webinf>
