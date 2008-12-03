@@ -198,6 +198,7 @@
 				<include name="images/*"/>
 				<include name="layout/*"/>
 				<include name="test/*"/>
+				<include name="includes/**"/>
 			</fileset>
 		</war>
 		
