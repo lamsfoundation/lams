@@ -851,7 +851,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 				}
 			}
 			else if (r == "presenceAvailable") {
-				if (learner_epres_cb.selected){
+				Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&lessonId=' + _root.lessonID, null, false);
+				if (learner_epres_cb.selected) {
+					
 					var msg:String = Dictionary.getValue('ls_confirm_presence_enabled') ;
 					LFMessage.showMessageAlert(msg);
 
