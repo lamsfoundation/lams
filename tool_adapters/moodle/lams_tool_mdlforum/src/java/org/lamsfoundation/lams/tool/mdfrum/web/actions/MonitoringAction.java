@@ -64,7 +64,7 @@ public class MonitoringAction extends LamsDispatchAction {
     private static final String TOOL_APP_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
 	    + MdlForumConstants.TOOL_SIGNATURE + "/";
 
-    public static final String RELATIVE_MONITOR_URL = "mod/forum/view.php?";
+    public static final String RELATIVE_MONITOR_URL = "mod/Forum/view.php?";
 
     public IMdlForumService mdlForumService;
 

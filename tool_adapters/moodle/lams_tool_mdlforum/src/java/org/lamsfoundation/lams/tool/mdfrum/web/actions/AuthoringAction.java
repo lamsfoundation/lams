@@ -64,7 +64,9 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public IMdlForumService mdlForumService;
 
-    public static final String RELATIVE_MOODLE_AUTHOR_URL = "course/modedit-lams.php?";
+    //public static final String RELATIVE_MOODLE_AUTHOR_URL = "/course/modedit-lams.php?";
+    public static final String RELATIVE_MOODLE_AUTHOR_URL = "course/lamsframes.php?";
+    public static final String MOODLE_EDIT_URL = "course/modedit-lams.php";
 
     // Authoring SessionMap key names
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
@@ -149,7 +151,12 @@ public class AuthoringAction extends LamsDispatchAction {
 	    responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
 	    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
 		    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
+  
 	    responseUrl += "&lamsUpdateURL=" + returnUpdateUrl;
+	    
+	    String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_EDIT_URL, "UTF8");
+	    
+	    responseUrl += "&dest=" + encodedMoodleRelativePath ;
 
 	    if (mdlForum.getExtSection() != null) {
 		responseUrl += "&section=" + mdlForum.getExtSection();
@@ -158,9 +165,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	    }
 
 	    if (mdlForum.getExtToolContentId() != null) {
-		responseUrl += "&update=" + mdlForum.getExtToolContentId().toString();
+		responseUrl += "&id=" + mdlForum.getExtToolContentId().toString();
 	    } else {
-		responseUrl += "&add=forum";
+		responseUrl += "&add=Forum";
 	    }
 
 	    if (mdlForum.getExtCourseId() != null) {
@@ -169,11 +176,11 @@ public class AuthoringAction extends LamsDispatchAction {
 		responseUrl += "&course=" + courseFromCSV;
 	    }
 
-	    log.debug("Sending to moodle forum edit page: " + responseUrl);
+	    log.debug("Sending to moodle Forum edit page: " + responseUrl);
 
 	    response.sendRedirect(responseUrl);
 	} catch (Exception e) {
-	    log.error("Could not redirect to mdl forum authoring", e);
+	    log.error("Could not redirect to mdl Forum authoring", e);
 	}
 	return null;
     }

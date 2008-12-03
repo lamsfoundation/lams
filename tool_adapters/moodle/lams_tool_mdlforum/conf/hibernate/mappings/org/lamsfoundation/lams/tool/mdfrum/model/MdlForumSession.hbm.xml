@@ -86,7 +86,7 @@
             insert="true"
         >
             <column
-                name="mdlforum_uid" 
+                name="mdlForum_uid" 
             />
         </many-to-one>
 
@@ -99,7 +99,7 @@
         >
 
             <key
-                column="mdlforum_session_uid"
+                column="mdlForum_session_uid"
             >
             </key>
 

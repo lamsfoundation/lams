@@ -14,20 +14,20 @@
   <form-beans>
 
     <form-bean
-      name="authoringForm"
-      type="org.lamsfoundation.lams.tool.mdfrum.web.forms.AuthoringForm"
+      name="mdfrum10AdminForm"
+      type="org.lamsfoundation.lams.tool.mdfrum.web.forms.AdminForm"
     />
     <form-bean
       name="monitoringForm"
       type="org.lamsfoundation.lams.tool.mdfrum.web.forms.MonitoringForm"
     />
     <form-bean
-      name="mdfrum10AdminForm"
-      type="org.lamsfoundation.lams.tool.mdfrum.web.forms.AdminForm"
-    />
-    <form-bean
       name="learningForm"
       type="org.lamsfoundation.lams.tool.mdfrum.web.forms.LearningForm"
+    />
+    <form-bean
+      name="authoringForm"
+      type="org.lamsfoundation.lams.tool.mdfrum.web.forms.AuthoringForm"
     />
 
   </form-beans>
@@ -45,21 +45,6 @@
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
-    <action
-      path="/mdfrum10admin"
-      type="org.lamsfoundation.lams.tool.mdfrum.web.actions.AdminAction"
-      name="mdfrum10AdminForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="config"
-        path="/pages/admin/config.jsp"
-        redirect="false"
-      />
-    </action>
     <action
       path="/learning"
       type="org.lamsfoundation.lams.tool.mdfrum.web.actions.LearningAction"
@@ -93,6 +78,21 @@
     >
     </action>
     <action
+      path="/monitoring"
+      type="org.lamsfoundation.lams.tool.mdfrum.web.actions.MonitoringAction"
+      name="monitoringForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="tiles:/monitoring/main"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.mdfrum.web.actions.AuthoringAction"
       name="authoringForm"
@@ -113,17 +113,17 @@
       />
     </action>
     <action
-      path="/monitoring"
-      type="org.lamsfoundation.lams.tool.mdfrum.web.actions.MonitoringAction"
-      name="monitoringForm"
+      path="/mdfrum10admin"
+      type="org.lamsfoundation.lams.tool.mdfrum.web.actions.AdminAction"
+      name="mdfrum10AdminForm"
       scope="request"
       parameter="dispatch"
       unknown="false"
       validate="false"
     >
       <forward
-        name="success"
-        path="tiles:/monitoring/main"
+        name="config"
+        path="/pages/admin/config.jsp"
         redirect="false"
       />
     </action>

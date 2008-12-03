@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.mdfrum.dto.MdlForumDTO;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
@@ -73,7 +74,11 @@ public class LearningAction extends LamsDispatchAction {
     private static final String TOOL_APP_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
 	    + MdlForumConstants.TOOL_SIGNATURE + "/";
 
-    public static final String RELATIVE_LEARNER_URL = "mod/forum/view.php?";
+    //public static final String RELATIVE_LEARNER_URL = "mod/Forum/view.php?";
+    
+    public static final String RELATIVE_LEARNER_URL = "course/lamsframes.php?";
+    public static final String MOODLE_VIEW_URL = "mod/Forum/view.php";
+    public static final String RELATIVE_TEACHER_URL = "mod/Forum/view.php?"; 
 
     private IMdlForumService mdlForumService;
 
@@ -88,6 +93,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	// Retrieve the session and content.
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, false);
 	MdlForumSession mdlForumSession = mdlForumService.getSessionBySessionId(toolSessionID);
 	if (mdlForumSession == null) {
 	    throw new MdlForumException("Cannot retreive session with toolSessionID: " + toolSessionID);
@@ -118,19 +124,34 @@ public class LearningAction extends LamsDispatchAction {
 	    try {
 		String responseUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_SERVER_URL)
 			.getConfigValue();
-		responseUrl += RELATIVE_LEARNER_URL;
+		
+			if(mode.equals(ToolAccessMode.TEACHER))
+			{
+				responseUrl += RELATIVE_TEACHER_URL;
+			}
+			else if (mode.equals(ToolAccessMode.LEARNER))
+			{
+				responseUrl += RELATIVE_LEARNER_URL;
+			}
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ toolSessionID.toString() + "&dispatch=finishActivity";
+		
+		
+		
+		String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_VIEW_URL, "UTF8");
 
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
+		
 
-		responseUrl += "&id=" + mdlForumSession.getExtSessionId() + "&returnUrl=" + returnUrl;
+		responseUrl += "&id=" + mdlForumSession.getExtSessionId() + "&returnUrl=" + returnUrl
+			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1";
+		
 
-		log.debug("Redirecting for mdl forum learner: " + responseUrl);
+		log.debug("Redirecting for mdl Forum learner: " + responseUrl);
 		response.sendRedirect(responseUrl);
 	    } catch (Exception e) {
-		log.error("Could not redirect to mdl forum authoring", e);
+		log.error("Could not redirect to mdl Forum authoring", e);
 	    }
 	} else {
 	    throw new MdlForumException("External content id null for learner");
