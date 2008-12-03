@@ -13,6 +13,17 @@
 		<c:set var="imageGallery" value="${sessionMap.imageGallery}" />		
 		
 		<%@ include file="/common/header.jsp"%>
+		
+		<script type="text/javascript">
+
+			function deleteComment(commentUid) {
+				var	deletionConfirmed = confirm('<fmt:message key="warning.msg.monitoring.do.you.want.to.delete"></fmt:message>');
+
+				if (deletionConfirmed) {
+					window.location.href = "<c:url value='/monitoring/removeComment.do'/>?sessionMapID=${sessionMapID}&commentUid=" + commentUid;
+				}
+			}
+		</script>
 	</lams:head>
 	
 	<body class="stripes">
@@ -136,10 +147,8 @@
 													<img src="<html:rewrite page='/includes/images/edit.gif'/>" 
 															title="<fmt:message key="label.authoring.basic.resource.edit" />" style="border-style: none;"/>
 												</a>
-												<c:set var="removeCommentUrl" >
-													<c:url value='/monitoring/removeComment.do'/>?sessionMapID=${sessionMapID}&commentUid=${comment.uid}&TB_iframe=true&height=300&width=300
-												</c:set>		
-												<a href="${removeCommentUrl}" class="thickbox" style="margin-left: 15px;">
+		
+												<a href="#" style="margin-left: 15px;" id="removeCommentLink" onclick="deleteComment(${comment.uid});" >
 													<img src="<html:rewrite page='/includes/images/cross.gif'/>" 												 
 															title="<fmt:message key="label.authoring.basic.resource.delete" />" style="border-style: none;"/>												
 												</a>
