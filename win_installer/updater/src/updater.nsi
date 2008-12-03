@@ -254,7 +254,7 @@ SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
             call copyllid
             
             ; Updating the database to support version
-            ; from 2.2 on, this only handles no auto-patch scripts
+            ; from 2.2 on, this only handles non auto-patch scripts
             call updateCoreDatabase 
                             
             # changing the instdir back to the original inst dir
@@ -1333,6 +1333,10 @@ Function updateCoreDatabase
     FileWrite $0 "update lams_configuration set config_value='${SERVER_VERSION_NUMBER}' where config_key='LearnerClientVersion' OR config_key='ServerVersionNumber' OR config_key='MonitorClientVersion' OR config_key='AuthoringClientVersion';$\r$\n"
     Filewrite $0 "update lams_configuration set config_value='${VERSION}' where config_key='Version';$\r$\n"
     Filewrite $0 "update lams_configuration set config_value='${LANGUAGE_PACK_VERSION}' where config_key='DictionaryDateCreated';$\r$\n"
+    
+    ##### 2.2 ONLY ######
+    Filewrite $0 "update lams_learning_library set valid_flag=0 where title='Dimdim';$\r$\n"
+    
     Fileclose $0
     IfErrors 0 +3
         Detailprint "Problem closing updateConfiguration.sql"
