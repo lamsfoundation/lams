@@ -57,7 +57,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
-import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryApplicationException;
+import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
 import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageCommentComparator;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
@@ -268,7 +268,7 @@ public class LearningAction extends Action {
 
 	    nextActivityUrl = service.finishToolSession(sessionId, userID);
 	    request.setAttribute(ImageGalleryConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (ImageGalleryApplicationException e) {
+	} catch (ImageGalleryException e) {
 	    log.error("Failed get next activity url:" + e.getMessage());
 	}
 
@@ -648,7 +648,7 @@ public class LearningAction extends Action {
      * 
      * @param request
      * @param imageForm
-     * @throws ImageGalleryApplicationException
+     * @throws ImageGalleryException
      */
     private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm)
 	    throws Exception {

@@ -31,15 +31,16 @@ classpath_addition,
 context_file,
 create_date_time,
 modified_date_time,
-admin_url
+admin_url,
+supports_outputs
 )
 VALUES
 (
 'laimag10',
-'imageGalleryService',
-'Shared ImageGallery',
-'Shared ImageGallery',
-'sharedimageGallery',
+'laimagImageGalleryService',
+'ImageGallery',
+'ImageGallery',
+'imageGallery',
 '@tool_version@',
 NULL,
 NULL,
@@ -62,5 +63,6 @@ NULL,
 '/org/lamsfoundation/lams/tool/imageGallery/imageGalleryApplicationContext.xml',
 NOW(),
 NOW(),
-'tool/laimag10/laimag10admin/start.do'
+'tool/laimag10/laimag10admin/start.do',
+1
 )

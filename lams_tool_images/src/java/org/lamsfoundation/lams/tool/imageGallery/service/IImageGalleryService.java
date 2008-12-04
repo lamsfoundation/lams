@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
@@ -55,9 +54,9 @@ public interface IImageGalleryService {
      * 
      * @param contentId
      * @return
-     * @throws ImageGalleryApplicationException
+     * @throws ImageGalleryException
      */
-    ImageGallery getDefaultContent(Long contentId) throws ImageGalleryApplicationException;
+    ImageGallery getDefaultContent(Long contentId) throws ImageGalleryException;
 
     /**
      * Get list of imageGallery items by given imageGalleryUid. These imageGallery items must be created by author.
@@ -113,7 +112,7 @@ public interface IImageGalleryService {
     /**
      * Delete file from repository.
      */
-    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ImageGalleryApplicationException;
+    void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ImageGalleryException;
 
     /**
      * Save or update imageGallery into database.
@@ -235,7 +234,7 @@ public interface IImageGalleryService {
      * @param userId
      * @return
      */
-    String finishToolSession(Long toolSessionId, Long userId) throws ImageGalleryApplicationException;
+    String finishToolSession(Long toolSessionId, Long userId) throws ImageGalleryException;
 
     ImageGalleryItem getImageGalleryItemByUid(Long itemUid);
 
@@ -256,7 +255,7 @@ public interface IImageGalleryService {
      */
     List<List<UserImageContributionDTO>> getImageSummary(Long contentId, Long imageUid);
 
-    List<ImageGalleryUser> getUserListBySessionItem(Long sessionId, Long itemUid);
+    List<ImageGalleryUser> getUserListBySessionId(Long sessionId);
 
     /**
      * Set a imageGallery item visible or not.
@@ -323,8 +322,6 @@ public interface IImageGalleryService {
      * @return
      */
     ImageGalleryUser getUser(Long uid);
-
-    public IEventNotificationService getEventNotificationService();
 
     /**
      * Gets a message from imageGallery bundle. Same as <code><fmt:message></code> in JSP pages.

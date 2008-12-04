@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageCommentDAO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 
 /**
  * Hibernate implementation of <code>ImageCommentDAO</code>.

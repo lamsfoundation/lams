@@ -23,10 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 
 /**
  * DAO interface for <code>ImageComment</code>.

@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.imageGallery.dto;
 import java.util.Set;
 
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
  
 /**

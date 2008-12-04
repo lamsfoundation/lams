@@ -23,26 +23,24 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
-public class ImageGalleryApplicationException extends Exception {
+public class ImageGalleryException extends RuntimeException {
 
-    public ImageGalleryApplicationException() {
+    private static final long serialVersionUID = 166078303054196936L;
+
+    public ImageGalleryException() {
 	super();
-
     }
 
-    public ImageGalleryApplicationException(String message, Throwable cause) {
+    public ImageGalleryException(String message, Throwable cause) {
 	super(message, cause);
-
     }
 
-    public ImageGalleryApplicationException(String message) {
+    public ImageGalleryException(String message) {
 	super(message);
-
     }
 
-    public ImageGalleryApplicationException(Throwable cause) {
+    public ImageGalleryException(Throwable cause) {
 	super(cause);
-
     }
 
 }

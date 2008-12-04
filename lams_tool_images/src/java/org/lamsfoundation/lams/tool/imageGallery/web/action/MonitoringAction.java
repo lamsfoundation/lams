@@ -25,19 +25,13 @@
 package org.lamsfoundation.lams.tool.imageGallery.web.action;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -49,7 +43,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
@@ -62,14 +55,10 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
-import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryApplicationException;
-import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageCommentComparator;
+import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageCommentForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -397,7 +386,7 @@ public class MonitoringAction extends Action {
      * 
      * @param request
      * @param imageForm
-     * @throws ImageGalleryApplicationException
+     * @throws ImageGalleryException
      */
     private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm){
 

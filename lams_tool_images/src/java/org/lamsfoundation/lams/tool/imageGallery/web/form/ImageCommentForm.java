@@ -23,13 +23,10 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.imageGallery.web.form;  
 
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
  
 /**

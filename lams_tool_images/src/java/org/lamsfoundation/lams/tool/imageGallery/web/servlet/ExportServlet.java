@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
-import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryApplicationException;
+import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
 import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryServiceProxy;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler;
 import org.lamsfoundation.lams.tool.imageGallery.util.ReflectDTOComparator;
@@ -100,7 +100,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
 				teacher(request, response, directoryName, cookies,sessionMap);
 			}
-		} catch (ImageGalleryApplicationException e) {
+		} catch (ImageGalleryException e) {
 			logger.error("Cannot perform export for imageGallery tool.");
 		}
 
@@ -135,12 +135,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 
 	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws ImageGalleryApplicationException {
+			throws ImageGalleryException {
 
 		if (userID == null || toolSessionID == null) {
 			String error = "Tool session Id or user Id is null. Unable to continue";
 			logger.error(error);
-			throw new ImageGalleryApplicationException(error);
+			throw new ImageGalleryException(error);
 		}
 
 		ImageGalleryUser learner = service.getUserByIDAndSession(userID,toolSessionID);
@@ -148,7 +148,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		if (learner == null) {
 			String error = "The user with user id " + userID + " does not exist.";
 			logger.error(error);
-			throw new ImageGalleryApplicationException(error);
+			throw new ImageGalleryException(error);
 		}
 
 		ImageGallery content = service.getImageGalleryBySessionId(toolSessionID);
@@ -156,7 +156,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		if (content == null) {
 			String error = "The content for this activity has not been defined yet.";
 			logger.error(error);
-			throw new ImageGalleryApplicationException(error);
+			throw new ImageGalleryException(error);
 		}
 		
 		
@@ -189,13 +189,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws ImageGalleryApplicationException {
+			throws ImageGalleryException {
 
 		// check if toolContentId exists in db or not
 		if (toolContentID == null) {
 			String error = "Tool Content Id is missing. Unable to continue";
 			logger.error(error);
-			throw new ImageGalleryApplicationException(error);
+			throw new ImageGalleryException(error);
 		}
 
 		ImageGallery content = service.getImageGalleryByContentId(toolContentID);
@@ -203,7 +203,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		if (content == null) {
 			String error = "Data is missing from the database. Unable to Continue";
 			logger.error(error);
-			throw new ImageGalleryApplicationException(error);
+			throw new ImageGalleryException(error);
 		}
 		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
 		if(groupList != null) {

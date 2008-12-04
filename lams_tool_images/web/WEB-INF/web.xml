@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
- <display-name>Shared ImageGallery</display-name>
+ <display-name>Image Gallery</display-name>
 <description>
-	Shared ImageGallery tool
+	ImageGallery tool
 </description>
 <context-param>
 	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
@@ -41,7 +41,7 @@
     </filter-class>
     <init-param>
       <param-name>sessionFactoryBeanName</param-name>
-      <param-value>imageGallerySessionFactory</param-value>
+      <param-value>laimagImageGallerySessionFactory</param-value>
     </init-param>
    </filter>
    <!-- System session filter -->
@@ -130,7 +130,7 @@
 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
 	    <init-param>
 	      <param-name>toolContentHandlerBeanName</param-name>
-	      <param-value>imageGalleryToolContentHandler</param-value>
+	      <param-value>laimagImageGalleryToolContentHandler</param-value>
 	    </init-param>
 	    <load-on-startup>3</load-on-startup>
 	</servlet>

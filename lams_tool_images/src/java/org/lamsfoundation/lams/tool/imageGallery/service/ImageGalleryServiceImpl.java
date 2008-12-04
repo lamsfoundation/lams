@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
@@ -142,6 +141,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private ImageGalleryToolContentHandler imageGalleryToolContentHandler;
 
     private MessageService messageService;
+    
+    private ImageGalleryOutputFactory imageGalleryOutputFactory;
 
     // system services
     private IRepositoryService repositoryService;
@@ -158,8 +159,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     private ICoreNotebookService coreNotebookService;
 
-    private IEventNotificationService eventNotificationService;
-
     // *******************************************************************************
     // Service method
     // *******************************************************************************
@@ -175,7 +174,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      * @throws ImscpApplicationException
      */
     private IVersionedNode getFile(Long uuid, Long versionId, String relativePath)
-	    throws ImageGalleryApplicationException {
+	    throws ImageGalleryException {
 
 	ITicket tic = getRepositoryLoginTicket();
 
@@ -190,14 +189,14 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
 	    ImageGalleryServiceImpl.log.error(error);
-	    throw new ImageGalleryApplicationException(error, e);
+	    throw new ImageGalleryException(error, e);
 
 	} catch (Exception e) {
 
 	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
 		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
 	    ImageGalleryServiceImpl.log.error(error);
-	    throw new ImageGalleryApplicationException(error, e);
+	    throw new ImageGalleryException(error, e);
 
 	}
     }
@@ -210,9 +209,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      * the tool needs to upload/download files from the content repository.
      * 
      * @return ITicket The ticket for repostory access
-     * @throws ImageGalleryApplicationException
+     * @throws ImageGalleryException
      */
-    private ITicket getRepositoryLoginTicket() throws ImageGalleryApplicationException {
+    private ITicket getRepositoryLoginTicket() throws ImageGalleryException {
 	ICredentials credentials = new SimpleCredentials(imageGalleryToolContentHandler.getRepositoryUser(),
 		imageGalleryToolContentHandler.getRepositoryId());
 	try {
@@ -220,11 +219,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		    .getRepositoryWorkspaceName());
 	    return ticket;
 	} catch (AccessDeniedException ae) {
-	    throw new ImageGalleryApplicationException("Access Denied to repository." + ae.getMessage());
+	    throw new ImageGalleryException("Access Denied to repository." + ae.getMessage());
 	} catch (WorkspaceNotFoundException we) {
-	    throw new ImageGalleryApplicationException("Workspace not found." + we.getMessage());
+	    throw new ImageGalleryException("Workspace not found." + we.getMessage());
 	} catch (LoginException e) {
-	    throw new ImageGalleryApplicationException("Login failed." + e.getMessage());
+	    throw new ImageGalleryException("Login failed." + e.getMessage());
 	}
     }
 
@@ -236,11 +235,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return rs;
     }
 
-    public ImageGallery getDefaultContent(Long contentId) throws ImageGalleryApplicationException {
+    public ImageGallery getDefaultContent(Long contentId) throws ImageGalleryException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
 	    ImageGalleryServiceImpl.log.error(error);
-	    throw new ImageGalleryApplicationException(error);
+	    throw new ImageGalleryException(error);
 	}
 
 	ImageGallery defaultContent = getDefaultImageGallery();
@@ -284,12 +283,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return imageGalleryUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
 
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ImageGalleryApplicationException {
+    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ImageGalleryException {
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
 	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
 	} catch (Exception e) {
-	    throw new ImageGalleryApplicationException("Exception occured while deleting files from"
+	    throw new ImageGalleryException("Exception occured while deleting files from"
 		    + " the repository " + e.getMessage());
 	}
     }
@@ -457,7 +456,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
     }
 
-    public String finishToolSession(Long toolSessionId, Long userId) throws ImageGalleryApplicationException {
+    public String finishToolSession(Long toolSessionId, Long userId) throws ImageGalleryException {
 	ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
 	imageGalleryUserDao.saveObject(user);
@@ -470,9 +469,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	try {
 	    nextUrl = this.leaveToolSession(toolSessionId, userId);
 	} catch (DataMissingException e) {
-	    throw new ImageGalleryApplicationException(e);
+	    throw new ImageGalleryException(e);
 	} catch (ToolException e) {
-	    throw new ImageGalleryApplicationException(e);
+	    throw new ImageGalleryException(e);
 	}
 	return nextUrl;
     }
@@ -624,16 +623,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return map;
     }
 
-    public List<ImageGalleryUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
-	List<ImageGalleryItemVisitLog> logList = imageGalleryItemVisitDao.getImageGalleryItemLogBySession(sessionId,
-		itemUid);
-	List<ImageGalleryUser> userList = new ArrayList(logList.size());
-	for (ImageGalleryItemVisitLog visit : logList) {
-	    ImageGalleryUser user = visit.getUser();
-	    user.setAccessDate(visit.getAccessDate());
-	    userList.add(user);
-	}
-	return userList;
+    public List<ImageGalleryUser> getUserListBySessionId(Long sessionId) {
+	return imageGalleryUserDao.getBySessionID(sessionId);
     }
 
     public void setItemVisible(Long itemUid, boolean visible) {
@@ -685,25 +676,25 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     // *****************************************************************************
     // private methods
     // *****************************************************************************
-    private ImageGallery getDefaultImageGallery() throws ImageGalleryApplicationException {
+    private ImageGallery getDefaultImageGallery() throws ImageGalleryException {
 	Long defaultImageGalleryId = getToolDefaultContentIdBySignature(ImageGalleryConstants.TOOL_SIGNATURE);
 	ImageGallery defaultImageGallery = getImageGalleryByContentId(defaultImageGalleryId);
 	if (defaultImageGallery == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
 	    ImageGalleryServiceImpl.log.error(error);
-	    throw new ImageGalleryApplicationException(error);
+	    throw new ImageGalleryException(error);
 	}
 
 	return defaultImageGallery;
     }
 
-    private Long getToolDefaultContentIdBySignature(String toolSignature) throws ImageGalleryApplicationException {
+    private Long getToolDefaultContentIdBySignature(String toolSignature) throws ImageGalleryException {
 	Long contentId = null;
 	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
 	    ImageGalleryServiceImpl.log.error(error);
-	    throw new ImageGalleryApplicationException(error);
+	    throw new ImageGalleryException(error);
 	}
 	return contentId;
     }
@@ -754,7 +745,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     /**
      * Process an uploaded file.
      * 
-     * @throws ImageGalleryApplicationException
+     * @throws ImageGalleryException
      * @throws FileNotFoundException
      * @throws IOException
      * @throws RepositoryCheckedException
@@ -862,7 +853,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	if (toolContentObj == null) {
 	    try {
 		toolContentObj = getDefaultImageGallery();
-	    } catch (ImageGalleryApplicationException e) {
+	    } catch (ImageGalleryException e) {
 		throw new DataMissingException(e.getMessage());
 	    }
 	}
@@ -969,7 +960,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	ImageGallery imageGallery = getImageGalleryByContentId(toolContentId);
+	if (imageGallery == null) {
+	    imageGallery = getDefaultImageGallery();
+	}
+	return getImageGalleryOutputFactory().getToolOutputDefinitions(imageGallery);
     }
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
@@ -984,7 +979,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	if (imageGallery == null) {
 	    try {
 		imageGallery = getDefaultImageGallery();
-	    } catch (ImageGalleryApplicationException e) {
+	    } catch (ImageGalleryException e) {
 		throw new ToolException(e);
 	    }
 	}
@@ -1085,7 +1080,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return imageGalleryOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     /**
@@ -1095,7 +1090,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	return imageGalleryOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
@@ -1146,16 +1141,16 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	this.coreNotebookService = coreNotebookService;
     }
 
-    public IEventNotificationService getEventNotificationService() {
-	return eventNotificationService;
-    }
-
-    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
-	this.eventNotificationService = eventNotificationService;
-    }
-
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
+    }
+    
+    public ImageGalleryOutputFactory getImageGalleryOutputFactory() {
+	return imageGalleryOutputFactory;
+    }
+
+    public void setImageGalleryOutputFactory(ImageGalleryOutputFactory imageGalleryOutputFactory) {
+	this.imageGalleryOutputFactory = imageGalleryOutputFactory;
     }
 
     public ImageGalleryConfigItem getConfigItem(String key) {
