@@ -354,9 +354,10 @@ public class LearningAction extends Action {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
 
-	
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
+	String escapedDescription = image.getDescription().replaceAll("[\"]", "&quot;");
+	image.setDescription(escapedDescription);
 	sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_IMAGE, image);
 	
 	// becuase in webpage will use this login name. Here is just
