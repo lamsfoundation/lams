@@ -24,10 +24,6 @@ db_root_pass="$RET"
 
 case "$1" in
     remove)
-        # Remove the caching jars
-        rm -f /usr/share/jboss-4.0.2/server/default/lib/jgroups.jar
-        rm -f /usr/share/jboss-4.0.2/server/default/lib/jboss-cache.jar
-
         # Remove user and group
         deluser lams 2> /dev/null || true
 

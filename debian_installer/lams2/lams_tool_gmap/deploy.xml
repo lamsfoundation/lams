@@ -1,0 +1,34 @@
+<Deploy>
+  <toolSignature>lagmap10</toolSignature>
+  <toolWebUri>lams-tool-lagmap10.war</toolWebUri>
+  <toolContext>/lams/tool/lagmap10</toolContext>
+  <toolUpdateScriptPath>/usr/share/lams2/lams_tool_gmap/sql/updateTo20080521.sql</toolUpdateScriptPath>
+  <toolInsertScriptPath>/usr/share/lams2/lams_tool_gmap/sql/tool_insert.sql</toolInsertScriptPath>
+  <toolLibraryInsertScriptPath>/usr/share/lams2/lams_tool_gmap/sql/library_insert.sql</toolLibraryInsertScriptPath>
+  <hideTool>false</hideTool>
+  <toolActivityInsertScriptPath>/usr/share/lams2/lams_tool_gmap/sql/activity_insert.sql</toolActivityInsertScriptPath>
+  <toolTablesScriptPath>/usr/share/lams2/lams_tool_gmap/sql/create_lams_tool_gmap.sql</toolTablesScriptPath>
+  <toolTablesDeleteScriptPath>/usr/share/lams2/lams_tool_gmap/sql/drop_lams_tool_gmap.sql</toolTablesDeleteScriptPath>
+  <toolDBVersionScriptPath>/usr/share/lams2/lams_tool_gmap/sql/db_version_insert.sql</toolDBVersionScriptPath>
+  <toolApplicationContextPath>/org/lamsfoundation/lams/tool/gmap/gmapApplicationContext.xml</toolApplicationContextPath>
+  <toolJarFileName>lams-tool-lagmap10.jar</toolJarFileName>
+  <minServerVersionNumber>2.0</minServerVersionNumber>
+  <deployFiles>
+    <string>/usr/share/lams2/lams_tool_gmap/lams-tool-lagmap10.war</string>
+    <string>/usr/share/lams2/lams_tool_gmap/lams-tool-lagmap10.jar</string>
+  </deployFiles>
+  <languageFiles>
+    <string>/usr/share/lams2/lams_tool_gmap/language/ApplicationResources.properties</string>
+    <string>/usr/share/lams2/lams_tool_gmap/language/ApplicationResources_el_GR.properties</string>
+    <string>/usr/share/lams2/lams_tool_gmap/language/ApplicationResources_en_AU.properties</string>
+    <string>/usr/share/lams2/lams_tool_gmap/language/ApplicationResources_es_ES.properties</string>
+    <string>/usr/share/lams2/lams_tool_gmap/language/ApplicationResources_no_NO.properties</string>
+  </languageFiles>
+  <toolVersion>20080521</toolVersion>
+  <dbDriverClass>com.mysql.jdbc.Driver</dbDriverClass>
+  <dbDriverUrl>jdbc:mysql://localhost/lams_head?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true&amp;useUnicode=true</dbDriverUrl>
+  <dbUsername>lams</dbUsername>
+  <dbPassword>lamsdemo</dbPassword>
+  <lamsEarPath>/usr/share/jboss-4.0.2/server/default/deploy/lams.ear</lamsEarPath>
+  <languageFilesPackage>org.lamsfoundation.lams.tool.gmap</languageFilesPackage>
+</Deploy>

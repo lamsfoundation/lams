@@ -17,6 +17,59 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+configure220 () {
+    # Configure 2.2 tools; need to run after above tools have been deployed
+    if [ "$db_root_pass" != "" ] ; then
+        mysql $db_name < /usr/share/lams2/configure2.2.0.sql -u root -p$db_root_pass || true
+    else
+        mysql $db_name < /usr/share/lams2/configure2.2.0.sql -u root || true
+    fi
+}
+
+update211to220 () {
+    # Update 2.1.1 database to 2.2
+    if [ "$db_root_pass" != "" ] ; then
+        mysql $db_name < /usr/share/lams2/2.1.1to2.2.0.sql -u root -p$db_root_pass || true
+    else
+        mysql $db_name < /usr/share/lams2/2.1.1to2.2.0.sql -u root || true
+    fi
+
+    # Add data collection tool, new in 2.2
+    cd /usr/share/lams2/lams_tool_daco/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh > /dev/null || true
+
+    # Add dimdim tool, new in 2.2 (disabled in 2.1.1to2.2.0.sql however)
+    cd /usr/share/lams2/lams_tool_dimdim/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh > /dev/null || true
+
+    # Add gmap tool, new in 2.2
+    cd /usr/share/lams2/lams_tool_gmap/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh > /dev/null || true
+
+    # Add spreadsheet tool, new in 2.2
+    cd /usr/share/lams2/lams_tool_spreadsheet/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh > /dev/null || true
+
+    # Add wiki tool, new in 2.2
+    cd /usr/share/lams2/lams_tool_wiki/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh > /dev/null || true
+}
+
 update21rc1to210 () {
     # Update 2.1rc1 database to 2.1
     if [ "$db_root_pass" != "" ] ; then
@@ -40,6 +93,11 @@ update210to211 () {
     else
         mysql $db_name < /usr/share/lams2/2.1.0to2.1.1.sql -u root || true
     fi
+}
+
+update () {
+    rm -rf /var/cache/jboss/tmp/*
+    rm -rf /var/cache/jboss/work/*
 }
 
 case "$1" in
@@ -90,13 +148,24 @@ case "$1" in
         sed -i -e "s/port=\"8080\"/port=\"$server_port\"/" server.xml
 
         case "$2" in
+            2.1.1*)
+                update;
+                update211to220;
+                configure220;
+            ;;
             2.1.0*)
+                update;
                 update210to211;
+                update211to220;
+                configure220;
             ;;
 
             2.1rc1*)
+                update;
                 update21rc1to210;
                 update210to211;
+                update211to220;
+                configure220;
             ;;
 
             *)
@@ -180,11 +249,6 @@ case "$1" in
                         -u root || true
                 fi
 
-                # Copy caching jars
-                cd /usr/share/jboss-4.0.2/server/
-                cp all/lib/jgroups.jar default/lib/
-                cp all/lib/jboss-cache.jar default/lib/
-
                 # Place lams-www.war (uploaded data) in /var/lib
                 cd /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/
                 if [ ! -d /var/lib/lams/ ] ; then
@@ -202,6 +266,11 @@ case "$1" in
                 fi
                 ln -s /var/lib/lams/lams-www.war 2>/dev/null || true
 
+                # Copy included repository (only for new installs)
+                cp -rp /usr/share/lams2/repository/ /var/lib/lams/
+
+                configure220;
+
                 # Add user and group
                 adduser --system --group --no-create-home lams 2> /dev/null
                 chown -L -R lams:lams /usr/share/jboss-4.0.2/
@@ -215,6 +284,7 @@ case "$1" in
                         /etc/init.d/mysql restart || exit $?
                     fi
                 fi
+
             ;;
         esac
 
@@ -260,8 +330,16 @@ case "$1" in
         # Remove temp files
         rm -f /usr/share/lams2/2.1rc1to2.1.sql
         rm -f /usr/share/lams2/lams.sql
-        rm -rf /usr/share/lams2/lams_tool_task_list
+        rm -rf /usr/share/lams2/lams_tool_task
         rm -f /usr/share/lams2/2.1.0to2.1.1.sql
+        rm -f /usr/share/lams2/2.1.1to2.2.0.sql
+        rm -f /usr/share/lams2/configure2.2.0.sql
+        rm -rf /usr/share/lams2/lams_tool_daco
+        rm -rf /usr/share/lams2/lams_tool_dimdim
+        rm -rf /usr/share/lams2/lams_tool_gmap
+        rm -rf /usr/share/lams2/lams_tool_spreadsheet
+        rm -rf /usr/share/lams2/lams_tool_wiki
+        rm -rf /usr/share/lams2/repository
 
         # Delete default ROOT.war/index.html (replaced with redirecting index.jsp)
         rm -f /usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/ROOT.war/index.html

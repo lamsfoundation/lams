@@ -1,0 +1,34 @@
+<Deploy>
+  <toolSignature>lawiki10</toolSignature>
+  <toolWebUri>lams-tool-lawiki10.war</toolWebUri>
+  <toolContext>/lams/tool/lawiki10</toolContext>
+  <toolUpdateScriptPath>/usr/share/lams2/lams_tool_wiki/sql/updateTo20080929.sql</toolUpdateScriptPath>
+  <toolInsertScriptPath>/usr/share/lams2/lams_tool_wiki/sql/tool_insert.sql</toolInsertScriptPath>
+  <toolLibraryInsertScriptPath>/usr/share/lams2/lams_tool_wiki/sql/library_insert.sql</toolLibraryInsertScriptPath>
+  <hideTool>false</hideTool>
+  <toolActivityInsertScriptPath>/usr/share/lams2/lams_tool_wiki/sql/activity_insert.sql</toolActivityInsertScriptPath>
+  <toolTablesScriptPath>/usr/share/lams2/lams_tool_wiki/sql/create_lams_tool_wiki.sql</toolTablesScriptPath>
+  <toolTablesDeleteScriptPath>/usr/share/lams2/lams_tool_wiki/sql/drop_lams_tool_wiki.sql</toolTablesDeleteScriptPath>
+  <toolDBVersionScriptPath>/usr/share/lams2/lams_tool_wiki/sql/db_version_insert.sql</toolDBVersionScriptPath>
+  <toolApplicationContextPath>/org/lamsfoundation/lams/tool/wiki/wikiApplicationContext.xml</toolApplicationContextPath>
+  <toolJarFileName>lams-tool-lawiki10.jar</toolJarFileName>
+  <minServerVersionNumber>2.0</minServerVersionNumber>
+  <deployFiles>
+    <string>/usr/share/lams2/lams_tool_wiki/lams-tool-lawiki10.war</string>
+    <string>/usr/share/lams2/lams_tool_wiki/lams-tool-lawiki10.jar</string>
+  </deployFiles>
+  <languageFiles>
+    <string>/usr/share/lams2/lams_tool_wiki/language/ApplicationResources.properties</string>
+    <string>/usr/share/lams2/lams_tool_wiki/language/ApplicationResources_el_GR.properties</string>
+    <string>/usr/share/lams2/lams_tool_wiki/language/ApplicationResources_en_AU.properties</string>
+    <string>/usr/share/lams2/lams_tool_wiki/language/ApplicationResources_es_ES.properties</string>
+    <string>/usr/share/lams2/lams_tool_wiki/language/ApplicationResources_no_NO.properties</string>
+  </languageFiles>
+  <toolVersion>20080929</toolVersion>
+  <dbDriverClass>com.mysql.jdbc.Driver</dbDriverClass>
+  <dbDriverUrl>jdbc:mysql://localhost/lams_head?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true&amp;useUnicode=true</dbDriverUrl>
+  <dbUsername>lams</dbUsername>
+  <dbPassword>lamsdemo</dbPassword>
+  <lamsEarPath>/usr/share/jboss-4.0.2/server/default/deploy/lams.ear</lamsEarPath>
+  <languageFilesPackage>org.lamsfoundation.lams.tool.wiki</languageFilesPackage>
+</Deploy>
