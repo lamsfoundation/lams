@@ -137,12 +137,14 @@ public interface IImageGalleryService {
     void deleteImageGalleryItem(Long uid);
 
     /**
-     * Return all reource items within the given toolSessionID.
+     * Returns set of images from authoring + the tasks added by members of that particular group.
      * 
+     * @param imageGallery
      * @param sessionId
+     *            sessionId which defines Group
      * @return
      */
-    List<ImageGalleryItem> getImageGalleryItemsBySessionId(Long sessionId);
+    Set<ImageGalleryItem> getImagesForGroup(ImageGallery imageGallery, Long sessionId);
 
     /**
      * Save/update current ImageGalleryItem.

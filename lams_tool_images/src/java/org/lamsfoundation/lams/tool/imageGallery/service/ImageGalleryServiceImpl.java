@@ -334,23 +334,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	imageGalleryItemDao.removeObject(ImageGalleryItem.class, uid);
     }
 
-    public List<ImageGalleryItem> getImageGalleryItemsBySessionId(Long sessionId) {
-	ImageGallerySession session = imageGallerySessionDao.getSessionBySessionId(sessionId);
-	if (session == null) {
-	    ImageGalleryServiceImpl.log.error("Failed get ImageGallerySession by ID [" + sessionId + "]");
-	    return null;
-	}
-	// add imageGallery items from Authoring
-	ImageGallery imageGallery = session.getImageGallery();
-	List<ImageGalleryItem> items = new ArrayList<ImageGalleryItem>();
-	items.addAll(imageGallery.getImageGalleryItems());
-
-	// add imageGallery items from ImageGallerySession
-	items.addAll(session.getImageGalleryItems());
-
-	return items;
-    }
-
     public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
 	ImageGallerySession session = imageGallerySessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
@@ -482,55 +465,29 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	// get all item which is accessed by user
 	Map<Long, Integer> visitCountMap = imageGalleryItemVisitDao.getSummary(contentId);
-
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(contentId);
-	SortedSet<ImageGalleryItem> resItemList = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());
-	resItemList.addAll(imageGallery.getImageGalleryItems());
 
-	// get all sessions in a imageGallery and retrieve all imageGallery items under this session
-	// plus initial imageGallery items by author creating (resItemList)
 	List<ImageGallerySession> sessionList = imageGallerySessionDao.getByContentId(contentId);
 	for (ImageGallerySession session : sessionList) {
 	    // one new group for one session.
 	    group = new ArrayList<Summary>();
-	    // firstly, put all initial imageGallery item into this group.
-	    for (ImageGalleryItem item : resItemList) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item);
+	    Set<ImageGalleryItem> groupImages = getImagesForGroup(imageGallery, session.getSessionId());
+	    
+	    for (ImageGalleryItem image : groupImages) {
+		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), image);
 		
-		int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(item.getUid(), session.getUid());
+		int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(image.getUid(), session.getUid());
 		sum.setNumberOfVotes(numberOfVotes);
 		
-		Object[] ratingForGroup = getRatingForGroup(item.getUid(),session.getSessionId());
+		Object[] ratingForGroup = getRatingForGroup(image.getUid(),session.getSessionId());
 		sum.setNumberRatings(((Long)ratingForGroup[0]).intValue());
 		sum.setAverageRating(((Float)ratingForGroup[1]).floatValue());
 		
 		// set viewNumber according visit log
-		if (visitCountMap.containsKey(item.getUid())) {
-		    sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
+		if (visitCountMap.containsKey(image.getUid())) {
+		    sum.setViewNumber(visitCountMap.get(image.getUid()).intValue());
 		}
 		group.add(sum);
-	    }
-	    // get this session's all imageGallery items
-	    SortedSet<ImageGalleryItem> sessItemList = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());
-	    sessItemList.addAll(session.getImageGalleryItems());
-	    for (ImageGalleryItem item : sessItemList) {
-		// to skip all item create by author
-		if (!item.isCreateByAuthor()) {
-		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item);
-		    
-		    int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(item.getUid(), session.getUid());
-		    sum.setNumberOfVotes(numberOfVotes);
-		    
-		    Object[] ratingForGroup = getRatingForGroup(item.getUid(),session.getSessionId());
-		    sum.setNumberRatings(((Long)ratingForGroup[0]).intValue());
-		    sum.setAverageRating(((Float)ratingForGroup[1]).floatValue());
-		    
-		    // set viewNumber according visit log
-		    if (visitCountMap.containsKey(item.getUid())) {
-			sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
-		    }
-		    group.add(sum);
-		}
 	    }
 	    // if there is no any item available, then just put session name into Summary
 	    if (group.size() == 0) {
@@ -546,10 +503,15 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	List<List<UserImageContributionDTO>> imageSummary = new ArrayList<List<UserImageContributionDTO>>();
 	List<UserImageContributionDTO> group = new ArrayList<UserImageContributionDTO>();
 	ImageGalleryItem image = imageGalleryItemDao.getByUid(imageUid);
-
-	// get all sessions in a imageGallery and retrieve all imageGallery items under this session
-	// plus initial imageGallery items by author creating (resItemList)
-	List<ImageGallerySession> sessionList = imageGallerySessionDao.getByContentId(contentId);
+	
+	List<ImageGallerySession> sessionList;
+	if (image.isCreateByAuthor()) {
+	    sessionList = imageGallerySessionDao.getByContentId(contentId);
+	} else {
+	    sessionList = new ArrayList<ImageGallerySession>();
+	    sessionList.add(image.getCreateBy().getSession());
+	}
+	
 	for (ImageGallerySession session : sessionList) {
 	    // one new group for one session.
 	    group = new ArrayList<UserImageContributionDTO>();
@@ -557,7 +519,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(image.getUid(), session.getUid());
 	    
 	    List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(session.getSessionId());
-	    // firstly, put all initial imageGallery item into this group.
 	    for (ImageGalleryUser user : users) {
 		UserImageContributionDTO sum = new UserImageContributionDTO(session.getSessionName(), user);
 		
@@ -1159,6 +1120,23 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     public void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item) {
 	imageGalleryConfigItemDAO.saveOrUpdate(item);
+    }
+    
+    public Set<ImageGalleryItem> getImagesForGroup(ImageGallery imageGallery, Long sessionId) {
+	TreeSet<ImageGalleryItem> images = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());	
+	
+	List<ImageGalleryUser> grouppedUsers = getUserListBySessionId(sessionId);
+	Set<ImageGalleryItem> allImages = imageGallery.getImageGalleryItems();
+
+	for (ImageGalleryItem image : allImages) {
+	    for (ImageGalleryUser grouppedUser : grouppedUsers) {
+		if (image.isCreateByAuthor() || grouppedUser.getUserId().equals(image.getCreateBy().getUserId())) {
+		    images.add(image);
+		}
+	    }
+	}
+	
+	return images;
     }
     
     private Object[] getRatingForGroup(Long imageUid, Long sessionId) {

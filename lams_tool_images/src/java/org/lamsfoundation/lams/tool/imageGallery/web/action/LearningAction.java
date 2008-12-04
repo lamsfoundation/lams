@@ -214,25 +214,26 @@ public class LearningAction extends Action {
 	    sessionMap.put(ImageGalleryConstants.PARAM_RUN_OFFLINE, false);
 	}
 
-	// init imageGallery item list
-	List<ImageGalleryItem> items = service.getImageGalleryItemsBySessionId(sessionId);	
-	SortedSet<ImageGalleryItem> imageGalleryItemList = new TreeSet<ImageGalleryItem>(
-		new ImageGalleryItemComparator());
-	if (items != null) {
-	    for (ImageGalleryItem item : items) {
+	// Create set of images besides this filtering out items added by users from other groups
+	TreeSet<ImageGalleryItem> images = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());
+	if (mode.isLearner()) {
+	    Set<ImageGalleryItem> groupImages = service.getImagesForGroup(imageGallery, sessionId);
+	    for (ImageGalleryItem image : groupImages) {
 		// becuase in webpage will use this login name. Here is just
 		// initial it to avoid session close error in proxy object.
-		if (item.getCreateBy() != null) {
-		    item.getCreateBy().getLoginName();
+		if (image.getCreateBy() != null) {
+		    image.getCreateBy().getLoginName();
 		}
-		// remove hidden items.		
-		if (!item.isHide()) {
-		    imageGalleryItemList.add(item);
+		// remove hidden items.
+		if (!image.isHide()) {
+		    images.add(image);
 		}
 	    }
-	}
+	} else {
+	    images.addAll(imageGallery.getImageGalleryItems());
+	}	
 	
-	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST, imageGalleryItemList);	
+	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST, images);	
 	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, imageGallery);
 
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
@@ -599,22 +600,6 @@ public class LearningAction extends Action {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
 	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.RESOURCE_SERVICE);
-    }
-
-    /**
-     * List save current imageGallery items.
-     * 
-     * @param request
-     * @return
-     */
-    private SortedSet<ImageGalleryItem> getImageList(SessionMap sessionMap) {
-	SortedSet<ImageGalleryItem> list = (SortedSet<ImageGalleryItem>) sessionMap
-		.get(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST);
-	if (list == null) {
-	    list = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());
-	    sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_ITEM_LIST, list);
-	}
-	return list;
     }
 
     private ImageGalleryUser getCurrentUser(IImageGalleryService service, Long sessionId) {
