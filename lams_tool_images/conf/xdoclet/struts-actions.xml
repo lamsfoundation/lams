@@ -121,24 +121,6 @@
 			<forward name="success" path="/pages/authoring/parts/itemattachment.jsp" />
 		</action>
 		
-		<!-- ==========  Display Item  ========== -->
-		
-		<action path="/reviewItem"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.ViewItemAction"
-			parameter="reviewItem">
-			<forward name="success" path="/pages/itemreview/mainframe.jsp" />
-		</action>
-		<action path="/nextInstruction"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.ViewItemAction"
-			parameter="nextInstruction">
-			<forward name="success" path="/pages/itemreview/instructionsnav.jsp" />
-		</action>
-		<action path="/openUrlPopup"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.ViewItemAction"
-			parameter="openUrlPopup">
-			<forward name="success" path="/pages/itemreview/openurl.jsp" />
-		</action>
-		
 		<!-- ========== Learning Definitions ============================== -->
 		
 		<action path="/learning/start"
