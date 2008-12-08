@@ -41,9 +41,7 @@ public class ImageGalleryConstants {
     public static final String PARAM_FILE_UUID = "fileUuid";
     public static final String PARAM_IMAGE_INDEX = "imageIndex";
     public static final String PARAM_IMAGE_UID = "imageUid";
-    public static final String PARAM_CURRENT_INSTRUCTION_INDEX = "insIdx";
     public static final String PARAM_RUN_OFFLINE = "runOffline";
-    public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
     public static final String PARAM_TITLE = "title";
     public static final String PARAM_COMMENTS = "comments";
     public static final String PARAM_CURRENT_IMAGE = "currentImage";
@@ -58,8 +56,6 @@ public class ImageGalleryConstants {
     public static final String ATTR_DELETED_RESOURCE_ITEM_LIST = "deleteImageGalleryList";
     public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
     public static final String ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
-    public static final String ATT_LEARNING_OBJECT = "cpPackage";
-    public static final String ATTR_RESOURCE_REVIEW_URL = "imageGalleryItemReviewUrl";
     public static final String ATTR_RESOURCE = "imageGallery";
     public static final String ATTR_IMAGE = "image";
     public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
@@ -67,7 +63,6 @@ public class ImageGalleryConstants {
     public static final String ATTR_SUMMARY_LIST = "summaryList";
     public static final String ATTR_EXPORT_IMAGE_LIST = "exportImageList";
     public static final String ATTR_IMAGE_SUMMARY = "imageSummary";
-    public static final String ATTR_USER_LIST = "userList";
     public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";
     public static final String ATTR_FINISH_LOCK = "finishedLock";
     public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
@@ -86,19 +81,14 @@ public class ImageGalleryConstants {
     public static final String ATTR_THUMBNAIL_IMAGE_DIMENSIONS = "thumbnailImageDimensions";
     
     // error message keys
-    public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
     public static final String ERROR_MSG_NOT_ALLOWED_FORMAT = "error.resource.image.not.alowed.format";
-    public static final String ERROR_MSG_URL_BLANK = "error.resource.item.url.blank";
-    public static final String ERROR_MSG_DESC_BLANK = "error.resource.item.desc.blank";
     public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
     public static final String ERROR_MSG_COMMENT_BLANK = "error.resource.image.comment.blank";
-    public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
     public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
     public static final String ERROR_MSG_REQUIRED_FIELDS_MISSING = "error.required.fields.missing";
     public static final String ERROR_MSG_ENTERED_VALUES_NOT_INTEGERS = "error.entered.values.not.integers";
 
     public static final String PAGE_EDITABLE = "isPageEditable";
-    public static final String MODE_AUTHOR_SESSION = "author_session";
     public static final String ATTR_REFLECTION_ON = "reflectOn";
     public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
     public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
@@ -107,5 +97,4 @@ public class ImageGalleryConstants {
     
     public static final String DEFUALT_PROTOCOL_REFIX = "http://";
     public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
-    public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";
 }
