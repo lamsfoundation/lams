@@ -334,80 +334,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	imageGalleryItemDao.removeObject(ImageGalleryItem.class, uid);
     }
 
-    public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
-	ImageGallerySession session = imageGallerySessionDao.getSessionBySessionId(sessionId);
-	if (session == null) {
-	    ImageGalleryServiceImpl.log.error("Failed get ImageGallerySession by ID [" + sessionId + "]");
-	    return null;
-	}
-	// initial imageGallery items list
-	List<Summary> itemList = new ArrayList();
-	Set<ImageGalleryItem> resList = session.getImageGallery().getImageGalleryItems();
-	for (ImageGalleryItem item : resList) {
-	    if (skipHide && item.isHide()) {
-		continue;
-	    }
-	    // if item is create by author
-	    if (item.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
-		itemList.add(sum);
-	    }
-	}
-
-	// get this session's all imageGallery items
-	Set<ImageGalleryItem> sessList = session.getImageGalleryItems();
-	for (ImageGalleryItem item : sessList) {
-	    if (skipHide && item.isHide()) {
-		continue;
-	    }
-
-	    // to skip all item create by author
-	    if (!item.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
-		itemList.add(sum);
-	    }
-	}
-
-	return itemList;
-    }
-
-    public List<List<Summary>> exportByContentId(Long contentId) {
-	ImageGallery imageGallery = imageGalleryDao.getByContentId(contentId);
-	List<List<Summary>> groupList = new ArrayList();
-
-	// create init imageGallery items list
-	List<Summary> initList = new ArrayList();
-	groupList.add(initList);
-	Set<ImageGalleryItem> resList = imageGallery.getImageGalleryItems();
-	for (ImageGalleryItem item : resList) {
-	    if (item.isCreateByAuthor()) {
-		Summary sum = new Summary(null, null, item, true);
-		initList.add(sum);
-	    }
-	}
-
-	// session by session
-	List<ImageGallerySession> sessionList = imageGallerySessionDao.getByContentId(contentId);
-	for (ImageGallerySession session : sessionList) {
-	    List<Summary> group = new ArrayList<Summary>();
-	    // get this session's all imageGallery items
-	    Set<ImageGalleryItem> sessList = session.getImageGalleryItems();
-	    for (ImageGalleryItem item : sessList) {
-		// to skip all item create by author
-		if (!item.isCreateByAuthor()) {
-		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
-		    group.add(sum);
-		}
-	    }
-	    if (group.size() == 0) {
-		group.add(new Summary(session.getSessionId(), session.getSessionName(), null, false));
-	    }
-	    groupList.add(group);
-	}
-
-	return groupList;
-    }
-
     public ImageGallery getImageGalleryBySessionId(Long sessionId) {
 	ImageGallerySession session = imageGallerySessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -458,132 +384,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 	return nextUrl;
     }
-
-    public List<List<Summary>> getSummary(Long contentId) {
-	List<List<Summary>> groupList = new ArrayList<List<Summary>>();
-	List<Summary> group = new ArrayList<Summary>();
-
-	// get all item which is accessed by user
-	Map<Long, Integer> visitCountMap = imageGalleryItemVisitDao.getSummary(contentId);
-	ImageGallery imageGallery = imageGalleryDao.getByContentId(contentId);
-
-	List<ImageGallerySession> sessionList = imageGallerySessionDao.getByContentId(contentId);
-	for (ImageGallerySession session : sessionList) {
-	    // one new group for one session.
-	    group = new ArrayList<Summary>();
-	    Set<ImageGalleryItem> groupImages = getImagesForGroup(imageGallery, session.getSessionId());
-	    
-	    for (ImageGalleryItem image : groupImages) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), image);
-		
-		int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(image.getUid(), session.getUid());
-		sum.setNumberOfVotes(numberOfVotes);
-		
-		Object[] ratingForGroup = getRatingForGroup(image.getUid(),session.getSessionId());
-		sum.setNumberRatings(((Long)ratingForGroup[0]).intValue());
-		sum.setAverageRating(((Float)ratingForGroup[1]).floatValue());
-		
-		// set viewNumber according visit log
-		if (visitCountMap.containsKey(image.getUid())) {
-		    sum.setViewNumber(visitCountMap.get(image.getUid()).intValue());
-		}
-		group.add(sum);
-	    }
-	    // if there is no any item available, then just put session name into Summary
-	    if (group.size() == 0) {
-		group.add(new Summary(session.getSessionId(), session.getSessionName(), null));
-	    }
-	    groupList.add(group);
-	}
-
-	return groupList;
-    }
     
-    public List<List<UserImageContributionDTO>> getImageSummary(Long contentId, Long imageUid) {
-	List<List<UserImageContributionDTO>> imageSummary = new ArrayList<List<UserImageContributionDTO>>();
-	List<UserImageContributionDTO> group = new ArrayList<UserImageContributionDTO>();
-	ImageGalleryItem image = imageGalleryItemDao.getByUid(imageUid);
-	
-	List<ImageGallerySession> sessionList;
-	if (image.isCreateByAuthor()) {
-	    sessionList = imageGallerySessionDao.getByContentId(contentId);
-	} else {
-	    sessionList = new ArrayList<ImageGallerySession>();
-	    sessionList.add(image.getCreateBy().getSession());
-	}
-	
-	for (ImageGallerySession session : sessionList) {
-	    // one new group for one session.
-	    group = new ArrayList<UserImageContributionDTO>();
-	    Object[] ratingForGroup = getRatingForGroup(image.getUid(),session.getSessionId());
-	    int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(image.getUid(), session.getUid());
-	    
-	    List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(session.getSessionId());
-	    for (ImageGalleryUser user : users) {
-		UserImageContributionDTO sum = new UserImageContributionDTO(session.getSessionName(), user);
-		
-		sum.setNumberOfVotes(numberOfVotes);
-		
-		sum.setNumberRatings(((Long)ratingForGroup[0]).intValue());
-		sum.setAverageRating(((Float)ratingForGroup[1]).floatValue());
-		
-		ImageRating rating = imageRatingDao.getImageRatingByImageAndUser(image.getUid(), user.getUserId());
-		if (rating != null) {
-		    sum.setRating(rating.getRating());
-		}
-		
-		boolean isVotedForThisImage = (image.getUid().equals(user.getVotedImageUid()));
-		sum.setVotedForThisImage(isVotedForThisImage);
-		
-		Set<ImageComment> dbComments = image.getComments();
-		TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
-		for (ImageComment comment : dbComments) {
-		    if (comment.getCreateBy().getUserId().equals(user.getUserId())) {
-			comments.add(comment);
-		    }
-		}
-		sum.setComments(comments);
-		
-		group.add(sum);
-	    }
-
-	    imageSummary.add(group);
-	}
-
-	return imageSummary;
-
-    }
-
-    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
-
-	List<ImageGallerySession> sessionList = imageGallerySessionDao.getByContentId(contentId);
-	for (ImageGallerySession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getImageGallery().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-	    // get all users in this session
-	    List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(sessionId);
-	    for (ImageGalleryUser user : users) {
-		ReflectDTO ref = new ReflectDTO(user);
-
-		if (setEntry) {
-		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    ImageGalleryConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		    if (entry != null) {
-			ref.setReflect(entry.getEntry());
-		    }
-		}
-
-		ref.setHasRefection(hasRefection);
-		list.add(ref);
-	    }
-	    map.put(sessionId, list);
-	}
-
-	return map;
-    }
-
     public List<ImageGalleryUser> getUserListBySessionId(Long sessionId) {
 	return imageGalleryUserDao.getBySessionID(sessionId);
     }
@@ -634,30 +435,164 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return (ImageGalleryUser) imageGalleryUserDao.getObject(ImageGalleryUser.class, uid);
     }
 
-    // *****************************************************************************
-    // private methods
-    // *****************************************************************************
-    private ImageGallery getDefaultImageGallery() throws ImageGalleryException {
-	Long defaultImageGalleryId = getToolDefaultContentIdBySignature(ImageGalleryConstants.TOOL_SIGNATURE);
-	ImageGallery defaultImageGallery = getImageGalleryByContentId(defaultImageGalleryId);
-	if (defaultImageGallery == null) {
-	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    ImageGalleryServiceImpl.log.error(error);
-	    throw new ImageGalleryException(error);
+    public List<List<Summary>> getSummary(Long contentId) {
+	List<List<Summary>> groupList = new ArrayList<List<Summary>>();
+	List<Summary> group = new ArrayList<Summary>();
+
+	// get all item which is accessed by user
+	ImageGallery imageGallery = imageGalleryDao.getByContentId(contentId);
+
+	List<ImageGallerySession> sessionList = imageGallerySessionDao.getByContentId(contentId);
+	for (ImageGallerySession session : sessionList) {
+	    // one new group for one session.
+	    group = new ArrayList<Summary>();
+	    Set<ImageGalleryItem> groupImages = getImagesForGroup(imageGallery, session.getSessionId());
+	    
+	    for (ImageGalleryItem image : groupImages) {
+		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), image);
+		
+		int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(image.getUid(), session.getUid());
+		sum.setNumberOfVotes(numberOfVotes);
+		
+		Object[] ratingForGroup = getRatingForGroup(image.getUid(),session.getSessionId());
+		sum.setNumberRatings(((Long)ratingForGroup[0]).intValue());
+		sum.setAverageRating(((Float)ratingForGroup[1]).floatValue());
+		
+		group.add(sum);
+	    }
+	    // if there is no any item available, then just put session name into Summary
+	    if (group.size() == 0) {
+		group.add(new Summary(session.getSessionId(), session.getSessionName(), null));
+	    }
+	    groupList.add(group);
 	}
 
-	return defaultImageGallery;
+	return groupList;
+    }
+    
+    public List<List<UserImageContributionDTO>> getImageSummary(Long contentId, Long imageUid) {
+	List<List<UserImageContributionDTO>> imageSummary = new ArrayList<List<UserImageContributionDTO>>();
+	List<UserImageContributionDTO> group = new ArrayList<UserImageContributionDTO>();
+	ImageGalleryItem image = imageGalleryItemDao.getByUid(imageUid);
+	
+	List<ImageGallerySession> sessionList;
+	if (image.isCreateByAuthor()) {
+	    sessionList = imageGallerySessionDao.getByContentId(contentId);
+	} else {
+	    sessionList = new ArrayList<ImageGallerySession>();
+	    sessionList.add(image.getCreateBy().getSession());
+	}
+	
+	for (ImageGallerySession session : sessionList) {
+	    // one new group for one session.
+	    group = new ArrayList<UserImageContributionDTO>();
+	    Object[] ratingForGroup = getRatingForGroup(image.getUid(),session.getSessionId());
+	    int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(image.getUid(), session.getUid());
+	    
+	    List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(session.getSessionId());
+	    for (ImageGalleryUser user : users) {
+		UserImageContributionDTO userContribution = createUserContribution(image, user, session, numberOfVotes, ratingForGroup);
+		group.add(userContribution);
+	    }
+
+	    imageSummary.add(group);
+	}
+
+	return imageSummary;
+
     }
 
-    private Long getToolDefaultContentIdBySignature(String toolSignature) throws ImageGalleryException {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
-	if (contentId == null) {
-	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    ImageGalleryServiceImpl.log.error(error);
-	    throw new ImageGalleryException(error);
+    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
+	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
+
+	List<ImageGallerySession> sessionList = imageGallerySessionDao.getByContentId(contentId);
+	for (ImageGallerySession session : sessionList) {
+	    Long sessionId = session.getSessionId();
+	    boolean hasRefection = session.getImageGallery().isReflectOnActivity();
+	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+	    // get all users in this session
+	    List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(sessionId);
+	    for (ImageGalleryUser user : users) {
+		ReflectDTO ref = new ReflectDTO(user);
+
+		if (setEntry) {
+		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+			    ImageGalleryConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		    if (entry != null) {
+			ref.setReflect(entry.getEntry());
+		    }
+		}
+
+		ref.setHasRefection(hasRefection);
+		list.add(ref);
+	    }
+	    map.put(sessionId, list);
 	}
-	return contentId;
+
+	return map;
+    }
+    
+    public List<List<List<UserImageContributionDTO>>> exportBySessionId(Long sessionId, ImageGalleryUser user, boolean skipHide) {
+	ImageGallerySession session = imageGallerySessionDao.getSessionBySessionId(sessionId);
+	if (session == null) {
+	    ImageGalleryServiceImpl.log.error("Failed get ImageGallerySession by ID [" + sessionId + "]");
+	    return null;
+	}
+	
+	//imageList-->sessionList-->contributionList
+	ImageGallery imageGallery = session.getImageGallery();
+	List<List<List<UserImageContributionDTO>>> imageList = new ArrayList();
+
+	Set<ImageGalleryItem> dbImages = imageGallery.getImageGalleryItems();
+	for (ImageGalleryItem image : dbImages) {
+	    if (skipHide && image.isHide()) {
+		continue;
+	    }
+
+	    List<List<UserImageContributionDTO>> sessionList = new ArrayList();
+	    
+	    List<UserImageContributionDTO> userContributionList = new ArrayList<UserImageContributionDTO>();
+
+	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
+	    int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(image.getUid(), session.getUid());	    
+	    UserImageContributionDTO userContribution = createUserContribution(image, user, session, numberOfVotes, ratingForGroup);
+	    userContribution.setImage(image);
+	    userContributionList.add(userContribution);
+	    sessionList.add(userContributionList);
+	    imageList.add(sessionList);
+	}
+
+	return imageList;
+    }
+
+    public List<List<List<UserImageContributionDTO>>> exportByContentId(Long contentId) {
+	ImageGallery imageGallery = imageGalleryDao.getByContentId(contentId);
+	List<List<List<UserImageContributionDTO>>> imageList = new ArrayList();	
+	
+	Set<ImageGalleryItem> dbImages = imageGallery.getImageGalleryItems();
+	for (ImageGalleryItem image : dbImages) {
+
+	    List<List<UserImageContributionDTO>> sessionList = new ArrayList();
+	    List<ImageGallerySession> imageGallerySessionList = imageGallerySessionDao.getByContentId(contentId);
+	    for(ImageGallerySession imageSession : imageGallerySessionList) {
+		List<UserImageContributionDTO> userContributionList = new ArrayList<UserImageContributionDTO>();
+		Object[] ratingForGroup = getRatingForGroup(image.getUid(), imageSession.getSessionId());
+		int numberOfVotes = imageGalleryUserDao.getNumberOfVotes(image.getUid(), imageSession.getUid());	    
+		
+		List<ImageGalleryUser> userList = imageGalleryUserDao.getBySessionID(imageSession.getSessionId());
+		for (ImageGalleryUser user : userList) {
+		    UserImageContributionDTO userContribution = createUserContribution(image, user, imageSession, numberOfVotes, ratingForGroup);
+		    userContribution.setImage(image);
+		    userContributionList.add(userContribution);		    
+		}
+		sessionList.add(userContributionList);
+		
+	    }
+
+	    imageList.add(sessionList);
+	}	
+
+	return imageList;
     }
 
     public void uploadImageGalleryItemFile(ImageGalleryItem image, FormFile file)
@@ -1139,6 +1074,66 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return images;
     }
     
+    // *****************************************************************************
+    // private methods
+    // *****************************************************************************
+    private ImageGallery getDefaultImageGallery() throws ImageGalleryException {
+	Long defaultImageGalleryId = getToolDefaultContentIdBySignature(ImageGalleryConstants.TOOL_SIGNATURE);
+	ImageGallery defaultImageGallery = getImageGalleryByContentId(defaultImageGalleryId);
+	if (defaultImageGallery == null) {
+	    String error = messageService.getMessage("error.msg.default.content.not.find");
+	    ImageGalleryServiceImpl.log.error(error);
+	    throw new ImageGalleryException(error);
+	}
+
+	return defaultImageGallery;
+    }
+
+    private Long getToolDefaultContentIdBySignature(String toolSignature) throws ImageGalleryException {
+	Long contentId = null;
+	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	if (contentId == null) {
+	    String error = messageService.getMessage("error.msg.default.content.not.find");
+	    ImageGalleryServiceImpl.log.error(error);
+	    throw new ImageGalleryException(error);
+	}
+	return contentId;
+    }    
+    
+    private UserImageContributionDTO createUserContribution(ImageGalleryItem image, ImageGalleryUser user, ImageGallerySession session, int numberOfVotes, Object[] ratingForGroup) {
+	UserImageContributionDTO userContribution = new UserImageContributionDTO(session.getSessionName(), user);
+	
+	userContribution.setNumberOfVotes(numberOfVotes);
+	userContribution.setNumberRatings(((Long)ratingForGroup[0]).intValue());
+	userContribution.setAverageRating(((Float)ratingForGroup[1]).floatValue());
+	
+	ImageRating rating = imageRatingDao.getImageRatingByImageAndUser(image.getUid(), user.getUserId());
+	if (rating != null) {
+	    userContribution.setRating(rating.getRating());
+	}
+	
+	boolean isVotedForThisImage = (image.getUid().equals(user.getVotedImageUid()));
+	userContribution.setVotedForThisImage(isVotedForThisImage);
+	
+	Set<ImageComment> dbComments = image.getComments();
+	TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
+	for (ImageComment comment : dbComments) {
+	    if (comment.getCreateBy().getUserId().equals(user.getUserId())) {
+		comments.add(comment);
+	    }
+	}
+	userContribution.setComments(comments);
+	
+	return userContribution;
+    }
+    
+    /**
+     * Calculates average rating and number of rating for the current group.
+     * 
+     * @param imageUid
+     * @param sessionId
+     * @return
+     */
     private Object[] getRatingForGroup(Long imageUid, Long sessionId) {
 	List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(sessionId);
 	Long numberRatings = new Long(0);

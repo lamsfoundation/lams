@@ -65,6 +65,7 @@ public class ImageGalleryConstants {
     public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
     public static final String ATTR_SUMMARY_LIST = "summaryList";
+    public static final String ATTR_EXPORT_IMAGE_LIST = "exportImageList";
     public static final String ATTR_IMAGE_SUMMARY = "imageSummary";
     public static final String ATTR_USER_LIST = "userList";
     public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";

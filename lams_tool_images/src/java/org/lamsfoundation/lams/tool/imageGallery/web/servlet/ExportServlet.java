@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.imageGallery.web.servlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +47,9 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
+import org.lamsfoundation.lams.tool.imageGallery.dto.UserImageContributionDTO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
@@ -62,220 +65,226 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Export portfolio servlet to export all shared imageGallery into offline HTML
- * package.
+ * Export portfolio servlet to export all images into offline HTML package.
  * 
- * @author Steve.Ni
+ * @author Andrey Balan
  * 
  * @version $Revision$
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
-	private static final long serialVersionUID = -4529093489007108143L;
+    private static final long serialVersionUID = -4529093489007108143L;
 
-	private static Logger logger = Logger.getLogger(ExportServlet.class);
+    private static Logger logger = Logger.getLogger(ExportServlet.class);
 
-	private final String FILENAME = "shared_imageGallery_main.html";
+    private final String FILENAME = "imageGallery_main.html";
 
-	private ImageGalleryToolContentHandler handler;
-	
-	private IImageGalleryService service;
-	
-	@Override
-	public void init() throws ServletException {
-		service = ImageGalleryServiceProxy.getImageGalleryService(getServletContext());
-		super.init();
+    private ImageGalleryToolContentHandler handler;
+
+    private IImageGalleryService service;
+
+    @Override
+    public void init() throws ServletException {
+	service = ImageGalleryServiceProxy.getImageGalleryService(getServletContext());
+	super.init();
+    }
+
+    public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
+
+	// initial sessionMap
+	SessionMap sessionMap = new SessionMap();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+
+	try {
+	    if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
+		sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.LEARNER);
+		learner(request, response, directoryName, cookies, sessionMap);
+	    } else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
+		sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+		teacher(request, response, directoryName, cookies, sessionMap);
+	    }
+	} catch (ImageGalleryException e) {
+	    logger.error("Cannot perform export for imageGallery tool.");
 	}
-	
-	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
 
-//		initial sessionMap
-		SessionMap sessionMap = new SessionMap();
-		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-		
-		try {
-			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.LEARNER);
-				learner(request, response, directoryName, cookies,sessionMap);
-			} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
-				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
-				teacher(request, response, directoryName, cookies,sessionMap);
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+		+ request.getContextPath();
+	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
+		directoryName, FILENAME, cookies);
+
+	return FILENAME;
+    }
+
+    protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
+	if (toolContentID == null && toolSessionID == null) {
+	    logger.error("Tool content Id or and session Id are null. Unable to activity title");
+	} else {
+
+	    ImageGallery content = null;
+	    if (toolContentID != null) {
+		content = service.getImageGalleryByContentId(toolContentID);
+	    } else {
+		ImageGallerySession session = service.getImageGallerySessionBySessionId(toolSessionID);
+		if (session != null)
+		    content = session.getImageGallery();
+	    }
+	    if (content != null) {
+		activityTitle = content.getTitle();
+	    }
+	}
+	return super.doOfflineExport(request, response, directoryName, cookies);
+    }
+
+    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies, HashMap sessionMap) throws ImageGalleryException {
+
+	if (userID == null || toolSessionID == null) {
+	    String error = "Tool session Id or user Id is null. Unable to continue";
+	    logger.error(error);
+	    throw new ImageGalleryException(error);
+	}
+
+	ImageGalleryUser learner = service.getUserByIDAndSession(userID, toolSessionID);
+
+	if (learner == null) {
+	    String error = "The user with user id " + userID + " does not exist.";
+	    logger.error(error);
+	    throw new ImageGalleryException(error);
+	}
+
+	ImageGallery content = service.getImageGalleryBySessionId(toolSessionID);
+
+	if (content == null) {
+	    String error = "The content for this activity has not been defined yet.";
+	    logger.error(error);
+	    throw new ImageGalleryException(error);
+	}
+
+	List<List<List<UserImageContributionDTO>>> exportImageList = service.exportBySessionId(toolSessionID, learner, true);
+	saveFileToLocal(exportImageList, directoryName);
+
+	// Add flag to indicate whether to render user notebook entries
+	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
+
+	// Create reflectList if reflection is enabled.
+	if (content.isReflectOnActivity()) {
+	    // Create reflectList, need to follow same structure used in teacher
+	    // see service.getReflectList();
+	    Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
+	    Set<ReflectDTO> reflectDTOSet = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+	    reflectDTOSet.add(getReflectionEntry(learner));
+	    map.put(toolSessionID, reflectDTOSet);
+
+	    // Add reflectList to sessionMap
+	    sessionMap.put(ImageGalleryConstants.ATTR_REFLECT_LIST, map);
+	}
+
+	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, content);
+	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, content.getTitle());
+	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, content.getInstructions());
+	sessionMap.put(ImageGalleryConstants.ATTR_EXPORT_IMAGE_LIST, exportImageList);
+    }
+
+    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies, HashMap sessionMap) throws ImageGalleryException {
+
+	// check if toolContentId exists in db or not
+	if (toolContentID == null) {
+	    String error = "Tool Content Id is missing. Unable to continue";
+	    logger.error(error);
+	    throw new ImageGalleryException(error);
+	}
+
+	ImageGallery content = service.getImageGalleryByContentId(toolContentID);
+
+	if (content == null) {
+	    String error = "Data is missing from the database. Unable to Continue";
+	    logger.error(error);
+	    throw new ImageGalleryException(error);
+	}
+	List<List<List<UserImageContributionDTO>>> exportImageList = service.exportByContentId(toolContentID);
+	saveFileToLocal(exportImageList, directoryName);
+
+	// Add flag to indicate whether to render user notebook entries
+	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
+
+	// Create reflectList if reflection is enabled.
+	if (content.isReflectOnActivity()) {
+	    Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId(), true);
+	    // Add reflectList to sessionMap
+	    sessionMap.put(ImageGalleryConstants.ATTR_REFLECT_LIST, reflectList);
+	}
+
+	// put it into HTTPSession
+	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, content);	
+	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, content.getTitle());
+	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, content.getInstructions());
+	sessionMap.put(ImageGalleryConstants.ATTR_EXPORT_IMAGE_LIST, exportImageList);
+    }
+
+    /**
+     * Create download links for every attachment.
+     * 
+     * @param taskSummaries
+     * @param directoryName
+     * @throws IOException
+     */
+    private void saveFileToLocal(List<List<List<UserImageContributionDTO>>> exportImageList, String directoryName) {
+	handler = getToolContentHandler();
+
+	for (List<List<UserImageContributionDTO>> sessionList : exportImageList) {
+	    for (List<UserImageContributionDTO> userContributionList : sessionList) {
+		for (UserImageContributionDTO userContribution : userContributionList) {
+		    try {
+			ImageGalleryItem image = userContribution.getImage();
+			int idx = 1;
+			String userName = image.getCreateBy().getLoginName();
+			String localDir;
+			while (true) {
+			    localDir = FileUtil.getFullPath(directoryName, userName + "/" + idx);
+			    File local = new File(localDir);
+			    if (!local.exists()) {
+				local.mkdirs();
+				break;
+			    }
+			    idx++;
 			}
-		} catch (ImageGalleryException e) {
-			logger.error("Cannot perform export for imageGallery tool.");
+			image.setAttachmentLocalUrl(userName + "/" + idx + "/" + image.getThumbnailFileUuid() + '.'
+				+ FileUtil.getFileExtension(image.getFileName()));
+			handler.saveFile(image.getThumbnailFileUuid(), FileUtil.getFullPath(directoryName, image
+				.getAttachmentLocalUrl()));
+		    } catch (Exception e) {
+			logger.error("Export forum topic attachment failed: " + e.toString());
+		    }
+		    break;
 		}
-
-		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-				+ request.getContextPath();
-		writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID="+sessionMap.getSessionID()
-				, directoryName, FILENAME, cookies);
-
-		return FILENAME;
-	}
-	
-	protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-        if (toolContentID == null && toolSessionID == null) {
-            logger.error("Tool content Id or and session Id are null. Unable to activity title");
-        } else {
-
-        	ImageGallery content = null;
-            if ( toolContentID != null ) {
-            	content = service.getImageGalleryByContentId(toolContentID);
-            } else {
-            	ImageGallerySession session=service.getImageGallerySessionBySessionId(toolSessionID);
-            	if ( session != null )
-            		content = session.getImageGallery();
-            }
-            if ( content != null ) {
-            	activityTitle = content.getTitle();
-            }
-        }
-        return super.doOfflineExport(request, response, directoryName, cookies);
+		break;
+	    }
 	}
 
-
-
-	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws ImageGalleryException {
-
-		if (userID == null || toolSessionID == null) {
-			String error = "Tool session Id or user Id is null. Unable to continue";
-			logger.error(error);
-			throw new ImageGalleryException(error);
-		}
-
-		ImageGalleryUser learner = service.getUserByIDAndSession(userID,toolSessionID);
-
-		if (learner == null) {
-			String error = "The user with user id " + userID + " does not exist.";
-			logger.error(error);
-			throw new ImageGalleryException(error);
-		}
-
-		ImageGallery content = service.getImageGalleryBySessionId(toolSessionID);
-
-		if (content == null) {
-			String error = "The content for this activity has not been defined yet.";
-			logger.error(error);
-			throw new ImageGalleryException(error);
-		}
-		
-		
-		List<Summary> group = service.exportBySessionId(toolSessionID,true);
-		saveFileToLocal(group, directoryName);
-		
-		List<List> groupList = new ArrayList<List>();
-		if(group.size() > 0)
-			groupList.add(group);
-		
-		// Add flag to indicate whether to render user notebook entries
-		sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
-		
-		// Create reflectList if reflection is enabled.
-		if (content.isReflectOnActivity()) {
-			// Create reflectList, need to follow same structure used in teacher
-			// see service.getReflectList();
-			Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();  
-			Set<ReflectDTO> reflectDTOSet = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-			reflectDTOSet.add(getReflectionEntry(learner));
-			map.put(toolSessionID, reflectDTOSet);
-			
-			// Add reflectList to sessionMap
-			sessionMap.put(ImageGalleryConstants.ATTR_REFLECT_LIST, map);
-		}
-		
-		sessionMap.put(ImageGalleryConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, content.getInstructions());
-		sessionMap.put(ImageGalleryConstants.ATTR_SUMMARY_LIST, groupList);
+    }
+    
+    private ImageGalleryToolContentHandler getToolContentHandler() {
+	if (handler == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this
+		    .getServletContext());
+	    handler = (ImageGalleryToolContentHandler) wac.getBean(ImageGalleryConstants.TOOL_CONTENT_HANDLER_NAME);
 	}
+	return handler;
+    }
 
-	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws ImageGalleryException {
+    private ReflectDTO getReflectionEntry(ImageGalleryUser imageGalleryUser) {
+	ReflectDTO reflectDTO = new ReflectDTO(imageGalleryUser);
+	NotebookEntry notebookEntry = service.getEntry(imageGalleryUser.getSession().getSessionId(),
+		CoreNotebookConstants.NOTEBOOK_TOOL, ImageGalleryConstants.TOOL_SIGNATURE, imageGalleryUser.getUserId()
+			.intValue());
 
-		// check if toolContentId exists in db or not
-		if (toolContentID == null) {
-			String error = "Tool Content Id is missing. Unable to continue";
-			logger.error(error);
-			throw new ImageGalleryException(error);
-		}
-
-		ImageGallery content = service.getImageGalleryByContentId(toolContentID);
-
-		if (content == null) {
-			String error = "Data is missing from the database. Unable to Continue";
-			logger.error(error);
-			throw new ImageGalleryException(error);
-		}
-		List<List<Summary>> groupList = service.exportByContentId(toolContentID);
-		if(groupList != null) {
-			for (List<Summary> list : groupList) {
-				saveFileToLocal(list, directoryName);
-			}
-		}
-		
-		// Add flag to indicate whether to render user notebook entries
-		sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
-		
-		// Create reflectList if reflection is enabled.
-		if (content.isReflectOnActivity()) {
-			Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId(), true);
-			// Add reflectList to sessionMap
-			sessionMap.put(ImageGalleryConstants.ATTR_REFLECT_LIST, reflectList);
-		}
-		
-		// put it into HTTPSession
-		sessionMap.put(ImageGalleryConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, content.getInstructions());
-		sessionMap.put(ImageGalleryConstants.ATTR_SUMMARY_LIST, groupList);
+	// check notebookEntry is not null
+	if (notebookEntry != null) {
+	    reflectDTO.setReflect(notebookEntry.getEntry());
+	    logger.debug("Could not find notebookEntry for ImageGalleryUser: " + imageGalleryUser.getUid());
 	}
-
-    private void saveFileToLocal(List<Summary> list, String directoryName) {
-    	handler = getToolContentHandler();
-		for (Summary summary : list) {
-//		    BYYYY MEEEE
-//			//for learning object, it just display "No offlice pakcage avaliable" information.
-//			if(summary.getItemType() == ImageGalleryConstants.RESOURCE_TYPE_LEARNING_OBJECT 
-//				|| summary.getItemType() == ImageGalleryConstants.RESOURCE_TYPE_URL)
-//				continue;
-			try{
-				int idx= 1;
-				String userName = summary.getUsername();
-				String localDir;
-				while(true){
-					localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
-					File local = new File(localDir);
-					if(!local.exists()){
-						local.mkdirs();
-						break;
-					}
-					idx++;
-				}
-				summary.setAttachmentLocalUrl(userName + "/" + idx + "/" + summary.getFileUuid() + '.' + FileUtil.getFileExtension(summary.getFileName()));
-				handler.saveFile(summary.getFileUuid(), FileUtil.getFullPath(directoryName, summary.getAttachmentLocalUrl()));
-			} catch (Exception e) {
-				logger.error("Export forum topic attachment failed: " + e.toString());
-			}
-		}
-		
-	}
-
-	private ImageGalleryToolContentHandler getToolContentHandler() {
-  	    if ( handler == null ) {
-    	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
-    	      handler = (ImageGalleryToolContentHandler) wac.getBean(ImageGalleryConstants.TOOL_CONTENT_HANDLER_NAME);
-    	    }
-    	    return handler;
-	}
-	
-	private ReflectDTO getReflectionEntry(ImageGalleryUser imageGalleryUser) {
-		ReflectDTO reflectDTO = new ReflectDTO(imageGalleryUser);
-		NotebookEntry notebookEntry = service.getEntry(imageGalleryUser.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
-				ImageGalleryConstants.TOOL_SIGNATURE, imageGalleryUser.getUserId().intValue());
-		
-		// check notebookEntry is not null
-		if (notebookEntry != null) {
-			reflectDTO.setReflect(notebookEntry.getEntry());
-			logger.debug("Could not find notebookEntry for ImageGalleryUser: " + imageGalleryUser.getUid());
-		}        		
-		 return reflectDTO;
-	}
+	return reflectDTO;
+    }
 }

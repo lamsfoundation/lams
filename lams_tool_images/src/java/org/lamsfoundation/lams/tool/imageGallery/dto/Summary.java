@@ -53,7 +53,6 @@ public class Summary {
     private boolean itemHide;
     private String itemTitle;
     private String username;
-    private int viewNumber;
     private int numberOfVotes;
     private float averageRating;
     private int numberRatings;    
@@ -190,14 +189,6 @@ public class Summary {
 	this.username = username;
     }
 
-    public int getViewNumber() {
-	return viewNumber;
-    }
-
-    public void setViewNumber(int viewNumber) {
-	this.viewNumber = viewNumber;
-    }
-    
     public int getNumberOfVotes() {
 	return numberOfVotes;
     }

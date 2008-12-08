@@ -74,6 +74,9 @@ public class ImageGalleryItem implements Cloneable {
     private float averageRating;
     
     private int numberRatings;
+    
+    //*************** NON Persist Field (only for exporting) ********************
+    private String attachmentLocalUrl;
 
     /**
      * Default contruction method.
@@ -388,5 +391,12 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setThumbnailFile(ImageGalleryAttachment thumbnailFile) {
 	this.thumbnailFile = thumbnailFile;
+    }
+    
+    public String getAttachmentLocalUrl() {
+        return attachmentLocalUrl;
+    }
+    public void setAttachmentLocalUrl(String attachmentLocalUrl) {
+        this.attachmentLocalUrl = attachmentLocalUrl;
     }
 }

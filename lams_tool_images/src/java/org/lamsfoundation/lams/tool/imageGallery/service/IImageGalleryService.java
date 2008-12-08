@@ -277,9 +277,9 @@ public interface IImageGalleryService {
      *                imageGallery item
      * @return
      */
-    public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
+    public List<List<List<UserImageContributionDTO>>> exportBySessionId(Long sessionId, ImageGalleryUser user, boolean skipHide);
 
-    public List<List<Summary>> exportByContentId(Long contentId);
+    public List<List<List<UserImageContributionDTO>>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.

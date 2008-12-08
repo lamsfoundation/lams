@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.imageGallery.dto;
 import java.util.Set;
 
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
  
 /**
@@ -52,6 +53,9 @@ public class UserImageContributionDTO {
     private boolean isVotedForThisImage;
     
     private Set<ImageComment> comments;
+    
+    //only for export needs
+    private ImageGalleryItem image;
 
     public UserImageContributionDTO() {
     }
@@ -163,6 +167,14 @@ public class UserImageContributionDTO {
 
     public void setComments(Set<ImageComment> comments) {
 	this.comments = comments;
+    }
+    
+    public ImageGalleryItem getImage() {
+	return image;
+    }
+
+    public void setImage(ImageGalleryItem image) {
+	this.image = image;
     }
 
 }

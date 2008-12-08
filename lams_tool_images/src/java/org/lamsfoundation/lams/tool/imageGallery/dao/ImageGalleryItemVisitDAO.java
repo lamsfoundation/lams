@@ -34,13 +34,6 @@ public interface ImageGalleryItemVisitDAO extends DAO {
 	public ImageGalleryItemVisitLog getImageGalleryItemLog(Long itemUid,Long userId);
 
 	public int getUserViewLogCount(Long sessionId, Long userUid);
-	/**
-	 * Return list which contains key pair which key is imageGallery item uid, value is number view.
-	 * 
-	 * @param contentId
-	 * @return
-	 */
-	public Map<Long,Integer> getSummary(Long contentId);
 	
 	public List<ImageGalleryItemVisitLog> getImageGalleryItemLogBySession(Long sessionId,Long itemUid);
 
