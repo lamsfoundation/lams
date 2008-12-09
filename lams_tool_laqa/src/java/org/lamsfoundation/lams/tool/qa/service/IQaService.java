@@ -120,7 +120,7 @@ public interface IQaService {
 
     public List getAllQuestionEntriesSorted(final long qaContentId) throws QaApplicationException;
 
-    public void updateQaQueContent(QaQueContent qaQueContent) throws QaApplicationException;
+    public void saveOrUpdateQaQueContent(QaQueContent qaQueContent) throws QaApplicationException;
 
     /**
      * Return the qa session object according to the requested session id.
@@ -297,54 +297,63 @@ public interface IQaService {
     public String createConditionName(Collection<QaCondition> existingConditions);
 
     public void deleteCondition(QaCondition condition);
-    
+
     public QaCondition createDefaultComplexCondition(QaContent qaContent);
-    
+
     /**
      * Gets the qa config item with the given key
+     * 
      * @param configKey
      * @return
      */
     public QaConfigItem getConfigItem(String configKey);
-    
+
     /**
      * Saves or updates a qa config item
+     * 
      * @param configItem
      */
     public void saveOrUpdateConfigItem(QaConfigItem configItem);
-    
+
     /**
      * Gets the set of wizard categories from the database
+     * 
      * @return
      */
     public SortedSet<QaWizardCategory> getWizardCategories();
-    
+
     /**
      * Saves the entire set of QaWizardCategories (including the child cognitive skills and questions)
+     * 
      * @param categories
      */
     public void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories);
-    
+
     /**
      * Deletes a wizard category from the db
+     * 
      * @param uid
      */
     public void deleteWizardCategoryByUID(Long uid);
-    
+
     /**
      * Deletes a wizard cognitive skill from the db
+     * 
      * @param uid
      */
     public void deleteWizardSkillByUID(Long uid);
-    
+
     /**
      * Deletes a wizard question from the db
+     * 
      * @param uid
      */
     public void deleteWizardQuestionByUID(Long uid);
-    
+
     /**
      * Deletes all categories, sub skills and sub questions
      */
     public void deleteAllWizardCategories();
+
+    public void removeQuestionsFromCache(QaContent qaContent);
 }

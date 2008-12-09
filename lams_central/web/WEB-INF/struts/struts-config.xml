@@ -26,7 +26,12 @@
       type="org.lamsfoundation.lams.web.PasswordChangeActionForm"
     />
 
-   <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
+   <form-bean
+  name="GroupingPedagogicalPlannerForm"
+  type="org.lamsfoundation.lams.web.planner.GroupingPedagogicalPlannerForm"
+/>
+
+<form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="userId" type="java.lang.Integer" />
 	<form-property name="login" type="java.lang.String" />
 	<form-property name="password" type="java.lang.String" />
@@ -146,6 +151,11 @@
         path="/profile.do?method=lessons"
         redirect="false"
       />
+      <forward
+        name="planner"
+        path="/pedagogicalPlanner.do"
+        redirect="false"
+      />
     </action>
     <action
       path="/saveprofile"
@@ -255,6 +265,19 @@
       />
     </action>
     <action
+      path="/Presence"
+      type="org.lamsfoundation.lams.web.PresenceServlet"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/index.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/theme"
       type="org.lamsfoundation.lams.themes.web.ThemeAction"
       parameter="method"
@@ -276,6 +299,72 @@
       <forward
         name="message"
         path=".message"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/findUserLessons"
+      type="org.lamsfoundation.lams.web.FindUserLessonsAction"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success-getResults"
+        path="/findUserLessons.jsp"
+        redirect="false"
+      />
+      <forward
+        name="success-autocomplete"
+        path="/findUserLessonsAutocomplete.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/pedagogicalPlanner"
+      type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="success"
+        path=".planner"
+        redirect="false"
+      />
+      <forward
+        name="grouping"
+        path="/pedagogical_planner/grouping.jsp"
+        redirect="false"
+      />
+      <forward
+        name="preview"
+        path="/home.do?method=learner"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/pedagogicalPlanner/grouping"
+      type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction"
+      name="GroupingPedagogicalPlannerForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path=".planner"
+        redirect="false"
+      />
+      <forward
+        name="grouping"
+        path="/pedagogical_planner/grouping.jsp"
+        redirect="false"
+      />
+      <forward
+        name="preview"
+        path="/home.do?method=learner"
         redirect="false"
       />
     </action>

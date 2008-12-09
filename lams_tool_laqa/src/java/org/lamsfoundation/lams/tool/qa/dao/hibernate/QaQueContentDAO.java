@@ -34,150 +34,120 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
-
-
 /**
  * @author Ozgur Demirtas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code
+ * Templates
  */
 
 public class QaQueContentDAO extends HibernateDaoSupport implements IQaQueContentDAO {
-	 	static Logger logger = Logger.getLogger(QaQueContentDAO.class.getName());
-	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from qaQueContent in class QaQueContent where qaQueContent.qaContentId=:qaContentId";
-	 	private static final String GET_QUESTION_IDS_FOR_CONTENT = "select qaQueContent.qaQueContentId from QaQueContent qaQueContent where qaQueContent.qaContentId = :qa";
-	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from qaQueContent in class QaQueContent where qaQueContent.question=:question and qaQueContent.qaContentId=:qaContentId";
-	 	private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from qaQueContent in class QaQueContent where qaQueContent.displayOrder=:displayOrder and qaQueContent.qaContentId=:qaContentId";
-	 	private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from qaQueContent in class QaQueContent where qaQueContent.qaContentId=:qaContentId order by qaQueContent.displayOrder";
-	 	
-	 	public QaQueContent getToolDefaultQuestionContent(final long qaContentId)
-	    {
+    static Logger logger = Logger.getLogger(QaQueContentDAO.class.getName());
+    private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from qaQueContent in class QaQueContent where qaQueContent.qaContentId=:qaContentId";
+    private static final String GET_QUESTION_IDS_FOR_CONTENT = "select qaQueContent.qaQueContentId from QaQueContent qaQueContent where qaQueContent.qaContentId = :qa";
+    private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from qaQueContent in class QaQueContent where qaQueContent.question=:question and qaQueContent.qaContentId=:qaContentId";
+    private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from qaQueContent in class QaQueContent where qaQueContent.displayOrder=:displayOrder and qaQueContent.qaContentId=:qaContentId";
+    private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from qaQueContent in class QaQueContent where qaQueContent.qaContentId=:qaContentId order by qaQueContent.displayOrder";
 
-	 	    HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-				.setLong("qaContentId", qaContentId)
-				.list();
+    public QaQueContent getToolDefaultQuestionContent(final long qaContentId) {
 
-			if(list != null && list.size() > 0){
-				QaQueContent qa = (QaQueContent) list.get(0);
-				return qa;
-			}
-			return null;
-	    }
-	 	
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(QaQueContentDAO.LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong(
+		"qaContentId", qaContentId).list();
 
-	 	public QaQueContent getQaQueById(long qaQueContentId)
-	 	{
-			String query = "from QaQueContent as qu where qu.qaQueContentId = ?";
-		    HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(query)
-				.setLong(0,qaQueContentId)
-				.list();
-			
-			if(list != null && list.size() > 0){
-				QaQueContent qa = (QaQueContent) list.get(0);
-				return qa;
-			}
-			return null;
-	 	}
+	if (list != null && list.size() > 0) {
+	    QaQueContent qa = (QaQueContent) list.get(0);
+	    return qa;
+	}
+	return null;
+    }
 
-	 	
-	 	public QaQueContent getQuestionContentByQuestionText(final String question, Long qaContentId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
+    public QaQueContent getQaQueById(long qaQueContentId) {
+	String query = "from QaQueContent as qu where qu.qaQueContentId = ?";
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(query).setLong(0, qaQueContentId).list();
 
-	        List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT)
-			.setString("question", question)
-			.setLong("qaContentId", qaContentId.longValue())				
-			.list();
-			
-			if(list != null && list.size() > 0){
-				QaQueContent qa = (QaQueContent) list.get(0);
-				return qa;
-			}
-			return null;
-	    }
+	if (list != null && list.size() > 0) {
+	    QaQueContent qa = (QaQueContent) list.get(0);
+	    return qa;
+	}
+	return null;
+    }
 
+    public QaQueContent getQuestionContentByQuestionText(final String question, Long qaContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
 
-	 	public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long qaContentId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(QaQueContentDAO.LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT).setString(
+		"question", question).setLong("qaContentId", qaContentId.longValue()).list();
 
-	        List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
-			.setLong("displayOrder", displayOrder.longValue())
-			.setLong("qaContentId", qaContentId.longValue())				
-			.list();
-			
-			if(list != null && list.size() > 0){
-				QaQueContent qa = (QaQueContent) list.get(0);
-				return qa;
-			}
-			return null;
-	    }
+	if (list != null && list.size() > 0) {
+	    QaQueContent qa = (QaQueContent) list.get(0);
+	    return qa;
+	}
+	return null;
+    }
 
-	 	public List getAllQuestionEntriesSorted(final long qaContentId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER)
-				.setLong("qaContentId", qaContentId)
-				.list();
+    public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long qaContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
 
-			return list;
-	    }
+	List list = getSession().createQuery(QaQueContentDAO.LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong(
+		"displayOrder", displayOrder.longValue()).setLong("qaContentId", qaContentId.longValue()).list();
 
+	if (list != null && list.size() > 0) {
+	    QaQueContent qa = (QaQueContent) list.get(0);
+	    return qa;
+	}
+	return null;
+    }
 
-	 	public List getQuestionIndsForContent(QaContent qa)
-	    {
-	    	   
-			  List listDefaultQuestionIds=(getHibernateTemplate().findByNamedParam(GET_QUESTION_IDS_FOR_CONTENT,
-	                "qa",
-	                qa));
-			  
-			  return listDefaultQuestionIds;
-	    }
-	 	
-	 	public List getAllQuestionEntries(final long qaContentId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-				.setLong("qaContentId", qaContentId)
-				.list();
+    public List getAllQuestionEntriesSorted(final long qaContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(QaQueContentDAO.SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong(
+		"qaContentId", qaContentId).list();
 
-			return list;
-	    }
-	 	
-	 	
-		public void createQueContent(QaQueContent queContent) 
-	    {
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().save(queContent);
-	    }
-		
-		public void updateQaQueContent(QaQueContent qaQueContent)
-	    {
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().update(qaQueContent);
-	    }
+	return list;
+    }
 
-		
-		public void removeQueContent(long qaQueContentId) 
-	    {
-			QaQueContent qaQueContent= (QaQueContent) this.getHibernateTemplate().load(QaQueContent.class, new Long(qaQueContentId));
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().delete(qaQueContent);
-	    }
-		
-		
-		public void removeQaQueContent(QaQueContent qaQueContent)
-	    {
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().delete(qaQueContent);
-	    }
+    public List getQuestionIndsForContent(QaContent qa) {
 
-        
-        public List getQaQueContentsByContentId(long qaContentId){
-            return getHibernateTemplate().findByNamedParam(LOAD_QUESTION_CONTENT_BY_CONTENT_ID, "qaContentId", new Long(qaContentId));
-        }
-} 
+	List listDefaultQuestionIds = getHibernateTemplate().findByNamedParam(
+		QaQueContentDAO.GET_QUESTION_IDS_FOR_CONTENT, "qa", qa);
+
+	return listDefaultQuestionIds;
+    }
+
+    public List getAllQuestionEntries(final long qaContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(QaQueContentDAO.LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong(
+		"qaContentId", qaContentId).list();
+
+	return list;
+    }
+
+    public void createQueContent(QaQueContent queContent) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().save(queContent);
+    }
+
+    public void saveOrUpdateQaQueContent(QaQueContent qaQueContent) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().saveOrUpdate(qaQueContent);
+    }
+
+    public void removeQueContent(long qaQueContentId) {
+	QaQueContent qaQueContent = (QaQueContent) this.getHibernateTemplate().load(QaQueContent.class,
+		new Long(qaQueContentId));
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(qaQueContent);
+    }
+
+    public void removeQaQueContent(QaQueContent qaQueContent) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(qaQueContent);
+    }
+
+    public List getQaQueContentsByContentId(long qaContentId) {
+	return getHibernateTemplate().findByNamedParam(QaQueContentDAO.LOAD_QUESTION_CONTENT_BY_CONTENT_ID,
+		"qaContentId", new Long(qaContentId));
+    }
+}

@@ -16,9 +16,10 @@
 		<form-bean name="QaAuthoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm"/>
 	   	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
 	   	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
-	   <form-bean name="QaConditionForm" type="org.lamsfoundation.lams.tool.qa.web.QaConditionForm"/>
-	   
-	   <form-bean name="laqa11AdminForm" type="org.lamsfoundation.lams.tool.qa.web.QaAdminForm"/>
+	    <form-bean name="QaConditionForm" type="org.lamsfoundation.lams.tool.qa.web.QaConditionForm"/>
+	    <form-bean name="QaPedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.qa.web.QaPedagogicalPlannerForm"/>
+	    
+	    <form-bean name="laqa11AdminForm" type="org.lamsfoundation.lams.tool.qa.web.QaAdminForm"/>
 	</form-beans>
 	
 	  <!-- ========== Global Exceptions Definitions =================================== -->
@@ -181,6 +182,23 @@
 			parameter="downCondition">
 			<forward name="success" path="/authoring/conditionList.jsp" />
 		</action>
+		
+		<!-- ==========  Authroing Definitions: Pedagogical Planner methods ========== -->
+		<action
+	      path="/pedagogicalPlanner"
+	      type="org.lamsfoundation.lams.tool.qa.web.QaPedagogicalPlannerAction"
+	      name="QaPedagogicalPlannerForm"
+	      scope="request"
+	      parameter="dispatch"
+	      unknown="false"
+	      validate="false"
+	     >
+	      <forward
+	        name="success"
+	        path="/authoring/pedagogicalPlannerForm.jsp"
+	        redirect="false"
+	      />
+	    </action>
 	
 	
 	<!--Learning Starter  -->

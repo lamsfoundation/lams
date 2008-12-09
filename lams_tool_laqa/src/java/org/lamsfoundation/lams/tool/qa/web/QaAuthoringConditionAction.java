@@ -43,7 +43,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.util.LabelValueBean;
-import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -384,7 +383,7 @@ public class QaAuthoringConditionAction extends Action {
 	for (QaQuestionContentDTO question : questions) {
 	    String nonHTMLQuestion = question.getQuestion();
 	    if (nonHTMLQuestion != null) {
-		nonHTMLQuestion = TextSearchCondition.removeHTMLtags(nonHTMLQuestion);
+		nonHTMLQuestion = WebUtil.removeHTMLtags(nonHTMLQuestion);
 		// we don't want to cite the whole question, so we just leave some first characters; it should be enough
 		// to recognise the question by a teacher
 		if (nonHTMLQuestion.length() > QaAppConstants.QUESTION_CUTOFF_INDEX) {

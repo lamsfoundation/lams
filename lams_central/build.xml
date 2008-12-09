@@ -251,6 +251,7 @@
 	            <include name="**/*Action.java" />
 	            <include name="**/*ActionForm.java" />
 	            <include name="**/*Tag.java" />
+	         	<include name="web/planner/*.java" />
 	         </fileset>
 
 	         <deploymentdescriptor 

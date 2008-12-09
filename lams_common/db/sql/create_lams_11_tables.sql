@@ -429,6 +429,7 @@ CREATE TABLE lams_system_tool (
      , help_url TEXT
      , create_date_time DATETIME NOT NULL
      , admin_url TEXT
+	 , pedagogical_planner_url TEXT
      , UNIQUE UQ_systool_activity_type (learning_activity_type_id)
      , PRIMARY KEY (system_tool_id)
      , INDEX (learning_activity_type_id)
@@ -463,6 +464,7 @@ CREATE TABLE lams_tool (
      , monitor_url TEXT 
      , contribute_url TEXT
      , moderation_url TEXT
+	 , pedagogical_planner_url TEXT
      , help_url TEXT
      , create_date_time DATETIME NOT NULL
      , language_file VARCHAR(255)

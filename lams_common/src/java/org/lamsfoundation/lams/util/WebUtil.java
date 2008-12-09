@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 
 /**
@@ -449,6 +450,18 @@ public class WebUtil
     		return input.replaceAll("[\n\r\f]", "<BR/>");
     	else
     		return null;
+    }
+
+    /**
+     * Strips HTML tags and leave "pure" text. Useful for FCKeditor created text.
+     * 
+     * @param text
+     *                string to process
+     * @return string after stripping
+     */
+    public static String removeHTMLtags(String text) {
+        return text == null ? null : text.replaceAll(TextSearchCondition.BR_TAG_REGEX, " ").replaceAll(
+        	TextSearchCondition.HTML_TAG_REGEX, "");
     }
 
 }

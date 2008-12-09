@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.ToolOutputFormatException;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.forum.dto.ForumConditionDTO;
 import org.lamsfoundation.lams.tool.forum.util.ConditionTopicComparator;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * A text search condition with a set of topics on answers to which the search should be performed.
@@ -105,7 +106,7 @@ public class ForumCondition extends TextSearchCondition {
 				    && getPhraseCondition() == null;
 			} else {
 			    for (String answer : answers) {
-				answer = removeHTMLtags(answer);
+				answer = WebUtil.removeHTMLtags(answer);
 				if (!singleTopicResult) {
 				    singleTopicResult = matches(answer);
 				}

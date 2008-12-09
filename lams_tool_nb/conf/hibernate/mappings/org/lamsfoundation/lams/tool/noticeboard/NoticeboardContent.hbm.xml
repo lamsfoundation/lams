@@ -80,7 +80,7 @@
             length="1"
         />
 
-       <property
+        <property
             name="reflectOnActivity"
             type="boolean"
             update="true"
@@ -89,7 +89,7 @@
             length="1"
         />
 
-       <property
+        <property
             name="reflectInstructions"
             type="java.lang.String"
             update="true"

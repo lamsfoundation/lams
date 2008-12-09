@@ -70,7 +70,7 @@
 
         <property
             name="runOffline"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="run_offline"
@@ -79,7 +79,7 @@
 
         <property
             name="lockOnFinished"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="lock_on_finished"
@@ -88,7 +88,7 @@
 
         <property
             name="reflectOnActivity"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="reflect_on_activity"
@@ -124,7 +124,7 @@
 
         <property
             name="contentInUse"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="content_in_use"
@@ -133,7 +133,7 @@
 
         <property
             name="defineLater"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="define_later"
@@ -189,7 +189,7 @@
 
         <property
             name="filteringEnabled"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="filtering_enabled"
@@ -204,6 +204,24 @@
             column="filter_keywords"
             length="65535"
         />
+
+        <set
+            name="conditions"
+            lazy="true"
+            cascade="all"
+            sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
+        >
+
+            <key
+                column="content_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.chat.model.ChatCondition"
+            />
+
+        </set>
 
         <!--
             To add non XDoclet property mappings, create a file named

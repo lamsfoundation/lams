@@ -30,19 +30,21 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 /**
  * @author Ozgur Demirtas
  * 
- * <p>Interface that defines the contract for VoteContent access </p>
+ * <p>
+ * Interface that defines the contract for VoteContent access
+ * </p>
  */
 public interface IVoteContentDAO {
-	public VoteContent getVoteContentByUID(Long uid);
+    public VoteContent getVoteContentByUID(Long uid);
 
-	public VoteContent findVoteContentById(Long voteContentId);
+    public VoteContent findVoteContentById(Long voteContentId);
 
-	public VoteContent getVoteContentBySession(Long voteSessionId);
+    public VoteContent getVoteContentBySession(Long voteSessionId);
 
     public void saveVoteContent(VoteContent voteContent);
 
     public void updateVoteContent(VoteContent voteContent);
-    
+
     public void saveOrUpdateVote(VoteContent voteContent);
 
     public void removeVote(VoteContent voteContent);
@@ -52,8 +54,10 @@ public interface IVoteContentDAO {
     public void removeVoteSessions(VoteContent voteContent);
 
     public void addVoteSession(Long voteContentId, VoteSession voteSession);
-    
+
     public List findAll(Class objClass);
-    
+
     public void flush();
-  }
+
+    public void removeNominationsFromCache(VoteContent voteContent);
+}

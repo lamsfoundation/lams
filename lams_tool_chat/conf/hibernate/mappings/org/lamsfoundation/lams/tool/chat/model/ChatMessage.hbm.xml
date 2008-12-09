@@ -89,7 +89,7 @@
 
         <property
             name="hidden"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="hidden"

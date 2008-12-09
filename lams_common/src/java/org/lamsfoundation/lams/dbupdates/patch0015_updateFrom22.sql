@@ -1,0 +1,16 @@
+-- SQL statements to update from LAMS 2.2
+
+-- Turn off autocommit, so nothing is committed if there is an error
+SET AUTOCOMMIT = 0;
+
+----------------------Put all sql statements below here-------------------------
+
+--  LDEV-1998 ------------- 
+ALTER TABLE lams_tool ADD COLUMN pedagogical_planner_url TEXT;
+ALTER TABLE lams_system_tool ADD COLUMN pedagogical_planner_url TEXT;
+UPDATE lams_system_tool SET pedagogical_planner_url='pedagogicalPlanner/initGrouping.do' WHERE system_tool_id=1;
+----------------------Put all sql statements above here-------------------------
+
+-- If there were no errors, commit and restore autocommit to on
+COMMIT;
+SET AUTOCOMMIT = 1;

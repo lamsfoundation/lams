@@ -237,9 +237,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public void updateQaQueContent(QaQueContent qaQueContent) throws QaApplicationException {
+    public void saveOrUpdateQaQueContent(QaQueContent qaQueContent) throws QaApplicationException {
 	try {
-	    qaQueContentDAO.updateQaQueContent(qaQueContent);
+	    qaQueContentDAO.saveOrUpdateQaQueContent(qaQueContent);
 
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is updating qa content by question: "
@@ -1831,23 +1831,21 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public void setQaOutputFactory(QaOutputFactory qaOutputFactory) {
 	this.qaOutputFactory = qaOutputFactory;
     }
-    
-    
 
     public IQaConfigItemDAO getQaConfigItemDAO() {
-        return qaConfigItemDAO;
+	return qaConfigItemDAO;
     }
 
     public void setQaConfigItemDAO(IQaConfigItemDAO qaConfigItemDAO) {
-        this.qaConfigItemDAO = qaConfigItemDAO;
+	this.qaConfigItemDAO = qaConfigItemDAO;
     }
-    
+
     public IQaWizardDAO getQaWizardDAO() {
-        return qaWizardDAO;
+	return qaWizardDAO;
     }
 
     public void setQaWizardDAO(IQaWizardDAO qaWizardDAO) {
-        this.qaWizardDAO = qaWizardDAO;
+	this.qaWizardDAO = qaWizardDAO;
     }
 
     public QaContent getQaContentBySessionId(Long sessionId) {
@@ -1880,79 +1878,83 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    qaDAO.deleteCondition(condition);
 	}
     }
-    
+
     public QaCondition createDefaultComplexCondition(QaContent qaContent) {
 	return getQaOutputFactory().createDefaultComplexCondition(qaContent);
     }
-    
+
     /**
      * Gets the qa config item with the given key
+     * 
      * @param configKey
      * @return
      */
-    public QaConfigItem getConfigItem(String configKey)
-    {
+    public QaConfigItem getConfigItem(String configKey) {
 	return qaConfigItemDAO.getConfigItemByKey(configKey);
     }
-    
+
     /**
      * Saves or updates a qa config item
+     * 
      * @param configItem
      */
-    public void saveOrUpdateConfigItem(QaConfigItem configItem)
-    {
+    public void saveOrUpdateConfigItem(QaConfigItem configItem) {
 	qaConfigItemDAO.saveOrUpdate(configItem);
     }
-    
+
     /**
      * Gets the set of wizard categories from the database
+     * 
      * @return
      */
-    public SortedSet<QaWizardCategory> getWizardCategories()
-    {
+    public SortedSet<QaWizardCategory> getWizardCategories() {
 	return qaWizardDAO.getWizardCategories();
     }
-    
+
     /**
      * Saves the entire set of QaWizardCategories (including the child cognitive skills and questions)
+     * 
      * @param categories
      */
-    public void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories)
-    {
+    public void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories) {
 	qaWizardDAO.saveOrUpdateCategories(categories);
     }
-    
+
     /**
      * Deletes a wizard category from the db
+     * 
      * @param uid
      */
-    public void deleteWizardCategoryByUID(Long uid)
-    {
+    public void deleteWizardCategoryByUID(Long uid) {
 	qaWizardDAO.deleteWizardCategoryByUID(uid);
     }
-    
+
     /**
      * Deletes a wizard cognitive skill from the db
+     * 
      * @param uid
      */
-    public void deleteWizardSkillByUID(Long uid)
-    {
+    public void deleteWizardSkillByUID(Long uid) {
 	qaWizardDAO.deleteWizardSkillByUID(uid);
     }
-    
+
     /**
      * Deletes a wizard question from the db
+     * 
      * @param uid
      */
-    public void deleteWizardQuestionByUID(Long uid){
+    public void deleteWizardQuestionByUID(Long uid) {
 	qaWizardDAO.deleteWizardQuestionByUID(uid);
     }
-    
+
     /**
      * Deletes all categories, sub skills and sub questions
      */
-    public void deleteAllWizardCategories()
-    {
+    public void deleteAllWizardCategories() {
 	qaWizardDAO.deleteAllWizardCategories();
+    }
+
+    public void removeQuestionsFromCache(QaContent qaContent) {
+	qaDAO.removeQuestionsFromCache(qaContent);
     }
 }

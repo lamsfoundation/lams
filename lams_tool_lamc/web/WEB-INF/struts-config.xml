@@ -7,6 +7,7 @@
 		<form-bean name="McAuthoringForm" type="org.lamsfoundation.lams.tool.mc.web.McAuthoringForm"/>
 		<form-bean name="McLearningForm" type="org.lamsfoundation.lams.tool.mc.web.McLearningForm"/>
 		<form-bean name="McMonitoringForm" type="org.lamsfoundation.lams.tool.mc.web.McMonitoringForm"/>
+		<form-bean name="McPedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.mc.web.McPedagogicalPlannerForm"/>
 	</form-beans>
 	
   	<!-- ========== Global Exception Definitions =================================== -->
@@ -218,6 +219,24 @@
 	  	/>   
 	  	
 	</action>  
+	
+	<!-- ==========  Authroing Definitions: Pedagogical Planner methods ========== -->
+		<action
+	      path="/pedagogicalPlanner"
+	      type="org.lamsfoundation.lams.tool.mc.web.McPedagogicalPlannerAction"
+	      name="McPedagogicalPlannerForm"
+	      scope="request"
+	      parameter="dispatch"
+	      unknown="false"
+	      validate="false"
+	     >
+	      <forward
+	        name="success"
+	        path="/authoring/pedagogicalPlannerForm.jsp"
+	        redirect="false"
+	      />
+	    </action>
+	
 	
 	
    <!--Learning Main Action: interacts with the Learning module user -->

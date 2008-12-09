@@ -90,6 +90,9 @@ public class SystemTool implements Serializable {
     private String adminUrl;
 
     /** persistent field */
+    private String pedagogicalPlannerUrl;
+
+    /** persistent field */
     private Date createDateTime;
 
     /**
@@ -331,6 +334,17 @@ public class SystemTool implements Serializable {
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getSystemToolId()).toHashCode();
+    }
+
+    /**
+     * @hibernate.property column="pedagogical_planner_url" length="65535" not-null="false"
+     */
+    public String getPedagogicalPlannerUrl() {
+	return pedagogicalPlannerUrl;
+    }
+
+    public void setPedagogicalPlannerUrl(String pedagogicalPlannerUrl) {
+	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
     }
 
 }

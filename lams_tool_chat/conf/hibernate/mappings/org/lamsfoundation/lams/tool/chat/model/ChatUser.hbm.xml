@@ -72,7 +72,7 @@
 
         <property
             name="finishedActivity"
-            type="java.lang.Boolean"
+            type="boolean"
             update="true"
             insert="true"
             column="finishedActivity"

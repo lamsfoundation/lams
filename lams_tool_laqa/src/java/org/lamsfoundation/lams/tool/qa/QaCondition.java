@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.ToolOutputFormatException;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * A text search condition with a set of questions on answers to which the search should be performed.
@@ -87,7 +88,7 @@ public class QaCondition extends TextSearchCondition {
 		    result = true;
 		    for (QaQueContent question : questions) {
 			String textToMatch = answers[question.getDisplayOrder() - 1];
-			textToMatch = removeHTMLtags(textToMatch);
+			textToMatch = WebUtil.removeHTMLtags(textToMatch);
 			result &= matches(textToMatch);
 			// if at least one answer does not satisfy the condition, there is no need to look further
 			if (!result) {

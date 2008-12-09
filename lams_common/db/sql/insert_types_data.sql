@@ -140,13 +140,14 @@ INSERT INTO lams_wkspc_fld_content_type VALUES (2,'PACKAGE');
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
 	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
-	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+	export_pfolio_class_url, monitor_url, contribute_url, create_date_time,pedagogical_planner_url)
 VALUES (1, 2, 'Grouping', 'All types of grouping including random and chosen.', 
 	'learning/grouping.do?method=performGrouping', 'learning/grouping.do?method=performGrouping', 
 	'learning/grouping.do?method=viewGrouping&mode=teacher', 'learning/groupingExportPortfolio?mode=learner', 
 	'learning/groupingExportPortfolio?mode=teacher', 
 	'monitoring/grouping.do?method=startGrouping', 
-	'monitoring/grouping.do?method=startGrouping', now() );
+	'monitoring/grouping.do?method=startGrouping', now(),
+	'pedagogicalPlanner/grouping.do?method=initGrouping');
 
 INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
 	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
@@ -298,4 +299,4 @@ INSERT INTO lams_ext_server_org_map VALUES
   (1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%','http://dummy','\0',7);
 
 -- initialise db version
-INSERT INTO patches VALUES ('lams', 13, NOW(), 'F');
+INSERT INTO patches VALUES ('lams', 15, NOW(), 'F');

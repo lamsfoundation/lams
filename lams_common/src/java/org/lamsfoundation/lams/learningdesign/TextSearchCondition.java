@@ -369,18 +369,6 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	return list;
     }
 
-    /**
-     * Strips HTML tags and leave "pure" text. Useful for FCKeditor created text.
-     * 
-     * @param text
-     *                string to process
-     * @return string after stripping
-     */
-    public static String removeHTMLtags(String text) {
-	return text == null ? null : text.replaceAll(TextSearchCondition.BR_TAG_REGEX, " ").replaceAll(
-		TextSearchCondition.HTML_TAG_REGEX, "");
-    }
-
     @Override
     public TextSearchConditionDTO getBranchConditionDTO(Integer toolActivityUIID) {
 	return new TextSearchConditionDTO(this, toolActivityUIID);

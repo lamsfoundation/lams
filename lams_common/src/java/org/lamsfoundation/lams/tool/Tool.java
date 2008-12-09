@@ -26,13 +26,13 @@ package org.lamsfoundation.lams.tool;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.dto.AuthoringToolDTO;
 
-
-/** 
+/**
  * 
  * @hibernate.class table="lams_tool"
  */
@@ -67,25 +67,28 @@ public class Tool implements Serializable {
 
     /** persistent field */
     private String monitorUrl;
-    
+
     /** persistent field */
     private String contributeUrl;
-    
+
     /** persistent field */
     private String moderationUrl;
-    
+
+    /** persistent field */
+    private String pedagogicalPlannerUrl;
+
     /** persistent field */
     private String helpUrl;
-    
+
     /** persistent field */
     private String adminUrl;
-    
+
     /** persistent field */
     private boolean supportsRunOffline;
-    
+
     /** persistent field */
     private boolean valid;
- 
+
     /** nullable persistent field */
     private long defaultToolContentId;
 
@@ -103,94 +106,74 @@ public class Tool implements Serializable {
 
     /** persistent field */
     private Date createDateTime;
-    
+
     /** persistent field */
     private Set activities;
 
     /** persistent field */
     private Integer groupingSupportTypeId;
-    
+
     /** persistent field */
     private String toolIdentifier;
 
     /** persistent field */
     private String toolVersion;
 
-	/** Name of the file (including the package) that contains the text strings for
-	 * this activity. e.g. org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties. */
-	private String languageFile;
+    /**
+     * Name of the file (including the package) that contains the text strings for this activity. e.g.
+     * org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties.
+     */
+    private String languageFile;
 
-	/** Does this tool produce output definitions / conditions */
-	private Boolean supportsOutputs;
-	
-	/**
-	 * Null if not a tool adapter tool, otherwise this string maps to the external server
-	 * which this tool adapter will be used for
-	 */
-	private String extLmsId;
+    /** Does this tool produce output definitions / conditions */
+    private Boolean supportsOutputs;
 
-	/** 
-	 * Entries for an tool in a language property file 
-	 */
-	public static final String I18N_DISPLAY_NAME = "tool.display.name";
-	public static final String I18N_DESCRIPTION = "tool.description";
+    /**
+     * Null if not a tool adapter tool, otherwise this string maps to the external server which this tool adapter will
+     * be used for
+     */
+    private String extLmsId;
+
+    /**
+     * Entries for an tool in a language property file
+     */
+    public static final String I18N_DISPLAY_NAME = "tool.display.name";
+    public static final String I18N_DESCRIPTION = "tool.description";
 
     /** full constructor */
-    public Tool(Long toolId, 
-                String learnerUrl, 
-                String learnerPreviewUrl,
-                String learnerProgressUrl,
-                String authorUrl, 
-                String defineLaterUrl, 
-                String monitorUrl,
-                String contributeUrl,
-                String moderationUrl,
-                String exportPortfolioLearnerUrl,
-                String exportPortfolioClassUrl,
-                boolean supportsGrouping, 
-                boolean supportsRunOffline,
-                long defaultToolContentId, 
-                String toolSignature, 
-                String toolDisplayName, 
-                String description, 
-                String className, 
-                Set activities,
-                Integer groupingSupportTypeId,
-                Date createDateTime,
-                String toolIdentifier,
-                String toolVersion,
-                String languageFile,
-                boolean supportsOutputs,
-                String extLmsId
-                ) 
-    {
-        this.toolId = toolId;
-        this.learnerUrl = learnerUrl;
-        this.learnerPreviewUrl = learnerPreviewUrl;
-        this.learnerProgressUrl = learnerProgressUrl;
-        this.authorUrl = authorUrl;
-        this.defineLaterUrl = defineLaterUrl;
-        this.monitorUrl = monitorUrl;
-        this.contributeUrl = contributeUrl;
-        this.moderationUrl = moderationUrl;
-        this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
-        this.exportPortfolioClassUrl = exportPortfolioClassUrl;
+    public Tool(Long toolId, String learnerUrl, String learnerPreviewUrl, String learnerProgressUrl, String authorUrl,
+	    String defineLaterUrl, String monitorUrl, String contributeUrl, String moderationUrl,
+	    String exportPortfolioLearnerUrl, String exportPortfolioClassUrl, boolean supportsGrouping,
+	    boolean supportsRunOffline, long defaultToolContentId, String toolSignature, String toolDisplayName,
+	    String description, String className, Set activities, Integer groupingSupportTypeId, Date createDateTime,
+	    String toolIdentifier, String toolVersion, String languageFile, boolean supportsOutputs, String extLmsId) {
+	this.toolId = toolId;
+	this.learnerUrl = learnerUrl;
+	this.learnerPreviewUrl = learnerPreviewUrl;
+	this.learnerProgressUrl = learnerProgressUrl;
+	this.authorUrl = authorUrl;
+	this.defineLaterUrl = defineLaterUrl;
+	this.monitorUrl = monitorUrl;
+	this.contributeUrl = contributeUrl;
+	this.moderationUrl = moderationUrl;
+	this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
+	this.exportPortfolioClassUrl = exportPortfolioClassUrl;
 
-        this.supportsGrouping = supportsGrouping;
-        this.supportsRunOffline = supportsRunOffline;
-        this.defaultToolContentId = defaultToolContentId;
-        this.toolSignature = toolSignature;
-        this.toolDisplayName = toolDisplayName;
-        this.description = description;
-        this.serviceName = className;
-        this.activities = activities;
-        this.groupingSupportTypeId = groupingSupportTypeId;
-        this.createDateTime = createDateTime;
-        this.toolIdentifier = toolIdentifier;
-        this.toolVersion = toolVersion;
-        this.languageFile = languageFile;
-        this.supportsOutputs = supportsOutputs;
-        this.extLmsId = extLmsId;
+	this.supportsGrouping = supportsGrouping;
+	this.supportsRunOffline = supportsRunOffline;
+	this.defaultToolContentId = defaultToolContentId;
+	this.toolSignature = toolSignature;
+	this.toolDisplayName = toolDisplayName;
+	this.description = description;
+	serviceName = className;
+	this.activities = activities;
+	this.groupingSupportTypeId = groupingSupportTypeId;
+	this.createDateTime = createDateTime;
+	this.toolIdentifier = toolIdentifier;
+	this.toolVersion = toolVersion;
+	this.languageFile = languageFile;
+	this.supportsOutputs = supportsOutputs;
+	this.extLmsId = extLmsId;
     }
 
     /** default constructor */
@@ -198,494 +181,453 @@ public class Tool implements Serializable {
     }
 
     /** minimal constructor */
-    public Tool(Long toolId, 
-                String learnerUrl, 
-                String authorUrl, 
-                boolean supportsGrouping, 
-                boolean supportsRunOffline,
-                long defaultToolContentId, 
-                String toolSignature, 
-                String toolDisplayName, 
-                String className, 
-                Set activities,
-                Integer groupingSupportTypeId,
-                Date createDateTime,
-                String toolIdentifier,
-                String toolVersion) 
-    {
-        this.toolId = toolId;
-        this.learnerUrl = learnerUrl;
-        this.authorUrl = authorUrl;
-        this.supportsGrouping = supportsGrouping;
-        this.supportsRunOffline = supportsRunOffline;
-        this.defaultToolContentId = defaultToolContentId;
-        this.toolSignature = toolSignature;
-        this.toolDisplayName = toolDisplayName;
-        this.serviceName = className;
-        this.activities = activities;
-        this.groupingSupportTypeId = groupingSupportTypeId;
-        this.createDateTime = createDateTime;
-        this.toolIdentifier = toolIdentifier;
-        this.toolVersion = toolVersion;
+    public Tool(Long toolId, String learnerUrl, String authorUrl, boolean supportsGrouping, boolean supportsRunOffline,
+	    long defaultToolContentId, String toolSignature, String toolDisplayName, String className, Set activities,
+	    Integer groupingSupportTypeId, Date createDateTime, String toolIdentifier, String toolVersion) {
+	this.toolId = toolId;
+	this.learnerUrl = learnerUrl;
+	this.authorUrl = authorUrl;
+	this.supportsGrouping = supportsGrouping;
+	this.supportsRunOffline = supportsRunOffline;
+	this.defaultToolContentId = defaultToolContentId;
+	this.toolSignature = toolSignature;
+	this.toolDisplayName = toolDisplayName;
+	serviceName = className;
+	this.activities = activities;
+	this.groupingSupportTypeId = groupingSupportTypeId;
+	this.createDateTime = createDateTime;
+	this.toolIdentifier = toolIdentifier;
+	this.toolVersion = toolVersion;
     }
 
-    /** 
-     * @hibernate.id generator-class="native" type="java.lang.Long"
-     *             	 column="tool_id"      
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="tool_id"
      */
     public Long getToolId() {
-        return this.toolId;
+	return toolId;
     }
 
     public void setToolId(Long toolId) {
-        this.toolId = toolId;
+	this.toolId = toolId;
     }
 
-    /** 
-     * @hibernate.property column="learner_url" length="65535"
-     *            		   not-null="true"    
+    /**
+     * @hibernate.property column="learner_url" length="65535" not-null="true"
      */
     public String getLearnerUrl() {
-        return this.learnerUrl;
+	return learnerUrl;
     }
 
     public void setLearnerUrl(String learnerUrl) {
-        this.learnerUrl = learnerUrl;
+	this.learnerUrl = learnerUrl;
     }
 
-    /** 
-     * @hibernate.property column="learner_preview_url" length="65535"
-     *            		   not-null="false"    
+    /**
+     * @hibernate.property column="learner_preview_url" length="65535" not-null="false"
      */
     public String getLearnerPreviewUrl() {
-        return this.learnerPreviewUrl;
+	return learnerPreviewUrl;
     }
 
     public void setLearnerPreviewUrl(String learnerPreviewUrl) {
-        this.learnerPreviewUrl = learnerPreviewUrl;
+	this.learnerPreviewUrl = learnerPreviewUrl;
     }
 
-    /** 
-     * @hibernate.property column="learner_progress_url" length="65535"
-     *            		   not-null="false"    
+    /**
+     * @hibernate.property column="learner_progress_url" length="65535" not-null="false"
      */
     public String getLearnerProgressUrl() {
-        return this.learnerProgressUrl;
+	return learnerProgressUrl;
     }
 
     public void setLearnerProgressUrl(String learnerProgressUrl) {
-        this.learnerProgressUrl = learnerProgressUrl;
+	this.learnerProgressUrl = learnerProgressUrl;
     }
 
     /**
      * Does this tool support contribute? Will be true if the contributeURL is not null/empty string.
      */
-    public boolean getSupportsContribute()
-    {
-    	String contributeURL = getContributeUrl();
-    	return ( contributeURL != null && contributeURL.trim().length() > 0);   
+    public boolean getSupportsContribute() {
+	String contributeURL = getContributeUrl();
+	return contributeURL != null && contributeURL.trim().length() > 0;
     }
-    
-    /** 
-     * @hibernate.property column="author_url" length="65535" not-null="true"         
+
+    /**
+     * @hibernate.property column="author_url" length="65535" not-null="true"
      */
     public String getAuthorUrl() {
-        return this.authorUrl;
+	return authorUrl;
     }
 
     public void setAuthorUrl(String authorUrl) {
-        this.authorUrl = authorUrl;
+	this.authorUrl = authorUrl;
     }
 
-    /** 
+    /**
      * Does this tool support define later? Will be true if the defineLaterURL is not null/empty string.
      */
     public boolean getSupportsDefineLater() {
-    	String url = getDefineLaterUrl();
-    	return ( url != null && url.trim().length() > 0);   
+	String url = getDefineLaterUrl();
+	return url != null && url.trim().length() > 0;
     }
 
     /**
      * Does this tool support moderation? Will be true if the moderateURL is not null/empty string.
      */
-    public boolean getSupportsModeration()
-    {
-    	String url = getModerationUrl();
-    	return ( url != null && url.trim().length() > 0);   
+    public boolean getSupportsModeration() {
+	String url = getModerationUrl();
+	return url != null && url.trim().length() > 0;
     }
-    
+
     /**
-     * @hibernate.property column="supports_run_offline_flag" length="1"
-     *             		   not-null="true" 
+     * @hibernate.property column="supports_run_offline_flag" length="1" not-null="true"
      * @return Returns the supportsRunOffline.
      */
-    public boolean getSupportsRunOffline()
-    {
-        return supportsRunOffline;
+    public boolean getSupportsRunOffline() {
+	return supportsRunOffline;
     }
-    
+
     /**
-     * @param supportsRunOffline The supportsRunOffline to set.
+     * @param supportsRunOffline
+     *                The supportsRunOffline to set.
      */
-    public void setSupportsRunOffline(boolean supportsRunOffline)
-    {
-        this.supportsRunOffline = supportsRunOffline;
+    public void setSupportsRunOffline(boolean supportsRunOffline) {
+	this.supportsRunOffline = supportsRunOffline;
     }
-    
-    /** 
-     * @hibernate.property column="define_later_url" length="65535"  not-null="false"        
+
+    /**
+     * @hibernate.property column="define_later_url" length="65535" not-null="false"
      */
     public String getDefineLaterUrl() {
-        return this.defineLaterUrl;
+	return defineLaterUrl;
     }
 
     public void setDefineLaterUrl(String defineLaterUrl) {
-        this.defineLaterUrl = defineLaterUrl;
+	this.defineLaterUrl = defineLaterUrl;
     }
 
-    /** 
-     * @hibernate.property column="default_tool_content_id" length="20"
-     *             		   not-null="false"       
+    /**
+     * @hibernate.property column="default_tool_content_id" length="20" not-null="false"
      */
     public long getDefaultToolContentId() {
-        return this.defaultToolContentId;
+	return defaultToolContentId;
     }
 
     public void setDefaultToolContentId(long defaultToolContentId) {
-        this.defaultToolContentId = defaultToolContentId;
+	this.defaultToolContentId = defaultToolContentId;
     }
 
-    /** 
-     * @hibernate.property column="tool_signature" length="64"
-     *                     not-null="true"      
+    /**
+     * @hibernate.property column="tool_signature" length="64" not-null="true"
      */
     public String getToolSignature() {
-        return this.toolSignature;
+	return toolSignature;
     }
 
     public void setToolSignature(String toolSignature) {
-        this.toolSignature = toolSignature;
+	this.toolSignature = toolSignature;
     }
 
-    /** 
-     * @hibernate.property column="tool_display_name" length="255"
-     *             		   not-null="true"     
+    /**
+     * @hibernate.property column="tool_display_name" length="255" not-null="true"
      */
     public String getToolDisplayName() {
-        return this.toolDisplayName;
+	return toolDisplayName;
     }
 
     public void setToolDisplayName(String toolDisplayName) {
-        this.toolDisplayName = toolDisplayName;
+	this.toolDisplayName = toolDisplayName;
     }
 
-    /** 
-     * @hibernate.property column="description" length="65535"     
+    /**
+     * @hibernate.property column="description" length="65535"
      */
     public String getDescription() {
-        return this.description;
+	return description;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+	this.description = description;
     }
 
-    /** 
-     * @hibernate.property column="service_name" length="65535"
-     *             		   not-null="true"      
+    /**
+     * @hibernate.property column="service_name" length="65535" not-null="true"
      */
     public String getServiceName() {
-        return this.serviceName;
+	return serviceName;
     }
 
     public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+	this.serviceName = serviceName;
     }
 
-    /** 
-     * @hibernate.property column="export_pfolio_learner_url" length="65535"
-     *             		   not-null="false"  
+    /**
+     * @hibernate.property column="export_pfolio_learner_url" length="65535" not-null="false"
      */
     public String getExportPortfolioLearnerUrl() {
-        return this.exportPortfolioLearnerUrl;
+	return exportPortfolioLearnerUrl;
     }
 
     public void setExportPortfolioLearnerUrl(String exportPortfolioLearnerUrl) {
-        this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
+	this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
     }
 
-    /** 
-     * @hibernate.property column="export_pfolio_class_url" length="65535"
-     *             		   not-null="false"  
+    /**
+     * @hibernate.property column="export_pfolio_class_url" length="65535" not-null="false"
      */
     public String getExportPortfolioClassUrl() {
-        return this.exportPortfolioClassUrl;
+	return exportPortfolioClassUrl;
     }
 
     public void setExportPortfolioClassUrl(String exportPortfolioClassUrl) {
-        this.exportPortfolioClassUrl = exportPortfolioClassUrl;
+	this.exportPortfolioClassUrl = exportPortfolioClassUrl;
     }
 
-    /** 
+    /**
      * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key  column="tool_id"
-     * @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.learningdesign.Activity"
-     *         
+     * @hibernate.collection-key column="tool_id"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"
+     * 
      */
     public Set getActivities() {
-        return this.activities;
+	return activities;
     }
 
     public void setActivities(Set activities) {
-        this.activities = activities;
+	this.activities = activities;
     }
 
     /**
-     * @hibernate.property column="valid_flag" length="1"
-     *             		   not-null="true"    
+     * @hibernate.property column="valid_flag" length="1" not-null="true"
      * @return Returns the valid.
      */
-    public boolean isValid()
-    {
-        return valid;
+    public boolean isValid() {
+	return valid;
     }
+
     /**
-     * @param valid The valid to set.
+     * @param valid
+     *                The valid to set.
      */
-    public void setValid(boolean valid)
-    {
-        this.valid = valid;
+    public void setValid(boolean valid) {
+	this.valid = valid;
     }
+
     /**
      * @return Returns the groupingSupportTypeId.
      */
-    public Integer getGroupingSupportTypeId()
-    {
-        return groupingSupportTypeId;
+    public Integer getGroupingSupportTypeId() {
+	return groupingSupportTypeId;
     }
+
     /**
-     * @param groupingSupportTypeId The groupingSupportTypeId to set.
+     * @param groupingSupportTypeId
+     *                The groupingSupportTypeId to set.
      */
-    public void setGroupingSupportTypeId(Integer groupingSupportTypeId)
-    {
-        this.groupingSupportTypeId = groupingSupportTypeId;
+    public void setGroupingSupportTypeId(Integer groupingSupportTypeId) {
+	this.groupingSupportTypeId = groupingSupportTypeId;
     }
-    
+
     /**
-     * @hibernate.property column="create_date_time"
-				           length="19" not-null="true"
+     * @hibernate.property column="create_date_time" length="19" not-null="true"
      * @return Returns the createDateTime.
      */
-    public Date getCreateDateTime()
-    {
-        return createDateTime;
+    public Date getCreateDateTime() {
+	return createDateTime;
     }
-    /**
-     * @param createDateTime The createDateTime to set.
-     */
-    public void setCreateDateTime(Date createDateTime)
-    {
-        this.createDateTime = createDateTime;
-    }
-    
 
     /**
-     * @hibernate.property column="contribute_url" length="65535" not-null="false"  
+     * @param createDateTime
+     *                The createDateTime to set.
+     */
+    public void setCreateDateTime(Date createDateTime) {
+	this.createDateTime = createDateTime;
+    }
+
+    /**
+     * @hibernate.property column="contribute_url" length="65535" not-null="false"
      * @return Returns the contributeUrl.
      */
-    public String getContributeUrl()
-    {
-        return contributeUrl;
+    public String getContributeUrl() {
+	return contributeUrl;
     }
+
     /**
-     * @param contributeUrl The contributUrl to set.
+     * @param contributeUrl
+     *                The contributUrl to set.
      */
-    public void setContributeUrl(String contributeUrl)
-    {
-        this.contributeUrl = contributeUrl;
+    public void setContributeUrl(String contributeUrl) {
+	this.contributeUrl = contributeUrl;
     }
+
     /**
-     * @hibernate.property column="moderation_url" length="65535" not-null="false"   
+     * @hibernate.property column="moderation_url" length="65535" not-null="false"
      * @return Returns the moderationUrl.
      */
-    public String getModerationUrl()
-    {
-        return moderationUrl;
+    public String getModerationUrl() {
+	return moderationUrl;
     }
+
     /**
-     * @param moderationUrl The moderationUrl to set.
+     * @param moderationUrl
+     *                The moderationUrl to set.
      */
-    public void setModerationUrl(String moderationUrl)
-    {
-        this.moderationUrl = moderationUrl;
+    public void setModerationUrl(String moderationUrl) {
+	this.moderationUrl = moderationUrl;
     }
+
     /**
-     * @hibernate.property column="monitor_url" length="65535" not-null="false"  
+     * @hibernate.property column="monitor_url" length="65535" not-null="false"
      * @return Returns the monitorUrl.
      */
-    public String getMonitorUrl()
-    {
-        return monitorUrl;
-    }
-    /**
-     * @param monitorUrl The monitorUrl to set.
-     */
-    public void setMonitorUrl(String monitorUrl)
-    {
-        this.monitorUrl = monitorUrl;
-    }
- 
-    /**
-     * @hibernate.property column="help_url" length="65535" not-null="false"  
-     * @return Returns the helpUrl.
-     */
-    public String getHelpUrl()
-    {
-        return helpUrl;
-    }
-    /**
-     * @param helpUrl The helpUrl to set.
-     */
-    public void setHelpUrl(String helpUrl)
-    {
-        this.helpUrl = helpUrl;
+    public String getMonitorUrl() {
+	return monitorUrl;
     }
 
-    
     /**
-     * @hibernate.property column="admin_url" length="65535" not-null="false"  
-     * @return Returns the helpUrl.
+     * @param monitorUrl
+     *                The monitorUrl to set.
      */
-    public String getAdminUrl()
-    {
-        return adminUrl;
-    }
-    /**
-     * @param helpUrl The helpUrl to set.
-     */
-    public void setAdminUrl(String adminUrl)
-    {
-        this.adminUrl = adminUrl;
+    public void setMonitorUrl(String monitorUrl) {
+	this.monitorUrl = monitorUrl;
     }
 
-    
-    /** 
-     * @hibernate.property column="tool_identifier" length="64"       
+    /**
+     * @hibernate.property column="help_url" length="65535" not-null="false"
+     * @return Returns the helpUrl.
+     */
+    public String getHelpUrl() {
+	return helpUrl;
+    }
+
+    /**
+     * @param helpUrl
+     *                The helpUrl to set.
+     */
+    public void setHelpUrl(String helpUrl) {
+	this.helpUrl = helpUrl;
+    }
+
+    /**
+     * @hibernate.property column="admin_url" length="65535" not-null="false"
+     * @return Returns the helpUrl.
+     */
+    public String getAdminUrl() {
+	return adminUrl;
+    }
+
+    /**
+     * @param helpUrl
+     *                The helpUrl to set.
+     */
+    public void setAdminUrl(String adminUrl) {
+	this.adminUrl = adminUrl;
+    }
+
+    /**
+     * @hibernate.property column="tool_identifier" length="64"
      */
     public String getToolIdentifier() {
-        return this.toolIdentifier;
+	return toolIdentifier;
     }
 
     public void setToolIdentifier(String toolIdentifier) {
-        this.toolIdentifier = toolIdentifier;
+	this.toolIdentifier = toolIdentifier;
     }
 
-    /** 
-     * @hibernate.property column="tool_version" length="10"       
+    /**
+     * @hibernate.property column="tool_version" length="10"
      */
     public String getToolVersion() {
-        return this.toolVersion;
+	return toolVersion;
     }
 
     public void setToolVersion(String toolVersion) {
-        this.toolVersion = toolVersion;
+	this.toolVersion = toolVersion;
     }
 
-    
-    /** 
-     * @hibernate.property column="language_file" length="255" not-null="false"   
+    /**
+     * @hibernate.property column="language_file" length="255" not-null="false"
      */
-	public String getLanguageFile() {
-		return languageFile;
-	}
+    public String getLanguageFile() {
+	return languageFile;
+    }
 
-	public void setLanguageFile(String languageFile) {
-		this.languageFile = languageFile;
-	}
+    public void setLanguageFile(String languageFile) {
+	this.languageFile = languageFile;
+    }
 
-   /**
+    /**
      * @hibernate.property column="supports_outputs" length="1"
      * @return Returns the supportsOutputs.
      */
-    public boolean getSupportsOutputs()
-    {
-        return supportsOutputs;
+    public boolean getSupportsOutputs() {
+	return supportsOutputs;
     }
-    
+
     /**
-     * @param supportsRunOffline The supportsRunOffline to set.
+     * @param supportsRunOffline
+     *                The supportsRunOffline to set.
      */
-    public void setSupportsOutputs(boolean supportsOutputs)
-    {
-        this.supportsOutputs = supportsOutputs;
-    }
-    
-    
-    /** 
-     * @hibernate.property column="ext_lms_id" length="255" not-null="false"  
-     */
-	public String getExtLmsId() {
-		return extLmsId;
-	}
-
-	public void setExtLmsId(String extLmsId) {
-		this.extLmsId = extLmsId;
-	}
-
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("toolId", getToolId())
-            .toString();
+    public void setSupportsOutputs(boolean supportsOutputs) {
+	this.supportsOutputs = supportsOutputs;
     }
 
+    /**
+     * @hibernate.property column="ext_lms_id" length="255" not-null="false"
+     */
+    public String getExtLmsId() {
+	return extLmsId;
+    }
+
+    public void setExtLmsId(String extLmsId) {
+	this.extLmsId = extLmsId;
+    }
+
+    @Override
+    public String toString() {
+	return new ToStringBuilder(this).append("toolId", getToolId()).toString();
+    }
+
+    @Override
     public boolean equals(Object other) {
-        if ( (this == other ) ) return true;
-        if ( !(other instanceof Tool) ) return false;
-        Tool castOther = (Tool) other;
-        return new EqualsBuilder()
-            .append(this.getToolId(), castOther.getToolId())
-            .isEquals();
+	if (this == other) {
+	    return true;
+	}
+	if (!(other instanceof Tool)) {
+	    return false;
+	}
+	Tool castOther = (Tool) other;
+	return new EqualsBuilder().append(this.getToolId(), castOther.getToolId()).isEquals();
     }
 
+    @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(getToolId())
-            .toHashCode();
+	return new HashCodeBuilder().append(getToolId()).toHashCode();
     }
-    public AuthoringToolDTO getAuthoringToolDTO(){
-    	return new AuthoringToolDTO(this);
+
+    public AuthoringToolDTO getAuthoringToolDTO() {
+	return new AuthoringToolDTO(this);
     }
 
     public IToolVO createBasicToolVO() {
-    	IToolVO vo = new BasicToolVO(
-    			this.toolId, 
-    			this.supportsGrouping, 
-    			this.learnerUrl, 
-    			this.learnerPreviewUrl, 
-    			this.learnerProgressUrl, 
-    			this.authorUrl, 
-    			this.defineLaterUrl, 
-    			this.exportPortfolioLearnerUrl, 
-    			this.exportPortfolioClassUrl, 
-    			this.monitorUrl,
-    			this.contributeUrl,
-    			this.moderationUrl,
-    			this.helpUrl,
-    			this.supportsRunOffline,
-    			this.defaultToolContentId, 
-    			this.toolSignature, 
-    			this.toolDisplayName, 
-    			this.description, 
-    			this.serviceName, 
-    			this.createDateTime,
-    			this.groupingSupportTypeId,
-    			this.toolIdentifier, 
-    			this.toolVersion, 
-    			this.languageFile,
-    			this.supportsOutputs,
-    			this.extLmsId);
-    	return vo;
+	IToolVO vo = new BasicToolVO(toolId, supportsGrouping, learnerUrl, learnerPreviewUrl, learnerProgressUrl,
+		authorUrl, defineLaterUrl, exportPortfolioLearnerUrl, exportPortfolioClassUrl, monitorUrl,
+		contributeUrl, moderationUrl, helpUrl, supportsRunOffline, defaultToolContentId, toolSignature,
+		toolDisplayName, description, serviceName, createDateTime, groupingSupportTypeId, toolIdentifier,
+		toolVersion, languageFile, supportsOutputs, extLmsId);
+	return vo;
+    }
+
+    /**
+     * @hibernate.property column="pedagogical_planner_url" length="65535" not-null="false"
+     */
+    public String getPedagogicalPlannerUrl() {
+	return pedagogicalPlannerUrl;
+    }
+
+    public void setPedagogicalPlannerUrl(String pedagogicalPlannerUrl) {
+	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
     }
 
 }

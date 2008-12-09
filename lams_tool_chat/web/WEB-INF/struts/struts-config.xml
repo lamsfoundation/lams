@@ -14,6 +14,10 @@
   <form-beans>
 
     <form-bean
+      name="pedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.chat.web.forms.ChatPedagogicalPlannerForm"
+    />
+    <form-bean
       name="monitoringForm"
       type="org.lamsfoundation.lams.tool.chat.web.forms.MonitoringForm"
     />
@@ -49,6 +53,21 @@
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
+    <action
+      path="/pedagogicalPlanner"
+      type="org.lamsfoundation.lams.tool.chat.web.actions.PedagogicalPlannerAction"
+      name="pedagogicalPlannerForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/pages/authoring/pedagogicalPlannerForm.jsp"
+        redirect="false"
+      />
+    </action>
     <action
       path="/learning"
       type="org.lamsfoundation.lams.tool.chat.web.actions.LearningAction"

@@ -57,4 +57,6 @@ public interface IQaContentDAO {
     public int countUserResponsed(QaContent content);
 
     public void deleteCondition(QaCondition condition);
+
+    public void removeQuestionsFromCache(QaContent qaContent);
 }

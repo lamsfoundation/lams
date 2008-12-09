@@ -112,6 +112,12 @@
 					<c:set var="tabRight" value="tab-right-highlight"/>	
 					<c:set var="highlight" value="true" />					
 				</c:if>
+				<c:if test="${headerlink.name eq 'index.planner'}">
+					<c:set var="tabLeft" value="tab-left-highlight"/>
+					<c:set var="tabMiddle" value="tab-middle-highlight"/>
+					<c:set var="tabRight" value="tab-right-highlight"/>	
+					<c:set var="highlight" value="true" />					
+				</c:if>
 	
 				<div class="${tabLeft}"></div>
 				<div class="${tabMiddle}">
@@ -180,6 +186,9 @@
 							</c:if>
 							<c:if test="${tab eq 'community'}">
 								<tiles:insert attribute="community" />
+							</c:if>
+							<c:if test="${tab eq 'planner'}">
+								<tiles:insert attribute="planner" />
 							</c:if>
 						</td>
 					</tr>

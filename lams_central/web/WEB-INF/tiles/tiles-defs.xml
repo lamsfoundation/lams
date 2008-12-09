@@ -38,6 +38,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="community" value="community.jsp"/>	
 	</definition>
 	
+	<definition name=".planner" path="/main.jsp">
+		<put name="planner" value="pedagogical_planner/base.jsp"/>	
+	</definition>
+	
 	<definition name=".editprofile" path="/main.jsp">
 		<put name="profile" value="editprofile.jsp"/>	
 	</definition>

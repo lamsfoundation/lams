@@ -1,3 +1,8 @@
+<form-bean
+  name="GroupingPedagogicalPlannerForm"
+  type="org.lamsfoundation.lams.web.planner.GroupingPedagogicalPlannerForm"
+/>
+
 <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="userId" type="java.lang.Integer" />
 	<form-property name="login" type="java.lang.String" />
@@ -20,6 +25,8 @@
 	<form-property name="localeId" type="java.lang.Integer" />
 	<form-property name="enableFlash" type="java.lang.Boolean" />
 </form-bean>
+
+
 
 <!--  uncomment to use wddxPost   
  <form-bean

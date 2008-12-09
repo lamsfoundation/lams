@@ -413,6 +413,12 @@
 				<include name="jboss-serialization.jar" />
 			</fileset>
 		</copy>
+		<copy overwrite="yes" todir="${contentrepository.directory}/pedagogical_planner">	
+			<fileset dir="${lib}/pedagogical_planner">
+				<include name="**"/> 
+			</fileset>
+		</copy>
+		
 	</target>
 
 	<target name="test-report" description="Run all the test cases across the system. Takes a long time.">

@@ -713,7 +713,7 @@ public class AuthoringUtil implements QaAppConstants {
 		    existingQaQueContent.setDisplayOrder(displayOrder);
 
 		    AuthoringUtil.logger.debug("updating the existing question content: " + existingQaQueContent);
-		    qaService.updateQaQueContent(existingQaQueContent);
+		    qaService.saveOrUpdateQaQueContent(existingQaQueContent);
 		}
 	    }
 	}
@@ -774,7 +774,7 @@ public class AuthoringUtil implements QaAppConstants {
 		existingQaQueContent.setDisplayOrder(displayOrder);
 		AuthoringUtil.logger.debug("updating the existing question content for displayOrder: "
 			+ existingQaQueContent);
-		qaService.updateQaQueContent(existingQaQueContent);
+		qaService.saveOrUpdateQaQueContent(existingQaQueContent);
 		displayOrder++;
 	    }
 	}

@@ -88,6 +88,7 @@
         lazy="true"
         inverse="true"
 		cascade="all-delete-orphan"
+		order-by="displayOrder"
     >
         <key>
             <column name="mc_que_content_id" />

@@ -109,6 +109,14 @@
             length="250"
         />
 
+        <property
+            name="roomCreated"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="room_created"
+        />
+
         <set
             name="chatMessages"
             lazy="true"

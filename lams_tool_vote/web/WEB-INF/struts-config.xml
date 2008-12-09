@@ -7,7 +7,8 @@
 		<form-bean name="VoteAuthoringForm" type="org.lamsfoundation.lams.tool.vote.web.VoteAuthoringForm"/>
 		<form-bean name="VoteLearningForm" type="org.lamsfoundation.lams.tool.vote.web.VoteLearningForm"/>
 		<form-bean name="VoteMonitoringForm" type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringForm"/>
-		<form-bean name="VoteChartForm" type="org.lamsfoundation.lams.tool.vote.web.VoteChartForm"/>				
+		<form-bean name="VoteChartForm" type="org.lamsfoundation.lams.tool.vote.web.VoteChartForm"/>
+		<form-bean name="VotePedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.vote.web.VotePedagogicalPlannerForm"/>				
 	</form-beans>
 	
   	<!-- ========== Global Exception Definitions =================================== -->
@@ -153,7 +154,22 @@
 	  	/>
 	</action>  
     
-
+	<!-- ==========  Authroing Definitions: Pedagogical Planner methods ========== -->
+	<action
+      path="/pedagogicalPlanner"
+      type="org.lamsfoundation.lams.tool.vote.web.VotePedagogicalPlannerAction"
+      name="VotePedagogicalPlannerForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+     >
+      <forward
+        name="success"
+        path="/authoring/pedagogicalPlannerForm.jsp"
+        redirect="false"
+      />
+    </action>
    <!--Learning Starter Action: initializes the Learning module -->
    <action 	path="/learningStarter" 
    			type="org.lamsfoundation.lams.tool.vote.web.VoteLearningStarterAction" 

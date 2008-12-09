@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -68,6 +69,7 @@ import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
+import org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
@@ -155,6 +157,16 @@ public class AuthoringAction extends Action {
 	if (param.equals("deleteAttachment")) {
 	    return deleteAttachment(mapping, form, request, response);
 	}
+	if (param.equals("initPedagogicalPlannerForm")) {
+	    return initPedagogicalPlannerForm(mapping, form, request, response);
+	}
+	if (param.equals("saveOrUpdatePedagogicalPlannerForm")) {
+	    return saveOrUpdatePedagogicalPlannerForm(mapping, form, request, response);
+	}
+	if (param.equals("createPedagogicalPlannerTopic")) {
+	    return createPedagogicalPlannerTopic(mapping, form, request, response);
+	}
+
 	return mapping.findForward("error");
     }
 
@@ -846,7 +858,7 @@ public class AuthoringAction extends Action {
 		forumService = getForumManager();
 		Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
 		// only allow one attachment, so replace whatever
-		Set attSet = attSet = new HashSet();
+		Set attSet = new HashSet();
 		attSet.add(att);
 		newMsg.setHasAttachment(true);
 		newMsg.getMessage().setAttachments(attSet);
@@ -1052,5 +1064,81 @@ public class AuthoringAction extends Action {
      */
     private List getDeletedForumConditionList(SessionMap sessionMap) {
 	return getListFromSession(sessionMap, ForumConstants.ATTR_DELETED_CONDITION_LIST);
+    }
+
+    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	ForumPedagogicalPlannerForm plannerForm = (ForumPedagogicalPlannerForm) form;
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Forum forum = getForumManager().getForumByContentId(toolContentID);
+	plannerForm.fillForm(forum);
+
+	return mapping.findForward("success");
+    }
+
+    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException {
+	ForumPedagogicalPlannerForm plannerForm = (ForumPedagogicalPlannerForm) form;
+	ActionMessages errors = plannerForm.validate();
+	if (errors.isEmpty()) {
+	    Forum forum = getForumManager().getForumByContentId(plannerForm.getToolContentID());
+
+	    int topicIndex = 0;
+	    String topic = null;
+	    Message message = null;
+	    List<Message> newTopics = new LinkedList<Message>();
+	    Iterator<Message> forumTopicIterator = forum.getMessages().iterator();
+	    do {
+		topic = plannerForm.getTopic(topicIndex);
+		if (StringUtils.isEmpty(topic)) {
+		    plannerForm.removeTopic(topicIndex);
+		} else {
+		    if (forumTopicIterator.hasNext()) {
+			message = forumTopicIterator.next();
+			message.setUpdated(new Date());
+			message.setSubject(topic);
+		    } else {
+			message = new Message();
+			message.setIsAuthored(true);
+			Date currentDate = new Date();
+			message.setCreated(currentDate);
+			message.setUpdated(currentDate);
+			message.setLastReplyDate(currentDate);
+
+			HttpSession ss = SessionManager.getSession();
+			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			ForumUser forumUser = getForumManager().getUserByID(new Long(user.getUserID().intValue()));
+			message.setCreatedBy(forumUser);
+			message.setModifiedBy(forumUser);
+
+			message.setSubject(topic);
+
+			newTopics.add(message);
+			message.setForum(forum);
+			getForumManager().createRootTopic(forum.getUid(), null, message);
+		    }
+		    topicIndex++;
+		}
+
+	    } while (topic != null);
+	    while (forumTopicIterator.hasNext()) {
+		message = forumTopicIterator.next();
+		forumTopicIterator.remove();
+		getForumManager().deleteTopic(message.getUid());
+	    }
+	    forum.getMessages().addAll(newTopics);
+	    getForumManager().updateForum(forum);
+	} else {
+	    saveErrors(request, errors);
+	}
+	return mapping.findForward("success");
+    }
+
+    public ActionForward createPedagogicalPlannerTopic(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException,
+	    PersistenceException {
+	ForumPedagogicalPlannerForm plannerForm = (ForumPedagogicalPlannerForm) form;
+	plannerForm.setTopic(plannerForm.getTopicCount().intValue(), "");
+	return mapping.findForward("success");
     }
 }

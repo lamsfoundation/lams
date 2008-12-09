@@ -160,9 +160,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     }
 
-    /**********************************************
+    /*******************************************************************************************************************
      * Setter Methods
-     * *******************************************/
+     ******************************************************************************************************************/
     /**
      * Set i18n MessageService
      */
@@ -172,7 +172,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param groupDAO
-     *            The groupDAO to set.
+     *                The groupDAO to set.
      */
     public void setGroupDAO(GroupDAO groupDAO) {
 	this.groupDAO = groupDAO;
@@ -216,7 +216,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param transitionDAO
-     *            The transitionDAO to set
+     *                The transitionDAO to set
      */
     public void setTransitionDAO(TransitionDAO transitionDAO) {
 	this.transitionDAO = transitionDAO;
@@ -224,7 +224,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param learningDesignDAO
-     *            The learningDesignDAO to set.
+     *                The learningDesignDAO to set.
      */
     public void setLearningDesignDAO(LearningDesignDAO learningDesignDAO) {
 	this.learningDesignDAO = learningDesignDAO;
@@ -232,7 +232,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param learningLibraryDAO
-     *            The learningLibraryDAO to set.
+     *                The learningLibraryDAO to set.
      */
     public void setLearningLibraryDAO(LearningLibraryDAO learningLibraryDAO) {
 	this.learningLibraryDAO = learningLibraryDAO;
@@ -240,7 +240,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param baseDAO
-     *            The baseDAO to set.
+     *                The baseDAO to set.
      */
     public void setBaseDAO(BaseDAO baseDAO) {
 	this.baseDAO = baseDAO;
@@ -248,7 +248,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param activityDAO
-     *            The activityDAO to set.
+     *                The activityDAO to set.
      */
     public void setActivityDAO(ActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
@@ -256,7 +256,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param toolDAO
-     *            The toolDAO to set
+     *                The toolDAO to set
      */
     public void setToolDAO(ToolDAO toolDAO) {
 	this.toolDAO = toolDAO;
@@ -264,7 +264,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param toolDAO
-     *            The toolDAO to set
+     *                The toolDAO to set
      */
     public void setSystemToolDAO(SystemToolDAO systemToolDAO) {
 	this.systemToolDAO = systemToolDAO;
@@ -272,7 +272,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param licenseDAO
-     *            The licenseDAO to set
+     *                The licenseDAO to set
      */
     public void setLicenseDAO(LicenseDAO licenseDAO) {
 	this.licenseDAO = licenseDAO;
@@ -292,7 +292,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param learningDesignService
-     *            The Learning Design Validator Service
+     *                The Learning Design Validator Service
      */
     public void setLearningDesignService(ILearningDesignService learningDesignService) {
 	this.learningDesignService = learningDesignService;
@@ -320,7 +320,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @param contentIDGenerator
-     *            The contentIDGenerator to set.
+     *                The contentIDGenerator to set.
      */
     public void setContentIDGenerator(ToolContentIDGenerator contentIDGenerator) {
 	this.contentIDGenerator = contentIDGenerator;
@@ -362,13 +362,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	this.beanFactory = beanFactory;
     }
 
-    /**********************************************
+    /*******************************************************************************************************************
      * Utility/Service Methods
-     * *******************************************/
+     ******************************************************************************************************************/
 
     /**
-     * Helper method to retrieve the user data. Gets the id from the user
-     * details in the shared session
+     * Helper method to retrieve the user data. Gets the id from the user details in the shared session
      * 
      * @return the user id
      */
@@ -527,9 +526,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 
 	if (design != null) { /*
-			       * only the user who is editing the design may
-			       * unlock it
-			       */
+	 * only the user who is editing the design may unlock it
+	 */
 	    if (design.getEditOverrideUser().equals(user)) {
 		design.setEditOverrideLock(false);
 		design.setEditOverrideUser(null);
@@ -543,8 +541,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		}
 
 		/*
-		 * parse Learning Design to find last read - only Activity (
-		 * hopefully the system gate in this case )
+		 * parse Learning Design to find last read - only Activity ( hopefully the system gate in this case )
 		 */
 		EditOnFlyProcessor processor = new EditOnFlyProcessor(design, activityDAO);
 
@@ -592,12 +589,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Remove a temp. System Gate from the design. Requires removing the gate
-     * from any learner progress entries - should only be a current activity but
-     * remove it from previous and next, just in case.
+     * Remove a temp. System Gate from the design. Requires removing the gate from any learner progress entries - should
+     * only be a current activity but remove it from previous and next, just in case.
      * 
-     * This will leave a "hole" in the learner progress, but the progress engine
-     * can take care of that.
+     * This will leave a "hole" in the learner progress, but the progress engine can take care of that.
      * 
      * @param gate
      * @param design
@@ -912,8 +907,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign,
      *      java.lang.Integer, org.lamsfoundation.lams.usermanagement.User,
-     *      org.lamsfoundation.lams.usermanagement.WorkspaceFolder,
-     *      java.lang.Boolean, java.lang.String)
+     *      org.lamsfoundation.lams.usermanagement.WorkspaceFolder, java.lang.Boolean, java.lang.String)
      */
     public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign, Integer copyType, User user,
 	    WorkspaceFolder workspaceFolder, boolean setOriginalDesign, String newDesignName, String customCSV)
@@ -954,8 +948,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * @throws WorkspaceFolderException
      * @throws IOException
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#insertLearningDesign(java.lang.Long,
-     *      java.lang.Long, java.lang.Integer, java.lang.Boolean,
-     *      java.lang.String, java.lang.Integer)
+     *      java.lang.Long, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.Integer)
      */
     public LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID,
 	    boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID, String customCSV)
@@ -1029,8 +1022,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#copyLearningDesignToolContent(org.lamsfoundation.lams.learningdesign.LearningDesign,
-     *      org.lamsfoundation.lams.learningdesign.LearningDesign,
-     *      java.lang.Integer)
+     *      org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer)
      */
     private LearningDesign copyLearningDesignToolContent(LearningDesign design, LearningDesign originalLearningDesign,
 	    Integer copyType) throws LearningDesignException {
@@ -1082,21 +1074,20 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Updates the Activity information in the newLearningDesign based on the
-     * originalLearningDesign. This any grouping details.
+     * Updates the Activity information in the newLearningDesign based on the originalLearningDesign. This any grouping
+     * details.
      * 
-     * As new activities are created, the UIID is incremented by the uiidOffset.
-     * If we are just copying a sequence this will be set to 0. But if we are
-     * importing a sequence into another sequence, this will be an offset value
-     * so we new ids guaranteed to be outside of the range of the main sequence
-     * (this may mean gaps in the uiids but that doesn't matter).
+     * As new activities are created, the UIID is incremented by the uiidOffset. If we are just copying a sequence this
+     * will be set to 0. But if we are importing a sequence into another sequence, this will be an offset value so we
+     * new ids guaranteed to be outside of the range of the main sequence (this may mean gaps in the uiids but that
+     * doesn't matter).
      * 
      * @param originalLearningDesign
-     *            The LearningDesign to be copied
+     *                The LearningDesign to be copied
      * @param newLearningDesign
-     *            The copy of the originalLearningDesign
-     * @return Map of all the new activities, where the key is the UIID value.
-     *         This is used as an input to updateDesignTransitions
+     *                The copy of the originalLearningDesign
+     * @return Map of all the new activities, where the key is the UIID value. This is used as an input to
+     *         updateDesignTransitions
      */
     private HashMap<Integer, Activity> updateDesignActivities(LearningDesign originalLearningDesign,
 	    LearningDesign newLearningDesign, int uiidOffset, String customCSV) {
@@ -1231,24 +1222,21 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * As part of updateDesignActivities(), process an activity and, via
-     * recursive calls, the activity's child activities. Need to keep track of
-     * any new groupings created so we can go back and update the grouped
-     * activities with their new groupings at the end. Also copies the tool
-     * content.
+     * As part of updateDesignActivities(), process an activity and, via recursive calls, the activity's child
+     * activities. Need to keep track of any new groupings created so we can go back and update the grouped activities
+     * with their new groupings at the end. Also copies the tool content.
      * 
      * @param activity
-     *            Activity to process. May not be null.
+     *                Activity to process. May not be null.
      * @param newLearningDesign
-     *            The new learning design. May not be null.
+     *                The new learning design. May not be null.
      * @param newActivities
-     *            Temporary set of new activities - as activities are processed
-     *            they are added to the set. May not be null.
+     *                Temporary set of new activities - as activities are processed they are added to the set. May not
+     *                be null.
      * @param newGroupings
-     *            Temporary set of new groupings. Key is the grouping UUID. May
-     *            not be null.
+     *                Temporary set of new groupings. Key is the grouping UUID. May not be null.
      * @param parentActivity
-     *            This activity's parent activity (if one exists). May be null.
+     *                This activity's parent activity (if one exists). May be null.
      */
     private void processActivity(Activity activity, LearningDesign newLearningDesign,
 	    Map<Integer, Activity> newActivities, Map<Integer, Grouping> newGroupings, Activity parentActivity,
@@ -1278,13 +1266,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Updates the Transition information in the newLearningDesign based on the
-     * originalLearningDesign
+     * Updates the Transition information in the newLearningDesign based on the originalLearningDesign
      * 
      * @param originalLearningDesign
-     *            The LearningDesign to be copied
+     *                The LearningDesign to be copied
      * @param newLearningDesign
-     *            The copy of the originalLearningDesign
+     *                The copy of the originalLearningDesign
      */
     public void updateDesignTransitions(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
 	    HashMap<Integer, Activity> newActivities, int uiidOffset) {
@@ -1329,13 +1316,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Updates the competence information in the newLearningDesign based on the
-     * originalLearningDesign
+     * Updates the competence information in the newLearningDesign based on the originalLearningDesign
      * 
      * @param originalLearningDesign
-     *            The LearningDesign to be copied
+     *                The LearningDesign to be copied
      * @param newLearningDesign
-     *            The copy of the originalLearningDesign
+     *                The copy of the originalLearningDesign
      */
     public void updateDesignCompetences(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
 	    boolean insert) {
@@ -1432,13 +1418,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Updates the competence information in the newLearningDesign based on the
-     * originalLearningDesign
+     * Updates the competence information in the newLearningDesign based on the originalLearningDesign
      * 
      * @param originalLearningDesign
-     *            The LearningDesign to be copied
+     *                The LearningDesign to be copied
      * @param newLearningDesign
-     *            The copy of the originalLearningDesign
+     *                The copy of the originalLearningDesign
      */
     public void updateCompetenceMappings(Set<Competence> newCompetences, HashMap<Integer, Activity> newActivities) {
 	for (Integer activityKey : newActivities.keySet()) {
@@ -1471,10 +1456,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * Determines the type of activity and returns a deep-copy of the same
      * 
      * @param activity
-     *            The object to be deep-copied
+     *                The object to be deep-copied
      * @param newGroupings
-     *            Temporary set of new groupings. Key is the grouping UUID. May
-     *            not be null.
+     *                Temporary set of new groupings. Key is the grouping UUID. May not be null.
      * @return Activity The new deep-copied Activity object
      */
     private Activity getActivityCopy(final Activity activity, Map<Integer, Grouping> newGroupings, int uiidOffset) {
@@ -1499,7 +1483,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * Returns a set of child activities for the given parent activity
      * 
      * @param parentActivity
-     *            The parent activity
+     *                The parent activity
      * @return HashSet Set of the activities that belong to the parentActivity
      */
     private HashSet getChildActivities(Activity parentActivity) {
@@ -1512,18 +1496,16 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * This method saves a new Learning Design to the database. It received a
-     * WDDX packet from flash, deserializes it and then finally persists it to
-     * the database.
+     * This method saves a new Learning Design to the database. It received a WDDX packet from flash, deserializes it
+     * and then finally persists it to the database.
      * 
-     * A user may update an existing learning design if they have user/owner
-     * rights to the folder or they are doing live edit. A user may create a new
-     * learning design only if they have user/owner rights to the folder.
+     * A user may update an existing learning design if they have user/owner rights to the folder or they are doing live
+     * edit. A user may create a new learning design only if they have user/owner rights to the folder.
      * 
      * Note: it does not validate the design - that must be done separately.
      * 
      * @param wddxPacket
-     *            The WDDX packet received from Flash
+     *                The WDDX packet received from Flash
      * @return Long learning design id
      * @throws Exception
      */
@@ -1575,9 +1557,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     /**
      * Validate the learning design, updating the valid flag appropriately.
      * 
-     * This needs to be run in a separate transaction to
-     * storeLearningDesignDetails to ensure the database is fully updated before
-     * the validation occurs (due to some quirks we are finding using Hibernate)
+     * This needs to be run in a separate transaction to storeLearningDesignDetails to ensure the database is fully
+     * updated before the validation occurs (due to some quirks we are finding using Hibernate)
      * 
      * @param learningDesignId
      * @throws Exception
@@ -1633,9 +1614,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * This is a utility method used by the method
-     * <code>getAllLearningDesignDetails</code> to pack the required information
-     * in a data transfer object.
+     * This is a utility method used by the method <code>getAllLearningDesignDetails</code> to pack the required
+     * information in a data transfer object.
      * 
      * @param iterator
      * @return Hashtable The required information in a Hashtable
@@ -1728,8 +1708,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Delete a learning design from the database. Does not remove any content
-     * stored in tools - that is done by the LamsCoreToolService
+     * Delete a learning design from the database. Does not remove any content stored in tools - that is done by the
+     * LamsCoreToolService
      */
     public void deleteLearningDesign(LearningDesign design) {
 	if (design == null) {
@@ -1784,12 +1764,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Get a unique name for a learning design, based on the names of the
-     * learning designs in the folder. If the learning design has duplicated
-     * name in same folder, then the new name will have a timestamp. The new
-     * name format will be oldname_ddMMYYYY_idx. The idx will be auto
-     * incremental index number, start from 1. Warning - this may be quite
-     * intensive as it gets all the learning designs in a folder.
+     * Get a unique name for a learning design, based on the names of the learning designs in the folder. If the
+     * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
+     * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
+     * quite intensive as it gets all the learning designs in a folder.
      * 
      * @param originalLearningDesign
      * @param workspaceFolder
@@ -1821,6 +1799,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    }
 	}
 	return newName;
+    }
+
+    public Grouping getGroupingById(Long groupingID) {
+	return groupingDAO.getGroupingById(groupingID);
     }
 
 }

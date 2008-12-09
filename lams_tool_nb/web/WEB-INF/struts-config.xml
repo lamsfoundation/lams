@@ -14,6 +14,10 @@
   <form-beans>
 
     <form-bean
+      name="NbPedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerForm"
+    />
+    <form-bean
       name="NbMonitoringForm"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringForm"
     />
@@ -161,6 +165,21 @@
       <forward
         name="reflectOnActivity"
         path=".reflectOnActivity"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/pedagogicalPlanner"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerAction"
+      name="NbPedagogicalPlannerForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/authoring/pedagogicalPlannerForm.jsp"
         redirect="false"
       />
     </action>
