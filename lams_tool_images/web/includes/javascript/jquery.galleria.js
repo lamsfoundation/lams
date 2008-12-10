@@ -147,6 +147,7 @@ $$ = $.fn.galleria = function($options) {
 					_a.find('img').addClass('thumb noscale').css('display','none') :
 					_img.clone(true).addClass('thumb').css('display','none');
 				
+				
 				if (_a) { _a.replaceWith(_thumb); }
 				
 				if (!_thumb.hasClass('noscale')) { // scaled tumbnails!
@@ -169,6 +170,11 @@ $$ = $.fn.galleria = function($options) {
 				
 				// add the rel attribute
 				_thumb.attr('rel',_src);
+				
+				if(jQuery.browser.msie) {
+					_thumb.attr('imageWidth',_a.attr('width'));
+					_thumb.attr('imageHeight',_a.attr('height'));
+				}
 				
 				// add the title attribute
 				_thumb.attr('title',_title);
@@ -300,13 +306,18 @@ $$.onPageLoad = function(_src) {
 	
 		// define a new image
 		var _img   = $(new Image()).attr('src',_src).addClass('replaced');
+		
+		if(jQuery.browser.msie) {
+			_img.attr('width',_thumb.attr('imageWidth'));
+			_img.attr('height',_thumb.attr('imageHeight'));
+		}	
 
 		// empty the wrapper and insert the new image
 		_wrapper.empty().append(_img);
 
 		// insert the caption
 		_wrapper.siblings('.caption').text(_thumb.attr('title'));
-		
+
 		// fire the onImage function to customize the loaded image's features
 		$.galleria.onImage(_img,_wrapper.siblings('.caption'),_thumb);
 		
@@ -314,7 +325,6 @@ $$.onPageLoad = function(_src) {
 		if($.galleria.clickNext) {
 			_img.css('cursor','pointer').click(function() { $.galleria.next(); })
 		}
-		
 	} else {
 		
 		// clean up the container if none are active

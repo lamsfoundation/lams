@@ -3,8 +3,8 @@
 <script type="text/javascript"> 
 	var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
 </script>
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/lightbox.js'/>" ></script>
-<link rel="stylesheet" href="<html:rewrite page='/includes/css/lightbox.css'/>"  type="text/css">
+<script type="text/javascript" src="<html:rewrite page='/includes/javascript/lytebox.js'/>" ></script>
+<link rel="stylesheet" href="<html:rewrite page='/includes/css/lytebox.css'/>"  type="text/css">
 
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">
@@ -39,13 +39,6 @@
 			elem.style.display="block";
 		}
 	}
-
-	function previewItem(type,idx,sessionMapID){
-		//1:url, 2:file, 3:website,4:learning object
-		//This mode is special for unsaved author page. It is different with the author mode in preview 
-		var myUrl = "<c:url value='/reviewItem.do?mode=author_session&imageIndex='/>"+idx+"&sessionMapID="+sessionMapID;
-		launchPopup(myUrl,"Review");
-	}
 	
 	function editItem(idx,sessionMapID){
 		var url = "<c:url value="/authoring/editItemInit.do?imageIndex="/>" + idx +"&sessionMapID="+sessionMapID;;
@@ -61,6 +54,7 @@
 			var url = "<c:url value="/authoring/removeItem.do"/>";
 			var param = "imageIndex=" + idx +"&sessionMapID="+sessionMapID;;
 			deleteItemLoading();
+			alert(param);
 		    var myAjax = new Ajax.Updater(
 			    	imageGalleryListTargetDiv,
 			    	url,
@@ -79,7 +73,7 @@
 	}
 	function deleteItemComplete(){
 		hideBusy(imageGalleryListTargetDiv);
-		initLightbox();
+		initLytebox();
 	}
 	
 	function upImage(idx, sessionMapID){
@@ -152,7 +146,7 @@
 
 <p>
 	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px';initLightbox();"
+		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'; LyteBox.prototype.updateLyteboxItems();"
 		id="reourceInputArea" name="reourceInputArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">

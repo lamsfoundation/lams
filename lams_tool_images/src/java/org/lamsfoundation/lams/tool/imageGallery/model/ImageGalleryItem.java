@@ -58,7 +58,15 @@ public class ImageGalleryItem implements Cloneable {
     
     private Long originalFileUuid;
     
+    private int originalImageWidth;
+    
+    private int originalImageHeight;
+    
     private Long mediumFileUuid;
+    
+    private int mediumImageWidth;
+    
+    private int mediumImageHeight;
     
     private Long thumbnailFileUuid;
 
@@ -251,6 +259,32 @@ public class ImageGalleryItem implements Cloneable {
     }
     
     /**
+     * @hibernate.property column="original_image_width"
+     * 
+     * @return
+     */
+    public int getOriginalImageWidth() {
+	return originalImageWidth;
+    }
+
+    public void setOriginalImageWidth(int originalImageWidth) {
+	this.originalImageWidth = originalImageWidth;
+    }
+    
+    /**
+     * @hibernate.property column="original_image_height"
+     * 
+     * @return
+     */
+    public int getOriginalImageHeight() {
+	return originalImageHeight;
+    }
+
+    public void setOriginalImageHeight(int originalImageHeight) {
+	this.originalImageHeight = originalImageHeight;
+    }
+    
+    /**
      * @hibernate.property column="medium_file_uuid"
      * 
      * @return
@@ -261,6 +295,32 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setMediumFileUuid(Long mediumFileUuid) {
 	this.mediumFileUuid = mediumFileUuid;
+    }
+    
+    /**
+     * @hibernate.property column="medium_image_width"
+     * 
+     * @return
+     */
+    public int getMediumImageWidth() {
+	return mediumImageWidth;
+    }
+
+    public void setMediumImageWidth(int mediumImageWidth) {
+	this.mediumImageWidth = mediumImageWidth;
+    }
+    
+    /**
+     * @hibernate.property column="medium_image_height"
+     * 
+     * @return
+     */
+    public int getMediumImageHeight() {
+	return mediumImageHeight;
+    }
+
+    public void setMediumImageHeight(int mediumImageHeight) {
+	this.mediumImageHeight = mediumImageHeight;
     }
 
     /**

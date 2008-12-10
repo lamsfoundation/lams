@@ -26,13 +26,15 @@
 				 	<c:set var="mediumImagePath">
 	   					<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
 					</c:set>					
-					<a href="${mediumImagePath}" rel="lightbox" title="${image.title}" style="border-style: none;">
+					<a href="${mediumImagePath}" rel="lyteframe" title="${image.title}" style="border-style: none;" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: no;">
 						<img src="${thumbnailPath}" alt="${image.title}" style="border-style: none;"/>
 					</a>
 				</td>
 				
 				<td style="vertical-align:middle;">
-					<a href="${mediumImagePath}" rel="lightbox" title="${image.title}">${image.title}</a>
+					<a href="${mediumImagePath}" rel="lyteframe" title="${image.title}" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: auto;">
+						${image.title}
+					</a>
 				</td>
 
 				<td width="40px" style="vertical-align:middle;">
@@ -74,15 +76,29 @@
 			</tr>
 		</c:forEach>
 	</table>
+	
 </div>
 
 <%-- This script will works when a new resoruce item submit in order to refresh "ImageGallery List" panel. --%>
 <script lang="javascript">
 	if(window.top != null){
 		window.top.hideMessage();
+		//alert(window.top != null);
 		var obj = window.top.document.getElementById('imageGalleryListArea');
+		//alert(obj.innerHTML);
 		obj.innerHTML= document.getElementById("itemList").innerHTML;
+		//alert(obj.innerHTML);
+
+		//var reourceInputArea = window.top.document.getElementById("reourceInputArea");
+		//document.getElementById('check').;
+		//alert(obj.innerHTML);
+		//alert(reourceInputArea);
+		//if (reourceInputArea.style.display=="block") {
+			//initLytebox();
+		//}
+
 	} else {
-		initLightbox();
+		alert("ss");
+		initLytebox();
 	}
 </script>

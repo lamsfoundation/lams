@@ -108,8 +108,10 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			var pagesize = tb_getPageSize();
 			var x = pagesize[0] - 150;
 			var y = pagesize[1] - 150;
-			var imageWidth = imgPreloader.width;
-			var imageHeight = imgPreloader.height;
+			var imageWidth = (jQuery.browser.msie) ? parseInt(params['dbWidth']) : imgPreloader.width;
+			var initialImageWidth = imageWidth;
+			var imageHeight = (jQuery.browser.msie) ? parseInt(params['dbHeight']) : imgPreloader.height;
+			var initialImageHeight = imageHeight;
 			if (imageWidth > x) {
 				imageHeight = imageHeight * (x / imageWidth); 
 				imageWidth = x; 
@@ -130,12 +132,10 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			TB_WIDTH = imageWidth + 30;
 			TB_HEIGHT = imageHeight + 60;
 
-			alert(imgPreloader.width);
-			alert(imgPreloader.height);
-			if ((imgPreloader.width > x) ||(imgPreloader.height > y)) {
+			if ((initialImageWidth > x) ||(initialImageHeight > y)) {
 				$("#TB_window").append("<iframe id='TB_Image' style='border:0px;' frameborder='no' src='"+url+"' width='"+imageWidth+"' height='"+imageHeight+"'/></iframe>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>");
 			} else {
-				$("#TB_window").append("<a href='' id='TB_ImageOff' title='Close'><img id='TB_Image' src='"+url+"' width='"+imageWidth+"' height='"+imageHeight+"' alt='"+caption+"'/></a>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>");				
+				$("#TB_window").append("<a href='' id='TB_ImageOff' title='Close'><img id='TB_Image' src='"+url+"' width='"+initialImageWidth+"px' height='"+initialImageHeight+"px' alt='"+caption+"'/></a>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>");				
 			}
 		
 			$("#TB_closeWindowButton").click(tb_remove);
@@ -293,7 +293,7 @@ function tb_remove() {
 }
 
 function tb_position() {
-$("#TB_window").css({marginLeft: '-' + parseInt((TB_WIDTH / 2),10) + 'px', width: TB_WIDTH + 'px'});
+	$("#TB_window").css({marginLeft: '-' + parseInt((TB_WIDTH / 2),10) + 'px', width: TB_WIDTH + 'px'});
 	if ( !(jQuery.browser.msie && jQuery.browser.version < 7)) { // take away IE6
 		$("#TB_window").css({marginTop: '-' + parseInt((TB_HEIGHT / 2),10) + 'px'});
 	}

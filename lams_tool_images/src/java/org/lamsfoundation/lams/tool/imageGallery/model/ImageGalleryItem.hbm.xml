@@ -93,11 +93,43 @@
         />
 
         <property
+            name="originalImageWidth"
+            type="int"
+            update="true"
+            insert="true"
+            column="original_image_width"
+        />
+
+        <property
+            name="originalImageHeight"
+            type="int"
+            update="true"
+            insert="true"
+            column="original_image_height"
+        />
+
+        <property
             name="mediumFileUuid"
             type="java.lang.Long"
             update="true"
             insert="true"
             column="medium_file_uuid"
+        />
+
+        <property
+            name="mediumImageWidth"
+            type="int"
+            update="true"
+            insert="true"
+            column="medium_image_width"
+        />
+
+        <property
+            name="mediumImageHeight"
+            type="int"
+            update="true"
+            insert="true"
+            column="medium_image_height"
         />
 
         <property

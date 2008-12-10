@@ -85,6 +85,7 @@
 			clickNext : ${fn:length(sessionMap.imageGalleryList) > 1}, // sets helper for making the image clickable only if there is more than 1 image
 			insert    : '#main_image', // the containing selector for our main image
 			onImage   : function(image,caption,thumb) {
+
 				// fetch the thumbnail container
 				var _li = thumb.parents('li');
 				// fade out inactive thumbnail
@@ -147,6 +148,7 @@
 			//alert(parent.document.getElementById("contentFrame").width);
 			//parent.document.getElementById("contentFrame").width = "2000px";
 		//}
+
 	});
 
 	<!--
@@ -198,6 +200,8 @@
 			
 			var href = "<html:rewrite page='/download/?preferDownload=false'/>";
 			href = href + "&uuid=" + $('#commentsArea_originalFileUuid').val();
+			href = href + "&dbWidth=" + $('#commentsArea_originalImageWidth').val();
+			href = href + "&dbHeight=" + $('#commentsArea_originalImageHeight').val();
 			$("#openOriginalSizeLink a").attr('href', href);
 			
 			var imageUid = $('#commentsArea_imageUid').val();
@@ -372,7 +376,7 @@
 						</c:otherwise>
 					</c:choose>
 				
-						<a href="<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false" title="${image.title}" id="${image.uid}">
+						<a href="<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false" title="${image.title}" id="${image.uid}" width="${image.mediumImageWidth}" height="${image.mediumImageHeight}">
 							<img src="<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false" alt="${image.title}" id="${image.uid}">
 						</a>
 					</li>

@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
+import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +39,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -612,7 +615,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	    // Read the original image from the repository
 	    InputStream originalIS = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
-	    InputStream mediumIS = ResizePictureUtil.resizePicture(originalIS, mediumImageDimensions);
+	    BufferedImage originalImage = ImageIO.read(originalIS);
+	    image.setOriginalImageWidth(originalImage.getWidth(null));
+	    image.setOriginalImageHeight(originalImage.getHeight(null));
+	    InputStream mediumIS = ResizePictureUtil.resizePicture(originalImage, mediumImageDimensions);
 	    String mediumFileName = MEDIUM_FILENAME_PREFIX + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName,
 		    file.getContentType(), IToolContentHandler.TYPE_ONLINE);
@@ -623,7 +629,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	    // Read the original image from the repository
 	    InputStream mediumIS2 = imageGalleryToolContentHandler.getFileNode(mediumNodeKey.getUuid()).getFile();
-	    InputStream thumbnailIS = ResizePictureUtil.resizePicture(mediumIS2, thumbnailImageDimensions);
+	    BufferedImage mediumImage = ImageIO.read(mediumIS2);
+	    image.setMediumImageWidth(mediumImage.getWidth(null));
+	    image.setMediumImageHeight(mediumImage.getHeight(null));
+	    InputStream thumbnailIS = ResizePictureUtil.resizePicture(mediumImage, thumbnailImageDimensions);
 	    String thumbnailFileName = THUMBNAIL_FILENAME_PREFIX + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName,
 		    file.getContentType(), IToolContentHandler.TYPE_ONLINE);
@@ -635,6 +644,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	} catch (NumberFormatException e) {
 	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.number.format.exception") + ":"  + e.toString());
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.number.format.exception"));
+	} catch (IOException e) {
+	    ImageGalleryServiceImpl.log.error(messageService.getMessage("error.msg.io.exception.resizing") + ":"  + e.toString());
+	    throw new ImageGalleryException(messageService.getMessage("error.msg.io.exception.resizing"));
 	}
     }
 
