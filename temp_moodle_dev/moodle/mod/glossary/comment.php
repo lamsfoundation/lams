@@ -72,9 +72,12 @@ function glossary_comment_add() {
         if (!$newcomment->id = insert_record('glossary_comments', $newcomment)) {
             error('Could not insert this new comment');
         } else {
+        	if($cm->is_lams==1){
+        	 	$next=1;//lams: variable we pass to the view page to tell it that there is a new entry
+        	}
             add_to_log($course->id, 'glossary', 'add comment', "comments.php?id=$cm->id&amp;eid=$entry->id", "$newcomment->id", $cm->id);
         }
-        redirect("comments.php?id=$cm->id&amp;eid=$entry->id");
+        redirect("comments.php?id=$cm->id&amp;eid=$entry->id&amp;next=$next");
 
     } else {
         glossary_comment_print_header($course, $cm, $glossary, $entry, 'add');
