@@ -38,11 +38,11 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryUser;
 import org.lamsfoundation.lams.tool.mdglos.dto.MdlGlossaryDTO;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossary;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryConfigItem;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossarySession;
-import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryUser;
 import org.lamsfoundation.lams.tool.mdglos.service.IMdlGlossaryService;
 import org.lamsfoundation.lams.tool.mdglos.service.MdlGlossaryServiceProxy;
 import org.lamsfoundation.lams.tool.mdglos.util.MdlGlossaryConstants;
@@ -98,6 +98,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	MdlGlossary mdlGlossary = mdlGlossarySession.getMdlGlossary();
+	MdlGlossaryUser mdlGlossaryUser = getCurrentUser(toolSessionID);
 
 	// check defineLater
 	if (mdlGlossary.isDefineLater()) {
@@ -127,7 +128,7 @@ public class LearningAction extends LamsDispatchAction {
 				{
 					responseUrl += RELATIVE_TEACHER_URL;
 				}
-				else if (mode.equals(ToolAccessMode.LEARNER))
+				else if (mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR))
 				{
 					responseUrl += RELATIVE_LEARNER_URL;
 				}
@@ -141,7 +142,7 @@ public class LearningAction extends LamsDispatchAction {
 		
 
 		responseUrl += "&id=" + mdlGlossarySession.getExtSessionId() + "&returnUrl=" + returnUrl
-			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1";
+			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1" + "&isFinished=" + mdlGlossaryUser.isFinishedActivity();
 		
 		
 		log.debug("Redirecting for mdl glossary learner: " + responseUrl);
