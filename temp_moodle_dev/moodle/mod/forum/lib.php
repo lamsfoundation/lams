@@ -6695,7 +6695,60 @@ function forum_get_open_modes() {
  * This function clones an existing instance of Moodle forum
  * replacing the course and the userid
  */
-function forum_clone_instance($id, $sectionid, $courseid, $userid) {
+//Function that once you give a number of discussions it looks for the posts related to it;  clone the discussions and their posts
+function add_discussions_instance($newdiscussions,$forumid,$courseid) {
+	foreach ($newdiscussions as $newdiscussion) {
+					
+					
+					$newposts= get_records("forum_posts","discussion",$newdiscussion->id);
+					$newdiscussion->forum=$forumid;
+					$newdiscussion->oldid=$newdiscussion->id;
+					$oldfirstpost=$newdiscussion->firstpost;
+					$newdiscussion->course=$courseid;
+					$newdiscussion->id=insert_record("forum_discussions",$newdiscussion);
+					$newposts_reverse = array_reverse($newposts, true);
+					
+					foreach ($newposts_reverse as $newpost) {
+								$newpost->oldid=$newpost->id;
+								// insert the post from the diascussion
+								$newpost->discussion=$newdiscussion->id;
+								$newpost->id=insert_record("forum_posts",$newpost);
+								// if the post if the first of the discussion, update the firstpost variable from discussion with the post new id
+								if($newpost->oldid==$oldfirstpost){
+									$newdiscussion->firstpost=$newpost->id;
+									update_record("forum_discussions",$newdiscussion);
+								
+								}
+					}
+							
+					// we look to all new posts and change their parent variable with the new parent-s id, so we have again the same three but with  new id from the new forum and discussions
+					foreach ($newposts as $newpost) {
+						$forumdiscussions= get_records("forum_discussions",'forum',$newdiscussion->forum);
+						foreach ($forumdiscussions as $forumdiscussion) {
+								$oldparents=get_records("forum_posts","parent",$newpost->oldid);
+									
+								if($oldparents!=null){
+										foreach ($oldparents as $newparent) {
+												
+											if($newparent->parent!=0){
+													if($newparent->discussion==$forumdiscussion->id){
+															$newparent->parent=$newpost->id;
+															update_record("forum_posts",$newparent);
+													}
+											}
+										}
+								}
+						}
+							
+							
+					}
+	   }       		
+
+}
+
+
+function forum_clone_instance($id, $sectionid, $courseid) {
+
     $cm = get_record('course_modules', 'id', $id);
 
     if ( ! $cm or ! $existingforum = get_record('forum', 'id', $cm->instance) ) {
@@ -6707,14 +6760,14 @@ function forum_clone_instance($id, $sectionid, $courseid, $userid) {
         $existingforum->id = insert_record('forum', $existingforum);
     } else {
         // make a copy of an existing forum
-        unset($existingforum->id);
         $existingforum->name = addslashes($existingforum->name);
         $existingforum->intro = addslashes($existingforum->intro);
         $existingforum->course = $courseid;
         $existingforum->is_lams = 1;
+        $existingforum->oldid = $existingforum->id;
         $existingforum->id = insert_record('forum', $existingforum);
     }
-
+	
     $module = get_record('modules', 'name', 'forum');
     $section = get_course_section($sectionid, $courseid);
 
@@ -6722,10 +6775,15 @@ function forum_clone_instance($id, $sectionid, $courseid, $userid) {
     $cm->module = $module->id;
     $cm->instance = $existingforum->id;
     $cm->added = time();
-    $cm->section = $section->id;
+    $cm->section = $section->section;
+    $cm->is_lams = 1; 
     $cm->id = insert_record('course_modules', $cm);
 
-    return $cm->id;
+	// clone forum discussions
+	$newdiscussions= get_records("forum_discussions",'forum',$existingforum->oldid);
+	//add discussions and their posts
+	add_discussions_instance($newdiscussions, $existingforum->id,$courseid);
+	return $cm->id;
 }
 
 /**
@@ -6736,9 +6794,12 @@ function forum_export_instance($id) {
     $cm = get_record('course_modules', 'id', $id);
     if ($cm) {
         if ($forum = get_record('forum', 'id', $cm->instance)) {
-            // serialize forum into a string; assuming forum object
+        
+	        $discussions= get_records("forum_discussions",'forum',$forum->id);
+        	// serialize forum into a string; assuming forum object
             // doesn't contain binary data in any of its columns
-            $s = serialize($forum);
+            $all=array($forum,$discussions);
+            $s = serialize($all);
 
             header('Content-Description: File Transfer');
             header('Content-Type: text/plain');
@@ -6759,7 +6820,10 @@ function forum_export_instance($id) {
 function forum_import_instance($filepath, $userid, $courseid, $sectionid) {
     // file contents contains serialized forum object
     $filestr = file_get_contents($filepath);
-    $forum = unserialize($filestr);
+  
+    $all=unserialize($filestr);
+    $forum = $all[0];
+    $discussions= $all[1];
 
     // import this forum into a new course
     $forum->course = $courseid;
@@ -6780,8 +6844,13 @@ function forum_import_instance($filepath, $userid, $courseid, $sectionid) {
     $cm->instance = $forum->id;
     $cm->added = time();
     $cm->section = $section->id;
+    $cm->is_lams = 1; 
     $cm->id = insert_record('course_modules', $cm);
-
+    
+    //add discussions and their posts
+    if($discussions!=''){
+    	  add_discussions_instance($discussions, $forum->id,$courseid);
+    }
     return $cm->id;
 }
 
