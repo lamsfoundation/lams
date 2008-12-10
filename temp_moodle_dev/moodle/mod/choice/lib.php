@@ -856,7 +856,7 @@ function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
     $cm->module = $module->id;
     $cm->instance = $choice->id;
     $cm->added = time();
-    $cm->section = $section->id;
+    $cm->section = $section->section;
 	$cm->is_lams = 1; 
     $cm->id = insert_record('course_modules', $cm);
 	//add choice's options
