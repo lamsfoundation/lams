@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuiz;
  */
 public class MdlQuizOutputFactory extends OutputFactory {
 
-    protected final static String OUTPUT_NAME_LEARNER_GRADE = "learner.grade";
+    protected final static String OUTPUT_NAME_LEARNER_GRADE = "learner.percentage.grade";
 
     public MdlQuizOutputFactory() {
     }
