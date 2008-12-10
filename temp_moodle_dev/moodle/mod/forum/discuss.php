@@ -138,8 +138,14 @@
     }
 
     $navigation = build_navigation($navlinks, $cm);
-    print_header("$course->shortname: ".format_string($discussion->name), $course->fullname,
+    //if in Lams sequence don't display Moodle's navigation header
+        if($cm->is_lams==1){
+        	print_header();
+        }else{
+        	  print_header("$course->shortname: ".format_string($discussion->name), $course->fullname,
                      $navigation, "", "", true, $searchform, navmenu($course, $cm));
+        }
+  
 
 
 /// Check to see if groups are being used in this forum
@@ -221,7 +227,8 @@
     $canrate = has_capability('mod/forum:rate', $modcontext);
     forum_print_discussion($course, $cm, $forum, $discussion, $post, $displaymode, $canreply, $canrate);
 
-    print_footer($course);
+     //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer($course,null, false,$cm->is_lams);
 
 
 ?>
