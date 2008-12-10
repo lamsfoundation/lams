@@ -6,6 +6,7 @@
 
     $id  = required_param('id', PARAM_INT);           // Course Module ID
     $eid = required_param('eid', PARAM_INT);          // Entry ID
+    $next  = optional_param('next', 0, PARAM_INT); // 1 if new entry in Lams
 
     global $USER, $CFG;
 
@@ -70,8 +71,9 @@
     } else {
         print_heading(get_string("nocomments","glossary"));
     }
-
-
+	 if($glossary->is_lams==1&&$next==1){ //lams: display the next activity button 
+            	include('showlamsnext.php');
+	}   
 /// Finish the page
 
      //we pass a new parameter to the function so it won't we printed if is_lams=1
