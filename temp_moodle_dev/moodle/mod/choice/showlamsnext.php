@@ -4,12 +4,12 @@
 		<title>Untitled Document</title>
 		<script type="text/javascript">
 		/* Functoin that passa parameter to the buttons frame and display the button */
-        function appearbutton(id){
+        function appearbutton(){
 				parent.button.toggle("next");  /* makes button visible*/
 						
 		}
 		</script>
 		</head>
-		<body  onLoad="appearbutton(<?php echo($cm->id);?>)">			  
+		<body  onLoad="appearbutton()">			  
 		</body>
 		</html>
