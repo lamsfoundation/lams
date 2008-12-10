@@ -21,8 +21,6 @@
 
     print_header_simple("$strchoices", "", $navigation, "", "", true, "", navmenu($course));
 
- 	//m
-     //if (! $choices = get_all_instances_in_course("choice", $course)) {
     if (! $choices = get_all_instances_in_course("choice", $course)) {
         notice(get_string('thereareno', 'moodle', $strchoices), "../../course/view.php?id=$course->id");
     }
