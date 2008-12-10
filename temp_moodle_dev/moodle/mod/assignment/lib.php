@@ -97,22 +97,22 @@ class assignment_base {
      * This in turn calls the methods producing individual parts of the page
      */
     function view() {
-
         $context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
         require_capability('mod/assignment:view', $context);
 
         add_to_log($this->course->id, "assignment", "view", "view.php?id={$this->cm->id}",
                    $this->assignment->id, $this->cm->id);
-
-        $this->view_header();
-
-        $this->view_intro();
-
-        $this->view_dates();
-
-        $this->view_feedback();
-
-        $this->view_footer();
+		
+	    $this->view_header();
+	
+	    $this->view_intro();
+	
+	    $this->view_dates();
+	
+	    $this->view_feedback();
+	
+	    $this->view_footer();
+		
     }
 
     /**
@@ -126,24 +126,29 @@ class assignment_base {
      * @param $subpage string Description of subpage to be used in navigation trail
      */
     function view_header($subpage='') {
-
+		
         global $CFG;
-
-
+		
         if ($subpage) {
             $navigation = build_navigation($subpage, $this->cm);
         } else {
             $navigation = build_navigation('', $this->cm);
         }
-
-        print_header($this->pagetitle, $this->course->fullname, $navigation, '', '',
-                     true, update_module_button($this->cm->id, $this->course->id, $this->strassignment),
-                     navmenu($this->course, $this->cm));
-
+        //lams: if is a lams sequence don't display the moodle's navigation menus
+		if($this->cm->is_lams==1){
+			 print_header($this->pagetitle, '', '', '', '',
+	                     true, update_module_button($this->cm->id, $this->course->id, $this->strassignment));
+		}else{
+	        print_header($this->pagetitle, $this->course->fullname, $navigation, '', '',
+	                     true, update_module_button($this->cm->id, $this->course->id, $this->strassignment),
+	                     navmenu($this->course, $this->cm));
+		}
+		
         groups_print_activity_menu($this->cm, 'view.php?id=' . $this->cm->id);
 
         echo '<div class="reportlink">'.$this->submittedlink().'</div>';
         echo '<div class="clearer"></div>';
+        
     }
 
 
@@ -194,7 +199,8 @@ class assignment_base {
      * This will be suitable for most assignment types
      */
     function view_footer() {
-        print_footer($this->course);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+        print_footer($this->course,null, false,$this->cm->is_lams);
     }
 
     /**
@@ -3059,5 +3065,188 @@ function assignment_reset_course_form_defaults($course) {
 function assignment_get_extra_capabilities() {
     return array('moodle/site:accessallgroups', 'moodle/site:viewfullnames');
 }
+
+/**
+ * LAMS Function
+ * This function clones an existing instance of Moodle assignment
+ * replacing the course and the userid
+ */
+function assignment_clone_instance($id, $sectionref, $courseid) {
+	global $CFG;
+	$cm = get_record('course_modules', 'id', $id);
+	
+	
+	if ( ! $cm ) {
+        // create a new assignment with default content
+        $existingassignment->course = $courseid;
+        $existingassignment->name = "assignment offline";
+        $existingassignment->description = "";
+        $existingassignment->is_lams = 1;
+        $existingassignment->format = 0;
+        $existingassignment->assignmenttype = "offline";
+        $existingassignment->grade = 100;
+        
+        //
+        
+          $event->name        = $assignment->name;
+                $event->description = $assignment->description;
+                $event->courseid    = $assignment->course;
+                $event->groupid     = 0;
+                $event->userid      = 0;
+                $event->modulename  = 'assignment';
+                $event->instance    = $returnid;
+                $event->eventtype   = 'due';
+                $event->timestart   = $assignment->timedue;
+                $event->timeduration = 0;
+        
+        
+        
+        //
+    } else {
+        // make a copy of an existing assignment
+        $existingassignment = get_record('assignment', 'id', $cm->instance);
+        $existingassignment->oldid = $existingassignment->id;
+    	unset($existingassignment->id);
+        $existingassignment->name = addslashes($existingassignment->name);
+        $existingassignment->description = addslashes($existingassignment->description);
+        $existingassignment->course = $courseid;
+        $existingassignment->is_lams = 1;
+        
+    }
+	$existingassignment->id = insert_record('assignment', $existingassignment);
+    $module = get_record('modules', 'name', 'assignment');
+    $section = get_course_section($sectionref, $courseid);
+
+    
+    // module parameters
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $existingassignment->id;
+    $cm->added = time();
+    $cm->section = $section->section;
+	$cm->is_lams = 1; 
+    $cm->id = insert_record('course_modules', $cm);
+	
+    //adds the new assignment to the sequence variable in section table   
+    $existingassignment->section = $sectionref;
+    $existingassignment->coursemodule = $cm->id;
+    $existingassignment->instance = $cm->instance;
+          
+    require_once($CFG->dirroot.'/course/lib.php');
+    add_mod_to_section($existingassignment);
+    
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Serialize a assignment instance and return serialized string to LAMS
+ */
+function assignment_export_instance($id) {
+    $cm = get_record('course_modules', 'id', $id);
+    if ($cm) {
+        if ($assignment = get_record('assignment', 'id', $cm->instance)) {
+           //get all submissions from the assignment
+            $submissions = get_records('assignment_submissions', 'assignment', $assignment->id);
+            
+            //our file will contain the assignment, its entries and categories 
+            $all=array($assignment,$submissions);
+             // serialize assignment into a string; assuming assignment object
+            // doesn't contain binary data in any of its columns
+			$s = serialize($all);
+            header('Content-Description: File Transfer');
+            header('Content-Type: text/plain');
+            header('Content-Length: ' . strlen($s));
+            echo $s;
+            exit;
+        }
+    }
+
+    header('HTTP/1.1 500 Internal Error');
+    exit;
+}
+
+/**
+ * LAMS Function
+ * Deserializes a serialized Moodle assignment, and creates a new instance of it
+ */
+function assignment_import_instance($filepath, $userid, $courseid, $sectionid) {
+    // file contents contains serialized assignment object
+     $filestr = file_get_contents($filepath);
+     $all=unserialize($filestr);
+    
+    //we split the array so we can get the assignment and its submissions
+    $assignment = $all[0];
+    $submissions = $all[1];
+    
+    // import this assignment into a new course
+    $assignment->course = $courseid;
+
+    // escape text columns for saving into database
+    $assignment->name = addslashes($assignment->name);
+    $assignment->description = addslashes($assignment->description);
+    
+
+    if ( ! $assignment->id = insert_record('assignment', $assignment) ) {
+        return 0; 
+    }
+    
+    $module = get_record('modules', 'name', 'assignment');
+    $section = get_course_section($sectionid, $courseid);
+
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $assignment->id;
+    $cm->added = time();
+    $cm->section = $section->id;
+	$cm->is_lams = 1; 
+    $cm->id = insert_record('course_modules', $cm);
+    
+    //if the assignment havesubmissions we copy them and insert them to the database with the new assignment id
+    $newcategoryid=array();
+    if($submissions!=''){
+	    foreach ($submissions as $submission) {
+	    	$submission->assignment=$assignment->id;
+	    	insert_record('assignment_submissions', $submission);
+	    }
+	 
+    }
+    
+
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Return a statistic for a given user in this Moodle assignment for use in branching
+ */
+function assignment_get_tool_output($id, $userid) {
+
+     $cm = get_record('course_modules', 'id', $id);
+    
+     if ($cm) {
+        $submission = get_record('assignment_submissions', 'assignment',$cm->instance,'userid',$userid);
+         if ($submission) {
+			return $submission->numfiles; 
+         }else{
+         	return 0;
+         }
+    }
+    return 0;
+}
+
+/**
+ * LAMS Function
+ * Return an HTML representation of a user's activity in this assignment
+ */
+function assignment_export_portfolio($id, $userid) {
+    global $CFG;
+    $text = 'This tool does not support export portfolio.  It may be accessible via ';
+    $text .= '<a href="'.$CFG->wwwroot.'/mod/assignment/view.php?id='.$id.'">this</a> link.';
+    return $text;
+
+}
+
+
 
 ?>
