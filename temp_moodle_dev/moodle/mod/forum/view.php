@@ -13,7 +13,7 @@
     $page        = optional_param('page', 0, PARAM_INT);     // which page to show
     $search      = optional_param('search', '');             // search string
     $returnurl   = optional_param('returnUrl', '', PARAM_TEXT);  // lams url to proceed to next in sequence
-
+	$editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
     $buttontext = '';
 
     if ($id) {
@@ -63,8 +63,9 @@
 
 /// Print header.
     $navigation = build_navigation('', $cm);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_header_simple(format_string($forum->name), "",
-                 $navigation, "", "", true, $buttontext, navmenu($course, $cm));
+                 $navigation, "", "", true, $buttontext, navmenu($course, $cm),false,'',false,$cm->is_lams);
 
 /// Some capability checks.
     if (empty($cm->visible) and !has_capability('moodle/course:viewhiddenactivities', $context)) {
@@ -86,7 +87,14 @@
     } else {
         add_to_log($course->id, "forum", "view forum", "view.php?f=$forum->id", "$forum->id");
     }
-
+	
+    if($editing==1&&$cm->is_lams==1){//lams: if you are a teacher editing show lams navigation button to finish editing
+			include('showlamsfinish.php');
+	}
+	$isteacher = has_capability('mod/forum:preview', get_context_instance(CONTEXT_MODULE, $cm->id)); // indicates if is a teacher, useful in lams
+	if($isteacher&&$editing==0&&$cm->is_lams==1){//lams: if the teachers view the choice as a learner, display the next activity button so he hasn't to attempt the choice if he don't want to
+	       include('showlamsnext.php');
+	}
 
 
 /// Print settings and things across the top
@@ -178,7 +186,7 @@
         }
 //        print_box_start('rsslink');
         echo '<span class="wrap rsslink">';
-        rss_print_link($course->id, $userid, "forum", $forum->id, $tooltiptext);
+       rss_print_link($course->id, $userid, "forum", $forum->id, $tooltiptext);
         echo '</span>';
 //        print_box_end(); // subscription
 
@@ -268,12 +276,8 @@
 
             break;
     }
-
-    if ($forum->is_lams) {
-        echo '<div align="right"><p><input type="button" value="Next Activity" onclick="window.location=\''.$returnurl.'\'" /></p></div>';
-        echo '<hr />';
-    } else {
-        print_footer($course);
-    }
+  
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+         print_footer($course,null, false,$cm->is_lams);
 
 ?>
