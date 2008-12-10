@@ -12,7 +12,7 @@ $confirm = optional_param('confirm',0, PARAM_INT);    // proceed. Edit the edtry
 
 $mode = optional_param('mode', '', PARAM_ALPHA);      // categories if by category?
 $hook = optional_param('hook', '', PARAM_ALPHANUM);   // CategoryID
-
+$next=0;//lams: variable that after editing we pass to the view page to let it know we have edit an entry
 if (! $cm = get_coursemodule_from_id('glossary', $id)) {
     error("Course Module ID was incorrect");
 }
@@ -50,6 +50,7 @@ if ($e) { // if entry is specified
 $mform =& new mod_glossary_entry_form(null, compact('cm', 'glossary', 'hook', 'mode', 'e', 'context'));
 if ($mform->is_cancelled()){
     if ($e){
+    
         redirect("view.php?id=$cm->id&amp;mode=entry&amp;hook=$e");
     } else {
         redirect("view.php?id=$cm->id");
@@ -94,33 +95,34 @@ if ($mform->is_cancelled()){
         }
 
         if (update_record('glossary_entries', $todb)) {
+         $next=1;//lams: variable we pass to the view page to tell it that there is a new entry
             add_to_log($course->id, "glossary", "update entry",
                        "view.php?id=$cm->id&amp;mode=entry&amp;hook=$todb->id",
                        $todb->id, $cm->id);
+     
+	       
         } else {
             error("Could not update your glossary");
         }
     } else {
-
+    		
         $todb->userid = $USER->id;
         $todb->timecreated = $timenow;
         $todb->sourceglossaryid = 0;
         $todb->teacherentry = has_capability('mod/glossary:manageentries', $context);
 
-
+    	
         if ($todb->id = insert_record("glossary_entries", $todb)) {
             $e = $todb->id;
             $dir = glossary_file_area_name($todb);
             if ($mform->save_files($dir) and $newfilename = $mform->get_new_filename()) {
                 set_field("glossary_entries", "attachment", $newfilename, "id", $todb->id);
             }
+             $next=1;//lams: variable we pass to the view page to tell it that there is a new entry
             add_to_log($course->id, "glossary", "add entry",
                        "view.php?id=$cm->id&amp;mode=entry&amp;hook=$todb->id", $todb->id,$cm->id);
-            //in lams: if student or teacher in student mode, display the next activity button when insert a new entry
-            $editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
-            if($cm->is_lams==1&&$editing==0){
-            	include('showlamsnext.php');
-        	}
+       		
+           
         } else {
             error("Could not insert this new entry");
         }
@@ -131,6 +133,7 @@ if ($mform->is_cancelled()){
     delete_records("glossary_alias", "entryid", $e);
 
     if (empty($fromform->notcategorised) && isset($fromform->categories)) {
+    
         $newcategory->entryid = $e;
         foreach ($fromform->categories as $category) {
             if ( $category > 0 ) {
@@ -154,7 +157,7 @@ if ($mform->is_cancelled()){
             }
         }
     }
-    redirect("view.php?id=$cm->id&amp;mode=entry&amp;hook=$todb->id");
+    redirect("view.php?id=$cm->id&amp;mode=entry&amp;next=$next&amp;hook=$todb->id");
 
 } else {
     if ($e) {
@@ -177,6 +180,7 @@ if ($mform->is_cancelled()){
         $toform->fullmatch = $fromdb->fullmatch;
         $toform->aliases = '';
         $ineditperiod = ((time() - $fromdb->timecreated <  $CFG->maxeditingtime) || $glossary->editalways);
+    	
         if ((!$ineditperiod  || $USER->id != $fromdb->userid) and !has_capability('mod/glossary:manageentries', $context)) {
             if ( $USER->id != $fromdb->userid ) {
                 print_error('errcannoteditothers', 'glossary');
@@ -191,6 +195,7 @@ if ($mform->is_cancelled()){
         }
         $mform->set_data($toform);
     }
+
 }
 
 $stredit = empty($e) ? get_string('addentry', 'glossary') : get_string("edit");
@@ -219,7 +224,6 @@ if (!$e) {
 $mform->display();
 
 ///glossary_print_tabbed_table_end();
-
 
 //we pass a new parameter to the function so it won't we printed if is_lams=1
 print_footer($course,null, false,$glossary->is_lams);
