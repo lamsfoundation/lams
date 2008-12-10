@@ -36,8 +36,8 @@ import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossary;
  */
 public class MdlGlossaryOutputFactory extends OutputFactory {
 
-    protected final static String OUTPUT_NAME_LEARNER_NUM_POSTS = "learner.number.of.posts";
-    protected final static String OUTPUT_NAME_LEARNER_NUM_WORDS = "learner.number.of.words";
+    protected final static String OUTPUT_NAME_LEARNER_NUM_POSTS = "learner.number.of.comments";
+    protected final static String OUTPUT_NAME_LEARNER_NUM_ENTRIES = "learner.number.of.entries";
 
     public MdlGlossaryOutputFactory() {
     }
@@ -52,8 +52,8 @@ public class MdlGlossaryOutputFactory extends OutputFactory {
 	ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_POSTS, new Long(0), null);
 	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_POSTS, definition);
 
-	ToolOutputDefinition definition2 = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_WORDS, new Long(0), null);
-	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_WORDS, definition2);
+	ToolOutputDefinition definition2 = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_ENTRIES, new Long(0), null);
+	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_ENTRIES, definition2);
 
 	return definitionMap;
     }
@@ -66,8 +66,8 @@ public class MdlGlossaryOutputFactory extends OutputFactory {
 	    map.put(OUTPUT_NAME_LEARNER_NUM_POSTS, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_POSTS, dlGlossaryService,
 		    mdlGlossary, learnerId, extSessionId.toString(), toolSessionId));
 	}
-	if (names.contains(OUTPUT_NAME_LEARNER_NUM_WORDS)) {
-	    map.put(OUTPUT_NAME_LEARNER_NUM_WORDS, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_WORDS, dlGlossaryService,
+	if (names.contains(OUTPUT_NAME_LEARNER_NUM_ENTRIES)) {
+	    map.put(OUTPUT_NAME_LEARNER_NUM_ENTRIES, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_ENTRIES, dlGlossaryService,
 		    mdlGlossary, learnerId, extSessionId.toString(), toolSessionId));
 	}
 	return map;
