@@ -39,13 +39,15 @@
     $navigation = build_navigation($strsubscribers, $cm);
 
     if (has_capability('mod/forum:managesubscriptions', $context)) {
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
         print_header_simple("$strsubscribers", "", $navigation,
-            "", "", true, forum_update_subscriptions_button($course->id, $id));
+            "", "", true, forum_update_subscriptions_button($course->id, $id),'',false,'',false,$cm->is_lams);
         if ($edit != -1) {
             $USER->subscriptionsediting = $edit;
         }
     } else {
-        print_header_simple("$strsubscribers", "", $navigation, "", "", true, '');
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+        print_header_simple("$strsubscribers", "", $navigation, "", "", true, '','',false,'',false,$cm->is_lams);
         unset($USER->subscriptionsediting);
     }
 
@@ -77,7 +79,8 @@
             echo "</table>";
         }
 
-        print_footer($course);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+         print_footer($course,null, false,$cm->is_lams);
         exit;
     }
 
@@ -159,6 +162,7 @@
 
     print_simple_box_end();
 
-    print_footer($course);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer($course,null, false,$cm->is_lams);
 
 ?>

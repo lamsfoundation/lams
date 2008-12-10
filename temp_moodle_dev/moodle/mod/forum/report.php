@@ -82,5 +82,6 @@
     }
 
     close_window_button();
-    print_footer('none');
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer('none',null, false,$cm->is_lams);
 ?>
