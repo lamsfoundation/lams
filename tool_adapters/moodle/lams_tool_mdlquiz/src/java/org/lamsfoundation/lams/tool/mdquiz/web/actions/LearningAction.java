@@ -103,6 +103,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	MdlQuiz mdlQuiz = mdlQuizSession.getMdlQuiz();
+	MdlQuizUser mdlQuizUser = getCurrentUser(toolSessionID);
 
 	// check defineLater
 	if (mdlQuiz.isDefineLater()) {
@@ -132,7 +133,7 @@ public class LearningAction extends LamsDispatchAction {
 		{
 			responseUrl += RELATIVE_TEACHER_URL;
 		}
-		else if (mode.equals(ToolAccessMode.LEARNER))
+		else if (mode.equals(ToolAccessMode.LEARNER)|| mode.equals(ToolAccessMode.AUTHOR))
 		{
 			responseUrl += RELATIVE_LEARNER_URL;
 		}
@@ -146,7 +147,7 @@ public class LearningAction extends LamsDispatchAction {
 		
 
 		responseUrl += "&id=" + mdlQuizSession.getExtSessionId() + "&returnUrl=" + returnUrl
-			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1";
+			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1" + "&isFinished=" + mdlQuizUser.isFinishedActivity();
 
 		log.debug("Redirecting for mdl quiz learner: " + responseUrl);
 		response.sendRedirect(responseUrl);
