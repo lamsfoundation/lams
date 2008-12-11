@@ -126,6 +126,8 @@ class assignment_uploadsingle extends assignment_base {
                     unset($submission->data1);  // Don't need to update this.
                     unset($submission->data2);  // Don't need to update this.
                     if (update_record("assignment_submissions", $submission)) {
+                     	//lams: add 'saved' variable so lams can recognize if the student have uploaded a file	
+	            		$saved=1;
                         add_to_log($this->course->id, 'assignment', 'upload',
                                 'view.php?a='.$this->assignment->id, $this->assignment->id, $this->cm->id);
                         $submission = $this->get_submission($USER->id);
@@ -140,6 +142,8 @@ class assignment_uploadsingle extends assignment_base {
                     $newsubmission->timemodified = time();
                     $newsubmission->numfiles = 1;
                     if (insert_record('assignment_submissions', $newsubmission)) {
+                    	//lams: add 'saved' variable so lams can recognize if the student have uploaded a file	
+	            		$saved=1;
                         add_to_log($this->course->id, 'assignment', 'upload',
                                 'view.php?a='.$this->assignment->id, $this->assignment->id, $this->cm->id);
                         $submission = $this->get_submission($USER->id);
@@ -155,7 +159,8 @@ class assignment_uploadsingle extends assignment_base {
             notify(get_string("uploaderror", "assignment")); //submitting not allowed!
         }
 
-        print_continue('view.php?id='.$this->cm->id);
+        //lams: add 'saved' variable so lams can recognize if the student have uploaded a file	
+        redirect('view.php?id='.$this->cm->id.'&saved='.$saved);
 
         $this->view_footer();
     }
