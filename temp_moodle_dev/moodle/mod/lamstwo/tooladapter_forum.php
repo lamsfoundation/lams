@@ -33,7 +33,7 @@
  	
  	    switch ($method) {
  	        case 'clone':
- 	            $newcmid = forum_clone_instance($cmid, $section, $courseid);
+ 	            $newcmid = forum_clone_instance($cmid, $sectionid, $courseid);
  	            echo $newcmid;
  	            break;
  	        case 'import':
