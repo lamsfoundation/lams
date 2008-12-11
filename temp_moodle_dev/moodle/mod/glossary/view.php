@@ -20,6 +20,7 @@
     $show       = optional_param('show', '', PARAM_ALPHA);           // [ concept | alias ] => mode=term hook=$show
     $returnurl   = optional_param('returnUrl', '', PARAM_TEXT);  // lams url to proceed to next in sequence
 	$editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
+	$next  = optional_param('next', 0, PARAM_INT); // 1 if new entry in Lams
     if (!empty($id)) {
         if (! $cm = get_coursemodule_from_id('glossary', $id)) {
             error("Course Module ID was incorrect");
@@ -530,7 +531,10 @@
     echo '<br />';
     glossary_print_tabbed_table_end();
 
-/// Finish the page
+    if($cm->is_lams==1&&$next==1&&$editing==0){ //lams: display the next activity button 
+            	include('showlamsnext.php');
+	}    
+    /// Finish the page
 
     
     //we pass a new parameter to the function so it won't we printed if is_lams=1
