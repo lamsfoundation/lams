@@ -175,6 +175,18 @@
 			<th>
 				<fmt:message key="monitoring.label.title" />
 			</th>
+			<c:choose>
+				<c:when test="${sessionMap.imageGallery.allowRank == true}">
+					<th width="70px" style="padding-left:0px; text-align:center;">
+						<fmt:message key="label.monitoring.average.rating" />
+					</th>
+				</c:when>
+				<c:when test="${sessionMap.imageGallery.allowVote == true}">
+					<th width="70px" style="padding-left:0px; text-align:center;">
+						<fmt:message key="label.monitoring.number.votes" />
+					</th>
+				</c:when>
+			</c:choose>				
 			<th width="75px" >
 				<!--hide/show-->
 			</th>
@@ -219,6 +231,18 @@
 							${title}
 						</a>
 					</td>
+					<c:choose>
+						<c:when test="${sessionMap.imageGallery.allowRank == true}">
+							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
+								${summary.averageRating}
+							</td>
+						</c:when>
+						<c:when test="${sessionMap.imageGallery.allowVote == true}">
+							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
+								${summary.numberOfVotes}
+							</td>
+						</c:when>
+					</c:choose>						
 					
 					<td style="vertical-align:middle; padding-left: 0px; text-align: center;">
 						<c:choose>
