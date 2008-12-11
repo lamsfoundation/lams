@@ -79,7 +79,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	public static final String RELATIVE_LEARNER_URL = "course/lamsframes.php?";
 	public static final String MOODLE_VIEW_URL = "mod/Forum/view.php";
-	public static final String RELATIVE_TEACHER_URL = "mod/Forum/view.php?";
+	public static final String RELATIVE_TEACHER_URL = "mod/forum/view.php?";
 
 	private IMdlForumService mdlForumService;
 
