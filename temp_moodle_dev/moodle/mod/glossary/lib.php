@@ -2370,9 +2370,8 @@ function glossary_clone_instance($id, $sectionref, $courseid) {
     $cm->module = $module->id;
     $cm->instance = $existingglossary->id;
     $cm->added = time();
-    $cm->section = $section->id;
+    $cm->section = $section->section;
 	$cm->is_lams = 1; 
-    $cm->course = $courseid;
     $cm->id = insert_record('course_modules', $cm);
 	
     //adds the new glossary to the sequence variable in section table
@@ -2381,7 +2380,7 @@ function glossary_clone_instance($id, $sectionref, $courseid) {
     $existingglossary->instance = $cm->instance;
           
     require_once($CFG->dirroot.'/course/lib.php');
-   // add_mod_to_section($existingglossary);
+    add_mod_to_section($existingglossary);
     
     //add entries  
 	
@@ -2419,11 +2418,9 @@ function glossary_clone_instance($id, $sectionref, $courseid) {
 	          		$newentries= get_records("glossary_entries","glossaryid",$existingglossary->id);
 	          		foreach ($newentries as $newentry) {
 		          		$newglossarycategories = get_record("glossary_entries_categories","categoryid",$newcategory->oldid,"entryid",$newentry->id);
-				          if ( $newglossarycategories ) {
-					         // foreach ($newglossarycategories as $glossarycategories) {
+				          if ( $newglossarycategories ) { 
 					          		$newglossarycategories->categoryid=$newcategory->id;
 					          		 update_record("glossary_entries_categories",$newglossarycategories);
-					         //}
 				          }
 	          		}
 	          		
