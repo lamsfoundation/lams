@@ -5,7 +5,7 @@
 
 <html>
 	<body class="stripes">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
+		<c:set var="sessionMapID" value="${sessionMapID}" />
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 		<script type="text/javascript">

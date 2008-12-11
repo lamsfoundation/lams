@@ -210,6 +210,23 @@
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
+		<action path="/monitoring/newImageInit"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
+			parameter="newImageInit"
+			name="imageGalleryItemForm" 
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/pages/monitoring/parts/addimage.jsp" />
+		</action>
+		<action path="/monitoring/saveNewImage"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
+			parameter="saveNewImage"
+			name="imageGalleryItemForm" 
+			scope="request" 
+			validate="false">
+			<forward name="image" path="/pages/monitoring/parts/addimage.jsp" />
+			<forward name="success" path="/pages/monitoring/start.jsp" />
+		</action>		
 		<action path="/monitoring/imageSummary"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
 			parameter="imageSummary"

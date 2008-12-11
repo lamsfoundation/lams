@@ -25,6 +25,9 @@
 package org.lamsfoundation.lams.tool.imageGallery.web.action;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +35,7 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -45,6 +49,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
@@ -56,9 +61,13 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
+import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageCommentForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -77,6 +86,12 @@ public class MonitoringAction extends Action {
 	if (param.equals("summary")) {
 	    return summary(mapping, form, request, response);
 	}
+	if (param.equals("newImageInit")) {
+	    return newImageInit(mapping, form, request, response);
+	}
+	if (param.equals("saveNewImage")) {
+	    return saveNewImage(mapping, form, request, response);
+	}	
 	if (param.equals("imageSummary")) {
 	    return imageSummary(mapping, form, request, response);
 	}
@@ -135,6 +150,62 @@ public class MonitoringAction extends Action {
     }
     
     /**
+     * Initial page for add imageGallery item (single file or URL).
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward newImageInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
+	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }
+
+    /**
+     * Save imageGallery item into database.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward saveNewImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
+	String sessionMapID = itemForm.getSessionMapID();
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	
+	ActionErrors errors = validateImageGalleryItem(itemForm);
+
+	if (!errors.isEmpty()) {
+	    this.addErrors(request, errors);
+	    return mapping.findForward("image");
+	}
+
+	try {
+	    extractFormToImageGalleryItem(request, itemForm);
+	} catch (Exception e) {
+	    // any upload exception will display as normal error message rather then throw exception directly
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    e.getMessage()));
+	    if (!errors.isEmpty()) {
+		this.addErrors(request, errors);
+		return mapping.findForward("image");
+	    }
+	}
+	
+	//redirect
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }
+    
+    /**
      * Display edit page for existed imageGallery item.
      * 
      * @param mapping
@@ -189,11 +260,13 @@ public class MonitoringAction extends Action {
 	// get back sessionMAP
 	ImageGalleryItemForm imageForm = (ImageGalleryItemForm) form;
 	String sessionMapID = imageForm.getSessionMapID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap
-		.get(AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	extractFormToImageGalleryItem(request, imageForm);
+	try {
+	    extractFormToImageGalleryItem(request, imageForm);
+	} catch (UploadImageGalleryFileException e) {
+	    // UploadImageGalleryFileException will no occur here, only in case when new image gallery item is creating
+	}
 
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
@@ -386,20 +459,62 @@ public class MonitoringAction extends Action {
      * 
      * @param request
      * @param imageForm
+     * @throws UploadImageGalleryFileException 
      * @throws ImageGalleryException
      */
-    private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm){
+    private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm) throws UploadImageGalleryFileException{
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(imageForm.getSessionMapID());
 	IImageGalleryService service = getImageGalleryService();
+	Long contentId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_CONTENT_ID);
+	ImageGallery imageGallery = service.getImageGalleryByContentId(contentId);
 
-	Long imageUid = new Long(imageForm.getImageUid());
-	ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
+	int imageUid = NumberUtils.stringToInt(imageForm.getImageUid(), -1);
+	ImageGalleryItem image = null;
+	if (imageUid == -1) { // add
+	    image = new ImageGalleryItem();
+	    image.setCreateDate(new Timestamp(new Date().getTime()));
+	    
+	    //setting SequenceId
+	    Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
+	    int maxSeq = 0;
+	    for (ImageGalleryItem dbImage : imageList) {
+		if (dbImage.getSequenceId() > maxSeq) {
+		    maxSeq = dbImage.getSequenceId();
+		}
+	    }
+	    image.setSequenceId(maxSeq + 1);
 
+	    // upload ImageGalleryItem file
+	    // and setting file properties' fields: item.setFileUuid(); item.setFileVersionId(); item.setFileType();
+	    // item.setFileName();
+	    if (imageForm.getFile() != null) {
+		try {
+		    service.uploadImageGalleryItemFile(image, imageForm.getFile());
+		} catch (UploadImageGalleryFileException e) {
+		    // remove new image!
+		    throw e;
+		}
+	    }
+
+	    HttpSession ss = SessionManager.getSession();
+	    // get back login user DTO
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    ImageGalleryUser imageGalleryUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+		    imageGallery.getContentId());
+	    image.setCreateBy(imageGalleryUser);	
+	    image.setCreateByAuthor(true);
+	    
+	    imageList.add(image);
+	    imageGallery.setImageGalleryItems(imageList);
+	    service.saveOrUpdateImageGallery(imageGallery);
+
+	} else { // edit
+	    image = service.getImageGalleryItemByUid(new Long(imageUid));
+	}
+	
 	String title = imageForm.getTitle();
 	if (StringUtils.isBlank(title)) {
-	    Long contentId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_CONTENT_ID);
-	    ImageGallery imageGallery = service.getImageGalleryByContentId(contentId);
 	    Long nextConsecutiveImageTitle = imageGallery.getNextImageTitle();
 	    imageGallery.setNextImageTitle(nextConsecutiveImageTitle + 1);
 	    service.saveOrUpdateImageGallery(imageGallery);
@@ -409,7 +524,39 @@ public class MonitoringAction extends Action {
 	image.setTitle(title);
 
 	image.setDescription(imageForm.getDescription());
+	image.setHide(false);
 	service.saveOrUpdateImageGalleryItem(image);
+    }
+    
+    /**
+     * Validate imageGallery item.
+     * 
+     * @param itemForm
+     * @return
+     */
+    private ActionErrors validateImageGalleryItem(ImageGalleryItemForm itemForm) {
+	ActionErrors errors = new ActionErrors();
+
+	// validate file size
+	FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
+	// for edit validate: file already exist
+	if ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName())) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_FILE_BLANK));
+	}
+
+	// check for allowed format : gif, png, jpg
+	if (itemForm.getFile() != null) {
+	    String contentType = itemForm.getFile().getContentType();
+	    if (StringUtils.isEmpty(contentType)
+		    || !(contentType.equals("image/gif") || contentType.equals("image/png")
+			    || contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
+			    .equals("image/pjpeg") || contentType.equals("image/x-png"))) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
+	    }
+	}
+
+	return errors;
     }
 
 }
