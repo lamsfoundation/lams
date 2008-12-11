@@ -1187,13 +1187,18 @@ function quiz_clone_instance($id, $sectionref, $courseid) {
 	
 	
 	
-	if ( ! $cm ) {
+	if ( ! $cm ||$cm->instance==0) {
         // create a new quiz with default content
         $existingquiz->course = $courseid;
         $existingquiz->name = "Quiz";
         $existingquiz->intro = "";
         $existingquiz->is_lams = 1;
-        
+        $existingquiz->questions = "0";
+        $existingquiz->timecreated = time();
+        $existingquiz->sumgrades = 1;
+        $existingquiz->grade = 10;
+        $existingquiz->id = insert_record('quiz', $existingquiz);
+        quiz_after_add_or_update($existingquiz);
     } else {
         // make a copy of an existing quiz
         $existingquiz = get_record('quiz', 'id', $cm->instance);
@@ -1201,21 +1206,22 @@ function quiz_clone_instance($id, $sectionref, $courseid) {
     	unset($existingquiz->id);
         $existingquiz->name = addslashes($existingquiz->name);
         $existingquiz->intro = addslashes($existingquiz->intro);
+        $existingquiz->timecreated = time();
         $existingquiz->course = $courseid;
         $existingquiz->is_lams = 1;
-        
+        $existingquiz->id = insert_record('quiz', $existingquiz);
+        quiz_after_add_or_update($existingquiz);
     }
-	$existingquiz->id = insert_record('quiz', $existingquiz);
+	
     $module = get_record('modules', 'name', 'quiz');
     $section = get_course_section($sectionref, $courseid);
-
     
     // module parameters
     $cm->course = $courseid;
     $cm->module = $module->id;
     $cm->instance = $existingquiz->id;
     $cm->added = time();
-    $cm->section = $section->id;
+    $cm->section = $section->section;
 	$cm->is_lams = 1; 
     $cm->course = $courseid;
     $cm->id = insert_record('course_modules', $cm);
@@ -1224,7 +1230,7 @@ function quiz_clone_instance($id, $sectionref, $courseid) {
     $existingquiz->section = $sectionref;
     $existingquiz->coursemodule = $cm->id;
     $existingquiz->instance = $cm->instance;
-          
+         
     require_once($CFG->dirroot.'/course/lib.php');
    // add_mod_to_section($existingquiz);
     
@@ -1307,7 +1313,8 @@ function quiz_get_tool_output($id, $userid) {
     if ($cm) {
 		$grade = get_record('quiz_grades', 'userid', $userid, 'quiz', $cm->instance);
 		if ($grade) {
-			return $grade->grade;
+			$percentage =( $grade->grade)*10;
+			return $percentage;
 		}else{
 			return 0;	
 		}
