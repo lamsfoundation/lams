@@ -46,7 +46,7 @@ public class ImageGalleryConstants {
     public static final String PARAM_COMMENTS = "comments";
     public static final String PARAM_CURRENT_IMAGE = "currentImage";
     public static final String PARAM_CURRENT_RATING = "currentRating";
-    public static final String PARAM_VOTED_IMAGE_UID = "votedImageUid";
+    public static final String PARAM_IS_VOTED = "isVoted";
 
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";

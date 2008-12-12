@@ -224,31 +224,26 @@
 			}
 
 			if (${imageGallery.allowVote && (mode != 'teacher') && (not finishedLock)}) {	
-				var votedImageUid = $('#commentsArea_votedImageUid').val();
+				var isVoted = $('#commentsArea_isVoted').val();
 				var votingFormLabel;
-				if (votedImageUid == 0) {
+				if (isVoted == "true") {
+
+					$('#votingForm_vote').attr('disabled', false);
+					$('#votingForm_vote').attr('checked', true);
+					votingFormLabel = "<fmt:message key='label.learning.unvote'/>";					
+					 
+				} else {
 					
 					$('#votingForm_vote').attr('disabled', false);
 					$('#votingForm_vote').attr('checked', false);
 					votingFormLabel = "<fmt:message key='label.learning.vote.here'/>";
-					 
-				} else if (imageUid == votedImageUid) {
-					
-					$('#votingForm_vote').attr('disabled', false);
-					$('#votingForm_vote').attr('checked', true);
-					votingFormLabel = "<fmt:message key='label.learning.unvote'/>";
 										
-				} else {
-					
-					$('#votingForm_vote').attr('disabled', true);
-					$('#votingForm_vote').attr('checked', false);
-					votingFormLabel = "<fmt:message key='label.learning.already.voted'/>";
 				}
 				$('#votingForm_label').text(votingFormLabel);
 				$('#votingForm_imageUid').attr('value', imageUid);
 			} else if (${finishedLock}) {
-				var votedImageUid = $('#commentsArea_votedImageUid').val();
-				if (imageUid == votedImageUid) {
+				var isVoted = $('#commentsArea_isVoted').val();
+				if (isVoted == "true") {
 					$('#votingForm_vote').attr('checked', true);
 				} else {
 					$('#votingForm_vote').attr('checked', false);

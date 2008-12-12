@@ -46,7 +46,7 @@ public class UserImageContributionDTO {
     private String sessionName;
     private float averageRating;
     private int numberRatings;  
-    private int numberOfVotes;
+    private int numberOfVotesForImage;
     
     private ImageGalleryUser user;
     private int rating;
@@ -119,22 +119,22 @@ public class UserImageContributionDTO {
     }
     
     /**
-     * Returns image sequence number.
+     * Returns image number of votes.
      * 
      * @return image sequence number
      */
-    public int getNumberOfVotes() {
-	return numberOfVotes;
+    public int getNumberOfVotesForImage() {
+	return numberOfVotesForImage;
     }
 
     /**
-     * Sets image number of rates.
+     * Sets image number of votes.
      * 
      * @param numberRates
      *                image number of rates
      */
-    public void setNumberOfVotes(int numberOfVotes) {
-	this.numberOfVotes = numberOfVotes;
+    public void setNumberOfVotesForImage(int numberOfVotesForImage) {
+	this.numberOfVotesForImage = numberOfVotesForImage;
     }
 
     public ImageGalleryUser getUser() {

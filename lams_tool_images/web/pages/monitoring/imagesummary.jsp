@@ -74,7 +74,7 @@
 					<c:when test="${imageGallery.allowVote == true}">
 						<ul>
 							<li>
-								<fmt:message key="label.monitoring.number.votes" />: ${groupSummary[0].numberOfVotes}
+								<fmt:message key="label.monitoring.number.votes" />: ${groupSummary[0].numberOfVotesForImage}
 							</li>
 						</ul>
 						<br>						

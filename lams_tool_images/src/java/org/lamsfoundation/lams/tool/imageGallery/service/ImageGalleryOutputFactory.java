@@ -164,22 +164,19 @@ public class ImageGalleryOutputFactory extends OutputFactory {
     }
     
     /**
-     * Get the number of images for a specific user. Will always return a ToolOutput object.
+     * Get the number of imageVotes for a specific user. Will always return a ToolOutput object.
      */
     private ToolOutput getNumVotes(ImageGalleryUser user, ImageGallerySession session, IImageGalleryService imageGalleryService) {
 	ImageGallery imageGallery = session.getImageGallery();
 	
 	int countVotes = 0;
 	if (user != null) {
-	    if ((user.getVotedImageUid() != null) && !user.getVotedImageUid().equals(new Long(0))){
-		countVotes = 1;
-	    }
+	    countVotes = imageGalleryService.getNumberVotesByUserId(user.getUserId());
 	} else {
 	    List<ImageGalleryUser> users = imageGalleryService.getUserListBySessionId(session.getSessionId());
 	    for (ImageGalleryUser dbUser : users) {
-		if ((dbUser.getVotedImageUid() != null) && !dbUser.getVotedImageUid().equals(new Long(0))){
-		    countVotes++;
-		}
+		int userCountVotes = imageGalleryService.getNumberVotesByUserId(user.getUserId());
+		countVotes += userCountVotes;
 	    }
 	}
 	

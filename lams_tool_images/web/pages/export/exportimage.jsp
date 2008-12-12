@@ -33,7 +33,7 @@
 		<c:when test="${imageGallery.allowVote == true}">
 			<ul>
 				<li>
-					<fmt:message key="label.monitoring.number.votes" />: ${userContribution.numberOfVotes}
+					<fmt:message key="label.monitoring.number.votes" />: ${userContribution.numberOfVotesForImage}
 				</li>
 			</ul>
 			<br>						

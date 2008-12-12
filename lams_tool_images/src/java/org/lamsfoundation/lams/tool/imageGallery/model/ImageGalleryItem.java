@@ -51,9 +51,11 @@ public class ImageGalleryItem implements Cloneable {
     private int sequenceId;
 
     private boolean isHide;
+    
     private boolean isCreateByAuthor;
 
     private Date createDate;
+    
     private ImageGalleryUser createBy;
     
     private Long originalFileUuid;
@@ -86,20 +88,20 @@ public class ImageGalleryItem implements Cloneable {
     //*************** NON Persist Field (only for exporting) ********************
     private String attachmentLocalUrl;
 
-    /**
-     * Default contruction method.
-     * 
-     */
-    public ImageGalleryItem() {
-	comments = new HashSet();
-    }    
-    
     // *************** NON Persist Fields (used only for export needs) ********************
     private ImageGalleryAttachment originalFile;
 
     private ImageGalleryAttachment mediumFile;
 
     private ImageGalleryAttachment thumbnailFile;
+    
+    /**
+     * Default contruction method.
+     * 
+     */
+    public ImageGalleryItem() {
+	comments = new HashSet();
+    }  
 
     @Override
     public Object clone() {

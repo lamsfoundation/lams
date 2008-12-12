@@ -15,7 +15,6 @@
 	</c:set>
 </c:if>
 
-
 <input type="hidden" name="imageUid" id="commentsArea_imageUid" value="${commentsImage.uid}"/>
 <input type="hidden" name="title" id="commentsArea_title" value="${commentsImage.title}"/>
 <input type="hidden" name="originalImageWidth" id="commentsArea_originalImageWidth" value="${commentsImage.originalImageWidth}"/>
@@ -25,7 +24,7 @@
 <input type="hidden" name="averageRating" id="commentsArea_averageRating" value="${commentsImage.averageRating}"/>
 <input type="hidden" name="numberRatings" id="commentsArea_numberRatings" value="${commentsImage.numberRatings}"/>
 <input type="hidden" name="currentRating" id="commentsArea_currentRating" value="${commentsSessionMap.currentRating}"/>
-<input type="hidden" name="votedImageUid" id="commentsArea_votedImageUid" value="${commentsSessionMap.votedImageUid}"/>
+<input type="hidden" name="isVoted" id="commentsArea_isVoted" value="${commentsSessionMap.isVoted}"/>
 <input type="hidden" name="addedBy" id="commentsArea_addedBy" value="${commentsAddedBy}"/>
 
 

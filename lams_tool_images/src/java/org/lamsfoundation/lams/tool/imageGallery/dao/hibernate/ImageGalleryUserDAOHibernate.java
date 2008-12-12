@@ -36,8 +36,6 @@ public class ImageGalleryUserDAOHibernate extends BaseDAOHibernate implements Im
 	    + " as u where u.userId =? and u.session.sessionId=?";
     private static final String FIND_BY_SESSION_ID = "from " + ImageGalleryUser.class.getName()
 	    + " as u where u.session.sessionId=?";
-    private static final String FIND_COUNT_OF_VOTES = "select count(*) from "
-	    + ImageGalleryUser.class.getName() + " as u where  u.votedImageUid =? and u.session.sessionId=?";
 
     public ImageGalleryUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
 	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
@@ -55,13 +53,6 @@ public class ImageGalleryUserDAOHibernate extends BaseDAOHibernate implements Im
 
     public List<ImageGalleryUser> getBySessionID(Long sessionId) {
 	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
-    }
-    
-    public int getNumberOfVotes(Long votedImageUid, Long sessionId) {
-	List list = getHibernateTemplate().find(FIND_COUNT_OF_VOTES, new Object[] {votedImageUid, sessionId});
-	if (list == null || list.size() == 0)
-	    return 0;
-	return ((Number) list.get(0)).intValue();
     }
 
 }

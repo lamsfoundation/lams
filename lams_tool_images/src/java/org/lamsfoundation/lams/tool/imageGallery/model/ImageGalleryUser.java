@@ -51,8 +51,6 @@ public class ImageGalleryUser implements Cloneable {
 
     private ImageGallerySession session;
     private ImageGallery imageGallery;
-    
-    private Long votedImageUid;
 
     // =============== NON Persisit value: for display use ===========
     // the user access some reousrce item date time. Use in monitoring summary page
@@ -234,19 +232,6 @@ public class ImageGalleryUser implements Cloneable {
 
     public void setAccessDate(Date accessDate) {
 	this.accessDate = accessDate;
-    }
-    
-    
-    /**
-     * @hibernate.property column="voted_image_uid"
-     * @return
-     */
-    public Long getVotedImageUid() {
-	return votedImageUid;
-    }
-
-    public void setVotedImageUid(Long votedImageUid) {
-	this.votedImageUid = votedImageUid;
     }
 
 }

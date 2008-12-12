@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
 import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
@@ -379,7 +380,12 @@ public class LearningAction extends Action {
 	}
 
 	if (imageGallery.isAllowVote()) {
-	    sessionMap.put(ImageGalleryConstants.PARAM_VOTED_IMAGE_UID, imageGalleryUser.getVotedImageUid());	    
+	    boolean isVotedForThisImage = false;
+	    ImageVote imageVote = service.getImageVoteByImageAndUser(image.getUid(), imageGalleryUser.getUserId());
+	    if ((imageVote != null) && imageVote.isVoted()) {
+		isVotedForThisImage = true;
+	    }
+	    sessionMap.put(ImageGalleryConstants.PARAM_IS_VOTED, isVotedForThisImage);
 	}
 	
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -510,10 +516,16 @@ public class LearningAction extends Action {
 	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),sessionId);
 
 	//persist ImageGalleryItem changes in DB
-	boolean vote = (((ImageRatingForm)form).getVote());
-	Long votedImageUid = vote ? imageUid : 0;
-	imageGalleryUser.setVotedImageUid(votedImageUid);
-	service.saveUser(imageGalleryUser);	
+	boolean formVote = (((ImageRatingForm)form).getVote());
+	ImageVote imageVote = service.getImageVoteByImageAndUser(imageUid, imageGalleryUser.getUserId());
+	if (imageVote == null) {
+	    imageVote = new ImageVote();
+	    imageVote.setCreateBy(imageGalleryUser);
+	    ImageGalleryItem image = service.getImageGalleryItemByUid(imageUid);
+	    imageVote.setImageGalleryItem(image);
+	}
+	imageVote.setVoted(formVote);
+	service.saveOrUpdateImageVote(imageVote);	
 	
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);

@@ -88,14 +88,6 @@
             column="session_finished"
         />
 
-        <property
-            name="votedImageUid"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="voted_image_uid"
-        />
-
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ImageGalleryUser.xml

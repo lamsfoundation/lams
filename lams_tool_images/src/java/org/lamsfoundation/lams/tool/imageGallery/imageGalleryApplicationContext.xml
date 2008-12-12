@@ -22,7 +22,8 @@
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGallery.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryItem.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageComment.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageRating.hbm.xml</value>                  
+               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageRating.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageVote.hbm.xml</value>                       
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryItemVisitLog.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/imageGallery/model/ImageGallerySession.hbm.xml</value>
@@ -53,6 +54,11 @@
         </property>
     </bean>   
     <bean id="laimagImageRatingDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageRatingDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="laimagImageGallerySessionFactory"/>
+        </property>
+    </bean>
+    <bean id="laimagImageVoteDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageVoteDAOHibernate">
         <property name="sessionFactory">
             <ref local="laimagImageGallerySessionFactory"/>
         </property>
@@ -105,7 +111,10 @@
         </property>
         <property name="imageRatingDao">
             <ref local="laimagImageRatingDao"/>
-        </property>                
+        </property>       
+        <property name="imageVoteDao">
+            <ref local="laimagImageVoteDao"/>
+        </property>          
         <property name="imageGalleryItemVisitDao">
             <ref local="laimagImageGalleryItemVisitDao"/>
         </property>

@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
+import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 
 /**
  * @author Dapeng.Ni
@@ -163,7 +164,15 @@ public interface IImageGalleryService {
      * @return
      */
     void saveOrUpdateImageRating(ImageRating rating);
-    
+
+    /**
+     * Save/update ImageVote.
+     * 
+     * @param vote
+     *            ImageVote
+     * @return
+     */
+    void saveOrUpdateImageVote(ImageVote vote);
 
     /**
      * Get imageGallery which is relative with the special toolSession.
@@ -219,6 +228,23 @@ public interface IImageGalleryService {
      * @return
      */
     ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId);
+    
+    /**
+     * Returns imageVote by the given imageUid and userId
+     * 
+     * @param imageUid
+     * @param userId
+     * @return
+     */
+    ImageVote getImageVoteByImageAndUser(Long imageUid, Long userId);
+    
+    /**
+     * Return number of imageVotes made by user.
+     * 
+     * @param userId
+     * @return
+     */
+    int getNumberVotesByUserId(Long userId);
 
     /**
      * Save or update imageGallery session.
