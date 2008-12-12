@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -71,7 +72,7 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	ImageGallerySession session = imageGalleryService.getImageGallerySessionBySessionId(toolSessionId);
 	if (session != null) {
 
-	    ImageGalleryUser user = imageGalleryService.getUserByIDAndSession(learnerId, session.getUid());
+	    ImageGalleryUser user = imageGalleryService.getUserByIDAndSession(learnerId, toolSessionId);
 
 	    if (names == null || names.contains(OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED)) {
 		output.put(OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, getNumUploadedImages(user, session));
@@ -92,7 +93,7 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	    ImageGallerySession session = imageGalleryService.getImageGallerySessionBySessionId(toolSessionId);
 	    if (session != null) {
 
-		ImageGalleryUser user = imageGalleryService.getUserByIDAndSession(learnerId, session.getUid());
+		ImageGalleryUser user = imageGalleryService.getUserByIDAndSession(learnerId, toolSessionId);
 
 		if (name.equals(OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED)) {
 		    return getNumUploadedImages(user, session);
@@ -138,7 +139,9 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	int countComments = 0;
 	if (user != null) {
 	    Set<ImageGalleryItem> allImages = imageGallery.getImageGalleryItems();
-	    for (ImageGalleryItem image : allImages) {
+	    Iterator<ImageGalleryItem> it = allImages.iterator();
+	    while(it.hasNext()) {
+		ImageGalleryItem image = it.next();
 		Set<ImageComment> imageComments = image.getComments();
 		for (ImageComment comment : imageComments) {
 		    if (user.getUserId().equals(comment.getCreateBy().getUserId())) {

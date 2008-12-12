@@ -106,7 +106,7 @@ public interface IImageGalleryService {
      * @param sessionId
      * @return
      */
-    ImageGalleryUser getUserByIDAndSession(Long long1, Long sessionId);
+    ImageGalleryUser getUserByIDAndSession(Long userId, Long sessionId);
 
     // ********** Repository methods ***********************
     /**
