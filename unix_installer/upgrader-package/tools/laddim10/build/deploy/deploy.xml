@@ -1,0 +1,31 @@
+<Deploy>
+  <toolSignature>laddim10</toolSignature>
+  <toolWebUri>lams-tool-laddim10.war</toolWebUri>
+  <toolContext>/lams/tool/laddim10</toolContext>
+  <toolUpdateScriptPath>@toolDeployPackageDir@/sql/updateTo20080811.sql</toolUpdateScriptPath>
+  <toolInsertScriptPath>@toolDeployPackageDir@/sql/tool_insert.sql</toolInsertScriptPath>
+  <toolLibraryInsertScriptPath>@toolDeployPackageDir@/sql/library_insert.sql</toolLibraryInsertScriptPath>
+  <hideTool>false</hideTool>
+  <toolActivityInsertScriptPath>@toolDeployPackageDir@/sql/activity_insert.sql</toolActivityInsertScriptPath>
+  <toolTablesScriptPath>@toolDeployPackageDir@/sql/create_lams_tool_dimdim.sql</toolTablesScriptPath>
+  <toolTablesDeleteScriptPath>@toolDeployPackageDir@/sql/drop_lams_tool_dimdim.sql</toolTablesDeleteScriptPath>
+  <toolDBVersionScriptPath>@toolDeployPackageDir@/sql/db_version_insert.sql</toolDBVersionScriptPath>
+  <toolApplicationContextPath>/org/lamsfoundation/lams/tool/dimdim/dimdimApplicationContext.xml</toolApplicationContextPath>
+  <toolJarFileName>lams-tool-laddim10.jar</toolJarFileName>
+  <minServerVersionNumber>2.0</minServerVersionNumber>
+  <deployFiles>
+    <string>@toolDeployPackageDir@/lams-tool-laddim10.war</string>
+    <string>@toolDeployPackageDir@/lams-tool-laddim10.jar</string>
+  </deployFiles>
+  <languageFiles>
+    <string>@toolDeployPackageDir@/language/ApplicationResources.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_en_AU.properties</string>
+  </languageFiles>
+  <toolVersion>20080811</toolVersion>
+  <dbDriverClass>@dbDriverClass@</dbDriverClass>
+  <dbDriverUrl>@dbDriverUrl@</dbDriverUrl>
+  <dbUsername>@dbUsername@</dbUsername>
+  <dbPassword>@dbPassword@</dbPassword>
+  <lamsEarPath>@lamsear@</lamsEarPath>
+  <languageFilesPackage>org.lamsfoundation.lams.tool.dimdim</languageFilesPackage>
+</Deploy>

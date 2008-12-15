@@ -29,7 +29,7 @@ INSERT INTO tl_lagmap10_configuration (
 )
 VALUES(
 	"GmapKey",
-	""
+	"ABQIAAAAvPAE96y1iioFQOnrP1RCBxQ3ZLSPwrKlL-Fn7FdXNTuNedFYMRT30phEMjEwUhQPccHtJ9JNU1mknQ"
 );
 
 

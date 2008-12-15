@@ -2,7 +2,7 @@
   <toolSignature>ladaco10</toolSignature>
   <toolWebUri>lams-tool-ladaco10.war</toolWebUri>
   <toolContext>/lams/tool/ladaco10</toolContext>
-  <toolUpdateScriptPath>@toolDeployPackageDir@/sql/updatescripts/updateTo20080804.sql</toolUpdateScriptPath>
+  <toolUpdateScriptPath>@toolDeployPackageDir@/sql/updatescripts/updateTo20081114.sql</toolUpdateScriptPath>
   <toolInsertScriptPath>@toolDeployPackageDir@/sql/tool_insert.sql</toolInsertScriptPath>
   <toolLibraryInsertScriptPath>@toolDeployPackageDir@/sql/library_insert.sql</toolLibraryInsertScriptPath>
   <hideTool>false</hideTool>
@@ -19,10 +19,13 @@
   </deployFiles>
   <languageFiles>
     <string>@toolDeployPackageDir@/language/ApplicationResources.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_el_GR.properties</string>
     <string>@toolDeployPackageDir@/language/ApplicationResources_en_AU.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_es_ES.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_it_IT.properties</string>
     <string>@toolDeployPackageDir@/language/ApplicationResources_no_NO.properties</string>
   </languageFiles>
-  <toolVersion>20080804</toolVersion>
+  <toolVersion>20081114</toolVersion>
   <dbDriverClass>@dbDriverClass@</dbDriverClass>
   <dbDriverUrl>@dbDriverUrl@</dbDriverUrl>
   <dbUsername>@dbUsername@</dbUsername>

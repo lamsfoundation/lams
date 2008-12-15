@@ -30,7 +30,8 @@ language_file,
 classpath_addition,
 context_file,
 create_date_time,
-modified_date_time
+modified_date_time,
+supports_outputs
 )
 VALUES
 (
@@ -39,7 +40,7 @@ VALUES
 'Data Collection',
 'Collecting data with custom structure.',
 'daco',
-'20080804',
+'20081114',
 NULL,
 NULL,
 0,
@@ -60,5 +61,6 @@ NULL,
 'lams-tool-ladaco10.jar',
 '/org/lamsfoundation/lams/tool/daco/dacoApplicationContext.xml',
 NOW(),
-NOW()
+NOW(),
+1
 )

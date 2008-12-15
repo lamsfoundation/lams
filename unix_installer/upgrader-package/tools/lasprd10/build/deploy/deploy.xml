@@ -21,6 +21,8 @@
     <string>@toolDeployPackageDir@/language/ApplicationResources.properties</string>
     <string>@toolDeployPackageDir@/language/ApplicationResources_el_GR.properties</string>
     <string>@toolDeployPackageDir@/language/ApplicationResources_en_AU.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_es_ES.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_it_IT.properties</string>
     <string>@toolDeployPackageDir@/language/ApplicationResources_no_NO.properties</string>
   </languageFiles>
   <toolVersion>20080612</toolVersion>
