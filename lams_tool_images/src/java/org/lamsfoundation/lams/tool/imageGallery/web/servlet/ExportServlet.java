@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
 import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryServiceProxy;
+import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryBundler;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryToolContentHandler;
 import org.lamsfoundation.lams.tool.imageGallery.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -109,6 +110,16 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 		+ request.getContextPath();
+	
+	// Attempting to export required images
+	try {
+	    ImageGalleryBundler imageBundler = new ImageGalleryBundler();
+	    imageBundler.bundle(request, cookies, directoryName);
+	} catch (Exception e) {
+	    logger.error(
+		    "Could not export spreadsheet javascript files, some files may be missing in export portfolio", e);
+	}
+	
 	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
 		directoryName, FILENAME, cookies);
 
@@ -180,6 +191,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    sessionMap.put(ImageGalleryConstants.ATTR_REFLECT_LIST, map);
 	}
 
+	// put it into HTTPSession
 	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, content);
 	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, content.getTitle());
 	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, content.getInstructions());
@@ -230,11 +242,11 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
      * @param directoryName
      * @throws IOException
      */
-    private void saveFileToLocal(List<List<List<UserImageContributionDTO>>> exportImageList, String directoryName) {
+    private void saveFileToLocal(List<List<List<UserImageContributionDTO>>> sessionList, String directoryName) {
 	handler = getToolContentHandler();
 
-	for (List<List<UserImageContributionDTO>> sessionList : exportImageList) {
-	    for (List<UserImageContributionDTO> userContributionList : sessionList) {
+	for (List<List<UserImageContributionDTO>> imageList : sessionList) {
+	    for (List<UserImageContributionDTO> userContributionList : imageList) {
 		for (UserImageContributionDTO userContribution : userContributionList) {
 		    try {
 			ImageGalleryItem image = userContribution.getImage();
@@ -250,17 +262,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			    }
 			    idx++;
 			}
-			image.setAttachmentLocalUrl(userName + "/" + idx + "/" + image.getThumbnailFileUuid() + '.'
+			image.setAttachmentLocalUrl(userName + "/" + idx + "/" + image.getMediumFileUuid() + '.'
 				+ FileUtil.getFileExtension(image.getFileName()));
-			handler.saveFile(image.getThumbnailFileUuid(), FileUtil.getFullPath(directoryName, image
+			handler.saveFile(image.getMediumFileUuid(), FileUtil.getFullPath(directoryName, image
 				.getAttachmentLocalUrl()));
 		    } catch (Exception e) {
 			logger.error("Export forum topic attachment failed: " + e.toString());
 		    }
 		    break;
 		}
-		break;
 	    }
+	    break;
 	}
 
     }

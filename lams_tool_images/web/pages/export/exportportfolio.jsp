@@ -4,7 +4,7 @@
 <c:set var="sessionMapID" value="${param.sessionMapID}"/>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="imageGallery" value="${sessionMap.imageGallery}"/>
-<c:set var="exportImageList" value="${sessionMap.exportImageList}"/>
+<c:set var="sessionList" value="${sessionMap.exportImageList}"/>
 <c:set var="mode" value="${sessionMap.mode}"/>
 <c:set var="title" value="${sessionMap.title}"/>
 
@@ -14,6 +14,18 @@
 		<c:set var="lams">
 			<lams:LAMSURL />
 		</c:set>
+		
+		<script type="text/javascript" src="./javascript/jquery-1.2.6.pack.js" ></script>
+	 	<script type="text/javascript" src="./javascript/jquery.rating.1.1.js"></script>
+	 	<link rel="stylesheet" type="text/css" href="./css/jquery.rating.css"/>
+	 	
+	 	<script type="text/javascript">
+			$(document).ready(function(){
+		 		$('input[@type=radio].star').rating({
+					readOnly: true
+				});
+			});
+		</script>
 	
 		<lams:css localLinkPath="../"/>
 	</lams:head>
@@ -23,16 +35,27 @@
 		<div id="content">
 	
 			<h1>${title} </h1>
+			
+			<h1>${instructions} </h1>
 	
-			<c:set var="sessionList" value="${exportImageList[0]}"/>
 			<c:choose>
 				<c:when test="${not empty sessionList}">
 				
 					<table border="0" cellspacing="3" width="98%">
-						<c:forEach var="sessionList" items="${exportImageList}">
+						<c:forEach var="imageList" items="${sessionList}">
 							<tr>
 								<td>
-									<%@ include file="exportimage.jsp"%>
+									<c:choose>
+										<c:when test="${mode == 'learner'}">
+											<%@ include file="exportimagelearner.jsp"%>
+										</c:when>
+										
+										<c:when test="${mode == 'teacher'}">
+											<c:if test="${not empty imageList}">
+												<%@ include file="exportimageteacher.jsp"%>
+											</c:if>
+										</c:when>
+									</c:choose>								
 								</td>
 							</tr>
 						</c:forEach>

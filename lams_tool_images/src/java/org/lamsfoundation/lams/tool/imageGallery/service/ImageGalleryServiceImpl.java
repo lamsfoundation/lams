@@ -557,41 +557,42 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    return null;
 	}
 	
-	//imageList-->sessionList-->contributionList
+	//sessionList-->imageList-->contributionList
 	ImageGallery imageGallery = session.getImageGallery();
-	List<List<List<UserImageContributionDTO>>> imageList = new ArrayList();
+	List<List<List<UserImageContributionDTO>>> sessionList = new ArrayList();
+	List<List<UserImageContributionDTO>> imageList = new ArrayList();
+	sessionList.add(imageList);
 
-	Set<ImageGalleryItem> dbImages = imageGallery.getImageGalleryItems();
+	Set<ImageGalleryItem> dbImages = new TreeSet(new ImageGalleryItemComparator());
+	dbImages.addAll(getImagesForGroup(imageGallery, session.getSessionId()));
 	for (ImageGalleryItem image : dbImages) {
 	    if (skipHide && image.isHide()) {
 		continue;
 	    }
 
-	    List<List<UserImageContributionDTO>> sessionList = new ArrayList();
-	    
 	    List<UserImageContributionDTO> userContributionList = new ArrayList<UserImageContributionDTO>();
 
 	    Object[] ratingForGroup = getRatingForGroup(image.getUid(), session.getSessionId());
 	    UserImageContributionDTO userContribution = createUserContribution(image, user, session, ratingForGroup);
 	    userContribution.setImage(image);
 	    userContributionList.add(userContribution);
-	    sessionList.add(userContributionList);
-	    imageList.add(sessionList);
+	    imageList.add(userContributionList);
 	}
 
-	return imageList;
+	return sessionList;
     }
 
     public List<List<List<UserImageContributionDTO>>> exportByContentId(Long contentId) {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(contentId);
-	List<List<List<UserImageContributionDTO>>> imageList = new ArrayList();	
+	List<List<List<UserImageContributionDTO>>> sessionList = new ArrayList();	
 	
-	Set<ImageGalleryItem> dbImages = imageGallery.getImageGalleryItems();
-	for (ImageGalleryItem image : dbImages) {
+	List<ImageGallerySession> imageGallerySessionList = imageGallerySessionDao.getByContentId(contentId);
+	for(ImageGallerySession imageSession : imageGallerySessionList) {
 
-	    List<List<UserImageContributionDTO>> sessionList = new ArrayList();
-	    List<ImageGallerySession> imageGallerySessionList = imageGallerySessionDao.getByContentId(contentId);
-	    for(ImageGallerySession imageSession : imageGallerySessionList) {
+	    List<List<UserImageContributionDTO>> imageList = new ArrayList();
+	    Set<ImageGalleryItem> dbImages = new TreeSet(new ImageGalleryItemComparator());
+	    dbImages.addAll(imageGallery.getImageGalleryItems());
+	    for (ImageGalleryItem image : dbImages) {
 		List<UserImageContributionDTO> userContributionList = new ArrayList<UserImageContributionDTO>();
 		Object[] ratingForGroup = getRatingForGroup(image.getUid(), imageSession.getSessionId());
 		
@@ -601,14 +602,14 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		    userContribution.setImage(image);
 		    userContributionList.add(userContribution);		    
 		}
-		sessionList.add(userContributionList);
+		imageList.add(userContributionList);
 		
 	    }
 
-	    imageList.add(sessionList);
+	    sessionList.add(imageList);
 	}	
 
-	return imageList;
+	return sessionList;
     }
 
     public void uploadImageGalleryItemFile(ImageGalleryItem image, FormFile file)
