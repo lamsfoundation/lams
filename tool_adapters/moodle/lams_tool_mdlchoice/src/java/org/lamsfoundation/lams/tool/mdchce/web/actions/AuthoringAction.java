@@ -147,12 +147,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    //String courseUrlToBeUsed = (mdlChoice.getExtCourseUrl() != null) ? mdlChoice.getExtCourseUrl() : courseUrlFromCSV;
 
 	   String responseUrl = mdlChoiceService.getConfigItem(MdlChoiceConfigItem.KEY_EXTERNAL_SERVER_URL)
-		    .getConfigValue();
-	   /* responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
-	    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
-		    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
-	    responseUrl += "&lamsUpdateURL=" + returnUpdateUrl;*/
-		
+		    .getConfigValue();		
 		
 		 responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
 		    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"

@@ -98,6 +98,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	MdlChoice mdlChoice = mdlChoiceSession.getMdlChoice();
+	MdlChoiceUser mdlChoiceUser = getCurrentUser(toolSessionID);
 
 	// check defineLater
 	if (mdlChoice.isDefineLater()) {
@@ -127,7 +128,7 @@ public class LearningAction extends LamsDispatchAction {
 				{
 					responseUrl += RELATIVE_TEACHER_URL;
 				}
-				else if (mode.equals(ToolAccessMode.LEARNER))
+				else if (mode.equals(ToolAccessMode.LEARNER)|| mode.equals(ToolAccessMode.AUTHOR))
 				{
 					responseUrl += RELATIVE_LEARNER_URL;
 				}
@@ -141,7 +142,7 @@ public class LearningAction extends LamsDispatchAction {
 		
 
 		responseUrl += "&id=" + mdlChoiceSession.getExtSessionId() + "&returnUrl=" + returnUrl
-			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1";
+			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1" + "&isFinished=" + mdlChoiceUser.isFinishedActivity();
 		
 		
 		log.debug("Redirecting for mdl choice learner: " + responseUrl);
