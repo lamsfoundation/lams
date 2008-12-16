@@ -45,6 +45,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -65,6 +66,7 @@ import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageRatingForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ReflectionForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -698,6 +700,21 @@ public class LearningAction extends Action {
 	service.saveOrUpdateImageGallery(imageGallery);
 
 	service.saveOrUpdateImageGalleryItem(image);
+
+	// notify teachers
+	if (imageGallery.isNotifyTeachersOnImageSumbit()) {
+	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
+	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
+		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+		for (int i = 0; i < monitoringUsersIds.length; i++) {
+		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+		}
+		String fullName = imageGalleryUser.getLastName() + " " + imageGalleryUser.getFirstName();
+		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
+			service.getLocalisedMessage("event.imagesubmit.subject", null),
+			service.getLocalisedMessage("event.imagesubmit.body", new Object[] { fullName }));
+	    }
+	}
     }
 
     /**

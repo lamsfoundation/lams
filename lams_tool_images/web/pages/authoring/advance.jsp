@@ -14,6 +14,11 @@
 			document.imageGalleryForm.allowRank.checked = false;
 		}		
 	}
+
+	function uncheckNotifyTeachersOnImageSumbit() {
+		document.imageGalleryForm.notifyTeachersOnImageSumbit.checked = false;
+		document.imageGalleryForm.notifyTeachersOnImageSumbit.disabled = ! eval(document.imageGalleryForm.notifyTeachersOnImageSumbit.disabled);
+	}
 </script>
 	
 <c:set var="formBean"
@@ -31,10 +36,21 @@
 </p>
 
 <p>
-	<html:checkbox property="imageGallery.allowShareImages" styleClass="noBorder" styleId="allowShareImages">
+	<html:checkbox property="imageGallery.allowShareImages" styleClass="noBorder" styleId="allowShareImages"
+	onclick="uncheckNotifyTeachersOnImageSumbit();">
 	</html:checkbox>
 	<label for="allowShareImages">
 		<fmt:message key="label.authoring.advance.allow.learner.share.images" />
+	</label>
+</p>
+
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<html:checkbox property="imageGallery.notifyTeachersOnImageSumbit" styleClass="noBorder" styleId="notifyTeachersOnImageSumbit"
+			disabled="${not formBean.imageGallery.allowShareImages}" >
+	</html:checkbox>
+	<label for="notifyTeachersOnImageSumbit">
+		<fmt:message key="label.authoring.advance.notify.monitoring.teachers" />
 	</label>
 </p>
 

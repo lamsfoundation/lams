@@ -98,6 +98,8 @@ public class ImageGallery implements Cloneable {
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
+    
+    private boolean notifyTeachersOnImageSumbit;
 
     // *************** NON Persist Fields ********************
     private IToolContentHandler toolContentHandler;
@@ -569,5 +571,17 @@ public class ImageGallery implements Cloneable {
 
     public void setAllowRank(boolean allowRank) {
 	this.allowRank = allowRank;
+    }
+
+    /**
+     * @hibernate.property column="image_submit_notify"
+     * @return
+     */
+    public boolean isNotifyTeachersOnImageSumbit() {
+	return notifyTeachersOnImageSumbit;
+    }
+
+    public void setNotifyTeachersOnImageSumbit(boolean notifyTeachersOnImageSumbit) {
+	this.notifyTeachersOnImageSumbit = notifyTeachersOnImageSumbit;
     }
 }

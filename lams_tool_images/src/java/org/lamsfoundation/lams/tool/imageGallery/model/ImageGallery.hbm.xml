@@ -220,6 +220,14 @@
             column="allow_rank"
         />
 
+        <property
+            name="notifyTeachersOnImageSumbit"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="image_submit_notify"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ImageGallery.xml

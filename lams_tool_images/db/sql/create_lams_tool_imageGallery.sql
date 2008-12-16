@@ -41,6 +41,7 @@ create table tl_laimag10_imageGallery (
    reflect_instructions varchar(255), 
    reflect_on_activity smallint,
    allow_rank tinyint,
+   image_submit_notify tinyint DEFAULT 0,
    primary key (uid)
 )type=innodb;
 create table tl_laimag10_imageGallery_item (
@@ -146,8 +147,8 @@ alter table tl_laimag10_user add index FK_NEW_1821149711_30113BFC309ED320 (image
 
 INSERT INTO `tl_laimag10_imageGallery` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, `lock_on_finished`,
  `instructions`, `next_image_title`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `allow_comment_images`, 
- `allow_share_images`, `allow_vote`, `allow_rank`, `reflect_on_activity`) VALUES
-  (1,NULL,NULL,NULL,'ImageGallery','0','0','Instructions ',1,null,null,0,0,${default_content_id},0,0,0,0,0);
+ `allow_share_images`, `allow_vote`, `allow_rank`, `reflect_on_activity`, `image_submit_notify`) VALUES
+  (1,NULL,NULL,NULL,'ImageGallery','0','0','Instructions ',1,null,null,0,0,${default_content_id},0,0,0,0,0,0);
 
 INSERT INTO `tl_laimag10_configuration` (`config_key`, `config_value`) VALUES
   ('mediumImageDimensions',	'640');

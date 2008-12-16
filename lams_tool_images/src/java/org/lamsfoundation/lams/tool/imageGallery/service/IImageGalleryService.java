@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
@@ -41,6 +42,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageRating;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Dapeng.Ni
@@ -376,4 +378,8 @@ public interface IImageGalleryService {
      * @param item
      */
     public void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item);    
+    
+    IEventNotificationService getEventNotificationService();
+
+    public List<User> getMonitorsByToolSessionId(Long sessionId);
 }

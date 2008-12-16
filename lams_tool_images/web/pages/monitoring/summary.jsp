@@ -71,6 +71,23 @@
 		
 		<tr>
 			<td>
+				<fmt:message key="label.authoring.advance.notify.monitoring.teachers" />
+			</td>
+			
+			<td>
+				<c:choose>
+					<c:when test="${sessionMap.imageGallery.notifyTeachersOnImageSumbit == true}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>	
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
 				<fmt:message key="label.authoring.advance.allow.learner.comment.images" />
 			</td>
 			

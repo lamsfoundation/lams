@@ -62,6 +62,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -165,6 +166,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private IExportToolContentService exportContentService;
 
     private ICoreNotebookService coreNotebookService;
+    
+    private IEventNotificationService eventNotificationService;
+    
+    private ILessonService lessonService;
 
     // *******************************************************************************
     // Service method
@@ -1065,6 +1070,26 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+    
+    public IEventNotificationService getEventNotificationService() {
+	return eventNotificationService;
+    }
+
+    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+	this.eventNotificationService = eventNotificationService;
+    }
+    
+    public List<User> getMonitorsByToolSessionId(Long sessionId) {
+	return getLessonService().getMonitorsByToolSessionId(sessionId);
+    }
+
+    public ILessonService getLessonService() {
+	return lessonService;
+    }
+
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
     }
 
     public String getLocalisedMessage(String key, Object[] args) {
