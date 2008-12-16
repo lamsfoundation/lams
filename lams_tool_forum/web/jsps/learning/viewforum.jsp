@@ -71,7 +71,7 @@
 		</c:if>
 
 		<c:if
-			test='${sessionMap.mode != "teacher" && sessionMap.allowNewTopics}'>
+			test='${sessionMap.allowNewTopics}'>
 			<html:button property="newtopic"
 				onclick="javascript:location.href='${newtopic}';"
 				disabled="${sessionMap.finishedLock}" styleClass="${buttonClass}">

@@ -146,7 +146,7 @@
 					
 							<!--  Reply Button -->
 							<c:if
-								test="${(not sessionMap.finishedLock) && (not noMorePosts) && (sessionMap.mode ne 'teacher')}">
+								test="${(not sessionMap.finishedLock) && (not noMorePosts)}">
 								<c:set var="replytopic">
 									<html:rewrite
 										page="/learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}" />
