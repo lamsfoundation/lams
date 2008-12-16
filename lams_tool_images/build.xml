@@ -16,9 +16,6 @@
 		<fileset dir="${sharedlib}">
 			<include name="**/*.jar"/>
 		</fileset>
-		<fileset dir="lib">
-			<include name="**/*.jar"/>
-		</fileset>
 		<fileset dir="${j2eelibs}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -76,6 +73,7 @@
             debug="on"
             compiler="modern"
             classpathref="project.classpath"
+			deprecation="on"
             destdir="${build.classes.java}"/>
 	 	<copy overwrite="yes" todir="${build.classes.java}" verbose="true">
 			<fileset dir="${src.java.dir}">
