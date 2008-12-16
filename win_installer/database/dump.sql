@@ -1273,7 +1273,7 @@ CREATE TABLE `lams_organisation` (
 
 LOCK TABLES `lams_organisation` WRITE;
 /*!40000 ALTER TABLE `lams_organisation` DISABLE KEYS */;
-INSERT INTO `lams_organisation` VALUES (1,'Root',NULL,'Root Organisation',NULL,1,'2008-12-04 09:49:22',1,1,1,0,0,0,0,1,NULL,NULL),(2,'Playpen','PP101','Developers Playpen',1,2,'2008-12-04 09:49:22',1,2,1,0,0,0,0,1,NULL,NULL),(3,'Everybody',NULL,'All People In Course',2,3,'2008-12-04 09:49:22',1,NULL,1,0,0,0,0,1,NULL,NULL),(4,'Mathematics 1','MATH111','Mathematics 1',1,2,'2008-12-04 09:49:22',1,3,1,0,0,0,0,2,NULL,NULL),(5,'Tutorial Group A','TUTA','Tutorial Group A',4,3,'2008-12-04 09:49:22',1,NULL,1,0,0,0,0,2,NULL,NULL),(6,'Tutorial Group B','TUTB','Tutorial Group B',4,3,'2008-12-04 09:49:22',1,NULL,1,0,0,0,0,2,NULL,NULL),(7,'Moodle','Moodle','Moodle Test',1,2,'2008-12-04 09:49:22',1,50,2,0,0,0,0,1,NULL,NULL);
+INSERT INTO `lams_organisation` VALUES (1,'Root',NULL,'Root Organisation',NULL,1,'2008-12-04 09:49:22',1,1,1,0,0,0,0,1,NULL,NULL),(2,'Playpen','PP101','Developers Playpen',1,2,'2008-12-04 09:49:22',1,2,1,0,0,0,0,1,NULL,NULL),(3,'Everybody',NULL,'All People In Course',2,3,'2008-12-04 09:49:22',1,NULL,1,0,0,0,0,1,NULL,'1,2,3'),(4,'Mathematics 1','MATH111','Mathematics 1',1,2,'2008-12-04 09:49:22',1,3,1,0,0,0,0,2,NULL,NULL),(5,'Tutorial Group A','TUTA','Tutorial Group A',4,3,'2008-12-04 09:49:22',1,NULL,1,0,0,0,0,2,NULL,NULL),(6,'Tutorial Group B','TUTB','Tutorial Group B',4,3,'2008-12-04 09:49:22',1,NULL,1,0,0,0,0,2,NULL,NULL),(7,'Moodle','Moodle','Moodle Test',1,2,'2008-12-04 09:49:22',1,50,2,0,0,0,0,1,NULL,NULL);
 /*!40000 ALTER TABLE `lams_organisation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1641,7 +1641,7 @@ CREATE TABLE `lams_qtz_simple_triggers` (
 
 LOCK TABLES `lams_qtz_simple_triggers` WRITE;
 /*!40000 ALTER TABLE `lams_qtz_simple_triggers` DISABLE KEYS */;
-INSERT INTO `lams_qtz_simple_triggers` VALUES ('Resend Messages Job trigger','DEFAULT',-1,3600000,1);
+INSERT INTO `lams_qtz_simple_triggers` VALUES ('Resend Messages Job trigger','DEFAULT',-1,3600000,2);
 /*!40000 ALTER TABLE `lams_qtz_simple_triggers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1699,7 +1699,7 @@ CREATE TABLE `lams_qtz_triggers` (
 
 LOCK TABLES `lams_qtz_triggers` WRITE;
 /*!40000 ALTER TABLE `lams_qtz_triggers` DISABLE KEYS */;
-INSERT INTO `lams_qtz_triggers` VALUES ('Resend Messages Job trigger','DEFAULT','Resend Messages Job','DEFAULT','0',NULL,1228351474656,1228347874656,'WAITING','SIMPLE',1228347874656,0,NULL,0,NULL);
+INSERT INTO `lams_qtz_triggers` VALUES ('Resend Messages Job trigger','DEFAULT','Resend Messages Job','DEFAULT','0',NULL,1228355074656,1228347874656,'WAITING','SIMPLE',1228347874656,0,NULL,0,NULL);
 /*!40000 ALTER TABLE `lams_qtz_triggers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -5836,4 +5836,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-12-03 23:53:21
+-- Dump completed on 2008-12-04  0:59:11
