@@ -14,16 +14,16 @@
   <form-beans>
 
     <form-bean
-      name="monitoringForm"
-      type="org.lamsfoundation.lams.tool.mdchce.web.forms.MonitoringForm"
+      name="learningForm"
+      type="org.lamsfoundation.lams.tool.mdchce.web.forms.LearningForm"
     />
     <form-bean
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.mdchce.web.forms.AuthoringForm"
     />
     <form-bean
-      name="learningForm"
-      type="org.lamsfoundation.lams.tool.mdchce.web.forms.LearningForm"
+      name="monitoringForm"
+      type="org.lamsfoundation.lams.tool.mdchce.web.forms.MonitoringForm"
     />
     <form-bean
       name="mdchce10AdminForm"
@@ -46,6 +46,21 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
+      path="/monitoring"
+      type="org.lamsfoundation.lams.tool.mdchce.web.actions.MonitoringAction"
+      name="monitoringForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="tiles:/monitoring/main"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/mdchce10admin"
       type="org.lamsfoundation.lams.tool.mdchce.web.actions.AdminAction"
       name="mdchce10AdminForm"
@@ -61,9 +76,9 @@
       />
     </action>
     <action
-      path="/monitoring"
-      type="org.lamsfoundation.lams.tool.mdchce.web.actions.MonitoringAction"
-      name="monitoringForm"
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.mdchce.web.actions.AuthoringAction"
+      name="authoringForm"
       scope="request"
       parameter="dispatch"
       unknown="false"
@@ -71,7 +86,12 @@
     >
       <forward
         name="success"
-        path="tiles:/monitoring/main"
+        path="tiles:/authoring/main"
+        redirect="false"
+      />
+      <forward
+        name="message_page"
+        path="tiles:/generic/message"
         redirect="false"
       />
     </action>
@@ -104,26 +124,6 @@
       <forward
         name="defineLater"
         path="tiles:/learning/defineLater"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.mdchce.web.actions.AuthoringAction"
-      name="authoringForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="tiles:/authoring/main"
-        redirect="false"
-      />
-      <forward
-        name="message_page"
-        path="tiles:/generic/message"
         redirect="false"
       />
     </action>
