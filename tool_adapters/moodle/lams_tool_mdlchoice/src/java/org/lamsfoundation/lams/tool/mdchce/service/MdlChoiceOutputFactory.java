@@ -21,71 +21,135 @@
  */
 package org.lamsfoundation.lams.tool.mdchce.service;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.tool.OutputFactory;
+import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.mdchce.dto.MdlChoiceOutputDTO;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoice;
+import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceUser;
+
 
 /**
  * Creates the output definitions for mdlchoice tool Adapter tool.
  */
 public class MdlChoiceOutputFactory extends OutputFactory {
 
-	protected final static String OUTPUT_NAME_LEARNER_CHOICE = "learner.choice.output";
+    protected final static String LEARNER_CHOICE_OUTPUT = "learner.choice.output";
 
-	public MdlChoiceOutputFactory() {
+    public MdlChoiceOutputFactory() {
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
+     */
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
+	    throws ToolException {
+
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+
+	if (toolContentObject != null) {
+	    List<MdlChoiceOutputDTO> choices = (List<MdlChoiceOutputDTO>) toolContentObject;
+	    
+	    if (choices == null || choices.size() == 0)
+	    {
+		log.error("Unable to build output definitions for moodel choice, no options have been added yet");
+	    }
+	    else{
+		ToolOutputDefinition definition = buildBooleanSetOutputDefinition(LEARNER_CHOICE_OUTPUT);
+		    if (definition.getDefaultConditions() == null)
+			definition.setDefaultConditions(new ArrayList<BranchCondition>());
+
+		    List<BranchCondition> defaultConditions = definition.getDefaultConditions();
+
+		    int order = 1;
+		    for (MdlChoiceOutputDTO dto : choices) {
+			String name = buildConditionName(LEARNER_CHOICE_OUTPUT, "" + dto.getId());
+			defaultConditions.add(new BranchCondition(null, null, new Integer(order++), name, dto.getChoice(),
+				OutputType.OUTPUT_BOOLEAN.toString(), null, null, Boolean.TRUE.toString()));
+			order++;
+		    }
+		    
+		    definition.setShowConditionNameOnly(Boolean.TRUE);
+		    definitionMap.put(LEARNER_CHOICE_OUTPUT, definition);
+	    }
+	} else {
+	    log.error("Unable to build output definitions for Vote as no tool content object supplied.");
 	}
 
-	/**
-	 * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
-	 */
-	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(
-			Object toolContentObject) throws ToolException {
-		TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	return definitionMap;
+    }
 
-		ToolOutputDefinition definition = buildLongOutputDefinition(
-				OUTPUT_NAME_LEARNER_CHOICE);
-		definitionMap.put(OUTPUT_NAME_LEARNER_CHOICE, definition);
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IMdlChoiceService dlChoiceService,
+	    Long toolSessionId, Long learnerId, MdlChoice mdlChoice, Long extSessionId) {
 
-		return definitionMap;
+	TreeMap<String, ToolOutput> map = new TreeMap<String, ToolOutput>();
+	if (names == null || names.contains(LEARNER_CHOICE_OUTPUT)) {
+	    map.put(LEARNER_CHOICE_OUTPUT, getExtToolOutput(LEARNER_CHOICE_OUTPUT, dlChoiceService,
+		    mdlChoice, learnerId, extSessionId.toString(), toolSessionId));
+	}
+	return map;
+
+    }
+
+    public ToolOutput getToolOutput(String name, IMdlChoiceService dlChoiceService, Long toolSessionId, Long learnerId,
+	    MdlChoice getToolOutput, Long extSessionId) {
+	if (name != null) {
+	    return getExtToolOutput(name, dlChoiceService, getToolOutput, learnerId, extSessionId.toString(),
+		    toolSessionId);
+	}
+	return null;
+
+    }
+
+    public ToolOutput getExtToolOutput(String outputName, IMdlChoiceService mdlChoiceService, MdlChoice mdlChoice,
+	    Long userId, String extToolContentId, Long toolSessionId) {
+	
+	MdlChoiceUser user = mdlChoiceService.getUserByUserIdAndSessionId(userId, toolSessionId);
+	boolean condition = this.isChoiceSelected(outputName, mdlChoiceService, mdlChoice, userId, extToolContentId, toolSessionId);
+	return new ToolOutput(outputName, getI18NText(outputName, true), condition);
+    }
+    
+    
+    private boolean isChoiceSelected(String outputName, IMdlChoiceService mdlChoiceService, MdlChoice mdlChoice,
+	    Long userId, String extToolContentId, Long toolSessionId)
+    {
+	String[] dcNames = splitConditionName(outputName);
+	if (dcNames[1] == null || dcNames[1].length() == 0) {
+	    log.error("Unable to convert the display order to an int for tool output "
+		    + LEARNER_CHOICE_OUTPUT
+		    + ". Returning false. Name doesn't contain the display order. Condition name was: " + outputName);
+	    return false;
+	}
+	
+	String choiceOutputName = "";
+	String choiceId = "";
+	try {
+	    choiceOutputName = dcNames[0];
+	    choiceId = dcNames[1];
+	} catch (Exception e) {
+	    log.error("Problem retrieving outputs"
+		    + LEARNER_CHOICE_OUTPUT
+		    + ". Returning false. Number format exception thrown. Condition name was: " + outputName, e);
+	    return false;
 	}
 
-	public SortedMap<String, ToolOutput> getToolOutput(List<String> names,
-			IMdlChoiceService dlChoiceService, Long toolSessionId,
-			Long learnerId, MdlChoice mdlChoice, Long extSessionId) {
-
-		TreeMap<String, ToolOutput> map = new TreeMap<String, ToolOutput>();
-		if (names == null || names.contains(OUTPUT_NAME_LEARNER_CHOICE)) {
-			map.put(OUTPUT_NAME_LEARNER_CHOICE, getExtToolOutput(
-					OUTPUT_NAME_LEARNER_CHOICE, dlChoiceService, mdlChoice,
-					learnerId, extSessionId.toString(), toolSessionId));
-		}
-		return map;
+	if (userId != null) {
+	    
+	    return mdlChoiceService.getExternalToolOutputBoolean(choiceOutputName, mdlChoice, userId, extToolContentId,
+			toolSessionId, choiceId); 
 	}
-
-	public ToolOutput getToolOutput(String name,
-			IMdlChoiceService dlChoiceService, Long toolSessionId,
-			Long learnerId, MdlChoice getToolOutput, Long extSessionId) {
-		if (name != null) {
-			return getExtToolOutput(name, dlChoiceService, getToolOutput,
-					learnerId, extSessionId.toString(), toolSessionId);
-		}
-		return null;
-
-	}
-
-	public ToolOutput getExtToolOutput(String outputName,
-			IMdlChoiceService mdlChoiceService, MdlChoice mdlChoice,
-			Long userId, String extToolContentId, Long toolSessionId) {
-		int number = mdlChoiceService.getExternalToolOutputInt(outputName,
-				mdlChoice, userId, extToolContentId, toolSessionId);
-		return new ToolOutput(outputName, getI18NText(outputName, true),
-				new Long(number));
-	}
+	return false;
+    }
+    
 
 }

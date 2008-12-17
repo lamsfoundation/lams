@@ -27,26 +27,23 @@ package org.lamsfoundation.lams.tool.mdchce.service;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.StringReader;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.TreeMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
@@ -73,10 +70,14 @@ import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mdchce.dao.IMdlChoiceConfigItemDAO;
 import org.lamsfoundation.lams.tool.mdchce.dao.IMdlChoiceDAO;
 import org.lamsfoundation.lams.tool.mdchce.dao.IMdlChoiceSessionDAO;
 import org.lamsfoundation.lams.tool.mdchce.dao.IMdlChoiceUserDAO;
+import org.lamsfoundation.lams.tool.mdchce.dto.MdlChoiceOutputDTO;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoice;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceConfigItem;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceSession;
@@ -85,9 +86,6 @@ import org.lamsfoundation.lams.tool.mdchce.util.MdlChoiceConstants;
 import org.lamsfoundation.lams.tool.mdchce.util.MdlChoiceException;
 import org.lamsfoundation.lams.tool.mdchce.util.MdlChoiceToolContentHandler;
 import org.lamsfoundation.lams.tool.mdchce.util.WebUtility;
-import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -95,6 +93,11 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * An implementation of the IMdlChoiceService interface.
@@ -192,8 +195,8 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
      */
     public Long copyExternalToolContent(HashMap<String, String> params) throws ToolException, Exception {
 
-	String cloneServletUrl = mdlChoiceConfigItemDAO.getConfigItemByKey(MdlChoiceConfigItem.KEY_EXTERNAL_TOOL_SERVLET)
-		.getConfigValue();
+	String cloneServletUrl = mdlChoiceConfigItemDAO.getConfigItemByKey(
+		MdlChoiceConfigItem.KEY_EXTERNAL_TOOL_SERVLET).getConfigValue();
 
 	// add the method to the params
 	params.put(EXT_SERVER_PARAM_METHOD, EXT_SERVER_METHOD_CLONE);
@@ -259,8 +262,8 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
 	}
     }
 
-    public int getExternalToolOutputInt(String outputName, MdlChoice mdlChoice, Long userId, String extToolContentId,
-	    Long toolSessionId) {
+    public boolean getExternalToolOutputBoolean(String outputName, MdlChoice mdlChoice, Long userId, String extToolContentId,
+	    Long toolSessionId, String optionID) {
 	MdlChoiceUser user = this.getUserByUserIdAndSessionId(userId, toolSessionId);
 	ExtServerOrgMap extServerMap = getExtServerOrgMap();
 
@@ -276,10 +279,11 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
 	    params.put(EXT_SERVER_PARAM_EXT_TOOL_CONTENT_ID, extToolContentId);
 	    params.put(EXT_SERVER_PARAM_METHOD, EXT_SERVER_METHOD_OUTPUT);
 	    params.put(EXT_SERVER_PARAM_OUTPUT_NAME, URLEncoder.encode(outputName, "UTF8"));
+	    params.put("optionID", URLEncoder.encode(optionID, "UTF8"));
 
 	    InputStream is = WebUtility.getResponseInputStreamFromExternalServer(outputServletUrl, params);
 	    BufferedReader isReader = new BufferedReader(new InputStreamReader(is));
-	    int ret = Integer.parseInt(isReader.readLine());
+	    boolean ret = Boolean.parseBoolean(isReader.readLine());
 	    return ret;
 	} catch (Exception e) {
 	    logger.debug("Failed getting external output", e);
@@ -316,8 +320,8 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
 	    return null;
 	}
 
-	return mdlChoiceOutputFactory.getToolOutput(name, this, toolSessionId, learnerId, session.getMdlChoice(), session
-		.getExtSessionId());
+	return mdlChoiceOutputFactory.getToolOutput(name, this, toolSessionId, learnerId, session.getMdlChoice(),
+		session.getExtSessionId());
     }
 
     /**
@@ -336,7 +340,72 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
 	if (mdchce == null) {
 	    mdchce = getDefaultContent();
 	}
-	return mdlChoiceOutputFactory.getToolOutputDefinitions(mdchce);
+	
+	List<MdlChoiceOutputDTO> choices = getPossibleChoices(mdchce);
+	
+	//HashMap<String, Object> map = new HashMap<String, Object>();
+	//map.put("toolContent", mdchce);
+	//map.put("choices", choices);
+	
+	return mdlChoiceOutputFactory.getToolOutputDefinitions(choices);
+    }
+
+    private List<MdlChoiceOutputDTO> getPossibleChoices(MdlChoice mdchce) {
+	try {
+	    if (mdchce.getExtToolContentId() == null)
+	    {
+		return new ArrayList<MdlChoiceOutputDTO>();
+	    }
+	    
+	    String servletUrl = mdlChoiceConfigItemDAO
+		    .getConfigItemByKey(MdlChoiceConfigItem.KEY_EXTERNAL_TOOL_SERVLET).getConfigValue();
+
+	    // Get the required params, then call the eternal server
+	    HashMap<String, String> params = this.getRequiredExtServletParams(mdchce);
+	    params.put(EXT_SERVER_PARAM_METHOD, EXT_SERVER_METHOD_EXPORT_GET_CHOICES);
+	    params.put(EXT_SERVER_PARAM_EXT_TOOL_CONTENT_ID, mdchce.getExtToolContentId().toString());
+
+	    // Make the request
+	    InputStream is = WebUtility.getResponseInputStreamFromExternalServer(servletUrl, params);
+	    BufferedReader isReader = new BufferedReader(new InputStreamReader(is));
+	    String str = isReader.readLine();
+	    if (str == null) {
+		throw new UserInfoFetchException("Fail to clone choice in .LRN:"
+			+ " - No data returned from external server");
+	    }
+	    
+	    return getChoicesFromString(str);
+
+	} catch (Exception e) {
+	    logger.error("Failed to call external server to copy tool content" + e);
+	    throw new ToolException("Failed to call external server to copy tool content" + e);
+	}
+
+    }
+
+    private List<MdlChoiceOutputDTO> getChoicesFromString(String string) {
+	try {
+	    List<MdlChoiceOutputDTO> choices = new ArrayList<MdlChoiceOutputDTO>();
+	    
+	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder db = dbf.newDocumentBuilder();
+	    Document document = db.parse(new InputSource(new StringReader(string)));
+	    NodeList list = document.getElementsByTagName("choice");
+
+	    for (int i = 0; i < list.getLength(); i++) {
+		NamedNodeMap markerNode = ((Node) list.item(i)).getAttributes();
+		String choice = markerNode.getNamedItem("option").getNodeValue();
+		long id = Long.parseLong(markerNode.getNamedItem("optionID").getNodeValue());
+		MdlChoiceOutputDTO dto = new MdlChoiceOutputDTO(id, choice);
+		choices.add(dto);
+	    }
+	    
+	    return choices;
+
+	} catch (Exception e) {
+	    logger.error("Problem parsing choices xml", e);
+	    throw new ToolException("Problem parsing choices xml" + e);
+	}
     }
 
     public String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp) {
@@ -649,8 +718,8 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
 		Object toolPOJO = exportContentService.importToolContent(toolContentPath, mdlChoiceToolContentHandler,
 			fromVersion, toVersion);
 		if (!(toolPOJO instanceof MdlChoice))
-		    throw new ImportToolContentException("Import MdlChoice tool content failed. Deserialized object is "
-			    + toolPOJO);
+		    throw new ImportToolContentException(
+			    "Import MdlChoice tool content failed. Deserialized object is " + toolPOJO);
 		MdlChoice mdlChoice = (MdlChoice) toolPOJO;
 		// reset it to new toolContentId
 		mdlChoice.setToolContentId(toolContentId);

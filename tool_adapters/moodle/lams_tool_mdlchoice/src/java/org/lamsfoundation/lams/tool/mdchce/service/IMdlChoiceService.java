@@ -45,6 +45,7 @@ public interface IMdlChoiceService {
     public static final String EXT_SERVER_METHOD_EXPORT = "export";
     public static final String EXT_SERVER_METHOD_OUTPUT = "output";
     public static final String EXT_SERVER_METHOD_EXPORT_PORTFOLIO = "export_portfolio";
+    public static final String EXT_SERVER_METHOD_EXPORT_GET_CHOICES = "getoptions";
 
     /**
      * Makes a copy of the default content and assigns it a newContentID
@@ -172,8 +173,8 @@ public interface IMdlChoiceService {
      * @param toolSessionId
      * @return
      */
-    public int getExternalToolOutputInt(String outputName, MdlChoice mdlChoice, Long userId, String extToolContentId,
-	    Long toolSessionId);
+    public boolean getExternalToolOutputBoolean(String outputName, MdlChoice mdlChoice, Long userId, String extToolContentId,
+	    Long toolSessionId, String choiceID);
 
     /**
      * Converts the customCSV parameter into a hashmap
