@@ -771,6 +771,7 @@ function choice_clone_instance($id, $sectionref, $courseid) {
         $existingchoice->text = addslashes($existingchoice->text);
         $existingchoice->course = $courseid;
         $existingchoice->is_lams = 1;
+        $existingchoice->format = 1;
         
     }
 	$existingchoice->id = insert_record('choice', $existingchoice);
@@ -783,15 +784,23 @@ function choice_clone_instance($id, $sectionref, $courseid) {
     $cm->module = $module->id;
     $cm->instance = $existingchoice->id;
     $cm->added = time();
-    $cm->section = $section->id;
+    $cm->section = $section->section;
 	$cm->is_lams = 1; 
     
     $cm->id = insert_record('course_modules', $cm);
 	
     //copy the old choice's options and create new records for the new choice's options
-	if ($options = get_records("choice_options", "choiceid", $existingchoice->old_id, "id")) {
+	if ($options = get_records("choice_options", "choiceid", $existingchoice->old_id)) {
             foreach ($options as $option) {
                 $option->choiceid = $existingchoice->id;
+                $option->text = addslashes($option->text);
+                insert_record("choice_options", $option);
+            }
+	}else{
+			for($i=1;$i<4;$i++) {
+                $option->choiceid = $existingchoice->id;
+                $option->text = "option ".$i;
+                $option->timemodified = time();
                 insert_record("choice_options", $option);
             }
 	}
@@ -816,7 +825,7 @@ function choice_export_instance($id) {
 	            header('Content-Description: File Transfer');
 	            header('Content-Type: text/plain');
 	            header('Content-Length: ' . strlen($s));
-	            echo $s;
+	            echo $s; 
 	            exit;
         }
        
@@ -872,20 +881,52 @@ function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
  * LAMS Function
  * Return a statistic for a given user in this Moodle choice for use in branching
  */
-/*function choice_get_tool_output($id, $userid) {
+function choice_get_tool_output($id, $userid,$optionid) {
     $cm = get_record('course_modules', 'id', $id);
-	//$choice=get_record('choice', 'id', $cm->instance);
     if ($cm) {
-		//$grade=choice_get_user_grades($choice, $userid);
-		$grade = get_record('choice_grades', 'userid', $userid, 'choice', $cm->instance);
-		if ($grade) {
-			return $grade->grade;
-		}else{
-			return 0;	
+    	$choice=get_record('choice', 'id', $cm->instance);
+		if ($choice) {
+			$option = get_record('choice_answers', 'choiceid', $choice->id, 'userid', $userid);
+			
+			if($option->optionid==$optionid){
+			
+					return true;
+			}else{
+			
+					return false;
+			}
 		}
     }
-    return 0;
-}*/
+}
+
+/**
+ * LAMS Function
+ * Return a all the options for a given ID Moodle Choice for use in branching
+ */
+function choice_get_options($id) {
+    $cm = get_record('course_modules', 'id', $id);
+	
+    if ($cm) {
+    
+    	$choice=get_record('choice', 'id', $cm->instance);
+		if ($choice) {
+					if ($options = get_records("choice_options", "choiceid", $choice->id, "id")) {
+							  header('Content-Type: text/plain');
+							  
+							  echo("<?xml version='1.0'?>");	
+							  echo('<choices>');		  
+				           	  foreach ($options as $option) {
+				            			$text=mb_ereg_replace('#', '_', $option->text);
+				            			//addslashes(
+				            			echo('<choice option="'.addslashes(utf8_decode($text)).'" optionID="'.$option->id.'"/>');
+				              			
+				              }
+				              echo('</choices>'); 
+					}
+			
+    	}
+    }
+}
 
 /**
  * LAMS Function
