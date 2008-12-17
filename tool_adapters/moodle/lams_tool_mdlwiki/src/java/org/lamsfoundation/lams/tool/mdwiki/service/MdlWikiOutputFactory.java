@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.mdwiki.service.IMdlWikiService;
 import org.lamsfoundation.lams.tool.mdwiki.model.MdlWiki;
 
 /**
@@ -36,7 +37,9 @@ import org.lamsfoundation.lams.tool.mdwiki.model.MdlWiki;
  */
 public class MdlWikiOutputFactory extends OutputFactory {
 
-    protected final static String OUTPUT_NAME_LEARNER_GRADE = "learner.percentage.grade";
+	protected final static String OUTPUT_NAME_LEARNER_NUM_ENTRIES = "learner.number.of.entries";
+    protected final static String OUTPUT_NAME_LEARNER_NUM_PAGES = "learner.number.of.pages";
+    protected final static String OUTPUT_NAME_LEARNER_NUM_ENTRIES_PAGES = "learner.number.of.entries.or.pages";
 
     public MdlWikiOutputFactory() {
     }
@@ -45,25 +48,39 @@ public class MdlWikiOutputFactory extends OutputFactory {
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
-	    throws ToolException {
-		TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+    throws ToolException {
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	
-		ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_GRADE, new Long(0), null);
-		definitionMap.put(OUTPUT_NAME_LEARNER_GRADE, definition);
+	ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_ENTRIES, new Long(0), null);
+	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_ENTRIES, definition);
 	
-		return definitionMap;
-    }
-
-    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IMdlWikiService dlWikiService,
+	ToolOutputDefinition definition2 = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_PAGES, new Long(0), null);
+	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_PAGES, definition2);
+	
+	ToolOutputDefinition definition3 = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_ENTRIES_PAGES, new Long(0), null);
+	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_ENTRIES_PAGES, definition3);
+	
+	return definitionMap;
+	}
+	
+	public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IMdlWikiService dlWikiService,
 	    Long toolSessionId, Long learnerId, MdlWiki mdlWiki, Long extSessionId) {
-
-		TreeMap<String, ToolOutput> map = new TreeMap<String, ToolOutput>();
-		if (names == null || names.contains(OUTPUT_NAME_LEARNER_GRADE)) {
-		    map.put(OUTPUT_NAME_LEARNER_GRADE, getExtToolOutput(OUTPUT_NAME_LEARNER_GRADE, dlWikiService,
-			    mdlWiki, learnerId, extSessionId.toString(), toolSessionId));
-		}
-		return map;
-    }
+	
+	TreeMap<String, ToolOutput> map = new TreeMap<String, ToolOutput>();
+	if (names == null || names.contains(OUTPUT_NAME_LEARNER_NUM_ENTRIES)) {
+	    map.put(OUTPUT_NAME_LEARNER_NUM_ENTRIES, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_ENTRIES, dlWikiService,
+		    mdlWiki, learnerId, extSessionId.toString(), toolSessionId));
+	}
+	if (names.contains(OUTPUT_NAME_LEARNER_NUM_PAGES)) {
+	    map.put(OUTPUT_NAME_LEARNER_NUM_PAGES, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_PAGES, dlWikiService,
+		    mdlWiki, learnerId, extSessionId.toString(), toolSessionId));
+	}
+	if (names.contains(OUTPUT_NAME_LEARNER_NUM_ENTRIES_PAGES)) {
+	    map.put(OUTPUT_NAME_LEARNER_NUM_ENTRIES_PAGES, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_ENTRIES_PAGES, dlWikiService,
+		    mdlWiki, learnerId, extSessionId.toString(), toolSessionId));
+	}
+	return map;
+}
 
     public ToolOutput getToolOutput(String name, IMdlWikiService dlWikiService, Long toolSessionId, Long learnerId,
 	    MdlWiki getToolOutput, Long extSessionId) {
