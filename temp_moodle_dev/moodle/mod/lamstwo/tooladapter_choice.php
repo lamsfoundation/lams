@@ -28,6 +28,7 @@
  	    $sectionid  = optional_param('section', 1, PARAM_INT);
  	    $courseid   = optional_param('cs', 1, PARAM_INT);
  	    $outputname = optional_param('oname', '', PARAM_TEXT);
+ 	    $optionid = optional_param('optionID', PARAM_INT);
  	
  	    $user = get_record('user', 'username', $username);
  	
@@ -48,8 +49,11 @@
  	            echo $text;
  	            break;
  	        case 'output':
- 	            $output = choice_get_tool_output($cmid, $user->id);
+ 	            $output = choice_get_tool_output($cmid, $user->id,$optionid);
  	            echo $output;
+ 	            break;
+ 	        case 'getoptions':
+ 	             choice_get_options($cmid);
  	            break;
  	        default:
  	    }
