@@ -1750,4 +1750,235 @@ function wiki_get_extra_capabilities() {
     return array('moodle/site:accessallgroups', 'moodle/site:viewfullnames');
 }
 
+/**
+ * LAMS Function
+ * This function clones an existing instance of Moodle wiki
+ * replacing the course and the userid
+ */
+function wiki_clone_instance($id, $sectionref, $courseid,$userid) {
+	global $CFG;
+	$cm = get_record('course_modules', 'id', $id);
+
+	if ( ! $cm ||$cm->instance==0) {
+        // create a new wiki with default content
+        $existingwiki->course = $courseid;
+        $existingwiki->name = "Wiki";
+        $existingwiki->summary = "";
+        $existingwiki->is_lams = 1;
+    } else {
+        // make a copy of an existing wiki
+        $existingwiki = get_record('wiki', 'id', $cm->instance);
+        $existingwiki->oldid = $existingwiki->id;
+    	unset($existingwiki->id);
+        $existingwiki->name = addslashes($existingwiki->name);
+        $existingwiki->summary = addslashes($existingwiki->summary);
+        $existingwiki->course = $courseid;
+        $existingwiki->is_lams = 1;
+    }
+	$existingwiki->id = wiki_add_instance($existingwiki);
+    $module = get_record('modules', 'name', 'wiki');
+    $section = get_course_section($sectionref, $courseid);
+    
+    // module parameters
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $existingwiki->id;
+    $cm->added = time();
+    $cm->section = $section->section;
+	$cm->is_lams = 1; 
+    $cm->course = $courseid;
+    $cm->id = insert_record('course_modules', $cm);
+	
+    //adds the new wiki to the sequence variable in section table
+    $existingwiki->section = $sectionref;
+    $existingwiki->coursemodule = $cm->id;
+    $existingwiki->instance = $cm->instance;
+         
+    require_once($CFG->dirroot.'/course/lib.php');
+    //add_mod_to_section($existingwiki);
+    
+    //add wiki entries
+    $entries= get_records("wiki_entries","wikiid",$existingwiki->oldid);
+    
+  	if ( $entries ) {
+          foreach ($entries as $entry) {
+	            $entry->wikiid = $existingwiki->id;
+	            $entry->course = $courseid;
+                $entry->timemodified = time();
+                $entry->oldid = $entry->id;
+                $entry->userid = $userid;
+                unset($entry->id);
+                $entry->id=insert_record("wiki_entries", $entry);
+                
+         		 //add wiki pages
+			    $pages= get_records("wiki_pages","wiki",$entry->oldid);
+			  	if ( $pages ) {
+			          foreach ($pages as $page) {
+			                $page->wiki = $entry->id;
+			                $page->course = $courseid;
+			                $page->lastmodified = time();
+			                $page->userid = $userid;
+			                unset($page->id);
+			                $page->id=insert_record("wiki_pages", $page);
+			                
+					 }
+				}
+                
+		 }
+	}
+	
+	
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Serialize a wiki instance and return serialized string to LAMS
+ */
+function wiki_export_instance($id) {
+    $cm = get_record('course_modules', 'id', $id);
+    if ($cm) {
+        if ($wiki = get_record('wiki', 'id', $cm->instance)) {
+            // serialize wiki into a string; assuming wiki object
+            // doesn't contain binary data in any of its columns
+            
+            //get all entries from the wiki
+            $entries = get_records('wiki_entries', 'wikiid', $wiki->id);
+            foreach ($entries as $entry) {
+	            //get all pages from the wiki
+	            $num=$entry->id;
+	            $pages[$num] = get_records('wiki_pages', 'wiki', $num);
+            }
+           
+            $all=array($wiki,$entries,$pages);
+            
+            $s = serialize($all);
+            header('Content-Description: File Transfer');
+            header('Content-Type: text/plain');
+            header('Content-Length: ' . strlen($s));
+            echo $s;
+            exit;
+        }
+    }
+
+    header('HTTP/1.1 500 Internal Error');
+    exit;
+}
+
+/**
+ * LAMS Function
+ * Deserializes a serialized Moodle wiki, and creates a new instance of it
+ */
+function wiki_import_instance($filepath, $userid, $courseid, $sectionid) {
+	
+	$filestr = file_get_contents($filepath);
+    
+    $all=unserialize($filestr);
+    //we split the array so we can get the wiki, entries and categories values
+    $wiki = $all[0];
+    $entries = $all[1];
+    $pages = $all[2];
+    
+  
+    // escape text columns for saving into database
+    
+    $wiki->name = addslashes($wiki->name);
+    $wiki->summary = addslashes($wiki->summary);
+
+    if ( ! $wiki->id = wiki_add_instance($wiki) ) {
+        return 0; 
+    }
+    $module = get_record('modules', 'name', 'wiki');
+    $section = get_course_section($sectionid, $courseid);
+ 
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $wiki->id;
+    $cm->added = time();
+    $cm->section = $section->id;
+	$cm->is_lams = 1; 
+    $cm->id = insert_record('course_modules', $cm);
+    
+ 	if($entries){
+	    foreach ($entries as $entry) {
+	   
+	    	$entry->wikiid=$wiki->id;
+	    	$entry->course=$courseid;
+	    	$entry->oldid=$entry->id;
+	    	$entry->userid = $userid;
+	    	$entry->id=insert_record('wiki_entries', $entry);
+				 if($pages){
+				 		$num=$entry->oldid;
+				 		//copy all pages from that entry
+				 		foreach ($pages[$num] as $p) {
+				    					$p->wiki=$entry->id;
+				    					$p->userid = $userid;
+				    					$p->id=insert_record('wiki_pages', $p); 
+				 		}
+			 	 }
+	    }
+ 	}
+	
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Return a statistic for a given user in this Moodle wiki for use in branching 
+ */
+function wiki_get_tool_output($id,$outputname,$userid) {
+	
+	
+	
+    $cm = get_record('course_modules', 'id', $id);
+   
+    if ($cm) {
+    	if ($wiki = get_record('wiki', 'id', $cm->instance)) {
+    			$entries= get_records("wiki_entries","wikiid",$wiki->id);
+    			$numentries=0;
+		        $numpages=0;
+		        if ($entries) {
+		        	foreach ($entries as $entry) {
+		        		if($entry->userid==$userid){
+				            			//number of entries 
+				            			$numentries++;
+				        }
+			            $pages = get_records('wiki_pages', 'wiki', $entry->id);
+			            if($pages){
+				            foreach ($pages as $page) {
+				            	if($page->userid==$userid){
+				            			//number of pages 
+				            			$numpages++;
+				            	}
+				            }
+			            }
+            		}
+		        }
+		        switch ($outputname) {
+		            case ("learner.number.of.entries"):
+		                return $numentries;
+		            case ("learner.number.of.pages"):
+		                return $numpages;
+		            case ("learner.number.of.entries.or.pages"):
+		            	//number of pages or entries
+		                return $numpages+$numentries;
+		        }
+    	}
+      
+    }
+    return 0;
+}
+
+/**
+ * LAMS Function
+ * Return an HTML representation of a user's activity in this wiki
+ */
+function wiki_export_portfolio($id, $userid) {
+    global $CFG;
+    $text = 'This tool does not support export portfolio.  It may be accessible via ';
+    $text .= '<a href="'.$CFG->wwwroot.'/mod/wiki/view.php?id='.$id.'">this</a> link.';
+    return $text;
+
+}
+
 ?>
