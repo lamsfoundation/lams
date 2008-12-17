@@ -87,10 +87,12 @@ class mod_wiki_mod_form extends moodleform_mod {
         $features->groups = true;
         $features->groupings = true;
         $features->groupmembersonly = true;
-        $this->standard_coursemodule_elements($features);
+        $this->standard_hidden_coursemodule_elements();
 //-------------------------------------------------------------------------------
 // buttons
-        $this->add_action_buttons();
+ 		// button “save and display” at the end of the form
+        $this->add_action_buttons(false,null,false);
+        //$this->add_action_buttons();
 
     }
 }
