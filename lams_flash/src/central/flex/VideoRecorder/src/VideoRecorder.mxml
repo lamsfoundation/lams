@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="680" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]" xmlns:ns1="*" height="652" creationComplete="init()" enabled="false">
+
+	<mx:Script>
+		<![CDATA[
+			// imports
+			import mx.events.MetadataEvent;		
+			import mx.containers.TitleWindow;
+			import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.rpc.events.FaultEvent;
+			import mx.controls.Alert;
+			import mx.collections.XMLListCollection;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.HTTPService;
+			import adobe.utils.CustomActions;
+			import mx.controls.advancedDataGridClasses.AdvancedDataGridGroupItemRenderer;
+			import mx.controls.advancedDataGridClasses.AdvancedDataGridItemRenderer;
+			import mx.events.ListEvent;
+			import mx.collections.HierarchicalData;
+			import mx.core.mx_internal;
+			import mx.managers.PopUpManager;
+			
+			// connection-related
+			private var nc:NetConnection;
+			private var ns:NetStream;
+			private var cam:Camera;
+			private var mic:Microphone;
+			private var filename:String = "";
+			private var itemClicked:Object = null;
+			
+			// flags
+			private var isCameraViewed:Boolean = false;
+			private var isPublishing:Boolean = false;
+			private var isVideoPaused:Boolean = false;
+			private var isVideoPlaying:Boolean = false;
+			
+			// from flashvars
+			private var contentEditable:Boolean;
+			private var userId:int;
+			private var toolSessionId:int;
+			private var allowUseVoice:Boolean;
+			private var allowUseCamera:Boolean;
+			private var allowLearnerVideoVisibility:Boolean;
+			private var allowLearnerVideoExport:Boolean;
+			
+			// ui stuff
+			private var getDetailsPopUp:GetRecordingDetailsPopUp;
+			private var videoContainer:Video;
+			private var video:Video = new Video(320, 240);
+			[Bindable] private var videoRecordings:HierarchicalData;
+			
+			// ugly callback stuff
+			NetConnection.prototype.onBWDone = function(infoObject) {
+				// print its properties
+    			Application.application.printInfoObject("onBWDone", infoObject)
+			}
+			
+			public function onPlayStatus(infoObject:Object){
+				// print its properties
+				printInfoObject("onPlayStatus", infoObject);
+    			
+    			switch(infoObject.code){
+    				case "NetStream.Play.Start":{
+						var i:int = 0;
+						i++;
+						break;
+    				}
+    				case "NetStream.Play.Complete":{
+						playClick();
+						break;
+    				}
+    				default:
+    			}
+			}
+			
+			public function onMetaData(infoObject:Object){
+				// print its properties
+				printInfoObject("onMetaData", infoObject);
+			}			
+			
+			// called from creationComplete
+			private function init():void {
+				// get flashvars
+				getFlashVars();
+				
+				// for testing purposes (when running in debug)
+				if(toolSessionId == 0){
+					userId = 1;
+					toolSessionId = 1;
+				}
+			
+				/*
+				Alert.show(
+					"contentEditable: " + contentEditable +
+					"\nuserId: " + userId +
+					"\ntoolSessionId: " + toolSessionId +
+					"\nallowUseVoice: " + allowUseVoice +
+					"\nallowUseCamera: " + allowUseCamera +
+					"\nallowLearnerVideoVisibility: " + allowLearnerVideoVisibility +
+					"\nallowLearnerVideoExport: " + allowLearnerVideoExport);
+				*/
+												
+				createConnection();
+			}
+			
+			// gets flashvars from request
+			private function getFlashVars():void{
+				contentEditable = stringToBool(Application.application.parameters.contentEditable);
+				userId = Application.application.parameters.userId;
+				toolSessionId = Application.application.parameters.toolSessionId;
+				allowUseVoice = stringToBool(Application.application.parameters.allowUseVoice);
+				allowUseCamera = stringToBool(Application.application.parameters.allowUseCamera);
+				allowLearnerVideoVisibility = stringToBool(Application.application.parameters.allowLearnerVideoVisibility);
+				allowLearnerVideoExport = stringToBool(Application.application.parameters.allowLearnerVideoExport);
+			}
+			
+			private function createConnection():void{
+				// create basic netConnection object
+				nc = new NetConnection();
+			
+				// add some listeners to it
+				nc.addEventListener(NetStatusEvent.NET_STATUS, ncStatusHandler);
+				nc.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+				
+				// connect to the local Red5 server and wait for callback
+				nc.connect("rtmp://172.20.100.220/oflaDemo");
+				
+				// wait for NetStatusEvent to be thrown
+			}
+			
+			// callback called on NetConnection connect event
+			private function ncStatusHandler(event:NetStatusEvent):void {
+				// get the info object
+				var infoObject:Object = event.info;
+				
+				// print its properties
+				printInfoObject("ncStatusHandler", infoObject);
+  
+				// if successful connection
+				if (infoObject.code == "NetConnection.Connect.Success") {
+					// enable application
+					Application.application.enabled = true;
+					
+					// call server and get recordings, update datagrid with results
+					getRecordingsFromServer();
+					
+					// create netstream
+					ns = new NetStream(nc);
+					//ns.client = this;
+					ns.bufferTime = 5;
+					
+					// add listeners
+					ns.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
+					ns.addEventListener(NetStatusEvent.NET_STATUS, nsStatusHandler);
+					ns.addEventListener(MetadataEvent.METADATA_RECEIVED, nsMetaDataHandler);
+					ns.client = this;
+
+					// fix video player and attach the netstream to it
+					player.addChild(video);
+					video.visible = true;
+					video.attachNetStream(ns);
+				
+					// get references to the camera and mic
+					mic = Microphone.getMicrophone();
+					cam = Camera.getCamera();
+					
+					// setup some simple settings with the cam and mic for quality
+					setupCameraMic();
+						
+					// attach webcam and mic
+					ns.attachCamera(cam);
+					ns.attachAudio(mic);
+				}
+				else{					
+    				// pop an alert
+					Alert.show("NetConnection not connected");
+				}
+			}
+			
+			// callback called on NetStream connect event
+			private function nsStatusHandler(event:NetStatusEvent):void {
+				// get the info object
+				var infoObject:Object = event.info;
+				
+				// print its properties
+				printInfoObject("nsStatusHandler", infoObject);
+				
+				switch(infoObject.code){
+					case "NetStream.Play.Start":{
+						break;
+					}
+					case "NetStream.Play.Stop":{
+						break;
+					}
+					case "NetStream.Buffer.Empty":{
+						break;
+					}
+					case "NetStream.Buffer.Full":{
+						break;
+					}
+					case "NetStream.Buffer.Flush":{
+						break;
+					}
+					case "NetStream.Play.Start":{
+						var i:int = 0;
+						i++;
+						break;
+					}
+					case "NetStream.Pause.Notify":{
+						var i:int = 0;
+						i++;
+						break;
+					}
+					case "NetStream.Unpause.Notify":{
+						var i:int = 0;
+						i++;
+						break;
+					}
+					default:
+				}
+			}
+			
+			// callback called on NetStream connect event
+			private function nsMetaDataHandler(event:MetadataEvent):void {
+				// get the info object
+				var infoObject:Object = event.info;
+				
+				// print its properties
+				printInfoObject("nsMetaDataHandler", infoObject);
+			}
+			
+			// creates an httpservice and gets video recordings
+			private function getRecordingsFromServer():void{
+				var videoRecorderActions:HTTPService = new HTTPService();
+				videoRecorderActions.url = "http://172.20.100.220:8080/lams/tool/lavidr10/videoRecorderActions.do";
+				videoRecorderActions.method = "POST";
+				videoRecorderActions.resultFormat = "e4x";
+				videoRecorderActions.request.method = "getRecordingsByToolSessionIdAndUserId";
+				videoRecorderActions.request.toolSessionId = toolSessionId;
+				videoRecorderActions.request.userId = 0;
+				videoRecorderActions.addEventListener(ResultEvent.RESULT, getRecordingsSuccessHandler);
+				videoRecorderActions.addEventListener(FaultEvent.FAULT, getRecordingsFaultHandler);
+				
+				videoRecorderActions.send();
+			}
+			
+			// creates an httpservice and saves a video recording
+        	private function saveRecordingToServer(userId:int, title:String, description:String, filename:String, rating:Number, toolSessionId:int, recordingId:int):void{
+				var videoRecorderActions:HTTPService  = new HTTPService();
+				videoRecorderActions.url = "http://172.20.100.220:8080/lams/tool/lavidr10/videoRecorderActions.do";
+				videoRecorderActions.method = "POST";
+				videoRecorderActions.resultFormat = "e4x";
+				videoRecorderActions.request.method = "saveRecording";
+				videoRecorderActions.request.userId = userId;
+				videoRecorderActions.request.recordingId = recordingId;
+				videoRecorderActions.request.title = title;
+				videoRecorderActions.request.rating = rating;
+				videoRecorderActions.request.description = description;
+				videoRecorderActions.request.filename = filename;
+				videoRecorderActions.request.toolSessionId = toolSessionId;
+				videoRecorderActions.addEventListener(ResultEvent.RESULT, saveRecordingSuccessHandler);
+				videoRecorderActions.addEventListener(FaultEvent.FAULT, saveRecordingFaultHandler);
+				
+				videoRecorderActions.send();
+        	}
+        	
+        	// handler for successful get recordings
+			private function getRecordingsSuccessHandler(e:ResultEvent):void {
+	        	videoRecordings = new HierarchicalData(e.result.recordings.userFolder);
+				videoRecordings.childrenField = "child";
+	        }
+	        
+	        // fault handler for get recordings
+	      	private function getRecordingsFaultHandler(e:FaultEvent):void {
+	      		Alert.show(e.toString());
+	        }
+	        
+	        // handler for successful save recording
+			private function saveRecordingSuccessHandler(e:ResultEvent):void {
+	        	Alert.show("Recording successfully saved");
+	        	getRecordingsFromServer();
+	        }
+	        
+	        // fault handler for save recording
+	      	private function saveRecordingFaultHandler(e:FaultEvent):void {
+	      		Alert.show(e.toString());
+	        }
+	        
+			private function securityErrorHandler(event:SecurityErrorEvent):void {
+				trace("securityErrorHandler: " + event);
+			}
+	
+			private  function asyncErrorHandler(event:AsyncErrorEvent):void {
+				trace("securityErrorHandler: " + event);
+			} 
+        
+        	// handler called when the confirm action ("ok", "cancel", "save") on a popup is hit
+        	private function popUpRemovedHandler(event:Event):void{
+        		// if the given popup is of type getDetailsPopUp
+        		if(event.target == getDetailsPopUp){
+        			// get the details
+        			var title:String = getDetailsPopUp.titleInput.text;
+        			var description:String = getDetailsPopUp.descriptionInput.text;
+        			var recordingId:int = -1;
+        			var rating:Number = 0;
+        			
+        			// call the http service to save a recording
+        			saveRecordingToServer(userId, title, description, filename + ".flv", rating, toolSessionId, recordingId);
+        		}
+        		
+        		// no matter what popup, close it
+        		if(event.target is TitleWindow){
+        			PopUpManager.removePopUp(TitleWindow(event.target));
+        		}
+        	}
+        	
+        	// click handler for startPublish button
+			private function viewCameraAndPublishClick():void{
+				if(isPublishing || !isCameraViewed){
+					viewCameraClick();
+					publishClick();
+				}
+				else{
+					publishClick();
+				}
+			}
+			
+			// click handler for viewCamera button
+			private function viewCameraClick():Boolean {
+				// if camera is not being used
+				if(!isCameraViewed){
+					// check to see if a video was playing
+					if(isVideoPlaying){
+						ns.close();
+					}
+				
+					//change the view stack
+					videoViewStack.selectedChild = recorderView;
+					
+					// attach the cam to the videoDisplay
+					videoDisplay.attachCamera(cam);
+					isCameraViewed = true;
+					
+					// change the view camera button's label
+					viewCameraButton.label = "Stop Camera";
+					
+					setEnabledPlaybackButtonsAndDataGrid(false);
+				}
+				// if camera is being used
+				else {
+					// clear the videoDisplay
+					videoDisplay.attachCamera(null);
+					isCameraViewed = false;
+					
+					// change view
+					videoViewStack.selectedChild = blackView;
+					
+					// change the view camera button's label
+					viewCameraButton.label = "View Camera";
+					
+					setEnabledPlaybackButtonsAndDataGrid(true);
+				}
+				
+				return isCameraViewed;
+			}
+			
+			// called from viewCameraClick() (not really a handler)
+			private function publishClick():Boolean {
+				// if not publishing
+				if(!isPublishing){
+					// create video filename
+					filename = "lamsRecording_session" + toolSessionId + "_user" + userId + "_" + Math.random();
+					// publish video to media server
+					ns.publish(filename, "record");
+					isPublishing = true;
+					
+					// change the start recording button's label
+					startRecButton.label = "Stop Recording";
+					viewCameraButton.enabled = false;				
+				}
+				// if recording
+				else {
+					// close the netStream object
+					ns.close();
+					isPublishing = false;
+					
+					// change the start recording button's label
+					startRecButton.label = "Start Recording";
+					viewCameraButton.enabled = true;
+					
+					getDetailsPopUp = GetRecordingDetailsPopUp(PopUpManager.createPopUp(this, GetRecordingDetailsPopUp, true));
+					PopUpManager.centerPopUp(getDetailsPopUp);
+					getDetailsPopUp.init(null, null);
+					getDetailsPopUp.addEventListener("popUpClose", popUpRemovedHandler);
+				}
+				
+				return isPublishing; 
+			}
+			
+			// click handler for the videoDataGrid list
+			private function videoDataGridClick(event:ListEvent):void {
+				// if video is playing
+				if(isVideoPlaying || isVideoPaused){
+					// close stream
+					resetVideo();
+				}
+				
+				// store last item clicked
+				itemClicked = event.itemRenderer.data;
+				
+				// update video text info
+				if(!itemClicked.hasOwnProperty("child") && videoDataGrid.enabled){
+					title.text = itemClicked.title;
+					description.text = itemClicked.description;
+					author.text = itemClicked.author;
+					notes.text = itemClicked.notes
+					
+					playVideo(itemClicked.filename);
+				}
+				else{
+					itemClicked = null;
+				}
+			}
+			
+			private function playVideo(filename:String):void{
+				// change the view stack to player view
+				videoViewStack.selectedChild = playerView;
+				
+				// open new stream
+				ns.play(filename);
+				ns.seek(0);
+				ns.pause();
+				isVideoPlaying = false;
+				isVideoPaused = true;
+			}
+			
+			// resume the paused netstream video
+			private function playClick():void {
+				// if video is not currently playing
+				if(!isVideoPlaying){
+					// if the last item clicked is not null
+					if(itemClicked != null){
+						// play stream
+						isVideoPaused = false;
+						isVideoPlaying = true;
+						ns.resume();
+						
+						playButton.label = "Stop";
+					}
+				}
+				else{
+					resetVideoStillClicked();
+					playButton.label = "Play";
+				}
+
+			}
+			
+			private function resetVideoStillClicked():void{
+				ns.seek(0);
+				isVideoPaused = true;
+				isVideoPlaying = false;
+				
+				playButton.label = "Play";
+			}
+			
+			private function resetVideo():void{
+				ns.close();
+				isVideoPaused = false;
+				isVideoPlaying = false;
+				
+				playButton.label = "Play";
+			}
+			
+			// sets up camera and mic
+			private function setupCameraMic():void {
+				// setting dimensions and framerate
+				cam.setMode(320, 240, 30);
+				// set to minimum of 70% quality
+				cam.setQuality(0,70);
+				
+				// setup mic
+				mic.rate = 44;
+			}
+			
+	        // convert a string to a boolean
+	        private function stringToBool(string:String):Boolean{
+	        	switch(string){
+	        		case "1":
+	        		case "true":
+	        		case "yes":
+	        			return true;
+	        		case "0":
+	        		case "false":
+	        		case "no":
+	        			return false;
+	        		default:
+	        		return Boolean(string);
+	        	}
+	        }
+	        
+	        private function printInfoObject(caller:String, infoObject:Object):void{
+	        	trace("caller: " + caller);
+	       		for (var prop in infoObject) {
+        			trace("\t"+prop+":\t"+infoObject[prop]);
+    			}
+	        }
+	        
+			private function recordingLabelFunction(row:Object, column:AdvancedDataGridColumn):String 
+			{
+				return row.title;
+			}
+			
+			private function createDateLabelFunction(row:Object, column:AdvancedDataGridColumn):String 
+			{
+				return row.createDate;
+			}
+
+			private function setEnabledPlaybackButtonsAndDataGrid(enabled:Boolean):void{
+				playButton.enabled = enabled;
+				deleteButton.enabled = enabled;
+				exportButton.enabled = enabled;
+				refreshButton.enabled = enabled;
+				videoDataGrid.enabled = enabled;
+			}
+			
+			private function setEnabledPlaybackButtonsSep(en1:Boolean, en2:Boolean, en3:Boolean, en4:Boolean):void{
+				playButton.enabled = en1;
+				deleteButton.enabled = en2;
+				exportButton.enabled = en3;
+				refreshButton.enabled = en4;
+			}
+			
+			private function setEnabledRecordingButtons(enabled:Boolean):void{
+				startRecButton.enabled = enabled;
+				viewCameraButton.enabled = enabled;
+			}
+
+			private function setEnabledRecordingButtonsSep(en1:Boolean, en2:Boolean):void{
+				startRecButton.enabled = en1;
+				viewCameraButton.enabled = en2;
+			}
+			
+	    ]]>
+	</mx:Script>
+
+	<mx:Panel width="340" height="280" layout="absolute" left="10" top="10" title="Display:" id="videoPanel">
+		<mx:ViewStack id="videoViewStack" width="100%" height="100%" creationPolicy="all">
+			<mx:Canvas id="recorderView" width="100%" height="100%">
+				<mx:VideoDisplay width="320" height="240" id="videoDisplay" visible="true"/>
+			</mx:Canvas>
+			<mx:Canvas id="blackView" width="100%" height="100%" backgroundColor="#000000">
+			</mx:Canvas>
+			<mx:Canvas id="playerView" width="100%" height="100%" backgroundColor="#000000">
+				<mx:UIComponent id="player" width="100%" height="100%" />
+			</mx:Canvas>
+		</mx:ViewStack>
+	</mx:Panel>
+	<mx:AdvancedDataGrid id="videoDataGrid" x="358" y="38" width="312" height="548" selectionMode="singleRow" showHeaders="true" dataProvider="{videoRecordings}" itemClick="videoDataGridClick(event)" sortableColumns="true" displayItemsExpanded="true" resizableColumns="false">
+		<mx:columns>
+			<mx:AdvancedDataGridColumn headerText="Author and Title" dataField="recording" labelFunction="recordingLabelFunction"/>
+			<mx:AdvancedDataGridColumn headerText="Create Date" dataField="createDate" labelFunction="createDateLabelFunction"/>
+		</mx:columns>
+    </mx:AdvancedDataGrid>
+	<mx:VBox x="10" y="324" width="340" height="262" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" horizontalScrollPolicy="off" borderStyle="solid">
+		<mx:Label text="Title:" fontStyle="italic"/>
+		<mx:Text width="100%" id="title"/>
+		<mx:HRule width="100%"/>
+		<mx:HBox width="100%" height="54">
+			<mx:VBox width="177" height="50">
+				<mx:Label text="Author:" fontStyle="italic"/>
+				<mx:Text width="100%" id="author"/>
+			</mx:VBox>
+			<mx:Spacer width="100%"/>
+			<mx:VBox width="132" height="52">
+				<mx:Label text="Rating:" fontStyle="italic"/>
+			</mx:VBox>
+		</mx:HBox>
+		<mx:HRule width="100%"/>
+		<mx:Label text="Description:" fontStyle="italic"/>
+		<ns1:ResizeableTextArea id="description" width="100%" wordWrap="true" editable="false" verticalScrollPolicy="off" height="20" borderStyle="none"/>
+		<mx:HRule width="100%"/>
+		<mx:Label text="Monitor Notes:" fontStyle="italic"/>
+		<ns1:ResizeableTextArea width="100%" id="notes" wordWrap="true" editable="true" verticalScrollPolicy="off" height="20"/>
+	</mx:VBox>
+	<mx:Label x="10" y="298" text="Video information:" fontWeight="bold"/>
+	<mx:HBox x="10" y="594" width="660" height="48">
+		<mx:VBox width="338" height="100%">
+			<mx:Label text="Recording controls:" fontWeight="bold"/>
+			<mx:HBox width="100%" height="100%">
+				<mx:Button label="View Camera" id="viewCameraButton" click="viewCameraClick()"/>
+				<mx:Button label="Start Recording" fontWeight="bold" id="startRecButton" click="viewCameraAndPublishClick()"/>
+			</mx:HBox>
+		</mx:VBox>
+		<mx:VBox width="100%" height="100%">
+			<mx:VBox width="100%" height="100%" horizontalAlign="right">
+				<mx:Label text="Playback controls:" fontWeight="bold"/>
+				<mx:HBox width="100%" horizontalAlign="right">
+					<mx:Button label="Refresh" id="refreshButton" click="getRecordingsFromServer()"/>
+					<mx:Button label="Play" id="playButton" click="playClick()"/>
+					<mx:Button label="Delete" id="deleteButton"/>
+					<mx:Button label="Export" id="exportButton"/>
+				</mx:HBox>
+			</mx:VBox>
+		</mx:VBox>
+	</mx:HBox>
+	<mx:HRule width="100%" x="10" y="594"/>
+	<mx:HBox x="358" y="10" width="312">
+		<mx:Label text="Videos:" fontWeight="bold"/>
+	</mx:HBox>
+	
+</mx:Application>
