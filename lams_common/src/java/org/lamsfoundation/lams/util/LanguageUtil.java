@@ -109,11 +109,24 @@ public class LanguageUtil {
 	}
 	
 	/**
-	 * Returns server default locale.
+	 * Returns server default locale; if invalid, uses en_AU.
 	 */
 	public static SupportedLocale getDefaultLocale() {
 		String localeName = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
-		return getSupportedLocale(localeName.substring(0,2),localeName.substring(3));
+		String langIsoCode = DEFAULT_LANGUAGE;
+		String countryIsoCode = DEFAULT_COUNTRY;
+		if (StringUtils.isNotBlank(localeName) && localeName.length() > 2) {
+        		langIsoCode = localeName.substring(0,2);
+        		countryIsoCode = localeName.substring(3);
+		}
+		
+		SupportedLocale locale = null;
+		locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+		if (locale == null) {
+		    locale = getSupportedLocaleOrNull(DEFAULT_LANGUAGE, DEFAULT_COUNTRY); 
+		}
+		
+		return locale;
 	}
 	
 	/**
@@ -134,11 +147,24 @@ public class LanguageUtil {
     }
     
 	/**
-	 * Finds a locale based on language and/or country.
+	 * Finds a locale based on language and/or country, use server locale if invalid.
 	 */
 	public static SupportedLocale getSupportedLocale(String langIsoCode, String countryIsoCode) {
 		SupportedLocale locale = null;
-		Map<String, Object> properties = new HashMap<String, Object>();
+		
+		locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+		if (locale == null) {
+		    locale = getDefaultLocale();
+		}
+		
+		return locale;
+	}
+	
+	// Given langIsoCode and countryIsoCode, returns SupportedLocale (null if doesn't exist)
+	private static SupportedLocale getSupportedLocaleOrNull(String langIsoCode, String countryIsoCode) {
+	    	SupportedLocale locale = null;
+	    	
+	    	Map<String, Object> properties = new HashMap<String, Object>();
 		
 		if (StringUtils.isNotBlank(countryIsoCode)) {
 			properties.put("countryIsoCode", countryIsoCode.trim());
@@ -146,9 +172,9 @@ public class LanguageUtil {
 		if (StringUtils.isNotBlank(langIsoCode)) {
 			properties.put("languageIsoCode", langIsoCode.trim());
 		}
-		
+	    	
 		if (properties.isEmpty()) {
-			return getDefaultLocale();
+			return null;
 		}
 		
 		List list = getService().findByProperties(SupportedLocale.class, properties);
@@ -156,9 +182,8 @@ public class LanguageUtil {
 			Collections.sort(list);
 			locale = (SupportedLocale)list.get(0);
 		} else {
-			locale = getDefaultLocale();
+			locale = null;
 		}
-		
 		return locale;
 	}
 
