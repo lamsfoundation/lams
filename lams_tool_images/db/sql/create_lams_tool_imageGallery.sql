@@ -65,8 +65,6 @@ create table tl_laimag10_imageGallery_item (
    file_version_id bigint,
    file_type varchar(255),
    file_name varchar(255),
-   average_rating FLOAT(7,1) DEFAULT 0,
-   number_ratings integer DEFAULT 0,
    primary key (uid)
 )type=innodb;
 create table tl_laimag10_image_comment (

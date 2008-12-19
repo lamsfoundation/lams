@@ -148,6 +148,15 @@ public interface IImageGalleryService {
      * @return
      */
     Set<ImageGalleryItem> getImagesForGroup(ImageGallery imageGallery, Long sessionId);
+    
+    /**
+     * Calculates average rating and number of rating for the current group.
+     * 
+     * @param imageUid
+     * @param sessionId
+     * @return Object[] {numberRatings, averageRating}
+     */
+    Object[] getRatingForGroup(Long imageUid, Long sessionId);
 
     /**
      * Save/update current ImageGalleryItem.

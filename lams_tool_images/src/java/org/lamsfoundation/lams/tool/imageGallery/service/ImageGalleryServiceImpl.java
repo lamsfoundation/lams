@@ -1129,6 +1129,31 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return images;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    public Object[] getRatingForGroup(Long imageUid, Long sessionId) {
+	List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(sessionId);
+	Long numberRatings = new Long(0);
+	Float averageRating = new Float(0);
+	List<ImageRating> ratings = imageRatingDao.getImageRatingsByImageUid(imageUid);
+	for (ImageRating rating : ratings) {
+	    for (ImageGalleryUser user : users) {
+		if (rating.getCreateBy().getUserId().equals(user.getUserId())) {
+		    numberRatings++;
+		    averageRating += rating.getRating();
+		}
+	    }
+	}
+
+	
+	if (! numberRatings.equals(new Long(0))) {
+	    averageRating = averageRating / numberRatings;
+	}
+	
+	return  new Object[] {numberRatings, averageRating};
+    }
+    
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -1187,33 +1212,4 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return userContribution;
     }
     
-    /**
-     * Calculates average rating and number of rating for the current group.
-     * 
-     * @param imageUid
-     * @param sessionId
-     * @return
-     */
-    private Object[] getRatingForGroup(Long imageUid, Long sessionId) {
-	List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(sessionId);
-	Long numberRatings = new Long(0);
-	Float averageRating = new Float(0);
-	List<ImageRating> ratings = imageRatingDao.getImageRatingsByImageUid(imageUid);
-	for (ImageRating rating : ratings) {
-	    for (ImageGalleryUser user : users) {
-		if (rating.getCreateBy().getUserId().equals(user.getUserId())) {
-		    numberRatings++;
-		    averageRating += rating.getRating();
-		}
-	    }
-	}
-
-	
-	if (! numberRatings.equals(new Long(0))) {
-	    averageRating = averageRating / numberRatings;
-	}
-	
-	return  new Object[] {numberRatings, averageRating};
-    }
-
 }

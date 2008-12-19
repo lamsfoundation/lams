@@ -84,7 +84,7 @@
 				<table cellpadding="0" class="alternative-color" >
 			
 					<tr>
-						<th width="100px">
+						<th width="150px">
 							<fmt:message key="label.monitoring.imagesummary.user" />
 						</th>
 						<c:if test="${imageGallery.allowVote}">				
@@ -93,7 +93,7 @@
 							</th>
 						</c:if>
 						<c:if test="${imageGallery.allowRank}">					
-							<th width="50px">
+							<th style="padding-left:0px; text-align:center; width: 100px;">
 								<fmt:message key="label.monitoring.imagesummary.rating" />
 							</th>
 						</c:if>						

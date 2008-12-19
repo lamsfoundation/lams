@@ -81,10 +81,6 @@ public class ImageGalleryItem implements Cloneable {
     //Set of user comments
     private Set comments;
     
-    private float averageRating;
-    
-    private int numberRatings;
-    
     //*************** NON Persist Field (only for exporting) ********************
     private String attachmentLocalUrl;
 
@@ -385,48 +381,6 @@ public class ImageGalleryItem implements Cloneable {
 
     public void setComments(Set comments) {
 	this.comments = comments;
-    }
-    
-    /**
-     * Returns image average rating.
-     * 
-     * @return image average rating
-     * 
-     * @hibernate.property column="average_rating"
-     */
-    public float getAverageRating() {
-	return averageRating;
-    }
-
-    /**
-     * Sets image average rating.
-     * 
-     * @param averageRating
-     *                image average rating
-     */
-    public void setAverageRating(float averageRating) {
-	this.averageRating = averageRating;
-    }
-    
-    /**
-     * Returns image sequence number.
-     * 
-     * @return image sequence number
-     * 
-     * @hibernate.property column="number_ratings"
-     */
-    public int getNumberRatings() {
-	return numberRatings;
-    }
-
-    /**
-     * Sets image number of rates.
-     * 
-     * @param numberRates
-     *                image number of rates
-     */
-    public void setNumberRatings(int numberRatings) {
-	this.numberRatings = numberRatings;
     }
     
     // *************** NON Persist Fields (used only for export needs) ********************

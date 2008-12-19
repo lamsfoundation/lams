@@ -21,8 +21,8 @@
 <input type="hidden" name="originalImageHeight" id="commentsArea_originalImageHeight" value="${commentsImage.originalImageHeight}"/>
 <input type="hidden" name="originalFileUuid" id="commentsArea_originalFileUuid" value="${commentsImage.originalFileUuid}"/>
 <input type="hidden" name="imageDescription" id="commentsArea_description" value="${commentsImage.description}"/>
-<input type="hidden" name="averageRating" id="commentsArea_averageRating" value="${commentsImage.averageRating}"/>
-<input type="hidden" name="numberRatings" id="commentsArea_numberRatings" value="${commentsImage.numberRatings}"/>
+<input type="hidden" name="averageRating" id="commentsArea_averageRating" value="${commentsSessionMap.averageRating}"/>
+<input type="hidden" name="numberRatings" id="commentsArea_numberRatings" value="${commentsSessionMap.numberRatings}"/>
 <input type="hidden" name="currentRating" id="commentsArea_currentRating" value="${commentsSessionMap.currentRating}"/>
 <input type="hidden" name="isVoted" id="commentsArea_isVoted" value="${commentsSessionMap.isVoted}"/>
 <input type="hidden" name="addedBy" id="commentsArea_addedBy" value="${commentsAddedBy}"/>

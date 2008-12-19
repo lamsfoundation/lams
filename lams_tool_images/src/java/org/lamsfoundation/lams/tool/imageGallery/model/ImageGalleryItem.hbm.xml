@@ -184,22 +184,6 @@
 
         </set>
 
-        <property
-            name="averageRating"
-            type="float"
-            update="true"
-            insert="true"
-            column="average_rating"
-        />
-
-        <property
-            name="numberRatings"
-            type="int"
-            update="true"
-            insert="true"
-            column="number_ratings"
-        />
-
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ImageGalleryItem.xml

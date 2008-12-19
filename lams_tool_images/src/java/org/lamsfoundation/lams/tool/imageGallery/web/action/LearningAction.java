@@ -371,13 +371,24 @@ public class LearningAction extends Action {
 
 	if (imageGallery.isAllowCommentImages()) {
 	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
-	    comments.addAll(image.getComments());
+	    List<ImageGalleryUser> sessionUsers = service.getUserListBySessionId(sessionId);
+	    for(ImageComment comment : comments) {
+		for(ImageGalleryUser sessionUser : sessionUsers) {
+		    if (comment.getCreateBy().getUserId().equals(sessionUser.getUserId())) {
+			comments.add(comment);
+		    }
+		}
+	    }
 	    sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
 	}
 
 	if (imageGallery.isAllowRank()) {
 	    ImageRating imageRating = service.getImageRatingByImageAndUser(imageUid, imageGalleryUser.getUserId());
 	    int rating = (imageRating == null) ? 0 : imageRating.getRating();
+	    
+	    Object[] ratingForGroup = service.getRatingForGroup(imageUid, sessionId);
+	    sessionMap.put(ImageGalleryConstants.PARAM_NUMBER_RATINGS, ((Long)ratingForGroup[0]).toString());	    
+	    sessionMap.put(ImageGalleryConstants.PARAM_AVERAGE_RATING, ((Float)ratingForGroup[1]).toString());	    
 	    sessionMap.put(ImageGalleryConstants.PARAM_CURRENT_RATING, rating);	    
 	}
 
@@ -467,21 +478,6 @@ public class LearningAction extends Action {
 
 	//persist ImageGalleryItem changes in DB
 	ImageGalleryItem dbImage = service.getImageGalleryItemByUid(imageUid);	
-	int numberRatings;
-	float summary;
-	if (imageRating == null) {
-	    summary = dbImage.getAverageRating()*dbImage.getNumberRatings() + rating;
-	    numberRatings = dbImage.getNumberRatings() + 1;
-	} else {
-	    summary = dbImage.getAverageRating()*dbImage.getNumberRatings() + rating - imageRating.getRating();
-	    numberRatings = dbImage.getNumberRatings();
-	}
-	float newAverageRating = summary / numberRatings;
-	
-	dbImage.setNumberRatings(numberRatings);
-	dbImage.setAverageRating(newAverageRating);
-	service.saveOrUpdateImageGalleryItem(dbImage);	
-	
 	if (imageRating == null) { // add
 	    imageRating = new ImageRating();
 	    imageRating.setCreateBy(imageGalleryUser);
