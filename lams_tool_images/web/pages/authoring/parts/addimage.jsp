@@ -9,18 +9,17 @@
 		<lams:css style="tabbed"/>
 
 		<script type="text/javascript">
-	   <%-- user for  imageGalleryitem.js --%>
-       var removeItemAttachmentUrl = "<c:url value='/authoring/removeItemAttachment.do'/>";
-	</script>
-		<script type="text/javascript"
-			src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
+		   <%-- used for  imageGalleryitem.js --%>
+	       var removeItemAttachmentUrl = "<c:url value='/authoring/removeImageFile.do'/>";
+		</script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
 	</lams:head>
 	<body>
 
 		<!-- Basic Info Form-->
 
 		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateItem" method="post"
+		<html:form action="/authoring/saveOrUpdateImage" method="post"
 			styleId="imageGalleryItemForm" enctype="multipart/form-data">
 			<html:hidden property="sessionMapID" />
 			<html:hidden property="imageIndex" />
@@ -50,10 +49,19 @@
 			<c:set var="itemAttachment"
 				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<div id="itemAttachmentArea">
-				<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
+				<%@ include file="/pages/authoring/parts/imagefile.jsp"%>
 			</div>
+			
+			<c:if test="${empty formBean.imageIndex}">
+				<div style="margin-bottom: 10px; margin-top: 15px;">
+					<a href="javascript:showMessage('<html:rewrite page="/authoring/initMultipleImages.do?sessionMapID=${formBean.sessionMapID}"/>');" >
+						<fmt:message key="label.authoring.basic.upload.multiple.images" />
+					</a>
+				</div>	
+			</c:if>		
 
 		</html:form>
+		
 
 		<lams:ImgButtonWrapper>
 			<a href="#" onclick="document.imageGalleryItemForm.submit();" class="button-add-item"><fmt:message

@@ -75,51 +75,68 @@
 		
 		<!-- ==========  Authroing Definitions: Add image methods ========== -->
 		
-		<action path="/authoring/newItemInit"
+		<action path="/authoring/newImageInit"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AuthoringAction"
 			name="imageGalleryItemForm" 
 			scope="request" 
 			validate="false"			
-			parameter="newItemInit">
-			<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
+			parameter="newImageInit">
+			<forward name="image" path="/pages/authoring/parts/addimage.jsp" />
 		</action>
-		<action path="/authoring/editItemInit"
+		<action path="/authoring/editImage"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AuthoringAction"
 			name="imageGalleryItemForm" 
 			scope="request" 
-			parameter="editItemInit" 
+			parameter="editImage" 
 			validate="false">
-			<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
+			<forward name="image" path="/pages/authoring/parts/addimage.jsp" />
 		</action>
-		<action path="/authoring/saveOrUpdateItem"
+		<action path="/authoring/saveOrUpdateImage"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AuthoringAction"
-			parameter="saveOrUpdateItem"
+			parameter="saveOrUpdateImage"
 			name="imageGalleryItemForm" 
 			scope="request" 
 			validate="false">
-			<forward name="file" path="/pages/authoring/parts/addfile.jsp" />
+			<forward name="image" path="/pages/authoring/parts/addimage.jsp" />
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
-		<action path="/authoring/removeItem"
+		<action path="/authoring/removeImage"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AuthoringAction"
-			parameter="removeItem">
+			parameter="removeImage">
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
 		<action path="/authoring/upImage"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AuthoringAction"
-			parameter="upItem">
+			parameter="upImage">
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
 		<action path="/authoring/downImage"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AuthoringAction"
-			parameter="downItem">
+			parameter="downImage">
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>		
-		<action path="/authoring/removeItemAttachment"
+		<action path="/authoring/removeImageFile"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AuthoringAction"
-			parameter="removeItemAttachment">
-			<forward name="success" path="/pages/authoring/parts/itemattachment.jsp" />
+			parameter="removeImageFile">
+			<forward name="success" path="/pages/authoring/parts/imagefile.jsp" />
 		</action>
+		<action path="/authoring/initMultipleImages"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AuthoringAction"
+			name="multipleImagesForm" 
+			scope="request" 
+			validate="false"			
+			parameter="initMultipleImages">
+			<forward name="images" path="/pages/authoring/parts/addmultipleimages.jsp" />
+		</action>
+		<action path="/authoring/saveMultipleImages"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.AuthoringAction"
+			parameter="saveMultipleImages"
+			name="multipleImagesForm" 
+			scope="request" 
+			validate="false">
+			<forward name="images" path="/pages/authoring/parts/addmultipleimages.jsp" />
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>		
 		
 		<!-- ========== Learning Definitions ============================== -->
 		
@@ -153,6 +170,23 @@
 			<forward name="image" path="/pages/learning/parts/addimage.jsp" />
 			<forward name="success" path="/pages/learning/start.jsp" />
 		</action>
+		<action path="/learning/initMultipleImages"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
+			name="multipleImagesForm" 
+			scope="request" 
+			validate="false"			
+			parameter="initMultipleImages">
+			<forward name="success" path="/pages/learning/parts/addmultipleimages.jsp" />
+		</action>
+		<action path="/learning/saveMultipleImages"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
+			parameter="saveMultipleImages"
+			name="multipleImagesForm" 
+			scope="request" 
+			validate="false">
+			<forward name="images" path="/pages/learning/parts/addmultipleimages.jsp" />
+			<forward name="success" path="/pages/learning/start.jsp" />
+		</action>		
 		
 		<action path="/learning/loadImageData"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
@@ -225,6 +259,23 @@
 			scope="request" 
 			validate="false">
 			<forward name="image" path="/pages/monitoring/parts/addimage.jsp" />
+			<forward name="success" path="/pages/monitoring/start.jsp" />
+		</action>		
+		<action path="/monitoring/initMultipleImages"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
+			name="multipleImagesForm" 
+			scope="request" 
+			validate="false"			
+			parameter="initMultipleImages">
+			<forward name="success" path="/pages/monitoring/parts/addmultipleimages.jsp" />
+		</action>
+		<action path="/monitoring/saveMultipleImages"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
+			parameter="saveMultipleImages"
+			name="multipleImagesForm" 
+			scope="request" 
+			validate="false">
+			<forward name="images" path="/pages/monitoring/parts/addmultipleimages.jsp" />
 			<forward name="success" path="/pages/monitoring/start.jsp" />
 		</action>		
 		<action path="/monitoring/imageSummary"

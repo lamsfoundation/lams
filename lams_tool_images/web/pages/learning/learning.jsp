@@ -387,7 +387,7 @@
 			</c:if>
 			<c:if test="${imageGallery.allowShareImages && (mode != 'teacher') && (not finishedLock)}">
 				<br>
-				<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=500&width=480&modal=true" class="button add_new_image thickbox">  
+				<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="button add_new_image thickbox">  
 					<fmt:message key="label.learning.add.new.image" />
 				</a>
 			</c:if>		

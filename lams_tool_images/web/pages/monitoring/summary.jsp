@@ -321,8 +321,8 @@
 
 </c:forEach>
 
-<div class="space-top">
-	<a href="<html:rewrite page='/monitoring/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=500&width=480&modal=true" class="button add_new_image thickbox">  
+<div class="space-top space-left">
+	<a href="<html:rewrite page='/monitoring/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="button add_new_image thickbox">  
 		<fmt:message key="label.monitoring.summary.add.new.image" />
 	</a>
 </div>

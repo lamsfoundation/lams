@@ -47,6 +47,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -64,6 +65,7 @@ import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
 import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageCommentForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
+import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -91,6 +93,12 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("saveNewImage")) {
 	    return saveNewImage(mapping, form, request, response);
+	}
+	if (param.equals("initMultipleImages")) {
+	    return initMultipleImages(mapping, form, request, response);
+	}
+	if (param.equals("saveMultipleImages")) {
+	    return saveMultipleImages(mapping, form, request, response);
 	}	
 	if (param.equals("imageSummary")) {
 	    return imageSummary(mapping, form, request, response);
@@ -150,7 +158,7 @@ public class MonitoringAction extends Action {
     }
     
     /**
-     * Initial page for add imageGallery item (single file or URL).
+     * Initial page for addding new imageGallery item.
      * 
      * @param mapping
      * @param form
@@ -160,7 +168,6 @@ public class MonitoringAction extends Action {
      */
     private ActionForward newImageInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -204,6 +211,61 @@ public class MonitoringAction extends Action {
 	//redirect
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
+    
+    /**
+     * Initial page for addding new imageGallery item.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward initMultipleImages(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }
+
+    /**
+     * Save imageGallery item into database.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward saveMultipleImages(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	MultipleImagesForm multipleForm = (MultipleImagesForm) form;
+	String sessionMapID = multipleForm.getSessionMapID();
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	
+	ActionErrors errors = validateMultipleImages(multipleForm);
+
+	if (!errors.isEmpty()) {
+	    this.addErrors(request, errors);
+	    return mapping.findForward("images");
+	}
+
+	try {
+	    extractMultipleFormToImageGalleryItems(request, multipleForm);
+	} catch (Exception e) {
+	    // any upload exception will display as normal error message rather then throw exception directly
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    e.getMessage()));
+	    if (!errors.isEmpty()) {
+		this.addErrors(request, errors);
+		return mapping.findForward("images");
+	    }
+	}
+	
+	//redirect
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+    }    
     
     /**
      * Display edit page for existed imageGallery item.
@@ -529,6 +591,27 @@ public class MonitoringAction extends Action {
     }
     
     /**
+     * Extract web form content to imageGallery items.
+     * 
+     * @param request
+     * @param multipleForm
+     * @throws ImageGalleryException
+     */
+    private void extractMultipleFormToImageGalleryItems(HttpServletRequest request, MultipleImagesForm multipleForm)
+	    throws Exception {
+	
+	List<FormFile> fileList = createFileListFromMultipleForm(multipleForm);
+	for (FormFile file : fileList) {
+	    ImageGalleryItemForm imageForm = new ImageGalleryItemForm();
+	    imageForm.setSessionMapID(multipleForm.getSessionMapID());
+	    imageForm.setTitle("");
+	    imageForm.setDescription("");
+	    imageForm.setFile(file);
+	    extractFormToImageGalleryItem(request, imageForm);
+	}
+    }
+    
+    /**
      * Validate imageGallery item.
      * 
      * @param itemForm
@@ -547,10 +630,7 @@ public class MonitoringAction extends Action {
 	// check for allowed format : gif, png, jpg
 	if (itemForm.getFile() != null) {
 	    String contentType = itemForm.getFile().getContentType();
-	    if (StringUtils.isEmpty(contentType)
-		    || !(contentType.equals("image/gif") || contentType.equals("image/png")
-			    || contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
-			    .equals("image/pjpeg") || contentType.equals("image/x-png"))) {
+	    if (isContentTypeForbidden(contentType)) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
 	    }
@@ -558,5 +638,74 @@ public class MonitoringAction extends Action {
 
 	return errors;
     }
+    
+    /**
+     * Validate imageGallery items.
+     * 
+     * @param multipleForm
+     * @return
+     */
+    private ActionErrors validateMultipleImages(MultipleImagesForm multipleForm) {
+	ActionErrors errors = new ActionErrors();
+
+	List<FormFile> fileList = createFileListFromMultipleForm(multipleForm);
+	
+	// validate files size
+	for (FormFile file : fileList) {
+	    FileValidatorUtil.validateFileSize(file, true, errors);
+
+	    // check for allowed format : gif, png, jpg
+	    String contentType = file.getContentType();
+	    if (isContentTypeForbidden(contentType)) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT_FOR, file.getFileName()));
+	    }
+	}
+
+	return errors;
+    }
+    
+    /**
+     * Create file list from multiple form.
+     * 
+     * @param multipleForm
+     * @return
+     */
+    private List<FormFile> createFileListFromMultipleForm(MultipleImagesForm multipleForm) {
+
+	List<FormFile> fileList = new ArrayList<FormFile>();
+	if (! StringUtils.isEmpty(multipleForm.getFile1().getFileName())) {
+	    fileList.add(multipleForm.getFile1());
+	}
+	if (! StringUtils.isEmpty(multipleForm.getFile2().getFileName())) {
+	    fileList.add(multipleForm.getFile2());
+	}
+	if (! StringUtils.isEmpty(multipleForm.getFile3().getFileName())) {
+	    fileList.add(multipleForm.getFile3());
+	}
+	if (! StringUtils.isEmpty(multipleForm.getFile4().getFileName())) {
+	    fileList.add(multipleForm.getFile4());
+	}
+	if (! StringUtils.isEmpty(multipleForm.getFile5().getFileName())) {
+	    fileList.add(multipleForm.getFile5());
+	}
+
+	return fileList;
+    }
+    
+    /**
+     * Checks if the format is allowed.
+     * 
+     * @param contentType
+     * @return
+     */
+    private boolean isContentTypeForbidden(String contentType) {
+	boolean isContentTypeForbidden = StringUtils.isEmpty(contentType)
+		|| !(contentType.equals("image/gif") || contentType.equals("image/png")
+			|| contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
+			.equals("image/pjpeg"));
+
+	return isContentTypeForbidden;
+    }    
 
 }

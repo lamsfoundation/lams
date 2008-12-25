@@ -9,15 +9,10 @@
 			<fmt:message key="label.learning.title" />
 		</title>
 		<%@ include file="/common/headerWithoutPrototype.jsp"%>
-		
-		
-		
 	</lams:head>
 	
 	<body class="stripes">
-	
 		<div id="content" >
-		
 			<%@ include file="/common/messages.jsp"%>
 			
 			<html:form action="/learning/saveNewImage" method="post" styleId="imageGalleryItemForm" enctype="multipart/form-data">
@@ -46,6 +41,12 @@
 				</div>
 				<div id="itemAttachmentArea">
 					<input type="file" name="file" />			
+				</div>
+				
+				<div style="margin-bottom: 0px; margin-top: 15px;">
+					<a href="<html:rewrite page='/learning/initMultipleImages.do?sessionMapID='/>${formBean.sessionMapID}&KeepThis=true&TB_iframe=true&height=500&width=480&modal=true" class="thickbox">  
+						<fmt:message key="label.authoring.basic.upload.multiple.images" />
+					</a>				
 				</div>
 			</html:form>
 

@@ -84,6 +84,7 @@ public class ImageGalleryConstants {
     
     // error message keys
     public static final String ERROR_MSG_NOT_ALLOWED_FORMAT = "error.resource.image.not.alowed.format";
+    public static final String ERROR_MSG_NOT_ALLOWED_FORMAT_FOR = "error.resource.image.not.alowed.format.for";
     public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
     public static final String ERROR_MSG_COMMENT_BLANK = "error.resource.image.comment.blank";
     public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";

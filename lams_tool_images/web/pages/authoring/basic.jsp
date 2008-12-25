@@ -41,7 +41,7 @@
 	}
 	
 	function editItem(idx,sessionMapID){
-		var url = "<c:url value="/authoring/editItemInit.do?imageIndex="/>" + idx +"&sessionMapID="+sessionMapID;;
+		var url = "<c:url value="/authoring/editImage.do?imageIndex="/>" + idx +"&sessionMapID="+sessionMapID;;
 		showMessage(url);
 	}
 	//The panel of imageGallery list panel
@@ -51,10 +51,9 @@
 		var	deletionConfirmed = confirm('<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>');
 		
 		if (deletionConfirmed) {
-			var url = "<c:url value="/authoring/removeItem.do"/>";
+			var url = "<c:url value="/authoring/removeImage.do"/>";
 			var param = "imageIndex=" + idx +"&sessionMapID="+sessionMapID;;
 			deleteItemLoading();
-			alert(param);
 		    var myAjax = new Ajax.Updater(
 			    	imageGalleryListTargetDiv,
 			    	url,
@@ -139,7 +138,7 @@
 </div>
 
 <p align="small-space-bottom">
-	<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}"/>');"  class="button-add-item">
+	<a href="javascript:showMessage('<html:rewrite page="/authoring/newImageInit.do?sessionMapID=${formBean.sessionMapID}"/>');"  class="button-add-item">
 		<fmt:message key="label.authoring.basic.add.image" />
 	</a>
 </p>
