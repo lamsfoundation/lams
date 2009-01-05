@@ -60,7 +60,8 @@ class page_lesson extends page_generic_activity {
      *
      * @return void
      **/
-    function print_header($title = '', $morenavlinks = array()) {
+    //LAMS: we pass a new parameter so when in a lams sequence we don't display Moodle's headers
+    function print_header($title = '', $morenavlinks = array(),$is_lams=NULL) {
         global $CFG;
 
         $this->init_full();
@@ -125,7 +126,13 @@ class page_lesson extends page_generic_activity {
         // }
 
         $navigation = build_navigation($morenavlinks, $this->modulerecord);
-        print_header($title, $this->courserecord->fullname, $navigation, '', $meta, true, $buttons, navmenu($this->courserecord, $this->modulerecord));
+        //LAMS: in a lams sequence we don't display Moodle's headers
+        if($is_lams==1){
+        	print_header();
+        }else{
+        	print_header($title, $this->courserecord->fullname, $navigation, '', $meta, true, $buttons, navmenu($this->courserecord, $this->modulerecord));
+        }
+        
 
         if (has_capability('mod/lesson:manage', $context)) {
             print_heading_with_help($activityname, 'overview', 'lesson');

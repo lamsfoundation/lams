@@ -110,14 +110,16 @@
     lesson_print_header($cm, $course, $lesson, $action);
     
     $course_context = get_context_instance(CONTEXT_COURSE, $course->id);
-    if (has_capability('gradereport/grader:view', $course_context) && has_capability('moodle/grade:viewall', $course_context)) {
+    //we add a new parameter to the IF condition so if we are in lams the All Course Grades Button won't be displayed
+    if (has_capability('gradereport/grader:view', $course_context) && has_capability('moodle/grade:viewall', $course_context)&&$cm->is_lams==0) {
         echo '<div class="allcoursegrades"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id . '">' 
             . get_string('seeallcoursegrades', 'grades') . '</a></div>';
     }
 
     if ($nothingtodisplay) {
         notify(get_string('nolessonattempts', 'lesson'));
-        print_footer($course);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+    	print_footer($course,null, false,$cm->is_lams);
         exit();
     }
 
@@ -916,6 +918,7 @@
     }
 
 /// Finish the page
-    print_footer($course);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer($course,null, false,$cm->is_lams);
 
 ?>
