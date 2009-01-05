@@ -45,7 +45,9 @@
     $strlessons = get_string("modulenameplural", "lesson");
 
     $navigation = build_navigation($strimportppt, $cm);
-    print_header_simple("$strimportppt", " $strimportppt", $navigation);
+    
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_header_simple("$strimportppt", " $strimportppt", $navigation, "", "", true, '','',false,'',false,$cm->is_lams);
 
     if ($form = data_submitted()) {   /// Filename
 
@@ -69,14 +71,19 @@
                 
                 if(! $mod_save_objects($objects, $mod->id, $pageid)) {  // sends it to DB
                     error("could not save");
-                }
+                //LAMS: variable we pass to let it know we have added a new PPT while editting
+                }elseif($cm->is_lams==1){
+            		$uploaded=1;
+            	}
             } else {
                 error('could not get data');
             }
 
             echo "<hr>";
-            print_continue("$CFG->wwwroot/mod/$modname/view.php?id=$cm->id");
-            print_footer($course);
+            // pass a new parameter to view.php just to know if the teacher has imported any question (if he did, he will be able to finish editting Lams's sequence)
+            print_continue("$CFG->wwwroot/mod/$modname/view.php?id=$cm->id&uploaded=$uploaded");
+            //we pass a new parameter to the function so it won't we printed if is_lams=1
+    		print_footer($course,null, false,$cm->is_lams);
             exit;
         }
     }
@@ -103,7 +110,8 @@
     echo "</form>";
     print_simple_box_end();
 
-    print_footer($course);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer($course,null, false,$cm->is_lams);
     
 // START OF FUNCTIONS
 
