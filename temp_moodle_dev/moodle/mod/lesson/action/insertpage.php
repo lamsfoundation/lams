@@ -91,6 +91,8 @@
             $newpageid = insert_record("lesson_pages", $newpage);
             if (!$newpageid) {
                 error("Insert page: new first page not inserted");
+            }else{
+            	$uploaded=1;
             }
         } else {
             // there are existing pages put this at the start
@@ -187,5 +189,5 @@
     }
     
     lesson_set_message(get_string('insertedpage', 'lesson').': '.format_string($newpage->title, true), 'notifysuccess');
-    redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id");
+    redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id&uploaded=$uploaded");
 ?>

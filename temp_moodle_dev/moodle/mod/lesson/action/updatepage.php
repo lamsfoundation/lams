@@ -49,6 +49,9 @@
     
     if (!update_record("lesson_pages", $page)) {
         error("Update page: page not updated");
+    }else{
+    	// LAMS: we pass a vrialbe to view.php if the page has been edited
+    	$uploaded=1;
     }
     if ($page->qtype == LESSON_ENDOFBRANCH || $page->qtype == LESSON_ESSAY || $page->qtype == LESSON_CLUSTER || $page->qtype == LESSON_ENDOFCLUSTER) {
         // there's just a single answer with a jump
@@ -179,8 +182,8 @@
     lesson_set_message(get_string('updatedpage', 'lesson').': '.format_string($page->title, true), 'notifysuccess');
     if ($redirect == 'navigation') {
         // takes us back to viewing the page
-        redirect("$CFG->wwwroot/mod/lesson/view.php?id=$cm->id&amp;pageid=$page->id");
+        redirect("$CFG->wwwroot/mod/lesson/view.php?id=$cm->id&amp;pageid=$page->id&uploaded=$uploaded");
     } else {
-        redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id");
+        redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id&uploaded=$uploaded");
     }
 ?>
