@@ -61,9 +61,11 @@
         }
         
         lesson_set_message(get_string('addedanendofbranch', 'lesson'), 'notifysuccess');
+        //LAMS: variable we pass to let it know we have added a new Branch
+        $uploaded=1;
     } else {
         lesson_set_message(get_string('nobranchtablefound', 'lesson'));
     }
-    
-    redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id");
+    //LAMS: new variable $uploaded we pass, so in view.php we will be able to display the button "finished and back to LAMS"
+    redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id&uploaded=$uploaded");
 ?>
