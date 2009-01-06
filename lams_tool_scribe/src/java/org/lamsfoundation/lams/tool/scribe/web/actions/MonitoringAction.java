@@ -92,7 +92,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		Scribe scribe = scribeService.getScribeByContentId(toolContentID);
 			
 		ScribeDTO scribeDTO = setupScribeDTO(scribe);
-		
+		boolean isGroupedActivity = scribeService.isGroupedActivity(toolContentID);
+		request.setAttribute("isGroupedActivity", isGroupedActivity);
 		request.setAttribute("monitoringDTO", scribeDTO);
 		request.setAttribute("contentFolderID", contentFolderID);
 		

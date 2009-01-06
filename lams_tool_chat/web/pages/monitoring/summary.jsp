@@ -97,13 +97,15 @@
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
 <c:forEach var="session" items="${dto.sessionDTOs}">
 	<table cellspacing="0">
-		<tr>
-			<td colspan="3">
-				<h2>
-					${session.sessionName}
-				</h2>
-			</td>
-		</tr>
+		<c:if test="${isGroupedActivity}">
+			<tr>
+				<td colspan="3">
+					<h2>
+						${session.sessionName}
+					</h2>
+				</td>
+			</tr>
+		</c:if>
 
 		<tr>
 			<td class="field-name" style="width: 30%;">

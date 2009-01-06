@@ -95,9 +95,12 @@ function confirmForceComplete() {
 </div>
 
 <c:forEach var="session" items="${dto.sessionDTOs}">
-	<h2>
-		${session.sessionName}
-	</h2>
+	
+	<c:if test="${isGroupedActivity}">
+		<h2>
+			${session.sessionName}
+		</h2>
+	</c:if>
 
 	<c:choose>
 		<c:when

@@ -147,6 +147,9 @@ public class MonitoringAction extends LamsDispatchAction {
 
 			chatDTO.getSessionDTOs().add(sessionDTO);
 		}
+		
+		boolean isGroupedActivity = chatService.isGroupedActivity(toolContentID);
+		request.setAttribute("isGroupedActivity", isGroupedActivity);
 		request.setAttribute("monitoringDTO", chatDTO);
 		request.setAttribute("contentFolderID", contentFolderID);
 		
