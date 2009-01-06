@@ -143,15 +143,14 @@ public class LamsToolService implements ILamsToolService {
 	return toolSessionDAO.getToolSession(toolSessionId);
     }
 
-    @Override
     public Boolean isGroupedActivity(long toolContentID) {
-	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentID);
-	if (activities.size() == 1) {
-	    Activity activity = activities.get(0);
-	    return activity.getApplyGrouping();
-	} else {
-	    log.debug("ToolContent contains multiple activities, can't test whether grouping applies.");
-	    return null;
-	}
+		List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentID);
+		if (activities.size() == 1) {
+		    Activity activity = activities.get(0);
+		    return activity.getApplyGrouping();
+		} else {
+		    log.debug("ToolContent contains multiple activities, can't test whether grouping applies.");
+		    return null;
+		}
     }
 }
