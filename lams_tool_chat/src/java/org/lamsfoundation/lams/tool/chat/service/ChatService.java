@@ -841,7 +841,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		    .getFromUser().getLoginName(), chatMessage.toString());
 	}
     }
-
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
+    
     /* Private methods */
     private Map<Long, ChatMessageFilter> messageFilters = new ConcurrentHashMap<Long, ChatMessageFilter>();
 

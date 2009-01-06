@@ -485,6 +485,10 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		saveOrUpdateScribeUser(scribeUser);
 		return scribeUser;
 	}
+	
+	public boolean isGroupedActivity(long toolContentID) {
+	    return toolService.isGroupedActivity(toolContentID);
+	}
 
 	public IAuditService getAuditService() {
 		return auditService;

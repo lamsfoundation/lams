@@ -261,4 +261,6 @@ public interface IChatService {
     public List<ChatMessage> getMessagesSentByUser(Long userUid);
 
     void releaseConditionsFromCache(Chat chat);
+    
+    boolean isGroupedActivity(long toolContentID);
 }

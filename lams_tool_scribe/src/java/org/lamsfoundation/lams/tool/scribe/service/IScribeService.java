@@ -160,4 +160,6 @@ public interface IScribeService {
 	 * @param toolSessionId
 	 */
 	public void createReportEntry(Long toolSessionId);
+	
+	boolean isGroupedActivity(long toolContentID);
 }
