@@ -655,9 +655,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
     
     public boolean isGroupedActivity(long toolContentID) {
-	
-	getNotebookByContentId(1L);
-	
 	return toolService.isGroupedActivity(toolContentID);
     }
 }
