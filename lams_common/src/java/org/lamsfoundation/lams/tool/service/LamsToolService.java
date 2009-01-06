@@ -25,12 +25,15 @@ package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -52,6 +55,7 @@ public class LamsToolService implements ILamsToolService {
 
     public IToolDAO toolDAO;
     public IToolSessionDAO toolSessionDAO;
+    public IToolContentDAO toolContentDAO;
 
     /**
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getAllPotentialLearners(long)
@@ -103,6 +107,22 @@ public class LamsToolService implements ILamsToolService {
 	this.toolSessionDAO = toolSessionDAO;
     }
 
+    /**
+     * 
+     * @return
+     */
+    public IToolContentDAO getToolContentDAO() {
+        return toolContentDAO;
+    }
+
+    /**
+     * 
+     * @param toolContentDAO
+     */
+    public void setToolContentDAO(IToolContentDAO toolContentDAO) {
+        this.toolContentDAO = toolContentDAO;
+    }
+    
     public String generateUniqueContentFolder() throws FileUtilException, IOException {
 
 	return FileUtil.generateUniqueContentFolderID();
@@ -121,5 +141,17 @@ public class LamsToolService implements ILamsToolService {
     public ToolSession getToolSession(Long toolSessionId)
     {
 	return toolSessionDAO.getToolSession(toolSessionId);
+    }
+
+    @Override
+    public Boolean isGroupedActivity(long toolContentID) {
+	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentID);
+	if (activities.size() == 1) {
+	    Activity activity = activities.get(0);
+	    return activity.getApplyGrouping();
+	} else {
+	    log.debug("ToolContent contains multiple activities, can't test whether grouping applies.");
+	    return null;
+	}
     }
 }

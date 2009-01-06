@@ -174,4 +174,6 @@ public interface INotebookService {
     void releaseConditionsFromCache(Notebook notebook);
 
     void deleteCondition(NotebookCondition condition);
+    
+    boolean isGroupedActivity(long toolContentID);
 }

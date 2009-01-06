@@ -67,4 +67,6 @@ public interface ILamsToolService
     public Tool getPersistToolBySignature(final String toolSignature);
     
     public ToolSession getToolSession(Long toolSessionId);
+    
+    public Boolean isGroupedActivity(long toolContentID);
 }

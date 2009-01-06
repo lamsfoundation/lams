@@ -653,4 +653,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	    notebookDAO.delete(condition);
 	}
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	
+	getNotebookByContentId(1L);
+	
+	return toolService.isGroupedActivity(toolContentID);
+    }
 }
