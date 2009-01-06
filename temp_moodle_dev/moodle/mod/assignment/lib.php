@@ -3085,23 +3085,7 @@ function assignment_clone_instance($id, $sectionref, $courseid) {
         $existingassignment->format = 0;
         $existingassignment->assignmenttype = "offline";
         $existingassignment->grade = 100;
-        
-        //
-        
-          $event->name        = $assignment->name;
-                $event->description = $assignment->description;
-                $event->courseid    = $assignment->course;
-                $event->groupid     = 0;
-                $event->userid      = 0;
-                $event->modulename  = 'assignment';
-                $event->instance    = $returnid;
-                $event->eventtype   = 'due';
-                $event->timestart   = $assignment->timedue;
-                $event->timeduration = 0;
-        
-        
-        
-        //
+     
     } else {
         // make a copy of an existing assignment
         $existingassignment = get_record('assignment', 'id', $cm->instance);
