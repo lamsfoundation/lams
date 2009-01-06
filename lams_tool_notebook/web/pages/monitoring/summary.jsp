@@ -64,15 +64,11 @@
 
 <c:forEach var="session" items="${dto.sessionDTOs}">
 
-	<table>
-		<tr>
-			<td>
-				<h2>
-					${session.sessionName}
-				</h2>
-			</td>
-		</tr>
-	</table>
+	<c:if test="${isGroupedActivity}">
+		<h2>
+			${session.sessionName}
+		</h2>
+	</c:if>
 
 	<table cellpadding="0">
 		<tr>

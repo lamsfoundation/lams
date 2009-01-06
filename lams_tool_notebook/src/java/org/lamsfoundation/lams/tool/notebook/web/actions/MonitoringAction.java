@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
+import org.lamsfoundation.lams.tool.service.LamsToolService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -77,7 +78,9 @@ public class MonitoringAction extends LamsDispatchAction {
 		if (notebook == null) {
 			// TODO error page.
 		}
-
+		
+		boolean isGroupedActivity = notebookService.isGroupedActivity(toolContentID);
+		
 		NotebookDTO notebookDT0 = new NotebookDTO(notebook);
 
 		Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true);
@@ -85,6 +88,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		request.setAttribute("notebookDTO", notebookDT0);
 		request.setAttribute("contentFolderID", contentFolderID);
+		request.setAttribute("isGroupedActivity", isGroupedActivity);
+		
 		return mapping.findForward("success");
 	}
 
