@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
+import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -132,6 +133,9 @@ public class AuthoringActivityDTO extends BaseDTO {
     /** Maximum number of activities to be attempted */
     private Integer maxOptions;
 
+    /** Maximum number of floating activities allow */
+    private Integer maxActivities;
+    
     /** Minimum number of activities to be attempted */
     private Integer minOptions;
 
@@ -333,7 +337,9 @@ public class AuthoringActivityDTO extends BaseDTO {
 	    addParallelActivityAttributes((ParallelActivity) activity);
 	} else if (activity.isBranchingActivity()) {
 	    addBranchingActivityAttributes((BranchingActivity) activity);
-	} else {
+	} else if (activity.isFloatingActivity()) {
+		addFloatingActivityAttributes((FloatingActivity) activity);
+    } else {
 	    addSequenceActivityAttributes((SequenceActivity) activity, branchMappings);
 	}
 
@@ -364,7 +370,11 @@ public class AuthoringActivityDTO extends BaseDTO {
 	endXCoord = activity.getEndXcoord();
 	endYCoord = activity.getEndYcoord();
     }
-
+    
+    private void addFloatingActivityAttributes(FloatingActivity floatingActivity) {
+    	maxActivities = floatingActivity.getMaxNumberOfActivities();
+    }
+    
     private void addSequenceActivityAttributes(SequenceActivity activity,
 	    ArrayList<BranchActivityEntryDTO> branchMappings) {
 
@@ -608,6 +618,13 @@ public class AuthoringActivityDTO extends BaseDTO {
 	return libraryActivityUIImage;
     }
 
+    /**
+     * @return Returns the maxActivities.
+     */
+    public Integer getMaxActivities() {
+	return maxActivities;
+    }
+    
     /**
      * @return Returns the maxOptions.
      */
@@ -1024,6 +1041,16 @@ public class AuthoringActivityDTO extends BaseDTO {
 	}
     }
 
+    /**
+     * @param maxActivities
+     *                The maxActivities to set.
+     */
+    public void setMaxActivities(Integer maxActivities) {
+	if (!maxActivities.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
+	    this.maxActivities = maxActivities;
+	}
+    }
+    
     /**
      * @param maxOptions
      *                The maxOptions to set.

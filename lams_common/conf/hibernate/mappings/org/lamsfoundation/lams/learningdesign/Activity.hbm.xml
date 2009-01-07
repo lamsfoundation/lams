@@ -356,6 +356,20 @@
 					<meta attribute="class-description" inherit="false">@hibernate.class </meta>
 				</subclass>
 			</subclass>
+			
+		 	<subclass name="org.lamsfoundation.lams.learningdesign.FloatingActivity" discriminator-value="15">
+		 		<meta attribute="class-description" inherit="false">@hibernate.class</meta>
+				
+				<property name="maxNumberOfActivities" type="java.lang.Integer" column="max_number_of_options" length="5">
+					<meta attribute="field-description">@hibernate.property column="max_number_of_options" length="5"</meta>    
+					<meta attribute="use-in-toString">true</meta>
+				</property>
+				
+                <!-- uni-directional many-to-one association to System Tool -->
+                <many-to-one name="systemTool" class="org.lamsfoundation.lams.tool.SystemTool" lazy="false" >
+                	<column name="system_tool_id" not-null="false"/>
+                </many-to-one>                    
+		 	</subclass>	
 	</subclass>
 
 </class>

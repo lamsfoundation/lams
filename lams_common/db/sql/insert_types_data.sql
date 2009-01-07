@@ -82,6 +82,7 @@ INSERT INTO lams_learning_activity_type VALUES (11, 'BRANCHING_GROUP');
 INSERT INTO lams_learning_activity_type VALUES (12, 'BRANCHING_TOOL');
 INSERT INTO lams_learning_activity_type VALUES (13, 'OPTIONS_WITH_SEQUENCES');
 INSERT INTO lams_learning_activity_type VALUES (14, 'GATE_CONDITION');
+INSERT INTO lams_learning_activity_type VALUES (15, 'FLOATING');
 
 INSERT INTO lams_gate_activity_level VALUES (1, 'LEARNER');
 INSERT INTO lams_gate_activity_level VALUES (2, 'GROUP');
@@ -224,6 +225,14 @@ VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met',
 	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, null, 
 	'monitoring/gateExportPortfolio?mode=teacher', 'monitoring/gate.do?method=viewGate', 
 	'monitoring/gate.do?method=viewGate', now()	);
+
+INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
+	learner_url, learner_preview_url, learner_progress_url, export_pfolio_learner_url, 
+	export_pfolio_class_url, monitor_url, contribute_url, create_date_time)
+VALUES (11, 15, 'Floating Activities', 'A collection of floating activities', 
+	NULL, NULL, null, 'monitoring/floatingExportPortfolio?mode=learner', 
+	'monitoring/floatingExportPortfolio?mode=teacher', 'monitoring/floating.do?method=viewFloating', 
+	'monitoring/floating.do?method=viewFloating', now()	);
 
 -- Supported Locales
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 

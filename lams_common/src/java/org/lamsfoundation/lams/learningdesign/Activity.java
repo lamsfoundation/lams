@@ -78,6 +78,7 @@ public abstract class Activity implements Serializable, Nullable {
     public static final int TOOL_BRANCHING_ACTIVITY_TYPE = 12;
     public static final int OPTIONS_WITH_SEQUENCES_TYPE = 13;
     public static final int CONDITION_GATE_ACTIVITY_TYPE = 14;
+    public static final int FLOATING_ACTIVITY_TYPE = 15;
     /** *************************************************************** */
 
     /*******************************************************************************************************************
@@ -367,6 +368,10 @@ public abstract class Activity implements Serializable, Nullable {
 	    activity = new OptionsWithSequencesActivity();
 	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 	    break;
+	case FLOATING_ACTIVITY_TYPE:
+		activity = new FloatingActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
 	default:
 	    activity = new GroupingActivity();
 	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
@@ -993,6 +998,15 @@ public abstract class Activity implements Serializable, Nullable {
 	return getActivityTypeId().intValue() == Activity.TOOL_BRANCHING_ACTIVITY_TYPE;
     }
 
+    /**
+     * Check up whether an activity is floating activity.
+     * 
+     * @return is this activity a floating activity
+     */
+    public boolean isFloatingActivity() {
+    return getActivityTypeId().intValue() == Activity.FLOATING_ACTIVITY_TYPE;
+    }
+    
     public boolean isActivityReadOnly() {
 	return readOnly.equals(Boolean.TRUE);
     }

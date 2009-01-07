@@ -110,6 +110,9 @@ public interface WDDXTAGS {
     // yet
     public static final String INPUT_TOOL_ACTIVITY_UIID = "toolActivityUIID";
 
+    /** FloatingActivity specific tags */
+    public static final String MAX_ACTIVITIES = "maxActivities";
+    
     /** OptionsActivity specific tags */
     public static final String MAX_OPTIONS = "maxOptions";
     public static final String MIN_OPTIONS = "minOptions";

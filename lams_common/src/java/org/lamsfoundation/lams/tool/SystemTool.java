@@ -49,6 +49,7 @@ public class SystemTool implements Serializable {
     public static final Long TOOL_BASED_BRANCHING = new Long(8);
     public static final Long SEQUENCE = new Long(9);
     public static final Long CONDITION_GATE = new Long(10);
+    public static final Long FLOATING_ACTIVITIES = new Long(11);
 
     /** identifier field */
     private Long systemToolId;

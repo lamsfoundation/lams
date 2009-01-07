@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.learningdesign.Competence;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
+import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -1332,11 +1333,23 @@ public class ObjectExtractor implements IObjectExtractor {
 	    buildParallelActivity((ParallelActivity) activity, activityDetails);
 	} else if (activity instanceof BranchingActivity) {
 	    buildBranchingActivity((BranchingActivity) activity, activityDetails);
-	} else {
+	} else if (activity instanceof FloatingActivity) {
+		buildFloatingActivity((FloatingActivity) activity, activityDetails);
+    } else {
 	    buildSequenceActivity((SequenceActivity) activity, activityDetails);
 	}
     }
 
+    private void buildFloatingActivity(FloatingActivity floatingActivity, Hashtable activityDetails)
+    	throws WDDXProcessorConversionException, ObjectExtractorException {
+    	if (keyExists(activityDetails, WDDXTAGS.MAX_ACTIVITIES)) {
+    	    floatingActivity.setMaxNumberOfActivities(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.MAX_ACTIVITIES));
+    	}
+    	
+    	SystemTool systemTool = getSystemTool(SystemTool.FLOATING_ACTIVITIES);
+    	floatingActivity.setSystemTool(systemTool);
+    }
+    
     private void buildBranchingActivity(BranchingActivity branchingActivity, Hashtable activityDetails)
 	    throws WDDXProcessorConversionException, ObjectExtractorException {
 	if (branchingActivity.isChosenBranchingActivity()) {

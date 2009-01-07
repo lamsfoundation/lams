@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
+import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.GroupBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -110,6 +111,8 @@ public class ActivityDAO extends BaseDAO implements IActivityDAO {
 						return getActivityByActivityId(activityId, ToolBranchingActivity.class);
 					case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
 						return getActivityByActivityId(activityId, OptionsWithSequencesActivity.class);
+					case Activity.FLOATING_ACTIVITY_TYPE:
+						return getActivityByActivityId(activityId, FloatingActivity.class);
 					default:
 						break;
 				}
