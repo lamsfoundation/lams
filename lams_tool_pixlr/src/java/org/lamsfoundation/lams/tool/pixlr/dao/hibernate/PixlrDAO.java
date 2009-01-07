@@ -1,0 +1,82 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+/* $$Id$$ */
+
+package org.lamsfoundation.lams.tool.pixlr.dao.hibernate;
+
+import java.util.List;
+
+import org.hibernate.FlushMode;
+import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
+import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrDAO;
+import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
+import org.lamsfoundation.lams.tool.pixlr.model.PixlrAttachment;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+
+/**
+ * DAO for accessing the Pixlr objects - Hibernate specific code.
+ */
+public class PixlrDAO extends BaseDAO implements IPixlrDAO {
+
+    private static final String FIND_FORUM_BY_CONTENTID = "from Pixlr pixlr where pixlr.toolContentId=?";
+
+    private static final String FIND_INSTRUCTION_FILE = "from " + PixlrAttachment.class.getName()
+	    + " as i where tool_content_id=? and i.file_uuid=? and i.file_version_id=? and i.file_type=?";
+
+    @SuppressWarnings("unchecked")
+    public Pixlr getByContentId(Long toolContentId) {
+	List list = getHibernateTemplate().find(PixlrDAO.FIND_FORUM_BY_CONTENTID, toolContentId);
+	if (list != null && list.size() > 0) {
+	    return (Pixlr) list.get(0);
+	} else {
+	    return null;
+	}
+    }
+
+    public void saveOrUpdate(Pixlr pixlr) {
+	this.getHibernateTemplate().saveOrUpdate(pixlr);
+	this.getHibernateTemplate().flush();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	if (toolContentId != null && uuid != null && versionId != null) {
+	    List list = getSession().createQuery(PixlrDAO.FIND_INSTRUCTION_FILE).setLong(0,
+		    toolContentId.longValue()).setLong(1, uuid.longValue()).setLong(2, versionId.longValue())
+		    .setString(3, type).list();
+	    if (list != null && list.size() > 0) {
+		PixlrAttachment file = (PixlrAttachment) list.get(0);
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		templ.delete(file);
+		templ.flush();
+	    }
+	}
+
+    }
+
+    public void releaseFromCache(Object o) {
+	getSession().evict(o);
+
+    }
+}
