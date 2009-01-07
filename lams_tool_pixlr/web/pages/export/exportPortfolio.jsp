@@ -154,6 +154,27 @@
 				</p>
 			</c:otherwise>
 		</c:choose>
+		
+		<c:if test="${pixlrDTO.reflectOnActivity}">
+			<h2>
+				<fmt:message key="monitoring.th.reflection" />
+			</h2>
+			
+			<h4>
+				${pixlrDTO.reflectInstructions}
+			</h4>
+			
+			<c:choose>
+				<c:when test="${userDTO.finishedReflection}">
+					<p>
+						${userDTO.notebookEntry}
+					</p>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.notAvailable" />
+				</c:otherwise>
+			</c:choose>
+		</c:if>
 	</c:otherwise>
 </c:choose></div>
 <!--closes content-->
