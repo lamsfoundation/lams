@@ -204,7 +204,7 @@ public class PixlrUserDTO implements Comparable<Object>{
 	    this.imageHidden = imageHidden;
 	}
 
-	// set thumbnail dimentions with a maximum of 100 width or height
+	// set thumbnail dimensions with a maximum of 100 width or height
 	public void setThumbnailDimensions()
 	{
 	    if (imageWidth != null && imageHeight != null)
