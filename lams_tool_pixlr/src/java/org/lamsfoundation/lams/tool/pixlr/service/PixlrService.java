@@ -95,6 +95,8 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     static Logger logger = Logger.getLogger(PixlrService.class.getName());
 
+    public static final String EXPORT_IMAGE_FILE_NAME = "authorImage";
+
     private IPixlrDAO pixlrDAO = null;
 
     private IPixlrSessionDAO pixlrSessionDAO = null;
@@ -149,7 +151,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	// TODO Auto-generated method stub
 	return null;
     }
-
 
     @SuppressWarnings("unchecked")
     public ToolSessionExportOutputData exportToolSession(List ToolSessionIds) throws DataMissingException,
@@ -218,22 +219,36 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     public String copyImage(Pixlr toContent) throws Exception {
-	String newFileName = FileUtil.generateUniqueContentFolderID() + ".jpg";
 
 	String realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR
 		+ File.separator + "images" + File.separator + "pixlr";
 
 	File existingFile = new File(realBaseDir + File.separator + toContent.getImageFileName());
-	File newFile = new File(realBaseDir + File.separator + newFileName);
-	FileOutputStream out = new FileOutputStream(newFile);
-	FileInputStream in = new FileInputStream(existingFile);
 
-	byte[] buf = new byte[1024];
-	int len;
-	while ((len = in.read(buf)) > 0) {
-	    out.write(buf, 0, len);
+	if (existingFile.exists()) {
+	    String ext = getFileExtension(toContent.getImageFileName());
+	    String newFileName = FileUtil.generateUniqueContentFolderID() + ext;
+
+	    String newFilePath = realBaseDir + File.separator + newFileName;
+	    copyFile(existingFile, newFilePath);
+	    return newFileName;
+	} else {
+	    return null;
 	}
-	return newFileName;
+    }
+
+    public void copyFile(File srcFile, String destPath) throws Exception {
+	if (srcFile.exists() && srcFile.canRead()) {
+	    File newFile = new File(destPath);
+	    FileOutputStream out = new FileOutputStream(newFile);
+	    FileInputStream in = new FileInputStream(srcFile);
+	    byte[] buf = new byte[1024];
+	    int len;
+	    while ((len = in.read(buf)) > 0) {
+		out.write(buf, 0, len);
+	    }
+	}
+
     }
 
     public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
@@ -283,6 +298,32 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	pixlr = Pixlr.newInstance(pixlr, toolContentId, null);
 	pixlr.setToolContentHandler(null);
 	pixlr.setPixlrSessions(null);
+
+	// bundling the author image in export
+	try {
+	    if (pixlr.getImageFileName() != null) {
+		File imageFile = new File(PixlrConstants.LAMS_PIXLR_BASE_DIR + File.separator
+			+ pixlr.getImageFileName());
+		if (imageFile.exists()) {
+
+		    String ext = getFileExtension(pixlr.getImageFileName());
+
+		    String tempDir = rootPath + File.separator + toolContentId.toString();
+		    File tempDirFile = new File(tempDir);
+		    if (!tempDirFile.exists()) {
+			tempDirFile.mkdirs();
+		    }
+		    String newFilePath = tempDir + File.separator + EXPORT_IMAGE_FILE_NAME + ext;
+
+		    copyFile(imageFile, newFilePath);
+		    pixlr.setImageFileName(EXPORT_IMAGE_FILE_NAME + ext);
+		}
+	    }
+
+	} catch (Exception e) {
+	    logger.error("Could not export pixlr image, image may be missing in export", e);
+	}
+
 	Set<PixlrAttachment> atts = pixlr.getPixlrAttachments();
 	for (PixlrAttachment att : atts) {
 	    att.setPixlr(null);
@@ -321,10 +362,38 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	    pixlr.setToolContentId(toolContentId);
 	    pixlr.setCreateBy(new Long(newUserUid.longValue()));
 
+	    // Copying the image file into lams_www.war/images/pixlr
+	    File imageFile = new File(toolContentPath + File.separator + pixlr.getImageFileName());
+
+	    if (imageFile.exists() && imageFile.canRead()) {
+
+		String newFileName = FileUtil.generateUniqueContentFolderID()
+			+ getFileExtension(pixlr.getImageFileName());
+
+		String newFilePath = PixlrConstants.LAMS_PIXLR_BASE_DIR + File.separator + newFileName;
+
+		copyFile(imageFile, newFilePath);
+		pixlr.setImageFileName(newFileName);
+	    } else {
+		pixlr.setImageFileName(PixlrConstants.DEFAULT_IMAGE_FILE_NAME);
+	    }
+
 	    pixlrDAO.saveOrUpdate(pixlr);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
+	} catch (Exception e) {
+	    logger.error("Error during import possibly because of file copy error", e);
+	    throw new ToolException(e);
 	}
+    }
+
+    public String getFileExtension(String fileName) {
+	String ext = "";
+	int i = fileName.lastIndexOf('.');
+	if (i > 0 && i < fileName.length() - 1) {
+	    ext += "." + fileName.substring(i + 1).toLowerCase();
+	}
+	return ext;
     }
 
     /**
@@ -537,7 +606,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
-    
     /**
      * Import the data for a 1.0.2 Pixlr
      */

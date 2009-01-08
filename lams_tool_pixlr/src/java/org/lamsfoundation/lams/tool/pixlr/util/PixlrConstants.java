@@ -24,8 +24,11 @@
 
 package org.lamsfoundation.lams.tool.pixlr.util;
 
+import java.io.File;
+
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 
 public interface PixlrConstants {
     public static final String TOOL_SIGNATURE = "lapixl10";
@@ -62,4 +65,7 @@ public interface PixlrConstants {
     public static final String ERROR_MSG_FILE_UPLOAD = "error.file.upload.failed";
     
     public static final String LAMS_WWW_PIXLR_FOLDER_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/www/images/pixlr/";
+    public static final String LAMS_PIXLR_BASE_DIR = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR
+	+ File.separator + "images" + File.separator + "pixlr";
+
 }

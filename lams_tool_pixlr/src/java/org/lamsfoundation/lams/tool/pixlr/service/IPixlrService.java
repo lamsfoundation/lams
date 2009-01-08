@@ -154,4 +154,11 @@ public interface IPixlrService {
      * 
      */
     void updateEntry(NotebookEntry notebookEntry);
+    
+    /**
+     * Helper method to extract file extension from a string
+     * @param fileName
+     * @return
+     */
+    String getFileExtension(String fileName);
 }

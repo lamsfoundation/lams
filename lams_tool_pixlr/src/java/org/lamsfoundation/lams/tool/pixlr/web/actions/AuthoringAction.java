@@ -92,9 +92,7 @@ public class AuthoringAction extends LamsDispatchAction {
     private static final String KEY_UNSAVED_OFFLINE_FILES = "unsavedOfflineFiles";
     private static final String KEY_DELETED_FILES = "deletedFiles";
     
-    private static final String LAMS_PIXLR_BASE_DIR = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR
-	+ File.separator + "images" + File.separator + "pixlr";
-
+ 
     /**
      * Default method when no dispatch parameter is specified. It is expected
      * that the parameter <code>toolContentID</code> will be passed in. This
@@ -576,19 +574,26 @@ public class AuthoringAction extends LamsDispatchAction {
 	
 	String filename = PixlrConstants.DEFAULT_IMAGE_FILE_NAME;
 
+	// set up pixlrService
+	if (pixlrService == null) {
+	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
+	}
+	
 	if (imageForm.getFile() != null) {
 
 	    // check the directory exists, then create it if it doesnt
-	    File pixlrDir = new File(LAMS_PIXLR_BASE_DIR);
+	    File pixlrDir = new File(PixlrConstants.LAMS_PIXLR_BASE_DIR);
 	    if (!pixlrDir.exists()) {
 		pixlrDir.mkdirs();
 	    }
 
-	    filename = FileUtil.generateUniqueContentFolderID() + ".jpg";
-	    String fileWriteName = LAMS_PIXLR_BASE_DIR + File.separator + filename;
+	    FormFile formFile = imageForm.getFile();
+	    
+	    filename = FileUtil.generateUniqueContentFolderID() + pixlrService.getFileExtension(formFile.getFileName());
+	    String fileWriteName = PixlrConstants.LAMS_PIXLR_BASE_DIR + File.separator + filename;
 	    File uploadFile = new File(fileWriteName);
 	    FileOutputStream out = new FileOutputStream(uploadFile);
-	    FormFile formFile = imageForm.getFile();
+	    
 	    out.write(formFile.getFileData());
 	    
 	    // Now save the image size
