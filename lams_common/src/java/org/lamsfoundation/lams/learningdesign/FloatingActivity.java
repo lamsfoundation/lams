@@ -151,9 +151,9 @@ public class FloatingActivity extends ComplexActivity implements Serializable {
     }
 
     /** 
-     * Get the maximum number of options, guaranteed not to return null. If the 
+     * Get the maximum number of activities, guaranteed not to return null. If the 
      * value is null in the database, returns the number of activities
-     * in this optional activity.
+     * in this floating activity.
      */
     public Integer getMaxNumberOfActivitiesNotNull() {
     	return maxNumberOfActivities!=null ? maxNumberOfActivities : getActivities().size();

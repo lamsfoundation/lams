@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -66,7 +67,7 @@ public class LearningDesignValidator {
 
 		// check all activities have their necessary transitions. First check the 
 		// top level, then we need to check each branch inside a branching activity.
-		Set<Activity> topLevelActivities = learningDesign.getParentActivities();
+		Set<Activity> topLevelActivities = extractFloatingActivities(learningDesign.getParentActivities());
 		validateActivityTransitionRules(topLevelActivities, learningDesign.getTransitions());
 
 		for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
@@ -74,6 +75,7 @@ public class LearningDesignValidator {
 			validateGroupingIfGroupingIsApplied(activity);
 			validateOptionalActivity(activity);
 			validateOptionsActivityOrderId(activity);
+			validateFloatingActivity(activity);
 			validateGroupingActivity(activity);
 			Vector<ValidationErrorDTO> activityErrors = activity.validateActivity(messageService);
 			if (activityErrors != null && !activityErrors.isEmpty()) {
@@ -83,6 +85,19 @@ public class LearningDesignValidator {
 
 		cleanupValidationErrors();
 		return errors;
+	}
+	
+	/**
+	 * Removes all Floating Activity(s) from the top level collection for validation procressing.
+	 * 
+	 * @param topLevelActivities	Set of Top-level activities.
+	 */
+	private Set<Activity> extractFloatingActivities(Set<Activity> topLevelActivities) {
+		for (Activity activity : (Set<Activity>) topLevelActivities)
+			if(activity.isFloatingActivity())
+				topLevelActivities.remove(activity);
+		
+		return topLevelActivities;
 	}
 
 	/**
@@ -157,7 +172,11 @@ public class LearningDesignValidator {
 		ArrayList<ComplexActivity> complexActivitiesToProcess = null;
 
 		for (Activity activity : activities) {
+			if(activity.isFloatingActivity())
+				break;
+			
 			checkActivityForTransition(activity, numOfTopLevelActivities);
+			
 			if (activity.getTransitionFrom() == null) {
 				noOuputTransition.add(activity);
 			}
@@ -240,7 +259,7 @@ public class LearningDesignValidator {
 	 */
 	private ArrayList<ComplexActivity> checkActivityForFurtherProcessing(ArrayList<ComplexActivity> complexActivitiesToProcess,
 			Activity activity) {
-		if (activity.isComplexActivity() && !activity.isParallelActivity()) {
+		if (activity.isComplexActivity() && !activity.isParallelActivity() && !activity.isFloatingActivity()) {
 			if (complexActivitiesToProcess == null) {
 				complexActivitiesToProcess = new ArrayList<ComplexActivity>();
 			}
@@ -366,6 +385,35 @@ public class LearningDesignValidator {
 						.getMessage(ValidationErrorDTO.OPTIONAL_ACTIVITY_ERROR_KEY), optionsActivity.getActivityUIID()));
 			}
 
+		}
+
+	}
+	
+	/**
+	 * If this activity is an FloatingActivity, then it must contain at least one activity and no more than the 
+	 * maximum activities value. 
+	 * 
+	 * @param parentActivity
+	 */
+	private void validateFloatingActivity(Activity parentActivity) {
+
+		if (parentActivity.isFloatingActivity()) {
+			//get the child activities and check how many there are.
+			FloatingActivity floatingActivity = (FloatingActivity) parentActivity;
+			Set childActivities = floatingActivity.getActivities();
+			int numOfChildActivities = childActivities.size();
+			// require at least one floating activity
+			if (numOfChildActivities == 0) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.FLOATING_ACTIVITY_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.FLOATING_ACTIVITY_ERROR_KEY), floatingActivity.getActivityUIID()));
+			}
+			// collection cannot exceed max limit
+			if (numOfChildActivities > floatingActivity.getMaxNumberOfActivities()) {
+				errors.add(new ValidationErrorDTO(ValidationErrorDTO.FLOATING_ACTIVITY_MAX_ERROR_CODE, messageService
+						.getMessage(ValidationErrorDTO.FLOATING_ACTIVITY_MAX_ERROR_KEY), floatingActivity.getActivityUIID()));
+			}
+			
+			
 		}
 
 	}

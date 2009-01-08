@@ -896,7 +896,8 @@ public abstract class Activity implements Serializable, Nullable {
 		|| getActivityTypeId().intValue() == Activity.OPTIONS_WITH_SEQUENCES_TYPE
 		|| getActivityTypeId().intValue() == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE
 		|| getActivityTypeId().intValue() == Activity.GROUP_BRANCHING_ACTIVITY_TYPE
-		|| getActivityTypeId().intValue() == Activity.TOOL_BRANCHING_ACTIVITY_TYPE;
+		|| getActivityTypeId().intValue() == Activity.TOOL_BRANCHING_ACTIVITY_TYPE
+		|| getActivityTypeId().intValue() == Activity.FLOATING_ACTIVITY_TYPE;
     }
 
     public boolean isSystemToolActivity() {

@@ -42,6 +42,8 @@ public class ValidationErrorDTO {
 	public static final String GROUPING_SELECTED_ERROR_KEY = "validation.error.GroupingSelected"; // GS
 	public static final String OPTIONAL_ACTIVITY_ERROR_KEY = "validation.error.OptionalActivity"; // OA
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "validation.error.OptionalActivityOrderId"; // OAOI
+	public static final String FLOATING_ACTIVITY_ERROR_KEY = "validation.error.FloatingActivity"; // OA
+	public static final String FLOATING_ACTIVITY_MAX_ERROR_KEY = "validation.error.FloatingActivity.maximum"; // OA
 	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1"; // SG
 	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";
 	public static final String CONDITION_GATE_ACTVITY_CONDITION = "validation.error.conditionGateMustHaveACondition"; // CGC
@@ -68,6 +70,8 @@ public class ValidationErrorDTO {
 	public static final String GROUPING_SELECTED_ERROR_CODE = "GS";
 	public static final String OPTIONAL_ACTIVITY_ERROR_CODE = "OA";
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_CODE = "OAOI";
+	public static final String FLOATING_ACTIVITY_ERROR_CODE = "FA";
+	public static final String FLOATING_ACTIVITY_MAX_ERROR_CODE = "FAMX";
 	public static final String SCHEDULE_GATE_ERROR_CODE = "SG1";
 	public static final String CONDITION_GATE_ACTVITY_CONDITION_ERROR_CODE = "CGC";
 	public static final String CONDITION_GATE_ACTVITY_TOOLINPUT_ERROR_CODE = "CGI";
