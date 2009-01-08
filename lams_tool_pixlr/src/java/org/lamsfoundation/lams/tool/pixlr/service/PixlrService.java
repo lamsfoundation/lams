@@ -225,7 +225,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
 	File existingFile = new File(realBaseDir + File.separator + toContent.getImageFileName());
 
-	if (existingFile.exists()) {
+	if (existingFile.exists() && existingFile.canRead()) {
 	    String ext = getFileExtension(toContent.getImageFileName());
 	    String newFileName = FileUtil.generateUniqueContentFolderID() + ext;
 
@@ -233,7 +233,19 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	    copyFile(existingFile, newFilePath);
 	    return newFileName;
 	} else {
-	    return null;
+	    // if cant find or read the file, just copy the default image file
+	    if (existingFile.exists() && existingFile.canRead()) {
+        	File existingFile2 = new File(getDefaultContent().getImageFileName());
+		String ext = getFileExtension(toContent.getImageFileName());
+		String newFileName = FileUtil.generateUniqueContentFolderID() + ext;
+		String newFilePath = realBaseDir + File.separator + newFileName;
+		copyFile(existingFile2, newFilePath);
+		return newFileName;
+	    }
+	    else
+	    {
+		throw new PixlrException("Could not find file to copy");
+	    }
 	}
     }
 
@@ -375,7 +387,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 		copyFile(imageFile, newFilePath);
 		pixlr.setImageFileName(newFileName);
 	    } else {
-		pixlr.setImageFileName(PixlrConstants.DEFAULT_IMAGE_FILE_NAME);
+		pixlr.setImageFileName(getDefaultContent().getImageFileName());
 	    }
 
 	    pixlrDAO.saveOrUpdate(pixlr);

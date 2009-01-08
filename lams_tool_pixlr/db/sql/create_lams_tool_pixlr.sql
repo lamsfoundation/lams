@@ -26,7 +26,10 @@ INSERT INTO tl_lapixl10_pixlr (
 	reflect_on_activity,
 	allow_view_others_images,
 	image_width, 
-	image_height) 
+	image_height,
+	image_file_name
+	
+) 
 VALUES(
 	"Pixlr",
 	"Instructions",
@@ -40,6 +43,7 @@ VALUES(
 	0,
 	1,
 	200,
-	200
+	200,
+	"blank.jpg"
 );
 

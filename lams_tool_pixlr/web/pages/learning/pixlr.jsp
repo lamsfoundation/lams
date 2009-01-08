@@ -80,7 +80,7 @@
 
 	<br />
 	<div style="text-align:center;">
-		<img id="image" title='<fmt:message key="tooltip.openfullsize" />' onclick="openImage('${currentImageURL}')" src="${currentImageURL}" />
+		<img id="image" border="1" title='<fmt:message key="tooltip.openfullsize" />' onclick="openImage('${currentImageURL}')" src="${currentImageURL}" />
 		
 		<br />
 		<br />
@@ -107,11 +107,17 @@
 	
 	if (image.height >= image.width)
 	{
-		image.height = 300;
+		if (image.height > 300)
+		{
+			image.height = 300;
+		}
 	}
 	else
 	{
-		image.width = 300;
+		if (image.width > 300)
+		{
+			image.width = 300;
+		}
 	}
 //-->
 </script>

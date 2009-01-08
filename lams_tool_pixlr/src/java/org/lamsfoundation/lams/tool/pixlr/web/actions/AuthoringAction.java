@@ -142,11 +142,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	Boolean imageExists = false;
 	if ((pixlr.getImageFileName() != null && !pixlr.getImageFileName().equals(""))) {
 	    imageUrl += pixlr.getImageFileName();
-	    if (!pixlr.getImageFileName().equals(PixlrConstants.DEFAULT_IMAGE_FILE_NAME)) {
+	    if (!pixlr.getImageFileName().equals(pixlrService.getDefaultContent().getImageFileName())) {
 		imageExists = true;
 	    }
 	} else {
-	    imageUrl += PixlrConstants.DEFAULT_IMAGE_FILE_NAME;
+	    imageUrl += pixlrService.getDefaultContent().getImageFileName();
 	}
 	request.setAttribute("imageURL", imageUrl);
 	request.setAttribute("imageExists", imageExists);
