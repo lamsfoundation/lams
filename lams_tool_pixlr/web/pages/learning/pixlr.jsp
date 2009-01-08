@@ -3,15 +3,7 @@
 <script type="text/javascript">
 <!--
 	var mode = "${mode}";
-
-	function disableFinishButton() {
-		document.getElementById("finishButton").disabled = true;
-	}
-
-	function validateForm() {
-	}
 	
-	var popupWindow = null;
 	
 	function openPixlr(url)
 	{
@@ -19,24 +11,13 @@
 		url += "&image=" + escape("${currentImageURL}");
 		openPopup(url, 570, 796);
 	}
-	
-	function openImage(url)
-	{
-		openPopup(url, origImageHeight, origImageWidth)
-	}
-	
-	function openPopup(url, height, width)
-	{	
-		if(popupWindow && popupWindow.open && !popupWindow.closed){
-			popupWindow.close();
-		}
-		popupWindow = window.open(url,'popupWindow','resizable,width=' +width+ ',height=' +height+ ',scrollbars');
-	}
-	
+
 	function refresh()
 	{
 		window.location.href = "<lams:WebAppURL/>/learning.do?mode=${mode}&toolSessionID=${toolSessionID}&redoQuestion=true";
 	}
+	
+	
 
 //-->
 </script>
@@ -100,24 +81,8 @@
 
 <script type="text/javascript">
 <!--
-	//resizing image to thumbnail size
-	var image = document.getElementById("image");
-	var origImageHeight = image.height;
-	var origImageWidth =  image.width;
 	
-	if (image.height >= image.width)
-	{
-		if (image.height > 300)
-		{
-			image.height = 300;
-		}
-	}
-	else
-	{
-		if (image.width > 300)
-		{
-			image.width = 300;
-		}
-	}
+	
+	
 //-->
 </script>
