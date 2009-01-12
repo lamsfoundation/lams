@@ -29,7 +29,8 @@
     require_once($CFG->dirroot.'/mod/quiz/editlib.php');
     //Gets Lams update URL if the quiz was created in a sequence
     $lamsupdateurl = optional_param('lamsUpdateURL', PARAM_TEXT);//lams update address to come back to Lams after editing the quiz
-    /**
+    $is_learner  = optional_param('is_learner',0, PARAM_INT);
+	/**
      * Callback function called from question_list() function (which is called from showbank())
      * Displays action icon as first action for each question.
      */
@@ -306,8 +307,11 @@
         if ($quiz->is_lams==1){
         	// old redirect(urldecode($lamsupdateurl)."&extToolContentID=$quiz->id");
         	//include the javascript code so we can call the button frame and change the button properties so it can be shown
-        	include('showlamsfinish.php');
-      
+	        if($is_learner==0){	
+	        	include('showlamsfinish.php');
+	        }else{
+	        	include('showlamsnext.php');
+	        }
         }
         $significantchangemade = true;
     }
