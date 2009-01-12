@@ -28,6 +28,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrAttachment;
+import org.lamsfoundation.lams.tool.pixlr.model.PixlrConfigItem;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrException;
@@ -154,11 +155,28 @@ public interface IPixlrService {
      * 
      */
     void updateEntry(NotebookEntry notebookEntry);
-    
+
     /**
      * Helper method to extract file extension from a string
+     * 
      * @param fileName
      * @return
      */
     String getFileExtension(String fileName);
+
+    /**
+     * Get the pixlr config item by key
+     * 
+     * @param key
+     * @return
+     */
+    public PixlrConfigItem getConfigItem(String key);
+
+    /**
+     * Save a pixlr configItem
+     * 
+     * @param item
+     */
+    public void saveOrUpdatePixlrConfigItem(PixlrConfigItem item);
+
 }

@@ -29,7 +29,8 @@ classpath_addition,
 context_file,
 create_date_time,
 modified_date_time,
-supports_outputs
+supports_outputs,
+admin_url
 )
 VALUES
 (
@@ -60,5 +61,6 @@ NULL,
 '/org/lamsfoundation/lams/tool/pixlr/pixlrApplicationContext.xml',
 NOW(),
 NOW(),
-0
+0,
+'tool/lapixl10/lapixl10admin.do'
 )

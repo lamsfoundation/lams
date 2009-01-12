@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.pixlr.dto.PixlrDTO;
 import org.lamsfoundation.lams.tool.pixlr.dto.PixlrUserDTO;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
+import org.lamsfoundation.lams.tool.pixlr.model.PixlrConfigItem;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
 import org.lamsfoundation.lams.tool.pixlr.service.IPixlrService;
@@ -91,7 +92,6 @@ public class LearningAction extends LamsDispatchAction {
 
     private static final boolean MODE_OPTIONAL = false;
     private static final String PIXLR_UTL = "http://www.pixlr.com/editor/";
-    
 
     private IPixlrService pixlrService;
 
@@ -183,6 +183,7 @@ public class LearningAction extends LamsDispatchAction {
 	String url = PIXLR_UTL + "?";
 	url += "&title=" + URLEncoder.encode(pixlr.getTitle(), "UTF8");
 	url += "&referrer=LAMS";
+	url += "&loc=" + getPixlrLocale();
 
 	String currentImageURL;
 
@@ -451,5 +452,33 @@ public class LearningAction extends LamsDispatchAction {
 	request.setAttribute("mode", mode);
 	request.setAttribute("pixlrImageFolderURL", PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL);
 	return mapping.findForward("viewAll");
+    }
+
+    /**
+     * Work out if this user's language is supported by pixlr
+     * 
+     * @return
+     */
+    private String getPixlrLocale() {
+	String locale = "en";
+
+	String languagesCSV = pixlrService.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV) != null ? pixlrService
+		.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV).getConfigValue() : null;
+
+	if (languagesCSV != null && !languagesCSV.equals("")) {
+	    UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+
+	    String[] languages = languagesCSV.split(",");
+
+	    for (int i = 0; i < languages.length; i++) {
+		if (languages[i].equals(user.getFckLanguageMapping())) {
+		    locale = languages[i];
+		    break;
+		}
+	    }
+
+	}
+
+	return locale;
     }
 }

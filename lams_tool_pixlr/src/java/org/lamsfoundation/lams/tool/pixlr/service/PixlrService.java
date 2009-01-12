@@ -66,11 +66,13 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrAttachmentDAO;
+import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrConfigItemDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrSessionDAO;
 import org.lamsfoundation.lams.tool.pixlr.dao.IPixlrUserDAO;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrAttachment;
+import org.lamsfoundation.lams.tool.pixlr.model.PixlrConfigItem;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrConstants;
@@ -120,6 +122,8 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     private ICoreNotebookService coreNotebookService;
 
     private PixlrOutputFactory pixlrOutputFactory;
+    
+    private IPixlrConfigItemDAO pixlrConfigItemDAO;
 
     public PixlrService() {
 	super();
@@ -235,15 +239,13 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	} else {
 	    // if cant find or read the file, just copy the default image file
 	    if (existingFile.exists() && existingFile.canRead()) {
-        	File existingFile2 = new File(getDefaultContent().getImageFileName());
+		File existingFile2 = new File(getDefaultContent().getImageFileName());
 		String ext = getFileExtension(toContent.getImageFileName());
 		String newFileName = FileUtil.generateUniqueContentFolderID() + ext;
 		String newFilePath = realBaseDir + File.separator + newFileName;
 		copyFile(existingFile2, newFilePath);
 		return newFileName;
-	    }
-	    else
-	    {
+	    } else {
 		throw new PixlrException("Could not find file to copy");
 	    }
 	}
@@ -616,6 +618,14 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	}
     }
 
+    public PixlrConfigItem getConfigItem(String key) {
+	return pixlrConfigItemDAO.getConfigItemByKey(key);
+    }
+
+    public void saveOrUpdatePixlrConfigItem(PixlrConfigItem item) {
+	pixlrConfigItemDAO.saveOrUpdate(item);
+    }
+
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
     /**
@@ -744,5 +754,13 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     public void setPixlrOutputFactory(PixlrOutputFactory pixlrOutputFactory) {
 	this.pixlrOutputFactory = pixlrOutputFactory;
+    }
+
+    public IPixlrConfigItemDAO getPixlrConfigItemDAO() {
+        return pixlrConfigItemDAO;
+    }
+
+    public void setPixlrConfigItemDAO(IPixlrConfigItemDAO pixlrConfigItemDAO) {
+        this.pixlrConfigItemDAO = pixlrConfigItemDAO;
     }
 }

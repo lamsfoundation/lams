@@ -25,6 +25,10 @@
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.pixlr.web.forms.AuthoringForm"
     />
+    <form-bean
+      name="lapixlr10AdminForm"
+      type="org.lamsfoundation.lams.tool.pixlr.web.forms.AdminForm"
+    />
 
   </form-beans>
 
@@ -118,6 +122,21 @@
       <forward
         name="viewAll"
         path="/pages/learning/viewAll.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/lapixl10admin"
+      type="org.lamsfoundation.lams.tool.pixlr.web.actions.AdminAction"
+      name="lapixl10AdminForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="config"
+        path="/pages/admin/config.jsp"
         redirect="false"
       />
     </action>
