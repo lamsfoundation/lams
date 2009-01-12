@@ -124,46 +124,45 @@
 
     if (!empty($USER->id) && !has_capability('moodle/legacy:guest', $context, NULL, false)) {
         $SESSION->fromdiscussion = "$FULLME";
-        if (forum_is_forcesubscribed($forum)) {
-            $streveryoneisnowsubscribed = get_string('everyoneisnowsubscribed', 'forum');
-            $strallowchoice = get_string('allowchoice', 'forum');
-            echo '<span class="helplink">' . get_string("forcessubscribe", 'forum') . '</span><br />';
-            helpbutton("subscription", $strallowchoice, "forum");
-            echo '&nbsp;<span class="helplink">';
-            if (has_capability('mod/forum:managesubscriptions', $context)) {
-                echo "<a title=\"$strallowchoice\" href=\"subscribe.php?id=$forum->id&amp;force=no\">$strallowchoice</a>";
-            } else {
-                echo $streveryoneisnowsubscribed;
-            }
-            echo '</span><br />';
-
-        } else if ($forum->forcesubscribe == FORUM_DISALLOWSUBSCRIBE) {
-            $strsubscriptionsoff = get_string('disallowsubscribe','forum');
-            echo $strsubscriptionsoff;
-            helpbutton("subscription", $strsubscriptionsoff, "forum");
-        } else {
-            $streveryonecannowchoose = get_string("everyonecannowchoose", "forum");
-            $strforcesubscribe = get_string("forcesubscribe", "forum");
-            $strshowsubscribers = get_string("showsubscribers", "forum");
-            echo '<span class="helplink">' . get_string("allowsallsubscribe", 'forum') . '</span><br />';
-            helpbutton("subscription", $strforcesubscribe, "forum");
-            echo '&nbsp;';
-
-            if (has_capability('mod/forum:managesubscriptions', $context)) {
-                echo "<span class=\"helplink\"><a title=\"$strforcesubscribe\" href=\"subscribe.php?id=$forum->id&amp;force=yes\">$strforcesubscribe</a></span>";
-            } else {
-                echo '<span class="helplink">'.$streveryonecannowchoose.'</span>';
-            }
-
-            if(has_capability('mod/forum:viewsubscribers', $context)){
-                echo "<br />";
-                echo "<span class=\"helplink\"><a href=\"subscribers.php?id=$forum->id\">$strshowsubscribers</a></span>";
-            }
-
-            echo '<div class="helplink" id="subscriptionlink">', forum_get_subscribe_link($forum, $context,
-                    array('forcesubscribed' => '', 'cantsubscribe' => '')), '</div>';
+	        if (forum_is_forcesubscribed($forum)) {
+	            $streveryoneisnowsubscribed = get_string('everyoneisnowsubscribed', 'forum');
+	            $strallowchoice = get_string('allowchoice', 'forum');
+	            echo '<span class="helplink">' . get_string("forcessubscribe", 'forum') . '</span><br />';
+	            helpbutton("subscription", $strallowchoice, "forum");
+	            echo '&nbsp;<span class="helplink">';
+	            if (has_capability('mod/forum:managesubscriptions', $context)) {
+	                echo "<a title=\"$strallowchoice\" href=\"subscribe.php?id=$forum->id&amp;force=no\">$strallowchoice</a>";
+	            } else {
+	                echo $streveryoneisnowsubscribed;
+	            }
+	            echo '</span><br />';
+	
+	        } else if ($forum->forcesubscribe == FORUM_DISALLOWSUBSCRIBE) {
+	            $strsubscriptionsoff = get_string('disallowsubscribe','forum');
+	            echo $strsubscriptionsoff;
+	            helpbutton("subscription", $strsubscriptionsoff, "forum");
+	        } else {
+	            $streveryonecannowchoose = get_string("everyonecannowchoose", "forum");
+	            $strforcesubscribe = get_string("forcesubscribe", "forum");
+	            $strshowsubscribers = get_string("showsubscribers", "forum");
+	            echo '<span class="helplink">' . get_string("allowsallsubscribe", 'forum') . '</span><br />';
+	            helpbutton("subscription", $strforcesubscribe, "forum");
+	            echo '&nbsp;';
+	
+	            if (has_capability('mod/forum:managesubscriptions', $context)) {
+	                echo "<span class=\"helplink\"><a title=\"$strforcesubscribe\" href=\"subscribe.php?id=$forum->id&amp;force=yes\">$strforcesubscribe</a></span>";
+	            } else {
+	                echo '<span class="helplink">'.$streveryonecannowchoose.'</span>';
+	            }
+	
+	            if(has_capability('mod/forum:viewsubscribers', $context)){
+	                echo "<br />";
+	                echo "<span class=\"helplink\"><a href=\"subscribers.php?id=$forum->id\">$strshowsubscribers</a></span>";
+	            }
+	
+	            echo '<div class="helplink" id="subscriptionlink">', forum_get_subscribe_link($forum, $context,
+	                    array('forcesubscribed' => '', 'cantsubscribe' => '')), '</div>';
         }
-
         if (forum_tp_can_track_forums($forum)) {
             echo '<div class="helplink" id="trackinglink">'. forum_get_tracking_link($forum). '</div>';
         }
