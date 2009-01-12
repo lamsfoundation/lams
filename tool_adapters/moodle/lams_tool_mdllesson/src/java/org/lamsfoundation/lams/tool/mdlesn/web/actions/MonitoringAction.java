@@ -64,7 +64,7 @@ public class MonitoringAction extends LamsDispatchAction {
     private static final String TOOL_APP_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
 	    + MdlLessonConstants.TOOL_SIGNATURE + "/";
 
-    public static final String RELATIVE_MONITOR_URL = "mod/lesson/view.php?";
+    public static final String RELATIVE_MONITOR_URL = "course/modedit-lams.php?";
 
     public IMdlLessonService mdlLessonService;
 
@@ -98,7 +98,7 @@ public class MonitoringAction extends LamsDispatchAction {
 			+ sessionDTO.getSessionID().toString() + "&dispatch=finishActivity";
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
 
-		responseUrl += "&id=" + sessionDTO.getExtSessionID() + "&returnUrl=" + returnUrl;
+		responseUrl += "&update=" + sessionDTO.getExtSessionID()+ "&id=" + sessionDTO.getExtSessionID() + "&returnUrl=" + returnUrl;
 
 		sessionDTO.setRunTimeUrl(responseUrl);
 	    } catch (UnsupportedEncodingException e) {
