@@ -881,18 +881,23 @@ function choice_import_instance($filepath, $userid, $courseid, $sectionid) {
  * LAMS Function
  * Return a statistic for a given user in this Moodle choice for use in branching
  */
-function choice_get_tool_output($id, $userid,$optionid) {
+function choice_get_tool_output($id, $userid,$orderID) {
     $cm = get_record('course_modules', 'id', $id);
     if ($cm) {
     	$choice=get_record('choice', 'id', $cm->instance);
 		if ($choice) {
-			$option = get_record('choice_answers', 'choiceid', $choice->id, 'userid', $userid);
-			
-			if($option->optionid==$optionid){
-			
+			$useroption = get_record('choice_answers', 'choiceid', $choice->id, 'userid', $userid);
+			$options = get_records('choice_options', 'choiceid', $choice->id);
+			$i=1;
+			foreach ($options as $option) {
+				$num=$option->id;
+				$orderoptions[$num]=$i;
+				$i++;
+			}
+			$num=$useroption->optionid;
+			if($orderID==$orderoptions[$num]){
 					return true;
 			}else{
-			
 					return false;
 			}
 		}
@@ -914,12 +919,12 @@ function choice_get_options($id) {
 							  header('Content-Type: text/plain');
 							  
 							  echo("<?xml version='1.0'?>");	
-							  echo('<choices>');		  
+							  echo('<choices>');	
+							  $i=1;	  
 				           	  foreach ($options as $option) {
 				            			$text=mb_ereg_replace('#', '_', $option->text);
-				            			//addslashes(
-				            			echo('<choice option="'.addslashes(utf8_decode($text)).'" optionID="'.$option->id.'"/>');
-				              			
+				            			echo('<choice option="'.addslashes(utf8_decode($text)).'" orderID="'.$i.'"/>');
+				              			$i++;
 				              }
 				              echo('</choices>'); 
 					}
