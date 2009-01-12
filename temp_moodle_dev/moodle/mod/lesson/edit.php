@@ -297,7 +297,7 @@
                 break;
         }
     } 
-	if($cm->is_lams==1&&$uploaded==1){
+	if($cm->is_lams==1&&$uploaded==1&&$is_learner==0){
 		 		//lams: display the next activity button 
             	include('showlamsfinish.php');   
 	}
