@@ -76,7 +76,7 @@ public class LearningAction extends LamsDispatchAction {
 
     public static final String RELATIVE_LEARNER_URL = "course/lamsframes.php?";
     public static final String MOODLE_VIEW_URL = "mod/wiki/view.php";
-    public static final String RELATIVE_TEACHER_URL = "mod/wiki/report.php?";
+    public static final String RELATIVE_TEACHER_URL = "mod/wiki/view.php?page=info/Wiki";
     
     private IMdlWikiService mdlWikiService;
 
