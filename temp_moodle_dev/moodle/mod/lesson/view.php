@@ -18,7 +18,7 @@
     $edit    = optional_param('edit', -1, PARAM_BOOL);
     $uploaded = optional_param('uploaded',0, PARAM_INT); // 1 if something has been edited in the lesson
     $editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
-    
+    $is_learner  = optional_param('is_learner',0, PARAM_INT);
     list($cm, $course, $lesson) = lesson_get_basics($id);
 
     require_login($course->id, false, $cm);
@@ -192,7 +192,7 @@
                 lesson_set_message(get_string('lessonnotready', 'lesson', $course->teacher)); // a nice message to the student
             } else {
                 if (!count_records('lesson_pages', 'lessonid', $lesson->id)) {
-                    redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id"); // no pages - redirect to add pages
+                    redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id&is_learner=$is_learner"); // no pages - redirect to add pages
                 } else {
                     lesson_set_message(get_string('lessonpagelinkingbroken', 'lesson'));  // ok, bad mojo
                 }
@@ -1064,9 +1064,8 @@
     	if($uploaded==1||$editing==1){
 		 		//lams: display the finish edditing button if we have added any kind of question
             	include('showlamsfinish.php');   
-    	}elseif($finishlesson==1||!get_record('lesson_pages', 'lessonid', $lesson->id)){
+    	}elseif($finishlesson==1||$is_learner==1||!get_record('lesson_pages', 'lessonid', $lesson->id)){
     			//lams: display the next activity button if we have added any kind of question
-    			echo("dfdfdf");
             	include('showlamsnext.php');   
     	}
 	}
