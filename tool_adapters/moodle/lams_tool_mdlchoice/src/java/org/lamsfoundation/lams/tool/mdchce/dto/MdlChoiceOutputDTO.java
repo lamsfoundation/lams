@@ -30,7 +30,7 @@ package org.lamsfoundation.lams.tool.mdchce.dto;
  */
 public class MdlChoiceOutputDTO {
     
-    private long id;
+    private long orderId;
     private String choice;
     
     public MdlChoiceOutputDTO() {
@@ -38,18 +38,18 @@ public class MdlChoiceOutputDTO {
 	// TODO Auto-generated constructor stub
     }
 
-    public MdlChoiceOutputDTO(long id, String choice) {
+    public MdlChoiceOutputDTO(long orderId, String choice) {
 	super();
-	this.id = id;
+	this.orderId = orderId;
 	this.choice = choice;
     }
 
-    public long getId() {
-        return id;
+    public long getOrderId() {
+        return orderId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setOrderId(long orderId) {
+        this.orderId = orderId;
     }
 
     public String getChoice() {

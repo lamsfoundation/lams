@@ -263,7 +263,7 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
     }
 
     public boolean getExternalToolOutputBoolean(String outputName, MdlChoice mdlChoice, Long userId, String extToolContentId,
-	    Long toolSessionId, String optionID) {
+	    Long toolSessionId, String choiceOrderId) {
 	MdlChoiceUser user = this.getUserByUserIdAndSessionId(userId, toolSessionId);
 	ExtServerOrgMap extServerMap = getExtServerOrgMap();
 
@@ -279,7 +279,7 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
 	    params.put(EXT_SERVER_PARAM_EXT_TOOL_CONTENT_ID, extToolContentId);
 	    params.put(EXT_SERVER_PARAM_METHOD, EXT_SERVER_METHOD_OUTPUT);
 	    params.put(EXT_SERVER_PARAM_OUTPUT_NAME, URLEncoder.encode(outputName, "UTF8"));
-	    params.put("optionID", URLEncoder.encode(optionID, "UTF8"));
+	    params.put("orderID", URLEncoder.encode(choiceOrderId, "UTF8"));
 
 	    InputStream is = WebUtility.getResponseInputStreamFromExternalServer(outputServletUrl, params);
 	    BufferedReader isReader = new BufferedReader(new InputStreamReader(is));
@@ -395,7 +395,7 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
 	    for (int i = 0; i < list.getLength(); i++) {
 		NamedNodeMap markerNode = ((Node) list.item(i)).getAttributes();
 		String choice = markerNode.getNamedItem("option").getNodeValue();
-		long id = Long.parseLong(markerNode.getNamedItem("optionID").getNodeValue());
+		long id = Long.parseLong(markerNode.getNamedItem("orderID").getNodeValue());
 		MdlChoiceOutputDTO dto = new MdlChoiceOutputDTO(id, choice);
 		choices.add(dto);
 	    }

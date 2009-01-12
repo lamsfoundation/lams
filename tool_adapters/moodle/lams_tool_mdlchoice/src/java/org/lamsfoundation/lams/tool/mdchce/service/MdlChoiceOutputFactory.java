@@ -73,7 +73,7 @@ public class MdlChoiceOutputFactory extends OutputFactory {
 
 		    int order = 1;
 		    for (MdlChoiceOutputDTO dto : choices) {
-			String name = buildConditionName(LEARNER_CHOICE_OUTPUT, "" + dto.getId());
+			String name = buildConditionName(LEARNER_CHOICE_OUTPUT, "" + dto.getOrderId());
 			defaultConditions.add(new BranchCondition(null, null, new Integer(order++), name, dto.getChoice(),
 				OutputType.OUTPUT_BOOLEAN.toString(), null, null, Boolean.TRUE.toString()));
 			order++;
@@ -132,10 +132,10 @@ public class MdlChoiceOutputFactory extends OutputFactory {
 	}
 	
 	String choiceOutputName = "";
-	String choiceId = "";
+	String choiceOrderId = "";
 	try {
 	    choiceOutputName = dcNames[0];
-	    choiceId = dcNames[1];
+	    choiceOrderId = dcNames[1];
 	} catch (Exception e) {
 	    log.error("Problem retrieving outputs"
 		    + LEARNER_CHOICE_OUTPUT
@@ -146,7 +146,7 @@ public class MdlChoiceOutputFactory extends OutputFactory {
 	if (userId != null) {
 	    
 	    return mdlChoiceService.getExternalToolOutputBoolean(choiceOutputName, mdlChoice, userId, extToolContentId,
-			toolSessionId, choiceId); 
+			toolSessionId, choiceOrderId); 
 	}
 	return false;
     }
