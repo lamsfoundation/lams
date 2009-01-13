@@ -90,7 +90,7 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		Iterator i = subActivities.iterator();
 		int completedCount = 0;
 		while (i.hasNext()) {
-			ActivityURL activityURL = LearningWebUtil.getActivityURL( actionMappings, learnerProgress, (Activity)i.next(), false);
+			ActivityURL activityURL = LearningWebUtil.getActivityURL( actionMappings, learnerProgress, (Activity)i.next(), false, false);
 			if ( activityURL.isComplete() ) {
 				completedCount++;
 			}

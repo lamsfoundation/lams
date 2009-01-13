@@ -44,6 +44,7 @@ public class ActivityURL {
 	private String title;
 	private String description;
 	private boolean complete;
+	private boolean floating;
 	private byte status;
 	private boolean defaultURL;
 	private List<ActivityURL> childActivities;
@@ -55,6 +56,7 @@ public class ActivityURL {
 	{
 	    this.activityId = activityId;
 	    this.url = url;
+	    this.floating = false;
 	}
 	
 	public boolean isComplete() {
@@ -62,6 +64,15 @@ public class ActivityURL {
 	}
 	public void setComplete(boolean complete) {
 		this.complete = complete;
+	}
+	public boolean isFloating() {
+		return floating;
+	}
+	public boolean getFloating() {
+		return floating;
+	}
+	public void setFloating(boolean floating) {
+		this.floating = floating;
 	}
 	public String getTitle() {
 		return title;

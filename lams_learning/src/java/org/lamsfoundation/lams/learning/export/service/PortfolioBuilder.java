@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.learning.export.NotebookPortfolio;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.ISystemToolActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
@@ -240,6 +241,10 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	}
 
     }
+    
+    public void startFloatingActivity(FloatingActivity activity) throws LearningDesignProcessorException {}
+	
+	public void endFloatingActivity(FloatingActivity activity) throws LearningDesignProcessorException {}
 
     /**
      * A system tool may be a simple or a complex activity, so the logic is in a method called by both

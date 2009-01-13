@@ -381,10 +381,9 @@ public class LearnerService implements ICoreLearnerService {
 
 	ProgressBuilder builder = new ProgressBuilder(progress, activityDAO, activityMapping);
 	builder.parseLearningDesign();
-	List<ActivityURL> list = builder.getActivityList();
 
 	Object[] retValue = new Object[2];
-	retValue[0] = list;
+	retValue[0] = (List<ActivityURL>) builder.getActivityList();;
 	retValue[1] = progress.getCurrentActivity() != null ? progress.getCurrentActivity().getActivityId() : null;
 
 	return retValue;
@@ -434,7 +433,8 @@ public class LearnerService implements ICoreLearnerService {
 
 	if (toActivity != null) {
 	    progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
-	    progress.setCurrentActivity(toActivity);
+	    if(!toActivity.isFloating())
+	    	progress.setCurrentActivity(toActivity);
 	    progress.setNextActivity(toActivity);
 	}
 

@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
 import org.lamsfoundation.lams.learningdesign.SimpleActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -55,6 +56,7 @@ public class ProgressBuilder extends LearningDesignProcessor {
 	ArrayList<ActivityURL> currentActivityList;
 	String forceLearnerURL;
 	boolean previewMode;
+	boolean isFloating;
 	
 	/** Create the builder. Supply all the data that will be needed to parse the design and build the portfolio entries. 
 	 * 
@@ -81,15 +83,17 @@ public class ProgressBuilder extends LearningDesignProcessor {
 
 		this.mainActivityList = new ArrayList<ActivityURL>();
 		this.currentActivityList = mainActivityList;
+		
 		this.activityListStack = new ArrayStack(5);
 
 		Lesson lesson = progress.getLesson();
 		previewMode = lesson.isPreviewLesson();
-		if ( previewMode) {
+		isFloating = false;
+		//if ( previewMode ) {
 			// setup the basic call to the learner screen, ready just to put the activity id on the end. Saves calculating it for every activity
 			this.forceLearnerURL = "learner.do?method=forceMoveRedirect&lessonID="
 				+progress.getLesson().getLessonId()+"&destActivityID=";
-		}
+		//}
 			
 
 	}
@@ -102,7 +106,9 @@ public class ProgressBuilder extends LearningDesignProcessor {
 
 		if ( activity.isSequenceActivity() ) {
 			return ( progress.getProgressState(activity) != LearnerProgress.ACTIVITY_NOT_ATTEMPTED );
-		} 
+		} else if ( activity.isFloatingActivity() ) {
+			isFloating = true;
+		}
 		return true;
 	}
 
@@ -136,6 +142,8 @@ public class ProgressBuilder extends LearningDesignProcessor {
 			complexActivityURL.setChildActivities(currentActivityList);
 			currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
 			currentActivityList.add(complexActivityURL);
+			
+			if(activity.isFloatingActivity()) isFloating = false;
 		}
 	}
 
@@ -150,7 +158,7 @@ public class ProgressBuilder extends LearningDesignProcessor {
 		currentActivityList.add(p);
 		
 	}
-	
+
 	/**
 	 * Creates a progress object with properties activityId, activityName, activityDescription and progress status.
 	 * 
@@ -166,9 +174,12 @@ public class ProgressBuilder extends LearningDesignProcessor {
 			log.error(error);
 			throw new LearningDesignProcessorException(error);
 		}
-		ActivityURL activityURL =  LearningWebUtil.getActivityURL( activityMapping, progress, activity, false);
-		if ( activityURL.getStatus() == LearnerProgress.ACTIVITY_NOT_ATTEMPTED ) {
-			activityURL.setUrl( previewMode? forceLearnerURL+activity.getActivityId() : null);
+		ActivityURL activityURL =  LearningWebUtil.getActivityURL( activityMapping, progress, activity, false, isFloating);
+		if ( activityURL.getStatus() == LearnerProgress.ACTIVITY_NOT_ATTEMPTED && isFloating) {
+			activityURL.setUrl( (previewMode || isFloating) ? forceLearnerURL+activity.getActivityId() : null);
+		}
+		if (activity.isFloatingActivity()) {
+			activityURL.setUrl(null);
 		}
 		return activityURL;
 	}
@@ -177,6 +188,4 @@ public class ProgressBuilder extends LearningDesignProcessor {
 	public ArrayList<ActivityURL> getActivityList() {
 		return mainActivityList;
 	}
-	
-	
 }

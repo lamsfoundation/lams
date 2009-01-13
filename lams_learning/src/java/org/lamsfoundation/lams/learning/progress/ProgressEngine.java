@@ -96,6 +96,9 @@ public class ProgressEngine
         	}
             populateCurrentCompletedActivityList(learnerProgress, completedActivityList);
         	return setLessonComplete(learnerProgress, LearnerProgress.LESSON_IN_DESIGN_COMPLETE);
+        } else if ( completedActivity.isFloating() ) {
+        	// special case - floating activity
+        	return learnerProgress;
         } else {
 	        Transition transition = completedActivity.getTransitionFrom();
 	        if (transition != null)
@@ -299,6 +302,7 @@ public class ProgressEngine
                 		" to the complex activity. But activity type"+
                 		parent.getActivityTypeId()+" has been found");
             //move to next activity within parent if not all children are completed.
+            
             
             ComplexActivity complexParent = (ComplexActivity) activityDAO.getActivityByActivityId(parent.getActivityId(),ComplexActivity.class);
             if (! learnerProgress.getCompletedActivities().contains(complexParent) && !complexParent.areChildrenCompleted(learnerProgress))

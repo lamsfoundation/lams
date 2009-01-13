@@ -225,6 +225,9 @@ public class LearningWebUtil
 			progress = learnerService.completeActivity(learnerId, currentActivity,progress);
 		}
 	
+		if ( progress == null )
+			return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
+		
 		LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
 		LearningWebUtil.putLearnerProgressInRequest(request,progress);
 		return actionMappings.getProgressForward(progress, redirect, false, request, learnerService);
@@ -339,7 +342,7 @@ public class LearningWebUtil
 		return progressSummary.toString();
 	}
 
-	public static ActivityURL getActivityURL( ActivityMapping activityMapping, LearnerProgress learnerProgress, Activity activity, boolean defaultURL) {
+	public static ActivityURL getActivityURL( ActivityMapping activityMapping, LearnerProgress learnerProgress, Activity activity, boolean defaultURL, boolean isFloating) {
 		ActivityURL activityURL = new ActivityURL();
 		String url = activityMapping.getActivityURL(activity);
 		activityURL.setUrl(url);
@@ -352,7 +355,7 @@ public class LearningWebUtil
 		if ( status == LearnerProgress.ACTIVITY_COMPLETED) {
 		    activityURL.setComplete(true);
 		}
-		
+		activityURL.setFloating(isFloating);
 		activityURL.setDefaultURL(defaultURL);
 		return activityURL;
 	}

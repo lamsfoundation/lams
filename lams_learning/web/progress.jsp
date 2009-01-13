@@ -44,7 +44,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:if test="${status.first}">
 		<UL style="margin-right:0">
 	</c:if>
-
+	<c:if test="${activity.floating}">
+		<p>&nbsp;</p>
+	</c:if>
 	<lams:ProgressOutput activity="${activity}"/>
 	<c:if test="${status.last}">
 		</UL>

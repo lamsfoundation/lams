@@ -133,7 +133,7 @@ public class BranchingActivityAction extends LamsDispatchAction {
 	    		while (i.hasNext()) {
 	    			Activity nextBranch = (Activity)i.next();
 	    			ActivityURL activityURL = LearningWebUtil.getActivityURL( actionMappings, learnerProgress, 
-	    					nextBranch, branch != null && branch.equals(nextBranch));
+	    					nextBranch, branch != null && branch.equals(nextBranch), false);
 	    			if ( activityURL.isComplete() ) {
 	    				completedCount++;
 	    			}
