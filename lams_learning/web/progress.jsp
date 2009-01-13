@@ -37,6 +37,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		function loadFrame(url) {
 			parent.frames['contentFrame'].location.href = url;
 		}
+		function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){
+			window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
+		}
 	</script>
 <body>
 
