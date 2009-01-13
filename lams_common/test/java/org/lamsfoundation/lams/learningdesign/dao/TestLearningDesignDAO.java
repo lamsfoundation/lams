@@ -64,6 +64,13 @@ public class TestLearningDesignDAO extends AbstractCommonTestCase {
 		long x = 20;
 		assertEquals(activity.getActivityId().longValue(),x);
 	}
+	public void testCalculateFloatingActivity(){
+		learningDesign = learningDesignDAO.getLearningDesignById(new Long(1));
+		Activity activity = learningDesign.calculateFloatingActivity();
+		assertNotNull(activity.getActivityId());
+		long x = 20;
+		assertEquals(activity.getActivityId().longValue(),x);
+	}
 	public void testGetAllValidLearningDesignsInFolder(){
 		List list = learningDesignDAO.getAllValidLearningDesignsInFolder(new Integer(1));
 		System.out.println("SIZE:"+list.size());

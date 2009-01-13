@@ -189,6 +189,14 @@
         <column name="first_activity_id" />
     </many-to-one>
     
+    <!-- bi-directional many-to-one association to Activity-->    
+    
+    <many-to-one name="floatingActivity" class="org.lamsfoundation.lams.learningdesign.Activity">
+        <meta attribute="field-description">@hibernate.column name="floating_activity_id"         
+      	</meta>
+        <column name="floating_activity_id" />
+    </many-to-one>
+    
     <!-- bi-directional many-to-one association to LearningDesign -->
     
     <many-to-one name="originalLearningDesign" class="org.lamsfoundation.lams.learningdesign.LearningDesign">

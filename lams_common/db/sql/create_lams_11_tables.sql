@@ -346,6 +346,7 @@ CREATE TABLE lams_learning_design (
      , description TEXT
      , title VARCHAR(255)
      , first_activity_id BIGINT(20)
+     , floating_activity_id BIGINT(20)
      , max_id INT(11)
      , valid_design_flag TINYINT(4) NOT NULL
      , read_only_flag TINYINT(4) NOT NULL
@@ -386,6 +387,7 @@ CREATE TABLE lams_learning_design (
 )TYPE=InnoDB;
 CREATE INDEX idx_design_parent_id ON lams_learning_design (original_learning_design_id ASC);
 CREATE INDEX idx_design_first_act ON lams_learning_design (first_activity_id ASC);
+CREATE INDEX idx_design_floating_act ON lams_learning_design (floating_activity_id ASC);
 
 CREATE TABLE lams_grouping (
        grouping_id BIGINT(20) NOT NULL AUTO_INCREMENT

@@ -936,6 +936,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	// set first activity assumes that the transitions are all set up
 	// correctly.
 	newLearningDesign.setFirstActivity(newLearningDesign.calculateFirstActivity());
+	newLearningDesign.setFloatingActivity(newLearningDesign.calculateFloatingActivity());
 	newLearningDesign.setLearningDesignUIID(originalLearningDesign.getLearningDesignUIID());
 
 	updateCompetenceMappings(newLearningDesign.getCompetences(), newActivities);

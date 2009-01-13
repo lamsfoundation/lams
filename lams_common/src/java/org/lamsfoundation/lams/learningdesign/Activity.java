@@ -1161,5 +1161,13 @@ public abstract class Activity implements Serializable, Nullable {
 
 	return getParentBranch(parent, processedActivityIds);
     }
+    
+    public boolean isFloating() {
+    	if(parentActivity != null) {
+    		return parentActivity.isFloatingActivity();
+    	}
+    	
+    	return false;
+    }
 
 }

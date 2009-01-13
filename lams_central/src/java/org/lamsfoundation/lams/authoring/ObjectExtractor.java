@@ -470,6 +470,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	progressDefaultChildActivities();
 
 	learningDesign.setFirstActivity(learningDesign.calculateFirstActivity());
+	learningDesign.setFloatingActivity(learningDesign.calculateFloatingActivity());
 	learningDesignDAO.insertOrUpdate(learningDesign);
 
 	deleteUnwantedGroupings();

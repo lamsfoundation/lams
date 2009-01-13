@@ -65,6 +65,11 @@ public class LearningDesignValidator {
 	public Vector<ValidationErrorDTO> validate() {
 		errors = new Vector<ValidationErrorDTO>(); // initialises the list of validation messages.
 
+		// check the design has a starting or first activity
+		if(learningDesign.getFirstActivity() == null)
+			errors.add(new ValidationErrorDTO(ValidationErrorDTO.FIRST_ACTIVITY_ERROR_CODE, messageService
+					.getMessage(ValidationErrorDTO.FIRST_ACTIVITY_ERROR_KEY)));
+			
 		// check all activities have their necessary transitions. First check the 
 		// top level, then we need to check each branch inside a branching activity.
 		Set<Activity> topLevelActivities = extractFloatingActivities(learningDesign.getParentActivities());
@@ -93,9 +98,12 @@ public class LearningDesignValidator {
 	 * @param topLevelActivities	Set of Top-level activities.
 	 */
 	private Set<Activity> extractFloatingActivities(Set<Activity> topLevelActivities) {
-		for (Activity activity : (Set<Activity>) topLevelActivities)
-			if(activity.isFloatingActivity())
+		for (Activity activity : (Set<Activity>) topLevelActivities) {
+			if(activity.isFloatingActivity()) {
 				topLevelActivities.remove(activity);
+				return topLevelActivities;
+			}
+		}
 		
 		return topLevelActivities;
 	}

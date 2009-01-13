@@ -67,9 +67,16 @@ public abstract class LearningDesignProcessor {
 	/** Do any processing needed at the end of a complex activity */
 	public abstract void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException;
 	
+	/** A simple activity has been found. Do any processing needed at the start of the activity */
+	//public abstract void startFloatingActivity(FloatingActivity activity) throws LearningDesignProcessorException ;
+
+	/** Do any processing needed at the end of a complex activity */
+	//public abstract void endFloatingActivity(FloatingActivity activity) throws LearningDesignProcessorException;
+
 	public void parseLearningDesign() throws LearningDesignProcessorException {
 		if ( getDesign() != null ) {
 			handleActivity(getDesign().getFirstActivity());
+			if(getDesign().getFloatingActivity() != null) handleComplexActivity(getDesign().getFloatingActivity());
 		}
 	}
 	
@@ -132,7 +139,7 @@ public abstract class LearningDesignProcessor {
 		startSimpleActivity(simple);
 		endSimpleActivity(simple);
 	}
-
+	
 	public LearningDesign getDesign() {
 		return design;
 	}

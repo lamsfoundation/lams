@@ -42,15 +42,16 @@ public class ValidationErrorDTO {
 	public static final String GROUPING_SELECTED_ERROR_KEY = "validation.error.GroupingSelected"; // GS
 	public static final String OPTIONAL_ACTIVITY_ERROR_KEY = "validation.error.OptionalActivity"; // OA
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_KEY = "validation.error.OptionalActivityOrderId"; // OAOI
-	public static final String FLOATING_ACTIVITY_ERROR_KEY = "validation.error.FloatingActivity"; // OA
-	public static final String FLOATING_ACTIVITY_MAX_ERROR_KEY = "validation.error.FloatingActivity.maximum"; // OA
+	public static final String FLOATING_ACTIVITY_ERROR_KEY = "validation.error.FloatingActivity"; // FLA
+	public static final String FLOATING_ACTIVITY_MAX_ERROR_KEY = "validation.error.FloatingActivity.maximum"; // FLA
 	public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1"; // SG
 	public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";
 	public static final String CONDITION_GATE_ACTVITY_CONDITION = "validation.error.conditionGateMustHaveACondition"; // CGC
 	public static final String CONDITION_GATE_ACTVITY_TOOLINPUT = "validation.error.conditionGateMustHaveAnInputToolActivity"; // CGI
 	public static final String GROUPING_ACTIVITY_MISSING_GROUPING_KEY = "validation.error.grouping.missing"; // GM
 	public static final String GROUPING_ACTIVITY_GROUP_COUNT_MISMATCH_KEY = "validation.error.group.count.mismatch"; // GC
-
+	public static final String FIRST_ACTIVITY_ERROR_KEY = "validation.error.first.activity"; // FIA
+	
 	public static final String BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH = "validation.error.branching.must.have.a.branch"; // BB
 	public static final String BRANCHING_ACTIVITY_MUST_HAVE_DEFAULT_BRANCH = "validation.error.toolBranchingMustHaveDefaultBranch"; // BDB
 	public static final String SEQUENCE_ACTIVITY_MUST_HAVE_FIRST_ACTIVITY = "validation.error.sequenceActivityMustHaveFirstActivity"; // SFA
@@ -70,7 +71,7 @@ public class ValidationErrorDTO {
 	public static final String GROUPING_SELECTED_ERROR_CODE = "GS";
 	public static final String OPTIONAL_ACTIVITY_ERROR_CODE = "OA";
 	public static final String OPTIONAL_ACTIVITY_ORDER_ID_INVALID_ERROR_CODE = "OAOI";
-	public static final String FLOATING_ACTIVITY_ERROR_CODE = "FA";
+	public static final String FLOATING_ACTIVITY_ERROR_CODE = "FLA";
 	public static final String FLOATING_ACTIVITY_MAX_ERROR_CODE = "FAMX";
 	public static final String SCHEDULE_GATE_ERROR_CODE = "SG1";
 	public static final String CONDITION_GATE_ACTVITY_CONDITION_ERROR_CODE = "CGC";
@@ -85,7 +86,8 @@ public class ValidationErrorDTO {
 	public static final String BRANCH_CONDITION_INVALID_ERROR_CODE = "BCOND";
 	public static final String BRANCHING_ACTVITY_TOOLINPUT_ERROR_CODE = "BTI";
 	public static final String BRANCHING_ACTVITY_TOOLCONDITION_ERROR_CODE = "BTC";
-
+	public static final String FIRST_ACTIVITY_ERROR_CODE = "FIA";
+	
 	private static MessageResources resources = MessageResources.getMessageResources(ValidationErrorDTO.CONFIG_PARAM);
 	/**
 	 * Rule: Other (Covers any cases that are not covered by another code)

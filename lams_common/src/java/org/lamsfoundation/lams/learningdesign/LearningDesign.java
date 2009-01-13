@@ -79,6 +79,9 @@ public class LearningDesign implements Serializable {
 
 	/** nullable persistent field */
 	private Activity firstActivity;
+	
+	/** nullable persistent field */
+	private Activity floatingActivity;
 
 	/** nullable persistent field */
 	private Integer maxID;
@@ -167,6 +170,7 @@ public class LearningDesign implements Serializable {
 			String description,
 			String title,
 			Activity firstActivity,
+			Activity floatingActivity,
 			Integer maxID,
 			Boolean validDesign,
 			Boolean readOnly,
@@ -194,6 +198,7 @@ public class LearningDesign implements Serializable {
 		this.description = description;
 		this.title = title;
 		this.firstActivity = firstActivity;
+		this.floatingActivity = floatingActivity;
 		this.maxID = maxID;
 		this.validDesign = validDesign;
 		this.readOnly = readOnly;
@@ -483,12 +488,25 @@ public class LearningDesign implements Serializable {
 		Iterator parentIterator = parentActivities.iterator();
 		while(parentIterator.hasNext()){
 			Activity activity = (Activity)parentIterator.next();
-			if(activity.getTransitionTo()==null){
+			if(activity.getTransitionTo()==null && !activity.isFloatingActivity()){
 				newFirstActivity = activity;
 				break;
 			}
 		}
 		return newFirstActivity;
+	}
+	public Activity calculateFloatingActivity(){
+		Activity newFloatingActivity = null;
+		HashSet parentActivities = this.getParentActivities();
+		Iterator parentIterator = parentActivities.iterator();
+		while(parentIterator.hasNext()){
+			Activity activity = (Activity)parentIterator.next();
+			if(activity.isFloatingActivity()){
+				newFloatingActivity = activity;
+				break;
+			}
+		}
+		return newFloatingActivity;
 	}
 	public WorkspaceFolder getWorkspaceFolder() {
 		return workspaceFolder;
@@ -565,7 +583,13 @@ public class LearningDesign implements Serializable {
 		this.competences = competences;
 	}
    
-   
+	public void setFloatingActivity(Activity activity) {
+		floatingActivity = activity;
+	}
+	
+	public Activity getFloatingActivity() {
+		return floatingActivity;
+	}
 
 
 }

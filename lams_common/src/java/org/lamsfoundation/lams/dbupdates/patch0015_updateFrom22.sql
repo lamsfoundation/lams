@@ -9,6 +9,11 @@ SET AUTOCOMMIT = 0;
 ALTER TABLE lams_tool ADD COLUMN pedagogical_planner_url TEXT;
 ALTER TABLE lams_system_tool ADD COLUMN pedagogical_planner_url TEXT;
 UPDATE lams_system_tool SET pedagogical_planner_url='pedagogicalPlanner/initGrouping.do' WHERE system_tool_id=1;
+
+-- LDEV-2074 --------------
+ALTER TABLE lams_learning_design ADD COLUMN first_activity_id BIGINT(20);
+CREATE INDEX idx_design_floating_act ON lams_learning_design (floating_activity_id ASC);
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

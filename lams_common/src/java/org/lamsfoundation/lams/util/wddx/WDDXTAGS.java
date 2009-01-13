@@ -170,6 +170,8 @@ public interface WDDXTAGS {
     public static final String LEARNING_DESIGN_UIID = "learningDesignUIID";
     public static final String FIRST_ACTIVITY_ID = "firstActivityID";
     public static final String FIRST_ACTIVITY_UIID = "firstActivityUIID";
+    public static final String FLOATING_ACTIVITY_ID = "floatingActivityID";
+    public static final String FLOATING_ACTIVITY_UIID = "floatingActivityUIID";
 
     public static final String MAX_ID = "maxID";
     public static final String VALID_DESIGN = "validDesign";

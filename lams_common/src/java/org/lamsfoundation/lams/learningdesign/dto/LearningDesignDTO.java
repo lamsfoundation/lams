@@ -56,6 +56,8 @@ public class LearningDesignDTO extends BaseDTO{
 	private String title;	
 	private Long firstActivityID;
 	private Integer firstActivityUIID;
+	private Long floatingActivityID;
+	private Integer floatingActivityUIID;
 	private Integer maxID;	
 	private Boolean validDesign;
 	private Boolean readOnly;
@@ -96,6 +98,8 @@ public class LearningDesignDTO extends BaseDTO{
 							 String title,
 							 Long firstActivityID,
 							 Integer firstActivityUIID,
+							 Long floatingActivityID,
+							 Integer floatingActivityUIID,
 							 Integer maxId,
 							 Boolean validDesign, 
 							 Boolean readOnly,
@@ -124,6 +128,8 @@ public class LearningDesignDTO extends BaseDTO{
 		this.title = title;
 		this.firstActivityID = firstActivityID;
 		this.firstActivityUIID = firstActivityUIID;
+		this.floatingActivityID = floatingActivityID;
+		this.floatingActivityUIID = floatingActivityUIID;
 		this.maxID = maxId;
 		this.validDesign = validDesign;
 		this.readOnly = readOnly;
@@ -162,6 +168,13 @@ public class LearningDesignDTO extends BaseDTO{
 		this.firstActivityUIID = learningDesign.getFirstActivity()!=null?
 								 learningDesign.getFirstActivity().getActivityUIID():
 								 null;
+		this.floatingActivityID = learningDesign.getFirstActivity()!=null?
+								 learningDesign.getFirstActivity().getActivityId():
+								 null;
+		this.floatingActivityUIID = learningDesign.getFloatingActivity()!=null?
+								 learningDesign.getFloatingActivity().getActivityUIID():
+								 null;
+		
 		this.maxID = learningDesign.getMaxID();
 		this.validDesign = learningDesign.getValidDesign();
 		this.designVersion = learningDesign.getDesignVersion();
@@ -262,6 +275,12 @@ public class LearningDesignDTO extends BaseDTO{
 	public Long getFirstActivityID() {
 		//return firstActivityID!=null?firstActivityID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
 	    return firstActivityID;
+	}
+	/**
+	 * @return Returns the floatingActivityID.
+	 */
+	public Long getFloatingActivityID() {
+		return floatingActivityID;
 	}
 	/**
 	 * @return Returns the helpText.
@@ -522,6 +541,13 @@ public class LearningDesignDTO extends BaseDTO{
 			this.firstActivityID = firstActivityID;
 	}
 	/**
+	 * @param floatingActivityID The floatingActivityID to set.
+	 */
+	public void setFloatingActivityID(Long floatingActivityID) {
+		if(!floatingActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
+			this.floatingActivityID = floatingActivityID;
+	}
+	/**
 	 * @param helpText The helpText to set.
 	 */
 	public void setHelpText(String helpText) {
@@ -652,11 +678,24 @@ public class LearningDesignDTO extends BaseDTO{
 	    return firstActivityUIID;
 	}
 	/**
+	 * @return Returns the floatingActivityUIID.
+	 */
+	public Integer getFloatingActivityUIID() {		
+		return floatingActivityUIID;
+	}
+	/**
 	 * @param firstActivityUIID The firstActivityUIID to set.
 	 */
 	public void setFirstActivityUIID(Integer firstActivityUIID) {
 		if(!firstActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
 			this.firstActivityUIID = firstActivityUIID;
+	}
+	/**
+	 * @param floatingActivityUIID The floatingActivityUIID to set.
+	 */
+	public void setFloatingActivityUIID(Integer floatingActivityUIID) {
+		if(!floatingActivityUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
+			this.floatingActivityUIID = floatingActivityUIID;
 	}	
 	/**
 	 * @return Returns the onlineInstructions.
