@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.mdscrm.model.MdlScorm;
  */
 public class MdlScormOutputFactory extends OutputFactory {
 
-    protected final static String OUTPUT_NAME_LEARNER_NUM_SUBS = "learner.number.of.files.submitted";
+    protected final static String OUTPUT_NAME_LEARNER_NUM_SUBS = "learner.number.of.different.scoes";
 
     public MdlScormOutputFactory() {
     }
