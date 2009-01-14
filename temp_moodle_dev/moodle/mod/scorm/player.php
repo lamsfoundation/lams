@@ -14,7 +14,7 @@
     $mode = optional_param('mode', 'normal', PARAM_ALPHA); // navigation mode
     $currentorg = optional_param('currentorg', '', PARAM_RAW); // selected organization
     $newattempt = optional_param('newattempt', 'off', PARAM_ALPHA); // the user request to start a new attempt
-
+	$editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
     if (!empty($id)) {
         if (! $cm = get_coursemodule_from_id('scorm', $id)) {
             error("Course Module ID was incorrect");
@@ -40,7 +40,11 @@
     }
 
     require_login($course->id, false, $cm);
-
+	
+    if($cm->is_lams==1&&$editing==0){
+		 		//lams: display the next activity button
+            	include('showlamsnext.php');   
+	}
     $strscorms = get_string('modulenameplural', 'scorm');
     $strscorm  = get_string('modulename', 'scorm');
     $strpopup = get_string('popup','scorm');
@@ -63,9 +67,13 @@
     if (!$cm->visible and !has_capability('moodle/course:viewhiddenactivities', get_context_instance(CONTEXT_COURSE,$course->id))) {
         $navlinks[] = array('name' => format_string($scorm->name,true), 'link' => "view.php?id=$cm->id", 'type' => 'activityinstance');
         $navigation = build_navigation($navlinks);
-        
-        print_header($pagetitle, $course->fullname, $navigation,
-                 '', '', true, update_module_button($cm->id, $course->id, $strscorm), '', false);
+          //if is_lams=1 hide moodle's header
+        if($scorm->is_lams==0){
+	        print_header($pagetitle, $course->fullname, $navigation,
+	                 '', '', true, update_module_button($cm->id, $course->id, $strscorm), '', false);
+        }else{
+        	print_header();
+        }
         notice(get_string("activityiscurrentlyhidden"));
     }
     //
@@ -129,11 +137,15 @@
     $navlinks[] = array('name' => format_string($scorm->name,true), 'link' => "view.php?id=$cm->id", 'type' => 'activityinstance');
     $navigation = build_navigation($navlinks);
     $exitlink = '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$scorm->course.'" title="'.$strexit.'">'.$strexit.'</a> ';
-    
-    print_header($pagetitle, $course->fullname,
-                 $navigation,
-                 '', '', true, $exitlink.update_module_button($cm->id, $course->id, $strscorm), '', false, $bodyscript);
-?>
+    //if is_lams=1  hide Moodle's headers
+    if($scorm->is_lams==0){
+	    print_header($pagetitle, $course->fullname,
+	                 $navigation,
+	                 '', '', true, $exitlink.update_module_button($cm->id, $course->id, $strscorm), '', false, $bodyscript);
+    }else{
+     print_header();
+    }
+    ?>
     <script type="text/javascript" src="request.js"></script>
     <script type="text/javascript" src="api.php?id=<?php echo $cm->id.$scoidstr.$modestr.$attemptstr ?>"></script>
     <script type="text/javascript" src="<?php echo $CFG->wwwroot; ?>/mod/scorm/rd.js"></script>
@@ -327,4 +339,7 @@
             </div> <!-- SCORM object -->
         </div> <!-- SCORM box  -->
     </div> <!-- SCORM page -->
-<?php print_footer('none'); ?>
+<?php 
+	//we pass a new parameter to the function so it won't we printed if is_lams=1
+     print_footer('none',null, false,$cm->is_lams);
+?>
