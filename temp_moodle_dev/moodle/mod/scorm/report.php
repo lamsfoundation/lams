@@ -67,17 +67,26 @@
         if (empty($b)) {
             if (empty($a)) {
                 $navigation = build_navigation('', $cm);
+                //if is_lams=1 hide Moodle's headers
+                if($scorm->is_lams==0){
                 print_header("$course->shortname: ".format_string($scorm->name), $course->fullname,$navigation,
                              '', '', true);
+                }else{
+                	print_header();
+                }
             } else {
                 
                 $navlinks = array();
                 $navlinks[] = array('name' => $strreport, 'link' => "report.php?id=$cm->id", 'type' => 'title');    
                 $navlinks[] = array('name' => "$strattempt $attempt - ".fullname($userdata), 'link' => '', 'type' => 'title');
                 $navigation = build_navigation($navlinks, $cm);
-                    
+                //if is_lams=1 hide Moodle's headers
+                if($scorm->is_lams==0){     
                 print_header("$course->shortname: ".format_string($scorm->name), $course->fullname,
                              $navigation, '', '', true);
+                }else{
+                	print_header();
+                }
             }
         } else {
 
@@ -86,9 +95,13 @@
             $navlinks[] = array('name' => "$strattempt $attempt - ".fullname($userdata), 'link' => "report.php?a=$a&amp;user=$user&amp;attempt=$attempt", 'type' => 'title');
             $navlinks[] = array('name' => $sco->title, 'link' => '', 'type' => 'title');
             $navigation = build_navigation($navlinks, $cm);
-            
-            print_header("$course->shortname: ".format_string($scorm->name), $course->fullname, $navigation,
+            //if is_lams=1 hide Moodle's headers
+            if($scorm->is_lams==0){
+            	print_header("$course->shortname: ".format_string($scorm->name), $course->fullname, $navigation,
                      '', '', true);
+            }else{
+            	print_header();
+            }
         }
         print_heading(format_string($scorm->name));
     }
@@ -409,6 +422,7 @@
 
 
     if (empty($noheader)) {
-        print_footer($course);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+		print_footer($course,null, false,$cm->is_lams);
     }
 ?>
