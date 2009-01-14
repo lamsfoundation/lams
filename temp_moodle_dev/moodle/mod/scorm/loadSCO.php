@@ -110,7 +110,11 @@
             //note: do not convert this to use get_file_url()!
             //      SCORM does not work without slasharguments anyway and there might be some extra ?xx=yy params
             //      see MDL-16060
-            $result = $CFG->wwwroot.'/file.php/'.$scorm->course.'/'.$basedir.'/'.$launcher;
+            if($scorm->is_lams==1){
+            	$result = $CFG->wwwroot.'/file.php/'.$launcher;
+            }else{
+            	$result = $CFG->wwwroot.'/file.php/'.$scorm->course.'/'.$basedir.'/'.$launcher;
+            }
         }
     }
     
