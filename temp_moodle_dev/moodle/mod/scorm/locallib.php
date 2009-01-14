@@ -548,8 +548,8 @@ function scorm_course_format_display($user,$course) {
     }
     echo '</div>';
 }
-
-function scorm_view_display ($user, $scorm, $action, $cm, $boxwidth='') {
+//lams: we pass a new variable (editing) to the function so the page player.php can know we are editing or ot in aim to display the correct lams' button
+function scorm_view_display ($user, $scorm, $action, $cm, $boxwidth='',$editing=null) {
     global $CFG;
 
     if ($scorm->updatefreq == UPDATE_EVERYTIME){
@@ -604,8 +604,8 @@ function scorm_view_display ($user, $scorm, $action, $cm, $boxwidth='') {
         $scorm->version = 'scorm_12';
     }
     require_once($CFG->dirroot.'/mod/scorm/datamodels/'.$scorm->version.'lib.php');
-
-    $result = scorm_get_toc($user,$scorm,'structlist',$orgidentifier);
+	//lams: we pass a new variable (editing) to the function so the page player.php can know we are editing or ot in aim to display the correct lams' button
+    $result = scorm_get_toc($user,$scorm,'structlist',$orgidentifier,'','normal','',false,$editing);
     $incomplete = $result->incomplete;
     echo $result->toc;
     print_simple_box_end();
@@ -646,11 +646,12 @@ function scorm_simple_play($scorm,$user) {
    if ($scoes && (count($scoes) == 1)) {
        if ($scorm->skipview >= 1) {
            $sco = current($scoes);
+           //lams: we pass a new variable (editing) to the function so the page player.php can know we are editing or ot in aim to display the correct lams' button
            if (scorm_get_tracks($sco->id,$user->id) === false) {
-               header('Location: player.php?a='.$scorm->id.'&scoid='.$sco->id);
+               header('Location: player.php?a='.$scorm->id.'&scoid='.$sco->id.'&editing='.$editing);
                $result = true;
            } else if ($scorm->skipview == 2) {
-               header('Location: player.php?a='.$scorm->id.'&scoid='.$sco->id);
+               header('Location: player.php?a='.$scorm->id.'&scoid='.$sco->id.'&editing='.$editing);
                $result = true;
            }
        }
@@ -698,7 +699,8 @@ function scorm_parse($scorm) {
         $scorm->launch = scorm_parse_aicc($referencedir, $scorm->id);
     } else {
         require_once('datamodels/scormlib.php');
-        $scorm->launch = scorm_parse_scorm($referencedir,$scorm->id);
+         //we pass the variables "is_lams" and "scormid" to be able to modify the path of the launch property 
+        $scorm->launch = scorm_parse_scorm($referencedir,$scorm->id,$scorm->is_lams);
     }
     return $scorm->launch;
 }
