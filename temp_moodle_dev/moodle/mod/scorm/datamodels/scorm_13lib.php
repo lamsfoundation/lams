@@ -1,6 +1,6 @@
 <?php // $Id$
 
-function scorm_get_toc($user,$scorm,$liststyle,$currentorg='',$scoid='',$mode='normal',$attempt='',$play=false) {
+function scorm_get_toc($user,$scorm,$liststyle,$currentorg='',$scoid='',$mode='normal',$attempt='',$play=false,$editing=null) {
     global $CFG;
 
     $strexpand = get_string('expcoll','scorm');
@@ -174,7 +174,8 @@ function scorm_get_toc($user,$scorm,$liststyle,$currentorg='',$scoid='',$mode='n
                         if ($sco->id == $scoid) {
                             $result->prerequisites = true;
                         }
-                            $url = $CFG->wwwroot.'/mod/scorm/player.php?a='.$scorm->id.'&amp;currentorg='.$currentorg.$modestr.'&amp;scoid='.$sco->id;
+                        	//lams: we pass the variable "editing" to let the player.php know that the teacher is editing or not the activity in aim to display the proper lams button
+                            $url = $CFG->wwwroot.'/mod/scorm/player.php?a='.$scorm->id.'&amp;currentorg='.$currentorg.$modestr.'&amp;scoid='.$sco->id.'&amp;editing='.$editing;
                             $result->toc .= $statusicon.'&nbsp;'.$startbold.'<a href="'.$url.'">'.format_string($sco->title).'</a>'.$score.$endbold."</li>\n";
                             $tocmenus[$sco->id] = scorm_repeater('&minus;',$level) . '&gt;' . format_string($sco->title);
                     } else {
