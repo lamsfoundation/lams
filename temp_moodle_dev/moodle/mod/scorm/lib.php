@@ -18,7 +18,7 @@ function scorm_add_instance($scorm) {
     if (($packagedata = scorm_check_package($scorm)) != null) {
         $scorm->pkgtype = $packagedata->pkgtype;
         $scorm->datadir = $packagedata->datadir;
-        $scorm->launch = $packagedata->launch;
+        $scorm->launch =  $packagedata->launch;
         $scorm->parse = 1;
 
         $scorm->timemodified = time();
@@ -640,6 +640,186 @@ function scorm_reset_userdata($data) {
  */
 function scorm_get_extra_capabilities() {
     return array('moodle/site:accessallgroups');
+}
+
+/**
+ * LAMS Function
+ * This function clones an existing instance of Moodle scorm
+ * replacing the course and the userid
+ */
+function scorm_clone_instance($id, $sectionref, $courseid) {
+	global $CFG;
+	$cm = get_record('course_modules', 'id', $id);
+	
+	
+	if ( ! $cm ) {
+        // create a new scorm with default content
+        $existingscorm->course = $courseid;
+        $existingscorm->name = "Scorm";
+        $existingscorm->summary = "";
+        $existingscorm->reference = "";
+        $existingscorm->is_lams = 1;
+        $existingscorm->version = "SCORM_1.3";
+        $existingscorm->timemodified = time();
+        
+    } else {
+        // make a copy of an existing scorm
+        $existingscorm = get_record('scorm', 'id', $cm->instance);
+        $scoes= get_records("scorm_scoes",'scorm',$existingscorm->id);
+    	unset($existingscorm->id);
+        $existingscorm->name = addslashes($existingscorm->name);
+        $existingscorm->summary = addslashes($existingscorm->summary);
+        $existingscorm->course = $courseid;
+        $existingscorm->reference = addslashes($existingscorm->reference);
+        $existingscorm->is_lams = 1;
+        $existingscorm->timemodified = time();
+        $cm->oldcourse = $cm->course;
+        
+    }
+	$existingscorm->id = insert_record('scorm', $existingscorm);
+    $module = get_record('modules', 'name', 'scorm');
+    $section = get_course_section($sectionref, $courseid);
+
+    
+    // module parameters
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $existingscorm->id;
+    $cm->added = time();
+    $cm->section = $section->section;
+	$cm->is_lams = 1; 
+    $cm->id = insert_record('course_modules', $cm);
+	
+    //adds the new scorm to the sequence variable in section table   
+    $existingscorm->section = $sectionref;
+    $existingscorm->coursemodule = $cm->id;
+    $existingscorm->instance = $cm->instance;
+         
+    require_once($CFG->dirroot.'/course/lib.php');
+    add_mod_to_section($existingscorm);
+    
+    //copy scoes 
+    
+    if($scoes){
+    	
+	     foreach ($scoes as $sco) {
+	     		$sco->scorm= $existingscorm->id;
+	     		$scoinfo= get_records("scorm_scoes_data",'scoid',$sco->id);
+	     		$sco->id = insert_record('scorm_scoes', $sco); 
+	     		 if($scoinfo){
+		     		foreach ($scoinfo as $scodata) {
+		     		 $scodata->scoid=$sco->id;
+		     		 $scodata->id = insert_record('scorm_scoes_data', $scodata);
+		     		}
+	     		}
+	     		
+	     		
+	     }
+    }
+    
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Serialize a scorm instance and return serialized string to LAMS
+ */
+function scorm_export_instance($id) {
+	global $CFG;
+    $cm = get_record('course_modules', 'id', $id);
+    if ($cm) {
+        if ($scorm = get_record('scorm', 'id', $cm->instance)) {
+        	$scormzip=file_get_contents($CFG->dataroot.'/'.$scorm->course.'/'.$scorm->reference);
+        	$scormzip=base64_encode($scormzip);
+            // serialize scorm into a string; assuming scorm object
+            // doesn't contain binary data in any of its columns
+			$s = serialize(array($scorm,$scormzip));
+            header('Content-Description: File Transfer');
+            header('Content-Type: text/plain');
+            header('Content-Length: ' . strlen($s));
+            echo $s;
+            exit;
+        }
+    }
+
+    header('HTTP/1.1 500 Internal Error');
+    exit;
+}
+
+/**
+ * LAMS Function
+ * Deserializes a serialized Moodle scorm, and creates a new instance of it
+ */
+function scorm_import_instance($filepath, $userid, $courseid, $sectionid) {
+    // file contents contains serialized scorm object
+    $filestr = file_get_contents($filepath);
+    //we split the array so we can get the scorm and itsd zip file
+    $all=unserialize($filestr);
+    $scorm=$all[0];
+   
+    // import this scorm into a new course
+    $scorm->course = $courseid;
+
+    $scorm->name = addslashes($scorm->name);
+    $scorm->summary = addslashes($scorm->summary);
+	$scormzip=base64_decode($all[1]);
+    //creates the reference zip file from the string we have passed to the function 
+	file_put_contents($CFG->dataroot.'/'.$scorm->course.'/'.$scorm->reference, $scormzip);
+    $scorm->reference = addslashes($scorm->reference);
+    $scorm->timemodified = time();
+    //creates a new scorm file from the zip and the scorm new properties
+	if ( ! $scorm->id = scorm_add_instance($scorm) ) {
+        return 0; 
+    }
+    
+    $module = get_record('modules', 'name', 'scorm');
+    $section = get_course_section($sectionid, $courseid);
+
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $scorm->id;
+    $cm->added = time();
+    $cm->section = $section->section;
+	$cm->is_lams = 1; 
+    $cm->id = insert_record('course_modules', $cm);
+ 	
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Return a statistic for a given user in this Moodle scorm for use in branching
+ */
+function scorm_get_tool_output($id, $userid) {
+	 require_once('locallib.php');
+     $cm = get_record('course_modules', 'id', $id);
+     if ($cm) {
+     
+        $scoes = get_records('scorm_scoes_track','scormid',$cm->instance);
+      	$numscoes=0;
+      	foreach($scoes as $sco){
+	      	 if ($sco->userid==$userid && $sco->value=='completed') {
+	                $numscoes++; 
+	      	 }   
+      	}   
+        if ($scoes) {
+			return  $numscoes; 
+         }
+     }
+     return 0;
+}
+
+/**
+ * LAMS Function
+ * Return an HTML representation of a user's activity in this scorm
+ */
+function scorm_export_portfolio($id, $userid) {
+    global $CFG;
+    $text = 'This tool does not support export portfolio.  It may be accessible via ';
+    $text .= '<a href="'.$CFG->wwwroot.'/mod/scorm/view.php?id='.$id.'">this</a> link.';
+
+    return $text;
+
 }
 
 ?>
