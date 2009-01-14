@@ -7,6 +7,8 @@
 	
 	function openPixlr(url)
 	{
+		alert('<fmt:message key="message.learner.saveWhenFinished" />');
+		
 		url += "&target=" + escape("${returnURL}");
 		url += "&image=" + escape("${currentImageURL}");
 		openPopup(url, 570, 796);
