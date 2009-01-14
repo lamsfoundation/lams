@@ -13,7 +13,7 @@ function scorm_get_resources($blocks) {
     return $resources;
 }
 
-function scorm_get_manifest($blocks,$scoes) {
+function scorm_get_manifest($blocks,$scoes,$is_lams=null,$scormid=null) {
     static $parents = array();
     static $resources;
 
@@ -47,7 +47,8 @@ function scorm_get_manifest($blocks,$scoes) {
                     $organization = '';
                     $resources = array();
                     $resources = scorm_get_resources($block['children']);
-                    $scoes = scorm_get_manifest($block['children'],$scoes);
+                    //we pass the variables "is_lams" and "scormid" to be able to modify the path of the launch property inside the scorm_get_manifest function
+        			$scoes = scorm_get_manifest($block['children'],$scoes,$is_lams,$scormid);
                     if (count($scoes->elements) <= 0) {
                         foreach ($resources as $item => $resource) {
                             if (!empty($resource['HREF'])) {
@@ -66,7 +67,8 @@ function scorm_get_manifest($blocks,$scoes) {
                     if (!isset($scoes->defaultorg) && isset($block['attrs']['DEFAULT'])) {
                         $scoes->defaultorg = addslashes($block['attrs']['DEFAULT']);
                     }
-                    $scoes = scorm_get_manifest($block['children'],$scoes);
+                    //we pass the variables "is_lams" and "scormid" to be able to modify the path of the launch property inside the scorm_get_manifest function
+        			$scoes = scorm_get_manifest($block['children'],$scoes,$is_lams,$scormid);
                 break;
                 case 'ORGANIZATION':
                     $identifier = addslashes($block['attrs']['IDENTIFIER']);
@@ -83,7 +85,8 @@ function scorm_get_manifest($blocks,$scoes) {
                     array_push($parents, $parent);
                     $organization = $identifier;
 
-                    $scoes = scorm_get_manifest($block['children'],$scoes);
+                    //we pass the variables "is_lams" and "scormid" to be able to modify the path of the launch property inside the scorm_get_manifest function
+        			$scoes = scorm_get_manifest($block['children'],$scoes,$is_lams,$scormid);
                     
                     array_pop($parents);
                 break;
@@ -111,7 +114,13 @@ function scorm_get_manifest($blocks,$scoes) {
                         if (isset($resources[$idref]['XML:BASE'])) {
                             $base = $resources[$idref]['XML:BASE'];
                         }
-                        $scoes->elements[$manifest][$organization][$identifier]->launch = addslashes($base.$resources[$idref]['HREF']);
+                        //we pass the variables "is_lams" and "scormid" so we modify the path of the launch property so when we clone the activity will refer the path to the "mother's" files
+                        if($is_lams==0){
+                        	$scoes->elements[$manifest][$organization][$identifier]->launch = addslashes($base.$resources[$idref]['HREF']);
+                        }else{
+                        	$scorm = get_record('scorm', 'id', $scormid);
+                        	$scoes->elements[$manifest][$organization][$identifier]->launch = addslashes("$scorm->course/moddata/scorm/$scorm->id/".$base.$resources[$idref]['HREF']);
+                        }
                         if (empty($resources[$idref]['ADLCP:SCORMTYPE'])) {
                             $resources[$idref]['ADLCP:SCORMTYPE'] = 'asset';
                         }
@@ -122,8 +131,8 @@ function scorm_get_manifest($blocks,$scoes) {
                     $parent->identifier = $identifier;
                     $parent->organization = $organization;
                     array_push($parents, $parent);
-
-                    $scoes = scorm_get_manifest($block['children'],$scoes);
+                    //we pass the variables "is_lams" and "scormid" to be able to modify the path of the launch property inside the scorm_get_manifest function
+        			$scoes = scorm_get_manifest($block['children'],$scoes,$is_lams,$scormid);
                     
                     array_pop($parents);
                 break;
@@ -456,7 +465,7 @@ function scorm_get_manifest($blocks,$scoes) {
     return $scoes;
 }
 
-function scorm_parse_scorm($pkgdir,$scormid) {
+function scorm_parse_scorm($pkgdir,$scormid,$is_lams=null) {
     global $CFG;
     
     $launch = 0;
@@ -475,7 +484,8 @@ function scorm_parse_scorm($pkgdir,$scormid) {
 //print_object($manifests); 
         $scoes = new stdClass();
         $scoes->version = '';
-        $scoes = scorm_get_manifest($manifests,$scoes);
+        //we pass the variables "is_lams" and "scormid" to be able to modify the path of the launch property inside the scorm_get_manifest function
+        $scoes = scorm_get_manifest($manifests,$scoes,$is_lams,$scormid);
 //print_object($scoes);
         if (count($scoes->elements) > 0) {
             $olditems = get_records('scorm_scoes','scorm',$scormid);
