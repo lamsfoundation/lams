@@ -96,7 +96,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     public ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	// Get the learning design template zip file
-	String designFilePath = "pedagogical_planner\\1\\1\\1";
+	String designFilePath = "pedagogical_planner" + File.separator + "1" + File.separator + "1" + File.separator
+		+ "1";
 	String contentRepositoryPath = Configuration.get("ContentRepositoryPath");
 	File templateDirectory = new File(contentRepositoryPath, designFilePath);
 	File designFile = new File(templateDirectory, CentralConstants.TEMPLATE_FILE_NAME);
