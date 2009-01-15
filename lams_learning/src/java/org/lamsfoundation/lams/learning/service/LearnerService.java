@@ -432,14 +432,15 @@ public class LearnerService implements ICoreLearnerService {
 	    progress.setProgressState(fromActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
 	}
 
-	progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
-	toActivity.setReadOnly(true);
+	if (toActivity != null) {    
+		progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
+		toActivity.setReadOnly(true);
 		
-	if(!toActivity.isFloating()) {
-		progress.setCurrentActivity(toActivity);
-		progress.setNextActivity(toActivity);
+		if(!toActivity.isFloating()) {
+			progress.setCurrentActivity(toActivity);
+			progress.setNextActivity(toActivity);
+		}
 	}
-
 	
 	learnerProgressDAO.updateLearnerProgress(progress);
 	activityDAO.update(toActivity);
