@@ -410,6 +410,7 @@ public class LearnerService implements ICoreLearnerService {
 	    }
 
 	    progressEngine.setActivityAttempted(progress, activity);
+	    
 	    progress.setCurrentActivity(activity);
 	    progress.setNextActivity(activity);
 
@@ -431,14 +432,17 @@ public class LearnerService implements ICoreLearnerService {
 	    progress.setProgressState(fromActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
 	}
 
-	if (toActivity != null) {
-	    progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
-	    if(!toActivity.isFloating())
-	    	progress.setCurrentActivity(toActivity);
-	    progress.setNextActivity(toActivity);
+	progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
+	toActivity.setReadOnly(true);
+		
+	if(!toActivity.isFloating()) {
+		progress.setCurrentActivity(toActivity);
+		progress.setNextActivity(toActivity);
 	}
 
+	
 	learnerProgressDAO.updateLearnerProgress(progress);
+	activityDAO.update(toActivity);
 	return progress;
     }
 

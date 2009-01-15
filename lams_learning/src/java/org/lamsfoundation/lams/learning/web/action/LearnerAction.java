@@ -531,7 +531,13 @@ public class LearnerAction extends LamsDispatchAction
     	Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
     	
     	try {
-    		forceMoveShared(request, learnerService,lessonId);
+    		String url;
+    		Activity targetActivity = forceMoveShared(request, learnerService, lessonId);
+    		
+    		if(!targetActivity.isFloating()) url = activityMapping.getDisplayActivityAction(null);
+    		else url = activityMapping.getActivityURL(targetActivity);
+    		
+    		//TODO: update for moving to Floating Activity in Flash Learner
     		flashMessage = new FlashMessage("forceMove", activityMapping.getDisplayActivityAction(null));
         } catch (Exception e) {
         	flashMessage = handleException(e, "forceMove", learnerService);
@@ -568,8 +574,13 @@ public class LearnerAction extends LamsDispatchAction
     	Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
     	
     	try {
-    		forceMoveShared(request, learnerService,lessonId);
-           	return redirectToURL(mapping, response, "/learning" + activityMapping.getDisplayActivityAction(lessonId));
+    		String url;
+    		Activity targetActivity = forceMoveShared(request, learnerService,lessonId); 
+    		
+    		if(!targetActivity.isFloating()) url = "/learning" + activityMapping.getDisplayActivityAction(lessonId);
+    		else url = activityMapping.getActivityURL(targetActivity);
+    		
+    		return redirectToURL(mapping, response, url);
         } catch (Exception e) {
         	log.error("Exception throw doing force move",e);
         	throw new ServletException(e);
@@ -578,9 +589,9 @@ public class LearnerAction extends LamsDispatchAction
 
     /**
 	 * @param request
-	 * @return
+	 * @return targetActivity 	The activity we are moving to. 
 	 */
-	private void forceMoveShared(HttpServletRequest request, ICoreLearnerService learnerService, Long lessonId) {
+	private Activity forceMoveShared(HttpServletRequest request, ICoreLearnerService learnerService, Long lessonId) {
 
 		//getting requested object according to coming parameters
 		Integer learnerId = LearningWebUtil.getUserId();
@@ -614,12 +625,14 @@ public class LearnerAction extends LamsDispatchAction
     	
     	if(toActivityId != null)
     		toActivity = learnerService.getActivity(toActivityId);
-    	 
+    	
     	learnerService.moveToActivity(learnerId, lessonId, fromActivity, toActivity);
     	
 		if ( log.isDebugEnabled() ) {
 			log.debug("Force move for learner "+learnerId+" lesson "+lessonId+". ");
 		}
+		
+		return toActivity;
 	}
     
 	/**
