@@ -428,6 +428,10 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			canvas.openDesignForEditOnFly(ldID);
 		} else {
 			Debugger.log("Authoring started in Author Mode", Debugger.CRITICAL, "start", "Application");
+			if (_root.learningDesignID != null) { // learningDesignID passed in from the pedagogical planner, need to auto-open the design
+				var ldID = Number(_root.learningDesignID);
+				canvas.openDesignByImport(ldID);
+			}
 		}
 		
     }
