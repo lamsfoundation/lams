@@ -516,7 +516,8 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    }
 
 	    String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
-		    + "/monitoring.do?dispatch=showWiki&toolSessionID=" + toolSessionID.toString();
+		    + "/monitoring.do?dispatch=showWiki&toolSessionID=" + toolSessionID.toString() 
+		    + "&contentFolderID=" + wikiSession.getContentFolderID();
 	    
 	    String hash = relativePath + "," + toolSessionID.toString() + ",t";
 	    hash = new String(Base64.encodeBase64(hash.getBytes()));
