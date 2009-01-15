@@ -244,5 +244,9 @@ public class ConfigurationKeys {
     public static String ADMIN_SCREEN_SIZE = "AdminScreenSize";
 
     public static String GMAP_KEY = "GmapKey";
+    
+    public static String SMTP_AUTH_USER = "SMTPUser";
+    
+    public static String SMTP_AUTH_PASSWORD = "SMTPPassword";
 
 }

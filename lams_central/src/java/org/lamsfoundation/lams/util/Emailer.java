@@ -1,67 +1,93 @@
 package org.lamsfoundation.lams.util;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
-import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.util.Configuration;
-
+import javax.mail.Authenticator;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.Message.RecipientType;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
 import org.apache.log4j.Logger;
 
 /**
- * A class that handles emails, used for forgot password task
+ * A class that handles emails
+ * 
  * @author lfoxton
  */
 public class Emailer {
 
-	private static Logger log = Logger.getLogger(Emailer.class);
-	
-	public Emailer() {}
-	
+    public Emailer() {
+    }
 
-	/**
-	 * Sends an email sourced from admin
-	 * @param subject the subject of the email
-	 * @param to the email of the recipient
-	 * @param body the body of the email
-	 */
-	public static void sendFromSupportEmail(String subject, String to, String body)
-							throws AddressException, MessagingException
-	{
-		String supportEmail = Configuration.get("LamsSupportEmail");
-		String smtpServer = Configuration.get("SMTPServer");
-		Properties properties = new Properties();
-		properties.put("mail.smtp.host", smtpServer);
-		send(subject, to, supportEmail, body, properties);
+    /**
+     * Sends an email sourced from support email
+     * 
+     * @param subject
+     *                the subject of the email
+     * @param to
+     *                the email of the recipient
+     * @param body
+     *                the body of the email
+     */
+    public static void sendFromSupportEmail(String subject, String to, String body) throws AddressException,
+	    MessagingException {
+	String supportEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
+	String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
+	Properties properties = new Properties();
+	properties.put("mail.smtp.host", smtpServer);
+	send(subject, to, supportEmail, body, properties);
+    }
+
+    /**
+     * Creates a mail session with authentication if it is required, ie if it
+     * has been set up with SMTP authentication in the config page
+     * 
+     * @param properties
+     * @return
+     */
+    public static Session getMailSession(Properties properties) {
+	Session session;
+	String smtpAuthUser = Configuration.get(ConfigurationKeys.SMTP_AUTH_USER);
+	String smtpAuthPass = Configuration.get(ConfigurationKeys.SMTP_AUTH_PASSWORD);
+	if (smtpAuthUser != null && !smtpAuthUser.trim().equals("")) {
+
+	    properties.setProperty("mail.smtp.submitter", smtpAuthUser);
+	    properties.setProperty("mail.smtp.auth", "true");
+
+	    SMTPAuthenticator auth = new SMTPAuthenticator(smtpAuthUser, smtpAuthPass);
+	    session = Session.getInstance(properties, auth);
+	} else {
+	    session = Session.getInstance(properties);
 	}
-	
-	
-	/**
-	 * Send email to recipients
-	 * @param subject the subject of the email
-	 * @param to the email of the recipient
-	 * @param from the email to source the email from
-	 * @param body the body of the email
-	 */
-	public static void send(String subject, String to, String from, String body, Properties mailServerConfig) 
-							throws AddressException, MessagingException
-	{
-		Session session = Session.getInstance(mailServerConfig);
-		MimeMessage message = new MimeMessage(session);
-		message.setFrom(new InternetAddress(from));
-		message.addRecipient(RecipientType.TO, new InternetAddress(to));
-		message.setSubject(subject);
-		message.setText(body);
-		Transport.send(message);
-	}
-	
-	
+	return session;
+    }
+
+    /**
+     * Send email to recipients
+     * 
+     * @param subject
+     *                the subject of the email
+     * @param to
+     *                the email of the recipient
+     * @param from
+     *                the email to source the email from
+     * @param body
+     *                the body of the email
+     */
+    public static void send(String subject, String to, String from, String body, Properties mailServerConfig)
+	    throws AddressException, MessagingException {
+	Session session = getMailSession(mailServerConfig);
+	MimeMessage message = new MimeMessage(session);
+	message.setFrom(new InternetAddress(from));
+	message.addRecipient(RecipientType.TO, new InternetAddress(to));
+	message.setSubject(subject);
+	message.setText(body);
+	Transport.send(message);
+    }
+
 }
