@@ -44,6 +44,7 @@ public class ActivityPortfolio {
     /* The link to the tool page from the main export page */
     private String toolLink;
     private boolean headingNoPage;
+    private boolean floating;
     private Set<String> competencesCovered = new TreeSet<String>();
 
     /**
@@ -69,6 +70,7 @@ public class ActivityPortfolio {
 	toolLink = null;
 	childPortfolios = null;
 	headingNoPage = false;
+	floating = false;
     }
 
     /**
@@ -152,6 +154,18 @@ public class ActivityPortfolio {
 
     public void setHeadingNoPage(boolean headingNoPage) {
 	this.headingNoPage = headingNoPage;
+    }
+    
+    /**
+     * Identifies this portfolio as of a Floating Activity
+     * @return
+     */
+    public boolean isFloating() {
+	return floating;
+    }
+
+    public void setFloating(boolean floating) {
+	this.floating = floating;
     }
 
     public Set<String> getCompetencesCovered() {

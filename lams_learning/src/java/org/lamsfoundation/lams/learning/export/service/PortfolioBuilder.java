@@ -108,6 +108,8 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	this.user = user;
 	this.lesson = lesson;
 	this.progress = progress;
+	
+	
     }
 
     /** Prepares to process children */
@@ -124,6 +126,7 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	    activityListStack.push(currentPortfolioList);
 	    currentPortfolioList = new ArrayList<ActivityPortfolio>();
 	}
+	
 	return true;
     }
 
@@ -166,6 +169,7 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	if (complexPortfolio != null && !flattenLearnerBranching) {
 	    currentPortfolioList.add(complexPortfolio);
 	}
+
     }
 
     @Override
@@ -241,10 +245,6 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	}
 
     }
-    
-    public void startFloatingActivity(FloatingActivity activity) throws LearningDesignProcessorException {}
-	
-	public void endFloatingActivity(FloatingActivity activity) throws LearningDesignProcessorException {}
 
     /**
      * A system tool may be a simple or a complex activity, so the logic is in a method called by both
@@ -355,6 +355,7 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	p.setActivityId(activity.getActivityId());
 	p.setActivityName(activity.getTitle());
 	p.setActivityDescription(activity.getDescription());
+	p.setFloating(activity.isFloatingActivity());
 	return p;
     }
 

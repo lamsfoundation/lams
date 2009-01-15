@@ -225,7 +225,7 @@ public class LearningWebUtil
 			progress = learnerService.completeActivity(learnerId, currentActivity,progress);
 		}
 	
-		if ( progress == null )
+		if ( currentActivity.isFloating() )
 			return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 		
 		LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
