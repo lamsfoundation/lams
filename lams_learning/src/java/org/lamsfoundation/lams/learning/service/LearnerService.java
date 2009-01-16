@@ -434,7 +434,11 @@ public class LearnerService implements ICoreLearnerService {
 
 	if (toActivity != null) {    
 		progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
-		toActivity.setReadOnly(true);
+		
+		if(!toActivity.getReadOnly()) {
+			toActivity.setReadOnly(true);
+			activityDAO.update(toActivity);
+		}
 		
 		if(!toActivity.isFloating()) {
 			progress.setCurrentActivity(toActivity);
@@ -443,7 +447,6 @@ public class LearnerService implements ICoreLearnerService {
 	}
 	
 	learnerProgressDAO.updateLearnerProgress(progress);
-	activityDAO.update(toActivity);
 	return progress;
     }
 

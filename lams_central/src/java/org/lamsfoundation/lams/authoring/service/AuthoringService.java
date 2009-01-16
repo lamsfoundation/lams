@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Competence;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -1107,10 +1108,15 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	if (oldParentActivities != null) {
 	    Iterator iterator = oldParentActivities.iterator();
 	    while (iterator.hasNext()) {
-		processActivity((Activity) iterator.next(), newLearningDesign, newActivities, newGroupings, null,
-			originalLearningDesign.getLearningDesignId(), uiidOffset, customCSV);
+	    	processActivity((Activity) iterator.next(), newLearningDesign, newActivities, newGroupings, null,
+	    			originalLearningDesign.getLearningDesignId(), uiidOffset, customCSV);
 	    }
 	}
+	
+	if(originalLearningDesign.getFloatingActivity() != null && newLearningDesign.getFloatingActivity() != null) {
+    	// remove the Floating Activity in current design
+    	newActivities.remove(originalLearningDesign.getFloatingActivity());
+    }
 
 	Collection<Activity> activities = newActivities.values();
 
@@ -1129,68 +1135,68 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	// and fix any branch mappings
 	for (Activity activity : activities) {
 	    if (activity.isComplexActivity()) {
-		ComplexActivity newComplex = (ComplexActivity) activity;
-		Activity oldDefaultActivity = newComplex.getDefaultActivity();
-		if (oldDefaultActivity != null) {
-		    Activity newDefaultActivity = newActivities.get(LearningDesign.addOffset(oldDefaultActivity
-			    .getActivityUIID(), uiidOffset));
-		    newComplex.setDefaultActivity(newDefaultActivity);
-		}
+	    	ComplexActivity newComplex = (ComplexActivity) activity;
+	    	Activity oldDefaultActivity = newComplex.getDefaultActivity();
+			if (oldDefaultActivity != null) {
+			    Activity newDefaultActivity = newActivities.get(LearningDesign.addOffset(oldDefaultActivity
+				    .getActivityUIID(), uiidOffset));
+			    newComplex.setDefaultActivity(newDefaultActivity);
+			}
 	    }
 
 	    if (activity.isSequenceActivity()) {
-		SequenceActivity newSequenceActivity = (SequenceActivity) activity;
-		// Need to check if the sets are not null as these are new
-		// objects and Hibernate may not have backed them with
-		// collections yet.
-		if (newSequenceActivity.getBranchEntries() != null && newSequenceActivity.getBranchEntries().size() > 0) {
-
-		    Activity parentActivity = newSequenceActivity.getParentActivity();
-		    if (parentActivity.isChosenBranchingActivity() || parentActivity.isGroupBranchingActivity()
-			    && parentActivity.getDefineLater() != null
-			    && parentActivity.getDefineLater().booleanValue()) {
-			// Don't have any preset up entries for a teacher chosen
-			// or a define later group based branching.
-			// Must be copying a design that was run previously.
-			newSequenceActivity.getBranchEntries().clear();
-
-		    } else {
-			Iterator beIter = newSequenceActivity.getBranchEntries().iterator();
-			while (beIter.hasNext()) {
-			    // sequence activity will be correct but the
-			    // branching activity and the grouping will be wrong
-			    // the condition was copied by the sequence activity
-			    // copy
-			    BranchActivityEntry entry = (BranchActivityEntry) beIter.next();
-			    BranchingActivity oldBranchingActivity = (BranchingActivity) entry.getBranchingActivity();
-			    entry.setBranchingActivity(newActivities.get(LearningDesign.addOffset(oldBranchingActivity
-				    .getActivityUIID(), uiidOffset)));
-			    Group oldGroup = entry.getGroup();
-			    if (oldGroup != null) {
-				Grouping oldGrouping = oldGroup.getGrouping();
-				Grouping newGrouping = newGroupings.get(LearningDesign.addOffset(oldGrouping
-					.getGroupingUIID(), uiidOffset));
-				if (newGrouping != null) {
-				    entry.setGroup(newGrouping.getGroup(LearningDesign.addOffset(oldGroup
-					    .getGroupUIID(), uiidOffset)));
-				}
+			SequenceActivity newSequenceActivity = (SequenceActivity) activity;
+			// Need to check if the sets are not null as these are new
+			// objects and Hibernate may not have backed them with
+			// collections yet.
+			if (newSequenceActivity.getBranchEntries() != null && newSequenceActivity.getBranchEntries().size() > 0) {
+	
+			    Activity parentActivity = newSequenceActivity.getParentActivity();
+			    if (parentActivity.isChosenBranchingActivity() || parentActivity.isGroupBranchingActivity()
+				    && parentActivity.getDefineLater() != null
+				    && parentActivity.getDefineLater().booleanValue()) {
+					// Don't have any preset up entries for a teacher chosen
+					// or a define later group based branching.
+					// Must be copying a design that was run previously.
+					newSequenceActivity.getBranchEntries().clear();
+	
+			    } else {
+					Iterator beIter = newSequenceActivity.getBranchEntries().iterator();
+					while (beIter.hasNext()) {
+					    // sequence activity will be correct but the
+					    // branching activity and the grouping will be wrong
+					    // the condition was copied by the sequence activity
+					    // copy
+					    BranchActivityEntry entry = (BranchActivityEntry) beIter.next();
+					    BranchingActivity oldBranchingActivity = (BranchingActivity) entry.getBranchingActivity();
+					    entry.setBranchingActivity(newActivities.get(LearningDesign.addOffset(oldBranchingActivity
+						    .getActivityUIID(), uiidOffset)));
+					    Group oldGroup = entry.getGroup();
+					    if (oldGroup != null) {
+						Grouping oldGrouping = oldGroup.getGrouping();
+						Grouping newGrouping = newGroupings.get(LearningDesign.addOffset(oldGrouping
+							.getGroupingUIID(), uiidOffset));
+						if (newGrouping != null) {
+						    entry.setGroup(newGrouping.getGroup(LearningDesign.addOffset(oldGroup
+							    .getGroupUIID(), uiidOffset)));
+						}
+					    }
+					}
+	
 			    }
 			}
-
-		    }
-		}
 	    }
 
 	    if (activity.getInputActivities() != null && activity.getInputActivities().size() > 0) {
-		Set<Activity> newInputActivities = new HashSet<Activity>();
-		Iterator inputIter = activity.getInputActivities().iterator();
-		while (inputIter.hasNext()) {
-		    Activity elem = (Activity) inputIter.next();
-		    newInputActivities.add(newActivities.get(LearningDesign.addOffset(elem.getActivityUIID(),
-			    uiidOffset)));
-		}
-		activity.getInputActivities().clear();
-		activity.getInputActivities().addAll(newInputActivities);
+			Set<Activity> newInputActivities = new HashSet<Activity>();
+			Iterator inputIter = activity.getInputActivities().iterator();
+			while (inputIter.hasNext()) {
+			    Activity elem = (Activity) inputIter.next();
+			    newInputActivities.add(newActivities.get(LearningDesign.addOffset(elem.getActivityUIID(),
+				    uiidOffset)));
+			}
+			activity.getInputActivities().clear();
+			activity.getInputActivities().addAll(newInputActivities);
 	    }
 	}
 
@@ -1260,9 +1266,20 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	if (oldChildActivities != null) {
 	    Iterator childIterator = oldChildActivities.iterator();
 	    while (childIterator.hasNext()) {
-		processActivity((Activity) childIterator.next(), newLearningDesign, newActivities, newGroupings,
-			newActivity, originalLearningDesignId, uiidOffset, customCSV);
-	    }
+	    	Activity childActivity = (Activity) childIterator.next();
+	    	
+	    	// If Floating Activity(s) exist in BOTH designs then we:
+	        // Transfer the floating activities from the main design to the one that is to be imported. 
+	        // Number of activities may overflow the max limit for the container - to be handled in flash 
+	        // when design is opened.
+	        Activity refParentActivity = (childActivity.isFloating() && newLearningDesign.getFloatingActivity() != null) 
+	    						? newLearningDesign.getFloatingActivity()
+	    						: newActivity;
+	    	// TODO: fix order id for transfer of floating activities when contained in both designs.
+			processActivity(childActivity, newLearningDesign, newActivities, newGroupings,
+				refParentActivity, originalLearningDesignId, uiidOffset, customCSV);
+			
+		}
 	}
     }
 
