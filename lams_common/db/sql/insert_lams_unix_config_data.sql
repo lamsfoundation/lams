@@ -14,7 +14,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('DumpDir','/var/opt/lams/dump', 'config.dump.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/lams.ear', 'config.ear.dir', 'config.header.system', 'STRING', 1);
+values ('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/lams.ear/', 'config.ear.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('SMTPServer','', 'config.smtp.server', 'config.header.email', 'STRING', 0);
@@ -240,3 +240,9 @@ values ('LearnerScreenSize','800x600', 'config.learner.screen.size', 'config.hea
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('AdminScreenSize','800x600', 'config.admin.screen.size', 'config.header.look.feel', 'STRING', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('SMTPUser','', 'config.smtp.user', 'config.header.email', 'STRING', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('SMTPPassword','', 'config.smtp.password', 'config.header.email', 'STRING', 1);
