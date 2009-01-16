@@ -28,8 +28,6 @@
 		${gmapDTO.instructions}
 	</p>
 
-	
-
 	<br />
 	
 	<table>

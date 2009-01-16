@@ -62,175 +62,160 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
  * @struts.action-forward name="gmap_display"
  *                        path="tiles:/monitoring/gmap_display"
- * @struts.action-forward name="notebook" path="/pages/monitoring/notebook.jsp"             
+ * @struts.action-forward name="notebook" path="/pages/monitoring/notebook.jsp"
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {
 
-	private static Logger log = Logger.getLogger(MonitoringAction.class);
+    private static Logger log = Logger.getLogger(MonitoringAction.class);
 
-	public IGmapService gmapService;
+    public IGmapService gmapService;
 
-	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
-		setupService();
+	setupService();
 
-		Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-		
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-				
-		Gmap gmap = gmapService.getGmapByContentId(toolContentID);
-		
-		if (gmap == null) {
-			// TODO error page.
-		}
+	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
-		GmapDTO gmapDT0 = new GmapDTO(gmap);
-		
-		// Adding the markers lists to a map with tool sessions as the key
-		//Map<Long, Set<GmapMarkerDTO> > sessionMarkersMap = new HashMap<Long, Set<GmapMarkerDTO> >();
-		for (GmapSessionDTO sessionDTO : gmapDT0.getSessionDTOs())
-		{
-			Long toolSessionID = sessionDTO.getSessionID();
-			sessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(toolSessionID));
-		
-			for (GmapUserDTO userDTO :sessionDTO.getUserDTOs()) 
-			{				
-				// get the notebook entry.
-				NotebookEntry notebookEntry = gmapService.getEntry(toolSessionID,
-						CoreNotebookConstants.NOTEBOOK_TOOL,
-						GmapConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue()
-						);
-				if (notebookEntry != null) 
-				{
-					userDTO.setFinishedReflection(true);
-					//userDTO.setNotebookEntry(notebookEntry.getEntry());
-				} 
-				else 
-				{
-					userDTO.setFinishedReflection(false);
-				}			
-				sessionDTO.getUserDTOs().add(userDTO);
-			}
-		}
-		
-		// get the gmap API key from the config table and add it to the session
-		GmapConfigItem gmapKey = gmapService.getConfigItem(GmapConfigItem.KEY_GMAP_KEY);
-		if (gmapKey != null && gmapKey.getConfigValue() != null)
-		{
-			request.setAttribute(GmapConstants.ATTR_GMAP_KEY, gmapKey.getConfigValue());
-		}
-		
-		request.setAttribute("gmapDTO", gmapDT0);
-		request.setAttribute("contentFolderID", contentFolderID);
-		return mapping.findForward("success");
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+
+	Gmap gmap = gmapService.getGmapByContentId(toolContentID);
+
+	if (gmap == null) {
+	    // TODO error page.
 	}
-	
-	/**
-	 * set up gmapService
-	 */
-	private void setupService() {
-		if (gmapService == null) {
-			gmapService = GmapServiceProxy.getGmapService(this
-					.getServlet().getServletContext());
-		}
-	}
-	
-	/**
-	 * Allows teachers to edit/remove existing markers
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	public ActionForward saveMarkers(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws Exception
-	{
 
-		MonitoringForm monitoringForm = (MonitoringForm) form;
-		Long toolSessionID = monitoringForm.getToolSessionID();
-		//Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
+	GmapDTO gmapDT0 = new GmapDTO(gmap);
 
-		GmapUser gmapUser = getCurrentUser(toolSessionID);
+	// Adding the markers lists to a map with tool sessions as the key
+	//Map<Long, Set<GmapMarkerDTO> > sessionMarkersMap = new HashMap<Long, Set<GmapMarkerDTO> >();
+	for (GmapSessionDTO sessionDTO : gmapDT0.getSessionDTOs()) {
+	    Long toolSessionID = sessionDTO.getSessionID();
+	    sessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(toolSessionID));
 
-		if (gmapUser != null) {
-
-			//MonitoringForm monitoringForm = (MonitoringForm) form;	
-			
-			// Retrieve the session and content.
-			GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
-			if (gmapSession == null) {
-				throw new GmapException("Cannot retreive session with toolSessionID"+ toolSessionID);
-			}
-			
-			// update the marker list
-			Gmap gmap = gmapSession.getGmap();
-			gmapService.updateMarkerListFromXML(monitoringForm.getMarkersXML(), gmap, gmapUser, true, gmapSession);
-			
+	    for (GmapUserDTO userDTO : sessionDTO.getUserDTOs()) {
+		// get the notebook entry.
+		NotebookEntry notebookEntry = gmapService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+			GmapConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
+		if (notebookEntry != null) {
+		    userDTO.setFinishedReflection(true);
+		    //userDTO.setNotebookEntry(notebookEntry.getEntry());
 		} else {
-			log.error("saveMarkers(): couldn't find GmapUser with id: "
-					+ gmapUser.getUserId() + "and toolSessionID: "
-					+ toolSessionID);
+		    userDTO.setFinishedReflection(false);
 		}
-
-		return unspecified(mapping, form, request, response);
+		sessionDTO.getUserDTOs().add(userDTO);
+	    }
 	}
-	
-	/**
-	 * Get the current user
-	 * @param toolSessionId
-	 * @return
-	 */
-	private GmapUser getCurrentUser(Long toolSessionId) {
-		UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(
-				AttributeNames.USER);
 
-		// attempt to retrieve user using userId and toolSessionId
-		GmapUser gmapUser = gmapService
-				.getUserByUserIdAndSessionId(new Long(user.getUserID()
-						.intValue()), toolSessionId);
-
-		if (gmapUser == null) {
-			GmapSession gmapSession = gmapService
-					.getSessionBySessionId(toolSessionId);
-			gmapUser = gmapService.createGmapUser(user,
-					gmapSession);
-		}
-
-		return gmapUser;
+	// get the gmap API key from the config table and add it to the session
+	GmapConfigItem gmapKey = gmapService.getConfigItem(GmapConfigItem.KEY_GMAP_KEY);
+	if (gmapKey != null && gmapKey.getConfigValue() != null) {
+	    request.setAttribute(GmapConstants.ATTR_GMAP_KEY, gmapKey.getConfigValue());
 	}
-	
-	/**
-	 * Opens a user's reflection
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	public ActionForward openNotebook(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-		
-		//MonitoringForm monitorForm = (MonitoringForm) form;
-		Long toolSessionId = WebUtil.readLongParam(request, "toolSessionID", false);
-		Long userID = WebUtil.readLongParam(request, "userID", false);
-		
-		GmapUser gmapUser = gmapService.getUserByUserIdAndSessionId(userID, toolSessionId);
-		
-		NotebookEntry notebookEntry = gmapService.getEntry(toolSessionId, 
-				CoreNotebookConstants.NOTEBOOK_TOOL, 
-				GmapConstants.TOOL_SIGNATURE, 
-				userID.intValue());
-		
-		GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
-		gmapUserDTO.setNotebookEntry(notebookEntry.getEntry());
-		
-		request.setAttribute("gmapUserDTO", gmapUserDTO);
-		
-		return mapping.findForward("notebook");
+
+	request.setAttribute("gmapDTO", gmapDT0);
+	request.setAttribute("contentFolderID", contentFolderID);
+	return mapping.findForward("success");
+    }
+
+    /**
+     * set up gmapService
+     */
+    private void setupService() {
+	if (gmapService == null) {
+	    gmapService = GmapServiceProxy.getGmapService(this.getServlet().getServletContext());
 	}
+    }
+
+    /**
+     * Allows teachers to edit/remove existing markers
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public ActionForward saveMarkers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	MonitoringForm monitoringForm = (MonitoringForm) form;
+	Long toolSessionID = monitoringForm.getToolSessionID();
+	//Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
+
+	GmapUser gmapUser = getCurrentUser(toolSessionID);
+
+	if (gmapUser != null) {
+
+	    //MonitoringForm monitoringForm = (MonitoringForm) form;	
+
+	    // Retrieve the session and content.
+	    GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
+	    if (gmapSession == null) {
+		throw new GmapException("Cannot retreive session with toolSessionID" + toolSessionID);
+	    }
+
+	    // update the marker list
+	    Gmap gmap = gmapSession.getGmap();
+	    gmapService.updateMarkerListFromXML(monitoringForm.getMarkersXML(), gmap, gmapUser, true, gmapSession);
+
+	} else {
+	    log.error("saveMarkers(): couldn't find GmapUser with id: " + gmapUser.getUserId() + "and toolSessionID: "
+		    + toolSessionID);
+	}
+
+	return unspecified(mapping, form, request, response);
+    }
+
+    /**
+     * Get the current user
+     * 
+     * @param toolSessionId
+     * @return
+     */
+    private GmapUser getCurrentUser(Long toolSessionId) {
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+
+	// attempt to retrieve user using userId and toolSessionId
+	GmapUser gmapUser = gmapService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+		toolSessionId);
+
+	if (gmapUser == null) {
+	    GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionId);
+	    gmapUser = gmapService.createGmapUser(user, gmapSession);
+	}
+
+	return gmapUser;
+    }
+
+    /**
+     * Opens a user's reflection
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	//MonitoringForm monitorForm = (MonitoringForm) form;
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionID", false);
+	Long userID = WebUtil.readLongParam(request, "userID", false);
+
+	GmapUser gmapUser = gmapService.getUserByUserIdAndSessionId(userID, toolSessionId);
+
+	NotebookEntry notebookEntry = gmapService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		GmapConstants.TOOL_SIGNATURE, userID.intValue());
+
+	GmapUserDTO gmapUserDTO = new GmapUserDTO(gmapUser);
+	gmapUserDTO.setNotebookEntry(notebookEntry.getEntry());
+
+	request.setAttribute("gmapUserDTO", gmapUserDTO);
+
+	return mapping.findForward("notebook");
+    }
 }
