@@ -822,4 +822,159 @@ function chat_get_extra_capabilities() {
     return array('moodle/site:accessallgroups', 'moodle/site:viewfullnames');
 }
 
+/**
+ * LAMS Function
+ * This function clones an existing instance of Moodle chat
+ * replacing the course and the userid
+ */
+function chat_clone_instance($id, $sectionref, $courseid) {
+	global $CFG;
+	$cm = get_record('course_modules', 'id', $id);
+	
+	
+	if ( ! $cm) {
+        // create a new chat with default content
+        $existingchat->course = $courseid;
+        $existingchat->name = "Chat";
+        $existingchat->intro = "";
+        $existingchat->is_lams = 1;
+        $existingchat->timemodified = time();
+    } else {
+        // make a copy of an existing chat
+        $existingchat = get_record('chat', 'id', $cm->instance);
+        $existingchat->name = addslashes($existingchat->name);
+        $existingchat->intro = addslashes($existingchat->intro);
+        $existingchat->course = $courseid;
+        $existingchat->is_lams = 1;
+        $existingchat->timemodified = time();
+        
+    }
+	$existingchat->id = insert_record('chat', $existingchat);
+    $module = get_record('modules', 'name', 'chat');
+    $section = get_course_section($sectionref, $courseid);
+	
+    
+    // module parameters
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $existingchat->id;
+    $cm->added = time();
+    $cm->section = $section->section;
+	$cm->is_lams = 1; 
+    $cm->id = insert_record('course_modules', $cm);
+	//print_r($cm);
+    //adds the new chat to the sequence variable in section table   
+    $existingchat->section = $sectionref;
+    $existingchat->coursemodule = $cm->id;
+    $existingchat->instance = $cm->instance;
+          
+    require_once($CFG->dirroot.'/course/lib.php');
+    add_mod_to_section($existingchat);
+    
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Serialize a chat instance and return serialized string to LAMS
+ */
+function chat_export_instance($id) {
+    $cm = get_record('course_modules', 'id', $id);
+    if ($cm) {
+        if ($chat = get_record('chat', 'id', $cm->instance)) {
+           //get all messages and users from the chat
+           // $messages = get_records('chat_messages', 'chatid', $chat->id);
+           // $users = get_records('chat_users', 'chatid', $chat->id);
+            //our file will contain the chat, its users and messages
+           // $all=array($chat,$messages,$users);
+             // serialize chat into a string; assuming chat object
+            // doesn't contain binary data in any of its columns
+			$s = serialize($chat);
+            header('Content-Description: File Transfer');
+            header('Content-Type: text/plain');
+            header('Content-Length: ' . strlen($s));
+            echo $s;
+            exit;
+        }
+    }
+
+    header('HTTP/1.1 500 Internal Error');
+    exit;
+}
+
+/**
+ * LAMS Function
+ * Deserializes a serialized Moodle chat, and creates a new instance of it
+ */
+function chat_import_instance($filepath, $userid, $courseid, $sectionid) {
+    // file contents contains serialized chat object
+     $filestr = file_get_contents($filepath);
+     $all=unserialize($filestr);
+    
+    //we split the array so we can get the chat and its submissions
+    $chat = $all[0];
+ //   $messages = $all[1];
+   // $users = $all[2];
+    // import this chat into a new course
+    $chat->course = $courseid;
+
+    // escape text columns for saving into database
+    $chat->name = addslashes($chat->name);
+    $chat->intro = addslashes($chat->intro);
+    
+
+    if ( ! $chat->id = insert_record('chat', $chat) ) {
+        return 0; 
+    }
+    
+    $module = get_record('modules', 'name', 'chat');
+    $section = get_course_section($sectionid, $courseid);
+
+    $cm->course = $courseid;
+    $cm->module = $module->id;
+    $cm->instance = $chat->id;
+    $cm->added = time();
+    $cm->section = $section->id;
+	$cm->is_lams = 1; 
+    $cm->id = insert_record('course_modules', $cm);
+
+    return $cm->id;
+}
+
+/**
+ * LAMS Function
+ * Return a statistic for a given user in this Moodle chat for use in branching
+ */
+function chat_get_tool_output($id, $userid) {
+
+     $cm = get_record('course_modules', 'id', $id);
+    
+     if ($cm) {
+        $messages = get_records('chat_messages', 'chatid',$cm->instance);
+        $i=0;
+         if ($messages) {
+         echo($cm->instance);
+	        foreach($messages as $message){
+		        if($message->userid==$userid ||$message->system==0){
+		        	$i++;
+		        }
+	        }
+         }
+         return $i;
+    }
+    return 0;
+}
+
+/**
+ * LAMS Function
+ * Return an HTML representation of a user's activity in this chat
+ */
+function chat_export_portfolio($id, $userid) {
+    global $CFG;
+    $text = 'This tool does not support export portfolio.  It may be accessible via ';
+    $text .= '<a href="'.$CFG->wwwroot.'/mod/chat/view.php?id='.$id.'">this</a> link.';
+    return $text;
+
+}
+
 ?>
