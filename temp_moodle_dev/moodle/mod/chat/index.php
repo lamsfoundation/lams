@@ -25,8 +25,8 @@
     $navlinks = array();
     $navlinks[] = array('name' => $strchats, 'link' => '', 'type' => 'activity');
     $navigation = build_navigation($navlinks);
-
-    print_header_simple($strchats, '', $navigation, '', '', true, '', navmenu($course));
+	//we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_header_simple($strchats, '', $navigation, '', '', true, '', navmenu($course),false,'',false,$cm->is_lams);
 
 /// Get all the appropriate data
 
@@ -85,6 +85,7 @@
 
 /// Finish the page
 
-    print_footer($course);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+	print_footer($course,null, false,$chat->is_lams);
 
 ?>
