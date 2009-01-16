@@ -36,9 +36,7 @@ import org.lamsfoundation.lams.tool.mdchat.model.MdlChat;
  */
 public class MdlChatOutputFactory extends OutputFactory {
 
-    protected final static String OUTPUT_NAME_LEARNER_NUM_POSTS = "learner.number.of.posts";
-    protected final static String OUTPUT_NAME_LEARNER_NUM_WORDS = "learner.number.of.words";
-
+    protected final static String OUTPUT_NAME_LEARNER_NUM_MESSAGES = "learner.number.of.messages";
     public MdlChatOutputFactory() {
     }
 
@@ -49,11 +47,8 @@ public class MdlChatOutputFactory extends OutputFactory {
 	    throws ToolException {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
-	ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_POSTS, new Long(0), null);
-	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_POSTS, definition);
-
-	ToolOutputDefinition definition2 = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_WORDS, new Long(0), null);
-	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_WORDS, definition2);
+	ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_MESSAGES, new Long(0), null);
+	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_MESSAGES, definition);
 
 	return definitionMap;
     }
@@ -62,14 +57,11 @@ public class MdlChatOutputFactory extends OutputFactory {
 	    Long toolSessionId, Long learnerId, MdlChat mdlChat, Long extSessionId) {
 
 	TreeMap<String, ToolOutput> map = new TreeMap<String, ToolOutput>();
-	if (names == null || names.contains(OUTPUT_NAME_LEARNER_NUM_POSTS)) {
-	    map.put(OUTPUT_NAME_LEARNER_NUM_POSTS, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_POSTS, dlChatService,
+	if (names == null || names.contains(OUTPUT_NAME_LEARNER_NUM_MESSAGES)) {
+	    map.put(OUTPUT_NAME_LEARNER_NUM_MESSAGES, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_MESSAGES, dlChatService,
 		    mdlChat, learnerId, extSessionId.toString(), toolSessionId));
 	}
-	if (names.contains(OUTPUT_NAME_LEARNER_NUM_WORDS)) {
-	    map.put(OUTPUT_NAME_LEARNER_NUM_WORDS, getExtToolOutput(OUTPUT_NAME_LEARNER_NUM_WORDS, dlChatService,
-		    mdlChat, learnerId, extSessionId.toString(), toolSessionId));
-	}
+
 	return map;
 
     }
