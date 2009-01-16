@@ -10,6 +10,7 @@
     $id   = optional_param('id', 0, PARAM_INT);
     $c    = optional_param('c', 0, PARAM_INT);
     $edit = optional_param('edit', -1, PARAM_BOOL);
+    $editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
 
     if ($id) {
         if (! $cm = get_coursemodule_from_id('chat', $id)) {
@@ -48,8 +49,9 @@
     // show some info for guests
     if (isguestuser()) {
         $navigation = build_navigation('', $cm);
+         //we pass a new parameter to the function so it won't we printed if is_lams=1
         print_header_simple(format_string($chat->name), '', $navigation,
-                      '', '', true, '', navmenu($course, $cm));
+                      '', '', true, '', navmenu($course, $cm),false,'',false,$cm->is_lams);
         $wwwroot = $CFG->wwwroot.'/login/index.php';
         if (!empty($CFG->loginhttps)) {
             $wwwroot = str_replace('http:','https:', $wwwroot);
@@ -58,7 +60,8 @@
         notice_yesno(get_string('noguests', 'chat').'<br /><br />'.get_string('liketologin'),
                 $wwwroot, $CFG->wwwroot.'/course/view.php?id='.$course->id);
 
-        print_footer($course);
+        //we pass a new parameter to the function so it won't we printed if is_lams=1
+		print_footer($course,null, false,$chat->is_lams);
         exit;
 
     } else {
@@ -83,9 +86,9 @@
     if (($edit != -1) and $PAGE->user_allowed_editing()) {
         $USER->editing = $edit;
     }
-
-    $PAGE->print_header($course->shortname.': %fullname%');
-
+	//add a new parameter for lams for not to display moodle's headers
+    $PAGE->print_header($course->shortname.': %fullname%',NULL,'','',$cm->is_lams);
+	
     echo '<table id="layout-table"><tr>';
 
     $lt = (empty($THEME->layouttable)) ? array('left', 'middle', 'right') : $THEME->layouttable;
@@ -201,6 +204,16 @@
     
     echo '</tr></table>';
 
-    print_footer($course);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+	print_footer($course,null, false,$cm->is_lams);
+	//if is lams display navigation buttons so you can finish uploading or go to next activity
+	if($cm->is_lams==1){
+    		if($editing==1){
+				include('showlamsfinish.php');
+			}else{
+				include('showlamsnext.php');
+			}
+
+	}
 
 ?>
