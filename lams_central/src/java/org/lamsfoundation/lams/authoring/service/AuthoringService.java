@@ -1113,11 +1113,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    }
 	}
 	
-	if(originalLearningDesign.getFloatingActivity() != null && newLearningDesign.getFloatingActivity() != null) {
-    	// remove the Floating Activity in current design
-    	newActivities.remove(originalLearningDesign.getFloatingActivity());
-    }
-
 	Collection<Activity> activities = newActivities.values();
 
 	// Go back and find all the grouped activities and assign them the new
@@ -1211,6 +1206,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	if (uiidOffset == 0) {
 	    newLearningDesign.getActivities().clear();
 	}
+
+	if(originalLearningDesign.getFloatingActivity() != null && newLearningDesign.getFloatingActivity() != null) {
+    	// remove the Floating Activity in current design
+    	activities.remove(originalLearningDesign.getFloatingActivity());
+    }
+
 	newLearningDesign.getActivities().addAll(activities);
 
 	// On very rare occasions, we've had Hibernate try to save the branching
