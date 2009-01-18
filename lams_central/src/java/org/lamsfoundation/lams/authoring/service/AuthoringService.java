@@ -1277,7 +1277,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    						? newLearningDesign.getFloatingActivity()
 	    						: newActivity;
 	    	// TODO: fix order id for transfer of floating activities when contained in both designs.
-			processActivity(childActivity, newLearningDesign, newActivities, newGroupings,
+			if(childActivity.isFloating() && newLearningDesign.getFloatingActivity() != null)
+				childActivity.setOrderId(((FloatingActivity) refParentActivity).getActivities().size()+childActivity.getOrderId()+1);
+	    	processActivity(childActivity, newLearningDesign, newActivities, newGroupings,
 				refParentActivity, originalLearningDesignId, uiidOffset, customCSV);
 			
 		}
