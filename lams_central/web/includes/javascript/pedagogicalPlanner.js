@@ -11,6 +11,7 @@
    var ACTION_PREVIEW = 1; //After successful submit start preview
    var ACTION_OPEN_AUTHOR = 2; //After successful submit open full authoring
    var END_HEAD_REGEX_PATTERN = new RegExp('</head','i'); //Regex to find "head" element in a html pages
+   var FILE_ELEMENT_NAME = "file[";
        
    // Submit all activities
    function submitAll(action,additionalParameter){
@@ -54,10 +55,21 @@
    	var form = $('#activity'+activityIndex).contents().find('#pedagogicalPlannerForm');
    	if (form.length > 0){
    		form.ajaxSubmit({
+   			beforeSubmit: prepareFormData,
    			success: onActivityResponse,
    			dataType: "html"
    		});
    	}
+   }
+   
+   function prepareFormData(formData, jqForm, options){
+  	for (elementIndex = 0;elementIndex<formData.length;elementIndex++){
+  		var elementName = formData[elementIndex].name;
+  		if (elementName.indexOf(FILE_ELEMENT_NAME)==0 && formData[elementIndex].value==""){
+  			var openBracketIndex = elementName.indexOf("[")+1;
+  			formData[elementIndex].name="fileDummy["+elementName.substr(openBracketIndex,elementName.length-openBracketIndex-1)+"]";
+  		}
+  	}
    }
    
    //Called when server responds after a submit
@@ -84,7 +96,10 @@
  	var activity = document.getElementById('activity'+activityIndex);
  	if (activity!=null){
 	  	 //there is a bug in FF that strips head and body tags from inserted text; that's why it has to be done this way
-	  	 $('#activity'+activityIndex).contents().find('head').html(responseText.substring(responseText.search(/<head/i),responseText.search(END_HEAD_REGEX_PATTERN )));
+	  	 var headResponse = responseText.substring(responseText.search(/<head/i),responseText.search(END_HEAD_REGEX_PATTERN ));
+	  	 if (headResponse.length>0){
+	  	 	$('#activity'+activityIndex).contents().find('head').html();
+	  	 }
 	  	 activity.contentWindow.document.body.innerHTML=responseText.substring(responseText.search(/<body/i));
 	  	 //An activity form may have a function that should be called after form is received; its name must be "fillForm()"
 	  	 if (activity.contentWindow.fillForm){
