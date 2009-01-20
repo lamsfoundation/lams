@@ -16,10 +16,10 @@ CREATE INDEX idx_design_floating_act ON lams_learning_design (floating_activity_
 
 -- LDEV-1983 --------------
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('SMTPUser','', 'config.smtp.user', 'config.header.email', 'STRING', 1);
+values ('SMTPUser','', 'config.smtp.user', 'config.header.email', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('SMTPPassword','', 'config.smtp.password', 'config.header.email', 'STRING', 1);
+values ('SMTPPassword','', 'config.smtp.password', 'config.header.email', 'STRING', 0);
 
 
 ----------------------Put all sql statements above here-------------------------
