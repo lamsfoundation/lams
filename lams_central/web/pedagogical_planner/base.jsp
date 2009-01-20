@@ -139,6 +139,6 @@
 	<c:param name="ldId" value="${planner.learningDesignID}" />
 </c:url>
 
-<a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_OPEN_AUTHOR,null)"><fmt:message key="button.planner.view.full.author" /></a>
+<a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_OPEN_AUTHOR,${planner.learningDesignID})"><fmt:message key="button.planner.view.full.author" /></a>
 <a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_PREVIEW,'${startPreviewUrl}')"><fmt:message key="button.planner.preview" /></a>
 <a  class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_DO_NOTHING,null)"><fmt:message key="button.planner.save" /></a>

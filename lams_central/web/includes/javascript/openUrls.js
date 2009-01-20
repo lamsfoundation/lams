@@ -50,27 +50,26 @@
 				}
 			}
 		}
-
-		function openAuthor()
-		{
-			
+		
+		function openAuthor(learningDesignId){
+			var learningDesignParam = learningDesignId==null ? "":"&learningDesignID="+learningDesignId;
 			if(isMac)
-			{
-				authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
-			}
+				{
+					authorWin = window.open('home.do?method=author'+learningDesignParam,'aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+				}
 			else
-			{
-				if(authorWin && !authorWin.closed)
 				{
-					//authorWin.location = 'home.do?method=author';
-					authorWin.focus();
+					if(authorWin && !authorWin.closed)
+					{
+						//authorWin.location = 'home.do?method=author';
+						authorWin.focus();
+					}
+					else
+					{
+						authorWin = window.open('home.do?method=author'+learningDesignParam,'aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+						authorWin.focus();
+					}
 				}
-				else
-				{
-					authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
-					authorWin.focus();
-				}
-			}
 		}
 
 		function openAuthorForEditOnFly( learningDesignID )

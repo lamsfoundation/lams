@@ -6,6 +6,7 @@
    var activitiesResponded = 0; //Number of activities that responded
    var actionAfterCompleted; //What action should be called if all activities were saved successfully
    var startPreviewUrl; //Url to start preview
+   var learningDesignId; //ID of the design to open
    
    var ACTION_DO_NOTHING = 0; //After successful submit do nothing
    var ACTION_PREVIEW = 1; //After successful submit start preview
@@ -19,6 +20,9 @@
     actionAfterCompleted=action;
     if (actionAfterCompleted==ACTION_PREVIEW){
     	startPreviewUrl=additionalParameter;
+    }
+    else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
+  	    learningDesignId=additionalParameter;
     }
     callAttemptedID++;
     
@@ -131,7 +135,7 @@
   	   		window.open(startPreviewUrl,'Preview','width=800,height=600,scrollbars=yes,resizable=yes');
   	   	}
   	   	else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
-  	   		 openAuthor();
+  	   		 openAuthor(learningDesignId);
   	   	}
   	}
   	else {
