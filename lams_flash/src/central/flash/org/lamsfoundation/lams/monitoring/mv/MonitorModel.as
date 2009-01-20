@@ -24,6 +24,7 @@
 import org.lamsfoundation.lams.monitoring.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.Branch;
 import org.lamsfoundation.lams.authoring.BranchingActivity;
@@ -840,7 +841,7 @@ class MonitorModel extends Observable{
 			}
 			
 			if(ddm_activity.activityTypeID == Activity.SEQUENCE_ACTIVITY_TYPE && selectedTab != LearnerTabView._tabID){
-				eventArr.push(createViewUpdate("ADD_SEQUENCE", ddm_activity));
+				eventArr.push(createViewUpdate("ADD_SEQUENCE", ddm_activity, tabID));
 			} else if(ddm_activity.parentActivityID > 0 || ddm_activity.parentUIID > 0){
 				var parentAct;
 				if((parentAct = _activeSeq.getLearningDesignModel().activities.get(ddm_activity.parentUIID)) != null)
@@ -892,11 +893,11 @@ class MonitorModel extends Observable{
 	}
 	
 	private function callDesignEvents(tabID, eventArr):Void {
-		if(tabID != LearnerTabView._tabID)
+		if(tabID != LearnerTabView._tabID && tabID != MonitorTabView._tabID)
 			for(var i=0; i<eventArr.length; i++)
 				broadcastViewUpdate(eventArr[i].updateType, eventArr[i].data, eventArr[i].tabID, eventArr[i].learner);
-			else
-				broadcastViewUpdate("DRAW_ALL", eventArr, tabID);
+		else
+			broadcastViewUpdate("DRAW_ALL", eventArr, tabID);
 		
 	}
 	

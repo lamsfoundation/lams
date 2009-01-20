@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.br.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
 import org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView;
+import org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView;
 import org.lamsfoundation.lams.common.style.*
 
 import mx.controls.*
@@ -337,7 +338,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		icon_mc._y -= (!_sequenceChild) ? 6 : 0;
 	}
 	
-	private function drawLearners():Void {
+	public function drawLearners():Void {
 		mm = MonitorModel(_monitorController.getModel());
 		
 		var learner_X = _activity.xCoord + learnerOffset_X;
@@ -382,10 +383,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 		
 		// get the length of learners from the Monitor Model and run a for loop.
-		for (var j=0; j<mm.allLearnersProgress.length; j++){
+		var learnersProgress:Array = mm.allLearnersProgress;
+		for (var j=0; j<learnersProgress.length; j++){
 				
 			var learner:Object = new Object();
-			learner = mm.allLearnersProgress[j]
+			learner = learnersProgress[j]
 					
 			//Gets a true if learner's currect activityID matches this activityID else false.
 			var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
@@ -418,10 +420,20 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 	 * @return  
 	 */
 	private function draw(){
-		
+		Debugger.log("module: " + _module, Debugger.CRITICAL, "draw", "CanvasActivity");
 		// Drawing learner on the activty. 
-		if(_module == "monitoring")
-			drawLearners();
+		if(_module == "monitoring") {
+			var view = (activity.parentUIID == null) ? _monitorView : null;
+			
+			Debugger.log("view: " + view, Debugger.CRITICAL, "draw", "CanvasActivity");
+			if(view != null) {
+				view.addEvt("DRAW_LEARNERS", this);
+				view.drawNext();
+			} else if(_canvasBranchView != null) {
+				MovieClipUtils.doLater(Proxy.create(this, drawLearners));
+			}
+				
+		}
 		
 		Debugger.log(_activity.title+',_activity.isGateActivity():'+_activity.isGateActivity(),4,'draw','CanvasActivity');
 		

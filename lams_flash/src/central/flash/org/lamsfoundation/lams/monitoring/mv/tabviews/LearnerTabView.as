@@ -211,8 +211,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					break;
 				case 'DRAW_DESIGN' :
 					Debugger.log("DRAW_DESIGN received",Debugger.CRITICAL,"update","LearnerTabView");
-					adjustLearnerPanel(mm);
 					if (infoObj.tabID == _tabID && !mm.locked){
+						adjustLearnerPanel(mm);
 						if (mm.isDesignDrawn) {
 							clearCanvas(mm);
 						}
@@ -220,8 +220,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					}
 					break;
 				case 'DRAW_ALL' :
-					adjustLearnerPanel(mm);
 					if (infoObj.tabID == _tabID && !mm.locked){
+						adjustLearnerPanel(mm);
 						evtArr = infoObj.data;
 						drawAll();
 					}

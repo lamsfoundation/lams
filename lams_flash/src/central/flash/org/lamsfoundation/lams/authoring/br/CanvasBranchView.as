@@ -340,13 +340,19 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		var endX:Number = (this.activity.endXCoord != null) ? this.activity.endXCoord : hubEndDir_x;
 		var endY:Number = (this.activity.endYCoord != null) ? this.activity.endYCoord : _endy;
 		
+		var _module = null;
+		
+		if(model instanceof MonitorModel) {
+			_module = "monitoring";
+		}
+		
 		// start-point connector hub
-		cHubStart_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _canvasController:getController(), _canvasBranchView:_canvasBranchView, _x: startX , _y: startY, branchConnector:true})
-												  : activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _monitorController:getController(), _canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true});
+		cHubStart_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _canvasController:getController(), _canvasBranchView:_canvasBranchView, _x: startX , _y: startY, branchConnector:true, _module:_module})
+												  : activityLayer.createChildAtDepth("CanvasBranchingConnectorStart",DepthManager.kTop,{_activity: activity, _monitorController:getController(), _canvasBranchView:_canvasBranchView, _x: activity.startXCoord , _y: activity.startYCoord, branchConnector:true, _module:_module});
 		// end-point connector hub
-		cHubEnd_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _canvasController:CanvasController(getController()), _canvasBranchView:_canvasBranchView, _x: endX , _y: endY, branchConnector:true})
-												: activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _monitorController:MonitorController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.endXCoord , _y: activity.endYCoord, branchConnector:true});
-												
+		cHubEnd_mc = (model instanceof CanvasModel) ? activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _canvasController:CanvasController(getController()), _canvasBranchView:_canvasBranchView, _x: endX , _y: endY, branchConnector:true, _module:_module})
+												: activityLayer.createChildAtDepth("CanvasBranchingConnectorEnd",DepthManager.kTop,{_activity: activity, _monitorController:MonitorController(getController()), _canvasBranchView:_canvasBranchView, _x: activity.endXCoord , _y: activity.endYCoord, branchConnector:true, _module:_module});
+											
 		this.onEnterFrame = hitConnectorHubs;
 		
 	}

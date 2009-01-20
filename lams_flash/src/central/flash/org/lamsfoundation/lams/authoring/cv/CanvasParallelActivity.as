@@ -246,7 +246,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 		return styleObj;
 	}
 	
-	private function drawLearners():Void {
+	public function drawLearners():Void {
 		var mm:MonitorModel = MonitorModel(_monitorController.getModel());
 		
 		var learner_X = (mm.activeView instanceof CanvasComplexView) ? this._x + learnerOffset_X : _activity.xCoord + learnerOffset_X;
@@ -282,9 +282,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasParallelActivity extends MovieC
 	private function draw(){			
 		//write text
 		title_lbl.text = _activity.title;
+		
+		if(fromModuleTab == "monitorMonitorTab") {
+			var view = (activity.parentUIID == null) ? _monitorTabView : null;
+			Debugger.log("view: " + view, Debugger.CRITICAL, "draw", "CanvasParallelActivity");
 			
-		if(fromModuleTab == "monitorMonitorTab")
-			drawLearners()
+			if(view != null) {
+				view.addEvt("DRAW_LEARNERS", this);
+				view.drawNext();
+			} else if(_canvasBranchView != null) {
+				MovieClipUtils.doLater(Proxy.create(this, drawLearners));
+			}
+		}
 			
 		//position the container (this)
 		if(!_canvasComplexView) {

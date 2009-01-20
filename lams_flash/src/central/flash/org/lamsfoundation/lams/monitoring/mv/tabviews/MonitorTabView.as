@@ -79,6 +79,10 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	private var orig_height:Number
 	private var firstRun:Number;
 	
+	private var drawCount:Number;
+	private var maxCount:Number;
+	private var evtArr:Array;
+	
 	/**
 	* Constructor
 	*/
@@ -191,7 +195,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 					break;
 				case 'DRAW_TRANSITION' :
 					if (infoObj.tabID == _tabID && !mm.locked){
-						drawTransition(infoObj.data, mm)
+						drawTransition(infoObj.data, mm);
 					}
 					break;
 				case 'HIDE_TRANSITION' :
@@ -219,8 +223,14 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 					
 					break;
 				case 'DRAW_ALL' :
-					if (infoObj.tabID == _tabID && !mm.locked){
-						drawAll(infoObj.data, mm);
+					if (infoObj.tabID == _tabID && !mm.locked && mm.currentBranchingActivity == null){
+						evtArr = infoObj.data;
+						drawAll();
+					}
+					break;
+				case 'DRAW_LEARNERS' :
+					if(infoObj.tabID == _tabID && !mm.locked){
+						infoObj.data.drawLearners();
 					}
 					break;
 				case 'SET_ACTIVE' :
@@ -401,15 +411,39 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 			mm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		}
 		
-		mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true);
-		
 		return true;
 	}
 	
 	private function drawAll(objArr:Array, mm:MonitorModel){
-		for (var i=0; i<objArr.length; i++){
-			update(mm,objArr[i]);
+		Debugger.log("draw all: " + evtArr.length, Debugger.CRITICAL, "drawAll", "MonitorTabView");
+		drawCount = 0;
+		maxCount = evtArr.length;
+		
+		drawNext();
+	}
+	
+	public function drawNext():Void {
+		Debugger.log("draw next: " + drawCount, Debugger.CRITICAL, "drawNext", "MonitorTabView");
+		Debugger.log("max count: " + maxCount, Debugger.CRITICAL, "drawNext", "MonitorTabView");
+		
+		if(drawCount < maxCount) {
+			update(mm, evtArr[drawCount]);
+			
+			drawCount++;
+		
+			if(evtArr[drawCount-1].updateType != "DRAW_ACTIVITY")
+				drawNext();
+		} else {
+			mm.getMonitor().getMV().getMonitorSequenceScp().redraw(true);
 		}
+		
+		
+	}
+	
+	public function addEvt(updateType:String, data:Object):Void {
+		var evt = mm.createViewUpdate(updateType, data, _tabID, null);
+		evtArr.push(evt);
+		maxCount = evtArr.length;
 	}
 	
 	/**

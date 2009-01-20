@@ -319,7 +319,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		_activity = a;
 	}
 	
-	private function drawLearners():Void {
+	public function drawLearners():Void {
 		var mm:MonitorModel = MonitorModel(_monitorController.getModel());
 		
 		var learner_X = (mm.activeView instanceof CanvasComplexView) ? this._x + learnerOffset_X : _activity.xCoord + learnerOffset_X;
@@ -391,8 +391,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		//dimentions of container (this)
 		setLocking();
 			
-		if(fromModuleTab == "monitorMonitorTab")
-			drawLearners();
+		if(fromModuleTab == "monitorMonitorTab") {
+			var view = (activity.parentUIID == null) ? _monitorTabView : null;
+			
+			Debugger.log("view: " + view, Debugger.CRITICAL, "draw", "CanvasOptionalActivity");
+			if(view != null) {
+				view.addEvt("DRAW_LEARNERS", this);
+				view.drawNext();
+			} else if(_canvasBranchView != null) {
+				MovieClipUtils.doLater(Proxy.create(this, drawLearners));
+			}
+				
+		}
 		
 		Debugger.log ("I am in Draw :" + _activity.title + 'uiID:' + _activity.activityUIID + ' children:' + _children.length, Debugger.GEN, 'Draw', 'CanvasOptionalActivity');
 		
