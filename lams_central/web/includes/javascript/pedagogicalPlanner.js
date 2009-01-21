@@ -56,8 +56,14 @@
    
    //Submit single activity
    function submitActivityForm(activityIndex){
-   	var form = $('#activity'+activityIndex).contents().find('#pedagogicalPlannerForm');
+    var activity = document.getElementById('activity'+activityIndex);
+   	var form = $(activity).contents().find('#pedagogicalPlannerForm');
    	if (form.length > 0){
+   		//check if activity has a special function that needs to be run before submit
+   		if (activity.contentWindow.prepareFormData){
+	  	 	activity.contentWindow.prepareFormData();
+	  	 }
+	  	//prepareFormData above is inside the tool and the one below is here, triggered by jQuery
    		form.ajaxSubmit({
    			beforeSubmit: prepareFormData,
    			success: onActivityResponse,

@@ -9,5 +9,7 @@
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>
