@@ -1,0 +1,1 @@
+document.write('<img src="panels/accents_panel.gif" width="30" height="78" border="0" alt="Accents Panel" usemap="#accents_map" /><map name="accents_map" id="accents_map"><area shape="rect" alt="\hat{a}" title="\hat{a}" coords="0,0,14,14" onmouseover="hover(this, event)" onclick="insertText(\'\\hat{}\',5)" /></map>');

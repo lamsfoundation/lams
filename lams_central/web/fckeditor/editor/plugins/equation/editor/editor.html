@@ -1,0 +1,471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="copyright" content="Copyright CodeCogs 2007-2008
+ Written by Will Bateman.
+	
+ GNU General Public License Agreement
+ Copyright (C) 2004-2008 CodeCogs, Zyba Ltd, Broadwood, Holford, TA5 1DU, England.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by Free Software Foundation, 
+ either version 3 of the License, or (at your option) any later version. 
+ You must retain a copy of this licence in all copies.
+ 
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ 
+ See the GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>."/>
+<title>LaTeX Equation Editor for the Internet</title>
+<meta name="robots" content="index, nofollow"/>
+<meta name="description" content="A web-based LaTeX equation editor that generates graphical equations (gif, png, swf, pdf). It also provides the HTML code for directly embedding the equations into any website, forum or blog. Images may also be used directly within your offline documentation. Open source and XHTML compliant."/>
+<meta name="keywords" content="LaTeX, equation editor, open source, equations, mimetex, pdf, gif, png, swf, instantly rendered, preview, free"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<link rel="stylesheet" href="css/equation.css" type="text/css"/>
+<script src="js/eq_fck.js" type="text/javascript"></script>
+<script src="js/editor.js" type="text/javascript"></script>
+<script src="js/clipboard.js" type="text/javascript"></script>
+<script type="text/javascript">AC_FL_RunContent = 0;</script>
+<script src="js/eq_flash.js" type="text/javascript"></script>
+<script type="text/javascript">
+// Send the equation to the opening window.
+var cctarget = '';
+var cctype = 'html';
+</script>
+</head>
+<body onload="LoadSelected();">
+<div id="hover"></div>
+<div class="center">
+<div class="top">
+<select title="Spaces" onchange="insertText(this.options[this.selectedIndex].value); this.selectedIndex=0;">
+  <option selected="selected" value="" style="color:#8080ff">Spaces...</option>
+  <option value="\,">thin</option>
+  <option value="\:">medium</option>
+  <option value="\;">thick</option>
+  <option value="\!">negative</option>
+</select>
+<select title="Styles" onchange="insertText(this.options[this.selectedIndex].value, 1000); this.selectedIndex=0;">
+  <option selected="selected" value="" style="color:#8080ff">Style...</option>
+  <optgroup label="Equation Only">
+  <option value="\mathbb{}" title="\mathbb{}">Blackboard</option>
+  <option value="\mathbf{}" title="\mathbf{}">Bold</option>
+  <option value="\boldsymbol{}" title="\boldsymbol{}">Bold Greek</option>
+  <option value="\mathit{}" title="\mathit{}">Italic</option>
+  
+  <option value="\mathrm{}" title="\mathrm{}">Roman</option>
+  <option value="\mathfrak{}" title="\mathfrak{}">Fraktur</option>
+  </optgroup>
+  <optgroup label="Text Only">
+  <option value="\texttt{}" title="\texttt{}">Typewriter</option>
+  <option value="\textup{}" title="\textup{}">Upright</option>
+  <option value="\textbf{}" title="\textbf{}">Bold</option>
+  <option value="\textit{}" title="\textit{}">Italic</option>
+  <option value="\textrm{}" title="\textrm{}">Roman</option>
+  <option value="\textsl{}" title="\textsl{}">Slanted</option>
+  <option value="\textsc{}" title="\textsc{}">SMALL CAPS</option>
+  <option value="\emph{}"   title="\emph{}">Emphasis</option>
+  </optgroup>
+</select>
+<select title="Functions" onchange="insertText(this.options[this.selectedIndex].value); this.selectedIndex=0;">
+  <option selected="selected" value="" style="color:#8080ff">Functions&hellip;</option>
+  <option value="\arg">arg</option>
+  <option value="\deg">degree</option>
+  <option value="\det">det</option>
+  <option value="\dim">dim</option>
+  <option value="\gcd">gcd</option>
+  <option value="\hom">hom</option>
+  <option value="\ker">ker</option>
+  <option value="\partial">partial</option>
+  <option value="\Pr">Pr</option>
+  <option value="\sup">sup</option>  
+  <optgroup label="Logs">
+  <option value="\exp">exp</option>
+  <option value="\lg">lg</option>
+  <option value="\ln">ln</option>
+  <option value="\log">log</option>
+  <option value="\log_{e}">log e</option>
+  <option value="\log_{10}">log 10</option>
+  </optgroup>
+  <optgroup label="Limits">
+  <option value="\lim">limit</option>
+  <option value="\liminf">liminf</option>
+  <option value="\limsup">limsup</option>
+  <option value="\max">maximum</option>
+  <option value="\min">minimum</option>
+  <option value="\infty">infinite</option> 			
+  </optgroup>  
+  <optgroup label="Trig">
+  <option value="\sin">sin</option>
+  <option value="\cos">cos</option>
+  <option value="\tan">tan</option>
+  <option value="\sin^{-1}">sin-1</option>
+  <option value="\cos^{-1}">cos-1</option>
+  <option value="\tan^{-1}">tan-1</option> 
+  <option value="\csc">csc</option>
+  <option value="\sec">sec</option>
+  <option value="\cot">cot</option>
+  <option value="\sinh">sinh</option>
+  <option value="\cosh">cosh</option>
+  <option value="\tanh">tanh</option>
+  <option value="\coth">coth</option>
+  <option value="\sinh^{-1}">sinh-1</option>
+  <option value="\cosh^{-1}">cosh-1</option>
+  <option value="\tanh^{-1}">tanh-1</option> 
+  </optgroup>
+  <optgroup label="Complex">
+  <option value="\Re">Real</option>
+  <option value="\Im">Imaginary</option>
+  <option value="\imath">i</option>
+  <option value="\jmath">j</option>
+  </optgroup>
+</select>
+<select title="Foreign Characters" onchange="insertText(this.options[this.selectedIndex].value); this.selectedIndex=0;">
+  <option selected="selected" value="" style="color:#8080ff">Foreign...</option>
+  <option value="\oe">&oelig;</option>
+  <option value="\OE">&OElig;</option>
+  <option value="\ae">&aelig;</option>
+  <option value="\AE">&AElig;</option>
+  <option value="\aa">&aring;</option>
+  <option value="\AA">&Aring;</option>
+  <option value="\ss">&szlig;</option>
+  <option value="\S">(&sect;) section</option>
+  <option value="\P">(&para;) paragraph</option>
+  <option value="\o">o</option>
+  <option value="\O">O</option>
+  <option value="\l">l</option>
+  <option value="\L">L</option>
+  <option value="\dag">dagger</option>
+  <option value="\ddag">double dagger</option>
+  <option value="\copyright">&copy;</option>
+  <option value="\pounds">&pound;</option>
+</select>
+<select title="Symbols" onchange="insertText(this.options[this.selectedIndex].value); this.selectedIndex=0;">
+  <option selected="selected" value="" style="color:#8080ff">Symbols...</option>
+	<option value="\pm" title="\pm">(&plusmn;) plus or minus</option>
+  <option value="\mp" title="\mp">minus or plus</option>
+  <option value="\times">(&times;) times</option>
+  <option value="\div" title="\div">(&divide;) divided by</option>
+  <option value="\ast" title="\ast">(&lowast;) asterisk</option>
+  <option value="\star">(*) star</option>
+  <option value="\circ" title="\circ">circle</option>
+  <option value="^{\circ}" title="^{\circ}">degree symbol</option>
+  <option value="\bullet">(&bull;) bullet</option>
+  <option value="\cdot">(&middot;) center dot</option>
+  <option value="\uplus">u plus</option>
+  <option value="\sqcap">square cap</option>
+  <option value="\sqcup">square cup</option>
+  <option value="\vee">(&or;) vee</option>
+  <option value="\wedge">(&and;) wedge</option>
+  <option value="\diamond">(&loz;) diamond</option>
+  <option value="\bigtriangleup">big triangle up</option>
+  <option value="\bigtriangledown">big triangle down</option>
+  <option value="\triangleleft">triangle left</option>
+  <option value="\triangleright">triangle right</option>
+  <option value="\lhd">large triangle left</option>
+  <option value="\rhd">large triangle right</option>
+  <option value="\oplus">(&oplus;) circle plus</option>
+  <option value="\ominus">circle minus</option>
+  <option value="\otimes">(&otimes;) circle times</option>
+  <option value="\oslash">circle slash</option>
+  <option value="\odot">circle dot</option>
+  <option value="\bigcirc">big circle</option>  
+  <option value="\dagger">(&dagger;) dagger</option>
+  <option value="\ddagger">(&Dagger;) double dagger</option>
+  <option value="\amalg">coproduct</option>
+</select>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://en.wikipedia.org/wiki/Help:Formula" target="_blank"><img src="http://www.codecogs.com/images/icons/i.gif" alt="help" align="bottom" width="13" height="13" border="0"/></a>
+</div>
+<div class="top">
+<img id="undobutton" src="http://www.codecogs.com/images/buttons/undo-x.gif" width="20" height="13" alt="undo" title="undo" style="vertical-align:bottom" onclick="undo('latex_formula');"/>
+<img id="redobutton" src="http://www.codecogs.com/images/buttons/redo-x.gif" width="20" height="13" alt="redo" title="redo" style="vertical-align:bottom; margin-right:20px" onclick="redo('latex_formula');" />
+<select name="fontsize" id="fontsize" title="Font" onchange="textchanged();">
+  <option value="\tiny">(8pt) Tiny</option>
+  <option value="\small">(10pt) Small</option>
+  <option value="" selected="selected">(12pt) Normal</option>
+  <option value="\large">(14pt) Large</option>
+  <option value="\huge">(20pt) Huge</option>
+</select>
+
+<select title="Title" onchange="insertText(this.options[this.selectedIndex].value, this.options[this.selectedIndex].value.length-1); this.selectedIndex=0">
+  <option selected="selected" value="" style="color:#8080ff">Color...</option>
+  <option value="{\color{red} }" style="color:red">Red</option>
+  <option value="{\color{green} }" style="color:green">Green</option>
+  <option value="{\color{blue} }" style="color:blue">Blue</option>
+</select>
+<select name="history" id="history" title="history" onchange="insertText(this.options[this.selectedIndex].value); this.selectedIndex=0;">
+  <option selected="selected" value="" style="color:#8080ff">History...</option>
+</select>
+
+</div>
+
+<div id="toolbar_wrapper">
+<div id="toolbar">
+<div class="panel" id="panel1" onmouseover="this.style.overflow='visible'" onmouseout="this.style.overflow='hidden'">
+<!-- 
+Copyright (C) 2004-2007 CodeCogs, Zyba Ltd, Broadwood, Holford, TA5 1DU, England.
+-->
+<img src="panels/operators_panel.gif" width="133" height="102" border="0" alt="Operators Panel" usemap="#operators_map" />
+<map name="operators_map" id="operators_map">
+<area shape="rect" alt="\frac{a}{b}" title="\frac{a}{b}" coords="0,0,25,24" onmouseover="hover(this, event)" onclick="insertText('\\frac{}{}',6)" />
+<area shape="rect" alt="a^b"         title="a^b"         coords="0,26,25,50" onmouseover="hover(this, event)" onclick="insertText('^{}',2)" />
+<area shape="rect" alt="a_b"         title="a_b"         coords="0,52,25,76" onmouseover="hover(this, event)" onclick="insertText('_{}',2)" />
+<area shape="rect" alt="\frac{\\partial }{\\partial x}"   title="\frac{\partial }{\partial x}"    coords="0,78,25,102" onmouseover="hover(this, event)" onclick="insertText('\\frac{\\partial }{\\partial x}',15)" />
+
+<area shape="rect" alt="\int"       title="\int"         coords="27,0,52,24" onmouseover="hover(this, event)" onclick="insertText('\\int')" />
+<area shape="rect" alt="\int_a^b"   title="\int_a^b"     coords="27,26,52,50" onmouseover="hover(this, event)" onclick="insertText('\\int_{}^{}{}',6,11)" />
+<area shape="rect" alt="\oint_a^b"  title="\oint_a^b"    coords="27,52,52,76" onmouseover="hover(this, event)" onclick="insertText('\\oint_{}^{}{}',7,12)" />
+<area shape="rect" alt="\lim_{x \rightarrow 0}" title="\lim_{x \rightarrow 0}" coords="27,78,52,102" onmouseover="hover(this, event)" onclick="insertText('\\lim_{}',6)" />
+
+<area shape="rect" alt="\prod"       title="\prod"       coords="54,0,79,24" onmouseover="hover(this, event)"  onclick="insertText('\\prod{}',6)" />
+<area shape="rect" alt="\prod_a^b"   title="\prod_a^b"   coords="54,26,79,50" onmouseover="hover(this, event)" onclick="insertText('\\prod_{}^{}{}',7,12)" />
+<area shape="rect" alt="\coprod"     title="\coprod"     coords="54,52,79,76" onmouseover="hover(this, event)" onclick="insertText('\\coprod{}',8)" />
+<area shape="rect" alt="\coprod_a^b" title="\coprod_a^b" coords="54,78,79,102" onmouseover="hover(this, event)" onclick="insertText('\\coprod_{}^{}{}',9,14)" />
+
+<area shape="rect" alt="\bigcap"     title="\bigcap"     coords="81,0,106,24" onmouseover="hover(this, event)" onclick="insertText('\\bigcap{}',8)" />
+<area shape="rect" alt="\bigcap_a^b" title="\bigcap_a^b" coords="81,26,106,50" onmouseover="hover(this, event)" onclick="insertText('\\bigcap_{}^{}{}',9,14)" />
+<area shape="rect" alt="\bigcup"     title="\bigcup"     coords="81,52,106,76" onmouseover="hover(this, event)" onclick="insertText('\\bigcup{}',8)" />
+<area shape="rect" alt="\bigcup_a^b" title="\bigcup_a^b" coords="81,78,106,102" onmouseover="hover(this, event)" onclick="insertText('\\bigcup_{}^{}{}',9,14)" />
+
+<area shape="rect" alt="\sum"       title="\sum"         coords="108,0,133,24" onmouseover="hover(this, event)" onclick="insertText('\\sum{}',5)" />
+<area shape="rect" alt="\sum_a^b"   title="\sum_a^b"     coords="108,26,133,50" onmouseover="hover(this, event)" onclick="insertText('\\sum_{}^{}{}',6,11)" />
+<area shape="rect" alt="\sqrt{x}"   title="\sqrt{x}"     coords="108,52,133,76" onmouseover="hover(this, event)" onclick="insertText('\\sqrt{}',6)" />
+<area shape="rect" alt="\sqrt[n]{x}" title="\sqrt[n]{x}" coords="108,78,133,102" onmouseover="hover(this, event)" onclick="insertText('\\sqrt[]{}',6)" />
+</map>
+</div>
+
+<div class="panel" id="panel2" onmouseover="this.style.overflow='visible'" onmouseout="this.style.overflow='hidden'">
+<!-- 
+Copyright (C) 2004-2007 CodeCogs, Zyba Ltd, Broadwood, Holford, TA5 1DU, England.
+-->
+<img src="panels/brackets_panel.gif" width="25" height="128" border="0" alt="Brackets Panel" usemap="#brackets_map" />
+<map name="brackets_map" id="brackets_map">
+
+<area shape="rect" alt="\left( \right)" title="\left( \right)" coords="0,0,25,24" onclick="insertText('\\left( \\right)',6)" />
+<area shape="rect" alt="\left[ \right]" title="\left[ \right]" coords="0,26,25,50" onclick="insertText('\\left[ \\right]',6)" />
+<area shape="rect" alt="\left| \right|" title="\left| \right|" coords="0,52,25,76" onclick="insertText('\\left| \\right|',6)" />
+<area shape="rect" alt="\left< \right>" title="\left< \right>" coords="0,78,25,102" onclick="insertText('\\left< \\right>',6)" />
+<area shape="rect" alt="\left\{ \right\}" title="\left\{ \right\}" coords="0,104,25,128" onclick="insertText('\\left\\{ \\right\\}',7)" />
+</map>
+
+</div>
+
+<div class="panel2" id="panel3" onmouseover="this.style.overflow='visible'" onmouseout="this.style.overflow='hidden'">
+<!-- 
+Copyright (C) 2004-2007 CodeCogs, Zyba Ltd, Broadwood, Holford, TA5 1DU, England.
+-->
+<img src="panels/greekletters_panel.gif" width="94" height="112" border="0" alt="Greek Letters Panel" usemap="#greekletters_map" />
+<map name="greekletters_map" id="greekletters_map">
+<area shape="rect" alt="\alpha"    title="\alpha"   coords="0,0,14,14" onmouseover="hover(this, event)"  onclick="insertText('\\alpha')" />
+<area shape="rect" alt="\beta"     title="\beta"    coords="16,0,30,14" onmouseover="hover(this, event)" onclick="insertText('\\beta')" />
+<area shape="rect" alt="\gamma"    title="\gamma"   coords="32,0,46,14" onmouseover="hover(this, event)" onclick="insertText('\\gamma')" />
+<area shape="rect" alt="\delta"    title="\delta"   coords="48,0,62,14" onmouseover="hover(this, event)" onclick="insertText('\\delta')" />
+<area shape="rect" alt="\epsilon"  title="\epsilon" coords="64,0,78,14" onmouseover="hover(this, event)" onclick="insertText('\\epsilon')" />
+<area shape="rect" alt="\varepsilon" title="\varepsilon" coords="80,0,94,14" onmouseover="hover(this, event)" onclick="insertText('\\varepsilon')" />
+
+<area shape="rect" alt="\zeta"     title="\zeta"     coords="0,16,14,30" onmouseover="hover(this, event)" onclick="insertText('\\zeta')" />
+<area shape="rect" alt="\eta"      title="\eta"      coords="16,16,30,30" onmouseover="hover(this, event)" onclick="insertText('\\eta')" />
+<area shape="rect" alt="\theta"    title="\theta"    coords="32,16,46,30" onmouseover="hover(this, event)" onclick="insertText('\\theta')" />
+<area shape="rect" alt="\vartheta" title="\vartheta" coords="48,16,62,30" onmouseover="hover(this, event)" onclick="insertText('\\vartheta')" />
+<area shape="rect" alt="\iota"     title="\iota"     coords="64,16,78,30" onmouseover="hover(this, event)" onclick="insertText('\\iota')" />
+<area shape="rect" alt="\kappa"    title="\kappa"    coords="80,16,94,30" onmouseover="hover(this, event)" onclick="insertText('\\kappa')" />
+
+<area shape="rect" alt="\lambda"   title="\lambda"  coords="0,32,14,46" onmouseover="hover(this, event)" onclick="insertText('\\lambda')" />
+<area shape="rect" alt="\mu"       title="\mu"      coords="16,32,30,46" onmouseover="hover(this, event)" onclick="insertText('\\mu')" />
+<area shape="rect" alt="\nu"       title="\nu"      coords="32,32,46,46" onmouseover="hover(this, event)" onclick="insertText('\\nu')" />
+<area shape="rect" alt="\xi"       title="\xi"      coords="48,32,62,46" onmouseover="hover(this, event)" onclick="insertText('\\xi')" />
+<area shape="rect" alt="\pi"       title="\pi"      coords="64,32,78,46" onmouseover="hover(this, event)" onclick="insertText('\\pi')" />
+<area shape="rect" alt="\varpi"    title="\varpi"   coords="80,32,94,46" onmouseover="hover(this, event)" onclick="insertText('\\varpi')" />
+
+<area shape="rect" alt="\rho"      title="\rho"     coords="0,48,14,62"  onmouseover="hover(this, event)" onclick="insertText('\\rho')" />
+<area shape="rect" alt="\varrho"   title="\varrho"  coords="16,48,30,62" onmouseover="hover(this, event)"  onclick="insertText('\\varrho')" />
+<area shape="rect" alt="\sigma"    title="\sigma"   coords="32,48,46,62" onmouseover="hover(this, event)"  onclick="insertText('\\sigma')" />
+<area shape="rect" alt="\varsigma" title="\varsigma" coords="48,48,62,62" onmouseover="hover(this, event)" onclick="insertText('\\varsigma')" />
+<area shape="rect" alt="\tau"      title="\tau"     coords="64,48,78,62" onmouseover="hover(this, event)" onclick="insertText('\\tau')" />
+<area shape="rect" alt="\upsilon"  title="\upsilon" coords="80,48,94,62" onmouseover="hover(this, event)" onclick="insertText('\\upsilon')" />
+
+<area shape="rect" alt="\phi"      title="\phi"     coords="0,64,14,78" onmouseover="hover(this, event)" onclick="insertText('\\phi')" />
+<area shape="rect" alt="\varphi"   title="\varphi"  coords="16,64,30,78" onmouseover="hover(this, event)" onclick="insertText('\\varphi')" />
+<area shape="rect" alt="\chi"      title="\chi"     coords="32,64,46,78" onmouseover="hover(this, event)" onclick="insertText('\\chi')" />
+<area shape="rect" alt="\psi"      title="\psi"     coords="48,64,62,78" onmouseover="hover(this, event)" onclick="insertText('\\psi')" />
+<area shape="rect" alt="\omega"    title="\omega"   coords="64,64,78,78" onmouseover="hover(this, event)" onclick="insertText('\\omega')" />
+
+<area shape="rect" alt="\Gamma"    title="\Gamma"   coords="0,82,14,96"  onmouseover="hover(this, event)"  onclick="insertText('\\Gamma')" />
+<area shape="rect" alt="\Delta"    title="\Delta"   coords="16,82,30,96" onmouseover="hover(this, event)"  onclick="insertText('\\Delta')" />
+<area shape="rect" alt="\Theta"    title="\Theta"   coords="32,82,46,96" onmouseover="hover(this, event)"  onclick="insertText('\\Theta')" />
+<area shape="rect" alt="\Lambda"   title="\Lambda"  coords="48,82,62,96" onmouseover="hover(this, event)"  onclick="insertText('\\Lambda')" />
+<area shape="rect" alt="\Xi"       title="\Xi"      coords="64,82,78,96" onmouseover="hover(this, event)"  onclick="insertText('\\Xi')" />
+<area shape="rect" alt="\Pi"       title="\Pi"      coords="80,82,94,96" onmouseover="hover(this, event)"  onclick="insertText('\\Pi')" />
+
+<area shape="rect" alt="\Sigma"    title="\Sigma"   coords="0,98,14,112" onmouseover="hover(this, event)" onclick="insertText('\\Sigma')" />
+<area shape="rect" alt="\Upsilon"  title="\Upsilon" coords="16,98,30,112" onmouseover="hover(this, event)" onclick="insertText('\\Upsilon')" />
+<area shape="rect" alt="\Phi"      title="\Phi"     coords="32,98,46,112" onmouseover="hover(this, event)" onclick="insertText('\\Phi')" />
+<area shape="rect" alt="\Psi"      title="\Psi"     coords="48,98,62,112" onmouseover="hover(this, event)" onclick="insertText('\\Psi')" />
+<area shape="rect" alt="\Omega"    title="\Omega"   coords="64,98,78,112" onmouseover="hover(this, event)" onclick="insertText('\\Omega')" />
+</map>
+</div>
+
+<div class="panel2" id="panel4" onmouseover="this.style.overflow='visible'" onmouseout="this.style.overflow='hidden'">
+<!-- 
+Copyright (C) 2004-2007 CodeCogs, Zyba Ltd, Broadwood, Holford, TA5 1DU, England.
+-->
+<img src="panels/relations_panel.gif" width="46" height="190" border="0" alt="Relations Panel" usemap="#relations_map" />
+<map name="relations_map" id="relations_map">
+<area shape="rect" alt="\leq"        title="\leq"      coords="0,0,14,14"   onmouseover="hover(this, event)" onclick="insertText('\\leq')" />
+<area shape="rect" alt="\prec"       title="\prec"     coords="0,16,14,30"  onmouseover="hover(this, event)" onclick="insertText('\\prec')" />
+<area shape="rect" alt="\preceq"     title="\preceq"   coords="0,32,14,46"  onmouseover="hover(this, event)" onclick="insertText('\\preceq')" />
+<area shape="rect" alt="\ll"         title="\ll"       coords="0,48,14,62"  onmouseover="hover(this, event)" onclick="insertText('\\ll')" />
+<area shape="rect" alt="\subset"     title="\subset"   coords="0,64,14,78"  onmouseover="hover(this, event)" onclick="insertText('\\subset')" />
+<area shape="rect" alt="\subseteq"   title="\subseteq" coords="0,80,14,94"  onmouseover="hover(this, event)" onclick="insertText('\\subseteq')" />
+<area shape="rect" alt="\sqsubset"   title="\sqsubset" coords="0,96,14,110" onmouseover="hover(this, event)" onclick="insertText('\\sqsubset')" />
+<area shape="rect" alt="\sqsubseteq" title="\sqsubseteq" coords="0,112,14,126" onmouseover="hover(this, event)" onclick="insertText('\\sqsubseteq')" />
+<area shape="rect" alt="\in"         title="\in"       coords="0,128,14,142" onmouseover="hover(this, event)" onclick="insertText('\\in')" />
+<area shape="rect" alt="\vdash"      title="\vdash"    coords="0,144,14,158" onmouseover="hover(this, event)" onclick="insertText('\\vdash')" />
+<area shape="rect" alt="\models"     title="\models"   coords="0,160,14,174" onmouseover="hover(this, event)" onclick="insertText('\\models')" />
+<area shape="rect" alt="\bowtie"     title="\bowtie"   coords="0,176,14,190" onmouseover="hover(this, event)" onclick="insertText('\\bowtie')" />
+
+
+<area shape="rect" alt="\geq"        title="\geq"      coords="16,0,30,14"    onmouseover="hover(this, event)" onclick="insertText('\\geq')" />
+<area shape="rect" alt="\succ"       title="\succ"     coords="16,16,30,30"   onmouseover="hover(this, event)" onclick="insertText('\\succ')" />
+<area shape="rect" alt="\succeq"     title="\succeq"   coords="16,32,30,46"   onmouseover="hover(this, event)" onclick="insertText('\\succeq')" />
+<area shape="rect" alt="\gg"         title="\gg"       coords="16,48,30,62"   onmouseover="hover(this, event)" onclick="insertText('\\gg')" />
+<area shape="rect" alt="\supset"     title="\supset"   coords="16,64,30,78"   onmouseover="hover(this, event)" onclick="insertText('\\supset')">
+<area shape="rect" alt="\supseteq"   title="\supseteq" coords="16,80,30,94"   onmouseover="hover(this, event)" onclick="insertText('\\supseteq')" />
+<area shape="rect" alt="\sqsupset"   title="\sqsupset" coords="16,96,30,110"  onmouseover="hover(this, event)" onclick="insertText('\\sqsupset')" />
+<area shape="rect" alt="\sqsupseteq" title="\sqsupseteq" coords="16,112,30,126" onmouseover="hover(this, event)" onclick="insertText('\\sqsupseteq')" />
+<area shape="rect" alt="\ni"         title="\ni"       coords="16,128,30,142" onmouseover="hover(this, event)" onclick="insertText('\\ni')" />
+<area shape="rect" alt="\dashv"      title="\dashv"    coords="16,144,30,158" onmouseover="hover(this, event)" onclick="insertText('\\dashv')" />
+<area shape="rect" alt="\perp"     title="\perp"       coords="16,160,30,174" onmouseover="hover(this, event)" onclick="insertText('\\perp')" />
+<area shape="rect" alt="\Join"     title="\Join"       coords="16,176,30,190" onmouseover="hover(this, event)" onclick="insertText('\\Join')" />
+
+
+<area shape="rect" alt="\neq"    title="\neq"    coords="32,0,46,14"    onmouseover="hover(this, event)" onclick="insertText('\\neq')" />
+<area shape="rect" alt="\equiv"  title="\equiv"  coords="32,16,46,30"   onmouseover="hover(this, event)" onclick="insertText('\\equiv')" />
+<area shape="rect" alt="\doteq"  title="\doteq"  coords="32,32,46,46"   onmouseover="hover(this, event)" onclick="insertText('\\doteq')" />
+<area shape="rect" alt="\sim"    title="\sim"    coords="32,48,46,62"   onmouseover="hover(this, event)" onclick="insertText('\\sim')" />
+<area shape="rect" alt="\approx" title="\approx" coords="32,64,46,78"   onmouseover="hover(this, event)" onclick="insertText('\\approx')" />
+<area shape="rect" alt="\simeq"  title="\simeq"  coords="32,80,46,94"   onmouseover="hover(this, event)" onclick="insertText('\\simeq')" />
+<area shape="rect" alt="\cong"   title="\cong"   coords="32,96,46,110"  onmouseover="hover(this, event)" onclick="insertText('\\cong')" />
+<area shape="rect" alt="\asymp"  title="\asymp"  coords="32,112,46,126" onmouseover="hover(this, event)" onclick="insertText('\\asymp')" />
+<area shape="rect" alt="\propto" title="\propto" coords="32,128,46,142" onmouseover="hover(this, event)" onclick="insertText('\\propto')" />
+<area shape="rect" alt="\mid"    title="\mid"    coords="32,144,46,158" onmouseover="hover(this, event)" onclick="insertText('\\mid')" />
+<area shape="rect" alt="\parallel" title="\parallel" coords="32,160,46,174" onmouseover="hover(this, event)" onclick="insertText('\\parallel')" />
+</map>
+</div>
+
+<div class="panel2" id="panel5" onmouseover="this.style.overflow='visible'" onmouseout="this.style.overflow='hidden'">
+<!-- 
+Copyright (C) 2004-2007 CodeCogs, Zyba Ltd, Broadwood, Holford, TA5 1DU, England.
+-->
+<img src="panels/arrows_panel.gif" width="52" height="46" border="0" alt="Accents Panel" usemap="#arrows_map" />
+<map name="arrows_map" id="arrows_map">
+<area shape="rect" title="\leftarrow" coords="0,0,25,14" onmouseover="hover(this, event)" onclick="insertText('\\leftarrow')" />
+<area shape="rect" title="\Leftarrow" coords="0,16,25,30" onmouseover="hover(this, event)" onclick="insertText('\\Leftarrow')" />
+<area shape="rect" title="\rightarrow" coords="27,0,52,14" onmouseover="hover(this, event)" onclick="insertText('\\rightarrow')" />
+<area shape="rect" title="\Rightarrow" coords="27,16,52,30" onmouseover="hover(this, event)" onclick="insertText('\\Rightarrow')" />
+<area shape="rect" title="\leftrightarrow" coords="0,32,25,46" onmouseover="hover(this, event)" onclick="insertText('\\leftrightarrow')" />
+<area shape="rect" title="\Leftrightarrow" coords="27,32,52,46" onmouseover="hover(this, event)" onclick="insertText('\\Leftrightarrow')" />
+</map>
+</div>
+
+<div class="panel2" id="panel6" onmouseover="this.style.overflow='visible'" onmouseout="this.style.overflow='hidden'">
+<!--Copyright (C) 2004-2007 CodeCogs, Zyba Ltd, Broadwood, Holford, TA5 1DU, England. -->
+<img src="panels/accents_panel.gif" width="30" height="78" border="0" alt="Accents Panel" usemap="#accents_map" />
+<map name="accents_map" id="accents_map">
+<area shape="rect" alt="\hat{a}" title="\hat{a}" coords="0,0,14,14" onmouseover="hover(this, event)" onclick="insertText('\\hat{}',5)" />
+<area shape="rect" alt="\check{a}" title="\check{a}" coords="0,16,14,30" onmouseover="hover(this, event)" onclick="insertText('\\check{}',7)" />
+<area shape="rect" alt="\tilde{a}" title="\tilde{a}" coords="0,32,14,46" onmouseover="hover(this, event)" onclick="insertText('\\tilde{}',7)" />
+<area shape="rect" alt="\acute{a}" title="\acute{a}" coords="0,48,14,62" onmouseover="hover(this, event)" onclick="insertText('\\acute{}',7)" />
+<area shape="rect" alt="\grave{a}" title="\grave{a}" coords="0,64,14,78" onmouseover="hover(this, event)" onclick="insertText('\\grave{}',7)" />
+
+<area shape="rect" alt="\dot{a}"   title="\dot{a}"   coords="16,0,30,14" onmouseover="hover(this, event)" onclick="insertText('\\dot{}',5)" />
+<area shape="rect" alt="\ddot{a}"  title="\ddot{a}"  coords="16,16,30,30" onmouseover="hover(this, event)" onclick="insertText('\\ddot{}',6)" />
+<area shape="rect" alt="\breve{a}" title="\breve{a}" coords="16,32,30,46" onmouseover="hover(this, event)" onclick="insertText('\\breve{}',7)" />
+<area shape="rect" alt="\bar{a}"   title="\bar{a}"   coords="16,48,30,62" onmouseover="hover(this, event)" onclick="insertText('\\bar{}',5)" />
+<area shape="rect" alt="\vec{a}"   title="\vec{a}"   coords="16,64,30,78" onmouseover="hover(this, event)" onclick="insertText('\\vec{}',5)" />
+</map>
+
+</div>
+
+<div class="panel" id="panel7" onmouseover="this.style.overflow='visible'" onmouseout="this.style.overflow='hidden'">
+<!-- 
+Copyright (C) 2004-2007 CodeCogs, Zyba Ltd, Broadwood, Holford, TA5 1DU, England.
+-->
+<img src="panels/matrix_panel.gif" width="79" height="128" border="0" alt="Matrix Panel" usemap="#matrix_map" />
+<map name="matrix_map" id="matrix_map">
+<area shape="rect" alt="\begin{matrix} ... \end{matrix}"    title="\begin{matrix} ... \end{matrix}"        coords="0,0,25,24"   onclick="makeArrayMatrix('','','')" />
+<area shape="rect" alt="\begin{pmatrix} ... \end{pmatrix}"  title="\begin{pmatrix} ... \end{pmatrix}"      coords="0,26,25,50"  onclick="makeArrayMatrix('p','','')" />
+<area shape="rect" alt="\begin{vmatrix} ... \end{vmatrix}"  title="\begin{vmatrix} ... \end{vmatrix}"      coords="0,52,25,76"  onclick="makeArrayMatrix('v','','')" />
+<area shape="rect" alt="\begin{Vmatrix} ... \end{Vmatrix}"  title="\begin{Vmatrix} ... \end{Vmatrix}"      coords="0,78,25,102" onclick="makeArrayMatrix('V','','')" />
+<area shape="rect" alt="\left.\begin{matrix}... \end{matrix}\right|"    title="\left.\begin{matrix}... \end{matrix}\right|" coords="0,104,25,128" onclick="makeArrayMatrix('','\\left.','\\right|')" />
+
+<area shape="rect" alt="\being{bmatrix} ... \end{bmatrix}"  title="\begin{bmatrix} ... \end{bmatrix}"      coords="27,0,52,24"   onclick="makeArrayMatrix('b','','')" />
+<area shape="rect" alt="\bigl(\begin{smallmatrix} ... \end{smallmatrix}\bigr)" title="\bigl(\begin{smallmatrix} ... \end{smallmatrix}\bigr)" coords="27,26,52,50"  onclick="makeArrayMatrix('small','\\bigl(','\\bigr)')" />
+<area shape="rect" alt="\begin{Bmatrix} ... \end{Bmatrix}"  title="\begin{Bmatrix} ... \end{Bmatrix}"  coords="27,52,52,76"  onclick="makeArrayMatrix('B','','')" />
+<area shape="rect" alt="\begin{Bmatrix} ... \end{matrix}"   title="\left\{\begin{matrix} ... \end{matrix}\right."  coords="27,78,52,102" onclick="makeArrayMatrix('','\\left\\{','\\right.')" />
+<area shape="rect" alt="\begin{matrix} ... \end{Bmatrix}"   title="\left.\begin{matrix} ... \end{Bmatrix}\right\}"  coords="27,104,52,128"  onclick="makeArrayMatrix('','\\left.','\\right\\}')" />
+
+<area shape="rect" alt="\begin{cases} ... \end{cases}"   title="\begin{cases} ... \end{cases}"   coords="54,0,79,24"   onclick="makeEquationsMatrix('cases', true, true)" />
+<area shape="rect" alt="\begin{align} ... \end{align}"   title="\begin{align} ... \end{align}"   coords="54,26,79,50"  onclick="makeEquationsMatrix('align', false)" />
+</map>
+</div>
+
+</div>   
+</div>
+
+
+<div id="toolbar_space" class="bottom"></div> 
+<textarea name="latex_formula" id="latex_formula" cols="80" rows="8" onkeyup="textchanged(); autorenderEqn(10)" onkeydown="countclik(this);"></textarea>
+<div style="padding:3px;">
+<select id="format" name="format" onchange="formatchanged();" title="Select the output format for the rendered equation">
+  <option value="gif">gif</option>
+  <option value="png">png</option>
+  <option value="pdf">pdf</option>
+  <option value="swf">swf</option>
+</select>
+<select id="dpi" name="dpi" onchange="textchanged();" title="Select the output resolution">
+  <option value="100">100 dpi</option>
+  <option value="200">200 dpi</option>
+  <option value="300">300 dpi</option>
+</select>
+<select id="bg" name="bg" onchange="textchanged();" title="Background color">
+  <option value="transparent">transparent</option>
+  <option value="white">white</option>
+  <option value="black">black</option>
+  <option value="red">red</option>  
+  <option value="green">green</option>  
+  <option value="blue">blue</option>  
+</select>
+<input type="checkbox" id="inline" name="inline" title="inline_title" onchange="textchanged(); document.getElementById('compressed').checked=this.checked;" /> <label for="eqstyle">inline</label>
+<input type="checkbox" id="compressed" name="compressed" title="compressed_title" onchange="textchanged();"/> <label for="eqstyle2">compressed</label>
+</div>
+<div>
+<input type="button" class="lightbluebutton" onclick="cleartext()" value="Clear" title="Clear the Edition Window"/>
+<input id="renderbutton" type="button" class="greybutton" onclick="renderEqn(null)" value="Render Equation" title="Click to see your equation rendered below" />
+<input id="copybutton" type="button" class="greybutton" onclick="updateOpener(cctarget,cctype);" value="Copy to Document" />
+</div>
+
+<div id="equationcomment"><strong>Type your LaTeX equation in the box above and click Render Expression to see it displayed here.</strong></div>
+
+<img id="equationview" name="equationview" />
+<script type="text/javascript">
+var el = document.getElementById('equationview');
+el.onload = processEquationChange;
+el.src = "http://www.codecogs.com/images/spacer.gif";
+</script>
+</div>
+
+<div id="footer">
+<div style="position:absolute; left:5px; bottom:15px">
+  <p><strong><a href="http://www.codecogs.com/components/equationeditor/equation_install.php" target="_blank">ver 2.6</a></strong></p>
+  <p><a href="http://www.codecogs.com" target="_blank"><img src="http://www.codecogs.com/images/poweredbycc.gif" width="102" height="34" vspace="5" border="0"/></a></p>
+</div>
+<p style="font-size:10px">CodeCogs &copy; 2007-2008. Written by <a href="http://www.codecogs.com" target="_blank">Will Bateman</a> and <a href="http://www.mayer.dial.pipex.com/tex.htm" target="_blank">Steve Mayer</a>.</p>
+</div>
+<iframe id="download" name="download" height="0" frameborder="0" src=""></iframe>
+</body>
+</html>
