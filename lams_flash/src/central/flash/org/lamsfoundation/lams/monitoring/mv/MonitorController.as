@@ -517,9 +517,6 @@ class MonitorController extends AbstractController {
 			_monitorModel.broadcastViewUpdate("TRIGGER_ACTION", null);
 		}
 	}
-
-	
-	
 	
 	/**
 	 * called when the dialog is loaded, calles methods to set up content in dialogue
@@ -528,23 +525,22 @@ class MonitorController extends AbstractController {
 	 * @param   evt 
 	 * @return  
 	 */
-    public function openDialogLoaded(evt:Object) {
+    public function openDialogLoaded(evt:Object, activity:Activity) {
         Debugger.log('!evt.type:'+evt.type,Debugger.GEN,'openDialogLoaded','org.lamsfoundation.lams.MonitorController');
         
 		//Check type is correct
 		if(evt.type == 'contentLoaded'){
 			//set a ref to the view
-			evt.target.scrollContent.monitorView = LessonTabView(getView());
+			var view:MonitorView = MonitorView(_monitorModel.getMonitor().getMV());
 			
-			//set a ref to the dia in the view
-			LessonTabView(getView()).dialog = evt.target.scrollContent;
-			
-			//set up UI
-			//note this function registeres the dialog to receive view updates
-			if (evt.target.scrollContent instanceof org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog) {
-				evt.target.scrollContent.setUpContent(_monitorModel);
+			//set a ref to the dialog in the view
+			evt.target.scrollContent.monitorView = (activity == null || activity == undefined) ? view.getLessonTabView() : view.getMonitorTabView();
+			evt.target.scrollContent.monitorView.dialog = evt.target.scrollContent;
+
+			if(activity != null) {
+				evt.target.scrollContent.setUpContent(_monitorModel, activity);
 			} else {
-				evt.target.scrollContent.setUpContent();
+				evt.target.scrollContent.setUpContent(_monitorModel);
 			}
 			
         } else {
@@ -698,4 +694,13 @@ class MonitorController extends AbstractController {
             //TODO DI 25/05/05 raise wrong event type error 
         }
 	}
+	
+	/**
+	* Open Learners Dialog for display of learners currently at the Activity.
+	* @param Activity
+	*/
+	public function openCurrentLearnersDialog(currentActivity:Activity):Void {
+			_monitorModel.getMonitor().getMV().getLessonTabView().showLearnersDialog(_monitorModel, currentActivity);
+	}
+	
 }

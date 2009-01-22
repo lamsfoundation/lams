@@ -83,6 +83,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 	private var maxCount:Number;
 	private var evtArr:Array;
 	
+	private var _dialog:MovieClip;
+	
 	/**
 	* Constructor
 	*/
@@ -621,4 +623,22 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
     public function defaultController (model:Observable):Controller {
         return new MonitorController(model);
     }
+	
+		/**
+	 * 
+	 * @usage   
+	 * @param   newworkspaceDialog 
+	 * @return  
+	 */
+	public function set dialog (dialog:MovieClip):Void {
+		_dialog = dialog;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get dialog ():MovieClip {
+		return _dialog;
+	}
 }

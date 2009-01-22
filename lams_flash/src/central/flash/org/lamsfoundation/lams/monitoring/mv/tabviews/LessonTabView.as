@@ -718,9 +718,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	/**
     * Opens the lesson manager dialog
     */
-    public function showLearnersDialog(mm:MonitorModel) {
+    public function showLearnersDialog(mm:MonitorModel, activity:Activity) {
 		var opendialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:Dictionary.getValue('ls_win_learners_title'),closeButton:true,scrollContentPath:'learnersDialog'});
-		opendialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
+		opendialog.addEventListener('contentLoaded', Proxy.create(_monitorController,_monitorController.openDialogLoaded, activity));
 		
     }
 	

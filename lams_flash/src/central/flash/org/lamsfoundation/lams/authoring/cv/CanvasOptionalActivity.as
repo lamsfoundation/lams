@@ -325,34 +325,51 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 		var learner_X = (mm.activeView instanceof CanvasComplexView) ? this._x + learnerOffset_X : _activity.xCoord + learnerOffset_X;
 		var learner_Y = (mm.activeView instanceof CanvasComplexView) ? this._y + learnerOffset_Y : _activity.yCoord + learnerOffset_Y;
 		
+		findCurrentUsersInProgress(mm.allLearnersProgress, true, learner_X, learner_Y);
+	}
+	
+	private function findCurrentUsersInProgress(learnersProgress:Array, attachIcons:Boolean, offsetX, offsetY):Number {
+		var mm:MonitorModel = MonitorModel(_monitorController.getModel());
+		
+		var noOfCurrent:Number = 0;
+		var learner_X = offsetX;
+		var learner_Y = offsetY;
+		
 		// get the length of learners from the Monitor Model and run a for loop.
-		for (var j=0; j<mm.allLearnersProgress.length; j++){
+		for (var j=0; j<learnersProgress.length; j++){
 			var learner:Object = new Object();
-			learner = mm.allLearnersProgress[j]
+			learner = learnersProgress[j]
 				
 			//Gets a true if learner's currect activityID matches this activityID else false.
 			var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
-			var hasPlus:Boolean = false;
 			
-			if (isLearnerCurrentAct){
-				var actX:Number = (mm.activeView instanceof CanvasComplexView) ? this._x : _activity.xCoord;
+			if (isLearnerCurrentAct) {
+				noOfCurrent++;
 				
-				if (learner_X > (actX + 92)){
-					learner_X = actX + learnerOffset_X ;
-					learner_Y = 27;
-					hasPlus = true;
+				if(attachIcons) {
+				
+					var actX:Number = (mm.activeView instanceof CanvasComplexView) ? this._x : _activity.xCoord;
 					
-					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus });
-					learnerContainer.attachMovie("plusIcon", "plusIcon", learnerContainer.getNextHighestDepth(), {_activity:_activity, _monitorController:_monitorController, _x:learner_X+PLUS_MARGIN_X, _y:learner_Y+PLUS_MARGIN_Y});
-					return;
+					if (learner_X > (actX + 92)){
+						learner_X = actX + learnerOffset_X ;
+						learner_Y = 27;
+						
+						noOfCurrent += findCurrentUsersInProgress(learnersProgress.slice(j+1, learnersProgress.length), false, null, null);
+							
+						learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y});
+						learnerContainer.attachMovie("plusIcon", "plusIcon", learnerContainer.getNextHighestDepth(), {_activity:_activity, _monitorController:_monitorController, _x:learner_X+PLUS_MARGIN_X, _y:learner_Y+PLUS_MARGIN_Y, _noOfLearners:noOfCurrent});
+						
+						return noOfCurrent;
+					}
+						
+					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y});
+					learner_X += 10;
 				}
-					
-				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName(), learnerContainer.getNextHighestDepth(),{_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:hasPlus});
-				learner_X = learner_X+10;
 			}
 		}
+		
+		return noOfCurrent;
 	}
-	
 	
 	private function draw (){
 		

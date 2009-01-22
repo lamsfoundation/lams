@@ -383,9 +383,18 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 		}
 		
 		// get the length of learners from the Monitor Model and run a for loop.
-		var learnersProgress:Array = mm.allLearnersProgress;
+		findCurrentUsersInProgress(mm.allLearnersProgress, true, [learner_X, learner_Y, xCoord]);
+		
+	}
+	
+	private function findCurrentUsersInProgress(learnersProgress:Array, attachIcons:Boolean, offsets:Array):Number {
+		var noOfCurrent:Number = 0;
+		var learner_X = offsets[0];
+		var learner_Y = offsets[1];
+		var xCoord = offsets[2];
+		
 		for (var j=0; j<learnersProgress.length; j++){
-				
+			
 			var learner:Object = new Object();
 			learner = learnersProgress[j]
 					
@@ -393,24 +402,31 @@ class org.lamsfoundation.lams.authoring.cv.CanvasActivity extends MovieClip impl
 			var isLearnerCurrentAct:Boolean = Progress.isLearnerCurrentActivity(learner, _activity.activityID);
 			
 			if (isLearnerCurrentAct){
+				noOfCurrent++;
 				
-				// Add + icon to indicate that more users are currently at the Activity. 
-				// We are unable to display all the users across the Activity's panel.
-				Debugger.log("learner_X: " + learner_X + " ref: " + learnerContainer + " xcoord: " + xCoord, Debugger.CRITICAL, "drawLearners", "CanvasActivity");
-				
-				if(learner_X > (xCoord + getVisibleWidth() - 30)) {
-					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName()+activity.activityUIID, learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:true, _clone:false });
-					learnerContainer.attachMovie("plusIcon", "plusIcon", learnerContainer.getNextHighestDepth(), {_activity:_activity, _monitorController:_monitorController, _x:learner_X+PLUS_MARGIN_X, _y:learner_Y+PLUS_MARGIN_Y});
-					return;
+				if(attachIcons) {
+					// Add + icon to indicate that more users are currently at the Activity. 
+					// We are unable to display all the users across the Activity's panel.
+					Debugger.log("learner_X: " + learner_X + " ref: " + learnerContainer, Debugger.CRITICAL, "drawLearners", "CanvasActivity");
+					
+					if(learner_X > (xCoord + getVisibleWidth() - 30)) {
+						noOfCurrent += findCurrentUsersInProgress(learnersProgress.slice(j+1, learnersProgress.length), false, null, null);
+						learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName()+activity.activityUIID, learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _clone:false});
+						learnerContainer.attachMovie("plusIcon", "plusIcon", learnerContainer.getNextHighestDepth(), {_activity:_activity, _monitorController:_monitorController, _x:learner_X+PLUS_MARGIN_X, _y:learner_Y+PLUS_MARGIN_Y, _noOfLearners: noOfCurrent});
+						
+						return noOfCurrent;
+					}
+	
+					// attach icon
+					learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName()+activity.activityUIID, learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _clone:false });
+					
+					//  space icons
+					learner_X += 10;
 				}
-
-				// attach icon
-				learnerContainer.attachMovie("learnerIcon", "learnerIcon"+learner.getUserName()+activity.activityUIID, learnerContainer.getNextHighestDepth(), {_activity:_activity, learner:learner, _monitorController:_monitorController, _x:learner_X, _y:learner_Y, _hasPlus:false, _clone:false });
-				
-				//  space icons
-				learner_X += 10;
 			}
 		}
+		
+		return noOfCurrent;
 	}
 	
 	/**

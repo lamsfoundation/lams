@@ -66,9 +66,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	private var _visibleHeight:Number;
 	private var _selected_mc:MovieClip;
 	
-	private var smallCross:MovieClip;
-	private var _hasPlus:Boolean;
-	
 	private var _clone_mc:MovieClip;
 	private var _clone:Boolean;
 	
@@ -97,7 +94,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 			learner = initObj.learner;
 			learnerOffset_X = initObj._x;
 			learnerOffset_Y = initObj._y;
-			_hasPlus = initObj._hasPlus;
 			_clone = initObj._clone;
 		}
 		
@@ -153,9 +149,6 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		Debugger.log('Learner is in Activity: '+_activity.title,4,'draw','LearnerIcon');
 		setStyles();
 		
-		Debugger.log('hasPlus: '+ _hasPlus,Debugger.CRITICAL,'draw','CanvasActivity');
-		smallCross._visible = _hasPlus;
-		
 		_visible = true;
 	}
 	
@@ -171,14 +164,13 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 				Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.CRITICAL,'localOnPress','CanvasActivity For Monitoring');
 				var _learnerID:Number = learner.getLearnerId()
 				_monitorController.activityDoubleClick(_activity, "MonitorTabViewLearner", _learnerID);
-						
 			}
 			
 		} else {
 
 			_doubleClicking = false;
 			Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
-			_clone_mc = org.lamsfoundation.lams.monitoring.Application.root.attachMovie("learnerIcon", String(_name + "_clone" + _activity.activityUIID), DepthManager.kTop, {_x:(this._x + org.lamsfoundation.lams.monitoring.Application.MONITOR_X), _y:(this._y + org.lamsfoundation.lams.monitoring.Application.MONITOR_Y), _activity:_activity, learner:learner, _monitorController:_monitorController, _hasPlus:_hasPlus, _clone: true });
+			_clone_mc = org.lamsfoundation.lams.monitoring.Application.root.attachMovie("learnerIcon", String(_name + "_clone" + _activity.activityUIID), DepthManager.kTop, {_x:(this._x + org.lamsfoundation.lams.monitoring.Application.MONITOR_X), _y:(this._y + org.lamsfoundation.lams.monitoring.Application.MONITOR_Y), _activity:_activity, learner:learner, _monitorController:_monitorController, _clone: true });
 			_clone_mc._y = 	_root._ymouse - ICON_HEIGHT/2;
 			_clone_mc._x = 	_root._xmouse - ICON_WIDTH/2
 			_monitorController.activityClick(_clone_mc, "LearnerIcon");

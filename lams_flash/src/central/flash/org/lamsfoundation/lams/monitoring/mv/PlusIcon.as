@@ -27,7 +27,8 @@ import org.lamsfoundation.lams.common.util.ui.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.monitoring.mv.*;
-import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.common.style.*;
+import org.lamsfoundation.lams.common.dict.*;
 
 import com.polymercode.Draw;
 import mx.managers.*
@@ -52,7 +53,10 @@ class org.lamsfoundation.lams.monitoring.mv.PlusIcon extends MovieClip {
 	private var _monitorView;
 	private var _tm:ThemeManager;
 	private var _activity:Activity;
-	private var learner:Progress;
+	private var _noOfLearners:Number;
+	
+	private var _dcStartTime:Number = 0;
+	private var _doubleClicking:Boolean;
 	
 	private var _isSelected:Boolean;
 	private var app:ApplicationParent; 
@@ -65,7 +69,9 @@ class org.lamsfoundation.lams.monitoring.mv.PlusIcon extends MovieClip {
 		app = ApplicationParent.getInstance();
 		
 		toolTip = new ToolTip();
-		init();
+		
+		if(_activity != undefined)
+			init();
 	}
 	
 	public function init(initObj):Void{
@@ -75,5 +81,67 @@ class org.lamsfoundation.lams.monitoring.mv.PlusIcon extends MovieClip {
 			this._x = initObj._x;
 			this._y = initObj._y;
 		}
+		
+		click_mc.onRollOver = Proxy.create (this, localOnRollOver);
+		click_mc.onRollOut = Proxy.create (this, localOnRollOut);
+		
+		if (_activity != undefined){
+			click_mc.onPress = Proxy.create (this, localOnPress);
+			click_mc.onRelease = Proxy.create (this, localOnRelease);
+			click_mc.onReleaseOutside = Proxy.create (this, localOnReleaseOutside);
+		}
 	}
+	
+	public function showToolTip(visible:Boolean):Void{
+		if(!visible) {
+			toolTip.CloseToolTip();
+			return;
+		}
+		
+		var ttHolder = this;
+		var ttMessage = Dictionary.getValue("learner_plus_tooltip", [_noOfLearners]);		
+		var ttWidth = StringUtils.getButtonWidthForStr(ttMessage);
+		
+		toolTip.DisplayToolTip(ttHolder, ttMessage, -5, -10, undefined, ttWidth);
+		
+	}
+	
+	private function localOnPress():Void{
+		
+		// check double-click
+		var now:Number = new Date().getTime();
+		
+		if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
+			_doubleClicking = true;
+			Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.CRITICAL,'localOnPress','PlusIcon');
+			showToolTip(false);
+			_monitorController.openCurrentLearnersDialog(activity);
+			
+		} else {
+			_doubleClicking = false;
+			Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','PlusIcon');
+		}
+		
+		_dcStartTime = now;
+	
+	}
+	
+	private function localOnRollOver():Void{
+		showToolTip(true);
+	}
+	
+	private function localOnRollOut():Void{
+		showToolTip(false);
+	}
+	
+	public function get activity():Activity {
+		return _activity;
+	}
+	
+	private function localOnRelease():Void{}
+	
+	private function localOnReleaseOutside():Void{
+		showToolTip(false);
+	}
+	
 }
