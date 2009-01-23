@@ -36,7 +36,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class CSSThemeUtil {
 	
 	// private static Logger log = Logger.getLogger(CSSThemeUtil.class);
-	private static String DEFAULT_HTML_THEME = "defaultHTML";
+	public static String DEFAULT_HTML_THEME = "defaultHTML";
+	
+	public static String DEFAULT_MAIN_HTML_THEME = "defaultMainHTML";
 	
 	/**
 	 * Will return a list of stylesheets for the current user.
@@ -45,13 +47,16 @@ public class CSSThemeUtil {
 	 * The default stylesheet will always be included in this list.
 	 * @return
 	 */
-	public static List<String> getAllUserThemes()
+	public static List<String> getAllUserThemes(String defaultTheme)
 	{
 		List<String> themeList = new ArrayList<String>();
 		
 		// Always have default as that defines everything. Other themes
 		// define changes.
-   		themeList.add(DEFAULT_HTML_THEME); 	   	
+   		
+
+		themeList.add(defaultTheme);   	
+
 
    		boolean userThemeFound = false;
 	   	HttpSession ss = SessionManager.getSession();

@@ -23,7 +23,7 @@
 	</c:otherwise>
 	</c:choose>
 	
-	<lams:css style="tabbed" />
+	<lams:css style="main" />
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
