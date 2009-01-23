@@ -438,8 +438,9 @@ public class LearningAction extends Action {
 
 	if (imageGallery.isAllowCommentImages()) {
 	    TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
+	    Set<ImageComment> dbComments = image.getComments();
 	    List<ImageGalleryUser> sessionUsers = service.getUserListBySessionId(sessionId);
-	    for(ImageComment comment : comments) {
+	    for(ImageComment comment : dbComments) {
 		for(ImageGalleryUser sessionUser : sessionUsers) {
 		    if (comment.getCreateBy().getUserId().equals(sessionUser.getUserId())) {
 			comments.add(comment);
@@ -510,9 +511,17 @@ public class LearningAction extends Action {
 	dbComments.add(comment);
 	service.saveOrUpdateImageGalleryItem(dbItem);
 			
-	//to make available new changes be visible in jsp page
+	// to make available new changes be visible in jsp page
 	TreeSet<ImageComment> comments = new TreeSet<ImageComment>(new ImageCommentComparator());
-	comments.addAll(dbItem.getComments());
+	dbComments = dbItem.getComments();
+	List<ImageGalleryUser> sessionUsers = service.getUserListBySessionId(sessionId);
+	for (ImageComment dbComment : dbComments) {
+	    for (ImageGalleryUser sessionUser : sessionUsers) {
+		if (dbComment.getCreateBy().getUserId().equals(sessionUser.getUserId())) {
+		    comments.add(dbComment);
+		}
+	    }
+	}
 	sessionMap.put(ImageGalleryConstants.PARAM_COMMENTS, comments);
 	
 	form.reset(mapping, request);
