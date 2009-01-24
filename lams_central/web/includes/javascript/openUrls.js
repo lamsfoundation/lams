@@ -51,11 +51,10 @@
 			}
 		}
 		
-		function openAuthor(learningDesignId){
-			var learningDesignParam = learningDesignId==null ? "":"&learningDesignID="+learningDesignId;
+		function openAuthor(){
 			if(isMac)
 				{
-					authorWin = window.open('home.do?method=author'+learningDesignParam,'aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+					authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 				}
 			else
 				{
@@ -66,7 +65,26 @@
 					}
 					else
 					{
-						authorWin = window.open('home.do?method=author'+learningDesignParam,'aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+						authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+						authorWin.focus();
+					}
+				}
+		}
+		
+		function openPedagogicalPlanner(){
+			if(isMac)
+				{
+					authorWin = window.open('pedagogicalPlanner.do','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable,scrollbars');
+				}
+			else
+				{
+					if(authorWin && !authorWin.closed)
+					{
+						authorWin.focus();
+					}
+					else
+					{
+						authorWin = window.open('pedagogicalPlanner.do','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable,scrollbars');
 						authorWin.focus();
 					}
 				}

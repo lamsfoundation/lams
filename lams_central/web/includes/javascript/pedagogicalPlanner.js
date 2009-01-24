@@ -141,7 +141,7 @@
   	   		window.open(startPreviewUrl,'Preview','width=800,height=600,scrollbars=yes,resizable=yes');
   	   	}
   	   	else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
-  	   		 openAuthor(learningDesignId);
+  	   		 document.location.href="home.do?method=author&learningDesignID="+learningDesignId;
   	   	}
   	}
   	else {
