@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.chat.web.forms;
 
 import org.lamsfoundation.lams.tool.chat.model.Chat;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
 
 /**
@@ -42,7 +43,7 @@ public class ChatPedagogicalPlannerForm extends PedagogicalPlannerForm {
 
     public void fillForm(Chat chat) {
 	if (chat != null) {
-	    setInstructions(chat.getInstructions());
+	    setInstructions(WebUtil.removeHTMLtags(chat.getInstructions()));
 	    setToolContentID(chat.getToolContentId());
 	}
     }

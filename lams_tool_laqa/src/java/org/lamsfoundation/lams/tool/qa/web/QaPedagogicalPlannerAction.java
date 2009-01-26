@@ -84,13 +84,13 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 		} else {
 		    if (questionIndex < qaContent.getQaQueContents().size()) {
 			QaQueContent qaQueContent = getQaService().getQuestionContentByDisplayOrder(
-				(long) questionIndex, qaContent.getUid());
+				(long) questionIndex + 1, qaContent.getUid());
 			qaQueContent.setQuestion(question);
 			getQaService().saveOrUpdateQaQueContent(qaQueContent);
 
 		    } else {
 			QaQueContent qaQueContent = new QaQueContent();
-			qaQueContent.setDisplayOrder(questionIndex);
+			qaQueContent.setDisplayOrder(questionIndex + 1);
 			qaQueContent.setIsOptional(false);
 			qaQueContent.setQaContent(qaContent);
 			qaQueContent.setQaContentId(qaContent.getQaContentId());
@@ -103,8 +103,8 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 	    if (questionIndex < qaContent.getQaQueContents().size()) {
 		getQaService().removeQuestionsFromCache(qaContent);
 		for (; questionIndex < qaContent.getQaQueContents().size(); questionIndex++) {
-		    QaQueContent qaQueContent = getQaService().getQuestionContentByDisplayOrder((long) questionIndex,
-			    qaContent.getUid());
+		    QaQueContent qaQueContent = getQaService().getQuestionContentByDisplayOrder(
+			    (long) questionIndex + 1, qaContent.getUid());
 		    getQaService().removeQaQueContent(qaQueContent);
 		}
 	    }
