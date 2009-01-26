@@ -375,8 +375,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	notebook.setTitle(authForm.getTitle());
 	notebook.setInstructions(authForm.getInstructions());
 	if (mode.isAuthor()) { // Teacher cannot modify following
-	    notebook.setOfflineInstructions(authForm.getOnlineInstruction());
-	    notebook.setOnlineInstructions(authForm.getOfflineInstruction());
+	    notebook.setOfflineInstructions(authForm.getOfflineInstruction());
+	    notebook.setOnlineInstructions(authForm.getOnlineInstruction());
 	    notebook.setLockOnFinished(authForm.isLockOnFinished());
 	    notebook.setAllowRichEditor(authForm.isAllowRichEditor());
 

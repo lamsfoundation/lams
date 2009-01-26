@@ -23,7 +23,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.notebook.web.forms;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
 
 /**
@@ -42,8 +44,9 @@ public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerForm {
 
     public void fillForm(Notebook notebook) {
 	if (notebook != null) {
-	    setInstructions(notebook.getInstructions());
+	    setInstructions(WebUtil.removeHTMLtags(notebook.getInstructions()));
 	    setToolContentID(notebook.getToolContentId());
+	    setEditingAdviceAvailable(!StringUtils.isEmpty(notebook.getOnlineInstructions()));
 	}
     }
 }

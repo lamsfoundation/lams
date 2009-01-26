@@ -70,7 +70,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action-forward name="passwordChanged" path=".passwordChangeOk"
  * @struts.action-forward name="portrait" path="/portrait.do"
  * @struts.action-forward name="lessons" path="/profile.do?method=lessons"
- * @struts.action-forward name="planner" path="/pedagogicalPlanner.do"
  */
 public class IndexAction extends Action {
 
@@ -115,8 +114,6 @@ public class IndexAction extends Action {
 	} else if (StringUtils.equals(tab, "community")) {
 	    request.setAttribute("tab", tab);
 	    return mapping.findForward("community");
-	} else if (StringUtils.equals(tab, "planner")) {
-	    return mapping.findForward("planner");
 	}
 
 	if (request.isUserInRole(Role.SYSADMIN)) {
@@ -138,7 +135,7 @@ public class IndexAction extends Action {
     private void setHeaderLinks(HttpServletRequest request) {
 	List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
 	if (request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
-	    headerLinks.add(new IndexLinkBean("index.planner", "index.do?tab=planner"));
+	    headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
 	    headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
 	}
 	headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?tab=profile"));

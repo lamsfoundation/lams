@@ -72,7 +72,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Marcin Cieslak
  * 
  * @struts:action path="/pedagogicalPlanner" scope="request" parameter="method"
- * @struts:action-forward name="success" path=".planner"
+ * @struts:action-forward name="success" path="/pedagogical_planner/base.jsp"
  * 
  * @struts:action path="/pedagogicalPlanner/grouping" scope="request" name="GroupingPedagogicalPlannerForm"
  *                validate="false" parameter="method"
@@ -194,7 +194,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	planner.setLearningDesignID(learningDesignID);
 
 	request.setAttribute(CentralConstants.ATTR_PLANNER, planner);
-	request.setAttribute("tab", "planner");
 	return mapping.findForward("success");
     }
 

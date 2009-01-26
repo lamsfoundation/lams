@@ -1,0 +1,88 @@
+/* ----- add selectors here for font sizing ----- */
+#JT_close_left, #JT_close_right{font-size: 1.1em;}
+#JT_copy p, #JT_copy ul{font-size: 1.1em;}
+
+/* ---------->>> jtip <<<---------------------------------------------------------------*/
+
+#JT_arrow_left{
+	background: url(../images/css/jtip_arrow_left.gif) no-repeat left top;
+	position: absolute;
+	z-index:101;
+	left:-12px;
+	height:23px;
+	width:10px;
+}
+
+#JT_arrow_right{
+	background: url(../images/css/jtip_arrow_right.gif) no-repeat left top;
+	position: absolute;
+	z-index:101;
+	height:23px;
+	width:11px;
+}
+
+/* for consistency between firefox and IE */
+body > #JT_arrow_right {
+  margin-left: 3px;
+}
+
+#JT {
+	position: absolute;
+	z-index:100;
+	border: 2px solid #ccc;
+	background-color: #fff;
+	overflow: hidden;
+}
+
+#JT_copy{
+	padding:10px;
+	color:#333;
+}
+
+.JT_loader{
+	background: url(../images/css/jtip_loader.gif) no-repeat center center;
+	width:100%;
+	height:12px;
+}
+
+#JT_close_left{
+	background-color: #ccc;
+	text-align: left;
+	padding-left: 8px;
+	padding-bottom: 5px;
+	padding-top: 2px;
+	font-weight:bold;
+}
+
+#JT_close_right{
+	background-color: #ccc;
+	text-align: left;
+	padding-left: 8px;
+	padding-bottom: 5px;
+	padding-top: 2px;
+	font-weight:bold;
+}
+
+#JT_copy p{
+margin:3px 0;
+}
+
+#JT_copy img{
+	padding: 1px;
+	border: 1px solid #ccc;
+}
+
+.jTip{
+cursor:help;
+}
+
+#JT iframe{
+	display:none;
+	display/**/:block;
+	position:absolute;
+	top:0;
+	left:0;
+	z-index:-1;
+	filter:mask();
+	height:3000px;
+}

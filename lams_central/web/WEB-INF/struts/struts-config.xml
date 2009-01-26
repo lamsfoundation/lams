@@ -151,11 +151,6 @@
         path="/profile.do?method=lessons"
         redirect="false"
       />
-      <forward
-        name="planner"
-        path="/pedagogicalPlanner.do"
-        redirect="false"
-      />
     </action>
     <action
       path="/saveprofile"
@@ -329,7 +324,7 @@
     >
       <forward
         name="success"
-        path=".planner"
+        path="/pedagogical_planner/base.jsp"
         redirect="false"
       />
       <forward
@@ -354,7 +349,7 @@
     >
       <forward
         name="success"
-        path=".planner"
+        path="/pedagogical_planner/base.jsp"
         redirect="false"
       />
       <forward

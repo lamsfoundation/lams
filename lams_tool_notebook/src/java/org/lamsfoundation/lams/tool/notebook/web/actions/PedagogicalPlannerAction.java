@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
+import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.web.forms.NotebookPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -72,7 +73,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Notebook notebook = getNotebookService().getNotebookByContentId(toolContentID);
 	plannerForm.fillForm(notebook);
-	return mapping.findForward("success");
+	return mapping.findForward(NotebookConstants.SUCCESS);
     }
 
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
@@ -88,7 +89,16 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	} else {
 	    saveErrors(request, errors);
 	}
-	return mapping.findForward("success");
+	return mapping.findForward(NotebookConstants.SUCCESS);
+    }
+
+    public ActionForward getEditingAdvice(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Notebook notebook = getNotebookService().getNotebookByContentId(toolContentID);
+	String onlineInstructions = notebook.getOnlineInstructions();
+	writeAJAXResponse(response, onlineInstructions);
+	return null;
     }
 
     private INotebookService getNotebookService() {
@@ -97,5 +107,4 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	}
 	return notebookService;
     }
-
 }
