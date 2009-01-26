@@ -145,7 +145,13 @@ li.no-list-type  {
 }
 
 #header-no-tabs { /*layout of the header  when no-tabs are required. Big enough to line up with LAMS icon - don't use for learner (see header-no-tabs-learner) */
-width:100%; height:40px; background:url('../images/css/top_bg.jpg') no-repeat bottom; }
+	width:90%;
+	margin-left:auto;
+	margin-right:auto;
+	min-width:707px;
+	height:40px; 
+	background:url('../images/css/top_bg.jpg') no-repeat bottom;
+}
 
 
 
