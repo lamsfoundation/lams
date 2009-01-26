@@ -141,6 +141,7 @@
   	   		window.open(startPreviewUrl,'Preview','width=800,height=600,scrollbars=yes,resizable=yes');
   	   	}
   	   	else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
+  	   		 window.resizeTo(authoring_width,authoring_height);
   	   		 document.location.href="home.do?method=author&learningDesignID="+learningDesignId;
   	   	}
   	}
@@ -151,4 +152,10 @@
   		$('#pedagogicalPlannerErrorArea').show();
   	}
    }
+  }
+  
+  function closePlanner(text){
+ 	 if (confirm(text)){
+  		window.close();
+  	 }
   }

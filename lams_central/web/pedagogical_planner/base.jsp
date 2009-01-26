@@ -107,7 +107,7 @@
 		<c:param name="ldId" value="${planner.learningDesignID}" />
 	</c:url>
 	<div id="buttonArea">
-		<a class="button pedagogicalPlannerButtons" href="javascript:window.close()"><fmt:message key="button.close" /></a>
+		<a class="button pedagogicalPlannerButtons" href="javascript:closePlanner('<fmt:message key="msg.planner.not.saved" />');"><fmt:message key="button.close" /></a>
 		<a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_OPEN_AUTHOR,${planner.learningDesignID})"><fmt:message key="button.planner.view.full.author" /></a>
 		<a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_PREVIEW,'${startPreviewUrl}')"><fmt:message key="button.planner.preview" /></a>
 		<a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_DO_NOTHING,null)"><fmt:message key="button.planner.save" /></a>
