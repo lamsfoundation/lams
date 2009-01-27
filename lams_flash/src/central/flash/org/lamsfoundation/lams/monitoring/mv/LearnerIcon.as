@@ -121,12 +121,12 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	
 	public function showToolTip():Void{
 			
-		var ttHolder = this;
+		var ttHolder = this._parent;
 		var ttMessage = learner.getFullName();
 		
 		var ttWidth = StringUtils.getButtonWidthForStr(ttMessage);
 		
-		toolTip.DisplayToolTip(ttHolder, ttMessage, -5, -10, undefined, ttWidth);
+		toolTip.DisplayToolTip(ttHolder, ttMessage, this._x - 5, this._y - 10, undefined, ttWidth);
 		
 	}
 	
