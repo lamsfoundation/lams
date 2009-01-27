@@ -161,18 +161,24 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		if((now - _dcStartTime) <= Config.DOUBLE_CLICK_DELAY){
 			if (app.controlKeyPressed != "transition"){
 				_doubleClicking = true;
+				
 				Debugger.log('DoubleClicking: '+this.activity.activityID,Debugger.CRITICAL,'localOnPress','CanvasActivity For Monitoring');
+				
+				if(_clone_mc != null);
+					_clone_mc.stopDrag();
+				
 				var _learnerID:Number = learner.getLearnerId()
-				_monitorController.activityDoubleClick(_activity, "MonitorTabViewLearner", _learnerID);
+				viewLearner();
 			}
 			
 		} else {
-
 			_doubleClicking = false;
-			Debugger.log('SingleClicking:+'+this,Debugger.GEN,'onPress','CanvasActivity for monitoring');
+			Debugger.log('SingleClicking:+'+this,Debugger.GEN,'localOnPress','LearnerIcon');
+			
 			_clone_mc = org.lamsfoundation.lams.monitoring.Application.root.attachMovie("learnerIcon", String(_name + "_clone" + _activity.activityUIID), DepthManager.kTop, {_x:(this._x + org.lamsfoundation.lams.monitoring.Application.MONITOR_X), _y:(this._y + org.lamsfoundation.lams.monitoring.Application.MONITOR_Y), _activity:_activity, learner:learner, _monitorController:_monitorController, _clone: true });
 			_clone_mc._y = 	_root._ymouse - ICON_HEIGHT/2;
 			_clone_mc._x = 	_root._xmouse - ICON_WIDTH/2
+			
 			_monitorController.activityClick(_clone_mc, "LearnerIcon");
 			
 		}
@@ -189,22 +195,33 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		showAssets(false);
 	}
 	
-	
 	private function localOnRelease():Void{
 		if(!_doubleClicking){
-			Debugger.log('Releasing:'+this,Debugger.GEN,'onRelease','CanvasActivity');
 			_monitorController.activityRelease(_clone_mc, "LearnerIcon");
 			_clone_mc.removeMovieClip();
 		}
 	}
 	
 	private function localOnReleaseOutside():Void{
-		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','CanvasActivity');
+		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','LearnerIcon');
 		showAssets(false);
-		_monitorController.activityRelease(_clone_mc, "LearnerIcon");
-		_clone_mc.removeMovieClip();
+		
+		if(!_doubleClicking){
+			_monitorController.activityRelease(_clone_mc, "LearnerIcon");
+		}
+		
+		if(_clone_mc != null)
+			_clone_mc.removeMovieClip();
 	}
 	
+	public function viewLearner(URLToSend:String):Void {
+		if(_activity != null) {
+			if(learner != null) {
+				var _URLToSend = (URLToSend != null) ? URLToSend : _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+_activity.activityID+'&userID='+learner.getLearnerId()+'&lessonID='+_root.lessonID;
+				JsPopup.getInstance().launchPopupWindow(_URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+			}
+		}
+	}
 	
 	public function get xCoord():Number{
 		return learnerOffset_X;

@@ -280,6 +280,7 @@ class MonitorController extends AbstractController {
 			if(_monitorModel.isDragging){
 				act.stopDrag();
 			}
+			
 			// hittest learner icon and finish door
 			var dropTarget:Object = findParentActivity(eval(act._droptarget));
 			Debugger.log("dropTarget.activity.title: "+dropTarget.activity.title, Debugger.GEN, "activityRelease", "MonitorController");
@@ -391,8 +392,8 @@ class MonitorController extends AbstractController {
 	}
 
 	public function activityDoubleClick(ca:Object, forTabView:String, learnerID:Number, fromContextMenu:Boolean):Void{
-		
 		Debugger.log("ca.activity.isBranchingActivity(): "+ca.activity.isBranchingActivity(), Debugger.GEN, "activityDoubleClick", "MonitorController");
+		
 		if(!fromContextMenu && ca.activity.isBranchingActivity() && _monitorModel.getSelectedTab() == MonitorTabView._tabID) {
 			_monitorModel.openBranchActivityContent(ca, true);
 		} 
@@ -432,7 +433,8 @@ class MonitorController extends AbstractController {
 					getURL("javascript:alert('"+alertMSG+"');");
 					
 				} else {
-					JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+					if(ca instanceof LearnerIcon) LearnerIcon(ca).viewLearner(URLToSend);
+					else JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
 				}
 			} else {
 				
@@ -444,7 +446,8 @@ class MonitorController extends AbstractController {
 						Debugger.log("open complex viewer: " + ca.activity.activityUIID, Debugger.CRITICAL, "activityDoubleClick", "MonitorController")
 						_monitorModel.getMonitor().openComplexView(ca);
 					} else {
-						JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+						if(ca instanceof LearnerIcon) LearnerIcon(ca).viewLearner(URLToSend);
+						else JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
 					}
 					
 			}
