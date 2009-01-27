@@ -5,7 +5,7 @@
 <lams:html>
 <lams:head>
 	<lams:css style="core" />
-	<link href="<lams:LAMSURL />css/jTip.css" rel="stylesheet" type="text/css">
+	<link href="<lams:LAMSURL />css/jTip.css" rel="stylesheet" type="text/css" />
 	
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jtip.js"></script>
@@ -15,14 +15,17 @@
 	<h4 class="space-left" style="float:left"><fmt:message key="label.authoring.basic.instructions" /></h4>
 	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		
 		<c:if test="${formBean.editingAdviceAvailable}">
 			<c:url value="/pedagogicalPlanner.do" var="tipUrl">
 				<c:param name="dispatch" value="getEditingAdvice" />
 				<c:param name="toolContentID" value="${formBean.toolContentID}" />
+				<c:param name="width" value="400" />
 			</c:url>
-			<a class="jTip" style="float: right; margin-right: 30px; color: #47BC23;" name="<fmt:message key="label.planner.editing.advice" />" 
+			<a class="jTip" name="<fmt:message key="label.planner.editing.advice" />" 
 				href="${tipUrl}" id="editingAdvice"><fmt:message key="label.planner.editing.advice" /></a>
 		</c:if>
+		
 		<html:hidden property="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />

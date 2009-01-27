@@ -86,3 +86,9 @@ cursor:help;
 	filter:mask();
 	height:3000px;
 }
+
+a#editingAdvice{
+	float: right;
+	margin-right: 30px;
+	color: #47BC23;
+}

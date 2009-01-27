@@ -62,6 +62,9 @@ function JT_show(url,linkId,title){
 	    var JT_width = (getAbsoluteLeft(linkId) - 22);
 	    $('#JT').css({left: 2, width: JT_width}); //adjust width to fit
 	  }
+	  
+	  $('#JT').height(120);
+	  
 	  //get the height of the jtip after loading it
 	  var jtip_height = $('#JT').height();
 	  //adjust the top of jTip
