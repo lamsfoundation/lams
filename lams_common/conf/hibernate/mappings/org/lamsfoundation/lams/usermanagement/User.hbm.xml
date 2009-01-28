@@ -500,6 +500,39 @@
         </meta>    
     </property>
     
+    <property
+        name="lamsCommunityToken"
+        type="java.lang.String"
+        column="lams_community_token"
+        not-null="false"
+        length="255"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="lams_community_token"
+            length="255"
+            not-null="false"
+        </meta>    
+    </property>
+    
+    <property
+        name="lamsCommunityUsername"
+        type="java.lang.String"
+        column="lams_community_username"
+        not-null="true"
+        unique="true"
+        length="255"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="lams_community_username"
+            length="255"
+            not-null="false"
+        </meta>    
+    </property>
+    
 </class>
 
    <sql-query name="usersAttemptedActivity">

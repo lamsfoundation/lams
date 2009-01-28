@@ -27,189 +27,207 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
+
 /**
  * @author Manpreet Minhas
  */
 public class UserDTO {
-	
-	private Integer userID;
-	private String firstName;
-	private String lastName;
-	private String login;
-	private String localeLanguage;
-	private String localeCountry;
-	private String fckLanguageMapping;
-	private String direction;
+
+    private Integer userID;
+    private String firstName;
+    private String lastName;
+    private String login;
+    private String localeLanguage;
+    private String localeCountry;
+    private String fckLanguageMapping;
+    private String direction;
     private String email;
-   // private CSSThemeVisualElement theme;
+    // private CSSThemeVisualElement theme;
     private CSSThemeBriefDTO flashTheme;
     private CSSThemeBriefDTO htmlTheme;
     private TimeZone timeZone;
     private Integer authenticationMethodId;
     private Boolean enableFlash;
+    private String lamsCommunityToken;
+    private String lamsCommunityUsername;
+    private Boolean loggedIntoLamsCommunity;
 
-//	public UserDTO(Integer userID, String firstName, String lastName,
-//			String login, String email, CSSThemeVisualElement theme) {		
-//		this.userID = userID;
-//		this.firstName = firstName;
-//		this.lastName = lastName;
-//		this.login = login;
-//		this.email = email;
-//		this.theme = theme;
-//	}
-	
-	public UserDTO(Integer userID, String firstName, String lastName,
-			String login, String localeLanguage,  String localeCountry, String direction, 
-			String email, CSSThemeBriefDTO flashTheme, CSSThemeBriefDTO htmlTheme,
-			TimeZone timezone, Integer authenticationMethodId, String fckLanguageMapping,
-			Boolean enableFlash) {		
-		this.userID = userID;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.login = login;
-		this.localeCountry = localeCountry;
-		this.localeLanguage = localeLanguage;
-		this.direction = direction;
-		this.email = email;
-		this.flashTheme = flashTheme;
-		this.htmlTheme = htmlTheme;
-		this.timeZone = timezone;
-		this.authenticationMethodId = authenticationMethodId;
-		this.fckLanguageMapping = fckLanguageMapping;
-		this.enableFlash = enableFlash;
-	}
-	
-	/**
-	 * Equality test of UserDTO objects
-	 */
-	public boolean equals(Object o) {
-		if ((o != null) && (o.getClass() == this.getClass())) {
-			return ((UserDTO)o).userID == this.userID;
-		} else {
-			return false;
-		}		
-	}
-	
-	/**
-	 *  Returns the hash code value for this object.
-	 */
-	public int hashCode() {
-		// TODO this might be an ineffcient implementation since userIDs are likely to be sequential, 
-		// hence we dont get a good spread of values
-		return userID.intValue();
-	}
-	
-	/**
-	 * @return Returns the firstName.
-	 */
-	public String getFirstName() {
-		return firstName;
-	}
-	/**
-	 * @return Returns the lastName.
-	 */
-	public String getLastName() {
-		return lastName;
-	}
-	/**
-	 * @return Returns the login.
-	 */
-	public String getLogin() {
-		return login;
-	}
-	/**
-	 * @return Returns the userID.
-	 */
-	public Integer getUserID() {
-		return userID;
-	}
+    //	public UserDTO(Integer userID, String firstName, String lastName,
+    //			String login, String email, CSSThemeVisualElement theme) {		
+    //		this.userID = userID;
+    //		this.firstName = firstName;
+    //		this.lastName = lastName;
+    //		this.login = login;
+    //		this.email = email;
+    //		this.theme = theme;
+    //	}
 
+    public UserDTO(Integer userID, String firstName, String lastName, String login, String localeLanguage,
+	    String localeCountry, String direction, String email, CSSThemeBriefDTO flashTheme,
+	    CSSThemeBriefDTO htmlTheme, TimeZone timezone, Integer authenticationMethodId, String fckLanguageMapping,
+	    Boolean enableFlash, String lamsCommunityToken, String lamsCommunityUsername) {
+	this.userID = userID;
+	this.firstName = firstName;
+	this.lastName = lastName;
+	this.login = login;
+	this.localeCountry = localeCountry;
+	this.localeLanguage = localeLanguage;
+	this.direction = direction;
+	this.email = email;
+	this.flashTheme = flashTheme;
+	this.htmlTheme = htmlTheme;
+	this.timeZone = timezone;
+	this.authenticationMethodId = authenticationMethodId;
+	this.fckLanguageMapping = fckLanguageMapping;
+	this.enableFlash = enableFlash;
+	this.lamsCommunityToken = lamsCommunityToken;
+	this.lamsCommunityUsername = lamsCommunityUsername;
+    }
 
-	public CSSThemeBriefDTO getFlashTheme() {
-		return flashTheme;
+    /**
+     * Equality test of UserDTO objects
+     */
+    public boolean equals(Object o) {
+	if ((o != null) && (o.getClass() == this.getClass())) {
+	    return ((UserDTO) o).userID == this.userID;
+	} else {
+	    return false;
 	}
+    }
 
+    /**
+     * Returns the hash code value for this object.
+     */
+    public int hashCode() {
+	// TODO this might be an ineffcient implementation since userIDs are likely to be sequential, 
+	// hence we dont get a good spread of values
+	return userID.intValue();
+    }
 
-	public void setFlashTheme(CSSThemeBriefDTO flashTheme) {
-		this.flashTheme = flashTheme;
-	}
+    /**
+     * @return Returns the firstName.
+     */
+    public String getFirstName() {
+	return firstName;
+    }
 
-	public CSSThemeBriefDTO getHtmlTheme() {
-		return htmlTheme;
-	}
+    /**
+     * @return Returns the lastName.
+     */
+    public String getLastName() {
+	return lastName;
+    }
 
+    /**
+     * @return Returns the login.
+     */
+    public String getLogin() {
+	return login;
+    }
 
-	public void setHtmlTheme(CSSThemeBriefDTO htmlTheme) {
-		this.htmlTheme = htmlTheme;
-	}
-	
-	public String getEmail() {
-		return email;
-	}
+    /**
+     * @return Returns the userID.
+     */
+    public Integer getUserID() {
+	return userID;
+    }
 
+    public CSSThemeBriefDTO getFlashTheme() {
+	return flashTheme;
+    }
 
-	public String getLocaleCountry() {
-		return localeCountry;
-	}
+    public void setFlashTheme(CSSThemeBriefDTO flashTheme) {
+	this.flashTheme = flashTheme;
+    }
 
+    public CSSThemeBriefDTO getHtmlTheme() {
+	return htmlTheme;
+    }
 
-	public String getLocaleLanguage() {
-		return localeLanguage;
-	}
-	
-	/** Should the page be displayed left to right (LTR) or right to left (RTL) */
-	public String getDirection() {
-		return direction;
-	}
-	
-	/** User's timezone. At the moment, this is always the server's timezone */
-	public TimeZone getTimeZone() {
-		return timeZone;
-	}
-	
-	public Integer getAuthenticationMethodId() {
-		return authenticationMethodId;
-	}
-	
-	public String toString() {
-		return new ToStringBuilder(this)
-			.append("userID", getUserID())
-			.append("firstName", getFirstName())
-			.append("lastName", getLastName())
-			.append("login", getLogin())
-			.append("localeLanguage", getLocaleLanguage())
-			.append("localeCountry", getLocaleCountry())
-			.append("direction", getDirection())
-			.append("email", getEmail())
-			.append("flashTheme", getFlashTheme())
-			.append("htmlTheme", getHtmlTheme())
-			.append("timeZone", getTimeZone())
-			.append("authenticationMethodId", getAuthenticationMethodId())
-			.append("fckLanguageMapping", getFckLanguageMapping())
-			.append("enableFlash", getEnableFlash())
-			.toString();
-	}
+    public void setHtmlTheme(CSSThemeBriefDTO htmlTheme) {
+	this.htmlTheme = htmlTheme;
+    }
 
-	public String getFckLanguageMapping() {
-		return fckLanguageMapping;
-	}
+    public String getEmail() {
+	return email;
+    }
 
-	public Boolean getEnableFlash() {
-		return enableFlash;
-	}
+    public String getLocaleCountry() {
+	return localeCountry;
+    }
 
-	public void setEnableFlash(Boolean enableFlash) {
-		this.enableFlash = enableFlash;
-	}
+    public String getLocaleLanguage() {
+	return localeLanguage;
+    }
 
+    /** Should the page be displayed left to right (LTR) or right to left (RTL) */
+    public String getDirection() {
+	return direction;
+    }
 
-//	public CSSThemeVisualElement getTheme() {
-//		return theme;
-//	}
-//	
-//	public void setTheme(CSSThemeVisualElement theme) {
-//		this.theme = theme;
-//	}
-	
-	
+    /** User's timezone. At the moment, this is always the server's timezone */
+    public TimeZone getTimeZone() {
+	return timeZone;
+    }
+
+    public Integer getAuthenticationMethodId() {
+	return authenticationMethodId;
+    }
+
+    public String toString() {
+	return new ToStringBuilder(this).append("userID", getUserID()).append("firstName", getFirstName()).append(
+		"lastName", getLastName()).append("login", getLogin()).append("localeLanguage", getLocaleLanguage())
+		.append("localeCountry", getLocaleCountry()).append("direction", getDirection()).append("email",
+			getEmail()).append("flashTheme", getFlashTheme()).append("htmlTheme", getHtmlTheme()).append(
+			"timeZone", getTimeZone()).append("authenticationMethodId", getAuthenticationMethodId())
+		.append("fckLanguageMapping", getFckLanguageMapping()).append("enableFlash", getEnableFlash()).append(
+			"lamsCommunityUser", this.getLamsCommunityUsername()).append("lamsCommunityToken",
+			this.getLamsCommunityToken()).append("loggedIntoLamsCommunity",
+			"" + this.getLoggedIntoLamsCommunity()).toString();
+    }
+
+    public String getFckLanguageMapping() {
+	return fckLanguageMapping;
+    }
+
+    public Boolean getEnableFlash() {
+	return enableFlash;
+    }
+
+    public void setEnableFlash(Boolean enableFlash) {
+	this.enableFlash = enableFlash;
+    }
+
+    public String getLamsCommunityToken() {
+	return lamsCommunityToken;
+    }
+
+    public void setLamsCommunityToken(String lamsCommunityToken) {
+	this.lamsCommunityToken = lamsCommunityToken;
+    }
+
+    public String getLamsCommunityUsername() {
+	return lamsCommunityUsername;
+    }
+
+    public void setLamsCommunityUsername(String lamsCommunityUsername) {
+	this.lamsCommunityUsername = lamsCommunityUsername;
+    }
+
+    public Boolean getLoggedIntoLamsCommunity() {
+	return loggedIntoLamsCommunity;
+    }
+
+    public void setLoggedIntoLamsCommunity(Boolean loggedIntoLamsCommunity) {
+	this.loggedIntoLamsCommunity = loggedIntoLamsCommunity;
+    }
+
+    //	public CSSThemeVisualElement getTheme() {
+    //		return theme;
+    //	}
+    //	
+    //	public void setTheme(CSSThemeVisualElement theme) {
+    //		this.theme = theme;
+    //	}
+
 }
