@@ -317,6 +317,8 @@ CREATE TABLE lams_user (
      , portrait_uuid BIGINT(20)
      , change_password TINYINT DEFAULT 0
      , enable_flash TINYINT(1) DEFAULT 1
+	 , lams_community_token VARCHAR(255)
+ 	 , lams_community_username VARCHAR(255)
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
@@ -1056,4 +1058,20 @@ CREATE TABLE patches (
      , patch_in_progress CHAR(1) NOT NULL DEFAULT 'F'
      , PRIMARY KEY (system_name)
 )TYPE=InnoDB;
+
+CREATE TABLE lams_registration (
+	   uid BIGINT NOT NULL auto_increment
+     , site_name VARCHAR(255) NOT NULL
+     , organisation VARCHAR(255) NOT NULL
+     , name VARCHAR(255) NOT NULL
+     , email VARCHAR(255) NOT NULL
+	 , server_country VARCHAR(2) NOT NULL
+	 , public_directory TINYINT(1) DEFAULT 1
+	 , enable_lams_community TINYINT(1) DEFAULT 0
+	 , server_key VARCHAR(255) NOT NULL
+	 , server_id VARCHAR(255) NOT NULL
+     , PRIMARY KEY (uid)
+)TYPE=InnoDB;
+
+
  
