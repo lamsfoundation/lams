@@ -3,6 +3,11 @@
   type="org.lamsfoundation.lams.web.planner.GroupingPedagogicalPlannerForm"
 />
 
+<form-bean
+  name="lamsCommunityLoginForm"
+  type="org.lamsfoundation.lams.web.lamscommunity.LamsCommunityLoginForm"
+/>
+
 <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="userId" type="java.lang.Integer" />
 	<form-property name="login" type="java.lang.String" />
@@ -24,6 +29,9 @@
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeId" type="java.lang.Integer" />
 	<form-property name="enableFlash" type="java.lang.Boolean" />
+	<form-property name="lamsCommunityToken" type="java.lang.String" />
+	<form-property name="lamsCommunityUsername" type="java.lang.String" />
+	<form-property name="disableLamsCommunityUsername" type="java.lang.Boolean" />
 </form-bean>
 
 

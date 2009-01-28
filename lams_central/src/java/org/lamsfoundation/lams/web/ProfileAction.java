@@ -198,6 +198,10 @@ public class ProfileAction extends LamsDispatchAction {
 	userForm.set("localeId", locale.getLocaleId());
 	request.setAttribute("locales", locales);
 	request.setAttribute("tab", "profile");
+	
+	boolean hasLamsCommunityToken = requestor.getLamsCommunityToken() != null;
+	request.setAttribute("hasLamsCommunityToken", hasLamsCommunityToken);
+	
 	return mapping.findForward("edit");
     }
 

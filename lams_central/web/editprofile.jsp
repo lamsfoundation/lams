@@ -30,11 +30,13 @@
 
 <c:set var="authenticationMethodId"><lams:user property="authenticationMethodId"/></c:set>
 <c:set var="dbId"><%= AuthenticationMethod.DB %></c:set>
+<c:set var="lamsCommunityToken"><bean:write name="UserForm" property="lamsCommunityToken" /></c:set>
+<c:set var="lamsCommunityUsername"><bean:write name="UserForm" property="lamsCommunityUsername" /></c:set>
 <c:if test="${authenticationMethodId eq dbId}">	
 
     <tr>
-		<td class="align-right"><fmt:message key="label.username"/>:</td>
-		<td><bean:write name="UserForm" property="login" /></td>
+		<td class="align-right" width="50%"><fmt:message key="label.username"/>:</td>
+		<td width="50%"><bean:write name="UserForm" property="login" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.title"/>:</td>
@@ -125,9 +127,20 @@
 			</html:select>
 		</td>
 	</tr>
-	
+	<c:if test="${not empty lamsCommunityToken}">
+		<tr>
+			<td class="align-right">
+				<fmt:message key="label.lamscommunity.changeuser">
+					<fmt:param value="${lamsCommunityUsername}" />
+				</fmt:message>
+			:</td> 
+			<td>
+				<html:checkbox property="disableLamsCommunityUsername"></html:checkbox>
+			</td>
+		</tr>
+	</c:if>
 </c:if>
-
+<br />
 <c:if test="${authenticationMethodId != dbId}">	
 
 	<html:hidden property="title" />

@@ -4,6 +4,7 @@
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c"%>
 
 <lams:html>
 <lams:head>
@@ -23,3 +24,12 @@
 
 </body>
 </lams:html>
+
+<c:if test="${logoutLamsCommunity}">
+<iframe
+	id="lamscommunityLogoutIframe" name="lamscommunityLogoutIframe"
+	src="http://lamscommunity.org/logout"
+	style="width:0px;height:0px;border:0px;display:none;overflow:auto" frameborder="no"
+	>
+</iframe>
+</c:if>
