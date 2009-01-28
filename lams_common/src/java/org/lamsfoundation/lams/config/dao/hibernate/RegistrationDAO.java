@@ -18,30 +18,34 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.config.dao.hibernate; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.config.dao.hibernate;
 
 import java.util.List;
 
 import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.config.dao.IRegistrationDAO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
- 
-public class RegistrationDAO extends BaseDAO implements IRegistrationDAO{
-    
-    private static final String LOAD_REG = "from registration in class " + Registration.class.getName() ;
-    
-    public void saveOrUpdate(Registration reg){
+
+public class RegistrationDAO extends BaseDAO implements IRegistrationDAO {
+
+    private static final String LOAD_REG = "from registration in class " + Registration.class.getName();
+
+    public void saveOrUpdate(Registration reg) {
 	getHibernateTemplate().saveOrUpdate(reg);
     }
-    
+
     @SuppressWarnings("unchecked")
-    public Registration get(){
+    public Registration get() {
 	List list = getHibernateTemplate().find(LOAD_REG);
-	return (Registration)list.get(0);
+
+	if (list != null && list.get(0) != null) {
+	    return (Registration) list.get(0);
+	} else {
+	    return null;
+	}
     }
 
 }
- 
