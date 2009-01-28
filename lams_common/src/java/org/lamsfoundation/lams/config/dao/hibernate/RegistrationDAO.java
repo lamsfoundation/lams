@@ -41,7 +41,7 @@ public class RegistrationDAO extends BaseDAO implements IRegistrationDAO {
     public Registration get() {
 	List list = getHibernateTemplate().find(LOAD_REG);
 
-	if (list != null && list.size() >0) {
+	if (list != null && list.size() > 0) {
 	    return (Registration) list.get(0);
 	} else {
 	    return null;
