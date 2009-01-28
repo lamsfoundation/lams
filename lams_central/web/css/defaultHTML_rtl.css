@@ -50,7 +50,7 @@ h1 {
 	color:#0087e5; 
 	font-size:15px; 
 	margin-bottom:0px; 
-	margin-right:10px; 
+	margin-right:10px;
 	padding-top:5px; }
 
 
@@ -216,7 +216,7 @@ Tab navigation styles
 .tab-right-selected { /* defines right side of selected tab */
 	height: 31px;
 	width: 8px;
-	background: url('../images/css/selected_right.jpg') no-repeat top right;;
+	background: url('../images/css/selected_right.jpg') no-repeat top right;
 	float: left
 }
 
@@ -242,7 +242,7 @@ Tab navigation styles
 .tab-right { /* defines right side of selected tab */
 	height: 31px;
 	width: 8px;
-	background: url('../images/css/button_right.jpg') no-repeat top right;;
+	background: url('../images/css/button_right.jpg') no-repeat top right;
 	float: left
 }
 
