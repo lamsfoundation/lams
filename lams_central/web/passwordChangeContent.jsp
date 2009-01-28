@@ -29,10 +29,10 @@
 		
 			<table class="body">
 				<tr>
-					<td class="align-right">
+					<td class="align-right" width="50%">
 						<fmt:message key="label.username"/>:
 					</td>
-					<td class="align-left">
+					<td class="align-left" width="50%">
 						<html:hidden name="<%=PasswordChangeActionForm.formName%>" property="login"/>
 						<bean:write name="<%=PasswordChangeActionForm.formName%>" property="login"/>
 					</td>

@@ -21,9 +21,9 @@
 
 	<table>
 		<tr>
-			<td class="align-right" valign="top"><fmt:message
+			<td class="align-right" valign="top" width="50%"><fmt:message
 				key="label.portrait.current" />:</td>
-			<td><logic:notEqual name="PortraitActionForm"
+			<td width="50%"><logic:notEqual name="PortraitActionForm"
 				property="portraitUuid" value="0">
 				<img class="img-border"
 					src="/lams/download/?uuid=<bean:write name="PortraitActionForm" property="portraitUuid" />&preferDownload=false" />
@@ -54,5 +54,5 @@
 
 	</div>
 
-	<p> <fmt:message key="msg.portrait.resized" />  </p>
+	<p align="center"> <fmt:message key="msg.portrait.resized" />  </p>
 </html:form>
