@@ -4,11 +4,27 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<lams:css style="core" />
-	<link href="<lams:LAMSURL />css/jTip.css" rel="stylesheet" type="text/css" />
-	
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jtip.js"></script>
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dimensions.pack.js"></script>
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cluetip.js"></script>
+	<script language="JavaScript" type="text/javascript">
+		$(document).ready(function() {
+			$('#editingAdvice').cluetip({
+				height: 130,
+				cluetipClass: 'jtip',
+				arrows: true,
+				dropShadow: false,
+	 			sticky: true,
+				waitImage: true,
+				activation: 'click',
+				closeText: 'X',
+				topOffset: 0
+			});
+		});
+	</script>
+	
+	<lams:css style="core" />
+	<link href="<lams:LAMSURL />css/jquery.cluetip.css" rel="stylesheet" type="text/css" />
 </lams:head>
 <body>
 	<%@ include file="/common/messages.jsp"%>
@@ -20,10 +36,8 @@
 			<c:url value="/pedagogicalPlanner.do" var="tipUrl">
 				<c:param name="dispatch" value="getEditingAdvice" />
 				<c:param name="toolContentID" value="${formBean.toolContentID}" />
-				<c:param name="width" value="400" />
 			</c:url>
-			<a class="jTip" name="<fmt:message key="label.planner.editing.advice" />" 
-				href="${tipUrl}" id="editingAdvice"><fmt:message key="label.planner.editing.advice" /></a>
+			<a href="#" title="" rel="${tipUrl}" id="editingAdvice"><fmt:message key="label.planner.editing.advice" /></a>
 		</c:if>
 		
 		<html:hidden property="toolContentID" />
