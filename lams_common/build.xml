@@ -429,6 +429,7 @@ Ant build file.
 		<hibernatedoclet destdir="${conf.hibernate.mapping.dir}" excludedtags="@version,@author,@todo" force="true" verbose="true">
 			<fileset dir="${src.java.dir}">
 				<include name="**/ConfigurationItem.java" />
+				<include name="**/Registration.java" />
 			</fileset>
 			<hibernate version="3.0" />
 		</hibernatedoclet>

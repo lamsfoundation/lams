@@ -71,6 +71,7 @@
 				
 				<!--  Configuration related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/config/ConfigurationItem.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/config/Registration.hbm.xml</value>
 				
 				<!-- Integration related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/integration/ExtServerOrgMap.hbm.xml</value>
@@ -289,6 +290,7 @@
 	<!--  Configuration service -->
 	<bean id="configurationService" class="org.lamsfoundation.lams.util.Configuration" singleton="true">
 		<property name="configurationDAO"><ref bean="configurationDAO" /></property>
+		<property name="registrationDAO"><ref bean="registrationDAO" /></property>
 	</bean>
 	
 	<!-- auditing service -->
@@ -357,6 +359,9 @@
 	
 	<!--  Configuration related beans -->
 	<bean id="configurationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	<bean id="registrationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.RegistrationDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
