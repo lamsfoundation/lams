@@ -32,7 +32,9 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.config.ConfigurationItem;
+import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO;
+import org.lamsfoundation.lams.config.dao.hibernate.RegistrationDAO;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -40,6 +42,7 @@ import org.springframework.beans.factory.InitializingBean;
  * 
  * @author Fei Yang
  * @author Mitchell Seaton
+ * @author Luke Foxton
  */
 public class Configuration implements InitializingBean {
 
@@ -50,6 +53,8 @@ public class Configuration implements InitializingBean {
     private static Map items = null;
 
     protected ConfigurationDAO configurationDAO;
+    
+    protected static RegistrationDAO registrationDAO;
 
     /**
      * @param configurationDAO
@@ -166,5 +171,20 @@ public class Configuration implements InitializingBean {
 	    System.setProperty(key, value);
 	}
     }
+    
+    public static void saveOrUpdateRegistration(Registration reg){
+	registrationDAO.saveOrUpdate(reg);
+    }
+    
+    public static Registration getRegistration(){
+	return registrationDAO.get();
+    }
 
+    public RegistrationDAO getRegistrationDAO() {
+        return registrationDAO;
+    }
+
+    public void setRegistrationDAO(RegistrationDAO registrationDAO) {
+        this.registrationDAO = registrationDAO;
+    }
 }
