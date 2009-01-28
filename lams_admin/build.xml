@@ -290,6 +290,7 @@
 		<copy verbose="yes" todir="${jboss.deploy}/${product}.war">
 			<fileset dir="${conf.web.dir}">
 				<include name="**/*.jsp" />
+				<include name="**/*.xml" />
 			</fileset>
 		</copy>
 	</target>
