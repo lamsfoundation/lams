@@ -646,6 +646,8 @@ My Courses Pages
 
 #page-mycourses { /*whole layout of page*/
 	margin: 25px auto;
+	min-width: 707px;
+	max-width: 1024px;
 	width: 100%;
 	background: url('../images/css/lams_logo.gif') no-repeat 95% -7px;
 
