@@ -774,15 +774,27 @@ class WorkspaceDialog extends MovieClip{
 	 */
 	private function saveFile(snode:XMLNode):Void{
 		Debugger.log('Saving a file.',Debugger.GEN,'saveFile','org.lamsfoundation.lams.WorkspaceDialog');
+		
 		var snodeData = treeview.selectedNode.attributes.data;
 		var isWritable:Boolean = _workspaceModel.isWritableResource(snodeData.resourceType,snodeData.resourceID);
+		
 		Debugger.log("isWritable: "+isWritable, Debugger.CRITICAL, "saveFile", "WorkspaceDialog");
 		_workspaceController = _workspaceView.getController();
+		
+		if(StringUtils.containsReservedChar(resourceTitle_txi.text)) {
+			LFMessage.showMessageAlert(Dictionary.getValue('ws_save_title_reserved_chars', [StringUtils.reserved.toString()]), null);
+			Cursor.showCursor(ApplicationParent.C_DEFAULT);
+			return;
+		}
+		
 		if(snode == treeview.dataProvider.firstChild){
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
 		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
+			
 			if(snode.parentNode != null) { 
+				
 				if(searchForFile(snode.parentNode, resourceTitle_txi.text, true)) {
+					
 					if(isWritable) {
 						//run a confirm dialogue as user is about to overwrite a design!
 						LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true));
@@ -791,8 +803,11 @@ class WorkspaceDialog extends MovieClip{
 					else // don't have permission, file is read-only
 						LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null)
 				}
+				
 			}
+			
 		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
+			
 			if(snode.attributes.data.resourceID < 0){	
 				LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
 				_workspaceController.clearBusy();
@@ -803,6 +818,7 @@ class WorkspaceDialog extends MovieClip{
 				LFMessage.showMessageAlert(Dictionary.getValue('ws_chk_overwrite_existing', [resourceTitle_txi.text]), null);
 				_workspaceController.clearBusy();
 			}
+			
 		} else {
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_click_folder_file'),null);
 			_workspaceController.clearBusy();

@@ -34,6 +34,7 @@ class StringUtils {
 	//Declarations
 	private var _className:String = 'StringUtils';
 	private static var _nextID:Number = 0;
+	public static var reserved:Array    = [";","/","?",":","@","&","=","+","$",","]; 	// reserved URI characters
 
 	//Constructor
 	function StringUtils() {
@@ -431,5 +432,12 @@ class StringUtils {
 		}
 		Debugger.log("correctPresenceRoomName originalRoomName: " + s + " correctedRoomName: " + newRoomName, Debugger.MED, "correctPresenceRoomName", "StringUtils");
 		return newRoomName;
+	}
+	
+	public static function containsReservedChar(str:String):Boolean {
+		for(var i=0; i<=reserved.length; i++)
+			if(str.indexOf(reserved[i]) != -1) return true;
+			
+		return false;
 	}
 }
