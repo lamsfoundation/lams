@@ -23,9 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.notebook.web.forms;
 
-import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
 
 /**
@@ -33,6 +31,15 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
  */
 public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerForm {
     String instructions;
+    String contentFolderID;
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
 
     public String getInstructions() {
 	return instructions;
@@ -44,9 +51,8 @@ public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerForm {
 
     public void fillForm(Notebook notebook) {
 	if (notebook != null) {
-	    setInstructions(WebUtil.removeHTMLtags(notebook.getInstructions()));
+	    setInstructions(notebook.getInstructions());
 	    setToolContentID(notebook.getToolContentId());
-	    setEditingAdviceAvailable(!StringUtils.isEmpty(notebook.getOnlineInstructions()));
 	}
     }
 }

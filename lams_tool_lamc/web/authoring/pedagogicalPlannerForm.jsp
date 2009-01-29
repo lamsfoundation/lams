@@ -66,11 +66,11 @@
 		<input type="hidden" id="questionCount" value="${formBean.questionCount}" />
 		
 		<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}" >
-			<html:text property="question[${questionIndex-1}]" size="70" />
+			<html:text property="question[${questionIndex-1}]" size="75" />
 			<div class="space-left">
 				<c:forEach var="candidateAnswerIndex" begin="1" end="${formBean.candidateAnswerCount[questionIndex-1]}" >
 					${candidateAnswerIndex}.
-					<input size="50" type="text" name="candidateAnswer${questionIndex}-${candidateAnswerIndex}" id="candidateAnswer${questionIndex}-${candidateAnswerIndex}" />
+					<input size="55" type="text" name="candidateAnswer${questionIndex}-${candidateAnswerIndex}" id="candidateAnswer${questionIndex}-${candidateAnswerIndex}" />
 					<html:radio property="correct[${questionIndex-1}]" value="${candidateAnswerIndex}" />
 					<br />
 				</c:forEach>

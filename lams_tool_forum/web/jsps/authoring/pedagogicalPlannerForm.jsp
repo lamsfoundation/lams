@@ -42,7 +42,7 @@
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
 		<c:forEach var="topicIndex"  begin="1" end="${formBean.topicCount}" >
-			<html:textarea property="topic[${topicIndex-1}]" cols="62" rows="4" />
+			<html:textarea property="topic[${topicIndex-1}]" cols="65" rows="4" />
 		</c:forEach>
 	</html:form>
 	<a class="button" href="javascript:createTopic();"><fmt:message key="label.authoring.create.new.topic" /></a>

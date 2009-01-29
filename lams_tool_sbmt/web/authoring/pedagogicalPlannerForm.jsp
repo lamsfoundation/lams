@@ -5,6 +5,14 @@
 <lams:html>
 <lams:head>
 	<lams:css style="core" />
+	
+	<script type="text/javascript">
+	function prepareFormData(){
+		//FCKeditor content is not submitted when sending by jQuery; we need to do this
+		var content = FCKeditorAPI.GetInstance('instruction').GetXHTML();
+		document.getElementById("instruction").value=content;
+	}
+	</script>
 </lams:head>
 <body>
 	<h4 class="space-left"><fmt:message key="label.authoring.basic.instruction" /></h4>
@@ -13,7 +21,13 @@
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
-		<html:textarea property="instruction" style="margin: 2px 0px 0px 10px;" cols="62" rows="5" />
+		
+		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<lams:FCKEditor id="instruction"
+			value="${formBean.instruction}"
+			contentFolderID="${formBean.contentFolderID}"
+			toolbarSet="Custom-Wiki" height="200px">
+		</lams:FCKEditor>
 	</html:form>
 </body>
 </lams:html>

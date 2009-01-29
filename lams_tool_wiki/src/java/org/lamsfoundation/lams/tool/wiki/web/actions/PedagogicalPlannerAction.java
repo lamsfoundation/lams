@@ -25,10 +25,12 @@
 package org.lamsfoundation.lams.tool.wiki.web.actions;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -39,7 +41,6 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPedagogicalPlannerForm;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -72,9 +73,32 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	WikiPedagogicalPlannerForm plannerForm = (WikiPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Wiki wiki = getWikiService().getWikiByContentId(toolContentID);
-	plannerForm.fillForm(wiki);
-	plannerForm.setContentFolderID(FileUtil.generateUniqueContentFolderID());
-	return mapping.findForward("success");
+	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
+	if (command == null) {
+	    plannerForm.fillForm(wiki);
+	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	    plannerForm.setContentFolderID(contentFolderId);
+	    return mapping.findForward("success");
+	} else {
+	    try {
+		String onlineInstructions = wiki.getOnlineInstructions();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter writer = response.getWriter();
+
+		if (AttributeNames.COMMAND_CHECK_EDITING_ADVICE.equals(command)) {
+		    Integer activityIndex = WebUtil.readIntParam(request, AttributeNames.PARAM_ACTIVITY_INDEX);
+		    String responseText = (StringUtils.isEmpty(wiki.getOnlineInstructions()) ? "NO" : "OK") + '&'
+			    + activityIndex;
+		    writer.print(responseText);
+
+		} else if (AttributeNames.COMMAND_GET_EDITING_ADVICE.equals(command)) {
+		    writer.print(onlineInstructions);
+		}
+	    } catch (IOException e) {
+		PedagogicalPlannerAction.logger.error(e);
+	    }
+	    return null;
+	}
     }
 
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,

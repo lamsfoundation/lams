@@ -60,3 +60,9 @@ div#pedagogicalPlannerErrorArea{
 	margin-bottom: 20px;
 	width: 60%;
 }
+
+a.editingAdvice{
+	display: none;
+	font-size: smaller;
+	margin: 0px 0px 0px 500px;
+}

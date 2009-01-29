@@ -9,7 +9,6 @@
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE13_CONTAINER"/>
 	<classpathentry kind="var" path="JBOSS_HOME/server/default/deploy/jboss-hibernate.deployer/jboss-hibernate.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-cache.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>

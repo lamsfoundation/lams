@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.chat.web.forms;
 
 import org.lamsfoundation.lams.tool.chat.model.Chat;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
 
 /**
@@ -32,6 +31,7 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
  */
 public class ChatPedagogicalPlannerForm extends PedagogicalPlannerForm {
     String instructions;
+    String contentFolderID;
 
     public String getInstructions() {
 	return instructions;
@@ -43,8 +43,16 @@ public class ChatPedagogicalPlannerForm extends PedagogicalPlannerForm {
 
     public void fillForm(Chat chat) {
 	if (chat != null) {
-	    setInstructions(WebUtil.removeHTMLtags(chat.getInstructions()));
+	    setInstructions(chat.getInstructions());
 	    setToolContentID(chat.getToolContentId());
 	}
+    }
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
     }
 }

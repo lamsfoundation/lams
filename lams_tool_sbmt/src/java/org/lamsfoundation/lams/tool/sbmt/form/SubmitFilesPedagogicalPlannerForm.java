@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.sbmt.form;
 
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
 
 /**
@@ -33,6 +32,15 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
  */
 public class SubmitFilesPedagogicalPlannerForm extends PedagogicalPlannerForm {
     String instruction;
+    String contentFolderID;
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
 
     public String getInstruction() {
 	return instruction;
@@ -45,7 +53,6 @@ public class SubmitFilesPedagogicalPlannerForm extends PedagogicalPlannerForm {
     public void fillForm(SubmitFilesContent content) {
 	if (content != null) {
 	    String instruction = content.getInstruction();
-	    instruction = WebUtil.removeHTMLtags(instruction);
 	    setInstruction(instruction);
 	    setToolContentID(content.getContentID());
 	}

@@ -81,6 +81,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class PedagogicalPlannerAction extends LamsDispatchAction {
 
+    private static final String CHAR_QUESTION_MARK = "?";
+    private static final char CHAR_AMPERSAND = '&';
+    private static final char CHAR_EQUALS = '=';
     private static IUserManagementService userManagementService;
     private static IExportToolContentService exportService;
     private static IAuthoringService authoringService;
@@ -137,6 +140,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	// create DTO that holds all the necessary information of the activities
 	int activitySupportingPlannerCount = 0;
 	Activity activity = learningDesign.getFirstActivity();
+	int activityIndex = 1;
 	while (activity != null) {
 	    boolean activitySupportsPlanner = false;
 	    boolean activityAdded = false;
@@ -144,37 +148,60 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		ToolActivity toolActivity = (ToolActivity) activity;
 		String pedagogicalPlannerUrl = toolActivity.getTool().getPedagogicalPlannerUrl();
 		if (pedagogicalPlannerUrl == null) {
-		    activitites.add(new PedagogicalPlannerActivityDTO(toolActivity.getToolContentId(), toolActivity
-			    .getTool().getToolDisplayName(), activity.getTitle(),
-			    CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT + "?", activity
-				    .getLibraryActivityUiImage()));
+		    activitites.add(new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(),
+			    activity.getTitle(), CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity
+				    .getLibraryActivityUiImage(), null, null));
 
 		} else {
-		    pedagogicalPlannerUrl += pedagogicalPlannerUrl.contains("?") ? '&' : '?';
-		    activitites.add(new PedagogicalPlannerActivityDTO(toolActivity.getToolContentId(), toolActivity
-			    .getTool().getToolDisplayName(), activity.getTitle(), pedagogicalPlannerUrl, activity
-			    .getLibraryActivityUiImage()));
+		    pedagogicalPlannerUrl += pedagogicalPlannerUrl
+			    .contains(PedagogicalPlannerAction.CHAR_QUESTION_MARK) ? PedagogicalPlannerAction.CHAR_AMPERSAND
+			    : PedagogicalPlannerAction.CHAR_QUESTION_MARK;
+		    pedagogicalPlannerUrl += AttributeNames.PARAM_TOOL_CONTENT_ID
+			    + PedagogicalPlannerAction.CHAR_EQUALS + toolActivity.getToolContentId();
+		    activitites
+			    .add(new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(),
+				    activity.getTitle(), pedagogicalPlannerUrl
+					    + PedagogicalPlannerAction.CHAR_AMPERSAND
+					    + AttributeNames.PARAM_CONTENT_FOLDER_ID
+					    + PedagogicalPlannerAction.CHAR_EQUALS
+					    + learningDesign.getContentFolderID(),
+				    activity.getLibraryActivityUiImage(), pedagogicalPlannerUrl
+					    + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_COMMAND
+					    + PedagogicalPlannerAction.CHAR_EQUALS
+					    + AttributeNames.COMMAND_CHECK_EDITING_ADVICE
+					    + PedagogicalPlannerAction.CHAR_AMPERSAND
+					    + AttributeNames.PARAM_ACTIVITY_INDEX
+					    + PedagogicalPlannerAction.CHAR_EQUALS + activityIndex,
+				    pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND
+					    + AttributeNames.PARAM_COMMAND + PedagogicalPlannerAction.CHAR_EQUALS
+					    + AttributeNames.COMMAND_GET_EDITING_ADVICE));
 		    activitySupportsPlanner = true;
 		}
 		activityAdded = true;
 	    } else if (activity.isGroupingActivity()) {
 		GroupingActivity groupingActivity = (GroupingActivity) activity;
-		activitites.add(new PedagogicalPlannerActivityDTO(groupingActivity.getCreateGrouping().getGroupingId(),
-			null, activity.getTitle(), groupingActivity.getSystemTool().getPedagogicalPlannerUrl() + "&",
-			CentralConstants.IMAGE_PATH_GROUPING));
+		activitites.add(new PedagogicalPlannerActivityDTO(null, activity.getTitle(), groupingActivity
+			.getSystemTool().getPedagogicalPlannerUrl()
+			+ PedagogicalPlannerAction.CHAR_AMPERSAND
+			+ AttributeNames.PARAM_TOOL_CONTENT_ID
+			+ PedagogicalPlannerAction.CHAR_EQUALS + groupingActivity.getCreateGrouping().getGroupingId(),
+			CentralConstants.IMAGE_PATH_GROUPING, null, null));
 		activitySupportsPlanner = true;
 		activityAdded = true;
 	    } else if (activity.isGateActivity()) {
-		activitites.add(new PedagogicalPlannerActivityDTO(null, null, activity.getTitle(),
-			CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT + "?", CentralConstants.IMAGE_PATH_GATE));
+		activitites
+			.add(new PedagogicalPlannerActivityDTO(null, activity.getTitle(),
+				CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT, CentralConstants.IMAGE_PATH_GATE,
+				null, null));
 		activityAdded = true;
 	    }
 	    if (activitySupportsPlanner) {
 		activitySupportingPlannerCount++;
 	    }
 	    if (!activityAdded) {
-		activitites.add(new PedagogicalPlannerActivityDTO(null, null, activity.getTitle(),
-			CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT + "?", activity.getLibraryActivityUiImage()));
+		activitites.add(new PedagogicalPlannerActivityDTO(null, activity.getTitle(),
+			CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity.getLibraryActivityUiImage(), null,
+			null));
 	    }
 	    Transition transitionTo = activity.getTransitionTo();
 	    if (transitionTo == null) {
@@ -182,6 +209,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    } else {
 		activity = transitionTo.getToActivity();
 	    }
+	    activityIndex++;
 	}
 	// Set other properties
 	PedagogicalPlannerDTO planner = new PedagogicalPlannerDTO();
@@ -319,7 +347,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	getMonitoringService().startLesson(lesson.getLessonId(), userDto.getUserID());
 	String newPath = mapping.findForward("preview").getPath();
-	newPath = newPath + '&' + AttributeNames.PARAM_LESSON_ID + '=' + lesson.getLessonId();
+	newPath = newPath + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_LESSON_ID
+		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId();
 	return new ActionForward(newPath, true);
     }
 }

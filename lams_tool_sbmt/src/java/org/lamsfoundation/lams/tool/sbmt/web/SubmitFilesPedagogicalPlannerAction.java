@@ -25,10 +25,12 @@
 package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -38,6 +40,7 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.form.SubmitFilesPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
+import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction;
@@ -72,8 +75,32 @@ public class SubmitFilesPedagogicalPlannerAction extends LamsDispatchAction {
 	SubmitFilesPedagogicalPlannerForm plannerForm = (SubmitFilesPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	SubmitFilesContent submitFiles = getSubmitFilesService().getSubmitFilesContent(toolContentID);
-	plannerForm.fillForm(submitFiles);
-	return mapping.findForward("success");
+	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
+	if (command == null) {
+	    plannerForm.fillForm(submitFiles);
+	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	    plannerForm.setContentFolderID(contentFolderId);
+	    return mapping.findForward(SbmtConstants.SUCCESS);
+	} else {
+	    try {
+		String onlineInstructions = submitFiles.getOnlineInstruction();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter writer = response.getWriter();
+
+		if (AttributeNames.COMMAND_CHECK_EDITING_ADVICE.equals(command)) {
+		    Integer activityIndex = WebUtil.readIntParam(request, AttributeNames.PARAM_ACTIVITY_INDEX);
+		    String responseText = (StringUtils.isEmpty(submitFiles.getOnlineInstruction()) ? "NO" : "OK") + '&'
+			    + activityIndex;
+		    writer.print(responseText);
+
+		} else if (AttributeNames.COMMAND_GET_EDITING_ADVICE.equals(command)) {
+		    writer.print(onlineInstructions);
+		}
+	    } catch (IOException e) {
+		SubmitFilesPedagogicalPlannerAction.logger.error(e);
+	    }
+	    return null;
+	}
     }
 
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
@@ -89,7 +116,7 @@ public class SubmitFilesPedagogicalPlannerAction extends LamsDispatchAction {
 	} else {
 	    saveErrors(request, errors);
 	}
-	return mapping.findForward("success");
+	return mapping.findForward(SbmtConstants.SUCCESS);
     }
 
     private ISubmitFilesService getSubmitFilesService() {

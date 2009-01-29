@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -1071,9 +1072,31 @@ public class AuthoringAction extends Action {
 	ForumPedagogicalPlannerForm plannerForm = (ForumPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Forum forum = getForumManager().getForumByContentId(toolContentID);
-	plannerForm.fillForm(forum);
+	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
+	if (command == null) {
+	    plannerForm.fillForm(forum);
+	    return mapping.findForward("success");
+	} else {
+	    try {
+		String onlineInstructions = forum.getOnlineInstructions();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter writer = response.getWriter();
 
-	return mapping.findForward("success");
+		if (AttributeNames.COMMAND_CHECK_EDITING_ADVICE.equals(command)) {
+		    Integer activityIndex = WebUtil.readIntParam(request, AttributeNames.PARAM_ACTIVITY_INDEX);
+		    String responseText = (StringUtils.isEmpty(forum.getOnlineInstructions()) ? "NO" : "OK") + '&'
+			    + activityIndex;
+		    writer.print(responseText);
+
+		} else if (AttributeNames.COMMAND_GET_EDITING_ADVICE.equals(command)) {
+		    writer.print(onlineInstructions);
+		}
+	    } catch (IOException e) {
+		AuthoringAction.log.error(e);
+	    }
+	    return null;
+	}
+
     }
 
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,

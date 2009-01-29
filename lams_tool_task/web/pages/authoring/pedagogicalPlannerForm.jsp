@@ -43,7 +43,7 @@
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
 		<c:forEach var="itemIndex"  begin="1" end="${formBean.taskListItemCount}" >
-			<html:text styleClass="item" size="80" property="taskListItem[${itemIndex-1}]"></html:text>
+			<html:text styleClass="item" size="85" property="taskListItem[${itemIndex-1}]"></html:text>
 		</c:forEach>
 	</html:form>
 	<a class="button" href="javascript:createItem();"><fmt:message key="label.authoring.basic.add.task" /></a>

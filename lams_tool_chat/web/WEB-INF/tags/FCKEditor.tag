@@ -5,6 +5,7 @@
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
 <%@ attribute name="value" required="true" rtexprvalue="true"%>
 <%@ attribute name="toolbarSet" required="false" rtexprvalue="true"%>
+<%@ attribute name="height" required="false" rtexprvalue="true"%>
 <%@ attribute name="contentFolderID" required="false" rtexprvalue="true"%>
 
 <c:set var="language">
@@ -39,6 +40,7 @@
 -->
 
 <fck:editor id="${id}"
+	height="${height}"
 	basePath="${basePath}"
 	toolbarSet="${toolbarSet}"
 	imageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"

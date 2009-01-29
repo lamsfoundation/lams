@@ -13,7 +13,7 @@
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
-		<html:textarea property="content" style="margin: 2px 0px 0px 10px;" cols="62" rows="5" />
+		<html:textarea property="content" style="margin: 2px 0px 0px 10px;" cols="65" rows="6" />
 	</html:form>
 </body>
 </lams:html>

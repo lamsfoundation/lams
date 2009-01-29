@@ -187,9 +187,6 @@
 							<c:if test="${tab eq 'community'}">
 								<tiles:insert attribute="community" />
 							</c:if>
-							<c:if test="${tab eq 'planner'}">
-								<tiles:insert attribute="planner" />
-							</c:if>
 						</td>
 					</tr>
 				</tbody>

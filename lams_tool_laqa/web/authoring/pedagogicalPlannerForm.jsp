@@ -40,7 +40,7 @@
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
 		<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}" >
-			<html:textarea property="question[${questionIndex-1}]" cols="62" rows="4" />
+			<html:textarea property="question[${questionIndex-1}]" cols="65" rows="4" />
 		</c:forEach>
 	</html:form>
 	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.add.new.question" /></a>

@@ -9,9 +9,7 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="title.lams"/> :: <fmt:message key="planner.title" /></title>
-	<lams:css style="main" />
-	<link href="<lams:LAMSURL />css/pedagogicalPlanner.css" rel="stylesheet" type="text/css">
-	  
+
 	  <script type="text/javascript">
 	   var activityCount = ${fn:length(planner.activities)}; //How many activities are there in the sequence
 	   var activitySupportingPlannerCount = ${planner.activitySupportingPlannerCount}; //How many of activities support the planner (their data will be submitted)
@@ -26,7 +24,51 @@
 	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
 	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
 	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dimensions.pack.js"></script>
+	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cluetip.js"></script>
 	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/pedagogicalPlanner.js"></script>
+	  <script language="JavaScript" type="text/javascript">
+	  	$(document).ready(function() {
+	  		var activityCount = ${fn:length(planner.activities)};
+	  		for (var activityIndex = 1;activityIndex<=activityCount;activityIndex++){
+	  			var editingAdviceLink = $('#editingAdvice'+activityIndex);
+	  			if (editingAdviceLink.length > 0){
+	  				var checkEditingAdviceUrl = $(editingAdviceLink).attr("rel");
+	  				$.get(
+	  					checkEditingAdviceUrl,
+	  					function(responseText){
+	  						var responseParts = responseText.split("&");
+    						var activityInnerIndex = responseParts[1];
+    						var editingAdviceExists = responseParts[0]=="OK";
+	  						if (editingAdviceExists){
+	  							$('#editingAdvice'+activityInnerIndex).show().cluetip({
+	  								width: 480,
+									cluetipClass: 'jtip',
+									arrows: true,
+									dropShadow: false,
+						 			sticky: true,
+									waitImage: true,
+									closeText: '<fmt:message key="label.authoring.close" />',
+									closePosition: 'title',
+									attribute: 'href',
+									activation: 'click',
+									fx: {             
+                      					open: 'slideDown'
+    								}
+								});
+	  						}
+	  					},
+	  					"html"
+	  				);
+	  			}
+	  		}
+
+		});
+	  </script>
+	  
+	  <lams:css style="main" />
+	  <link href="<lams:LAMSURL />css/pedagogicalPlanner.css" rel="stylesheet" type="text/css">
+	  <link href="<lams:LAMSURL />css/jquery.cluetip.css" rel="stylesheet" type="text/css" />
 </lams:head>
 <body class="stripes">
 <div id="page">
@@ -74,24 +116,30 @@
 					<h4>${activity.title}</h4>
 				</td>
 				<td class="formCell">
-				<iframe frameborder="0" marginheight="0" marginwidth="0" name="activity${activityStatus.index+1}" id="activity${activityStatus.index+1}" class="toolFrame"
-					src="<lams:LAMSURL/>${activity.pedagogicalPlannerUrl}toolContentID=${activity.toolContentID}">
-				</iframe>
+					<iframe frameborder="0" marginheight="0" marginwidth="0" name="activity${activityStatus.index+1}" id="activity${activityStatus.index+1}" class="toolFrame"
+						src="<lams:LAMSURL/>${activity.pedagogicalPlannerUrl}">
+					</iframe>
+					<c:if test="${not empty activity.checkEditingAdviceUrl}">
+						<a href="<lams:LAMSURL/>${activity.editingAdviceUrl}" title=""
+							rel="<lams:LAMSURL/>${activity.checkEditingAdviceUrl}" 
+							class="editingAdvice"
+							id="editingAdvice${activityStatus.index+1}"><fmt:message key="label.planner.editing.advice" /></a>
+					</c:if>
 				</td>
 			</tr>
-			<c:if test="${not activityStatus.last}">
-				<tr>
-					<td class="titleCell">
+			<tr>
+				<td class="titleCell">
+					<c:if test="${not activityStatus.last}">
 						<img src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
-					</td>
-					<td>
-					</td>
-				</tr>
-			</c:if>
+					</c:if>
+				</td>
+				<td>
+				</td>
+			</tr>
 		</c:forEach>
 	</table>
 	
-	<div  id="pedagogicalPlannerErrorArea" style="display:none;" class="warning" >
+	<div id="pedagogicalPlannerErrorArea" style="display:none;" class="warning" >
 	</div>
 	
 	<div  id="pedagogicalPlannerInfoArea" style="display:none;" class="info" >

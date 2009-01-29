@@ -36,7 +36,7 @@ import org.apache.struts.action.ActionMessages;
  * @author Marcin Cieslak
  * 
  */
-public class PedagogicalPlannerForm extends ActionForm {
+public abstract class PedagogicalPlannerForm extends ActionForm {
     /**
      * Set when opening a Learning Design.
      */
@@ -50,10 +50,6 @@ public class PedagogicalPlannerForm extends ActionForm {
      * Set when submitting form in base.jsp page.
      */
     private Integer callID;
-    /**
-     * Should the form contain tooltip with online instructions?
-     */
-    private Boolean editingAdviceAvailable;
 
     public Long getToolContentID() {
 	return toolContentID;
@@ -102,13 +98,5 @@ public class PedagogicalPlannerForm extends ActionForm {
 
     public void setActivityOrderNumber(Integer activityOrderNumber) {
 	this.activityOrderNumber = activityOrderNumber;
-    }
-
-    public Boolean getEditingAdviceAvailable() {
-	return editingAdviceAvailable;
-    }
-
-    public void setEditingAdviceAvailable(Boolean editingAdviceAvailable) {
-	this.editingAdviceAvailable = editingAdviceAvailable;
     }
 }

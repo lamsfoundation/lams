@@ -25,10 +25,11 @@ package org.lamsfoundation.lams.authoring.dto;
 
 public class PedagogicalPlannerActivityDTO {
     private String pedagogicalPlannerUrl;
-    private Long toolContentID;
     private String toolIconUrl;
     private String title;
     private String type;
+    private String editingAdviceUrl;
+    private String checkEditingAdviceUrl;
 
     public String getPedagogicalPlannerUrl() {
 	return pedagogicalPlannerUrl;
@@ -38,19 +39,12 @@ public class PedagogicalPlannerActivityDTO {
 	pedagogicalPlannerUrl = toolSignature;
     }
 
-    public Long getToolContentID() {
-	return toolContentID;
-    }
-
-    public void setToolContentID(Long toolContentID) {
-	this.toolContentID = toolContentID;
-    }
-
-    public PedagogicalPlannerActivityDTO(Long toolContentID, String type, String title, String pedagogicalPlannerUrl,
-	    String toolIconUrl) {
+    public PedagogicalPlannerActivityDTO(String type, String title, String pedagogicalPlannerUrl, String toolIconUrl,
+	    String checkEditingAdviceUrl, String editingAdviceUrl) {
 	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
-	this.toolContentID = toolContentID;
 	this.toolIconUrl = toolIconUrl;
+	this.checkEditingAdviceUrl = checkEditingAdviceUrl;
+	this.editingAdviceUrl = editingAdviceUrl;
 	this.title = title;
 	this.type = type;
     }
@@ -77,5 +71,21 @@ public class PedagogicalPlannerActivityDTO {
 
     public void setType(String type) {
 	this.type = type;
+    }
+
+    public String getEditingAdviceUrl() {
+	return editingAdviceUrl;
+    }
+
+    public void setEditingAdviceUrl(String editingAdviceUrl) {
+	this.editingAdviceUrl = editingAdviceUrl;
+    }
+
+    public String getCheckEditingAdviceUrl() {
+	return checkEditingAdviceUrl;
+    }
+
+    public void setCheckEditingAdviceUrl(String checkEditingAdviceUrl) {
+	this.checkEditingAdviceUrl = checkEditingAdviceUrl;
     }
 }
