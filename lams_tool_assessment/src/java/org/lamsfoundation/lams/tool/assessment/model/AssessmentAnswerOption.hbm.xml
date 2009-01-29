@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswerOption"
+        table="tl_laasse10_answer_options"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-AssessmentAnswerOption.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="sequenceId"
+            type="int"
+            update="true"
+            insert="true"
+            column="sequence_id"
+        />
+
+        <property
+            name="question"
+            type="text"
+            update="true"
+            insert="true"
+            column="question"
+        />
+
+        <property
+            name="answerString"
+            type="text"
+            update="true"
+            insert="true"
+            column="answer_string"
+        />
+
+        <property
+            name="answerLong"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="answer_long"
+        />
+
+        <property
+            name="acceptedError"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="accepted_error"
+        />
+
+        <property
+            name="grade"
+            type="float"
+            update="true"
+            insert="true"
+            column="grade"
+        />
+
+        <property
+            name="feedback"
+            type="text"
+            update="true"
+            insert="true"
+            column="feedback"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-AssessmentAnswerOption.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>

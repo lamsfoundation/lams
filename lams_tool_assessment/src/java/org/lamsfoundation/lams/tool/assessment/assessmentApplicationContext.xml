@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.assessment.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+    <!-- Hibernate SessionFactory -->
+    <bean id="assessmentSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="toolDataSource"/></property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+
+        <!-- Must references all OR mapping files. -->
+        <property name="mappingResources">
+            <list>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentUser.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/Assessment.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestion.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentAnswerOption.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentOverallFeedback.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestionVisitLog.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentAttachment.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentSession.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- core beans -->
+    <bean id="assessmentDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="assessmentSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="assessmentQuestionDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="assessmentSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="assessmentQuestionVisitDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="assessmentSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="assessmentAttachmentDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentAttachmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="assessmentSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="assessmentUserDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="assessmentSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="assessmentSessionDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="assessmentSessionFactory"/>
+        </property>
+    </bean>
+
+
+    <!-- Managers -->
+	<bean id="assessmentToolContentHandler" class="org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="assessmentManagerTarget" class="org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl">
+        <property name="assessmentDao">
+            <ref local="assessmentDao"/>
+        </property>
+        <property name="assessmentQuestionDao">
+            <ref local="assessmentQuestionDao"/>
+        </property>
+        <property name="assessmentQuestionVisitDao">
+            <ref local="assessmentQuestionVisitDao"/>
+        </property>
+        <property name="assessmentAttachmentDao">
+            <ref local="assessmentAttachmentDao"/>
+        </property>
+        <property name="assessmentUserDao">
+            <ref local="assessmentUserDao"/>
+        </property>
+        <property name="assessmentSessionDao">
+            <ref local="assessmentSessionDao"/>
+        </property>
+        <property name="assessmentToolContentHandler">
+            <ref local="assessmentToolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="auditService">
+   			<ref bean="auditService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="messageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>   
+		<property name="lessonService">
+   			<ref bean="lessonService"/>
+   		</property>
+				
+    </bean>
+
+    <bean id="assessmentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="assessmentManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setQuestionComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setQuestionVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setQuestionAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+
