@@ -1014,6 +1014,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	updateDesignTransitions(designToImport, mainDesign, newActivities, uiidOffset);
 	mainDesign.setMaxID(LearningDesign.addOffset(designToImport.getMaxID(), uiidOffset));
 	mainDesign.setValidDesign(Boolean.FALSE);
+	mainDesign.setLastModifiedDateTime(new Date());
 	learningDesignDAO.update(mainDesign);
 
 	insertCompetenceMappings(mainDesign.getCompetences(), designToImport.getCompetences(), newActivities);
