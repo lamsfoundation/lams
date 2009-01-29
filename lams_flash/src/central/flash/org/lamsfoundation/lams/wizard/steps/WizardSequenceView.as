@@ -51,9 +51,12 @@ class org.lamsfoundation.lams.wizard.steps.WizardSequenceView extends AbstractVi
 	
 	private var location_treeview:Tree;
 	private var location_tb:MovieClip;
+	private var dateModified_lbl:Label;
 
 	private var _workspaceView:WorkspaceView;
 	private var _workspaceController:WorkspaceController;
+	
+    private var themeManager:ThemeManager;  //Theme manager
 	
 	//Defined so compiler can 'see' events added at runtime by EventDispatcher
     private var dispatchEvent:Function;     
@@ -65,12 +68,17 @@ class org.lamsfoundation.lams.wizard.steps.WizardSequenceView extends AbstractVi
 	}
 	
 	public function init(m:Observable,c:Controller) {
-		super(m, c)
+		super(m, c);
+		
+		 //set the reference to the StyleManager
+        themeManager = ThemeManager.getInstance();
+        dateModified_lbl.setStyle('styleName', themeManager.getStyleObject('label'));
 	}
 	
 	public function show(v:Boolean):Void {
 		location_treeview.visible = v;
 		location_tb._visible = false;
+		dateModified_lbl._visible = false;
 	}
 	
 	public function setupLocationTabs():Void{
@@ -165,7 +173,7 @@ class org.lamsfoundation.lams.wizard.steps.WizardSequenceView extends AbstractVi
 		
 		location_treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
 		location_treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
-		location_treeview.addEventListener("change", Delegate.create(_workspaceController, _workspaceController.onTreeNodeChange));
+		location_treeview.addEventListener("change", this);
 		
 		var wsNode:XMLNode = location_treeview.firstVisibleNode;
 		
@@ -226,6 +234,26 @@ class org.lamsfoundation.lams.wizard.steps.WizardSequenceView extends AbstractVi
 		refreshTree();
 	
 	}
+	
+	public function change(event:Object) {
+		var wm = WizardModel(_parent.getModel());
+		if (location_treeview == event.target) {
+			var node = location_treeview.selectedItem;
+		  
+			if(node.attributes.data.resourceType == wm.RT_LD) {
+				dateModified_lbl.text = Dictionary.getValue('wizard_wkspc_date_modified_lbl', [node.attributes.data.formattedLastModifiedDateTime]);
+				dateModified_lbl._visible = true;
+				
+			} else {
+				dateModified_lbl.text = "";
+				dateModified_lbl._visible = false;
+			}
+			
+		}
+		
+		_workspaceController.onTreeNodeChange(event);
+	}
+
 	
 	/**
 	 * Closes the folder node

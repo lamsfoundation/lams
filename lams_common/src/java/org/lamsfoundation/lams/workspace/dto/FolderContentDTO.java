@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.SortedSet;
 import java.util.Vector;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
@@ -45,6 +46,7 @@ public class FolderContentDTO {
 	public String description;
 	public Date creationDateTime;
 	public Date lastModifiedDateTime;
+	public String formattedLastModifiedDateTime;
 	public String resourceType;
 	public Long resourceID;
 	public Integer permissionCode;
@@ -78,6 +80,7 @@ public class FolderContentDTO {
 		this.description = design.getDescription();
 		this.creationDateTime = design.getCreateDateTime();
 		this.lastModifiedDateTime = design.getLastModifiedDateTime();
+		this.formattedLastModifiedDateTime = formatLastModifiedDateTime();
 		this.resourceType = DESIGN;
 		this.resourceID = design.getLearningDesignId();
 		this.permissionCode = permissionCode;
@@ -91,6 +94,7 @@ public class FolderContentDTO {
 		this.description = "Folder";
 		this.creationDateTime = workspaceFolder.getCreationDate();
 		this.lastModifiedDateTime = workspaceFolder.getLastModifiedDate();
+		this.formattedLastModifiedDateTime = formatLastModifiedDateTime();
 		this.resourceType = FOLDER;
 		this.resourceID = new Long(workspaceFolder.getWorkspaceFolderId().intValue());
 		this.permissionCode = permissionCode;
@@ -103,6 +107,7 @@ public class FolderContentDTO {
 		this.description = workspaceFolderContent.getDescription();
 		this.creationDateTime = workspaceFolderContent.getCreateDate();
 		this.lastModifiedDateTime = workspaceFolderContent.getLastModified();
+		this.formattedLastModifiedDateTime = formatLastModifiedDateTime();
 		this.resourceID = workspaceFolderContent.getFolderContentID();
 		this.permissionCode = permissionCode;		
 		if(workspaceFolderContent.getContentTypeID().equals(WorkspaceFolderContent.CONTENT_TYPE_FILE))
@@ -132,6 +137,12 @@ public class FolderContentDTO {
 	 */
 	public Date getLastModifiedDateTime() {
 		return lastModifiedDateTime!=null?lastModifiedDateTime:WDDXTAGS.DATE_NULL_VALUE;
+	}
+	/**
+	 * @return Returns the lastModifiedDateTime.
+	 */
+	public String getFormattedLastModifiedDateTime() {
+		return formattedLastModifiedDateTime!=null?formattedLastModifiedDateTime:WDDXTAGS.STRING_NULL_VALUE;
 	}
 	/**
 	 * @return Returns the name.
@@ -188,5 +199,14 @@ public class FolderContentDTO {
 
 	public void setReadOnly(Boolean readOnly) {
 		this.readOnly = readOnly;
+	}
+	
+	private String formatLastModifiedDateTime() {
+		if(this.lastModifiedDateTime != null) {
+			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+			return sdf.format(lastModifiedDateTime);
+		} else {
+			return null;
+		}
 	}
 }

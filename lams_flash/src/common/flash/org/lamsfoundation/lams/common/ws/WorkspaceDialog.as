@@ -76,6 +76,7 @@ class WorkspaceDialog extends MovieClip{
     private var licenseImg_pnl:MovieClip;
     private var viewLicense_btn:Button;
 	
+	private var dateModified_lbl:Label;
 	
 	
     private var fm:FocusManager;            //Reference to focus manager
@@ -115,6 +116,13 @@ class WorkspaceDialog extends MovieClip{
         //trace('WorkSpaceDialog.constructor');
         //Set up this class to use the Flash event delegation model
         EventDispatcher.initialize(this);
+
+        //set the reference to the StyleManager
+        themeManager = ThemeManager.getInstance();
+        
+		//TODO: Make setStyles more efficient
+		setStyles();
+		
         _resultDTO = new Object();
 		//this.tabEnabled = true
         //Create a clip that will wait a frame before dispatching init to give components time to setup
@@ -128,11 +136,7 @@ class WorkspaceDialog extends MovieClip{
         //Delete the enterframe dispatcher
         delete this.onEnterFrame;
 		//TODO: DC apply the themes here
-        
 
-        //set the reference to the StyleManager
-        themeManager = ThemeManager.getInstance();
-        
         //Set the container reference
         Debugger.log('container=' + _container,Debugger.GEN,'init','org.lamsfoundation.lams.WorkspaceDialog');
 
@@ -149,6 +153,7 @@ class WorkspaceDialog extends MovieClip{
 		
 		name_lbl.text = Dictionary.getValue('ws_dlg_filename');
         description_lbl.text = Dictionary.getValue('ws_dlg_description');
+		dateModified_lbl._visible = false;
 		
 		//Set the text for buttons
 		ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
@@ -162,9 +167,6 @@ class WorkspaceDialog extends MovieClip{
 		rename_btn.label = Dictionary.getValue('rename_btn');
 		//TODO: Dictionary calls for all the rest of the buttons
 		
-		//TODO: Make setStyles more efficient
-		setStyles();
-
         //get focus manager + set focus to OK button, focus manager is available to all components through getFocusManager
         fm = _container.getFocusManager();
         fm.enabled = true;
@@ -190,7 +192,7 @@ class WorkspaceDialog extends MovieClip{
         yCancelOffset = panel._height - cancel_btn._y;
         
         //Register as listener with StyleManager and set Styles
-        themeManager.addEventListener('themeChanged',this);
+        themeManager.addEventListener('themeChanged', this);
 
         treeview = location_dnd.getTree();
 		//Fire contentLoaded event, this is required by all dialogs so that creator of LFWindow can know content loaded
@@ -662,7 +664,18 @@ class WorkspaceDialog extends MovieClip{
     private function setStyles(){
         //Get label style and apply to label
 		var styleObj = themeManager.getStyleObject('label');
-        name_lbl.setStyle('styleName',styleObj);
+        name_lbl.setStyle('styleName', styleObj);
+		dateModified_lbl.setStyle('styleName', styleObj);
+		
+		styleObj = themeManager.getStyleObject('button');
+		new_btn.setStyle('styleName',styleObj);
+		copy_btn.setStyle('styleName',styleObj);
+		paste_btn.setStyle('styleName',styleObj);
+		delete_btn.setStyle('styleName',styleObj);
+		rename_btn.setStyle('styleName',styleObj);
+		
+		ok_btn.setStyle('styleName',styleObj);
+		cancel_btn.setStyle('styleName',styleObj);
 	}
 
     /**
@@ -1022,7 +1035,7 @@ class WorkspaceDialog extends MovieClip{
 		
 		treeview.addEventListener("nodeOpen", Delegate.create(_workspaceController, _workspaceController.onTreeNodeOpen));
 		treeview.addEventListener("nodeClose", Delegate.create(_workspaceController, _workspaceController.onTreeNodeClose));
-		treeview.addEventListener("change", Delegate.create(_workspaceController, _workspaceController.onTreeNodeChange));
+		treeview.addEventListener("change", this);
 		
 		location_dnd.addEventListener("drag_complete", Delegate.create(_workspaceController, _workspaceController.onDragComplete));
 		
@@ -1035,6 +1048,25 @@ class WorkspaceDialog extends MovieClip{
 		_workspaceController.forceNodeOpen(wsNode);
 		
     }
+	
+	public function change(event:Object) {
+		if (treeview == event.target) {
+			var node = treeview.selectedItem;
+		  
+			if(node.attributes.data.resourceType == _workspaceModel.RT_LD) {
+				dateModified_lbl.text = Dictionary.getValue('ws_dlg_date_modified_lbl', [node.attributes.data.formattedLastModifiedDateTime]);
+				dateModified_lbl._visible = true;
+			} else {
+				dateModified_lbl.text = "";
+				dateModified_lbl._visible = false;
+			}
+			
+		}
+		
+		_workspaceController.onTreeNodeChange(event);
+	}
+
+	
     
     /**
     * XML onLoad handler for treeview data
