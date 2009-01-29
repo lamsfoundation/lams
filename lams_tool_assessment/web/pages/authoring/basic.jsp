@@ -3,7 +3,7 @@
 <c:url var="newQuestionInitUrl" value='/authoring/newQuestionInit.do'>
 	<c:param name="sessionMapID" value="${formBean.sessionMapID}" />
 </c:url>	
-	
+
 <script lang="javascript">
 	//The panel of assessment list panel
 	var questionListTargetDiv = "#questionListArea";
@@ -105,7 +105,6 @@
 		<option selected="selected"><fmt:message key="label.authoring.basic.type.choice" /></option>
 		<option><fmt:message key="label.authoring.basic.type.multiple.choice" /></option>
 		<option><fmt:message key="label.authoring.basic.type.matching.pairs" /></option>
-		<option><fmt:message key="label.authoring.basic.type.fill.the.gap" /></option>
 		<option><fmt:message key="label.authoring.basic.type.short.answer" /></option>
 		<option><fmt:message key="label.authoring.basic.type.numerical" /></option>
 		<option><fmt:message key="label.authoring.basic.type.true.false" /></option>

@@ -230,9 +230,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	handler = getToolContentHandler();
 	for (Summary summary : list) {
 	    // for learning object, it just display "No offlice pakcage avaliable" information.
-	    if (summary.getQuestionType() == AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP
-		    || summary.getQuestionType() == AssessmentConstants.QUESTION_TYPE_CHOICE)
-		continue;
+//	    if (summary.getQuestionType() == AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP
+//		    || summary.getQuestionType() == AssessmentConstants.QUESTION_TYPE_CHOICE)
+//		continue;
 	    try {
 		int idx = 1;
 		String userName = summary.getUsername();

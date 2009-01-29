@@ -2,12 +2,12 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 <c:set var="listSize" value="${fn:length(optionList)}" />
 <div id="optionArea">
-	<form id="optionForm">
+	<form id="optionForm" name="optionForm">
 		<input type="hidden" name="optionCount" id="optionCount" value="${listSize}">
-
+	
 		<div class="field-name space-top">
 			<fmt:message key="label.authoring.basic.answer.options" />
-			<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="optionArea_Busy" />			
+			<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="optionArea_Busy" />	
 		</div>
 
 		<table class="alternative-color" cellspacing="0">
@@ -27,7 +27,7 @@
 								<td style="padding-left:0px; border-bottom:0px; background:none;">	
 									<input type="hidden" name="optionSequenceId${status.index}" id="optionSequenceId${status.index}" value="${option.sequenceId}">									
 									<input type="text" name="optionAnswer${status.index}"
-										id="optionAnswer${status.index}" size="57" value="${option.answerString}">
+										id="optionAnswer${status.index}" size="7" value="${option.answerString}">
 								</td>									
 								
 							</tr>
@@ -96,7 +96,7 @@
 						</table>
 					</td>
 					
-					<td width="40px" style="padding-left:0px; vertical-align:middle;">
+					<td width="40px" style="vertical-align:middle;">
 						<c:if test="${not status.first}">
 							<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
 								border="0" title="<fmt:message key="label.authoring.basic.up"/>"

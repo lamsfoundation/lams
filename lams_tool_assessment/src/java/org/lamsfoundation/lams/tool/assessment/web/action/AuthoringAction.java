@@ -683,13 +683,13 @@ public class AuthoringAction extends Action {
 	Set<AssessmentAnswerOption> optionList = getOptionsFromRequest(request, true);
 	
 	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
-	ActionErrors errors = validateAssessmentQuestion(questionForm, optionList);
+	ActionErrors errors = new ActionErrors();//validateAssessmentQuestion(questionForm, optionList);
 
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
-	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);	    
-	    return findForward(questionForm.getQuestionType(), mapping);
-	}
+//	if (!errors.isEmpty()) {
+//	    this.addErrors(request, errors);
+//	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);	    
+//	    return findForward(questionForm.getQuestionType(), mapping);
+//	}
 	
 	try {
 	    extractFormToAssessmentQuestion(request, questionForm, optionList);
@@ -1070,9 +1070,6 @@ public class AuthoringAction extends Action {
 	case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
 	    forward = mapping.findForward("matchingpairs");
 	    break;
-	case AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP:
-	    forward = mapping.findForward("fillthegap");
-	    break;
 	case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
 	    forward = mapping.findForward("shortanswer");
 	    break;
@@ -1188,42 +1185,42 @@ public class AuthoringAction extends Action {
 
     }
 
-    /**
-     * Vaidate assessment question regards to their type (url/file/learning object/website zip file)
-     * 
-     * @param questionForm
-     * @return
-     */
-    private ActionErrors validateAssessmentQuestion(AssessmentQuestionForm questionForm, Set<AssessmentAnswerOption> optionList) {
-	ActionErrors errors = new ActionErrors();
-	if (StringUtils.isBlank(questionForm.getTitle())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_QUESTION_NAME_BLANK));
-	}
-	if (StringUtils.isBlank(questionForm.getQuestion())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_QUESTION_TEXT_BLANK));
-	}
-	
-	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_CHOICE) {
-	    /* Checks if entered value is integer. */
-	    try {
-		Integer.parseInt(questionForm.getDefaultGrade());
-	    } catch (NumberFormatException nfe) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			AssessmentConstants.ERROR_MSG_DEFAULT_GRADE_WRONG_FORMAT));
-	    }
-	    try {
-		Float.parseFloat(questionForm.getPenaltyFactor());
-	    } catch (NumberFormatException nfe) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			AssessmentConstants.ERROR_MSG_PENALTY_FACTOR_WRONG_FORMAT));
-	    }
-	    
-	    if (optionList.size() < 2) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_NOT_ENOUGH_OPTIONS));
-	    }
-	}
-	return errors;
-    }
+//    /**
+//     * Vaidate assessment question regards to their type (url/file/learning object/website zip file)
+//     * 
+//     * @param questionForm
+//     * @return
+//     */
+//    private ActionErrors validateAssessmentQuestion(AssessmentQuestionForm questionForm, Set<AssessmentAnswerOption> optionList) {
+//	ActionErrors errors = new ActionErrors();
+//	if (StringUtils.isBlank(questionForm.getTitle())) {
+//	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_QUESTION_NAME_BLANK));
+//	}
+////	if (StringUtils.isBlank(questionForm.getQuestion())) {
+////	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_QUESTION_TEXT_BLANK));
+////	}
+//	
+//	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_CHOICE) {
+//	    /* Checks if entered value is integer. */
+//	    try {
+//		Integer.parseInt(questionForm.getDefaultGrade());
+//	    } catch (NumberFormatException nfe) {
+//		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+//			AssessmentConstants.ERROR_MSG_DEFAULT_GRADE_WRONG_FORMAT));
+//	    }
+//	    try {
+//		Float.parseFloat(questionForm.getPenaltyFactor());
+//	    } catch (NumberFormatException nfe) {
+//		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+//			AssessmentConstants.ERROR_MSG_PENALTY_FACTOR_WRONG_FORMAT));
+//	    }
+//	    
+//	    if (optionList.size() < 2) {
+//		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_NOT_ENOUGH_OPTIONS));
+//	    }
+//	}
+//	return errors;
+//    }
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.

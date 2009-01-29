@@ -42,16 +42,14 @@ public class AssessmentConstants {
     public static final short QUESTION_TYPE_MULTIPLE_CHOICE = 2;
 
     public static final short QUESTION_TYPE_MATCHING_PAIRS = 3;
-
-    public static final short QUESTION_TYPE_FILL_THE_GAP = 4;
     
-    public static final short QUESTION_TYPE_SHORT_ANSWER = 5;
+    public static final short QUESTION_TYPE_SHORT_ANSWER = 4;
 
-    public static final short QUESTION_TYPE_NUMERICAL = 6;
+    public static final short QUESTION_TYPE_NUMERICAL = 5;
 
-    public static final short QUESTION_TYPE_TRUE_FALSE = 7;
+    public static final short QUESTION_TYPE_TRUE_FALSE = 6;
 
-    public static final short QUESTION_TYPE_ESSAY = 8;
+    public static final short QUESTION_TYPE_ESSAY = 7;
 
     // for action forward name
     public static final String SUCCESS = "success";

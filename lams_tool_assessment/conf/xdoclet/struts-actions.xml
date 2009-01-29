@@ -84,7 +84,6 @@
 			<forward name="choice" path="/pages/authoring/parts/addchoice.jsp" />
 			<forward name="multiplechoice" path="/pages/authoring/parts/addmultiplechoice.jsp" />
 			<forward name="matchingpairs" path="/pages/authoring/parts/addmatchingpairs.jsp" />
-			<forward name="fillthegap" path="/pages/authoring/parts/addfillthegap.jsp" />
 			<forward name="shortanswer" path="/pages/authoring/parts/addshortanswer.jsp" />
 			<forward name="numerical" path="/pages/authoring/parts/addnumerical.jsp" />
 			<forward name="truefalse" path="/pages/authoring/parts/addtruefalse.jsp" />
@@ -99,7 +98,6 @@
 			<forward name="choice" path="/pages/authoring/parts/addchoice.jsp" />
 			<forward name="multiplechoice" path="/pages/authoring/parts/addmultiplechoice.jsp" />
 			<forward name="matchingpairs" path="/pages/authoring/parts/addmatchingpairs.jsp" />
-			<forward name="fillthegap" path="/pages/authoring/parts/addfillthegap.jsp" />
 			<forward name="shortanswer" path="/pages/authoring/parts/addshortanswer.jsp" />
 			<forward name="numerical" path="/pages/authoring/parts/addnumerical.jsp" />
 			<forward name="truefalse" path="/pages/authoring/parts/addtruefalse.jsp" />
@@ -114,7 +112,6 @@
 			<forward name="choice" path="/pages/authoring/parts/addchoice.jsp" />
 			<forward name="multiplechoice" path="/pages/authoring/parts/addmultiplechoice.jsp" />
 			<forward name="matchingpairs" path="/pages/authoring/parts/addmatchingpairs.jsp" />
-			<forward name="fillthegap" path="/pages/authoring/parts/addfillthegap.jsp" />
 			<forward name="shortanswer" path="/pages/authoring/parts/addshortanswer.jsp" />
 			<forward name="numerical" path="/pages/authoring/parts/addnumerical.jsp" />
 			<forward name="truefalse" path="/pages/authoring/parts/addtruefalse.jsp" />

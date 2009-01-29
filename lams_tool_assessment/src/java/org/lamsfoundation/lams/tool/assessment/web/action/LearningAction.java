@@ -595,9 +595,6 @@ public class LearningAction extends Action {
 	case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
 	    forward = mapping.findForward("website");
 	    break;
-	case AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP:
-	    forward = mapping.findForward("learningobject");
-	    break;
 	default:
 	    forward = null;
 	    break;
@@ -656,10 +653,10 @@ public class LearningAction extends Action {
 	// if(StringUtils.isBlank(questionForm.getDescription()))
 	// errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(AssessmentConstants.ERROR_MSG_DESC_BLANK));
 	// }
-	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS
-		|| questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP
-		|| questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-
+//	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS
+//		|| questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP
+//		|| questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+//
 //	    if (questionForm.getFile() != null && FileUtil.isExecutableFile(questionForm.getFile().getFileName())) {
 //		ActionMessage msg = new ActionMessage("error.attachment.executable");
 //		errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
@@ -673,7 +670,7 @@ public class LearningAction extends Action {
 //		    && (questionForm.getFile() == null || StringUtils.isEmpty(questionForm.getFile().getFileName()))) {
 //		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_FILE_BLANK));
 //	    }
-	}
+//	}
 	return errors;
     }
 
