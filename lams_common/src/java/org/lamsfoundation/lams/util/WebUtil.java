@@ -448,7 +448,7 @@ public class WebUtil {
      */
     public static InputStream getResponseInputStreamFromExternalServer(String urlStr, HashMap<String, String> params)
 	    throws Exception {
-	if (!urlStr.endsWith("?"))
+	if (!urlStr.contains("?"))
 	    urlStr += "?";
 
 	for (Entry<String, String> entry : params.entrySet()) {

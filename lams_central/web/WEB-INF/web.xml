@@ -18,7 +18,6 @@
 				classpath:/org/lamsfoundation/lams/web/webApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/integrationContext.xml
 				classpath:/org/lamsfoundation/lams/usermanagement/ldapContext.xml
-				classpath:/org/lamsfoundation/lams/dbupdates/autopatchContext.xml
 				<!--  Needed to communicate with the tools -->
 				classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
@@ -245,11 +244,6 @@
 
    </servlet>
    <servlet>
-      <servlet-name>XMPP</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.web.PresenceServlet</servlet-class>
-
-   </servlet>
-   <servlet>
       <servlet-name>BogoPogoServlet</servlet-name>
       <servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToJpgServlet</servlet-class>
 
@@ -457,10 +451,6 @@
    <servlet-mapping>
       <servlet-name>Connector</servlet-name>
       <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>XMPP</servlet-name>
-      <url-pattern>/XMPP</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>BogoPogoServlet</servlet-name>

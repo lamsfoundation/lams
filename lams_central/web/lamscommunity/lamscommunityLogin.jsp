@@ -42,7 +42,7 @@
 		<html:form action="/lamsCommunityLogin" method="post" styleId="lamsCommunityLogin">
 			
 			<html:hidden property="dispatch" value="authenticate" />
-			
+			<html:hidden property="lcDest" />
 			<p>
 				<fmt:message key="label.lamscommunity.login"/>&nbsp;<html:text property="lcUserName" tabindex="1"></html:text>
 			</p>

@@ -24,11 +24,19 @@
 package org.lamsfoundation.lams.web.lamscommunity;
 
 import java.net.URLEncoder;
+import java.util.Date;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpSession;
+
+import org.lamsfoundation.lams.config.Registration;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -39,8 +47,6 @@ public class LamsCommunityUtil {
     public static final String LAMS_COMMUNITY_URL = "http://lamscommunity.org";
     public static final String LAMS_COMMUNITY_SSO_URL = "http://lamscommunity.org/lams/x/sso";
     public static final String LAMS_COMMUNITY_AUTH_URL = "http://lamscommunity.org/lams/x/auth";
-
-    
     
     public static final String PARAM_HASH = "hs";
     public static final String PARAM_SERVER_ID = "sid";
@@ -48,7 +54,8 @@ public class LamsCommunityUtil {
     public static final String PARAM_LC_USERNAME = "un";
     public static final String PARAM_LC_PASSWORD = "ps";
     public static final String PARAM_LC_USER_TOKEN = "tk";
-    
+    public static final String PARAM_DEST = "dest";
+    public static final String PARAM_RETURN_URL = "returnURL";
 
     public static String createAuthenticationHash(String timestamp, String username, String password, String serverId, String serverKey) {
 	String hash = "";
@@ -93,6 +100,41 @@ public class LamsCommunityUtil {
 	byte[] results = cipher.doFinal(text.getBytes("UTF-8"));
 	BASE64Encoder encoder = new BASE64Encoder();
 	return encoder.encode(results);
+    }
+    
+    
+    /**
+     * Appends the required authentication info and hash to a url
+     * @param url
+     * @return
+     * @throws Exception
+     */
+    public static String appendAuthInfoToURL(String url) throws Exception
+    {
+	Registration reg = Configuration.getRegistration();
+	String serverID;
+	String serverKey;
+	if(reg != null && reg.getServerID() != null && reg.getServerKey() != null) 
+	{
+	    serverID = reg.getServerID();
+	    serverKey = reg.getServerKey();
+	}
+	else
+	{
+	    throw new Exception("Attempt to authenticate in lams community without registration");
+	}
+	
+	UserDTO userDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	String timestamp = "" + new Date().getTime();
+	String hash = LamsCommunityUtil.createAuthenticationHash(timestamp, userDTO.getLamsCommunityUsername(), userDTO.getLamsCommunityToken(), serverID, serverKey);
+
+	url += "&" + LamsCommunityUtil.PARAM_LC_USERNAME + "=" + URLEncoder.encode(userDTO.getLamsCommunityUsername(), "UTF8");
+	url += "&" + LamsCommunityUtil.PARAM_HASH + "=" + hash;
+	url += "&" + LamsCommunityUtil.PARAM_SERVER_ID + "=" + serverID;
+	url += "&" + LamsCommunityUtil.PARAM_TIMESTAMP + "=" + timestamp;
+	
+	return url;
+	
     }
     
     
