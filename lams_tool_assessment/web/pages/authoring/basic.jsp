@@ -102,8 +102,7 @@
 <!-- Dropdown menu for choosing a question type -->
 <p>
 	<select id="questionType" style="float: left">
-		<option selected="selected"><fmt:message key="label.authoring.basic.type.choice" /></option>
-		<option><fmt:message key="label.authoring.basic.type.multiple.choice" /></option>
+		<option selected="selected"><fmt:message key="label.authoring.basic.type.multiple.choice" /></option>
 		<option><fmt:message key="label.authoring.basic.type.matching.pairs" /></option>
 		<option><fmt:message key="label.authoring.basic.type.short.answer" /></option>
 		<option><fmt:message key="label.authoring.basic.type.numerical" /></option>

@@ -37,19 +37,17 @@ public class AssessmentConstants {
     public static final int INITIAL_OVERALL_FEEDBACK_NUMBER = 3;
 
     // question type;
-    public static final short QUESTION_TYPE_CHOICE = 1;
+    public static final short QUESTION_TYPE_MULTIPLE_CHOICE = 1;
 
-    public static final short QUESTION_TYPE_MULTIPLE_CHOICE = 2;
-
-    public static final short QUESTION_TYPE_MATCHING_PAIRS = 3;
+    public static final short QUESTION_TYPE_MATCHING_PAIRS = 2;
     
-    public static final short QUESTION_TYPE_SHORT_ANSWER = 4;
+    public static final short QUESTION_TYPE_SHORT_ANSWER = 3;
 
-    public static final short QUESTION_TYPE_NUMERICAL = 5;
+    public static final short QUESTION_TYPE_NUMERICAL = 4;
 
-    public static final short QUESTION_TYPE_TRUE_FALSE = 6;
+    public static final short QUESTION_TYPE_TRUE_FALSE = 5;
 
-    public static final short QUESTION_TYPE_ESSAY = 7;
+    public static final short QUESTION_TYPE_ESSAY = 6;
 
     // for action forward name
     public static final String SUCCESS = "success";
@@ -95,6 +93,8 @@ public class AssessmentConstants {
     public static final String ATTR_OPTION_FEEDBACK_PREFIX = "optionFeedback";
     
     public static final String ATTR_OPTION_SEQUENCE_ID_PREFIX = "optionSequenceId";
+    
+    public static final String ATTR_OPTION_QUESTION_PREFIX = "optionQuestion";
     
     public static final String ATTR_QUESTION_TYPE = "questionType";
 

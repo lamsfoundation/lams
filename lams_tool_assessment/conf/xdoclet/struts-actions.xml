@@ -81,7 +81,6 @@
 			scope="request" 
 			validate="false"			
 			parameter="newQuestionInit">
-			<forward name="choice" path="/pages/authoring/parts/addchoice.jsp" />
 			<forward name="multiplechoice" path="/pages/authoring/parts/addmultiplechoice.jsp" />
 			<forward name="matchingpairs" path="/pages/authoring/parts/addmatchingpairs.jsp" />
 			<forward name="shortanswer" path="/pages/authoring/parts/addshortanswer.jsp" />
@@ -95,7 +94,6 @@
 			scope="request" 
 			parameter="editQuestion" 
 			validate="false">
-			<forward name="choice" path="/pages/authoring/parts/addchoice.jsp" />
 			<forward name="multiplechoice" path="/pages/authoring/parts/addmultiplechoice.jsp" />
 			<forward name="matchingpairs" path="/pages/authoring/parts/addmatchingpairs.jsp" />
 			<forward name="shortanswer" path="/pages/authoring/parts/addshortanswer.jsp" />
@@ -109,13 +107,6 @@
 			name="assessmentQuestionForm" 
 			scope="request" 
 			validate="false">
-			<forward name="choice" path="/pages/authoring/parts/addchoice.jsp" />
-			<forward name="multiplechoice" path="/pages/authoring/parts/addmultiplechoice.jsp" />
-			<forward name="matchingpairs" path="/pages/authoring/parts/addmatchingpairs.jsp" />
-			<forward name="shortanswer" path="/pages/authoring/parts/addshortanswer.jsp" />
-			<forward name="numerical" path="/pages/authoring/parts/addnumerical.jsp" />
-			<forward name="truefalse" path="/pages/authoring/parts/addtruefalse.jsp" />
-			<forward name="essay" path="/pages/authoring/parts/addessay.jsp" />			
 			<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
 		</action>
 		<action path="/authoring/removeQuestion"

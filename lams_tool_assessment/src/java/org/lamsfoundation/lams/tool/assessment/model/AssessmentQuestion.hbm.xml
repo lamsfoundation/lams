@@ -83,6 +83,22 @@
         />
 
         <property
+            name="feedback"
+            type="text"
+            update="true"
+            insert="true"
+            column="feedback"
+        />
+
+        <property
+            name="multipleAnswersAllowed"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="multiple_answers_allowed"
+        />
+
+        <property
             name="feedbackOnCorrect"
             type="text"
             update="true"

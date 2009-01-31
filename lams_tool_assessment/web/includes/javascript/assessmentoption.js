@@ -11,6 +11,7 @@
 		$(optionTargetDiv).load(
 			url,
 			{
+				questionType: questionType,
 				optionList: optionList 
 			}
 		);
@@ -21,6 +22,7 @@
 		$(optionTargetDiv).load(
 				url,
 				{
+					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
 				}
@@ -32,6 +34,7 @@
 		$(optionTargetDiv).load(
 				url,
 				{
+					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
 				}
@@ -43,6 +46,7 @@
 		$(optionTargetDiv).load(
 				url,
 				{
+					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
 				}

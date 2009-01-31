@@ -48,6 +48,8 @@ public class AssessmentQuestionForm extends ActionForm {
     private String defaultGrade;
     private String penaltyFactor;
     private String generalFeedback;
+    private String feedback;
+    private boolean multipleAnswersAllowed;
     private String feedbackOnCorrect;
     private String feedbackOnPartiallyCorrect;
     private String feedbackOnIncorrect;
@@ -132,6 +134,22 @@ public class AssessmentQuestionForm extends ActionForm {
 
     public void setGeneralFeedback(String generalFeedback) {
 	this.generalFeedback = generalFeedback;
+    }
+    
+    public String getFeedback() {
+	return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+	this.feedback = feedback;
+    }
+    
+    public boolean isMultipleAnswersAllowed() {
+	return multipleAnswersAllowed;
+    }
+
+    public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
+	this.multipleAnswersAllowed = multipleAnswersAllowed;
     }
 
     public String getFeedbackOnCorrect() {

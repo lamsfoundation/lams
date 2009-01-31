@@ -52,6 +52,8 @@ create table tl_laasse10_assessment_question (
    default_grade integer DEFAULT 1,
    penalty_factor float DEFAULT 0.1,
    general_feedback text,
+   feedback text,
+   multiple_answers_allowed tinyint DEFAULT 0,
    feedback_on_correct text,
    feedback_on_partially_correct text,
    feedback_on_incorrect text,

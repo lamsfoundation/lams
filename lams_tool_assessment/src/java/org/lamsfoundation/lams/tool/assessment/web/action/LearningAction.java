@@ -388,7 +388,7 @@ public class LearningAction extends Action {
 //		LearningAction.log.error("Failed upload Assessment File " + e.toString());
 //		return mapping.findForward(AssessmentConstants.ERROR);
 //	    }
-	} else if (type == AssessmentConstants.QUESTION_TYPE_CHOICE) {
+//	} else if (type == AssessmentConstants.QUESTION_TYPE_CHOICE) {
 //	    question.setUrl(questionForm.getUrl());
 //	    question.setOpenUrlNewWindow(questionForm.isOpenUrlNewWindow());
 	}
@@ -586,9 +586,6 @@ public class LearningAction extends Action {
     private ActionForward findForward(short type, ActionMapping mapping) {
 	ActionForward forward;
 	switch (type) {
-	case AssessmentConstants.QUESTION_TYPE_CHOICE:
-	    forward = mapping.findForward("url");
-	    break;
 	case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
 	    forward = mapping.findForward("file");
 	    break;
@@ -637,7 +634,7 @@ public class LearningAction extends Action {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_QUESTION_NAME_BLANK));
 	}
 
-	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_CHOICE) {
+	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 //	    if (StringUtils.isBlank(questionForm.getUrl())) {
 //		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_URL_BLANK));
 //		// URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://address:port

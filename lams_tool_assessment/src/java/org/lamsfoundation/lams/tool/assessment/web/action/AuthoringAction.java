@@ -630,6 +630,7 @@ public class AuthoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 
 	short type = (short) NumberUtils.stringToInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, type);
 	return findForward(type, mapping);
     }
     
@@ -661,6 +662,7 @@ public class AuthoringAction extends Action {
 		questionForm.setContentFolderID((String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	    }
 	}
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, question.getType());
 	return findForward(question == null ? -1 : question.getType(), mapping);
     }
 
@@ -679,32 +681,12 @@ public class AuthoringAction extends Action {
      */
     private ActionForward saveOrUpdateQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	// get instructions:
-	Set<AssessmentAnswerOption> optionList = getOptionsFromRequest(request, true);
 	
 	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
-	ActionErrors errors = new ActionErrors();//validateAssessmentQuestion(questionForm, optionList);
+	extractFormToAssessmentQuestion(request, questionForm);
 
-//	if (!errors.isEmpty()) {
-//	    this.addErrors(request, errors);
-//	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);	    
-//	    return findForward(questionForm.getQuestionType(), mapping);
-//	}
-	
-	try {
-	    extractFormToAssessmentQuestion(request, questionForm, optionList);
-	} catch (Exception e) {
-	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_UPLOAD_FAILED, e
-		    .getMessage()));
-	    if (!errors.isEmpty()) {
-		this.addErrors(request, errors);
-		return findForward(questionForm.getQuestionType(), mapping);
-	    }
-	}
 	// set session map ID so that questionlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, questionForm.getSessionMapID());
-	// return null to close this window
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
@@ -820,6 +802,8 @@ public class AuthoringAction extends Action {
 	option.setGrade(0);
 	optionList.add(option);
 	
+	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE, WebUtil.readIntParam(request,
+		AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
@@ -847,6 +831,8 @@ public class AuthoringAction extends Action {
 //	    delList.add(question);    
 	}
 
+	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE, WebUtil.readIntParam(request,
+		AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
@@ -904,6 +890,8 @@ public class AuthoringAction extends Action {
 	    optionList.addAll(rList);
 	}
 
+	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE, WebUtil.readIntParam(request,
+		AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
@@ -1061,9 +1049,6 @@ public class AuthoringAction extends Action {
     private ActionForward findForward(short type, ActionMapping mapping) {
 	ActionForward forward;
 	switch (type) {
-	case AssessmentConstants.QUESTION_TYPE_CHOICE:
-	    forward = mapping.findForward("choice");
-	    break;
 	case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
 	    forward = mapping.findForward("multiplechoice");
 	    break;
@@ -1104,6 +1089,8 @@ public class AuthoringAction extends Action {
 	form.setDefaultGrade(String.valueOf(question.getDefaultGrade()));
 	form.setPenaltyFactor(String.valueOf(question.getPenaltyFactor()));
 	form.setGeneralFeedback(question.getGeneralFeedback());
+	form.setFeedback(question.getFeedback());
+	form.setMultipleAnswersAllowed(question.isMultipleAnswersAllowed());
 	form.setFeedbackOnCorrect(question.getFeedbackOnCorrect());
 	form.setFeedbackOnPartiallyCorrect(question.getFeedbackOnPartiallyCorrect());
 	form.setFeedbackOnIncorrect(question.getFeedbackOnIncorrect());
@@ -1114,7 +1101,8 @@ public class AuthoringAction extends Action {
 	}
 	
 	short questionType = question.getType();
-	if (questionType == AssessmentConstants.QUESTION_TYPE_CHOICE) {
+	if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) ||
+		(questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)) {
 	    Set<AssessmentAnswerOption> optionList = question.getAnswerOptions();
 	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	}
@@ -1128,7 +1116,7 @@ public class AuthoringAction extends Action {
      * @param questionForm
      * @throws AssessmentApplicationException
      */
-    private void extractFormToAssessmentQuestion(HttpServletRequest request, AssessmentQuestionForm questionForm, Set<AssessmentAnswerOption> optionList) throws Exception {
+    private void extractFormToAssessmentQuestion(HttpServletRequest request, AssessmentQuestionForm questionForm) {
 	/*
 	 * BE CAREFUL: This method will copy nessary info from request form to an old or new AssessmentQuestion instance. It
 	 * gets all info EXCEPT AssessmentQuestion.createDate and AssessmentQuestion.createBy, which need be set when persisting
@@ -1163,17 +1151,18 @@ public class AuthoringAction extends Action {
 	question.setHide(false);
 	
 	question.setDefaultGrade(Integer.parseInt(questionForm.getDefaultGrade()));
-	question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	question.setGeneralFeedback(questionForm.getGeneralFeedback());
-
-	if ((type == AssessmentConstants.QUESTION_TYPE_CHOICE)
-		|| (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)) {
+	
+	if ((type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)) {
+	    question.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
+	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setShuffle(questionForm.isShuffle());
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
 	    question.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 
-	    // set instructions
+	    // set options
+	    Set<AssessmentAnswerOption> optionList = getOptionsFromRequest(request, true);
 	    Set options = new LinkedHashSet();
 	    int seqId = 0;
 	    for (AssessmentAnswerOption option : optionList) {
@@ -1181,46 +1170,24 @@ public class AuthoringAction extends Action {
 		options.add(option);
 	    }
 	    question.setAnswerOptions(options);
+	} else if ((type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)) {
+	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    question.setShuffle(questionForm.isShuffle());
+
+	    // set options
+	    Set<AssessmentAnswerOption> matchingPairsList = getOptionsFromRequest(request, true);
+	    Set matchingPairs = new LinkedHashSet();
+	    int seqId = 0;
+	    for (AssessmentAnswerOption matchingPair : matchingPairsList) {
+		matchingPair.setSequenceId(seqId++);
+		matchingPairs.add(matchingPair);
+	    }
+	    question.setAnswerOptions(matchingPairs);
+	}else if ((type == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
+	    question.setFeedback(questionForm.getFeedback());
 	}
 
     }
-
-//    /**
-//     * Vaidate assessment question regards to their type (url/file/learning object/website zip file)
-//     * 
-//     * @param questionForm
-//     * @return
-//     */
-//    private ActionErrors validateAssessmentQuestion(AssessmentQuestionForm questionForm, Set<AssessmentAnswerOption> optionList) {
-//	ActionErrors errors = new ActionErrors();
-//	if (StringUtils.isBlank(questionForm.getTitle())) {
-//	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_QUESTION_NAME_BLANK));
-//	}
-////	if (StringUtils.isBlank(questionForm.getQuestion())) {
-////	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_QUESTION_TEXT_BLANK));
-////	}
-//	
-//	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_CHOICE) {
-//	    /* Checks if entered value is integer. */
-//	    try {
-//		Integer.parseInt(questionForm.getDefaultGrade());
-//	    } catch (NumberFormatException nfe) {
-//		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-//			AssessmentConstants.ERROR_MSG_DEFAULT_GRADE_WRONG_FORMAT));
-//	    }
-//	    try {
-//		Float.parseFloat(questionForm.getPenaltyFactor());
-//	    } catch (NumberFormatException nfe) {
-//		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-//			AssessmentConstants.ERROR_MSG_PENALTY_FACTOR_WRONG_FORMAT));
-//	    }
-//	    
-//	    if (optionList.size() < 2) {
-//		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_NOT_ENOUGH_OPTIONS));
-//	    }
-//	}
-//	return errors;
-//    }
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
@@ -1246,38 +1213,41 @@ public class AuthoringAction extends Action {
      * 
      */
     private TreeSet<AssessmentAnswerOption> getOptionsFromRequest(HttpServletRequest request, boolean skipBlankOptions) {
-	String list = request.getParameter(AssessmentConstants.ATTR_OPTION_LIST);
-	String[] params = list.split("&");
-	Map<String, String> paramMap = new HashMap<String, String>();
-	String[] pair;
-	for (String item : params) {
-	    pair = item.split("=");
-	    if (pair == null || pair.length != 2)
-		continue;
-	    try {
-		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
-	    } catch (UnsupportedEncodingException e) {
-		log.error("Error occurs when decode instruction string:" + e.toString());
-	    }request.getParameter("optionAnswer1");
-	}
+	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OPTION_LIST);
 
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
+	int questionType = WebUtil.readIntParam(request,AssessmentConstants.ATTR_QUESTION_TYPE);
 	TreeSet<AssessmentAnswerOption> optionList = new TreeSet<AssessmentAnswerOption>(new AssessmentAnswerOptionComparator());
 	for (int i = 0; i < count; i++) {
-	    String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
-	    float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
-	    String feedback = paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i);
-	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-	    
-	    if ((answerString == null) && skipBlankOptions){
-		continue;
+	    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
+		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
+		String feedback = paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i);
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
+
+		if ((answerString == null) && skipBlankOptions) {
+		    continue;
+		}
+		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
+		option.setAnswerString(answerString);
+		option.setGrade(grade);
+		option.setFeedback(feedback);
+		optionList.add(option);
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
+		String question = paramMap.get(AssessmentConstants.ATTR_OPTION_QUESTION_PREFIX + i);
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
+
+		if ((question == null) && skipBlankOptions) {
+		    continue;
+		}
+		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
+		option.setAnswerString(answerString);
+		option.setQuestion(question);
+		optionList.add(option);
 	    }
-	    AssessmentAnswerOption option = new AssessmentAnswerOption();
-	    option.setSequenceId(NumberUtils.stringToInt(sequenceId));
-	    option.setAnswerString(answerString);
-	    option.setGrade(grade);
-	    option.setFeedback(feedback);
-	    optionList.add(option);
 	}
 	return optionList;
     }
@@ -1319,22 +1289,7 @@ public class AuthoringAction extends Action {
      * @param request
      */
     private TreeSet<AssessmentOverallFeedback> getOverallFeedbacksFromForm(HttpServletRequest request, boolean skipBlankOverallFeedbacks) {
-	String list = request.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST);
-	String[] params = list.split("&");
-	Map<String, String> paramMap = new HashMap<String, String>();
-	String[] pair;
-	for (String item : params) {
-	    pair = item.split("=");
-	    if (pair == null || pair.length != 2)
-		continue;
-	    try {
-		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
-	    } catch (UnsupportedEncodingException e) {
-		log.error("Error occurs when decode instruction string:" + e.toString());
-	    }request.getParameter("optionAnswer1");
-	}
-	
-	
+	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST);
 	
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
@@ -1360,6 +1315,31 @@ public class AuthoringAction extends Action {
 	}
 	return overallFeedbackList;
     }
+    
+    /**
+     * Split Request Parameter from <code>HttpRequest</code>
+     * 
+     * @param request
+     * @param parameterName parameterName
+     */
+    private Map<String, String> splitRequestParameter(HttpServletRequest request, String parameterName) {
+	String list = request.getParameter(parameterName);
+	String[] params = list.split("&");
+	Map<String, String> paramMap = new HashMap<String, String>();
+	String[] pair;
+	for (String item : params) {
+	    pair = item.split("=");
+	    if (pair == null || pair.length != 2)
+		continue;
+	    try {
+		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
+	    } catch (UnsupportedEncodingException e) {
+		log.error("Error occurs when decode instruction string:" + e.toString());
+	    }
+	}
+	return paramMap;
+    }
+
 
     private ActionMessages validate(AssessmentForm assessmentForm, ActionMapping mapping, HttpServletRequest request) {
 	ActionMessages errors = new ActionMessages();

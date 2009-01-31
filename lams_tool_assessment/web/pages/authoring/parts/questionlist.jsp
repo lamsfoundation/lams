@@ -24,27 +24,21 @@
 					<span class="field-name">
 						<c:choose>
 							<c:when test="${question.type == 1}">
-								<fmt:message key="label.authoring.basic.type.choice" />
-							</c:when>		
-							<c:when test="${question.type == 2}">
 								<fmt:message key="label.authoring.basic.type.multiple.choice" />
 							</c:when>
-							<c:when test="${question.type == 3}">
+							<c:when test="${question.type == 2}">
 								<fmt:message key="label.authoring.basic.type.matching.pairs" />
 							</c:when>
-							<c:when test="${question.type == 4}">
-								<fmt:message key="label.authoring.basic.type.fill.the.gap" />
-							</c:when>
-							<c:when test="${question.type == 5}">
+							<c:when test="${question.type == 3}">
 								<fmt:message key="label.authoring.basic.type.short.answer" />
 							</c:when>
-							<c:when test="${question.type == 6}">
+							<c:when test="${question.type == 4}">
 								<fmt:message key="label.authoring.basic.type.numerical" />
 							</c:when>
-							<c:when test="${question.type == 7}">
+							<c:when test="${question.type == 5}">
 								<fmt:message key="label.authoring.basic.type.true.false" />
 							</c:when>
-							<c:when test="${question.type == 8}">
+							<c:when test="${question.type == 6}">
 								<fmt:message key="label.authoring.basic.type.essay" />
 							</c:when>
 						</c:choose>

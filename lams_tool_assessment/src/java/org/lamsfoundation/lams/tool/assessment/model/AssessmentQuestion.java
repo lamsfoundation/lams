@@ -57,6 +57,10 @@ public class AssessmentQuestion implements Cloneable {
     
     private String generalFeedback;
     
+    private String feedback;
+    
+    private boolean multipleAnswersAllowed;
+    
     private String feedbackOnCorrect;
     
     private String feedbackOnPartiallyCorrect;
@@ -241,6 +245,30 @@ public class AssessmentQuestion implements Cloneable {
 
     public void setGeneralFeedback(String generalFeedback) {
 	this.generalFeedback = generalFeedback;
+    }
+    
+    /**
+     * @hibernate.property column="feedback" type="text"
+     * @return
+     */
+    public String getFeedback() {
+	return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+	this.feedback = feedback;
+    }
+    
+    /**
+     * @hibernate.property column="multiple_answers_allowed"
+     * @return
+     */
+    public boolean isMultipleAnswersAllowed() {
+	return multipleAnswersAllowed;
+    }
+
+    public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
+	this.multipleAnswersAllowed = multipleAnswersAllowed;
     }
 
     /**
