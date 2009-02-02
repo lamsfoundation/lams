@@ -122,6 +122,79 @@
 </foreign-key-list>
 <index-list/>
 </table>
+<table alias="" name="tl_lafrum11_timestamp" remarks="" uid="1b66b0a:11f3509a39d:-7ff3">
+<table-description/>
+<table-figure-bounds height="85" width="167" x="821" y="156"/>
+<column-list>
+<column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="1b66b0a:11f3509a39d:-7fef">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="message_uid" remarks="" uid="1b66b0a:11f3509a39d:-7fec">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="forum_user_id" remarks="" uid="1b66b0a:11f3509a39d:-7fe9">
+<column-description/>
+<data-type jdbc-type="-5" name="BIGINT" selected-variant-pattern="BIGINT(%n)">
+<variant type-name-pattern="BIGINT"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n)"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) UNSIGNED ZEROFILL"/>
+<variant precision-max="19" precision-min="0" precision-variable="%n" type-name-pattern="BIGINT(%n) ZEROFILL"/>
+<variant type-name-pattern="BIGINT UNSIGNED"/>
+<variant type-name-pattern="BIGINT UNSIGNED ZEROFILL"/>
+<variant type-name-pattern="BIGINT ZEROFILL"/>
+</data-type>
+</column>
+<column alias="" auto-increment="false" column-size="0" decimal-digits="0" default-value="" mandatory="true" name="timestamp_date" remarks="" uid="1b66b0a:11f3509a39d:-7fe4">
+<column-description/>
+<data-type jdbc-type="93" literal-prefix="'" literal-suffix="'" name="DATETIME" selected-variant-pattern="DATETIME">
+<variant type-name-pattern="DATETIME"/>
+</data-type>
+</column>
+</column-list>
+<primary-key alias="" name="PK_TL_LAFRUM11_TIMESTAMP" remarks="" uid="1b66b0a:11f3509a39d:-7ff2">
+<primary-key-description/>
+<primary-key-column name="uid"/>
+</primary-key>
+<unique-key-list/>
+<foreign-key-list>
+<foreign-key alias="" name="FK_tl_lafrum11_timestamp_1" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_lafrum11_message" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="1b66b0a:11f3509a39d:-7fbb">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="uid" referenced-key-column-name="uid"/>
+</foreign-key>
+<foreign-key alias="" name="FK_tl_lafrum11_timestamp_2" on-delete="" on-update="" referenced-key="PRIMARY" referenced-table="tl_lafrum11_forum_user" referenced-table-schema="DEFAULT_SCHEMA" remarks="" source-entity-role="" source-multiplicity="0..*" source-relationship-type="" target-entity-role="" target-multiplicity="1" target-relationship-type="" uid="1b66b0a:11f3509a39d:-7f4d">
+<foreign-key-description/>
+<foreign-key-figure>
+<fk-fig-bendpoint-list/>
+</foreign-key-figure>
+<foreign-key-column column-name="uid" referenced-key-column-name="uid"/>
+</foreign-key>
+</foreign-key-list>
+<index-list/>
+</table>
 </table-list>
 </schema>
 <schema alias="" name="DEFAULT_SCHEMA" remarks="" uid="3c59d3:1182f36109d:-7ffe">
@@ -458,7 +531,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum_user" remarks="" uid="3c59d3:1182f36109d:-7fdc">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="366" y="175"/>
+<table-figure-bounds height="-1" width="-1" x="622" y="282"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7fda">
 <column-description/>
@@ -817,7 +890,7 @@
 </table>
 <table alias="" name="tl_lafrum11_message_seq" remarks="" uid="3c59d3:1182f36109d:-7fba">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="767" y="282"/>
+<table-figure-bounds height="-1" width="-1" x="730" y="717"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7fb8">
 <column-description/>
@@ -910,7 +983,7 @@
 </table>
 <table alias="" name="tl_lafrum11_report" remarks="" uid="3c59d3:1182f36109d:-7fb1">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="754" y="593"/>
+<table-figure-bounds height="-1" width="-1" x="936" y="585"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7faf">
 <column-description/>
@@ -966,7 +1039,7 @@
 </table>
 <table alias="" name="tl_lafrum11_tool_session" remarks="" uid="3c59d3:1182f36109d:-7faa">
 <table-description/>
-<table-figure-bounds height="136" width="182" x="650" y="9"/>
+<table-figure-bounds height="136" width="182" x="354" y="40"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7fa8">
 <column-description/>
