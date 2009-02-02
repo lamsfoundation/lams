@@ -89,6 +89,8 @@ import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeqDao;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
+import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
+import org.lamsfoundation.lams.tool.forum.persistence.TimestampDao;
 import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
@@ -118,6 +120,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private AttachmentDao attachmentDao;
 
     private MessageDao messageDao;
+    
+    private TimestampDao timestampDao;
 
     private MessageSeqDao messageSeqDao;
 
@@ -243,7 +247,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	MessageSeq msgSeq = messageSeqDao.getByTopicId(message.getUid());
 	Message root = msgSeq.getRootMessage();
 	// update reply date
-	messageDao.saveOrUpdate(root);
+	//messageDao.saveOrUpdate(root); // do not update date of root posting
 
 	return message;
     }
@@ -321,11 +325,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	msgSeq.setRootMessage(root);
 	messageSeqDao.save(msgSeq);
 
-	// update last reply date for root message
+	// update last reply date for root messagegetlas
 	root.setLastReplyDate(new Date());
 	// update reply message number for root
 	root.setReplyNumber(root.getReplyNumber() + 1);
-	messageDao.saveOrUpdate(root);
+	//messageDao.saveOrUpdate(root); // do not update the date of root posting
 
 	return replyMessage;
     }
@@ -1138,6 +1142,14 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public void setForumDao(ForumDao forumDao) {
 	this.forumDao = forumDao;
     }
+    
+    public TimestampDao getTimestampDao() {
+        return timestampDao;
+    }
+
+    public void setTimestampDao(TimestampDao timestampDao) {
+        this.timestampDao = timestampDao;
+    }
 
     public MessageDao getMessageDao() {
 	return messageDao;
@@ -1255,4 +1267,48 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	} while (uniqueNumber == null);
 	return getForumOutputFactory().buildTextSearchConditionName(uniqueNumber);
     }
+    
+    /**
+     * Get number of new postings.
+     * 
+     * @param sessionId
+     * @param messageId
+     * @param userId
+     * @return 
+     */
+    public int getNewMessagesNum(Long messageId, Long userId) {
+	return timestampDao.getNewMessagesNum(messageId, userId);
+    }
+    
+    /**
+     * Get last topic date.
+     * 
+     * @param messageId
+     * @return 
+     */
+    public Date getLastTopicDate(Long messageId) {
+	return messageDao.getLastTopicDate(messageId);
+    }
+    
+    /**
+     * Get timestamp.
+     * 
+     * @param messageId
+     * @param forumUserId
+     * @return 
+     */
+    public Timestamp getTimestamp(Long MessageId, Long forumUserId) throws PersistenceException {
+	return timestampDao.getTimestamp(MessageId, forumUserId);
+    }
+    
+    /**
+     * Save timestamp.
+     * 
+     * @param timestamp
+     * @return 
+     */
+    public void saveTimestamp(Timestamp timestamp) {
+	timestampDao.saveOrUpdate(timestamp);
+    }
+  
 }

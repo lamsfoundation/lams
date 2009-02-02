@@ -25,6 +25,9 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,6 +47,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.hibernate.Session;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -59,6 +63,8 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
+import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
+import org.lamsfoundation.lams.tool.forum.service.ForumService;
 import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
@@ -268,6 +274,19 @@ public class LearningAction extends Action {
 					forumUser.getUserId().longValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
 					IEventNotificationService.PERIODICITY_SINGLE);
 		}
+		
+		// displaying new postings
+		for (Iterator iterator = rootTopics.iterator(); iterator.hasNext();) {
+			MessageDTO messageDTO = (MessageDTO) iterator.next();
+			int numOfNewPosts = forumService.getNewMessagesNum( 
+				messageDTO.getMessage().getUid(), forumUser.getUid());
+			if (numOfNewPosts == -1) // first time; show all postings as new, including root message
+			    messageDTO.setNewPostingsNum(messageDTO.getMessage().getReplyNumber() + 1);
+			else
+			    messageDTO.setNewPostingsNum(numOfNewPosts);
+			
+			messageDTO.setLastTopicDate(forumService.getLastTopicDate(messageDTO.getMessage().getUid()));
+		}
 
 		return mapping.findForward("success");
 	}
@@ -462,9 +481,44 @@ public class LearningAction extends Action {
 		// as it has a link from the view topic screen back to View Forum screen.
 		boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 		sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
-
+		
+		// Saving or updating user timestamp
+		saveUserTimestamp(rootTopicId, forumUser);
+		
 		return mapping.findForward("success");
-
+	}
+	
+	/**
+	 * Saving user timestamp
+	 * 
+	 * @param toorTopicId
+	 * @param forumUser
+	 * @return
+	 */
+	private void saveUserTimestamp(Long rootTopicId, ForumUser forumUser)
+	{
+	    Date curDate = new Date();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                curDate = dateFormat.parse(dateFormat.format(new Date()));
+            } catch(ParseException pe) {
+            	pe.printStackTrace();
+              }
+    	
+		Timestamp timestamp = forumService.getTimestamp(rootTopicId, forumUser.getUid());
+		if (timestamp != null)
+		{
+		    timestamp.setTimestamp(curDate);
+		    forumService.saveTimestamp(timestamp);
+		}
+		else
+		{
+		    timestamp = new Timestamp();
+		    timestamp.setMessage(forumService.getMessage(rootTopicId));
+		    timestamp.setTimestamp(curDate);
+		    timestamp.setForumUser(forumUser);
+		    forumService.saveTimestamp(timestamp);
+		}
 	}
 
 	/**
@@ -518,11 +572,25 @@ public class LearningAction extends Action {
 		forumService = getForumManager();
 		forumService.createRootTopic(forumId, sessionId, message);
 
-		// echo back current root topic to fourm init page
+		// echo back current root topic to forum init page
 		List rootTopics = forumService.getRootTopics(sessionId);
 		request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
 		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
-
+		
+		saveUserTimestamp(message.getUid(), forumUser);
+		
+		for (Iterator iterator = rootTopics.iterator(); iterator.hasNext();) {
+			MessageDTO messageDTO = (MessageDTO) iterator.next();
+			int numOfNewPosts = forumService.getNewMessagesNum( 
+				messageDTO.getMessage().getUid(), forumUser.getUid());
+			if (numOfNewPosts == -1) // first time; show all postings as new, including root message
+			    messageDTO.setNewPostingsNum(messageDTO.getMessage().getReplyNumber() + 1);
+			else
+			    messageDTO.setNewPostingsNum(numOfNewPosts);
+			
+			messageDTO.setLastTopicDate(forumService.getLastTopicDate(messageDTO.getMessage().getUid()));
+		}
+		
 		return mapping.findForward("success");
 	}
 
@@ -626,6 +694,9 @@ public class LearningAction extends Action {
 		request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 
 		sessionMap.remove(ForumConstants.ATTR_ORIGINAL_MESSAGE);
+		
+		// Saving or updating user timestamp
+		saveUserTimestamp(rootTopicId, forumUser);
 
 		return mapping.findForward("success");
 	}
@@ -759,7 +830,10 @@ public class LearningAction extends Action {
 
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
-
+		
+		// Saving or updating user timestamp
+		saveUserTimestamp(rootTopicId, forumUser);
+		
 		return mapping.findForward("success");
 	}
 
@@ -804,7 +878,7 @@ public class LearningAction extends Action {
 		request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 		request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, WebUtil
 				.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
-
+		
 		return mapping.findForward("success");
 	}
 

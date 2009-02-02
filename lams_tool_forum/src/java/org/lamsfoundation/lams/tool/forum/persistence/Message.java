@@ -52,7 +52,6 @@ public class Message implements Cloneable{
 	private boolean isAuthored;
 	private boolean isAnonymous;
 
-	
 	private Date created;
 	private Date updated;
 	private Date lastReplyDate;
@@ -66,7 +65,6 @@ public class Message implements Cloneable{
 	private ForumUser modifiedBy;
 	private Set attachments;
 	private ForumReport report;
-	
 	private Set sessionClones;
 
 	private ForumToolContentHandler toolContentHandler;
@@ -168,6 +166,7 @@ public class Message implements Cloneable{
 		}
 		this.setUpdated(new Date(now));
 	}
+	
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
@@ -409,7 +408,8 @@ public class Message implements Cloneable{
     public Message getParent() {
         return parent;
     }
-	/**
+    
+    /**
      * @return a set of Attachments to this Message.
      *
      * @hibernate.set table="ATTACHMENT"
@@ -512,4 +512,5 @@ public class Message implements Cloneable{
 	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
 		this.toolContentHandler = toolContentHandler;
 	}
+
 }

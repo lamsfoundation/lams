@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.forum.service;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.struts.upload.FormFile;
@@ -39,6 +40,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
+import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
@@ -50,7 +52,7 @@ public interface IForumService {
     // ************************************************************************************
     /**
      * Create a Forum instance according to the default content. <BR>
-     * Note, this new insstance won't save into database until called persist method.
+     * Note, this new instance won't save into database until called persist method.
      * 
      * @param contentID
      * @return
@@ -105,6 +107,42 @@ public interface IForumService {
     // ************************************************************************************
     // Topic Method
     // ************************************************************************************
+    
+    /**
+     * Get number of new postings.
+     * 
+     * @param sessionId
+     * @param messageId
+     * @param userId
+     * @return 
+     */
+    public int getNewMessagesNum(Long messageId, Long userId);
+    
+    /**
+     * Get last topic date.
+     * 
+     * @param messageId
+     * @return 
+     */
+    public Date getLastTopicDate(Long messageId);
+    
+    /**
+     * Get timestamp.
+     * 
+     * @param messageId
+     * @param forumUserId
+     * @return 
+     */
+    public Timestamp getTimestamp(Long MessageId, Long forumUserId);
+    
+    /**
+     * Save timestamp.
+     * 
+     * @param timestamp
+     * @return 
+     */
+    public void saveTimestamp(Timestamp timestamp);
+    
     /**
      * Create a root topic.
      * 

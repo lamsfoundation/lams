@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.tool.forum.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,7 +53,10 @@ public class MessageDTO {
 	//2 fields use for export portfolio function
 	private String attachmentName;
 	private String attachmentLocalUrl;
-
+	
+	private int newPostingsNum;
+	private Date lastTopicDate;
+	
 	/**
 	 * Get a <code>MessageDTO</code> instance from a given <code>Message</code>.
 	 * 
@@ -202,4 +206,19 @@ public class MessageDTO {
 		this.numOfPosts = numOfPosts;
 	}
 
+	public void setNewPostingsNum(int newPostingsNum) {
+	    this.newPostingsNum = newPostingsNum;
+	}
+
+	public int getNewPostingsNum() {
+	    return newPostingsNum;
+	}
+
+	public void setLastTopicDate(Date lastTopicDate) {
+	    this.lastTopicDate = lastTopicDate;
+	}
+
+	public Date getLastTopicDate() {
+	    return lastTopicDate;
+	}
 }

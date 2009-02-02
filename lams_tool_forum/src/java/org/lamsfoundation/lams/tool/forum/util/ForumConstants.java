@@ -140,7 +140,7 @@ public interface ForumConstants {
     public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 
     public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-
+    
     public static final String ATTR_MINIMUM_REPLY = "minimumReply";
 
     public static final String ATTR_MAXIMUM_REPLY = "maximumReply";

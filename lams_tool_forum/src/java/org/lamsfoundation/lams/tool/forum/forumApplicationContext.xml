@@ -1,155 +1,199 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-	<bean id="forumMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="forumMessageService" class="org.lamsfoundation.lams.util.MessageService"
+		singleton="true">
 		<property name="messageSource">
-			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-				<property name="basename"><value>org.lamsfoundation.lams.tool.forum.ApplicationResources</value></property>
+			<bean id="messageSource"
+				class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename">
+					<value>org.lamsfoundation.lams.tool.forum.ApplicationResources</value>
+				</property>
 			</bean>
 		</property>
 	</bean>
-    <!-- Hibernate SessionFactory -->
-    <bean id="forumSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="toolDataSource"/></property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+	<!-- Hibernate SessionFactory -->
+	<bean id="forumSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="toolDataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<ref bean="hibernateProperties" />
+		</property>
 
-        <!-- Must references all OR mapping files. -->
-        <property name="mappingResources">
-            <list>
-               <value>org/lamsfoundation/lams/learningdesign/BranchCondition.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/forum/persistence/Forum.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/forum/persistence/Message.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/forum/persistence/Attachment.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/forum/persistence/ForumUser.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/forum/persistence/ForumReport.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/forum/persistence/ForumToolSession.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/forum/persistence/MessageSeq.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/forum/persistence/ForumCondition.hbm.xml</value>
-            </list>
-        </property>
-    </bean>
+		<!-- Must references all OR mapping files. -->
+		<property name="mappingResources">
+			<list>
+				<value>org/lamsfoundation/lams/learningdesign/BranchCondition.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/forum/persistence/Forum.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/forum/persistence/Message.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/forum/persistence/Attachment.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/forum/persistence/ForumUser.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/forum/persistence/ForumReport.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/forum/persistence/ForumToolSession.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/forum/persistence/MessageSeq.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/forum/persistence/ForumCondition.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/forum/persistence/Timestamp.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
 
-    <!-- core beans -->
-    <bean id="forumDao" class="org.lamsfoundation.lams.tool.forum.persistence.ForumDao">
-        <property name="sessionFactory">
-            <ref local="forumSessionFactory"/>
-        </property>
-    </bean>
-    <bean id="forumUserDao" class="org.lamsfoundation.lams.tool.forum.persistence.ForumUserDao">
-        <property name="sessionFactory">
-            <ref local="forumSessionFactory"/>
-        </property>
-    </bean>
+	<!-- core beans -->
+	<bean id="forumDao" class="org.lamsfoundation.lams.tool.forum.persistence.ForumDao">
+		<property name="sessionFactory">
+			<ref local="forumSessionFactory" />
+		</property>
+	</bean>
+	<bean id="forumUserDao"
+		class="org.lamsfoundation.lams.tool.forum.persistence.ForumUserDao">
+		<property name="sessionFactory">
+			<ref local="forumSessionFactory" />
+		</property>
+	</bean>
 
-   <bean id="attachmentDao" class="org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao">
-        <property name="sessionFactory">
-            <ref local="forumSessionFactory"/>
-        </property>
-    </bean>
+	<bean id="attachmentDao"
+		class="org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao">
+		<property name="sessionFactory">
+			<ref local="forumSessionFactory" />
+		</property>
+	</bean>
 
-   <bean id="messageDao" class="org.lamsfoundation.lams.tool.forum.persistence.MessageDao">
-        <property name="sessionFactory">
-            <ref local="forumSessionFactory"/>
-        </property>
-    </bean>
+	<bean id="messageDao"
+		class="org.lamsfoundation.lams.tool.forum.persistence.MessageDao">
+		<property name="sessionFactory">
+			<ref local="forumSessionFactory" />
+		</property>
+	</bean>
 
-   <bean id="messageSeqDao" class="org.lamsfoundation.lams.tool.forum.persistence.MessageSeqDao">
-        <property name="sessionFactory">
-            <ref local="forumSessionFactory"/>
-        </property>
-    </bean>
-   <bean id="forumToolSessionDao" class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao">
-        <property name="sessionFactory">
-            <ref local="forumSessionFactory"/>
-        </property>
-    </bean>
+	<bean id="timestampDao"
+		class="org.lamsfoundation.lams.tool.forum.persistence.TimestampDao">
+		<property name="sessionFactory">
+			<ref local="forumSessionFactory" />
+		</property>
+	</bean>
 
-    <!-- Managers -->
-	<bean id="forumToolContentHandler" class="org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler">
-	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean> 
-	
-	<bean id="forumOutputFactory" class="org.lamsfoundation.lams.tool.forum.service.ForumOutputFactory">
- 		<property name="toolMessageService"><ref bean="forumMessageService"/></property>
- 	</bean>
-	
-    <bean id="forumManagerTarget" class="org.lamsfoundation.lams.tool.forum.service.ForumService">
-        <property name="forumDao">
-            <ref local="forumDao"/>
-        </property>
-        <property name="forumUserDao">
-            <ref local="forumUserDao"/>
-        </property>
-        <property name="attachmentDao">
-            <ref local="attachmentDao"/>
-        </property>
-        <property name="messageDao">
-            <ref local="messageDao"/>
-        </property>
-        <property name="messageSeqDao">
-            <ref local="messageSeqDao"/>
-        </property>
-        <property name="forumToolSessionDao">
-            <ref local="forumToolSessionDao"/>
-        </property>
-        <property name="forumToolContentHandler">
-            <ref local="forumToolContentHandler"/>
-        </property>
-        <property name="repositoryService">
-            <ref bean="repositoryService"/>
-        </property>
-   		<property name="toolService">
-   			<ref bean="lamsToolService"/>
-   		</property>
-   		<property name="learnerService">
-   			<ref bean="learnerService"/>
-   		</property>
-   		<property name="userManagementService">
-   			<ref bean="userManagementService"/>
-   		</property>
-   		<property name="exportContentService">
-   			<ref bean="exportToolContentService"/>
-   		</property>
-   		<property name="auditService"><ref bean="auditService"/></property>
-   		<property name="messageService"><ref bean="forumMessageService"/></property>
-  		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
-  		<property name="forumOutputFactory"><ref local="forumOutputFactory"/></property>
-  		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
-    </bean>
+	<bean id="messageSeqDao"
+		class="org.lamsfoundation.lams.tool.forum.persistence.MessageSeqDao">
+		<property name="sessionFactory">
+			<ref local="forumSessionFactory" />
+		</property>
+	</bean>
+	<bean id="forumToolSessionDao"
+		class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao">
+		<property name="sessionFactory">
+			<ref local="forumSessionFactory" />
+		</property>
+	</bean>
 
-    <bean id="forumService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name="transactionManager"><ref bean="transactionManager"/></property>
-        <property name="target">
-            <ref local="forumManagerTarget"/>
-        </property>
-        <property name="proxyTargetClass">
-            <value>false</value>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                
-                <prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="finishUserSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <!--  Tool Content Manager and Tool Session Manager calls -->
-                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="removeToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="exportToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="removeToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                
-                <prop key="cloneContentTopics">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                
-                
-                <prop key="importToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                
-                <prop key="exportToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                
+	<!-- Managers -->
+	<bean id="forumToolContentHandler"
+		class="org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler">
+		<property name="repositoryService">
+			<ref bean="repositoryService" />
+		</property>
+	</bean>
+
+	<bean id="forumOutputFactory"
+		class="org.lamsfoundation.lams.tool.forum.service.ForumOutputFactory">
+		<property name="toolMessageService">
+			<ref bean="forumMessageService" />
+		</property>
+	</bean>
+
+	<bean id="forumManagerTarget" class="org.lamsfoundation.lams.tool.forum.service.ForumService">
+		<property name="forumDao">
+			<ref local="forumDao" />
+		</property>
+		<property name="forumUserDao">
+			<ref local="forumUserDao" />
+		</property>
+		<property name="attachmentDao">
+			<ref local="attachmentDao" />
+		</property>
+		<property name="messageDao">
+			<ref local="messageDao" />
+		</property>
+		<property name="messageSeqDao">
+			<ref local="messageSeqDao" />
+		</property>
+		<property name="timestampDao">
+			<ref local="timestampDao" />
+		</property>
+		<property name="forumToolSessionDao">
+			<ref local="forumToolSessionDao" />
+		</property>
+		<property name="forumToolContentHandler">
+			<ref local="forumToolContentHandler" />
+		</property>
+		<property name="repositoryService">
+			<ref bean="repositoryService" />
+		</property>
+		<property name="toolService">
+			<ref bean="lamsToolService" />
+		</property>
+		<property name="learnerService">
+			<ref bean="learnerService" />
+		</property>
+		<property name="userManagementService">
+			<ref bean="userManagementService" />
+		</property>
+		<property name="exportContentService">
+			<ref bean="exportToolContentService" />
+		</property>
+		<property name="auditService">
+			<ref bean="auditService" />
+		</property>
+		<property name="messageService">
+			<ref bean="forumMessageService" />
+		</property>
+		<property name="coreNotebookService">
+			<ref bean="coreNotebookService" />
+		</property>
+		<property name="forumOutputFactory">
+			<ref local="forumOutputFactory" />
+		</property>
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService" />
+		</property>
+	</bean>
+
+	<bean id="forumService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="target">
+			<ref local="forumManagerTarget" />
+		</property>
+		<property name="proxyTargetClass">
+			<value>false</value>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+
+				<prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="finishUserSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<!--  Tool Content Manager and Tool Session Manager calls -->
+				<prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="removeToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="exportToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="removeToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="cloneContentTopics">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+
+				<prop key="importToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="exportToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="import102ToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="setReflectiveData">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-            </props>
-        </property>
-    </bean>
+			</props>
+		</property>
+	</bean>
 
 </beans>

@@ -25,6 +25,10 @@
 
 package org.lamsfoundation.lams.tool.forum.persistence;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -49,8 +53,11 @@ public class MessageDao extends HibernateDaoSupport {
 					+ " where m.toolSession.sessionId=?";
 	
 	private static final String SQL_QUERY_TOPICS_NUMBER_BY_USER_SESSION = "select count(*) from " + Message.class.getName() + " m "
-	+ " where m.createdBy.userId=? and m.toolSession.sessionId=? and m.isAuthored = false";
+		+ " where m.createdBy.userId=? and m.toolSession.sessionId=? and m.isAuthored = false";
 	
+	private static final String SQL_QUERY_LAST_TOPIC_DATE_BY_MESSAGE = " select m.updated from " + Message.class.getName() + " m "
+		+ " where m.uid IN (select seq.message.uid FROM " + MessageSeq.class.getName() 
+		+ " seq WHERE seq.rootMessage.uid = ?) order by m.updated desc ";
 	
 	public void saveOrUpdate(Message message) {
 		message.updateModificationData();
@@ -126,5 +133,16 @@ public class MessageDao extends HibernateDaoSupport {
 		else
 			return 0;
 	}
-
+	/**
+	 * Return date of the last posting in a thread
+	 * @param messageID
+	 * @return
+	 */
+	public Date getLastTopicDate(Long messageID) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_LAST_TOPIC_DATE_BY_MESSAGE, new Object[]{messageID});
+		if(list != null && list.size() > 0)
+			return ((Date) list.get(0));
+		else
+			return new Date();
+	}
 }

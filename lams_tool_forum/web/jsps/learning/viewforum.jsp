@@ -64,7 +64,6 @@
 	</c:set>
 
 	<div>
-
 		<c:set var="buttonClass" value="button" />
 		<c:if test="${sessionMap.finishedLock}">
 			<c:set var="buttonClass" value="disabled" />

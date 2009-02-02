@@ -18,24 +18,24 @@
       type="org.lamsfoundation.lams.tool.forum.web.forms.ForumForm"
     />
     <form-bean
-      name="forumConditionForm"
-      type="org.lamsfoundation.lams.tool.forum.web.forms.ForumConditionForm"
-    />
-    <form-bean
       name="markForm"
       type="org.lamsfoundation.lams.tool.forum.web.forms.MarkForm"
     />
     <form-bean
-      name="pedagogicalPlannerForm"
-      type="org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm"
+      name="reflectionForm"
+      type="org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm"
     />
     <form-bean
       name="messageForm"
       type="org.lamsfoundation.lams.tool.forum.web.forms.MessageForm"
     />
     <form-bean
-      name="reflectionForm"
-      type="org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm"
+      name="pedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm"
+    />
+    <form-bean
+      name="forumConditionForm"
+      type="org.lamsfoundation.lams.tool.forum.web.forms.ForumConditionForm"
     />
 
    <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm" />

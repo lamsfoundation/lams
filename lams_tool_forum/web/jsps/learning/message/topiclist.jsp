@@ -12,6 +12,9 @@
 			<th width="60px">
 				<fmt:message key="lable.topic.title.replies" />
 			</th>
+			<th width="60px">
+				<fmt:message key="lable.topic.title.repliesnew" />
+			</th>
 			<th width="25%">
 				<fmt:message key="lable.topic.title.update" />
 			</th>
@@ -45,11 +48,16 @@
 					</c:if>
 					${author}
 				</td>
-				<td  align="center">
+				
+				<td align="center">
 					<c:out value="${topic.message.replyNumber}" />
 				</td>
+				
+				<td align="center">
+					<c:out value="${topic.newPostingsNum}" />
+				</td>
 				<td>
-					<lams:Date value="${topic.message.updated}"/>
+					<lams:Date value="${topic.lastTopicDate}"/>
 				</td>
 				<c:if
 					test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
