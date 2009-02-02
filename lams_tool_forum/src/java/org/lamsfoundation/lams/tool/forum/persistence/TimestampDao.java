@@ -24,7 +24,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;

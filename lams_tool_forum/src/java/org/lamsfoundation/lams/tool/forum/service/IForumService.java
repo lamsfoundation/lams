@@ -111,7 +111,6 @@ public interface IForumService {
     /**
      * Get number of new postings.
      * 
-     * @param sessionId
      * @param messageId
      * @param userId
      * @return 

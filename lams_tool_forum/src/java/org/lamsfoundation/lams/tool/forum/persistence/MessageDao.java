@@ -25,9 +25,6 @@
 
 package org.lamsfoundation.lams.tool.forum.persistence;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 

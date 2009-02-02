@@ -9,7 +9,7 @@
 <table-list>
 <table alias="" name="tl_lafrum11_condition_topics" remarks="" uid="a5032e:11d2755344e:-7ff0">
 <table-description/>
-<table-figure-bounds height="56" width="156" x="104" y="653"/>
+<table-figure-bounds height="56" width="156" x="87" y="657"/>
 <column-list>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="condition_id" remarks="" uid="a5032e:11d2755344e:-7fee">
 <column-description/>
@@ -64,7 +64,7 @@
 </table>
 <table alias="" name="tl_lafrum11_conditions" remarks="" uid="a5032e:11d2755344e:-7feb">
 <table-description/>
-<table-figure-bounds height="50" width="131" x="-73" y="408"/>
+<table-figure-bounds height="50" width="131" x="-52" y="431"/>
 <column-list>
 <column alias="" auto-increment="false" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="condition_id" remarks="" uid="a5032e:11d2755344e:-7fe9">
 <column-description/>
@@ -130,7 +130,7 @@
 <table-list>
 <table alias="" name="tl_lafrum11_attachment" remarks="" uid="3c59d3:1182f36109d:-7ffd">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="107" y="375"/>
+<table-figure-bounds height="-1" width="-1" x="106" y="379"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7ffb">
 <column-description/>
@@ -458,7 +458,7 @@
 </table>
 <table alias="" name="tl_lafrum11_forum_user" remarks="" uid="3c59d3:1182f36109d:-7fdc">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="336" y="175"/>
+<table-figure-bounds height="-1" width="-1" x="366" y="175"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7fda">
 <column-description/>
@@ -541,7 +541,7 @@
 </table>
 <table alias="" name="tl_lafrum11_message" remarks="" uid="3c59d3:1182f36109d:-7fd3">
 <table-description/>
-<table-figure-bounds height="282" width="197" x="377" y="324"/>
+<table-figure-bounds height="282" width="197" x="418" y="449"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7fd1">
 <column-description/>
@@ -817,7 +817,7 @@
 </table>
 <table alias="" name="tl_lafrum11_message_seq" remarks="" uid="3c59d3:1182f36109d:-7fba">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="689" y="313"/>
+<table-figure-bounds height="-1" width="-1" x="767" y="282"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7fb8">
 <column-description/>
@@ -910,7 +910,7 @@
 </table>
 <table alias="" name="tl_lafrum11_report" remarks="" uid="3c59d3:1182f36109d:-7fb1">
 <table-description/>
-<table-figure-bounds height="-1" width="-1" x="673" y="474"/>
+<table-figure-bounds height="-1" width="-1" x="754" y="593"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7faf">
 <column-description/>
@@ -966,7 +966,7 @@
 </table>
 <table alias="" name="tl_lafrum11_tool_session" remarks="" uid="3c59d3:1182f36109d:-7faa">
 <table-description/>
-<table-figure-bounds height="136" width="182" x="595" y="11"/>
+<table-figure-bounds height="136" width="182" x="650" y="9"/>
 <column-list>
 <column alias="" auto-increment="true" column-size="20" decimal-digits="0" default-value="" mandatory="true" name="uid" remarks="" uid="3c59d3:1182f36109d:-7fa8">
 <column-description/>

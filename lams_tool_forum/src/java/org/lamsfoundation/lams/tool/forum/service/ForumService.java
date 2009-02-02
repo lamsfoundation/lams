@@ -1271,7 +1271,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     /**
      * Get number of new postings.
      * 
-     * @param sessionId
      * @param messageId
      * @param userId
      * @return 
