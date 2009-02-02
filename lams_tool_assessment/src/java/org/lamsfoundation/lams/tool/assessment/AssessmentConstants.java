@@ -90,6 +90,8 @@ public class AssessmentConstants {
     
     public static final String ATTR_OPTION_GRADE_PREFIX = "optionGrade";
     
+    public static final String ATTR_OPTION_ACCEPTED_ERROR_PREFIX = "optionAcceptedError";
+    
     public static final String ATTR_OPTION_FEEDBACK_PREFIX = "optionFeedback";
     
     public static final String ATTR_OPTION_SEQUENCE_ID_PREFIX = "optionSequenceId";

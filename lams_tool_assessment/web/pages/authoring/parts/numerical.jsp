@@ -8,9 +8,21 @@
 		<td style="padding-left:0px; border-bottom:0px; background:none;">	
 			<input type="hidden" name="optionSequenceId${status.index}" id="optionSequenceId${status.index}" value="${option.sequenceId}">									
 			<input type="text" name="optionAnswer${status.index}"
-				id="optionAnswer${status.index}" size="56" value="${option.answerString}">
+				id="optionAnswer${status.index}" size="25" value="${option.answerString}">
 		</td>									
 	</tr>
+	
+	<tr>
+		<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; background:none;">
+			<span class="field-name">
+				<fmt:message key="label.authoring.basic.option.accepted.error"></fmt:message>
+			</span>
+		</td>
+		<td style="padding-left:0px; border-bottom:0px; background:none;">	
+			<input type="text" name="optionAcceptedError${status.index}"
+				id="optionAcceptedError${status.index}" size="25" value="${option.acceptedError}">
+		</td>									
+	</tr>	
 	
 	<tr>
 		<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; background:none;;">

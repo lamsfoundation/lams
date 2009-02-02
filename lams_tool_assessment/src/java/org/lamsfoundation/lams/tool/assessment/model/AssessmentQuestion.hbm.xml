@@ -139,6 +139,14 @@
         />
 
         <property
+            name="correctAnswer"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="correct_answer"
+        />
+
+        <property
             name="hide"
             type="boolean"
             update="true"

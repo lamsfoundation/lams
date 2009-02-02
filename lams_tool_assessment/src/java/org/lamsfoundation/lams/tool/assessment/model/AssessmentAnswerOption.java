@@ -45,7 +45,7 @@ public class AssessmentAnswerOption implements Cloneable {
     
     private Long answerLong;
     
-    private Long acceptedError;
+    private float acceptedError;
     
     private float grade;
     
@@ -132,11 +132,11 @@ public class AssessmentAnswerOption implements Cloneable {
      * 
      * @return Returns the possible  answer.
      */
-    public Long getAcceptedError() {
+    public float getAcceptedError() {
 	return acceptedError;
     }
 
-    public void setAcceptedError(Long acceptedError) {
+    public void setAcceptedError(float acceptedError) {
 	this.acceptedError = acceptedError;
     }
     

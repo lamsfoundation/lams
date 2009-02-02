@@ -8,6 +8,7 @@
 	function addOption(){
 		var url= addOptionUrl;
 		var optionList = $("#optionForm").serialize(true);
+		prepareFCKEditorsForAjaxSubmit();
 		$(optionTargetDiv).load(
 			url,
 			{
@@ -51,6 +52,11 @@
 					optionList: optionList 
 				}
 		);
+	}
+	function prepareFCKEditorsForAjaxSubmit(){
+		//$("input[id^=optionFeedback]").each(function() {
+		//	this.val(FCKeditorAPI.GetInstance($(this).id).GetXHTML());
+		//});
 	}
 	
 

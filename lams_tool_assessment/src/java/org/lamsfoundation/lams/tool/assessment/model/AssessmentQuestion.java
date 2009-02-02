@@ -71,6 +71,8 @@ public class AssessmentQuestion implements Cloneable {
     
     private boolean caseSensitive;
     
+    private boolean correctAnswer;
+    
     private boolean hide;
     private boolean isCreateByAuthor;
 
@@ -329,6 +331,18 @@ public class AssessmentQuestion implements Cloneable {
 
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
+    }
+    
+    /**
+     * @hibernate.property column="correct_answer"
+     * @return
+     */
+    public boolean getCorrectAnswer() {
+	return correctAnswer;
+    }
+
+    public void setCorrectAnswer(boolean correctAnswer) {
+	this.correctAnswer = correctAnswer;
     }
     
     /**

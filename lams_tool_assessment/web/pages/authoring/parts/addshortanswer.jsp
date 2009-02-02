@@ -6,6 +6,7 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
+		<c:set var="questionType" value="3"	scope="request" />
 		
 		<style type="text/css">
 			label { width: 10em; float: left; }
@@ -13,32 +14,54 @@
 			em { font-weight: bold; padding-right: 1em; vertical-align: top; }
 		</style>
 
+		<script type="text/javascript">
+			var questionType = ${questionType};
+			var addOptionUrl = "<c:url value='/authoring/newOption.do'/>";
+		   	var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
+    	    var upOptionUrl = "<c:url value='/authoring/upOption.do'/>";
+    	    var downOptionUrl = "<c:url value='/authoring/downOption.do'/>";
+		</script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/assessmentoption.js'/>"></script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.validate.js'/>"></script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
   	    <script><!--
 			$(document).ready(function(){
+				
 		    	$("#assessmentQuestionForm").validate({
 		    		rules: {
 		    			title: "required",
 		    			defaultGrade: {
 		    			      required: true,
 		    			      digits: true
-		    			}
+		    			},
+		    			penaltyFactor: {
+		    			      required: true,
+		    			      number: true
+		    			},
+		    			fake: {
+		    				required: function(element) {
+		    		        	return $("input[name^=optionAnswer]:filled").length < 1;
+			    		    }
+	    			    }
 		    		},
 		    		messages: {
 		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    			defaultGrade: {
 		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
+		    			},
+		    			penaltyFactor: {
+		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
+		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
 		    			}
 		    		},
 		    		debug: true,
      			    submitHandler: function(form) {
+		    			$("#optionList").val($("#optionForm").serialize(true));
 		    			$("#question").val(FCKeditorAPI.GetInstance("question").GetXHTML());
 		    			$("#generalFeedback").val(FCKeditorAPI.GetInstance("generalFeedback").GetXHTML());
-		    			$("#feedback").val(FCKeditorAPI.GetInstance("feedback").GetXHTML());
-	     			    
+		    			
 		    	    	var options = { 
 		    	    		target:  parent.jQuery('#questionListArea'), 
 		    		   		success: afterRatingSubmit  // post-submit callback
@@ -58,18 +81,19 @@
 		
 	</lams:head>
 	
-	<body class="stripes">
+	<body class="stripes" onload="parent.resizeIframe();">
 		<div id="content" >	
 			<%@ include file="/common/messages.jsp"%>
 			
 			<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="assessmentQuestionForm">
 				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 				<html:hidden property="sessionMapID" />
-				<html:hidden property="questionType" value="6"/>
+				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
+				<input type="hidden" name="optionList" id="optionList" />
 				<html:hidden property="questionIndex" />
 	
 				<h2 class="no-space-left">
-					<fmt:message key="label.authoring.basic.type.essay" />
+					<fmt:message key="label.authoring.basic.type.short.answer" />
 				</h2>
 	
 				<div class="field-name space-top">
@@ -84,7 +108,7 @@
 				<lams:FCKEditor id="question" value="${formBean.question}"
 					contentFolderID="${formBean.contentFolderID}">
 				</lams:FCKEditor>
-	
+				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.default.question.grade" />
 					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
@@ -92,25 +116,46 @@
 				<html:text property="defaultGrade" size="3" />
 					
 				<div class="field-name space-top">
+					<fmt:message key="label.authoring.basic.penalty.factor" />
+					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
+				</div>
+				<html:text property="penaltyFactor" size="3" />
+				
+				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
 				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
 					contentFolderID="${formBean.contentFolderID}">
-				</lams:FCKEditor>				
+				</lams:FCKEditor>
+	
+				<div class="field-name space-top">
+					<fmt:message key="label.authoring.short.answer.case.sensitivity" />
+				</div>
+				<html:select property="caseSensitive">
+					<html:option value="false"><fmt:message key="label.authoring.short.answer.no.case.unimportant" /></html:option>
+					<html:option value="true"><fmt:message key="label.authoring.short.answer.yes.case.must.match" /></html:option>
+				</html:select>
+				
+				<br><br>
+				<input type="hidden" name="fake" id="fake">
 				
 				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.feedback" />
+					<fmt:message key="label.authoring.short.answer.answers" />
 				</div>
-				<lams:FCKEditor id="feedback" value="${formBean.feedback}"
-					contentFolderID="${formBean.contentFolderID}">
-				</lams:FCKEditor>				
-
+				<label for="fake" class="error" style="display: none;"><fmt:message key='label.authoring.short.answer.error.answer'/></label>
 			</html:form>
-
-			<br /><br /><br />
+			
+			<!-- Options -->
+			<form id="optionForm" name="optionForm">
+				<%@ include file="optionlist.jsp"%>
+				<a href="javascript:;" onclick="addOption();" class="button-add-item right-buttons" style="margin-right: 40px; margin-top:0px">
+					<fmt:message key="label.authoring.short.answer.add.answer" /> 
+				</a>
+			</form>
+			
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="$('#assessmentQuestionForm').submit();" class="button-add-item">
-					<fmt:message key="label.authoring.essay.add.essay" /> 
+					<fmt:message key="label.authoring.short.answer.add.short.answer" /> 
 				</a>
 				<a href="#" onclick="self.parent.tb_remove();" class="button space-left">
 					<fmt:message key="label.cancel" /> 

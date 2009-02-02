@@ -59,7 +59,7 @@
 
         <property
             name="acceptedError"
-            type="java.lang.Long"
+            type="float"
             update="true"
             insert="true"
             column="accepted_error"

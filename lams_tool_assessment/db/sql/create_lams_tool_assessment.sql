@@ -59,6 +59,7 @@ create table tl_laasse10_assessment_question (
    feedback_on_incorrect text,
    shuffle tinyint,
    case_sensitive tinyint,
+   correct_answer tinyint DEFAULT 0,
    hide tinyint,
    create_by_author tinyint,
    create_date datetime,
@@ -74,7 +75,7 @@ create table tl_laasse10_answer_options (
    question text,
    answer_string text,
    answer_long bigint,
-   accepted_error bigint,
+   accepted_error float,
    grade float,
    feedback text,
    primary key (uid)

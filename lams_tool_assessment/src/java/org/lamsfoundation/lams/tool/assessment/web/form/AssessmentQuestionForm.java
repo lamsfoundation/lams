@@ -55,6 +55,7 @@ public class AssessmentQuestionForm extends ActionForm {
     private String feedbackOnIncorrect;
     private boolean shuffle;
     private boolean caseSensitive;
+    private boolean correctAnswer;
 
     public String getSessionMapID() {
 	return sessionMapID;
@@ -190,6 +191,14 @@ public class AssessmentQuestionForm extends ActionForm {
 
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
+    }
+    
+    public boolean isCorrectAnswer() {
+	return correctAnswer;
+    }
+
+    public void setCorrectAnswer(boolean correctAnswer) {
+	this.correctAnswer = correctAnswer;
     }
 
 }

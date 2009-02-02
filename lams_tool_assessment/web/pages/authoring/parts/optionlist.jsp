@@ -11,12 +11,15 @@
 				</td>
 				<td>
 					<c:choose>
-						<c:when test="${questionType == 1}">
+						<c:when test="${(questionType == 1) || (questionType == 3)}">
 							<%@ include file="option.jsp"%>
 						</c:when>
 						<c:when test="${questionType == 2}">
 							<%@ include file="matchingpair.jsp"%>
 						</c:when>
+						<c:when test="${questionType == 4}">
+							<%@ include file="numerical.jsp"%>
+						</c:when>						
 					</c:choose>	
 				</td>
 					

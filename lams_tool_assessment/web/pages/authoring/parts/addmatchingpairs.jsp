@@ -59,6 +59,8 @@
 		    		debug: true,
      			    submitHandler: function(form) {
 		    			$("#optionList").val($("#optionForm").serialize(true));
+		    			$("#question").val(FCKeditorAPI.GetInstance("question").GetXHTML());
+		    			$("#generalFeedback").val(FCKeditorAPI.GetInstance("generalFeedback").GetXHTML());
 		    			
 		    	    	var options = { 
 		    	    		target:  parent.jQuery('#questionListArea'), 
@@ -126,7 +128,9 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
-				<lams:STRUTS-textarea rows="5" cols="50" property="generalFeedback"/>
+				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
+					contentFolderID="${formBean.contentFolderID}">
+				</lams:FCKEditor>				
 	
 				<div class="field-name space-top" >
 					<fmt:message key="label.authoring.basic.shuffle.the.choices" />

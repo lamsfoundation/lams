@@ -1096,13 +1096,16 @@ public class AuthoringAction extends Action {
 	form.setFeedbackOnIncorrect(question.getFeedbackOnIncorrect());
 	form.setShuffle(question.isShuffle());
 	form.setCaseSensitive(question.isCaseSensitive());
+	form.setCorrectAnswer(question.getCorrectAnswer());
 	if (questionIdx >= 0) {
 	    form.setQuestionIndex(new Integer(questionIdx).toString());
 	}
 	
 	short questionType = question.getType();
-	if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) ||
-		(questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)) {
+	if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
+		|| (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
+		|| (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
+		|| (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
 	    Set<AssessmentAnswerOption> optionList = question.getAnswerOptions();
 	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	}
@@ -1160,8 +1163,28 @@ public class AuthoringAction extends Action {
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
 	    question.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-
-	    // set options
+	} else if ((type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)) {
+	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    question.setShuffle(questionForm.isShuffle());
+	} else if ((type == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
+	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    question.setCaseSensitive(questionForm.isCaseSensitive());
+	} else if ((type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
+	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	} else if ((type == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE)) {
+	    question.setPenaltyFactor(1);
+	    question.setCorrectAnswer(questionForm.isCorrectAnswer());
+	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());	    
+	} else if ((type == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
+	    question.setFeedback(questionForm.getFeedback());
+	}
+	
+	// set options
+	if ((type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
+		|| (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
+		|| (type == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
+		|| (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
 	    Set<AssessmentAnswerOption> optionList = getOptionsFromRequest(request, true);
 	    Set options = new LinkedHashSet();
 	    int seqId = 0;
@@ -1170,21 +1193,6 @@ public class AuthoringAction extends Action {
 		options.add(option);
 	    }
 	    question.setAnswerOptions(options);
-	} else if ((type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)) {
-	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.setShuffle(questionForm.isShuffle());
-
-	    // set options
-	    Set<AssessmentAnswerOption> matchingPairsList = getOptionsFromRequest(request, true);
-	    Set matchingPairs = new LinkedHashSet();
-	    int seqId = 0;
-	    for (AssessmentAnswerOption matchingPair : matchingPairsList) {
-		matchingPair.setSequenceId(seqId++);
-		matchingPairs.add(matchingPair);
-	    }
-	    question.setAnswerOptions(matchingPairs);
-	}else if ((type == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
-	    question.setFeedback(questionForm.getFeedback());
 	}
 
     }
@@ -1219,7 +1227,8 @@ public class AuthoringAction extends Action {
 	int questionType = WebUtil.readIntParam(request,AssessmentConstants.ATTR_QUESTION_TYPE);
 	TreeSet<AssessmentAnswerOption> optionList = new TreeSet<AssessmentAnswerOption>(new AssessmentAnswerOptionComparator());
 	for (int i = 0; i < count; i++) {
-	    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
+		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
 		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
 		String feedback = paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i);
@@ -1246,6 +1255,23 @@ public class AuthoringAction extends Action {
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
 		option.setAnswerString(answerString);
 		option.setQuestion(question);
+		optionList.add(option);
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
+		float acceptedError = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i));
+		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
+		String feedback = paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i);
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
+
+		if ((answerString == null) && skipBlankOptions) {
+		    continue;
+		}
+		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
+		option.setAnswerString(answerString);
+		option.setAcceptedError(acceptedError);
+		option.setGrade(grade);
+		option.setFeedback(feedback);
 		optionList.add(option);
 	    }
 	}
