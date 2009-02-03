@@ -66,3 +66,52 @@ a.editingAdvice{
 	font-size: smaller;
 	margin: 0px 0px 0px 500px;
 }
+
+td.branchingFirstActivity{
+	border-bottom: thick blue solid;
+	text-align: center;
+}
+
+td.branchingLastActivity{
+	border-bottom: thick blue solid;
+}
+
+td.branch1{
+	border-right: thick yellow solid;
+	border-left: thick blue solid;
+}
+
+td.branch2{
+	border-right: thick orange solid;
+	border-left: thick blue solid;
+}
+
+td.branch3{
+	border-right: thick red solid;
+	border-left: thick blue solid;
+}
+
+td.branch4{
+	border-right: thick purple solid;
+	border-left: thick blue solid;
+}
+
+h3.branch1{
+	color: #F1CD03;
+	text-decoration: underline;
+}
+
+h3.branch2{
+	color: orange;
+	text-decoration: underline;
+}
+
+h3.branch3{
+	color: red;
+	text-decoration: underline;
+}
+
+h3.branch4{
+	color: purple;
+	text-decoration: underline;
+}

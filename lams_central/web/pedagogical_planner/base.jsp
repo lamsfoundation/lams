@@ -96,11 +96,40 @@
 	
 	<!-- IFrames with activities. -->
 	<table cellspacing="0" cellpadding="0" class="pedagogicalPlannerTable">
+		<c:set var="lastParentActivityTitle" />
+		<c:set var="lastBranch" />
 		<c:forEach var="activity" varStatus="activityStatus" items="${planner.activities}">
+			<c:if test="${not empty activity.parentActivityTitle and not (activity.parentActivityTitle eq lastParentActivityTitle)}">
+				<c:set var="lastParentActivityTitle" value="${activity.parentActivityTitle}" />
+				<tr>
+					<td colspan="2" class="branchingFirstActivity">
+						<h2 style="color: blue">${lastParentActivityTitle}</h2>
+					</td>
+				</tr>
+			</c:if>
 			<tr>
-				<td class="titleCell">
-					<span>${activity.type}<br /></span>
+				<td class="titleCell
+				<c:if test="${not empty activity.branch}">
+					branch${activity.branch}
+				</c:if>
+				<c:if test="${activity.lastNestedActivity}">
+					branchingLastActivity
+				</c:if>
+				">
+					<c:if test="${not empty activity.branch and not (activity.branch eq lastBranch)}">
+						<c:set var="lastBranch" value="${activity.branch}" />
+						<h3 class="branch${lastBranch}"><fmt:message key="label.planner.branch" />${lastBranch}
+						<c:if test="${activity.defaultBranch}">
+							<br /><fmt:message key="label.planner.branch.default" />
+						</c:if>
+						</h3>
+					</c:if>
+					<c:if test="${not empty activity.type}">
+						<span>${activity.type}<br /></span>
+					</c:if>
 					<c:choose>
+						<c:when test="${empty activity.toolIconUrl}">
+						</c:when>
 						<c:when test="${fn:endsWith(activity.toolIconUrl,'.swf')}">
 							<object width="35" height="35">
 								<param name="movie" value="<lams:LAMSURL/>${activity.toolIconUrl}" ></param>
@@ -112,10 +141,15 @@
 							<img src="<lams:LAMSURL/>${activity.toolIconUrl}" />
 						</c:otherwise>
 					</c:choose>
-	
-					<h4>${activity.title}</h4>
+					<c:if test="${not empty activity.title}">
+						<h4>${activity.title}</h4>
+					</c:if>
 				</td>
-				<td class="formCell">
+				<td class="formCell
+				<c:if test="${activity.lastNestedActivity}">
+					branchingLastActivity
+				</c:if>
+				">
 					<iframe frameborder="0" marginheight="0" marginwidth="0" name="activity${activityStatus.index+1}" id="activity${activityStatus.index+1}" class="toolFrame"
 						src="<lams:LAMSURL/>${activity.pedagogicalPlannerUrl}">
 					</iframe>
@@ -128,7 +162,16 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="titleCell">
+				<td class="titleCell
+				<c:if test="${not empty activity.branch and not activity.lastNestedActivity}">
+					branch${activity.branch}
+				</c:if>
+				"
+				<c:if test="${activity.lastNestedActivity}">
+					style="padding-top: 5px;"
+				</c:if>
+				>
+				
 					<c:if test="${not activityStatus.last}">
 						<img src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
 					</c:if>

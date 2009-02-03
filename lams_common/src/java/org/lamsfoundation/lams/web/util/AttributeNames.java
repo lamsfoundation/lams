@@ -86,5 +86,5 @@ public class AttributeNames {
     public static final String PARAM_COMMAND = "command";
     public static final String COMMAND_GET_EDITING_ADVICE = "getEditingAdvice";
     public static final String COMMAND_CHECK_EDITING_ADVICE = "checkEditingAdvice";
-    public static final String PARAM_ACTIVITY_INDEX = "activityNumber";
+    public static final String PARAM_ACTIVITY_INDEX = "activityIndex";
 }

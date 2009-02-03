@@ -30,6 +30,23 @@ public class PedagogicalPlannerActivityDTO {
     private String type;
     private String editingAdviceUrl;
     private String checkEditingAdviceUrl;
+    private Boolean supportsPlanner;
+    private Short branch;
+    private String parentActivityTitle;
+    private Boolean lastNestedActivity = false;
+    private Boolean defaultBranch = false;
+
+    public static final short TYPE_PLAIN_ACTIVITY = 1;
+    public static final short TYPE_BRANCHING_ACTIVITY = 2;
+    public static final short TYPE_OPTIONAL_ACTIVITY = 3;
+
+    public Boolean getSupportsPlanner() {
+	return supportsPlanner;
+    }
+
+    public void setSupportsPlanner(Boolean supportsPlanner) {
+	this.supportsPlanner = supportsPlanner;
+    }
 
     public String getPedagogicalPlannerUrl() {
 	return pedagogicalPlannerUrl;
@@ -39,14 +56,16 @@ public class PedagogicalPlannerActivityDTO {
 	pedagogicalPlannerUrl = toolSignature;
     }
 
-    public PedagogicalPlannerActivityDTO(String type, String title, String pedagogicalPlannerUrl, String toolIconUrl,
-	    String checkEditingAdviceUrl, String editingAdviceUrl) {
+    public PedagogicalPlannerActivityDTO(String type, String title, Boolean supportsPlanner,
+	    String pedagogicalPlannerUrl, String toolIconUrl, String checkEditingAdviceUrl, String editingAdviceUrl) {
+	this.supportsPlanner = supportsPlanner;
 	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
 	this.toolIconUrl = toolIconUrl;
 	this.checkEditingAdviceUrl = checkEditingAdviceUrl;
 	this.editingAdviceUrl = editingAdviceUrl;
 	this.title = title;
 	this.type = type;
+
     }
 
     public String getToolIconUrl() {
@@ -87,5 +106,37 @@ public class PedagogicalPlannerActivityDTO {
 
     public void setCheckEditingAdviceUrl(String checkEditingAdviceUrl) {
 	this.checkEditingAdviceUrl = checkEditingAdviceUrl;
+    }
+
+    public Short getBranch() {
+	return branch;
+    }
+
+    public void setBranch(Short branch) {
+	this.branch = branch;
+    }
+
+    public String getParentActivityTitle() {
+	return parentActivityTitle;
+    }
+
+    public void setParentActivityTitle(String branchingActivityTitle) {
+	parentActivityTitle = branchingActivityTitle;
+    }
+
+    public Boolean getLastNestedActivity() {
+	return lastNestedActivity;
+    }
+
+    public void setLastNestedActivity(Boolean lastNestedActivity) {
+	this.lastNestedActivity = lastNestedActivity;
+    }
+
+    public Boolean getDefaultBranch() {
+	return defaultBranch;
+    }
+
+    public void setDefaultBranch(Boolean defaultBranch) {
+	this.defaultBranch = defaultBranch;
     }
 }

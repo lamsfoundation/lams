@@ -135,6 +135,8 @@ public class CentralConstants {
 
     public static final String PARAM_SEQUENCE_TITLE = "sequenceTitle";
 
+    public static final String PARAM_FORM_MESSAGE = "formMessage";
+
     public static final String ERROR_PLANNER_TITLE_BLANK = "error.planner.title.blank";
 
     public static final String PATH_ACTIVITY_NO_PLANNER_SUPPORT = "/pedagogical_planner/defaultForm.jsp";
@@ -142,6 +144,8 @@ public class CentralConstants {
     public static final String TEMPLATE_FILE_NAME = "LAMS_Pedagogical_Planner_Template.zip";
 
     public static final String IMAGE_PATH_GATE = "images/stop.gif";
+
+    public static final String RESOURCE_KEY_BRANCH_EMPTY = "label.planner.branch.empty";
 
     public static final String IMAGE_PATH_GROUPING = "images/grouping.gif";
 }

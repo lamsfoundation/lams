@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,11 +43,13 @@ import org.lamsfoundation.lams.authoring.dto.PedagogicalPlannerActivityDTO;
 import org.lamsfoundation.lams.authoring.dto.PedagogicalPlannerDTO;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -136,86 +139,30 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	if (toolsErrorMsgs.size() > 0) {
 	    throw new ServletException("There were tool errors.");
 	}
-	List<PedagogicalPlannerActivityDTO> activitites = new ArrayList<PedagogicalPlannerActivityDTO>();
+	List<PedagogicalPlannerActivityDTO> activities = new ArrayList<PedagogicalPlannerActivityDTO>();
 	// create DTO that holds all the necessary information of the activities
-	int activitySupportingPlannerCount = 0;
-	Activity activity = learningDesign.getFirstActivity();
-	int activityIndex = 1;
-	while (activity != null) {
-	    boolean activitySupportsPlanner = false;
-	    boolean activityAdded = false;
-	    if (activity.isToolActivity()) {
-		ToolActivity toolActivity = (ToolActivity) activity;
-		String pedagogicalPlannerUrl = toolActivity.getTool().getPedagogicalPlannerUrl();
-		if (pedagogicalPlannerUrl == null) {
-		    activitites.add(new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(),
-			    activity.getTitle(), CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity
-				    .getLibraryActivityUiImage(), null, null));
 
-		} else {
-		    pedagogicalPlannerUrl += pedagogicalPlannerUrl
-			    .contains(PedagogicalPlannerAction.CHAR_QUESTION_MARK) ? PedagogicalPlannerAction.CHAR_AMPERSAND
-			    : PedagogicalPlannerAction.CHAR_QUESTION_MARK;
-		    pedagogicalPlannerUrl += AttributeNames.PARAM_TOOL_CONTENT_ID
-			    + PedagogicalPlannerAction.CHAR_EQUALS + toolActivity.getToolContentId();
-		    activitites
-			    .add(new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(),
-				    activity.getTitle(), pedagogicalPlannerUrl
-					    + PedagogicalPlannerAction.CHAR_AMPERSAND
-					    + AttributeNames.PARAM_CONTENT_FOLDER_ID
-					    + PedagogicalPlannerAction.CHAR_EQUALS
-					    + learningDesign.getContentFolderID(),
-				    activity.getLibraryActivityUiImage(), pedagogicalPlannerUrl
-					    + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_COMMAND
-					    + PedagogicalPlannerAction.CHAR_EQUALS
-					    + AttributeNames.COMMAND_CHECK_EDITING_ADVICE
-					    + PedagogicalPlannerAction.CHAR_AMPERSAND
-					    + AttributeNames.PARAM_ACTIVITY_INDEX
-					    + PedagogicalPlannerAction.CHAR_EQUALS + activityIndex,
-				    pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND
-					    + AttributeNames.PARAM_COMMAND + PedagogicalPlannerAction.CHAR_EQUALS
-					    + AttributeNames.COMMAND_GET_EDITING_ADVICE));
-		    activitySupportsPlanner = true;
-		}
-		activityAdded = true;
-	    } else if (activity.isGroupingActivity()) {
-		GroupingActivity groupingActivity = (GroupingActivity) activity;
-		activitites.add(new PedagogicalPlannerActivityDTO(null, activity.getTitle(), groupingActivity
-			.getSystemTool().getPedagogicalPlannerUrl()
-			+ PedagogicalPlannerAction.CHAR_AMPERSAND
-			+ AttributeNames.PARAM_TOOL_CONTENT_ID
-			+ PedagogicalPlannerAction.CHAR_EQUALS + groupingActivity.getCreateGrouping().getGroupingId(),
-			CentralConstants.IMAGE_PATH_GROUPING, null, null));
-		activitySupportsPlanner = true;
-		activityAdded = true;
-	    } else if (activity.isGateActivity()) {
-		activitites
-			.add(new PedagogicalPlannerActivityDTO(null, activity.getTitle(),
-				CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT, CentralConstants.IMAGE_PATH_GATE,
-				null, null));
-		activityAdded = true;
-	    }
-	    if (activitySupportsPlanner) {
-		activitySupportingPlannerCount++;
-	    }
-	    if (!activityAdded) {
-		activitites.add(new PedagogicalPlannerActivityDTO(null, activity.getTitle(),
-			CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity.getLibraryActivityUiImage(), null,
-			null));
-	    }
+	Activity activity = learningDesign.getFirstActivity();
+	while (activity != null) {
+	    addActivityToPlanner(learningDesign, activities, activity);
 	    Transition transitionTo = activity.getTransitionTo();
 	    if (transitionTo == null) {
 		activity = null;
 	    } else {
 		activity = transitionTo.getToActivity();
 	    }
-	    activityIndex++;
+	}
+	int activitySupportingPlannerCount = 0;
+	for (PedagogicalPlannerActivityDTO activityDTO : activities) {
+	    if (activityDTO.getSupportsPlanner()) {
+		activitySupportingPlannerCount++;
+	    }
 	}
 	// Set other properties
 	PedagogicalPlannerDTO planner = new PedagogicalPlannerDTO();
 	planner.setActivitySupportingPlannerCount(activitySupportingPlannerCount);
 	planner.setSequenceTitle(learningDesign.getTitle());
-	planner.setActivities(activitites);
+	planner.setActivities(activities);
 	planner.setSendInPortions(false);
 	planner.setSubmitDelay(5000L);
 	planner.setActivitiesInPortion(2);
@@ -350,5 +297,99 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	newPath = newPath + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_LESSON_ID
 		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId();
 	return new ActionForward(newPath, true);
+    }
+
+    private PedagogicalPlannerActivityDTO addActivityToPlanner(LearningDesign learningDesign,
+	    List<PedagogicalPlannerActivityDTO> activities, Activity activity) throws ServletException {
+	boolean isNested = activity.getParentActivity() != null
+		&& (activity.getParentActivity().isBranchingActivity() || activity.isOptionsActivity());
+
+	PedagogicalPlannerActivityDTO addedDTO = null;
+	if (activity.isToolActivity()) {
+	    ToolActivity toolActivity = (ToolActivity) activity;
+	    String pedagogicalPlannerUrl = toolActivity.getTool().getPedagogicalPlannerUrl();
+	    if (pedagogicalPlannerUrl == null) {
+		addedDTO = new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(), activity
+			.getTitle(), false, CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity
+			.getLibraryActivityUiImage(), null, null);
+	    } else {
+		pedagogicalPlannerUrl += pedagogicalPlannerUrl.contains(PedagogicalPlannerAction.CHAR_QUESTION_MARK) ? PedagogicalPlannerAction.CHAR_AMPERSAND
+			: PedagogicalPlannerAction.CHAR_QUESTION_MARK;
+		pedagogicalPlannerUrl += AttributeNames.PARAM_TOOL_CONTENT_ID + PedagogicalPlannerAction.CHAR_EQUALS
+			+ toolActivity.getToolContentId();
+		addedDTO = new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(), activity
+			.getTitle(), true, pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND
+			+ AttributeNames.PARAM_CONTENT_FOLDER_ID + PedagogicalPlannerAction.CHAR_EQUALS
+			+ learningDesign.getContentFolderID(), activity.getLibraryActivityUiImage(),
+			pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_COMMAND
+				+ PedagogicalPlannerAction.CHAR_EQUALS + AttributeNames.COMMAND_CHECK_EDITING_ADVICE
+				+ PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_ACTIVITY_INDEX
+				+ PedagogicalPlannerAction.CHAR_EQUALS + (activities.size() + 1), pedagogicalPlannerUrl
+				+ PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_COMMAND
+				+ PedagogicalPlannerAction.CHAR_EQUALS + AttributeNames.COMMAND_GET_EDITING_ADVICE);
+	    }
+	    activities.add(addedDTO);
+	} else if (activity.isGroupingActivity()) {
+	    GroupingActivity groupingActivity = (GroupingActivity) activity;
+	    addedDTO = new PedagogicalPlannerActivityDTO(null, activity.getTitle(), true, groupingActivity
+		    .getSystemTool().getPedagogicalPlannerUrl()
+		    + PedagogicalPlannerAction.CHAR_AMPERSAND
+		    + AttributeNames.PARAM_TOOL_CONTENT_ID
+		    + PedagogicalPlannerAction.CHAR_EQUALS + groupingActivity.getCreateGrouping().getGroupingId(),
+		    CentralConstants.IMAGE_PATH_GROUPING, null, null);
+	    activities.add(addedDTO);
+	} else if (activity.isGateActivity()) {
+	    addedDTO = new PedagogicalPlannerActivityDTO(null, activity.getTitle(), false,
+		    CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT, CentralConstants.IMAGE_PATH_GATE, null, null);
+	    activities.add(addedDTO);
+	} else if (activity.isBranchingActivity()) {
+	    if (isNested) {
+		throw new ServletException(
+			"Nested branching or optional activities are not allowed in Pedagogical Planner.");
+	    }
+	    BranchingActivity branchingActivity = (BranchingActivity) activity;
+	    SequenceActivity defaultSequence = (SequenceActivity) branchingActivity.getDefaultActivity();
+	    Set<SequenceActivity> sequenceActivities = branchingActivity.getActivities();
+	    short branch = 1;
+	    for (SequenceActivity sequenceActivity : sequenceActivities) {
+		if (branch > 4) {
+		    throw new ServletException(
+			    "Number of branches in branching activity is limited to 4 in Pedagogical Planner.");
+		}
+		Activity nestedActivity = sequenceActivity.getDefaultActivity();
+		boolean defaultBranch = sequenceActivity.equals(defaultSequence);
+		if (nestedActivity == null) {
+		    String path = CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT
+			    + PedagogicalPlannerAction.CHAR_QUESTION_MARK + CentralConstants.PARAM_FORM_MESSAGE
+			    + PedagogicalPlannerAction.CHAR_EQUALS
+			    + getMessageService().getMessage(CentralConstants.RESOURCE_KEY_BRANCH_EMPTY);
+		    addedDTO = new PedagogicalPlannerActivityDTO(null, null, false, path, null, null, null);
+		    addedDTO.setParentActivityTitle(activity.getTitle());
+		    addedDTO.setBranch(branch);
+		    addedDTO.setDefaultBranch(defaultBranch);
+		    activities.add(addedDTO);
+		} else {
+		    do {
+			addedDTO = addActivityToPlanner(learningDesign, activities, nestedActivity);
+			Transition transitionTo = nestedActivity.getTransitionTo();
+			if (transitionTo == null) {
+			    nestedActivity = null;
+			} else {
+			    nestedActivity = transitionTo.getToActivity();
+			}
+			addedDTO.setParentActivityTitle(activity.getTitle());
+			addedDTO.setBranch(branch);
+			addedDTO.setDefaultBranch(defaultBranch);
+		    } while (nestedActivity != null);
+		}
+		branch++;
+	    }
+	    addedDTO.setLastNestedActivity(true);
+	} else {
+	    addedDTO = new PedagogicalPlannerActivityDTO(null, activity.getTitle(), false,
+		    CentralConstants.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity.getLibraryActivityUiImage(), null, null);
+	    activities.add(addedDTO);
+	}
+	return addedDTO;
     }
 }
