@@ -21,6 +21,8 @@ values ('SMTPUser','', 'config.smtp.user', 'config.header.email', 'STRING', 0);
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('SMTPPassword','', 'config.smtp.password', 'config.header.email', 'STRING', 0);
 
+-- LDEV-2107 --------------
+INSERT into lams_workspace_folder_type VALUES (3, 'PUBLIC SEQUENCES');
 
 ----------------------Put all sql statements above here-------------------------
 
