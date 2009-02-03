@@ -113,6 +113,7 @@ INSERT into lams_copy_type VALUES(3,'PREVIEW');
 
 INSERT into lams_workspace_folder_type VALUES (1, 'NORMAL');
 INSERT into lams_workspace_folder_type VALUES (2, 'RUN SEQUENCES');
+INSERT into lams_workspace_folder_type VALUES (3, 'PUBLIC SEQUENCES');
 
 INSERT INTO lams_authentication_method VALUES (1, 1, 'LAMS-Database');
 INSERT INTO lams_authentication_method VALUES (2, 2, 'Oxford-WebAuth');

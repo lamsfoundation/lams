@@ -221,7 +221,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 			if ( BOOTSTRAP_FOLDER_ID.equals(folderID )) {
 				MessageService msgService = workspaceManagementService.getMessageService();
 
-				// return back the dummy org DTO and the user's workspace folder
+				// return back the dummy org DTO, the user's workspace folder and public folder
 				Vector<FolderContentDTO> folders = new Vector<FolderContentDTO>();
 				FolderContentDTO userFolder = workspaceManagementService.getUserWorkspaceFolder(userID);
 				if ( userFolder != null )
@@ -234,6 +234,10 @@ public class WorkspaceAction extends LamsDispatchAction {
 						null);
 				
 				folders.add(dummyOrgFolder);
+				
+				FolderContentDTO publicFolder = workspaceManagementService.getPublicWorkspaceFolder(userID);
+				if ( publicFolder != null )
+					folders.add(publicFolder);
 				
 				packet = createFolderContentPacket(null, BOOTSTRAP_FOLDER_ID, folders);
 				

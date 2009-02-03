@@ -381,6 +381,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		} else {
 			if ( WorkspaceFolder.RUN_SEQUENCES.equals(workspaceFolder.getWorkspaceFolderType()) ) {
 				permission = WorkspaceFolder.READ_ACCESS;
+			} else if( WorkspaceFolder.PUBLIC_SEQUENCES.equals(workspaceFolder.getWorkspaceFolderType()) ) {
+				permission = WorkspaceFolder.MEMBERSHIP_ACCESS;
 			} else if (workspaceFolder.getUserID().equals(user.getUserId())) {
 				permission = WorkspaceFolder.OWNER_ACCESS;
 			} else if (isSysAuthorAdmin(user)){
@@ -1190,6 +1192,31 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			}
 		} else {
 			log.warn("getUserWorkspaceFolder: User "+userID+" does not exist. Returning no folders.");
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * (non-Javadoc)
+	 * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getPublicWorkspaceFolder(java.lang.Integer)
+	 */
+	public FolderContentDTO getPublicWorkspaceFolder(Integer userID) throws IOException {
+		User user = (User)baseDAO.find(User.class,userID);
+		
+		if (user != null) {
+			WorkspaceFolder publicFolder = null;
+			List list = baseDAO.findByProperty(WorkspaceFolder.class, "workspaceFolderType", WorkspaceFolder.PUBLIC_SEQUENCES);
+			
+			if (list != null && list.size() > 0) {
+				publicFolder = (WorkspaceFolder) list.get(0);
+			}
+			
+			if(publicFolder != null) {
+				publicFolder.setName(messageService.getMessage("public.folder"));
+				Integer permissions = getPermissions(publicFolder, user);
+				return new FolderContentDTO(publicFolder, permissions);
+			}
 		}
 		
 		return null;

@@ -18,6 +18,7 @@ insert into lams_workspace (workspace_id, name, default_fld_id) values(7,'Three 
 insert into lams_workspace (workspace_id, name, default_fld_id) values(8,'Four Test',8);
 insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(50,'Moodle Test',40,41);
 insert into lams_workspace (workspace_id, name, default_fld_id) values(51,'System Administrator',45);
+insert into lams_workspace (workspace_id, name, default_fld_id) values(52,'Public Folder',46);
 
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(1,null,'ROOT',1,'20041223','20041223',1);
@@ -58,6 +59,9 @@ values(41,40,'Lesson Sequence Folder',1,'20041223','20041223',2);
 insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
 values(45,null,'System Administrator',1,'20061101','20061101',1);
 
+insert into lams_workspace_folder (workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(46,1,'Public Folder',1,'20041223','20041223',3);
+
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (1, 1,1);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (2, 2,2);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (3, 2,22);
@@ -70,6 +74,7 @@ insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) valu
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (10, 8,8);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (11, 50,40);
 insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (12, 51,45);
+insert into lams_wkspc_wkspc_folder (id, workspace_id, workspace_folder_id) values (13, 52,46);
 
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
 	VALUES (1, 'Root', null, 'Root Organisation',null,1,NOW(),1,1,1,1);
@@ -85,8 +90,7 @@ INSERT INTO lams_organisation (organisation_id, name, code, description, parent_
 	VALUES (6, 'Tutorial Group B', 'TUTB', 'Tutorial Group B',4,3,NOW(),1,null,2,1);
 INSERT INTO lams_organisation (organisation_id, name, code, description, parent_organisation_id, organisation_type_id, create_date, created_by, workspace_id, locale_id, organisation_state_id)
 	VALUES (7, 'Moodle', 'Moodle', 'Moodle Test',1,2,NOW(),1,50,1,2);
-
-
+	
 -- users
 INSERT INTO lams_user (user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,
 city,state,country,day_phone,evening_phone,mobile_phone,fax,email,
@@ -170,7 +174,7 @@ values
 '0211111113','test4@xx.os',
 0,'20041223',1,8,1,1,2);
 
---- sysadmin only belongs to root
+--- sysadmin only belongs to root and public
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (1, 1, 1);
 
 --- all other users belong to Playpen

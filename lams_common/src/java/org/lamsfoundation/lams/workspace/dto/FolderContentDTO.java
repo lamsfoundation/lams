@@ -48,6 +48,7 @@ public class FolderContentDTO {
 	public Date lastModifiedDateTime;
 	public String formattedLastModifiedDateTime;
 	public String resourceType;
+	public Long resourceTypeID;
 	public Long resourceID;
 	public Integer permissionCode;
 	public Vector versionDetails;
@@ -96,6 +97,7 @@ public class FolderContentDTO {
 		this.lastModifiedDateTime = workspaceFolder.getLastModifiedDate();
 		this.formattedLastModifiedDateTime = formatLastModifiedDateTime();
 		this.resourceType = FOLDER;
+		this.resourceTypeID = new Long(workspaceFolder.getWorkspaceFolderType().intValue());
 		this.resourceID = new Long(workspaceFolder.getWorkspaceFolderId().intValue());
 		this.permissionCode = permissionCode;
 		this.licenseID = null;
@@ -167,6 +169,12 @@ public class FolderContentDTO {
 	 */
 	public String getResourceType() {
 		return resourceType!=null?resourceType:WDDXTAGS.STRING_NULL_VALUE;
+	}
+	/**
+	 * @return Returns the resourceTypeID.
+	 */
+	public Long getResourceTypeID() {
+		return resourceTypeID!=null?resourceTypeID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
 	}
 	/**
 	 * @return Returns the versionDetails.

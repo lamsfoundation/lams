@@ -46,6 +46,7 @@ public class WorkspaceFolder implements Serializable {
 	/******************************************************************/
 	public static final Integer NORMAL = new Integer(1);
 	public static final Integer RUN_SEQUENCES = new Integer(2);
+	public static final Integer PUBLIC_SEQUENCES = new Integer(3);
 	/******************************************************************/
 	
 	/** static final variables indicating the permissions on the workspaceFolder */
@@ -55,7 +56,7 @@ public class WorkspaceFolder implements Serializable {
 	public static final Integer OWNER_ACCESS = new Integer(3);
 	public static final Integer NO_ACCESS = new Integer(4);
 	/******************************************************************/
-
+	
     /** identifier field */
     private Integer workspaceFolderId;
 

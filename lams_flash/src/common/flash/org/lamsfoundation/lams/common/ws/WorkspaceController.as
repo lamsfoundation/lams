@@ -270,7 +270,11 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 		
 		_global.breakpoint();
 		if(tgt.indexOf("copy_btn") != -1){
-			_workspaceModel.setClipboardItem(snode.attributes.data);
+			if(isUserPrivateFolder(snode) || isPublicFolder(snode)) { clearBusy(); return; }
+				
+			if(!snodeData.readOnly)
+				_workspaceModel.setClipboardItem(snode.attributes.data);
+			
 			
 		}else if(tgt.indexOf("paste_btn") != -1){
 			var itemToPaste = _workspaceModel.getClipboardItem();
@@ -304,7 +308,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 
 		}else if(tgt.indexOf("delete_btn") != -1){
 			
-			if(isUserPrivateFolder(snode)) { LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);  clearBusy(); return; }
+			if(isUserPrivateFolder(snode) || isPublicFolder(snode)) { LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);  clearBusy(); return; }
 			
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 			
@@ -342,7 +346,7 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 			
 		}else if(tgt.indexOf("rename_btn") != -1){
 			//check we can rename a folder here
-			if(isUserPrivateFolder(snode)) { LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);  clearBusy(); return; }
+			if(isUserPrivateFolder(snode) || isPublicFolder(snode)) { LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);  clearBusy(); return; }
 			
 			var snodeData = workspaceDialogue.treeview.selectedNode.attributes.data;
 			if(snodeData != null){
@@ -411,6 +415,20 @@ class org.lamsfoundation.lams.common.ws.WorkspaceController extends AbstractCont
 	 */
 	private function isUserPrivateFolder(snode:XMLNode) {
 		if(_workspaceModel.getWorkspaceResource(_workspaceModel.RT_FOLDER + "_" + WorkspaceModel.ROOT_VFOLDER).firstChild == snode) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Determine if node is representing the public folder
+	 * 
+	 * @param   snode Node to check
+	 * @return  
+	 */
+	private function isPublicFolder(snode:XMLNode) {
+		if(_workspaceModel.getWorkspaceResource(_workspaceModel.RT_FOLDER + "_" + WorkspaceModel.ROOT_VFOLDER).lastChild == snode && snode.attributes.data.resourceTypeID == Workspace.PUBLIC_SEQ_TYPE) {
 			return true;
 		} else {
 			return false;

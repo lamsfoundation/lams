@@ -43,6 +43,10 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 	public static var MODE_READONLY:String = "READONLY";
 	public static var MODE_INSERT:String = "INSERT";
 	
+	public static var NORMAL_TYPE:Number = 1;
+	public static var RUN_SEQ_TYPE:Number = 2;
+	public static var PUBLIC_SEQ_TYPE:Number = 3;
+	
 	//Model
 	private var workspaceModel:WorkspaceModel;
 	

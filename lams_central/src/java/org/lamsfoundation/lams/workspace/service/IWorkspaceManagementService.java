@@ -291,7 +291,17 @@ public interface IWorkspaceManagementService {
 	 * @throws IOException
 	 */
 	public FolderContentDTO getUserWorkspaceFolder(Integer userID)throws IOException;
-
+	
+	/**
+	 * This method returns the public workspace folder for the server. 
+	 * 
+	 * @param userID The <code>user_id</code> of the user for whom the
+	 * 				 folders have to fetched
+	 * @return FolderContentDTO for the public workspace folder 
+	 * @throws IOException
+	 */
+	public FolderContentDTO getPublicWorkspaceFolder(Integer userID) throws IOException;
+	
 	/**
 	 * This method renames the workspaceFolder/learning design with the
 	 * given <code>resourceID</code> to <code>newName</code>.
