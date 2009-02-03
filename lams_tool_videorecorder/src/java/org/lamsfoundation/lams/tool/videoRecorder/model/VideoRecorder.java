@@ -76,6 +76,10 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     
     private boolean allowLearnerVideoVisibility;
     
+    private boolean allowComments;
+    
+    private boolean allowRatings;
+    
     private String onlineInstructions;
 
     private String offlineInstructions;
@@ -278,6 +282,30 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setAllowLearnerVideoExport(boolean allowLearnerVideoExport) {
 	this.allowLearnerVideoExport = allowLearnerVideoExport;
+    }  
+
+    /**
+     * @hibernate.property column="allow_comments" length="1"
+     * @return
+     */
+    public boolean isAllowComments() {
+	return allowComments;
+    }
+
+    public void setAllowComments(boolean allowComments) {
+	this.allowComments = allowComments;
+    }  
+
+    /**
+     * @hibernate.property column="allow_ratings" length="1"
+     * @return
+     */
+    public boolean isAllowRatings() {
+	return allowRatings;
+    }
+
+    public void setAllowRatings(boolean allowRatings) {
+	this.allowRatings = allowRatings;
     }  
     
     /**

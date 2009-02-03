@@ -199,6 +199,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	// set the update date
 	videoRecorder.setUpdateDate(new Date());
 
+	// set changed attributes
+	updateVideoRecorder(videoRecorder, authForm, mode);
+	
 	// releasing defineLater flag so that learner can start using the tool.
 	videoRecorder.setDefineLater(false);
 
@@ -374,7 +377,7 @@ public class AuthoringAction extends LamsDispatchAction {
     private void updateVideoRecorder(VideoRecorder videoRecorder, AuthoringForm authForm, ToolAccessMode mode) {
 	videoRecorder.setTitle(authForm.getTitle());
 	videoRecorder.setInstructions(authForm.getInstructions());
-	if (mode.isAuthor()) { // Teacher cannot modify following
+	//if (mode.isAuthor()) { // Teacher cannot modify following
 	    videoRecorder.setOfflineInstructions(authForm.getOnlineInstruction());
 	    videoRecorder.setOnlineInstructions(authForm.getOfflineInstruction());
 	    videoRecorder.setLockOnFinished(authForm.isLockOnFinished());
@@ -382,7 +385,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	    videoRecorder.setAllowUseCamera(authForm.isAllowUseCamera());
 	    videoRecorder.setAllowLearnerVideoVisibility(authForm.isAllowLearnerVideoVisibility());
 	    videoRecorder.setAllowLearnerVideoExport(authForm.isAllowLearnerVideoExport());
-	}
+	    videoRecorder.setAllowComments(authForm.isAllowComments());
+	    videoRecorder.setAllowRatings(authForm.isAllowComments());
+	//}
     }
 
     /**
@@ -402,6 +407,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	authForm.setAllowUseCamera(videoRecorder.isAllowUseCamera());
 	authForm.setAllowLearnerVideoVisibility(videoRecorder.isAllowLearnerVideoVisibility());
 	authForm.setAllowLearnerVideoExport(videoRecorder.isAllowLearnerVideoExport());
+	authForm.setAllowComments(videoRecorder.isAllowComments());
+	authForm.setAllowRatings(videoRecorder.isAllowComments());
     }
 
     /**

@@ -70,20 +70,19 @@
         />
 
         <property
-            name="notes"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="notes"
-            length="1027"
-        />
-
-        <property
             name="rating"
             type="java.lang.Float"
             update="true"
             insert="true"
             column="rating"
+        />
+
+        <property
+            name="isJustSound"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="is_just_sound"
         />
 
         <many-to-one
@@ -104,6 +103,42 @@
             column="filename"
             length="255"
         />
+
+        <set
+            name="ratings"
+            lazy="false"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="videoRecorder_recording_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating"
+            />
+
+        </set>
+
+        <set
+            name="comments"
+            lazy="false"
+            cascade="all-delete-orphan"
+            sort="unsorted"
+        >
+
+            <key
+                column="videoRecorder_recording_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment"
+            />
+
+        </set>
 
         <!--
             To add non XDoclet property mappings, create a file named

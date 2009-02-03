@@ -26,13 +26,18 @@ package org.lamsfoundation.lams.tool.videoRecorder.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRatingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment;
+import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderCondition;
+import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRecording;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
@@ -131,6 +136,60 @@ public interface IVideoRecorderService {
 
     /**
      * 
+     * @param commentId
+     * @return
+     */
+    public VideoRecorderComment getCommentById(Long commentId);
+    
+    /**
+     * 
+     * @param userId
+     * @return
+     */
+    public Set<VideoRecorderComment> getCommentsByUserId(Long userId);
+    
+    /**
+     * 
+     * @param toolSessionId
+     * @return
+     */
+    public Set<VideoRecorderCommentDTO> getCommentsByToolSessionId(Long toolSessionId);
+
+    /**
+     * 
+     * @param videoRecorderComment
+     */
+    public void saveOrUpdateVideoRecorderComment(VideoRecorderComment videoRecorderComment);    
+    
+    /**
+     * 
+     * @param ratingId
+     * @return
+     */
+    public VideoRecorderRating getRatingById(Long ratingId);
+    
+    /**
+     * 
+     * @param userId
+     * @return
+     */
+    public Set<VideoRecorderRating> getRatingsByUserId(Long userId);
+    
+    /**
+     * 
+     * @param toolSessionId
+     * @return
+     */
+    public Set<VideoRecorderRatingDTO> getRatingsByToolSessionId(Long toolSessionId); 
+
+    /**
+     * 
+     * @param videoRecorderComment
+     */
+    public void saveOrUpdateVideoRecorderRating(VideoRecorderRating videoRecorderRating);        
+    
+    /**
+     * 
      * @param user
      * @param videoRecorderSession
      * @return
@@ -164,6 +223,12 @@ public interface IVideoRecorderService {
      * @param videoRecorderRecording
      */
     public void saveOrUpdateVideoRecorderRecording(VideoRecorderRecording videoRecorderRecording); 
+
+    /**
+     * 
+     * @param videoRecorderRecording
+     */
+    public void deleteVideoRecorderRecording(VideoRecorderRecording videoRecorderRecording);
     
     /**
      * 
@@ -205,4 +270,8 @@ public interface IVideoRecorderService {
     void releaseConditionsFromCache(VideoRecorder videoRecorder);
 
     void deleteCondition(VideoRecorderCondition condition);
+    
+    public String getLanguageXML();
+    
+    public String getLanguageXMLForFCK();
 }

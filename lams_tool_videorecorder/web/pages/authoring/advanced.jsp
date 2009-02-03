@@ -30,7 +30,7 @@
 	<html:checkbox property="allowLearnerVideoVisibility" value="1"
 		styleClass="noBorder" styleId="allowLearnerVideoVisibility"></html:checkbox>
 	<label for="allowLearnerVideoVisibility">
-		<fmt:message key="allowLearnerVideoVisibility" />
+		<fmt:message key="advanced.allowLearnerVideoVisibility" />
 	</label>
 </p>
 
@@ -38,6 +38,22 @@
 	<html:checkbox property="allowLearnerVideoExport" value="1"
 		styleClass="noBorder" styleId="allowLearnerVideoExport"></html:checkbox>
 	<label for="allowLearnerVideoExport">
-		<fmt:message key="allowLearnerVideoExport" />
+		<fmt:message key="advanced.allowLearnerVideoExport" />
+	</label>
+</p>
+
+<p>
+	<html:checkbox property="allowComments" value="1"
+		styleClass="noBorder" styleId="allowComments"></html:checkbox>
+	<label for="allowComments">
+		<fmt:message key="advanced.allowComments" />
+	</label>
+</p>
+
+<p>
+	<html:checkbox property="allowRatings" value="1"
+		styleClass="noBorder" styleId="allowRatings"></html:checkbox>
+	<label for="allowRatings">
+		<fmt:message key="advanced.allowRatings" />
 	</label>
 </p>

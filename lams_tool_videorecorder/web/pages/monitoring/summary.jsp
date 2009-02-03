@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script src="./includes/flash/AC_OETags.js" language="javascript"></script>
 <script type="text/javascript">
 <!--
 	var evalcomixWindow = null;
@@ -111,64 +112,124 @@
 		</td>
 	</tr>
 	
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowComments" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.allowComments}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="advanced.allowRatings" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.allowRatings}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
 </table>
 </div>
 
-<c:forEach var="session" items="${dto.sessionDTOs}">
+<div id="videoRecorder">
+	<script language="JavaScript" type="text/javascript">
+	<!--
+	// Globals
+	// Major version of Flash required
+	var requiredMajorVersion = 9;
+	// Minor version of Flash required
+	var requiredMinorVersion = 0;
+	// Minor version of Flash required
+	var requiredRevision = 124;
 
-	<table>
-		<tr>
-			<td>
-				<h2>
-					${session.sessionName}
-				</h2>
-			</td>
-		</tr>
-	</table>
-
-	<table cellpadding="0">
-		<tr>
-			<td class="field-name" width="30%">
-				<fmt:message key="heading.totalLearners" />
-			</td>
-			<td width="70%">
-				${session.numberOfLearners}
-			</td>
-		</tr>
-	</table>
-
-	<table cellpadding="0">
-
-		<tr>
-			<th>
-				<fmt:message key="heading.learner" />
-			</th>
-			<th>
-				<fmt:message key="heading.notebookEntry" />
-			</th>
-		</tr>
-
-
-		<c:forEach var="user" items="${session.userDTOs}">
-			<tr>
-				<td width="30%">
-					${user.firstName} ${user.lastName}
-				</td>
-				<td width="70%">
-					<c:choose>
-						<c:when test="${user.entryUID == null}">
-							<fmt:message key="label.notAvailable" />
-						</c:when>
-
-						<c:otherwise>
-							<a
-								href="./monitoring.do?dispatch=showVideoRecorder&amp;userUID=${user.uid}">
-								<fmt:message key="label.view" /> </a>
-						</c:otherwise>
-					</c:choose>
-
-				</td>
-			</tr>
-		</c:forEach>
-	</table>
-</c:forEach>
+	// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
+	var hasProductInstall = DetectFlashVer(6, 0, 65);
+	
+	// Version check based upon the values defined in globals
+	var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
+	
+	if ( hasProductInstall && !hasRequestedVersion ) {
+		// DO NOT MODIFY THE FOLLOWING FOUR LINES
+		// Location visited after installation is complete if installation is required
+		var MMPlayerType = (isIE == true) ? "ActiveX" : "PlugIn";
+		var MMredirectURL = window.location;
+	    document.title = document.title.slice(0, 47) + " - Flash Player Installation";
+	    var MMdoctitle = document.title;
+	
+		AC_FL_RunContent(
+			"src", "./includes/flash/playerProductInstall",
+			"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
+			"width", "680",
+			"height", "676",
+			"align", "middle",
+			"id", "VideoRecorder",
+			"quality", "high",
+			"bgcolor", "#ffffff",
+			"name", "VideoRecorder",
+			"allowScriptAccess","sameDomain",
+			"type", "application/x-shockwave-flash",
+			"pluginspage", "http://www.adobe.com/go/getflashplayer"
+		);
+	} else if (hasRequestedVersion) {
+		// if we've detected an acceptable version
+		// embed the Flash Content SWF when all tests are passed
+		AC_FL_RunContent(
+				"src", "./includes/flash/VideoRecorder",
+				"FlashVars", "contentEditable"+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&mode='+'${mode}'+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowLearnerVideoExport='+${videoRecorderDTO.allowLearnerVideoExport}+'&allowComments='+${videoRecorderDTO.allowComments}+'&allowRatings='+${videoRecorderDTO.allowRatings}+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&languageXML='+"${languageXML}"+"",
+				"width", "680",
+				"height", "676",
+				"align", "middle",
+				"id", "VideoRecorder",
+				"quality", "high",
+				"bgcolor", "#ffffff",
+				"name", "VideoRecorder",
+				"allowScriptAccess","sameDomain",
+				"type", "application/x-shockwave-flash",
+				"pluginspage", "http://www.adobe.com/go/getflashplayer"
+		);
+	  } else {  // flash is too old or we can't detect the plugin
+	    var alternateContent = 'Alternate HTML content should be placed here. '
+	  	+ 'This content requires the Adobe Flash Player. '
+	   	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
+	    document.write(alternateContent);  // insert non-flash content
+	  }
+	// -->
+	</script>
+	<noscript>
+	  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+				id="VideoRecorder" width="680" height="676"
+				codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+				<param name="movie" value="/includes/flash/VideoRecorder.swf" />
+				<param name="quality" value="high" />
+				<param name="bgcolor" value="#ffffff" />
+				<param name="allowScriptAccess" value="sameDomain" />
+				<embed src="./includes/flash/VideoRecorder.swf" quality="high" bgcolor="#869ca7"
+					width="526" height="676" name="VideoRecorder" align="middle"
+					play="true"
+					loop="false"
+					quality="high"
+					allowScriptAccess="sameDomain"
+					type="application/x-shockwave-flash"
+					pluginspage="http://www.adobe.com/go/getflashplayer">
+				</embed>
+		</object>
+	</noscript>
+</div>

@@ -62,6 +62,10 @@ public class AuthoringForm extends ActionForm {
 	
 	boolean allowLearnerVideoVisibility;
 	
+	boolean allowComments;
+	
+	boolean allowRatings;
+	
 	FormFile onlineFile; 
 
 	FormFile offlineFile;
@@ -210,5 +214,21 @@ public class AuthoringForm extends ActionForm {
 
 	public void setAllowLearnerVideoExport(boolean allowLearnerVideoExport) {
 		this.allowLearnerVideoExport = allowLearnerVideoExport;
+	}
+	
+	public boolean isAllowComments() {
+		return allowComments;
+	}
+
+	public void setAllowComments(boolean allowComments) {
+		this.allowComments = allowComments;
+	}
+	
+	public boolean isAllowRatings() {
+		return allowRatings;
+	}
+
+	public void setAllowRatings(boolean allowRatings) {
+		this.allowRatings = allowRatings;
 	}
 }

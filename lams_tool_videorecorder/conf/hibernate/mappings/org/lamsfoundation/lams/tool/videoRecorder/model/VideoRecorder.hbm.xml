@@ -123,6 +123,24 @@
         />
 
         <property
+            name="allowComments"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_comments"
+            length="1"
+        />
+
+        <property
+            name="allowRatings"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_ratings"
+            length="1"
+        />
+
+        <property
             name="onlineInstructions"
             type="java.lang.String"
             update="true"

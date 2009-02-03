@@ -36,6 +36,8 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment;
+import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
+import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRecording;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
@@ -55,14 +57,18 @@ public class VideoRecorderRecordingDTO {
 	public String title;
 
 	public String description;
-    
-	public String notes;
 	
 	public Float rating;
+	
+	public Boolean isJustSound;
     
 	public VideoRecorderSession videoRecorderSession;
 	
 	public String filename;
+	
+	public Set ratings;
+	
+	public Set comments;
 	
 	/* Constructors */
 	public VideoRecorderRecordingDTO(){}
@@ -74,13 +80,15 @@ public class VideoRecorderRecordingDTO {
 		this.createBy = videoRecorderRecording.getCreateBy();
 		this.title = videoRecorderRecording.getTitle();
 		this.description = videoRecorderRecording.getDescription();
-		this.notes = videoRecorderRecording.getNotes();
 		this.rating = videoRecorderRecording.getRating();
+		this.isJustSound = videoRecorderRecording.getIsJustSound();
 		this.videoRecorderSession = videoRecorderRecording.getVideoRecorderSession();
 		this.filename = videoRecorderRecording.getFilename();
+		this.ratings = VideoRecorderRatingDTO.getVideoRecorderRatingDTOs(videoRecorderRecording.getRatings());
+		this.comments = VideoRecorderCommentDTO.getVideoRecorderCommentDTOs(videoRecorderRecording.getComments());
 	}
 
-	public static List<VideoRecorderRecordingDTO> getVideoRecorderRecordingDTO(List vrrList){
+	public static List<VideoRecorderRecordingDTO> getVideoRecorderRecordingDTOs(List vrrList){
 		List<VideoRecorderRecordingDTO> retSet = new ArrayList<VideoRecorderRecordingDTO>();
 		if(vrrList == null || vrrList.isEmpty())
 			return retSet;
@@ -143,14 +151,6 @@ public class VideoRecorderRecordingDTO {
     public void setDescription(String description) {
 	this.description = description;
     }
-
-    public String getNotes() {
-	return notes;
-    }
-
-    public void setNotes(String notes) {
-	this.notes = notes;
-    }
     
     public Float getRating() {
 	return rating;
@@ -159,6 +159,14 @@ public class VideoRecorderRecordingDTO {
     public void setRating(Float rating) {
 	this.rating = rating;
     }
+        
+	public Boolean getIsJustSound() {
+		return isJustSound;
+	}
+
+	public void setIsJustSound(Boolean isJustSound) {
+		this.isJustSound = isJustSound;
+	}
 
 	public VideoRecorderSession getVideoRecorderSession() {
 		return this.videoRecorderSession;
@@ -174,5 +182,21 @@ public class VideoRecorderRecordingDTO {
 
 	public void setFilename(String filename) {
 		this.filename = filename;
+	}
+	
+	public Set getComments() {
+		return this.comments;
+	}
+	
+	public void setComments(Set comments) {
+		this.comments = comments;
+	}
+	
+	public Set getRatings() {
+		return this.ratings;
+	}
+	
+	public void setRatings(Set ratings) {
+		this.ratings = ratings;
 	}
 }

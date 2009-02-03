@@ -25,4 +25,52 @@
 				contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 		</td>
 	</tr>
+	<tr>
+		<td class="field-name">
+			<fmt:message key="advanced.allowUseVoice" />
+		</td>
+		<td>
+			<html:checkbox property="allowUseVoice" styleClass="noBorder"></html:checkbox>
+		</td>
+	</tr>
+	<tr>
+		<td class="field-name">
+			<fmt:message key="advanced.allowUseCamera" />
+		</td>
+		<td>
+			<html:checkbox property="allowUseCamera" styleClass="noBorder"></html:checkbox>
+		</td>
+	</tr>
+	<tr>
+		<td class="field-name">
+			<fmt:message key="advanced.allowLearnerVideoVisibility" />
+		</td>
+		<td>
+			<html:checkbox property="allowLearnerVideoVisibility" styleClass="noBorder"></html:checkbox>
+		</td>
+	</tr>
+	<tr>
+		<td class="field-name">
+			<fmt:message key="advanced.allowLearnerVideoExport" />
+		</td>
+		<td>
+			<html:checkbox property="allowLearnerVideoExport" styleClass="noBorder"></html:checkbox>
+		</td>
+	</tr>
+	<tr>
+		<td class="field-name">
+			<fmt:message key="advanced.allowComments" />
+		</td>
+		<td>
+			<html:checkbox property="allowComments" styleClass="noBorder"></html:checkbox>
+		</td>
+	</tr>
+	<tr>
+		<td class="field-name">
+			<fmt:message key="advanced.allowRatings" />
+		</td>
+		<td>
+			<html:checkbox property="allowRatings" styleClass="noBorder"></html:checkbox>
+		</td>
+	</tr>
 </table>

@@ -20,6 +20,7 @@
 	<lams:TabBody id="2" titleKey="button.instructions" page="instructions.jsp" />
 	<lams:TabBody id="3" titleKey="button.editActivity" page="editActivity.jsp" />
 	<lams:TabBody id="4" titleKey="button.statistics" page="statistics.jsp" />
+	
 </div>
 
 <div id="footer"></div>

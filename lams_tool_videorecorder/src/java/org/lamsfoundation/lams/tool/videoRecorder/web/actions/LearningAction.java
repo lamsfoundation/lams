@@ -55,6 +55,8 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /**
  * @author
@@ -118,26 +120,25 @@ public class LearningAction extends LamsDispatchAction {
 			videoRecorderUser = getCurrentUser(toolSessionID);
 		}
 		
-		// set mode, toolSessionID and VideoRecorderDTO
+		VideoRecorderDTO videoRecorderDT0 = new VideoRecorderDTO(videoRecorder);
+		
+		// set mode, toolSessionID and userId
 		request.setAttribute("mode", mode.toString());
 		request.setAttribute("userId", videoRecorderUser.getUid());
+		request.setAttribute("videoRecorderDTO", videoRecorderDT0);
 		learningForm.setToolSessionID(toolSessionID);
 		request.setAttribute("toolSessionId", toolSessionID);
-
-		VideoRecorderDTO videoRecorderDTO = new VideoRecorderDTO(videoRecorder);
-		request.setAttribute("videoRecorderDTO", videoRecorderDTO);
 		
-		/*
-		List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs;
+		// set language xml
+		request.setAttribute("languageXML", videoRecorderService.getLanguageXML());
 		
-		if(videoRecorderDTO.allowLearnerVideoVisibility){
-			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionId(toolSessionID);
-		} else{
-			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionIdAndUserId(toolSessionID, videoRecorderUser.getUserId());
-		}
+		// set red5 server url
+		String red5ServerUrl = Configuration.get(ConfigurationKeys.RED5_SERVER_URL);
+		request.setAttribute("red5ServerUrl", red5ServerUrl);
 		
-		request.setAttribute("videoRecorderRecordingDTOs", videoRecorderRecordingDTOs);
-		*/
+		// set LAMS server url
+		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+		request.setAttribute("serverUrl", serverUrl);
 		
 		// Set the content in use flag.
 		if (!videoRecorder.isContentInUse()) {

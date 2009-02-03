@@ -26,6 +26,54 @@
 				<c:out value="${dto.instructions}" escapeXml="false" />
 			</td>
 		</tr>
+		<tr>
+			<td class="field-name" width="30%">
+				<fmt:message key="advanced.allowUseVoice" />
+			</td>
+			<td>
+				<c:out value="${dto.allowUseVoice}" escapeXml="false" />
+			</td>
+		</tr>
+		<tr>
+			<td class="field-name" width="30%">
+				<fmt:message key="advanced.allowUseCamera" />
+			</td>
+			<td>
+				<c:out value="${dto.allowUseCamera}" escapeXml="false" />
+			</td>
+		</tr>
+		<tr>
+			<td class="field-name" width="30%">
+				<fmt:message key="advanced.allowLearnerVideoVisibility" />
+			</td>
+			<td>
+				<c:out value="${dto.allowLearnerVideoVisibility}" escapeXml="false" />
+			</td>
+		</tr>
+		<tr>
+			<td class="field-name" width="30%">
+				<fmt:message key="advanced.allowLearnerVideoExport" />
+			</td>
+			<td>
+				<c:out value="${dto.allowLearnerVideoExport}" escapeXml="false" />
+			</td>
+		</tr>
+		<tr>
+			<td class="field-name" width="30%">
+				<fmt:message key="advanced.allowComments" />
+			</td>
+			<td>
+				<c:out value="${dto.allowComments}" escapeXml="false" />
+			</td>
+		</tr>
+		<tr>
+			<td class="field-name" width="30%">
+				<fmt:message key="advanced.allowRatings" />
+			</td>
+			<td>
+				<c:out value="${dto.allowRatings}" escapeXml="false" />
+			</td>
+		</tr>
 	</tbody>
 </table>
 

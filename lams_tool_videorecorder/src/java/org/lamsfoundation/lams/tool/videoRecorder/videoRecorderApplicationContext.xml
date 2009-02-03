@@ -28,7 +28,9 @@
 				<value>org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderUser.hbm.xml</value>
 				<value>org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderAttachment.hbm.xml</value> 
 				<value>org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderCondition.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderRecording.hbm.xml</value> 
+				<value>org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderRecording.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderRating.hbm.xml</value>
+				<value>org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderComment.hbm.xml</value>  
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
@@ -47,6 +49,8 @@
 				<property name="videoRecorderUserDAO"><ref bean="videoRecorderUserDAO"/></property>
 				<property name="videoRecorderDAO"><ref bean="videoRecorderDAO"/></property>
 				<property name="videoRecorderRecordingDAO"><ref bean="videoRecorderRecordingDAO"/></property>
+				<property name="videoRecorderRatingDAO"><ref bean="videoRecorderRatingDAO"/></property>
+				<property name="videoRecorderCommentDAO"><ref bean="videoRecorderCommentDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property>	
 				<property name="auditService"><ref bean="auditService"/></property>		
@@ -54,6 +58,7 @@
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="videoRecorderOutputFactory"><ref bean="videoRecorderOutputFactory"/></property>
+		   		<property name="messageService"><ref bean="videoRecorderMessageService"/></property>  
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -97,6 +102,14 @@
 	</bean>
 	
 	<bean id="videoRecorderAttachmentDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderAttachmentDAO">
+		<property name="sessionFactory"><ref local="videoRecorderSessionFactory"/></property>
+	</bean>
+
+	<bean id="videoRecorderRatingDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderRatingDAO">
+		<property name="sessionFactory"><ref local="videoRecorderSessionFactory"/></property>
+	</bean>
+
+	<bean id="videoRecorderCommentDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderCommentDAO">
 		<property name="sessionFactory"><ref local="videoRecorderSessionFactory"/></property>
 	</bean>
 	

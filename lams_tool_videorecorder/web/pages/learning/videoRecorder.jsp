@@ -101,7 +101,7 @@
 			AC_FL_RunContent(
 				"src", "./includes/flash/playerProductInstall",
 				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
-				"width", "526",
+				"width", "680",
 				"height", "676",
 				"align", "middle",
 				"id", "VideoRecorder",
@@ -117,8 +117,8 @@
 			// embed the Flash Content SWF when all tests are passed
 			AC_FL_RunContent(
 					"src", "./includes/flash/VideoRecorder",
-					"FlashVars", "contentEditable"+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowLearnerVideoExport='+${videoRecorderDTO.allowLearnerVideoExport}+"",
-					"width", "526",
+					"FlashVars", "contentEditable"+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&mode='+'${mode}'+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowLearnerVideoExport='+${videoRecorderDTO.allowLearnerVideoExport}+'&allowComments='+${videoRecorderDTO.allowComments}+'&allowRatings='+${videoRecorderDTO.allowRatings}+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&languageXML='+"${languageXML}"+"",
+					"width", "680",
 					"height", "676",
 					"align", "middle",
 					"id", "VideoRecorder",
@@ -139,7 +139,7 @@
 		</script>
 		<noscript>
 		  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-					id="VideoRecorder" width="656" height="676"
+					id="VideoRecorder" width="680" height="676"
 					codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
 					<param name="movie" value="/includes/flash/VideoRecorder.swf" />
 					<param name="quality" value="high" />

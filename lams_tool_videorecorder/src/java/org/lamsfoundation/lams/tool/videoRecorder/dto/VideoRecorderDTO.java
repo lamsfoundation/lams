@@ -62,6 +62,10 @@ public class VideoRecorderDTO {
     public boolean allowLearnerVideoExport;
     
     public boolean allowLearnerVideoVisibility;
+    
+    public boolean allowComments;
+    
+    public boolean allowRatings;
 	
 	public Set<VideoRecorderAttachmentDTO> onlineInstructionsFiles;
 
@@ -86,6 +90,8 @@ public class VideoRecorderDTO {
 		allowUseCamera = videoRecorder.isAllowUseCamera();
 		allowLearnerVideoExport = videoRecorder.isAllowLearnerVideoExport();
 		allowLearnerVideoVisibility = videoRecorder.isAllowLearnerVideoVisibility();
+		allowComments = videoRecorder.isAllowComments();
+		allowRatings = videoRecorder.isAllowRatings();
 
 		onlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
@@ -219,6 +225,22 @@ public class VideoRecorderDTO {
 
 	public void setAllowLearnerVideoExport(boolean allowLearnerVideoExport) {
 		this.allowLearnerVideoExport = allowLearnerVideoExport;
+	}
+	
+	public boolean isAllowComments() {
+		return allowComments;
+	}
+
+	public void setAllowComments(boolean allowComments) {
+		this.allowComments = allowComments;
+	}
+	
+	public boolean isAllowRatings() {
+		return allowRatings;
+	}
+
+	public void setAllowRatings(boolean allowRatings) {
+		this.allowRatings = allowRatings;
 	}
 	
 	public boolean isLockOnFinish() {

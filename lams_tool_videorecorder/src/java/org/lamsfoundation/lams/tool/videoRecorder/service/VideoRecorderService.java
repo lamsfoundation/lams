@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.videoRecorder.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
@@ -53,6 +54,8 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -64,15 +67,21 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRatingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderAttachmentDAO;
+import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderCommentDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderDAO;
+import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderRatingDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderRecordingDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderSessionDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderUserDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment;
+import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderCondition;
+import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRecording;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
@@ -81,6 +90,7 @@ import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderException;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -104,6 +114,10 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     private IVideoRecorderUserDAO videoRecorderUserDAO = null;
 
     private IVideoRecorderAttachmentDAO videoRecorderAttachmentDAO = null;
+    
+    private IVideoRecorderRatingDAO videoRecorderRatingDAO = null;
+    
+    private IVideoRecorderCommentDAO videoRecorderCommentDAO = null;
 
     private ILearnerService learnerService;
 
@@ -122,6 +136,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     private VideoRecorderOutputFactory videoRecorderOutputFactory;
 
     private Random generator = new Random();
+    
+    private MessageService messageService;
 
     public VideoRecorderService() {
 	super();
@@ -403,17 +419,48 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public VideoRecorderRecording getRecordingById(Long recordingId){
 	return videoRecorderRecordingDAO.getRecordingById(recordingId);
     }
+    
+    public void deleteVideoRecorderRecording(VideoRecorderRecording videoRecorderRecording){
+	videoRecorderRecordingDAO.delete(videoRecorderRecording);
+	return;
+    }
 
+    public VideoRecorderRating getRatingById(Long ratingId){
+	return videoRecorderRatingDAO.getRatingById(ratingId);
+    }
+    
+    public VideoRecorderComment getCommentById(Long commentId){
+	return videoRecorderCommentDAO.getCommentById(commentId);
+    }
+    
+    public Set<VideoRecorderRating> getRatingsByUserId(Long userId){
+	return videoRecorderRatingDAO.getRatingsByUserId(userId);
+    }
+    
+    public Set<VideoRecorderRatingDTO> getRatingsByToolSessionId(Long toolSessionId){
+    Set<VideoRecorderRating> list = videoRecorderRatingDAO.getRatingsByToolSessionId(toolSessionId);
+    return VideoRecorderRatingDTO.getVideoRecorderRatingDTOs(list);
+    }
+    
+    public Set<VideoRecorderComment> getCommentsByUserId(Long userId){
+	return videoRecorderCommentDAO.getCommentsByUserId(userId);
+    }
+    
+    public Set<VideoRecorderCommentDTO> getCommentsByToolSessionId(Long toolSessionId){
+    Set<VideoRecorderComment> list = videoRecorderCommentDAO.getCommentsByToolSessionId(toolSessionId);
+    return VideoRecorderCommentDTO.getVideoRecorderCommentDTOs(list);
+    }
+    
     public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionId(Long toolSessionId){
     	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolSessionId(toolSessionId);
     	
-    	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTO(list);
+    	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
     
     public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserId(Long toolSessionId, Long userId){
     	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getBySessionAndUserIds(toolSessionId, userId);
     	
-    	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTO(list);
+    	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
     
     public VideoRecorderAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
@@ -440,7 +487,6 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 
     public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
 	videoRecorderDAO.deleteInstructionFile(contentID, uuid, versionID, type);
-
     }
 
     public void saveOrUpdateVideoRecorder(VideoRecorder videoRecorder) {
@@ -459,6 +505,14 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     videoRecorderRecordingDAO.saveOrUpdate(videoRecorderRecording);
     }
 
+    public void saveOrUpdateVideoRecorderComment(VideoRecorderComment videoRecorderComment){
+        videoRecorderCommentDAO.saveOrUpdate(videoRecorderComment);
+    }
+    
+    public void saveOrUpdateVideoRecorderRating(VideoRecorderRating videoRecorderRating){
+        videoRecorderRatingDAO.saveOrUpdate(videoRecorderRating);
+    }
+    
     public VideoRecorderUser createVideoRecorderUser(UserDTO user, VideoRecorderSession videoRecorderSession) {
 	VideoRecorderUser videoRecorderUser = new VideoRecorderUser(user, videoRecorderSession);
 	saveOrUpdateVideoRecorderUser(videoRecorderUser);
@@ -622,6 +676,30 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public void setVideoRecorderUserDAO(IVideoRecorderUserDAO userDAO) {
 	videoRecorderUserDAO = userDAO;
     }
+    
+	public void setMessageService(MessageService messageService) {
+		this.messageService = messageService;
+	}
+	
+	public MessageService getMessageService() {
+		return messageService;
+	}
+	
+    public IVideoRecorderCommentDAO getVideoRecorderCommentDAO() {
+	return videoRecorderCommentDAO;
+    }
+
+    public void setVideoRecorderCommentDAO(IVideoRecorderCommentDAO commentDAO) {
+	videoRecorderCommentDAO = commentDAO;
+    }
+    
+    public IVideoRecorderRatingDAO getVideoRecorderRatingDAO() {
+	return videoRecorderRatingDAO;
+    }
+
+    public void setVideoRecorderRatingDAO(IVideoRecorderRatingDAO ratingDAO) {
+	videoRecorderRatingDAO = ratingDAO;
+    }
 
     public ILearnerService getLearnerService() {
 	return learnerService;
@@ -685,4 +763,84 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    videoRecorderDAO.delete(condition);
 	}
     }
+    
+	/**
+	 * @return String of xml with all needed language elements
+	 */ 
+	public String getLanguageXML(){
+		ArrayList<String> languageCollection = new ArrayList<String>();		
+		languageCollection.add(new String("button.ok"));
+		languageCollection.add(new String("button.save"));
+		languageCollection.add(new String("button.cancel"));
+		languageCollection.add(new String("button.yes"));
+		languageCollection.add(new String("button.no"));
+		languageCollection.add(new String("videorecorder.stop.recording"));
+		languageCollection.add(new String("videorecorder.start.recording"));
+		languageCollection.add(new String("videorecorder.stop.camera"));
+		languageCollection.add(new String("videorecorder.view.camera"));
+		languageCollection.add(new String("videorecorder.author"));
+		languageCollection.add(new String("videorecorder.description"));
+		languageCollection.add(new String("videorecorder.title"));
+		languageCollection.add(new String("videorecorder.new.recording.details"));
+		languageCollection.add(new String("videorecorder.comment"));
+		languageCollection.add(new String("videorecorder.date"));
+		languageCollection.add(new String("videorecorder.rating"));
+		languageCollection.add(new String("videorecorder.play"));
+		languageCollection.add(new String("videorecorder.stop"));
+		languageCollection.add(new String("videorecorder.pause"));
+		languageCollection.add(new String("videorecorder.resume"));
+		languageCollection.add(new String("videorecorder.video.information"));
+		languageCollection.add(new String("videorecorder.sort.by"));
+		languageCollection.add(new String("videorecorder.recording.controls"));
+		languageCollection.add(new String("videorecorder.videos"));
+		languageCollection.add(new String("videorecorder.add.comment"));
+		languageCollection.add(new String("videorecorder.video"));
+		languageCollection.add(new String("videorecorder.export.video"));
+		languageCollection.add(new String("videorecorder.delete.video"));
+		languageCollection.add(new String("videorecorder.enter.something.here"));
+		languageCollection.add(new String("videorecorder.message.sure.delete"));
+		languageCollection.add(new String("videorecorder.confirm"));
+		languageCollection.add(new String("videorecorder.web.application.not.available"));
+		languageCollection.add(new String("videorecorder.net.connection.not.connected"));
+		languageCollection.add(new String("videorecorder.net.connection.closed"));
+		languageCollection.add(new String("videorecorder.playing"));
+		languageCollection.add(new String("videorecorder.ready"));
+		languageCollection.add(new String("videorecorder.paused"));
+		languageCollection.add(new String("videorecorder.recording"));
+		languageCollection.add(new String("videorecorder.buffering"));
+		languageCollection.add(new String("videorecorder.waiting"));
+		String languageOutput = "<xml><language>";
+		
+		for(int i = 0; i < languageCollection.size(); i++){
+			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
+		}
+		
+		languageOutput += "</language></xml>";
+		
+		return languageOutput;
+	}
+	
+	public String getLanguageXMLForFCK(){
+		ArrayList<String> languageCollection = new ArrayList<String>();
+		languageCollection.add(new String("videorecorder.video.player"));
+		languageCollection.add(new String("videorecorder.video.recorder"));
+		languageCollection.add(new String("videorecorder.web.application.not.available"));
+		languageCollection.add(new String("videorecorder.net.connection.not.connected"));
+		languageCollection.add(new String("videorecorder.net.connection.closed"));
+		languageCollection.add(new String("videorecorder.playing"));
+		languageCollection.add(new String("videorecorder.ready"));
+		languageCollection.add(new String("videorecorder.paused"));
+		languageCollection.add(new String("videorecorder.recording"));
+		languageCollection.add(new String("videorecorder.buffering"));
+		languageCollection.add(new String("videorecorder.waiting"));
+		String languageOutput = "<xml><language>";
+		
+		for(int i = 0; i < languageCollection.size(); i++){
+			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
+		}
+		
+		languageOutput += "</language></xml>";
+		
+		return languageOutput;
+	}
 }

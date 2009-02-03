@@ -25,6 +25,9 @@
 package org.lamsfoundation.lams.tool.videoRecorder.model;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
@@ -47,19 +50,23 @@ public class VideoRecorderRecording implements java.io.Serializable {
 
     private Date updateDate;
 
-    private VideoRecorderUser createBy;
-
     private String title;
 
     private String description;
     
-    private String notes;
-    
     private Float rating;
+    
+    private String filename;
+    
+    private Boolean isJustSound;
+    
+    private VideoRecorderUser createBy;
     
     private VideoRecorderSession videoRecorderSession;
     
-    private String filename;
+    private Set ratings;
+    
+    private Set comments;
 
 	// Constructors
 
@@ -73,8 +80,10 @@ public class VideoRecorderRecording implements java.io.Serializable {
 		this.createBy = recording.createBy;
 		this.title = recording.title;
 		this.description = recording.description;
-		this.notes = recording.notes;
 		this.rating = recording.rating;
+		this.isJustSound = recording.isJustSound;
+		this.ratings = VideoRecorderRating.getVideoRecorderRatings(recording.ratings);
+		this.comments = VideoRecorderComment.getVideoRecorderComments(recording.comments);
 		this.videoRecorderSession = videoRecorderSession;
 		this.filename = recording.filename;
 	}
@@ -82,15 +91,18 @@ public class VideoRecorderRecording implements java.io.Serializable {
 	/** full constructor */
 	public VideoRecorderRecording(
 			Date createDate, Date updateDate, VideoRecorderUser createBy, String title, String description,
-			String notes, Float rating, Long videoRecorderUid, VideoRecorderSession videoRecorderSession, String filename) {
+			Float rating, Boolean isJustSound, Long videoRecorderUid, VideoRecorderSession videoRecorderSession, String filename,
+			Set ratings, Set comments) {
 				
 		this.createDate = createDate;
 		this.updateDate = updateDate;
 		this.createBy = createBy;
 		this.title = title;
 		this.description = description;
-		this.notes = notes;
 		this.rating = rating;
+		this.isJustSound = isJustSound;
+		this.ratings = ratings;
+		this.comments = comments;
 		this.videoRecorderSession = videoRecorderSession;
 		this.filename = filename;
 	}
@@ -179,19 +191,6 @@ public class VideoRecorderRecording implements java.io.Serializable {
     }
 
     /**
-     * @hibernate.property column="notes" length="1027"
-     * 
-     */
-
-    public String getNotes() {
-	return notes;
-    }
-
-    public void setNotes(String notes) {
-	this.notes = notes;
-    }
-
-    /**
      * @hibernate.property column="rating"
      * 
      */
@@ -203,7 +202,20 @@ public class VideoRecorderRecording implements java.io.Serializable {
     public void setRating(Float rating) {
 	this.rating = rating;
     }    
- 	
+
+    /**
+     * @hibernate.property column="is_just_sound"
+     * 
+     */
+
+    public Boolean getIsJustSound() {
+	return isJustSound;
+    }
+
+    public void setIsJustSound(Boolean isJustSound) {
+	this.isJustSound = isJustSound;
+    }   
+    
 	/**
      * Gets the toolSession
      *
@@ -220,7 +232,7 @@ public class VideoRecorderRecording implements java.io.Serializable {
 	public void setVideoRecorderSession(VideoRecorderSession videoRecorderSession) {
 		this.videoRecorderSession = videoRecorderSession;
 	}
-	
+		
     /**
      * @hibernate.property column="filename" length="255"
      * 
@@ -234,6 +246,42 @@ public class VideoRecorderRecording implements java.io.Serializable {
 	this.filename = filename;
     }
     
+	/**
+	 * @hibernate.set lazy="false"
+	 *                cascade="all-delete-orphan"
+	 * @hibernate.collection-key column="videoRecorder_recording_uid"
+	 * 
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating"
+	 * 
+	 * @return
+	 */
+    
+	public Set getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(Set ratings) {
+		this.ratings = ratings;
+	}
+
+	/**
+	 * @hibernate.set lazy="false"
+	 *                cascade="all-delete-orphan"
+	 * @hibernate.collection-key column="videoRecorder_recording_uid"
+	 * 
+	 * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment"
+	 * 
+	 * @return
+	 */
+	
+	public Set getComments() {
+		return comments;
+	}
+
+	public void setComments(Set comments) {
+		this.comments = comments;
+	}
+
 	/**
 	 * toString
 	 * 
@@ -250,9 +298,10 @@ public class VideoRecorderRecording implements java.io.Serializable {
 		buffer.append("createBy").append("='").append(getCreateBy()).append("', ");
 		buffer.append("createTitle").append("='").append(getTitle()).append("', ");
 		buffer.append("createDescription").append("='").append(getDescription()).append("', ");
-		buffer.append("notes").append("='").append(getNotes()).append("', ");
 		buffer.append("videoRecorderSessionUid").append("='").append(getVideoRecorderSession().getSessionId());
 		buffer.append("filename").append("='").append(getFilename());
+		buffer.append("comments").append("='").append(getComments());
+		buffer.append("ratings").append("='").append(getRatings());
 		buffer.append("']");
 
 		return buffer.toString();	
