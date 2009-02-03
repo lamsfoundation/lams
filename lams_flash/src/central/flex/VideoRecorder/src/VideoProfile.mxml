@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="290" height="115" verticalScrollPolicy="off" horizontalScrollPolicy="off" creationComplete="init()">
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+		
+			private function init():void{
+				var userId:int = Application.application.getUserId();
+				var allowLearnerVideoExport:Boolean = Application.application.getAllowLearnerVideoExport();
+				var allowLearnerVideoVisibility:Boolean = Application.application.getAllowLearnerVideoVisibility();
+				var mode:String = Application.application.getMode();
+				
+				if(mode == Application.application.LEARNER_MODE)
+					if(data.userUid != userId)
+						videoProfileButtonBox.removeChild(videoProfileButtonBox.getChildByName("deleteButton"));
+				
+				if(mode == Application.application.LEARNER_MODE)
+					if(data.userUid != userId || !allowLearnerVideoExport)
+						videoProfileButtonBox.removeChild(videoProfileButtonBox.getChildByName("exportButton"));
+			}
+		
+	    ]]>
+	</mx:Script>
+	<mx:VBox width="100%" height="100%" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" verticalGap="0" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+		<mx:HBox width="100%" height="100%" paddingBottom="3" paddingLeft="5" paddingRight="5" paddingTop="5" horizontalGap="4" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+			<mx:Image width="96" height="72" id="previewImage" source="http://clctext.tlt.psu.edu/labs/mac/help/software/VideoEditing/images/iMovie_icon.jpg"/>
+			<mx:VBox width="100%" height="72" verticalGap="0" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:Label fontWeight="bold" id="titleLabel" text="{data.title}" width="100%" textAlign="left"/>
+				<mx:Label id="authorLabel" text="{data.author}" width="100%" textAlign="left"/>
+				<mx:Label id="descriptionLabel" text="{data.description}" width="100%" textAlign="left"/>
+				<mx:Label id="dateLabel" text="{data.createDate}" fontStyle="italic" width="100%" textAlign="left"/>
+			</mx:VBox>
+		</mx:HBox>
+		<mx:HBox width="100%" height="100%" paddingTop="0" paddingRight="5" paddingLeft="5" paddingBottom="5" verticalAlign="middle" horizontalScrollPolicy="off" verticalScrollPolicy="off" id="videoProfileButtonBox">
+			<mx:Button icon="@Embed(source='assets/images/deleteIcon.swf')" width="25" height="20" id="deleteButton"/>
+			<mx:Button icon="@Embed(source='assets/images/exportIcon.swf')" width="25" height="20" id="exportButton"/>
+		</mx:HBox>
+	</mx:VBox>
+</mx:Canvas>

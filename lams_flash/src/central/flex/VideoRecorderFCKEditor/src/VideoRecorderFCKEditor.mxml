@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:ns1="org.lamsfoundation.lams.common.ui.components.*" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]" width="361" height="331" preinitialize="onPreinitialize(event)" applicationComplete="onApplicationComplete(event)" xmlns:ns2="*">
+
+	<mx:Script>
+		<![CDATA[
+			import org.lamsfoundation.lams.common.util.VideoDisplayUtil;
+			import mx.containers.ControlBar;
+			import mx.effects.easing.Elastic;
+			import mx.effects.AddChildAction;
+			import mx.states.AddChild;
+			import mx.controls.TabBar;
+			import org.lamsfoundation.lams.common.ui.components.VideoDisplayEvent;
+			import mx.events.SliderEvent;
+			import mx.controls.Button;
+			import mx.controls.Alert;
+			import org.lamsfoundation.lams.common.dictionary.XMLDictionary;
+		
+			private var red5ServerUrl:String;
+			private var serverUrl:String;
+			private var filename:String;
+			private var userId:int;
+			private var languageXML:XML;
+			[Bindable] private var mode:String;
+			private var dictionary:XMLDictionary;
+			private var nc:NetConnection;
+			private var timer:Timer;
+			private var cam:Camera;
+			private var mic:Microphone;
+			
+			private static var red5App:String = "oflaDemo";
+			
+			[Embed(source="./assets/images/playIcon.swf")] [Bindable] private var playIcon:Class;
+			[Embed(source="./assets/images/pauseIcon.swf")] [Bindable] private var pauseIcon:Class;
+			[Embed(source="./assets/images/recordIcon.swf")] [Bindable] private var recordIcon:Class;
+			
+			// called first of all, before any components are initialized
+			private function onPreinitialize(event:Event):void{
+				// get flashvars
+				getFlashVars();
+				
+				// for testing purposes (when running in debug)
+				if(mode == null){
+					red5ServerUrl = new String("rtmp://172.20.100.22/");
+					serverUrl = new String("http://172.20.100.220:8080/lams/");
+					filename = new String("files/lamsRecording_session1_user1_593243931.flv");
+					userId = 1;
+					mode = new String("recorderMode");
+				}
+				
+				// if no red5 server is specified, take for granted that mode is 
+				if(!red5ServerUrl){
+					mode = "playerModeOffline";
+				}
+				
+				// add the app name to the red5 url to complete the url
+				red5ServerUrl += red5App;
+				
+				/*
+				Alert.show(
+					"filename: " + filename +
+					"\nuserId: " + userId +
+					"\nred5ServerUrl: " + red5ServerUrl +
+					"\nserverUrl: " + serverUrl +
+					"\nmode: " + mode);
+				*/
+			}
+			
+			// add the appropriate controlbar, called after the videoDisplay component is added to the panel container
+			private function addControlBar(event:Event):void{
+				// create the video control bar
+				videoControlBar = new VideoControlBar();
+				
+				// give it the mode so it can delete buttons once created
+				videoControlBar.mode = mode;
+				
+				// add the control bar now, before the panel is added, so the control bar is anchored
+				videoDisplayPanel.addChild(videoControlBar);
+			}
+			
+			// called after everything is created and ready to go
+			private function onApplicationComplete(event:Event):void {		
+				// init labels if languageXML is not empty
+				if(languageXML.toString() != ""){
+					dictionary = new XMLDictionary(languageXML);
+					setLabels();
+				}
+				else{
+					dictionary = new XMLDictionary(new XML(""));
+				}
+				
+				videoControlBar.playButton.setStyle("icon", playIcon);
+				videoControlBar.playButton.enabled = false;
+				videoControlBar.seekSlider.enabled = false;
+				
+				// add listeners
+				addListeners();
+				
+				if(mode == "playerModeOnline"){
+					createConnection();
+				}
+				else if(mode == "playerModeOffline"){
+					var nc:NetConnection = new NetConnection();
+					nc.connect(null);
+					videoDisplay.bufferTime = 0;
+					videoDisplay.setNetConnection(nc);
+					videoDisplay.makeReadyVideo(filename);
+				}
+				else if(mode == "recorderMode"){
+					cam = VideoDisplayUtil.setupCamera();
+					mic = VideoDisplayUtil.setupMic();
+					videoDisplay.attachCamera(cam);
+					videoDisplay.attachMic(mic);
+					videoDisplay.bufferTime = 2;
+					createConnection();
+				}
+			}
+			
+			// adds some listeners
+			private function addListeners():void{
+				videoDisplay.addEventListener(VideoDisplayEvent.METADATA, onMetaData);
+				videoDisplay.addEventListener(VideoDisplayEvent.PAUSE, onPause);
+				videoDisplay.addEventListener(VideoDisplayEvent.UNPAUSE, onUnpause);
+				videoDisplay.addEventListener(VideoDisplayEvent.READY, onReady);
+				videoDisplay.addEventListener(VideoDisplayEvent.COMPLETE, onComplete);
+				videoDisplay.addEventListener(VideoDisplayEvent.STARTPUBLISH, onStartPublish);
+				videoDisplay.addEventListener(VideoDisplayEvent.STOPPUBLISH, onStopPublish);
+				
+				videoControlBar.playButton.addEventListener(MouseEvent.CLICK, playClick);
+				videoControlBar.seekSlider.addEventListener(SliderEvent.CHANGE, seekSliderChange);
+				videoControlBar.seekSlider.addEventListener(SliderEvent.THUMB_PRESS, seekSliderClick);
+				videoControlBar.seekSlider.addEventListener(SliderEvent.THUMB_RELEASE, seekSliderClick);
+				
+				if(mode == "recorderMode"){
+					videoControlBar.recordButton.addEventListener(MouseEvent.CLICK, recordClick);
+					videoControlBar.saveAndCloseButton.addEventListener(MouseEvent.CLICK, saveAndCloseClick);
+				}
+				
+				videoControlBar.seekSlider.dataTipFormatFunction = VideoDisplayUtil.secondsToString;
+			}
+			
+			// sets labels
+			private function setLabels():void{
+				if(mode == "playerModeOffline" || mode == "playerModeOffline"){
+					videoDisplayPanel.title = dictionary.getLabel("videorecorder.video.player");
+				}
+				else if(mode == "recorderMode"){
+					videoDisplayPanel.title = dictionary.getLabel("videorecorder.video.recorder");
+				}
+				
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.waiting");
+			}
+			
+			// gets flashvars
+			private function getFlashVars():void{
+				red5ServerUrl = Application.application.parameters.red5ServerUrl;
+				serverUrl = Application.application.parameters.serverUrl;
+				filename = Application.application.parameters.filename;
+				userId = Application.application.parameters.userId;
+				languageXML = XML(Application.application.parameters.languageXML);
+				mode = Application.application.parameters.mode;
+			}
+			
+			// creates a netconnection is its needed
+			private function createConnection():void{
+				// create basic netConnection object
+				nc = new NetConnection();
+			
+				// add some listeners to it
+				nc.addEventListener(NetStatusEvent.NET_STATUS, ncStatusHandler);
+				nc.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+				nc.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
+				
+				// set the nc to the videodisplay
+				videoDisplay.setNetConnection(nc);
+				
+				// connect to the local Red5 server and wait for callback
+				nc.connect(red5ServerUrl);
+				
+				// wait for NetStatusEvent to be thrown
+			}
+			
+			// callback called on NetConnection connect event
+			private function ncStatusHandler(event:NetStatusEvent):void {
+				// get the info object
+				var infoObject:Object = event.info;
+	  
+				// if successful connection
+				if (infoObject.code == "NetConnection.Connect.Success") {
+					// enable application
+					Application.application.enabled = true;
+					
+					// if we are in a player instance
+					if(mode == "playerModeOffline" || mode == "playerModeOffline"){
+						videoDisplay.makeReadyVideo(filename);
+					}
+					else if(mode == "recorderMode"){
+						videoDisplay.startViewCamera();
+					}
+
+				}
+				// if connection unsuccessful
+				else if(infoObject.code == "NetConnection.Connect.InvalidApp"){
+					Application.application.enabled = false;			
+					// pop an alert
+					Alert.show("Web appplication not available");
+				}
+				else if(infoObject.code == "NetConnection.Connect.Failed"){
+					Application.application.enabled = false;				
+					// pop an alert
+					Alert.show("NetConnection not connected");
+				}
+				else if(infoObject.code == "NetConnection.Connect.Closed"){
+					Application.application.enabled = false;
+					// pop an alert
+					Alert.show("NetConnection closed");
+				}
+			}
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void {
+				trace("securityErrorHandler: " + event);
+			}
+	
+			private  function asyncErrorHandler(event:AsyncErrorEvent):void {
+				trace("securityErrorHandler: " + event);
+			} 
+	    	
+	    	// ugly onBW callback
+			NetConnection.prototype.onBWDone = function(infoObject) {
+				// print its properties
+				VideoDisplayUtil.printInfoObject("onBWDone", infoObject)
+			}
+			
+			// play button click handler
+			private function playClick(event:MouseEvent):void{
+				videoDisplay.play();
+			}
+
+			// record button click handler
+			private function recordClick(event:MouseEvent):void{
+				if(!videoDisplay.isPublishing){
+					filename = VideoDisplayUtil.createFilenameForFCK(userId);
+					videoDisplay.startPublish(filename);
+				}
+				else if(videoDisplay.isPublishing)
+					videoDisplay.stopPublish();
+			}
+			
+			// save and close button click handler
+			private function saveAndCloseClick(event:MouseEvent):void{
+
+			}
+			
+			// onMetaData callback, called from videoDisplay
+			private function onMetaData(event:VideoDisplayEvent):void{
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.buffering");
+				videoControlBar.seekSlider.minimum = 0;
+				videoControlBar.seekSlider.maximum = event.metadata.duration;
+				
+				timer = new Timer(10);
+				timer.addEventListener(TimerEvent.TIMER, updateSeekSlider);
+				timer.start();
+			}
+			
+			// onReady callback, called from videoDisplay
+			private function onReady(event:VideoDisplayEvent):void{
+				videoControlBar.playButton.enabled = true;
+				videoControlBar.seekSlider.enabled = true;
+				videoControlBar.playButton.setStyle("icon", playIcon);
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.ready");
+			}
+			
+			// onUnpause callback, called from videoDisplay
+			private function onUnpause(event:VideoDisplayEvent):void{
+				videoControlBar.playButton.setStyle("icon", pauseIcon);
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.playing");
+			}
+			
+			// onPause callback, called from videoDisplay
+			private function onPause(event:VideoDisplayEvent):void{
+				videoControlBar.playButton.setStyle("icon", playIcon);
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.paused");
+			}
+			
+			// onComplete callback, called from videoDisplay
+			private function onComplete(event:VideoDisplayEvent):void{
+				videoControlBar.playButton.setStyle("icon", playIcon);
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.ready");
+			}
+			
+			private function onStartPublish(event:VideoDisplayEvent):void{
+				// stop the timer if it is created
+				if(timer)
+					timer.stop();
+					
+				videoControlBar.playButton.enabled = false;
+				videoControlBar.seekSlider.enabled = false;
+				videoControlBar.timerLabel.text = "00:00";
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.recording");
+			}
+			
+			private function onStopPublish(event:VideoDisplayEvent):void{
+				// alert complete
+				Alert.show("Recording complete. Click play to review, record to record again or close to post the current recording.");
+				
+				// change the start recording button's label
+				videoDisplay.makeReadyVideo(filename);
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.ready");
+			}
+						
+			// update method called from a timer (launched when metadata is received)
+			private function updateSeekSlider(event:TimerEvent):void{
+				// if the video isn't actually playing yet
+				if(videoDisplay.playMode == videoDisplay.INIT_MODE || videoDisplay. playMode == videoDisplay.READY_MODE){
+					videoControlBar.seekSlider.value = 0;
+					videoControlBar.timerLabel.text = "0:00" + " / " + VideoDisplayUtil.secondsToString(String(videoDisplay.duration));
+				}
+				// otherwise, if it is playing
+				else if(videoDisplay.playMode == videoDisplay.PLAY_MODE || videoDisplay.playMode == videoDisplay.PAUSE_MODE){
+					videoControlBar.seekSlider.value = videoDisplay.time;
+					videoControlBar.timerLabel.text = VideoDisplayUtil.secondsToString(String(videoDisplay.time)) + " / " + VideoDisplayUtil.secondsToString(String(videoDisplay.duration));					
+				}
+			}
+			
+			// seek slider click handler
+			private function seekSliderClick(event:SliderEvent):void {
+				// if seekslider is enabled
+				
+				if(videoControlBar.seekSlider.enabled){
+					// if the mouse is pressed
+					if(event.type == SliderEvent.THUMB_PRESS){
+						// stop the timer so that the bar seekSlider can manually be controlled
+						timer.stop();
+					}
+					// if the mouse is released
+					else if(event.type == SliderEvent.THUMB_RELEASE){
+						// start the timer again and allow it to regain control of the seekSlider
+						timer.start();
+					}
+				}
+			}
+			
+			private function seekSliderChange(event:SliderEvent):void {
+				videoDisplay.seek(event.value);
+			}
+			
+		]]>
+	</mx:Script>
+	<mx:Panel x="10" y="10" width="340" height="310" layout="absolute" title="Video Recorder" id="videoDisplayPanel">
+		<ns1:VideoDisplay x="0" y="0" id="videoDisplay" />
+		<ns2:VideoControlBar x="127" y="216" id="videoControlBar" mode="{mode}">
+		</ns2:VideoControlBar>
+	</mx:Panel>
+	
+</mx:Application>

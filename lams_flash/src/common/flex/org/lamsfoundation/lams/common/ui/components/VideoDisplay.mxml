@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:ViewStack xmlns:mx="http://www.adobe.com/2006/mxml" width="320" height="240" creationPolicy="all" creationComplete="onCreationComplete()">
+
+	<mx:Script>
+		<![CDATA[
+			import mx.containers.Tile;
+			import mx.controls.Alert;
+			import org.lamsfoundation.lams.common.ui.components.VideoDisplayEvent;
+			
+			// flags
+			[Bindable] private var _isCameraViewed:Boolean = false;
+			[Bindable] private var _isPublishing:Boolean = false;
+			
+			private var _playMode:int;
+			public const INIT_MODE:int = 0;
+			public const READY_MODE:int = 1;
+			public const PAUSE_MODE:int = 2;
+			public const PLAY_MODE:int = 3;
+			
+			// embeds
+			[Embed(source="../../../../../../assets/images/playerVolume.png")] [Bindable] private var volumeEmbed:Class;
+			
+			// variables
+			private var video:Video;
+			private var timer:Timer;
+			private var _cam:Camera;
+			private var _mic:Microphone;
+			private var _ns:NetStream;
+			private var _metadata:Object;
+			private var _nc:NetConnection;
+			private var _filename:String;
+			private var _bufferTime:int = 2;
+
+			// init method called when creation completes
+			private function onCreationComplete():void{
+				// create new video object
+				video = new Video();
+				video.width = this.width;
+				video.height = this.height;
+				
+				// fix video player
+				player.addChild(video);
+				video.visible = true;
+				
+				// reset to make sure everything is set to default
+				reset();
+			}
+			
+			// attachs a cam, must be called from parent before using a camera
+			public function attachCamera(cam:Camera):void{
+				_cam = cam;
+				display.attachCamera(_cam);
+			}
+			
+			// attachs a mic, must be called from parent before using a mic
+			public function attachMic(mic:Microphone):void{
+				_mic = mic;
+			}
+			
+			// attachs a nc, must be called from parent before attempting a connection
+			public function setNetConnection(nc:NetConnection):void{
+				_nc = nc;
+			}
+			
+			// playMode getter
+			public function get playMode():int{
+				return _playMode;
+			}
+
+			// sets child view
+			public function setSelectedChild(selectedChild:String):void{
+				switch(selectedChild){
+					case "recorderView":{
+						this.selectedChild = recorderView;
+						break;
+					}
+					case "playerView":{
+						this.selectedChild = playerView;
+						break;
+					}
+					case "blackView":{
+						this.selectedChild = blackView;
+						break;
+					}
+					case "audioView":{
+						this.selectedChild = audioView;
+						break;
+					}
+					default:{
+						this.selectedChild = blackView;
+						break;
+					}
+				}
+			}
+			
+			// prepares the player to receive a video
+			public function makeReadyVideo(filename:String):void{
+				// reset the current ns
+				reset();
+							
+				// change the view
+				selectedChild = playerView;
+				
+				// save filename
+				_filename = filename;
+				
+				// play
+				_ns.play(_filename);
+			}
+			
+			// prepares the player to receive an audio file (aka video with no video)
+			public function makeReadyAudio(filename:String):void{
+				// reset the current ns
+				reset();
+							
+				// change the view
+				selectedChild = audioView;
+				
+				// save filename
+				_filename = filename;
+				
+				// play
+				_ns.play(_filename);
+			}
+			
+			// like both above methods but uses old filename and view state
+			private function makeReadyAgain():void{
+				// seek the video the very beginning and pause
+				_playMode = READY_MODE;
+				
+				//stop the timer and reset
+				timer.stop();
+				timer = createTimer();
+				
+				// pause the ns and go back to the beginning
+				_ns.pause();
+				_ns.seek(0);
+			}
+			
+			// metadata handler
+			public function onMetaData(infoObject:Object):void{
+				// save metadata object
+				_metadata = infoObject;
+				
+				// if in init mode, seek and pause the video
+				if(playMode == INIT_MODE){
+					// pause the netstream
+					_ns.pause();
+					
+					// create a timer and wait for the buffer period to be over
+					var timer:Timer = new Timer(_bufferTime * 1000, 1);
+					timer.addEventListener(TimerEvent.TIMER_COMPLETE, setReady);
+					timer.start();
+				}
+				
+				// add metadata to our custom event
+				var event:VideoDisplayEvent = new VideoDisplayEvent(VideoDisplayEvent.METADATA);
+				event.metadata = _metadata;
+				
+				// dispatch the event to the parent
+				dispatchEvent(event);
+			}
+			
+			// called from metadata callback
+			private function setReady(event:TimerEvent):void{		
+				_ns.seek(0);
+				
+				// seek the video the very beginning and pause
+				_playMode = READY_MODE;
+				
+				// displatch a ready event
+				dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.READY));
+				
+				// wait for a call to play
+			}
+			
+			// resets video
+			public function reset():void{
+				// change view to black
+				selectedChild = blackView;
+				
+				// if a netstream exists, clear it
+				if(_ns){
+					_ns.close();
+					_ns = null;	
+				}
+
+				// if a timer exists, stop it
+				if(timer){
+					timer.stop();
+					timer = null;	
+				}
+				
+				// clear the video object
+				video.clear();
+				
+				// reset play buttons
+				_playMode = INIT_MODE;
+				
+				// create a new netstream
+				_ns = createNetStream();
+				
+				// attach the new ns
+				video.attachNetStream(_ns);
+				
+				// create a new timer
+				timer = createTimer();
+				
+				// dispatch a reset event to parent
+				dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.RESET));
+			}
+			
+			// creates a new netstream object
+			private function createNetStream():NetStream{
+				// if nc is not null
+				if(_nc){
+					var ns:NetStream = new NetStream(_nc);
+					ns.bufferTime = _bufferTime;
+					
+					// listeners and callback stuff for netstatus object
+					var client:Object = new Object();
+					client.onMetaData = onMetaData;
+					client.onPlayStatus = onPlayStatus;
+					ns.client = client;
+					
+					ns.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
+					ns.addEventListener(NetStatusEvent.NET_STATUS, nsStatusHandler);
+					
+					// is camera is allowed, set that up
+					if(_cam){
+						ns.attachCamera(_cam);
+					}
+					
+					// if the mic is to be used, set that up
+					if(_mic){
+						ns.attachAudio(_mic);
+					}
+						
+					return ns;
+				}
+				else
+					return null;
+			}
+			
+			// creates a new timer object
+			private function createTimer():Timer{
+				var timer:Timer = new Timer(10);
+				timer.addEventListener(TimerEvent.TIMER, checkEndStream);
+				
+				return timer;
+			}
+			
+			// toggles pause and unpause
+			public function play():void {
+				// if video is on first frame and paused
+				if(playMode == READY_MODE || playMode == PAUSE_MODE){
+					// play stream
+					_playMode = PLAY_MODE;
+					_ns.resume();
+					
+					// start the timer
+					timer.start();
+					
+					// dispatch unpause event
+					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.UNPAUSE));
+				}
+				// else if the video is currently playing
+				else if(playMode == PLAY_MODE){
+					// pause stream
+					_playMode = PAUSE_MODE;
+					_ns.pause();
+					
+					// stop the timer
+					timer.stop();
+					
+					// dispatch pause event
+					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.PAUSE));
+				}
+			}
+			
+			// start camera method
+			public function startViewCamera():void{
+				// if the camera is not viewed yet
+				if(!_isCameraViewed){
+					// start viewing camera
+					viewCameraHelper();
+				}
+			}
+			
+			// stop camera method
+			public function stopViewCamera():void{
+				// if the camera is viewed
+				if(_isCameraViewed){
+					// stop viewing camera
+					viewCameraHelper();
+				}
+			}
+			
+			// view camera helper method to start and stop actual viewing
+			public function viewCameraHelper():void {
+				// if camera is set
+				if(_cam){
+					// if camera is not being used
+					if(!isCameraViewed){
+						// reset video
+						reset();
+						
+						// if the item clicked is full video OR if showing a camera
+						if(_cam && _mic){
+							// attach the cam to the videoDisplay
+							video.attachCamera(_cam);
+							
+							//change the view stack
+							selectedChild = recorderView;
+						}
+						// else if the item played is sound OR if we can only start sound
+						else if(_mic && !_cam){
+							//change the view stack
+							selectedChild = audioView;
+						}
+	
+						_isCameraViewed = true;
+						
+						// dispatch event
+						dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.STARTCAM));
+					}
+					// if camera is being used
+					else {
+						// clear the videoDisplay
+						video.attachCamera(null);
+						_isCameraViewed = false;
+						
+						// change view
+						selectedChild = blackView;
+						
+						// dispatch event
+						dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.STOPCAM));
+					}
+				}
+			}
+			
+			// publish method
+			public function startPublish(filename:String):void{
+				// if we are not already publishing
+				if(!_isPublishing){
+					// store filename to use
+					_filename = filename;
+					
+					// if camera is not on yet
+					if(!isCameraViewed){
+						// start camera
+						viewCameraHelper();
+						
+						// and start publishing
+						publishHelper();
+					}
+					else{
+						// just start publishing
+						publishHelper();
+					}
+				}
+			}
+			
+			// stop publishing method
+			public function stopPublish():void{
+				// if we are publishing
+				if(_isPublishing){
+					// stop camera
+					viewCameraHelper();
+					
+					//stop publishing
+					publishHelper();
+				}
+			}
+			
+			// publish helper method to start and stop actual publishing
+			private function publishHelper():void {
+				// if not publishing
+				if(!_isPublishing){
+					// create a new netstream
+					_ns = createNetStream();
+					
+					/*
+					// create the bitmap data for preview image
+					previewImage = new BitmapData(320, 240);
+
+					// start another video and attach the camera
+					var videoPreview:Video = new Video(320, 240);
+					videoPreview.attachCamera(cam);
+					
+					// draw from the video
+					previewImage.draw(videoList);
+					
+					// encode the bmp
+					var pngEncoder:PNGEncoder = new PNGEncoder();
+					var rawBytes:ByteArray = pngEncoder.encode(previewImage);
+					*/
+					
+					// save the preview image to server (using a LAMS servlet)
+					/*
+					var imageService:ImageService = new ImageService(serverUrl, "savePreviewImage");
+					imageService.addEventListener(ResultEvent.RESULT, savePreviewImageSuccessHandler);
+					imageService.addEventListener(FaultEvent.FAULT, savePreviewImageFaultHandler);
+					imageService.sendImageToServer(previewImage, imageService.JPG_EXT, filename);
+					*/
+					
+					/*
+					// save the preview image to server (using the Red5 servlet)
+					nc.call("savePreviewImage", null, rawBytes, filename);
+					*/
+					
+					// publish video to media server
+					_ns.publish(_filename, "record");
+					_isPublishing = true;
+					
+					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.STARTPUBLISH));
+				}
+				// if recording
+				else {
+					// close the netStream object
+					_ns.close();
+					_isPublishing = false;
+					
+					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.STOPPUBLISH));
+				}
+			}
+			
+			public function seek(position:Number):void{
+				if(playMode != INIT_MODE){
+					_ns.seek(position);
+				}
+			}
+			
+			public function get bufferTime():int{
+				return _bufferTime;
+			}
+			
+			public function set bufferTime(bufferTime:int):void{
+				_bufferTime = bufferTime;
+			}
+			
+			public function get time():Number{
+				return _ns.time;
+			}
+			
+			public function get duration():Number{
+				return _metadata.duration;
+			}
+			
+			public function get metadata():Object{
+				return _metadata;
+			}
+			
+			public function get isPublishing():Boolean{
+				return _isPublishing;
+			}
+			
+			public function get isCameraViewed():Boolean{
+				return _isCameraViewed;
+			}
+			
+			private function nsStatusHandler(event:NetStatusEvent):void {
+				// get the info object
+				var infoObject:Object = event.info;
+								
+				switch(infoObject.code){
+					case "NetStream.Play.Start":{
+						// alert
+						//Alert.show("NetStream.Play.Start");
+						break;
+					}
+					case "NetStream.Play.Stop":{
+						// alert
+						//Alert.show("NetStream.Play.Stop");
+						break;
+					}
+					case "NetStream.Buffer.Empty":{
+						// alert
+						//Alert.show("NetStream.Buffer.Empty");
+						break;
+					}
+					case "NetStream.Buffer.Full":{
+						// alert
+						//Alert.show("NetStream.Buffer.Full");
+						break;
+					}
+					case "NetStream.Buffer.Flush":{
+						// alert
+						//Alert.show("NetStream.Buffer.Flush");
+						break;
+					}
+					case "NetStream.Pause.Notify":{
+						// alert
+						//Alert.show("NetStream.Pause.Notify");
+						//dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.PAUSE));
+						break;
+					}
+					case "NetStream.Unpause.Notify":{
+						// alert
+						//Alert.show("NetStream.Unpause.Notify");
+						//dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.UNPAUSE));
+						break;
+					}
+					default:
+				}
+			}
+			
+			private function onPlayStatus(infoObject:Object):void{  			
+    			switch(infoObject.code){
+    				case "NetStream.Play.Start":{
+    					// alert
+    					// Alert.show("NetStream.Play.Start");
+						break;
+    				}
+    				case "NetStream.Play.Complete":{
+    					// alert
+    					//Alert.show("NetStream.Play.Complete");
+    					makeReadyAgain();
+    					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.COMPLETE));
+						break;
+    				}
+    				default:
+    			}
+			}
+			
+			// checks end of the stream (called every second from the timer)
+			private function checkEndStream(event:TimerEvent):void{
+				if(_ns.time >= metadata.duration){
+					makeReadyAgain();
+					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.COMPLETE));
+				}
+			}
+			
+			private function securityErrorHandler(event:SecurityErrorEvent):void {
+				trace("securityErrorHandler: " + event);
+			}
+	
+			private  function asyncErrorHandler(event:AsyncErrorEvent):void {
+				trace("securityErrorHandler: " + event);
+			}
+						
+	    ]]>
+	</mx:Script>
+	
+	<mx:Canvas id="recorderView" width="100%" height="100%">
+		<mx:VideoDisplay width="100%" height="100%" id="display" visible="true"/>
+	</mx:Canvas>
+	<mx:Canvas id="blackView" width="100%" height="100%" backgroundColor="#000000">
+	</mx:Canvas>
+	<mx:Canvas id="playerView" width="100%" height="100%" backgroundColor="#000000">
+		<mx:UIComponent id="player" width="100%" height="100%"/>
+	</mx:Canvas>
+	<mx:Canvas id="audioView" width="100%" height="100%" backgroundColor="#000000">
+		<mx:Image id="audioImage" width="100%" height="100%" source="{volumeEmbed}" verticalAlign="middle" horizontalAlign="center" scaleContent="false"/>
+	</mx:Canvas>
+</mx:ViewStack>

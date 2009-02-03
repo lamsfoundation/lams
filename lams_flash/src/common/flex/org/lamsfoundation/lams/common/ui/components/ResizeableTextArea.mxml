@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TextArea xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onLoad()">
+<mx:TextArea xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onCreationComplete()">
   
 	<mx:Script>
 	<![CDATA[
 		import mx.events.FlexEvent;
 
-		private function onLoad():void
+		private function onCreationComplete():void
 		{
 			this.addEventListener(FlexEvent.UPDATE_COMPLETE, resizeMe);
 			this.addEventListener(KeyboardEvent.KEY_UP, resizeMe);
@@ -16,8 +16,9 @@
 			if(event.currentTarget == this){
 				this.height = this.textHeight + 10;
 			}
-		}           
-]]>
-</mx:Script>
+		}
+		
+	]]>
+	</mx:Script>
   
 </mx:TextArea> 

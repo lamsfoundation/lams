@@ -1,30 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="376" height="198" title="New Recording Details">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="376" height="196" title="New Recording Details">
 
 	<mx:Script>
-        <![CDATA[       
+        <![CDATA[
+        	import org.lamsfoundation.lams.common.dictionary.XMLDictionary;       
             import mx.managers.PopUpManager;
 	       	
-	       	private var languageXML:XML;
+	       	private var _dictionary:XMLDictionary;
 	       		
 		   	private function initApp():void{
 		   		this.focusManager.setFocus(titleInput);
 		   	}
 		   	
-		   	public function init(title:String, languageXML:XML):void{
-		   		//this.title = title;
-		   		this.languageXML = languageXML;
+		   	public function init(dictionary:XMLDictionary):void{
+		   		this.dictionary = dictionary;
+		   		this.title = dictionary.getLabel("videorecorder.new.recording.details");
+		   		titleLabel.text = dictionary.getLabelAndConcatenate("videorecorder.title", [":"]);
+		   		descriptionLabel.text = dictionary.getLabelAndConcatenate("videorecorder.description", [":"]);
+		   		titleInput.text = dictionary.getLabelAndReplace("videorecorder.enter.something.here", ["videorecorder.title"]);
+		   		descriptionInput.text = dictionary.getLabelAndReplace("videorecorder.enter.something.here", ["videorecorder.description"]);
+		   		doneButton.label = dictionary.getLabel("button.done");
 		   	}
+		   	
+		   	public function set dictionary(dictionary:XMLDictionary):void{
+		   		_dictionary = dictionary;
+		   	}
+		   	
+		   	public function get dictionary():XMLDictionary{
+		   		return _dictionary;
+		   	}
+		   	
         ]]>
     </mx:Script>
     
 	<mx:Label x="10" y="10" text="Title:" id="titleLabel"/>
 	<mx:Label x="10" y="39" text="Description:" id="descriptionLabel"/>
-	<mx:TextArea x="89" y="38" width="253" height="76" wordWrap="true" editable="true" text="Enter description here" id="descriptionInput"/>
+	<mx:TextArea x="89" y="38" width="253" height="75" wordWrap="true" editable="true" text="Enter description here" id="descriptionInput"/>
 	<mx:TextInput x="89" y="8" width="253" editable="true" id="titleInput" text="Enter title here"/>
 	<mx:ControlBar height="41" y="431">
 		<mx:HBox width="100%" height="100%" horizontalAlign="right">
-			<mx:Button label="OK" id="okButton" click="dispatchEvent(new Event('popUpClose'))"/>
+			<mx:Button label="Done" id="doneButton" click="dispatchEvent(new Event('popUpClose'))"/>
 		</mx:HBox>
 	</mx:ControlBar>
 </mx:TitleWindow>

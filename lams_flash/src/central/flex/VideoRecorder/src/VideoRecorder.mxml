@@ -1,95 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="680" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]" xmlns:ns1="*" height="652" creationComplete="init()" enabled="false">
-
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="682" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]" xmlns:ns1="org.lamsfoundation.lams.common.ui.components.*" xmlns:controls="com.asfusion.controls.*" height="652" creationComplete="init()" enabled="true" xmlns:local="*" xmlns:ns2="org.lamsfoundation.lams.common.ui.components.*">
+	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.common.util.VideoDisplayUtil;
+			//includes
+			include "HTTPServices.as"
+			
 			// imports
+			import org.lamsfoundation.lams.common.ui.components.VideoDisplayEvent;
+			import mx.events.CloseEvent;
+			import org.lamsfoundation.lams.common.util.LAMSStringUtil;
+			import mx.utils.StringUtil;
+			import org.lamsfoundation.lams.common.ui.components.SortEvent;
+			import mx.graphics.codec.PNGEncoder;
+			import mx.events.SliderEvent;
+			import mx.events.DragEvent;
+			import com.asfusion.controls.Rating;
+			import com.asfusion.controls.ratingclasses.RatingEvent;
+			import mx.collections.ArrayCollection;
 			import mx.events.MetadataEvent;		
 			import mx.containers.TitleWindow;
-			import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
-			import mx.controls.dataGridClasses.DataGridColumn;
 			import mx.rpc.events.FaultEvent;
 			import mx.controls.Alert;
 			import mx.collections.XMLListCollection;
 			import mx.rpc.events.ResultEvent;
 			import mx.rpc.http.HTTPService;
 			import adobe.utils.CustomActions;
-			import mx.controls.advancedDataGridClasses.AdvancedDataGridGroupItemRenderer;
-			import mx.controls.advancedDataGridClasses.AdvancedDataGridItemRenderer;
 			import mx.events.ListEvent;
-			import mx.collections.HierarchicalData;
-			import mx.core.mx_internal;
 			import mx.managers.PopUpManager;
+			import org.lamsfoundation.lams.common.dictionary.XMLDictionary;
 			
 			// connection-related
 			private var nc:NetConnection;
-			private var ns:NetStream;
-			private var cam:Camera;
-			private var mic:Microphone;
+			private var client:Object;
+			private var cam:Camera = null;
+			private var mic:Microphone = null;
+			private static var red5App:String = "oflaDemo";
+			private static var servletLocation:String = "tool/lavidr10/videoRecorderActions.do";
+					
+			// from flashvars
+			[Bindable] private var contentEditable:Boolean;
+			[Bindable] private var userId:int;
+			[Bindable] private var toolSessionId:int;
+			[Bindable] private var allowUseVoice:Boolean;
+			[Bindable] private var allowUseCamera:Boolean;
+			[Bindable] private var allowLearnerVideoVisibility:Boolean;
+			[Bindable] private var allowLearnerVideoExport:Boolean;
+			[Bindable] private var allowComments:Boolean;
+			[Bindable] private var allowRatings:Boolean;
+			[Bindable] private var red5ServerUrl:String;
+			[Bindable] private var serverUrl:String;
+			[Bindable] private var languageXML:XML;
+			[Bindable] private var mode:String;
+
+			// misc
 			private var filename:String = "";
 			private var itemClicked:Object = null;
-			
-			// flags
-			private var isCameraViewed:Boolean = false;
-			private var isPublishing:Boolean = false;
-			private var isVideoPaused:Boolean = false;
-			private var isVideoPlaying:Boolean = false;
-			
-			// from flashvars
-			private var contentEditable:Boolean;
-			private var userId:int;
-			private var toolSessionId:int;
-			private var allowUseVoice:Boolean;
-			private var allowUseCamera:Boolean;
-			private var allowLearnerVideoVisibility:Boolean;
-			private var allowLearnerVideoExport:Boolean;
+			private var ratingClicked:Rating;
+			private var dictionary:XMLDictionary;
+			[Bindable] private var videoRecordings:XMLList = null;
+			private var timer:Timer;
+			private var metadata:Object;
 			
 			// ui stuff
 			private var getDetailsPopUp:GetRecordingDetailsPopUp;
-			private var videoContainer:Video;
-			private var video:Video = new Video(320, 240);
-			[Bindable] private var videoRecordings:HierarchicalData;
+			private var addCommentPopUp:AddCommentPopUp;
 			
-			// ugly callback stuff
-			NetConnection.prototype.onBWDone = function(infoObject) {
-				// print its properties
-    			Application.application.printInfoObject("onBWDone", infoObject)
-			}
+			private var previewImage:BitmapData;
 			
-			public function onPlayStatus(infoObject:Object){
-				// print its properties
-				printInfoObject("onPlayStatus", infoObject);
-    			
-    			switch(infoObject.code){
-    				case "NetStream.Play.Start":{
-						var i:int = 0;
-						i++;
-						break;
-    				}
-    				case "NetStream.Play.Complete":{
-						playClick();
-						break;
-    				}
-    				default:
-    			}
-			}
-			
-			public function onMetaData(infoObject:Object){
-				// print its properties
-				printInfoObject("onMetaData", infoObject);
-			}			
-			
+			// constants
+			public const TEACHER_MODE:String = "teacher";
+			public const AUTHOR_MODE:String = "author";
+			public const LEARNER_MODE:String = "learner";
+							
 			// called from creationComplete
 			private function init():void {
 				// get flashvars
 				getFlashVars();
+								
+				// if in teacher or author mode
+				if(mode == TEACHER_MODE || mode == AUTHOR_MODE){
+					allowComments = true;
+					allowRatings = true;
+					allowLearnerVideoExport = true;
+					allowLearnerVideoVisibility = true;
+					allowUseCamera = true;
+					allowUseVoice = true;	
+				}
+				
+				// init labels if languageXML is not empty
+				if(languageXML.toString() != ""){
+					dictionary = new XMLDictionary(languageXML);
+					setLabels();
+				}
+				else{
+					dictionary = new XMLDictionary(new XML(""));
+				}
+				
+				// add some listeners
+				addListeners();
 				
 				// for testing purposes (when running in debug)
 				if(toolSessionId == 0){
+					contentEditable = true;
 					userId = 1;
 					toolSessionId = 1;
+					allowUseVoice = true;
+					allowUseCamera = true;
+					allowComments = true;
+					allowRatings = true;
+					allowLearnerVideoExport = false;
+					allowLearnerVideoVisibility = true;
+					red5ServerUrl = "rtmp://172.20.100.22/";
+					serverUrl = "http://172.20.100.220:8080/lams/";
+					mode = AUTHOR_MODE;
 				}
-			
+				
 				/*
 				Alert.show(
 					"contentEditable: " + contentEditable +
@@ -98,21 +125,109 @@
 					"\nallowUseVoice: " + allowUseVoice +
 					"\nallowUseCamera: " + allowUseCamera +
 					"\nallowLearnerVideoVisibility: " + allowLearnerVideoVisibility +
-					"\nallowLearnerVideoExport: " + allowLearnerVideoExport);
+					"\nallowLearnerVideoExport: " + allowLearnerVideoExport +
+					"\nallowComments: " + allowComments +
+					"\nallowRatings: " + allowRatings +
+					"\nred5ServerUrl: " + red5ServerUrl +
+					"\nserverUrl: " + serverUrl +
+					"\nmode: " + mode);
 				*/
-												
+				
+				// add the app name to the red5 url to complete the url
+				red5ServerUrl += red5App;
+				
+				// add the servlet location to the server url to complete
+				serverUrl += servletLocation;
+				
+				// if the cam is to be used, set that up
+				if(allowUseCamera){
+					cam = VideoDisplayUtil.setupCamera();
+					videoDisplay.attachCamera(cam);
+				}
+				// else remove the view camera button
+				else{
+					recordingButtonBox.removeChild(recordingButtonBox.getChildByName("viewCameraButton"));
+				}
+				
+				// if the mic is to be used, set that up
+				if(allowUseVoice){
+					mic = VideoDisplayUtil.setupMic();
+					videoDisplay.attachMic(mic)
+				}
+				
+				// if neither mic or camera are to be used
+				if(!allowUseCamera && !allowUseVoice){
+					// remove recording button
+					removeChild(getChildByName("recordingBox"));
+					
+					// stretch the video list
+					videoList.setStyle("bottom", 10);
+					videoList.invalidateList();
+				}
+				
+				// init components that need it
+				videoInformation.init();
+								
+				// create the connection
 				createConnection();
 			}
 			
 			// gets flashvars from request
 			private function getFlashVars():void{
-				contentEditable = stringToBool(Application.application.parameters.contentEditable);
+				red5ServerUrl = Application.application.parameters.red5ServerUrl;
+				serverUrl = Application.application.parameters.serverUrl;
+				contentEditable = LAMSStringUtil.stringToBool(Application.application.parameters.contentEditable);
 				userId = Application.application.parameters.userId;
 				toolSessionId = Application.application.parameters.toolSessionId;
-				allowUseVoice = stringToBool(Application.application.parameters.allowUseVoice);
-				allowUseCamera = stringToBool(Application.application.parameters.allowUseCamera);
-				allowLearnerVideoVisibility = stringToBool(Application.application.parameters.allowLearnerVideoVisibility);
-				allowLearnerVideoExport = stringToBool(Application.application.parameters.allowLearnerVideoExport);
+				allowUseVoice = LAMSStringUtil.stringToBool(Application.application.parameters.allowUseVoice);
+				allowUseCamera = LAMSStringUtil.stringToBool(Application.application.parameters.allowUseCamera);
+				allowLearnerVideoVisibility = LAMSStringUtil.stringToBool(Application.application.parameters.allowLearnerVideoVisibility);
+				allowLearnerVideoExport = LAMSStringUtil.stringToBool(Application.application.parameters.allowLearnerVideoExport);
+				allowComments = LAMSStringUtil.stringToBool(Application.application.parameters.allowComments);
+				allowRatings = LAMSStringUtil.stringToBool(Application.application.parameters.allowRatings);
+				languageXML = XML(Application.application.parameters.languageXML);
+				mode = Application.application.parameters.mode;
+			}
+			
+			// sets labels
+			private function setLabels():void{
+				playButton.label = dictionary.getLabel("videorecorder.play");
+				sortAuthorButton.label = dictionary.getLabel("videorecorder.author");
+				sortByLabel.text = dictionary.getLabelAndConcatenate("videorecorder.sort.by", [":"]);
+				sortDateButton.label = dictionary.getLabel("videorecorder.date");
+				sortTitleButton.label = dictionary.getLabel("videorecorder.title");
+				videosLabel.text = dictionary.getLabelAndConcatenate("videorecorder.videos", [":"]);
+				videoInformationLabel.text = dictionary.getLabelAndConcatenate("videorecorder.video.information", [":"]);
+				videoInformation.titleLabel.text = dictionary.getLabelAndConcatenate("videorecorder.title", [":"]);
+				videoInformation.authorLabel.text = dictionary.getLabelAndConcatenate("videorecorder.author", [":"]);
+				videoInformation.ratingLabel.text = dictionary.getLabelAndConcatenate("videorecorder.rating", [":"]);
+				videoInformation.descriptionLabel.text = dictionary.getLabelAndConcatenate("videorecorder.description", [":"]);
+				videoInformation.commentsLabel.text = dictionary.getLabelAndConcatenate("videorecorder.comment", ["s:"]);
+				startRecButton.label = dictionary.getLabel("videorecorder.start.recording");
+				viewCameraButton.label = dictionary.getLabel("videorecorder.view.camera");
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
+			}
+			
+			// adds listeners
+			private function addListeners():void{
+				videoInformation.ratingButton.addEventListener(RatingEvent.SELECTION_CHANGE, addRatingClick);
+				videoInformation.addCommentButton.addEventListener(MouseEvent.CLICK, addCommentClick);
+				videoList.addEventListener(MouseEvent.CLICK, deleteClick);
+				sortButtonGroup.addEventListener(SortEvent.EVENT_TYPE, sortRecordingsHandler);
+				playButton.addEventListener(MouseEvent.CLICK, playClick);
+				startRecButton.addEventListener(MouseEvent.CLICK, startRecordingClick);
+				viewCameraButton.addEventListener(MouseEvent.CLICK, viewCameraClick);
+				
+				videoDisplay.addEventListener(VideoDisplayEvent.METADATA, onMetaData);
+				videoDisplay.addEventListener(VideoDisplayEvent.PAUSE, onPause);
+				videoDisplay.addEventListener(VideoDisplayEvent.UNPAUSE, onUnpause);
+				videoDisplay.addEventListener(VideoDisplayEvent.READY, onReady);
+				videoDisplay.addEventListener(VideoDisplayEvent.RESET, onReset);
+				videoDisplay.addEventListener(VideoDisplayEvent.STARTCAM, onStartCamera);
+				videoDisplay.addEventListener(VideoDisplayEvent.STOPCAM, onStopCamera);
+				videoDisplay.addEventListener(VideoDisplayEvent.STARTPUBLISH, onStartPublish);
+				videoDisplay.addEventListener(VideoDisplayEvent.STOPPUBLISH, onStopPublish);
+				videoDisplay.addEventListener(VideoDisplayEvent.COMPLETE, onComplete);
 			}
 			
 			private function createConnection():void{
@@ -122,9 +237,16 @@
 				// add some listeners to it
 				nc.addEventListener(NetStatusEvent.NET_STATUS, ncStatusHandler);
 				nc.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+				nc.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
+				
+				// set the nc to the videodisplay
+				videoDisplay.setNetConnection(nc);
+				
+				// disable playback buttons
+				enablePlaybackButtons(false);
 				
 				// connect to the local Red5 server and wait for callback
-				nc.connect("rtmp://172.20.100.220/oflaDemo");
+				nc.connect(red5ServerUrl);
 				
 				// wait for NetStatusEvent to be thrown
 			}
@@ -135,7 +257,7 @@
 				var infoObject:Object = event.info;
 				
 				// print its properties
-				printInfoObject("ncStatusHandler", infoObject);
+				VideoDisplayUtil.printInfoObject("ncStatusHandler", infoObject);
   
 				// if successful connection
 				if (infoObject.code == "NetConnection.Connect.Success") {
@@ -143,150 +265,26 @@
 					Application.application.enabled = true;
 					
 					// call server and get recordings, update datagrid with results
-					getRecordingsFromServer();
-					
-					// create netstream
-					ns = new NetStream(nc);
-					//ns.client = this;
-					ns.bufferTime = 5;
-					
-					// add listeners
-					ns.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
-					ns.addEventListener(NetStatusEvent.NET_STATUS, nsStatusHandler);
-					ns.addEventListener(MetadataEvent.METADATA_RECEIVED, nsMetaDataHandler);
-					ns.client = this;
-
-					// fix video player and attach the netstream to it
-					player.addChild(video);
-					video.visible = true;
-					video.attachNetStream(ns);
-				
-					// get references to the camera and mic
-					mic = Microphone.getMicrophone();
-					cam = Camera.getCamera();
-					
-					// setup some simple settings with the cam and mic for quality
-					setupCameraMic();
-						
-					// attach webcam and mic
-					ns.attachCamera(cam);
-					ns.attachAudio(mic);
+					getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);	
 				}
-				else{					
+				// if connection unsuccessful
+				else if(infoObject.code == "NetConnection.Connect.InvalidApp"){
+					Application.application.enabled = false;			
     				// pop an alert
-					Alert.show("NetConnection not connected");
+					Alert.show(dictionary.getLabel("videorecorder.web.application.not.available"));
+				}
+				else if(infoObject.code == "NetConnection.Connect.Failed"){
+					Application.application.enabled = false;				
+    				// pop an alert
+					Alert.show(dictionary.getLabel("videorecorder.net.connection.not.connected"));
+				}
+				else if(infoObject.code == "NetConnection.Connect.Closed"){
+					Application.application.enabled = false;
+    				// pop an alert
+					Alert.show(dictionary.getLabel("videorecorder.net.connection.closed"));
 				}
 			}
 			
-			// callback called on NetStream connect event
-			private function nsStatusHandler(event:NetStatusEvent):void {
-				// get the info object
-				var infoObject:Object = event.info;
-				
-				// print its properties
-				printInfoObject("nsStatusHandler", infoObject);
-				
-				switch(infoObject.code){
-					case "NetStream.Play.Start":{
-						break;
-					}
-					case "NetStream.Play.Stop":{
-						break;
-					}
-					case "NetStream.Buffer.Empty":{
-						break;
-					}
-					case "NetStream.Buffer.Full":{
-						break;
-					}
-					case "NetStream.Buffer.Flush":{
-						break;
-					}
-					case "NetStream.Play.Start":{
-						var i:int = 0;
-						i++;
-						break;
-					}
-					case "NetStream.Pause.Notify":{
-						var i:int = 0;
-						i++;
-						break;
-					}
-					case "NetStream.Unpause.Notify":{
-						var i:int = 0;
-						i++;
-						break;
-					}
-					default:
-				}
-			}
-			
-			// callback called on NetStream connect event
-			private function nsMetaDataHandler(event:MetadataEvent):void {
-				// get the info object
-				var infoObject:Object = event.info;
-				
-				// print its properties
-				printInfoObject("nsMetaDataHandler", infoObject);
-			}
-			
-			// creates an httpservice and gets video recordings
-			private function getRecordingsFromServer():void{
-				var videoRecorderActions:HTTPService = new HTTPService();
-				videoRecorderActions.url = "http://172.20.100.220:8080/lams/tool/lavidr10/videoRecorderActions.do";
-				videoRecorderActions.method = "POST";
-				videoRecorderActions.resultFormat = "e4x";
-				videoRecorderActions.request.method = "getRecordingsByToolSessionIdAndUserId";
-				videoRecorderActions.request.toolSessionId = toolSessionId;
-				videoRecorderActions.request.userId = 0;
-				videoRecorderActions.addEventListener(ResultEvent.RESULT, getRecordingsSuccessHandler);
-				videoRecorderActions.addEventListener(FaultEvent.FAULT, getRecordingsFaultHandler);
-				
-				videoRecorderActions.send();
-			}
-			
-			// creates an httpservice and saves a video recording
-        	private function saveRecordingToServer(userId:int, title:String, description:String, filename:String, rating:Number, toolSessionId:int, recordingId:int):void{
-				var videoRecorderActions:HTTPService  = new HTTPService();
-				videoRecorderActions.url = "http://172.20.100.220:8080/lams/tool/lavidr10/videoRecorderActions.do";
-				videoRecorderActions.method = "POST";
-				videoRecorderActions.resultFormat = "e4x";
-				videoRecorderActions.request.method = "saveRecording";
-				videoRecorderActions.request.userId = userId;
-				videoRecorderActions.request.recordingId = recordingId;
-				videoRecorderActions.request.title = title;
-				videoRecorderActions.request.rating = rating;
-				videoRecorderActions.request.description = description;
-				videoRecorderActions.request.filename = filename;
-				videoRecorderActions.request.toolSessionId = toolSessionId;
-				videoRecorderActions.addEventListener(ResultEvent.RESULT, saveRecordingSuccessHandler);
-				videoRecorderActions.addEventListener(FaultEvent.FAULT, saveRecordingFaultHandler);
-				
-				videoRecorderActions.send();
-        	}
-        	
-        	// handler for successful get recordings
-			private function getRecordingsSuccessHandler(e:ResultEvent):void {
-	        	videoRecordings = new HierarchicalData(e.result.recordings.userFolder);
-				videoRecordings.childrenField = "child";
-	        }
-	        
-	        // fault handler for get recordings
-	      	private function getRecordingsFaultHandler(e:FaultEvent):void {
-	      		Alert.show(e.toString());
-	        }
-	        
-	        // handler for successful save recording
-			private function saveRecordingSuccessHandler(e:ResultEvent):void {
-	        	Alert.show("Recording successfully saved");
-	        	getRecordingsFromServer();
-	        }
-	        
-	        // fault handler for save recording
-	      	private function saveRecordingFaultHandler(e:FaultEvent):void {
-	      		Alert.show(e.toString());
-	        }
-	        
 			private function securityErrorHandler(event:SecurityErrorEvent):void {
 				trace("securityErrorHandler: " + event);
 			}
@@ -294,7 +292,17 @@
 			private  function asyncErrorHandler(event:AsyncErrorEvent):void {
 				trace("securityErrorHandler: " + event);
 			} 
-        
+        	
+        	// ugly onBW callback
+			NetConnection.prototype.onBWDone = function(infoObject) {
+				// print its properties
+    			Application.application.printInfoObject("onBWDone", infoObject)
+			}
+	
+        	private function sortRecordingsHandler(event:SortEvent):void{
+        		getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);	
+        	}
+        	
         	// handler called when the confirm action ("ok", "cancel", "save") on a popup is hit
         	private function popUpRemovedHandler(event:Event):void{
         		// if the given popup is of type getDetailsPopUp
@@ -308,305 +316,382 @@
         			// call the http service to save a recording
         			saveRecordingToServer(userId, title, description, filename + ".flv", rating, toolSessionId, recordingId);
         		}
+				// if the given popup is of type addCommentPopUp
+        		else if(event.target == addCommentPopUp){
+        			// get the details
+        			var comment:String = addCommentPopUp.commentInput.text;
+        			var commentId:int = -1;
+        			var toolSessionId:int = toolSessionId;
+        			var recordingId:int = itemClicked.recordingId;
+        			
+        			// call the http service to save a comment
+        			saveCommentToServer(toolSessionId, recordingId, userId, commentId, comment);
+        		}
         		
         		// no matter what popup, close it
         		if(event.target is TitleWindow){
         			PopUpManager.removePopUp(TitleWindow(event.target));
         		}
         	}
-        	
-        	// click handler for startPublish button
-			private function viewCameraAndPublishClick():void{
-				if(isPublishing || !isCameraViewed){
-					viewCameraClick();
-					publishClick();
+			
+			private function viewCameraClick(event:MouseEvent):void{
+				if(!videoDisplay.isCameraViewed)
+					videoDisplay.startViewCamera();
+				else if(videoDisplay.isCameraViewed)
+					videoDisplay.stopViewCamera();
+			}
+			
+			private function playClick(event:MouseEvent):void{
+				videoDisplay.play();
+			}
+			
+			private function startRecordingClick(event:MouseEvent):void{
+				if(!videoDisplay.isPublishing){
+					filename = VideoDisplayUtil.createFilename(toolSessionId, userId);
+					videoDisplay.startPublish(filename);
 				}
-				else{
-					publishClick();
+				else if(videoDisplay.isPublishing)
+					videoDisplay.stopPublish();
+			}
+			
+			private function addCommentClick(event:MouseEvent):void{
+				addCommentPopUp = AddCommentPopUp(PopUpManager.createPopUp(this, AddCommentPopUp, true));
+				PopUpManager.centerPopUp(addCommentPopUp);
+				addCommentPopUp.init(dictionary);
+				addCommentPopUp.addEventListener("popUpClose", popUpRemovedHandler);
+			}
+			
+			private function addRatingClick(event:RatingEvent):void{
+				if(!Rating(event.currentTarget).voted){
+					var recordingId:int = itemClicked.recordingId;
+					var ratingId:int = -1;
+					var rating:Number = event.selectedValue;
+					ratingClicked = Rating(event.currentTarget);
+					
+					saveRatingToServer(toolSessionId, ratingId, userId, rating, recordingId);			
 				}
 			}
 			
-			// click handler for viewCamera button
-			private function viewCameraClick():Boolean {
-				// if camera is not being used
-				if(!isCameraViewed){
-					// check to see if a video was playing
-					if(isVideoPlaying){
-						ns.close();
-					}
-				
-					//change the view stack
-					videoViewStack.selectedChild = recorderView;
-					
-					// attach the cam to the videoDisplay
-					videoDisplay.attachCamera(cam);
-					isCameraViewed = true;
-					
-					// change the view camera button's label
-					viewCameraButton.label = "Stop Camera";
-					
-					setEnabledPlaybackButtonsAndDataGrid(false);
+			private function deleteClick(event:MouseEvent):void{
+				if(event.target.hasOwnProperty("id") && event.target.id == "deleteButton"){
+					Alert.show(dictionary.getLabel("videorecorder.message.sure.delete"), dictionary.getLabel("videorecorder.confirm"), 3, this, confirmDeleteClick);  
 				}
-				// if camera is being used
-				else {
-					// clear the videoDisplay
-					videoDisplay.attachCamera(null);
-					isCameraViewed = false;
-					
-					// change view
-					videoViewStack.selectedChild = blackView;
-					
-					// change the view camera button's label
-					viewCameraButton.label = "View Camera";
-					
-					setEnabledPlaybackButtonsAndDataGrid(true);
-				}
-				
-				return isCameraViewed;
 			}
 			
-			// called from viewCameraClick() (not really a handler)
-			private function publishClick():Boolean {
-				// if not publishing
-				if(!isPublishing){
-					// create video filename
-					filename = "lamsRecording_session" + toolSessionId + "_user" + userId + "_" + Math.random();
-					// publish video to media server
-					ns.publish(filename, "record");
-					isPublishing = true;
-					
-					// change the start recording button's label
-					startRecButton.label = "Stop Recording";
-					viewCameraButton.enabled = false;				
-				}
-				// if recording
-				else {
-					// close the netStream object
-					ns.close();
-					isPublishing = false;
-					
-					// change the start recording button's label
-					startRecButton.label = "Start Recording";
-					viewCameraButton.enabled = true;
-					
-					getDetailsPopUp = GetRecordingDetailsPopUp(PopUpManager.createPopUp(this, GetRecordingDetailsPopUp, true));
-					PopUpManager.centerPopUp(getDetailsPopUp);
-					getDetailsPopUp.init(null, null);
-					getDetailsPopUp.addEventListener("popUpClose", popUpRemovedHandler);
-				}
-				
-				return isPublishing; 
+			private function confirmDeleteClick(event:CloseEvent):void{
+				if (event.detail==Alert.YES){
+					var recordingId:int = itemClicked.recordingId;
+                	deleteRecordingFromServer(recordingId);
+                	videoInformation.resetInformation();
+                	videoDisplay.reset();
+                }
 			}
 			
 			// click handler for the videoDataGrid list
-			private function videoDataGridClick(event:ListEvent):void {
-				// if video is playing
-				if(isVideoPlaying || isVideoPaused){
-					// close stream
-					resetVideo();
-				}
-				
-				// store last item clicked
-				itemClicked = event.itemRenderer.data;
-				
-				// update video text info
-				if(!itemClicked.hasOwnProperty("child") && videoDataGrid.enabled){
-					title.text = itemClicked.title;
-					description.text = itemClicked.description;
-					author.text = itemClicked.author;
-					notes.text = itemClicked.notes
+			private function videoListClick(event:ListEvent):void {
+				if(videoList.enabled){	
+					// reset video information
+					videoInformation.resetInformation();
 					
-					playVideo(itemClicked.filename);
+					// store last item clicked
+					itemClicked = event.itemRenderer.data;
+					
+					// enable video information buttons
+					videoInformation.enableVideoInformationButtons(true);
+				
+					// scroll the video information box back up to top
+					videoInformation.verticalScrollPosition = 0;
+					
+					// update fields
+					videoInformation.title.text = itemClicked.title;
+					videoInformation.description.text = itemClicked.description;
+					videoInformation.author.text = itemClicked.author;
+					videoInformation.ratingButton.value = itemClicked.rating;
+					videoInformation.printComments(itemClicked.comments);
+					
+					// if no vote has been done, enable voting and show average
+					if(itemClicked.userRating == -1){
+						videoInformation.ratingButton.voted = false;
+					}
+					// if vote has been done, show user's vote and disable voting
+					else{
+						videoInformation.ratingButton.voted = true;
+						videoInformation.ratingButton.votedValue = itemClicked.userRating;
+					}
+					
+					// make ready item clickedo
+					makeReadytItemClicked();
 				}
 				else{
 					itemClicked = null;
+					videoList.selectedItem = null;
+					videoInformation.resetInformation();
 				}
 			}
 			
-			private function playVideo(filename:String):void{
-				// change the view stack to player view
-				videoViewStack.selectedChild = playerView;
-				
-				// open new stream
-				ns.play(filename);
-				ns.seek(0);
-				ns.pause();
-				isVideoPlaying = false;
-				isVideoPaused = true;
+			private function makeReadytItemClicked():void{
+				// if playing a sound file
+				if(LAMSStringUtil.stringToBool(itemClicked.isJustSound)){
+					// change the view stack to audio view
+					videoDisplay.makeReadyAudio(itemClicked.filename);
+				}else{
+					// change the view stack to player view
+					videoDisplay.makeReadyVideo(itemClicked.filename);
+				}
 			}
 			
-			// resume the paused netstream video
-			private function playClick():void {
-				// if video is not currently playing
-				if(!isVideoPlaying){
-					// if the last item clicked is not null
-					if(itemClicked != null){
-						// play stream
-						isVideoPaused = false;
-						isVideoPlaying = true;
-						ns.resume();
-						
-						playButton.label = "Stop";
+			// onMetaData callback, called from videoDisplay
+			private function onMetaData(event:VideoDisplayEvent):void{
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.buffering");
+				
+				seekSlider.minimum = 0;
+				seekSlider.maximum = event.metadata.duration;
+				
+				timer = new Timer(10);
+				timer.addEventListener(TimerEvent.TIMER, updateSeekSlider);
+				timer.start();
+			}
+			
+			// onReady callback, called from videoDisplay
+			private function onReady(event:VideoDisplayEvent):void{
+				playButton.enabled = true;
+				seekSlider.enabled = true;
+				playButton.label = dictionary.getLabel("videorecorder.play");
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.ready");
+			}
+			
+			// onReset callback, called from videoDisplay
+			public function onReset(event:VideoDisplayEvent):void{
+				// reset play buttons
+				playButton.enabled = false;
+				playButton.label = dictionary.getLabel("videorecorder.play");
+				
+				// set panel status label
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
+				
+				// if a timer exists, clear it
+				if(timer){
+					timer.stop();
+					timer = null;
+				}
+
+				seekSlider.enabled = false;
+				seekSlider.minimum = 0;
+				seekSlider.maximum = 0;
+				seekSlider.value = seekSlider.minimum;
+				
+				timerLabel.text = "0:00 / 0:00";
+			}
+			
+			// onUnpause callback, called from videoDisplay
+			private function onUnpause(event:VideoDisplayEvent):void{
+				// set panel status label
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.playing");
+				
+				playButton.label = dictionary.getLabel("videorecorder.pause");
+			}
+			
+			// onPause callback, called from videoDisplay
+			private function onPause(event:VideoDisplayEvent):void{
+				// set panel status label
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.paused");
+				
+				playButton.label = dictionary.getLabel("videorecorder.resume");
+			}
+			
+			private function onStartPublish(event:VideoDisplayEvent):void{
+				// set panel status label
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.recording");
+				
+				// change the start recording button's label
+				startRecButton.label = dictionary.getLabel("videorecorder.stop.recording");
+				
+				viewCameraButton.enabled = false;
+			}
+			
+			private function onStopPublish(event:VideoDisplayEvent):void{		
+				// change the start recording button's label
+				startRecButton.label = dictionary.getLabel("videorecorder.start.recording");
+				
+				// set panel status label
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
+				
+				viewCameraButton.enabled = true;
+				
+				getDetailsPopUp = GetRecordingDetailsPopUp(PopUpManager.createPopUp(this, GetRecordingDetailsPopUp, true));
+				PopUpManager.centerPopUp(getDetailsPopUp);
+				getDetailsPopUp.init(dictionary);
+				getDetailsPopUp.addEventListener("popUpClose", popUpRemovedHandler);
+			}
+			
+			private function onStartCamera(event:VideoDisplayEvent):void{
+				// reset video information
+				videoInformation.resetInformation();
+				
+				// change the view camera button's label
+				viewCameraButton.label = dictionary.getLabel("videorecorder.stop.camera");
+				
+				// set panel status label
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
+				
+				// disable buttons
+				enablePlaybackButtonsAndVideoList(false);
+				videoInformation.enableVideoInformationButtons(false);
+			}
+			
+			private function onStopCamera(event:VideoDisplayEvent):void{
+				// change the view camera button's label
+				viewCameraButton.label = dictionary.getLabel("videorecorder.view.camera");
+				
+				
+				// set panel status label
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
+				
+				// clear item clicked
+				videoList.selectedItem = null;
+				itemClicked = null;
+				
+				// enable buttons
+				enablePlaybackButtonsAndVideoList(true);
+			}
+			
+			private function onComplete(event:VideoDisplayEvent):void{
+				playButton.label = dictionary.getLabel("videorecorder.play");
+			}
+			
+			private function seekSliderChange(event:SliderEvent):void {
+				videoDisplay.seek(event.value);
+			}
+			
+			private function seekSliderClick(event:SliderEvent):void {
+				// if seekslider is enabled
+				
+				if(seekSlider.enabled){
+					// if the mouse is pressed
+					if(event.type == SliderEvent.THUMB_PRESS){
+						// stop the timer so that the bar seekSlider can manually be controlled
+						timer.stop();
+					}
+					// if the mouse is released
+					else if(event.type == SliderEvent.THUMB_RELEASE){
+						// start the timer again and allow it to regain control of the seekSlider
+						timer.start();
 					}
 				}
-				else{
-					resetVideoStillClicked();
-					playButton.label = "Play";
+			}
+						
+			// update method called from a timer (launched when metadata is received)
+			private function updateSeekSlider(event:TimerEvent):void{
+				// if the video isn't actually playing yet
+				if(videoDisplay.playMode == videoDisplay.INIT_MODE || videoDisplay. playMode == videoDisplay.READY_MODE){
+					seekSlider.value = 0;
+					timerLabel.text = "0:00" + " / " + VideoDisplayUtil.secondsToString(String(videoDisplay.duration));
 				}
-
+				// otherwise, if it is playing
+				else if(videoDisplay.playMode == videoDisplay.PLAY_MODE || videoDisplay.playMode == videoDisplay.PAUSE_MODE){
+					seekSlider.value = videoDisplay.time;
+					timerLabel.text = VideoDisplayUtil.secondsToString(String(videoDisplay.time)) + " / " + VideoDisplayUtil.secondsToString(String(videoDisplay.duration));					
+				}
 			}
-			
-			private function resetVideoStillClicked():void{
-				ns.seek(0);
-				isVideoPaused = true;
-				isVideoPlaying = false;
-				
-				playButton.label = "Play";
-			}
-			
-			private function resetVideo():void{
-				ns.close();
-				isVideoPaused = false;
-				isVideoPlaying = false;
-				
-				playButton.label = "Play";
-			}
-			
-			// sets up camera and mic
-			private function setupCameraMic():void {
-				// setting dimensions and framerate
-				cam.setMode(320, 240, 30);
-				// set to minimum of 70% quality
-				cam.setQuality(0,70);
-				
-				// setup mic
-				mic.rate = 44;
-			}
-			
-	        // convert a string to a boolean
-	        private function stringToBool(string:String):Boolean{
-	        	switch(string){
-	        		case "1":
-	        		case "true":
-	        		case "yes":
-	        			return true;
-	        		case "0":
-	        		case "false":
-	        		case "no":
-	        			return false;
-	        		default:
-	        		return Boolean(string);
-	        	}
+				        	       	
+	       	// enables/disables the playback related buttons and video list
+			private function enablePlaybackButtonsAndVideoList(enabled:Boolean):void{
+				enablePlaybackButtons(enabled);
+				enableVideoList(enabled);
+			}	    
+	        
+	        // enables/disables the playback related buttons
+	        private function enablePlaybackButtons(enabled:Boolean):void{
+	        	playButton.label = dictionary.getLabel("videorecorder.play");
+				playButton.enabled = (enabled && itemClicked != null);
 	        }
 	        
-	        private function printInfoObject(caller:String, infoObject:Object):void{
-	        	trace("caller: " + caller);
-	       		for (var prop in infoObject) {
-        			trace("\t"+prop+":\t"+infoObject[prop]);
-    			}
+	        // enables/disables the video list
+	        private function enableVideoList(enabled:Boolean):void{
+	  			refreshButton.enabled = enabled;
+				videoList.enabled = enabled;
+				sortDateButton.enabled = enabled;
+				sortAuthorButton.enabled = enabled;
+				sortTitleButton.enabled = enabled;
+				
+				// if videoRecordings is defined
+				if(videoRecordings){
+					var length:int = videoRecordings.length();
+					// get children from videoList and enable/disable
+					for(var i:int = 0; i < length; i++){
+						
+						var videoProfile:VideoProfile = VideoProfile(videoList.indexToItemRenderer(i));
+						var deleteButton:Button = videoProfile.deleteButton;
+						var exportButton:Button = videoProfile.exportButton;
+						
+						if(deleteButton)
+							deleteButton.enabled = enabled;
+						
+						if(exportButton)
+							exportButton.enabled = enabled;
+					}
+				}    	
 	        }
 	        
-			private function recordingLabelFunction(row:Object, column:AdvancedDataGridColumn):String 
-			{
-				return row.title;
-			}
-			
-			private function createDateLabelFunction(row:Object, column:AdvancedDataGridColumn):String 
-			{
-				return row.createDate;
-			}
-
-			private function setEnabledPlaybackButtonsAndDataGrid(enabled:Boolean):void{
-				playButton.enabled = enabled;
-				deleteButton.enabled = enabled;
-				exportButton.enabled = enabled;
-				refreshButton.enabled = enabled;
-				videoDataGrid.enabled = enabled;
-			}
-			
-			private function setEnabledPlaybackButtonsSep(en1:Boolean, en2:Boolean, en3:Boolean, en4:Boolean):void{
-				playButton.enabled = en1;
-				deleteButton.enabled = en2;
-				exportButton.enabled = en3;
-				refreshButton.enabled = en4;
-			}
-			
-			private function setEnabledRecordingButtons(enabled:Boolean):void{
-				startRecButton.enabled = enabled;
-				viewCameraButton.enabled = enabled;
-			}
-
-			private function setEnabledRecordingButtonsSep(en1:Boolean, en2:Boolean):void{
-				startRecButton.enabled = en1;
-				viewCameraButton.enabled = en2;
-			}
-			
+	        // getters
+	        public function getUserId():int{
+	        	return userId;
+	        }
+	        
+	        public function getAllowLearnerVideoExport():Boolean{
+	        	return allowLearnerVideoExport;
+	        }
+	        
+	       	public function getAllowLearnerVideoVisibility():Boolean{
+	        	return allowLearnerVideoVisibility;
+	        }
+	        
+	        public function getAllowRatings():Boolean{
+	        	return allowRatings;
+	        }
+	        
+	        public function getAllowComments():Boolean{
+	        	return allowComments;
+	        }
+	        
+	        public function getDictionary():XMLDictionary{
+	        	return dictionary;
+	        }
+	        
+	        public function getMode():String{
+	        	return mode;
+	        }
 	    ]]>
 	</mx:Script>
 
-	<mx:Panel width="340" height="280" layout="absolute" left="10" top="10" title="Display:" id="videoPanel">
-		<mx:ViewStack id="videoViewStack" width="100%" height="100%" creationPolicy="all">
-			<mx:Canvas id="recorderView" width="100%" height="100%">
-				<mx:VideoDisplay width="320" height="240" id="videoDisplay" visible="true"/>
-			</mx:Canvas>
-			<mx:Canvas id="blackView" width="100%" height="100%" backgroundColor="#000000">
-			</mx:Canvas>
-			<mx:Canvas id="playerView" width="100%" height="100%" backgroundColor="#000000">
-				<mx:UIComponent id="player" width="100%" height="100%" />
-			</mx:Canvas>
-		</mx:ViewStack>
+	<mx:Panel width="340" height="310" layout="absolute" left="10" top="10" title="Display:" id="videoRecorderPanel" borderColor="#E2E2E2">
+	<ns1:VideoDisplay id="videoDisplay" width="320" height="240"/>
+	<mx:ControlBar height="38" y="242">
+		<mx:Button id="playButton" label="Play" width="75"/>
+		<mx:HSlider width="100%" id="seekSlider" change="seekSliderChange(event)" dataTipFormatFunction="VideoDisplayUtil.secondsToString" thumbPress="seekSliderClick(event)" thumbRelease="seekSliderClick(event)"/>
+		<mx:Label text="0:00 / 0:00" width="70" textAlign="center" id="timerLabel"/>
+	</mx:ControlBar>
 	</mx:Panel>
-	<mx:AdvancedDataGrid id="videoDataGrid" x="358" y="38" width="312" height="548" selectionMode="singleRow" showHeaders="true" dataProvider="{videoRecordings}" itemClick="videoDataGridClick(event)" sortableColumns="true" displayItemsExpanded="true" resizableColumns="false">
-		<mx:columns>
-			<mx:AdvancedDataGridColumn headerText="Author and Title" dataField="recording" labelFunction="recordingLabelFunction"/>
-			<mx:AdvancedDataGridColumn headerText="Create Date" dataField="createDate" labelFunction="createDateLabelFunction"/>
-		</mx:columns>
-    </mx:AdvancedDataGrid>
-	<mx:VBox x="10" y="324" width="340" height="262" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" horizontalScrollPolicy="off" borderStyle="solid">
-		<mx:Label text="Title:" fontStyle="italic"/>
-		<mx:Text width="100%" id="title"/>
-		<mx:HRule width="100%"/>
-		<mx:HBox width="100%" height="54">
-			<mx:VBox width="177" height="50">
-				<mx:Label text="Author:" fontStyle="italic"/>
-				<mx:Text width="100%" id="author"/>
-			</mx:VBox>
-			<mx:Spacer width="100%"/>
-			<mx:VBox width="132" height="52">
-				<mx:Label text="Rating:" fontStyle="italic"/>
-			</mx:VBox>
+	<mx:Label id="videoInformationLabel" x="10" y="328" text="Video information:" fontWeight="bold"/>
+	<local:VideoInformation id="videoInformation"/>
+	<mx:HBox left="358" top="10" right="10">
+		<mx:Label id="videosLabel" text="Videos:" fontWeight="bold"/>
+	</mx:HBox>
+	<mx:TileList borderStyle="none" id="videoList" itemRenderer="VideoProfile" dataProvider="{videoRecordings}" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" itemClick="videoListClick(event)" top="62" left="358" bottom="70" right="10"></mx:TileList>
+	<mx:HBox verticalAlign="middle" left="358" top="36" right="10">
+		<mx:Label id="sortByLabel" text="Sort by:" fontWeight="normal" fontStyle="normal"/>
+		<ns2:SortButtonGroup width="100%" horizontalGap="3" id="sortButtonGroup">
+			<ns2:SortButton id="sortDateButton" label="Date"  sortBy="date" selected="true" horizontalGap="0" sortDirection="descending"/>
+			<ns2:SortButton id="sortAuthorButton" label="Author"  sortBy="author" horizontalGap="0"/>
+			<ns2:SortButton id="sortTitleButton" label="Title"  sortBy="title" horizontalGap="0"/>
+		</ns2:SortButtonGroup>
+		<mx:Button label="Update" id="refreshButton" click="getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection)" height="17" textAlign="center"/>
+	</mx:HBox>
+	<mx:VBox height="52" horizontalAlign="right" right="10" bottom="10" left="357" id="recordingBox">
+		<mx:Label id="recordingControlsLabel" text="Recording controls:" fontWeight="bold"/>
+		<mx:HBox width="100%" height="100%" horizontalAlign="right"  id="recordingButtonBox">
+			<mx:Button id="viewCameraButton" label="View Camera"/>
+			<mx:Button fontWeight="bold" id="startRecButton" label="Start Recording"/>
 		</mx:HBox>
-		<mx:HRule width="100%"/>
-		<mx:Label text="Description:" fontStyle="italic"/>
-		<ns1:ResizeableTextArea id="description" width="100%" wordWrap="true" editable="false" verticalScrollPolicy="off" height="20" borderStyle="none"/>
-		<mx:HRule width="100%"/>
-		<mx:Label text="Monitor Notes:" fontStyle="italic"/>
-		<ns1:ResizeableTextArea width="100%" id="notes" wordWrap="true" editable="true" verticalScrollPolicy="off" height="20"/>
 	</mx:VBox>
-	<mx:Label x="10" y="298" text="Video information:" fontWeight="bold"/>
-	<mx:HBox x="10" y="594" width="660" height="48">
-		<mx:VBox width="338" height="100%">
-			<mx:Label text="Recording controls:" fontWeight="bold"/>
-			<mx:HBox width="100%" height="100%">
-				<mx:Button label="View Camera" id="viewCameraButton" click="viewCameraClick()"/>
-				<mx:Button label="Start Recording" fontWeight="bold" id="startRecButton" click="viewCameraAndPublishClick()"/>
-			</mx:HBox>
-		</mx:VBox>
-		<mx:VBox width="100%" height="100%">
-			<mx:VBox width="100%" height="100%" horizontalAlign="right">
-				<mx:Label text="Playback controls:" fontWeight="bold"/>
-				<mx:HBox width="100%" horizontalAlign="right">
-					<mx:Button label="Refresh" id="refreshButton" click="getRecordingsFromServer()"/>
-					<mx:Button label="Play" id="playButton" click="playClick()"/>
-					<mx:Button label="Delete" id="deleteButton"/>
-					<mx:Button label="Export" id="exportButton"/>
-				</mx:HBox>
-			</mx:VBox>
-		</mx:VBox>
-	</mx:HBox>
-	<mx:HRule width="100%" x="10" y="594"/>
-	<mx:HBox x="358" y="10" width="312">
-		<mx:Label text="Videos:" fontWeight="bold"/>
-	</mx:HBox>
-	
 </mx:Application>
