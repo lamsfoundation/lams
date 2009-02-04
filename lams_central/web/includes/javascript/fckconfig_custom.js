@@ -1,5 +1,5 @@
 FCKConfig.ToolbarSets["Default"] = [
-				    ['Source','-','FitWindow', 'Preview','PasteWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','OrderedList','UnorderedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','TextColor','BGColor','Equation'], 
+	['Source','-','FitWindow', 'Preview','PasteWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','OrderedList','UnorderedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','TextColor','BGColor','Equation'], 
 	['Image','Link','Table','Rule','Smiley','SpecialChar','Templates','FontFormat','FontName','FontSize','About']
 ] ;
 
@@ -27,6 +27,12 @@ FCKConfig.ToolbarSets["Custom-Wiki"] = [
 	['Table','Rule','Smiley','SpecialChar'],
 	['FontFormat','FontName','FontSize']
 ] ;
+
+FCKConfig.ToolbarSets["Custom-Pedplanner"] = [
+	['FitWindow', 'Preview','PasteWord','Bold','Italic','Underline', '-','OrderedList','UnorderedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','TextColor','BGColor','Equation'], 
+	['Image','Link','Table','Smiley','FontName','FontSize']
+] ;
+
 
 FCKConfig.EditorAreaCSS = FCKConfig.BasePath + '../../css/defaultHTML_learner.css' ;
 FCKConfig.SkinPath = FCKConfig.BasePath + 'skins/office2003/' ;
