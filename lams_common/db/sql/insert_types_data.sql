@@ -309,4 +309,4 @@ INSERT INTO lams_ext_server_org_map VALUES
   (1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%','http://dummy','\0',7);
 
 -- initialise db version
-INSERT INTO patches VALUES ('lams', 15, NOW(), 'F');
+INSERT INTO patches VALUES ('lams', 16, NOW(), 'F');
