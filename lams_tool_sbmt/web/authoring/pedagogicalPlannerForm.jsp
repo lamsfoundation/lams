@@ -14,7 +14,7 @@
 	}
 	</script>
 </lams:head>
-<body>
+<body style="width: 550px">
 	<h4 class="space-left"><fmt:message key="label.authoring.basic.instruction" /></h4>
 	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
 		<html:hidden property="toolContentID" />
@@ -26,8 +26,8 @@
 		<lams:FCKEditor id="instruction"
 			value="${formBean.instruction}"
 			contentFolderID="${formBean.contentFolderID}"
-                        toolbarSet="Custom-Pedplanner" height="200px"
-                        displayExpanded="false">
+            toolbarSet="Custom-Pedplanner" height="150px"
+            width="545px" displayExpanded="false">
 		</lams:FCKEditor>
 	</html:form>
 </body>

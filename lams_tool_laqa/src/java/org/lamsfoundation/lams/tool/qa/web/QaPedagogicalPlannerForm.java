@@ -32,11 +32,19 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
 
 public class QaPedagogicalPlannerForm extends PedagogicalPlannerForm {
     private List<String> question;
+    private String contentFolderID;
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
 
     @Override
     public ActionMessages validate() {
@@ -71,7 +79,7 @@ public class QaPedagogicalPlannerForm extends PedagogicalPlannerForm {
 	    if (questions != null) {
 		int topicIndex = 0;
 		for (QaQueContent message : (Set<QaQueContent>) questions) {
-		    setQuestion(topicIndex++, WebUtil.removeHTMLtags(message.getQuestion()));
+		    setQuestion(topicIndex++, message.getQuestion());
 		}
 	    }
 	}
@@ -104,5 +112,9 @@ public class QaPedagogicalPlannerForm extends PedagogicalPlannerForm {
 	}
 	question.remove(number);
 	return true;
+    }
+
+    public List<String> getQuestionList() {
+	return question;
     }
 }

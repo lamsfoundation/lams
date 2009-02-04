@@ -45,7 +45,7 @@
 </lams:head>
 <body id="body">
 	<%@ include file="/common/messages.jsp"%>
-	<html:form enctype="multipart/form-data" action="/authoring/saveOrUpdatePedagogicalPlannerForm.do" styleId="pedagogicalPlannerForm" method="post">
+	<html:form style="width: 555px" enctype="multipart/form-data" action="/authoring/saveOrUpdatePedagogicalPlannerForm.do" styleId="pedagogicalPlannerForm" method="post">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
@@ -59,18 +59,18 @@
 			<html:hidden property="fileVersion[${itemIndex-1}]" />
 			<html:hidden property="fileName[${itemIndex-1}]"></html:hidden>
 			<h4 class="space-left"><fmt:message key="label.authoring.basic.title"/></h4>
-			<html:text styleClass="item" size="85" property="title[${itemIndex-1}]"></html:text>
+			<html:text styleClass="item" size="80" property="title[${itemIndex-1}]"></html:text>
 			<c:choose>
 				<c:when test="${itemType eq 1}">
 					<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.url"/></h4>
-					<html:text styleClass="item" size="85" property="url[${itemIndex-1}]"></html:text>
+					<html:text styleClass="item" size="80" property="url[${itemIndex-1}]"></html:text>
 				</c:when>
 				<c:when test="${itemType eq 2}">
 					<html:hidden property="url[${itemIndex-1}]" />
 					<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.file"/>
 						<c:if test="${not empty itemFileName}">: ${itemFileName}</c:if>
 					</h4>
-					<html:file size="73" styleClass="item" property="file[${itemIndex-1}]" />
+					<html:file size="68" styleClass="item" property="file[${itemIndex-1}]" />
 				</c:when>
 			</c:choose>
 			<hr style="margin-left: auto; margin-right: auto; margin-top: 5px; margin-bottom: 5px; width: 450px" />

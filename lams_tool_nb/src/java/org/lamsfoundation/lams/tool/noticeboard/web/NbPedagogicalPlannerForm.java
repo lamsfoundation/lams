@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
 
 /**
@@ -32,7 +31,16 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
  *              type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerForm"
  */
 public class NbPedagogicalPlannerForm extends PedagogicalPlannerForm {
-    String content;
+    private String content;
+    private String contentFolderID;
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
 
     public String getContent() {
 	return content;
@@ -45,7 +53,6 @@ public class NbPedagogicalPlannerForm extends PedagogicalPlannerForm {
     public void fillForm(NoticeboardContent noticeboard) {
 	if (noticeboard != null) {
 	    String content = noticeboard.getContent();
-	    content = WebUtil.removeHTMLtags(content);
 	    setContent(content);
 	    setToolContentID(noticeboard.getNbContentId());
 	}

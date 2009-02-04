@@ -40,7 +40,6 @@ import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionContentDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
 
 public class McPedagogicalPlannerForm extends PedagogicalPlannerForm {
@@ -50,6 +49,15 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerForm {
     private List<Integer> candidateAnswerCount;
     private String candidateAnswersString;
     private List<String> correct;
+    private String contentFolderID;
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
 
     public ActionMessages validate(HttpServletRequest request) {
 	ActionMessages errors = new ActionMessages();
@@ -127,7 +135,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerForm {
 	    for (int questionIndex = 1; questionIndex <= questions.size(); questionIndex++) {
 		McQuestionContentDTO item = questions.get(questionIndex - 1);
 		int questionDisplayOrder = Integer.parseInt(item.getDisplayOrder());
-		String questionText = WebUtil.removeHTMLtags(item.getQuestion());
+		String questionText = item.getQuestion();
 		setQuestion(questionDisplayOrder - 1, questionText);
 		List<McCandidateAnswersDTO> candidateAnswers = item.getListCandidateAnswersDTO();
 
@@ -233,5 +241,9 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerForm {
     public void setCandidateAnswerCount(List<Integer> candidateAnswerCount) {
 
 	this.candidateAnswerCount = candidateAnswerCount;
+    }
+
+    public List<String> getQuestionList() {
+	return question;
     }
 }

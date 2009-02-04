@@ -76,6 +76,8 @@ public class NbPedagogicalPlannerAction extends LamsDispatchAction {
 	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
 	if (command == null) {
 	    plannerForm.fillForm(noticeboard);
+	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	    plannerForm.setContentFolderID(contentFolderId);
 	    return mapping.findForward("success");
 	} else {
 	    try {

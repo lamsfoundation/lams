@@ -65,6 +65,8 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
 	if (command == null) {
 	    plannerForm.fillForm(qaContent);
+	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	    plannerForm.setContentFolderID(contentFolderId);
 	    return mapping.findForward(QaAppConstants.SUCCESS);
 	} else {
 	    try {

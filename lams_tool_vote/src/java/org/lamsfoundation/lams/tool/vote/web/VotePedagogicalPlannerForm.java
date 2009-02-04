@@ -32,11 +32,19 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
 
 public class VotePedagogicalPlannerForm extends PedagogicalPlannerForm {
     private List<String> nomination;
+    private String contentFolderID;
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
 
     @Override
     public ActionMessages validate() {
@@ -71,7 +79,7 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerForm {
 	    if (questions != null) {
 		int topicIndex = 0;
 		for (VoteQueContent message : (Set<VoteQueContent>) questions) {
-		    setNomination(topicIndex++, WebUtil.removeHTMLtags(message.getQuestion()));
+		    setNomination(topicIndex++, message.getQuestion());
 		}
 	    }
 	}
@@ -104,5 +112,9 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerForm {
 	}
 	nomination.remove(number);
 	return true;
+    }
+
+    public List<String> getNominationList() {
+	return nomination;
     }
 }

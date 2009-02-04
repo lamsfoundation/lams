@@ -13,8 +13,12 @@
 			float: right;
 		}
 		
-		textarea {
-			margin: 5px 0px 0px 10px;
+		body{
+			width: 550px;
+		}
+					
+		div.FCKdiv {
+			margin-top: 10px;
 		}
 	</style>
 	
@@ -29,6 +33,18 @@
   				}
   			});
   		}
+  		function prepareFormData(){
+			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			var topicIndex = 0;
+			do{
+				var topic = document.getElementById("topic["+topicIndex+"]");
+				if (topic!=null){
+					var content = FCKeditorAPI.GetInstance("topic["+topicIndex+"]").GetXHTML();
+					topic.value=content;
+					topicIndex++;
+				}
+			} while (topic!=null);
+		}
   	</script>
 </lams:head>
 <body id="body">
@@ -42,7 +58,14 @@
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
 		<c:forEach var="topicIndex"  begin="1" end="${formBean.topicCount}" >
-			<html:textarea property="topic[${topicIndex-1}]" cols="65" rows="4" />
+			<div class="FCKdiv">
+				<lams:FCKEditor id="topic[${topicIndex-1}]"
+					value="${formBean.topicList[topicIndex-1]}"
+					contentFolderID="${formBean.contentFolderID}"
+	                toolbarSet="Custom-Pedplanner" height="150px"
+	                width="545px" displayExpanded="false">
+				</lams:FCKEditor>
+			</div>
 		</c:forEach>
 	</html:form>
 	<a class="button" href="javascript:createTopic();"><fmt:message key="label.authoring.create.new.topic" /></a>

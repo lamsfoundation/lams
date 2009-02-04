@@ -65,6 +65,8 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
 	if (command == null) {
 	    plannerForm.fillForm(voteContent);
+	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	    plannerForm.setContentFolderID(contentFolderId);
 	    return mapping.findForward(VoteAppConstants.SUCCESS);
 	} else {
 	    try {

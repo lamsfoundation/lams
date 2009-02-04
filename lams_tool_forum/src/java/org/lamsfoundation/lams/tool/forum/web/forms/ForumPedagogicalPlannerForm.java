@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
  */
 public class ForumPedagogicalPlannerForm extends PedagogicalPlannerForm {
     private List<String> topic;
+    private String contentFolderID;
 
     @Override
     public ActionMessages validate() {
@@ -106,5 +107,17 @@ public class ForumPedagogicalPlannerForm extends PedagogicalPlannerForm {
 	}
 	topic.remove(number);
 	return true;
+    }
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
+
+    public List<String> getTopicList() {
+	return topic;
     }
 }

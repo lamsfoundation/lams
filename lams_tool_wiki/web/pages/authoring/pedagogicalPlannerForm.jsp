@@ -10,6 +10,10 @@
 			margin: 5px 0px 5px 10px;
 			float: none;
 		}
+		
+		body {
+			width: 550px;
+		}
 	</style>
 	
 	<script type="text/javascript">
@@ -42,7 +46,8 @@
 		<lams:FCKEditor id="wikiBody"
 			value="${formBean.wikiBody}"
 			contentFolderID="${formBean.contentFolderID}"
-			toolbarSet="Custom-Wiki" height="200px">
+			toolbarSet="Custom-Pedplanner" height="150px"
+			width="545px" displayExpanded="false">
 		</lams:FCKEditor>
 	</html:form>
 </body>

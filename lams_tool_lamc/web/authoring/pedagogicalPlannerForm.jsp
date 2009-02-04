@@ -14,6 +14,14 @@
 		input {
 			margin: 5px 0px 0px 10px;
 		}
+		
+		body {
+			width: 550px;
+		}
+				
+		div.FCKdiv {
+			margin-top: 10px;
+		}
 	</style>
 	
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
@@ -28,6 +36,19 @@
   				}
   			});
   		}
+  		
+  		function prepareFormData(){
+			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			var questionIndex = 0;
+			do{
+				var question = document.getElementById("question["+questionIndex+"]");
+				if (question!=null){
+					var content = FCKeditorAPI.GetInstance("question["+questionIndex+"]").GetXHTML();
+					question.value=content;
+					questionIndex++;
+				}
+			} while (question!=null);
+		}
   		
 
   		function fillForm(){
@@ -50,6 +71,8 @@
 		$(document).ready(function(){
 			fillForm();
 		});
+		
+		
   	</script>
 </lams:head>
 <body id="body">
@@ -66,7 +89,14 @@
 		<input type="hidden" id="questionCount" value="${formBean.questionCount}" />
 		
 		<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}" >
-			<html:text property="question[${questionIndex-1}]" size="75" />
+			<div class="FCKdiv">
+				<lams:FCKEditor id="question[${questionIndex-1}]"
+					value="${formBean.questionList[questionIndex-1]}"
+					contentFolderID="${formBean.contentFolderID}"
+	                toolbarSet="Custom-Pedplanner" height="150px"
+	                width="545px" displayExpanded="false">
+				</lams:FCKEditor>
+			</div>
 			<div class="space-left">
 				<c:forEach var="candidateAnswerIndex" begin="1" end="${formBean.candidateAnswerCount[questionIndex-1]}" >
 					${candidateAnswerIndex}.

@@ -11,8 +11,12 @@
 			float: right;
 		}
 		
-		textarea {
-			margin: 5px 0px 0px 10px;
+		body {
+			width: 550px;
+		}
+		
+		div.FCKdiv {
+			margin-top: 5px;
 		}
 	</style>
 	
@@ -27,6 +31,19 @@
   				}
   			});
   		}
+  		
+  		function prepareFormData(){
+			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			var nominationIndex = 0;
+			do{
+				var nomination = document.getElementById("nomination["+nominationIndex+"]");
+				if (nomination!=null){
+					var content = FCKeditorAPI.GetInstance("nomination["+nominationIndex+"]").GetXHTML();
+					nomination.value=content;
+					nominationIndex++;
+				}
+			} while (nomination!=null);
+		}
   	</script>
 </lams:head>
 <body id="body">
@@ -40,7 +57,14 @@
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
 		<c:forEach var="nominationIndex"  begin="1" end="${formBean.nominationCount}" >
-			<html:textarea property="nomination[${nominationIndex-1}]" cols="65" rows="4" />
+			<div class="FCKdiv">
+				<lams:FCKEditor id="nomination[${nominationIndex-1}]"
+					value="${formBean.nominationList[nominationIndex-1]}"
+					contentFolderID="${formBean.contentFolderID}"
+	                toolbarSet="Custom-Pedplanner" height="150px"
+	                width="545px" displayExpanded="false">
+				</lams:FCKEditor>
+			</div>
 		</c:forEach>
 	</html:form>
 	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.add.new.nomination" /></a>

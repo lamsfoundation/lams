@@ -5,15 +5,30 @@
 <lams:html>
 <lams:head>
 	<lams:css style="core" />
+	
+	<script type="text/javascript">
+		function prepareFormData(){
+			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			var content = FCKeditorAPI.GetInstance('content').GetXHTML();
+			document.getElementById("content").value=content;
+		}
+	</script>
 </lams:head>
-<body>
+<body style="width: 550px">
 	<h4 class="space-left"><fmt:message key="basic.content" /></h4>
 	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
-		<html:textarea property="content" style="margin: 2px 0px 0px 10px;" cols="65" rows="6" />
+		
+		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<lams:FCKEditor id="content"
+			value="${formBean.content}"
+			contentFolderID="${formBean.contentFolderID}"
+               toolbarSet="Custom-Pedplanner" height="150px"
+               width="545px" displayExpanded="false">
+		</lams:FCKEditor>
 	</html:form>
 </body>
 </lams:html>

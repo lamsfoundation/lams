@@ -73,6 +73,8 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
 	if (command == null) {
 	    plannerForm.fillForm(qaContent, getMcService());
+	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	    plannerForm.setContentFolderID(contentFolderId);
 	    return mapping.findForward(McAppConstants.SUCCESS);
 	} else {
 	    try {
