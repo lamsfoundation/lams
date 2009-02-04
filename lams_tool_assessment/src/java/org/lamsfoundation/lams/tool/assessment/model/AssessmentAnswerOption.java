@@ -50,6 +50,9 @@ public class AssessmentAnswerOption implements Cloneable {
     private float grade;
     
     private String feedback;
+    
+    // *************** NON Persist Fields ********************    
+    private String acceptedErrorStr = "0.0";;
 
     // **********************************************************
     // Get/Set methods
@@ -172,6 +175,13 @@ public class AssessmentAnswerOption implements Cloneable {
 
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
+    }
+    
+    public String getAcceptedErrorStr() {
+	return acceptedErrorStr;
+    }
+    public void setAcceptedErrorStr(String acceptedErrorStr) {
+	this.acceptedErrorStr = acceptedErrorStr;
     }
 
     @Override

@@ -620,9 +620,10 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form; 
 	questionForm.setSessionMapID(sessionMapID);
-	questionForm.setContentFolderID((String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	questionForm.setContentFolderID(contentFolderID);
 	questionForm.setDefaultGrade("1");
 	questionForm.setPenaltyFactor("0.1");
 	
@@ -646,6 +647,7 @@ public class AuthoringAction extends Action {
 
 	short type = (short) NumberUtils.stringToInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, type);
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);	
 	return findForward(type, mapping);
     }
     
@@ -664,7 +666,8 @@ public class AuthoringAction extends Action {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
+	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	
 	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
 	AssessmentQuestion question = null;
 	if (questionIdx != -1) {
@@ -674,10 +677,11 @@ public class AuthoringAction extends Action {
 	    if (question != null) {
 		AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form; 
 		populateQuestionToForm(questionIdx, question, questionForm, request);
-		questionForm.setContentFolderID((String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID));
+		questionForm.setContentFolderID(contentFolderID);
 	    }
 	}
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, question.getType());
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return findForward(question == null ? -1 : question.getType(), mapping);
     }
 
@@ -817,6 +821,8 @@ public class AuthoringAction extends Action {
 	option.setGrade(0);
 	optionList.add(option);
 	
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
+		AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE, WebUtil.readIntParam(request,
 		AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
@@ -846,6 +852,8 @@ public class AuthoringAction extends Action {
 //	    delList.add(question);    
 	}
 
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
+		AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE, WebUtil.readIntParam(request,
 		AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
@@ -905,6 +913,8 @@ public class AuthoringAction extends Action {
 	    optionList.addAll(rList);
 	}
 
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
+		AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE, WebUtil.readIntParam(request,
 		AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
@@ -1272,10 +1282,10 @@ public class AuthoringAction extends Action {
      * Get answer options from <code>HttpRequest</code>
      * 
      * @param request
-     * @param skipBlankOptions whether the blank options will be preserved or not 
+     * @param isForSaving whether the blank options will be preserved or not 
      * 
      */
-    private TreeSet<AssessmentAnswerOption> getOptionsFromRequest(HttpServletRequest request, boolean skipBlankOptions) {
+    private TreeSet<AssessmentAnswerOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OPTION_LIST);
 
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
@@ -1284,49 +1294,52 @@ public class AuthoringAction extends Action {
 	for (int i = 0; i < count; i++) {
 	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
 		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
+		
 		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
-		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
-		String feedback = paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i);
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-
-		if ((answerString == null) && skipBlankOptions) {
+		if ((answerString == null) && isForSaving) {
 		    continue;
 		}
+		
 		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);		
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
 		option.setAnswerString(answerString);
-		option.setGrade(grade);
-		option.setFeedback(feedback);
+		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
+		option.setGrade(grade);    
+		option.setFeedback((String) paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 		optionList.add(option);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
 		String question = paramMap.get(AssessmentConstants.ATTR_OPTION_QUESTION_PREFIX + i);
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-
-		if ((question == null) && skipBlankOptions) {
+		if ((question == null) && isForSaving) {
 		    continue;
 		}
+		
 		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);		
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
-		option.setAnswerString(answerString);
+		option.setAnswerString((String) paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i));
 		option.setQuestion(question);
 		optionList.add(option);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
-		float acceptedError = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i));
-		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
-		String feedback = paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i);
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-
-		if ((answerString == null) && skipBlankOptions) {
+		if ((answerString == null) && isForSaving) {
 		    continue;
 		}
+		
 		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
 		option.setAnswerString(answerString);
-		option.setAcceptedError(acceptedError);
-		option.setGrade(grade);
-		option.setFeedback(feedback);
+		String acceptedErrorStr = paramMap.get(AssessmentConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i);
+		if (isForSaving && !StringUtils.isBlank(acceptedErrorStr)) {
+		    float acceptedError = Float.valueOf(acceptedErrorStr);
+		    option.setAcceptedError(acceptedError);
+		} else {
+		    option.setAcceptedErrorStr(acceptedErrorStr);
+		}
+		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
+		option.setGrade(grade);    
+		option.setFeedback((String) paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 		optionList.add(option);
 	    }
 	}
@@ -1338,28 +1351,28 @@ public class AuthoringAction extends Action {
      * 
      * @param request
      */
-    private TreeSet<AssessmentUnit> getUnitsFromRequest(HttpServletRequest request, boolean skipBlankUnits) {
+    private TreeSet<AssessmentUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_UNIT_LIST);
 
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_UNIT_COUNT));
 	TreeSet<AssessmentUnit> unitList = new TreeSet<AssessmentUnit>(new AssessmentUnitComparator());
 	for (int i = 0; i < count; i++) {
 	    String unitStr = paramMap.get(AssessmentConstants.ATTR_UNIT_UNIT_PREFIX + i);
-	    float multiplier = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i));
-	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_UNIT_SEQUENCE_ID_PREFIX + i);
-
-	    if (StringUtils.isBlank(unitStr) && skipBlankUnits) {
+	    if (StringUtils.isBlank(unitStr) && isForSaving) {
 		continue;
 	    }
+	    
 	    AssessmentUnit unit = new AssessmentUnit();
+	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_UNIT_SEQUENCE_ID_PREFIX + i);	    
 	    unit.setSequenceId(NumberUtils.stringToInt(sequenceId));
 	    unit.setUnit(unitStr);
-	    unit.setMultiplier(multiplier);
-//	    if (!StringUtils.isBlank(unitStr)) {
-//		int gradeBoundary = NumberUtils.stringToInt(paramMap
-//			.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i));
-//		unit.setGradeBoundary(gradeBoundary);
-//	    }
+	    String multiplierStr = (String) paramMap.get(AssessmentConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i);
+	    if (isForSaving && !StringUtils.isBlank(multiplierStr)) {
+		float multiplier = Float.valueOf(multiplierStr);
+		unit.setMultiplier(multiplier);
+	    } else {
+		unit.setMultiplierStr(multiplierStr);
+	    }	    
 	    unitList.add(unit);
 	}
 	return unitList;

@@ -40,10 +40,15 @@
 		    			      required: true,
 		    			      number: true
 		    			},
-		    			fake: {
+		    			hasAnswerFilled: {
 		    				required: function(element) {
 		    		        	return $("input[name^=optionAnswer]:filled").length < 1;
-			    		    }
+			    		    }			    		    
+	    			    },
+	    			    hasOneHundredGrade: {
+		    				required: function(element) {
+	    			    		return $("select[name^='optionGrade'][value='100.0']").length < 1;
+			    		    }			    		    
 	    			    }
 		    		},
 		    		messages: {
@@ -55,6 +60,12 @@
 		    			penaltyFactor: {
 		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
+		    			},
+		    			hasAnswerFilled: {
+		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
+		    			},
+		    			hasOneHundredGrade: {
+		    				required: "<br><fmt:message key='error.form.validation.hundred.score'/>"
 		    			}
 		    		},
 		    	    invalidHandler: function(form, validator) {
@@ -112,6 +123,7 @@
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
 				<html:hidden property="questionIndex" />
+				<html:hidden property="contentFolderID" styleId="contentFolderID"/>				
 	
 				<h2 class="no-space-left">
 					<fmt:message key="label.authoring.basic.type.short.answer" />
@@ -127,7 +139,7 @@
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
 				<lams:FCKEditor id="question" value="${formBean.question}"
-					contentFolderID="${formBean.contentFolderID}">
+					contentFolderID="${formBean.contentFolderID}" width="622px">
 				</lams:FCKEditor>
 				
 				<div class="field-name space-top">
@@ -146,7 +158,7 @@
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
 				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-					contentFolderID="${formBean.contentFolderID}">
+					contentFolderID="${formBean.contentFolderID}" width="622px">
 				</lams:FCKEditor>
 	
 				<div class="field-name space-top">
@@ -158,12 +170,12 @@
 				</html:select>
 				
 				<br><br>
-				<input type="hidden" name="fake" id="fake">
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.short.answer.answers" />
 				</div>
-				<label for="fake" class="error" style="display: none;"><fmt:message key='label.authoring.short.answer.error.answer'/></label>
+				<input type="hidden" name="hasAnswerFilled" id="hasAnswerFilled">
+				<input type="hidden" name="hasOneHundredGrade" id="hasOneHundredGrade">
 			</html:form>
 			
 			<!-- Options -->

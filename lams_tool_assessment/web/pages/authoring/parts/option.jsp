@@ -70,9 +70,9 @@
 				<fmt:message key="label.authoring.basic.option.feedback"></fmt:message>
 			</span>
 		</td>
-		<td style="padding-left:0px; border-bottom:0px; background:none;">
+		<td style="padding-left:0px; padding-right:0px; border-bottom:0px; background:none;" width="630px">
 			<lams:FCKEditor id="optionFeedback${status.index}" value="${option.feedback}"
-				contentFolderID="${formBean.contentFolderID}">
+				contentFolderID="${contentFolderID}">
 			</lams:FCKEditor>									
 		</td>
 	</tr>	

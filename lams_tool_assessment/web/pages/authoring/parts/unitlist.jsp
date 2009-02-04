@@ -37,7 +37,7 @@
 								</c:when>
 								<c:otherwise>
 									<input type="text" name="unitMultiplier${status.index}"
-										id="unitMultiplier${status.index}" size="20" value="${unit.multiplier}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
+										id="unitMultiplier${status.index}" size="20" value="${unit.multiplierStr}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 								</c:otherwise>
 							</c:choose>							
 							</td>									

@@ -112,6 +112,7 @@
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
 				<html:hidden property="questionIndex" />
+				<html:hidden property="contentFolderID" styleId="contentFolderID"/>				
 				<html:hidden property="feedbackOnCorrect" />
 				<html:hidden property="feedbackOnPartiallyCorrect" />
 				<html:hidden property="feedbackOnIncorrect" />
@@ -131,7 +132,7 @@
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
 				<lams:FCKEditor id="question" value="${formBean.question}"
-					contentFolderID="${formBean.contentFolderID}">
+					contentFolderID="${formBean.contentFolderID}" width="622px">
 				</lams:FCKEditor>
 	
 				<div class="field-name space-top">
@@ -150,7 +151,7 @@
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
 				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-					contentFolderID="${formBean.contentFolderID}">
+					contentFolderID="${formBean.contentFolderID}" width="622px">
 				</lams:FCKEditor>				
 	
 				<div class="field-name space-top" >

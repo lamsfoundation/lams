@@ -9,7 +9,7 @@
 				<td width="3px" style="vertical-align:middle;">
 					${status.index+1}
 				</td>
-				<td>
+				<td style="padding-left:10px;">
 					<c:choose>
 						<c:when test="${(questionType == 1) || (questionType == 3)}">
 							<%@ include file="option.jsp"%>
@@ -23,7 +23,7 @@
 					</c:choose>	
 				</td>
 					
-				<td width="40px" style="vertical-align:middle;">
+				<td width="15px" style="padding-left:0px; vertical-align:middle; text-align: center;">
 					<c:if test="${not status.first}">
 						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
 							border="0" title="<fmt:message key="label.authoring.basic.up"/>"

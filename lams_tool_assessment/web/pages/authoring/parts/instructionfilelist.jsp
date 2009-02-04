@@ -1,15 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page
-	import="org.lamsfoundation.lams.contentrepository.client.IToolContentHandler"%>
+<%@ page import="org.lamsfoundation.lams.contentrepository.client.IToolContentHandler"%>
 <c:set var="CONS_OFFLINE" value="<%=IToolContentHandler.TYPE_OFFLINE%>" />
 <c:choose>
 	<c:when test="${fileTypeFlag==CONS_OFFLINE}">
-		<c:set var="targetFileType"
-			value="<%=IToolContentHandler.TYPE_OFFLINE%>" />
+		<c:set var="targetFileType"	value="<%=IToolContentHandler.TYPE_OFFLINE%>" />
 	</c:when>
 	<c:otherwise>
-		<c:set var="targetFileType"
-			value="<%=IToolContentHandler.TYPE_ONLINE%>" />
+		<c:set var="targetFileType"	value="<%=IToolContentHandler.TYPE_ONLINE%>" />
 	</c:otherwise>
 </c:choose>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />

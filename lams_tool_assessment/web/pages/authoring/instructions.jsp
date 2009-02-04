@@ -1,9 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page
-	import="org.lamsfoundation.lams.contentrepository.client.IToolContentHandler"%>
-<c:set var="formBean"
-	value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<%@ page import="org.lamsfoundation.lams.contentrepository.client.IToolContentHandler"%>
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 
 <script type="text/javascript">
@@ -23,7 +20,7 @@
 	}
 	function deleteOnlineFile(fileUuid,fileVersionId){
 		var url = "<c:url value="/authoring/deleteOnlineFile.do"/>";
-		$(offlineArea).load(
+		$(onlineArea).load(
 				url,
 				{
 					fileVersionId: fileVersionId,
@@ -86,8 +83,7 @@
 	</tr>
 	<tr>
 		<td>
-			<c:set var="fileTypeFlag"
-				value="<%=IToolContentHandler.TYPE_OFFLINE%>" />
+			<c:set var="fileTypeFlag" value="<%=IToolContentHandler.TYPE_OFFLINE%>" />
 			<div id="offlinefileArea">
 				<%@ include file="parts/instructionfilelist.jsp"%>
 			</div>

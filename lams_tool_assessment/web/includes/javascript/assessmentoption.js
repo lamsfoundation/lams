@@ -7,11 +7,13 @@
 	//    var addOptionUrl = "<c:url value='/authoring/newOption.do'/>";
 	function addOption(){
 		var url= addOptionUrl;
-		var optionList = $("#optionForm").serialize(true);
+		var contentFolderID= $("#contentFolderID").val();
 		prepareFCKEditorsForAjaxSubmit();
+		var optionList = $("#optionForm").serialize(true);
 		$(optionTargetDiv).load(
 			url,
 			{
+				contentFolderID: contentFolderID,
 				questionType: questionType,
 				optionList: optionList 
 			}
@@ -19,10 +21,13 @@
 	}
 	function removeOption(idx){
  		var url= removeOptionUrl;
+		var contentFolderID= $("#contentFolderID").val();
+		prepareFCKEditorsForAjaxSubmit();
  		var optionList = $("#optionForm").serialize(true);
 		$(optionTargetDiv).load(
 				url,
 				{
+					contentFolderID: contentFolderID,					
 					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
@@ -31,10 +36,13 @@
 	}
 	function upOption(idx){
  		var url= upOptionUrl;
+		var contentFolderID= $("#contentFolderID").val();
+ 		prepareFCKEditorsForAjaxSubmit();
  		var optionList = $("#optionForm").serialize(true);
 		$(optionTargetDiv).load(
 				url,
 				{
+					contentFolderID: contentFolderID,					
 					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
@@ -43,10 +51,13 @@
 	}
 	function downOption(idx){
  		var url= downOptionUrl;
+		var contentFolderID= $("#contentFolderID").val(); 	
+ 		prepareFCKEditorsForAjaxSubmit();
  		var optionList = $("#optionForm").serialize(true);
 		$(optionTargetDiv).load(
 				url,
 				{
+					contentFolderID: contentFolderID,					
 					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
@@ -54,9 +65,16 @@
 		);
 	}
 	function prepareFCKEditorsForAjaxSubmit(){
-		//$("input[id^=optionFeedback]").each(function() {
-		//	this.val(FCKeditorAPI.GetInstance($(this).id).GetXHTML());
-		//});
+		if ((questionType == 1) || (questionType == 3) || (questionType == 4)) {
+			$("[name^=optionFeedback]").each(function() {
+				this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+			});
+		}
+		if (questionType == 2) {
+			$("[name^=optionQuestion]").each(function() {
+				this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+			});
+		}
 	}
 	
 

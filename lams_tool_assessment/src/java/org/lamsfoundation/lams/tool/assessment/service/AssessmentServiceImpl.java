@@ -755,8 +755,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	try {
 	    exportContentService.registerFileClassForExport(AssessmentAttachment.class.getName(), "fileUuid",
 		    "fileVersionId");
-	    exportContentService.registerFileClassForExport(AssessmentQuestion.class.getName(), "fileUuid",
-		    "fileVersionId");
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, assessmentToolContentHandler,
 		    rootPath);
 	} catch (ExportToolContentException e) {
@@ -770,8 +768,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	try {
 	    exportContentService.registerFileClassForImport(AssessmentAttachment.class.getName(), "fileUuid",
 		    "fileVersionId", "fileName", "fileType", null, null);
-	    exportContentService.registerFileClassForImport(AssessmentQuestion.class.getName(), "fileUuid",
-		    "fileVersionId", "fileName", "fileType", null, "initialItem");
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, assessmentToolContentHandler,
 		    fromVersion, toVersion);

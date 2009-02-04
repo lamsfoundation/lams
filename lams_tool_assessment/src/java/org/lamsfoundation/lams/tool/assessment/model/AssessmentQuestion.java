@@ -106,7 +106,7 @@ public class AssessmentQuestion implements Cloneable {
 		Set set = new HashSet();
 		while (iter.hasNext()) {
 		    AssessmentAnswerOption answerOption = (AssessmentAnswerOption) iter.next();
-		    AssessmentAttachment newAnswerOption = (AssessmentAttachment) answerOption.clone();
+		    AssessmentAnswerOption newAnswerOption = (AssessmentAnswerOption) answerOption.clone();
 		    set.add(newAnswerOption);
 		}
 		obj.answerOptions = set;

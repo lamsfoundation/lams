@@ -40,8 +40,8 @@
         }
         
         function doUploadOffline() {
-        	var myForm = $("authoringForm");
-        	myForm.action = "<c:url value='/authoring/uploadOfflineFile.do'/>";
+        	var myForm = $("#authoringForm");
+        	myForm.attr("action", "<c:url value='/authoring/uploadOfflineFile.do'/>");
         	myForm.submit();
         }
     </script>
