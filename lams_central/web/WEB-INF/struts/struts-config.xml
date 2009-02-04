@@ -163,11 +163,6 @@
         path="/profile.do?method=lessons"
         redirect="false"
       />
-      <forward
-        name="planner"
-        path="/pedagogicalPlanner.do"
-        redirect="false"
-      />
     </action>
     <action
       path="/saveprofile"

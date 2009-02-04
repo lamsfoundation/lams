@@ -30,8 +30,8 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
  * @struts.form name="pedagogicalPlannerForm"
  */
 public class ChatPedagogicalPlannerForm extends PedagogicalPlannerForm {
-    String instructions;
-    String contentFolderID;
+    private String instructions;
+    private String contentFolderID;
 
     public String getInstructions() {
 	return instructions;

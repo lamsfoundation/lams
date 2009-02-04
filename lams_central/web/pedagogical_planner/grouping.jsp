@@ -36,7 +36,7 @@
 	
 	<html:hidden property="groupingTypeId" />
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<table cellpadding="0" cellspacing="0">
+	<table style="width: 570px" cellpadding="0" cellspacing="0">
 		<tr>
 			<td style="width: 30%">
 				<h2><fmt:message key="label.planner.grouping.type" /></h2>
