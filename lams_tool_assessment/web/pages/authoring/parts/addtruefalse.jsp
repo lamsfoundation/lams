@@ -12,6 +12,7 @@
 			label { width: 10em; float: left; }
 			label.error { float: none; color: red; padding-left: .5em; vertical-align: top; font-weight: bold; font-style: italic;}
 			em { font-weight: bold; padding-right: 1em; vertical-align: top; }
+			input.error { border: 2px solid red;}			
 		</style>
 
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
@@ -34,6 +35,19 @@
 		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
 		    			}
+		    		},
+		    	    invalidHandler: function(form, validator) {
+		    		      var errors = validator.numberOfInvalids();
+		    		      if (errors) {
+		    		          var message = errors == 1
+		    		          	  ? "<fmt:message key='error.form.validation.error'/>"
+		    		          	  : "<fmt:message key='error.form.validation.errors'><fmt:param >" + errors + "</fmt:param></fmt:message>";
+	    		          	  
+		    		          $("div.error span").html(message);
+		    		          $("div.error").show();
+		    		      } else {
+		    		          $("div.error").hide();
+		    		      }
 		    		},
 		    		debug: true,
      			    submitHandler: function(form) {
@@ -64,6 +78,10 @@
 	<body class="stripes" onload="parent.resizeIframe();">
 		<div id="content" >	
 			<%@ include file="/common/messages.jsp"%>
+		    <div class="error" style="display:none;">
+		      	<img src="${ctxPath}/includes/images/warning.gif" alt="Warning!" width="24" height="24" style="float:left; margin: -5px 10px 0px 0px; " />
+		      	<span></span>.<br clear="all"/>
+		    </div>			
 			
 			<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="assessmentQuestionForm">
 				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />

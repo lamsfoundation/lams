@@ -8,7 +8,7 @@
 		<td style="padding-left:0px; border-bottom:0px; background:none;">	
 			<input type="hidden" name="optionSequenceId${status.index}" id="optionSequenceId${status.index}" value="${option.sequenceId}">									
 			<input type="text" name="optionAnswer${status.index}"
-				id="optionAnswer${status.index}" size="25" value="${option.answerString}">
+				id="optionAnswer${status.index}" size="25" value="${option.answerString}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 		</td>									
 	</tr>
 	
@@ -20,7 +20,7 @@
 		</td>
 		<td style="padding-left:0px; border-bottom:0px; background:none;">	
 			<input type="text" name="optionAcceptedError${status.index}"
-				id="optionAcceptedError${status.index}" size="25" value="${option.acceptedError}">
+				id="optionAcceptedError${status.index}" size="25" value="${option.acceptedError}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 		</td>									
 	</tr>	
 	
@@ -83,7 +83,9 @@
 			</span>
 		</td>
 		<td style="padding-left:0px; border-bottom:0px; background:none;">
-			<lams:STRUTS-textarea rows="5" cols="43" tabindex="2" property="optionFeedback${status.index}" styleId="optionFeedback${status.index}" value="${option.feedback}"/>									
+			<lams:FCKEditor id="optionFeedback${status.index}" value="${option.feedback}"
+				contentFolderID="${formBean.contentFolderID}">
+			</lams:FCKEditor>		
 		</td>
 	</tr>	
 </table>

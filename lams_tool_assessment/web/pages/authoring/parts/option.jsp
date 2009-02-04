@@ -71,7 +71,9 @@
 			</span>
 		</td>
 		<td style="padding-left:0px; border-bottom:0px; background:none;">
-			<lams:STRUTS-textarea rows="5" cols="43" tabindex="2" property="optionFeedback${status.index}" styleId="optionFeedback${status.index}" value="${option.feedback}"/>									
+			<lams:FCKEditor id="optionFeedback${status.index}" value="${option.feedback}"
+				contentFolderID="${formBean.contentFolderID}">
+			</lams:FCKEditor>									
 		</td>
 	</tr>	
 </table>

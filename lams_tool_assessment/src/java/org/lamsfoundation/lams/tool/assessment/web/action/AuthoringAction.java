@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswerOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
@@ -71,6 +72,7 @@ import org.lamsfoundation.lams.tool.assessment.service.UploadAssessmentFileExcep
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentAnswerOptionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentOverallFeedbackComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionComparator;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentUnitComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentQuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -165,6 +167,10 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("downOption")) {
 	    return downOption(mapping, form, request, response);
+	}
+	// -----------------------Assessment Unit functions ---------------------------	
+	if (param.equals("newUnit")) {
+	    return newUnit(mapping, form, request, response);
 	}
 	// -----------------------Assessment Overall Feedback functions ---------------------------
 	if (param.equals("initOverallFeedback")) {
@@ -628,6 +634,15 @@ public class AuthoringAction extends Action {
 	    optionList.add(option);
 	}
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
+	
+	List<AssessmentUnit> unitList = new ArrayList<AssessmentUnit>();
+	for (int i = 0; i < AssessmentConstants.INITIAL_UNITS_NUMBER; i++) {
+	    AssessmentUnit unit = new AssessmentUnit();
+	    unit.setSequenceId(i+1);
+	    unit.setMultiplier(0);
+	    unitList.add(unit);
+	}
+	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);	
 
 	short type = (short) NumberUtils.stringToInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, type);
@@ -897,6 +912,31 @@ public class AuthoringAction extends Action {
     }
     
     /**
+     * Ajax call, will add one more input line for new Unit.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward newUnit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	TreeSet<AssessmentUnit> unitList = getUnitsFromRequest(request, false);
+	AssessmentUnit unit = new AssessmentUnit();
+	int maxSeq = 1;
+	if (unitList != null && unitList.size() > 0) {
+	    AssessmentUnit last = unitList.last();
+	    maxSeq = last.getSequenceId() + 1;
+	}
+	unit.setSequenceId(maxSeq);
+	unitList.add(unit);
+	
+	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+    
+    /**
      * Ajax call, will add one more input line for new resource item instruction.
      * 
      * @param mapping
@@ -1109,6 +1149,10 @@ public class AuthoringAction extends Action {
 	    Set<AssessmentAnswerOption> optionList = question.getAnswerOptions();
 	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	}
+	if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+	    Set<AssessmentUnit> unitList = question.getUnits();
+	    request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);	    
+	}
     }
 
     /**
@@ -1194,7 +1238,18 @@ public class AuthoringAction extends Action {
 	    }
 	    question.setAnswerOptions(options);
 	}
-
+	// set units
+	if (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+	    Set<AssessmentUnit> unitList = getUnitsFromRequest(request, true);
+	    Set units = new LinkedHashSet();
+	    int seqId = 0;
+	    for (AssessmentUnit unit : unitList) {
+		unit.setSequenceId(seqId++);
+		units.add(unit);
+	    }
+	    question.setUnits(units);
+	}
+	
     }
 
     /**
@@ -1276,6 +1331,38 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	return optionList;
+    }
+    
+    /**
+     * Get units from <code>HttpRequest</code>
+     * 
+     * @param request
+     */
+    private TreeSet<AssessmentUnit> getUnitsFromRequest(HttpServletRequest request, boolean skipBlankUnits) {
+	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_UNIT_LIST);
+
+	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_UNIT_COUNT));
+	TreeSet<AssessmentUnit> unitList = new TreeSet<AssessmentUnit>(new AssessmentUnitComparator());
+	for (int i = 0; i < count; i++) {
+	    String unitStr = paramMap.get(AssessmentConstants.ATTR_UNIT_UNIT_PREFIX + i);
+	    float multiplier = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i));
+	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_UNIT_SEQUENCE_ID_PREFIX + i);
+
+	    if (StringUtils.isBlank(unitStr) && skipBlankUnits) {
+		continue;
+	    }
+	    AssessmentUnit unit = new AssessmentUnit();
+	    unit.setSequenceId(NumberUtils.stringToInt(sequenceId));
+	    unit.setUnit(unitStr);
+	    unit.setMultiplier(multiplier);
+//	    if (!StringUtils.isBlank(unitStr)) {
+//		int gradeBoundary = NumberUtils.stringToInt(paramMap
+//			.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i));
+//		unit.setGradeBoundary(gradeBoundary);
+//	    }
+	    unitList.add(unit);
+	}
+	return unitList;
     }
     
     /**

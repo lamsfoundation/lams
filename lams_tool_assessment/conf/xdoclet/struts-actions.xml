@@ -147,6 +147,14 @@
 			parameter="downOption">
 			<forward name="success" path="/pages/authoring/parts/optionlist.jsp" />
 		</action>		
+		
+		<!-- ==========  Authroing Definitions: Assessment Unit methods ========== -->
+		
+		<action path="/authoring/newUnit"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
+			parameter="newUnit">
+			<forward name="success" path="/pages/authoring/parts/unitlist.jsp" />
+		</action>		
 
 		<!-- ==========  Authroing Definitions: Assessment Overall Feedback methods ========== -->
 		

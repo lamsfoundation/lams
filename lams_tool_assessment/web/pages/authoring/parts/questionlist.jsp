@@ -76,7 +76,7 @@
 				
 				<td width="20px" style="vertical-align:middle;">
 					<c:set var="editQuestionUrl" >
-						<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionIndex=${status.index}&KeepThis=true&TB_iframe=true&height=540&width=650&modal=true
+						<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionIndex=${status.index}&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true
 					</c:set>		
 					<a href="${editQuestionUrl}" class="thickbox" style="margin-left: 20px;"> 
 						<img src="<html:rewrite page='/includes/images/edit.gif'/>" 

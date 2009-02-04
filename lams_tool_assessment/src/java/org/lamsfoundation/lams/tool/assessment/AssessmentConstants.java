@@ -34,6 +34,8 @@ public class AssessmentConstants {
     
     public static final int INITIAL_OPTIONS_NUMBER = 3;
     
+    public static final int INITIAL_UNITS_NUMBER = 2;
+    
     public static final int INITIAL_OVERALL_FEEDBACK_NUMBER = 3;
 
     // question type;
@@ -109,6 +111,16 @@ public class AssessmentConstants {
     public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 
     public static final String ATTR_DELETED_QUESTION_ATTACHMENT_LIST = "deletedQuestionAttachmmentList";
+    
+    public static final String ATTR_UNIT_LIST = "unitList";
+    
+    public static final String ATTR_UNIT_COUNT = "unitCount";
+    
+    public static final String ATTR_UNIT_UNIT_PREFIX = "unitUnit";
+    
+    public static final String ATTR_UNIT_MULTIPLIER_PREFIX = "unitMultiplier";
+    
+    public static final String ATTR_UNIT_SEQUENCE_ID_PREFIX = "unitSequenceId";
     
     public static final String ATTR_OVERALL_FEEDBACK_LIST = "overallFeedbackList";
     

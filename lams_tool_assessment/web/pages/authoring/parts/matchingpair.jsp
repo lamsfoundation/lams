@@ -6,8 +6,10 @@
 			</span>
 		</td>
 		<td style="padding-left:0px; border-bottom:0px; background:none;">
-			<input type="hidden" name="optionSequenceId${status.index}" id="optionSequenceId${status.index}" value="${option.sequenceId}">	
-			<lams:STRUTS-textarea rows="5" cols="43" tabindex="2" property="optionQuestion${status.index}" styleId="optionQuestion${status.index}" value="${option.question}"/>
+			<input type="hidden" name="optionSequenceId${status.index}" id="optionSequenceId${status.index}" value="${option.sequenceId}">
+			<lams:FCKEditor id="optionQuestion${status.index}" value="${option.question}"
+				contentFolderID="${formBean.contentFolderID}">
+			</lams:FCKEditor>				
 		</td>									
 	</tr>						
 	<tr>

@@ -59,7 +59,7 @@
 	function createNewQuestionInitHref() {
 		var questionTypeDropdown = document.getElementById("questionType");
 		var questionType = questionTypeDropdown.selectedIndex + 1;
-		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&KeepThis=true&TB_iframe=true&height=540&width=650&modal=true";
+		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref)
 	};
 	function refreshThickbox(){   

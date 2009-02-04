@@ -12,6 +12,7 @@
 			label { width: 10em; float: left; }
 			label.error { float: none; color: red; padding-left: .5em; vertical-align: top; font-weight: bold; font-style: italic;}
 			em { font-weight: bold; padding-right: 1em; vertical-align: top; }
+			input.error { border: 2px solid red;}
 		</style>
 
 		<script type="text/javascript">
@@ -20,6 +21,18 @@
 		   	var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
     	    var upOptionUrl = "<c:url value='/authoring/upOption.do'/>";
     	    var downOptionUrl = "<c:url value='/authoring/downOption.do'/>";
+    	    
+    		function addUnit(){
+    			var url= "<c:url value='/authoring/newUnit.do'/>";
+    			var unitList = $("#unitForm").serialize(true);
+    			$("#unitArea").load(
+    				url,
+    				{
+    					questionType: questionType,
+    					unitList: unitList 
+    				}
+    			);
+    		}
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/assessmentoption.js'/>"></script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
@@ -27,6 +40,8 @@
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
   	    <script><!--
 			$(document).ready(function(){
+				var optionValidator = $("#optionForm").validate();				
+				var unitValidator = $("#unitForm").validate();
 				
 		    	$("#assessmentQuestionForm").validate({
 		    		rules: {
@@ -41,9 +56,23 @@
 		    			},
 		    			fake: {
 		    				required: function(element) {
-		    		        	return $("input[name^=optionAnswer]:filled").length < 2;
-			    		    }
-	    			    }
+		    		        	return $("input[name^=optionAnswer]:filled").length < 1;
+			    		    }//,
+		    				//email: function(element) {
+			    				//alert($("input[name^='optionGrade'][value='100.0']").length);
+		    		        	//return $("input[name^=optionGrade value=100]").length < 1;
+			    		    //}			    		    
+	    			    },
+		    			unitList: {
+		    				required: function(element) {
+	    		        		return ! $("#unitForm").valid();
+		    		    	}
+    			    	},
+		    			optionList: {
+		    				required: function(element) {
+	    		        		return ! $("#optionForm").valid();
+		    		    	}
+    			    	}
 		    		},
 		    		messages: {
 		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
@@ -54,11 +83,45 @@
 		    			penaltyFactor: {
 		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
+		    			},
+		    			fake: {
+		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"//,
+		    				//email: "sss"
+		    			},		    			
+		    			unitList: {
+		    				required: ""
+		    			},
+		    			optionList: {
+		    				required: ""
 		    			}
+		    		},
+		    	    invalidHandler: function(form, validator) {
+		    		      var errors = validator.numberOfInvalids();
+		    		      if (errors) {
+			    		      if (optionValidator.numberOfInvalids()) {
+			    		    	  errors += optionValidator.numberOfInvalids() - 1;
+			    		      }
+			    		      if (unitValidator.numberOfInvalids()) {
+			    		    	  errors += unitValidator.numberOfInvalids() - 1;
+			    		      }
+			    		      
+		    		          var message = errors == 1
+		    		          	  ? "<fmt:message key='error.form.validation.error'/>"
+		    		          	  : "<fmt:message key='error.form.validation.errors'><fmt:param >" + errors + "</fmt:param></fmt:message>";
+	    		          	  
+		    		          $("div.error span").html(message);
+		    		          $("div.error").show();
+		    		      } else {
+		    		          $("div.error").hide();
+		    		      }
 		    		},
 		    		debug: true,
      			    submitHandler: function(form) {
+		    			$("[name^=optionFeedback]").each(function() {
+							this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+		    			});
 		    			$("#optionList").val($("#optionForm").serialize(true));
+		    			$("#unitList").val($("#unitForm").serialize(true));
 		    			$("#question").val(FCKeditorAPI.GetInstance("question").GetXHTML());
 		    			$("#generalFeedback").val(FCKeditorAPI.GetInstance("generalFeedback").GetXHTML());
 		    			
@@ -84,12 +147,17 @@
 	<body class="stripes" onload="parent.resizeIframe();">
 		<div id="content" >	
 			<%@ include file="/common/messages.jsp"%>
+		    <div class="error" style="display:none;">
+		      	<img src="${ctxPath}/includes/images/warning.gif" alt="Warning!" width="24" height="24" style="float:left; margin: -5px 10px 0px 0px; " />
+		      	<span></span>.<br clear="all"/>
+		    </div>
 			
 			<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="assessmentQuestionForm">
 				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 				<html:hidden property="sessionMapID" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
+				<input type="hidden" name="unitList" id="unitList" />
 				<html:hidden property="questionIndex" />
 	
 				<h2 class="no-space-left">
@@ -129,12 +197,11 @@
 				</lams:FCKEditor>
 				
 				<br><br>
-				<input type="hidden" name="fake" id="fake">
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.numerical.answers" />
 				</div>
-				<label for="fake" class="error" style="display: none;"><fmt:message key='label.authoring.numerical.error.answer'/></label>
+				<input type="hidden" name="fake" id="fake">
 			</html:form>
 			
 			<!-- Options -->
@@ -142,6 +209,17 @@
 				<%@ include file="optionlist.jsp"%>
 				<a href="javascript:;" onclick="addOption();" class="button-add-item right-buttons" style="margin-right: 40px; margin-top:0px">
 					<fmt:message key="label.authoring.numerical.add.answer" /> 
+				</a>
+			</form>
+			
+			<!-- Units -->
+			<div class="field-name" style="margin-top: 50px;">
+				<fmt:message key="label.authoring.numerical.units" />
+			</div>			
+			<form id="unitForm" name="unitForm">
+				<%@ include file="unitlist.jsp"%>
+				<a href="javascript:;" onclick="addUnit();" class="button-add-item right-buttons" style="margin-right: 40px; margin-top:0px">
+					<fmt:message key="label.authoring.numerical.add.unit" /> 
 				</a>
 			</form>
 			

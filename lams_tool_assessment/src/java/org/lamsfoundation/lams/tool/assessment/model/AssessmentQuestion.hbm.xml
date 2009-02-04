@@ -199,6 +199,25 @@
 
         </set>
 
+        <set
+            name="units"
+            lazy="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="sequence_id asc"
+        >
+
+            <key
+                column="question_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit"
+            />
+
+        </set>
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-AssessmentQuestion.xml

@@ -116,12 +116,11 @@ public class AssessmentQuestion implements Cloneable {
 	    if (units != null) {
 		Iterator iter = units.iterator();
 		Set set = new HashSet();
-		//TODO!!
-//		while (iter.hasNext()) {
-//		    AssessmentAnswerOption answerOption = (AssessmentAnswerOption) iter.next();
-//		    AssessmentAttachment newAnswerOption = (AssessmentAttachment) answerOption.clone();
-//		    set.add(newAnswerOption);
-//		}
+		while (iter.hasNext()) {
+		    AssessmentUnit unit = (AssessmentUnit) iter.next();
+		    AssessmentUnit newUnit = (AssessmentUnit) unit.clone();
+		    set.add(newUnit);
+		}
 		obj.units = set;
 	    }
 	    
@@ -411,6 +410,25 @@ public class AssessmentQuestion implements Cloneable {
      */
     public void setAnswerOptions(Set answerOptions) {
 	this.answerOptions = answerOptions;
+    }
+    
+    /**
+     * 
+     * @hibernate.set cascade="all" order-by="sequence_id asc"
+     * @hibernate.collection-key column="question_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit"
+     * 
+     * @return a set of units to this AssessmentQuestion.
+     */
+    public Set getUnits() {
+	return units;
+    }
+
+    /**
+     * @param answerOptions units to set.
+     */
+    public void setUnits(Set units) {
+	this.units = units;
     }
     
     public void setComplete(boolean complete) {

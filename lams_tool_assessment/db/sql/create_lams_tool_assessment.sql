@@ -88,6 +88,14 @@ create table tl_laasse10_assessment_overall_feedback (
    feedback text,
    primary key (uid)
 )type=innodb;
+create table tl_laasse10_assessment_unit (
+   uid bigint not null unique auto_increment,
+   question_uid bigint,
+   sequence_id integer,
+   multiplier integer,
+   unit varchar(255),
+   primary key (uid)
+)type=innodb;
 create table tl_laasse10_question_log (
    uid bigint not null auto_increment,
    access_date datetime,
@@ -125,6 +133,7 @@ alter table tl_laasse10_assessment_question add index FK_NEW_1720029621_F52D1F93
 alter table tl_laasse10_assessment_question add index FK_NEW_1720029621_F52D1F93EC0D3147 (session_uid), add constraint FK_NEW_1720029621_F52D1F93EC0D3147 foreign key (session_uid) references tl_laasse10_session (uid);
 alter table tl_laasse10_answer_options add index FK_tl_laasse10_answer_options_1 (question_uid), add constraint FK_tl_laasse10_answer_options_1 foreign key (question_uid) references tl_laasse10_assessment_question (uid);
 alter table tl_laasse10_assessment_overall_feedback add index FK_tl_laasse10_assessment_overall_feedback_1 (assessment_uid), add constraint FK_tl_laasse10_assessment_overall_feedback_1 foreign key (assessment_uid) references tl_laasse10_assessment (uid);
+alter table tl_laasse10_assessment_unit add index FK_tl_laasse10_assessment_unit_1 (question_uid), add constraint FK_tl_laasse10_assessment_unit_1 foreign key (question_uid) references tl_laasse10_assessment_question (uid);
 alter table tl_laasse10_question_log add index FK_NEW_1720029621_693580A438BF8DFE (assessment_question_uid), add constraint FK_NEW_1720029621_693580A438BF8DFE foreign key (assessment_question_uid) references tl_laasse10_assessment_question (uid);
 alter table tl_laasse10_question_log add index FK_NEW_1720029621_693580A441F9365D (user_uid), add constraint FK_NEW_1720029621_693580A441F9365D foreign key (user_uid) references tl_laasse10_user (uid);
 alter table tl_laasse10_session add index FK_NEW_1720029621_24AA78C530E79035 (assessment_uid), add constraint FK_NEW_1720029621_24AA78C530E79035 foreign key (assessment_uid) references tl_laasse10_assessment (uid);
