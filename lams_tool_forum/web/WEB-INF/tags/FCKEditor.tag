@@ -5,7 +5,11 @@
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
 <%@ attribute name="value" required="true" rtexprvalue="true"%>
 <%@ attribute name="toolbarSet" required="false" rtexprvalue="true"%>
+<%@ attribute name="height" required="false" rtexprvalue="true"%>
+<%@ attribute name="width" required="false" rtexprvalue="true"%>
 <%@ attribute name="contentFolderID" required="false" rtexprvalue="true"%>
+<%@ attribute name="displayExpanded" required="false" rtexprvalue="true"%>
+
 
 <c:set var="language">
 	<lams:user property="fckLanguageMapping" />
@@ -13,6 +17,14 @@
 
 <c:if test="${empty toolbarSet}">
 	<c:set var="toolbarSet" value="Default" />
+</c:if>
+
+<c:if test="${empty displayExpanded}">
+	<c:set var="displayExpanded" value="true" />
+</c:if>
+
+<c:if test="${empty width}">
+	<c:set var="width" value="100%" />
 </c:if>
 
 <c:set var="basePath"><lams:LAMSURL/>/fckeditor/</c:set>
@@ -34,11 +46,15 @@
 	oFCKeditor.Config["AutoDetectLanguage"]= false ;
 	oFCKeditor.Config["DefaultLanguage"]= "${language}" ;
 
+	oFCKeditor.Config["ToolbarStartExpanded"]= "${displayExpanded}" ;
+
 	oFCKeditor.Create();
 </script>
 -->
 
 <fck:editor id="${id}"
+	height="${height}"
+	width="${width}"
 	basePath="${basePath}"
 	toolbarSet="${toolbarSet}"
 	imageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
@@ -48,7 +64,8 @@
 	flashBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
 	flashUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/"
 	autoDetectLanguage="false"
-	defaultLanguage="${language}">
+	defaultLanguage="${language}"
+	toolbarStartExpanded="${displayExpanded}" >
 		${value}
 </fck:editor>
 
