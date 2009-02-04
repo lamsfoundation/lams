@@ -26,7 +26,8 @@
 		<lams:FCKEditor id="instruction"
 			value="${formBean.instruction}"
 			contentFolderID="${formBean.contentFolderID}"
-			toolbarSet="Custom-Wiki" height="200px">
+                        toolbarSet="Custom-Pedplanner" height="200px"
+                        displayExpanded="false">
 		</lams:FCKEditor>
 	</html:form>
 </body>
