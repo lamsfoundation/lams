@@ -31,14 +31,14 @@ public class PedagogicalPlannerActivityDTO {
     private String editingAdviceUrl;
     private String checkEditingAdviceUrl;
     private Boolean supportsPlanner;
-    private Short branch;
+    private Short group;
     private String parentActivityTitle;
     private Boolean lastNestedActivity = false;
     private Boolean defaultBranch = false;
+    private Short complexActivityType;
 
-    public static final short TYPE_PLAIN_ACTIVITY = 1;
-    public static final short TYPE_BRANCHING_ACTIVITY = 2;
-    public static final short TYPE_OPTIONAL_ACTIVITY = 3;
+    public static final short TYPE_BRANCHING_ACTIVITY = 1;
+    public static final short TYPE_OPTIONAL_ACTIVITY = 2;
 
     public Boolean getSupportsPlanner() {
 	return supportsPlanner;
@@ -108,12 +108,12 @@ public class PedagogicalPlannerActivityDTO {
 	this.checkEditingAdviceUrl = checkEditingAdviceUrl;
     }
 
-    public Short getBranch() {
-	return branch;
+    public Short getGroup() {
+	return group;
     }
 
-    public void setBranch(Short branch) {
-	this.branch = branch;
+    public void setGroup(Short branch) {
+	this.group = branch;
     }
 
     public String getParentActivityTitle() {
@@ -138,5 +138,13 @@ public class PedagogicalPlannerActivityDTO {
 
     public void setDefaultBranch(Boolean defaultBranch) {
 	this.defaultBranch = defaultBranch;
+    }
+
+    public Short getComplexActivityType() {
+	return complexActivityType;
+    }
+
+    public void setComplexActivityType(Short complexActivityType) {
+	this.complexActivityType = complexActivityType;
     }
 }

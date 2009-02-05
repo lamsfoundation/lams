@@ -8,9 +8,10 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 <lams:html>
 <lams:head>
-	<title><fmt:message key="title.lams"/> :: <fmt:message key="planner.title" /></title>
-
+	  <title><fmt:message key="title.lams"/> :: <fmt:message key="planner.title" /></title>
+	
 	  <script type="text/javascript">
+	   //First, set some JavaScript constants so included scripts can use them
 	   var activityCount = ${fn:length(planner.activities)}; //How many activities are there in the sequence
 	   var activitySupportingPlannerCount = ${planner.activitySupportingPlannerCount}; //How many of activities support the planner (their data will be submitted)
 	   var sendInPortions = ${planner.sendInPortions}; //Should the forms be send all at once or rather in parts
@@ -28,15 +29,19 @@
 	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cluetip.js"></script>
 	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/pedagogicalPlanner.js"></script>
 	  <script language="JavaScript" type="text/javascript">
+	  /* Add tooltips for Editing advice. First we make a call to tool's Action and check if there is any Editing advice.
+	  	 If yes, we show the previously hidden link and add clueTip functionality to it. */
 	  	$(document).ready(function() {
 	  		var activityCount = ${fn:length(planner.activities)};
 	  		for (var activityIndex = 1;activityIndex<=activityCount;activityIndex++){
 	  			var editingAdviceLink = $('#editingAdvice'+activityIndex);
 	  			if (editingAdviceLink.length > 0){
 	  				var checkEditingAdviceUrl = $(editingAdviceLink).attr("rel");
+	  				//Ajax call to get the answer: do we show the link or no
 	  				$.get(
 	  					checkEditingAdviceUrl,
 	  					function(responseText){
+	  						//After response we parse the message: <answer>&<activity index>
 	  						var responseParts = responseText.split("&");
     						var activityInnerIndex = responseParts[1];
     						var editingAdviceExists = responseParts[0]=="OK";
@@ -97,31 +102,63 @@
 	<!-- IFrames with activities. -->
 	<table cellspacing="0" cellpadding="0" class="pedagogicalPlannerTable">
 		<c:set var="lastParentActivityTitle" />
-		<c:set var="lastBranch" />
+		<c:set var="lastGroup" />
 		<c:forEach var="activity" varStatus="activityStatus" items="${planner.activities}">
-			<c:if test="${not empty activity.parentActivityTitle and not (activity.parentActivityTitle eq lastParentActivityTitle)}">
+			<c:if test="${not empty activity.complexActivityType and not (activity.parentActivityTitle eq lastParentActivityTitle)}">
 				<c:set var="lastParentActivityTitle" value="${activity.parentActivityTitle}" />
 				<tr>
-					<td colspan="2" class="branchingFirstActivity">
-						<h2 style="color: blue">${lastParentActivityTitle}</h2>
+					<td colspan="2" class="
+						<c:choose>
+							<c:when test="${activity.complexActivityType eq 1}">
+								branchingFirstActivity
+							</c:when>
+							<c:when test="${activity.complexActivityType eq 2}">
+								optionsFirstActivity
+							</c:when>
+						</c:choose>
+					">
+						<h2>${lastParentActivityTitle}</h2>
 					</td>
 				</tr>
 			</c:if>
 			<tr>
 				<td class="titleCell
-				<c:if test="${not empty activity.branch}">
-					branch${activity.branch}
+				<c:choose>
+					<c:when test="${activity.complexActivityType eq 1}">
+						branch
+					</c:when>
+					<c:when test="${activity.complexActivityType eq 2}">
+						option
+					</c:when>
+				</c:choose>
+				<c:if test="${not empty activity.group}">
+					group${activity.group}
 				</c:if>
 				<c:if test="${activity.lastNestedActivity}">
-					branchingLastActivity
+					<c:choose>
+						<c:when test="${activity.complexActivityType eq 1}">
+							branchingLastActivity
+						</c:when>
+						<c:when test="${activity.complexActivityType eq 2}">
+							optionsLastActivity
+						</c:when>
+					</c:choose>
 				</c:if>
 				">
-					<c:if test="${not empty activity.branch and not (activity.branch eq lastBranch)}">
-						<c:set var="lastBranch" value="${activity.branch}" />
-						<h3 class="branch${lastBranch}"><fmt:message key="label.planner.branch" />${lastBranch}
-						<c:if test="${activity.defaultBranch}">
-							<br /><fmt:message key="label.planner.branch.default" />
-						</c:if>
+					<c:if test="${not empty activity.group and not (activity.group eq lastGroup)}">
+						<c:set var="lastGroup" value="${activity.group}" />
+						<h3 class="group${lastGroup}">
+							<c:choose>
+								<c:when test="${activity.complexActivityType eq 1}">
+									<fmt:message key="label.planner.branch" />${lastGroup}
+									<c:if test="${activity.defaultBranch}">
+										<br /><fmt:message key="label.planner.branch.default" />
+									</c:if>
+								</c:when>
+								<c:when test="${activity.complexActivityType eq 2}">
+									<fmt:message key="label.planner.option" />${lastGroup}
+								</c:when>
+							</c:choose>
 						</h3>
 					</c:if>
 					<c:if test="${not empty activity.type}">
@@ -147,7 +184,14 @@
 				</td>
 				<td class="formCell
 				<c:if test="${activity.lastNestedActivity}">
-					branchingLastActivity
+					<c:choose>
+						<c:when test="${activity.complexActivityType eq 1}">
+							branchingLastActivity
+						</c:when>
+						<c:when test="${activity.complexActivityType eq 2}">
+							optionsLastActivity
+						</c:when>
+					</c:choose>
 				</c:if>
 				">
 					<iframe frameborder="0" marginheight="0" marginwidth="0" name="activity${activityStatus.index+1}" id="activity${activityStatus.index+1}" class="toolFrame"
@@ -163,8 +207,16 @@
 			</tr>
 			<tr>
 				<td class="titleCell
-				<c:if test="${not empty activity.branch and not activity.lastNestedActivity}">
-					branch${activity.branch}
+				<c:if test="${not empty activity.group and not activity.lastNestedActivity}">
+					<c:choose>
+						<c:when test="${activity.complexActivityType eq 1}">
+							branch
+						</c:when>
+						<c:when test="${activity.complexActivityType eq 2}">
+							option
+						</c:when>
+					</c:choose>
+					group${activity.group}
 				</c:if>
 				"
 				<c:if test="${activity.lastNestedActivity}">

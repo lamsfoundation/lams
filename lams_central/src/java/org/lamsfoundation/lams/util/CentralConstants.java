@@ -128,7 +128,7 @@ public class CentralConstants {
     public static final String ATTR_RESULT_CODE = "resultCode";
 
     public static final String ATTR_RESULT_TEXT = "resultText";
-
+    // Pedagogical Planner constants
     public static final String ATTR_PLANNER = "planner";
 
     public static final String PARAM_CALL_ATTEMPTED_ID = "callAttemptedID";
@@ -148,4 +148,10 @@ public class CentralConstants {
     public static final String RESOURCE_KEY_BRANCH_EMPTY = "label.planner.branch.empty";
 
     public static final String IMAGE_PATH_GROUPING = "images/grouping.gif";
+
+    public static final String FORWARD_GROUPING = "grouping";
+
+    public static final int PLANNER_MAX_BRANCHES = 4;
+
+    public static final int PLANNER_MAX_OPTIONS = 4;
 }

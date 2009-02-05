@@ -67,51 +67,66 @@ a.editingAdvice{
 	margin: 0px 0px 0px 500px;
 }
 
-td.branchingFirstActivity{
+td.branchingFirstActivity {
 	border-bottom: thick blue solid;
 	text-align: center;
+	color: blue;
 }
 
-td.branchingLastActivity{
+td.optionsFirstActivity {
+	border-bottom: thick lightgreen solid;
+	text-align: center;
+	color:lightgreen;
+}
+
+td.branchingLastActivity {
 	border-bottom: thick blue solid;
 }
 
-td.branch1{
+td.optionsLastActivity {
+	border-bottom: thick lightgreen solid;
+}
+
+td.branch {
+	border-left: thick blue solid;
+}
+
+td.option {
+	border-left: thick lightgreen solid;
+}
+
+td.group1{
 	border-right: thick yellow solid;
-	border-left: thick blue solid;
 }
 
-td.branch2{
+td.group2{
 	border-right: thick orange solid;
-	border-left: thick blue solid;
 }
 
-td.branch3{
+td.group3{
 	border-right: thick red solid;
-	border-left: thick blue solid;
 }
 
-td.branch4{
+td.group4{
 	border-right: thick purple solid;
-	border-left: thick blue solid;
 }
 
-h3.branch1{
+h3.group1{
 	color: #F1CD03;
 	text-decoration: underline;
 }
 
-h3.branch2{
+h3.group2{
 	color: orange;
 	text-decoration: underline;
 }
 
-h3.branch3{
+h3.group3{
 	color: red;
 	text-decoration: underline;
 }
 
-h3.branch4{
+h3.group4{
 	color: purple;
 	text-decoration: underline;
 }
