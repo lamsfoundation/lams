@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+
+<!-- 
+The DOCTYPE declaration declares the location of database-specific parts of the
+Ant build file. 
+-->
+<!DOCTYPE project [
+	<!ENTITY properties SYSTEM "file:./properties.xml">
+]>
+
+<project name="lams_tool_openid" basedir=".">
+
+	<!-- import properties from the specified file -->
+	<property file="build.properties" />
+	
+	<property name="name" value="lams_openid" />
+	<property name="product" value="lams_openid"/>
+	<property name="toolContext" value="openid"/>
+
+	<path id="all-libs">
+		<fileset dir="${sharedlib}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${j2eelibs}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="project.classpath">
+		<path refid="all-libs" />
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}" />
+		<pathelement location="lib" />
+	</path>
+	
+	<path id="schemaexport.classpath">
+		<path refid="project.classpath"/>
+		<pathelement location="${build.classes.java}"/>
+	</path>
+	
+	
+
+	
+	<target name="print-classpath">
+		<echo message="java.class.path = ${java.class.path}" />
+		<property name="path.string" refid="project.classpath" />
+		<echo message="project.classpath = ${path.string}" />
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="preparedirs">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build.classes.java}" />
+		<mkdir dir="${build.lib}" />
+	</target>
+
+
+	<target name="clean-build" description="removes all class files">
+		<delete dir="${build.classes.java}" />
+		<delete dir="${build.classes.test}" />
+		<delete dir="${build.lib}" />
+		<delete dir="${build.deploy}"/>
+		<mkdir dir="${build.classes.java}" />
+		<mkdir dir="${build.lib}" />
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Compilations								                  -->
+	<!-- ================================================================ -->
+
+	<target name="compile-java" depends="clean-build" description="compile java sources">
+		<javac srcdir="${src.java.dir}" compiler="modern" destdir="${build.classes.java}" deprecation="on" debug="on">
+			<compilerarg value="-Xlint:unchecked"/>
+			<classpath>
+				<path refid="project.classpath" />
+			</classpath>
+		</javac>
+		<copy overwrite="yes" todir="${build.classes.java}/${package}">
+			<fileset dir="${src.java.dir}/${package}">
+				<include name="*.xml" />
+				<include name="*.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Make jar archive for deployment        		    	          -->
+	<!-- ================================================================ -->
+	<target name="build-jar" depends="compile-java" description="creates jar file">
+		<delete file="${build.lib}/${product}.jar" />
+		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
+			<fileset dir="${build.classes.java}">
+			</fileset>
+		</jar>
+	</target>
+
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<!-- Make the war archive  for deployment             -->
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<target name="build-war" depends="build-jar" description="creates war file">
+		<delete file="${build.lib}/${product}.war" />
+		<war warfile="${build.lib}/${product}.war" webxml="${conf.webinf.dir}/web.xml" manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
+			<webinf dir="${conf.webinf.dir}">
+				<include name="**/*.tld" />
+				<include name="*.xml" />
+				<include name="*.properties" />
+				<exclude name="web.xml" />
+				<include name="spring/*" />
+				<include name="tiles/*.xml" />
+				<include name="struts/*" />
+				<include name="tags/*.tag" />
+			</webinf>
+			<fileset dir="${conf.web.dir}">
+				<include name="*" />
+			</fileset>
+			<lib dir="${build.lib}">
+			    <include name="${product}.jar"/>
+			</lib>
+			<lib dir="lib">
+			    <include name="*.jar"/>
+			</lib>
+		</war>
+	</target>
+
+	   <target name="copy-tags" depends="" description="copy the lams.tld and the lams tags">
+	   		<copy todir="${conf.webinf.dir}" overwrite="yes" file="${tag.web.dir}/lams.tld" />	
+			<copy todir="${conf.webinf.dir}/tags" overwrite="yes">
+				<fileset dir="${tag.web.dir}/tags">
+					<include name="*.tag" />
+				</fileset>
+			</copy>
+	   </target>
+
+	<!-- =================================================================== -->
+	<!-- Deploy the openid struts jar and war                               -->
+	<!-- =================================================================== -->
+	<target name="deploy-war" depends="build-war" description="Deploy the tool war file and jar file">
+		<delete quiet="true">
+			<fileset dir="${jboss.deploy}/tmp" />
+			<fileset dir="${jboss.deploy}/work" />
+		</delete>
+		<copy file="${build.lib}/${product}.war" todir="${jboss.deploy}" />
+	</target>
+
+	
+
+
+	<!-- ================================= -->
+	<!--          target: synchronize-jsp  -->            
+	<!--  ================================= -->
+	<target name="synchronize-deploy" description="copy non-java file into deploy folder">
+		<copy verbose="yes" todir="${jboss.deploy}/${product}.war">
+			<fileset dir="${conf.web.dir}">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+	</target>
+</project>
+
