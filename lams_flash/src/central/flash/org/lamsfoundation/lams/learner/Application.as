@@ -43,6 +43,7 @@ class Application extends ApplicationParent {
 	private var _header_mc:MovieClip;
 	private var _scratchpad_mc:MovieClip;
 	private var _presence_mc:MovieClip;
+	private var _reference_mc:MovieClip;
 
 	private static var SHOW_DEBUGGER:Boolean = false;
 	private static var MODULE:String = "learner";
@@ -55,10 +56,10 @@ class Application extends ApplicationParent {
 	public static var LESSON_Y:Number = 82;
 	public static var SPAD_X:Number = 0;
 	public static var SPAD_Y:Number = 554;
-	public static var SPAD_H:Number = 220;
 	public static var PRES_X:Number = 0;
 	public static var PRES_Y:Number = 554;
-	public static var PRES_H:Number = 220;
+	public static var REF_X:Number = 0;
+	public static var REF_Y:Number = 554;
     
 	
     private static var APP_ROOT_DEPTH:Number = 10; //depth of the application root
@@ -92,6 +93,7 @@ class Application extends ApplicationParent {
   	private var _headerLoaded:Boolean;
 	private var _scratchpadLoaded:Boolean;
 	private var _presenceLoaded:Boolean;
+	private var _referenceLoaded:Boolean;
     
 	
 	//Application instance is stored as a static in the application class
@@ -110,6 +112,7 @@ class Application extends ApplicationParent {
 		_headerLoaded = false;
 		_scratchpadLoaded = false;
 		_presenceLoaded = false;
+		_referenceLoaded = false;
 		
 		_userDataLoaded = false;
 		
@@ -221,6 +224,9 @@ class Application extends ApplicationParent {
 		_lesson = new Lesson(_appRoot_mc,LESSON_X,LESSON_Y);
         _lesson.addEventListener('load',Proxy.create(this,UIElementLoaded));
 
+		_reference_mc = _container_mc.createChildAtDepth('LReference', DepthManager.kTop, {_visible:false, _x:REF_X, _y:REF_Y, _lessonModel:_lesson.model, _lessonController:_lesson.view.getController()});
+		_reference_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
+
 		_presence_mc = _container_mc.createChildAtDepth('LPresence', DepthManager.kTop, {_x:PRES_X, _y:PRES_Y, _lessonModel:_lesson.model, _lessonController:_lesson.view.getController()});
 		_presence_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		
@@ -277,11 +283,15 @@ class Application extends ApplicationParent {
 					_presence_mc._visible = false;
 					Debugger.log('PRESENCE: presence loaded and set to not visible' ,Debugger.MED,'UIElementLoaded','Application');
 					break;
+				case 'Reference' :
+					_referenceLoaded = true;
+					_reference_mc.visible = false;
+					break;
                 default:
             }
             
             //If all of them are loaded set UILoad accordingly
-            if(_lessonLoaded && _headerLoaded && _scratchpadLoaded && _presenceLoaded){
+            if(_lessonLoaded && _headerLoaded && _scratchpadLoaded && _presenceLoaded && _referenceLoaded){
                 _UILoaded=true;                
             } 
             
@@ -317,9 +327,6 @@ class Application extends ApplicationParent {
 		
 		var resizeHeight:Number;
 		
-		Debugger.log('_presence_mc: ' +_presence_mc, Debugger.MED, 'onResize', 'Application');
-		Debugger.log('_presence_mc._visible: ' +_presence_mc._visible, Debugger.MED, 'onResize', 'Application');
-		
 		if (_presence_mc._visible) {
 			Debugger.log('resizeHeight set to Presence height', Debugger.MED, 'onResize', 'Application');
 			resizeHeight = LESSON_Y+_lesson.model.getPresenceHeight()+_lesson.model.getSpadHeight();
@@ -344,6 +351,12 @@ class Application extends ApplicationParent {
 		_lesson.setSize(w,h-resizeHeight);
 		_scratchpad_mc._y = h - _lesson.model.getSpadHeight();
 		_presence_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getPresenceHeight();
+		
+		if (_presence_mc._visible) {
+			_reference_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getPresenceHeight() - _lesson.model.getReferenceHeight();
+		} else {
+			_reference_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getReferenceHeight();
+		}
 		
 	}
 	
@@ -424,6 +437,10 @@ class Application extends ApplicationParent {
 	
 	public function getPresence():Presence{
 		return Presence(_presence_mc)
+	}
+	
+	public function getReference():Reference {
+		return Reference(_reference_mc)
 	}
 	
 	public function showDebugger():Void{

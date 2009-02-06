@@ -399,6 +399,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 		} else if(a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasOptionalActivity", DepthManager.kTopmost, {_activity:a, _children:children, _monitorController:mc, _monitorTabView:mtv, fromModuleTab:"monitorMonitorTab", learnerContainer:_learnerContainer_mc});	
+		} else if(a.activityTypeID==Activity.REFERENCE_ACTIVITY_TYPE){
+			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
+			newActivity_mc = activityLayer.createChildAtDepth("CanvasReferenceActivity", DepthManager.kTopmost, {_activity:a, _children:children, _monitorController:mc, _monitorTabView:mtv, fromModuleTab:"monitorMonitorTab", learnerContainer:_learnerContainer_mc});	
 		} else if(a.isBranchingActivity()){
 			a.branchView = null;
 			newActivity_mc = activityLayer.createChildAtDepth("CanvasBranchingActivity", DepthManager.kBottom, {_activity:a,_monitorController:mc, _monitorView:mtv, _module:"monitoring", learnerContainer:_learnerContainer_mc, setupBranchView:false,  showDiagram: true});

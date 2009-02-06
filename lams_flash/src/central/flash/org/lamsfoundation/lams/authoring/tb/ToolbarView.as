@@ -57,11 +57,11 @@ class ToolbarView extends AbstractView {
 	private var optional_btn:Button;
 	private var optional_act_btn:Button;
 	private var optional_seq_btn:Button;
-	
-	private var gate_btn:Button;
+	private var reference_btn:Button;
 	private var flow_btn:Button;
+	private var gate_btn:Button;
 	private var branch_btn:Button;
-	
+
 	private var group_btn:Button;
 	private var preview_btn:Button;
 	private var preview_btn_click_target:Button;
@@ -130,9 +130,10 @@ class ToolbarView extends AbstractView {
 	public function showHideOptAssets(v:Boolean){
 		optional_act_btn.visible = v;
 		optional_seq_btn.visible = v;
+		reference_btn.visible = v;
 		optional_bkg_pnl.visible = v;
 		
-		optional_bkg_pnl.setSize(Math.max(Math.max(optional_btn.width, optional_act_btn.width), Math.max(optional_btn.width, optional_seq_btn.width)) + 6, 95);
+		optional_bkg_pnl.setSize(Math.max(Math.max(optional_btn.width, optional_act_btn.width), Math.max(optional_btn.width, optional_seq_btn.width)) + 6, 126.5);
 		optional_bkg_pnl._x = optional_act_btn._x - 3;
 	}
     
@@ -164,6 +165,7 @@ class ToolbarView extends AbstractView {
 		gate_btn.addEventListener("click", controller);
 		group_btn.addEventListener("click", controller);
 		branch_btn.addEventListener("click", controller);
+		reference_btn.addEventListener("click", controller);
 		preview_btn.addEventListener("click", controller);
 		preview_btn_click_target.addEventListener("click", controller);
 		
@@ -208,6 +210,9 @@ class ToolbarView extends AbstractView {
 		optional_seq_btn.onRollOver = Proxy.create(this,this['showToolTip'], optional_seq_btn, "optional_seq_btn_tooltip");
 		optional_seq_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
+		reference_btn.onRollOver = Proxy.create(this,this['showToolTip'], optional_seq_btn, "support_act_btn_tooltip");
+		reference_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
 		group_btn.onRollOver = Proxy.create(this,this['showToolTip'], group_btn, "group_btn_tooltip");
 		group_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
@@ -245,6 +250,7 @@ class ToolbarView extends AbstractView {
 		gate_btn.label = Dictionary.getValue('gate_btn');
 		branch_btn.label = Dictionary.getValue('branch_btn');
 		flow_btn.label = Dictionary.getValue('flow_btn');
+		reference_btn.label = Dictionary.getValue("support_act_btn");
 		group_btn.label = Dictionary.getValue('group_btn');
 		preview_btn.label = Dictionary.getValue('preview_btn');
 		apply_changes_btn.label = Dictionary.getValue('apply_changes_btn');
@@ -264,12 +270,13 @@ class ToolbarView extends AbstractView {
 		optional_btn.tabIndex = 208
 		optional_act_btn.tabIndex = 209
 		optional_seq_btn.tabIndex = 210
-		flow_btn.tabIndex = 211
-		gate_btn.tabIndex = 212
-		branch_btn.tabIndex = 213
-		group_btn.tabIndex = 214
-		preview_btn.tabIndex = 215
-		cancel_btn.tabIndex = 216
+		reference_btn.tabIndex = 211
+		flow_btn.tabIndex = 212
+		gate_btn.tabIndex = 213
+		branch_btn.tabIndex = 214
+		group_btn.tabIndex = 215
+		preview_btn.tabIndex = 216
+		cancel_btn.tabIndex = 217
 	}
 	
 	public function setupButtons(tm:ToolbarModel, menuList:Array){
@@ -298,7 +305,6 @@ class ToolbarView extends AbstractView {
 					_toolbarMenu[i].clickTarget.btn = this.attachMovie("Button", menuList[i][2], this.getNextHighestDepth(), {label:"", icon:menuList[i][1], _alpha: 0});
 					_toolbarMenu[i].clickTarget.btn.setSize(btnWidth, 25);
 				}
-				
 			
 			} else {
 				_toolbarMenu[i] = null;
@@ -314,7 +320,7 @@ class ToolbarView extends AbstractView {
 				
 				_toolbarMenu[i]._y = btnOffset_Y;
 				
-				if ((i >= menuList.length-4) && (i < menuList.length-2)) {
+				if ((i >= menuList.length-5) && (i < menuList.length-2)) {
 					_toolbarMenu[i]._x = this.optional_btn._x;
 					_toolbarMenu[i]._y = (_toolbarMenu[i-1]._y+_toolbarMenu[i-1].height)+btnOffset_Y;
 					
@@ -322,7 +328,7 @@ class ToolbarView extends AbstractView {
 				
 				if (i >= menuList.length-2){
 					_toolbarMenu[i]._x = this.flow_btn._x;
-					_toolbarMenu[i]._y = (_toolbarMenu[i-3]._y+_toolbarMenu[i-3].height)+btnOffset_Y;
+					_toolbarMenu[i]._y = (_toolbarMenu[i-4]._y+_toolbarMenu[i-4].height)+btnOffset_Y;
 				}
 				
 				if (i == menuList.length){

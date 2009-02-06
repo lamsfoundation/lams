@@ -185,6 +185,17 @@ class MonitorController extends AbstractController {
 	 */
 	private function forceCompleteTransfer(learnerObj:Object, cActivity:Object):Void {
 		
+		// return if trying to force complete the learner to a support activity
+		if (cActivity.activity.activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE) {
+			LFMessage.showMessageAlert(Dictionary.getValue("al_error_forcecomplete_support_act"), null);
+			return;
+		} else if (cActivity.activity.parentUIID != null) {
+			if (_monitorModel.getMonitor().ddm.getActivityByUIID(cActivity.activity.parentUIID).activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE) {
+				LFMessage.showMessageAlert(Dictionary.getValue("al_error_forcecomplete_support_act"), null);
+				return;
+			}
+		}
+		
 		var learnerActivityID:Number = learnerObj.Learner.getCurrentActivityId();
 		var activityToCheck = cActivity.activity; // initially the Activity where the learner icon has been dropped
 		var targetIsAccessible:Boolean = _monitorModel.getIsValidDropTarget(learnerActivityID, activityToCheck);

@@ -90,6 +90,8 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 			_app.getCanvas().toggleOptionalActivity();
 		}else if(tgt.indexOf("optional_seq") != -1){
 			_app.getCanvas().toggleOptionalSequenceActivity();
+		}else if(tgt.indexOf("reference") != -1){
+			_app.getCanvas().toggleReferenceTool();
 		}else if(tgt.indexOf("optional") != -1){
 			if (!isOptActive && !optionPanelVisible){
 				var c:String = Cursor.getCurrentCursor();
@@ -113,7 +115,7 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 			}
 		}else if(tgt.indexOf("gate") != -1){
 			_app.getCanvas().toggleGateTool();
-						
+			
 		}else if(tgt.indexOf("group") != -1){
 			_app.getCanvas().toggleGroupTool();
 			

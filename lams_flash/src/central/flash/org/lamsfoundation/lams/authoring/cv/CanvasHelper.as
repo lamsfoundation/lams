@@ -790,13 +790,17 @@ class CanvasHelper {
 	public function closeBranchView(prevActiveView) {
 		var branchingAct:CanvasActivity = CanvasActivity(canvasModel.openBranchingActivities.pop());
 		var parentBranching:CanvasActivity = (canvasModel.openBranchingActivities.length > 0) ? CanvasActivity(canvasModel.openBranchingActivities[canvasModel.openBranchingActivities.length-1]) : null;
-
+		
 		if(prevActiveView != null) 
 			canvasModel.activeView = prevActiveView;
 		else
 			canvasModel.activeView = (parentBranching.activity.isBranchingActivity()) ? parentBranching.activity.branchView : canvasView;
 		
 		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
+		
+		if (canvasModel.currentBranchingActivity == null && canvasModel.getReferenceActivityOnCanvas() == null) {
+			Application.getInstance().getToolbar().setButtonState("reference_btn", true, false);
+		}
 		
 		if(canvasModel.activeView instanceof CanvasComplexView)
 			CanvasComplexView(canvasModel.activeView).branchingToClear.push(branchingAct);

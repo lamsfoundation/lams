@@ -199,8 +199,9 @@ class Lesson {
 		
 	}  
 	
-	public function moveToActivity(fromAct, toAct){
-		var callback:Function = Proxy.create(this, afterMoveActivity);
+	public function moveToActivity(fromAct, toAct, isReference){
+		//don't call the function to show the normal learner jsp if it is a reference act
+		var callback:Function = (isReference!=true) ? Proxy.create(this, afterMoveActivity) : null;
 		
 		// call action
 		var lessonId:Number = lessonModel.ID;
@@ -218,19 +219,18 @@ class Lesson {
 	
 	private function getFlashProgress():Void{
 		Debugger.log('Loading flash progress.',Debugger.CRITICAL,'getFlashProgress','Lesson');
-				
+		
 		if(!finishedDesign) { 
 			// first time through set interval for method polling
 			if(!_loadCheckIntervalID) {
+				
 				_loadCheckIntervalID = setInterval(Proxy.create(this, getFlashProgress), LOAD_CHECK_INTERVAL);
 			} else {
 				_loadCheckCount++;
 				Debugger.log('Waiting (' + _loadCheckCount + ') for data to load...',Debugger.CRITICAL,'getFlashProgress','Lesson');
-				
 				// if design loaded
 				if(finishedDesign) {
 					clearInterval(_loadCheckIntervalID);
-					
 					callFlashProgress();
 			
 				} else if(_loadCheckCount >= LOAD_CHECK_TIMEOUT_COUNT) {
@@ -238,7 +238,6 @@ class Lesson {
 					clearInterval(_loadCheckIntervalID);
 					var msg:String = Dictionary.getValue('al_timeout');
 					LFMessage.showMessageAlert(msg);
-					
 					// clear count and restart polling check
 					_loadCheckCount = 0;
 					getFlashProgress();
@@ -251,7 +250,7 @@ class Lesson {
 		
 	}
 	
-	private function callFlashProgress():Void {
+	public function callFlashProgress():Void {
 		var callback:Function = Proxy.create(this,saveProgressData);
 		var lessonId:Number = lessonModel.ID;
 		Application.getInstance().getComms().getRequest('learning/learner.do?method=getFlashProgressData&lessonID='+String(lessonId), callback, false);
@@ -353,6 +352,10 @@ class Lesson {
 			loadActivity(_root.serverURL + request);
 		}
 		
+	}
+	
+	public function showReferenceActivityPopup(request:String, activityID:Number) {
+		JsPopup.getInstance().launchPopupWindow(_root.serverURL + request, 'LearnerActivity'+activityID, 600, 800, true, true, true, false, false);
 	}
 	
 	private function loadActivity(url:String){

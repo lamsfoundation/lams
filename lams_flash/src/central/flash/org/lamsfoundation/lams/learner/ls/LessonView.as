@@ -224,8 +224,7 @@ class LessonView extends AbstractView {
 			var a:LearnerComplexActivity = LearnerComplexActivity(lm.activitiesDisplayed.get(ca.activity.activityUIID));
 			if(a.locked){
 				a.collapse();
-				Debugger.log('closed complex activity' + ca.activity.activityUIID,Debugger.CRITICAL,'closeComplexActivity','org.lamsfoundation.lams.LessonView');
-
+				Debugger.log('closed complex activity' + ca.activity.activityUIID,Debugger.CRITICAL,'closeComplexActivity','org.lamsfoundation.lams.LessonView');			
 			} else {
 				Debugger.log('not closed complex activity' + ca.activity.activityUIID,Debugger.CRITICAL,'closeComplexActivity','org.lamsfoundation.lams.LessonView');
 			}
@@ -248,7 +247,6 @@ class LessonView extends AbstractView {
 		Debugger.log('The activity:'+a.title+','+a.activityTypeID+' is now be drawn',Debugger.CRITICAL,'drawActivity','LessonView');
 		
 		var _activityLayer_mc = progress_scp.content;
-		var s:Boolean = false;
 		var newActivity_mc:MovieClip;
 		var lv:LessonView = LessonView(this);
 		var lc = getController();
@@ -292,6 +290,38 @@ class LessonView extends AbstractView {
 		return true;
 	}
 	
+	private function drawReferenceActivities(a:Activity,lm:LessonModel):Boolean{
+		
+		var referenceLayer = Application.getInstance().getReference();
+		
+		var newActivity_mc:MovieClip;
+		var lv:LessonView = LessonView(this);
+		var lc = getController();
+		
+		var activityTitle:String = a.title;
+		var yPos:Number = 44;
+			
+		var referenceActivities:Array = lm.learningDesignModel.getComplexActivityChildren(a.activityUIID); // these are the child reference acts
+
+		referenceLayer.numActivities = referenceActivities.length;
+		
+		Application.getInstance().getReference()._visible = true; // only show if there are reference activities
+
+		for (var i=0; i<referenceActivities.length; i++) {
+			newActivity_mc = referenceLayer.attachMovie("LearnerActivity", "LearnerActivity" + referenceActivities[i].activityID, referenceLayer.getNextHighestDepth(),{_activity:referenceActivities[i],_children:null,controller:lc,_view:lv, _x:-45, _y:yPos, actLabel:referenceActivities[i].title, learner:lm.progressData});
+			yPos += 30;
+			_activityList.push(newActivity_mc);
+		
+			var actItems:Number = lm.activitiesDisplayed.size()
+			if (actItems < lm.getActivityKeys().length){
+				lm.activitiesDisplayed.put(referenceActivities[i].activityUIID, newActivity_mc);
+			}
+			
+			progress_scp.redraw(true);
+		}
+		return true;
+
+	}
 	
 	/**
 	 * Updates existing activity on learner progress bar.
@@ -302,7 +332,6 @@ class LessonView extends AbstractView {
 	 */
 	private function updateActivity(a:Activity,lm:LessonModel):Boolean{
 		
-		
 		if(lm.activitiesDisplayed.containsKey(a.activityUIID)){
 			var activityMC:Object = lm.activitiesDisplayed.get(a.activityUIID);
 			activityMC.refresh();
@@ -312,7 +341,11 @@ class LessonView extends AbstractView {
 			getAndScrollToTargetPos(a, activityMC, lm.progressData, false);
 		
 		} else {
-			drawActivity(a, lm);
+			if (a.activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE) {
+				drawReferenceActivities(a, lm);
+			} else {
+				drawActivity(a, lm);
+			}
 		}
 		
 		return true;

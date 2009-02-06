@@ -45,6 +45,7 @@ class ApplicationParent {
 	public static var C_BRANCH:String = "c_branch";
 	public static var C_DEFAULT:String = "default";
 	public static var C_LICON:String = "c_licon";
+	public static var C_REFERENCE:String = "c_reference";
 	
 	public static var RTL:String = "RTL";
 	

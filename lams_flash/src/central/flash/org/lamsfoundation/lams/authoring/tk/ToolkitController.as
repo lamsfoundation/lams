@@ -82,12 +82,32 @@ class ToolkitController extends AbstractController {
 		Debugger.log("av: " + (cv.getCanvasModel().activeView instanceof CanvasComplexView), Debugger.GEN, "iconDrop", "ToolkitController");
 		
 		var optionalOnCanvas:Array  = (cv.getCanvasModel().activeView instanceof CanvasComplexView) ? [cv.model.activeView.openActivity] : cv.getCanvasModel().findOptionalActivities();
+		var referenceOnCanvas:CanvasReferenceActivity = cv.getCanvasModel().getReferenceActivityOnCanvas();
 		
 		//SEE IF ITS HIT the canvas
 		var isCanvasDrop:Boolean = cv.getCanvasModel().activeView.content.hitTest(dragIcon_mc);
-		
 		Debugger.log('isCanvasDrop:'+isCanvasDrop,Debugger.GEN,'iconDrop','ToolkitController');
 		
+		// testing if dropped on a reference activity container
+		if ((referenceOnCanvas != null) && (cv.getCanvasModel().activeView instanceof CanvasView)){
+			
+			var referenceX:Number = referenceOnCanvas.activity.xCoord;
+			var referenceY:Number = referenceOnCanvas.activity.yCoord;
+			
+			var referenceWidth:Number = referenceOnCanvas._width;
+			var referenceHeight:Number = referenceOnCanvas._height;
+			
+			if(iconMouseX >= referenceX && iconMouseX <= (referenceX + referenceWidth)){
+				if(iconMouseY >= referenceY && iconMouseY <= (referenceY + referenceHeight)){
+					isCanvasDrop = false;
+					var ta:TemplateActivity = _toolkitModel.getSelectedTemplateActivity();
+
+					cv.setDroppedTemplateActivity(ta, referenceOnCanvas.activity.activityUIID);
+				}
+			}
+		}
+		
+		// testing if dropped on each of the optional activity containers
 		for(var i=0; i<optionalOnCanvas.length; i++){
 			
 			var optionalX:Number = (cv.getCanvasModel().activeView instanceof CanvasComplexView) ?  optionalOnCanvas[i]._x : optionalOnCanvas[i].activity.xCoord;

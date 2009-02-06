@@ -355,9 +355,20 @@ class Canvas extends CanvasHelper {
 			
 			case(Activity.TOOL_ACTIVITY_TYPE):
 				actType = "Tool"
-				 actToAdd = ToolActivity(actToCopy.clone());
+				actToAdd = ToolActivity(actToCopy.clone());
 				actToAdd.activityUIID = _ddm.newUIID();
-			break;
+				
+				if (taParent != undefined || taParent != null){
+					var parentAct:Activity = canvasModel.getCanvas().ddm.getActivityByUIID(taParent);
+					var maxActs:Number = 6;
+					if (canvasModel.getCanvas().ddm.getComplexActivityChildren(taParent).length >= maxActs) {
+						//LFMessage.showMessageAlert("Cannot drop activity: "+actToAdd.title+" here. The reference activity permits a maximum of "+maxActs+" child activities.", null);
+						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_max_children_reached", [actToAdd.title], [maxActs]), null);
+						return;
+					}
+				}
+				break;
+
 			case(Activity.OPTIONAL_ACTIVITY_TYPE):
 				actToAdd = Activity(actToCopy.clone());
 				actToAdd.activityUIID = _ddm.newUIID();
@@ -391,7 +402,7 @@ class Canvas extends CanvasHelper {
 					var passChildToolID = ta.childActivities[i].toolID;
 					
 					Application.getInstance().getComms().getRequest('authoring/author.do?method=getToolContentID&toolID='+passChildToolID,callback, false);
-			}				 
+			}
 			break;
 			
 			
@@ -673,6 +684,15 @@ class Canvas extends CanvasHelper {
 		}
 	}
 	
+	public function toggleReferenceTool():Void{
+		var c:String = Cursor.getCurrentCursor();
+		if(c==ApplicationParent.C_REFERENCE){
+			stopReferenceTool();
+		}else{
+			startReferenceTool();
+		}
+	}
+	
 	public function toggleGateTool():Void{
 		var c:String = Cursor.getCurrentCursor();
 		if(c==ApplicationParent.C_GATE){
@@ -764,6 +784,19 @@ class Canvas extends CanvasHelper {
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
 		canvasModel.activeTool = "none";
 	}
+	
+	public function startReferenceTool(){
+		Debugger.log('Starting Reference Tool',Debugger.GEN,'startReferenceTool','Canvas');
+		Cursor.showCursor(ApplicationParent.C_OPTIONAL);
+		canvasModel.activeTool = CanvasModel.REFERENCE_TOOL;
+	}
+	
+	public function stopReferenceTool(){
+		Debugger.log('Stopping Reference Tool',Debugger.GEN,'stopReferenceTool','Canvas');
+		Cursor.showCursor(ApplicationParent.C_DEFAULT);
+		canvasModel.activeTool = "none";
+	}
+	
 	public function startGroupTool(){
 		Debugger.log('Starting group tool',Debugger.GEN,'startGateTool','Canvas');
 		Cursor.showCursor(ApplicationParent.C_GROUP);
@@ -857,18 +890,19 @@ class Canvas extends CanvasHelper {
 	/**
 	* Method to open Import popup window
 	*/
-	public function launchImportWindow():Void{
+	public function launchImportWindow(method:String):Void{
 		Debugger.log('Launching Import Window',Debugger.GEN,'launchImportWindow','Canvas');
 		if(_ddm.modified){
 			LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doImportLaunch), null);
 		} else {
-			doImportLaunch();
+			doImportLaunch(method);
 		}
 	}
 	
-	public function doImportLaunch():Void{
+	public function doImportLaunch(method:String):Void{
 		var serverUrl = Config.getInstance().serverUrl;
-		var importActionUrl:String = appendCustomCSVIfExists(serverUrl+'authoring/importToolContent.do?method=import');
+		if (method == null) method = "import";
+		var importActionUrl:String = appendCustomCSVIfExists(serverUrl+'authoring/importToolContent.do?method='+method);
 		JsPopup.getInstance().launchPopupWindow(importActionUrl, 'Import', 298, 800, true, true, false, false, false);
 	}
 	

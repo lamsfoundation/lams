@@ -26,6 +26,7 @@ import org.lamsfoundation.lams.learner.*;
 import org.lamsfoundation.lams.learner.ls.*;
 import org.lamsfoundation.lams.common.util.*;
 import org.lamsfoundation.lams.common.Progress;
+import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.SequenceActivity;
@@ -43,6 +44,7 @@ class LessonModel extends Observable {
 	private var __y:Number;
 	private var _spadHeight:Number;
 	private var _presenceHeight:Number;
+	private var _referenceHeight:Number;
 	private var _isDirty:Boolean;
 	private var infoObj:Object;
 	
@@ -140,6 +142,16 @@ class LessonModel extends Observable {
 	public function getPresenceHeight(){
 		return _presenceHeight;
 	}
+	
+	public function setReferenceHeight(h:Number){
+		_referenceHeight = h
+		Application.getInstance().onResize();
+	}
+	
+	public function getReferenceHeight(){
+		return _referenceHeight;
+	}
+	
 	/**
 	 * Set Lesson's unique ID
 	 * 
@@ -536,14 +548,22 @@ class LessonModel extends Observable {
 		ddmTransition_keys = learningDesignModel.transitions.keys();
 		
 		var orderedActivityArr:Array = new Array();
+		var orderedReferenceActArr:Array = new Array();
 		var trIndexArray:Array;
 		var dataObj:Object;
 		var ddmfirstActivity_key:Number = learningDesignModel.firstActivityID;
 		var learnerFirstActivity:Activity = learningDesignModel.activities.get(ddmfirstActivity_key);
-
+		var referenceActivity:ComplexActivity = learningDesignModel.getReferenceActivity();
+		
 		// recursive method to order design
 		_eventsDisabled = false;
 		orderDesign(learnerFirstActivity, orderedActivityArr);
+		
+		if (referenceActivity != null)
+			orderDesign(referenceActivity, orderedReferenceActArr); // order the reference activities
+			
+		for (var i=0; i<orderedReferenceActArr.length; i++)
+			orderedActivityArr.push(orderedReferenceActArr[i]);
 		
 		return orderedActivityArr;
 		

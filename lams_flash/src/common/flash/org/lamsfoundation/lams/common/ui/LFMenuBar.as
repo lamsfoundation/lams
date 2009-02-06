@@ -141,6 +141,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			file_menu.addMenuItem({type:"separator"});
 			
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_import'), instanceName:"importItem"});
+			file_menu.addMenuItem({label:"Import from community", instanceName:"importFromCommunity"});
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_export'), instanceName:"exportItem", enabled:false});
 			
 			file_menu.addMenuItem({type:"separator"});
@@ -293,10 +294,17 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 				Debugger.log('Clicked File > Insert...',Debugger.GEN,'fileMenuClicked','LFMenuBar');
                 org.lamsfoundation.lams.authoring.Application(app).getCanvas().openDesignBySelection(Workspace.MODE_INSERT);
 				break;
+				
 			case eventObj.menu.importItem:
 				Debugger.log('Clicked File > Import',Debugger.GEN,'fileMenuClicked','LFMenuBar');
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().launchImportWindow();
 				break;
+				
+			case eventObj.menu.importFromCommunity:
+				Debugger.log('Clicked File > Import from Community ...',Debugger.GEN,'fileMenuClicked','LFMenuBar');
+                org.lamsfoundation.lams.authoring.Application(app).getCanvas().launchImportWindow("importLC");
+				break;
+				
 			case eventObj.menu.exportItem:
 				Debugger.log('Clicked File > Export',Debugger.GEN,'fileMenuClicked','LFMenuBar');
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().launchExportWindow();

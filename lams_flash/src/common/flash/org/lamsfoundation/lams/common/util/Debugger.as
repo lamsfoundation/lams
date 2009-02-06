@@ -29,7 +29,7 @@ import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.common.ApplicationParent
 import mx.events.*/**  
 * Debug  
-* Can be used to print message to a floating windoe and to trace windoe.  SHoudl be used over trace().  
+* Can be used to print message to a floating window and to trace window.  Should be used over trace().  
 * Usage:
 * import org.lamsfoundation.lams.common.util.Debug;
 * 

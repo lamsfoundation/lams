@@ -268,7 +268,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		Debugger.log("Locking all Complex Activities", Debugger.GEN, "lockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || k[i].activity.activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE){
 				k[i].locked = true;
 			}
 		}
@@ -278,7 +278,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		Debugger.log("Unlocking all Complex Activities", Debugger.GEN, "unlockAllComplexActivities", "CanvasModel");
 		var k:Array = _activitiesDisplayed.values();
 		for (var i=0; i<k.length; i++){
-			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
+			if (k[i].activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || k[i].activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || k[i].activity.activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE){
 				k[i].locked = (k[i].activity.readOnly) ? true : false;
 			}
 		}
@@ -423,7 +423,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 	 */
 	private function refreshDesign(){
 	
-		Debugger.log('Running',Debugger.GEN,'refreshDesign','CanvasModel');
+		Debugger.log('refreshDesign invoked',Debugger.GEN,'refreshDesign','CanvasModel');
 		var evtsTable:Hashtable = new Hashtable("evtsTable");
 		
 		if(activeRefresh) {
@@ -860,6 +860,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 			
 		}
 		return actParent;
+	}
+	
+	public function getReferenceActivityOnCanvas():CanvasReferenceActivity {
+		var k:Array = _activitiesDisplayed.values();
+		for (var i=0; i<k.length; i++){
+			if (k[i].activity.activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE) {
+				return k[i];
+			}
+		}
+		return null;
 	}
 	
 	public function get currentBranchingActivity():Object {

@@ -92,7 +92,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var SYNCH_GATE_ACTIVITY_TYPE:Number = 3;
 	public static var SCHEDULE_GATE_ACTIVITY_TYPE:Number = 4;
 	public static var PERMISSION_GATE_ACTIVITY_TYPE:Number = 5;
-	public static var CONDITION_GATE_ACTIVITY_TYPE:Number = 14;
 	public static var PARALLEL_ACTIVITY_TYPE:Number = 6;
 	public static var OPTIONAL_ACTIVITY_TYPE:Number = 7;
 	public static var SEQUENCE_ACTIVITY_TYPE:Number = 8;
@@ -100,7 +99,9 @@ class org.lamsfoundation.lams.authoring.Activity {
 	public static var CHOSEN_BRANCHING_ACTIVITY_TYPE:Number = 10;
 	public static var GROUP_BRANCHING_ACTIVITY_TYPE:Number = 11;
 	public static var TOOL_BRANCHING_ACTIVITY_TYPE:Number = 12;
-	public static var OPTIONS_WITH_SEQUENCES_TYPE:Number = 13; 
+	public static var OPTIONS_WITH_SEQUENCES_TYPE:Number = 13;
+	public static var CONDITION_GATE_ACTIVITY_TYPE:Number = 14;
+	public static var REFERENCE_ACTIVITY_TYPE:Number = 15;
 
 	/******************************************************************/
 	
@@ -196,7 +197,6 @@ class org.lamsfoundation.lams.authoring.Activity {
 		_readOnly = false;
 		_createDateTime = new Date();
 		_branchView = null;
-		
 	}
 	
 	//static class level methods
@@ -265,6 +265,10 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	public function isOptionalSequenceActivity(parent:Activity):Boolean {
 		return (this.isSequenceActivity() && parent.isOptionsWithSequencesActivity());
+	}
+	
+	public function isReferenceActivity():Boolean {
+		return (_activityTypeID == REFERENCE_ACTIVITY_TYPE);
 	}
 	
 	public function isParallelActivity():Boolean{

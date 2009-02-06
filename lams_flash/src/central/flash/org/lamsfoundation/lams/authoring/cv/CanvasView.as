@@ -314,6 +314,11 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 			
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
+		else if(a.activityTypeID==Activity.REFERENCE_ACTIVITY_TYPE) {
+			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
+			var newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasReferenceActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv,_locked:a.isReadOnly()});
+			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
+		} 
 		else if(a.isBranchingActivity()){	
 			var newActivity_mc = activityLayer.createChildAtDepth("CanvasBranchingActivity",DepthManager.kTop,{_activity:a,_canvasController:cvc,_canvasView:cvv, setupBranchView: setupBranchView,  showDiagram: true});
 			cm.activitiesDisplayed.put(a.activityUIID, newActivity_mc);

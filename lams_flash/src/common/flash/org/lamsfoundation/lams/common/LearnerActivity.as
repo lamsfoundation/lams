@@ -105,6 +105,7 @@ class LearnerActivity extends MovieClip {
 	private var _visibleHeight:Number;
 	private var _base_mc:MovieClip;
 	private var _selected_mc:MovieClip;
+	private var vertHairLineMC:MovieClip;
 	
 	private var _line_bottom:MovieClip;
 	private var _line_top:MovieClip;
@@ -112,6 +113,8 @@ class LearnerActivity extends MovieClip {
 	// Identifies if the activity is a child of a complex activity and therefore nested inside a LCA and the level it is nested at.
 	private var _complex:Boolean;
 	private var _level:Number;
+	
+	private var _isReferenceChild:Boolean;
 	
 	/* Constructor */
 	function LearnerActivity(){
@@ -160,7 +163,18 @@ class LearnerActivity extends MovieClip {
 			learner = initObj.learner;
 		}
 		
-		if(_complex){
+		_isReferenceChild = false;
+		
+		if (model instanceof LessonModel) {
+			var parAct = model.getLearningDesignModel().getActivityByUIID(_activity.parentUIID);
+			if (parAct.activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE)
+				_isReferenceChild = true;
+		}
+		
+		if (_isReferenceChild) {
+			LABEL_X = 80;
+			LABEL_Y = -8;
+		} else if(_complex){
 			_autosize = "left";
 			LABEL_X = 18;
 			LABEL_Y = 2;
@@ -233,7 +247,12 @@ class LearnerActivity extends MovieClip {
 		
 		switch (actStatus){
 		    case 'completed_mc' :
-				completed_mc._visible = true;
+				if (_isReferenceChild && app.module == 'learner') {
+					attempted_mc._visible = true;
+				}else{
+					// normal case
+					completed_mc._visible = true;
+				}
 		        break;
             case 'current_mc' :
 				current_mc._visible = true;
@@ -250,6 +269,10 @@ class LearnerActivity extends MovieClip {
 			toolTitle = _activity.title;
 		}else {
 			toolTitle = actLabel;
+		}
+		
+		if (_isReferenceChild) {
+			vertHairLineMC._visible = false;
 		}
 		
 		Debugger.log("parent level: " + _parent._parent.level, Debugger.CRITICAL, "draw", "LearnerActivity");
@@ -286,9 +309,24 @@ class LearnerActivity extends MovieClip {
 	public function showToolTip(btnObj, ttMessage:String):Void{
 		Debugger.log("showToolTip invoked", Debugger.CRITICAL, "showToolTip", "LearnerActivity");
 		var appData = getAppData();
-		if(_complex){
+		var ttHolder = appData.ttHolder;
+		
+		if (ttMessage == undefined || ttMessage == null || ttMessage == "" || ttMessage == "undefined"){
+			ttMessage = "<b>"+ _activity.title+"</b>";
+		} else {
+			ttMessage = "<b>"+ _activity.title+"</b>\n" + ttMessage;
+		}
+		
+		var ttWidth = 140;
+		
+		if (isReferenceChild) {
+			var ttXpos = 10;
+			var ttYpos = _root._ymouse - 43;
+			
+		} else if(_complex){
 			var ttXpos = appData.compX + xPos;
 			var ttYpos = appData.compY + yPos;
+			
 		} else {
 			if(app.module == 'learner'){
 				var ttXpos = appData.compX + this._x-10;
@@ -299,25 +337,22 @@ class LearnerActivity extends MovieClip {
 			var ttYpos = appData.compY + this._y+targetHeightOffset;
 		}
 		
-		var ttHolder = appData.ttHolder;
-		Debugger.log("ttHolder: "+ttHolder, Debugger.CRITICAL, "showToolTip", "LearnerActivity");
+		if (isReferenceChild)
+			ttHolder.swapDepths( (this._parent.getDepth()+1) ); // tooltips were showing below depth of this._parent, the reference pain
 		
-		if (ttMessage == undefined || ttMessage == null || ttMessage == "" || ttMessage == "undefined"){
-			ttMessage = "<b>"+ _activity.title+"</b>";
-		} else {
-			ttMessage = "<b>"+ _activity.title+"</b>\n" + ttMessage;
-		}
-		
-		var ttWidth = 140;
 		_tip.DisplayToolTip(ttHolder, ttMessage, ttXpos, ttYpos, undefined, ttWidth);
 		
+	}
+	
+	// Returns true if the parent activity is a Reference Activity
+	public function get isReferenceChild():Boolean {
+		return _isReferenceChild;
 	}
 	
 	/**
 	 * Hide the tooltip.
 	 *
 	 */
-	
 	public function hideToolTip():Void{
 		_tip.CloseToolTip();
 	}
@@ -328,6 +363,13 @@ class LearnerActivity extends MovieClip {
 	 */
 	
 	private function onRollOver(){
+		
+		// handle reference activities
+		if (isReferenceChild) {
+			showToolTip(this.clickTarget_mc, Dictionary.getValue("support_act_tooltip"));
+			return;
+		}
+		
 		if (actStatus == "completed_mc"){
 			showToolTip(this.clickTarget_mc, Dictionary.getValue("completed_act_tooltip"));
 			
@@ -480,6 +522,10 @@ class LearnerActivity extends MovieClip {
 		Debugger.log('ReleasingOutside:'+this,Debugger.GEN,'onReleaseOutside','LearnerActivity');
 		
 		controller.activityReleaseOutside(this);
+	}
+	
+	public function get progressData():Progress {
+		return learner;
 	}
 	
 	public function set progressData(a:Progress){

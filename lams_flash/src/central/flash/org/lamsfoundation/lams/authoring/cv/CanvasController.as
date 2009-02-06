@@ -171,10 +171,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 		
 		var optionalOnCanvas:Array  = _canvasModel.findOptionalActivities();
 		var parallelOnCanvas:Array  = _canvasModel.findParallelActivities();
-		
-		Debugger.log("optional on canvas: " + optionalOnCanvas.length, Debugger.CRITICAL, "activityRelease", "CanvasController");
-		
-		
+		var referenceOnCanvas:CanvasReferenceActivity = _canvasModel.getReferenceActivityOnCanvas();
+
 	    if(_canvasModel.isDragging) {
 			ca.stopDrag();
 			
@@ -190,16 +188,45 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			var iconMouseX = _canvasModel.activeView.content._xmouse;
 			var iconMouseY = _canvasModel.activeView.content._ymouse;
 			
-			if (ca.activity.parentUIID != null && 
+			// if the reference activity was dragged somewhere
+			if (referenceOnCanvas.activity.activityUIID != null &&
+				ca.activity.activityUIID == referenceOnCanvas.activity.activityUIID) {
+				var canvasActs:Array = _canvasModel.activitiesDisplayed.values();
+				for (var i=0; i<canvasActs.length; i++) {
+					if (referenceOnCanvas.hitTest(canvasActs[i]) && canvasActs[i].activity.activityTypeID != Activity.REFERENCE_ACTIVITY_TYPE) {
+						
+						//LFMessage.showMessageAlert("Cannot drop a reference activity inside another activity", Debugger.GEN, "activityRelease", "CanvasController");
+						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_cannot_be_child"), null);
+						activitySnapBack(ca);
+					}
+				}
+			}
+			else if (ca.activity.parentUIID != null &&
+				ca.activity.parentUIID == referenceOnCanvas.activity.activityUIID) {
+				if ( (ca._x > referenceOnCanvas.panelWidth) ||
+					 (ca._x < -129) ||
+					 (ca._y < -55) ||
+					 (ca._y > 121) ) {
+					
+					//give it the new co-ords and 'drop' it
+					ca.activity.xCoord = iconMouseX - (_canvasModel.getCanvas().taWidth/2);
+					ca.activity.yCoord = iconMouseY - (_canvasModel.getCanvas().taHeight/2);
+					
+					_canvasModel.removeOptionalCA(ca, referenceOnCanvas.activity.activityUIID);
+				} else {
+					activitySnapBack(ca);
+				}
+			} else if (ca.activity.parentUIID != null && 
 				sequenceActivity.activityTypeID != Activity.SEQUENCE_ACTIVITY_TYPE && 
 				ca.activity.activityUIID != _canvasModel.currentBranchingActivity.activity.activityUIID){
 				
+				// activity is taken output of an optional activity container
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					if (ca.activity.parentUIID == optionalOnCanvas[i].activity.activityUIID){
 						if (optionalOnCanvas[i].locked == false){
-							if (ca._x > 142 || 
-								ca._x < -129 || 
-								ca._y < -55 || 
+							if (ca._x > 142 ||  // optional activity width
+								ca._x < -129 || // toolactivity width
+								ca._y < -55 ||  // toolactivity height
 								ca._y > optionalOnCanvas[i].panelHeight) {
 								
 								//give it the new co-ords and 'drop' it
@@ -242,14 +269,40 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 									activitySnapBack(ca);
 								}
 							}
-						
 						}
+					}
+				} // Following is validation for non-tool activities being dropped into the reference activity container which we don't want.
+			} else if (referenceOnCanvas != null && 
+				ca.hitTest(referenceOnCanvas) && 
+				(ca.activity.activityUIID != referenceOnCanvas.activity.activityUIID)) {
+				
+				if ( !(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) ) {
+					activitySnapBack(ca);
+					//var msg:String = "Activities of this type cannot be added as a support activity";
+					var msg:String = Dictionary.getValue("support_msg_invalid_child", [ca.activity.objectType]);
+					LFMessage.showMessageAlert(msg);
+
+				} else if (_canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID).hasTrans){
+					activitySnapBack(ca);
+					var msg:String = Dictionary.getValue('cv_invalid_optional_activity', [ca.activity.title]);
+					LFMessage.showMessageAlert(msg);
+					
+				} else {
+					//TODO: (maybe) if activity not already added
+					var numChildrenActs:Number = _canvasModel.getCanvas().ddm.getComplexActivityChildren(referenceOnCanvas.activity.activityUIID).length;
+					
+					if (numChildrenActs < 6) {
+						_canvasModel.addParentToActivity(referenceOnCanvas.activity.activityUIID, ca, false);
+						var newChildren:Array = _canvasModel.getCanvas().ddm.getComplexActivityChildren(referenceOnCanvas.activity.activityUIID); // caters for parrallel acts
+						referenceOnCanvas.updateChildren(newChildren);
+					} else {
+						//LFMessage.showMessageAlert("Cannot drop activity: "+ca.activity.title+" here. The reference activity permits a maximum of "+numChildrenActs+" child activities.", null);
+						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_max_children_reached", [ca.activity.title], [6]), null);
+						activitySnapBack(ca);
 					}
 				}
 				
-			} else {
-				Debugger.log("normal optional case", Debugger.CRITICAL, "activityRelease", "CanvasController");
-						
+			} else {				
 				//if we are on the optional Activity remove this activity from canvas and assign it a parentID of optional activity and place it in the optional activity window.
 				for (var i=0; i<optionalOnCanvas.length; i++){
 					if(ca.activity.activityUIID != optionalOnCanvas[i].activity.activityUIID ){
@@ -347,7 +400,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			
 			//get a view if ther is not one
 			if(!_canvasView)
-				_canvasView =  CanvasView(getView());
+				_canvasView = CanvasView(getView());
 			
 			// restricting (x, y) position to positive plane only
 			Debugger.log("ca x: " + ca._x, Debugger.CRITICAL, "activityRelease", "CanvasController");
@@ -537,6 +590,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					Debugger.log('activityDoubleClick CanvasBranchActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
 	   
 					_canvasModel.openBranchActivityContent(ca, true);
+					Application.getInstance().getToolbar().setButtonState("reference_btn", false, false);
 					
 					// invalidate design after opening tool content window
 					_canvasModel.getCanvas().ddm.validDesign = false;
@@ -677,12 +731,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			} else {
 			
 				if(!isActivityReadOnly(ca, Dictionary.getValue("cv_element_readOnly_action_del")) && !ca.branchConnector && !isActivityProtected(ca)) {
-					if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.isBranchingActivity()){
+					if (ca.activity.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || ca.activity.isBranchingActivity() || ca.activity.isReferenceActivity()){
 						Debugger.log("removing complex act that hit bin" , Debugger.CRITICAL, "isActivityOnBin", "CanvasController");
 						if(ca.activity.isBranchingActivity())
 							_canvasModel.getCanvas().ddm.removeEntries(_canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(ca.activity.activityUIID).all);
 						
-						_canvasModel.removeComplexActivity(ca);
+						if (ca.activity.isReferenceActivity()) {
+							Application.getInstance().getToolbar().setButtonState("reference_btn", true, false);
+						}
+
+						_canvasModel.removeComplexActivity(ca);	
 					} else {
 						_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
 					}
@@ -847,8 +905,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
 		
 	/**
-	* Clled when we get a click on the canvas, if its in craete gate mode then create a gate
-	* 
+	 * Called when we get a click on the canvas, if its in create gate mode then create a gate
+	 * 
 	 * public static var SYNCH_GATE_ACTIVITY_TYPE:Number = 3;
 	 * public static var SCHEDULE_GATE_ACTIVITY_TYPE:Number = 4;
 	 * public static var PERMISSION_GATE_ACTIVITY_TYPE:Number = 5;
@@ -892,6 +950,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			_canvasModel.getCanvas().stopOptionalActivity();
 		}
 		
+		if (_canvasModel.activeTool == CanvasModel.REFERENCE_TOOL){
+			var p = new Point(_canvasModel.activeView.content._xmouse-(complexActWidth/2), _canvasModel.activeView.content._ymouse); 
+			_canvasModel.createNewReferenceActivity(Activity.REFERENCE_ACTIVITY_TYPE,p);
+			_canvasModel.getCanvas().stopReferenceTool();
+		}
+		
 		if(_canvasModel.activeTool == CanvasModel.GROUP_TOOL){
 			var p = new Point(_canvasModel.activeView.content._xmouse-(toolActWidth/2), _canvasModel.activeView.content._ymouse-(toolActHeight/2)); 
 			_canvasModel.createNewGroupActivity(p,parent);
@@ -910,22 +974,25 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	}
 	
 	private function createValidTransitionTarget(transitionTargetObj:Object, isInitTarget:Boolean):Object{
-			var targetCA:Object;
-			Debugger.log("My transitionTargetObj is :"+transitionTargetObj.activity.activityUIID, Debugger.GEN,'createValidTransitionTarget','CanvasController');
-			//see what we can cast to
-			if(CanvasActivity(transitionTargetObj)!=null){
-				Debugger.log("Casting to CanvasActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
-				targetCA = CanvasActivity(transitionTargetObj);
-				return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
-			}else if(CanvasParallelActivity(transitionTargetObj)!=null){
-				Debugger.log("Casting to CanvasParallelActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
-				targetCA = CanvasParallelActivity(transitionTargetObj);
-				return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
-			}else if(CanvasOptionalActivity(transitionTargetObj)!=null){
-				Debugger.log("Casting to CanvasOptionalActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
-				targetCA = CanvasOptionalActivity(transitionTargetObj);
-				return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
-			}
+		var targetCA:Object;
+		Debugger.log("My transitionTargetObj is :"+transitionTargetObj.activity.activityUIID, Debugger.GEN,'createValidTransitionTarget','CanvasController');
+		
+		if(CanvasActivity(transitionTargetObj)!=null){
+			Debugger.log("Casting to CanvasActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
+			targetCA = CanvasActivity(transitionTargetObj);
+			return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
+		}else if(CanvasParallelActivity(transitionTargetObj)!=null){
+			Debugger.log("Casting to CanvasParallelActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
+			targetCA = CanvasParallelActivity(transitionTargetObj);
+			return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
+		}else if(CanvasOptionalActivity(transitionTargetObj)!=null){
+			Debugger.log("Casting to CanvasOptionalActivity", Debugger.GEN,'createValidTransitionTarget','CanvasController');
+			targetCA = CanvasOptionalActivity(transitionTargetObj);
+			return (isValidTransitionTarget(targetCA) || isInitTarget) ? targetCA : new LFError();
+		}else if(CanvasReferenceActivity(transitionTargetObj)!=null){
+			//return new LFError("Support activities cannot be connected to any other activity"); // connection not allowed to reference activities
+			return new LFError(Dictionary.getValue("support_msg_no_connection")); // connection not allowed to reference activities
+		}
 	}
 	
 	private function isValidTransitionTarget(target:Object):Boolean {

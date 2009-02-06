@@ -80,8 +80,9 @@ class ToolbarModel extends Observable {
 			buttonArr[9] 	= ["preview_btn", "icon_preview", "preview_btn_click_target"];
 			buttonArr[10] 	= ["optional_act_btn", "icon_optional"];
 			buttonArr[11] 	= ["optional_seq_btn", "icon_optional"];
-			buttonArr[12] 	= ["gate_btn", "icon_gate"];
-			buttonArr[13] 	= ["branch_btn", "icon_branch"];
+			buttonArr[12]	= ["reference_btn", "icon_optional"];
+			buttonArr[13] 	= ["gate_btn", "icon_gate"];
+			buttonArr[14] 	= ["branch_btn", "icon_branch"];
 			
 		} else {
 			buttonArr[0] 	= ["apply_changes_btn", "icon_saveDesign"];
@@ -95,8 +96,9 @@ class ToolbarModel extends Observable {
 			buttonArr[8] 	= ["group_btn", "icon_group"];
 			buttonArr[9] 	= ["optional_act_btn", "icon_optional"];
 			buttonArr[10] 	= ["optional_seq_btn", "icon_optional"];
-			buttonArr[11] 	= ["gate_btn", "icon_gate"];
-			buttonArr[12] 	= ["branch_btn", "icon_branch"];
+			buttonArr[11]	= ["reference_btn", "icon_optional"];
+			buttonArr[12] 	= ["gate_btn", "icon_gate"];
+			buttonArr[13] 	= ["branch_btn", "icon_branch"];
 		
 		}
 		

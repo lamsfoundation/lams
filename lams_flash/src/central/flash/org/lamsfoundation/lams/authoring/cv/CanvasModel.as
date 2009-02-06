@@ -42,6 +42,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	public static var GATE_TOOL:String = "GATE";
 	public static var GROUP_TOOL:String = "GROUP";
 	public static var BRANCH_TOOL:String = "BRANCH";
+	public static var REFERENCE_TOOL:String = "REFERENCE";
 	
 	public static var OPEN_FROM_FILE:Number = 0;
 	public static var ADD_FROM_TEMPLATE:Number = 1;
@@ -258,7 +259,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	}
 	
 	/**
-	 * Creates a new gate activity at the specified location
+	 * Creates a new optional activity at the specified location
 	 * @usage   
 	 * @param   gateTypeID 
 	 * @param   pos        
@@ -292,6 +293,30 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		
 		setDirty();
 		setSelectedItem(_activitiesDisplayed.get(optAct.activityUIID));
+		
+	}
+	
+	public function createNewReferenceActivity(ActivityTypeID, pos:Point){
+
+		var referenceAct = new ComplexActivity(_cv.ddm.newUIID());
+		
+		referenceAct.learningDesignID = _cv.ddm.learningDesignID;
+		referenceAct.activityTypeID = Activity.REFERENCE_ACTIVITY_TYPE;
+		referenceAct.title = Dictionary.getValue("support_act_title");
+		
+		referenceAct.groupingSupportType = Activity.GROUPING_SUPPORT_NONE;
+		referenceAct.activityCategoryID = Activity.CATEGORY_SYSTEM;
+		referenceAct.yCoord = pos.y;
+		referenceAct.xCoord = pos.x;
+
+		_cv.ddm.addActivity(referenceAct);
+		//_cv.ddm.referenceActivityUIID = referenceAct.activityUIID;
+		
+		// disable the reference activity button
+		Application.getInstance().getToolbar().setButtonState("reference_btn", false, false);
+		
+		setDirty();
+		setSelectedItem(_activitiesDisplayed.get(referenceAct.activityUIID));
 		
 	}
 	
@@ -504,7 +529,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 	public function addActivityToConnection(ca:Object):Object{
 		var activity:Activity;
 		//check we have not added too many
-		if(ca instanceof CanvasActivity || ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity){
+		if(ca instanceof CanvasActivity || ca instanceof CanvasParallelActivity || ca instanceof CanvasOptionalActivity || ca instanceof CanvasReferenceActivity){
 			activity = ca.activity;
 		} else if(ca instanceof Activity){
 			activity = Activity(ca);

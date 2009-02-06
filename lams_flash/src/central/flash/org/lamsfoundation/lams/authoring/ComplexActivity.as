@@ -42,6 +42,11 @@ class ComplexActivity extends Activity {
 	
 	private var _maxOptions:Number;
 	private var _minOptions:Number;
+	
+	//For Reference Activities
+	private var _minActivities:Number;
+	private var _maxActivities:Number;
+	
 	private var _optionsInstructions:String;
 	
 	private var _firstActivityUIID:Number;
@@ -66,6 +71,9 @@ class ComplexActivity extends Activity {
 			_minOptions = dto.minOptions;
 			//TODO: This is missing in the Library packet - tell mai.
 			_optionsInstructions = dto.optionsInstructions;
+		} else if (_activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE) {
+			_maxActivities = dto.maxActivities;
+			_minActivities = dto.minActivities;
 		}
 		
 		if(StringUtils.isWDDXNull(dto.defaultActivityUIID)) _firstActivityUIID = null;
@@ -82,9 +90,14 @@ class ComplexActivity extends Activity {
 	public function toData():Object{
 		var dto:Object = super.toData();
 		if(_activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || _activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
-			if(_maxOptions){	dto.maxOptions = _maxOptions;		}
-			if(_minOptions){	dto.minOptions = _minOptions;		}
-			if(_optionsInstructions){	dto.optionsInstructions = _optionsInstructions;		}
+			if(_maxOptions) { dto.maxOptions = _maxOptions;	}
+			if(_minOptions) { dto.minOptions = _minOptions; }
+			if(_optionsInstructions) { dto.optionsInstructions = _optionsInstructions; }
+		}
+		
+		if (_activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE) {
+			if(_minActivities) { dto.minActivities = _minActivities; }
+			dto.maxActivities = 6; // hard coded for now
 		}
 		
 		dto.defaultActivityUIID = (_firstActivityUIID == null) ? Config.NUMERIC_NULL_VALUE : _firstActivityUIID;
@@ -141,7 +154,43 @@ class ComplexActivity extends Activity {
 	public function get minOptions ():Number {
 		return _minOptions;
 	}
+	
+	/**
+	 * Used by REFERENCE_ACTIVITY_TYPE
+	 * @usage   
+	 * @param   newmaxActivities 
+	 * @return  
+	 */
+	public function set maxActivities (newmaxActivities:Number):Void {
+		_maxActivities = newmaxActivities;
+	}
+	/**
+	 * used by REFERENCE_ACTIVITY_TYPE
+	 * @usage   
+	 * @return  
+	 */
+	public function get maxActivities ():Number {
+		return _maxActivities;
+	}
 
+	
+	/**
+	 * used by REFERENCE_ACTIVITY_TYPE
+	 * @usage   
+	 * @param   newminActivities 
+	 * @return  
+	 */
+	public function set minActivities (newminActivities:Number):Void {
+		_minActivities = newminActivities;
+	}
+	/**
+	 * used by REFERENCE_ACTIVITY_TYPE
+	 * @usage   
+	 * @return  
+	 */
+	public function get minActivities ():Number {
+		return _minActivities;
+	}
 	
 	/**
 	 * 

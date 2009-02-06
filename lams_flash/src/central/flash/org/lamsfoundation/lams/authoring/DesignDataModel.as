@@ -75,6 +75,8 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	private var _maxID:Number;
 	private var _firstActivityID:Number;
 	private var _firstActivityUIID:Number;
+	private var _referenceActivityID:Number;
+	private var _referenceActivityUIID:Number;
 	
 	//James has asked for previous and next fields so I can build up a sequence map of LDs when browsing workspaces...
 	private var _parentLearningDesignID:Number;
@@ -165,6 +167,9 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		if(tmp){
 			Debugger.log('Succesfully added:'+tmp.title+':'+tmp.activityUIID,4,'addActivity','DesignDataModel');
+			if (tmp.activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE) {
+				referenceActivityUIID = tmp.activityUIID;
+			}
 		}else{
 			return new LFError("Adding activity failed","addActivity",this,'activityUIID:'+activity.activityUIID);
 		}
@@ -507,7 +512,10 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 				
 				_activities.put(newGateActivity.activityUIID,newGateActivity);
 			
-			} else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || dto.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || dto.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
+			} else if(dto.activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || 
+				dto.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE || 
+				dto.activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE || 
+				dto.activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE){
 				
 				var cAct:ComplexActivity= new ComplexActivity(dto.activityUIID);
 				cAct.populateFromDTO(dto);				
@@ -794,6 +802,7 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		if(_maxID){				design.maxID			= _maxID;				}
 		if(_firstActivityID){	design.firstActivityID	= _firstActivityID;		}
 		if(_firstActivityUIID){	design.firstActivityUIID= _firstActivityID;		}
+		if(_referenceActivityID){ design.referenceActivityID= _referenceActivityID;		}
 		if(_parentLearningDesignID){design.parentLearningDesignID= _parentLearningDesignID; 	}
 		if(_licenseID){			design.licenseID		= _licenseID;			}
 		if(_licenseText){		design.licenseText		= _licenseText;			}
@@ -962,6 +971,16 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 		
 		Debugger.log('Returning '+gActs.length+' grouping activities',Debugger.GEN,'getGroupingActivities','DesignDataModel');
 		return gActs;
+	}
+	
+	public function getReferenceActivity():ComplexActivity {
+		var acts:Array = _activities.values();
+		for(var i=0; i<acts.length;i++){
+			if(acts[i].activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE){
+				return acts[i];
+			}
+		}
+		return null;
 	}
 	
 	public function getActivitiesByType(type:Number):Array{
@@ -1458,6 +1477,14 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	public function set firstActivityID(a:Number):Void{
 		_firstActivityID = a;
 	}
+	
+	public function get referenceActivityID():Number {
+		return _referenceActivityID;
+	}
+	
+	public function set referenceActivityID(a:Number) {
+		_referenceActivityID = a;
+	}
 
 	public function get activities():Hashtable{
 		return _activities;
@@ -1586,6 +1613,24 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 	
 	public function get modified():Boolean {
 		return _modified;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   newreferenceActivityUIID 
+	 * @return  
+	 */
+	public function set referenceActivityUIID (newreferenceActivityUIID:Number):Void {
+		_referenceActivityUIID = newreferenceActivityUIID;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get referenceActivityUIID ():Number {
+		return _referenceActivityUIID;
 	}
 	
 	/**

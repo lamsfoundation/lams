@@ -168,6 +168,8 @@ class org.lamsfoundation.lams.monitoring.Application extends ApplicationParent {
 		_root.preloader.setEndValue(100);
 		_root.preloader.start(DefaultLayoutManager.COMPONENT_NO);
 		
+		_root._quality = "HIGH";
+		
 		_customCursor_mc = _container_mc.createEmptyMovieClip('_customCursor_mc', CCURSOR_DEPTH);			
 		
 		//add the cursors:

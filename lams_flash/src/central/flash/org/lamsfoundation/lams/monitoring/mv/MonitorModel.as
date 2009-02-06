@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView;
 import org.lamsfoundation.lams.authoring.Activity;
 import org.lamsfoundation.lams.authoring.Branch;
 import org.lamsfoundation.lams.authoring.BranchingActivity;
+import org.lamsfoundation.lams.authoring.ComplexActivity;
 import org.lamsfoundation.lams.authoring.Transition
 import org.lamsfoundation.lams.authoring.GateActivity;
 import org.lamsfoundation.lams.authoring.DesignDataModel;
@@ -751,7 +752,7 @@ class MonitorModel extends Observable{
 	private function orderDesign(activity:Activity, order:Array, omitComplex:Boolean):Void{
 		order.push(activity);
 		
-		if(!omitComplex && (activity.isBranchingActivity() || activity.isSequenceActivity() || activity.isOptionalActivity() || activity.isOptionsWithSequencesActivity())) {
+		if(!omitComplex && (activity.isBranchingActivity() || activity.isSequenceActivity() || activity.isOptionalActivity() || activity.isOptionsWithSequencesActivity()) || activity.isReferenceActivity()) {
 			var children:Array = _activeSeq.getLearningDesignModel().getComplexActivityChildren(activity.activityUIID);
 			for(var i=0; i<children.length; i++) {
 				orderDesign(children[i], order);
@@ -777,13 +778,22 @@ class MonitorModel extends Observable{
 		ddmTransition_keys = _activeSeq.getLearningDesignModel().transitions.keys();
 		
 		var orderedActivityArr:Array = new Array();
+		var orderedReferenceActArr:Array = new Array();
 		var trIndexArray:Array;
 		var dataObj:Object;
 		var ddmfirstActivity_key:Number = _activeSeq.getLearningDesignModel().firstActivityID;
 		var learnerFirstActivity:Activity = _activeSeq.getLearningDesignModel().activities.get(ddmfirstActivity_key);
 		
+		var referenceActivity:ComplexActivity = app.getMonitor().ddm.getReferenceActivity();
+		
 		// recursive method to order design
-		orderDesign(learnerFirstActivity, orderedActivityArr);
+		orderDesign(learnerFirstActivity, orderedActivityArr); // order the non-reference activities
+		
+		if (referenceActivity != null)
+			orderDesign(referenceActivity, orderedReferenceActArr); // order the reference activities
+			
+		for (var i=0; i<orderedReferenceActArr.length; i++)
+			orderedActivityArr.push(orderedReferenceActArr[i]);
 		
 		return orderedActivityArr;
 		

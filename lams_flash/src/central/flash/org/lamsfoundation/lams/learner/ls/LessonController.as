@@ -85,6 +85,17 @@ class LessonController extends AbstractController {
     }
    
 	public function activityDoubleClick(ca:Object):Void{
+		
+		if (ca.isReferenceChild) {
+			// launch a popup			
+			var URLToSend:String = 'learning/learner.do?method=forwardToLearnerActivityURL&activityID='+ca.activity.activityID+'&userID='+_root.userID+'&lessonID='+_root.lessonID;
+			_lessonModel.getLesson().moveToActivity(_lessonModel.progressData.getCurrentActivityId(), ca.activity.activityID, true);
+			_lessonModel.getLesson().showReferenceActivityPopup(URLToSend, ca.activity.activityID);
+			_app.getLesson().callFlashProgress();
+		
+			return;
+		}
+		
 		setBusy();
 		
 		Debugger.log('activityDoubleClick CanvasActivity:'+ca.activity.activityID + ' status: ' + ca.activityStatus + 'type id: ' + ca.activity.activityTypeID,Debugger.GEN,'activityDoubleClick','LessonController');
