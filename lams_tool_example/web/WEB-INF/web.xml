@@ -5,7 +5,7 @@
 
 <context-param>
 	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-  	<param-value>org.lamsfoundation.lams.applicationResources</param-value>
+  	<param-value>org.lamsfoundation.lams.tool.example.ApplicationResources</param-value>
 </context-param>
 
 <context-param> 
@@ -63,17 +63,11 @@
 </listener>	
 <listener>
 	<listener-class>
- 		org.lamsfoundation.lams.web.SessionListener
- 	</listener-class>
+		org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
+	</listener-class>
 </listener>
 
  <servlet>
-	<servlet-name>context</servlet-name>
-	<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
-	<load-on-startup>1</load-on-startup>
-</servlet>
-
-<servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
     <init-param>
@@ -99,7 +93,7 @@
 
 <servlet>
 		<servlet-name>Connector</servlet-name>
-		<servlet-class>com.fredck.FCKeditor.connector.ConnectorServlet</servlet-class>
+		<servlet-class>net.fckeditor.connector.ConnectorServlett</servlet-class>
 		<init-param>
 			<param-name>baseDir</param-name>
 			<param-value>/UserFiles/</param-value>
@@ -121,6 +115,10 @@
     <servlet-name>Connector</servlet-name>
     <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 </servlet-mapping>
+
+   <session-config>
+      <session-timeout>120</session-timeout>
+   </session-config>
 
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
@@ -235,6 +233,7 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>STAFF</role-name>
+    		<role-name>TEACHER</role-name>
     	</auth-constraint>
     </security-constraint>
 
@@ -247,6 +246,7 @@
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     		<role-name>STAFF</role-name>
+    		<role-name>TEACHER</role-name>
     		<role-name>ADMIN</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>

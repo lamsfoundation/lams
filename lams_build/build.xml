@@ -143,7 +143,8 @@
 					<include name="wddx/*.jar" />
 					<include name="concurrent/*.jar" />					
 					<include name="xstream/*.jar" />		
-					<include name="flagstone/*.jar" />
+					<include name="flagstone/*.jar" />		
+					<include name="slf4j/*.jar" />
 				</patternset>
 			</fileset> 
 			<fileset dir="..">
@@ -482,17 +483,28 @@
 		<ant antfile="../${lams_learning}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${lams_monitoring}/build.xml"  target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${lams_www}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_assessment_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_chat_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_daco_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_dimdim_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_forum_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_gmap_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_images_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_lamc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_laqa_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_larsrc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_lanb_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_notebook_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_pixlr_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_sbmt_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_scribe_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_spreadsheet_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_survey_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_task_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_vote_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_wiki_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		
 	</target>
 
 

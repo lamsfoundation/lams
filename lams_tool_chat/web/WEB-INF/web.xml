@@ -16,7 +16,8 @@
             	classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
 				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
-				classpath:/org/lamsfoundation/lams/tool/chat/chatApplicationContext.xml		
+				classpath:/org/lamsfoundation/lams/tool/chat/chatApplicationContext.xml	
+				classpath:/org/lamsfoundation/lams/tool/chat/dbupdates/autopatchContext.xml		
 	</param-value>
 </context-param>
 
@@ -63,8 +64,8 @@
 </listener>	
 <listener>
 	<listener-class>
- 		org.lamsfoundation.lams.web.SessionListener
- 	</listener-class>
+		org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
+	</listener-class>
 </listener>
 
  <servlet>
@@ -93,7 +94,7 @@
 
 <servlet>
 	<servlet-name>Connector</servlet-name>
-	<servlet-class>com.fredck.FCKeditor.connector.ConnectorServlet</servlet-class>
+	<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
 	<init-param>
 		<param-name>baseDir</param-name>
 		<param-value>/UserFiles/</param-value>
@@ -155,6 +156,10 @@
 	<servlet-name>exportPortfolio</servlet-name>
 	<url-pattern>/exportPortfolio</url-pattern>
 </servlet-mapping>
+
+   <session-config>
+      <session-timeout>120</session-timeout>
+   </session-config>
 
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
