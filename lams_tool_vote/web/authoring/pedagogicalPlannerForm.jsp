@@ -24,6 +24,7 @@
   	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	<script type="text/javascript">
   		function createQuestion(){
+  			prepareFormData();
   			$('#pedagogicalPlannerForm').ajaxSubmit({
   				url: "<c:url value='/pedagogicalPlanner.do?dispatch=createPedagogicalPlannerQuestion' />",
   				success: function(responseText){

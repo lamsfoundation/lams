@@ -67,23 +67,23 @@ a.editingAdvice{
 	margin: 0px 0px 0px 500px;
 }
 
-td.branchingFirstActivity {
+td.branchFirstActivity {
 	border-bottom: thick blue solid;
 	text-align: center;
 	color: blue;
 }
 
-td.optionsFirstActivity {
+td.optionFirstActivity {
 	border-bottom: thick lightgreen solid;
 	text-align: center;
 	color:lightgreen;
 }
 
-td.branchingLastActivity {
+td.branchLastActivity {
 	border-bottom: thick blue solid;
 }
 
-td.optionsLastActivity {
+td.optionLastActivity {
 	border-bottom: thick lightgreen solid;
 }
 

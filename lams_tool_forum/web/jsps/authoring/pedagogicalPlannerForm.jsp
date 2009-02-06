@@ -26,6 +26,7 @@
   	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	<script type="text/javascript">
   		function createTopic(){
+  			prepareFormData();
   			$('#pedagogicalPlannerForm').ajaxSubmit({
   				url: "<c:url value='/authoring/createPedagogicalPlannerTopic.do' />",
   				success: function(responseText){

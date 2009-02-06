@@ -11,7 +11,7 @@
 	  <title><fmt:message key="title.lams"/> :: <fmt:message key="planner.title" /></title>
 	
 	  <script type="text/javascript">
-	   //First, set some JavaScript constants so included scripts can use them
+	   // Set some JavaScript constants so included scripts can use them
 	   var activityCount = ${fn:length(planner.activities)}; //How many activities are there in the sequence
 	   var activitySupportingPlannerCount = ${planner.activitySupportingPlannerCount}; //How many of activities support the planner (their data will be submitted)
 	   var sendInPortions = ${planner.sendInPortions}; //Should the forms be send all at once or rather in parts
@@ -37,7 +37,7 @@
 	  			var editingAdviceLink = $('#editingAdvice'+activityIndex);
 	  			if (editingAdviceLink.length > 0){
 	  				var checkEditingAdviceUrl = $(editingAdviceLink).attr("rel");
-	  				//Ajax call to get the answer: do we show the link or no
+	  				//Ajax call to get the answer: do we show the Editing advice link or no
 	  				$.get(
 	  					checkEditingAdviceUrl,
 	  					function(responseText){
@@ -81,7 +81,7 @@
 	<h1 style="text-align: center" class="small-space-top"><fmt:message key="planner.title" /></h1>
 	
 	<div class="shading-bg" style="width: 97%">
-		<!-- A small form for learning design title only -->
+		<!-- A small form for learning design title only (in Java code it's "design details") -->
 		<form id="sequenceDetailsForm">
 			<table cellspacing="0" cellpadding="0" class="pedagogicalPlannerTable">
 				<tr>
@@ -103,48 +103,65 @@
 	<table cellspacing="0" cellpadding="0" class="pedagogicalPlannerTable">
 		<c:set var="lastParentActivityTitle" />
 		<c:set var="lastGroup" />
+		
+		<%-- Main loop for activities --%>
 		<c:forEach var="activity" varStatus="activityStatus" items="${planner.activities}">
+			<%-- Is it a simple, branching or options activity--%>
+			<c:choose>
+				<c:when test="${activity.complexActivityType eq 1}">
+					<c:set var="complexActivityType" value="branch" />
+				</c:when>
+				<c:when test="${activity.complexActivityType eq 2}">
+					<c:set var="complexActivityType" value="option" />
+				</c:when>
+			</c:choose>
+			
+			<%-- Small row with a down arrow --%>
+			<c:if test="${not activityStatus.first}">
+				<%-- If it's a break between two branches/options then don't draw neither an arrow nor colour --%>
+				<c:set var="drawArrow" value="${empty activity.group or previousActivity.group eq activity.group}" />
+				<tr>
+					<td class="titleCell
+					<c:if test="${not (empty previousActivity.group or previousActivity.lastNestedActivity)}">
+						${complexActivityType}
+						<c:if test="${drawArrow}">
+							group${activity.group}
+						</c:if>
+					</c:if>
+					"
+					<c:if test="${previousActivity.lastNestedActivity}">
+						style="padding-top: 10px;"
+					</c:if>
+					>
+						<c:if test="${drawArrow}">
+							<img src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
+						</c:if>
+					</td>
+					<td>
+					</td>
+				</tr>
+			</c:if>
+			
+			<%-- If it's a beginning of a complex activity, write the title. --%>
 			<c:if test="${not empty activity.complexActivityType and not (activity.parentActivityTitle eq lastParentActivityTitle)}">
 				<c:set var="lastParentActivityTitle" value="${activity.parentActivityTitle}" />
 				<tr>
-					<td colspan="2" class="
-						<c:choose>
-							<c:when test="${activity.complexActivityType eq 1}">
-								branchingFirstActivity
-							</c:when>
-							<c:when test="${activity.complexActivityType eq 2}">
-								optionsFirstActivity
-							</c:when>
-						</c:choose>
-					">
+					<td colspan="2" class="${complexActivityType}FirstActivity">
 						<h2>${lastParentActivityTitle}</h2>
 					</td>
 				</tr>
 			</c:if>
+			<%-- Row with activity frame --%>
 			<tr>
 				<td class="titleCell
-				<c:choose>
-					<c:when test="${activity.complexActivityType eq 1}">
-						branch
-					</c:when>
-					<c:when test="${activity.complexActivityType eq 2}">
-						option
-					</c:when>
-				</c:choose>
 				<c:if test="${not empty activity.group}">
-					group${activity.group}
+				${complexActivityType}	group${activity.group}
 				</c:if>
 				<c:if test="${activity.lastNestedActivity}">
-					<c:choose>
-						<c:when test="${activity.complexActivityType eq 1}">
-							branchingLastActivity
-						</c:when>
-						<c:when test="${activity.complexActivityType eq 2}">
-							optionsLastActivity
-						</c:when>
-					</c:choose>
+					${complexActivityType}LastActivity
 				</c:if>
 				">
+					<%-- Write out number of the branch/option if any --%>
 					<c:if test="${not empty activity.group and not (activity.group eq lastGroup)}">
 						<c:set var="lastGroup" value="${activity.group}" />
 						<h3 class="group${lastGroup}">
@@ -161,6 +178,7 @@
 							</c:choose>
 						</h3>
 					</c:if>
+					<%-- Activity type, icon and title --%>
 					<c:if test="${not empty activity.type}">
 						<span>${activity.type}<br /></span>
 					</c:if>
@@ -182,21 +200,18 @@
 						<h4>${activity.title}</h4>
 					</c:if>
 				</td>
+				<%-- Cell with activity form --%>
 				<td class="formCell
 				<c:if test="${activity.lastNestedActivity}">
-					<c:choose>
-						<c:when test="${activity.complexActivityType eq 1}">
-							branchingLastActivity
-						</c:when>
-						<c:when test="${activity.complexActivityType eq 2}">
-							optionsLastActivity
-						</c:when>
-					</c:choose>
+					${complexActivityType}LastActivity
 				</c:if>
 				">
+					<%-- To get the contents, an Ajax call is made to the tool --%>
 					<iframe frameborder="0" marginheight="0" marginwidth="0" name="activity${activityStatus.index+1}" id="activity${activityStatus.index+1}" class="toolFrame"
 						src="<lams:LAMSURL/>${activity.pedagogicalPlannerUrl}">
 					</iframe>
+					<%-- Editing advice link with URLs: one to check if it should be displayed (rel),
+						 another one to get the contents (href) --%>
 					<c:if test="${not empty activity.checkEditingAdviceUrl}">
 						<a href="<lams:LAMSURL/>${activity.editingAdviceUrl}" title=""
 							rel="<lams:LAMSURL/>${activity.checkEditingAdviceUrl}" 
@@ -205,35 +220,11 @@
 					</c:if>
 				</td>
 			</tr>
-			<tr>
-				<td class="titleCell
-				<c:if test="${not empty activity.group and not activity.lastNestedActivity}">
-					<c:choose>
-						<c:when test="${activity.complexActivityType eq 1}">
-							branch
-						</c:when>
-						<c:when test="${activity.complexActivityType eq 2}">
-							option
-						</c:when>
-					</c:choose>
-					group${activity.group}
-				</c:if>
-				"
-				<c:if test="${activity.lastNestedActivity}">
-					style="padding-top: 5px;"
-				</c:if>
-				>
-				
-					<c:if test="${not activityStatus.last}">
-						<img src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
-					</c:if>
-				</td>
-				<td>
-				</td>
-			</tr>
+			<c:set var="previousActivity" value="${activity}" />
 		</c:forEach>
 	</table>
 	
+	<%-- DIVs for messages from server, hidden by default --%>
 	<div id="pedagogicalPlannerErrorArea" style="display:none;" class="warning" >
 	</div>
 	
