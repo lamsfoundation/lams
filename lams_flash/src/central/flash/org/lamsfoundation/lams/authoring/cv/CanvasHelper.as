@@ -799,7 +799,7 @@ class CanvasHelper {
 		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
 		
 		if (canvasModel.currentBranchingActivity == null && canvasModel.getReferenceActivityOnCanvas() == null) {
-			Application.getInstance().getToolbar().setButtonState("reference_btn", true, false);
+			Application.getInstance().getToolbar().setButtonState("support_act_btn", true, false);
 		}
 		
 		if(canvasModel.activeView instanceof CanvasComplexView)

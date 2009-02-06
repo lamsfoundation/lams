@@ -362,8 +362,7 @@ class Canvas extends CanvasHelper {
 					var parentAct:Activity = canvasModel.getCanvas().ddm.getActivityByUIID(taParent);
 					var maxActs:Number = 6;
 					if (canvasModel.getCanvas().ddm.getComplexActivityChildren(taParent).length >= maxActs) {
-						//LFMessage.showMessageAlert("Cannot drop activity: "+actToAdd.title+" here. The reference activity permits a maximum of "+maxActs+" child activities.", null);
-						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_max_children_reached", [actToAdd.title], [maxActs]), null);
+						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_max_children_reached", [actToAdd.title, maxActs]), null);
 						return;
 					}
 				}

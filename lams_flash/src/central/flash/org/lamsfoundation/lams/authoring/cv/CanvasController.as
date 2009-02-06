@@ -297,7 +297,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 						referenceOnCanvas.updateChildren(newChildren);
 					} else {
 						//LFMessage.showMessageAlert("Cannot drop activity: "+ca.activity.title+" here. The reference activity permits a maximum of "+numChildrenActs+" child activities.", null);
-						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_max_children_reached", [ca.activity.title], [6]), null);
+						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_max_children_reached", [ca.activity.title, 6]), null);
 						activitySnapBack(ca);
 					}
 				}
@@ -590,7 +590,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					Debugger.log('activityDoubleClick CanvasBranchActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
 	   
 					_canvasModel.openBranchActivityContent(ca, true);
-					Application.getInstance().getToolbar().setButtonState("reference_btn", false, false);
+					Application.getInstance().getToolbar().setButtonState("support_act_btn", false, false);
 					
 					// invalidate design after opening tool content window
 					_canvasModel.getCanvas().ddm.validDesign = false;
@@ -737,7 +737,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 							_canvasModel.getCanvas().ddm.removeEntries(_canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(ca.activity.activityUIID).all);
 						
 						if (ca.activity.isReferenceActivity()) {
-							Application.getInstance().getToolbar().setButtonState("reference_btn", true, false);
+							Application.getInstance().getToolbar().setButtonState("support_act_btn", true, false);
 						}
 
 						_canvasModel.removeComplexActivity(ca);	

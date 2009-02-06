@@ -57,7 +57,7 @@ class ToolbarView extends AbstractView {
 	private var optional_btn:Button;
 	private var optional_act_btn:Button;
 	private var optional_seq_btn:Button;
-	private var reference_btn:Button;
+	private var support_act_btn:Button;
 	private var flow_btn:Button;
 	private var gate_btn:Button;
 	private var branch_btn:Button;
@@ -130,7 +130,7 @@ class ToolbarView extends AbstractView {
 	public function showHideOptAssets(v:Boolean){
 		optional_act_btn.visible = v;
 		optional_seq_btn.visible = v;
-		reference_btn.visible = v;
+		support_act_btn.visible = v;
 		optional_bkg_pnl.visible = v;
 		
 		optional_bkg_pnl.setSize(Math.max(Math.max(optional_btn.width, optional_act_btn.width), Math.max(optional_btn.width, optional_seq_btn.width)) + 6, 126.5);
@@ -165,7 +165,7 @@ class ToolbarView extends AbstractView {
 		gate_btn.addEventListener("click", controller);
 		group_btn.addEventListener("click", controller);
 		branch_btn.addEventListener("click", controller);
-		reference_btn.addEventListener("click", controller);
+		support_act_btn.addEventListener("click", controller);
 		preview_btn.addEventListener("click", controller);
 		preview_btn_click_target.addEventListener("click", controller);
 		
@@ -210,8 +210,8 @@ class ToolbarView extends AbstractView {
 		optional_seq_btn.onRollOver = Proxy.create(this,this['showToolTip'], optional_seq_btn, "optional_seq_btn_tooltip");
 		optional_seq_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
-		reference_btn.onRollOver = Proxy.create(this,this['showToolTip'], optional_seq_btn, "support_act_btn_tooltip");
-		reference_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		support_act_btn.onRollOver = Proxy.create(this,this['showToolTip'], optional_seq_btn, "support_act_btn_tooltip");
+		support_act_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		group_btn.onRollOver = Proxy.create(this,this['showToolTip'], group_btn, "group_btn_tooltip");
 		group_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
@@ -250,7 +250,7 @@ class ToolbarView extends AbstractView {
 		gate_btn.label = Dictionary.getValue('gate_btn');
 		branch_btn.label = Dictionary.getValue('branch_btn');
 		flow_btn.label = Dictionary.getValue('flow_btn');
-		reference_btn.label = Dictionary.getValue("support_act_btn");
+		support_act_btn.label = Dictionary.getValue("support_act_btn");
 		group_btn.label = Dictionary.getValue('group_btn');
 		preview_btn.label = Dictionary.getValue('preview_btn');
 		apply_changes_btn.label = Dictionary.getValue('apply_changes_btn');
@@ -270,7 +270,7 @@ class ToolbarView extends AbstractView {
 		optional_btn.tabIndex = 208
 		optional_act_btn.tabIndex = 209
 		optional_seq_btn.tabIndex = 210
-		reference_btn.tabIndex = 211
+		support_act_btn.tabIndex = 211
 		flow_btn.tabIndex = 212
 		gate_btn.tabIndex = 213
 		branch_btn.tabIndex = 214
@@ -454,6 +454,7 @@ class ToolbarView extends AbstractView {
 		optional_act_btn.setStyle('styleName',styleObj);
 		optional_seq_btn.setStyle('styleName',styleObj);
 		gate_btn.setStyle('styleName',styleObj);
+		support_act_btn.setStyle('styleName',styleObj);
 		flow_btn.setStyle('styleName',styleObj);
 		branch_btn.setStyle('styleName',styleObj);
 		group_btn.setStyle('styleName', styleObj);

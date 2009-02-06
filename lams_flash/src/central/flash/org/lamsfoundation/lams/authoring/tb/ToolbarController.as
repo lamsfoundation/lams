@@ -90,7 +90,7 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 			_app.getCanvas().toggleOptionalActivity();
 		}else if(tgt.indexOf("optional_seq") != -1){
 			_app.getCanvas().toggleOptionalSequenceActivity();
-		}else if(tgt.indexOf("reference") != -1){
+		}else if(tgt.indexOf("support") != -1){
 			_app.getCanvas().toggleReferenceTool();
 		}else if(tgt.indexOf("optional") != -1){
 			if (!isOptActive && !optionPanelVisible){
