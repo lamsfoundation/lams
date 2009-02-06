@@ -19,7 +19,7 @@
 </c:if>
 
 <c:if test="${empty displayExpanded}">
-	<c:set var="displayExpanded" value="false" />
+	<c:set var="displayExpanded" value="true" />
 </c:if>
 
 <c:if test="${empty width}">

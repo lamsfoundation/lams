@@ -19,7 +19,7 @@
 </c:if>
 
 <c:if test="${empty displayExpanded}">
-	<c:set var="displayExpanded" value="false" />
+	<c:set var="displayExpanded" value="true" />
 </c:if>
 
 <c:if test="${empty width}">
@@ -57,6 +57,7 @@
 	basePath="${basePath}"
 	toolbarSet="${toolbarSet}">
 <jsp:attribute name="value">${value}</jsp:attribute>
+<jsp:body>
 <fck:config
 	ImageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
 	ImageUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/${contentFolderID}/"
@@ -67,6 +68,7 @@
 	AutoDetectLanguage="false"
 	DefaultLanguage="${language}"
 	ToolbarStartExpanded="${displayExpanded}"/>
+</jsp:body>
 </fck:editor>
 
 

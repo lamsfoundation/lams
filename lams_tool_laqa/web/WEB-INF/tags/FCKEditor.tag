@@ -10,7 +10,6 @@
 <%@ attribute name="contentFolderID" required="false" rtexprvalue="true"%>
 <%@ attribute name="displayExpanded" required="false" rtexprvalue="true"%>
 
-
 <c:set var="language">
 	<lams:user property="fckLanguageMapping" />
 </c:set>
@@ -52,21 +51,24 @@
 </script>
 -->
 
-<fck:editor id="${id}"
+<fck:editor instanceName="${id}"
 	height="${height}"
 	width="${width}"
 	basePath="${basePath}"
-	toolbarSet="${toolbarSet}"
-	imageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
-	imageUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/${contentFolderID}/"
-	linkBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
-	linkUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/${contentFolderID}/"
-	flashBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
-	flashUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/"
-	autoDetectLanguage="false"
-	defaultLanguage="${language}"
-	toolbarStartExpanded="${displayExpanded}" >
-		${value}
+	toolbarSet="${toolbarSet}">
+<jsp:attribute name="value">${value}</jsp:attribute>
+<jsp:body>
+<fck:config
+	ImageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
+	ImageUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/${contentFolderID}/"
+	LinkBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
+	LinkUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/${contentFolderID}/"
+	FlashBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
+	FlashUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/"
+	AutoDetectLanguage="false"
+	DefaultLanguage="${language}"
+	ToolbarStartExpanded="${displayExpanded}"/>
+</jsp:body>
 </fck:editor>
 
 
