@@ -307,7 +307,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasReferenceActivity extends Movie
 	}
 	
 	public function get panelWidth():Number {
-		return (_panelWidth + 200);
+		return _panelWidth;
 	}
 	
 	private function getAssociatedStyle():Object{

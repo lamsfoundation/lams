@@ -195,7 +195,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				for (var i=0; i<canvasActs.length; i++) {
 					if (referenceOnCanvas.hitTest(canvasActs[i]) && canvasActs[i].activity.activityTypeID != Activity.REFERENCE_ACTIVITY_TYPE) {
 						
-						//LFMessage.showMessageAlert("Cannot drop a reference activity inside another activity", Debugger.GEN, "activityRelease", "CanvasController");
 						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_cannot_be_child"), null);
 						activitySnapBack(ca);
 					}
@@ -208,11 +207,16 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					 (ca._y < -55) ||
 					 (ca._y > 121) ) {
 					
-					//give it the new co-ords and 'drop' it
-					ca.activity.xCoord = iconMouseX - (_canvasModel.getCanvas().taWidth/2);
-					ca.activity.yCoord = iconMouseY - (_canvasModel.getCanvas().taHeight/2);
+					if (!isActivityReadOnly(ca, Dictionary.getValue('cv_element_readOnly_action_del'))) {
+						
+						//give it the new co-ords and 'drop' it
+						ca.activity.xCoord = iconMouseX - (_canvasModel.getCanvas().taWidth/2);
+						ca.activity.yCoord = iconMouseY - (_canvasModel.getCanvas().taHeight/2);
 					
-					_canvasModel.removeOptionalCA(ca, referenceOnCanvas.activity.activityUIID);
+						_canvasModel.removeOptionalCA(ca, referenceOnCanvas.activity.activityUIID);
+					} else {
+						activitySnapBack(ca);
+					}
 				} else {
 					activitySnapBack(ca);
 				}
