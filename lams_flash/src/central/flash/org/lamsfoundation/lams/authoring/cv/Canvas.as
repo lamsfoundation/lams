@@ -351,21 +351,26 @@ class Canvas extends CanvasHelper {
 		var actType:String;
 		Debugger.log('actToCopy.activityTypeID:'+actToCopy.activityTypeID,Debugger.GEN,'setDroppedTemplateActivity','Canvas');			
 		
+		if(Activity.TOOL_ACTIVITY_TYPE == Activity.TOOL_ACTIVITY_TYPE || Activity.TOOL_ACTIVITY_TYPE == Activity.PARALLEL_ACTIVITY_TYPE) {
+		
+		if (taParent != undefined || taParent != null){
+			var parentAct:Activity = canvasModel.getCanvas().ddm.getActivityByUIID(taParent);
+			if (parentAct.activityTypeID == Activity.REFERENCE_ACTIVITY_TYPE) {
+				var maxActs:Number = 6;
+				if (canvasModel.getCanvas().ddm.getComplexActivityChildren(taParent).length >= maxActs) {
+					LFMessage.showMessageAlert(Dictionary.getValue("support_msg_max_children_reached", [actToCopy.title, maxActs]), null);
+					return;
+					}
+				}
+			}
+		}
+		
 		switch(actToCopy.activityTypeID){
 			
 			case(Activity.TOOL_ACTIVITY_TYPE):
 				actType = "Tool"
 				actToAdd = ToolActivity(actToCopy.clone());
 				actToAdd.activityUIID = _ddm.newUIID();
-				
-				if (taParent != undefined || taParent != null){
-					var parentAct:Activity = canvasModel.getCanvas().ddm.getActivityByUIID(taParent);
-					var maxActs:Number = 6;
-					if (canvasModel.getCanvas().ddm.getComplexActivityChildren(taParent).length >= maxActs) {
-						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_max_children_reached", [actToAdd.title, maxActs]), null);
-						return;
-					}
-				}
 				break;
 
 			case(Activity.OPTIONAL_ACTIVITY_TYPE):
