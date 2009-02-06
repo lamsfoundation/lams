@@ -971,16 +971,19 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		for(var i=0; i<parentActivities.length; i++) {
 			
 			var cmActivity:Activity = Activity(parentActivities[i].activity);
-			var actTransitions:Object = _cv.ddm.getTransitionsForActivityUIID(cmActivity.activityUIID);
-		
-			checkActivityForTransition(cmActivity, actTransitions, noTopLevelActivities, errorMap);
-		
-			if(actTransitions.into == null) {
-				noInputTransition.push(cmActivity);
-			}
 			
-			if(actTransitions.out == null) {
-				noOutputTransition.push(cmActivity);
+			if (cmActivity.activityTypeID != Activity.REFERENCE_ACTIVITY_TYPE) {
+				var actTransitions:Object = _cv.ddm.getTransitionsForActivityUIID(cmActivity.activityUIID);
+			
+				checkActivityForTransition(cmActivity, actTransitions, noTopLevelActivities, errorMap);
+			
+				if(actTransitions.into == null) {
+					noInputTransition.push(cmActivity);
+				}
+				
+				if(actTransitions.out == null) {
+					noOutputTransition.push(cmActivity);
+				}
 			}
 		
 		}
