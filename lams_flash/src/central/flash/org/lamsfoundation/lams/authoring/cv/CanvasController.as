@@ -278,8 +278,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				
 				if ( !(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) ) {
 					activitySnapBack(ca);
-					//var msg:String = "Activities of this type cannot be added as a support activity";
-					var msg:String = Dictionary.getValue("support_msg_invalid_child", [ca.activity.objectType]);
+					var msg:String = Dictionary.getValue("support_msg_invalid_child", [ca.activity.i18nActivityTypeString]);
 					LFMessage.showMessageAlert(msg);
 
 				} else if (_canvasModel.getCanvas().ddm.getTransitionsForActivityUIID(ca.activity.activityUIID).hasTrans){

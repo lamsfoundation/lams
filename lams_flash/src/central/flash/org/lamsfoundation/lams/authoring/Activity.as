@@ -172,10 +172,10 @@ class org.lamsfoundation.lams.authoring.Activity {
 	
 	private var _stopAfterActivity:Boolean;
 	private var _readOnly:Boolean;
-	
 	private var _viewID:Boolean;
 
 	private var _branchView:CanvasBranchView;
+	private var _i18nActivityTypeString:String;
      
 	/**
 	 * Constructor
@@ -588,9 +588,16 @@ class org.lamsfoundation.lams.authoring.Activity {
 
 	public function set title(a:String):Void{
 		_title = a;
+		if (_i18nActivityTypeString == null || _i18nActivityTypeString == undefined) {
+			_i18nActivityTypeString = _title;
+		}
 	}
 	public function get title():String{
 		return _title;
+	}
+	
+	public function get i18nActivityTypeString():String {
+		return _i18nActivityTypeString;
 	}
 	
 	public function set description(a:String):Void{
