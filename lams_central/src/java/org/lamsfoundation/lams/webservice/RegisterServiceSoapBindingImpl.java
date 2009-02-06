@@ -22,8 +22,12 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.LanguageUtil;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class RegisterServiceSoapBindingImpl implements Register {
@@ -64,6 +68,31 @@ public class RegisterServiceSoapBindingImpl implements Register {
 			ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, 
 					username, password, firstName, lastName, email);
 			return true;
+		} catch (Exception e) {
+			log.debug(e.getMessage(), e);
+			throw new java.rmi.RemoteException(e.getMessage());
+		}
+	}
+	
+	public int createGroup(
+			String name,
+			String code,
+			String description,
+			String owner,
+			String serverId,
+			String datetime,
+			String hash) throws java.rmi.RemoteException {
+		try {
+			Organisation org = new Organisation();
+			org.setName(name);
+			org.setParentOrganisation(service.getRootOrganisation());
+			org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
+			org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,OrganisationState.ACTIVE));
+			SupportedLocale locale = LanguageUtil.getDefaultLocale();
+			org.setLocale(locale);
+			User user = service.getUserByLogin(owner);
+			service.saveOrganisation(org, user.getUserId());
+			return org.getOrganisationId();
 		} catch (Exception e) {
 			log.debug(e.getMessage(), e);
 			throw new java.rmi.RemoteException(e.getMessage());

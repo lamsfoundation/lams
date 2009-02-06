@@ -17,6 +17,15 @@ public interface Register extends java.rmi.Remote {
     		String datetime, 
     		String hash) throws java.rmi.RemoteException;
     
+    public int createGroup(
+	    String name,
+	    String code,
+	    String description,
+	    String owner,
+	    String serverId,
+	    String datetime,
+	    String hash) throws java.rmi.RemoteException;
+    
     public boolean addUserToGroup(
     		String username, 
 			String serverId, 

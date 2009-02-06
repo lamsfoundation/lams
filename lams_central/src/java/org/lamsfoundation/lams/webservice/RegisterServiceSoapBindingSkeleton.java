@@ -29,6 +29,7 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
 
     static {
         addCreateUser();
+        addCreateGroup();
         addAddUserToGroup();
         addAddUserToGroupLessons();
         addAddUserToSubgroup();
@@ -58,6 +59,30 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
             _myOperations.put("createUser", new java.util.ArrayList());
         }
         ((java.util.List)_myOperations.get("createUser")).add(_oper);
+    }
+    
+    private static void addCreateGroup() {
+	org.apache.axis.description.OperationDesc _oper;
+        org.apache.axis.description.FaultDesc _fault;
+        org.apache.axis.description.ParameterDesc [] _params;
+        _params = new org.apache.axis.description.ParameterDesc [] {
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "name"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "code"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "description"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "owner"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+        };
+        _oper = new org.apache.axis.description.OperationDesc("createGroup", _params, new javax.xml.namespace.QName("", "createGroupReturn"));
+        _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
+        _oper.setElementQName(new javax.xml.namespace.QName("", "createGroup"));
+        _oper.setSoapAction("");
+        _myOperationsList.add(_oper);
+        if (_myOperations.get("createGroup") == null) {
+            _myOperations.put("createGroup", new java.util.ArrayList());
+        }
+        ((java.util.List)_myOperations.get("createGroup")).add(_oper);
     }
     
     private static void addAddUserToGroup() {
@@ -179,6 +204,12 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
     public boolean createUser(String username, String password, String firstName, String lastName, String email, String serverId, String datetime, String hash) throws java.rmi.RemoteException
     {
         boolean ret = impl.createUser(username, password, firstName, lastName, email, serverId, datetime, hash);
+        return ret;
+    }
+    
+    public int createGroup(String name, String code, String description, String owner, String serverId, String datetime, String hash) throws java.rmi.RemoteException
+    {
+        int ret = impl.createGroup(name, code, description, owner, serverId, datetime, hash);
         return ret;
     }
     
