@@ -72,6 +72,7 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		
 		if(tgt.indexOf("new") != -1){
 			_app.getCanvas().clearCanvas(false);
+			_app.getToolbar().setButtonState("support_act_btn", true, false);
 		}else if(tgt.indexOf("open") != -1){
 			_app.getCanvas().openDesignBySelection();
 		}else if(tgt.indexOf("save") != -1){

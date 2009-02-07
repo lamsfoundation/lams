@@ -315,6 +315,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 			Debugger.log('Optional activity Type a.title:'+a.title+','+a.activityUIID+' added to the cm.activitiesDisplayed hashtable :'+newActivity_mc,4,'drawActivity','CanvasView');
 		}
 		else if(a.activityTypeID==Activity.REFERENCE_ACTIVITY_TYPE) {
+			
+			Application.getInstance().getToolbar().setButtonState("support_act_btn", false, false);
+			
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			
 			// If any of the child reference activities have been attempted make the parent reference activity readonly (for live edit)
