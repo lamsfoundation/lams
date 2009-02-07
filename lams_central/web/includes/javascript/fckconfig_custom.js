@@ -1,6 +1,6 @@
 FCKConfig.ToolbarSets["Default"] = [
 	['Source','-','FitWindow', 'Preview','PasteWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','OrderedList','UnorderedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','TextColor','BGColor','Equation'], 
-	['Image','Link','Table','Rule','Smiley','SpecialChar','Templates','FontFormat','FontName','FontSize','About']
+	['MoviePlayer','Image','Link','Table','Rule','Smiley','SpecialChar','Templates','FontFormat','FontName','FontSize','About']
 ] ;
 
 FCKConfig.ToolbarSets["Default-Learner"] = [
@@ -44,3 +44,4 @@ FCKConfig.FontFormats	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 FCKConfig.EnterMode = 'div' ;
 FCKConfig.Plugins.Add('wikilink', 'en', FCKConfig.BasePath + '../../../tool/lawiki10/');
 FCKConfig.Plugins.Add('equation', 'en');
+FCKConfig.Plugins.Add('movieplayer', 'en');
