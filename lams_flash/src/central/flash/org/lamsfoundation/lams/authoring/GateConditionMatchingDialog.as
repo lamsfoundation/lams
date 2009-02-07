@@ -208,7 +208,7 @@ class GateConditionMatchingDialog extends BranchMappingDialog {
 	
 	private function setupMatch(condition:ToolOutputCondition, gateState):Void {
 		
-		var gateOpenWhenConditionMet:Boolean = (gateState.objState == "open") ? true : false;
+		var gateOpenWhenConditionMet:Boolean = (gateState.value == "open") ? true : false;
 		var toMatch:ToolOutputGateActivityEntry = new ToolOutputGateActivityEntry(null, app.getCanvas().ddm.newUIID(), gateActivity, condition, gateOpenWhenConditionMet);
 		
 		match_dgd.addItem(toMatch);

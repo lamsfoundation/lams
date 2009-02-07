@@ -316,6 +316,17 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		}
 		else if(a.activityTypeID==Activity.REFERENCE_ACTIVITY_TYPE) {
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
+			
+			// If any of the child reference activities have been attempted make the parent reference activity readonly (for live edit)
+			if (!a.isReadOnly()) {
+				for (var i=0; i<children.length; i++) {
+					if (children[i].isReadOnly()) {
+						cm.getCanvas().ddm.getActivityByUIID(a.parentUIID).readOnly = true;
+						a.readOnly = true;
+					}
+				}
+			}
+			
 			var newActivity_mc = activityComplexLayer.createChildAtDepth("CanvasReferenceActivity",DepthManager.kTop,{_activity:a,_children:children,_canvasController:cvc,_canvasView:cvv,_locked:a.isReadOnly()});
 			cm.activitiesDisplayed.put(a.activityUIID,newActivity_mc);
 		} 

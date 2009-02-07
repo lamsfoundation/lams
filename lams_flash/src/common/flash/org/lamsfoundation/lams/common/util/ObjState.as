@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
- 
+
 /**
 * Util methods for string manipulation
 * @class	State
@@ -30,11 +30,11 @@
 class org.lamsfoundation.lams.common.util.ObjState {
 	
 	private var _displayText:String;
-	private var _objState:Object;
+	private var _value:Object;
 	
-	function ObjState(displayText:String, objState:Object){
-		this.displayText = displayText;
-		this.objState = objState;
+	function ObjState(displayText:String, value:Object){
+		_displayText = displayText;
+		_value = value;
 	}
 	
 	public function get displayText():String {
@@ -45,11 +45,11 @@ class org.lamsfoundation.lams.common.util.ObjState {
 		_displayText = s;
 	}
 	
-	public function get objState():Object {
-		return _objState;
+	public function get value():Object {
+		return _value;
 	}
 	
-	public function set objState(s:Object):Void {
-		_objState = s;
+	public function set value(s:Object):Void {
+		_value = s;
 	}
 }
