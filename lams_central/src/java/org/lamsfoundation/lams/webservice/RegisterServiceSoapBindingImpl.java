@@ -24,8 +24,11 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.UserOrganisation;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -74,7 +77,7 @@ public class RegisterServiceSoapBindingImpl implements Register {
 		}
 	}
 	
-	public int createGroup(
+	public int createOrganisation(
 			String name,
 			String code,
 			String description,
@@ -99,6 +102,62 @@ public class RegisterServiceSoapBindingImpl implements Register {
 		}
 	}
 
+    public boolean addUserToOrganisation(
+    		String login, 
+			Integer organisationId, 
+			Boolean asStaff, 
+		    String serverId,
+		    String datetime,
+		    String hash) throws java.rmi.RemoteException {
+		try {
+			// authenticate external server
+			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+			Authenticator.authenticate(serverMap, datetime,	hash);
+			
+			// get user and organisation
+			User user = service.getUserByLogin(login);
+			Organisation org = (Organisation)service.findById(Organisation.class, organisationId);
+			
+			if (user == null || org == null) {
+				return false;
+			}
+			
+			// check user is not already in org
+			UserOrganisation uo = service.getUserOrganisation(user.getUserId(), org.getOrganisationId());
+			
+			if (uo == null) {
+				// create UserOrganisation	
+				
+				uo = new UserOrganisation(user,org);
+				service.save(uo);
+				Integer[] roles;
+				if (asStaff) {
+					roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
+				} else {
+					roles = new Integer[] { Role.ROLE_LEARNER };
+				}
+				for(Integer roleId:roles){
+					UserOrganisationRole uor = new UserOrganisationRole(uo,(Role)service.findById(Role.class,roleId));
+					service.save(uor);
+					uo.addUserOrganisationRole(uor);
+				}
+				user.addUserOrganisation(uo);
+				service.save(user);
+				
+				return true;
+			
+			} else {
+				// do nothing
+				return false;
+			}
+			
+		} catch (Exception e) {
+			log.debug(e.getMessage(), e);
+			throw new java.rmi.RemoteException(e.getMessage());
+		}    	
+    
+    }
+	
 	public boolean addUserToGroup(
 			String username, 
 			String serverId, 

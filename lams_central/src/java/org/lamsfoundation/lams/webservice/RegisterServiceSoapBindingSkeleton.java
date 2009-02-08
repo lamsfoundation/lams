@@ -29,7 +29,8 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
 
     static {
         addCreateUser();
-        addCreateGroup();
+        addCreateOrganisation();
+        addAddUserToOrganisation();
         addAddUserToGroup();
         addAddUserToGroupLessons();
         addAddUserToSubgroup();
@@ -61,7 +62,7 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
         ((java.util.List)_myOperations.get("createUser")).add(_oper);
     }
     
-    private static void addCreateGroup() {
+    private static void addCreateOrganisation() {
 	org.apache.axis.description.OperationDesc _oper;
         org.apache.axis.description.FaultDesc _fault;
         org.apache.axis.description.ParameterDesc [] _params;
@@ -74,15 +75,38 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
             new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
         };
-        _oper = new org.apache.axis.description.OperationDesc("createGroup", _params, new javax.xml.namespace.QName("", "createGroupReturn"));
+        _oper = new org.apache.axis.description.OperationDesc("createOrganisation", _params, new javax.xml.namespace.QName("", "createOrganisationReturn"));
         _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
-        _oper.setElementQName(new javax.xml.namespace.QName("", "createGroup"));
+        _oper.setElementQName(new javax.xml.namespace.QName("", "createOrganisation"));
         _oper.setSoapAction("");
         _myOperationsList.add(_oper);
-        if (_myOperations.get("createGroup") == null) {
-            _myOperations.put("createGroup", new java.util.ArrayList());
+        if (_myOperations.get("createOrganisation") == null) {
+            _myOperations.put("createOrganisation", new java.util.ArrayList());
         }
-        ((java.util.List)_myOperations.get("createGroup")).add(_oper);
+        ((java.util.List)_myOperations.get("createOrganisation")).add(_oper);
+    }
+    
+    private static void addAddUserToOrganisation() {
+    	org.apache.axis.description.OperationDesc _oper;
+        org.apache.axis.description.FaultDesc _fault;
+        org.apache.axis.description.ParameterDesc [] _params;
+        _params = new org.apache.axis.description.ParameterDesc [] {
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "login"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "organisationId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "int"), java.lang.Integer.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "asStaff"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "boolean"), java.lang.Boolean.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "serverId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false), 
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "datetime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+            new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "hash"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false),
+        };
+        _oper = new org.apache.axis.description.OperationDesc("addUserToOrganisation", _params, new javax.xml.namespace.QName("", "addUserToOrganisationReturn"));
+        _oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        _oper.setElementQName(new javax.xml.namespace.QName("", "addUserToOrganisation"));
+        _oper.setSoapAction("");
+        _myOperationsList.add(_oper);
+        if (_myOperations.get("addUserToOrganisation") == null) {
+            _myOperations.put("addUserToOrganisation", new java.util.ArrayList());
+        }
+        ((java.util.List)_myOperations.get("addUserToOrganisation")).add(_oper);
     }
     
     private static void addAddUserToGroup() {
@@ -207,11 +231,16 @@ public class RegisterServiceSoapBindingSkeleton implements org.lamsfoundation.la
         return ret;
     }
     
-    public int createGroup(String name, String code, String description, String owner, String serverId, String datetime, String hash) throws java.rmi.RemoteException
+    public int createOrganisation(String name, String code, String description, String owner, String serverId, String datetime, String hash) throws java.rmi.RemoteException
     {
-        int ret = impl.createGroup(name, code, description, owner, serverId, datetime, hash);
+        int ret = impl.createOrganisation(name, code, description, owner, serverId, datetime, hash);
         return ret;
     }
+    
+    public boolean addUserToOrganisation(String login, Integer organisationId, Boolean asStaff, String serverId, String datetime, String hash) throws java.rmi.RemoteException {
+		boolean ret = impl.addUserToOrganisation(login, organisationId, asStaff, serverId, datetime, hash);
+		return ret;
+	}
     
     public boolean addUserToGroup(String username, String serverId, String datetime, String hash, 
     		String courseId, String courseName, String countryIsoCode, String langIsoCode, Boolean isTeacher) throws java.rmi.RemoteException {
