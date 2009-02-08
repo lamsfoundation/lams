@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
  	<script language="JavaScript" type="text/Javascript"><!--
     function doCloseRedirect() {
-        if ( window.name == "LearnerActivity" ) {
+        if ( window.name.match("LearnerActivity") != null ) {
         	<%-- In popup window (ie have revisited a completed activity. Just the one activity in the window so close --%>
             window.close();
         <%-- } else if ( window.parent.name == "LearnerActivity" ) {
