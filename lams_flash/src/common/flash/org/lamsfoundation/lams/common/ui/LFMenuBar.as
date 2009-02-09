@@ -141,7 +141,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			file_menu.addMenuItem({type:"separator"});
 			
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_import'), instanceName:"importItem"});
-			file_menu.addMenuItem({label:"Import from community", instanceName:"importFromCommunity"});
+			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_import_community'), instanceName:"importFromCommunity"});
 			file_menu.addMenuItem({label:Dictionary.getValue('mnu_file_export'), instanceName:"exportItem", enabled:false});
 			
 			file_menu.addMenuItem({type:"separator"});
@@ -457,7 +457,7 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 	}
 	
 	public function enableExport(enable:Boolean){
-		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(9), enable);
+		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(10), enable);
 	}
 	
 	public function enableSave(enable:Boolean){
