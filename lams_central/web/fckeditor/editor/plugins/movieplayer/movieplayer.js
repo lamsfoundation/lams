@@ -99,7 +99,7 @@ function BrowseServer() {
 	if(!FCKConfig.MediaBrowserWindowWidth) {
 		FCKConfig.MediaBrowserWindowWidth = FCKConfig.ScreenWidth * 0.7;
 	}
-	if(!FCKConfig.MediaBrowserWindowWidth) {
+	if(!FCKConfig.MediaBrowserWindowHeight) {
 		FCKConfig.MediaBrowserWindowHeight = FCKConfig.ScreenHeight * 0.7;
 	}
 	OpenFileBrowser(
@@ -186,8 +186,8 @@ Movie.prototype.getInnerHTML = function (objectId){
 			s += '        data="'+ mp3Player +'" ';
 			s += '        width="250" height="20" >';
 		    s += '  <PARAM name="bgcolor" value="#ffffff" />';
-		    s += '  <PARAM name="movie" value="'+ flashPlayer +'" />';
-		    s += '  <PARAM name="FlashVars" value="mp3='+this.url+'&amp;showstop=1&amp;showvolume=1&amp;bgcolor1=0ffff5&amp;bgcolor2=000029&amp;autoplay='+this.autoplay+'" />';
+		    s += '  <PARAM name="movie" value="'+ mp3Player +'" />';
+		    s += '  <PARAM value="mp3='+this.url+'&amp;autoplay='+this.autoplay+'&amp;showstop=1&amp;showvolume=1&amp;bgcolor1=0ffff5&amp;bgcolor2=000029" name="FlashVars" />';
 		    s += '</OBJECT>';
 		
 
@@ -207,7 +207,7 @@ Movie.prototype.getInnerHTML = function (objectId){
 			s += '  <OBJECT type="'+this.contentType+'" ';
 			s += '          data="'+ this.url +'" ';
 			s += '          width="'+this.width+'" height="'+this.height+'" ';
-			s += '          style="*display:none">'; // for IE6 only
+//			s += '          style="*display:none">'; // for IE6 only
 			s += '    <PARAM name="autoplay" value="'+this.autoplay+'" />';
 			s += '    <PARAM name="controller" value="true" />';
 		    s += '  </OBJECT>';
