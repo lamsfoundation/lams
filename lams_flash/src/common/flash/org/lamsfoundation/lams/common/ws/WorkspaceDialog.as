@@ -782,7 +782,7 @@ class WorkspaceDialog extends MovieClip{
 		_workspaceController = _workspaceView.getController();
 		
 		if(StringUtils.containsReservedChar(resourceTitle_txi.text)) {
-			LFMessage.showMessageAlert(Dictionary.getValue('ws_save_title_reserved_chars', [StringUtils.reserved.toString()]), null);
+			LFMessage.showMessageAlert(Dictionary.getValue('ws_save_title_reserved_chars', [StringUtils.reserved_str]), null);
 			Cursor.showCursor(ApplicationParent.C_DEFAULT);
 			return;
 		}
