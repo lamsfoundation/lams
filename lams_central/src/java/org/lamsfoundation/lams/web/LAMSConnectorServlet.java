@@ -185,7 +185,18 @@ public class LAMSConnectorServlet extends HttpServlet {
 				
 			}			
 			setCreateFolderResponse(retValue,root,document);
-		}		
+		} else if (commandStr.equals("DeleteFile"))	 {
+			String fileName=request.getParameter("fileName");
+			File fileToDelete = new File(currentDir,fileName);
+
+			if(fileToDelete.isFile()) fileToDelete.delete();
+			
+		} else if(commandStr.equals("DeleteFolder")) {
+			String folderName=request.getParameter("folderName");
+			File folderToDelete = new File(currentDir,folderName);
+
+			if(folderToDelete.isDirectory()) folderToDelete.delete();
+		}
 		
 		document.getDocumentElement().normalize();
 		try {
