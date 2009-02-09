@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.openid.web;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -34,24 +35,25 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
-import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.openid.service.ILamsOpenIdService;
+import org.lamsfoundation.lams.openid.service.LamsOpenIdServiceProxy;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.verisign.joid.consumer.OpenIdFilter;
 
 /**
  * A special servlet for the openid management. This servlet manages requests
  * from openID servlets to login. If the user exists in lams, then it will log
- * them in, otherwise they will be sent to the register page with any 
- * user information released by open id populating the page.
+ * them in, otherwise they will be sent to the register page with any user
+ * information released by open id populating the page.
  * 
  * @author lfoxton
- *
+ * 
  */
 public class LamsOpenIdServlet extends HttpServlet {
 
@@ -59,11 +61,13 @@ public class LamsOpenIdServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(LamsOpenIdServlet.class);
 
-    private static IntegrationService integrationService = null;
+    private ILamsOpenIdService openIdService = null;
 
-    private static final String LOGIN_REQUEST_SERVLET_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/LoginRequest?";
-    private static final String REGISTER_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/openid/register_openid.jsp?";
-    
+    private static final String LOGIN_REQUEST_SERVLET_URL = Configuration.get(ConfigurationKeys.SERVER_URL)
+	    + "/LoginRequest?";
+    private static final String REGISTER_URL = Configuration.get(ConfigurationKeys.SERVER_URL)
+	    + "/openid/register_openid.jsp?";
+
     /**
      * The doGet method of the servlet. <br>
      * 
@@ -77,89 +81,69 @@ public class LamsOpenIdServlet extends HttpServlet {
      *                 if an error occurred
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
+
+	openIdService = LamsOpenIdServiceProxy.getLamsOpenIdService(getServletContext());
+
 	HttpSession session = request.getSession(true);
-	
+
 	String loggedInAs = OpenIdFilter.getCurrentUser(session);
 
 	// First check that openid login was successful
-	if (loggedInAs == null)
-	{
+	if (loggedInAs == null) {
 	    log.error("Did not get a user from open id");
 	    throw new ServletException("Did not get a user from open id");
 	}
 
 	//String extUsername = request.getParameter(LoginRequestDispatcher.PARAM_USER_ID);
 	String serverId = request.getParameter(LoginRequestDispatcher.PARAM_SERVER_ID);
-	String extCourseId = request.getParameter(LoginRequestDispatcher.PARAM_COURSE_ID);
+	//String extCourseId = request.getParameter(LoginRequestDispatcher.PARAM_COURSE_ID);
 	String timestamp = request.getParameter(LoginRequestDispatcher.PARAM_TIMESTAMP);
 	String hash = request.getParameter(LoginRequestDispatcher.PARAM_HASH);
 	String method = request.getParameter(LoginRequestDispatcher.PARAM_METHOD);
-	String countryIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
-	String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
-	String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
+	//String countryIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
+	//String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
+	//String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 
 	try {
-	    ExtServerOrgMap serverMap = getIntegrationService().getExtServerOrgMap(serverId);
-	    
-	    ExtUserUseridMap userMap = getIntegrationService().getExistingExtUserUseridMap(serverMap, loggedInAs);
-	    
-	    if (userMap == null)
-	    {
+	    ExtServerOrgMap serverMap = openIdService.getExtServerOrgMap(serverId);
+
+	    ExtUserUseridMap userMap = openIdService.getExistingExtUserUseridMap(serverMap, loggedInAs);
+
+	    Authenticator.authenticate(serverMap, timestamp, loggedInAs, method, hash);
+
+	    if (userMap == null) {
 		String registerURL = REGISTER_URL;
 		registerURL += "&openid_url=" + loggedInAs;
 		response.sendRedirect(registerURL);
-	    }
-	    else
-	    {
+	    } else {
 		// User exists, do login
-		String loginRequestURL = LOGIN_REQUEST_SERVLET_URL;
-		loginRequestURL += "&uid=" + loggedInAs;
-		loginRequestURL += "&method=" + method;
-		loginRequestURL += "&ts=" + timestamp;
-		loginRequestURL += "&sid=" + serverId;
-		loginRequestURL += "&hash=" + hash;
-		loginRequestURL += "&courseid=" + extCourseId;
-		loginRequestURL += "&country=" + countryIsoCode;
-		loginRequestURL += "&lang=" + langIsoCode;
-		loginRequestURL += "&courseName=" + courseName;
-		loginRequestURL += "&requestSrc=&notifyCloseURL=&lsid=";
-		response.sendRedirect(loginRequestURL);
+		User user = openIdService.getUserByLogin(serverMap.getPrefix() + "_" + loggedInAs);
+
+		// Invalidate the session if there is one already existing
+		String loginRequestUsername = (String) session.getAttribute("extUser");
+		if (loginRequestUsername != null && loginRequestUsername.equals(loggedInAs)) {
+		    session.invalidate();
+		    session = request.getSession(true);
+		} else if (loginRequestUsername != null && !loginRequestUsername.equals(loggedInAs)) {
+		    session.invalidate();
+		    session = request.getSession(true);
+		} else if (request.getRemoteUser() != null && loginRequestUsername == null) {
+		    session.invalidate();
+		    session = request.getSession(true);
+		}
+			
+		session.setAttribute("extUser", loggedInAs);
+		session.setAttribute(AttributeNames.USER, user.getUserDTO());
+		
+		// Get the user password from the database
+		String pass = openIdService.getUserPassword(user.getLogin());
+		response.sendRedirect(Configuration.get(ConfigurationKeys.SERVER_URL) + "j_security_check?j_username="
+			+ URLEncoder.encode(user.getLogin(), "UTF8") + "&j_password=" + pass);
 	    }
-	    
+
 	} catch (Exception e) {
 	    log.error("Open ID login error: ", e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 	}
     }
-    
-    /**
-     * TODO: Use spring injection instead of hacking a context
-     * 
-     * @return
-     */
-    public IIntegrationService getIntegrationService() throws Exception{
-
-	if (integrationService == null) {
-	    String contexts[] = { "/org/lamsfoundation/lams/applicationContext.xml",
-		    "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-		    "/org/lamsfoundation/lams/toolApplicationContext.xml",
-		    "/org/lamsfoundation/lams/integrationContext.xml",
-		    "/org/lamsfoundation/lams/learning/learningApplicationContext.xml",
-		    "/org/lamsfoundation/lams/contentrepository/applicationContext.xml",
-		    "/org/lamsfoundation/lams/commonContext.xml" };
-
-	    ApplicationContext context = new ClassPathXmlApplicationContext(contexts);
-
-	    if (context == null)
-		throw new Exception("Unable to access application context. Cannot create integration service object.");
-
-	    IIntegrationService service = (IIntegrationService) context.getBean("integrationService");
-	    return service;
-	} else {
-	    return integrationService;
-	}
-    }
 }
-
-

@@ -82,9 +82,9 @@ Ant build file.
 			</classpath>
 		</javac>
 		<copy overwrite="yes" todir="${build.classes.java}/${package}">
+			
 			<fileset dir="${src.java.dir}/${package}">
 				<include name="*.xml" />
-				<include name="*.properties" />
 			</fileset>
 		</copy>
 	</target>

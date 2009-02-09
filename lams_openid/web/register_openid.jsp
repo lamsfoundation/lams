@@ -17,8 +17,7 @@
 	String method = "register";
 	String plaintext = timestamp + userID + method + LAMS_SERVER_ID + LAMS_SERVER_KEY;
 	String hash = HashUtil.sha1(plaintext);
-	String courseID = (ADD_TO_GROUP) ? GROUP_ID : "";
-	String loginRequestURL = LAMS_SERVER_URL + "/LoginRequest";
+	String loginRequestURL = LAMS_SERVER_URL + "/openid/RegisterOpenId";
 %>
  
 <html lang="en_au">
@@ -98,14 +97,19 @@
 						<input type="hidden" name="ts" value="<%=timestamp %>" />
 						<input type="hidden" name="sid" value="<%=LAMS_SERVER_ID %>" />
 						<input type="hidden" name="hash" value="<%=hash %>" />
-						<input type="hidden" name="courseid" value="<%=courseID %>" />
+						<input type="hidden" name="courseid" value="<%=GROUP_ID %>" />
+						<input type="hidden" name="courseName" value="<%=GROUP_NAME %>" />
 						<input type="hidden" name="country" value="<%=GROUP_COUNTRY_ISO_CODE %>" />
 						<input type="hidden" name="lang" value="<%=GROUP_LANG_ISO_CODE %>" />
 						<input type="hidden" name="method" value=<%=method %> />
 						<input type="hidden" name="requestSrc" value="" />
 						<input type="hidden" name="notifyCloseURL" value="" />
 						<input type="hidden" name="lsid" value="" />
-
+						<input type="hidden" name="addToGroup" value="<%=ADD_TO_GROUP %>" />
+						<input type="hidden" name="addToGroupAsTeacher" value="<%=GROUP_ADD_AS_TEACHER %>" />
+						<input type="hidden" name="addToGroupLessons" value="<%=ADD_TO_GROUP_LESSONS %>" />
+						<input type="hidden" name="addToGroupLessons" value="<%=ADD_TO_GROUP_LESSONS_AS_STAFF %>" />
+						
 						<table border="0" cellspacing="1" cellpadding="1" align="left">
 						
 							<tr>
