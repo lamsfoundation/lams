@@ -81,7 +81,7 @@ public class LearningDesign implements Serializable {
 	private Activity firstActivity;
 	
 	/** nullable persistent field */
-	private Activity floatingActivity;
+	private FloatingActivity floatingActivity;
 
 	/** nullable persistent field */
 	private Integer maxID;
@@ -170,7 +170,7 @@ public class LearningDesign implements Serializable {
 			String description,
 			String title,
 			Activity firstActivity,
-			Activity floatingActivity,
+			FloatingActivity floatingActivity,
 			Integer maxID,
 			Boolean validDesign,
 			Boolean readOnly,
@@ -495,14 +495,14 @@ public class LearningDesign implements Serializable {
 		}
 		return newFirstActivity;
 	}
-	public Activity calculateFloatingActivity(){
-		Activity newFloatingActivity = null;
+	public FloatingActivity calculateFloatingActivity(){
+		FloatingActivity newFloatingActivity = null;
 		HashSet parentActivities = this.getParentActivities();
 		Iterator parentIterator = parentActivities.iterator();
 		while(parentIterator.hasNext()){
 			Activity activity = (Activity)parentIterator.next();
 			if(activity.isFloatingActivity()){
-				newFloatingActivity = activity;
+				newFloatingActivity = (FloatingActivity) activity;
 				break;
 			}
 		}
@@ -583,11 +583,11 @@ public class LearningDesign implements Serializable {
 		this.competences = competences;
 	}
    
-	public void setFloatingActivity(Activity activity) {
+	public void setFloatingActivity(FloatingActivity activity) {
 		floatingActivity = activity;
 	}
 	
-	public Activity getFloatingActivity() {
+	public FloatingActivity getFloatingActivity() {
 		return floatingActivity;
 	}
 

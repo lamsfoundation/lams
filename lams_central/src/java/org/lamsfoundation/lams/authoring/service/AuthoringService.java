@@ -1208,11 +1208,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    newLearningDesign.getActivities().clear();
 	}
 
-	if(originalLearningDesign.getFloatingActivity() != null && newLearningDesign.getFloatingActivity() != null) {
-    	// remove the Floating Activity in current design
-    	activities.remove(originalLearningDesign.getFloatingActivity());
-    }
-
 	newLearningDesign.getActivities().addAll(activities);
 
 	// On very rare occasions, we've had Hibernate try to save the branching
@@ -1258,7 +1253,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    newActivity.setParentActivity(parentActivity);
 	    newActivity.setParentUIID(parentActivity.getActivityUIID());
 	}
-	newActivities.put(newActivity.getActivityUIID(), newActivity);
+	
+	if(!(newActivity.isFloatingActivity() && newLearningDesign.getFloatingActivity() != null))
+		newActivities.put(newActivity.getActivityUIID(), newActivity);
 
 	if (newActivity.isToolActivity()) {
 	    copyActivityToolContent(newActivity, newLearningDesign.getCopyTypeID(), originalLearningDesignId, customCSV);
@@ -1274,14 +1271,20 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	        // Transfer the floating activities from the main design to the one that is to be imported. 
 	        // Number of activities may overflow the max limit for the container - to be handled in flash 
 	        // when design is opened.
-	        Activity refParentActivity = (childActivity.isFloating() && newLearningDesign.getFloatingActivity() != null) 
-	    						? newLearningDesign.getFloatingActivity()
-	    						: newActivity;
-	    	// TODO: fix order id for transfer of floating activities when contained in both designs.
-			if(childActivity.isFloating() && newLearningDesign.getFloatingActivity() != null)
-				childActivity.setOrderId(((FloatingActivity) refParentActivity).getActivities().size()+childActivity.getOrderId()+1);
-	    	processActivity(childActivity, newLearningDesign, newActivities, newGroupings,
-				refParentActivity, originalLearningDesignId, uiidOffset, customCSV);
+	    	FloatingActivity fParentActivity = null;
+	    	Activity refParentActivity = null;
+	    	
+	    	if(childActivity.isFloating() && newLearningDesign.getFloatingActivity() != null)
+	    		fParentActivity = newLearningDesign.getFloatingActivity();
+	    	else 
+	    		refParentActivity = newActivity;
+	    	
+	    	if(childActivity.isFloating() && fParentActivity != null)
+				childActivity.setOrderId(fParentActivity.getActivities().size()+childActivity.getOrderId()+1);
+	    	
+			Activity pActivity = (fParentActivity != null) ? (Activity) fParentActivity : refParentActivity;
+			processActivity(childActivity, newLearningDesign, newActivities, newGroupings,
+				pActivity, originalLearningDesignId, uiidOffset, customCSV);
 			
 		}
 	}
