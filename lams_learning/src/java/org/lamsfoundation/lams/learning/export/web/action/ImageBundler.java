@@ -119,48 +119,6 @@ public class ImageBundler extends Bundler {
     }
 
     /**
-     * Creates list of files uploaded by user that should be exported.
-     */
-    private void setupFileList() {
-	String fileDirectory = lamsWwwPath + File.separatorChar + "secure" + File.separatorChar + contentFolderId
-		+ File.separatorChar + "File";
-	String outputFileDirectory = outputDirectory + File.separatorChar + contentFolderId + File.separatorChar
-		+ "File";
-	directoriesRequired.add(outputFileDirectory);
-
-	File dir = new File(fileDirectory);
-	if (!dir.canRead() || !dir.isDirectory()) {
-	    log.debug("Unable to read file directory " + dir.getAbsolutePath());
-	} else {
-	    File[] files = dir.listFiles();
-	    for (File imageFile : files) {
-		filesToCopy.put(outputFileDirectory + File.separatorChar + imageFile.getName(), imageFile);
-	    }
-	}
-    }
-
-    /**
-     * Creates list of Images uploaded by user that should be exported.
-     */
-    private void setupImageList() {
-	String imageDirectory = lamsWwwPath + File.separatorChar + "secure" + File.separatorChar + contentFolderId
-		+ File.separatorChar + "Image";
-	String outputImageDirectory = outputDirectory + File.separatorChar + contentFolderId + File.separatorChar
-		+ "Image";
-	directoriesRequired.add(outputImageDirectory);
-
-	File dir = new File(imageDirectory);
-	if (!dir.canRead() || !dir.isDirectory()) {
-	    log.debug("Unable to read image directory " + dir.getAbsolutePath());
-	} else {
-	    File[] files = dir.listFiles();
-	    for (File imageFile : files) {
-		filesToCopy.put(outputImageDirectory + File.separatorChar + imageFile.getName(), imageFile);
-	    }
-	}
-    }
-
-    /**
      * Creates list of FCKEditor smiley files that should be exported.
      */
     private void setupFCKEditorSmileysList() {
