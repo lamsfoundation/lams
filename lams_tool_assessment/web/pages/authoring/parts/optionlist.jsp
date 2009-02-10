@@ -5,11 +5,8 @@
 	
 	<table class="alternative-color" cellspacing="0">
 		<c:forEach var="option" items="${optionList}" varStatus="status">
-			<tr id="optionItem${status.index}">
-				<td width="3px" style="vertical-align:middle;">
-					${status.index+1}
-				</td>
-				<td style="padding-left:10px;">
+			<tr>
+				<td style="padding-left:10px; padding-top:15px; padding-bottom:15px;">
 					<c:choose>
 						<c:when test="${(questionType == 1) || (questionType == 3)}">
 							<%@ include file="option.jsp"%>
@@ -23,7 +20,7 @@
 					</c:choose>	
 				</td>
 					
-				<td width="15px" style="padding-left:0px; vertical-align:middle; text-align: center;">
+				<td width="20px" style="padding-left:10px; vertical-align:middle; text-align: center;">
 					<c:if test="${not status.first}">
 						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
 							border="0" title="<fmt:message key="label.authoring.basic.up"/>"
@@ -48,7 +45,7 @@
 					</c:if>
 				</td>
 	                
-				<td width="20px" style="padding-left:0px; vertical-align:middle;">
+				<td width="20px" style="padding-left:10px; vertical-align:middle; text-align: center;">
 					<img src="<html:rewrite page='/includes/images/cross.gif'/>"
 						title="<fmt:message key="label.authoring.basic.delete" />"
 						onclick="removeOption(${status.index})" />

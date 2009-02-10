@@ -1,36 +1,37 @@
 <table>
 	<tr>
-		<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; background:none;">
+		<td style="padding-left:10px; border-bottom:0px; vertical-align:middle; background:none;" width="70px;">
+			<input type="hidden" name="optionSequenceId${status.index}" id="optionSequenceId${status.index}" value="${option.sequenceId}">
 			<span class="field-name">
 				<fmt:message key="label.authoring.basic.option.answer"></fmt:message>
+				${status.index+1}
 			</span>
 		</td>
-		<td style="padding-left:0px; border-bottom:0px; background:none;">	
-			<input type="hidden" name="optionSequenceId${status.index}" id="optionSequenceId${status.index}" value="${option.sequenceId}">									
+		<td style="padding-left:10px; border-bottom:0px; background:none;">	
 			<input type="text" name="optionAnswer${status.index}"
 				id="optionAnswer${status.index}" size="25" value="${option.answerString}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 		</td>									
 	</tr>
 	
 	<tr>
-		<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; background:none;">
+		<td style="padding-left:10px; border-bottom:0px; vertical-align:middle; background:none;">
 			<span class="field-name">
 				<fmt:message key="label.authoring.basic.option.accepted.error"></fmt:message>
 			</span>
 		</td>
-		<td style="padding-left:0px; border-bottom:0px; background:none;">	
+		<td style="padding-left:10px; border-bottom:0px; background:none;">	
 			<input type="text" name="optionAcceptedError${status.index}"
 				id="optionAcceptedError${status.index}" size="25" value="${option.acceptedErrorStr}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 		</td>									
 	</tr>	
 	
 	<tr>
-		<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; background:none;">
+		<td style="padding-left:10px; border-bottom:0px; vertical-align:middle; background:none;">
 			<span class="field-name">
 				<fmt:message key="label.authoring.basic.option.grade"></fmt:message>
 			</span>
 		</td>
-		<td style="padding-left:0px; border-bottom:0px; background:none;">
+		<td style="padding-left:10px; border-bottom:0px; background:none;">
 			<html:select property="optionGrade${status.index}" style="float: left" value="${option.grade}">
 				<html:option value="100.0">100 %</html:option>
 				<html:option value="90.0">90 %</html:option>
@@ -77,14 +78,16 @@
 		</td>
 	</tr>
 	<tr>
-		<td style="padding-left:0px; border-bottom:0px; vertical-align:top; background:none;">
+		<td style="padding-left:10px; border-bottom:0px; vertical-align:top; background:none;" colspan="2">
 			<span class="field-name">
 				<fmt:message key="label.authoring.basic.option.feedback"></fmt:message>
 			</span>
 		</td>
-		<td style="padding-left:0px; border-bottom:0px; background:none;" width="630px">
+	</tr>
+	<tr>		
+		<td style="padding-left:10px; border-bottom:0px; background:none;" colspan="2">
 			<lams:FCKEditor id="optionFeedback${status.index}" value="${option.feedback}"
-				contentFolderID="${contentFolderID}">
+				contentFolderID="${contentFolderID}" width="622">
 			</lams:FCKEditor>		
 		</td>
 	</tr>	

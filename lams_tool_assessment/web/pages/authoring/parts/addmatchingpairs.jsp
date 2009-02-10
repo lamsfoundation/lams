@@ -98,7 +98,7 @@
 		
 	</lams:head>
 	
-	<body class="stripes">
+	<body class="stripes" onload="parent.resizeIframe();">
 		<div id="content" >	
 			<%@ include file="/common/messages.jsp"%>
 		    <div class="error" style="display:none;">

@@ -42,6 +42,9 @@
 		    			},
 		    			hasAnswerFilled: {
 		    				required: function(element) {
+				    			$("[name^=optionAnswer]").each(function() {
+									this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+				    			});		    				
 		    		        	return $("input[name^=optionAnswer]:filled").length < 1;
 			    		    }			    		    
 	    			    },
@@ -83,7 +86,7 @@
 		    		},
 		    		debug: true,
      			    submitHandler: function(form) {
-		    			$("[name^=optionFeedback]").each(function() {
+		    			$("[name^=optionAnswer]").each(function() {
 							this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
 		    			});
 		    			$("#optionList").val($("#optionForm").serialize(true));

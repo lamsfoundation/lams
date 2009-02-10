@@ -65,13 +65,16 @@
 		);
 	}
 	function prepareFCKEditorsForAjaxSubmit(){
-		if ((questionType == 1) || (questionType == 3) || (questionType == 4)) {
-			$("[name^=optionFeedback]").each(function() {
+		if ((questionType == 1) || (questionType == 3)) {
+			$("[name^=optionAnswer]").each(function() {
 				this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
 			});
-		}
-		if (questionType == 2) {
+		} else if (questionType == 2) {
 			$("[name^=optionQuestion]").each(function() {
+				this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+			});
+		} else if (questionType == 4) {
+			$("[name^=optionFeedback]").each(function() {
 				this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
 			});
 		}
