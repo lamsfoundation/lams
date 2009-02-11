@@ -72,6 +72,8 @@ public class LoginRequestDispatcher {
     public static final String PARAM_CUSTOM_CSV = "customCSV";
 
     public static final String PARAM_EXT_LMS_ID = "extlmsid";
+    
+    public static final String PARAM_MODE = "mode";
 
     public static final String METHOD_AUTHOR = "author";
 
@@ -105,6 +107,7 @@ public class LoginRequestDispatcher {
 
 	String method = request.getParameter(PARAM_METHOD);
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
+	String mode = request.getParameter(PARAM_MODE);
 
 	try {
 	    addUserToLessonClass(request, lessonId, method);
@@ -144,7 +147,12 @@ public class LoginRequestDispatcher {
 	}
 	/** LEARNER * */
 	else if (METHOD_LEARNER.equals(method) && lessonId != null) {
-	    return request.getContextPath() + URL_LEARNER + lessonId;
+	    String url = request.getContextPath() + URL_LEARNER + lessonId;
+	    if (mode != null)
+	    {
+		url += "&" + PARAM_MODE + "=" + mode;
+	    }
+	    return url;
 	} else {
 	    return request.getContextPath() + URL_DEFAULT;
 	}
