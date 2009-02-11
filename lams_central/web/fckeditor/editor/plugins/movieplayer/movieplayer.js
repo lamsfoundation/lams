@@ -194,14 +194,14 @@ Movie.prototype.getInnerHTML = function (objectId){
 	}else {
 		// Other video types
 		var pluginspace, codebase, classid;
-		if(this.contentType == "video/quicktime" || this.contentType == "video/mp4" || this.contentType == "video/mpeg") {
+		if(this.contentType == "video/quicktime" || this.contentType == "video/mp4" || this.contentType == "video/mpeg" || this.contentType == "video/x-msvideo" ) {
 			// QUICKTIME
 			this.autoplay = (this.autoplay == 'true' || this.autoplay == '1') ? 'true' : 'false';
 			s += '<OBJECT id="movie' + rnd + '" ';
 			s += '        classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" ';
 			s += '        codebase="http://www.apple.com/qtactivex/qtplugin.cab" '
-			s += '        width="'+this.width+'" height="'+this.height+'" >';
-		    s += '  <PARAM name="src" value="'+ this.url +'" />';
+			s += '        width="'+this.width+'" height="'+(this.height + 15)+'" >';
+		        s += '  <PARAM name="src" value="'+ this.url +'" />';
 			s += '  <PARAM name="autoplay" value="'+this.autoplay+'" />';
 			s += '  <PARAM name="controller" value="true" />';
 			s += '  <OBJECT type="'+this.contentType+'" ';
@@ -212,7 +212,6 @@ Movie.prototype.getInnerHTML = function (objectId){
 			s += '    <PARAM name="controller" value="true" />';
 		    s += '  </OBJECT>';
 		    s += '</OBJECT>';	
-		    
 		}else{
 			// WINDOWS MEDIA & OTHERS
 			this.autoplay = (this.autoplay == 'true' || this.autoplay == '1') ? 'true' : 'false';
@@ -273,7 +272,8 @@ function getContentType(url) {
 			(ext=="m4v") ? "video/mp4":
 			(ext=="mp3") ? "audio/mpeg":
 			(ext=="flv"||ext=="fla"||ext=="swf") ? "application/x-shockwave-flash":
-			(ext=="wmv"||ext=="wm" ||ext=="avi") ? "video/x-ms-wmv":
+			(ext=="wmv"||ext=="wm") ? "video/x-ms-wmv":
+                 	(ext=="avi") ? "video/x-msvideo":
 			(ext=="asf") ? "video/x-ms-asf":				
 			(ext=="wma") ? "audio/x-ms-wma":
 			(ext=="mov"||ext=="qt") ? "video/quicktime" : "video/x-ms-wmv";
