@@ -164,16 +164,16 @@ public class FileUtil {
 			throw new FileUtilException("No temporary directory known to the server. [System.getProperty( \"java.io.tmpdir\" ) returns null. ]\n Cannot upload package.");
 	
 		String tempDirName = tempSysDirName+File.separator
-			+prefix+System.currentTimeMillis()+"_"+suffix;
-		
-		// try 100 slightly different variations. If I can't find a unique
-		// one in ten tries, then give up.
+			+prefix+generateUniqueContentFolderID()+"_"+suffix;
 		File tempDir = new File(tempDirName);
+		// try 100 different variations. If I can't find a unique
+		// one in 100 tries, then give up.
 		int i = 0;
-		while ( tempDir.exists() && i < 100 ) {
+		while ( tempDir.exists() && i<100) {
 			tempDirName = tempSysDirName+File.separator
-				+prefix+System.currentTimeMillis()+"_"+i+suffix;
+				+prefix+generateUniqueContentFolderID()+"_"+suffix;
 			tempDir = new File(tempDirName);
+			i++;
 		}
 		if ( tempDir.exists() )
 			throw new FileUtilException("Unable to create temporary directory. The temporary filename/directory that we would use to extract files already exists: "
