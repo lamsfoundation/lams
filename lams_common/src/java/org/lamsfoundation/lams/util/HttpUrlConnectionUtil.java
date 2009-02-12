@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.util;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,6 +38,7 @@ import java.net.URL;
 
 import javax.servlet.http.Cookie;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 
@@ -153,13 +155,9 @@ public class HttpUrlConnectionUtil {
 			if (status == STATUS_OK)
 			{
 			    InputStream inputStream = con.getInputStream(); //start reading the input stream
-				OutputStream outStream = new FileOutputStream(absoluteFilePath);
-				   
-				int c = -1;
-				while ((c = inputStream.read())!= -1)
-				{
-					outStream.write(c);
-				}
+				OutputStream outStream = new BufferedOutputStream(new FileOutputStream(absoluteFilePath));
+				
+				IOUtils.copy(inputStream, outStream);
 				   
 				inputStream.close();
 				outStream.close(); 
