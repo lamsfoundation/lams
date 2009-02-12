@@ -1211,7 +1211,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    }
 
 	    // check if activity is already complete
-	    if (learnerProgress != null && learnerProgress.getCompletedActivities().contains(stopActivity)) {
+	    if (learnerProgress != null && learnerProgress.getCompletedActivities().containsKey(stopActivity)) {
 		return messageService.getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_ACTIVITY_DONE,
 			new Object[] { stopActivity.getTitle() });
 	    }
@@ -1352,7 +1352,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	// be set.
 	if (stopReason == null) {
 	    LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
-	    if (learnerProgress.getCompletedActivities().contains(stopActivity)) {
+	    if (learnerProgress.getCompletedActivities().containsKey(stopActivity)) {
 		// we have reached the stop activity. It may have been the
 		// activity we just processed
 		// or it may have been a parent activity (e.g. an optional

@@ -86,7 +86,7 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy
 	        for(Iterator i = complexActivity.getActivities().iterator();i.hasNext();)
 	        {
 	            Activity currentActivity = (Activity)i.next();
-	            boolean actComplete = learnerProgress.getCompletedActivities().contains(currentActivity);
+	            boolean actComplete = learnerProgress.getCompletedActivities().containsKey(currentActivity);
 	            if ( isPreview && ! actComplete) {
 	            	// found one not complete, so can try more branches
 	            	return false;

@@ -632,7 +632,7 @@ public class LessonService implements ILessonService {
 	    LessonService.log.debug("Removed activity from attempted activities");
 	}
 
-	removed = progress.getCompletedActivities().remove(activity);
+	removed = (progress.getCompletedActivities().remove(activity) != null);
 	if (removed) {
 	    recordUpdated = true;
 	    LessonService.log.debug("Removed activity from completed activities");

@@ -45,15 +45,11 @@
 				class="org.lamsfoundation.lams.learningdesign.Activity" />
 		</set>
 
-		<!-- uni-directional one-to-many association to completed activities -->
-		<set name="completedActivities" lazy="false" batch-size="20"
-			cascade="none" table="lams_progress_completed">
-			<key>
-				<column name="learner_progress_id" />
-			</key>
-			<many-to-many column="activity_id"
-				class="org.lamsfoundation.lams.learningdesign.Activity" />
-		</set>
+		<map name="completedActivities" lazy="false" batch-size="20" cascade="none" table="lams_progress_completed">
+			<key column="learner_progress_id"/>
+			<index-many-to-many column="activity_id" class="org.lamsfoundation.lams.learningdesign.Activity"/>
+			<element column="completed_date_time" type="java.util.Date"/>
+		</map>
 
 		<!-- bi-directional many-to-one association to User -->
 		<many-to-one name="user" lazy="false"

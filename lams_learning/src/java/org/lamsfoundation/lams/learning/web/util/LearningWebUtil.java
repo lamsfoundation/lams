@@ -218,7 +218,7 @@ public class LearningWebUtil
     	
 		if ( currentActivity == null ) {
 			progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
-		} else if ( progress.getCompletedActivities().contains(currentActivity) ) {
+		} else if ( progress.getCompletedActivities().containsKey(currentActivity) ) {
 			return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 		} else {
 			// Set activity as complete
@@ -322,7 +322,7 @@ public class LearningWebUtil
 			
 			progressSummary.append("&completed=");
 			first = true;
-			for ( Object obj : learnerProgress.getCompletedActivities() ) {
+			for ( Object obj : learnerProgress.getCompletedActivities().keySet() ) {
 				Activity activity = (Activity ) obj;
 				if ( ! first ) {
 					progressSummary.append("_");

@@ -397,7 +397,7 @@ public class LearnerService implements ICoreLearnerService {
 	    Boolean clearCompletedFlag) {
 	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
 
-	if (!progress.getCompletedActivities().contains(activity)) {
+	if (!progress.getCompletedActivities().containsKey(activity)) {
 	    // if we skip a sequence in an optional sequence, or have been force completed for branching / optional
 	    // sequence
 	    // and we go back to the sequence later, then the LessonComplete flag must be reset so that it will step

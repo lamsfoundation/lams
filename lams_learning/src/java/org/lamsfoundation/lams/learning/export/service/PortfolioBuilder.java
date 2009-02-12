@@ -183,7 +183,7 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 
 	// if learner only include the attempted and completed activities
 	if (accessMode == ToolAccessMode.LEARNER
-		&& !(progress.getCompletedActivities().contains(activity) || progress.getAttemptedActivities()
+		&& !(progress.getCompletedActivities().containsKey(activity) || progress.getAttemptedActivities()
 			.contains(activity))) {
 	    return;
 	}

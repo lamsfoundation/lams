@@ -36,6 +36,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -102,7 +104,7 @@ public class LearnerProgress implements Serializable
      *  Set of completed activities that includes all completed activities
      *  before current activity.
      */
-    private Set completedActivities;
+    private Map completedActivities;
     
     /**
      * The activity that user just completed. The purpose of this
@@ -167,11 +169,11 @@ public class LearnerProgress implements Serializable
      */
     public LearnerProgress(User user,Lesson lesson)
     {
-        this(null,user,lesson,new TreeSet( new ActivityOrderComparator()),new TreeSet( new ActivityOrderComparator()));
+        this(null,user,lesson,new TreeSet( new ActivityOrderComparator()),new TreeMap( new ActivityOrderComparator()));
     }
     
     /** full constructor */
-    public LearnerProgress(Long learnerProgressId, User user, Lesson lesson, Set attemptedActivities, Set completedActivities)
+    public LearnerProgress(Long learnerProgressId, User user, Lesson lesson, Set attemptedActivities, Map completedActivities)
     {
         this.learnerProgressId = learnerProgressId;
         this.user = user;
@@ -242,13 +244,13 @@ public class LearnerProgress implements Serializable
      *           
      *
      */
-    public Set getCompletedActivities()
+    public Map getCompletedActivities()
     {
         
         return this.completedActivities;
     }
     
-    public void setCompletedActivities(java.util.Set completedActivities)
+    public void setCompletedActivities(java.util.Map completedActivities)
     {
         
         this.completedActivities = completedActivities;
@@ -303,10 +305,10 @@ public class LearnerProgress implements Serializable
      */
     public byte getProgressState(Activity activity)
     {
-        if (completedActivities.contains(activity))
+        if (completedActivities.containsKey(activity))
         {
             return ACTIVITY_COMPLETED;
-        }
+        } 
         else if (attemptedActivities.contains(activity))
         {
             return ACTIVITY_ATTEMPTED;
@@ -361,7 +363,7 @@ public class LearnerProgress implements Serializable
     		this.attemptedActivities.add(activity);
     	}
     	else if (state == LearnerProgress.ACTIVITY_COMPLETED) {
-    		this.completedActivities.add(activity);
+    		this.completedActivities.put(activity, new Date(System.currentTimeMillis()));
     	}
     }
 
@@ -488,7 +490,7 @@ public class LearnerProgress implements Serializable
                                       this.user.getUserId(),
                                       this.currentActivity != null ? this.currentActivity.getActivityId() : null,
                                       this.createIdArrayFrom(this.attemptedActivities),
-                                      this.createIdArrayFrom(this.completedActivities),
+                                      this.createIdArrayFrom(this.completedActivities.keySet()),
                                       isComplete());
     }
     

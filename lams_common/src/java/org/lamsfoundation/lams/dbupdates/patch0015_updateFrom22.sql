@@ -24,6 +24,9 @@ values ('SMTPPassword','', 'config.smtp.password', 'config.header.email', 'STRIN
 -- LDEV-2107 --------------
 INSERT into lams_workspace_folder_type VALUES (3, 'PUBLIC SEQUENCES');
 
+-- LDEV-2115 --------------
+ALTER TABLE lams_progress_completed ADD COLUMN completed_date_time DATETIME NOT NULL;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

@@ -142,7 +142,7 @@ public class ProgressEngine
                                         +"learning design ["+ld.getTitle()+"], id["
                                         +ld.getLearningDesignId().longValue()
                                         +"]");
-        } else if ( progress.getCompletedActivities().contains(ld.getFirstActivity())  ) {
+        } else if ( progress.getCompletedActivities().containsKey(ld.getFirstActivity())  ) {
         	// special case - recalculating the appropriate current activity.
         	return doCalculateProgress(progress.getUser(), ld.getFirstActivity(), progress, new LinkedList<Long>());
         } else if ( canDoActivity(progress.getLesson(), ld.getFirstActivity()) ) {
@@ -241,7 +241,7 @@ public class ProgressEngine
     {
     	Activity nextActivity = transition.getToActivity();
     	
-    	if ( ! learnerProgress.getCompletedActivities().contains(nextActivity) ) {
+    	if ( ! learnerProgress.getCompletedActivities().containsKey(nextActivity) ) {
     		// normal case - the next activity is still yet to be done
     		
 	        learnerProgress.setPreviousActivity(completedActivity);
@@ -305,7 +305,7 @@ public class ProgressEngine
             
             
             ComplexActivity complexParent = (ComplexActivity) activityDAO.getActivityByActivityId(parent.getActivityId(),ComplexActivity.class);
-            if (! learnerProgress.getCompletedActivities().contains(complexParent) && !complexParent.areChildrenCompleted(learnerProgress))
+            if (! learnerProgress.getCompletedActivities().containsKey(complexParent) && !complexParent.areChildrenCompleted(learnerProgress))
             {
                 Activity nextActivity = complexParent.getNextActivityByParent(completedActivity);
                 

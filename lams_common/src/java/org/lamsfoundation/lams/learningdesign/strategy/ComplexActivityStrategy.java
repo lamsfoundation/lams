@@ -61,7 +61,7 @@ public abstract class ComplexActivityStrategy implements Serializable, IContribu
 	        for(Iterator i = complexActivity.getActivities().iterator();i.hasNext();)
 	        {
 	            Activity currentActivity = (Activity)i.next();
-	            if(learnerProgress.getCompletedActivities().contains(currentActivity))
+	            if(learnerProgress.getCompletedActivities().containsKey(currentActivity))
 	                numOfCompletedActivities++;
 	        }
         }
