@@ -55,13 +55,13 @@ public class Bundler {
 	}
     }
 
-    protected void copyFile(String destDirStr, File srcFile) throws IOException {
+    protected void copyFile(String destFilePath, File srcFile) throws IOException {
 
-	log.debug("Copying file " + srcFile + " to " + destDirStr);
-	File destDir = new File(destDirStr);
+	log.debug("Copying file " + srcFile + " to " + destFilePath);
+	File destFile = new File(destFilePath);
 
 	try {
-	    FileUtils.copyFileToDirectory(srcFile, destDir);
+	    FileUtils.copyFile(srcFile, destFile);
 	} catch (IOException e) {
 	    String message = "Unable to write out file needed for export portfolio. File was " + srcFile;
 	    log.error(message, e);
