@@ -102,8 +102,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 		if(baseDir==null)
 			baseDir="secure";
 		
-		realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + baseDir;
-		lamsContextPath = "/" + Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH) +"/";
+		getConfigKeyValues();
 		
 		File baseFile=new File(realBaseDir);
 		if(!baseFile.exists()){
@@ -122,6 +121,9 @@ public class LAMSConnectorServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		if (debug) System.out.println("--- BEGIN DOGET ---");
+
+		// get realBaseDir and lamsContextPath at request time from config values in memory
+		getConfigKeyValues();
 		
 		response.setContentType("text/xml; charset=UTF-8");
 		response.setHeader("Cache-Control","no-cache");
@@ -376,7 +378,10 @@ public class LAMSConnectorServlet extends HttpServlet {
 		else
 			return true;
 	}
-
-
+	
+	 private void getConfigKeyValues() {
+	 	realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + baseDir;
+		lamsContextPath = "/" + Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH) +"/";
+	 }
 }
 
