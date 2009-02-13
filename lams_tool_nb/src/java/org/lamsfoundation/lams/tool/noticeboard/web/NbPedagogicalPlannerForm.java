@@ -24,13 +24,13 @@
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
  * @struts:form name="NbPedagogicalPlannerForm"
  *              type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerForm"
  */
-public class NbPedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private String content;
     private String contentFolderID;
 

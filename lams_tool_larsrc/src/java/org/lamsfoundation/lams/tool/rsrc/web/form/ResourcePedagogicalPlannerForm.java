@@ -35,12 +35,12 @@ import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
  * @struts.form name="pedagogicalPlannerForm"
  */
-public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> title;
     private List<String> url;
     private List<FormFile> file;

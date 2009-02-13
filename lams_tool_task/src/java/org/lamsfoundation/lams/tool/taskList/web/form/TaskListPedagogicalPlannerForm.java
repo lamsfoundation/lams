@@ -32,12 +32,12 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItem;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
  * @struts.form name="pedagogicalPlannerForm"
  */
-public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class TaskListPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> taskListItem;
 
     @Override

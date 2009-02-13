@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS lams_log_event;
 DROP TABLE IF EXISTS lams_log_event_type;
 DROP TABLE IF EXISTS lams_organisation;
 DROP TABLE IF EXISTS lams_organisation_type;
+DROP TABLE IF EXISTS lams_planner_nodes;
 DROP TABLE IF EXISTS lams_progress_attempted;
 DROP TABLE IF EXISTS lams_progress_completed;
 DROP TABLE IF EXISTS lams_role;

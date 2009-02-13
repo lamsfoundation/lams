@@ -32,12 +32,12 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
  * @struts.form name="pedagogicalPlannerForm"
  */
-public class ForumPedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> topic;
     private String contentFolderID;
 

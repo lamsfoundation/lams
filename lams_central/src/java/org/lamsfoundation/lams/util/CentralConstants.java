@@ -139,7 +139,7 @@ public class CentralConstants {
 
     public static final String ERROR_PLANNER_TITLE_BLANK = "error.planner.title.blank";
 
-    public static final String PATH_ACTIVITY_NO_PLANNER_SUPPORT = "/pedagogical_planner/defaultForm.jsp";
+    public static final String PATH_ACTIVITY_NO_PLANNER_SUPPORT = "/pedagogical_planner/defaultActivityForm.jsp";
 
     public static final String TEMPLATE_FILE_NAME = "LAMS_Pedagogical_Planner_Template.zip";
 

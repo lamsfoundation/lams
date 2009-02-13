@@ -28,12 +28,12 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
  * @struts.form name="pedagogicalPlannerForm"
  */
-public class WikiPedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class WikiPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     String title;
     String wikiBody;
     String contentFolderID;

@@ -21,40 +21,24 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.sbmt.form;
+package org.lamsfoundation.lams.planner.dao;
 
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import java.util.List;
 
-/**
- * @struts:form name="SbmtPedagogicalPlannerForm"
- *              type="org.lamsfoundation.lams.tool.sbmt.form.SubmitFilesPedagogicalPlannerForm"
- */
-public class SubmitFilesPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
-    String instruction;
-    String contentFolderID;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 
-    public String getContentFolderID() {
-	return contentFolderID;
-    }
+public interface PedagogicalPlannerDAO {
+    PedagogicalPlannerSequenceNode getByUid(Long uid);
 
-    public void setContentFolderID(String contentFolderID) {
-	this.contentFolderID = contentFolderID;
-    }
+    PedagogicalPlannerSequenceNode getRootNode();
 
-    public String getInstruction() {
-	return instruction;
-    }
+    void saveOrUpdateNode(PedagogicalPlannerSequenceNode node);
 
-    public void setInstruction(String instructions) {
-	instruction = instructions;
-    }
+    void removeNode(PedagogicalPlannerSequenceNode node);
 
-    public void fillForm(SubmitFilesContent content) {
-	if (content != null) {
-	    String instruction = content.getInstruction();
-	    setInstruction(instruction);
-	    setToolContentID(content.getContentID());
-	}
-    }
+    List<String[]> getTitlePath(PedagogicalPlannerSequenceNode node);
+
+    String getFilePath(PedagogicalPlannerSequenceNode node);
+
+    Integer getNextSubdir(Long parentUid);
 }

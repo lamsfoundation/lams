@@ -65,7 +65,7 @@
 				<!-- Core Notebook Service related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/notebook/model/NotebookEntry.hbm.xml</value>
 				
-				<!-- Event notification related mapping files-->
+				<!-- Event notification service related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/events/Event.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/events/Subscription.hbm.xml</value>
 				
@@ -77,6 +77,9 @@
 				<value>classpath:org/lamsfoundation/lams/integration/ExtServerOrgMap.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/integration/ExtCourseClassMap.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/integration/ExtUserUseridMap.hbm.xml</value>
+				
+				<!-- Pedagogical Planner related mapping files-->
+				<value>classpath:org/lamsfoundation/lams/planner/PedagogicalPlannerSequenceNode.hbm.xml</value>
 				
 				<!-- Mapping files for tools with complex conditions -->
 
@@ -370,6 +373,11 @@
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	<bean id="competenceMappingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceMappingDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Pedagogical Planner related beans -->
+	<bean id="pedagogicalPlannerDAO" class="org.lamsfoundation.lams.planner.dao.hibernate.PedagogicalPlannerDAOHibernate">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	

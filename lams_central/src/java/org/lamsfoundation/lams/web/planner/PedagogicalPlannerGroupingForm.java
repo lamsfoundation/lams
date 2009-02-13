@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.learningdesign.RandomGrouping;
  * @author Marcin Cieslak
  * 
  */
-public class GroupingPedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityForm {
     private Integer groupingTypeId;
     private String numberOfGroups;
     private String learnersPerGroup;

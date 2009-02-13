@@ -1074,5 +1074,17 @@ CREATE TABLE lams_registration (
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
-
- 
+CREATE TABLE lams_planner_nodes (
+	uid BIGINT(20) NOT NULL auto_increment,
+	parent_uid BIGINT(20),
+	subdir TINYINT UNSIGNED NOT NULL,
+	locked TINYINT(1) NOT NULL DEFAULT 0,
+	title VARCHAR(255) NOT NULL,
+	brief_desc TEXT,
+	full_desc TEXT,
+	file_name VARCHAR(255),
+	PRIMARY KEY (uid),
+	UNIQUE KEY (parent_uid, subdir),
+	CONSTRAINT FK_lams_planner_node_parent FOREIGN KEY (parent_uid)
+	               REFERENCES lams_planner_nodes(uid) ON DELETE CASCADE ON UPDATE CASCADE
+)TYPE=InnoDB; 

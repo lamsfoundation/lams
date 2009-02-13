@@ -155,7 +155,26 @@
   }
   
   function closePlanner(text){
- 	 if (confirm(text)){
-  		window.close();
+	 if (text==null || confirm(text)){
+	 	window.close();
   	 }
+  }
+  
+  function leaveNodeEditor(text,url){
+	 	if (!isNodeChanged() || text==null || confirm(text)){
+  			document.location.href=url;
+  		}
+  	 }
+  	 
+  function removeNode(text,url){
+  		if (text==null || confirm(text)){
+  			document.location.href=url;
+  		}
+  }
+  
+  function isNodeChanged(){
+  	return false;
+  	//title!=$("#title").val() 
+  	//|| briefDescription!=$("#briefDescription").val() 
+  	//|| fullDescription!=$("#fullDescription").val();
   }

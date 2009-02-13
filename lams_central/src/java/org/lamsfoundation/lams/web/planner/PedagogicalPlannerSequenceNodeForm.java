@@ -21,40 +21,54 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.sbmt.form;
+package org.lamsfoundation.lams.web.planner;
 
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
+import org.apache.struts.action.ActionForm;
 
-/**
- * @struts:form name="SbmtPedagogicalPlannerForm"
- *              type="org.lamsfoundation.lams.tool.sbmt.form.SubmitFilesPedagogicalPlannerForm"
- */
-public class SubmitFilesPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
-    String instruction;
-    String contentFolderID;
+public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
+    private Long uid;
+    private Long parentUid;
+    private String title;
+    private String briefDescription;
+    private String fullDescription;
 
-    public String getContentFolderID() {
-	return contentFolderID;
+    public Long getUid() {
+	return uid;
     }
 
-    public void setContentFolderID(String contentFolderID) {
-	this.contentFolderID = contentFolderID;
+    public void setUid(Long uid) {
+	this.uid = uid;
     }
 
-    public String getInstruction() {
-	return instruction;
+    public String getTitle() {
+	return title;
     }
 
-    public void setInstruction(String instructions) {
-	instruction = instructions;
+    public void setTitle(String title) {
+	this.title = title;
     }
 
-    public void fillForm(SubmitFilesContent content) {
-	if (content != null) {
-	    String instruction = content.getInstruction();
-	    setInstruction(instruction);
-	    setToolContentID(content.getContentID());
-	}
+    public String getBriefDescription() {
+	return briefDescription;
+    }
+
+    public void setBriefDescription(String briefDescription) {
+	this.briefDescription = briefDescription;
+    }
+
+    public String getFullDescription() {
+	return fullDescription;
+    }
+
+    public void setFullDescription(String fullDescription) {
+	this.fullDescription = fullDescription;
+    }
+
+    public Long getParentUid() {
+	return parentUid;
+    }
+
+    public void setParentUid(Long parentUid) {
+	this.parentUid = parentUid;
     }
 }

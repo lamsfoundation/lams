@@ -400,9 +400,9 @@ Ant build file.
 	</target>
 	
 	<!-- =================================================================== -->
-	<!-- Generate Event Notification hibernate xml files                             	 -->
+	<!-- Generate Event Notification and Pedagogical Planner hibernate xml files                             	 -->
 	<!-- =================================================================== -->
-	<target name="generate-event-notification-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
+	<target name="generate-additional-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
 
 		<taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="all-libs" />
 
@@ -412,6 +412,8 @@ Ant build file.
 			<fileset dir="${src.java.dir}">
 				<include name="**/Event.java" />
 				<include name="**/Subscription.java" />
+				
+				<include name="**/PedagogicalPlannerSequenceNode.java" />
 			</fileset>
 			<hibernate version="3.0" />
 		</hibernatedoclet>

@@ -78,6 +78,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
+import org.lamsfoundation.lams.planner.dao.PedagogicalPlannerDAO;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
@@ -140,6 +141,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     protected SystemToolDAO systemToolDAO;
 
+    protected PedagogicalPlannerDAO pedagogicalPlannerDAO;
+
     protected ILamsCoreToolService lamsCoreToolService;
 
     protected ILearningDesignService learningDesignService;
@@ -159,6 +162,14 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     public AuthoringService() {
 
+    }
+
+    public PedagogicalPlannerDAO getPedagogicalPlannerDAO() {
+	return pedagogicalPlannerDAO;
+    }
+
+    public void setPedagogicalPlannerDAO(PedagogicalPlannerDAO pedagogicalPlannerDAO) {
+	this.pedagogicalPlannerDAO = pedagogicalPlannerDAO;
     }
 
     /*******************************************************************************************************************
@@ -527,8 +538,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 
 	if (design != null) { /*
-	 * only the user who is editing the design may unlock it
-	 */
+				 * only the user who is editing the design may unlock it
+				 */
 	    if (design.getEditOverrideUser().equals(user)) {
 		design.setEditOverrideLock(false);
 		design.setEditOverrideUser(null);
@@ -1109,11 +1120,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	if (oldParentActivities != null) {
 	    Iterator iterator = oldParentActivities.iterator();
 	    while (iterator.hasNext()) {
-	    	processActivity((Activity) iterator.next(), newLearningDesign, newActivities, newGroupings, null,
-	    			originalLearningDesign.getLearningDesignId(), uiidOffset, customCSV);
+		processActivity((Activity) iterator.next(), newLearningDesign, newActivities, newGroupings, null,
+			originalLearningDesign.getLearningDesignId(), uiidOffset, customCSV);
 	    }
 	}
-	
+
 	Collection<Activity> activities = newActivities.values();
 
 	// Go back and find all the grouped activities and assign them the new
@@ -1131,68 +1142,68 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	// and fix any branch mappings
 	for (Activity activity : activities) {
 	    if (activity.isComplexActivity()) {
-	    	ComplexActivity newComplex = (ComplexActivity) activity;
-	    	Activity oldDefaultActivity = newComplex.getDefaultActivity();
-			if (oldDefaultActivity != null) {
-			    Activity newDefaultActivity = newActivities.get(LearningDesign.addOffset(oldDefaultActivity
-				    .getActivityUIID(), uiidOffset));
-			    newComplex.setDefaultActivity(newDefaultActivity);
-			}
+		ComplexActivity newComplex = (ComplexActivity) activity;
+		Activity oldDefaultActivity = newComplex.getDefaultActivity();
+		if (oldDefaultActivity != null) {
+		    Activity newDefaultActivity = newActivities.get(LearningDesign.addOffset(oldDefaultActivity
+			    .getActivityUIID(), uiidOffset));
+		    newComplex.setDefaultActivity(newDefaultActivity);
+		}
 	    }
 
 	    if (activity.isSequenceActivity()) {
-			SequenceActivity newSequenceActivity = (SequenceActivity) activity;
-			// Need to check if the sets are not null as these are new
-			// objects and Hibernate may not have backed them with
-			// collections yet.
-			if (newSequenceActivity.getBranchEntries() != null && newSequenceActivity.getBranchEntries().size() > 0) {
-	
-			    Activity parentActivity = newSequenceActivity.getParentActivity();
-			    if (parentActivity.isChosenBranchingActivity() || parentActivity.isGroupBranchingActivity()
-				    && parentActivity.getDefineLater() != null
-				    && parentActivity.getDefineLater().booleanValue()) {
-					// Don't have any preset up entries for a teacher chosen
-					// or a define later group based branching.
-					// Must be copying a design that was run previously.
-					newSequenceActivity.getBranchEntries().clear();
-	
-			    } else {
-					Iterator beIter = newSequenceActivity.getBranchEntries().iterator();
-					while (beIter.hasNext()) {
-					    // sequence activity will be correct but the
-					    // branching activity and the grouping will be wrong
-					    // the condition was copied by the sequence activity
-					    // copy
-					    BranchActivityEntry entry = (BranchActivityEntry) beIter.next();
-					    BranchingActivity oldBranchingActivity = (BranchingActivity) entry.getBranchingActivity();
-					    entry.setBranchingActivity(newActivities.get(LearningDesign.addOffset(oldBranchingActivity
-						    .getActivityUIID(), uiidOffset)));
-					    Group oldGroup = entry.getGroup();
-					    if (oldGroup != null) {
-						Grouping oldGrouping = oldGroup.getGrouping();
-						Grouping newGrouping = newGroupings.get(LearningDesign.addOffset(oldGrouping
-							.getGroupingUIID(), uiidOffset));
-						if (newGrouping != null) {
-						    entry.setGroup(newGrouping.getGroup(LearningDesign.addOffset(oldGroup
-							    .getGroupUIID(), uiidOffset)));
-						}
-					    }
-					}
-	
+		SequenceActivity newSequenceActivity = (SequenceActivity) activity;
+		// Need to check if the sets are not null as these are new
+		// objects and Hibernate may not have backed them with
+		// collections yet.
+		if (newSequenceActivity.getBranchEntries() != null && newSequenceActivity.getBranchEntries().size() > 0) {
+
+		    Activity parentActivity = newSequenceActivity.getParentActivity();
+		    if (parentActivity.isChosenBranchingActivity() || parentActivity.isGroupBranchingActivity()
+			    && parentActivity.getDefineLater() != null
+			    && parentActivity.getDefineLater().booleanValue()) {
+			// Don't have any preset up entries for a teacher chosen
+			// or a define later group based branching.
+			// Must be copying a design that was run previously.
+			newSequenceActivity.getBranchEntries().clear();
+
+		    } else {
+			Iterator beIter = newSequenceActivity.getBranchEntries().iterator();
+			while (beIter.hasNext()) {
+			    // sequence activity will be correct but the
+			    // branching activity and the grouping will be wrong
+			    // the condition was copied by the sequence activity
+			    // copy
+			    BranchActivityEntry entry = (BranchActivityEntry) beIter.next();
+			    BranchingActivity oldBranchingActivity = (BranchingActivity) entry.getBranchingActivity();
+			    entry.setBranchingActivity(newActivities.get(LearningDesign.addOffset(oldBranchingActivity
+				    .getActivityUIID(), uiidOffset)));
+			    Group oldGroup = entry.getGroup();
+			    if (oldGroup != null) {
+				Grouping oldGrouping = oldGroup.getGrouping();
+				Grouping newGrouping = newGroupings.get(LearningDesign.addOffset(oldGrouping
+					.getGroupingUIID(), uiidOffset));
+				if (newGrouping != null) {
+				    entry.setGroup(newGrouping.getGroup(LearningDesign.addOffset(oldGroup
+					    .getGroupUIID(), uiidOffset)));
+				}
 			    }
 			}
+
+		    }
+		}
 	    }
 
 	    if (activity.getInputActivities() != null && activity.getInputActivities().size() > 0) {
-			Set<Activity> newInputActivities = new HashSet<Activity>();
-			Iterator inputIter = activity.getInputActivities().iterator();
-			while (inputIter.hasNext()) {
-			    Activity elem = (Activity) inputIter.next();
-			    newInputActivities.add(newActivities.get(LearningDesign.addOffset(elem.getActivityUIID(),
-				    uiidOffset)));
-			}
-			activity.getInputActivities().clear();
-			activity.getInputActivities().addAll(newInputActivities);
+		Set<Activity> newInputActivities = new HashSet<Activity>();
+		Iterator inputIter = activity.getInputActivities().iterator();
+		while (inputIter.hasNext()) {
+		    Activity elem = (Activity) inputIter.next();
+		    newInputActivities.add(newActivities.get(LearningDesign.addOffset(elem.getActivityUIID(),
+			    uiidOffset)));
+		}
+		activity.getInputActivities().clear();
+		activity.getInputActivities().addAll(newInputActivities);
 	    }
 	}
 
@@ -1253,9 +1264,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    newActivity.setParentActivity(parentActivity);
 	    newActivity.setParentUIID(parentActivity.getActivityUIID());
 	}
-	
-	if(!(newActivity.isFloatingActivity() && newLearningDesign.getFloatingActivity() != null))
-		newActivities.put(newActivity.getActivityUIID(), newActivity);
+
+	if (!(newActivity.isFloatingActivity() && newLearningDesign.getFloatingActivity() != null)) {
+	    newActivities.put(newActivity.getActivityUIID(), newActivity);
+	}
 
 	if (newActivity.isToolActivity()) {
 	    copyActivityToolContent(newActivity, newLearningDesign.getCopyTypeID(), originalLearningDesignId, customCSV);
@@ -1265,28 +1277,30 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	if (oldChildActivities != null) {
 	    Iterator childIterator = oldChildActivities.iterator();
 	    while (childIterator.hasNext()) {
-	    	Activity childActivity = (Activity) childIterator.next();
-	    	
-	    	// If Floating Activity(s) exist in BOTH designs then we:
-	        // Transfer the floating activities from the main design to the one that is to be imported. 
-	        // Number of activities may overflow the max limit for the container - to be handled in flash 
-	        // when design is opened.
-	    	FloatingActivity fParentActivity = null;
-	    	Activity refParentActivity = null;
-	    	
-	    	if(childActivity.isFloating() && newLearningDesign.getFloatingActivity() != null)
-	    		fParentActivity = newLearningDesign.getFloatingActivity();
-	    	else 
-	    		refParentActivity = newActivity;
-	    	
-	    	if(childActivity.isFloating() && fParentActivity != null)
-				childActivity.setOrderId(fParentActivity.getActivities().size()+childActivity.getOrderId()+1);
-	    	
-			Activity pActivity = (fParentActivity != null) ? (Activity) fParentActivity : refParentActivity;
-			processActivity(childActivity, newLearningDesign, newActivities, newGroupings,
-				pActivity, originalLearningDesignId, uiidOffset, customCSV);
-			
+		Activity childActivity = (Activity) childIterator.next();
+
+		// If Floating Activity(s) exist in BOTH designs then we:
+		// Transfer the floating activities from the main design to the one that is to be imported.
+		// Number of activities may overflow the max limit for the container - to be handled in flash
+		// when design is opened.
+		FloatingActivity fParentActivity = null;
+		Activity refParentActivity = null;
+
+		if (childActivity.isFloating() && newLearningDesign.getFloatingActivity() != null) {
+		    fParentActivity = newLearningDesign.getFloatingActivity();
+		} else {
+		    refParentActivity = newActivity;
 		}
+
+		if (childActivity.isFloating() && fParentActivity != null) {
+		    childActivity.setOrderId(fParentActivity.getActivities().size() + childActivity.getOrderId() + 1);
+		}
+
+		Activity pActivity = fParentActivity != null ? (Activity) fParentActivity : refParentActivity;
+		processActivity(childActivity, newLearningDesign, newActivities, newGroupings, pActivity,
+			originalLearningDesignId, uiidOffset, customCSV);
+
+	    }
 	}
     }
 

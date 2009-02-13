@@ -36,7 +36,7 @@ import org.apache.struts.action.ActionMessages;
  * @author Marcin Cieslak
  * 
  */
-public abstract class PedagogicalPlannerForm extends ActionForm {
+public abstract class PedagogicalPlannerActivityForm extends ActionForm {
     /**
      * Set when opening a Learning Design.
      */

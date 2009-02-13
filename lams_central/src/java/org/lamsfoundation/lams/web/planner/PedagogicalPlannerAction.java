@@ -40,8 +40,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.authoring.dto.PedagogicalPlannerActivityDTO;
-import org.lamsfoundation.lams.authoring.dto.PedagogicalPlannerDTO;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -58,6 +56,11 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
+import org.lamsfoundation.lams.planner.dao.PedagogicalPlannerDAO;
+import org.lamsfoundation.lams.planner.dto.PedagogicalPlannerActivityDTO;
+import org.lamsfoundation.lams.planner.dto.PedagogicalPlannerSequenceNodeDTO;
+import org.lamsfoundation.lams.planner.dto.PedagogicalPlannerTemplateDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -77,12 +80,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Marcin Cieslak
  * 
  * @struts:action path="/pedagogicalPlanner" scope="request" parameter="method"
- * @struts:action-forward name="success" path="/pedagogical_planner/base.jsp"
+ *                name="PedagogicalPlannerSequenceNodeForm"
+ * @struts:action-forward name="template" path="/pedagogical_planner/templateBase.jsp"
  * 
- * @struts:action path="/pedagogicalPlanner/grouping" scope="request" name="GroupingPedagogicalPlannerForm"
+ * @struts:action path="/pedagogicalPlanner/grouping" scope="request" name="PedagogicalPlannerGroupingForm"
  *                validate="false" parameter="method"
  * @struts:action-forward name="grouping" path="/pedagogical_planner/grouping.jsp"
  * @struts:action-forward name="preview" path="/home.do?method=learner"
+ * @struts:action-forward name="sequenceChooser" path="/pedagogical_planner/sequenceChooser.jsp"
  */
 public class PedagogicalPlannerAction extends LamsDispatchAction {
 
@@ -98,6 +103,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static IAuthoringService authoringService;
     private static IMonitoringService monitoringService;
     private static MessageService messageService;
+    private static PedagogicalPlannerDAO pedagogicalPlannerDAO;
 
     // Error messages used in class
     private static final String ERROR_TOOL_ERRORS = "There were tool errors.";
@@ -119,7 +125,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      */
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	return start(mapping, form, request, response);
+	return openSequenceNode(mapping, form, request, response);
     }
 
     /**
@@ -133,8 +139,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    private ActionForward openTemplate(ActionMapping mapping, HttpServletRequest request, String filePath)
+	    throws IOException, ServletException {
 	// Get the learning design template zip file
 	String designFilePath = "pedagogical_planner" + File.separator + "1" + File.separator + "1" + File.separator
 		+ "1";
@@ -203,7 +209,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	}
 	// create DTO for the whole design
-	PedagogicalPlannerDTO planner = new PedagogicalPlannerDTO();
+	PedagogicalPlannerTemplateDTO planner = new PedagogicalPlannerTemplateDTO();
 	planner.setActivitySupportingPlannerCount(activitySupportingPlannerCount);
 	planner.setSequenceTitle(learningDesign.getTitle());
 	planner.setActivities(activities);
@@ -215,7 +221,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	planner.setActivitiesInPortion(2);
 
 	request.setAttribute(CentralConstants.ATTR_PLANNER, planner);
-	return mapping.findForward("success");
+	return mapping.findForward("template");
     }
 
     private IExportToolContentService getExportService() {
@@ -297,7 +303,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     public ActionForward initGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	GroupingPedagogicalPlannerForm plannerForm = (GroupingPedagogicalPlannerForm) form;
+	PedagogicalPlannerGroupingForm plannerForm = (PedagogicalPlannerGroupingForm) form;
 	Long groupingId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Grouping grouping = getAuthoringService().getGroupingById(groupingId);
 	plannerForm.fillForm(grouping);
@@ -306,7 +312,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     public ActionForward saveOrUpdateGroupingForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	GroupingPedagogicalPlannerForm plannerForm = (GroupingPedagogicalPlannerForm) form;
+	PedagogicalPlannerGroupingForm plannerForm = (PedagogicalPlannerGroupingForm) form;
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
 	    Grouping grouping = getAuthoringService().getGroupingById(plannerForm.getToolContentID());
@@ -481,7 +487,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    short option = 1;
 	    for (Activity nestedActivity : nestedActivities) {
 		// Currently Planner supports only 4 options, but there is no logical reason for that; just add
-		    // colours
+		// colours
 		// in CSS and change this value for additional options
 		if (option > CentralConstants.PLANNER_MAX_OPTIONS) {
 		    throw new ServletException(PedagogicalPlannerAction.ERROR_TOO_MANY_OPTIONS);
@@ -517,5 +523,78 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    activities.add(addedDTO);
 	}
 	return addedDTO;
+    }
+
+    public ActionForward openSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	Long nodeUid = WebUtil.readLongParam(request, "uid", true);
+	return openSequenceNode(mapping, request, nodeUid);
+    }
+
+    public ActionForward openSequenceNode(ActionMapping mapping, HttpServletRequest request, Long nodeUid)
+	    throws IOException, ServletException {
+
+	PedagogicalPlannerSequenceNode node = null;
+	if (nodeUid == null) {
+	    node = getPedagogicalPlannerDAO().getRootNode();
+	} else {
+	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
+	    if (node.getFileName() != null) {
+		String filePath = getPedagogicalPlannerDAO().getFilePath(node);
+		return openTemplate(mapping, request, filePath);
+	    }
+	}
+	List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(node);
+	PedagogicalPlannerSequenceNodeDTO dto = new PedagogicalPlannerSequenceNodeDTO(node, titlePath);
+
+	Boolean edit = WebUtil.readBooleanParam(request, "edit", false);
+	dto.setEdit(edit);
+
+	Boolean createSubnode = WebUtil.readBooleanParam(request, "createSubnode", false);
+	dto.setCreateSubnode(createSubnode);
+
+	request.setAttribute("node", dto);
+	return mapping.findForward("sequenceChooser");
+    }
+
+    public ActionForward saveSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	Long nodeUid = WebUtil.readLongParam(request, "uid", true);
+	PedagogicalPlannerSequenceNode node = null;
+	PedagogicalPlannerSequenceNodeForm nodeForm = (PedagogicalPlannerSequenceNodeForm) form;
+	if (nodeUid == null) {
+	    node = new PedagogicalPlannerSequenceNode();
+	    if (nodeForm.getParentUid() != null) {
+		PedagogicalPlannerSequenceNode parent = getPedagogicalPlannerDAO().getByUid(nodeForm.getParentUid());
+		node.setParent(parent);
+	    }
+	    node.setSubdir(getPedagogicalPlannerDAO().getNextSubdir(nodeForm.getParentUid()));
+	} else {
+	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
+	}
+
+	node.setTitle(nodeForm.getTitle());
+	node.setBriefDescription(nodeForm.getBriefDescription());
+	node.setFullDescription(nodeForm.getFullDescription());
+	getPedagogicalPlannerDAO().saveOrUpdateNode(node);
+
+	nodeUid = node.getUid();
+	return openSequenceNode(mapping, request, nodeUid);
+    }
+
+    public ActionForward removeSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	Long nodeUid = WebUtil.readLongParam(request, "uid");
+	PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
+	Long parentUid = node.getParent() == null ? null : node.getParent().getUid();
+	getPedagogicalPlannerDAO().removeNode(node);
+	return openSequenceNode(mapping, request, parentUid);
+    }
+
+    public PedagogicalPlannerDAO getPedagogicalPlannerDAO() {
+	if (PedagogicalPlannerAction.pedagogicalPlannerDAO == null) {
+	    PedagogicalPlannerAction.pedagogicalPlannerDAO = getAuthoringService().getPedagogicalPlannerDAO();
+	}
+	return PedagogicalPlannerAction.pedagogicalPlannerDAO;
     }
 }

@@ -21,11 +21,11 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.authoring.dto;
+package org.lamsfoundation.lams.planner.dto;
 
 import java.util.List;
 
-public class PedagogicalPlannerDTO {
+public class PedagogicalPlannerTemplateDTO {
     private String sequenceTitle;
     private Boolean sendInPortions;
     private Integer activitiesInPortion;

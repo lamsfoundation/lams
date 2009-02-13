@@ -21,7 +21,7 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.authoring.dto;
+package org.lamsfoundation.lams.planner.dto;
 
 public class PedagogicalPlannerActivityDTO {
     private String pedagogicalPlannerUrl;

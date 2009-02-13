@@ -32,9 +32,9 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
-public class VotePedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> nomination;
     private String contentFolderID;
 

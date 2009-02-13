@@ -24,12 +24,12 @@
 package org.lamsfoundation.lams.tool.chat.web.forms;
 
 import org.lamsfoundation.lams.tool.chat.model.Chat;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
  * @struts.form name="pedagogicalPlannerForm"
  */
-public class ChatPedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class ChatPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private String instructions;
     private String contentFolderID;
 

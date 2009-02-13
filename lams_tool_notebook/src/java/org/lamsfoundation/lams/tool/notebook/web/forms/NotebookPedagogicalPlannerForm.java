@@ -24,12 +24,12 @@
 package org.lamsfoundation.lams.tool.notebook.web.forms;
 
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
  * @struts.form name="pedagogicalPlannerForm"
  */
-public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class NotebookPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     String instructions;
     String contentFolderID;
 

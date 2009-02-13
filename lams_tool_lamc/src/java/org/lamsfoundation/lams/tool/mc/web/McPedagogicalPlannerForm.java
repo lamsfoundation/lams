@@ -40,9 +40,9 @@ import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionContentDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
-import org.lamsfoundation.lams.web.planner.PedagogicalPlannerForm;
+import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
-public class McPedagogicalPlannerForm extends PedagogicalPlannerForm {
+public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private static Logger logger = Logger.getLogger(McPedagogicalPlannerForm.class);
 
     private List<String> question;
