@@ -27,13 +27,23 @@
 		<title>${instructions.title}</title>
 
 		<%@ include file="/common/header.jsp"%>
-
+		
 		<%-- param has higher level for request attribute --%>
 		<c:if test="${not empty param.mode}">
 			<c:set var="mode" value="${param.mode}" />
 		</c:if>
 		<script language="JavaScript" type="text/JavaScript">
 		<!--
+				jQuery.noConflict();
+		
+		  		jQuery(document).ready(function() {
+
+					jQuery("input#FinishInstruction").bind('click', function() {
+			   			finishIns();
+			  		});	
+
+		  		});
+		
 				function finishIns(){
 				//learner and author(preview mode) will mark the finish
 					if(${mode == "learner"} || ${mode == "author"}){
@@ -42,17 +52,44 @@
 					  		//set complete flag and finish this activity as well.
 					        window.parent.location.href='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${param.toolSessionID}&itemUid=${param.itemUid}"/>';
 					   }else{
-						    window.parent.opener.location.href="<c:url value="/learning/completeItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
+						    var url="<c:url value="/learning/completeItem"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${param.itemUid}&reqID="+reqIDVar.getTime();
+							jQuery.ajax({
+								type:   'GET',
+								dateType: 	'script',
+								url:    url,
+								timeout: 5000,
+
+								beforeSend:  function() {
+									// disable button
+									jQuery("input#FinishInstruction").attr("disabled", true);
+									jQuery("input#FinishInstruction").removeClass("button");
+									jQuery("input#FinishInstruction").addClass("disabled");
+								},
+
+								error: function() {
+									alert('server timeout');
+								},
+
+								success:  function(data) {
+									eval(data);
+								},
+
+								complete:  function() {
+									//enable button
+									jQuery("input#FinishInstruction").attr("disabled", false);
+									jQuery("input#FinishInstruction").removeClass("disabled");
+									jQuery("input#FinishInstruction").addClass("button");
+								}
+							});
+							
 					   }
 					}
-				   if(window.parent.opener != null) {
-						window.parent.opener=null;
-						window.parent.close();
-					}
 				}
+				
 				function continueReflect(){
 					 window.parent.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 				}
+
 				function nextIns(currIns){
 					document.location.href="<c:url value='/nextInstruction.do'/>?mode=${mode}&insIdx=" + currIns + "&sessionMapID=${sessionMapID}&itemUid=${param.itemUid}&itemIndex=${param.itemIndex}";
 				}
@@ -72,19 +109,17 @@
 				<c:choose>
 				
 				<c:when test="${instructions.current < instructions.total}">
-					<a href="#" id="NextInstruction"
+					<input type="button" id="NextInstruction" name="NextInstruction"
 						onClick="javascript:nextIns(${instructions.current})"
-						class="button"> <fmt:message key='label.next.instruction' />
-					</a>
+						class="button" value="<fmt:message key='label.next.instruction' />" />
 				</c:when>
 				<c:when test="${reflectOn && runAuto}">
-					<a href="#" id="FinishInstruction"
-						onClick="javascript:continueReflect()" class="button"> <fmt:message
-							key='label.continue' /> </a>
+					<input type="button" id="FinishInstruction" name="FinishInstruction"
+						onClick="javascript:continueReflect()" class="button" value="<fmt:message
+							key='label.continue' />" />
 				</c:when>
 				<c:otherwise>
-					<a href="#" id="FinishInstruction" onClick="javascript:finishIns()"
-						class="button"> <fmt:message key='label.finish' /> </a>
+					<input type="button" id="FinishInstruction" name="FinishInstruction" class="button" value="<fmt:message key='label.finish' />" />
 				</c:otherwise>
 			</c:choose>
 			</span>

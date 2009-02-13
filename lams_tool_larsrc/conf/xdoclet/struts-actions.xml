@@ -180,11 +180,11 @@
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />			
 		</action>
-		<action path="/learning/completeItem"
+		<!-- <action path="/learning/completeItem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			parameter="complete" >
-			<forward name="success" path="/pages/learning/learning.jsp" />
-		</action>
+			<forward name="success" path="/learning/" />
+		</action>-->
 		<action path="/learning/finish"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			input="/pages/learning/learning.jsp"

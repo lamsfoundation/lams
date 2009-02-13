@@ -87,6 +87,11 @@
 </servlet>
 
 <servlet>
+		<servlet-name>completeItem</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.tool.rsrc.web.servlet.CompleteItemServlet</servlet-class>
+</servlet>
+
+<servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
     <init-param>
@@ -155,6 +160,11 @@
 		<url-pattern>/exportPortfolio</url-pattern>
 	</servlet-mapping>
 
+	<servlet-mapping>
+	    <servlet-name>completeItem</servlet-name>
+	    <url-pattern>/learning/completeItem</url-pattern>
+	</servlet-mapping>
+	
   	<jsp-config>
 		<!--  ======================================================== -->	
 		<!-- Struts Tag Library Descriptors -->

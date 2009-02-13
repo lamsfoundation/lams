@@ -93,10 +93,6 @@ public class LearningAction extends Action {
 	if (param.equals("start")) {
 	    return start(mapping, form, request, response);
 	}
-	if (param.equals("complete")) {
-	    return complete(mapping, form, request, response);
-	}
-
 	if (param.equals("finish")) {
 	    return finish(mapping, form, request, response);
 	}
@@ -262,27 +258,6 @@ public class LearningAction extends Action {
 	}
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
 
-	return mapping.findForward(ResourceConstants.SUCCESS);
-    }
-
-    /**
-     * Mark resource item as complete status.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
-
-	doComplete(request);
-
-	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
