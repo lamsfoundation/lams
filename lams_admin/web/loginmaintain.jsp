@@ -17,18 +17,19 @@
 
 <div align="center"> 
 <c:set var="basePath"><lams:LAMSURL/>/fckeditor/</c:set>
-<fck:editor id="news" basePath="${basePath}"
-    width = "95%"
-	imageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
-	linkBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/-1/"
-	flashBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
-	imageUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/-1/"
-	linkUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/-1/"
-	flashUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/-1/"
-	defaultLanguage="${language}" 
-	autoDetectLanguage="false"
-	> 
-	<bean:write name="LoginMaintainForm" property="news" filter="false" />
+<fck:editor instanceName="news" basePath="${basePath}" width = "95%">
+    <jsp:attribute name="value"><bean:write name="LoginMaintainForm" property="news" filter="false" /></jsp:attribute>
+    <jsp:body>
+		<fck:config 
+			imageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
+			linkBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/-1/"
+			flashBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
+			imageUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/-1/"
+			linkUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/-1/"
+			flashUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/-1/"
+			defaultLanguage="${language}" 
+			autoDetectLanguage="false" />		
+	</jsp:body>
 </fck:editor>
 </div>
 <br />
