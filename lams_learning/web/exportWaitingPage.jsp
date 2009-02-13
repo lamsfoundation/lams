@@ -59,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		function displayGeneratingMessage() {
 			updateindicator = updateindicator+"... ";
-			document.getElementById("message").innerHTML = "<p><fmt:message key='export.portfolio.generating.message'/>"+updateindicator+"</p>";
+			document.getElementById("message").innerHTML = "<p><fmt:message key='export.portfolio.generating.message'/>"+" <br><br>  <img src='<lams:LAMSURL />/images/loadingAnimation.gif'>  </p>";
 		}
 
 		function sendRequest(url,HttpMethod)
