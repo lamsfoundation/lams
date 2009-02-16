@@ -74,6 +74,7 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 
 /**
@@ -97,7 +98,9 @@ public class LearnerService implements ICoreLearnerService {
     private ActivityMapping activityMapping;
     private IUserManagementService userManagementService;
     private ILessonService lessonService;
+    private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
     protected MessageService messageService;
+    
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -425,29 +428,61 @@ public class LearnerService implements ICoreLearnerService {
      *      java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity,
      *      org.lamsfoundation.lams.learningdesign.Activity)
      */
-    public LearnerProgress moveToActivity(Integer learnerId, Long lessonId, Activity fromActivity, Activity toActivity) {
-	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
-
-	if (fromActivity != null) {
-	    progress.setProgressState(fromActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
-	}
-
-	if (toActivity != null) {    
-		progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
-		
-		if(!toActivity.getReadOnly()) {
-			toActivity.setReadOnly(true);
-			activityDAO.update(toActivity);
+    public LearnerProgress moveToActivity(Integer learnerId, Long lessonId, Activity fromActivity, Activity toActivity) throws LearnerServiceException {
+	int count = 0;
+    LearnerProgress progress = null;
+    
+	// wait till lock is released
+    while(syncMap.containsKey(learnerId)) {
+    	count++;
+    	try {
+		    Thread.sleep(1000);
+		    
+	    	if(count > 100) {
+	    		throw new LearnerServiceException("Thread wait count exceeded limit.");
+	    	}
+	    	
+		} catch (InterruptedException e1) {
+		    throw new LearnerServiceException("While retrying to move activity, thread was interrupted.", e1);
 		}
+    }
+    
+    // lock
+    try {
+    
+	    syncMap.put(learnerId, lessonId);
+	    
+	    progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
 		
-		if(!toActivity.isFloating()) {
-			progress.setCurrentActivity(toActivity);
-			progress.setNextActivity(toActivity);
+		if (fromActivity != null && fromActivity.getActivityId() != progress.getCurrentActivity().getActivityId()) {
+		    progress.setProgressState(fromActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
 		}
-	}
 	
-	learnerProgressDAO.updateLearnerProgress(progress);
+		if (toActivity != null) {    
+			progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
+			
+			if(!toActivity.getReadOnly()) {
+				toActivity.setReadOnly(true);
+				activityDAO.update(toActivity);
+			}
+			
+			if(!toActivity.isFloating()) {
+				progress.setCurrentActivity(toActivity);
+				progress.setNextActivity(toActivity);
+			}
+		}
+	    
+		learnerProgressDAO.updateLearnerProgress(progress);
+    } catch(Exception e) {
+    	throw new LearnerServiceException(e.getMessage());
+    } finally {
+    	// remove lock
+    	if(syncMap.containsKey(learnerId))
+    		syncMap.remove(learnerId);
+    }
+	
 	return progress;
+	
     }
 
     /**
