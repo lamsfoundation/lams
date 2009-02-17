@@ -1078,7 +1078,6 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
         } else {
             //TODO DI 25/05/05 raise wrong event type error 
         }
-		
     }
 	
 	public function openToolOutputConditionsDialog(ta:ToolActivity){

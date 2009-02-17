@@ -371,6 +371,7 @@ class Canvas extends CanvasHelper {
 				actType = "Tool"
 				actToAdd = ToolActivity(actToCopy.clone());
 				actToAdd.activityUIID = _ddm.newUIID();
+				canvasModel.getCanvas().getToolOutputDefinitions(ToolActivity(actToAdd), false);
 				break;
 
 			case(Activity.OPTIONAL_ACTIVITY_TYPE):
@@ -628,26 +629,26 @@ class Canvas extends CanvasHelper {
 		
 	}
 	
-	public function getToolOutputDefinitions(ta:ToolActivity) {
+	public function getToolOutputDefinitions(ta:ToolActivity, launchDefinitionDialog:Boolean) {
 		var callback:Function; 
        
 		if(ta.toolContentID) {
-			callback = Proxy.create(this, setToolOutputDefinitions, ta);
+			callback = Proxy.create(this, setToolOutputDefinitions, ta, launchDefinitionDialog);
 			Application.getInstance().getComms().getRequest('authoring/author.do?method=getToolOutputDefinitions&toolContentID='+ta.toolContentID, callback, false);
 		} else {
-			callback = Proxy.create(this, setToolContentForDefinitions, ta);
+			callback = Proxy.create(this, setToolContentForDefinitions, ta, launchDefinitionDialog);
 			canvasModel.getNewToolContentID(ta, callback);
 		}
 			
 	}
 	
-	public function setToolContentForDefinitions(toolContentID:Number, ta:ToolActivity):Void {
+	public function setToolContentForDefinitions(toolContentID:Number, ta:ToolActivity, launchDefinitionDialog:Boolean):Void {
 		ta.toolContentID = toolContentID;
 		
-		getToolOutputDefinitions(ta);
+		getToolOutputDefinitions(ta, launchDefinitionDialog);
 	}
 	
-	public function setToolOutputDefinitions(r:Object, toolActivity:ToolActivity) {
+	public function setToolOutputDefinitions(r:Object, toolActivity:ToolActivity, launchDefinitionDialog:Boolean) {
 		if(r instanceof LFError){
 			Cursor.showCursor(Application.C_DEFAULT);
 			r.showErrorAlert();
@@ -659,8 +660,14 @@ class Canvas extends CanvasHelper {
 				toolActivity.addDefinition(r[i]);
 			}
 		}
-				
-		canvasModel.broadcastViewUpdate("OPEN_CONDITIONS_DIALOG", toolActivity);
+		
+		if (launchDefinitionDialog) {
+			canvasModel.broadcastViewUpdate("OPEN_CONDITIONS_DIALOG", toolActivity);
+		} else {
+			Debugger.log("sending TOOLACT_OUTPUT_TYPES_LOADED update", Debugger.GEN, "setToolOutputDefinitions", "Canvas");
+			canvasModel.broadcastViewUpdate("TOOLACT_OUTPUT_TYPES_LOADED", toolActivity);
+		}
+		
 		Debugger.log("total def: " + toolActivity.definitions.length, Debugger.CRITICAL, "setToolOutputDefinitions", "Canvas");
 				
 	}

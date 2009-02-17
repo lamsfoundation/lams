@@ -24,6 +24,7 @@
 import org.lamsfoundation.lams.authoring.cv.*;
 import org.lamsfoundation.lams.authoring.cmpt.*;
 import org.lamsfoundation.lams.authoring.br.BranchConnector;
+import org.lamsfoundation.lams.authoring.br.ToolOutputConditionsDialog;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
@@ -139,6 +140,8 @@ class PropertyInspector extends PropertyInspectorControls {
 		
 		_pi_defaultBranch_cb.addEventListener("click", Delegate.create(this, onDefaultBranchSelect));
 		
+		outputToGradebook_cmb.addEventListener("change", Delegate.create(this, setGradebookOutput));
+		
 		this.onEnterFrame = setupLabels;
 		
 		this.tabChildren = true;
@@ -182,6 +185,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		defineLater_chk.label = Dictionary.getValue('pi_definelater');
 		runOffline_chk.label = Dictionary.getValue('pi_runoffline');
 				
+		gradebook_lbl.text = "Gradebook Output";
 		//Complex Activity
 		//min_lbl.text = Dictionary.getValue('pi_min_act');
 		//max_lbl.text = Dictionary.getValue('pi_max_act');
@@ -282,7 +286,9 @@ class PropertyInspector extends PropertyInspectorControls {
             case 'SELECTED_ITEM' :
                 updateItemProperties(cm);
                 break;
-                   
+			case 'TOOLACT_OUTPUT_TYPES_LOADED' :
+				showActivityOutputProperties(event.data); // event.data is a ToolActivity instance in this case
+				break;
             default :
 		}
 
@@ -399,6 +405,8 @@ class PropertyInspector extends PropertyInspectorControls {
 				showGateControls(false);
 				showToolActivityProperties(ToolActivity(a));
 				showAppliedGroupingProperties(a);
+				
+				showActivityOutputProperties(a);
 			}
 			
 			delimitLine._visible = true;
@@ -757,7 +765,6 @@ class PropertyInspector extends PropertyInspectorControls {
 	private function showAppliedGroupingProperties(a:Activity){
 		//update the grouping drop down values
 		appliedGroupingActivity_cmb.dataProvider = getGroupingActivitiesDP();
-		_global.breakpoint();
 
 		var appliedGroupingAct:GroupingActivity = _canvasModel.getCanvas().ddm.getGroupingActivityByGroupingUIID(a.groupingUIID);
 		Debugger.log('a.groupingUIID='+a.groupingUIID+', appliedGroupingAct.activityUIID :'+appliedGroupingAct.activityUIID ,Debugger.GEN,'showAppliedGroupingProperties','PropertyInspector');
@@ -775,6 +782,50 @@ class PropertyInspector extends PropertyInspectorControls {
 			}
 		}	
 	}
-
+	
+	
+	private function setGradebookOutput(evt:Object) {
+		
+		if (_canvasModel.selectedItem.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE) {
+			
+			var toolAct:ToolActivity = ToolActivity(_canvasModel.selectedItem.activity);
+			if (evt.target.selectedIndex > 0) {
+				toolAct.gradebookToolOutputName = evt.target.selectedItem.name;
+			} else {
+				toolAct.gradebookToolOutputName = null;
+			}
+		}
+	}
+	
+	private function showActivityOutputProperties(a) {
+		
+		if (a.activityTypeID == Activity.TOOL_ACTIVITY_TYPE) {
+			var toolAct:ToolActivity = ToolActivity(a);
+			outputToGradebook_cmb.dataProvider = (toolAct.supportsOutputs == true) ? getToolActivityOutputTypes(toolAct) : null;
+			
+			if (toolAct.gradebookToolOutputName != null) {
+				for (var i=0; i<outputToGradebook_cmb.dataProvider.length; i++) {
+					if (outputToGradebook_cmb.dataProvider[i].name == toolAct.gradebookToolOutputName) {
+						outputToGradebook_cmb.selectedIndex = i;
+					}
+				}
+			} else if(toolAct.supportsOutputs) {
+				if (outputToGradebook_cmb.labelFunction == null) {
+					outputToGradebook_cmb.labelFunction = function(itemObj) {
+						return (itemObj.type == null) ? Dictionary.getValue("to_conditions_dlg_defin_item_header_lbl") : Dictionary.getValue("to_conditions_dlg_defin_item_fn_lbl", [itemObj.description, ToolOutputConditionsDialog.getOutputType(itemObj.type)]);
+					}
+				}
+			} else {
+				gradebook_lbl.visible = false;
+				outputToGradebook_cmb.visible = false;
+			}
+		}
+	}
+	
+	private function getToolActivityOutputTypes(toolAct:ToolActivity):Array {
+		var _definitions:Array = toolAct.definitions;
+		_definitions.splice(0,0, new ToolOutputDefinition()); // add an empty toolOutputDefinition for first entry where itemObj.type = null
+		return _definitions;
+	}
 }
 

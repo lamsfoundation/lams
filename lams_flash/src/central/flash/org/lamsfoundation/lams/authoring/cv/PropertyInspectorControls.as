@@ -99,6 +99,10 @@ class PropertyInspectorControls extends MovieClip {
 	private var endHours_stp:NumericStepper;
 	private var endMins_stp:NumericStepper;
 	
+	//gradebook
+	private var gradebook_lbl:Label;
+	private var outputToGradebook_cmb:ComboBox;
+	
 	//branches
 	private var branchType_lbl:Label;
 	private var branchType_cmb:ComboBox;
@@ -267,6 +271,9 @@ class PropertyInspectorControls extends MovieClip {
 		
 		_map_competence_btn.visible = v;
 		
+		gradebook_lbl.visible = v;
+		outputToGradebook_cmb.visible = v;
+		
 		if(e != null) {
 			grouping_lbl.enabled = e;
 			currentGrouping_lbl.enabled = e;
@@ -275,6 +282,8 @@ class PropertyInspectorControls extends MovieClip {
 			editGrouping_btn.enabled = e;
 			
 			_map_competence_btn.enabled = e;
+			
+			outputToGradebook_cmb.enabled = e;
 		}
 	}
 	
@@ -897,6 +906,7 @@ class PropertyInspectorControls extends MovieClip {
 		endMins_stp.setStyle('styleName', styleObj);
 		minAct_stp.setStyle('styleName', styleObj);
 		maxAct_stp.setStyle('styleName', styleObj);
+		gradebook_lbl.setStyle('styleName', styleObj);
 		
 		_pi_defaultBranch_cb.setStyle('styleName', styleObj);
 		_define_monitor_cb.setStyle('styleName', styleObj);
@@ -908,6 +918,7 @@ class PropertyInspectorControls extends MovieClip {
 		appliedGroupingActivity_cmb.setStyle('styleName', styleObj);
 		toolActs_cmb.setStyle('styleName', styleObj);
 		noSeqAct_cmb.setStyle('styleName', styleObj);
+		outputToGradebook_cmb.setStyle('styleName', styleObj);
 		
 		styleObj = _tm.getStyleObject('numericstepper');
 		days_stp.setStyle('styleName', styleObj);
@@ -1332,7 +1343,7 @@ class PropertyInspectorControls extends MovieClip {
 	private function onConditionsSetupClick(evt:Object){
 		// show tool outputs to branch mappings dialog
 		var ta:ToolActivity = ToolActivity(_canvasModel.getCanvas().ddm.getActivityByUIID(_canvasModel.selectedItem.activity.toolActivityUIID));
-		_canvasModel.getCanvas().getToolOutputDefinitions(ta);
+		_canvasModel.getCanvas().getToolOutputDefinitions(ta, true);
 		
 		setModified();
 	}

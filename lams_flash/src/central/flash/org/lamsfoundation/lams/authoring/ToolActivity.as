@@ -55,6 +55,8 @@ class ToolActivity extends Activity{
 	private var _supportsRunOffline:Boolean;
 	private var _supportsOutputs:Boolean;
 	
+	private var _gradebookToolOutputName:String;
+	
 	private var _competenceMappings:Array; // competences to which this activity is mapped
 	
 	private var _toolOutputDefinitions:Hashtable;
@@ -235,6 +237,15 @@ class ToolActivity extends Activity{
 		n.supportsModeration = _supportsRunOffline;
 		n.supportsOutputs = _supportsOutputs;
 		n.extLmsId = _extLmsId;
+		
+		n.gradebookToolOutputName = _gradebookToolOutputName;
+		
+		var numDefinitions:Number = definitions.length;
+		if (numDefinitions > 0) {
+			for (var i=0; i<numDefinitions; i++) {
+				n.addDefinition(definitions[i]);
+			}
+		}
 		
 		n.competenceMappings = new Array();
 		
@@ -521,5 +532,23 @@ class ToolActivity extends Activity{
 	public function get extLmsId ():String {
 		return _extLmsId;
 	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @param   n the name of the tooloutput 
+	 * @return  
+	 */
+	public function set gradebookToolOutputName (n:String):Void {
+		_gradebookToolOutputName = n;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get gradebookToolOutputName ():String {
+		return _gradebookToolOutputName;
+	}	
 }
 
