@@ -32,9 +32,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
               close the parent if you want to close the window. Live with two "close" messages for now. Eventually we 
 	      want to display the wait for the first one, and then close on the second. For that we will need
               location.href = "<c:out value="${param.waitURL}" escapeXml="false"/>"; --%>
-        } else if ( window.parent.name != "LearnerActivity" ) {
+        } else if ( window.parent.name != "LearnerActivity" ) {        	
         	<%-- In the main learner window, so want to continue with the main progress --%>
-            location.href = "<c:out value="${param.nextURL}" escapeXml="false"/>";
+        	<c:if test="${param.nextURL != null}">
+            	location.href = "<c:out value="${param.nextURL}" escapeXml="false"/>";
+            </c:if>
         }
     }
     window.onload = doCloseRedirect;

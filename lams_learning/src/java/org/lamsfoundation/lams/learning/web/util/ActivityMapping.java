@@ -355,11 +355,14 @@ public class ActivityMapping implements Serializable
     	String closeWindowURLAction =  activityMappingStrategy.getCloseWindowAction();    
 
 		// Always calculate the url for the "normal" next case as we won't know till we reach the close window if we need it.
-		String action = getDisplayActivityAction(lessonId);
+		
+    	String action = getDisplayActivityAction(lessonId);
 		action = strutsActionToURL(action,null,true);
 		action = WebUtil.appendParameterToURL(action, DisplayActivityAction.PARAM_INITIAL_DISPLAY, "false");
 		action = URLEncoder.encode(action, "UTF-8");
-    	closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "nextURL", action);
+    	
+		if(!justCompletedActivity.isFloating())
+			closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "nextURL", action);
     	
   		// If we are in the parallel frameset then we might need the nextURL, or we might need the "waiting" url.
     	if ( justCompletedActivity.getParentActivity() != null && justCompletedActivity.getParentActivity().isParallelActivity() ) {
