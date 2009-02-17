@@ -96,8 +96,8 @@ public class ProgressEngine
         	}
             populateCurrentCompletedActivityList(learnerProgress, completedActivityList);
         	return setLessonComplete(learnerProgress, LearnerProgress.LESSON_IN_DESIGN_COMPLETE);
-        } else if ( completedActivity.isFloating() ) {
-        	// special case - floating activity
+        } else if ( completedActivity.isFloating() && !completedActivity.getParentActivity().isParallelActivity()) {
+        	// special case - floating activity and not parallel activity (floating) child.
         	return learnerProgress;
         } else {
 	        Transition transition = completedActivity.getTransitionFrom();
