@@ -38,6 +38,7 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	public static var LEARNER_CHOICE_GROUPING:Number = 4;
 	
 	private var _equalGroupSizes:Boolean;
+	private var _viewStudentsBeforeSelection:Boolean;
 	
 	private var _groupingID:Number;
 	private var _groupingUIID:Number;
@@ -86,6 +87,7 @@ class org.lamsfoundation.lams.authoring.Grouping {
 			_maxNumberOfGroups = dto.maxNumberOfGroups;
 			_learnersPerGroups = dto.learnersPerGroup;
 			_equalGroupSizes = dto.equalNumberOfLearnersPerGroup;
+			_viewStudentsBeforeSelection = dto.viewStudentsBeforeSelection;
 			
 			populateGroups(dto.groups);
 	}
@@ -129,6 +131,7 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		dto.numberOfGroups = (_numberOfGroups > 0) ? _numberOfGroups : Config.NUMERIC_NULL_VALUE;
 		dto.maxNumberOfGroups = (_maxNumberOfGroups > 0) ? _maxNumberOfGroups : Config.NUMERIC_NULL_VALUE;
 		dto.equalNumberOfLearnersPerGroup = (_equalGroupSizes != null && _equalGroupSizes != undefined) ? equalGroupSizes : Config.BOOLEAN_NULL_VALUE;
+		dto.viewStudentsBeforeSelection = (_viewStudentsBeforeSelection != null && _viewStudentsBeforeSelection != undefined) ? viewStudentsBeforeSelection : Config.BOOLEAN_NULL_VALUE;
 		dto.learnersPerGroup = (_learnersPerGroups > 0) ? _learnersPerGroups :  Config.NUMERIC_NULL_VALUE; 
 		
 		dto.groups = new Array();
@@ -289,6 +292,23 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	 */
 	public function set equalGroupSizes (equalSizes:Boolean):Void {
 		_equalGroupSizes = equalSizes;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @param   vsbs true if learners can see who's in what group before they pick theirs
+	 * @return  
+	 */
+	public function set viewStudentsBeforeSelection (vsbs:Boolean):Void {
+		_viewStudentsBeforeSelection = vsbs;
+	}
+	/**
+	 * 
+	 * @usage   
+	 * @return  
+	 */
+	public function get viewStudentsBeforeSelection ():Boolean {
+		return _viewStudentsBeforeSelection;
 	}
 	/**
 	 * 

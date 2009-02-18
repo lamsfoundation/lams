@@ -128,6 +128,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		numRandomGroups_stp.addEventListener("focusOut", Delegate.create(this, updateGroupingMethodData));
 		
 		equalGroupSizes_chk.addEventListener("click", Delegate.create(this, updateGroupingMethodData));
+		preview_student_groups_chk.addEventListener("click", Delegate.create(this, updateGroupingMethodData));
 		
 		_group_match_btn.addEventListener("click", Delegate.create(this, onGroupMatchClick));
 		_group_naming_btn.addEventListener("click", Delegate.create(this, onGroupNamingClick));

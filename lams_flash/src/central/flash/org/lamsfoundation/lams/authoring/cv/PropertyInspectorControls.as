@@ -127,8 +127,9 @@ class PropertyInspectorControls extends MovieClip {
 	private var rndGroup_radio:RadioButtonGroup;
 	private var numGroups_stp:NumericStepper;
 	private var numRandomGroups_stp:NumericStepper;
-	private var numLearners_stp:NumericStepper;
-	
+	private var numLearners_stp:NumericStepper;	
+	private var preview_student_groups_lbl:Label;
+	private var preview_student_groups_chk:CheckBox;
 	private var	equalGroupSizes_chk:CheckBox;
 	private var _group_naming_btn:Button;
 	
@@ -515,6 +516,8 @@ class PropertyInspectorControls extends MovieClip {
 		}else{
 			numGroups_lbl.visible = v;
 			numLearners_lbl.visible = v;
+			preview_student_groups_lbl.visible = v;
+			preview_student_groups_chk.visible = v;
 			equalGroupSizes_lbl.visible = v;
 			equalGroupSizes_chk.visible = v;
 			numGroups_rdo.visible = v;
@@ -537,6 +540,8 @@ class PropertyInspectorControls extends MovieClip {
 		if(g.groupingTypeID == Grouping.CHOSEN_GROUPING){
 			numGroups_lbl.visible = true;
 			numLearners_lbl.visible = false;
+			preview_student_groups_lbl.visible = false;
+			preview_student_groups_chk.visible = false;
 			equalGroupSizes_lbl.visible = false;
 			equalGroupSizes_chk.visible = false;
 			numGroups_stp.visible = true;
@@ -555,6 +560,8 @@ class PropertyInspectorControls extends MovieClip {
 		else if(g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING){
 			numGroups_lbl.visible = true;
 			numLearners_lbl.visible = true;
+			preview_student_groups_lbl.visible = true;
+			preview_student_groups_chk.visible = true;
 			equalGroupSizes_lbl.visible = true;
 			equalGroupSizes_chk.visible = true;
 			numRandomGroups_stp.visible = false;
@@ -571,6 +578,7 @@ class PropertyInspectorControls extends MovieClip {
 				equalGroupSizes_lbl.enabled = e;
 				numLearners_rdo.enabled = e;
 				numGroups_rdo.enabled = e;
+				preview_student_groups_chk.enabled = e;
 				equalGroupSizes_chk.enabled = e;
 				
 				_group_naming_btn.enabled = e;
@@ -582,6 +590,8 @@ class PropertyInspectorControls extends MovieClip {
 		else if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
 			numGroups_lbl.visible = true;
 			numLearners_lbl.visible = true;
+			preview_student_groups_lbl.visible = false;
+			preview_student_groups_chk.visible = false;
 			equalGroupSizes_lbl.visible = false;
 			equalGroupSizes_chk.visible = false;
 			numGroups_stp.visible = false;
@@ -695,6 +705,9 @@ class PropertyInspectorControls extends MovieClip {
 			
 			if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
 				equalGroupSizes_chk.enabled = (e != null) ? e : true;
+				preview_student_groups_chk.enabled = (e != null) ? e : true;
+				preview_student_groups_lbl.visible = true;
+				preview_student_groups_chk.visible = true;
 				equalGroupSizes_lbl.visible = true;
 				equalGroupSizes_chk.visible = true;
 			}
@@ -722,6 +735,8 @@ class PropertyInspectorControls extends MovieClip {
 			_group_naming_btn.visible = false;
 			
 			if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
+				preview_student_groups_lbl.visible = true;
+				preview_student_groups_chk.visible = true;
 				equalGroupSizes_lbl.visible = true;
 				equalGroupSizes_chk.visible = true;
 			}
@@ -758,7 +773,8 @@ class PropertyInspectorControls extends MovieClip {
 			
 			numGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 0;
 			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 0;
-			equalGroupSizes_chk.selected = (g.equalGroupSizes != null) ? g.equalGroupSizes : false;
+			equalGroupSizes_chk.selected = (g.equalGroupSizes != null && g.equalGroupSizes != undefined) ? g.equalGroupSizes : false;
+			preview_student_groups_chk.selected = (g.viewStudentsBeforeSelection != null && g.viewStudentsBeforeSelection != undefined) ? g.viewStudentsBeforeSelection : false;
 		}
 		else { // Teacher Chosen Grouping
 			numGroups_stp.value = (g.maxNumberOfGroups != null) ? g.maxNumberOfGroups : 0;
@@ -798,6 +814,7 @@ class PropertyInspectorControls extends MovieClip {
 			g.numberOfGroups = numGroups_stp.value;
 			g.maxNumberOfGroups = 0;
 			g.equalGroupSizes = equalGroupSizes_chk.selected;
+			g.viewStudentsBeforeSelection = preview_student_groups_chk.selected;
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
 			
@@ -891,12 +908,14 @@ class PropertyInspectorControls extends MovieClip {
 		hoursEnd_lbl.setStyle('styleName', styleObj);
 		minsEnd_lbl.setStyle('styleName', styleObj);
 		numGroups_lbl.setStyle('styleName', styleObj);
+		preview_student_groups_lbl.setStyle('styleName', styleObj);
 		equalGroupSizes_lbl.setStyle('styleName', styleObj);
 		numLearners_lbl.setStyle('styleName', styleObj);
 		groupType_lbl.setStyle('styleName', styleObj);
 		applied_grouping_lbl.setStyle('styleName', styleObj);
 		title_txt.setStyle('styleName', styleObj);
 		desc_txt.setStyle('styleName', styleObj);
+		preview_student_groups_chk.setStyle('styleName', styleObj);
 		runOffline_chk.setStyle('styleName', styleObj);
 		defineLater_chk.setStyle('styleName', styleObj);
 		days_stp.setStyle('styleName', styleObj);
@@ -1384,30 +1403,6 @@ class PropertyInspectorControls extends MovieClip {
 		evt.target.scrollContent.conditions = conditions;
 		evt.target.scrollContent.loadLists();
 	}
-	
-	/**
-	 * @depricated
-	 * 
-	 * @usage   
-	 * @param   branches 
-	 * @return  
-	 *
-	private function getValidBranches(branches:Array):Array {
-		Debugger.log("validating br len: " + branches.length, Debugger.CRITICAL, "getvalidbranches", "PIC*");
-		
-		for(var i=0; i < branches.length; i++) {
-			Debugger.log("validating br: " + branches[i].sequenceActivity.title, Debugger.CRITICAL, "getvalidbranches", "PIC*");
-			Debugger.log("validating br dir: " + branches[i].direction, Debugger.CRITICAL, "getvalidbranches", "PIC*");
-			
-			if(branches[i].direction != BranchConnector.DIR_FROM_START && branches[i].direction != BranchConnector.DIR_SINGLE) {
-				branches.splice(i, 1);
-				i=i-1;
-			}
-		}
-		
-		return branches;
-	}
-	*/
 	
 	private function getValidSequences(seqs:Array):Array {
 		for(var i=0; i < seqs.length; i++) {
