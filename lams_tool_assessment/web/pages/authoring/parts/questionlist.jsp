@@ -41,6 +41,9 @@
 							<c:when test="${question.type == 6}">
 								<fmt:message key="label.authoring.basic.type.essay" />
 							</c:when>
+							<c:when test="${question.type == 7}">
+								<fmt:message key="label.authoring.basic.type.ordering" />
+							</c:when>							
 						</c:choose>
 					</span>
 				</td>

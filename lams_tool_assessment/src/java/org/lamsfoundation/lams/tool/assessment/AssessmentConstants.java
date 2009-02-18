@@ -50,6 +50,8 @@ public class AssessmentConstants {
     public static final short QUESTION_TYPE_TRUE_FALSE = 5;
 
     public static final short QUESTION_TYPE_ESSAY = 6;
+    
+    public static final short QUESTION_TYPE_ORDERING = 7;
 
     // for action forward name
     public static final String SUCCESS = "success";
@@ -136,8 +138,6 @@ public class AssessmentConstants {
 
     public static final String ATTR_ASSESSMENT = "assessment";
 
-    public static final String ATTR_RUN_AUTO = "runAuto";
-
     public static final String ATTR_QUESTION_UID = "questionUid";
 
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
@@ -163,6 +163,10 @@ public class AssessmentConstants {
     public static final String ATTR_INSTRUCTIONS = "instructions";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
+    
+    public static final String ATTR_PAGE_NUMBER = "pageNumber";
+    
+    public static final String ATTR_PAGED_QUESTIONS = "pagedQuestions";
 
     // error message keys
     public static final String ERROR_MSG_QUESTION_NAME_BLANK = "error.question.name.blank";

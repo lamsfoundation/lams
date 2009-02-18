@@ -1116,6 +1116,9 @@ public class AuthoringAction extends Action {
 	    break;
 	case AssessmentConstants.QUESTION_TYPE_ESSAY:
 	    forward = mapping.findForward("essay");
+	    break;
+	case AssessmentConstants.QUESTION_TYPE_ORDERING:
+	    forward = mapping.findForward("ordering");
 	    break;	    
 	default:
 	    forward = null;
@@ -1153,6 +1156,7 @@ public class AuthoringAction extends Action {
 	
 	short questionType = question.getType();
 	if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
+		|| (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
@@ -1210,7 +1214,7 @@ public class AuthoringAction extends Action {
 	question.setDefaultGrade(Integer.parseInt(questionForm.getDefaultGrade()));
 	question.setGeneralFeedback(questionForm.getGeneralFeedback());
 	
-	if ((type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)) {
+	if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    question.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setShuffle(questionForm.isShuffle());
@@ -1232,10 +1236,16 @@ public class AuthoringAction extends Action {
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());	    
 	} else if ((type == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
 	    question.setFeedback(questionForm.getFeedback());
+	} else if (type == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    question.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
+	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 	}
 	
 	// set options
 	if ((type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
+		|| (type == AssessmentConstants.QUESTION_TYPE_ORDERING)
 		|| (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
 		|| (type == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
 		|| (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
@@ -1290,22 +1300,24 @@ public class AuthoringAction extends Action {
 
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
 	int questionType = WebUtil.readIntParam(request,AssessmentConstants.ATTR_QUESTION_TYPE);
-	TreeSet<AssessmentAnswerOption> optionList = new TreeSet<AssessmentAnswerOption>(new AssessmentAnswerOptionComparator());
+	TreeSet<AssessmentAnswerOption> optionList = new TreeSet<AssessmentAnswerOption>(
+		new AssessmentAnswerOptionComparator());
 	for (int i = 0; i < count; i++) {
 	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
-		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
-		
+		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
+		    || (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
+
 		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
 		if ((answerString == null) && isForSaving) {
 		    continue;
 		}
-		
+
 		AssessmentAnswerOption option = new AssessmentAnswerOption();
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);		
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
 		option.setAnswerString(answerString);
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
-		option.setGrade(grade);    
+		option.setGrade(grade);
 		option.setFeedback((String) paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 		optionList.add(option);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {

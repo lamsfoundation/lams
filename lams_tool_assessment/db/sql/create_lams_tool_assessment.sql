@@ -100,6 +100,8 @@ create table tl_laasse10_question_log (
    uid bigint not null auto_increment,
    access_date datetime,
    assessment_question_uid bigint,
+   answer_string text,
+   answer_float float,
    user_uid bigint,
    complete tinyint,
    session_id bigint,

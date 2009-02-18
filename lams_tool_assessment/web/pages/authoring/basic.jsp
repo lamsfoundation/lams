@@ -108,6 +108,7 @@
 		<option><fmt:message key="label.authoring.basic.type.numerical" /></option>
 		<option><fmt:message key="label.authoring.basic.type.true.false" /></option>
 		<option><fmt:message key="label.authoring.basic.type.essay" /></option>
+		<option><fmt:message key="label.authoring.basic.type.ordering" /></option>
 	</select>
 	
 	<a onclick="createNewQuestionInitHref();return false;" href="" class="button-add-item space-left thickbox" id="newQuestionInitHref">  
