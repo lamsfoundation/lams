@@ -895,6 +895,8 @@ class Canvas extends CanvasHelper {
 			// open preview in new window
 			ApplicationParent.extCall("openPreview", r);
 			Debugger.log('Recieved Lesson ID: '+r ,Debugger.GEN,'onLaunchPreviewResponse','Canvas');
+			Application.getInstance().getToolbar().setButtonState("preview_btn", true, true);
+			Cursor.showCursor(Application.C_DEFAULT);
 		}
 	}
 	

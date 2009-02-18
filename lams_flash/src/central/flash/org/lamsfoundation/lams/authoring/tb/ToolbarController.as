@@ -125,6 +125,8 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 			
 		}else if(tgt.indexOf("preview") != -1){
 			_app.getCanvas().launchPreviewWindow();
+			Cursor.showCursor(Application.C_HOURGLASS);
+			_toolbarModel.setButtonState("preview_btn", false, true);
 		}else if(tgt.indexOf("cancel") != -1){
 			_app.getCanvas().finishEditOnFly(false, true);
 		}
