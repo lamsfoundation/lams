@@ -40,7 +40,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * @author Ozgur Demirtas
  *         <p>
- *         Hibernate implementation for database access to VoteContent for the voting tool.
+ *         Hibernate implementation for database access to VoteContent for the
+ *         voting tool.
  *         </p>
  */
 

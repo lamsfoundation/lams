@@ -116,8 +116,6 @@ public interface IVoteService {
     public int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionId)
 	    throws VoteApplicationException;
 
-    public int getAllEntriesCount() throws VoteApplicationException;
-
     public int getSessionEntriesCount(final Long voteSessionId) throws VoteApplicationException;
 
     public int getCompletedSessionEntriesCount(final Long voteSessionUid) throws VoteApplicationException;
@@ -152,8 +150,6 @@ public interface IVoteService {
     public void cleanAllQuestions(final Long voteContentUid) throws VoteApplicationException;
 
     public Set getUserEntries() throws VoteApplicationException;
-
-    public List getContentEntries(final Long voteContentUid) throws VoteApplicationException;
 
     public int getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId, final Long voteContentUid);
 
@@ -192,9 +188,10 @@ public interface IVoteService {
     public VoteSession getVoteSessionByUID(Long uid) throws VoteApplicationException;
 
     /**
-     * Get the count of all the potential learners for the vote session. This will include the people that have never
-     * logged into the lesson. Not great, but it is a better estimate of how many users there will be eventually than
-     * the number of people already known to the tool.
+     * Get the count of all the potential learners for the vote session. This
+     * will include the people that have never logged into the lesson. Not
+     * great, but it is a better estimate of how many users there will be
+     * eventually than the number of people already known to the tool.
      * 
      * @param voteSessionId
      *                The tool session id

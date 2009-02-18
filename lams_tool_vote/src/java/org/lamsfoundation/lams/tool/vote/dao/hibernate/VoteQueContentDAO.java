@@ -31,217 +31,175 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
 /**
  * @author Ozgur Demirtas
  * 
- * <p>Hibernate implementation for database access to VoteQueContent for the vote tool.</p>
+ * <p>
+ * Hibernate implementation for database access to VoteQueContent for the vote
+ * tool.
+ * </p>
  */
 public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueContentDAO {
-	 	static Logger logger = Logger.getLogger(VoteQueContentDAO.class.getName());
-	 	
-	 	private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID_SIMPLE = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId";
-	 	
-	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId";
-	 	
-	 	private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from voteQueContent in class VoteQueContent where voteQueContent.question=:question and voteQueContent.voteContentId=:voteContentUid";
-	 	
-	 	private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.displayOrder=:displayOrder and voteQueContent.voteContentId=:voteContentUid";
-	 	
-	 	private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId order by voteQueContent.displayOrder";
-	 	
-	 		 	
-	 	public VoteQueContent getVoteQueContentByUID(Long uid)
-		{
-			 return (VoteQueContent) this.getHibernateTemplate()
-	         .get(VoteQueContent.class, uid);
-		}
-		
-		
-	 	public VoteQueContent getToolDefaultQuestionContent(final long voteContentId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-				.setLong("voteContentId", voteContentId)
-				.list();
-			
-			if(list != null && list.size() > 0){
-				VoteQueContent voteq = (VoteQueContent) list.get(0);
-				return voteq;
-			}
-			return null;
-	    }
-	 	
-	 	
-        public List getVoteQueContentsByContentId(long voteContentId){
-            return getHibernateTemplate().findByNamedParam(LOAD_QUESTION_CONTENT_BY_CONTENT_ID, "voteContentId", new Long(voteContentId));
-        }
-	 	
-	 	public List getAllQuestionEntries(final long voteContentId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-				.setLong("voteContentId", voteContentId)
-				.list();
+    static Logger logger = Logger.getLogger(VoteQueContentDAO.class.getName());
 
-			return list;
-	    }
-	 	
-	 	
-	 	public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT)
-				.setString("question", question)
-				.setLong("voteContentUid", voteContentUid.longValue())				
-				.list();
-			
-			if(list != null && list.size() > 0){
-				VoteQueContent voteq = (VoteQueContent) list.get(0);
-				return voteq;
-			}
-			return null;
-	    }
-	 	
-	 	
-	 	public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
-				.setLong("displayOrder", displayOrder.longValue())
-				.setLong("voteContentUid", voteContentUid.longValue())				
-				.list();
-			
-			if(list != null && list.size() > 0){
-				VoteQueContent voteq = (VoteQueContent) list.get(0);
-				return voteq;
-			}
-			return null;
-	    }
+    private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID_SIMPLE = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId";
 
-	 	
-	 	public void removeQuestionContentByVoteUid(final Long voteContentUid)
-	    {
-			HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-				.setLong("voteContentId", voteContentUid.longValue())
-				.list();
+    private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId";
 
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    		VoteQueContent voteQueContent=(VoteQueContent)listIterator.next();
-					this.getSession().setFlushMode(FlushMode.AUTO);
-		    		templ.delete(voteQueContent);
-		    		templ.flush();
-		    	}
-			}
-	    }
-	 	
+    private static final String LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT = "from voteQueContent in class VoteQueContent where voteQueContent.question=:question and voteQueContent.voteContentId=:voteContentUid";
 
-	 	public void resetAllQuestions(final Long voteContentUid)
-	    {
-			HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-				.setLong("voteContentId", voteContentUid.longValue())
-				.list();
+    private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.displayOrder=:displayOrder and voteQueContent.voteContentId=:voteContentUid";
 
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    		VoteQueContent voteQueContent=(VoteQueContent)listIterator.next();
-					this.getSession().setFlushMode(FlushMode.AUTO);
-		    		templ.update(voteQueContent);
-		    	}
-			}
-	    }
-	 	
+    private static final String SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId order by voteQueContent.displayOrder";
 
-	 	public void cleanAllQuestions(final Long voteContentUid)
-	    {
-			HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-				.setLong("voteContentId", voteContentUid.longValue())
-				.list();
+    public VoteQueContent getVoteQueContentByUID(Long uid) {
+	return (VoteQueContent) this.getHibernateTemplate().get(VoteQueContent.class, uid);
+    }
 
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    		VoteQueContent voteQueContent=(VoteQueContent)listIterator.next();
-	    			this.getSession().setFlushMode(FlushMode.AUTO);
-	    			logger.debug("deleting voteQueContent: " + voteQueContent);
-		    		templ.delete(voteQueContent);	
-		    	}
-			}
-	    }
+    public VoteQueContent getToolDefaultQuestionContent(final long voteContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId",
+		voteContentId).list();
 
-	 	
-	 	public void cleanAllQuestionsSimple(final Long voteContentUid)
-	    {
-			HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(CLEAN_QUESTION_CONTENT_BY_CONTENT_ID_SIMPLE)
-				.setLong("voteContentId", voteContentUid.longValue())
-				.list();
+	if (list != null && list.size() > 0) {
+	    VoteQueContent voteq = (VoteQueContent) list.get(0);
+	    return voteq;
+	}
+	return null;
+    }
 
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    		VoteQueContent voteQueContent=(VoteQueContent)listIterator.next();
-	    			this.getSession().setFlushMode(FlushMode.AUTO);
-	    			logger.debug("deleting voteQueContent: " + voteQueContent);
-		    		templ.delete(voteQueContent);	
-		    	}
-			}
-	    }
+    public List getVoteQueContentsByContentId(long voteContentId) {
+	return getHibernateTemplate().findByNamedParam(LOAD_QUESTION_CONTENT_BY_CONTENT_ID, "voteContentId",
+		new Long(voteContentId));
+    }
 
-	 	
-	 	public List getAllQuestionEntriesSorted(final long voteContentId)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER)
-				.setLong("voteContentId", voteContentId)
-				.list();
+    public List getAllQuestionEntries(final long voteContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId",
+		voteContentId).list();
 
-			return list;
-	    }
+	return list;
+    }
 
+    public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT).setString("question", question)
+		.setLong("voteContentUid", voteContentUid.longValue()).list();
 
-	 	
-	 	public void saveVoteQueContent(VoteQueContent voteQueContent)
-	    {
-	    	this.getHibernateTemplate().save(voteQueContent);
+	if (list != null && list.size() > 0) {
+	    VoteQueContent voteq = (VoteQueContent) list.get(0);
+	    return voteq;
+	}
+	return null;
+    }
+
+    public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("displayOrder",
+		displayOrder.longValue()).setLong("voteContentUid", voteContentUid.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    VoteQueContent voteq = (VoteQueContent) list.get(0);
+	    return voteq;
+	}
+	return null;
+    }
+
+    public void removeQuestionContentByVoteUid(final Long voteContentUid) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId",
+		voteContentUid.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    Iterator listIterator = list.iterator();
+	    while (listIterator.hasNext()) {
+		VoteQueContent voteQueContent = (VoteQueContent) listIterator.next();
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		templ.delete(voteQueContent);
+		templ.flush();
 	    }
-	    
-		public void updateVoteQueContent(VoteQueContent voteQueContent)
-	    {
-	    	this.getHibernateTemplate().update(voteQueContent);
+	}
+    }
+
+    public void resetAllQuestions(final Long voteContentUid) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId",
+		voteContentUid.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    Iterator listIterator = list.iterator();
+	    while (listIterator.hasNext()) {
+		VoteQueContent voteQueContent = (VoteQueContent) listIterator.next();
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		templ.update(voteQueContent);
 	    }
-		
-		public void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent)
-	    {
-	    	this.getHibernateTemplate().saveOrUpdate(voteQueContent);
+	}
+    }
+
+    public void cleanAllQuestions(final Long voteContentUid) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId",
+		voteContentUid.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    Iterator listIterator = list.iterator();
+	    while (listIterator.hasNext()) {
+		VoteQueContent voteQueContent = (VoteQueContent) listIterator.next();
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		logger.debug("deleting voteQueContent: " + voteQueContent);
+		templ.delete(voteQueContent);
 	    }
-		
-		public void removeVoteQueContentByUID(Long uid)
-	    {
-			VoteQueContent voteq = (VoteQueContent)getHibernateTemplate().get(VoteQueContent.class, uid);
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().delete(voteq);
+	}
+    }
+
+    public void cleanAllQuestionsSimple(final Long voteContentUid) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(CLEAN_QUESTION_CONTENT_BY_CONTENT_ID_SIMPLE).setLong("voteContentId",
+		voteContentUid.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    Iterator listIterator = list.iterator();
+	    while (listIterator.hasNext()) {
+		VoteQueContent voteQueContent = (VoteQueContent) listIterator.next();
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		logger.debug("deleting voteQueContent: " + voteQueContent);
+		templ.delete(voteQueContent);
 	    }
-		
-		
-		public void removeVoteQueContent(VoteQueContent voteQueContent)
-	    {
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().delete(voteQueContent);
-	    }
-		
-		 public void flush()
-	    {
-	        this.getHibernateTemplate().flush();
-	    }
-	} 
+	}
+    }
+
+    public List getAllQuestionEntriesSorted(final long voteContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("voteContentId",
+		voteContentId).list();
+
+	return list;
+    }
+
+    public void saveVoteQueContent(VoteQueContent voteQueContent) {
+	this.getHibernateTemplate().save(voteQueContent);
+    }
+
+    public void updateVoteQueContent(VoteQueContent voteQueContent) {
+	this.getHibernateTemplate().update(voteQueContent);
+    }
+
+    public void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent) {
+	this.getHibernateTemplate().saveOrUpdate(voteQueContent);
+    }
+
+    public void removeVoteQueContentByUID(Long uid) {
+	VoteQueContent voteq = (VoteQueContent) getHibernateTemplate().get(VoteQueContent.class, uid);
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(voteq);
+    }
+
+    public void removeVoteQueContent(VoteQueContent voteQueContent) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(voteQueContent);
+    }
+
+    public void flush() {
+	this.getHibernateTemplate().flush();
+    }
+}

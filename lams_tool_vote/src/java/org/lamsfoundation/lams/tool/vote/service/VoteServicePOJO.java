@@ -95,8 +95,9 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  * 
- * The POJO implementation of Voting service. All business logic of Voting tool is implemented in this class. It
- * translates the request from presentation layer and performs appropriate database operation.
+ * The POJO implementation of Voting service. All business logic of Voting tool
+ * is implemented in this class. It translates the request from presentation
+ * layer and performs appropriate database operation.
  * 
  */
 public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSessionManager,
@@ -135,28 +136,28 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     public void configureContentRepository() throws VoteApplicationException {
-	VoteServicePOJO.logger.debug("retrieved repService: " + repositoryService);
+	logger.debug("retrieved repService: " + repositoryService);
 	cred = new SimpleCredentials(repositoryUser, repositoryId);
-	VoteServicePOJO.logger.debug("retrieved cred: " + cred);
+	logger.debug("retrieved cred: " + cred);
 	try {
 	    repositoryService.createCredentials(cred);
-	    VoteServicePOJO.logger.debug("created credentails.");
-	    repositoryService.addWorkspace(cred, VoteServicePOJO.repositoryWorkspaceName);
-	    VoteServicePOJO.logger.debug("created workspace.");
+	    logger.debug("created credentails.");
+	    repositoryService.addWorkspace(cred, repositoryWorkspaceName);
+	    logger.debug("created workspace.");
 	} catch (ItemExistsException ie) {
-	    VoteServicePOJO.logger.warn("Tried to configure repository but it "
+	    logger.warn("Tried to configure repository but it "
 		    + " appears to be already configured. Exception thrown by repository being ignored. ", ie);
 	} catch (RepositoryCheckedException e) {
 	    String error = "Error occured while trying to configure repository." + " Unable to recover from error: "
 		    + e.getMessage();
-	    VoteServicePOJO.logger.error(error, e);
+	    logger.error(error, e);
 	    throw new VoteApplicationException(error, e);
 	}
     }
 
     public void createVote(VoteContent voteContent) throws VoteApplicationException {
 	try {
-	    VoteServicePOJO.logger.debug("using voteContent defineLater:" + voteContent.isDefineLater());
+	    logger.debug("using voteContent defineLater:" + voteContent.isDefineLater());
 	    voteContentDAO.saveVoteContent(voteContent);
 	} catch (DataAccessException e) {
 	    throw new VoteApplicationException("Exception occured when lams is creating vote content: "
@@ -227,15 +228,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		    voteSessionUid);
 	} catch (DataAccessException e) {
 	    throw new VoteApplicationException("Exception occured when lams is retrieving usernames for votes: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public List getContentEntries(final Long voteContentUid) throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getContentEntries(voteContentUid);
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting content entries: "
 		    + e.getMessage(), e);
 	}
     }
@@ -387,8 +379,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		Set potentialLearners = toolService.getAllPotentialLearners(session.getVoteSessionId().longValue());
 		return potentialLearners != null ? potentialLearners.size() : 0;
 	    } else {
-		VoteServicePOJO.logger.error("Unable to find vote session record id=" + voteSessionId
-			+ ". Returning 0 users.");
+		logger.error("Unable to find vote session record id=" + voteSessionId + ". Returning 0 users.");
 		return 0;
 	    }
 	} catch (LamsToolServiceException e) {
@@ -459,15 +450,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    voteUsrAttemptDAO.removeAttemptsForUser(queUsrId);
 	} catch (DataAccessException e) {
 	    throw new VoteApplicationException("Exception occured when lams is removing voteUsrAttempts: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public int getAllEntriesCount() throws VoteApplicationException {
-	try {
-	    return voteUsrAttemptDAO.getAllEntriesCount();
-	} catch (DataAccessException e) {
-	    throw new VoteApplicationException("Exception occured when lams is getting all attempts entries count: "
 		    + e.getMessage(), e);
 	}
     }
@@ -852,7 +834,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * logs hiding of a user entered vote
      */
     public void hideOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException {
-	VoteServicePOJO.logger.debug("hiding user entry: " + voteUsrAttempt.getUserEntry());
+	logger.debug("hiding user entry: " + voteUsrAttempt.getUserEntry());
 	auditService.logHideEntry(VoteAppConstants.MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), voteUsrAttempt
 		.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
     }
@@ -861,7 +843,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * logs showing of a user entered vote
      */
     public void showOpenVote(VoteUsrAttempt voteUsrAttempt) throws VoteApplicationException {
-	VoteServicePOJO.logger.debug("showing user entry: " + voteUsrAttempt.getUserEntry());
+	logger.debug("showing user entry: " + voteUsrAttempt.getUserEntry());
 	auditService.logShowEntry(VoteAppConstants.MY_SIGNATURE, voteUsrAttempt.getQueUsrId(), voteUsrAttempt
 		.getVoteQueUsr().getUsername(), voteUsrAttempt.getUserEntry());
     }
@@ -904,13 +886,13 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     public User getCurrentUserData(String username) throws VoteApplicationException {
 	try {
-	    VoteServicePOJO.logger.debug("getCurrentUserData: " + username);
+	    logger.debug("getCurrentUserData: " + username);
 	    /**
 	     * this will return null if the username not found
 	     */
 	    User user = userManagementService.getUserByLogin(username);
 	    if (user == null) {
-		VoteServicePOJO.logger.error("No user with the username: " + username + " exists.");
+		logger.error("No user with the username: " + username + " exists.");
 		throw new VoteApplicationException("No user with that username exists.");
 	    }
 	    return user;
@@ -961,14 +943,14 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * @throws VoteApplicationException
      */
     public boolean studentActivityOccurredGlobal(VoteContent voteContent) throws VoteApplicationException {
-	VoteServicePOJO.logger.debug("voteContent uid: " + voteContent.getUid());
+	logger.debug("voteContent uid: " + voteContent.getUid());
 	Iterator questionIterator = voteContent.getVoteQueContents().iterator();
 
 	while (questionIterator.hasNext()) {
 	    VoteQueContent voteQueContent = (VoteQueContent) questionIterator.next();
 	    Iterator attemptsIterator = voteQueContent.getVoteUsrAttempts().iterator();
 	    while (attemptsIterator.hasNext()) {
-		VoteServicePOJO.logger.debug("there is at least one attempt for the standard nominamtions");
+		logger.debug("there is at least one attempt for the standard nominamtions");
 		/**
 		 * proved the fact that there is at least one attempt for this content.
 		 */
@@ -979,18 +961,18 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     public boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent) throws VoteApplicationException {
-	VoteServicePOJO.logger.debug("voteContent uid: " + voteContent.getUid());
+	logger.debug("voteContent uid: " + voteContent.getUid());
 	boolean studentActivityOccurredGlobal = studentActivityOccurredGlobal(voteContent);
-	VoteServicePOJO.logger.debug("studentActivityOccurredGlobal: " + studentActivityOccurredGlobal);
+	logger.debug("studentActivityOccurredGlobal: " + studentActivityOccurredGlobal);
 
 	int userEnteredVotesCount = getUserEnteredVotesCountForContent(voteContent.getUid());
-	VoteServicePOJO.logger.debug("userEnteredVotesCount: " + userEnteredVotesCount);
+	logger.debug("userEnteredVotesCount: " + userEnteredVotesCount);
 
 	if (studentActivityOccurredGlobal == true || userEnteredVotesCount > 0) {
 	    return true;
 	}
 
-	VoteServicePOJO.logger.debug("there is no votes/nominations for this content");
+	logger.debug("there is no votes/nominations for this content");
 	return false;
     }
 
@@ -1030,18 +1012,18 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * 
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-	VoteServicePOJO.logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
+	logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
 
 	if (fromContentId == null) {
-	    VoteServicePOJO.logger.error("fromContentId is null.");
-	    VoteServicePOJO.logger.debug("attempt retrieving tool's default content id with signatute : "
+	    logger.error("fromContentId is null.");
+	    logger.debug("attempt retrieving tool's default content id with signatute : "
 		    + VoteAppConstants.MY_SIGNATURE);
 	    long defaultContentId = 0;
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
 		fromContentId = new Long(defaultContentId);
 	    } catch (Exception e) {
-		VoteServicePOJO.logger.error("default content id has not been setup for signature: "
+		logger.error("default content id has not been setup for signature: "
 			+ VoteAppConstants.MY_SIGNATURE);
 		throw new ToolException("WARNING! default content has not been setup for signature"
 			+ VoteAppConstants.MY_SIGNATURE + " Can't continue!");
@@ -1049,58 +1031,58 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
 
 	if (toContentId == null) {
-	    VoteServicePOJO.logger.error("throwing ToolException: toContentId is null");
+	    logger.error("throwing ToolException: toContentId is null");
 	    throw new ToolException("toContentId is missing");
 	}
-	VoteServicePOJO.logger.debug("final - copyToolContent using ids: " + fromContentId + " and " + toContentId);
+	logger.debug("final - copyToolContent using ids: " + fromContentId + " and " + toContentId);
 
 	try {
 	    VoteContent fromContent = voteContentDAO.findVoteContentById(fromContentId);
 
 	    if (fromContent == null) {
-		VoteServicePOJO.logger.error("fromContent is null.");
-		VoteServicePOJO.logger.error("attempt retrieving tool's default content id with signatute : "
+		logger.error("fromContent is null.");
+		logger.error("attempt retrieving tool's default content id with signatute : "
 			+ VoteAppConstants.MY_SIGNATURE);
 		long defaultContentId = 0;
 		try {
 		    defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
 		    fromContentId = new Long(defaultContentId);
 		} catch (Exception e) {
-		    VoteServicePOJO.logger.error("default content id has not been setup for signature: "
+		    logger.error("default content id has not been setup for signature: "
 			    + VoteAppConstants.MY_SIGNATURE);
 		    throw new ToolException("WARNING! default content has not been setup for signature"
 			    + VoteAppConstants.MY_SIGNATURE + " Can't continue!");
 		}
 
 		fromContent = voteContentDAO.findVoteContentById(fromContentId);
-		VoteServicePOJO.logger.debug("using fromContent: " + fromContent);
+		logger.debug("using fromContent: " + fromContent);
 	    }
 
-	    VoteServicePOJO.logger.debug("final - retrieved fromContent: " + fromContent);
-	    VoteServicePOJO.logger.debug("final - before new instance using " + fromContent + " and " + toContentId);
-	    VoteServicePOJO.logger.debug("final - before new instance using voteToolContentHandler: "
+	    logger.debug("final - retrieved fromContent: " + fromContent);
+	    logger.debug("final - before new instance using " + fromContent + " and " + toContentId);
+	    logger.debug("final - before new instance using voteToolContentHandler: "
 		    + voteToolContentHandler);
 
 	    try {
 		VoteContent toContent = VoteContent.newInstance(voteToolContentHandler, fromContent, toContentId);
 		if (toContent == null) {
-		    VoteServicePOJO.logger.debug("throwing ToolException: WARNING!, retrieved toContent is null.");
+		    logger.debug("throwing ToolException: WARNING!, retrieved toContent is null.");
 		    throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
 		} else {
-		    VoteServicePOJO.logger.debug("retrieved toContent: " + toContent);
+		    logger.debug("retrieved toContent: " + toContent);
 		    voteContentDAO.saveVoteContent(toContent);
-		    VoteServicePOJO.logger.debug("toContent has been saved successfully: " + toContent);
+		    logger.debug("toContent has been saved successfully: " + toContent);
 		}
-		VoteServicePOJO.logger.debug("end of copyToolContent with ids: " + fromContentId + " and "
+		logger.debug("end of copyToolContent with ids: " + fromContentId + " and "
 			+ toContentId);
 
 	    } catch (ItemNotFoundException e) {
-		VoteServicePOJO.logger.error("exception occurred: " + e);
+		logger.error("exception occurred: " + e);
 	    } catch (RepositoryCheckedException e) {
-		VoteServicePOJO.logger.error("exception occurred: " + e);
+		logger.error("exception occurred: " + e);
 	    }
 	} catch (DataAccessException e) {
-	    VoteServicePOJO.logger
+	    logger
 		    .error("throwing ToolException: Exception occured when lams is copying content between content ids.");
 	    throw new ToolException("Exception occured when lams is copying content between content ids.");
 	}
@@ -1117,66 +1099,66 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      */
     public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
-	VoteServicePOJO.logger.debug("start of removeToolContent with toolContentID: " + toolContentID
+	logger.debug("start of removeToolContent with toolContentID: " + toolContentID
 		+ "removeSessionData: " + removeSessionData);
 
 	if (toolContentID == null) {
-	    VoteServicePOJO.logger.error("toolContentID is null");
+	    logger.error("toolContentID is null");
 	    throw new ToolException("toolContentID is missing");
 	}
 
 	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
-	VoteServicePOJO.logger.debug("retrieving voteContent: " + voteContent);
+	logger.debug("retrieving voteContent: " + voteContent);
 
 	if (voteContent != null) {
-	    VoteServicePOJO.logger
+	    logger
 		    .error("start deleting any uploaded file for this content from the content repository");
 	    Iterator filesIterator = voteContent.getVoteAttachments().iterator();
 	    while (filesIterator.hasNext()) {
 		VoteUploadedFile voteUploadedFile = (VoteUploadedFile) filesIterator.next();
-		VoteServicePOJO.logger.debug("iterated voteUploadedFile : " + voteUploadedFile);
+		logger.debug("iterated voteUploadedFile : " + voteUploadedFile);
 		String filesUuid = voteUploadedFile.getUuid();
 		if (filesUuid != null && filesUuid.length() > 0) {
 		    try {
 			voteToolContentHandler.deleteFile(new Long(filesUuid));
 		    } catch (RepositoryCheckedException e) {
-			VoteServicePOJO.logger.error("exception occured deleting files from content repository : " + e);
+			logger.error("exception occured deleting files from content repository : " + e);
 			throw new ToolException("undeletable file in the content repository");
 		    }
 		}
 	    }
-	    VoteServicePOJO.logger.debug("end deleting any uploaded files for this content.");
+	    logger.debug("end deleting any uploaded files for this content.");
 
 	    Iterator sessionIterator = voteContent.getVoteSessions().iterator();
 	    while (sessionIterator.hasNext()) {
 		if (removeSessionData == false) {
-		    VoteServicePOJO.logger.debug("removeSessionData is false, throwing SessionDataExistsException.");
+		    logger.debug("removeSessionData is false, throwing SessionDataExistsException.");
 		    throw new SessionDataExistsException();
 		}
 
 		VoteSession voteSession = (VoteSession) sessionIterator.next();
-		VoteServicePOJO.logger.debug("iterated voteSession : " + voteSession);
+		logger.debug("iterated voteSession : " + voteSession);
 
 		Iterator sessionUsersIterator = voteSession.getVoteQueUsers().iterator();
 		while (sessionUsersIterator.hasNext()) {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) sessionUsersIterator.next();
-		    VoteServicePOJO.logger.debug("iterated voteQueUsr : " + voteQueUsr);
+		    logger.debug("iterated voteQueUsr : " + voteQueUsr);
 
 		    Iterator sessionUsersAttemptsIterator = voteQueUsr.getVoteUsrAttempts().iterator();
 		    while (sessionUsersAttemptsIterator.hasNext()) {
 			VoteUsrAttempt voteUsrAttempt = (VoteUsrAttempt) sessionUsersAttemptsIterator.next();
-			VoteServicePOJO.logger.debug("iterated voteUsrAttempt : " + voteUsrAttempt);
+			logger.debug("iterated voteUsrAttempt : " + voteUsrAttempt);
 			removeAttempt(voteUsrAttempt);
-			VoteServicePOJO.logger.debug("removed voteUsrAttempt : " + voteUsrAttempt);
+			logger.debug("removed voteUsrAttempt : " + voteUsrAttempt);
 		    }
 		}
 	    }
-	    VoteServicePOJO.logger.debug("removed all existing responses of toolContent with toolContentID:"
+	    logger.debug("removed all existing responses of toolContent with toolContentID:"
 		    + toolContentID);
 	    voteContentDAO.removeVoteById(toolContentID);
-	    VoteServicePOJO.logger.debug("removed voteContent:" + voteContent);
+	    logger.debug("removed voteContent:" + voteContent);
 	} else {
-	    VoteServicePOJO.logger.error("Warning!!!, We should have not come here. voteContent is null.");
+	    logger.error("Warning!!!, We should have not come here. voteContent is null.");
 	    throw new ToolException("toolContentID is missing");
 	}
     }
@@ -1265,13 +1247,13 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      */
     public void setAsDefineLater(Long toolContentID, boolean value) throws DataMissingException, ToolException {
 	if (toolContentID == null) {
-	    VoteServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
+	    logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
 	    throw new DataMissingException("toolContentID is missing");
 	}
 
 	VoteContent voteContent = retrieveVote(toolContentID);
 	if (voteContent == null) {
-	    VoteServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
+	    logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
 	    throw new DataMissingException("voteContent is missing");
 	}
 	voteContent.setDefineLater(value);
@@ -1288,12 +1270,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      */
     public void setAsRunOffline(Long toolContentID, boolean value) throws DataMissingException, ToolException {
 	if (toolContentID == null) {
-	    VoteServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
+	    logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
 	    throw new DataMissingException("toolContentID is missing");
 	}
 	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
 	if (voteContent == null) {
-	    VoteServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
+	    logger.error("throwing DataMissingException: WARNING!: retrieved voteContent is null.");
 	    throw new DataMissingException("voteContent is missing");
 	}
 	voteContent.setRunOffline(value);
@@ -1311,10 +1293,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	VoteSession voteSession = retrieveVoteSession(toolSessionID);
 
 	if (voteSession == null) {
-	    VoteServicePOJO.logger.error("voteSession does not exist yet: " + toolSessionID);
+	    logger.error("voteSession does not exist yet: " + toolSessionID);
 	    return false;
 	} else {
-	    VoteServicePOJO.logger.debug("retrieving an existing voteSession: " + voteSession + " " + toolSessionID);
+	    logger.debug("retrieving an existing voteSession: " + voteSession + " " + toolSessionID);
 	}
 	return true;
     }
@@ -1334,47 +1316,47 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * 
      */
     public void createToolSession(Long toolSessionID, String toolSessionName, Long toolContentID) throws ToolException {
-	VoteServicePOJO.logger.debug("start of createToolSession with ids: " + toolSessionID + " and " + toolContentID);
-	VoteServicePOJO.logger.debug("toolSessionName: " + toolSessionName);
+	logger.debug("start of createToolSession with ids: " + toolSessionID + " and " + toolContentID);
+	logger.debug("toolSessionName: " + toolSessionName);
 
 	if (toolSessionID == null) {
-	    VoteServicePOJO.logger.error("toolSessionID is null");
+	    logger.error("toolSessionID is null");
 	    throw new ToolException("toolSessionID is missing");
 	}
 
 	long defaultContentId = 0;
 	if (toolContentID == null) {
-	    VoteServicePOJO.logger.error("toolContentID is null.");
-	    VoteServicePOJO.logger.error("attempt retrieving tool's default content id with signatute : "
+	    logger.error("toolContentID is null.");
+	    logger.error("attempt retrieving tool's default content id with signatute : "
 		    + VoteAppConstants.MY_SIGNATURE);
 
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
 		toolContentID = new Long(defaultContentId);
-		VoteServicePOJO.logger.debug("updated toolContentID to: " + toolContentID);
+		logger.debug("updated toolContentID to: " + toolContentID);
 	    } catch (Exception e) {
-		VoteServicePOJO.logger.error("default content id has not been setup for signature: "
+		logger.error("default content id has not been setup for signature: "
 			+ VoteAppConstants.MY_SIGNATURE);
 		throw new ToolException("WARNING! default content has not been setup for signature"
 			+ VoteAppConstants.MY_SIGNATURE + " Can't continue!");
 	    }
 	}
-	VoteServicePOJO.logger.debug("final toolSessionID and toolContentID: " + toolSessionID + " " + toolContentID);
+	logger.debug("final toolSessionID and toolContentID: " + toolSessionID + " " + toolContentID);
 
 	VoteContent voteContent = voteContentDAO.findVoteContentById(toolContentID);
-	VoteServicePOJO.logger.debug("retrieved voteContent: " + voteContent);
+	logger.debug("retrieved voteContent: " + voteContent);
 
 	if (voteContent == null) {
-	    VoteServicePOJO.logger.error("voteContent is null.");
-	    VoteServicePOJO.logger.error("attempt retrieving tool's default content id with signatute : "
+	    logger.error("voteContent is null.");
+	    logger.error("attempt retrieving tool's default content id with signatute : "
 		    + VoteAppConstants.MY_SIGNATURE);
 
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
 		toolContentID = new Long(defaultContentId);
-		VoteServicePOJO.logger.debug("updated toolContentID to: " + toolContentID);
+		logger.debug("updated toolContentID to: " + toolContentID);
 	    } catch (Exception e) {
-		VoteServicePOJO.logger.error("default content id has not been setup for signature: "
+		logger.error("default content id has not been setup for signature: "
 			+ VoteAppConstants.MY_SIGNATURE);
 		throw new ToolException("WARNING! default content has not been setup for signature"
 			+ VoteAppConstants.MY_SIGNATURE + " Can't continue!");
@@ -1382,7 +1364,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
 	    voteContent = voteContentDAO.findVoteContentById(toolContentID);
 	}
-	VoteServicePOJO.logger.debug("final - retrieved voteContent: " + voteContent);
+	logger.debug("final - retrieved voteContent: " + voteContent);
 
 	/*
 	 * create a new a new tool session if it does not already exist in the tool session table
@@ -1392,12 +1374,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		VoteSession voteSession = new VoteSession(toolSessionID, new Date(System.currentTimeMillis()),
 			VoteSession.INCOMPLETE, toolSessionName, voteContent, new TreeSet());
 
-		VoteServicePOJO.logger.debug("created voteSession: " + voteSession);
+		logger.debug("created voteSession: " + voteSession);
 		voteSessionDAO.saveVoteSession(voteSession);
-		VoteServicePOJO.logger.debug("created voteSession in the db: " + voteSession);
+		logger.debug("created voteSession in the db: " + voteSession);
 
 	    } catch (Exception e) {
-		VoteServicePOJO.logger.error("Error creating new toolsession in the db");
+		logger.error("Error creating new toolsession in the db");
 		throw new ToolException("Error creating new toolsession in the db: " + e);
 	    }
 	}
@@ -1413,16 +1395,16 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * @throws ToolException
      */
     public void removeToolSession(Long toolSessionID) throws DataMissingException, ToolException {
-	VoteServicePOJO.logger.debug("start of removeToolSession with id: " + toolSessionID);
+	logger.debug("start of removeToolSession with id: " + toolSessionID);
 	if (toolSessionID == null) {
-	    VoteServicePOJO.logger.error("toolSessionID is null");
+	    logger.error("toolSessionID is null");
 	    throw new DataMissingException("toolSessionID is missing");
 	}
 
 	VoteSession voteSession = null;
 	try {
 	    voteSession = retrieveVoteSession(toolSessionID);
-	    VoteServicePOJO.logger.debug("retrieved voteSession: " + voteSession);
+	    logger.debug("retrieved voteSession: " + voteSession);
 	} catch (VoteApplicationException e) {
 	    throw new DataMissingException("error retrieving voteSession: " + e);
 	} catch (Exception e) {
@@ -1430,13 +1412,13 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
 
 	if (voteSession == null) {
-	    VoteServicePOJO.logger.error("voteSession is null");
+	    logger.error("voteSession is null");
 	    throw new DataMissingException("voteSession is missing");
 	}
 
 	try {
 	    voteSessionDAO.removeVoteSession(voteSession);
-	    VoteServicePOJO.logger.debug("voteSession " + voteSession + " has been deleted successfully.");
+	    logger.debug("voteSession " + voteSession + " has been deleted successfully.");
 	} catch (VoteApplicationException e) {
 	    throw new ToolException("error deleting voteSession:" + e);
 	}
@@ -1453,28 +1435,28 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * 
      */
     public String leaveToolSession(Long toolSessionID, Long learnerId) throws DataMissingException, ToolException {
-	VoteServicePOJO.logger.debug("start of leaveToolSession with toolSessionID:" + toolSessionID
+	logger.debug("start of leaveToolSession with toolSessionID:" + toolSessionID
 		+ " and learnerId:" + learnerId);
-	VoteServicePOJO.logger.debug("make sure learnerService is available. Is it?" + learnerService);
+	logger.debug("make sure learnerService is available. Is it?" + learnerService);
 
 	if (learnerService == null) {
 	    return "dummyNextUrl";
 	}
 
 	if (learnerId == null) {
-	    VoteServicePOJO.logger.error("learnerId is null");
+	    logger.error("learnerId is null");
 	    throw new DataMissingException("learnerId is missing");
 	}
 
 	if (toolSessionID == null) {
-	    VoteServicePOJO.logger.error("toolSessionID is null");
+	    logger.error("toolSessionID is null");
 	    throw new DataMissingException("toolSessionID is missing");
 	}
 
 	VoteSession voteSession = null;
 	try {
 	    voteSession = retrieveVoteSession(toolSessionID);
-	    VoteServicePOJO.logger.debug("retrieved voteSession: " + voteSession);
+	    logger.debug("retrieved voteSession: " + voteSession);
 	} catch (VoteApplicationException e) {
 	    throw new DataMissingException("error retrieving voteSession: " + e);
 	} catch (Exception e) {
@@ -1482,12 +1464,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
 	voteSession.setSessionStatus(VoteAppConstants.COMPLETED);
 	voteSessionDAO.updateVoteSession(voteSession);
-	VoteServicePOJO.logger.debug("updated voteSession to COMPLETED" + voteSession);
+	logger.debug("updated voteSession to COMPLETED" + voteSession);
 
 	String nextUrl = learnerService.completeToolSession(toolSessionID, learnerId);
-	VoteServicePOJO.logger.debug("nextUrl: " + nextUrl);
+	logger.debug("nextUrl: " + nextUrl);
 	if (nextUrl == null) {
-	    VoteServicePOJO.logger.error("nextUrl is null");
+	    logger.error("nextUrl is null");
 	    throw new ToolException("nextUrl is null");
 	}
 	return nextUrl;
@@ -1518,27 +1500,27 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     public IToolVO getToolBySignature(String toolSignature) throws VoteApplicationException {
-	VoteServicePOJO.logger.debug("attempt retrieving tool with signature : " + toolSignature);
+	logger.debug("attempt retrieving tool with signature : " + toolSignature);
 	IToolVO tool = toolService.getToolBySignature(toolSignature);
-	VoteServicePOJO.logger.debug("retrieved tool: " + tool);
+	logger.debug("retrieved tool: " + tool);
 	return tool;
     }
 
     public long getToolDefaultContentIdBySignature(String toolSignature) throws VoteApplicationException {
 	long contentId = 0;
 	contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
-	VoteServicePOJO.logger.debug("tool default contentId : " + contentId);
+	logger.debug("tool default contentId : " + contentId);
 	return contentId;
     }
 
     public VoteQueContent getToolDefaultQuestionContent(long contentId) throws VoteApplicationException {
 	VoteQueContent voteQueContent = voteQueContentDAO.getToolDefaultQuestionContent(contentId);
-	VoteServicePOJO.logger.debug("retrieved voteQueContent : " + voteQueContent);
+	logger.debug("retrieved voteQueContent : " + voteQueContent);
 	return voteQueContent;
     }
 
     public List getToolSessionsForContent(VoteContent vote) {
-	VoteServicePOJO.logger.debug("attempt retrieving listToolSessionIds for : " + vote);
+	logger.debug("attempt retrieving listToolSessionIds for : " + vote);
 	List listToolSessionIds = voteSessionDAO.getSessionsFromContent(vote);
 	return listToolSessionIds;
     }
@@ -1576,12 +1558,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      */
     public ITicket getRepositoryLoginTicket() throws VoteApplicationException {
 	repositoryService = RepositoryProxy.getRepositoryService();
-	VoteServicePOJO.logger.debug("retrieved repositoryService : " + repositoryService);
+	logger.debug("retrieved repositoryService : " + repositoryService);
 
 	ICredentials credentials = new SimpleCredentials(repositoryUser, repositoryId);
 	try {
 	    ITicket ticket = repositoryService.login(credentials, VoteServicePOJO.repositoryWorkspaceName);
-	    VoteServicePOJO.logger.debug("retrieved ticket: " + ticket);
+	    logger.debug("retrieved ticket: " + ticket);
 	    return ticket;
 	} catch (AccessDeniedException e) {
 	    throw new VoteApplicationException("Access Denied to repository." + e.getMessage());
@@ -1604,10 +1586,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      */
     public void deleteFromRepository(Long uuid, Long versionID) throws VoteApplicationException {
 	ITicket ticket = getRepositoryLoginTicket();
-	VoteServicePOJO.logger.debug("retrieved ticket: " + ticket);
+	logger.debug("retrieved ticket: " + ticket);
 	try {
 	    String files[] = repositoryService.deleteVersion(ticket, uuid, versionID);
-	    VoteServicePOJO.logger.debug("retrieved files: " + files);
+	    logger.debug("retrieved files: " + files);
 	} catch (Exception e) {
 	    throw new VoteApplicationException("Exception occured while deleting files from" + " the repository "
 		    + e.getMessage());
@@ -1629,13 +1611,13 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * @throws SubmitFilesException
      */
     public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws VoteApplicationException {
-	VoteServicePOJO.logger.debug("attempt getting the ticket");
+	logger.debug("attempt getting the ticket");
 	ITicket ticket = getRepositoryLoginTicket();
-	VoteServicePOJO.logger.debug("retrieved ticket: " + ticket);
+	logger.debug("retrieved ticket: " + ticket);
 
 	try {
 	    NodeKey nodeKey = repositoryService.addFileItem(ticket, stream, fileName, null, null);
-	    VoteServicePOJO.logger.debug("retrieved nodeKey from repository service: " + nodeKey);
+	    logger.debug("retrieved nodeKey from repository service: " + nodeKey);
 	    return nodeKey;
 	} catch (Exception e) {
 	    throw new VoteApplicationException("Exception occured while trying to" + " upload file into the repository"
@@ -1647,7 +1629,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
 	    IVersionedNode node = repositoryService.getFileItem(ticket, uuid, null);
-	    VoteServicePOJO.logger.debug("retrieved node: " + node);
+	    logger.debug("retrieved node: " + node);
 	    return node.getFile();
 	} catch (AccessDeniedException e) {
 	    throw new VoteApplicationException("AccessDeniedException occured while trying to download file "
@@ -1666,12 +1648,12 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, VoteContent voteContent)
 	    throws VoteApplicationException {
 
-	VoteServicePOJO.logger.debug("attempt persisting file to the db: " + uuid + " " + isOnlineFile + " " + fileName
+	logger.debug("attempt persisting file to the db: " + uuid + " " + isOnlineFile + " " + fileName
 		+ " " + voteContent);
 	VoteUploadedFile voteUploadedFile = new VoteUploadedFile(uuid, isOnlineFile, fileName, voteContent);
-	VoteServicePOJO.logger.debug("created voteUploadedFile: " + voteUploadedFile);
+	logger.debug("created voteUploadedFile: " + voteUploadedFile);
 	voteUploadedFileDAO.saveUploadFile(voteUploadedFile);
-	VoteServicePOJO.logger.debug("persisted voteUploadedFile: " + voteUploadedFile);
+	logger.debug("persisted voteUploadedFile: " + voteUploadedFile);
     }
 
     /**
@@ -1679,9 +1661,9 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * removes all the entries in the uploaded files table
      */
     public void cleanUploadedFilesMetaData() throws VoteApplicationException {
-	VoteServicePOJO.logger.debug("attempt cleaning up uploaded file meta data table from the db");
+	logger.debug("attempt cleaning up uploaded file meta data table from the db");
 	voteUploadedFileDAO.cleanUploadedFilesMetaData();
-	VoteServicePOJO.logger.debug("files meta data has been cleaned up");
+	logger.debug("files meta data has been cleaned up");
     }
 
     /**
@@ -1757,7 +1739,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    toolContentObj.setMaxNominationCount(maxCount != null ? maxCount.toString() : "1");
 
 	} catch (WDDXProcessorConversionException e) {
-	    VoteServicePOJO.logger.error("Unable to content for activity " + toolContentObj.getTitle()
+	    logger.error("Unable to content for activity " + toolContentObj.getTitle()
 		    + "properly due to a WDDXProcessorConversionException.", e);
 	    throw new ToolException(
 		    "Invalid import data format for activity "
@@ -1785,7 +1767,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	voteContentDAO.saveVoteContent(toolContentObj);
     }
 
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    /**
+     * Set the description, throws away the title value as this is not supported
+     * in 2.0
+     */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
 
@@ -1803,7 +1788,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	VoteServicePOJO.logger.debug("coreNotebookService: " + coreNotebookService);
+	logger.debug("coreNotebookService: " + coreNotebookService);
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
@@ -1828,15 +1813,15 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 
     public void removeFile(Long submissionId) throws VoteApplicationException {
 	voteUploadedFileDAO.removeUploadFile(submissionId);
-	VoteServicePOJO.logger.debug("removed voteUploadedFile: " + submissionId);
+	logger.debug("removed voteUploadedFile: " + submissionId);
     }
 
     public void persistFile(VoteContent content, VoteUploadedFile file) throws VoteApplicationException {
-	VoteServicePOJO.logger.debug("in persistFile: " + file);
+	logger.debug("in persistFile: " + file);
 	content.getVoteAttachments().add(file);
 	file.setVoteContent(content);
 	voteContentDAO.saveOrUpdateVote(content);
-	VoteServicePOJO.logger.debug("persisted voteUploadedFile: " + file);
+	logger.debug("persisted voteUploadedFile: " + file);
 
     }
 
@@ -1853,7 +1838,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * @return Returns the logger.
      */
     public static Logger getLogger() {
-	return VoteServicePOJO.logger;
+	return logger;
     }
 
     /**
