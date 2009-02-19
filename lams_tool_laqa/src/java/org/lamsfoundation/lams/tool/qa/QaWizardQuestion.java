@@ -99,7 +99,7 @@ public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuesti
 	    return 1;
 	}
     }
-    
+
     public Object clone() {
 	QaWizardQuestion question = null;
 	try {

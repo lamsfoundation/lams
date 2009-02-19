@@ -371,8 +371,8 @@ public class AuthoringUtil implements QaAppConstants {
     }
 
     /**
-     * repopulateMap(TreeMap mapQuestionContent, HttpServletRequest request) return void repopulates the user entries
-     * into the Map
+     * repopulateMap(TreeMap mapQuestionContent, HttpServletRequest request)
+     * return void repopulates the user entries into the Map
      */
     protected void repopulateMap(Map mapQuestionContent, HttpServletRequest request) {
 	AuthoringUtil.logger.debug("starting repopulateMap");
@@ -561,8 +561,9 @@ public class AuthoringUtil implements QaAppConstants {
     }
 
     /**
-     * removes unused question entries from db removeRedundantQuestions (Map mapQuestionContent, IQaService qaService,
-     * QaAuthoringForm qaAuthoringForm)
+     * removes unused question entries from db removeRedundantQuestions (Map
+     * mapQuestionContent, IQaService qaService, QaAuthoringForm
+     * qaAuthoringForm)
      * 
      * @param mapQuestionContent
      * @param qaService
@@ -641,7 +642,8 @@ public class AuthoringUtil implements QaAppConstants {
     }
 
     /**
-     * createQuestionContent(TreeMap mapQuestionContent, HttpServletRequest request) return void
+     * createQuestionContent(TreeMap mapQuestionContent, HttpServletRequest
+     * request) return void
      * 
      * persist the questions in the Map the user has submitted
      */
@@ -744,8 +746,9 @@ public class AuthoringUtil implements QaAppConstants {
     }
 
     /**
-     * sorts the questions by the display order reOrganizeDisplayOrder(Map mapQuestionContent, IQaService qaService,
-     * QaAuthoringForm qaAuthoringForm, QaContent qaContent)
+     * sorts the questions by the display order reOrganizeDisplayOrder(Map
+     * mapQuestionContent, IQaService qaService, QaAuthoringForm
+     * qaAuthoringForm, QaContent qaContent)
      * 
      * @param mapQuestionContent
      * @param qaService
@@ -782,7 +785,8 @@ public class AuthoringUtil implements QaAppConstants {
     }
 
     /**
-     * checks if any entry is duplicate verifyDuplicatesOptionsMap(Map mapQuestions)
+     * checks if any entry is duplicate verifyDuplicatesOptionsMap(Map
+     * mapQuestions)
      * 
      * @param mapQuestions
      * @return

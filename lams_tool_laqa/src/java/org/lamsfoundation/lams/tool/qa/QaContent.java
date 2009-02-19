@@ -42,15 +42,17 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 /**
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code
- * Templates
+ * TODO To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Style - Code Templates
  */
 
 /**
- * QaContent Value Object The value object that maps to our model database table: tl_laqa11_content The relevant
- * hibernate mapping resides in: QaContent.hbm.xml
+ * QaContent Value Object The value object that maps to our model database
+ * table: tl_laqa11_content The relevant hibernate mapping resides in:
+ * QaContent.hbm.xml
  * 
- * Holds content representation for the tool. Default content is made available to the tool by the database.
+ * Holds content representation for the tool. Default content is made available
+ * to the tool by the database.
  */
 public class QaContent implements Serializable {
     static Logger logger = Logger.getLogger(QaContent.class.getName());
@@ -166,8 +168,9 @@ public class QaContent implements Serializable {
     }
 
     /**
-     * Copy Construtor to create a new qa content instance. Note that we don't copy the qa session data here because the
-     * qa session will be created after we copied tool content.
+     * Copy Construtor to create a new qa content instance. Note that we don't
+     * copy the qa session data here because the qa session will be created
+     * after we copied tool content.
      * 
      * @param qa
      *                the original qa content.

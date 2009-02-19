@@ -164,7 +164,8 @@ public class QaOutputFactory extends OutputFactory {
     }
 
     /**
-     * Creates a default condition so teachers know how to use complex conditions for this tool.
+     * Creates a default condition so teachers know how to use complex
+     * conditions for this tool.
      * 
      * @param qaContent
      *                content of the tool

@@ -5,7 +5,8 @@ import java.util.Comparator;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 /**
- * Comparator for <code>QaQueContent</code>. Only the display order is compared.
+ * Comparator for <code>QaQueContent</code>. Only the display order is
+ * compared.
  * 
  * @author Marcin Cieslak
  */

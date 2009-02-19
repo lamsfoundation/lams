@@ -32,145 +32,163 @@ import org.lamsfoundation.lams.tool.qa.service.IQaService;
 
 /**
  * @author Ozgur Demirtas
- *
+ * 
  */
 public class QaMonitoringForm extends QaAuthoringForm implements QaAppConstants {
-	//controls which method is called by the Lookup map */
-	protected String method;
-	protected String selectedToolSessionId;
-	protected String isToolSessionChanged;
-	
-	protected String editResponse;
-	protected String hideResponse;
-	protected String showResponse;
-	protected String currentUid;
-	
-	protected String sessionId;
-	
-	protected IQaService qaService;
-	
-	
-	public String toString() {
-	    super.toString();
-        return new ToStringBuilder(this)
-        	.append("Listing current QaMonitoringForm properties: ")
-            .append("method: ", method)
-            .append("selectedToolSessionId: ", selectedToolSessionId)
-            .append("isToolSessionChanged: ", isToolSessionChanged)
-            .append("editResponse: ", editResponse)
-            .append("hideResponse: ", hideResponse)
-            .append("showResponse: ", showResponse)
-            .append("currentUid: ", currentUid)
-            .toString();
+    //controls which method is called by the Lookup map */
+    protected String method;
+    protected String selectedToolSessionId;
+    protected String isToolSessionChanged;
+
+    protected String editResponse;
+    protected String hideResponse;
+    protected String showResponse;
+    protected String currentUid;
+
+    protected String sessionId;
+
+    protected IQaService qaService;
+
+    public String toString() {
+	super.toString();
+	return new ToStringBuilder(this).append("Listing current QaMonitoringForm properties: ").append("method: ",
+		method).append("selectedToolSessionId: ", selectedToolSessionId).append("isToolSessionChanged: ",
+		isToolSessionChanged).append("editResponse: ", editResponse).append("hideResponse: ", hideResponse)
+		.append("showResponse: ", showResponse).append("currentUid: ", currentUid).toString();
     }
-	
+
     /**
      * @return Returns the editResponse.
      */
     public String getEditResponse() {
-        return editResponse;
+	return editResponse;
     }
+
     /**
-     * @param editResponse The editResponse to set.
+     * @param editResponse
+     *                The editResponse to set.
      */
     public void setEditResponse(String editResponse) {
-        this.editResponse = editResponse;
+	this.editResponse = editResponse;
     }
+
     /**
      * @return Returns the qaService.
      */
     public IQaService getQaService() {
-        return qaService;
+	return qaService;
     }
+
     /**
-     * @param qaService The qaService to set.
+     * @param qaService
+     *                The qaService to set.
      */
     public void setQaService(IQaService qaService) {
-        this.qaService = qaService;
+	this.qaService = qaService;
     }
+
     /**
      * @return Returns the currentUid.
      */
     public String getCurrentUid() {
-        return currentUid;
+	return currentUid;
     }
+
     /**
-     * @param currentUid The currentUid to set.
+     * @param currentUid
+     *                The currentUid to set.
      */
     public void setCurrentUid(String currentUid) {
-        this.currentUid = currentUid;
+	this.currentUid = currentUid;
     }
+
     /**
      * @return Returns the hideResponse.
      */
     public String getHideResponse() {
-        return hideResponse;
+	return hideResponse;
     }
+
     /**
-     * @param hideResponse The hideResponse to set.
+     * @param hideResponse
+     *                The hideResponse to set.
      */
     public void setHideResponse(String hideResponse) {
-        this.hideResponse = hideResponse;
+	this.hideResponse = hideResponse;
     }
+
     /**
      * @return Returns the showResponse.
      */
     public String getShowResponse() {
-        return showResponse;
+	return showResponse;
     }
+
     /**
-     * @param showResponse The showResponse to set.
+     * @param showResponse
+     *                The showResponse to set.
      */
     public void setShowResponse(String showResponse) {
-        this.showResponse = showResponse;
+	this.showResponse = showResponse;
     }
-	/**
-	 * @return Returns the isToolSessionChanged.
-	 */
-	public String getIsToolSessionChanged() {
-		return isToolSessionChanged;
-	}
-	/**
-	 * @param isToolSessionChanged The isToolSessionChanged to set.
-	 */
-	public void setIsToolSessionChanged(String isToolSessionChanged) {
-		this.isToolSessionChanged = isToolSessionChanged;
-	}
-	/**
-	 * @return Returns the selectedToolSessionId.
-	 */
-	public String getSelectedToolSessionId() {
-		return selectedToolSessionId;
-	}
-	/**
-	 * @param selectedToolSessionId The selectedToolSessionId to set.
-	 */
-	public void setSelectedToolSessionId(String selectedToolSessionId) {
-		this.selectedToolSessionId = selectedToolSessionId;
-	}
-	
-	/**
-	 * @return Returns the method.
-	 */
-	public String getMethod() {
-		return method;
-	}
-	/**
-	 * @param method The method to set.
-	 */
-	public void setMethod(String method) {
-		this.method = method;
-	}
+
+    /**
+     * @return Returns the isToolSessionChanged.
+     */
+    public String getIsToolSessionChanged() {
+	return isToolSessionChanged;
+    }
+
+    /**
+     * @param isToolSessionChanged
+     *                The isToolSessionChanged to set.
+     */
+    public void setIsToolSessionChanged(String isToolSessionChanged) {
+	this.isToolSessionChanged = isToolSessionChanged;
+    }
+
+    /**
+     * @return Returns the selectedToolSessionId.
+     */
+    public String getSelectedToolSessionId() {
+	return selectedToolSessionId;
+    }
+
+    /**
+     * @param selectedToolSessionId
+     *                The selectedToolSessionId to set.
+     */
+    public void setSelectedToolSessionId(String selectedToolSessionId) {
+	this.selectedToolSessionId = selectedToolSessionId;
+    }
+
+    /**
+     * @return Returns the method.
+     */
+    public String getMethod() {
+	return method;
+    }
+
+    /**
+     * @param method
+     *                The method to set.
+     */
+    public void setMethod(String method) {
+	this.method = method;
+    }
+
     /**
      * @return Returns the sessionId.
      */
     public String getSessionId() {
-        return sessionId;
+	return sessionId;
     }
+
     /**
-     * @param sessionId The sessionId to set.
+     * @param sessionId
+     *                The sessionId to set.
      */
     public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+	this.sessionId = sessionId;
     }
 }

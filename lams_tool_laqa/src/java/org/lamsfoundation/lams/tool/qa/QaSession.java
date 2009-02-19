@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
@@ -34,26 +34,24 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 
-
 /**
  * 
- * @author Ozgur Demirtas 
- *  
- * QaSession Value Object
- * The value object that maps to our model database table: tl_laqa11_session
- * The relevant hibernate mapping resides in: QaSession.hbm.xml
+ * @author Ozgur Demirtas
  * 
- * Holds tool sessions 
+ * QaSession Value Object The value object that maps to our model database
+ * table: tl_laqa11_session The relevant hibernate mapping resides in:
+ * QaSession.hbm.xml
+ * 
+ * Holds tool sessions
  */
-public class QaSession implements Serializable,Comparable, Nullable
-{
-	static Logger logger = Logger.getLogger(QaSession.class.getName());
-	
+public class QaSession implements Serializable, Comparable, Nullable {
+    static Logger logger = Logger.getLogger(QaSession.class.getName());
+
     public final static String INCOMPLETE = "INCOMPLETE";
-    
+
     public static final String COMPLETED = "COMPLETED";
 
-	/** identifier field */
+    /** identifier field */
     private Long uid;
 
     /** identifier field */
@@ -64,203 +62,157 @@ public class QaSession implements Serializable,Comparable, Nullable
 
     /** nullable persistent field */
     private Date session_end_date;
-    
+
     /** nullable persistent field */
     private String session_status;
-    
+
     /** nullable persistent field */
     private String session_name;
-    
+
     /** persistent field */
     private QaContent qaContent;
 
     /** persistent field */
     private Set qaQueUsers;
-    
+
     /** persistent field */
     private Long qaContentId;
-    
-    public QaSession(){};
 
-    
-    public QaSession(Long qaSessionId,
-                         Date session_start_date,
-                         Date session_end_date,
-                         String session_status,
-                         QaContent qaContent,
-                         Set qaQueUsers)
-    {
-        this.qaSessionId = qaSessionId;
-        this.session_start_date = session_start_date;
-        this.session_end_date = session_end_date;
-        this.session_status = session_status;
-        this.qaContent = qaContent;
-        this.qaQueUsers = qaQueUsers;
+    public QaSession() {
+    };
+
+    public QaSession(Long qaSessionId, Date session_start_date, Date session_end_date, String session_status,
+	    QaContent qaContent, Set qaQueUsers) {
+	this.qaSessionId = qaSessionId;
+	this.session_start_date = session_start_date;
+	this.session_end_date = session_end_date;
+	this.session_status = session_status;
+	this.qaContent = qaContent;
+	this.qaQueUsers = qaQueUsers;
     }
 
-    
-    public QaSession(Long qaSessionId,
-			            Date session_start_date,
-			            String session_status,
-			            String session_name,						
-			            QaContent qaContent,
-			            Set qaQueUsers)
-	{
-		this.qaSessionId = qaSessionId;
-		this.session_start_date = session_start_date;
-		this.session_status = session_status;
-		this.session_name=session_name;
-		this.qaContent = qaContent;
-		this.qaQueUsers = qaQueUsers;
-		logger.debug(logger + " " + this.getClass().getName() +  "in full constructor: QaSession()");
-	}
-    
-
-    public Long getQaSessionId()
-    {
-        return this.qaSessionId;
+    public QaSession(Long qaSessionId, Date session_start_date, String session_status, String session_name,
+	    QaContent qaContent, Set qaQueUsers) {
+	this.qaSessionId = qaSessionId;
+	this.session_start_date = session_start_date;
+	this.session_status = session_status;
+	this.session_name = session_name;
+	this.qaContent = qaContent;
+	this.qaQueUsers = qaQueUsers;
+	logger.debug(logger + " " + this.getClass().getName() + "in full constructor: QaSession()");
     }
 
-    public void setQaSessionId(Long qaSessionId)
-    {
-        this.qaSessionId = qaSessionId;
+    public Long getQaSessionId() {
+	return this.qaSessionId;
     }
 
-    public Date getSession_start_date()
-    {
-        return this.session_start_date;
+    public void setQaSessionId(Long qaSessionId) {
+	this.qaSessionId = qaSessionId;
     }
 
-    public void setSession_start_date(Date session_start_date)
-    {
-        this.session_start_date = session_start_date;
+    public Date getSession_start_date() {
+	return this.session_start_date;
     }
 
-    public Date getSession_end_date()
-    {
-        return this.session_end_date;
+    public void setSession_start_date(Date session_start_date) {
+	this.session_start_date = session_start_date;
     }
 
-    public void setSession_end_date(Date session_end_date)
-    {
-        this.session_end_date = session_end_date;
+    public Date getSession_end_date() {
+	return this.session_end_date;
     }
 
-
-    public String getSession_status()
-    {
-        return session_status;
+    public void setSession_end_date(Date session_end_date) {
+	this.session_end_date = session_end_date;
     }
 
-
-    public void setSession_status(String session_status)
-    {
-        this.session_status = session_status;
+    public String getSession_status() {
+	return session_status;
     }
 
-    
-    public QaContent getQaContent()
-    {
-        return this.qaContent;
+    public void setSession_status(String session_status) {
+	this.session_status = session_status;
     }
 
-    public void setQaContent(QaContent qaContent)
-    {
-        this.qaContent = qaContent;
+    public QaContent getQaContent() {
+	return this.qaContent;
     }
 
-
-    public Set getQaQueUsers()
-    {
-        if (this.qaQueUsers == null)
-            setQaQueUsers(new TreeSet());
-        return this.qaQueUsers;
-    }
-    
-
-    public void setQaQueUsers(Set qaQueUsers)
-    {
-        this.qaQueUsers = qaQueUsers;
+    public void setQaContent(QaContent qaContent) {
+	this.qaContent = qaContent;
     }
 
-    
-    public void removeQueUsersBy(List responses)
-    {
-        Set queUserSet = new TreeSet(this.getQaQueUsers());
-    }
-    
-
-    public String toString()
-    {
-        return new ToStringBuilder(this).append("qaSessionId",getQaSessionId())
-                                        .append("session start date",getSession_start_date())
-                                        .append("session end date",getSession_end_date())
-                                        .append("session status",getSession_status())
-                                        .toString();
+    public Set getQaQueUsers() {
+	if (this.qaQueUsers == null)
+	    setQaQueUsers(new TreeSet());
+	return this.qaQueUsers;
     }
 
-    
-    public boolean equals(Object other)
-    {
-        if (!(other instanceof QaSession))
-            return false;
-    
-        QaSession castOther = (QaSession) other;
-        return new EqualsBuilder().append(this.getQaSessionId(),
-                                          castOther.getQaSessionId())
-	   								  .isEquals();
-      
+    public void setQaQueUsers(Set qaQueUsers) {
+	this.qaQueUsers = qaQueUsers;
     }
 
-    public int hashCode()
-    {
-        return new HashCodeBuilder().
-	  	append(getQaSessionId()).
-	  	toHashCode();
-    	 
-    }
-   
-  
-    public int compareTo(Object o)
-    {
-        QaSession qaSession = (QaSession) o;
-        return (int) (qaSessionId.longValue() - qaSession.qaSessionId.longValue());
+    public void removeQueUsersBy(List responses) {
+	Set queUserSet = new TreeSet(this.getQaQueUsers());
     }
 
-
-    public boolean isNull()
-    {
-        return false;
+    public String toString() {
+	return new ToStringBuilder(this).append("qaSessionId", getQaSessionId()).append("session start date",
+		getSession_start_date()).append("session end date", getSession_end_date()).append("session status",
+		getSession_status()).toString();
     }
 
+    public boolean equals(Object other) {
+	if (!(other instanceof QaSession))
+	    return false;
 
-	public Long getQaContentId() {
-		return qaContentId;
-	}
+	QaSession castOther = (QaSession) other;
+	return new EqualsBuilder().append(this.getQaSessionId(), castOther.getQaSessionId()).isEquals();
 
-	
-	public void setQaContentId(Long qaContentId) {
-		this.qaContentId = qaContentId;
-	}
+    }
 
-	
-	public Long getUid() {
-		return uid;
-	}
+    public int hashCode() {
+	return new HashCodeBuilder().append(getQaSessionId()).toHashCode();
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
-	/**
-	 * @return Returns the session_name.
-	 */
-	public String getSession_name() {
-		return session_name;
-	}
-	/**
-	 * @param session_name The session_name to set.
-	 */
-	public void setSession_name(String session_name) {
-		this.session_name = session_name;
-	}
+    }
+
+    public int compareTo(Object o) {
+	QaSession qaSession = (QaSession) o;
+	return (int) (qaSessionId.longValue() - qaSession.qaSessionId.longValue());
+    }
+
+    public boolean isNull() {
+	return false;
+    }
+
+    public Long getQaContentId() {
+	return qaContentId;
+    }
+
+    public void setQaContentId(Long qaContentId) {
+	this.qaContentId = qaContentId;
+    }
+
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    /**
+     * @return Returns the session_name.
+     */
+    public String getSession_name() {
+	return session_name;
+    }
+
+    /**
+     * @param session_name
+     *                The session_name to set.
+     */
+    public void setSession_name(String session_name) {
+	this.session_name = session_name;
+    }
 }

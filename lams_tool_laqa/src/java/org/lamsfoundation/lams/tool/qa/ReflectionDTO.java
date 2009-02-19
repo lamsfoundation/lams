@@ -23,110 +23,112 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that holds reflections from users
+ * <p>
+ * DTO that holds reflections from users
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class ReflectionDTO implements Comparable
-{
+public class ReflectionDTO implements Comparable {
     protected String userName;
-    
+
     protected String userId;
-    
+
     protected String sessionId;
-    
+
     protected String reflectionUid;
-    
+
     protected String entry;
-    
-    
-	public int compareTo(Object o)
-    {
-	    ReflectionDTO reflectionDTO = (ReflectionDTO) o;
-     
-        if (reflectionDTO == null)
-        	return 1;
-		else
-			return 0;
+
+    public int compareTo(Object o) {
+	ReflectionDTO reflectionDTO = (ReflectionDTO) o;
+
+	if (reflectionDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
 
-	
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("userName: ", userName)
-            .append("userId: ", userId)
-            .append("sessionId: ", sessionId)
-            .append("reflectionUid: ", reflectionUid)
-            .append("entry: ", entry)
-            .toString();
+    public String toString() {
+	return new ToStringBuilder(this).append("userName: ", userName).append("userId: ", userId).append(
+		"sessionId: ", sessionId).append("reflectionUid: ", reflectionUid).append("entry: ", entry).toString();
     }
-    
-
 
     /**
      * @return Returns the entry.
      */
     public String getEntry() {
-        return entry;
+	return entry;
     }
+
     /**
-     * @param entry The entry to set.
+     * @param entry
+     *                The entry to set.
      */
     public void setEntry(String entry) {
-        this.entry = entry;
+	this.entry = entry;
     }
+
     /**
      * @return Returns the sessionId.
      */
     public String getSessionId() {
-        return sessionId;
+	return sessionId;
     }
+
     /**
-     * @param sessionId The sessionId to set.
+     * @param sessionId
+     *                The sessionId to set.
      */
     public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+	this.sessionId = sessionId;
     }
+
     /**
      * @return Returns the reflectionUid.
      */
     public String getReflectionUid() {
-        return reflectionUid;
+	return reflectionUid;
     }
+
     /**
-     * @param reflectionUid The reflectionUid to set.
+     * @param reflectionUid
+     *                The reflectionUid to set.
      */
     public void setReflectionUid(String reflectionUid) {
-        this.reflectionUid = reflectionUid;
+	this.reflectionUid = reflectionUid;
     }
+
     /**
      * @return Returns the userId.
      */
     public String getUserId() {
-        return userId;
+	return userId;
     }
+
     /**
-     * @param userId The userId to set.
+     * @param userId
+     *                The userId to set.
      */
     public void setUserId(String userId) {
-        this.userId = userId;
+	this.userId = userId;
     }
+
     /**
      * @return Returns the userName.
      */
     public String getUserName() {
-        return userName;
+	return userName;
     }
+
     /**
-     * @param userName The userName to set.
+     * @param userName
+     *                The userName to set.
      */
     public void setUserName(String userName) {
-        this.userName = userName;
+	this.userName = userName;
     }
 }

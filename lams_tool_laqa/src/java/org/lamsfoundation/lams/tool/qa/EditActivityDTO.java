@@ -26,44 +26,42 @@ package org.lamsfoundation.lams.tool.qa;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that holds question and user attempts data for jsp purposes
+ * <p>
+ * DTO that holds question and user attempts data for jsp purposes
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class EditActivityDTO implements Comparable
-{
+public class EditActivityDTO implements Comparable {
     private String monitoredContentInUse;
-	
-	
+
     /**
      * @return Returns the monitoredContentInUse.
      */
     public String getMonitoredContentInUse() {
-        return monitoredContentInUse;
+	return monitoredContentInUse;
     }
+
     /**
-     * @param monitoredContentInUse The monitoredContentInUse to set.
+     * @param monitoredContentInUse
+     *                The monitoredContentInUse to set.
      */
     public void setMonitoredContentInUse(String monitoredContentInUse) {
-        this.monitoredContentInUse = monitoredContentInUse;
+	this.monitoredContentInUse = monitoredContentInUse;
     }
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("monitoredContentInUse", monitoredContentInUse)
-            .toString();
+
+    public String toString() {
+	return new ToStringBuilder(this).append("monitoredContentInUse", monitoredContentInUse).toString();
     }
-	
-	public int compareTo(Object o)
-    {
-	    EditActivityDTO editActivityDTO = (EditActivityDTO) o;
-     
-        if (editActivityDTO == null)
-        	return 1;
-		else
-			return 0;
+
+    public int compareTo(Object o) {
+	EditActivityDTO editActivityDTO = (EditActivityDTO) o;
+
+	if (editActivityDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
-	
+
 }

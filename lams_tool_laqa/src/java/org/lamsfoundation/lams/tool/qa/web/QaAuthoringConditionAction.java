@@ -55,8 +55,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Auxiliary action in author mode. It contains operations with QaCondition. The rest of operations are located in
- * <code>QaAction</code> action.
+ * Auxiliary action in author mode. It contains operations with QaCondition. The
+ * rest of operations are located in <code>QaAction</code> action.
  * 
  * @author Marcin Cieslak
  * @see org.lamsfoundation.lams.tool.qa.web.QaAction
@@ -139,9 +139,11 @@ public class QaAuthoringConditionAction extends Action {
     }
 
     /**
-     * This method will get necessary information from condition form and save or update into <code>HttpSession</code>
-     * condition list. Notice, this save is not persist them into database, just save <code>HttpSession</code>
-     * temporarily. Only they will be persist when the entire authoring page is being persisted.
+     * This method will get necessary information from condition form and save
+     * or update into <code>HttpSession</code> condition list. Notice, this
+     * save is not persist them into database, just save
+     * <code>HttpSession</code> temporarily. Only they will be persist when
+     * the entire authoring page is being persisted.
      * 
      * @param mapping
      * @param form
@@ -180,8 +182,9 @@ public class QaAuthoringConditionAction extends Action {
     }
 
     /**
-     * Remove condition from HttpSession list and update page display. As authoring rule, all persist only happen when
-     * user submit whole page. So this remove is just impact HttpSession values.
+     * Remove condition from HttpSession list and update page display. As
+     * authoring rule, all persist only happen when user submit whole page. So
+     * this remove is just impact HttpSession values.
      * 
      * @param mapping
      * @param form
@@ -319,7 +322,8 @@ public class QaAuthoringConditionAction extends Action {
     }
 
     /**
-     * Get the deleted condition list, which could be persisted or non-persisted items.
+     * Get the deleted condition list, which could be persisted or non-persisted
+     * items.
      * 
      * @param request
      * @return

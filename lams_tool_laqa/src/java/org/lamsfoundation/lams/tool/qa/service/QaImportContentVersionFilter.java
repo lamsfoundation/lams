@@ -28,15 +28,15 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 /**
  * Import filter class for different versions of Q&A content.
  */
-public class QaImportContentVersionFilter extends ToolContentVersionFilter{
+public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 
-	/**
-	 * Import 2.0RC1 version content to 2.0RC2 version. Added lock on finish
-	 * field.
-	 */
-	public void up20061102To20061113(){
-		// Change name to suit the version you give the tool.
-		this.addField(QaContent.class, "lockWhenFinished", new Boolean(true));
-		this.addField(QaContent.class, "showOtherAnswers", new Boolean(true));
-	}
+    /**
+     * Import 2.0RC1 version content to 2.0RC2 version. Added lock on finish
+     * field.
+     */
+    public void up20061102To20061113() {
+	// Change name to suit the version you give the tool.
+	this.addField(QaContent.class, "lockWhenFinished", new Boolean(true));
+	this.addField(QaContent.class, "showOtherAnswers", new Boolean(true));
+    }
 }

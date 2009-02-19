@@ -524,7 +524,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	qaAuthoringForm.setOfflineInstructions(qaContent.getOfflineInstructions());
 	sessionMap.put(QaAppConstants.ONLINE_INSTRUCTIONS_KEY, qaContent.getOnlineInstructions());
 	sessionMap.put(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY, qaContent.getOfflineInstructions());
-	
+
 	QaStarterAction.logger.debug("ACTIVITY_TITLE_KEY set to:" + sessionMap.get(QaAppConstants.ACTIVITY_TITLE_KEY));
 
 	qaAuthoringForm.resetUserAction();

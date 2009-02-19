@@ -22,73 +22,73 @@ http://www.gnu.org/licenses/gpl.txt
 /**
  * @author Ozgur Demirtas
  * 
-<action
-     path="/learning"
-     type="org.lamsfoundation.lams.tool.qa.web.QaLearningAction"
-     name="QaLearningForm"
-     scope="request"
-     input="/learning/AnswersContent.jsp"
-     parameter="method"
-     unknown="false"
-     validate="false">
+ <action
+ path="/learning"
+ type="org.lamsfoundation.lams.tool.qa.web.QaLearningAction"
+ name="QaLearningForm"
+ scope="request"
+ input="/learning/AnswersContent.jsp"
+ parameter="method"
+ unknown="false"
+ validate="false">
 
-     	<forward
-	    name="loadLearner"
-	    path="/learning/AnswersContent.jsp"	        
-	    redirect="false"
-      />
-      
-  	<forward
-		name="loadMonitoring"
-		path="/monitoring/MonitoringMaincontent.jsp"
-	    redirect="false"
-  	/>
-      
-  	<forward
-	    name="refreshMonitoring"
-	    path="/monitoring/MonitoringMaincontent.jsp"
-	    redirect="false"
-  	/>
-      
-    <forward
-        name="learningStarter"
-        path="/learningIndex.jsp"
-	    redirect="false"
-      />
-     
-      <forward
-        name="individualLearnerRep"
-        path="/learning/LearnerRep.jsp"
-	    redirect="false"
-      />
+ <forward
+ name="loadLearner"
+ path="/learning/AnswersContent.jsp"	        
+ redirect="false"
+ />
 
-     
-     <forward
-        name="learnerRep"
-        path="/monitoring/LearnerRep.jsp"
-	    redirect="false"
-      />
+ <forward
+ name="loadMonitoring"
+ path="/monitoring/MonitoringMaincontent.jsp"
+ redirect="false"
+ />
 
-     <forward
-        name="individualLearnerResults"
-        path="/learning/IndividualLearnerResults.jsp"
-	    redirect="false"
-      />
+ <forward
+ name="refreshMonitoring"
+ path="/monitoring/MonitoringMaincontent.jsp"
+ redirect="false"
+ />
+
+ <forward
+ name="learningStarter"
+ path="/learningIndex.jsp"
+ redirect="false"
+ />
+
+ <forward
+ name="individualLearnerRep"
+ path="/learning/LearnerRep.jsp"
+ redirect="false"
+ />
 
 
-     <forward
-        name="viewAllResults"
-        path="/learning/AllResults.jsp"
-	    redirect="false"
-      />
+ <forward
+ name="learnerRep"
+ path="/monitoring/LearnerRep.jsp"
+ redirect="false"
+ />
 
-	<forward
-	    name="notebook"
-	    path="/learning/Notebook.jsp"
-	    redirect="false"
-  	/>   
-  	
-</action>
+ <forward
+ name="individualLearnerResults"
+ path="/learning/IndividualLearnerResults.jsp"
+ redirect="false"
+ />
+
+
+ <forward
+ name="viewAllResults"
+ path="/learning/AllResults.jsp"
+ redirect="false"
+ />
+
+ <forward
+ name="notebook"
+ path="/learning/Notebook.jsp"
+ redirect="false"
+ />   
+
+ </action>
 
  * 
  */

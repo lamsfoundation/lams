@@ -40,15 +40,16 @@ import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.util.WebUtil;
 
 /**
- * A text search condition with a set of questions on answers to which the search should be performed.
+ * A text search condition with a set of questions on answers to which the
+ * search should be performed.
  * 
  * @author Marcin Cieslak
  * 
  */
 public class QaCondition extends TextSearchCondition {
     /**
-     * Questions linked to this condition. Answers to them will be scanned for the words that make the condition's
-     * parameters.
+     * Questions linked to this condition. Answers to them will be scanned for
+     * the words that make the condition's parameters.
      */
     private Set<QaQueContent> questions = new TreeSet<QaQueContent>(new QaQueContentComparator());
     private static Logger log = Logger.getLogger(QaCondition.class);
@@ -123,9 +124,10 @@ public class QaCondition extends TextSearchCondition {
     }
 
     /**
-     * Notice that questions are copied with very little information and then they are assigned to the cloned object.
-     * This method is used when assigning BranchActivityEntry needs, so only basic information (in fact, only order ID)
-     * is needed. Also, there should be no link to Q&A content.
+     * Notice that questions are copied with very little information and then
+     * they are assigned to the cloned object. This method is used when
+     * assigning BranchActivityEntry needs, so only basic information (in fact,
+     * only order ID) is needed. Also, there should be no link to Q&A content.
      */
     @Override
     public QaCondition clone(int uiidOffset) {
@@ -142,8 +144,9 @@ public class QaCondition extends TextSearchCondition {
     }
 
     /**
-     * Notice that questions from the cloned (and not the original) tool content are assigned to the cloned condition.
-     * This method is used for cloning tool content.
+     * Notice that questions from the cloned (and not the original) tool content
+     * are assigned to the cloned condition. This method is used for cloning
+     * tool content.
      */
     public QaCondition clone(QaContent qaContent) {
 

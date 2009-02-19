@@ -18,34 +18,32 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.tool.qa; 
- 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.qa;
+
 import java.io.Serializable;
 import java.util.SortedSet;
 
-public class QaWizardDTO implements Serializable{
-    
+public class QaWizardDTO implements Serializable {
+
     public static final long serialVersionUID = 3481234912412784515L;
-    
+
     SortedSet<QaWizardCategory> qaWizardCategories;
-    
-    public QaWizardDTO() {}
-    
-    public QaWizardDTO(SortedSet<QaWizardCategory> categories) 
-    {
-	
-	
+
+    public QaWizardDTO() {
+    }
+
+    public QaWizardDTO(SortedSet<QaWizardCategory> categories) {
+
     }
 
     public SortedSet<QaWizardCategory> getQaWizardCategories() {
-        return qaWizardCategories;
+	return qaWizardCategories;
     }
 
     public void setQaWizardCategories(SortedSet<QaWizardCategory> qaWizardCategories) {
-        this.qaWizardCategories = qaWizardCategories;
+	this.qaWizardCategories = qaWizardCategories;
     }
 }
- 

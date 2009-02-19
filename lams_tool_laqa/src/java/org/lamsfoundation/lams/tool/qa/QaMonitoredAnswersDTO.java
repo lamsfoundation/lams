@@ -28,108 +28,114 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that holds question and user attempts data for jsp purposes
+ * <p>
+ * DTO that holds question and user attempts data for jsp purposes
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class QaMonitoredAnswersDTO implements Comparable
-{
+public class QaMonitoredAnswersDTO implements Comparable {
     private String sessionId;
-    
+
     private String sessionName;
-    
-	private String questionUid;
-	
-	private String question;
-	
-	private Map questionAttempts;
-	
-	
-	/**
-	
-	/**
-	 * @return Returns the question.
-	 */
-	public String getQuestion() {
-		return question;
-	}
-	/**
-	 * @param question The question to set.
-	 */
-	public void setQuestion(String question) {
-		this.question = question;
-	}
-	/**
-	 * @return Returns the questionUid.
-	 */
-	public String getQuestionUid() {
-		return questionUid;
-	}
-	/**
-	 * @param questionUid The questionUid to set.
-	 */
-	public void setQuestionUid(String questionUid) {
-		this.questionUid = questionUid;
-	}
-	
-	/**
-	 * @return Returns the questionAttempts.
-	 */
-	public Map getQuestionAttempts() {
-		return questionAttempts;
-	}
-	/**
-	 * @param questionAttempts The questionAttempts to set.
-	 */
-	public void setQuestionAttempts(Map questionAttempts) {
-		this.questionAttempts = questionAttempts;
-	}
-	
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("sessionName:", sessionName)
-            .append("sessionId:", sessionId)
-			.append("questionUid:", questionUid)
-			.append("question:", question)
-			.append("questionAttempts:", questionAttempts)
-            .toString();
+
+    private String questionUid;
+
+    private String question;
+
+    private Map questionAttempts;
+
+    /**
+     * 
+     * /**
+     * 
+     * @return Returns the question.
+     */
+    public String getQuestion() {
+	return question;
     }
-	
-	public int compareTo(Object o)
-    {
-		QaMonitoredAnswersDTO qaMonitoredAnswersDTO = (QaMonitoredAnswersDTO) o;
-     
-        if (qaMonitoredAnswersDTO == null)
-        	return 1;
-		else
-			return (int) (new Long(questionUid).longValue() - new Long(qaMonitoredAnswersDTO.questionUid).longValue());
+
+    /**
+     * @param question
+     *                The question to set.
+     */
+    public void setQuestion(String question) {
+	this.question = question;
     }
-	
+
+    /**
+     * @return Returns the questionUid.
+     */
+    public String getQuestionUid() {
+	return questionUid;
+    }
+
+    /**
+     * @param questionUid
+     *                The questionUid to set.
+     */
+    public void setQuestionUid(String questionUid) {
+	this.questionUid = questionUid;
+    }
+
+    /**
+     * @return Returns the questionAttempts.
+     */
+    public Map getQuestionAttempts() {
+	return questionAttempts;
+    }
+
+    /**
+     * @param questionAttempts
+     *                The questionAttempts to set.
+     */
+    public void setQuestionAttempts(Map questionAttempts) {
+	this.questionAttempts = questionAttempts;
+    }
+
+    public String toString() {
+	return new ToStringBuilder(this).append("sessionName:", sessionName).append("sessionId:", sessionId).append(
+		"questionUid:", questionUid).append("question:", question)
+		.append("questionAttempts:", questionAttempts).toString();
+    }
+
+    public int compareTo(Object o) {
+	QaMonitoredAnswersDTO qaMonitoredAnswersDTO = (QaMonitoredAnswersDTO) o;
+
+	if (qaMonitoredAnswersDTO == null)
+	    return 1;
+	else
+	    return (int) (new Long(questionUid).longValue() - new Long(qaMonitoredAnswersDTO.questionUid).longValue());
+    }
+
     /**
      * @return Returns the sessionId.
      */
     public String getSessionId() {
-        return sessionId;
+	return sessionId;
     }
+
     /**
-     * @param sessionId The sessionId to set.
+     * @param sessionId
+     *                The sessionId to set.
      */
     public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+	this.sessionId = sessionId;
     }
+
     /**
      * @return Returns the sessionName.
      */
     public String getSessionName() {
-        return sessionName;
+	return sessionName;
     }
+
     /**
-     * @param sessionName The sessionName to set.
+     * @param sessionName
+     *                The sessionName to set.
      */
     public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
+	this.sessionName = sessionName;
     }
 }

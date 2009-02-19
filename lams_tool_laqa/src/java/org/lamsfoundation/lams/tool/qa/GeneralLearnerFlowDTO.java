@@ -28,601 +28,684 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-
-
 /**
- * <p> DTO that holds learner flow decision properties and some other view-only properties
+ * <p>
+ * DTO that holds learner flow decision properties and some other view-only
+ * properties
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class GeneralLearnerFlowDTO implements Comparable
-{
+public class GeneralLearnerFlowDTO implements Comparable {
     protected String activityOffline;
-    
-    protected Integer totalQuestionCount;
-    
-    protected String activityInstructions;
-    
-    protected String activityTitle;
-    
-    protected String countSessionComplete;
-    
-    protected String userName;
-    
-    protected String toolSessionID;
-    
-    protected String httpSessionID;
-    
-    protected String toolContentID;
-    
-    protected Integer currentQuestionIndex;
-    
-    protected String questionListingMode;
-    
-    protected String currentAnswer;
-    
-    protected String remainingQuestionCount;
-    
-    protected String teacherViewOnly;
-    
-    protected String notebookEntriesVisible;
-    
-    protected String reflection;
-    
-    protected String reflectionSubject;
-    
-    protected String notebookEntry;
-    
-    protected String reportTitleLearner;
-    
-    protected String endLearningMessage;
-    
-    protected String userNameVisible;
-    
-    protected String showOtherAnswers;
-    
-	protected String requestLearningReport;
 
-	protected String requestLearningReportProgress;
-	
-	protected String requestLearningReportViewOnly;
+    protected Integer totalQuestionCount;
+
+    protected String activityInstructions;
+
+    protected String activityTitle;
+
+    protected String countSessionComplete;
+
+    protected String userName;
+
+    protected String toolSessionID;
+
+    protected String httpSessionID;
+
+    protected String toolContentID;
+
+    protected Integer currentQuestionIndex;
+
+    protected String questionListingMode;
+
+    protected String currentAnswer;
+
+    protected String remainingQuestionCount;
+
+    protected String teacherViewOnly;
+
+    protected String notebookEntriesVisible;
+
+    protected String reflection;
+
+    protected String reflectionSubject;
+
+    protected String notebookEntry;
+
+    protected String reportTitleLearner;
+
+    protected String endLearningMessage;
+
+    protected String userNameVisible;
+
+    protected String showOtherAnswers;
+
+    protected String requestLearningReport;
+
+    protected String requestLearningReportProgress;
+
+    protected String requestLearningReportViewOnly;
 
     protected Map mapAnswers;
-    
+
     protected Map mapAnswersPresentable;
-    
+
     protected Map mapQuestions;
-    
+
     protected Map mapFeedback;
-    
+
     protected Map mapQuestionContentLearner;
-    
+
     protected List listMonitoredAnswersContainerDTO;
-    
+
     protected String currentMonitoredToolSession;
-    
+
     protected String initialScreen;
-    
+
     protected String lockWhenFinished;
-    
+
     protected String userUid;
-    
+
     protected String existMultipleUserResponses;
-    
+
     protected String usernameVisible;
-    
-    
+
     /**
      * @return Returns the usernameVisible.
      */
     public String getUsernameVisible() {
-        return usernameVisible;
+	return usernameVisible;
     }
+
     /**
-     * @param usernameVisible The usernameVisible to set.
+     * @param usernameVisible
+     *                The usernameVisible to set.
      */
     public void setUsernameVisible(String usernameVisible) {
-        this.usernameVisible = usernameVisible;
+	this.usernameVisible = usernameVisible;
     }
+
     /**
      * @return Returns the currentMonitoredToolSession.
      */
     public String getCurrentMonitoredToolSession() {
-        return currentMonitoredToolSession;
+	return currentMonitoredToolSession;
     }
+
     /**
-     * @param currentMonitoredToolSession The currentMonitoredToolSession to set.
+     * @param currentMonitoredToolSession
+     *                The currentMonitoredToolSession to set.
      */
-    public void setCurrentMonitoredToolSession(
-            String currentMonitoredToolSession) {
-        this.currentMonitoredToolSession = currentMonitoredToolSession;
+    public void setCurrentMonitoredToolSession(String currentMonitoredToolSession) {
+	this.currentMonitoredToolSession = currentMonitoredToolSession;
     }
+
     /**
      * @return Returns the currentAnswer.
      */
     public String getCurrentAnswer() {
-        return currentAnswer;
+	return currentAnswer;
     }
+
     /**
-     * @param currentAnswer The currentAnswer to set.
+     * @param currentAnswer
+     *                The currentAnswer to set.
      */
     public void setCurrentAnswer(String currentAnswer) {
-        this.currentAnswer = currentAnswer;
+	this.currentAnswer = currentAnswer;
     }
+
     protected String userFeedback;
-    
-    
-    
+
     /**
      * @return Returns the mapQuestionContentLearner.
      */
     public Map getMapQuestionContentLearner() {
-        return mapQuestionContentLearner;
+	return mapQuestionContentLearner;
     }
+
     /**
-     * @param mapQuestionContentLearner The mapQuestionContentLearner to set.
+     * @param mapQuestionContentLearner
+     *                The mapQuestionContentLearner to set.
      */
     public void setMapQuestionContentLearner(Map mapQuestionContentLearner) {
-        this.mapQuestionContentLearner = mapQuestionContentLearner;
+	this.mapQuestionContentLearner = mapQuestionContentLearner;
     }
+
     /**
      * @return Returns the userFeedback.
      */
     public String getUserFeedback() {
-        return userFeedback;
+	return userFeedback;
     }
+
     /**
-     * @param userFeedback The userFeedback to set.
+     * @param userFeedback
+     *                The userFeedback to set.
      */
     public void setUserFeedback(String userFeedback) {
-        this.userFeedback = userFeedback;
+	this.userFeedback = userFeedback;
     }
+
     /**
      * @return Returns the activityInstructions.
      */
     public String getActivityInstructions() {
-        return activityInstructions;
+	return activityInstructions;
     }
+
     /**
-     * @param activityInstructions The activityInstructions to set.
+     * @param activityInstructions
+     *                The activityInstructions to set.
      */
     public void setActivityInstructions(String activityInstructions) {
-        this.activityInstructions = activityInstructions;
+	this.activityInstructions = activityInstructions;
     }
+
     /**
      * @return Returns the activityOffline.
      */
     public String getActivityOffline() {
-        return activityOffline;
+	return activityOffline;
     }
+
     /**
-     * @param activityOffline The activityOffline to set.
+     * @param activityOffline
+     *                The activityOffline to set.
      */
     public void setActivityOffline(String activityOffline) {
-        this.activityOffline = activityOffline;
+	this.activityOffline = activityOffline;
     }
+
     /**
      * @return Returns the activityTitle.
      */
     public String getActivityTitle() {
-        return activityTitle;
+	return activityTitle;
     }
+
     /**
-     * @param activityTitle The activityTitle to set.
+     * @param activityTitle
+     *                The activityTitle to set.
      */
     public void setActivityTitle(String activityTitle) {
-        this.activityTitle = activityTitle;
+	this.activityTitle = activityTitle;
     }
+
     /**
      * @return Returns the countSessionComplete.
      */
     public String getCountSessionComplete() {
-        return countSessionComplete;
+	return countSessionComplete;
     }
+
     /**
-     * @param countSessionComplete The countSessionComplete to set.
+     * @param countSessionComplete
+     *                The countSessionComplete to set.
      */
     public void setCountSessionComplete(String countSessionComplete) {
-        this.countSessionComplete = countSessionComplete;
+	this.countSessionComplete = countSessionComplete;
     }
 
     /**
      * @return Returns the questionListingMode.
      */
     public String getQuestionListingMode() {
-        return questionListingMode;
+	return questionListingMode;
     }
+
     /**
-     * @param questionListingMode The questionListingMode to set.
+     * @param questionListingMode
+     *                The questionListingMode to set.
      */
     public void setQuestionListingMode(String questionListingMode) {
-        this.questionListingMode = questionListingMode;
-    }
-    
-	public int compareTo(Object o)
-    {
-	    GeneralLearnerFlowDTO gneralLearnerFlowDTO = (GeneralLearnerFlowDTO) o;
-     
-        if (gneralLearnerFlowDTO == null)
-        	return 1;
-		else
-			return 0;
+	this.questionListingMode = questionListingMode;
     }
 
-	
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("activityOffline: ", activityOffline)
-            .append("remainingQuestionCount: ", remainingQuestionCount)
-            .append("totalQuestionCount : ", totalQuestionCount)
-            .append("activityInstructions: ", activityInstructions)
-            .append("teacherViewOnly: ", teacherViewOnly)
-            .append("lockWhenFinished: ", lockWhenFinished)
-            .append("activityTitle: ", activityTitle)
-            .append("countSessionComplete: ", countSessionComplete)
-            .append("toolSessionID: ", toolSessionID)
-            .append("currentQuestionIndex: ", currentQuestionIndex)
-            .append("questionListingMode: ", questionListingMode)
-            .append("reportTitleLearner: ", reportTitleLearner)            
-            .append("userNameVisible: ", userNameVisible)
-            .append("requestLearningReport: ", requestLearningReport)            
-            .append("requestLearningReportProgress: ", requestLearningReportProgress)            
-            .append("requestLearningReportViewOnly: ", requestLearningReportViewOnly)            
-            .append("mapAnswers: ", mapAnswers)            
-            .append("mapQuestions: ", mapQuestions)            
-            .append("mapQuestionContentLearner: ", mapQuestionContentLearner)            
-            .append("listMonitoredAnswersContainerDTO: ", listMonitoredAnswersContainerDTO)            
-            .append("currentMonitoredToolSession: ", currentMonitoredToolSession)
-            .append("mapFeedback: ", mapFeedback)
-            .toString();
+    public int compareTo(Object o) {
+	GeneralLearnerFlowDTO gneralLearnerFlowDTO = (GeneralLearnerFlowDTO) o;
+
+	if (gneralLearnerFlowDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
-    
+
+    public String toString() {
+	return new ToStringBuilder(this).append("activityOffline: ", activityOffline).append(
+		"remainingQuestionCount: ", remainingQuestionCount).append("totalQuestionCount : ", totalQuestionCount)
+		.append("activityInstructions: ", activityInstructions).append("teacherViewOnly: ", teacherViewOnly)
+		.append("lockWhenFinished: ", lockWhenFinished).append("activityTitle: ", activityTitle).append(
+			"countSessionComplete: ", countSessionComplete).append("toolSessionID: ", toolSessionID)
+		.append("currentQuestionIndex: ", currentQuestionIndex).append("questionListingMode: ",
+			questionListingMode).append("reportTitleLearner: ", reportTitleLearner).append(
+			"userNameVisible: ", userNameVisible).append("requestLearningReport: ", requestLearningReport)
+		.append("requestLearningReportProgress: ", requestLearningReportProgress).append(
+			"requestLearningReportViewOnly: ", requestLearningReportViewOnly).append("mapAnswers: ",
+			mapAnswers).append("mapQuestions: ", mapQuestions).append("mapQuestionContentLearner: ",
+			mapQuestionContentLearner).append("listMonitoredAnswersContainerDTO: ",
+			listMonitoredAnswersContainerDTO).append("currentMonitoredToolSession: ",
+			currentMonitoredToolSession).append("mapFeedback: ", mapFeedback).toString();
+    }
 
     /**
-     * @param currentQuestionIndex The currentQuestionIndex to set.
+     * @param currentQuestionIndex
+     *                The currentQuestionIndex to set.
      */
     public void setCurrentQuestionIndex(Integer currentQuestionIndex) {
-        this.currentQuestionIndex = currentQuestionIndex;
+	this.currentQuestionIndex = currentQuestionIndex;
     }
+
     /**
-     * @param totalQuestionCount The totalQuestionCount to set.
+     * @param totalQuestionCount
+     *                The totalQuestionCount to set.
      */
     public void setTotalQuestionCount(Integer totalQuestionCount) {
-        this.totalQuestionCount = totalQuestionCount;
+	this.totalQuestionCount = totalQuestionCount;
     }
+
     /**
      * @return Returns the toolContentID.
      */
     public String getToolContentID() {
-        return toolContentID;
+	return toolContentID;
     }
+
     /**
-     * @param toolContentID The toolContentID to set.
+     * @param toolContentID
+     *                The toolContentID to set.
      */
     public void setToolContentID(String toolContentID) {
-        this.toolContentID = toolContentID;
+	this.toolContentID = toolContentID;
     }
+
     /**
      * @return Returns the toolSessionID.
      */
     public String getToolSessionID() {
-        return toolSessionID;
+	return toolSessionID;
     }
+
     /**
-     * @param toolSessionID The toolSessionID to set.
+     * @param toolSessionID
+     *                The toolSessionID to set.
      */
     public void setToolSessionID(String toolSessionID) {
-        this.toolSessionID = toolSessionID;
+	this.toolSessionID = toolSessionID;
     }
+
     /**
      * @return Returns the currentQuestionIndex.
      */
     public Integer getCurrentQuestionIndex() {
-        return currentQuestionIndex;
+	return currentQuestionIndex;
     }
+
     /**
      * @return Returns the totalQuestionCount.
      */
     public Integer getTotalQuestionCount() {
-        return totalQuestionCount;
+	return totalQuestionCount;
     }
+
     /**
      * @return Returns the endLearningMessage.
      */
     public String getEndLearningMessage() {
-        return endLearningMessage;
+	return endLearningMessage;
     }
+
     /**
-     * @param endLearningMessage The endLearningMessage to set.
+     * @param endLearningMessage
+     *                The endLearningMessage to set.
      */
     public void setEndLearningMessage(String endLearningMessage) {
-        this.endLearningMessage = endLearningMessage;
+	this.endLearningMessage = endLearningMessage;
     }
+
     /**
      * @return Returns the reportTitleLearner.
      */
     public String getReportTitleLearner() {
-        return reportTitleLearner;
+	return reportTitleLearner;
     }
+
     /**
-     * @param reportTitleLearner The reportTitleLearner to set.
+     * @param reportTitleLearner
+     *                The reportTitleLearner to set.
      */
     public void setReportTitleLearner(String reportTitleLearner) {
-        this.reportTitleLearner = reportTitleLearner;
+	this.reportTitleLearner = reportTitleLearner;
     }
+
     /**
      * @return Returns the userNameVisible.
      */
     public String getUserNameVisible() {
-        return userNameVisible;
+	return userNameVisible;
     }
+
     /**
-     * @param userNameVisible The userNameVisible to set.
+     * @param userNameVisible
+     *                The userNameVisible to set.
      */
     public void setUserNameVisible(String userNameVisible) {
-        this.userNameVisible = userNameVisible;
+	this.userNameVisible = userNameVisible;
     }
+
     /**
      * @return Returns the mapAnswers.
      */
     public Map getMapAnswers() {
-        return mapAnswers;
+	return mapAnswers;
     }
+
     /**
-     * @param mapAnswers The mapAnswers to set.
+     * @param mapAnswers
+     *                The mapAnswers to set.
      */
     public void setMapAnswers(Map mapAnswers) {
-        this.mapAnswers = mapAnswers;
+	this.mapAnswers = mapAnswers;
     }
+
     /**
      * @return Returns the mapQuestions.
      */
     public Map getMapQuestions() {
-        return mapQuestions;
+	return mapQuestions;
     }
+
     /**
-     * @param mapQuestions The mapQuestions to set.
+     * @param mapQuestions
+     *                The mapQuestions to set.
      */
     public void setMapQuestions(Map mapQuestions) {
-        this.mapQuestions = mapQuestions;
+	this.mapQuestions = mapQuestions;
     }
-    
+
     /**
      * @return Returns the httpSessionID.
      */
     public String getHttpSessionID() {
-        return httpSessionID;
+	return httpSessionID;
     }
+
     /**
-     * @param httpSessionID The httpSessionID to set.
+     * @param httpSessionID
+     *                The httpSessionID to set.
      */
     public void setHttpSessionID(String httpSessionID) {
-        this.httpSessionID = httpSessionID;
-    }    
+	this.httpSessionID = httpSessionID;
+    }
+
     /**
      * @return Returns the requestLearningReport.
      */
     public String getRequestLearningReport() {
-        return requestLearningReport;
+	return requestLearningReport;
     }
+
     /**
-     * @param requestLearningReport The requestLearningReport to set.
+     * @param requestLearningReport
+     *                The requestLearningReport to set.
      */
     public void setRequestLearningReport(String requestLearningReport) {
-        this.requestLearningReport = requestLearningReport;
+	this.requestLearningReport = requestLearningReport;
     }
+
     /**
      * @return Returns the requestLearningReportProgress.
      */
     public String getRequestLearningReportProgress() {
-        return requestLearningReportProgress;
+	return requestLearningReportProgress;
     }
+
     /**
-     * @param requestLearningReportProgress The requestLearningReportProgress to set.
+     * @param requestLearningReportProgress
+     *                The requestLearningReportProgress to set.
      */
-    public void setRequestLearningReportProgress(
-            String requestLearningReportProgress) {
-        this.requestLearningReportProgress = requestLearningReportProgress;
+    public void setRequestLearningReportProgress(String requestLearningReportProgress) {
+	this.requestLearningReportProgress = requestLearningReportProgress;
     }
-    
+
     /**
      * @return Returns the requestLearningReportViewOnly.
      */
     public String getRequestLearningReportViewOnly() {
-        return requestLearningReportViewOnly;
+	return requestLearningReportViewOnly;
     }
+
     /**
-     * @param requestLearningReportViewOnly The requestLearningReportViewOnly to set.
+     * @param requestLearningReportViewOnly
+     *                The requestLearningReportViewOnly to set.
      */
-    public void setRequestLearningReportViewOnly(
-            String requestLearningReportViewOnly) {
-        this.requestLearningReportViewOnly = requestLearningReportViewOnly;
+    public void setRequestLearningReportViewOnly(String requestLearningReportViewOnly) {
+	this.requestLearningReportViewOnly = requestLearningReportViewOnly;
     }
 
     /**
      * @return Returns the listMonitoredAnswersContainerDTO.
      */
     public List getListMonitoredAnswersContainerDTO() {
-        return listMonitoredAnswersContainerDTO;
+	return listMonitoredAnswersContainerDTO;
     }
+
     /**
-     * @param listMonitoredAnswersContainerDTO The listMonitoredAnswersContainerDTO to set.
+     * @param listMonitoredAnswersContainerDTO
+     *                The listMonitoredAnswersContainerDTO to set.
      */
-    public void setListMonitoredAnswersContainerDTO(
-            List listMonitoredAnswersContainerDTO) {
-        this.listMonitoredAnswersContainerDTO = listMonitoredAnswersContainerDTO;
+    public void setListMonitoredAnswersContainerDTO(List listMonitoredAnswersContainerDTO) {
+	this.listMonitoredAnswersContainerDTO = listMonitoredAnswersContainerDTO;
     }
 
     /**
      * @return Returns the mapAnswersPresentable.
      */
     public Map getMapAnswersPresentable() {
-        return mapAnswersPresentable;
+	return mapAnswersPresentable;
     }
+
     /**
-     * @param mapAnswersPresentable The mapAnswersPresentable to set.
+     * @param mapAnswersPresentable
+     *                The mapAnswersPresentable to set.
      */
     public void setMapAnswersPresentable(Map mapAnswersPresentable) {
-        this.mapAnswersPresentable = mapAnswersPresentable;
+	this.mapAnswersPresentable = mapAnswersPresentable;
     }
+
     /**
      * @return Returns the reflection.
      */
     public String getReflection() {
-        return reflection;
+	return reflection;
     }
+
     /**
-     * @param reflection The reflection to set.
+     * @param reflection
+     *                The reflection to set.
      */
     public void setReflection(String reflection) {
-        this.reflection = reflection;
+	this.reflection = reflection;
     }
+
     /**
      * @return Returns the reflectionSubject.
      */
     public String getReflectionSubject() {
-        return reflectionSubject;
+	return reflectionSubject;
     }
+
     /**
-     * @param reflectionSubject The reflectionSubject to set.
+     * @param reflectionSubject
+     *                The reflectionSubject to set.
      */
     public void setReflectionSubject(String reflectionSubject) {
-        this.reflectionSubject = reflectionSubject;
+	this.reflectionSubject = reflectionSubject;
     }
+
     /**
      * @return Returns the notebookEntry.
      */
     public String getNotebookEntry() {
-        return notebookEntry;
+	return notebookEntry;
     }
+
     /**
-     * @param notebookEntry The notebookEntry to set.
+     * @param notebookEntry
+     *                The notebookEntry to set.
      */
     public void setNotebookEntry(String notebookEntry) {
-        this.notebookEntry = notebookEntry;
+	this.notebookEntry = notebookEntry;
     }
-    
+
     /**
      * @return Returns the notebookEntriesVisible.
      */
     public String getNotebookEntriesVisible() {
-        return notebookEntriesVisible;
+	return notebookEntriesVisible;
     }
+
     /**
-     * @param notebookEntriesVisible The notebookEntriesVisible to set.
+     * @param notebookEntriesVisible
+     *                The notebookEntriesVisible to set.
      */
     public void setNotebookEntriesVisible(String notebookEntriesVisible) {
-        this.notebookEntriesVisible = notebookEntriesVisible;
+	this.notebookEntriesVisible = notebookEntriesVisible;
     }
+
     /**
      * @return Returns the userName.
      */
     public String getUserName() {
-        return userName;
+	return userName;
     }
+
     /**
-     * @param userName The userName to set.
+     * @param userName
+     *                The userName to set.
      */
     public void setUserName(String userName) {
-        this.userName = userName;
+	this.userName = userName;
     }
+
     /**
      * @return Returns the mapFeedback.
      */
     public Map getMapFeedback() {
-        return mapFeedback;
+	return mapFeedback;
     }
+
     /**
-     * @param mapFeedback The mapFeedback to set.
+     * @param mapFeedback
+     *                The mapFeedback to set.
      */
     public void setMapFeedback(Map mapFeedback) {
-        this.mapFeedback = mapFeedback;
+	this.mapFeedback = mapFeedback;
     }
+
     /**
      * @return Returns the teacherViewOnly.
      */
     public String getTeacherViewOnly() {
-        return teacherViewOnly;
+	return teacherViewOnly;
     }
+
     /**
-     * @param teacherViewOnly The teacherViewOnly to set.
+     * @param teacherViewOnly
+     *                The teacherViewOnly to set.
      */
     public void setTeacherViewOnly(String teacherViewOnly) {
-        this.teacherViewOnly = teacherViewOnly;
+	this.teacherViewOnly = teacherViewOnly;
     }
+
     /**
      * @return Returns the remainingQuestionCount.
      */
     public String getRemainingQuestionCount() {
-        return remainingQuestionCount;
+	return remainingQuestionCount;
     }
+
     /**
-     * @param remainingQuestionCount The remainingQuestionCount to set.
+     * @param remainingQuestionCount
+     *                The remainingQuestionCount to set.
      */
     public void setRemainingQuestionCount(String remainingQuestionCount) {
-        this.remainingQuestionCount = remainingQuestionCount;
+	this.remainingQuestionCount = remainingQuestionCount;
     }
+
     /**
      * @return Returns the initialScreen.
      */
     public String getInitialScreen() {
-        return initialScreen;
+	return initialScreen;
     }
+
     /**
-     * @param initialScreen The initialScreen to set.
+     * @param initialScreen
+     *                The initialScreen to set.
      */
     public void setInitialScreen(String initialScreen) {
-        this.initialScreen = initialScreen;
+	this.initialScreen = initialScreen;
     }
 
     /**
      * @return Returns the lockWhenFinished.
      */
     public String getLockWhenFinished() {
-        return lockWhenFinished;
+	return lockWhenFinished;
     }
+
     /**
-     * @param lockWhenFinished The lockWhenFinished to set.
+     * @param lockWhenFinished
+     *                The lockWhenFinished to set.
      */
     public void setLockWhenFinished(String lockWhenFinished) {
-        this.lockWhenFinished = lockWhenFinished;
+	this.lockWhenFinished = lockWhenFinished;
     }
+
     /**
      * @return Returns the showOtherAnswers.
      */
     public String getShowOtherAnswers() {
-        return showOtherAnswers;
+	return showOtherAnswers;
     }
+
     /**
-     * @param showOtherAnswers The showOtherAnswers to set.
+     * @param showOtherAnswers
+     *                The showOtherAnswers to set.
      */
     public void setShowOtherAnswers(String showOtherAnswers) {
-        this.showOtherAnswers = showOtherAnswers;
+	this.showOtherAnswers = showOtherAnswers;
     }
+
     /**
      * @return Returns the userUid.
      */
     public String getUserUid() {
-        return userUid;
+	return userUid;
     }
+
     /**
-     * @param userUid The userUid to set.
+     * @param userUid
+     *                The userUid to set.
      */
     public void setUserUid(String userUid) {
-        this.userUid = userUid;
+	this.userUid = userUid;
     }
+
     /**
      * @return Returns the existMultipleUserResponses.
      */
     public String getExistMultipleUserResponses() {
-        return existMultipleUserResponses;
+	return existMultipleUserResponses;
     }
+
     /**
-     * @param existMultipleUserResponses The existMultipleUserResponses to set.
+     * @param existMultipleUserResponses
+     *                The existMultipleUserResponses to set.
      */
     public void setExistMultipleUserResponses(String existMultipleUserResponses) {
-        this.existMultipleUserResponses = existMultipleUserResponses;
+	this.existMultipleUserResponses = existMultipleUserResponses;
     }
- }
+}

@@ -85,7 +85,8 @@ public interface IQaService {
     public void updateQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException;
 
     /**
-     * Return the question content object according to the requested question content id.
+     * Return the question content object according to the requested question
+     * content id.
      * 
      * @param qaQueContentId
      *                qa question content id
@@ -218,10 +219,11 @@ public interface IQaService {
     public void removeToolContent(Long toolContentId) throws QaApplicationException;
 
     /**
-     * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentId)
+     * createToolSession(Long toolSessionId,String toolSessionName, Long
+     * toolContentId)
      * 
-     * It is also defined here since in development we want to be able call it directly from the web-layer instead of it
-     * being called by the container.
+     * It is also defined here since in development we want to be able call it
+     * directly from the web-layer instead of it being called by the container.
      * 
      * @param toolSessionId
      * @param toolContentId
@@ -231,8 +233,8 @@ public interface IQaService {
     /**
      * leaveToolSession(Long toolSessionId, Long learnerId)
      * 
-     * It is also defined here since in development we want to be able call it directly from our web-layer instead of it
-     * being called by the container.
+     * It is also defined here since in development we want to be able call it
+     * directly from our web-layer instead of it being called by the container.
      * 
      * @param toolSessionId
      * @param toolContentId
@@ -273,8 +275,8 @@ public interface IQaService {
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
     /**
-     * Get the LAMS audit service. Needed as the web layer controls the staff updating of an answer, so the log entry
-     * must be made by the web layer.
+     * Get the LAMS audit service. Needed as the web layer controls the staff
+     * updating of an answer, so the log entry must be made by the web layer.
      */
     public IAuditService getAuditService();
 
@@ -283,11 +285,12 @@ public interface IQaService {
     public QaContent getQaContentBySessionId(Long sessionId);
 
     /**
-     * Creates an unique name for a QaCondition. It consists of the tool output definition name and a unique positive
-     * integer number.
+     * Creates an unique name for a QaCondition. It consists of the tool output
+     * definition name and a unique positive integer number.
      * 
      * @param existingConditions
-     *                existing conditions; required to check if a condition with the same name does not exist.
+     *                existing conditions; required to check if a condition with
+     *                the same name does not exist.
      * @return unique QaCondition name
      */
     public String createConditionName(Collection<QaCondition> existingConditions);
@@ -319,7 +322,8 @@ public interface IQaService {
     public SortedSet<QaWizardCategory> getWizardCategories();
 
     /**
-     * Saves the entire set of QaWizardCategories (including the child cognitive skills and questions)
+     * Saves the entire set of QaWizardCategories (including the child cognitive
+     * skills and questions)
      * 
      * @param categories
      */

@@ -31,22 +31,22 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * This class give a chance to clear HttpSession when user save/close authoring page.
- * @author Steve.Ni
- * ----------------XDoclet Tags--------------------
+ * This class give a chance to clear HttpSession when user save/close authoring
+ * page.
  * 
- * @struts:action path="/clearsession"   validate="false"
- *                
+ * @author Steve.Ni ----------------XDoclet Tags--------------------
+ * 
+ * @struts:action path="/clearsession" validate="false"
+ * 
  * @version $Revision$
  */
 public class ClearSessionAction extends LamsAuthoringFinishAction {
 
-	@Override
-	public void clearSession(String customiseSessionID,HttpSession session, ToolAccessMode mode) {
-		if(mode.isAuthor()){
-			session.removeAttribute(QaAction.SUBMIT_SUCCESS);
-		}
+    @Override
+    public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
+	if (mode.isAuthor()) {
+	    session.removeAttribute(QaAction.SUBMIT_SUCCESS);
 	}
+    }
 
-		
 }

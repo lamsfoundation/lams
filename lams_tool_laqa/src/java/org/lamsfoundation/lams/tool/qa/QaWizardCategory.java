@@ -112,9 +112,8 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
 
 	    if (cognitiveSkills != null) {
 		// create a copy of the skills
-		for(QaWizardCognitiveSkill skill : cognitiveSkills)
-		{
-		    QaWizardCognitiveSkill newSkill = (QaWizardCognitiveSkill)skill.clone();
+		for (QaWizardCognitiveSkill skill : cognitiveSkills) {
+		    QaWizardCognitiveSkill newSkill = (QaWizardCognitiveSkill) skill.clone();
 		    skills.add(newSkill);
 		}
 		category.setCognitiveSkills(skills);

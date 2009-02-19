@@ -32,34 +32,34 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 public class QaToolContentHandler extends ToolContentHandler {
 
     public static final String SPRING_BEAN_NAME = "qaToolContentHandler";
-    
+
     private static String repositoryWorkspaceName = "qaworkspace";
     private static String repositoryUser = "qa_user";
-    private static char[] repositoryId = {'l','a','m','s','-','q','a'};
+    private static char[] repositoryId = { 'l', 'a', 'm', 's', '-', 'q', 'a' };
 
     private QaToolContentHandler() {
-        super();
+	super();
     }
 
     /* (non-Javadoc)
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
      */
     public String getRepositoryWorkspaceName() {
-        return repositoryWorkspaceName;
+	return repositoryWorkspaceName;
     }
 
     /* (non-Javadoc)
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
      */
     public String getRepositoryUser() {
-        return repositoryUser;
+	return repositoryUser;
     }
 
     /* (non-Javadoc)
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
      */
     public char[] getRepositoryId() {
-        return repositoryId;
+	return repositoryId;
     }
 
 }

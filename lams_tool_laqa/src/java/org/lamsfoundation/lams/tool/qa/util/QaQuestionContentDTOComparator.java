@@ -5,7 +5,8 @@ import java.util.Comparator;
 import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 
 /**
- * Comparator for <code>QaQuestionContentDTO</code>. Only the display order is compared.
+ * Comparator for <code>QaQuestionContentDTO</code>. Only the display order
+ * is compared.
  * 
  * @author Marcin Cieslak
  */

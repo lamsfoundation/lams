@@ -29,46 +29,42 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-
 /**
- * <p>This class act as the proxy between web layer and service layer. It is
- * designed to decouple the presentation logic and business logic completely.
- * In this way, the presentation tier will no longer be aware of the changes in
+ * <p>
+ * This class act as the proxy between web layer and service layer. It is
+ * designed to decouple the presentation logic and business logic completely. In
+ * this way, the presentation tier will no longer be aware of the changes in
  * service layer. Therefore we can feel free to switch the business logic
- * implementation.</p>
+ * implementation.
+ * </p>
  * 
  * @author Ozgur Demirtas
- *
+ * 
  */
-public class QaServiceProxy
-{
+public class QaServiceProxy {
     /**
      * Return the q/a domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
-     * @param servletContext the servletContext for current application
+     * 
+     * @param servletContext
+     *                the servletContext for current application
      * @return qaService object.
      */
-    public static final IQaService getQaService(ServletContext servletContext)
-    {
-        return (IQaService)getQaDomainService(servletContext);
-    }
-    
-    public static final ToolSessionManager getQaSessionManager(ServletContext servletContext)
-    {
-        return (ToolSessionManager)getQaDomainService(servletContext);
-    }
-    
-    public static final ToolContentManager getQaContentManager(ServletContext servletContext)
-    {
-        return (ToolContentManager)getQaDomainService(servletContext);
+    public static final IQaService getQaService(ServletContext servletContext) {
+	return (IQaService) getQaDomainService(servletContext);
     }
 
-    
-    private static Object getQaDomainService(ServletContext servletContext)
-    {
-        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        return wac.getBean("qaService");
+    public static final ToolSessionManager getQaSessionManager(ServletContext servletContext) {
+	return (ToolSessionManager) getQaDomainService(servletContext);
     }
 
-    
+    public static final ToolContentManager getQaContentManager(ServletContext servletContext) {
+	return (ToolContentManager) getQaDomainService(servletContext);
+    }
+
+    private static Object getQaDomainService(ServletContext servletContext) {
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+	return wac.getBean("qaService");
+    }
+
 }

@@ -82,13 +82,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * </p>
  * 
  * <p>
- * Note that Struts action class only has the responsibility to navigate page flow. All database operation should go to
- * service layer and data transformation from domain model to struts form bean should go to form bean class. This ensure
- * clean and maintainable code.
+ * Note that Struts action class only has the responsibility to navigate page
+ * flow. All database operation should go to service layer and data
+ * transformation from domain model to struts form bean should go to form bean
+ * class. This ensure clean and maintainable code.
  * </p>
  * 
- * <code>SystemException</code> is thrown whenever an known error condition is identified. No system exception error
- * handling code should appear in the Struts action class as all of them are handled in
+ * <code>SystemException</code> is thrown whenever an known error condition is
+ * identified. No system exception error handling code should appear in the
+ * Struts action class as all of them are handled in
  * <code>CustomStrutsExceptionHandler<code>.
  * 
  * @author Ozgur Demirtas
@@ -161,22 +163,24 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      * </p>
      * 
      * <p>
-     * It is assuming that progress engine should pass in the tool access mode and the tool session id as http
-     * parameters.
+     * It is assuming that progress engine should pass in the tool access mode
+     * and the tool session id as http parameters.
      * </p>
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *                An ActionMapping class that will be used by the Action
+     *                class to tell the ActionServlet where to send the
+     *                end-user.
      * 
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *                The ActionForm class that will contain any data submitted
+     *                by the end-user via a form.
      * @param request
      *                A standard Servlet HttpServletRequest class.
      * @param response
      *                A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
-     *         next.
+     * @return An ActionForward class that will be returned to the ActionServlet
+     *         indicating where the user is to go next.
      * @throws IOException
      * @throws ServletException
      * @throws QaApplicationException
@@ -190,8 +194,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * submits content into the tool database ActionForward submitAllContent(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * submits content into the tool database ActionForward
+     * submitAllContent(ActionMapping mapping, ActionForm form,
+     * HttpServletRequest request, HttpServletResponse response) throws
+     * IOException, ServletException
      * 
      * @param mapping
      * @param form
@@ -833,7 +839,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * opens up an new screen within the current page for adding a new question newQuestionBox
+     * opens up an new screen within the current page for adding a new question
+     * newQuestionBox
      * 
      * @param mapping
      * @param form
@@ -922,13 +929,14 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    request.setAttribute(QaAppConstants.ATTR_WIZARD_ENABLED, true);
 	    request.setAttribute(QaAppConstants.ATTR_WIZARD_CATEGORIES, qaService.getWizardCategories());
 	}
-	
+
 	QaAction.logger.debug("fwd ing to newQuestionBox: ");
 	return mapping.findForward("newQuestionBox");
     }
 
     /**
-     * opens up an new screen within the current page for editing a question newEditableQuestionBox
+     * opens up an new screen within the current page for editing a question
+     * newEditableQuestionBox
      * 
      * @param mapping
      * @param form
@@ -1042,8 +1050,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * removes a question from the questions map ActionForward removeQuestion(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * removes a question from the questions map ActionForward
+     * removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest
+     * request, HttpServletResponse response) throws IOException,
+     * ServletException
      * 
      * @param mapping
      * @param form
@@ -1487,8 +1497,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * adds a new file to content repository ActionForward addNewFile(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * adds a new file to content repository ActionForward
+     * addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest
+     * request, HttpServletResponse response) throws IOException,
+     * ServletException
      * 
      * @param mapping
      * @param form
@@ -1613,8 +1625,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * deletes a file from the content repository ActionForward deleteFile(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * deletes a file from the content repository ActionForward
+     * deleteFile(ActionMapping mapping, ActionForm form, HttpServletRequest
+     * request, HttpServletResponse response) throws IOException,
+     * ServletException
      * 
      * @param mapping
      * @param form
@@ -1756,7 +1770,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm)
+     * addFileToContentRepository(HttpServletRequest request, QaAuthoringForm
+     * qaAuthoringForm)
      * 
      * @param request
      * @param qaAuthoringForm
@@ -1872,8 +1887,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
     /**
      * 
-     * Go through the attachments collections. Remove any content repository or tool objects matching entries in the the
-     * deletedAttachments collection, add any new attachments in the attachments collection. Clear the
+     * Go through the attachments collections. Remove any content repository or
+     * tool objects matching entries in the the deletedAttachments collection,
+     * add any new attachments in the attachments collection. Clear the
      * deletedAttachments collection, ready for new editing.
      * 
      * @param qaContent
@@ -1941,8 +1957,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * calls monitoring action summary screen generation ActionForward getSummary(ActionMapping mapping, ActionForm
-     * form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * calls monitoring action summary screen generation ActionForward
+     * getSummary(ActionMapping mapping, ActionForm form, HttpServletRequest
+     * request, HttpServletResponse response) throws IOException,
+     * ServletException
      * 
      * @param mapping
      * @param form
@@ -1960,8 +1978,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * calls monitoring action instructions screen generation ActionForward getInstructions(ActionMapping mapping,
-     * ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * calls monitoring action instructions screen generation ActionForward
+     * getInstructions(ActionMapping mapping, ActionForm form,
+     * HttpServletRequest request, HttpServletResponse response) throws
+     * IOException, ServletException
      * 
      * @param mapping
      * @param form
@@ -1981,8 +2001,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     /**
      * calls monitoring action stats screen generation
      * 
-     * ActionForward getStats(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response) throws IOException, ServletException
+     * ActionForward getStats(ActionMapping mapping, ActionForm form,
+     * HttpServletRequest request, HttpServletResponse response) throws
+     * IOException, ServletException
      * 
      * @param mapping
      * @param form
@@ -2002,8 +2023,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * generates Edit Activity screen ActionForward editActivityQuestions(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, ToolException
+     * generates Edit Activity screen ActionForward
+     * editActivityQuestions(ActionMapping mapping, ActionForm form,
+     * HttpServletRequest request, HttpServletResponse response) throws
+     * IOException, ServletException, ToolException
      * 
      * @param mapping
      * @param form
@@ -2148,7 +2171,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * Get the deleted condition list, which could be persisted or non-persisted items.
+     * Get the deleted condition list, which could be persisted or non-persisted
+     * items.
      * 
      * @param request
      * @return

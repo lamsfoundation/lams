@@ -118,7 +118,7 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
 	    return 1;
 	}
     }
-    
+
     public Object clone() {
 
 	QaWizardCognitiveSkill skill = null;
@@ -131,9 +131,8 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
 
 	    if (questions != null) {
 		// create a copy of the skills
-		for(QaWizardQuestion question : questions)
-		{
-		    QaWizardQuestion newQuestion = (QaWizardQuestion)question.clone();
+		for (QaWizardQuestion question : questions) {
+		    QaWizardQuestion newQuestion = (QaWizardQuestion) question.clone();
 		    newQuestions.add(newQuestion);
 		}
 		skill.setQuestions(newQuestions);

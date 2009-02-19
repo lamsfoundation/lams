@@ -37,13 +37,14 @@ import org.apache.log4j.Logger;
  * 
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code
- * Templates
+ * TODO To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Style - Code Templates
  */
 
 /**
- * QaQueContent Value Object The value object that maps to our model database table: tl_laqa11_que_content The relevant
- * hibernate mapping resides in: QaQueContent.hbm.xml
+ * QaQueContent Value Object The value object that maps to our model database
+ * table: tl_laqa11_que_content The relevant hibernate mapping resides in:
+ * QaQueContent.hbm.xml
  * 
  * Holds question content within a particular content
  */
@@ -276,8 +277,8 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     }
 
     /**
-     * Validate whether there is a response available for current question. This method only validate struts convient
-     * field at the moment.
+     * Validate whether there is a response available for current question. This
+     * method only validate struts convient field at the moment.
      * 
      * @return whether the resonse is available or not.
      */
@@ -302,7 +303,8 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     /**
      * Convenient method to check out the response for other field.
      * 
-     * @return true if other response field is not null and is not equals to empty String
+     * @return true if other response field is not null and is not equals to
+     *         empty String
      */
     public boolean isOtherResponseAvailable() {
 	if (otherResponse != null && !otherResponse.equals("")) {

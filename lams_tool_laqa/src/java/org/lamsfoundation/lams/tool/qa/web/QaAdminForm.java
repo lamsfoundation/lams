@@ -29,25 +29,26 @@ import org.apache.struts.upload.FormFile;
 public class QaAdminForm extends ActionForm {
 
     public static final long serialVersionUID = 978235712395273523L;
-    
-    public static final String TRUE= "true";
-    public static final String FALSE= "false";
-    
+
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
+
     private Boolean qaWizardEnabled;
     private String serialiseXML;
     private String deleteCategoriesCSV;
     private String deleteSkillsCSV;
     private String deleteQuestionsCSV;
     private FormFile importFile;
-    
-    public QaAdminForm() {}
+
+    public QaAdminForm() {
+    }
 
     public Boolean getQaWizardEnabled() {
-        return qaWizardEnabled;
+	return qaWizardEnabled;
     }
 
     public void setQaWizardEnabled(Boolean qaWizardEnabled) {
-        this.qaWizardEnabled = qaWizardEnabled;
+	this.qaWizardEnabled = qaWizardEnabled;
     }
 
     public void setQaWizardEnabled(String qaWizardEnabled) {
@@ -55,42 +56,42 @@ public class QaAdminForm extends ActionForm {
     }
 
     public String getSerialiseXML() {
-        return serialiseXML;
+	return serialiseXML;
     }
 
     public void setSerialiseXML(String serialiseXML) {
-        this.serialiseXML = serialiseXML;
+	this.serialiseXML = serialiseXML;
     }
 
     public String getDeleteCategoriesCSV() {
-        return deleteCategoriesCSV;
+	return deleteCategoriesCSV;
     }
 
     public void setDeleteCategoriesCSV(String deleteCategoriesCSV) {
-        this.deleteCategoriesCSV = deleteCategoriesCSV;
+	this.deleteCategoriesCSV = deleteCategoriesCSV;
     }
 
     public String getDeleteSkillsCSV() {
-        return deleteSkillsCSV;
+	return deleteSkillsCSV;
     }
 
     public void setDeleteSkillsCSV(String deleteSkillsCSV) {
-        this.deleteSkillsCSV = deleteSkillsCSV;
+	this.deleteSkillsCSV = deleteSkillsCSV;
     }
 
     public String getDeleteQuestionsCSV() {
-        return deleteQuestionsCSV;
+	return deleteQuestionsCSV;
     }
 
     public void setDeleteQuestionsCSV(String deleteQuestionsCSV) {
-        this.deleteQuestionsCSV = deleteQuestionsCSV;
+	this.deleteQuestionsCSV = deleteQuestionsCSV;
     }
 
     public FormFile getImportFile() {
-        return importFile;
+	return importFile;
     }
 
     public void setImportFile(FormFile importFile) {
-        this.importFile = importFile;
+	this.importFile = importFile;
     }
 }

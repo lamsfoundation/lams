@@ -349,13 +349,13 @@ public class QaAdminAction extends LamsDispatchAction {
      */
     @SuppressWarnings("unchecked")
     public ActionForward importWizard(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response){
+	    HttpServletResponse response) {
 	QaAdminForm adminForm = (QaAdminForm) form;
 
 	if (qaService == null) {
 	    qaService = QaServiceProxy.getQaService(this.getServlet().getServletContext());
 	}
-	
+
 	// First save the config items
 	QaConfigItem enableQaWizard = qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD);
 
@@ -374,24 +374,23 @@ public class QaAdminAction extends LamsDispatchAction {
 	    enableQaWizard.setConfigValue(QaAdminForm.FALSE);
 	}
 	qaService.saveOrUpdateConfigItem(enableQaWizard);
-	
 
 	// Now perform the import
 	try {
 	    String xml = new String(adminForm.getImportFile().getFileData());
 	    XStream conversionXml = new XStream();
-	    SortedSet<QaWizardCategory> exportCategories = (SortedSet<QaWizardCategory>)conversionXml.fromXML(xml);
+	    SortedSet<QaWizardCategory> exportCategories = (SortedSet<QaWizardCategory>) conversionXml.fromXML(xml);
 
 	    qaService.deleteAllWizardCategories();
 	    qaService.saveOrUpdateQaWizardCategories(exportCategories);
 	} catch (Exception e) {
 	    logger.error("Failed to import wizard model", e);
 	    request.setAttribute("error", true);
-	    request.setAttribute("errorKey", "wizard.import.error"); 
+	    request.setAttribute("errorKey", "wizard.import.error");
 	    request.setAttribute(ATTR_CATEGORIES, getQaWizardCategories());
 	    return mapping.findForward("config");
-	}	
-	
+	}
+
 	request.setAttribute(ATTR_CATEGORIES, getQaWizardCategories());
 	request.setAttribute("savedSuccess", true);
 	return mapping.findForward("config");
