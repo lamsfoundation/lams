@@ -33,124 +33,96 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
 /**
  * 
  * @author Ozgur Demirtas
  * 
  */
-public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO
-{
-	private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT	 = "from qaUsrResp in class QaUsrResp where qaUsrResp.queUsrId=:queUsrId and qaUsrResp.qaQueContentId=:qaQueContentId";
+public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
+    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT = "from qaUsrResp in class QaUsrResp where qaUsrResp.queUsrId=:queUsrId and qaUsrResp.qaQueContentId=:qaQueContentId";
 
-	public QaQueUsr getUserById(long userId)
-    {
-        return (QaQueUsr)this.getHibernateTemplate().load(QaQueUsr.class,new Long(userId));
-        
+    public QaQueUsr getUserById(long userId) {
+	return (QaQueUsr) this.getHibernateTemplate().load(QaQueUsr.class, new Long(userId));
+
     }
 
-	public void createUserResponse(QaUsrResp qaUsrResp)
-    {
-		this.getSession().setFlushMode(FlushMode.AUTO);
-    	this.getHibernateTemplate().save(qaUsrResp);    	
+    public void createUserResponse(QaUsrResp qaUsrResp) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().save(qaUsrResp);
     }
 
-	public QaUsrResp retrieveQaUsrResp(long responseId)
-    {
-        return (QaUsrResp) this.getHibernateTemplate().get(QaUsrResp.class, new Long(responseId));
+    public QaUsrResp retrieveQaUsrResp(long responseId) {
+	return (QaUsrResp) this.getHibernateTemplate().get(QaUsrResp.class, new Long(responseId));
     }
 
-    public QaUsrResp getAttemptByUID(Long uid)
-	{
-		String query = "from QaUsrResp attempt where attempt.responseId=?";
-		
-		HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(query)
-		.setLong(0,uid.longValue())
-		.list();
-		
-		if(list != null && list.size() > 0){
-		    QaUsrResp attempt = (QaUsrResp) list.get(0);
-			return attempt;
-		}
-		return null;	
+    public QaUsrResp getAttemptByUID(Long uid) {
+	String query = "from QaUsrResp attempt where attempt.responseId=?";
+
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(query).setLong(0, uid.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    QaUsrResp attempt = (QaUsrResp) list.get(0);
+	    return attempt;
 	}
-	
-	
-	
-	/**
+	return null;
+    }
+
+    /**
      * @see org.lamsfoundation.lams.tool.qa.dao.interfaces.IQaUsrRespDAO#saveUserResponse(com.lamsinternational.tool.qa.domain.QaUsrResp)
      */
-    public void saveUserResponse(QaUsrResp resp)
-    {
-    	this.getSession().setFlushMode(FlushMode.AUTO);    	
-        this.getHibernateTemplate().save(resp);
+    public void saveUserResponse(QaUsrResp resp) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().save(resp);
     }
 
     /**
      * @see org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO#updateUserResponse(org.lamsfoundation.lams.tool.qa.QaUsrResp)
      */
-    public void updateUserResponse(QaUsrResp resp)
-    {
-    	this.getSession().setFlushMode(FlushMode.AUTO);
-        this.getHibernateTemplate().update(resp);        
-    }
-    
-    public void removeUserResponse(QaUsrResp resp)
-    {
-    	this.getSession().setFlushMode(FlushMode.AUTO);
-        this.getHibernateTemplate().delete(resp);        
+    public void updateUserResponse(QaUsrResp resp) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().update(resp);
     }
 
-    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId)
-    {
-        HibernateTemplate templ = this.getHibernateTemplate();
-        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
-		.setLong("queUsrId", queUsrId.longValue())
-		.setLong("qaQueContentId", qaQueContentId.longValue())
-		.list();
-        
-		return list;
+    public void removeUserResponse(QaUsrResp resp) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(resp);
     }
-    
-    
-    public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId)
-    {
-        HibernateTemplate templ = this.getHibernateTemplate();
-        List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
-		.setLong("queUsrId", queUsrId.longValue())
-		.setLong("qaQueContentId", qaQueContentId.longValue())
-		.list();
-        
-        
-		if(list != null && list.size() > 0){
-			Iterator listIterator=list.iterator();
-	    	while (listIterator.hasNext())
-	    	{
-	    	    QaUsrResp qaUsrResp=(QaUsrResp)listIterator.next();
-				this.getSession().setFlushMode(FlushMode.AUTO);
-	    		templ.delete(qaUsrResp);
-	    		templ.flush();
-	    	}
-		}
+
+    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT).setLong("queUsrId",
+		queUsrId.longValue()).setLong("qaQueContentId", qaQueContentId.longValue()).list();
+
+	return list;
     }
-    
-    
-    public void removeUserResponseByQaQueId(Long qaQueId)
-    {
-    	if ( qaQueId != null ) {
-    		String query = "from resp in class org.lamsfoundation.lams.tool.qa.QaUsrResp"
-    			+ " where resp.qaQueContentId = ?";
-            Object obj = getSession().createQuery(query)
-				.setLong(0,qaQueId.longValue())
-				.uniqueResult();
-            if ( obj != null ) {
-            	this.getSession().setFlushMode(FlushMode.AUTO);
-            	getHibernateTemplate().delete(obj);
-            }
-    	}
+
+    public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT).setLong("queUsrId",
+		queUsrId.longValue()).setLong("qaQueContentId", qaQueContentId.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    Iterator listIterator = list.iterator();
+	    while (listIterator.hasNext()) {
+		QaUsrResp qaUsrResp = (QaUsrResp) listIterator.next();
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		templ.delete(qaUsrResp);
+		templ.flush();
+	    }
 	}
+    }
+
+    public void removeUserResponseByQaQueId(Long qaQueId) {
+	if (qaQueId != null) {
+	    String query = "from resp in class org.lamsfoundation.lams.tool.qa.QaUsrResp"
+		    + " where resp.qaQueContentId = ?";
+	    Object obj = getSession().createQuery(query).setLong(0, qaQueId.longValue()).uniqueResult();
+	    if (obj != null) {
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		getHibernateTemplate().delete(obj);
+	    }
+	}
+    }
 
 }
-
-

@@ -1,5 +1,4 @@
 /****************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
@@ -33,169 +32,129 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
-
 /**
  * @author Ozgur Demirtas
- *
+ * 
  */
-public class QaSessionDAO extends HibernateDaoSupport implements
-                                                         IQaSessionDAO
-{
-	private static final String COUNT_SESSION_INCOMPLITE 	= "select qaSession.session_status from QaSession qaSession where qaSession.session_status='INCOMPLETE' and qaSession.qaContentId = :qa";
-	private static final String COUNT_SESSION_ACTIVITY   	= "select qaSession.session_status from QaSession qaSession where qaSession.qaContentId = :qa";
-	private static final String GET_SESSION_IDS_FOR_CONTENT = "select qaSession.qaSessionId    from QaSession qaSession where qaSession.qaContentId = :qa";
-	private static final String COUNT_SESSION_COMPLETE 		= "from   qaSession in class QaSession where qaSession.session_status='COMPLETE'";
-	private static final String COUNT_SESSION_INCOMPLETE 	= "from   qaSession in class QaSession where qaSession.session_status='INCOMPLETE'";
-	private static final String GET_SESSIONS_FROM_CONTENT 	= "select qas.qaSessionId from QaSession qas where qas.qaContent=:qaContent order by qas.qaSessionId";
-	private static final String GET_SESSIONNAMES_FROM_CONTENT 	= "select qas.session_name from QaSession qas where qas.qaContent=:qaContent order by qas.qaSessionId";
-		
-	public int countSessionComplete()
-    {
-    	HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(COUNT_SESSION_COMPLETE)
-		.list();
-		
-		if(list != null && list.size() > 0){
-			return list.size();
-		}
-		else return 0;
-	}
-    
-	public int countSessionComplete(QaContent qa)
-    {
-    	HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(COUNT_SESSION_COMPLETE)
-		.list();
+public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
+    private static final String COUNT_SESSION_INCOMPLITE = "select qaSession.session_status from QaSession qaSession where qaSession.session_status='INCOMPLETE' and qaSession.qaContentId = :qa";
+    private static final String COUNT_SESSION_ACTIVITY = "select qaSession.session_status from QaSession qaSession where qaSession.qaContentId = :qa";
+    private static final String GET_SESSION_IDS_FOR_CONTENT = "select qaSession.qaSessionId    from QaSession qaSession where qaSession.qaContentId = :qa";
+    private static final String COUNT_SESSION_COMPLETE = "from   qaSession in class QaSession where qaSession.session_status='COMPLETE'";
+    private static final String COUNT_SESSION_INCOMPLETE = "from   qaSession in class QaSession where qaSession.session_status='INCOMPLETE'";
+    private static final String GET_SESSIONS_FROM_CONTENT = "select qas.qaSessionId from QaSession qas where qas.qaContent=:qaContent order by qas.qaSessionId";
+    private static final String GET_SESSIONNAMES_FROM_CONTENT = "select qas.session_name from QaSession qas where qas.qaContent=:qaContent order by qas.qaSessionId";
 
-		int sessionCount=0;
-		if(list != null && list.size() > 0){
-			QaSession qaSession = (QaSession) list.get(0);
-			logger.debug("qaSession: " + qaSession);
-			logger.debug("local session's content uid versus incoming content uid: " + 
-			        qaSession.getQaContent().getUid().intValue() + " versus " + qa.getUid().intValue());
-			
-			if (qaSession.getQaContent().getUid().intValue() == qa.getUid().intValue())
-			{
-			    ++sessionCount;
-			}
-		}
-		logger.debug("sessionCount: " + sessionCount);
-		return sessionCount;
-	}
+    public int countSessionComplete() {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(COUNT_SESSION_COMPLETE).list();
 
-	
-    public int countSessionIncomplete()
-    {
-    	HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(COUNT_SESSION_INCOMPLETE)
-		.list();
-		
-		if(list != null && list.size() > 0){
-			return list.size();
-		}
-		else return 0;
-	}
-
-	
-    public int studentActivityOccurred(QaContent qa)
-    {
-    	  return (getHibernateTemplate().findByNamedParam(COUNT_SESSION_ACTIVITY,
-                "qa",
-                qa)).size();
+	if (list != null && list.size() > 0) {
+	    return list.size();
+	} else
+	    return 0;
     }
-	
-    
-    public List getToolSessionsForContent(QaContent qa)
-    {
-    	   
-		  List lisToolSessionIds=(getHibernateTemplate().findByNamedParam(GET_SESSION_IDS_FOR_CONTENT,
-                "qa",
-                qa));
-		  return lisToolSessionIds;
+
+    public int countSessionComplete(QaContent qa) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(COUNT_SESSION_COMPLETE).list();
+
+	int sessionCount = 0;
+	if (list != null && list.size() > 0) {
+	    QaSession qaSession = (QaSession) list.get(0);
+	    logger.debug("qaSession: " + qaSession);
+	    logger.debug("local session's content uid versus incoming content uid: "
+		    + qaSession.getQaContent().getUid().intValue() + " versus " + qa.getUid().intValue());
+
+	    if (qaSession.getQaContent().getUid().intValue() == qa.getUid().intValue()) {
+		++sessionCount;
+	    }
+	}
+	logger.debug("sessionCount: " + sessionCount);
+	return sessionCount;
     }
-	
+
+    public int countSessionIncomplete() {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(COUNT_SESSION_INCOMPLETE).list();
+
+	if (list != null && list.size() > 0) {
+	    return list.size();
+	} else
+	    return 0;
+    }
+
+    public int studentActivityOccurred(QaContent qa) {
+	return (getHibernateTemplate().findByNamedParam(COUNT_SESSION_ACTIVITY, "qa", qa)).size();
+    }
+
+    public List getToolSessionsForContent(QaContent qa) {
+
+	List lisToolSessionIds = (getHibernateTemplate().findByNamedParam(GET_SESSION_IDS_FOR_CONTENT, "qa", qa));
+	return lisToolSessionIds;
+    }
+
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#getSurveySessionById(long)
      */
-    public QaSession getQaSessionById(long qaSessionId)
-    {
-		String query = "from QaSession as qus where qus.qaSessionId = ?";
-	    HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(query)
-			.setLong(0,qaSessionId)
-			.list();
-		
-		if(list != null && list.size() > 0){
-			QaSession qus = (QaSession) list.get(0);
-			return qus;
-		}
-		return null;
+    public QaSession getQaSessionById(long qaSessionId) {
+	String query = "from QaSession as qus where qus.qaSessionId = ?";
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(query).setLong(0, qaSessionId).list();
+
+	if (list != null && list.size() > 0) {
+	    QaSession qus = (QaSession) list.get(0);
+	    return qus;
+	}
+	return null;
     }
-    
-    
-    public String getSessionNameById(long qaSessionId)
-    {
-		String query = "from QaSession as qus where qus.qaSessionId = ?";
-	    HibernateTemplate templ = this.getHibernateTemplate();
-		List list = getSession().createQuery(query)
-			.setLong(0,qaSessionId)
-			.list();
-		
-		if(list != null && list.size() > 0){
-			QaSession qus = (QaSession) list.get(0);
-			return qus.getSession_name() ;
-		}
-		return null;
+
+    public String getSessionNameById(long qaSessionId) {
+	String query = "from QaSession as qus where qus.qaSessionId = ?";
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(query).setLong(0, qaSessionId).list();
+
+	if (list != null && list.size() > 0) {
+	    QaSession qus = (QaSession) list.get(0);
+	    return qus.getSession_name();
+	}
+	return null;
     }
-    
-    
-    public QaSession getQaSessionOrNullById(long qaSessionId)
-    {
-    	return getQaSessionById(qaSessionId);
+
+    public QaSession getQaSessionOrNullById(long qaSessionId) {
+	return getQaSessionById(qaSessionId);
     }
 
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#CreateSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
-    public void CreateQaSession(QaSession session)
-    {
-    	this.getSession().setFlushMode(FlushMode.AUTO);
-        this.getHibernateTemplate().save(session);
+    public void CreateQaSession(QaSession session) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().save(session);
     }
 
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#UpdateSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
-    public void UpdateQaSession(QaSession session)
-    {
-    	this.getSession().setFlushMode(FlushMode.AUTO);    	
-        this.getHibernateTemplate().update(session);
+    public void UpdateQaSession(QaSession session) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().update(session);
     }
 
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#deleteSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
-    public void deleteQaSession(QaSession qaSession)
-    {
-    	this.getSession().setFlushMode(FlushMode.AUTO);    	
-        this.getHibernateTemplate().delete(qaSession);
+    public void deleteQaSession(QaSession qaSession) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(qaSession);
     }
-    
-	public List getSessionsFromContent(QaContent qaContent)
-	{
-	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT,
-	            "qaContent",
-				qaContent));
-	}
-	
-	public List getSessionNamesFromContent(QaContent qaContent)
-	{
-	    return (getHibernateTemplate().findByNamedParam(GET_SESSIONNAMES_FROM_CONTENT,
-	            "qaContent",
-				qaContent));
-	}
-	
-	
-	
+
+    public List getSessionsFromContent(QaContent qaContent) {
+	return (getHibernateTemplate().findByNamedParam(GET_SESSIONS_FROM_CONTENT, "qaContent", qaContent));
+    }
+
+    public List getSessionNamesFromContent(QaContent qaContent) {
+	return (getHibernateTemplate().findByNamedParam(GET_SESSIONNAMES_FROM_CONTENT, "qaContent", qaContent));
+    }
+
 }

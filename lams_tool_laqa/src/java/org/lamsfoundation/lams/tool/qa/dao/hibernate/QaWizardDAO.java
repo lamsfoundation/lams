@@ -35,13 +35,12 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
 
 /**
  * 
- * @author lfoxton
+ * @author edited by lfoxton
  * 
  */
 public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
 
     private static final String QUERY_FIND_ALL_CATEGORIES = "from " + QaWizardCategory.class.getName();
-    private static final String QUERY_DELETE_ALL_CATEGORIES = "from " + QaWizardCategory.class.getName();
     private static final String QUERY_GET_CATEGORY = "from " + QaWizardCategory.class.getName() + " c where c.uid=?";
     private static final String QUERY_GET_SKILL = "from " + QaWizardCognitiveSkill.class.getName() + " c where c.uid=?";
     private static final String QUERY_GET_QUESTION = "from " + QaWizardQuestion.class.getName() + " q where q.uid=?";

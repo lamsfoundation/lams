@@ -34,119 +34,98 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaUploadedFileDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
 /**
  * @author Ozgur Demirtas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * TODO To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Style - Code Templates
  */
 
 public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploadedFileDAO {
-	 	static Logger logger = Logger.getLogger(QaUploadedFileDAO.class.getName());
-	 	
-        private static final String GET_UPLOADED_FILES = "from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContent.qaContentId = :contentId";
-        
-	 	private static final String DELETE_FILES_META_DATA = "from qaUploadedFile in class QaUploadedFile";
-	 	
-	 	public QaUploadedFile getUploadedFileById(long submissionId)
-	    {
-	        return (QaUploadedFile) this.getHibernateTemplate()
-	                                   .load(QaUploadedFile.class, new Long(submissionId));
-	    }
-	 	
-	 	/**
-	 	 * 
-	 	 * return null if not found
-	 	 */
-	 	public QaUploadedFile loadUploadedFileById(long submissionId)
-	    {
-	    	return (QaUploadedFile) this.getHibernateTemplate().get(QaUploadedFile.class, new Long(submissionId));
-	    }
+    static Logger logger = Logger.getLogger(QaUploadedFileDAO.class.getName());
 
-	 	
-	 	
-	 	public void updateUploadFile(QaUploadedFile qaUploadedFile)
-	    {
-	 		this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().update(qaUploadedFile);
-	    }
-	 	
-	     
-	    public void saveUploadFile(QaUploadedFile qaUploadedFile) 
-	    {
-	    	this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().save(qaUploadedFile);
-	    }
-	    
-	    public void createUploadFile(QaUploadedFile qaUploadedFile) 
-	    {
-	    	this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().save(qaUploadedFile);
-	    }
-	    
-	    public void UpdateUploadFile(QaUploadedFile qaUploadedFile)
-	    {
-	    	this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().update(qaUploadedFile);	
-	    }
+    private static final String GET_UPLOADED_FILES = "from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContent.qaContentId = :contentId";
 
-	    
-	    public void cleanUploadedFilesMetaData()
-	    {
-	    	/*
-	    	String query = "from uploadedFile in class org.lamsfoundation.lams.tool.qa.QaUploadedFile";
-	    	this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().delete(query);
-	        */
-			HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(DELETE_FILES_META_DATA)
-				.list();
+    private static final String DELETE_FILES_META_DATA = "from qaUploadedFile in class QaUploadedFile";
 
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    		QaUploadedFile mcFile=(QaUploadedFile)listIterator.next();
-					this.getSession().setFlushMode(FlushMode.AUTO);
-		    		templ.delete(mcFile);
-		    		templ.flush();
-		    	}
-			}
+    public QaUploadedFile getUploadedFileById(long submissionId) {
+	return (QaUploadedFile) this.getHibernateTemplate().load(QaUploadedFile.class, new Long(submissionId));
+    }
+
+    /**
+     * 
+     * return null if not found
+     */
+    public QaUploadedFile loadUploadedFileById(long submissionId) {
+	return (QaUploadedFile) this.getHibernateTemplate().get(QaUploadedFile.class, new Long(submissionId));
+    }
+
+    public void updateUploadFile(QaUploadedFile qaUploadedFile) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().update(qaUploadedFile);
+    }
+
+    public void saveUploadFile(QaUploadedFile qaUploadedFile) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().save(qaUploadedFile);
+    }
+
+    public void createUploadFile(QaUploadedFile qaUploadedFile) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().save(qaUploadedFile);
+    }
+
+    public void UpdateUploadFile(QaUploadedFile qaUploadedFile) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().update(qaUploadedFile);
+    }
+
+    public void cleanUploadedFilesMetaData() {
+	/*
+	String query = "from uploadedFile in class org.lamsfoundation.lams.tool.qa.QaUploadedFile";
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(query);
+	*/
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(DELETE_FILES_META_DATA).list();
+
+	if (list != null && list.size() > 0) {
+	    Iterator listIterator = list.iterator();
+	    while (listIterator.hasNext()) {
+		QaUploadedFile mcFile = (QaUploadedFile) listIterator.next();
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		templ.delete(mcFile);
+		templ.flush();
 	    }
-	    
-	    public void removeUploadFile(Long submissionId)
-	    {
-	    	if (submissionId != null ) {
-	    		
-	    		String query = "from uploadedFile in class org.lamsfoundation.lams.tool.qa.QaUploadedFile"
-	            + " where uploadedFile.submissionId = ?";
-	    		Object obj = this.getSession().createQuery(query)
-					.setLong(0,submissionId.longValue())
-					.uniqueResult();
-	    		if ( obj != null ) { 
-	    			this.getSession().setFlushMode(FlushMode.AUTO);
-	    			this.getHibernateTemplate().delete(obj);
-	    		}
-	    	}
-    	}
-	    
-	    public List retrieveQaUploadedFiles(QaContent qa)
-	    {
-	      List listFilenames=null;
-	      	listFilenames=(getHibernateTemplate().findByNamedParam(GET_UPLOADED_FILES, "contentId", qa.getQaContentId()));	
-		  return listFilenames;	
+	}
+    }
+
+    public void removeUploadFile(Long submissionId) {
+	if (submissionId != null) {
+
+	    String query = "from uploadedFile in class org.lamsfoundation.lams.tool.qa.QaUploadedFile"
+		    + " where uploadedFile.submissionId = ?";
+	    Object obj = this.getSession().createQuery(query).setLong(0, submissionId.longValue()).uniqueResult();
+	    if (obj != null) {
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		this.getHibernateTemplate().delete(obj);
 	    }
-	    
-	    public void deleteUploadFile(QaUploadedFile qaUploadedFile)
-	    {
-	    		this.getSession().setFlushMode(FlushMode.AUTO);
-	            this.getHibernateTemplate().delete(qaUploadedFile);
-    	}
-	    
-	    public void flush()
-	    {
-	        this.getHibernateTemplate().flush();
-	    }
-	    
-} 
+	}
+    }
+
+    public List retrieveQaUploadedFiles(QaContent qa) {
+	List listFilenames = null;
+	listFilenames = (getHibernateTemplate().findByNamedParam(GET_UPLOADED_FILES, "contentId", qa.getQaContentId()));
+	return listFilenames;
+    }
+
+    public void deleteUploadFile(QaUploadedFile qaUploadedFile) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(qaUploadedFile);
+    }
+
+    public void flush() {
+	this.getHibernateTemplate().flush();
+    }
+
+}

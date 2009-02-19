@@ -35,138 +35,106 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
-
 /**
- * @author Ozgur Demirtas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Ozgur Demirtas fixed by lfoxton
+ * 
+ * TODO To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Style - Code Templates
  */
 
 public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
-	 	static Logger logger = Logger.getLogger(QaQueUsrDAO.class.getName());
-	 	
-	 private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSessionId= :qaSession";
-	 private static final String LOAD_USER_FOR_SESSION = "from qaQueUsr in class QaQueUsr where  qaQueUsr.qaSessionId= :qaSessionId";
-		
-	   public QaQueUsr getQaUserByUID(Long uid)
-	   {
-			 return (QaQueUsr) this.getHibernateTemplate()
-	         .get(QaQueUsr.class, uid);
-	   }
+    static Logger logger = Logger.getLogger(QaQueUsrDAO.class.getName());
 
-		
-		public int countSessionUser(QaSession qaSession)
-	    {
-		   return (getHibernateTemplate().findByNamedParam(COUNT_SESSION_USER,
-	            "qaSession",
-				qaSession)).size();
+    private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSessionId= :qaSession";
+    private static final String LOAD_USER_FOR_SESSION = "from qaQueUsr in class QaQueUsr where  qaQueUsr.qaSessionId= :qaSessionId";
+
+    public QaQueUsr getQaUserByUID(Long uid) {
+	return (QaQueUsr) this.getHibernateTemplate().get(QaQueUsr.class, uid);
+    }
+
+    public int countSessionUser(QaSession qaSession) {
+	return (getHibernateTemplate().findByNamedParam(COUNT_SESSION_USER, "qaSession", qaSession)).size();
+    }
+
+    public QaQueUsr getQaQueUsrById(long qaQueUsrId) {
+	String query = "from QaQueUsr user where user.queUsrId=?";
+
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(query).setLong(0, qaQueUsrId).list();
+
+	if (list != null && list.size() > 0) {
+	    QaQueUsr qu = (QaQueUsr) list.get(0);
+	    return qu;
+	}
+	return null;
+    }
+
+    public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId) {
+
+	String strGetUser = "from qaQueUsr in class QaQueUsr where qaQueUsr.queUsrId=:queUsrId and qaQueUsr.qaSessionId=:qaSessionId";
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(strGetUser).setLong("queUsrId", queUsrId.longValue()).setLong(
+		"qaSessionId", qaSessionId.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    QaQueUsr usr = (QaQueUsr) list.get(0);
+	    return usr;
+	}
+	return null;
+    }
+
+    public List getUserBySessionOnly(final QaSession qaSession) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_USER_FOR_SESSION).setLong("qaSessionId",
+		qaSession.getUid().longValue()).list();
+	return list;
+    }
+
+    public QaQueUsr loadQaQueUsrById(long qaQueUsrId) {
+	return getQaQueUsrById(qaQueUsrId);
+    }
+
+    public void createUsr(QaQueUsr usr) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().save(usr);
+    }
+
+    public void updateUsr(QaQueUsr usr) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().update(usr);
+    }
+
+    public void deleteQaQueUsr(QaQueUsr qaQueUsr) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(qaQueUsr);
+    }
+
+    public int getTotalNumberOfUsers() {
+	String query = "from obj in class QaQueUsr";
+	return this.getHibernateTemplate().find(query).size();
+    }
+
+    public int getTotalNumberOfUsers(QaContent qa) {
+	String strGetUser = "from qaQueUsr in class QaQueUsr";
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(strGetUser).list();
+	logger.debug("strGetUser: " + strGetUser);
+	logger.debug("qa: " + qa);
+	logger.debug("list: " + list);
+
+	int totalUserCount = 0;
+	if (list != null && list.size() > 0) {
+	    QaQueUsr usr = (QaQueUsr) list.get(0);
+	    logger.debug("usr: " + usr);
+	    logger.debug("local usr content uid versus incoming content uid: "
+		    + usr.getQaSession().getQaContent().getUid().intValue() + " versus " + qa.getUid().intValue());
+
+	    if (usr.getQaSession().getQaContent().getUid().intValue() == qa.getUid().intValue()) {
+		++totalUserCount;
 	    }
-	 	
+	}
+	logger.debug("final totalUserCount: " + totalUserCount);
+	return totalUserCount;
+    }
 
-		public QaQueUsr getQaQueUsrById(long qaQueUsrId)
-		{
-			String query = "from QaQueUsr user where user.queUsrId=?";
-			
-				HibernateTemplate templ = this.getHibernateTemplate();
-				List list = getSession().createQuery(query)
-				.setLong(0,qaQueUsrId)
-				.list();
-				
-				if(list != null && list.size() > 0){
-					QaQueUsr qu = (QaQueUsr) list.get(0);
-					return qu;
-				}
-				return null;
-		}
-
-
-		public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId)
-		{
-			
-			String strGetUser = "from qaQueUsr in class QaQueUsr where qaQueUsr.queUsrId=:queUsrId and qaQueUsr.qaSessionId=:qaSessionId";
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(strGetUser)
-				.setLong("queUsrId", queUsrId.longValue())
-				.setLong("qaSessionId", qaSessionId.longValue())				
-				.list();
-			
-			if(list != null && list.size() > 0){
-				QaQueUsr usr = (QaQueUsr) list.get(0);
-				return usr;
-			}
-			return null;
-		}
-
-		
-		
-		
-		public List getUserBySessionOnly(final QaSession qaSession)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-	        List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
-			.setLong("qaSessionId", qaSession.getUid().longValue())				
-			.list();
-			return list;
-	    }
-		
-		
-		public QaQueUsr loadQaQueUsrById(long qaQueUsrId)
-	 	{
-	 		return getQaQueUsrById(qaQueUsrId);
-	 	}
-
-		
-	 	public void createUsr(QaQueUsr usr) 
-	    {
-	 		this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().save(usr);
-	    }
-	 	
-	 	public void updateUsr(QaQueUsr usr) 
-	    {
-	 		this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().update(usr);
-	    }
-
-	 	
-	 	public void deleteQaQueUsr(QaQueUsr qaQueUsr) 
-	    {
-	 		this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().delete(qaQueUsr);
-	    }
-	 	
-	    public int getTotalNumberOfUsers() {
-			String query="from obj in class QaQueUsr"; 
-			return this.getHibernateTemplate().find(query).size();
-		}
-	    
-	    
-	    public int getTotalNumberOfUsers(QaContent qa)
-	    {
-			String strGetUser = "from qaQueUsr in class QaQueUsr";
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(strGetUser)
-				.list();
-			logger.debug("strGetUser: " + strGetUser);
-			logger.debug("qa: " + qa);
-			logger.debug("list: " + list);
-			
-			int totalUserCount=0;
-			if(list != null && list.size() > 0){
-				QaQueUsr usr = (QaQueUsr) list.get(0);
-				logger.debug("usr: " + usr);
-				logger.debug("local usr content uid versus incoming content uid: " + 
-				        usr.getQaSession().getQaContent().getUid().intValue() + " versus " + qa.getUid().intValue());
-				
-				if (usr.getQaSession().getQaContent().getUid().intValue() == qa.getUid().intValue())
-				{
-				    ++totalUserCount;
-				}
-			}
-			logger.debug("final totalUserCount: " + totalUserCount);
-	        return totalUserCount;
-	    }
-	    
-} 
+}
