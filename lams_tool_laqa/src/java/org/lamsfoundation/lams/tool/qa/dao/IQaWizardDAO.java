@@ -18,23 +18,26 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.tool.qa.dao; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.qa.dao;
 
 import java.util.SortedSet;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
-import org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill;
-import org.lamsfoundation.lams.tool.qa.QaWizardQuestion;
-public interface IQaWizardDAO extends IBaseDAO{
+
+public interface IQaWizardDAO extends IBaseDAO {
     void saveOrUpdateCategories(SortedSet<QaWizardCategory> categories);
+
     SortedSet<QaWizardCategory> getWizardCategories();
+
     void deleteWizardCategoryByUID(Long uid);
+
     void deleteWizardSkillByUID(Long uid);
+
     void deleteWizardQuestionByUID(Long uid);
+
     void deleteAllWizardCategories();
 }
- 

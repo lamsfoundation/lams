@@ -27,31 +27,27 @@ import java.util.List;
 
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
-
 /**
  * 
  * @author Ozgur Demirtas
  * 
  */
-public interface IQaUsrRespDAO
-{
-	public void saveUserResponse(QaUsrResp resp);
-	
-	public QaUsrResp getAttemptByUID(Long uid);
+public interface IQaUsrRespDAO {
+    public void saveUserResponse(QaUsrResp resp);
 
-	public void updateUserResponse(QaUsrResp resp);
-	
-	public void createUserResponse(QaUsrResp resp);
-	
-	public void removeUserResponse(QaUsrResp resp);
-	
-	public void removeUserResponseByQaQueId(Long qaQueId);
-	
-	public QaUsrResp retrieveQaUsrResp(long responseId);
-	
-	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
-	
-	public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
+    public QaUsrResp getAttemptByUID(Long uid);
+
+    public void updateUserResponse(QaUsrResp resp);
+
+    public void createUserResponse(QaUsrResp resp);
+
+    public void removeUserResponse(QaUsrResp resp);
+
+    public void removeUserResponseByQaQueId(Long qaQueId);
+
+    public QaUsrResp retrieveQaUsrResp(long responseId);
+
+    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
+
+    public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
 }
-
-
