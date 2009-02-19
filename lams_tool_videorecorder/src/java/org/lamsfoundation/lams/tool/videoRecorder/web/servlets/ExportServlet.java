@@ -33,6 +33,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -48,22 +50,20 @@ import org.lamsfoundation.lams.learning.export.web.action.CustomToolImageBundler
 import org.lamsfoundation.lams.learning.export.web.action.MultipleDirFileBundler;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
-import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderSessionDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderUserDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRecording;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.service.IVideoRecorderService;
 import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderServiceProxy;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderException;
+import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderRecordingComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.ExternalServerUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -77,7 +77,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	private final String FILENAME = "videoRecorder_main.html";
 	public static final String VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "tool/lavidr10/includes/flash/";
 	public static final String VIDEORECORDER_RECORDINGS_HTTP_FOLDER_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "tool/lavidr10/recordings/";
-	public static final String VIDEORECORDER_RECORDINGS_FOLDER_URL = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + "/" + "lams-tool-lavidr10.war" + "/" + "recordings" + "/";
+	public static final String VIDEORECORDER_RECORDINGS_FOLDER_DEST = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + "/" + "lams-tool-lavidr10.war" + "/" + "recordings" + "/";
+	public static final String VIDEORECORDER_RECORDINGS_FOLDER_SRC = Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL);
 
 	private IVideoRecorderService videoRecorderService;
 
@@ -88,7 +89,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			videoRecorderService = VideoRecorderServiceProxy
 					.getVideoRecorderService(getServletContext());
 		}
-
+		
+		toolSessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
+		
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
 				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
@@ -147,67 +150,198 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error(error);
 			throw new VideoRecorderException(error);
 		}
-
+		
+		// get the session from the toolSessionId
 		VideoRecorderSession videoRecorderSession = videoRecorderService
 				.getSessionBySessionId(toolSessionID);
 
+		// get the video recorder from the session		
 		VideoRecorder videoRecorder = videoRecorderSession.getVideoRecorder();
+		
+		// get toolContentId from video recorder
+		toolContentID = videoRecorder.getToolContentId();
+		
+		/*
+		// get videorecorder from toolContentId
+		VideoRecorder videoRecorder = videoRecorderService.getVideoRecorderByContentId(toolContentID);
+		*/
+		
+		// get export options
+		boolean exportAll = videoRecorder.isExportAll();
+		boolean exportOffline = videoRecorder.isExportOffline();
+				
+		// transform to dto
 		VideoRecorderDTO videoRecorderDTO = new VideoRecorderDTO(videoRecorder);
 
+		// get lams user from session
 		UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession()
 				.getAttribute(AttributeNames.USER);
 
+		// get video recorder user from userId and sessionId
 		VideoRecorderUser videoRecorderUser = videoRecorderService
 				.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),
 						toolSessionID);
 		
+		// transform to dto
 		VideoRecorderUserDTO videoRecorderUserDTO = new VideoRecorderUserDTO(videoRecorderUser);
-
-		List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionIdAndUserId(toolSessionID, videoRecorderUser.getUid());
 		
+		// get the video recording dtos
+		List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs;
+		
+		// get video recording dtos
+		if(exportAll)
+		{
+			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionId(toolSessionID, toolContentID);
+		}else{
+			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionIdAndUserId(toolSessionID, videoRecorderUser.getUid(), toolContentID);
+		}
+		
+		// sort the list of recording dtos in order to create the xml correctly
+		Comparator<VideoRecorderRecordingDTO> comp = new VideoRecorderRecordingComparator("author", "ascending");
+	    Collections.sort(videoRecorderRecordingDTOs, comp);
+	    
+	    // get the nb of recordings
 		int nbRecordings = videoRecorderRecordingDTOs.size();
 		
+		// set dtos to request (used in export jsp)
 		request.getSession().setAttribute("videoRecorderDTO", videoRecorderDTO);
 		request.getSession().setAttribute("videoRecorderUserDTO", videoRecorderUserDTO);
 		request.getSession().setAttribute("videoRecorderRecordingDTOs", videoRecorderRecordingDTOs);
 		
-		// set language xml
+		// set language xml to request
 		request.getSession().setAttribute("languageXML", videoRecorderService.getLanguageXMLForFCK());
 		
-		// set red5 server url
+		// set red5 server url to request
 		String red5ServerUrl = Configuration.get(ConfigurationKeys.RED5_SERVER_URL);
 		request.getSession().setAttribute("red5ServerUrl", red5ServerUrl);
 		
-		// set LAMS server url
+		// set LAMS server url to request
 		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 		request.getSession().setAttribute("serverUrl", serverUrl);
 		
-		ArrayList<String>[] fileArray = new ArrayList[2];
-		fileArray[0] = new ArrayList<String>();
-		fileArray[1] = new ArrayList<String>();
+		// if doing export offline, copy recordings files
+		if(exportOffline){
+			bundleFilesForOffline(request, response, directoryName, cookies, videoRecorderRecordingDTOs);
+		}
+		// otherwise, just copy files (like js)
+		else{
+			bundleFilesForOnline(request, response, directoryName, cookies, videoRecorderRecordingDTOs);
+		}
+	}
 
+	private void doTeacherExport(HttpServletRequest request,
+			HttpServletResponse response, String directoryName, Cookie[] cookies)
+			throws VideoRecorderException {
+
+		logger.debug("doExportTeacher: toolContentID:" + toolContentID);
+
+		// check if toolContentID available
+		if (toolContentID == null) {
+			String error = "Tool Content ID is missing. Unable to continue";
+			logger.error(error);
+			throw new VideoRecorderException(error);
+		}
+		
+		// get video recorder from tool content id
+		VideoRecorder videoRecorder = videoRecorderService.getVideoRecorderByContentId(toolContentID);
+		
+		// make into dto
+		VideoRecorderDTO videoRecorderDTO = new VideoRecorderDTO(videoRecorder);
+		
+		// get export options
+		boolean exportAll = videoRecorder.isExportAll();
+		boolean exportOffline = videoRecorder.isExportOffline();
+				
+		// get lams user from session
+		UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession()
+				.getAttribute(AttributeNames.USER);
+		
+		// get video recording dtos from just tool content id
+		List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionId(new Long(0), toolContentID);
+		
+		// get nb of recordings
+		int nbRecordings = videoRecorderRecordingDTOs.size();
+		
+		// add dtos to request
+		request.getSession().setAttribute("videoRecorderDTO", videoRecorderDTO);
+		request.getSession().setAttribute("videoRecorderRecordingDTOs", videoRecorderRecordingDTOs);
+		
+		// set language xml to request
+		request.getSession().setAttribute("languageXML", videoRecorderService.getLanguageXMLForFCK());
+		
+		// set red5 server url to request
+		String red5ServerUrl = Configuration.get(ConfigurationKeys.RED5_SERVER_URL);
+		request.getSession().setAttribute("red5ServerUrl", red5ServerUrl);
+		
+		// set LAMS server url to request
+		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+		request.getSession().setAttribute("serverUrl", serverUrl);
+		
+		// if doing export offline, copy recordings files
+		if(exportOffline){
+			bundleFilesForOffline(request, response, directoryName, cookies, videoRecorderRecordingDTOs);
+		}
+		// otherwise, just copy files (like js)
+		else{
+			bundleFilesForOnline(request, response, directoryName, cookies, videoRecorderRecordingDTOs);
+		}
+	}
+	
+	private void bundleFilesForOnline(HttpServletRequest request,
+			HttpServletResponse response, String directoryName, Cookie[] cookies,
+			List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs){
+		// prepare the file array
+		// index 0 is for the files from VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL
+		ArrayList<String>[] fileArray = new ArrayList[1];
+		fileArray[0] = new ArrayList<String>();
+
+		// add the files need from VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL
 		fileArray[0].add("VideoRecorderFCKEditor.swf");
 		fileArray[0].add("playerProductInstall.swf");
 		fileArray[0].add("AC_OETags.js");
 		
+		// bundling files
 		try {
+			String[] urls = new String[1];
+			urls[0] = VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL;
+			
+			MultipleDirFileBundler fileBundler = new MultipleDirFileBundler();
+		    fileBundler.bundle(request, cookies, directoryName, urls, fileArray);
+		} catch (Exception e) {
+			logger.error("Could not bundle files", e);
+		}
+	}
+	
+	private void bundleFilesForOffline(HttpServletRequest request,
+			HttpServletResponse response, String directoryName, Cookie[] cookies,
+			List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs){
+		// prepare the file array
+		// index 0 is for the files from VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL
+		// index 1 is for the files from VIDEORECORDER_RECORDINGS_HTTP_FOLDER_URL
+		ArrayList<String>[] fileArray = new ArrayList[2];
+		fileArray[0] = new ArrayList<String>();
+		fileArray[1] = new ArrayList<String>();
+
+		// add the files need from VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL
+		fileArray[0].add("VideoRecorderFCKEditor.swf");
+		fileArray[0].add("playerProductInstall.swf");
+		fileArray[0].add("AC_OETags.js");
+		
+		// add the files from VIDEORECORDER_RECORDINGS_HTTP_FOLDER_URL
+		try {
+			// for each video recording
 			Iterator<VideoRecorderRecordingDTO> iter = videoRecorderRecordingDTOs.iterator();
 			while(iter.hasNext()){
+				// get the video recording
 				VideoRecorderRecordingDTO vr = (VideoRecorderRecordingDTO) iter.next();
-			    InputStream is = getResponseInputStreamFromExternalServer("http://172.20.100.22:8080/streams/" + vr.getFilename(), new HashMap<String, String>());
-	
-			    File imageFile = new File(VIDEORECORDER_RECORDINGS_FOLDER_URL + vr.getFilename());
+				
+				// get the stream from the external server
+			    InputStream is = ExternalServerUtil.getResponseInputStreamFromExternalServer(VIDEORECORDER_RECORDINGS_FOLDER_SRC + vr.getFilename(), new HashMap<String, String>());
 			    
-			    FileOutputStream out = new FileOutputStream(imageFile);
-
-			    byte[] buf = new byte[10 * 1024];
-			    int len;
-			    while ((len = is.read(buf)) > 0) {
-			    	out.write(buf, 0, len);
-			    }
+			    // write the flv file locally
+			    File file = ExternalServerUtil.writeFile(is, VIDEORECORDER_RECORDINGS_FOLDER_DEST + vr.getFilename());
 			    
-			    out.close();
-			    
+			    // add the filename to the list
 			    fileArray[1].add(vr.getFilename());
 			}
 		} catch (Exception e) {
@@ -225,134 +359,5 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		} catch (Exception e) {
 			logger.error("Could not bundle files", e);
 		}
-	}
-
-	private void doTeacherExport(HttpServletRequest request,
-			HttpServletResponse response, String directoryName, Cookie[] cookies)
-			throws VideoRecorderException {
-
-		logger.debug("doExportTeacher: toolContentID:" + toolContentID);
-
-		// check if toolContentID available
-		if (toolSessionID == null) {
-			String error = "Tool Session ID is missing. Unable to continue";
-			logger.error(error);
-			throw new VideoRecorderException(error);
-		}
-
-		VideoRecorderSession videoRecorderSession = videoRecorderService
-				.getSessionBySessionId(toolSessionID);
-
-		VideoRecorder videoRecorder = videoRecorderSession.getVideoRecorder();
-		VideoRecorderDTO videoRecorderDTO = new VideoRecorderDTO(videoRecorder);
-		
-		UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession()
-				.getAttribute(AttributeNames.USER);
-
-		VideoRecorderUser videoRecorderUser = videoRecorderService
-				.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),
-						toolSessionID);
-		
-		VideoRecorderUserDTO videoRecorderUserDTO = new VideoRecorderUserDTO(videoRecorderUser);
-
-		List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionId(toolSessionID);
-		
-		int nbRecordings = videoRecorderRecordingDTOs.size();
-		
-		request.getSession().setAttribute("videoRecorderDTO", videoRecorderDTO);
-		request.getSession().setAttribute("videoRecorderUserDTO", videoRecorderUserDTO);
-		request.getSession().setAttribute("videoRecorderRecordingDTOs", videoRecorderRecordingDTOs);
-		
-		// set language xml
-		request.getSession().setAttribute("languageXML", videoRecorderService.getLanguageXMLForFCK());
-		
-		// set red5 server url
-		String red5ServerUrl = Configuration.get(ConfigurationKeys.RED5_SERVER_URL);
-		request.getSession().setAttribute("red5ServerUrl", red5ServerUrl);
-		
-		// set LAMS server url
-		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-		request.getSession().setAttribute("serverUrl", serverUrl);
-		
-		ArrayList<String>[] fileArray = new ArrayList[2];
-
-		fileArray[0].add("VideoRecorderFCKEditor.swf");
-		fileArray[0].add("playerProductInstall.swf");
-		fileArray[0].add("AC_OETags.js");
-		
-		try {
-			int counter = 3;
-			int listSize = videoRecorderRecordingDTOs.size();
-			Iterator<VideoRecorderRecordingDTO> iter = videoRecorderRecordingDTOs.iterator();
-			while(iter.hasNext()){
-				VideoRecorderRecordingDTO vr = (VideoRecorderRecordingDTO) iter.next();
-			    InputStream is = getResponseInputStreamFromExternalServer("http://172.20.100.22:8080/streams/" + vr.getFilename(), new HashMap<String, String>());
-	
-			    File imageFile = new File(VIDEORECORDER_RECORDINGS_FOLDER_URL + vr.getFilename());
-			    
-			    FileOutputStream out = new FileOutputStream(imageFile);
-
-			    byte[] buf = new byte[10 * 1024];
-			    int len;
-			    while ((len = is.read(buf)) > 0) {
-			    	out.write(buf, 0, len);
-			    }
-			    
-			    out.close();
-			    
-			    fileArray[1].add(vr.getFilename());
-			    
-			    counter++;
-			}
-		} catch (Exception e) {
-			logger.error("Could not find files on Red5 server", e);
-		}
-
-		// bundling files
-		try {
-			String[] urls = new String[2];
-			urls[0] = VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL;
-			urls[1] = VIDEORECORDER_RECORDINGS_FOLDER_URL;
-			
-			MultipleDirFileBundler fileBundler = new MultipleDirFileBundler();
-		    fileBundler.bundle(request, cookies, directoryName, urls, fileArray);
-		} catch (Exception e) {
-			logger.error("Could not bundle files", e);
-		}
-	}
-
-    public static InputStream getResponseInputStreamFromExternalServer(String urlStr, HashMap<String, String> params)
-    throws ToolException, IOException {
-		if (!urlStr.endsWith("?"))
-		    urlStr += "?";
-		
-		for (Entry<String, String> entry : params.entrySet()) {
-		    urlStr += "&" + entry.getKey() + "=" + entry.getValue();
-		}
-		
-		logger.debug("Making request to external servlet: " + urlStr);
-		
-		URL url = new URL(urlStr);
-		URLConnection conn = url.openConnection();
-		if (!(conn instanceof HttpURLConnection)) {
-		    logger.error("Fail to connect to external server though url:  " + urlStr);
-		    throw new ToolException("Fail to connect to external server though url:  " + urlStr);
-		}
-		
-		HttpURLConnection httpConn = (HttpURLConnection) conn;
-		if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-		    logger.error("Fail to fetch data from external server, response code:  " + httpConn.getResponseCode()
-			    + " Url: " + urlStr);
-		    throw new ToolException("Fail to fetch data from external server, response code:  "
-			    + httpConn.getResponseCode() + " Url: " + urlStr);
-		}
-		
-		InputStream is = url.openConnection().getInputStream();
-		if (is == null) {
-		    logger.error("Fail to fetch data from external server, return InputStream null:  " + urlStr);
-		    throw new ToolException("Fail to fetch data from external server, return inputStream null:  " + urlStr);
-		}
-		
-		return is;
 	}
 }

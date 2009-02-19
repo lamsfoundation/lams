@@ -71,14 +71,16 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     private boolean allowUseVoice;
     
     private boolean allowUseCamera;
-    
-    private boolean allowLearnerVideoExport;
-    
+        
     private boolean allowLearnerVideoVisibility;
     
     private boolean allowComments;
     
     private boolean allowRatings;
+    
+    private boolean exportOffline;
+    
+    private boolean exportAll;
     
     private String onlineInstructions;
 
@@ -110,7 +112,8 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
 	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
 	    boolean allowUseVoice, boolean allowUseCamera, boolean allowLearnerVideoExport, boolean allowLearnerVideoVisibility,
-	    Long toolContentId, Set videoRecorderAttachments, Set videoRecorderSessions) {
+	    Long toolContentId, Set videoRecorderAttachments, Set videoRecorderSessions, boolean exportAll,
+	    boolean exportOffline) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
@@ -127,8 +130,9 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	this.videoRecorderSessions = videoRecorderSessions;
 	this.allowUseVoice = allowUseVoice;
 	this.allowUseCamera = allowUseCamera;
-	this.allowLearnerVideoExport = allowLearnerVideoExport;
 	this.allowLearnerVideoVisibility = allowLearnerVideoVisibility;
+	this.exportOffline = exportOffline;
+	this.exportAll = exportAll;
     }
 
     // Property accessors
@@ -273,18 +277,6 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     }    
 
     /**
-     * @hibernate.property column="allow_learner_video_export" length="1"
-     * @return
-     */
-    public boolean isAllowLearnerVideoExport() {
-	return allowLearnerVideoExport;
-    }
-
-    public void setAllowLearnerVideoExport(boolean allowLearnerVideoExport) {
-	this.allowLearnerVideoExport = allowLearnerVideoExport;
-    }  
-
-    /**
      * @hibernate.property column="allow_comments" length="1"
      * @return
      */
@@ -306,6 +298,30 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setAllowRatings(boolean allowRatings) {
 	this.allowRatings = allowRatings;
+    }  
+
+    /**
+     * @hibernate.property column="export_offline" length="1"
+     * @return
+     */
+    public boolean isExportOffline() {
+	return exportOffline;
+    }
+
+    public void setExportOffline(boolean exportOffline) {
+	this.exportOffline = exportOffline;
+    }  
+    
+    /**
+     * @hibernate.property column="export_all" length="1"
+     * @return
+     */
+    public boolean isExportAll() {
+	return exportAll;
+    }
+
+    public void setExportAll(boolean exportAll) {
+	this.exportAll = exportAll;
     }  
     
     /**
@@ -434,7 +450,6 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	buffer.append("allowUseVoice").append("='").append(isAllowUseVoice()).append("' ");
 	buffer.append("allowUseCamera").append("='").append(isAllowUseCamera()).append("' ");
 	buffer.append("allowLearnerVideoVisibility").append("='").append(isAllowLearnerVideoVisibility()).append("' ");
-	buffer.append("allowLearnerVideoExport").append("='").append(isAllowLearnerVideoExport()).append("' ");
 	buffer.append("]");
 
 	return buffer.toString();

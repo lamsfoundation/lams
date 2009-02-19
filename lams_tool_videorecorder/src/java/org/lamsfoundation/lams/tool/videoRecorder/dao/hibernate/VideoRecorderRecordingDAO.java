@@ -43,6 +43,9 @@ public class VideoRecorderRecordingDAO extends BaseDAO implements IVideoRecorder
 	private static final String SQL_QUERY_BY_SESSION_ID = "from " + VideoRecorderRecording.class.getName() + " as vrr "
 	+ "where vrr.videoRecorderSession.sessionId=?";
 	
+	private static final String SQL_QUERY_BY_TOOL_CONTENT_ID = "from " + VideoRecorderRecording.class.getName() + " as vrr "
+	+ "where vrr.toolContentId=?";
+	
 	private static final String SQL_QUERY_BY_SESSION_ID_AND_USER_ID = "from " + VideoRecorderRecording.class.getName() + " as vrr "
 	+ "where vrr.videoRecorderSession.sessionId=? and vrr.createBy=?";
 	
@@ -65,6 +68,10 @@ public class VideoRecorderRecordingDAO extends BaseDAO implements IVideoRecorder
 		return (List<VideoRecorderRecording>)(this.getHibernateTemplate().find(SQL_QUERY_BY_SESSION_ID_AND_USER_ID, new Object[] {toolSessionId, userId}));
 	}
 
+	public List<VideoRecorderRecording> getByToolContentId(Long toolContentId){
+		return (List<VideoRecorderRecording>)(this.getHibernateTemplate().find(SQL_QUERY_BY_TOOL_CONTENT_ID, toolContentId));
+	}
+	
     public void saveOrUpdate(VideoRecorderRecording videoRecorderRecording) {
 		this.getHibernateTemplate().saveOrUpdate(videoRecorderRecording);
 		this.getHibernateTemplate().flush();

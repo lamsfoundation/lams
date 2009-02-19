@@ -101,14 +101,14 @@
 			AC_FL_RunContent(
 				"src", "./includes/flash/playerProductInstall",
 				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
-				"width", "680",
+				"width", "100%",
 				"height", "676",
 				"align", "middle",
 				"id", "VideoRecorder",
 				"quality", "high",
 				"bgcolor", "#ffffff",
 				"name", "VideoRecorder",
-				"allowScriptAccess","sameDomain",
+				"allowScriptAccess","always",
 				"type", "application/x-shockwave-flash",
 				"pluginspage", "http://www.adobe.com/go/getflashplayer"
 			);
@@ -117,15 +117,15 @@
 			// embed the Flash Content SWF when all tests are passed
 			AC_FL_RunContent(
 					"src", "./includes/flash/VideoRecorder",
-					"FlashVars", "contentEditable"+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&mode='+'${mode}'+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowLearnerVideoExport='+${videoRecorderDTO.allowLearnerVideoExport}+'&allowComments='+${videoRecorderDTO.allowComments}+'&allowRatings='+${videoRecorderDTO.allowRatings}+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&languageXML='+"${languageXML}"+"",
-					"width", "680",
+					"FlashVars", "contentEditable"+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&toolContentId='+${toolContentId}+'&mode='+'${mode}'+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowComments='+${videoRecorderDTO.allowComments}+'&allowRatings='+${videoRecorderDTO.allowRatings}+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&languageXML='+"${languageXML}"+"",
+					"width", "100%",
 					"height", "676",
 					"align", "middle",
 					"id", "VideoRecorder",
 					"quality", "high",
 					"bgcolor", "#ffffff",
 					"name", "VideoRecorder",
-					"allowScriptAccess","sameDomain",
+					"allowScriptAccess","always",
 					"type", "application/x-shockwave-flash",
 					"pluginspage", "http://www.adobe.com/go/getflashplayer"
 			);
@@ -139,7 +139,7 @@
 		</script>
 		<noscript>
 		  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-					id="VideoRecorder" width="680" height="676"
+					id="VideoRecorder" width="100%" height="676"
 					codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
 					<param name="movie" value="/includes/flash/VideoRecorder.swf" />
 					<param name="quality" value="high" />
@@ -150,11 +150,32 @@
 						play="true"
 						loop="false"
 						quality="high"
-						allowScriptAccess="sameDomain"
+						allowScriptAccess="always"
 						type="application/x-shockwave-flash"
 						pluginspage="http://www.adobe.com/go/getflashplayer">
 					</embed>
 			</object>
 		</noscript>
 	</div>
+	
+	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="learningForm">
+		<html:hidden property="dispatch" styleId = "dispatch" value="finishActivity" />
+		<html:hidden property="toolSessionID" styleId="toolSessionID"/>
+		<html:hidden property="mode" value="${mode}" />	
+		<div class="space-bottom-top align-right">
+			<c:choose>
+				<c:when test="${!videoRecorderUserDTO.finishedActivity}">
+					<html:submit styleClass="button" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity';">
+						<fmt:message key="button.continue" />
+					</html:submit>
+				</c:when>
+					<c:otherwise>
+					<html:hidden property="dispatch" value="finishActivity" />
+					<html:submit styleClass="button" styleId="finishButton" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity';">
+						<fmt:message key="button.finish" />
+					</html:submit>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</html:form>
 </div>

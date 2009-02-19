@@ -35,14 +35,6 @@
 </p>
 
 <p>
-	<html:checkbox property="allowLearnerVideoExport" value="1"
-		styleClass="noBorder" styleId="allowLearnerVideoExport"></html:checkbox>
-	<label for="allowLearnerVideoExport">
-		<fmt:message key="advanced.allowLearnerVideoExport" />
-	</label>
-</p>
-
-<p>
 	<html:checkbox property="allowComments" value="1"
 		styleClass="noBorder" styleId="allowComments"></html:checkbox>
 	<label for="allowComments">
@@ -55,5 +47,21 @@
 		styleClass="noBorder" styleId="allowRatings"></html:checkbox>
 	<label for="allowRatings">
 		<fmt:message key="advanced.allowRatings" />
+	</label>
+</p>
+
+<p>
+	<html:checkbox property="exportOffline" value="1"
+		styleClass="noBorder" styleId="exportOffline"></html:checkbox>
+	<label for="exportOffline">
+		<fmt:message key="advanced.exportOffline" />
+	</label>
+</p>
+
+<p>
+	<html:checkbox property="exportAll" value="1"
+		styleClass="noBorder" styleId="exportAll"></html:checkbox>
+	<label for="exportAll">
+		<fmt:message key="advanced.exportAll" />
 	</label>
 </p>

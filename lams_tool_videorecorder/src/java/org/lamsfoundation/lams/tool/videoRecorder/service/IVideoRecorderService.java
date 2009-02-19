@@ -206,18 +206,34 @@ public interface IVideoRecorderService {
     /**
      * 
      * @param toolSessionId
+     * @param toolContentId
      * @return
      */
-    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionId(Long toolSessionId);
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionId(Long toolSessionId, Long toolContentId);
     
     /**
      * 
      * @param toolSessionId
-     * @paramuserId
+     * @param userId
+     * @param toolContentId
      * @return
      */
-    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserId(Long toolSessionId, Long userId);
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserId(Long toolSessionId, Long userId, Long toolContentId);
 
+    /**
+     * 
+     * @param toolContentId
+     * @return
+     */
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolContentId(Long toolContentId);
+    
+    /**
+     * 
+     * @param toolContentId
+     * @return
+     */
+    public VideoRecorderRecording getFirstRecordingByToolContentId(Long toolContentId);
+    
     /**
      * 
      * @param videoRecorderRecording
@@ -274,4 +290,6 @@ public interface IVideoRecorderService {
     public String getLanguageXML();
     
     public String getLanguageXMLForFCK();
+    
+    public String getMessage(String key);
 }

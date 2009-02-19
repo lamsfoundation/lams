@@ -79,7 +79,7 @@ public class LearningAction extends LamsDispatchAction {
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
+				
 		LearningForm learningForm = (LearningForm) form;
 
 		// 'toolSessionID' and 'mode' paramters are expected to be present.
@@ -107,6 +107,8 @@ public class LearningAction extends LamsDispatchAction {
 
 		VideoRecorder videoRecorder = videoRecorderSession.getVideoRecorder();
 
+		Long toolContentID = videoRecorder.getToolContentId();
+
 		// check defineLater
 		if (videoRecorder.isDefineLater()) {
 			return mapping.findForward("defineLater");
@@ -122,12 +124,16 @@ public class LearningAction extends LamsDispatchAction {
 		
 		VideoRecorderDTO videoRecorderDT0 = new VideoRecorderDTO(videoRecorder);
 		
+		VideoRecorderUserDTO videoRecorderUserDTO = new VideoRecorderUserDTO(videoRecorderUser);
+		
 		// set mode, toolSessionID and userId
 		request.setAttribute("mode", mode.toString());
+		request.setAttribute("videoRecorderUserDTO", videoRecorderUserDTO);
 		request.setAttribute("userId", videoRecorderUser.getUid());
 		request.setAttribute("videoRecorderDTO", videoRecorderDT0);
 		learningForm.setToolSessionID(toolSessionID);
 		request.setAttribute("toolSessionId", toolSessionID);
+		request.setAttribute("toolContentId", toolContentID);
 		
 		// set language xml
 		request.setAttribute("languageXML", videoRecorderService.getLanguageXML());

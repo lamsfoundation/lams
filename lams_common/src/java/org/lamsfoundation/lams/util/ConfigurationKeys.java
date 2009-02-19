@@ -244,6 +244,10 @@ public class ConfigurationKeys {
     public static String ADMIN_SCREEN_SIZE = "AdminScreenSize";
 
     public static String GMAP_KEY = "GmapKey";
+        
+    public static String RED5_SERVER_URL = "Red5ServerUrl";
+    
+    public static String RED5_RECORDINGS_URL = "Red5RecordingsUrl";
     
     public static String SMTP_AUTH_USER = "SMTPUser";
     

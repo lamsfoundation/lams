@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderSessionDTO;
 
 /**
  * 
@@ -79,6 +80,11 @@ public class VideoRecorderSession implements java.io.Serializable {
 		this.sessionName = sessionName;
 		this.videoRecorder = videoRecorder;
 		this.videoRecorderUsers = videoRecorderUsers;
+	}
+	
+	public VideoRecorderSession(VideoRecorderSessionDTO videoRecorderSessionDTO) {
+		this.sessionId = videoRecorderSessionDTO.getSessionID();
+		this.sessionName = videoRecorderSessionDTO.getSessionName();
 	}
 
 	// Property accessors

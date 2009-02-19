@@ -298,44 +298,41 @@
 			
 			// view camera helper method to start and stop actual viewing
 			public function viewCameraHelper():void {
-				// if camera is set
-				if(_cam){
-					// if camera is not being used
-					if(!isCameraViewed){
-						// reset video
-						reset();
+				// if camera is not being used
+				if(!isCameraViewed){
+					// reset video
+					reset();
+					
+					// if the item clicked is full video OR if showing a camera
+					if(_cam){
+						// attach the cam to the videoDisplay
+						video.attachCamera(_cam);
 						
-						// if the item clicked is full video OR if showing a camera
-						if(_cam && _mic){
-							// attach the cam to the videoDisplay
-							video.attachCamera(_cam);
-							
-							//change the view stack
-							selectedChild = recorderView;
-						}
-						// else if the item played is sound OR if we can only start sound
-						else if(_mic && !_cam){
-							//change the view stack
-							selectedChild = audioView;
-						}
-	
-						_isCameraViewed = true;
-						
-						// dispatch event
-						dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.STARTCAM));
+						//change the view stack
+						selectedChild = recorderView;
 					}
-					// if camera is being used
-					else {
-						// clear the videoDisplay
-						video.attachCamera(null);
-						_isCameraViewed = false;
-						
-						// change view
-						selectedChild = blackView;
-						
-						// dispatch event
-						dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.STOPCAM));
+					// else if the item played is sound OR if we can only start sound
+					else if(_mic && !_cam){
+						//change the view stack
+						selectedChild = audioView;
 					}
+
+					_isCameraViewed = true;
+					
+					// dispatch event
+					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.STARTCAM));
+				}
+				// if camera is being used
+				else {
+					// clear the videoDisplay
+					video.attachCamera(null);
+					_isCameraViewed = false;
+					
+					// change view
+					selectedChild = blackView;
+					
+					// dispatch event
+					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.STOPCAM));
 				}
 			}
 			

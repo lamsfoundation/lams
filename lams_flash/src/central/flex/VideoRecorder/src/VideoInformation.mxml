@@ -5,15 +5,11 @@
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionary;
 			import mx.core.Application;
 			
-			private var allowRatings:Boolean;
-			private var allowComments:Boolean;
-			private var dictionary:XMLDictionary;
+			public var allowRatings:Boolean;
+			public var allowComments:Boolean;
+			public var dictionary:XMLDictionary;
 			
-			public function init():void{
-				allowRatings = Application.application.getAllowRatings();
-				allowComments = Application.application.getAllowComments();
-				dictionary = Application.application.getDictionary();
-				
+			public function init():void{			
 				// enable/disable ratings
 				if(!allowRatings)
 					authorBox.removeChild(authorBox.getChildByName("ratingsBox"));
@@ -21,11 +17,23 @@
 				// enable/disable comments
 				if(!allowComments)
 					videoInformationBox.removeChild(videoInformationBox.getChildByName("commentsBox")); 
+					
+				enableVideoInformationButtons(false);
+				resetInformation();
 			}
 			
 			public function enableVideoInformationButtons(enabled:Boolean):void{
 				ratingButton.enabled = enabled;
 				addCommentButton.enabled = enabled;
+				
+				if(enabled){
+					addCommentButton.toolTip = dictionary.getLabel("videorecorder.tooltip.add.comment");
+					ratingButton.toolTip = dictionary.getLabel("videorecorder.tooltip.rate.recording");
+				}
+				else{
+					addCommentButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.add.comment", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+					ratingButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.rate.recording", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				}
 			}
 		
 			public function printComments(comments:XMLList):void{
@@ -54,7 +62,8 @@
 				ratingButton.value = 0;
 				ratingButton.votedValue = 0;
 				ratingButton.enabled = false;
-				addCommentButton.enabled = false;	
+				addCommentButton.enabled = false;
+				addCommentButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.add.comment", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
 			}
 	    ]]>
 	</mx:Script>

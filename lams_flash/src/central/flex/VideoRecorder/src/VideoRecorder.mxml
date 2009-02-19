@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="682" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]" xmlns:ns1="org.lamsfoundation.lams.common.ui.components.*" xmlns:controls="com.asfusion.controls.*" height="652" creationComplete="init()" enabled="true" xmlns:local="*" xmlns:ns2="org.lamsfoundation.lams.common.ui.components.*">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="100%" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]" xmlns:ns1="org.lamsfoundation.lams.common.ui.components.*" xmlns:controls="com.asfusion.controls.*" height="100%" applicationComplete="onApplicationComplete(event)"  preinitialize="onPreinitialize(event)" enabled="true" xmlns:local="*" xmlns:ns2="org.lamsfoundation.lams.common.ui.components.*">
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.common.util.ArgumentsToRendererFactory;
 			import org.lamsfoundation.lams.common.util.VideoDisplayUtil;
 			//includes
 			include "HTTPServices.as"
@@ -19,7 +20,7 @@
 			import com.asfusion.controls.Rating;
 			import com.asfusion.controls.ratingclasses.RatingEvent;
 			import mx.collections.ArrayCollection;
-			import mx.events.MetadataEvent;		
+			import mx.events.MetadataEvent;	
 			import mx.containers.TitleWindow;
 			import mx.rpc.events.FaultEvent;
 			import mx.controls.Alert;
@@ -36,6 +37,8 @@
 			private var client:Object;
 			private var cam:Camera = null;
 			private var mic:Microphone = null;
+			
+			// static strings
 			private static var red5App:String = "oflaDemo";
 			private static var servletLocation:String = "tool/lavidr10/videoRecorderActions.do";
 					
@@ -43,6 +46,7 @@
 			[Bindable] private var contentEditable:Boolean;
 			[Bindable] private var userId:int;
 			[Bindable] private var toolSessionId:int;
+			[Bindable] private var toolContentId:int;
 			[Bindable] private var allowUseVoice:Boolean;
 			[Bindable] private var allowUseCamera:Boolean;
 			[Bindable] private var allowLearnerVideoVisibility:Boolean;
@@ -56,17 +60,17 @@
 
 			// misc
 			private var filename:String = "";
-			private var itemClicked:Object = null;
+			[Bindable] private var itemClicked:Object = null;
 			private var ratingClicked:Rating;
-			private var dictionary:XMLDictionary;
+			[Bindable] private var dictionary:XMLDictionary;
 			[Bindable] private var videoRecordings:XMLList = null;
-			private var timer:Timer;
+			private var playTimer:Timer;
+			private var recTimer:Timer;
 			private var metadata:Object;
 			
 			// ui stuff
 			private var getDetailsPopUp:GetRecordingDetailsPopUp;
 			private var addCommentPopUp:AddCommentPopUp;
-			
 			private var previewImage:BitmapData;
 			
 			// constants
@@ -74,8 +78,8 @@
 			public const AUTHOR_MODE:String = "author";
 			public const LEARNER_MODE:String = "learner";
 							
-			// called from creationComplete
-			private function init():void {
+			// called from preinitialize
+			private function onPreinitialize(event:Event):void {
 				// get flashvars
 				getFlashVars();
 								
@@ -88,27 +92,16 @@
 					allowUseCamera = true;
 					allowUseVoice = true;	
 				}
-				
-				// init labels if languageXML is not empty
-				if(languageXML.toString() != ""){
-					dictionary = new XMLDictionary(languageXML);
-					setLabels();
-				}
-				else{
-					dictionary = new XMLDictionary(new XML(""));
-				}
-				
-				// add some listeners
-				addListeners();
-				
+								
 				// for testing purposes (when running in debug)
 				if(toolSessionId == 0){
 					contentEditable = true;
 					userId = 1;
-					toolSessionId = 1;
+					toolSessionId = 4;
+					toolContentId = 1;
 					allowUseVoice = true;
-					allowUseCamera = true;
-					allowComments = true;
+					allowUseCamera = false;
+					allowComments = false;
 					allowRatings = true;
 					allowLearnerVideoExport = false;
 					allowLearnerVideoVisibility = true;
@@ -122,6 +115,7 @@
 					"contentEditable: " + contentEditable +
 					"\nuserId: " + userId +
 					"\ntoolSessionId: " + toolSessionId +
+					"\ntoolContentId: " + toolContentId +
 					"\nallowUseVoice: " + allowUseVoice +
 					"\nallowUseCamera: " + allowUseCamera +
 					"\nallowLearnerVideoVisibility: " + allowLearnerVideoVisibility +
@@ -132,6 +126,22 @@
 					"\nserverUrl: " + serverUrl +
 					"\nmode: " + mode);
 				*/
+			}
+			
+			// called from applicationComplete
+			private function onApplicationComplete(event:Event):void {
+				// init labels if languageXML is not empty
+				if(languageXML.toString() != ""){
+					dictionary = new XMLDictionary(languageXML);
+					setLabels();
+					setTooltips();
+				}
+				else{
+					dictionary = new XMLDictionary(new XML(""));
+				}
+				
+				// add some listeners
+				addListeners();
 				
 				// add the app name to the red5 url to complete the url
 				red5ServerUrl += red5App;
@@ -164,10 +174,21 @@
 					videoList.setStyle("bottom", 10);
 					videoList.invalidateList();
 				}
+				else{
+					if(!isWebcamInfoSet())
+					{
+						Security.showSettings();
+						setWebcamInfo(true);
+					}
+				}
 				
 				// init components that need it
 				videoInformation.init();
-								
+				
+				// disable playback buttons and enable the video list
+				enablePlaybackButtons(false);
+				enableVideoList(true);
+				
 				// create the connection
 				createConnection();
 			}
@@ -179,6 +200,7 @@
 				contentEditable = LAMSStringUtil.stringToBool(Application.application.parameters.contentEditable);
 				userId = Application.application.parameters.userId;
 				toolSessionId = Application.application.parameters.toolSessionId;
+				toolContentId = Application.application.parameters.toolContentId;
 				allowUseVoice = LAMSStringUtil.stringToBool(Application.application.parameters.allowUseVoice);
 				allowUseCamera = LAMSStringUtil.stringToBool(Application.application.parameters.allowUseCamera);
 				allowLearnerVideoVisibility = LAMSStringUtil.stringToBool(Application.application.parameters.allowLearnerVideoVisibility);
@@ -189,9 +211,10 @@
 				mode = Application.application.parameters.mode;
 			}
 			
-			// sets labels
+			// sets initial labels
 			private function setLabels():void{
 				playButton.label = dictionary.getLabel("videorecorder.play");
+				refreshButton.label = dictionary.getLabel("videorecorder.refresh");
 				sortAuthorButton.label = dictionary.getLabel("videorecorder.author");
 				sortByLabel.text = dictionary.getLabelAndConcatenate("videorecorder.sort.by", [":"]);
 				sortDateButton.label = dictionary.getLabel("videorecorder.date");
@@ -203,9 +226,24 @@
 				videoInformation.ratingLabel.text = dictionary.getLabelAndConcatenate("videorecorder.rating", [":"]);
 				videoInformation.descriptionLabel.text = dictionary.getLabelAndConcatenate("videorecorder.description", [":"]);
 				videoInformation.commentsLabel.text = dictionary.getLabelAndConcatenate("videorecorder.comment", ["s:"]);
+				videoInformation.addCommentButton.label = dictionary.getLabel("videorecorder.add.comment");
 				startRecButton.label = dictionary.getLabel("videorecorder.start.recording");
 				viewCameraButton.label = dictionary.getLabel("videorecorder.view.camera");
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
+			}
+			
+			// sets initial tooltips
+			private function setTooltips():void{
+				playButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.play", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				refreshButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.refresh", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				sortAuthorButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.sort.author", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				sortDateButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.sort.date", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				sortTitleButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.sort.title", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				viewCameraButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.camera");
+				startRecButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.recording");
+				
+				videoInformation.addCommentButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.add.comment", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				videoInformation.ratingButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.rate.recording", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
 			}
 			
 			// adds listeners
@@ -230,6 +268,25 @@
 				videoDisplay.addEventListener(VideoDisplayEvent.COMPLETE, onComplete);
 			}
 			
+			// checks for previous webcam info
+			private function isWebcamInfoSet():Boolean{
+				var lamsVideoRecorderInfo:Object = SharedObject.getLocal("lamsWebcamInfo");
+				
+				if(lamsVideoRecorderInfo.data.webcamSet){
+					return lamsVideoRecorderInfo.data.webcamSet;
+				}else{
+					return false;
+				}
+					
+			}
+			
+			// sets webcam info
+			private function setWebcamInfo(checked:Boolean):void{
+				var lamsVideoRecorderInfo:Object = SharedObject.getLocal("lamsWebcamInfo");
+				lamsVideoRecorderInfo.data.webcamSet = checked;
+			}
+			
+			// creates connection to red5 server
 			private function createConnection():void{
 				// create basic netConnection object
 				nc = new NetConnection();
@@ -285,10 +342,12 @@
 				}
 			}
 			
+			// netconnection security error handler
 			private function securityErrorHandler(event:SecurityErrorEvent):void {
 				trace("securityErrorHandler: " + event);
 			}
-	
+			
+			// netconnection async error handler
 			private  function asyncErrorHandler(event:AsyncErrorEvent):void {
 				trace("securityErrorHandler: " + event);
 			} 
@@ -298,7 +357,8 @@
 				// print its properties
     			Application.application.printInfoObject("onBWDone", infoObject)
 			}
-	
+			
+			// handler to sort and update recordings
         	private function sortRecordingsHandler(event:SortEvent):void{
         		getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);	
         	}
@@ -334,17 +394,26 @@
         		}
         	}
 			
+			// view camera click handler
 			private function viewCameraClick(event:MouseEvent):void{
-				if(!videoDisplay.isCameraViewed)
+				if(!videoDisplay.isCameraViewed){
+					// reset the video display
+					videoDisplay.reset();
+					
+					// start the camera
 					videoDisplay.startViewCamera();
-				else if(videoDisplay.isCameraViewed)
+				}
+				else if(videoDisplay.isCameraViewed){
 					videoDisplay.stopViewCamera();
+				}
 			}
 			
+			// play click handler
 			private function playClick(event:MouseEvent):void{
 				videoDisplay.play();
 			}
 			
+			// recording click handler
 			private function startRecordingClick(event:MouseEvent):void{
 				if(!videoDisplay.isPublishing){
 					filename = VideoDisplayUtil.createFilename(toolSessionId, userId);
@@ -354,6 +423,7 @@
 					videoDisplay.stopPublish();
 			}
 			
+			// add comment click handler
 			private function addCommentClick(event:MouseEvent):void{
 				addCommentPopUp = AddCommentPopUp(PopUpManager.createPopUp(this, AddCommentPopUp, true));
 				PopUpManager.centerPopUp(addCommentPopUp);
@@ -361,6 +431,7 @@
 				addCommentPopUp.addEventListener("popUpClose", popUpRemovedHandler);
 			}
 			
+			// add rating click handler
 			private function addRatingClick(event:RatingEvent):void{
 				if(!Rating(event.currentTarget).voted){
 					var recordingId:int = itemClicked.recordingId;
@@ -372,12 +443,14 @@
 				}
 			}
 			
+			// delete recording click handler
 			private function deleteClick(event:MouseEvent):void{
 				if(event.target.hasOwnProperty("id") && event.target.id == "deleteButton"){
 					Alert.show(dictionary.getLabel("videorecorder.message.sure.delete"), dictionary.getLabel("videorecorder.confirm"), 3, this, confirmDeleteClick);  
 				}
 			}
 			
+			// confirm delete click handler
 			private function confirmDeleteClick(event:CloseEvent):void{
 				if (event.detail==Alert.YES){
 					var recordingId:int = itemClicked.recordingId;
@@ -409,14 +482,28 @@
 					videoInformation.ratingButton.value = itemClicked.rating;
 					videoInformation.printComments(itemClicked.comments);
 					
+					videoInformation.addCommentButton.toolTip = dictionary.getLabel("videorecorder.tooltip.add.comment");
+					
+					// show/hide ratings and comments depending on toolContentId status
+					if(LAMSStringUtil.stringToBool(itemClicked.isToolContent)){
+						videoInformation.ratingsBox.visible = false;
+						videoInformation.commentsBox.visible = false;
+					}
+					else{
+						videoInformation.ratingsBox.visible = true;
+						videoInformation.commentsBox.visible = true;
+					}
+					
 					// if no vote has been done, enable voting and show average
 					if(itemClicked.userRating == -1){
 						videoInformation.ratingButton.voted = false;
+						videoInformation.ratingButton.toolTip = dictionary.getLabel("videorecorder.tooltip.rate.recording");
 					}
 					// if vote has been done, show user's vote and disable voting
 					else{
 						videoInformation.ratingButton.voted = true;
 						videoInformation.ratingButton.votedValue = itemClicked.userRating;
+						videoInformation.ratingButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.already.rated", [" ", String(itemClicked.userRating)]);
 					}
 					
 					// make ready item clickedo
@@ -429,6 +516,7 @@
 				}
 			}
 			
+			// makes the clicked item ready with the video display
 			private function makeReadytItemClicked():void{
 				// if playing a sound file
 				if(LAMSStringUtil.stringToBool(itemClicked.isJustSound)){
@@ -447,40 +535,24 @@
 				seekSlider.minimum = 0;
 				seekSlider.maximum = event.metadata.duration;
 				
-				timer = new Timer(10);
-				timer.addEventListener(TimerEvent.TIMER, updateSeekSlider);
-				timer.start();
+				playTimer = new Timer(10);
+				playTimer.addEventListener(TimerEvent.TIMER, updateSeekSlider);
+				playTimer.start();
 			}
 			
 			// onReady callback, called from videoDisplay
 			private function onReady(event:VideoDisplayEvent):void{
-				playButton.enabled = true;
-				seekSlider.enabled = true;
-				playButton.label = dictionary.getLabel("videorecorder.play");
+				enablePlaybackButtons(true);
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.ready");
 			}
 			
 			// onReset callback, called from videoDisplay
 			public function onReset(event:VideoDisplayEvent):void{
 				// reset play buttons
-				playButton.enabled = false;
-				playButton.label = dictionary.getLabel("videorecorder.play");
+				enablePlaybackButtons(false);
 				
 				// set panel status label
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
-				
-				// if a timer exists, clear it
-				if(timer){
-					timer.stop();
-					timer = null;
-				}
-
-				seekSlider.enabled = false;
-				seekSlider.minimum = 0;
-				seekSlider.maximum = 0;
-				seekSlider.value = seekSlider.minimum;
-				
-				timerLabel.text = "0:00 / 0:00";
 			}
 			
 			// onUnpause callback, called from videoDisplay
@@ -489,6 +561,7 @@
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.playing");
 				
 				playButton.label = dictionary.getLabel("videorecorder.pause");
+				playButton.toolTip = dictionary.getLabel("videorecorder.tooltip.pause");
 			}
 			
 			// onPause callback, called from videoDisplay
@@ -497,39 +570,55 @@
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.paused");
 				
 				playButton.label = dictionary.getLabel("videorecorder.resume");
+				playButton.toolTip = dictionary.getLabel("videorecorder.tooltip.resume");
 			}
 			
+			// onStartPublish callback, called from videoDisplay
 			private function onStartPublish(event:VideoDisplayEvent):void{
 				// set panel status label
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.recording");
 				
 				// change the start recording button's label
 				startRecButton.label = dictionary.getLabel("videorecorder.stop.recording");
+				startRecButton.toolTip = dictionary.getLabel("videorecorder.tooltip.stop.recording");
 				
 				viewCameraButton.enabled = false;
+				viewCameraButton.label = dictionary.getLabel("videorecorder.view.camera");
+				viewCameraButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.start.camera", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				
+				recTimer = new Timer(250);
+				recTimer.addEventListener(TimerEvent.TIMER, updateTimerLabelForRecording);
+				recTimer.start();
 			}
 			
+			// onStopPublish callback, called from videoDisplay
 			private function onStopPublish(event:VideoDisplayEvent):void{		
 				// change the start recording button's label
 				startRecButton.label = dictionary.getLabel("videorecorder.start.recording");
+				startRecButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.recording");
 				
 				// set panel status label
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
 				
 				viewCameraButton.enabled = true;
+				viewCameraButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.camera");
 				
 				getDetailsPopUp = GetRecordingDetailsPopUp(PopUpManager.createPopUp(this, GetRecordingDetailsPopUp, true));
 				PopUpManager.centerPopUp(getDetailsPopUp);
 				getDetailsPopUp.init(dictionary);
 				getDetailsPopUp.addEventListener("popUpClose", popUpRemovedHandler);
+				
+				recTimer.stop();
 			}
 			
-			private function onStartCamera(event:VideoDisplayEvent):void{
+			// onStartCamera callback, called from videoDisplay
+			private function onStartCamera(event:VideoDisplayEvent):void{				
 				// reset video information
 				videoInformation.resetInformation();
 				
 				// change the view camera button's label
 				viewCameraButton.label = dictionary.getLabel("videorecorder.stop.camera");
+				viewCameraButton.toolTip = dictionary.getLabel("videorecorder.tooltip.stop.camera");
 				
 				// set panel status label
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
@@ -539,10 +628,11 @@
 				videoInformation.enableVideoInformationButtons(false);
 			}
 			
+			// onStopCamera callback, called from videoDisplay
 			private function onStopCamera(event:VideoDisplayEvent):void{
 				// change the view camera button's label
 				viewCameraButton.label = dictionary.getLabel("videorecorder.view.camera");
-				
+				viewCameraButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.camera");
 				
 				// set panel status label
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
@@ -555,27 +645,34 @@
 				enablePlaybackButtonsAndVideoList(true);
 			}
 			
+			// onComplete callback, called from videoDisplay
 			private function onComplete(event:VideoDisplayEvent):void{
+				// set panel status label
+				videoRecorderPanel.status = dictionary.getLabel("videorecorder.ready");
+				
+				// reset play button labels
 				playButton.label = dictionary.getLabel("videorecorder.play");
+				playButton.toolTip = dictionary.getLabel("videorecorder.tooltip.play");
 			}
 			
+			// seeks to the given location of recording
 			private function seekSliderChange(event:SliderEvent):void {
 				videoDisplay.seek(event.value);
 			}
 			
+			// seek slider click handler
 			private function seekSliderClick(event:SliderEvent):void {
 				// if seekslider is enabled
-				
 				if(seekSlider.enabled){
 					// if the mouse is pressed
 					if(event.type == SliderEvent.THUMB_PRESS){
 						// stop the timer so that the bar seekSlider can manually be controlled
-						timer.stop();
+						playTimer.stop();
 					}
 					// if the mouse is released
 					else if(event.type == SliderEvent.THUMB_RELEASE){
 						// start the timer again and allow it to regain control of the seekSlider
-						timer.start();
+						playTimer.start();
 					}
 				}
 			}
@@ -593,7 +690,13 @@
 					timerLabel.text = VideoDisplayUtil.secondsToString(String(videoDisplay.time)) + " / " + VideoDisplayUtil.secondsToString(String(videoDisplay.duration));					
 				}
 			}
-				        	       	
+			
+			// updates timerLabel when recording
+			private function updateTimerLabelForRecording(event:TimerEvent):void{
+				var timer:Timer = Timer(event.currentTarget);
+				timerLabel.text = VideoDisplayUtil.secondsToString(String(timer.currentCount * timer.delay / 1000));
+			}
+			   	       	
 	       	// enables/disables the playback related buttons and video list
 			private function enablePlaybackButtonsAndVideoList(enabled:Boolean):void{
 				enablePlaybackButtons(enabled);
@@ -602,8 +705,34 @@
 	        
 	        // enables/disables the playback related buttons
 	        private function enablePlaybackButtons(enabled:Boolean):void{
+	        	var trueEnable:Boolean = enabled && itemClicked != null;
+	        	
+	        	// play button stuff
 	        	playButton.label = dictionary.getLabel("videorecorder.play");
-				playButton.enabled = (enabled && itemClicked != null);
+	        	
+				playButton.enabled = trueEnable;
+				
+				if(trueEnable)
+					playButton.toolTip = dictionary.getLabel("videorecorder.tooltip.play");
+				else
+					playButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.play", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				
+				// seekslider stuff
+				seekSlider.enabled = trueEnable;
+				
+				if(!trueEnable){
+					// if a timer exists, clear it
+					if(playTimer){
+						playTimer.stop();
+						playTimer = null;
+					}
+					
+					seekSlider.minimum = 0;
+					seekSlider.maximum = 0;
+					seekSlider.value = seekSlider.minimum;
+					
+					timerLabel.text = "0:00 / 0:00";
+				}
 	        }
 	        
 	        // enables/disables the video list
@@ -613,6 +742,19 @@
 				sortDateButton.enabled = enabled;
 				sortAuthorButton.enabled = enabled;
 				sortTitleButton.enabled = enabled;
+				
+				if(enabled){
+					refreshButton.toolTip = dictionary.getLabel("videorecorder.tooltip.refresh");
+					sortAuthorButton.toolTip = dictionary.getLabel("videorecorder.tooltip.sort.author");
+					sortDateButton.toolTip = dictionary.getLabel("videorecorder.tooltip.sort.date");
+					sortTitleButton.toolTip = dictionary.getLabel("videorecorder.tooltip.sort.title");
+				}
+				else{
+					refreshButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.refresh", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+					sortAuthorButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.sort.author", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+					sortDateButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.sort.date", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+					sortTitleButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.sort.title", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				}
 				
 				// if videoRecordings is defined
 				if(videoRecordings){
@@ -624,11 +766,25 @@
 						var deleteButton:Button = videoProfile.deleteButton;
 						var exportButton:Button = videoProfile.exportButton;
 						
-						if(deleteButton)
+						if(deleteButton){
 							deleteButton.enabled = enabled;
+							
+							if(enabled)
+								deleteButton.toolTip = dictionary.getLabel("videorecorder.tooltip.delete.recording");
+							else
+								deleteButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.delete.recording", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+						}
+							
 						
-						if(exportButton)
+						if(exportButton){
 							exportButton.enabled = enabled;
+							
+							if(enabled)
+								exportButton.toolTip = dictionary.getLabel("videorecorder.tooltip.export.recording");
+							else
+								exportButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.export.recording", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+						}
+							
 					}
 				}    	
 	        }
@@ -673,11 +829,11 @@
 	</mx:ControlBar>
 	</mx:Panel>
 	<mx:Label id="videoInformationLabel" x="10" y="328" text="Video information:" fontWeight="bold"/>
-	<local:VideoInformation id="videoInformation"/>
+	<local:VideoInformation id="videoInformation" allowComments="{allowComments}" allowRatings="{allowRatings}" dictionary="{dictionary}"/>
 	<mx:HBox left="358" top="10" right="10">
 		<mx:Label id="videosLabel" text="Videos:" fontWeight="bold"/>
 	</mx:HBox>
-	<mx:TileList borderStyle="none" id="videoList" itemRenderer="VideoProfile" dataProvider="{videoRecordings}" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" itemClick="videoListClick(event)" top="62" left="358" bottom="70" right="10"></mx:TileList>
+	<mx:TileList borderStyle="none" id="videoList" itemRenderer="{new ArgumentsToRendererFactory({userId:this.userId, allowLearnerVideoExport:this.allowLearnerVideoExport, allowLearnerVideoVisibility:this.allowLearnerVideoVisibility, mode:this.mode, dictionary:this.dictionary},VideoProfile)}" dataProvider="{videoRecordings}" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" itemClick="videoListClick(event)" top="62" left="358" bottom="70" right="10"></mx:TileList>
 	<mx:HBox verticalAlign="middle" left="358" top="36" right="10">
 		<mx:Label id="sortByLabel" text="Sort by:" fontWeight="normal" fontStyle="normal"/>
 		<ns2:SortButtonGroup width="100%" horizontalGap="3" id="sortButtonGroup">

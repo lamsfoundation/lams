@@ -100,7 +100,7 @@
 											"quality", "high",
 											"bgcolor", "#869ca7",
 											"name", "VideoRecorderFCKEditor",
-											"allowScriptAccess","sameDomain",
+											"allowScriptAccess","always",
 											"type", "application/x-shockwave-flash",
 											"pluginspage", "http://www.adobe.com/go/getflashplayer"
 										);
@@ -109,7 +109,14 @@
 										// embed the Flash Content SWF when all tests are passed
 										AC_FL_RunContent(
 												"src", "./files/VideoRecorderFCKEditor",
-												"FlashVars", "&mode="+'playerModeOffline'+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&filename='+'${recording.filename}'+'&languageXML='+"${languageXML}"+"",
+												<c:choose>
+												<c:when test="${videoRecorderDTO.exportOffline == true}">
+													"FlashVars", "&mode="+'playerModeOffline'+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&filename='+'${recording.filename}'+'&languageXML='+"${languageXML}"+"",
+												</c:when>
+												<c:otherwise>
+													"FlashVars", "&mode="+'playerModeOnline'+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&filename='+'${recording.filename}'+'&languageXML='+"${languageXML}"+"",
+												</c:otherwise>
+												</c:choose>											
 												"width", "361",
 												"height", "331",
 												"align", "middle",
@@ -117,7 +124,7 @@
 												"quality", "high",
 												"bgcolor", "#869ca7",
 												"name", "VideoRecorderFCKEditor",
-												"allowScriptAccess","sameDomain",
+												"allowScriptAccess","always",
 												"type", "application/x-shockwave-flash",
 												"pluginspage", "http://www.adobe.com/go/getflashplayer"
 										);

@@ -6,10 +6,12 @@
 			private var _mode:String;
 			
 			private function onCreationComplete(event:Event):void{
-				if(_mode == "playerModeOffline" || _mode == "playerModeOffline"){
+				if(_mode == "playerModeOffline" || _mode == "playerModeOnline"){
 					removeChild(getChildByName("recordButton"));
 					removeChild(getChildByName("saveAndCloseButton"));
 				}
+				else if(_mode == "recorderModeAuthor")
+					removeChild(getChildByName("saveAndCloseButton"));
 			}
 			
 			public function set mode(mode:String):void{
@@ -18,9 +20,9 @@
 		]]>
 	</mx:Script>
 	
-	<mx:Button label="&gt;" width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" fontWeight="bold" id="playButton"/>
-	<mx:Button label="O" width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" fontWeight="normal" id="recordButton"/>
+	<mx:Button width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" id="playButton"/>
+	<mx:Button width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" id="recordButton"/>
 	<mx:HSlider width="100%" id="seekSlider"/>
 	<mx:Label text="0:00 / 0:00" width="70" textAlign="center" id="timerLabel"/>
-	<mx:Button label="x" width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" fontWeight="normal" id="saveAndCloseButton"/>
+	<mx:Button width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" id="saveAndCloseButton"/>
 </mx:ControlBar>

@@ -6,6 +6,7 @@ private function getRecordingsFromServer(sortBy:String, sortDirection:String):vo
 	videoRecorderActions.resultFormat = "e4x";
 	videoRecorderActions.request.method = "getRecordingsByToolSessionIdAndUserId";
 	videoRecorderActions.request.toolSessionId = toolSessionId;
+	videoRecorderActions.request.toolContentId = toolContentId;
 	videoRecorderActions.request.userId = userId;
 	
 	if(allowLearnerVideoVisibility || mode == "teacher")
@@ -51,6 +52,9 @@ private function saveRecordingToServer(userId:int, title:String, description:Str
 		videoRecorderActions.request.isJustSound = true;
 	else
 		videoRecorderActions.request.isJustSound = false;
+	
+	videoRecorderActions.request.toolContentId = -1;
+	videoRecorderActions.request.saveToLams = false;
 	
 	videoRecorderActions.request.toolSessionId = toolSessionId;
 	videoRecorderActions.addEventListener(ResultEvent.RESULT, saveRecordingSuccessHandler);
@@ -136,6 +140,9 @@ private function saveRatingSuccessHandler(e:ResultEvent):void {
 	// set the user's voted value
 	ratingClicked.votedValue = e.result.userRating;
 	
+	// fix the tooltip
+	ratingClicked.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.already.rated", [" ", String(e.result.userRating)]);
+
 	// update the video recordings
 	getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);	
 }

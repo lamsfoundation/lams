@@ -16,6 +16,10 @@
 		   		this.dictionary = dictionary;
 		   		commentLabel.text = dictionary.getLabelAndConcatenate("videorecorder.comment", [":"]);
 		   		commentInput.text = dictionary.getLabelAndReplace("videorecorder.enter.something.here", ["videorecorder.comment"]);
+		   		cancelButton.label = dictionary.getLabel("button.cancel");
+		   		cancelButton.toolTip = dictionary.getLabel("videorecorder.tooltip.cancel.comment");
+		   		okButton.label = dictionary.getLabel("button.save");
+		   		okButton.toolTip = dictionary.getLabel("videorecorder.tooltip.save.comment");
 		   	}
         ]]>
     </mx:Script>

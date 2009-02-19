@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -219,10 +220,24 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	if (fromContentId != null) {
 	    fromContent = videoRecorderDAO.getByContentId(fromContentId);
 	}
+	
+	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(fromContentId);
+	
+	VideoRecorderRecording vrr;
+	if(!list.isEmpty()){
+		vrr = list.get(0);
+		VideoRecorderRecording clonedRecording = new VideoRecorderRecording(vrr);
+		clonedRecording.setUid(null);
+		clonedRecording.setToolContentId(toContentId);
+		videoRecorderRecordingDAO.saveOrUpdate(clonedRecording);
+	}
+	
 	if (fromContent == null) {
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
+	
+	
 	VideoRecorder toContent = VideoRecorder.newInstance(fromContent, toContentId, videoRecorderToolContentHandler);
 	videoRecorderDAO.saveOrUpdate(toContent);
     }
@@ -451,16 +466,32 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     return VideoRecorderCommentDTO.getVideoRecorderCommentDTOs(list);
     }
     
-    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionId(Long toolSessionId){
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionId(Long toolSessionId, Long toolContentId){
     	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolSessionId(toolSessionId);
+    	list.addAll(videoRecorderRecordingDAO.getByToolContentId(toolContentId));
     	
     	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
     
-    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserId(Long toolSessionId, Long userId){
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserId(Long toolSessionId, Long userId, Long toolContentId){
     	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getBySessionAndUserIds(toolSessionId, userId);
+    	list.addAll(videoRecorderRecordingDAO.getByToolContentId(toolContentId));
     	
     	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
+    }
+    
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolContentId(Long toolContentId){
+    	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(toolContentId);
+    	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
+    }
+    
+    public VideoRecorderRecording getFirstRecordingByToolContentId(Long toolContentId){
+    	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(toolContentId);
+    	if(!list.isEmpty()){
+    		return list.get(0);
+    	}else{
+    		return null;
+    	}
     }
     
     public VideoRecorderAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
@@ -800,6 +831,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 		languageCollection.add(new String("videorecorder.enter.something.here"));
 		languageCollection.add(new String("videorecorder.message.sure.delete"));
 		languageCollection.add(new String("videorecorder.confirm"));
+		languageCollection.add(new String("videorecorder.update"));
+		languageCollection.add(new String("videorecorder.refresh"));
 		languageCollection.add(new String("videorecorder.web.application.not.available"));
 		languageCollection.add(new String("videorecorder.net.connection.not.connected"));
 		languageCollection.add(new String("videorecorder.net.connection.closed"));
@@ -809,6 +842,29 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 		languageCollection.add(new String("videorecorder.recording"));
 		languageCollection.add(new String("videorecorder.buffering"));
 		languageCollection.add(new String("videorecorder.waiting"));
+		languageCollection.add(new String("videorecorder.tooltip.sort.author"));
+		languageCollection.add(new String("videorecorder.tooltip.sort.title"));
+		languageCollection.add(new String("videorecorder.tooltip.sort.date"));
+		languageCollection.add(new String("videorecorder.tooltip.play"));
+		languageCollection.add(new String("videorecorder.tooltip.pause"));
+		languageCollection.add(new String("videorecorder.tooltip.resume"));
+		languageCollection.add(new String("videorecorder.tooltip.start.camera"));
+		languageCollection.add(new String("videorecorder.tooltip.stop.camera"));
+		languageCollection.add(new String("videorecorder.tooltip.add.comment"));
+		languageCollection.add(new String("videorecorder.tooltip.add.rating"));
+		languageCollection.add(new String("videorecorder.tooltip.refresh"));
+		languageCollection.add(new String("videorecorder.tooltip.save.recording"));
+		languageCollection.add(new String("videorecorder.tooltip.save.comment"));
+		languageCollection.add(new String("videorecorder.tooltip.cancel.comment"));
+		languageCollection.add(new String("videorecorder.tooltip.start.recording"));
+		languageCollection.add(new String("videorecorder.tooltip.stop.recording"));
+		languageCollection.add(new String("videorecorder.tooltip.delete.recording"));
+		languageCollection.add(new String("videorecorder.tooltip.export.recording"));
+		languageCollection.add(new String("videorecorder.tooltip.click.to.ready.recording"));
+		languageCollection.add(new String("videorecorder.tooltip.rate.recording"));
+		languageCollection.add(new String("videorecorder.tooltip.already.rated"));
+		languageCollection.add(new String("videorecorder.disabled"));
+		
 		String languageOutput = "<xml><language>";
 		
 		for(int i = 0; i < languageCollection.size(); i++){
@@ -822,6 +878,11 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	
 	public String getLanguageXMLForFCK(){
 		ArrayList<String> languageCollection = new ArrayList<String>();
+		languageCollection.add(new String("button.ok"));
+		languageCollection.add(new String("button.save"));
+		languageCollection.add(new String("button.cancel"));
+		languageCollection.add(new String("button.yes"));
+		languageCollection.add(new String("button.no"));
 		languageCollection.add(new String("videorecorder.video.player"));
 		languageCollection.add(new String("videorecorder.video.recorder"));
 		languageCollection.add(new String("videorecorder.web.application.not.available"));
@@ -833,6 +894,22 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 		languageCollection.add(new String("videorecorder.recording"));
 		languageCollection.add(new String("videorecorder.buffering"));
 		languageCollection.add(new String("videorecorder.waiting"));
+		languageCollection.add(new String("videorecorder.description"));
+		languageCollection.add(new String("videorecorder.title"));
+		languageCollection.add(new String("videorecorder.new.recording.details"));
+		languageCollection.add(new String("videorecorder.recording.complete.authoring"));
+		languageCollection.add(new String("videorecorder.enter.something.here"));
+		languageCollection.add(new String("videorecorder.recording.complete.fck"));
+		languageCollection.add(new String("videorecorder.tooltip.play"));
+		languageCollection.add(new String("videorecorder.tooltip.pause"));
+		languageCollection.add(new String("videorecorder.tooltip.resume"));
+		languageCollection.add(new String("videorecorder.tooltip.save.recording"));
+		languageCollection.add(new String("videorecorder.tooltip.start.recording"));
+		languageCollection.add(new String("videorecorder.tooltip.start.recording.again"));
+		languageCollection.add(new String("videorecorder.tooltip.start.recording.next"));
+		languageCollection.add(new String("videorecorder.tooltip.stop.recording"));
+		languageCollection.add(new String("videorecorder.disabled"));
+		
 		String languageOutput = "<xml><language>";
 		
 		for(int i = 0; i < languageCollection.size(); i++){
@@ -842,5 +919,9 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 		languageOutput += "</language></xml>";
 		
 		return languageOutput;
+	}
+	
+	public String getMessage(String key){
+		return messageService.getMessage(key);
 	}
 }

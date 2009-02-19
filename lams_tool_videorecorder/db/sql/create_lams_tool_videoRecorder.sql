@@ -41,6 +41,8 @@ create table tl_lavidr10_videoRecorder (
 	allow_learner_video_export bit,
 	allow_comments bit,
 	allow_ratings bit,
+	export_offline bit,
+	export_all bit,
 	primary key (uid)
 )type=innodb;
 
@@ -56,6 +58,7 @@ create table tl_lavidr10_session (
 
 create table tl_lavidr10_recording (
 	uid bigint not null auto_increment,
+	tool_content_id bigint,
 	create_date datetime,
 	update_date datetime,
 	create_by bigint,
@@ -118,7 +121,9 @@ INSERT INTO tl_lavidr10_videoRecorder (
 	allow_learner_video_visibility,
 	allow_learner_video_export,
 	allow_comments,
-	allow_ratings) 
+	allow_ratings,
+	export_offline,
+	export_all) 
 VALUES(
 	"VideoRecorder",
 	"Instructions",
@@ -129,6 +134,8 @@ VALUES(
 	0,
 	0,
 	0,
+	1,
+	1,
 	1,
 	1,
 	1,

@@ -17,6 +17,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>bin-release1</name>
+			<type>2</type>
+			<location>D:/LAMS_HEAD/lams_central/web/fckeditor/editor/plugins/videorecorder</location>
+		</link>
+		<link>
 			<name>[source path] flex</name>
 			<type>2</type>
 			<location>D:/LAMS_HEAD/lams_flash/src/common/flex</location>

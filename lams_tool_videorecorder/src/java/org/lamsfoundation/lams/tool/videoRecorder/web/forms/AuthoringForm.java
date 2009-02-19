@@ -57,14 +57,16 @@ public class AuthoringForm extends ActionForm {
 	boolean allowUseVoice;
 	
 	boolean allowUseCamera;
-	
-	boolean allowLearnerVideoExport;
-	
+		
 	boolean allowLearnerVideoVisibility;
 	
 	boolean allowComments;
 	
 	boolean allowRatings;
+	
+	boolean exportAll;
+	
+	boolean exportOffline;
 	
 	FormFile onlineFile; 
 
@@ -207,15 +209,7 @@ public class AuthoringForm extends ActionForm {
 	public void setAllowLearnerVideoVisibility(boolean allowLearnerVideoVisibility) {
 		this.allowLearnerVideoVisibility = allowLearnerVideoVisibility;
 	}
-	
-	public boolean isAllowLearnerVideoExport() {
-		return allowLearnerVideoExport;
-	}
-
-	public void setAllowLearnerVideoExport(boolean allowLearnerVideoExport) {
-		this.allowLearnerVideoExport = allowLearnerVideoExport;
-	}
-	
+		
 	public boolean isAllowComments() {
 		return allowComments;
 	}
@@ -230,5 +224,21 @@ public class AuthoringForm extends ActionForm {
 
 	public void setAllowRatings(boolean allowRatings) {
 		this.allowRatings = allowRatings;
+	}
+
+	public boolean isExportAll() {
+		return exportAll;
+	}
+
+	public void setExportAll(boolean exportAll) {
+		this.exportAll = exportAll;
+	}
+	
+	public boolean isExportOffline() {
+		return exportOffline;
+	}
+
+	public void setExportOffline(boolean exportOffline) {
+		this.exportOffline = exportOffline;
 	}
 }

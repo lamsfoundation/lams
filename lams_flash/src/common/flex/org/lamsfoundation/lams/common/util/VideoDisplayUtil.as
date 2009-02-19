@@ -26,6 +26,11 @@ package org.lamsfoundation.lams.common.util
        		
 			return "lamsRecording_forFCK" + "_user" + userId + "_" + randomNumber(1, 1000000000);
        	}
+       	
+       	public static function createFilenameForAuthor(toolContentId:int):String{
+       		
+       		return "lamsRecording_tool" + toolContentId + "_" + randomNumber(1, 1000000000);
+       	}
 	       
 	   	// creates a random number between bounds
        	private static function randomNumber(low:Number=NaN, high:Number=NaN):Number {

@@ -36,6 +36,7 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -48,16 +49,25 @@ import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderDTO;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderSessionDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderCondition;
+import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
+import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.service.IVideoRecorderService;
+import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderService;
 import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderServiceProxy;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderConstants;
 import org.lamsfoundation.lams.tool.videoRecorder.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -98,6 +108,12 @@ public class AuthoringAction extends LamsDispatchAction {
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
+	// get httpsession
+	HttpSession ss = SessionManager.getSession();
+	
+	// get LAMS user
+	UserDTO user = (UserDTO)ss.getAttribute(AttributeNames.USER);
+	
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
@@ -106,7 +122,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	if (videoRecorderService == null) {
 	    videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(this.getServlet().getServletContext());
 	}
-
+	
+	// get toolSessionManager
+	ToolSessionManager toolSessionManager =VideoRecorderServiceProxy.getVideoRecorderSessionManager(this.getServlet().getServletContext());
+	
 	// retrieving VideoRecorder with given toolContentID
 	VideoRecorder videoRecorder = videoRecorderService.getVideoRecorderByContentId(toolContentID);
 	if (videoRecorder == null) {
@@ -115,7 +134,25 @@ public class AuthoringAction extends LamsDispatchAction {
 	    videoRecorderService.saveOrUpdateVideoRecorder(videoRecorder);
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
-
+	
+	// transform to dto
+	VideoRecorderDTO videoRecorderDT0 = new VideoRecorderDTO(videoRecorder);
+	
+	// get recordings
+	List<VideoRecorderRecordingDTO> recordings = videoRecorderService.getRecordingsByToolContentId(toolContentID);
+	
+	// setup first recording
+	VideoRecorderRecordingDTO firstRecording = null;
+	
+	// if there are recordings
+	if(!recordings.isEmpty()){
+		// fetch the first one
+		firstRecording = recordings.get(0);
+	}
+	
+	// add it to the request
+	request.setAttribute("videoRecorderRecordingDTO", firstRecording);
+	
 	if (mode != null && mode.isTeacher()) {
 	    // Set the defineLater flag so that learners cannot use content
 	    // while we
@@ -133,9 +170,18 @@ public class AuthoringAction extends LamsDispatchAction {
 		toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
-	// add the sessionMap to HTTPSession.
+	// add the sessionMap to HTTPSession
 	request.getSession().setAttribute(map.getSessionID(), map);
 	request.setAttribute(VideoRecorderConstants.ATTR_SESSION_MAP, map);
+	
+	// add the toolContentId
+	request.setAttribute("toolContentId", toolContentID);
+	
+	// add the videoRecorderDTO
+	request.setAttribute("videoRecorderDTO", videoRecorderDT0);
+	
+	// set language xml
+	request.setAttribute("languageXML", videoRecorderService.getLanguageXMLForFCK());
 
 	return mapping.findForward("success");
     }
@@ -384,9 +430,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	    videoRecorder.setAllowUseVoice(authForm.isAllowUseVoice());
 	    videoRecorder.setAllowUseCamera(authForm.isAllowUseCamera());
 	    videoRecorder.setAllowLearnerVideoVisibility(authForm.isAllowLearnerVideoVisibility());
-	    videoRecorder.setAllowLearnerVideoExport(authForm.isAllowLearnerVideoExport());
 	    videoRecorder.setAllowComments(authForm.isAllowComments());
 	    videoRecorder.setAllowRatings(authForm.isAllowComments());
+	    videoRecorder.setExportAll(authForm.isExportAll());
+	    videoRecorder.setExportOffline(authForm.isExportOffline());
 	//}
     }
 
@@ -406,9 +453,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	authForm.setAllowUseVoice(videoRecorder.isAllowUseVoice());
 	authForm.setAllowUseCamera(videoRecorder.isAllowUseCamera());
 	authForm.setAllowLearnerVideoVisibility(videoRecorder.isAllowLearnerVideoVisibility());
-	authForm.setAllowLearnerVideoExport(videoRecorder.isAllowLearnerVideoExport());
 	authForm.setAllowComments(videoRecorder.isAllowComments());
 	authForm.setAllowRatings(videoRecorder.isAllowComments());
+	authForm.setExportAll(videoRecorder.isExportAll());
+	authForm.setExportOffline(videoRecorder.isExportOffline());
     }
 
     /**

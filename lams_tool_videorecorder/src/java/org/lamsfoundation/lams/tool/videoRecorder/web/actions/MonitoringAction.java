@@ -123,6 +123,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		request.setAttribute("mode", "author");
 		request.setAttribute("userId", videoRecorderUser.getUid());
 		request.setAttribute("toolSessionId", toolSessionID);
+		request.setAttribute("toolContentId", toolContentID);
 		request.setAttribute("videoRecorderDTO", videoRecorderDT0);
 		request.setAttribute("contentFolderID", contentFolderID);
 		

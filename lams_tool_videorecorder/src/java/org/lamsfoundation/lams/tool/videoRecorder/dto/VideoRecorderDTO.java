@@ -59,13 +59,15 @@ public class VideoRecorderDTO {
     
     public boolean allowUseCamera;
     
-    public boolean allowLearnerVideoExport;
-    
     public boolean allowLearnerVideoVisibility;
     
     public boolean allowComments;
     
     public boolean allowRatings;
+    
+    public boolean exportOffline;
+    
+    public boolean exportAll;
 	
 	public Set<VideoRecorderAttachmentDTO> onlineInstructionsFiles;
 
@@ -88,10 +90,11 @@ public class VideoRecorderDTO {
 		lockOnFinish = videoRecorder.isLockOnFinished();
 		allowUseVoice = videoRecorder.isAllowUseVoice();
 		allowUseCamera = videoRecorder.isAllowUseCamera();
-		allowLearnerVideoExport = videoRecorder.isAllowLearnerVideoExport();
 		allowLearnerVideoVisibility = videoRecorder.isAllowLearnerVideoVisibility();
 		allowComments = videoRecorder.isAllowComments();
 		allowRatings = videoRecorder.isAllowRatings();
+		exportAll = videoRecorder.isExportAll();
+		exportOffline = videoRecorder.isExportOffline();
 
 		onlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
@@ -218,15 +221,7 @@ public class VideoRecorderDTO {
 	public void setLearnerVideoVisibility(boolean allowLearnerVideoVisibility) {
 		this.allowLearnerVideoVisibility = allowLearnerVideoVisibility;
 	}
-	
-	public boolean isAllowLearnerVideoExport() {
-		return allowLearnerVideoExport;
-	}
-
-	public void setAllowLearnerVideoExport(boolean allowLearnerVideoExport) {
-		this.allowLearnerVideoExport = allowLearnerVideoExport;
-	}
-	
+		
 	public boolean isAllowComments() {
 		return allowComments;
 	}
@@ -241,6 +236,22 @@ public class VideoRecorderDTO {
 
 	public void setAllowRatings(boolean allowRatings) {
 		this.allowRatings = allowRatings;
+	}
+	
+	public boolean isExportOffline() {
+		return exportOffline;
+	}
+
+	public void setExportOffline(boolean exportOffline) {
+		this.exportOffline = exportOffline;
+	}
+	
+	public boolean isExportAll() {
+		return exportAll;
+	}
+
+	public void setExportAll(boolean exportAll) {
+		this.exportAll = exportAll;
 	}
 	
 	public boolean isLockOnFinish() {

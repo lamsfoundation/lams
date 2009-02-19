@@ -47,6 +47,8 @@ public class VideoRecorderRecordingDTO {
 	private static Logger logger = Logger.getLogger(VideoRecorderRecordingDTO.class);
 
 	public Long uid;
+	
+	public Long toolContentId;
 
 	public Date createDate;
 
@@ -75,6 +77,7 @@ public class VideoRecorderRecordingDTO {
 	
 	public VideoRecorderRecordingDTO(VideoRecorderRecording videoRecorderRecording) {
 		this.uid = videoRecorderRecording.getUid();
+		this.toolContentId = videoRecorderRecording.getToolContentId();
 		this.createDate = videoRecorderRecording.getCreateDate();
 		this.updateDate = videoRecorderRecording.getUpdateDate();
 		this.createBy = videoRecorderRecording.getCreateBy();
@@ -112,6 +115,14 @@ public class VideoRecorderRecordingDTO {
 	this.uid = uid;
     }
 
+    public Long getToolContentId() {
+	return toolContentId;
+    }
+
+    public void setToolContentId(Long toolContentId) {
+	this.toolContentId = toolContentId;
+    }    
+   
     public Date getCreateDate() {
 	return createDate;
     }

@@ -94,23 +94,6 @@
 			</c:choose>	
 		</td>
 	</tr>
-
-	<tr>
-		<td>
-			<fmt:message key="advanced.allowLearnerVideoExport" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.allowLearnerVideoExport}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
 	
 	<tr>
 		<td>
@@ -128,7 +111,7 @@
 			</c:choose>	
 		</td>
 	</tr>
-
+	
 	<tr>
 		<td>
 			<fmt:message key="advanced.allowRatings" />
@@ -137,6 +120,40 @@
 		<td>
 			<c:choose>
 				<c:when test="${dto.allowRatings}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="advanced.exportOffline" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.exportOffline}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="advanced.exportAll" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${dto.exportAll}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -177,14 +194,14 @@
 		AC_FL_RunContent(
 			"src", "./includes/flash/playerProductInstall",
 			"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
-			"width", "680",
+			"width", "100%",
 			"height", "676",
 			"align", "middle",
 			"id", "VideoRecorder",
 			"quality", "high",
 			"bgcolor", "#ffffff",
 			"name", "VideoRecorder",
-			"allowScriptAccess","sameDomain",
+			"allowScriptAccess","always",
 			"type", "application/x-shockwave-flash",
 			"pluginspage", "http://www.adobe.com/go/getflashplayer"
 		);
@@ -193,15 +210,15 @@
 		// embed the Flash Content SWF when all tests are passed
 		AC_FL_RunContent(
 				"src", "./includes/flash/VideoRecorder",
-				"FlashVars", "contentEditable"+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&mode='+'${mode}'+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowLearnerVideoExport='+${videoRecorderDTO.allowLearnerVideoExport}+'&allowComments='+${videoRecorderDTO.allowComments}+'&allowRatings='+${videoRecorderDTO.allowRatings}+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&languageXML='+"${languageXML}"+"",
-				"width", "680",
+				"FlashVars", "contentEditable"+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&toolContentId='+${toolContentId}+'&mode='+'${mode}'+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowComments='+${videoRecorderDTO.allowComments}+'&allowRatings='+${videoRecorderDTO.allowRatings}+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&languageXML='+"${languageXML}"+"",
+				"width", "100%",
 				"height", "676",
 				"align", "middle",
 				"id", "VideoRecorder",
 				"quality", "high",
 				"bgcolor", "#ffffff",
 				"name", "VideoRecorder",
-				"allowScriptAccess","sameDomain",
+				"allowScriptAccess","always",
 				"type", "application/x-shockwave-flash",
 				"pluginspage", "http://www.adobe.com/go/getflashplayer"
 		);
@@ -222,11 +239,11 @@
 				<param name="bgcolor" value="#ffffff" />
 				<param name="allowScriptAccess" value="sameDomain" />
 				<embed src="./includes/flash/VideoRecorder.swf" quality="high" bgcolor="#869ca7"
-					width="526" height="676" name="VideoRecorder" align="middle"
+					width="100%" height="676" name="VideoRecorder" align="middle"
 					play="true"
 					loop="false"
 					quality="high"
-					allowScriptAccess="sameDomain"
+					allowScriptAccess="always"
 					type="application/x-shockwave-flash"
 					pluginspage="http://www.adobe.com/go/getflashplayer">
 				</embed>

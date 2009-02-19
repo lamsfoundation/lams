@@ -29,10 +29,12 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -46,12 +48,14 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRecording;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.service.IVideoRecorderService;
+import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderService;
 import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderServiceProxy;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderRecordingComparator;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
@@ -60,6 +64,8 @@ import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.ExternalServerUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -88,6 +94,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 
     //---------------------------------------------------------------------
 	private static final String TOOL_SESSION_ID = "toolSessionId";
+	private static final String TOOL_CONTENT_ID = "toolContentId";
 	private static final String USER_ID = "userId";
 	private static final String TITLE = "title";
 	private static final String DESCRIPTION = "description";
@@ -104,7 +111,12 @@ public class VideoRecorderAction extends LamsDispatchAction {
 	private static final String GET_ALL = "getAll";
 	private static final String OK_MSG = "ok";
 	private static final String ERROR_MSG = "error";
-		
+	private static final String SAVE_TO_LAMS = "saveToLams";
+	private static final String SAVE_TO_LAMS_DEST = "saveToLamsDest";
+	
+	private String VIDEORECORDER_RECORDINGS_FOLDER_DEST = "";
+	private static final String VIDEORECORDER_RECORDINGS_FOLDER_SRC = Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL);
+	
 	private Integer getUserId(HttpServletRequest request) {
 		HttpSession ss = SessionManager.getSession();
 		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -124,6 +136,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 
 		// get paramaters from POST
     	Long toolSessionId = WebUtil.readLongParam(request, TOOL_SESSION_ID);
+    	Long toolContentId = WebUtil.readLongParam(request, TOOL_CONTENT_ID);
     	Long userId = WebUtil.readLongParam(request, USER_ID);
     	String sortBy = WebUtil.readStrParam(request, SORT_BY);
     	String sortDirection = WebUtil.readStrParam(request, SORT_DIR);
@@ -138,17 +151,17 @@ public class VideoRecorderAction extends LamsDispatchAction {
 		// if no user is specified
 		if(getAll){
 			// get all recordings
-			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionId(toolSessionId);
+			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionId(toolSessionId, toolContentId);
 		// otherwise
 		} else{
 			// get all recordings from user specified
-			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionIdAndUserId(toolSessionId, userId);
+			videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionIdAndUserId(toolSessionId, userId, toolContentId);
 		}
 		
 		// sort the list of recording DTOs in order to create the xml correctly
 		Comparator<VideoRecorderRecordingDTO> comp = new VideoRecorderRecordingComparator(sortBy, sortDirection);
 	    Collections.sort(videoRecorderRecordingDTOs, comp);
-
+	    
 		String xmlOutput = buildVideoRecordingsXML(videoRecorderRecordingDTOs, userId);
 		writeAJAXResponse(response, xmlOutput);
 		return null;
@@ -160,50 +173,97 @@ public class VideoRecorderAction extends LamsDispatchAction {
 
 		try{
 			// get paramaters from POST
-			Long toolSessionId = WebUtil.readLongParam(request, TOOL_SESSION_ID);
-	    	Long recordingId = WebUtil.readLongParam(request, RECORDING_ID);
-	    	Long userId = WebUtil.readLongParam(request, USER_ID);
-	    	String title = WebUtil.readStrParam(request, TITLE);
-	    	String description = WebUtil.readStrParam(request, DESCRIPTION);
-	    	String filename = WebUtil.readStrParam(request, FILENAME);
-	    	Boolean isJustSound = WebUtil.readBooleanParam(request, IS_JUST_SOUND);
-	    	int rating = WebUtil.readIntParam(request, RATING);
+			Long toolSessionId = WebUtil.readLongParam(request, TOOL_SESSION_ID, true);
+			Long toolContentId = WebUtil.readLongParam(request, TOOL_CONTENT_ID, true);
+	    	Long recordingId = WebUtil.readLongParam(request, RECORDING_ID, true);
+	    	Long userId = WebUtil.readLongParam(request, USER_ID, true);
+	    	String title = WebUtil.readStrParam(request, TITLE, false);
+	    	String description = WebUtil.readStrParam(request, DESCRIPTION, false);
+	    	String filename = WebUtil.readStrParam(request, FILENAME, true);
+	    	Boolean isJustSound = WebUtil.readBooleanParam(request, IS_JUST_SOUND, false);
+	    	int rating = WebUtil.readIntParam(request, RATING, false);
+	    	Boolean saveToLams = WebUtil.readBooleanParam(request, SAVE_TO_LAMS, false);
 	    	
 	    	// get service
 			IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
 			
-			// get user
-			VideoRecorderUser user = videoRecorderService.getUserByUID(userId);
+			// initialize session, user and recording
+			VideoRecorderSession session = null;
+			VideoRecorderUser user = null;
+			VideoRecorderRecording videoRecording = null;
+			VideoRecorder videoRecorder = null;
 			
-			// get session
-			VideoRecorderSession session = videoRecorderService.getSessionBySessionId(toolSessionId);
-			
-			
-			// create videoRecording
-			VideoRecorderRecording videoRecording;
-			
-			// if no recordingId is sent, create a new recording
-			if(recordingId == -1){
-				videoRecording = new VideoRecorderRecording();
-				videoRecording.setCreateBy(user);
-				videoRecording.setVideoRecorderSession(session);
-				videoRecording.setFilename(filename);
-				videoRecording.setRating((float)rating);
-				videoRecording.setCreateDate(new Date());
-				videoRecording.setIsJustSound(isJustSound);
-				videoRecording.setRatings(null);
-				videoRecording.setComments(null);
+			// if saving from author
+			if(toolContentId != -1){
+				// get video recorder
+				videoRecorder = videoRecorderService.getVideoRecorderByContentId(toolContentId);
+				
+				if(videoRecorder != null){
+					// get recording
+					videoRecording = videoRecorderService.getFirstRecordingByToolContentId(toolContentId);
+					
+					// if no recording exists create a new one
+					if(videoRecording == null){
+						videoRecording = new VideoRecorderRecording();
+						
+						videoRecording.setFilename(filename);
+						videoRecording.setRating((float)rating);
+						videoRecording.setCreateDate(new Date());
+						videoRecording.setIsJustSound(isJustSound);
+						videoRecording.setRatings(null);
+						videoRecording.setComments(null);
+						videoRecording.setCreateBy(null);
+						videoRecording.setToolContentId(toolContentId);
+					}					
+				}
+				
 			}
-			// otherwise get the recording from the DAO
-			else{
-				videoRecording = videoRecorderService.getRecordingById(recordingId);
-			}
+			// if saving from learner
+			else if(toolSessionId != -1){
+				// get session
+				session = videoRecorderService.getSessionBySessionId(toolSessionId);
+				
+				// get user
+				user = videoRecorderService.getUserByUID(userId);
+				
+				// if no recording id is specified
+				if(recordingId == -1){
+					// create a new recording
+					videoRecording = new VideoRecorderRecording();
+					videoRecording.setFilename(filename);
+					videoRecording.setRating((float)rating);
+					videoRecording.setCreateDate(new Date());
+					videoRecording.setIsJustSound(isJustSound);
+					videoRecording.setRatings(null);
+					videoRecording.setComments(null);
+					videoRecording.setCreateBy(user);
+					videoRecording.setVideoRecorderSession(session);
+				}
+				// otherwise get the recording from the DAO
+				else{
+					videoRecording = videoRecorderService.getRecordingById(recordingId);
+				}
+			}	
 			
+			// add the last common information
 			videoRecording.setUpdateDate(new Date());
 			videoRecording.setTitle(title);
 			videoRecording.setDescription(description);
+			videoRecording.setFilename(filename);
 			
+			// save
 			videoRecorderService.saveOrUpdateVideoRecorderRecording(videoRecording);
+			
+			// if we want the recently
+			if(saveToLams){
+				// get folder dest
+				VIDEORECORDER_RECORDINGS_FOLDER_DEST = WebUtil.readStrParam(request, SAVE_TO_LAMS_DEST);
+				// get the stream from the external server
+			    InputStream is = ExternalServerUtil.getResponseInputStreamFromExternalServer(VIDEORECORDER_RECORDINGS_FOLDER_SRC + filename, new HashMap<String, String>());
+			    
+			    // write the flv file locally
+			    File file = ExternalServerUtil.writeFile(is, VIDEORECORDER_RECORDINGS_FOLDER_DEST + filename);
+			}
 			
 			writeAJAXResponse(response, OK_MSG);
 			
@@ -369,94 +429,42 @@ public class VideoRecorderAction extends LamsDispatchAction {
 		return null;
 	}
 	
-	/*
-	public ActionForward savePreviewImage(ActionMapping mapping,
+	public ActionForward getLanguageXML(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		
-    	// Use functionality in org.red5.io.amf3.ByteArray to get parameters of the ByteArray
-		String rawImageString = request.getParameter(RAW_IMAGE);
-    	ByteArray rawImage;
-    	int BCurrentlyAvailable = rawImage.bytesAvailable();
-    	int BWholeSize = rawImage.length(); // Put the Red5 ByteArray into a standard Java array of bytes
-    	byte c[] = new byte[BWholeSize];
-    	rawImage.readBytes(c);
-
-    	// Transform the byte array into a java buffered image
-    	ByteArrayInputStream db = new ByteArrayInputStream(c);
-
-    	if(BCurrentlyAvailable > 0) {
-    		System.out.println("The byte Array currently has " + BCurrentlyAvailable + " bytes. The Buffer has " + db.available());
-    		try{
-    			BufferedImage JavaImage = ImageIO.read(db);
-    			// Now lets try and write the buffered image out to a file
-    			if(JavaImage != null) { // If you sent a jpeg to the server, just change PNG to JPEG and Red5ScreenShot.png to .jpeg
-    				ImageIO.write(JavaImage, "PNG", new File("Red5ScreenShot.png"));
-    			}
-    		}
-    		catch(IOException e){
-    			System.out.println("Save_ScreenShot: Writing of screenshot failed " + e); System.out.println("IO Error " + e);
-    		}
-    	}
-    	
-    	return null;
-    }
-    */
-	
-	/* for hierarchal data
-	private String buildVideoRecordingsXML(List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs, Long userId){
-		//start the output
-		String xmlOutput = "<xml><recordings>";
-		Long lastUserId = Long.valueOf("-1");
-		Long currentUserId = Long.valueOf("-1");
-		
-		// for every user, print out its recordings
-		for(VideoRecorderRecordingDTO videoRecorderRecordingDTO: videoRecorderRecordingDTOs){
-			VideoRecorderUser user = videoRecorderRecordingDTO.getCreateBy();
-			Set<VideoRecorderCommentDTO> comments = videoRecorderRecordingDTO.getComments();
-			Set<VideoRecorderRatingDTO> ratings = videoRecorderRecordingDTO.getRatings();
-			
-			currentUserId = user.getUserId();
-			if(currentUserId != lastUserId){
-				if(lastUserId != -1){
-					xmlOutput += "</userFolder>";
-				}
-				xmlOutput += "<userFolder>";
-				xmlOutput += "<title>" + user.getFirstName() + " " + user.getLastName() + "</title>";
-			}
-			
-			xmlOutput += "<child><recording>";
-			xmlOutput += "<recordingId>" + videoRecorderRecordingDTO.getUid() + "</recordingId>";
-			xmlOutput += "<title>" + videoRecorderRecordingDTO.getTitle() + "</title>";
-			xmlOutput += "<userUid>" + user.getUid() + "</userUid>";
-			xmlOutput += "<userId>" + user.getUserId() + "</userId>";
-			xmlOutput += "<author>" + user.getFirstName() + " " + user.getLoginName() + "</author>";
-			xmlOutput += "<createDate>" + videoRecorderRecordingDTO.getCreateDate().toLocaleString() + "</createDate>";
-			xmlOutput += "<updateDate>" + videoRecorderRecordingDTO.getUpdateDate().toLocaleString() + "</updateDate>";
-			xmlOutput += "<description>" + videoRecorderRecordingDTO.getDescription() + "</description>";
-			xmlOutput += "<filename>" + videoRecorderRecordingDTO.getFilename() + "</filename>";
-			xmlOutput += "<rating>" + videoRecorderRecordingDTO.getRating() + "</rating>";
-			xmlOutput += "<userRating>" + buildUserRating(ratings, userId) + "</userRating>";
-			
-			// for every recording, print out its comments
-			xmlOutput += buildVideoCommentsXML(comments);
-			xmlOutput += "</recording></child>";
-			
-			lastUserId = currentUserId;
+		// get service
+		try{
+			IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
+			writeAJAXResponse(response, videoRecorderService.getLanguageXML());
+		}catch(Exception e){
+			writeAJAXResponse(response, ERROR_MSG + e.getMessage());
 		}
 		
-		if(lastUserId == currentUserId && (lastUserId != -1 || currentUserId != -1)){
-			xmlOutput += "</userFolder>";
-		}
-		
-		xmlOutput += "</recordings></xml>";
-		return xmlOutput;
+		return null;
+
 	}
-	*/
+	
+	public ActionForward getLanguageXMLForFCK(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+		// get service
+		try{
+			IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
+			writeAJAXResponse(response, videoRecorderService.getLanguageXMLForFCK());
+		}catch(Exception e){
+			writeAJAXResponse(response, "");
+		}
+		
+		return null;
+
+	}
 	
 	private String buildVideoRecordingsXML(List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs, Long userId){
 		//start the output
 		String xmlOutput = "<recordings>";
+		
+		// get service
+		IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
 		
 		// for all recordings, print out their information
 		for(VideoRecorderRecordingDTO videoRecorderRecordingDTO: videoRecorderRecordingDTOs){
@@ -467,9 +475,18 @@ public class VideoRecorderAction extends LamsDispatchAction {
 			xmlOutput += "<recording>";
 			xmlOutput += "<recordingId>" + videoRecorderRecordingDTO.getUid() + "</recordingId>";
 			xmlOutput += "<title>" + videoRecorderRecordingDTO.getTitle() + "</title>";
-			xmlOutput += "<userUid>" + user.getUid() + "</userUid>";
-			xmlOutput += "<userId>" + user.getUserId() + "</userId>";
-			xmlOutput += "<author>" + user.getFirstName() + " " + user.getLoginName() + "</author>";
+			
+			if(user != null){
+				xmlOutput += "<isToolContent>false</isToolContent>";
+				xmlOutput += "<userUid>" + user.getUid() + "</userUid>";
+				xmlOutput += "<userId>" + user.getUserId() + "</userId>";
+				xmlOutput += "<author>" + user.getFirstName() + " " + user.getLoginName() + "</author>";
+			}
+			else if(user == null && videoRecorderRecordingDTO.getToolContentId() != -1){
+				xmlOutput += "<isToolContent>true</isToolContent>";
+				xmlOutput += "<author>" + videoRecorderService.getMessage("videorecorder.instructor") + "</author>";
+			}
+
 			xmlOutput += "<createDate>" + videoRecorderRecordingDTO.getCreateDate().toLocaleString() + "</createDate>";
 			xmlOutput += "<updateDate>" + videoRecorderRecordingDTO.getUpdateDate().toLocaleString() + "</updateDate>";
 			xmlOutput += "<description>" + videoRecorderRecordingDTO.getDescription() + "</description>";

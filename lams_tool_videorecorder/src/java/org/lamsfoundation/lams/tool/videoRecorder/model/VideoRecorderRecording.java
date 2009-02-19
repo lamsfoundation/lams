@@ -39,12 +39,14 @@ import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
  * @hibernate.class table="tl_lavidr10_recording"
  */
 
-public class VideoRecorderRecording implements java.io.Serializable {
+public class VideoRecorderRecording implements java.io.Serializable, Cloneable{
 	
 	private static final long serialVersionUID = -3701664859818409197L;
 
 	// Fields
 	private Long uid;
+	
+    private Long toolContentId;
 
     private Date createDate;
 
@@ -75,6 +77,7 @@ public class VideoRecorderRecording implements java.io.Serializable {
 	}
 
 	public VideoRecorderRecording(VideoRecorderRecordingDTO recording, VideoRecorderSession videoRecorderSession) {
+		this.uid = recording.uid;
 		this.createDate = recording.createDate;
 		this.updateDate = recording.updateDate;
 		this.createBy = recording.createBy;
@@ -86,13 +89,29 @@ public class VideoRecorderRecording implements java.io.Serializable {
 		this.comments = VideoRecorderComment.getVideoRecorderComments(recording.comments);
 		this.videoRecorderSession = videoRecorderSession;
 		this.filename = recording.filename;
+		this.toolContentId = recording.toolContentId;
+	}
+	
+	public VideoRecorderRecording(VideoRecorderRecording recording){
+		this.uid = recording.uid;
+		this.createDate = new Date();
+		this.updateDate = new Date();
+		this.createBy = recording.createBy;
+		this.title = recording.title;
+		this.description = recording.description;
+		this.rating = recording.rating;
+		this.isJustSound = false;
+		this.ratings = null;
+		this.comments = null;
+		this.filename = recording.filename;
+		this.toolContentId = recording.toolContentId;
 	}
 
 	/** full constructor */
 	public VideoRecorderRecording(
 			Date createDate, Date updateDate, VideoRecorderUser createBy, String title, String description,
 			Float rating, Boolean isJustSound, Long videoRecorderUid, VideoRecorderSession videoRecorderSession, String filename,
-			Set ratings, Set comments) {
+			Set ratings, Set comments, Long toolContentId) {
 				
 		this.createDate = createDate;
 		this.updateDate = updateDate;
@@ -105,6 +124,7 @@ public class VideoRecorderRecording implements java.io.Serializable {
 		this.comments = comments;
 		this.videoRecorderSession = videoRecorderSession;
 		this.filename = filename;
+		this.toolContentId = toolContentId;
 	}
 
     // Property accessors
@@ -121,6 +141,19 @@ public class VideoRecorderRecording implements java.io.Serializable {
 	this.uid = uid;
     }
 
+    /**
+     * @hibernate.property column="tool_content_id"
+     * 
+     */
+
+    public Long getToolContentId() {
+	return toolContentId;
+    }
+
+    public void setToolContentId(Long toolContentId) {
+	this.toolContentId = toolContentId;
+    }
+    
     /**
      * @hibernate.property column="create_date"
      * 
@@ -326,5 +359,17 @@ public class VideoRecorderRecording implements java.io.Serializable {
 		result = 37 * result
 				+ (getUid() == null ? 0 : this.getUid().hashCode());
 		return result;
+	}
+	
+	public Object clone() {
+		Object obj = null;
+		try {
+			obj = super.clone();
+			((VideoRecorderRecording) obj).setUid(null);
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+
+		return obj;
 	}
 }
