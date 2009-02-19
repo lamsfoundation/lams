@@ -38,7 +38,7 @@ public interface PedagogicalPlannerDAO {
 
     List<String[]> getTitlePath(PedagogicalPlannerSequenceNode node);
 
-    String getFilePath(PedagogicalPlannerSequenceNode node);
+    Integer getNextOrderId(Long parentUid);
 
-    Integer getNextSubdir(Long parentUid);
+    PedagogicalPlannerSequenceNode getNeighbourNode(PedagogicalPlannerSequenceNode node, Integer orderDelta);
 }

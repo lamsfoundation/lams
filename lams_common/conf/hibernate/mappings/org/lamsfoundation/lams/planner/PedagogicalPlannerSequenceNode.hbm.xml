@@ -37,11 +37,11 @@
         />
 
         <property
-            name="subdir"
+            name="order"
             type="java.lang.Integer"
             update="true"
             insert="true"
-            column="subdir"
+            column="order_id"
         />
 
         <property
@@ -81,7 +81,7 @@
             lazy="false"
             cascade="all"
             sort="unsorted"
-            order-by="subdir asc"
+            order-by="order_id asc"
         >
 
             <key
@@ -101,6 +101,14 @@
             update="true"
             insert="true"
             column="locked"
+        />
+
+        <property
+            name="fileUuid"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="file_uuid"
         />
 
         <!--

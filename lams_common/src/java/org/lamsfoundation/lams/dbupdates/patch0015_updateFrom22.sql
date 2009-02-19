@@ -9,7 +9,22 @@ SET AUTOCOMMIT = 0;
 ALTER TABLE lams_tool ADD COLUMN pedagogical_planner_url TEXT;
 ALTER TABLE lams_system_tool ADD COLUMN pedagogical_planner_url TEXT;
 UPDATE lams_system_tool SET pedagogical_planner_url='pedagogicalPlanner/initGrouping.do' WHERE system_tool_id=1;
-
+CREATE TABLE lams_planner_nodes (
+	uid BIGINT(20) NOT NULL auto_increment,
+	parent_uid BIGINT(20),
+	order_id TINYINT UNSIGNED NOT NULL,
+	locked TINYINT(1) NOT NULL DEFAULT 0,
+	content_folder_id VARCHAR(32),
+	title VARCHAR(255) NOT NULL,
+	brief_desc TEXT,
+	full_desc TEXT,
+	file_uuid  BIGINT(20) UNSIGNED,
+	file_name VARCHAR(255),
+	PRIMARY KEY (uid),
+	UNIQUE KEY (parent_uid, order_id),
+	CONSTRAINT FK_lams_planner_node_parent FOREIGN KEY (parent_uid)
+	               REFERENCES lams_planner_nodes(uid) ON DELETE CASCADE ON UPDATE CASCADE
+)TYPE=InnoDB;
 -- LDEV-2074 --------------
 ALTER TABLE lams_learning_design ADD COLUMN floating_activity_id BIGINT(20);
 CREATE INDEX idx_design_floating_act ON lams_learning_design (floating_activity_id ASC);

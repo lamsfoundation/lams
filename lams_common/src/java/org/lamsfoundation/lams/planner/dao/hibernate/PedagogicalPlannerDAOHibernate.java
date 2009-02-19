@@ -23,7 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.planner.dao.hibernate;
 
-import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,42 +43,13 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	    + " AS n WHERE n.parent=NULL";
     private static final String FIND_PARENT_TITLE = "SELECT n.parent.uid, n.title FROM "
 	    + PedagogicalPlannerSequenceNode.class.getName() + " AS n WHERE n.uid=?";
-
-    private static final String FIND_PARENT_DIR = "SELECT n.parent.uid, n.subdir FROM "
-	    + PedagogicalPlannerSequenceNode.class.getName() + " AS n WHERE n.uid=?";
-
-    private static final String FIND_MAX_SUBDIR = "SELECT MAX(n.subdir) FROM "
+    private static final String FIND_MAX_ORDER_ID = "SELECT MAX(n.order) FROM "
 	    + PedagogicalPlannerSequenceNode.class.getName() + " AS n WHERE n.parent.uid=?";
+    private static final String FIND_NEIGHBOUR_NODE = "FROM " + PedagogicalPlannerSequenceNode.class.getName()
+	    + " AS n WHERE n.parent.uid=? AND n.order=?";
 
     public PedagogicalPlannerSequenceNode getByUid(Long uid) {
 	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().get(PedagogicalPlannerSequenceNode.class, uid);
-    }
-
-    public String getFilePath(PedagogicalPlannerSequenceNode node) {
-	if (node.getParent() == null) {
-	    return null;
-	}
-	Long currentUid = node.getUid();
-	LinkedList<Integer> filePathParts = new LinkedList<Integer>();
-	List<Object[]> result;
-	Object[] row;
-	while (currentUid != null) {
-	    result = getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.FIND_PARENT_DIR, currentUid);
-	    if (result.size() > 0) {
-		row = result.get(0);
-		Integer subdir = (Integer) row[1];
-		filePathParts.addFirst(subdir);
-		currentUid = (Long) row[0];
-	    } else {
-		return null;
-	    }
-	}
-	StringBuilder filePath = new StringBuilder();
-	for (Integer dir : filePathParts) {
-	    filePath.append(dir.toString() + File.separator);
-	}
-	filePath.append(node.getFileName());
-	return filePath.toString();
     }
 
     public PedagogicalPlannerSequenceNode getRootNode() {
@@ -124,14 +94,24 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 
     public void saveOrUpdateNode(PedagogicalPlannerSequenceNode node) {
 	getHibernateTemplate().saveOrUpdate(node);
+	getHibernateTemplate().flush();
     }
 
-    public Integer getNextSubdir(Long parentUid) {
-	Integer maxSubdir = (Integer) getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.FIND_MAX_SUBDIR,
+    public Integer getNextOrderId(Long parentUid) {
+	Integer maxOrderId = (Integer) getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.FIND_MAX_ORDER_ID,
 		parentUid).get(0);
-	if (maxSubdir == null) {
-	    maxSubdir = 0;
+	if (maxOrderId == null) {
+	    maxOrderId = 0;
 	}
-	return maxSubdir + 1;
+	return maxOrderId + 1;
+    }
+
+    public PedagogicalPlannerSequenceNode getNeighbourNode(PedagogicalPlannerSequenceNode node, Integer orderDelta) {
+	Integer order = node.getOrder() + orderDelta;
+	Long parentUid = node.getParent() == null ? null : node.getParent().getUid();
+	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().find(
+		"FROM " + PedagogicalPlannerSequenceNode.class.getName()
+			+ " AS n WHERE ((? IS NULL AND n.parent=NULL) OR  n.parent.uid=?) AND n.order=?",
+		new Object[] { parentUid, parentUid, order }).get(0);
     }
 }

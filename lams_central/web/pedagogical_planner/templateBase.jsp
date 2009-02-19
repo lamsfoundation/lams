@@ -155,7 +155,7 @@
 			<tr>
 				<td class="titleCell
 				<c:if test="${not empty activity.group}">
-				${complexActivityType}	group${activity.group}
+					${complexActivityType}	group${activity.group}
 				</c:if>
 				<c:if test="${activity.lastNestedActivity}">
 					${complexActivityType}LastActivity

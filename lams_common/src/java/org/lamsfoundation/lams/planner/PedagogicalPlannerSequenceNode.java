@@ -14,10 +14,12 @@ public class PedagogicalPlannerSequenceNode {
     private Long uid;
     private PedagogicalPlannerSequenceNode parent;
     private Set<PedagogicalPlannerSequenceNode> subnodes = new LinkedHashSet<PedagogicalPlannerSequenceNode>();
-    private Integer subdir;
+    private Integer order;
+    private String contentFolderId;
     private String title;
     private String briefDescription;
     private String fullDescription;
+    private Long fileUuid;
     private String fileName;
     private Boolean locked = false;
 
@@ -41,15 +43,15 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.property column="subdir"
+     * @hibernate.property column="order_id"
      * @return
      */
-    public Integer getSubdir() {
-	return subdir;
+    public Integer getOrder() {
+	return order;
     }
 
-    public void setSubdir(Integer subdir) {
-	this.subdir = subdir;
+    public void setOrder(Integer subdir) {
+	order = subdir;
     }
 
     /**
@@ -105,7 +107,7 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.set cascade="all" order-by="subdir asc"
+     * @hibernate.set cascade="all" order-by="order_id asc"
      * @hibernate.collection-key column="parent_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode"
      * @return
@@ -128,6 +130,30 @@ public class PedagogicalPlannerSequenceNode {
 
     public void setLocked(Boolean locked) {
 	this.locked = locked;
+    }
+
+    /**
+     * @hibernate.property column="file_uuid"
+     * @return
+     */
+    public Long getFileUuid() {
+	return fileUuid;
+    }
+
+    public void setFileUuid(Long fileUuid) {
+	this.fileUuid = fileUuid;
+    }
+
+    /**
+     * @hibernate.property column="content_folder_id"
+     * @return
+     */
+    public String getContentFolderId() {
+	return contentFolderId;
+    }
+
+    public void setContentFolderId(String contentFolderId) {
+	this.contentFolderId = contentFolderId;
     }
 
 }

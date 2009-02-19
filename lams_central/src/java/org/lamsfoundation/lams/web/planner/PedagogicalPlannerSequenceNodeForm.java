@@ -24,13 +24,22 @@
 package org.lamsfoundation.lams.web.planner;
 
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.upload.FormFile;
 
 public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
     private Long uid;
     private Long parentUid;
+    private String contentFolderId;
     private String title;
     private String briefDescription;
     private String fullDescription;
+    private FormFile file;
+    private Boolean removeFile;
+    private String nodeType;
+    private Long fileUuid;
+
+    public final static String NODE_TYPE_SUBNODES = "subnodes";
+    public final static String NODE_TYPE_TEMPLATE = "template";
 
     public Long getUid() {
 	return uid;
@@ -70,5 +79,45 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
 
     public void setParentUid(Long parentUid) {
 	this.parentUid = parentUid;
+    }
+
+    public FormFile getFile() {
+	return file;
+    }
+
+    public void setFile(FormFile file) {
+	this.file = file;
+    }
+
+    public Boolean getRemoveFile() {
+	return removeFile;
+    }
+
+    public void setRemoveFile(Boolean removeFile) {
+	this.removeFile = removeFile;
+    }
+
+    public String getNodeType() {
+	return nodeType;
+    }
+
+    public void setNodeType(String nodeType) {
+	this.nodeType = nodeType;
+    }
+
+    public String getContentFolderId() {
+	return contentFolderId;
+    }
+
+    public void setContentFolderId(String contentFolderId) {
+	this.contentFolderId = contentFolderId;
+    }
+
+    public Long getFileUuid() {
+	return fileUuid;
+    }
+
+    public void setFileUuid(Long fileUuid) {
+	this.fileUuid = fileUuid;
     }
 }

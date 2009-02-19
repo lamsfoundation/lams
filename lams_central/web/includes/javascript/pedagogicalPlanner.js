@@ -161,20 +161,22 @@
   }
   
   function leaveNodeEditor(text,url){
-	 	if (!isNodeChanged() || text==null || confirm(text)){
+	 	if (text==null || confirm(text)){
   			document.location.href=url;
   		}
   	 }
-  	 
-  function removeNode(text,url){
-  		if (text==null || confirm(text)){
-  			document.location.href=url;
-  		}
+  
+  function onRemoveFileCheckboxChange(){
+  	 document.getElementById("fileInputArea").style.display = document.getElementById("removeFile").checked ? "none" : "block";	
   }
   
-  function isNodeChanged(){
-  	return false;
-  	//title!=$("#title").val() 
-  	//|| briefDescription!=$("#briefDescription").val() 
-  	//|| fullDescription!=$("#fullDescription").val();
-  }
+  function onNodeTypeChange(){
+  	if (document.getElementById("hasSubnodesType").checked){
+  		document.getElementById("fileArea").style.display="none";
+  		document.getElementById("fullDescriptionArea").style.display="block";
+  	}
+  	else {
+  		document.getElementById("fullDescriptionArea").style.display="none";
+  		document.getElementById("fileArea").style.display="block";
+  	}
+  }  

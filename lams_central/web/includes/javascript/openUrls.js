@@ -74,7 +74,7 @@
 		function openPedagogicalPlanner(){
 			if(isMac)
 				{
-					authorWin = window.open('pedagogicalPlanner.do','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable,scrollbars');
+					authorWin = window.open('pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');
 				}
 			else
 				{
@@ -84,7 +84,7 @@
 					}
 					else
 					{
-						authorWin = window.open('pedagogicalPlanner.do','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable,scrollbars');
+						authorWin = window.open('pedagogicalPlanner.do','aWindow','width='+pedagogical_planner_width+',height='+pedagogical_planner_height+',resizable,scrollbars');
 						authorWin.focus();
 					}
 				}

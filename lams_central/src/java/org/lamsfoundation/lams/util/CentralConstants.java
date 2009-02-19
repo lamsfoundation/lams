@@ -139,19 +139,27 @@ public class CentralConstants {
 
     public static final String ERROR_PLANNER_TITLE_BLANK = "error.planner.title.blank";
 
-    public static final String PATH_ACTIVITY_NO_PLANNER_SUPPORT = "/pedagogical_planner/defaultActivityForm.jsp";
-
-    public static final String TEMPLATE_FILE_NAME = "LAMS_Pedagogical_Planner_Template.zip";
-
-    public static final String IMAGE_PATH_GATE = "images/stop.gif";
-
     public static final String RESOURCE_KEY_BRANCH_EMPTY = "label.planner.branch.empty";
-
-    public static final String IMAGE_PATH_GROUPING = "images/grouping.gif";
 
     public static final String FORWARD_GROUPING = "grouping";
 
     public static final int PLANNER_MAX_BRANCHES = 4;
 
     public static final int PLANNER_MAX_OPTIONS = 4;
+
+    public static final String MONITORING_SERVICE_BEAN_NAME = "monitoringService";
+
+    public static final String CENTRAL_MESSAGE_SERVICE_BEAN_NAME = "centralMessageService";
+
+    public static final String ATTR_NODE = "node";
+
+    public static final String PARAM_CREATE_SUBNODE = "createSubnode";
+
+    public static final String PARAM_UID = "uid";
+
+    public static final String CENTRAL_TOOL_CONTENT_HANDLER_BEAN_NAME = "centralToolContentHandler";
+
+    public static final String PARAM_EDIT = "edit";
+
+    public static final String USER_MANAGEMENT_SERVICE_BEAN_NAME = "userManagementService";
 }

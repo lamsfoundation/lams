@@ -413,11 +413,6 @@
 				<include name="jboss-serialization.jar" />
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${contentrepository.directory}/pedagogical_planner">	
-			<fileset dir="${lib}/pedagogical_planner">
-				<include name="**"/> 
-			</fileset>
-		</copy>
 		
 	</target>
 

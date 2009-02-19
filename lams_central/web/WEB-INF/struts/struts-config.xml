@@ -31,8 +31,12 @@
     />
 
    <form-bean
-  name="GroupingPedagogicalPlannerForm"
-  type="org.lamsfoundation.lams.web.planner.GroupingPedagogicalPlannerForm"
+  name="PedagogicalPlannerGroupingForm"
+  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerGroupingForm"
+/>
+<form-bean
+  name="PedagogicalPlannerSequenceNodeForm"
+  type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerSequenceNodeForm"
 />
 
 <form-bean
@@ -345,48 +349,60 @@
     <action
       path="/pedagogicalPlanner"
       type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction"
+      name="PedagogicalPlannerSequenceNodeForm"
+      scope="request"
       parameter="method"
       unknown="false"
       validate="true"
     >
       <forward
-        name="success"
-        path="/pedagogical_planner/base.jsp"
-        redirect="false"
-      />
-      <forward
-        name="grouping"
-        path="/pedagogical_planner/grouping.jsp"
+        name="template"
+        path="/pedagogical_planner/templateBase.jsp"
         redirect="false"
       />
       <forward
         name="preview"
         path="/home.do?method=learner"
+        redirect="false"
+      />
+      <forward
+        name="sequenceChooser"
+        path="/pedagogical_planner/sequenceChooser.jsp"
+        redirect="false"
+      />
+      <forward
+        name="grouping"
+        path="/pedagogical_planner/grouping.jsp"
         redirect="false"
       />
     </action>
     <action
       path="/pedagogicalPlanner/grouping"
       type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerAction"
-      name="GroupingPedagogicalPlannerForm"
+      name="PedagogicalPlannerGroupingForm"
       scope="request"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
-        name="success"
-        path="/pedagogical_planner/base.jsp"
-        redirect="false"
-      />
-      <forward
-        name="grouping"
-        path="/pedagogical_planner/grouping.jsp"
+        name="template"
+        path="/pedagogical_planner/templateBase.jsp"
         redirect="false"
       />
       <forward
         name="preview"
         path="/home.do?method=learner"
+        redirect="false"
+      />
+      <forward
+        name="sequenceChooser"
+        path="/pedagogical_planner/sequenceChooser.jsp"
+        redirect="false"
+      />
+      <forward
+        name="grouping"
+        path="/pedagogical_planner/grouping.jsp"
         redirect="false"
       />
     </action>

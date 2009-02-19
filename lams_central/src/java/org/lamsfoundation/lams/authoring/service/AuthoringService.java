@@ -164,10 +164,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     }
 
-    public PedagogicalPlannerDAO getPedagogicalPlannerDAO() {
-	return pedagogicalPlannerDAO;
-    }
-
     public void setPedagogicalPlannerDAO(PedagogicalPlannerDAO pedagogicalPlannerDAO) {
 	this.pedagogicalPlannerDAO = pedagogicalPlannerDAO;
     }
@@ -538,8 +534,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 
 	if (design != null) { /*
-				 * only the user who is editing the design may unlock it
-				 */
+	 * only the user who is editing the design may unlock it
+	 */
 	    if (design.getEditOverrideUser().equals(user)) {
 		design.setEditOverrideLock(false);
 		design.setEditOverrideUser(null);

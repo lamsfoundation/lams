@@ -8,7 +8,7 @@ CSS for PedagogicalPlanner
 ********************************************** */
 
 .toolFrame {
-    width: 580px;
+    width: 780px;
     border: 1px lightgrey solid;
    }
    
@@ -27,12 +27,8 @@ CSS for PedagogicalPlanner
    	text-align: center;
    }
    
-.titleCell span{
-	font-size: smaller;
-	}
-   
 .formCell {
-   	width: 580px;
+   	width: 780px;
    }
    
 #pedagogicalPlannerInfoArea {
@@ -129,4 +125,16 @@ h3.group3{
 h3.group4{
 	color: purple;
 	text-decoration: underline;
+}
+
+.sequenceActionImage {
+	height: 15px;
+	width: 15px;
+	cursor: pointer;
+	float: left;
+	margin-left: 5px;
+}
+
+.align-center {
+	text-align: center;
 }

@@ -51,7 +51,6 @@
 		<property name="competenceDAO"><ref bean="competenceDAO"/></property>
 		<property name="competenceMappingDAO"><ref bean="competenceMappingDAO"/></property>
 		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
-		<property name="pedagogicalPlannerDAO"><ref bean="pedagogicalPlannerDAO"/></property>
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
 		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>
 		<property name="messageService"><ref bean="authoringMessageService"/></property>

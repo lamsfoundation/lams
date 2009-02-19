@@ -41,6 +41,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
     // Not node-bound variables, but simply attributes used in JSP page
     private Boolean edit = false;
     private Boolean createSubnode = false;
+    private Boolean isSysAdmin = true;
 
     public PedagogicalPlannerSequenceNodeDTO() {
     }
@@ -154,5 +155,13 @@ public class PedagogicalPlannerSequenceNodeDTO {
 
     public void setCreateSubnode(Boolean createSubnode) {
 	this.createSubnode = createSubnode;
+    }
+
+    public Boolean getIsSysAdmin() {
+	return isSysAdmin;
+    }
+
+    public void setIsSysAdmin(Boolean isSysAdmin) {
+	this.isSysAdmin = isSysAdmin;
     }
 }
