@@ -36,7 +36,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
- * @author Ozgur Demirtas fixed by lfoxton
+ * @author Ozgur Demirtas
  * 
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
@@ -47,6 +47,11 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
     private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSessionId= :qaSession";
     private static final String LOAD_USER_FOR_SESSION = "from qaQueUsr in class QaQueUsr where  qaQueUsr.qaSessionId= :qaSessionId";
+
+    private static final String GET_USER_COUNT_FOR_CONTENT = "select count(*) from QaQueUsr quser, QaSession qses, QaQueContent qcon where "
+	    + "quser.qaSession=qses and " + "qses.qaContent=qcon and " + "qcon.uid=:uid";
+
+    // select count(*) from tl_laqa11_que_usr quser, tl_laqa11_session qses where quser.qa_session_id=qses.uid and qses.qa_content_id=5378; 
 
     public QaQueUsr getQaUserByUID(Long uid) {
 	return (QaQueUsr) this.getHibernateTemplate().get(QaQueUsr.class, uid);
@@ -109,12 +114,20 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	this.getHibernateTemplate().delete(qaQueUsr);
     }
 
-    public int getTotalNumberOfUsers() {
-	String query = "from obj in class QaQueUsr";
-	return this.getHibernateTemplate().find(query).size();
-    }
-
     public int getTotalNumberOfUsers(QaContent qa) {
+
+	int returnInt = 0;
+	if (qa != null && qa.getUid() != null) {
+	    List result = getSession().createQuery(GET_USER_COUNT_FOR_CONTENT).setLong("uid", qa.getUid()).list();
+	    Integer resultInt = (result.get(0) != null) ? (Integer) result.get(0) : new Integer(0);
+	    returnInt = resultInt.intValue();
+	} else {
+	    logger.error("Attempt to count users from null content");
+	}
+	logger.debug("Number of users for quContent " +qa.getUid()+ ": " + returnInt);
+	return returnInt; 
+	
+	/*
 	String strGetUser = "from qaQueUsr in class QaQueUsr";
 	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(strGetUser).list();
@@ -135,6 +148,7 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	}
 	logger.debug("final totalUserCount: " + totalUserCount);
 	return totalUserCount;
+	*/
     }
 
 }

@@ -76,8 +76,6 @@ public interface IQaService {
 
     public QaContent getQaContentByUID(Long uid) throws QaApplicationException;
 
-    public int getTotalNumberOfUsers() throws QaApplicationException;
-
     public int getTotalNumberOfUsers(QaContent qa) throws QaApplicationException;
 
     public int countSessionComplete(QaContent qa) throws QaApplicationException;
@@ -267,8 +265,6 @@ public interface IQaService {
     public void removeFile(Long submissionId) throws QaApplicationException;
 
     public List retrieveQaUploadedFiles(QaContent qa) throws QaApplicationException;
-
-    public void cleanUploadedFilesMetaData() throws QaApplicationException;
 
     public List retrieveQaQueContentsByToolContentId(long toolContentId);
 

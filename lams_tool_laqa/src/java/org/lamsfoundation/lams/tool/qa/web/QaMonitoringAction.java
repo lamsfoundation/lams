@@ -244,8 +244,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     /**
-     * switches to instructions tab of the monitoring url. getInstructions(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * switches to instructions tab of the monitoring url.
+     * getInstructions(ActionMapping mapping, ActionForm form,
+     * HttpServletRequest request, HttpServletResponse response) throws
+     * IOException, ServletException
      * 
      * @param mapping
      * @param form
@@ -360,8 +362,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     /**
-     * activates editActivity screen ActionForward editActivity(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * activates editActivity screen ActionForward editActivity(ActionMapping
+     * mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
+     * response) throws IOException, ServletException
      * 
      * @param mapping
      * @param form
@@ -486,8 +489,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     /**
      * switches to summary tab of the monitoring url
      * 
-     * getSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * throws IOException, ServletException
+     * getSummary(ActionMapping mapping, ActionForm form, HttpServletRequest
+     * request, HttpServletResponse response) throws IOException,
+     * ServletException
      * 
      * @param mapping
      * @param form
@@ -736,10 +740,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     /**
-     * gets called when the user selects a group from dropdown box in the summary tab
+     * gets called when the user selects a group from dropdown box in the
+     * summary tab
      * 
-     * submitSession(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * throws IOException, ServletException
+     * submitSession(ActionMapping mapping, ActionForm form, HttpServletRequest
+     * request, HttpServletResponse response) throws IOException,
+     * ServletException
      * 
      * @param mapping
      * @param form
@@ -836,8 +842,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     /**
-     * enables the user to edit responses ActionForward editResponse(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * enables the user to edit responses ActionForward
+     * editResponse(ActionMapping mapping, ActionForm form, HttpServletRequest
+     * request, HttpServletResponse response) throws IOException,
+     * ServletException
      * 
      * @param mapping
      * @param form
@@ -1037,8 +1045,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     /**
-     * enables the user to update responses ActionForward updateResponse(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * enables the user to update responses ActionForward
+     * updateResponse(ActionMapping mapping, ActionForm form, HttpServletRequest
+     * request, HttpServletResponse response) throws IOException,
+     * ServletException
      * 
      * @param mapping
      * @param form
@@ -1256,8 +1266,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     /**
-     * enables the user to delete responses ActionForward deleteResponse(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+     * enables the user to delete responses ActionForward
+     * deleteResponse(ActionMapping mapping, ActionForm form, HttpServletRequest
+     * request, HttpServletResponse response) throws IOException,
+     * ServletException
      * 
      * @param mapping
      * @param form
@@ -1426,7 +1438,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     /**
-     * persists error messages to request scope persistError(HttpServletRequest request, String message)
+     * persists error messages to request scope persistError(HttpServletRequest
+     * request, String message)
      * 
      * @param request
      * @param message
@@ -1439,10 +1452,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     /**
-     * populates data for summary screen, view all results screen and export portfolio.
+     * populates data for summary screen, view all results screen and export
+     * portfolio.
      * 
-     * User id is needed if isUserNamesVisible is false && learnerRequest is true, as it is required to work out if the
-     * data being analysed is the current user.
+     * User id is needed if isUserNamesVisible is false && learnerRequest is
+     * true, as it is required to work out if the data being analysed is the
+     * current user.
      * 
      * @param request
      * @param qaContent
@@ -1583,7 +1598,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     /**
-     * populates data for stats screen refreshStatsData(HttpServletRequest request)
+     * populates data for stats screen refreshStatsData(HttpServletRequest
+     * request)
      * 
      * @param request
      */
@@ -3607,7 +3623,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     /**
      * returns reflection data for a specific session
      * 
-     * getReflectionListForSession(QaContent qaContent, String userID, IQaService qaService, String currentSessionId)
+     * getReflectionListForSession(QaContent qaContent, String userID,
+     * IQaService qaService, String currentSessionId)
      * 
      * @param qaContent
      * @param userID

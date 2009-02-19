@@ -46,8 +46,6 @@ public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploade
 
     private static final String GET_UPLOADED_FILES = "from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContent.qaContentId = :contentId";
 
-    private static final String DELETE_FILES_META_DATA = "from qaUploadedFile in class QaUploadedFile";
-
     public QaUploadedFile getUploadedFileById(long submissionId) {
 	return (QaUploadedFile) this.getHibernateTemplate().load(QaUploadedFile.class, new Long(submissionId));
     }
@@ -78,26 +76,6 @@ public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploade
     public void UpdateUploadFile(QaUploadedFile qaUploadedFile) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(qaUploadedFile);
-    }
-
-    public void cleanUploadedFilesMetaData() {
-	/*
-	String query = "from uploadedFile in class org.lamsfoundation.lams.tool.qa.QaUploadedFile";
-	this.getSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(query);
-	*/
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(DELETE_FILES_META_DATA).list();
-
-	if (list != null && list.size() > 0) {
-	    Iterator listIterator = list.iterator();
-	    while (listIterator.hasNext()) {
-		QaUploadedFile mcFile = (QaUploadedFile) listIterator.next();
-		this.getSession().setFlushMode(FlushMode.AUTO);
-		templ.delete(mcFile);
-		templ.flush();
-	    }
-	}
     }
 
     public void removeUploadFile(Long submissionId) {

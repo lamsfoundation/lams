@@ -32,27 +32,24 @@ import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 /**
  * 
  * @author Ozgur Demirtas
- *
+ * 
  */
-public interface IQaUploadedFileDAO
-{
-	 	public QaUploadedFile loadUploadedFileById(long submissionId);
+public interface IQaUploadedFileDAO {
+    public QaUploadedFile loadUploadedFileById(long submissionId);
 
-	 	public void updateUploadFile(QaUploadedFile qaUploadedFile);
-	 	
-	    public void saveUploadFile(QaUploadedFile qaUploadedFile);
-	    
-	    public void createUploadFile(QaUploadedFile qaUploadedFile); 
-	    
-	    public void UpdateUploadFile(QaUploadedFile qaUploadedFile);
+    public void updateUploadFile(QaUploadedFile qaUploadedFile);
 
-	    public void removeUploadFile(Long submissionId);
-	    
-	    public void deleteUploadFile(QaUploadedFile qaUploadedFile);
-        
-        public List retrieveQaUploadedFiles(QaContent qa);
-	    
-	    public void cleanUploadedFilesMetaData();
-	    
-	    public void flush();
+    public void saveUploadFile(QaUploadedFile qaUploadedFile);
+
+    public void createUploadFile(QaUploadedFile qaUploadedFile);
+
+    public void UpdateUploadFile(QaUploadedFile qaUploadedFile);
+
+    public void removeUploadFile(Long submissionId);
+
+    public void deleteUploadFile(QaUploadedFile qaUploadedFile);
+
+    public List retrieveQaUploadedFiles(QaContent qa);
+
+    public void flush();
 }

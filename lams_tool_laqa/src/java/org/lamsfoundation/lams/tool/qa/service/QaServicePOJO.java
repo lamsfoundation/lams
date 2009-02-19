@@ -580,15 +580,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public int getTotalNumberOfUsers() throws QaApplicationException {
-	try {
-	    return qaQueUsrDAO.getTotalNumberOfUsers();
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is retrieving total number of QaQueUsr: "
-		    + e.getMessage(), e);
-	}
-    }
-
     public int countTotalNumberOfUserResponsed(QaContent qa) throws QaApplicationException {
 	try {
 	    return qaDAO.countUserResponsed(qa);
@@ -1500,15 +1491,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public void removeFile(Long submissionId) throws QaApplicationException {
 	qaUploadedFileDAO.removeUploadFile(submissionId);
 	QaServicePOJO.logger.debug("removed qaUploadedFile: " + submissionId);
-    }
-
-    /**
-     * removes all the entries in the uploaded files table
-     */
-    public void cleanUploadedFilesMetaData() throws QaApplicationException {
-	QaServicePOJO.logger.debug("attempt cleaning up uploaded file meta data table from the db");
-	qaUploadedFileDAO.cleanUploadedFilesMetaData();
-	QaServicePOJO.logger.debug("files meta data has been cleaned up");
     }
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
