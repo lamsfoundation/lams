@@ -138,6 +138,8 @@ public class AssessmentConstants {
 
     public static final String ATTR_ASSESSMENT = "assessment";
 
+    public static final String ATTR_RUN_AUTO = "runAuto";
+    
     public static final String ATTR_QUESTION_UID = "questionUid";
 
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
