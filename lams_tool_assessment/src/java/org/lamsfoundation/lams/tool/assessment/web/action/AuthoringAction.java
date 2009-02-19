@@ -1239,7 +1239,6 @@ public class AuthoringAction extends Action {
 	} else if (type == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 	}
 	

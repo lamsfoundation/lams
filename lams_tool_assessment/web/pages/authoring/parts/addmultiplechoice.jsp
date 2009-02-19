@@ -226,6 +226,7 @@
 					contentFolderID="${formBean.contentFolderID}" width="622px">
 				</lams:FCKEditor>
 			</div>
+			<br><br>
 			
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="$('#assessmentQuestionForm').submit();" class="button-add-item">

@@ -93,7 +93,6 @@
 		    			$("#question").val(FCKeditorAPI.GetInstance("question").GetXHTML());
 		    			$("#generalFeedback").val(FCKeditorAPI.GetInstance("generalFeedback").GetXHTML());
 		    			$("#feedbackOnCorrect").val(FCKeditorAPI.GetInstance("feedbackOnCorrectOutsideForm").GetXHTML());
-		    			$("#feedbackOnPartiallyCorrect").val(FCKeditorAPI.GetInstance("feedbackOnPartiallyCorrectOutsideForm").GetXHTML());
 		    			$("#feedbackOnIncorrect").val(FCKeditorAPI.GetInstance("feedbackOnIncorrectOutsideForm").GetXHTML());
 		    			
 		    	    	var options = { 
@@ -131,7 +130,6 @@
 				<html:hidden property="questionIndex" />
 				<html:hidden property="contentFolderID" styleId="contentFolderID"/>
 				<html:hidden property="feedbackOnCorrect" styleId="feedbackOnCorrect"/>
-				<html:hidden property="feedbackOnPartiallyCorrect" styleId="feedbackOnPartiallyCorrect"/>
 				<html:hidden property="feedbackOnIncorrect" styleId="feedbackOnIncorrect"/>
 	
 				<h2 class="no-space-left">
@@ -186,7 +184,7 @@
 					<fmt:message key="label.authoring.choice.add.option" /> 
 				</a>
 			</form>
-			
+						
 			<!-- Overall feedback -->
 			<div class="field-name " style="margin-top: 60px;">
 				<fmt:message key="label.authoring.choice.overall.feedback" />
@@ -200,19 +198,13 @@
 				</lams:FCKEditor>
 				
 				<div class="field-name space-top">
-					<fmt:message key="label.authoring.choice.feedback.on.partially.correct" />
-				</div>
-				<lams:FCKEditor id="feedbackOnPartiallyCorrectOutsideForm" value="${formBean.feedbackOnPartiallyCorrect}"
-					contentFolderID="${formBean.contentFolderID}" width="622px">
-				</lams:FCKEditor>
-				
-				<div class="field-name space-top">
 					<fmt:message key="label.authoring.choice.feedback.on.incorrect" />
 				</div>
 				<lams:FCKEditor id="feedbackOnIncorrectOutsideForm" value="${formBean.feedbackOnIncorrect}"
 					contentFolderID="${formBean.contentFolderID}" width="622px">
 				</lams:FCKEditor>
 			</div>
+			<br><br>
 			
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="$('#assessmentQuestionForm').submit();" class="button-add-item">
