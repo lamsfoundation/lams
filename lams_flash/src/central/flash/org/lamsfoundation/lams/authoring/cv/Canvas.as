@@ -227,6 +227,7 @@ class Canvas extends CanvasHelper {
 			} else {
 				var callback:Function = Proxy.create(this,onStoreDesignResponse, callback);
 				
+				Application.getInstance().getToolbar().setButtonState("save_btn", false, true);
 				Application.getInstance().getComms().sendAndReceive(dto,"servlet/authoring/storeLearningDesignDetails",callback,false);
 			}
 		}
@@ -242,6 +243,7 @@ class Canvas extends CanvasHelper {
 	 * @return  
 	 */
 	public function onStoreDesignResponse(r, callback:Function):Void{
+		Application.getInstance().getToolbar().setButtonState("save_btn", true, true);
 		Application.getInstance().getWorkspace().getWV().clearDialog();
 		
 		if(r instanceof LFError){
