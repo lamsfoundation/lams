@@ -173,10 +173,10 @@ class PropertyInspector extends PropertyInspectorControls {
 		endOffset_lbl.text = Dictionary.getValue('pi_end_offset');
 		
 		groupType_lbl.text = Dictionary.getValue('pi_group_type');
-		equalGroupSizes_lbl.text = "Equal group sizes";
-		//equalGroupSizes_lbl = Dictionary.getValue('pi_equal_group_sizes');
+		equalGroupSizes_lbl.text = Dictionary.getValue('pi_equal_group_sizes');
 		numGroups_lbl.text = Dictionary.getValue('pi_num_groups');
 		numLearners_lbl.text = Dictionary.getValue('pi_num_learners');
+		preview_student_groups_lbl.text = Dictionary.getValue('view_students_before_selection');
 		
 		//Properties tab
 		title_lbl.text = Dictionary.getValue('pi_lbl_title');
@@ -185,8 +185,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		currentGrouping_lbl.text = Dictionary.getValue('pi_lbl_currentgroup');
 		defineLater_chk.label = Dictionary.getValue('pi_definelater');
 		runOffline_chk.label = Dictionary.getValue('pi_runoffline');
-				
-		gradebook_lbl.text = "Gradebook Output";
+		gradebook_lbl.text = Dictionary.getValue('gradebook_output_type');
 		//Complex Activity
 		//min_lbl.text = Dictionary.getValue('pi_min_act');
 		//max_lbl.text = Dictionary.getValue('pi_max_act');
@@ -791,9 +790,9 @@ class PropertyInspector extends PropertyInspectorControls {
 			
 			var toolAct:ToolActivity = ToolActivity(_canvasModel.selectedItem.activity);
 			if (evt.target.selectedIndex > 0) {
-				toolAct.gradebookToolOutputName = evt.target.selectedItem.name;
+				toolAct.gradebookToolOutputDefinitionName = evt.target.selectedItem.name;
 			} else {
-				toolAct.gradebookToolOutputName = null;
+				toolAct.gradebookToolOutputDefinitionName = null;
 			}
 		}
 	}
@@ -804,9 +803,9 @@ class PropertyInspector extends PropertyInspectorControls {
 			var toolAct:ToolActivity = ToolActivity(a);
 			outputToGradebook_cmb.dataProvider = (toolAct.supportsOutputs == true) ? getToolActivityOutputTypes(toolAct) : null;
 			
-			if (toolAct.gradebookToolOutputName != null) {
+			if (toolAct.gradebookToolOutputDefinitionName != null) {
 				for (var i=0; i<outputToGradebook_cmb.dataProvider.length; i++) {
-					if (outputToGradebook_cmb.dataProvider[i].name == toolAct.gradebookToolOutputName) {
+					if (outputToGradebook_cmb.dataProvider[i].name == toolAct.gradebookToolOutputDefinitionName) {
 						outputToGradebook_cmb.selectedIndex = i;
 					}
 				}

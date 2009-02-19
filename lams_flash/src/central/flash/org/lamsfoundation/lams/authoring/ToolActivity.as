@@ -55,7 +55,7 @@ class ToolActivity extends Activity{
 	private var _supportsRunOffline:Boolean;
 	private var _supportsOutputs:Boolean;
 	
-	private var _gradebookToolOutputName:String;
+	private var _gradebookToolOutputDefinitionName:String;
 	
 	private var _competenceMappings:Array; // competences to which this activity is mapped
 	
@@ -145,6 +145,16 @@ class ToolActivity extends Activity{
 			if(StringUtils.isWDDXNull(dto.extLmsId)) { _extLmsId = null }
 			else { _extLmsId = dto.extLmsId; }
 			 
+			if(StringUtils.isWDDXNull(dto.gradebookToolOutputDefinitionName)) { _gradebookToolOutputDefinitionName = null }
+			else { _gradebookToolOutputDefinitionName = dto.gradebookToolOutputDefinitionName; }
+			
+			//TODO: Have the backend send this to flash for all tool activities in the design on startup
+			if(!StringUtils.isWDDXNull(dto.toolOutputDefinitions)) {
+				for (var i=0; i<dto.toolOutputDefinitions.length; i++) {
+					addDefinition(dto.toolOutputDefinitions[i]);
+				}
+			}
+			
 			_competenceMappings = new Array();
 			if(!StringUtils.isWDDXNull(dto.competenceMappingTitles)) {
 				for (var i=0; i<dto.competenceMappingTitles.length; i++) {
@@ -174,6 +184,8 @@ class ToolActivity extends Activity{
 		dto.toolID = (_toolID) ?  _toolID: Config.NUMERIC_NULL_VALUE;	
 		
 		dto.extLmsId = (_extLmsId) ? _extLmsId : Config.STRING_NULL_VALUE;
+		
+		dto.gradebookToolOutputDefinitionName = (_gradebookToolOutputDefinitionName) ? _gradebookToolOutputDefinitionName : Config.STRING_NULL_VALUE;
 		
 		dto.competenceMappings = new Array();
 		if (_competenceMappings.length > 0) {
@@ -238,7 +250,7 @@ class ToolActivity extends Activity{
 		n.supportsOutputs = _supportsOutputs;
 		n.extLmsId = _extLmsId;
 		
-		n.gradebookToolOutputName = _gradebookToolOutputName;
+		n.gradebookToolOutputDefinitionName = _gradebookToolOutputDefinitionName;
 		
 		var numDefinitions:Number = definitions.length;
 		if (numDefinitions > 0) {
@@ -259,7 +271,9 @@ class ToolActivity extends Activity{
 	}
 	
 	public function addDefinition(dto:Object):Void {
-		_toolOutputDefinitions.put(dto.name, dto);
+		if (!_toolOutputDefinitions.containsKey(dto.name)) {
+			_toolOutputDefinitions.put(dto.name, dto);
+		}
 	}
 	
 	public function removeDefinition(key:String):Void {
@@ -539,16 +553,16 @@ class ToolActivity extends Activity{
 	 * @param   n the name of the tooloutput 
 	 * @return  
 	 */
-	public function set gradebookToolOutputName (n:String):Void {
-		_gradebookToolOutputName = n;
+	public function set gradebookToolOutputDefinitionName (n:String):Void {
+		_gradebookToolOutputDefinitionName = n;
 	}
 	/**
 	 * 
 	 * @usage   
 	 * @return  
 	 */
-	public function get gradebookToolOutputName ():String {
-		return _gradebookToolOutputName;
+	public function get gradebookToolOutputDefinitionName ():String {
+		return _gradebookToolOutputDefinitionName;
 	}	
 }
 
