@@ -112,10 +112,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	// Yet we might be asked for their page, as the activity has been commenced. 
 	// So need to do a "blank" page in that case
 	QaQueUsr learner = qaService.getQaUserBySession(userID, qaSession.getUid());
-	logger.debug("learner: " + learner);
+	logger.debug("UserID: " + learner.getUid());
 
 	QaContent content = qaSession.getQaContent();
-	logger.debug("content: " + content);
 	logger.debug("content id: " + content.getQaContentId());
 
 	if (content == null) {
@@ -130,7 +129,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
 	generalLearnerFlowDTO.setUserUid(learner != null ? learner.getUid().toString() : null);
-	logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 
 	// if learner is null, don't want to show other people's answers
 	if (learner != null) {
@@ -143,7 +141,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	}
 
 	generalLearnerFlowDTO = (GeneralLearnerFlowDTO) request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
-	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 
 	logger.debug("for the special case of export portfolio we place generalLearnerFlowDTO into session scope");
 	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
@@ -164,7 +161,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	}
 
 	QaContent content = qaService.loadQa(toolContentID.longValue());
-	logger.debug("content: " + content);
 
 	if (content == null) {
 	    String error = "Data is missing from the database. Unable to Continue";
@@ -176,16 +172,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	logger.debug("start refreshSummaryData for teacher mode.");
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
-	logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	qaMonitoringAction.refreshSummaryData(request, content, qaService, true, false, null, null,
 		generalLearnerFlowDTO, false, "All");
 	logger.debug("end refreshSummaryData for teacher mode.");
 	logger.debug("teacher uses content id: " + content.getQaContentId());
 
 	generalLearnerFlowDTO = (GeneralLearnerFlowDTO) request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
-	logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 
-	logger.debug("for the special case of export portfolio we place generalLearnerFlowDTO into session scope");
 	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");

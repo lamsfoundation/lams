@@ -75,7 +75,6 @@ public class MonitoringUtil implements QaAppConstants {
 	    Iterator sessionIterator = qaContent.getQaSessions().iterator();
 	    while (sessionIterator.hasNext()) {
 		QaSession qaSession = (QaSession) sessionIterator.next();
-		logger.debug("iterated qaSession : " + qaSession);
 		if (qaSession.getSession_status().equalsIgnoreCase(QaSession.INCOMPLETE))
 		    return false;
 	    }
@@ -95,10 +94,8 @@ public class MonitoringUtil implements QaAppConstants {
     public void updateResponse(IQaService qaService, String responseId, String updatedResponse) {
 	logger.debug("load response with responseId: " + new Long(responseId).longValue());
 	QaUsrResp qaUsrResp = qaService.retrieveQaUsrResp(new Long(responseId).longValue());
-	logger.debug("loaded user response:  " + qaUsrResp);
 	qaUsrResp.setAnswer(updatedResponse);
 	qaService.updateQaUsrResp(qaUsrResp);
-	logger.debug("updated user response in the db:  " + qaUsrResp);
     }
 
     /**
@@ -110,10 +107,8 @@ public class MonitoringUtil implements QaAppConstants {
     public void hideResponse(IQaService qaService, String responseId) {
 	logger.debug("load response with responseId for hiding: " + new Long(responseId).longValue());
 	QaUsrResp qaUsrResp = qaService.retrieveQaUsrResp(new Long(responseId).longValue());
-	logger.debug("loaded user response:  " + qaUsrResp);
 	qaUsrResp.setHidden(true);
 	qaService.updateQaUsrResp(qaUsrResp);
-	logger.debug("updated user response in the db:  " + qaUsrResp);
     }
 
     /**
@@ -125,10 +120,8 @@ public class MonitoringUtil implements QaAppConstants {
     public void unHideResponse(IQaService qaService, String responseId) {
 	logger.debug("load response with responseId for un-hiding: " + new Long(responseId).longValue());
 	QaUsrResp qaUsrResp = qaService.retrieveQaUsrResp(new Long(responseId).longValue());
-	logger.debug("loaded user response:  " + qaUsrResp);
 	qaUsrResp.setHidden(false);
 	qaService.updateQaUsrResp(qaUsrResp);
-	logger.debug("updated user response in the db:  " + qaUsrResp);
     }
 
     /**
@@ -144,8 +137,6 @@ public class MonitoringUtil implements QaAppConstants {
 	logger.debug("sessionsList size is:..." + sessionsList.size());
 
 	Map sessionsMap = QaUtils.convertToStringMap(sessionsList, "String");
-	logger.debug("generated sessionsMap:..." + sessionsMap);
-	logger.debug("sessionsMap size:..." + sessionsMap.size());
 
 	if (sessionsMap.isEmpty()) {
 	    logger.debug("sessionsMap size is 0:");
@@ -154,8 +145,6 @@ public class MonitoringUtil implements QaAppConstants {
 	    logger.debug("sessionsMap has some entries: " + sessionsMap.size());
 	    sessionsMap.put(new Long(sessionsMap.size() + 1).toString(), "All");
 	}
-
-	logger.debug("final sessionsMap:" + sessionsMap);
 	return sessionsMap;
     }
 
@@ -172,7 +161,6 @@ public class MonitoringUtil implements QaAppConstants {
 	logger.debug("sessionsList size is:..." + sessionsList.size());
 
 	Map sessionsMap = QaUtils.convertToStringMap(sessionsList, "Long");
-	logger.debug("generated sessionsMap:..." + sessionsMap);
 	logger.debug("sessionsMap size:..." + sessionsMap.size());
 
 	if (sessionsMap.isEmpty()) {
@@ -182,8 +170,6 @@ public class MonitoringUtil implements QaAppConstants {
 	    logger.debug("sessionsMap has some entries: " + sessionsMap.size());
 	    sessionsMap.put(new Long(sessionsMap.size() + 1).toString(), "All");
 	}
-
-	logger.debug("final sessionsMap:" + sessionsMap);
 	return sessionsMap;
     }
 
@@ -204,23 +190,14 @@ public class MonitoringUtil implements QaAppConstants {
 	    boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId) {
 	logger.debug("buildGroupsQuestionData: " + currentSessionId);
 
-	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-	logger.debug("isLearnerRequest: " + isLearnerRequest);
-	logger.debug("userId: " + userId);
-	logger.debug("qaService: " + qaService);
-
-	logger.debug("will be building groups question data  for content:..." + qaContent);
 	List listQuestions = qaService.getAllQuestionEntries(qaContent.getUid());
-	logger.debug("listQuestions:..." + listQuestions);
 
 	String sessionName = "";
 	if ((currentSessionId != null) && (!currentSessionId.equals("All"))) {
 	    QaSession qaSession = qaService.retrieveQaSessionOrNullById(new Long(currentSessionId).longValue());
-	    logger.debug("qaSession: " + qaSession);
 
 	    sessionName = qaSession.getSession_name();
 	}
-	logger.debug("sessionName: " + sessionName);
 	request.setAttribute(CURRENT_SESSION_NAME, sessionName);
 
 	List listMonitoredAnswersContainerDTO = new LinkedList();
@@ -228,7 +205,6 @@ public class MonitoringUtil implements QaAppConstants {
 	Iterator itListQuestions = listQuestions.iterator();
 	while (itListQuestions.hasNext()) {
 	    QaQueContent qaQueContent = (QaQueContent) itListQuestions.next();
-	    logger.debug("mcQueContent:..." + qaQueContent);
 
 	    if (qaQueContent != null) {
 		QaMonitoredAnswersDTO qaMonitoredAnswersDTO = new QaMonitoredAnswersDTO();
@@ -240,13 +216,11 @@ public class MonitoringUtil implements QaAppConstants {
 		Map questionAttemptData = buildGroupsAttemptData(request, qaContent, qaService, qaQueContent,
 			qaQueContent.getUid().toString(), isUserNamesVisible, isLearnerRequest, currentSessionId,
 			userId);
-		logger.debug("questionAttemptData:..." + questionAttemptData);
 		qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 		listMonitoredAnswersContainerDTO.add(qaMonitoredAnswersDTO);
 
 	    }
 	}
-	logger.debug("final listMonitoredAnswersContainerDTO:..." + listMonitoredAnswersContainerDTO);
 	return listMonitoredAnswersContainerDTO;
     }
 
@@ -259,18 +233,11 @@ public class MonitoringUtil implements QaAppConstants {
 	    QaQueContent qaQueContent, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest,
 	    String currentSessionId, String userId) {
 	logger.debug("doing buildGroupsAttemptData...");
-	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-	logger.debug("isLearnerRequest: " + isLearnerRequest);
-	logger.debug("currentSessionId: " + currentSessionId);
-	logger.debug("userId: " + userId);
-
-	logger.debug("qaService: " + qaService);
 
 	Map mapMonitoredAttemptsContainerDTO = new TreeMap(new QaStringComparator());
 	List listMonitoredAttemptsContainerDTO = new LinkedList();
 
 	Map summaryToolSessions = populateToolSessionsId(request, qaContent, qaService);
-	logger.debug("summaryToolSessions: " + summaryToolSessions);
 
 	Iterator itMap = summaryToolSessions.entrySet().iterator();
 
@@ -279,24 +246,16 @@ public class MonitoringUtil implements QaAppConstants {
 
 	    if (currentSessionId != null) {
 		if (currentSessionId.equals("All")) {
-		    logger.debug("**summary request is for All**:");
 		    while (itMap.hasNext()) {
 			Map.Entry pairs = (Map.Entry) itMap.next();
-			logger.debug("using the  summary tool sessions pair: " + pairs.getKey() + " = "
-				+ pairs.getValue());
 
 			if (!(pairs.getValue().toString().equals("None"))
 				&& !(pairs.getValue().toString().equals("All"))) {
-			    logger
-				    .debug("using the  numerical summary tool sessions pair: " + " = "
-					    + pairs.getValue());
 			    QaSession qaSession = qaService.retrieveQaSession(new Long(pairs.getValue().toString())
 				    .longValue());
-			    logger.debug("qaSession: " + " = " + qaSession);
+
 			    if (qaSession != null) {
 				List listUsers = qaService.getUserBySessionOnly(qaSession);
-				logger.debug("listMcUsers for session id:" + qaSession.getQaSessionId() + " = "
-					+ listUsers);
 				Map sessionUsersAttempts = populateSessionUsersAttempts(request, qaService, qaSession
 					.getQaSessionId(), listUsers, questionUid, isUserNamesVisible,
 					isLearnerRequest, userId);
@@ -305,13 +264,10 @@ public class MonitoringUtil implements QaAppConstants {
 			}
 		    }
 		} else if (!currentSessionId.equals("All")) {
-		    logger.debug("**summary request is for currentSessionId**:" + currentSessionId);
 		    QaSession qaSession = qaService
 			    .retrieveQaSession(new Long(currentSessionId.toString()).longValue());
-		    logger.debug("qaSession: " + " = " + qaSession);
 
 		    List listUsers = qaService.getUserBySessionOnly(qaSession);
-		    logger.debug("listUsers: " + " = " + listUsers);
 
 		    Map sessionUsersAttempts = populateSessionUsersAttempts(request, qaService, new Long(
 			    currentSessionId), listUsers, questionUid, isUserNamesVisible, isLearnerRequest, userId);
@@ -322,7 +278,6 @@ public class MonitoringUtil implements QaAppConstants {
 	    /*request is for learner report, use only the passed tool session in the report. */
 	    logger.debug("using currentSessionId for the learner report:" + currentSessionId);
 	    QaSession qaSession = qaService.retrieveQaSession(new Long(currentSessionId).longValue());
-	    logger.debug("qaSession: " + " = " + qaSession);
 	    if (qaSession != null) {
 		List listUsers = null;
 		if (qaContent.isShowOtherAnswers()) {
@@ -341,9 +296,7 @@ public class MonitoringUtil implements QaAppConstants {
 	    }
 	}
 
-	logger.debug("final listMonitoredAttemptsContainerDTO:..." + listMonitoredAttemptsContainerDTO);
 	mapMonitoredAttemptsContainerDTO = convertToMap(listMonitoredAttemptsContainerDTO);
-	logger.debug("final mapMonitoredAttemptsContainerDTO:..." + mapMonitoredAttemptsContainerDTO);
 	return mapMonitoredAttemptsContainerDTO;
     }
 
@@ -360,12 +313,8 @@ public class MonitoringUtil implements QaAppConstants {
      */
     public static Map populateSessionUsersAttempts(HttpServletRequest request, IQaService qaService, Long sessionId,
 	    List listUsers, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String userId) {
-	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-	logger.debug("isLearnerRequest: " + isLearnerRequest);
-	logger.debug("userId: " + userId);
 
 	logger.debug("doing populateSessionUsersAttempts...");
-	logger.debug("qaService: " + qaService);
 
 	Map mapMonitoredUserContainerDTO = new TreeMap(new QaStringComparator());
 	List listMonitoredUserContainerDTO = new LinkedList();
@@ -373,19 +322,14 @@ public class MonitoringUtil implements QaAppConstants {
 
 	while (itUsers.hasNext()) {
 	    QaQueUsr qaQueUsr = (QaQueUsr) itUsers.next();
-	    logger.debug("qaQueUsr: " + qaQueUsr);
 
 	    if (qaQueUsr != null) {
-		logger.debug("getting listUserAttempts for user id: " + qaQueUsr.getUid() + " and que content id: "
-			+ questionUid);
 		List listUserAttempts = qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), new Long(
 			questionUid));
-		logger.debug("listUserAttempts: " + listUserAttempts);
 
 		Iterator itAttempts = listUserAttempts.iterator();
 		while (itAttempts.hasNext()) {
 		    QaUsrResp qaUsrResp = (QaUsrResp) itAttempts.next();
-		    logger.debug("qaUsrResp: " + qaUsrResp);
 
 		    if (qaUsrResp != null) {
 			QaMonitoredUserDTO qaMonitoredUserDTO = new QaMonitoredUserDTO();
@@ -407,7 +351,6 @@ public class MonitoringUtil implements QaAppConstants {
 			qaMonitoredUserDTO.setResponse(qaUsrResp.getAnswer());
 
 			String responsePresentable = QaUtils.replaceNewLines(qaUsrResp.getAnswer());
-			logger.debug("responsePresentable: " + responsePresentable);
 			qaMonitoredUserDTO.setResponsePresentable(responsePresentable);
 
 			qaMonitoredUserDTO.setQuestionUid(questionUid);
@@ -417,15 +360,11 @@ public class MonitoringUtil implements QaAppConstants {
 		}
 	    }
 	}
-
-	logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
 	mapMonitoredUserContainerDTO = convertToMcMonitoredUserDTOMap(listMonitoredUserContainerDTO);
-	logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
 	return mapMonitoredUserContainerDTO;
     }
 
     public static Map convertToMcMonitoredUserDTOMap(List list) {
-	logger.debug("using convertToQaMonitoredUserDTOMap: " + list);
 	Map map = new TreeMap(new QaStringComparator());
 
 	Iterator listIterator = list.iterator();
@@ -448,12 +387,10 @@ public class MonitoringUtil implements QaAppConstants {
 	    logger.debug("using the  summary tool sessions pair: " + pairs.getKey() + " = " + pairs.getValue());
 	    newMap.put(pairs.getKey(), QaUtils.replaceNewLines(pairs.getValue().toString()));
 	}
-	logger.debug("newMap: " + newMap);
 	return newMap;
     }
 
     public static Map convertToMap(List list) {
-	logger.debug("using convertToMap: " + list);
 	Map map = new TreeMap(new QaStringComparator());
 
 	Iterator listIterator = list.iterator();
@@ -468,11 +405,9 @@ public class MonitoringUtil implements QaAppConstants {
     }
 
     public static boolean notebookEntriesExist(IQaService qaService, QaContent qaContent) {
-	logger.debug("finding out about content level notebook entries: " + qaContent);
 	Iterator iteratorSession = qaContent.getQaSessions().iterator();
 	while (iteratorSession.hasNext()) {
 	    QaSession qaSession = (QaSession) iteratorSession.next();
-	    logger.debug("qaSession: " + qaSession);
 
 	    if (qaSession != null) {
 		logger.debug("qaSession id: " + qaSession.getQaSessionId());
@@ -480,19 +415,13 @@ public class MonitoringUtil implements QaAppConstants {
 		Iterator iteratorUser = qaSession.getQaQueUsers().iterator();
 		while (iteratorUser.hasNext()) {
 		    QaQueUsr qaQueUsr = (QaQueUsr) iteratorUser.next();
-		    logger.debug("qaQueUsr: " + qaQueUsr);
 
 		    if (qaQueUsr != null) {
-			logger.debug("qaQueUsr id: " + qaQueUsr.getQueUsrId());
 
-			logger.debug("attempt getting notebookEntry: ");
 			NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
 				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(qaQueUsr.getQueUsrId()
 					.intValue()));
-
-			logger.debug("notebookEntry: " + notebookEntry);
 			if (notebookEntry != null) {
-			    logger.debug("found at least one notebookEntry: " + notebookEntry.getEntry());
 			    return true;
 			}
 
@@ -504,19 +433,15 @@ public class MonitoringUtil implements QaAppConstants {
     }
 
     public static void buildQaStatsDTO(HttpServletRequest request, IQaService qaService, QaContent qaContent) {
-	logger.debug("building qaStatsDTO: " + qaContent);
 	QaStatsDTO qaStatsDTO = new QaStatsDTO();
 
 	int countSessionComplete = 0;
 	int countAllUsers = 0;
-	logger.debug("finding out about content level notebook entries: " + qaContent);
 	Iterator iteratorSession = qaContent.getQaSessions().iterator();
 	while (iteratorSession.hasNext()) {
 	    QaSession qaSession = (QaSession) iteratorSession.next();
-	    logger.debug("qaSession: " + qaSession);
 
 	    if (qaSession != null) {
-		logger.debug("qaSession id: " + qaSession.getQaSessionId());
 
 		if (qaSession.getSession_status().equals(COMPLETED)) {
 		    ++countSessionComplete;
@@ -525,10 +450,8 @@ public class MonitoringUtil implements QaAppConstants {
 		Iterator iteratorUser = qaSession.getQaQueUsers().iterator();
 		while (iteratorUser.hasNext()) {
 		    QaQueUsr qaQueUsr = (QaQueUsr) iteratorUser.next();
-		    logger.debug("qaQueUsr: " + qaQueUsr);
 
 		    if (qaQueUsr != null) {
-			logger.debug("qaQueUsr foundid");
 			++countAllUsers;
 		    }
 		}
@@ -540,17 +463,13 @@ public class MonitoringUtil implements QaAppConstants {
 	qaStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
 	qaStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
 
-	logger.debug("qaStatsDTO: " + qaStatsDTO);
-
 	request.setAttribute(QA_STATS_DTO, qaStatsDTO);
     }
 
     public static void generateGroupsSessionData(HttpServletRequest request, IQaService qaService, QaContent qaContent,
 	    boolean forExport) {
-	logger.debug("generateGroupsSessionData: " + qaContent);
 
 	List listAllGroupsDTO = buildGroupBasedSessionData(request, qaContent, qaService);
-	logger.debug("listAllGroupsDTO: " + listAllGroupsDTO);
 
 	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
 
@@ -559,22 +478,17 @@ public class MonitoringUtil implements QaAppConstants {
     }
 
     public static List buildGroupBasedSessionData(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
-	logger.debug("buildGroupBasedSessionData" + qaContent);
-	logger.debug("will be building groups question data  for content:..." + qaContent);
+	logger.debug("buildGroupBasedSessionData: " + qaContent.getUid());
 	List listQuestions = qaService.getAllQuestionEntries(qaContent.getUid());
-	logger.debug("listQuestions:..." + listQuestions);
 
 	List listAllGroupsContainerDTO = new LinkedList();
 
 	Iterator iteratorSession = qaContent.getQaSessions().iterator();
 	while (iteratorSession.hasNext()) {
 	    QaSession qaSession = (QaSession) iteratorSession.next();
-	    logger.debug("iteration for group based session data: " + qaSession);
 	    String currentSessionId = qaSession.getQaSessionId().toString();
-	    logger.debug("currentSessionId: " + currentSessionId);
 
 	    String currentSessionName = qaSession.getSession_name();
-	    logger.debug("currentSessionName: " + currentSessionName);
 
 	    QaAllGroupsDTO qaAllGroupsDTO = new QaAllGroupsDTO();
 	    List listMonitoredAnswersContainerDTO = new LinkedList();
@@ -583,10 +497,8 @@ public class MonitoringUtil implements QaAppConstants {
 		Iterator itListQuestions = listQuestions.iterator();
 		while (itListQuestions.hasNext()) {
 		    QaQueContent qaQueContent = (QaQueContent) itListQuestions.next();
-		    logger.debug("qaQueContent:..." + qaQueContent);
 
 		    if (qaQueContent != null) {
-			logger.debug("populating QaMonitoredAnswersDTO for : " + qaQueContent);
 			QaMonitoredAnswersDTO qaMonitoredAnswersDTO = new QaMonitoredAnswersDTO();
 			qaMonitoredAnswersDTO.setQuestionUid(qaQueContent.getUid().toString());
 			qaMonitoredAnswersDTO.setQuestion(qaQueContent.getQuestion());
@@ -595,29 +507,18 @@ public class MonitoringUtil implements QaAppConstants {
 
 			Map questionAttemptData = buildGroupsAttemptData(request, qaContent, qaService, qaQueContent,
 				qaQueContent.getUid().toString(), true, false, currentSessionId, null);
-			logger.debug("generated  questionAttemptData: " + questionAttemptData);
 			qaMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-
-			logger.debug("adding qaMonitoredAnswersDTO to the listMonitoredAnswersContainerDTO: "
-				+ qaMonitoredAnswersDTO);
 			listMonitoredAnswersContainerDTO.add(qaMonitoredAnswersDTO);
 		    }
 		}
 	    }
-	    logger.debug("listMonitoredAnswersContainerDTO:" + listMonitoredAnswersContainerDTO);
 
-	    logger.debug("adding listMonitoredAnswersContainerDTO to the qaAllGroupsDTO:"
-		    + listMonitoredAnswersContainerDTO);
 	    qaAllGroupsDTO.setGroupData(listMonitoredAnswersContainerDTO);
 	    qaAllGroupsDTO.setSessionName(currentSessionName);
 	    qaAllGroupsDTO.setSessionId(currentSessionId);
-
-	    logger.debug("built qaAllGroupsDTO:" + qaAllGroupsDTO);
 	    listAllGroupsContainerDTO.add(qaAllGroupsDTO);
 
 	}
-
-	logger.debug("final listAllGroupsContainerDTO:..." + listAllGroupsContainerDTO);
 	return listAllGroupsContainerDTO;
     }
 

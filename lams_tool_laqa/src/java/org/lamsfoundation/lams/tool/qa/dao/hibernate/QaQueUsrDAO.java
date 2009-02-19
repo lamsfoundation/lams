@@ -124,7 +124,6 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	} else {
 	    logger.error("Attempt to count users from null content");
 	}
-	logger.debug("Number of users for quContent " +qa.getUid()+ ": " + returnInt);
 	return returnInt; 
     }
 

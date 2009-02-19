@@ -62,10 +62,6 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
 	int sessionCount = 0;
 	if (list != null && list.size() > 0) {
 	    QaSession qaSession = (QaSession) list.get(0);
-	    logger.debug("qaSession: " + qaSession);
-	    logger.debug("local session's content uid versus incoming content uid: "
-		    + qaSession.getQaContent().getUid().intValue() + " versus " + qa.getUid().intValue());
-
 	    if (qaSession.getQaContent().getUid().intValue() == qa.getUid().intValue()) {
 		++sessionCount;
 	    }

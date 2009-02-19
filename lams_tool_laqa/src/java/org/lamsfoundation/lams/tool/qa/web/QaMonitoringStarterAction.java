@@ -83,10 +83,10 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	QaUtils.cleanUpSessionAbsolute(request);
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-	logger.debug("qaMonitoringForm: " + qaMonitoringForm);
+	
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	logger.debug("qaService: " + qaService);
+	
 	qaMonitoringForm.setQaService(qaService);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -94,7 +94,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	ActionForward validateParameters = validateParameters(request, mapping, qaMonitoringForm);
-	logger.debug("validateParamaters: " + validateParameters);
+	
 	if (validateParameters != null) {
 	    return validateParameters;
 	}
@@ -119,13 +119,13 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	qaMonitoringAction.initInstructionsContent(mapping, form, request, response);
 	logger.debug("calling initStatsContent.");
 	qaMonitoringAction.initStatsContent(mapping, form, request, response, generalMonitoringDTO);
-	logger.debug("post initStatsContent." + generalMonitoringDTO);
+	
 
 	String toolContentID = qaMonitoringForm.getToolContentID();
 	logger.debug("toolContentID: " + toolContentID);
 
 	QaContent qaContent = qaService.loadQa(new Long(toolContentID).longValue());
-	logger.debug("existing qaContent:" + qaContent);
+	logger.debug("existing qaContent:" + qaContent.getUid());
 
 	/*true means there is at least 1 response*/
 	if (qaService.studentActivityOccurredGlobal(qaContent)) {
@@ -145,7 +145,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	logger.debug("attachmentList: " + attachmentList);
+	
 	generalMonitoringDTO.setAttachmentList(attachmentList);
 	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 	/** ...till here * */
@@ -160,8 +160,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	qaMonitoringAction.prepareReflectionData(request, qaContent, qaService, null, false, "All");
 
-	logger.debug("final qaMonitoringForm: " + qaMonitoringForm);
-	logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
+	
 	request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	/*for Edit Activity screen, BasicTab-ViewOnly*/
@@ -182,17 +182,13 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	    QaQueContent qaQueContent = (QaQueContent) queIterator.next();
 	    if (qaQueContent != null) {
-		logger.debug("question: " + qaQueContent.getQuestion());
-		logger.debug("displayorder: " + new Integer(qaQueContent.getDisplayOrder()).toString());
-		logger.debug("feedback: " + qaQueContent.getFeedback());
-
 		qaQuestionContentDTO.setQuestion(qaQueContent.getQuestion());
 		qaQuestionContentDTO.setDisplayOrder(new Integer(qaQueContent.getDisplayOrder()).toString());
 		qaQuestionContentDTO.setFeedback(qaQueContent.getFeedback());
 		listQuestionContentDTO.add(qaQuestionContentDTO);
 	    }
 	}
-	logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
@@ -239,7 +235,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
     public boolean initialiseMonitoringData(ActionMapping mapping, QaMonitoringForm qaMonitoringForm,
 	    HttpServletRequest request, HttpServletResponse response, IQaService qaService,
 	    GeneralMonitoringDTO generalMonitoringDTO) {
-	logger.debug("start initializing  monitoring data...: " + qaService);
+	logger.debug("start initializing  monitoring data...");
 	generalMonitoringDTO.setEditResponse(new Boolean(false).toString());
 	generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 
@@ -247,7 +243,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	logger.debug("toolContentID:" + toolContentID);
 
 	QaContent qaContent = qaService.loadQa(new Long(toolContentID).longValue());
-	logger.debug("existing qaContent:" + qaContent);
+	logger.debug("existing qaContent:" + qaContent.getUid());
 
 	if (qaContent == null) {
 	    QaUtils.cleanUpSessionAbsolute(request);
@@ -258,7 +254,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	logger.debug("refreshing summary data...");
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, false, null, null,
 		generalLearnerFlowDTO, false, "All");

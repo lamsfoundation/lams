@@ -82,7 +82,6 @@ public class QaDLStarterAction extends Action implements QaAppConstants {
 	logger.debug("init defineLater mode. removed attributes...");
 
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-	logger.debug("qaAuthoringForm: " + qaAuthoringForm);
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	qaAuthoringForm.setQaService(qaService);

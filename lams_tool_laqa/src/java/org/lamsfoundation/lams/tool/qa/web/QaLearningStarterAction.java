@@ -169,7 +169,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	QaUtils.cleanUpSessionAbsolute(request);
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	logger.debug("retrieving qaService: " + qaService);
 
 	/* holds the question contents for a given tool session and relevant content */
 	Map mapQuestions = new TreeMap(new QaComparator());
@@ -183,13 +182,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	generalLearnerFlowDTO.setCurrentQuestionIndex(new Integer(1));
 	generalLearnerFlowDTO.setCurrentAnswer("");
 
-	logger.debug("reading httpSessionID");
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
-	logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	logger.debug("sessionMap: " + sessionMap);
 
 	if (sessionMap == null) {
 	    sessionMap = new SessionMap();
@@ -203,7 +199,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 	/*validate learning mode parameters*/
 	boolean validateParameters = validateParameters(request, mapping, qaLearningForm);
-	logger.debug("validateParamaters: " + validateParameters);
 	if (!validateParameters) {
 	    logger.debug("error during validation");
 	}
@@ -239,7 +234,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	 */
 
 	QaSession qaSession = qaService.retrieveQaSessionOrNullById(new Long(toolSessionID).longValue());
-	logger.debug("retrieving qaSession: " + qaSession);
 	/*
 	 * find out what content this tool session is referring to
 	 * get the content for this tool session (many to one mapping)
@@ -249,7 +243,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	 * Each passed tool session id points to a particular content. Many to one mapping.
 	 */
 	QaContent qaContent = qaSession.getQaContent();
-	logger.debug("using qaContent: " + qaContent);
 	if (qaContent == null) {
 	    QaUtils.cleanUpSessionAbsolute(request);
 	    logger.debug("error: The tool expects qaContent.");
@@ -261,19 +254,16 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 	logger.debug("is tool reflective: " + qaContent.isReflect());
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
-	logger.debug("reflection subject: " + qaContent.getReflectionSubject());
 	generalLearnerFlowDTO.setReflectionSubject(qaContent.getReflectionSubject());
 
 	logger.debug("attempt getting notebookEntry: ");
 	NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
 		MY_SIGNATURE, new Integer(userID));
 
-	logger.debug("notebookEntry: " + notebookEntry);
 
 	if (notebookEntry != null) {
 	    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
 	    //String notebookEntryPresentable=notebookEntry.getEntry();
-	    logger.debug("notebookEntryPresentable: " + notebookEntryPresentable);
 	    generalLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
 	}
 
@@ -285,23 +275,19 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	 * And the passed tool session id refers to it.
 	 */
 
-	logger.debug("REPORT_TITLE_LEARNER: " + qaContent.getReportTitle());
 	generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
 
 	/*
 	 * Is the tool activity been checked as Run Offline in the property inspector?
 	 */
-	logger.debug("IS_TOOL_ACTIVITY_OFFLINE: " + qaContent.isRunOffline());
 	generalLearnerFlowDTO.setActivityOffline(new Boolean(qaContent.isRunOffline()).toString());
 
-	logger.debug("IS_USERNAME_VISIBLE: " + qaContent.isUsernameVisible());
 	generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
 	generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(qaContent.isShowOtherAnswers()).toString());
 
 	/*
 	 * Is the tool activity been checked as Define Later in the property inspector?
 	 */
-	logger.debug("IS_DEFINE_LATER: " + qaContent.isDefineLater());
 	if (qaContent.isDefineLater()) {
 	    QaUtils.cleanUpSessionAbsolute(request);
 	    return (mapping.findForward(DEFINE_LATER));
@@ -310,7 +296,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	/*
 	 * Learning mode requires this setting for jsp to generate the user's report 
 	 */
-	logger.debug("IS_QUESTIONS_SEQUENCED: " + qaContent.isQuestionsSequenced());
 	String feedBackType = "";
 	if (qaContent.isQuestionsSequenced()) {
 	    generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
@@ -319,7 +304,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
 	    feedBackType = FEEDBACK_TYPE_COMBINED;
 	}
-	logger.debug("QUESTION_LISTING_MODE: " + generalLearnerFlowDTO.getQuestionListingMode());
 
 	/*
 	 * fetch question content from content
@@ -327,11 +311,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	Iterator contentIterator = qaContent.getQaQueContents().iterator();
 	while (contentIterator.hasNext()) {
 	    QaQueContent qaQueContent = (QaQueContent) contentIterator.next();
-	    logger.debug("qaQueContent: " + qaQueContent);
-	    logger.debug("question: " + qaQueContent.getQuestion());
 	    if (qaQueContent != null) {
 		int displayOrder = qaQueContent.getDisplayOrder();
-		logger.debug("displayOrder: " + displayOrder);
 
 		if (displayOrder != 0) {
 		    /*
@@ -341,7 +322,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		}
 	    }
 	}
-	logger.debug("mapQuestions: " + mapQuestions);
 	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
 	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
 
@@ -352,11 +332,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    mapAnswers.put(pairs.getKey(), "");
 
 	}
-	logger.debug("mapAnswers : " + mapAnswers);
-	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
-	logger.debug("mapQuestions: " + mapQuestions);
 
-	logger.debug("mapQuestions has : " + mapQuestions.size() + " entries.");
+	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
 
 	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(mapQuestions.size()));
 	qaLearningForm.setTotalQuestionCount(new Integer(mapQuestions.size()).toString());
@@ -400,7 +377,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	 */
 	logger.debug("current userID: " + userID);
 	String learnerProgressUserIdString = WebUtil.readStrParam(request, AttributeNames.PARAM_USER_ID, true);
-	logger.debug("learnerProgressUserId: " + learnerProgressUserIdString);
 
 	if ((learnerProgressUserIdString != null) && (mode.equals("teacher"))) {
 	    logger.debug("start generating learner progress report for toolSessionID: " + toolSessionID);
@@ -410,7 +386,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    qaLearningForm.setUserID(learnerProgressUserIdString);
 	    Long learnerProgressUserId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
 	    QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	    logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 	    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setTeacherViewOnly(new Boolean(true).toString());
@@ -466,7 +441,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 	if (userID != null) {
 	    QaQueUsr qaQueUsr = qaService.getQaUserBySession(new Long(userID), qaSession.getUid());
-	    logger.debug("QaQueUsr:" + qaQueUsr);
 
 	    if ((qaQueUsr != null) && (qaQueUsr.isResponseFinalized())) {
 		logger.debug("is current user's response finalised: " + qaQueUsr.isResponseFinalized());
@@ -497,15 +471,10 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 			generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 
-			logger.debug("using generalLearnerFlowDTO: " + generalLearnerFlowDTO);
 			qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, isUserNamesVisible, true,
 				currentToolSessionID.toString(), userID, generalLearnerFlowDTO, false, toolSessionID);
-			logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
-
-			logger.debug("current sessionMap: " + sessionMap);
 
 			mapAnswers = (Map) sessionMap.get(MAP_ALL_RESULTS_KEY);
-			logger.debug("mapAnswers: " + mapAnswers);
 
 			HttpSession ss = SessionManager.getSession();
 			/* get back login user DTO */
@@ -518,14 +487,11 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 			generalLearnerFlowDTO.setUserUid(qaQueUsrLocal.getUid().toString());
 			String noteBookEntry = generalLearnerFlowDTO.getNotebookEntry();
-			logger.debug("noteBookEntry : " + noteBookEntry);
 			qaLearningForm.setEntryText(noteBookEntry);
 
 			logger.debug("attempt getting notebookEntry: ");
 			NotebookEntry notebookEntryLocal = qaService.getEntry(new Long(toolSessionID),
 				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(userID));
-
-			logger.debug("notebookEntryLocal: " + notebookEntryLocal);
 
 			if (notebookEntryLocal != null) {
 			    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntryLocal.getEntry());
@@ -539,8 +505,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			    generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(true).toString());
 
 			    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-			    logger.debug("before fwd, GENERAL_LEARNER_FLOW_DTO: "
-				    + request.getAttribute(GENERAL_LEARNER_FLOW_DTO));
 
 			    logger.debug("fwd'ing to." + REVISITED_LEARNER_REP);
 			    return (mapping.findForward(REVISITED_LEARNER_REP));
@@ -549,8 +513,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 			    generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(false).toString());
 
 			    request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-			    logger.debug("before fwd, GENERAL_LEARNER_FLOW_DTO: "
-				    + request.getAttribute(GENERAL_LEARNER_FLOW_DTO));
 			}
 
 			logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_REPORT);
@@ -566,7 +528,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	 * present user with the questions.
 	 */
 	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-	logger.debug("GENERAL_LEARNER_FLOW_DTO: " + request.getAttribute(GENERAL_LEARNER_FLOW_DTO));
 	logger.debug("forwarding to: " + LOAD_LEARNER);
 	return (mapping.findForward(LOAD_LEARNER));
     }
@@ -585,7 +546,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	*/
 	String userID = "";
 	HttpSession ss = SessionManager.getSession();
-	logger.debug("ss: " + ss);
 
 	if (ss != null) {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -635,7 +595,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
     boolean isSessionCompleted(String userSessionId, IQaService qaService) {
 	logger.debug("userSessionId:" + userSessionId);
 	QaSession qaSession = qaService.retrieveQaSessionOrNullById(new Long(userSessionId).longValue());
-	logger.debug("retrieving qaSession: " + qaSession);
 	logger.debug("voteSession status : " + qaSession.getSession_status());
 	if ((qaSession.getSession_status() != null) && (qaSession.getSession_status().equals(COMPLETED))) {
 	    logger.debug("this session is COMPLETED voteSession status : " + userSessionId);

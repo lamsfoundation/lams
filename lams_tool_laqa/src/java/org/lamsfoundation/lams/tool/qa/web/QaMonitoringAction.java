@@ -154,7 +154,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("starting  initStatsContent...");
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-	QaMonitoringAction.logger.debug("qaMonitoringForm: " + qaMonitoringForm);
 
 	IQaService qaService = null;
 	if (getServlet() != null) {
@@ -163,28 +162,24 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    qaService = qaMonitoringForm.getQaService();
 	}
 
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
-
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
+	
 	qaMonitoringForm.setToolContentID(strToolContentID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
+	
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -215,7 +210,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
-	QaMonitoringAction.logger.debug("notebookEntriesExist : " + notebookEntriesExist);
+	
 
 	if (notebookEntriesExist) {
 	    request.setAttribute(QaAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
@@ -229,12 +224,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	generalMonitoringDTO.setAttachmentList(attachmentList);
 	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 	/** ...till here * */
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 	QaMonitoringAction.logger.debug("ending  initStatsContent...");
 
@@ -268,10 +263,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     public void initInstructionsContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	QaMonitoringAction.logger.debug("starting initInstructionsContent...");
-	QaMonitoringAction.logger.debug("dispatching getInstructions..." + request);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-	QaMonitoringAction.logger.debug("qaMonitoringForm: " + qaMonitoringForm);
+	
 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
 
@@ -282,28 +277,26 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    qaService = qaMonitoringForm.getQaService();
 	}
 
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
+	
 	qaMonitoringForm.setToolContentID(strToolContentID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
+	
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -325,7 +318,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	EditActivityDTO editActivityDTO = new EditActivityDTO();
 	boolean isContentInUse = QaUtils.isContentInUse(qaContent);
-	QaMonitoringAction.logger.debug("isContentInUse:" + isContentInUse);
+	
 	if (isContentInUse == true) {
 	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
@@ -333,7 +326,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
-	QaMonitoringAction.logger.debug("notebookEntriesExist : " + notebookEntriesExist);
+	
 
 	if (notebookEntriesExist) {
 	    request.setAttribute(QaAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
@@ -347,18 +340,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	generalMonitoringDTO.setAttachmentList(attachmentList);
 	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 	/** ...till here * */
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	MonitoringUtil.buildQaStatsDTO(request, qaService, qaContent);
 
 	MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
-	QaMonitoringAction.logger.debug("ending  initInstructionsContent...");
+	
     }
 
     /**
@@ -378,10 +371,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    HttpServletResponse response) throws IOException, ServletException {
 	QaMonitoringAction.logger.debug("dispatching editActivity...");
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-	QaMonitoringAction.logger.debug("qaMonitoringForm: " + qaMonitoringForm);
+	
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	if (qaService == null) {
 	    qaService = qaMonitoringForm.getQaService();
@@ -390,35 +383,33 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaStarterAction qaStarterAction = new QaStarterAction();
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
+	
 	qaMonitoringForm.setToolContentID(strToolContentID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
+	
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	request.setAttribute(QaAppConstants.SOURCE_MC_STARTER, "monitoring");
-	QaMonitoringAction.logger.debug("SOURCE_MC_STARTER: monitoring");
+	
 
 	/*
 	 * it is possible that the content is being used by some learners. In this situation, the content is marked as
 	 * "in use" and content in use is not modifiable
 	 */
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("qaContent:" + qaContent);
+	QaMonitoringAction.logger.debug("qaContent:" + qaContent.getUid());
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
@@ -437,7 +428,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    generalMonitoringDTO.setActivityInstructions(qaContent.getInstructions());
 	}
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	EditActivityDTO editActivityDTO = new EditActivityDTO();
@@ -453,12 +444,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	generalMonitoringDTO.setAttachmentList(attachmentList);
 	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 	/** ...till here * */
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, "All");
@@ -512,7 +503,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    HttpServletResponse response) throws IOException, ServletException {
 	QaMonitoringAction.logger.debug("initSummaryContent...");
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-	QaMonitoringAction.logger.debug("qaMonitoringForm: " + qaMonitoringForm);
+	
 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
 
@@ -523,30 +514,29 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    qaService = qaMonitoringForm.getQaService();
 	}
 
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
 	qaMonitoringForm.setToolContentID(strToolContentID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
+	
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	/* this section is related to summary tab. Starts here. */
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
+
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -591,7 +581,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	generalMonitoringDTO.setAttachmentList(attachmentList);
 	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 	/* ...till here */
@@ -604,7 +594,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	request.setAttribute("reflect", qaContent.isReflect());
 	request.setAttribute("reflectionSubject", qaContent.getReflectionSubject());
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	MonitoringUtil.buildQaStatsDTO(request, qaService, qaContent);
@@ -618,10 +608,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispatching editActivityQuestions...");
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
-	QaMonitoringAction.logger.debug("qaMonitoringForm: " + qaMonitoringForm);
+	
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
 
@@ -633,7 +623,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	generalMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -641,15 +631,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaMonitoringForm.setToolContentID(strToolContentID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
+	
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String httpSessionID = request.getParameter("httpSessionID");
-	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
+	
 	qaMonitoringForm.setHttpSessionID(httpSessionID);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	qaMonitoringForm.setTitle(qaContent.getTitle());
 
@@ -672,12 +662,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	generalMonitoringDTO.setAttachmentList(attachmentList);
 	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 	/** ...till here * */
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	List listQuestionContentDTO = new LinkedList();
@@ -688,18 +678,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	    QaQueContent qaQueContent = (QaQueContent) queIterator.next();
 	    if (qaQueContent != null) {
-		QaMonitoringAction.logger.debug("question: " + qaQueContent.getQuestion());
-		QaMonitoringAction.logger.debug("displayorder: "
-			+ new Integer(qaQueContent.getDisplayOrder()).toString());
-		QaMonitoringAction.logger.debug("feedback: " + qaQueContent.getFeedback());
-
 		qaQuestionContentDTO.setQuestion(qaQueContent.getQuestion());
 		qaQuestionContentDTO.setDisplayOrder(new Integer(qaQueContent.getDisplayOrder()).toString());
 		qaQuestionContentDTO.setFeedback(qaQueContent.getFeedback());
 		listQuestionContentDTO.add(qaQuestionContentDTO);
 	    }
 	}
-	QaMonitoringAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -760,7 +745,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispatching submitSession...");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
@@ -794,20 +779,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
 
@@ -860,7 +843,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispatching editResponse...");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
@@ -877,15 +860,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	request.getSession().setAttribute(QaAppConstants.EDITABLE_RESPONSE_ID, responseId);
 
 	QaUsrResp qaUsrResp = qaService.retrieveQaUsrResp(new Long(responseId).longValue());
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 
 	refreshUserInput(request, qaMonitoringForm);
 
 	QaContent qaContent = qaUsrResp.getQaQueContent().getQaContent();
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	String currentMonitoredToolSession = qaMonitoringForm.getSelectedToolSessionId();
-	QaMonitoringAction.logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+	
 
 	if (currentMonitoredToolSession.equals("")) {
 	    currentMonitoredToolSession = "All";
@@ -906,17 +889,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	request.setAttribute(QaAppConstants.CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, true,
 		currentMonitoredToolSession);
@@ -955,12 +936,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispatching editGroupResponse...");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	String editableSessionId = request.getParameter("sessionId");
@@ -976,12 +957,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	request.getSession().setAttribute(QaAppConstants.EDITABLE_RESPONSE_ID, responseId);
 
 	QaUsrResp qaUsrResp = qaService.retrieveQaUsrResp(new Long(responseId).longValue());
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 
 	refreshUserInput(request, qaMonitoringForm);
 
 	QaContent qaContent = qaUsrResp.getQaQueContent().getQaContent();
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	String currentMonitoredToolSession = qaMonitoringForm.getSelectedToolSessionId();
 	QaMonitoringAction.logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
@@ -996,20 +977,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(1));
 	}
 
-	QaMonitoringAction.logger.debug("SELECTION_CASE: " + request.getAttribute(QaAppConstants.SELECTION_CASE));
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, true,
 		currentMonitoredToolSession);
@@ -1063,7 +1042,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispatching updateResponse...");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
@@ -1072,16 +1051,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	String responseId = qaMonitoringForm.getResponseId();
 	QaMonitoringAction.logger.debug("responseId: " + responseId);
 
 	String updatedResponse = request.getParameter("updatedResponse");
-	QaMonitoringAction.logger.debug("updatedResponse: " + updatedResponse);
+	
 	QaUsrResp qaUsrResp = qaService.retrieveQaUsrResp(new Long(responseId).longValue());
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 
 	/*
 	 * write out the audit log entry. If you move this after the update of the response, then make sure you update
@@ -1113,24 +1092,22 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(1));
 	}
-	QaMonitoringAction.logger.debug("SELECTION_CASE: " + request.getAttribute(QaAppConstants.SELECTION_CASE));
+	
 	request.setAttribute(QaAppConstants.CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 
 	QaContent qaContent = qaUsrResp.getQaQueContent().getQaContent();
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
@@ -1169,7 +1146,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispatching updateGroupResponse...");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
@@ -1178,16 +1155,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	String responseId = qaMonitoringForm.getResponseId();
 	QaMonitoringAction.logger.debug("responseId: " + responseId);
 
 	String updatedResponse = request.getParameter("updatedResponse");
-	QaMonitoringAction.logger.debug("updatedResponse: " + updatedResponse);
+	
 	QaUsrResp qaUsrResp = qaService.retrieveQaUsrResp(new Long(responseId).longValue());
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 
 	/*
 	 * write out the audit log entry. If you move this after the update of the response, then make sure you update
@@ -1214,23 +1191,21 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	} else {
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(1));
 	}
-	QaMonitoringAction.logger.debug("SELECTION_CASE: " + request.getAttribute(QaAppConstants.SELECTION_CASE));
+	
 
 	QaContent qaContent = qaUsrResp.getQaQueContent().getQaContent();
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
@@ -1284,7 +1259,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispatching deleteResponse...");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
@@ -1293,7 +1268,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	String currentMonitoredToolSession = qaMonitoringForm.getSelectedToolSessionId();
@@ -1309,13 +1284,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(1));
 	}
 
-	QaMonitoringAction.logger.debug("SELECTION_CASE: " + request.getAttribute(QaAppConstants.SELECTION_CASE));
+	
 
 	String responseId = qaMonitoringForm.getResponseId();
 	QaMonitoringAction.logger.debug("responseId: " + responseId);
 
 	QaUsrResp qaUsrResp = qaService.retrieveQaUsrResp(new Long(responseId).longValue());
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 
 	qaService.removeUserResponse(qaUsrResp);
 	QaMonitoringAction.logger.debug("response deleted.");
@@ -1323,20 +1298,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	refreshUserInput(request, qaMonitoringForm);
 
 	QaContent qaContent = qaUsrResp.getQaQueContent().getQaContent();
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS_ID, summaryToolSessionsId);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
@@ -1385,8 +1358,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    qaService = qaMonitoringForm.getQaService();
 	}
 
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
-	QaMonitoringAction.logger.debug("qaMonitoringForm: " + qaMonitoringForm);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
@@ -1397,13 +1368,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -1470,11 +1439,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     public void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
 	    boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId,
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean setEditResponse, String currentMonitoredToolSession) {
-	QaMonitoringAction.logger.debug("starting refreshSummaryData: setEditResponse + " + setEditResponse);
+	QaMonitoringAction.logger.debug("starting refreshSummaryData");
 	QaMonitoringAction.logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
-	QaMonitoringAction.logger.debug("qaService: " + isUserNamesVisible);
-
 	QaMonitoringAction.logger.debug("isUserNamesVisible: " + isUserNamesVisible);
 	QaMonitoringAction.logger.debug("isLearnerRequest: " + isLearnerRequest);
 
@@ -1482,7 +1448,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	/* this section is related to summary tab. Starts here. */
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
 
 	if (qaContent.getTitle() == null) {
@@ -1506,7 +1472,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	generalMonitoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
 	if (isContentInUse == true) {
-	    QaMonitoringAction.logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    
 	    persistError(request, "error.content.inUse");
 	    generalMonitoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
@@ -1527,7 +1493,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, qaContent, qaService,
 		isUserNamesVisible, isLearnerRequest, currentSessionId, userId);
 
-	QaMonitoringAction.logger.debug("listMonitoredAnswersContainerDTO: " + listMonitoredAnswersContainerDTO);
+	
 
 	/* getting stats screen content from here... */
 	int countAllUsers = qaService.getTotalNumberOfUsers(qaContent);
@@ -1554,13 +1520,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	generalMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	generalMonitoringDTO.setAttachmentList(attachmentList);
 	generalMonitoringDTO.setDeletedAttachmentList(new ArrayList());
 	/* ...till here * */
 
 	if (generalLearnerFlowDTO != null) {
-	    QaMonitoringAction.logger.debug("final generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	    
 	    QaMonitoringAction.logger
 		    .debug("placing LIST_MONITORED_ANSWERS_CONTAINER_DTO within generalLearnerFlowDTO");
 	    generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
@@ -1569,9 +1535,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		QaMonitoringAction.logger.debug("isLearnerRequest is true.");
 		generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 	    }
-
-	    QaMonitoringAction.logger.debug("end of refreshSummaryData,  generalLearnerFlowDTO : "
-		    + generalLearnerFlowDTO);
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	}
 
@@ -1590,7 +1553,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 	/* ... till here */
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	MonitoringUtil.buildQaStatsDTO(request, qaService, qaContent);
@@ -1605,8 +1568,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
      */
     public void refreshStatsData(HttpServletRequest request, QaMonitoringForm qaMonitoringForm, IQaService qaService,
 	    GeneralMonitoringDTO generalMonitoringDTO) {
-	QaMonitoringAction.logger.debug("starting refreshStatsData: " + qaService);
-	QaMonitoringAction.logger.debug("starting refreshStatsData with generalMonitoringDTO: " + generalMonitoringDTO);
+	
+	
 	/* it is possible that no users has ever logged in for the activity yet */
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -1614,13 +1577,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaMonitoringForm.setToolContentID(strToolContentID);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -1653,12 +1614,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	generalMonitoringDTO.setAttachmentList(attachmentList);
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 
 	request.setAttribute(QaAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
-	QaMonitoringAction.logger.debug("ending refreshStatsData with generalMonitoringDTO: " + generalMonitoringDTO);
+	QaMonitoringAction.logger.debug("ending refreshStatsData");
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	/* find out if there are any reflection entries, from here */
@@ -1681,18 +1642,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispatching showResponse...");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
 	String currentUid = qaMonitoringForm.getCurrentUid();
 	QaMonitoringAction.logger.debug("currentUid: " + currentUid);
 	QaUsrResp qaUsrResp = qaService.getAttemptByUID(new Long(currentUid));
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 	qaUsrResp.setVisible(true);
 	qaService.updateUserResponse(qaUsrResp);
 	qaService.showResponse(qaUsrResp);
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
@@ -1703,17 +1664,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -1727,12 +1686,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
 
-	QaMonitoringAction.logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+	
 	if (currentMonitoredToolSession.equals("All")) {
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(2));
 	} else {
@@ -1744,7 +1703,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.setAttribute(QaAppConstants.CURRENT_SESSION_NAME, qaSession.getSession_name());
 	}
 
-	QaMonitoringAction.logger.debug("SELECTION_CASE: " + request.getAttribute(QaAppConstants.SELECTION_CASE));
+	
 	request.setAttribute(QaAppConstants.CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
@@ -1782,18 +1741,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispatching showGroupResponse...");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
 	String currentUid = qaMonitoringForm.getCurrentUid();
 	QaMonitoringAction.logger.debug("currentUid: " + currentUid);
 	QaUsrResp qaUsrResp = qaService.getAttemptByUID(new Long(currentUid));
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 	qaUsrResp.setVisible(true);
 	qaService.updateUserResponse(qaUsrResp);
 	qaService.showResponse(qaUsrResp);
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
@@ -1804,17 +1763,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -1828,19 +1785,19 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
 
-	QaMonitoringAction.logger.debug("currentMonitoredToolSession: " + currentMonitoredToolSession);
+	
 	if (currentMonitoredToolSession.equals("All")) {
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(2));
 	} else {
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(1));
 	}
 
-	QaMonitoringAction.logger.debug("SELECTION_CASE: " + request.getAttribute(QaAppConstants.SELECTION_CASE));
+	
 
 	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
 
@@ -1877,7 +1834,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
 	QaMonitoringAction.logger.debug("dispatching hideResponse...");
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
@@ -1888,28 +1845,26 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	String currentUid = qaMonitoringForm.getCurrentUid();
 	QaMonitoringAction.logger.debug("currentUid: " + currentUid);
 	QaUsrResp qaUsrResp = qaService.getAttemptByUID(new Long(currentUid));
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 	qaUsrResp.setVisible(false);
 	qaService.updateUserResponse(qaUsrResp);
 	qaService.hideResponse(qaUsrResp);
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
 	qaMonitoringForm.setToolContentID(strToolContentID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -1933,11 +1888,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(1));
 	}
 
-	QaMonitoringAction.logger.debug("SELECTION_CASE: " + request.getAttribute(QaAppConstants.SELECTION_CASE));
+	
 	request.setAttribute(QaAppConstants.CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
@@ -1975,7 +1930,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
 	QaMonitoringAction.logger.debug("dispatching hideGroupResponse...");
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
@@ -1986,28 +1941,26 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	String currentUid = qaMonitoringForm.getCurrentUid();
 	QaMonitoringAction.logger.debug("currentUid: " + currentUid);
 	QaUsrResp qaUsrResp = qaService.getAttemptByUID(new Long(currentUid));
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 	qaUsrResp.setVisible(false);
 	qaService.updateUserResponse(qaUsrResp);
 	qaService.hideResponse(qaUsrResp);
-	QaMonitoringAction.logger.debug("qaUsrResp: " + qaUsrResp);
+	
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
 	qaMonitoringForm.setToolContentID(strToolContentID);
 
 	String editResponse = request.getParameter(QaAppConstants.EDIT_RESPONSE);
-	QaMonitoringAction.logger.debug("editResponse: " + editResponse);
+	
 	qaMonitoringForm.setEditResponse(editResponse);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("existing qaContent:" + qaContent);
+	
 
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, qaContent, qaService);
-	QaMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
+	
 	request.setAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS, summaryToolSessions);
-	QaMonitoringAction.logger.debug("SUMMARY_TOOL_SESSIONS: "
-		+ request.getAttribute(QaAppConstants.SUMMARY_TOOL_SESSIONS));
 
 	Map summaryToolSessionsId = MonitoringUtil.populateToolSessionsId(request, qaContent, qaService);
 	QaMonitoringAction.logger.debug("summaryToolSessionsId: " + summaryToolSessionsId);
@@ -2026,10 +1979,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(1));
 	}
 
-	QaMonitoringAction.logger.debug("SELECTION_CASE: " + request.getAttribute(QaAppConstants.SELECTION_CASE));
+	
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
@@ -2070,7 +2023,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
@@ -2091,7 +2044,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	NotebookEntry notebookEntry = qaService.getEntry(new Long(sessionId), CoreNotebookConstants.NOTEBOOK_TOOL,
 		QaAppConstants.MY_SIGNATURE, new Integer(userId));
 
-	QaMonitoringAction.logger.debug("notebookEntry: " + notebookEntry);
+	
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = new GeneralLearnerFlowDTO();
 	if (notebookEntry != null) {
@@ -2100,20 +2053,20 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    generalLearnerFlowDTO.setUserName(userName);
 	}
 
-	QaMonitoringAction.logger.debug("generalLearnerFlowDTO: " + generalLearnerFlowDTO);
+	
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	QaSession qaSession = qaService.retrieveQaSessionOrNullById(new Long(sessionId).longValue());
-	QaMonitoringAction.logger.debug("qaSession: " + qaSession);
+	
 
 	QaContent qaContent = qaSession.getQaContent();
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	prepareEditActivityScreenData(request, qaContent);
 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	generalMonitoringDTO.setAttachmentList(attachmentList);
 
 	if (qaService.studentActivityOccurredGlobal(qaContent)) {
@@ -2124,7 +2077,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + generalMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
 	/* find out if there are any reflection entries, from here */
@@ -2135,7 +2088,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.setAttribute(QaAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
 
 	    String userExceptionNoToolSessions = generalMonitoringDTO.getUserExceptionNoToolSessions();
-	    QaMonitoringAction.logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+	    
 
 	    if (userExceptionNoToolSessions.equals("true")) {
 		QaMonitoringAction.logger.debug("there are no online student activity but there are reflections : ");
@@ -2153,13 +2106,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     public void prepareEditActivityScreenData(HttpServletRequest request, QaContent qaContent) {
-	QaMonitoringAction.logger.debug("starting prepareEditActivityScreenData: " + qaContent);
+	
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
 
 	qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
 	qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
 
-	QaMonitoringAction.logger.debug("final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
     }
 
@@ -2169,23 +2122,23 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	/* start authoring code */
 	QaAuthoringForm qaAuthoringForm = (QaMonitoringForm) form;
-	QaMonitoringAction.logger.debug("dispathcing submitAllContent :" + form);
+	
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String httpSessionID = request.getParameter("httpSessionID");
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaMonitoringAction.logger.debug("activeModule: " + activeModule);
+	
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
@@ -2194,13 +2147,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 
 	Map mapQuestionContent = AuthoringUtil.extractMapQuestionContent(listQuestionContentDTO);
-	QaMonitoringAction.logger.debug("extracted mapQuestionContent: " + mapQuestionContent);
+	
 
 	Map mapFeedback = AuthoringUtil.extractMapFeedback(listQuestionContentDTO);
-	QaMonitoringAction.logger.debug("extracted mapFeedback: " + mapFeedback);
+	
 
 	ActionMessages errors = new ActionMessages();
 	QaMonitoringAction.logger.debug("mapQuestionContent size: " + mapQuestionContent.size());
@@ -2219,9 +2172,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaMonitoringAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaMonitoringAction.logger.debug("richTextInstructions: " + richTextInstructions);
-
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -2236,10 +2186,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
-	QaMonitoringAction.logger.debug("there are no issues with input, continue and submit data");
-
 	QaContent qaContentTest = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("qaContentTest: " + qaContentTest);
 
 	QaMonitoringAction.logger.debug("errors: " + errors);
 	if (!errors.isEmpty()) {
@@ -2261,7 +2208,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	    qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, mapFeedback, qaService,
 		    qaAuthoringForm, request, qaContentTest, strToolContentID, null);
-	    QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	    
 
 	    long defaultContentID = 0;
 	    QaMonitoringAction.logger.debug("attempt retrieving tool with signatute : " + QaAppConstants.MY_SIGNATURE);
@@ -2271,7 +2218,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    if (qaContent != null) {
 		qaGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
 	    }
-	    QaMonitoringAction.logger.debug("updated qaGeneralAuthoringDTO to: " + qaGeneralAuthoringDTO);
+	    
 
 	    authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, qaService, qaAuthoringForm, qaContent);
 
@@ -2309,7 +2256,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaAuthoringForm.resetUserAction();
 	qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
 
-	QaMonitoringAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
@@ -2343,24 +2290,24 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	QaMonitoringAction.logger.debug("final qaGeneralMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, "All");
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
-	QaMonitoringAction.logger.debug("notebookEntriesExist : " + notebookEntriesExist);
+	
 
 	if (notebookEntriesExist) {
 	    request.setAttribute(QaAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
 
 	    String userExceptionNoToolSessions = qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-	    QaMonitoringAction.logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+	    
 
 	    if (userExceptionNoToolSessions.equals("true")) {
 		QaMonitoringAction.logger.debug("there are no online student activity but there are reflections : ");
@@ -2387,20 +2334,20 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispathcing saveSingleQuestion");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String httpSessionID = request.getParameter("httpSessionID");
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	QaMonitoringAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
+	
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
 	QaMonitoringAction.logger.debug("activeModule: " + activeModule);
@@ -2412,17 +2359,17 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	if (qaContent == null) {
 	    QaMonitoringAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    qaContent = qaService.loadQa(new Long(defaultContentIdStr).longValue());
 	}
-	QaMonitoringAction.logger.debug("final qaContent: " + qaContent);
+	
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
 
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
@@ -2430,13 +2377,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 
 	String newQuestion = request.getParameter("newQuestion");
-	QaMonitoringAction.logger.debug("newQuestion: " + newQuestion);
+	
 
 	String feedback = request.getParameter("feedback");
-	QaMonitoringAction.logger.debug("feedback: " + feedback);
+	
 
 	String editableQuestionIndex = request.getParameter("editableQuestionIndex");
 	QaMonitoringAction.logger.debug("editableQuestionIndex: " + editableQuestionIndex);
@@ -2452,13 +2399,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		    Iterator listIterator = listQuestionContentDTO.iterator();
 		    while (listIterator.hasNext()) {
 			qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-			QaMonitoringAction.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-			QaMonitoringAction.logger.debug("qaQuestionContentDTO question:"
-				+ qaQuestionContentDTO.getQuestion());
 
 			String question = qaQuestionContentDTO.getQuestion();
 			String displayOrder = qaQuestionContentDTO.getDisplayOrder();
-			QaMonitoringAction.logger.debug("displayOrder:" + displayOrder);
 
 			if (displayOrder != null && !displayOrder.equals("")) {
 			    if (displayOrder.equals(editableQuestionIndex)) {
@@ -2467,7 +2410,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 			}
 		    }
-		    QaMonitoringAction.logger.debug("qaQuestionContentDTO found:" + qaQuestionContentDTO);
+		    
 
 		    qaQuestionContentDTO.setQuestion(newQuestion);
 		    qaQuestionContentDTO.setFeedback(feedback);
@@ -2475,8 +2418,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 		    listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO,
 			    qaQuestionContentDTO, editableQuestionIndex);
-		    QaMonitoringAction.logger.debug("post reorderUpdateListQuestionContentDTO listQuestionContentDTO: "
-			    + listQuestionContentDTO);
 		} else {
 		    QaMonitoringAction.logger.debug("duplicate question entry, not adding");
 		}
@@ -2486,13 +2427,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		Iterator listIterator = listQuestionContentDTO.iterator();
 		while (listIterator.hasNext()) {
 		    qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-		    QaMonitoringAction.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-		    QaMonitoringAction.logger.debug("qaQuestionContentDTO question:"
-			    + qaQuestionContentDTO.getQuestion());
 
 		    String question = qaQuestionContentDTO.getQuestion();
 		    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
-		    QaMonitoringAction.logger.debug("displayOrder:" + displayOrder);
+		    
 
 		    if (displayOrder != null && !displayOrder.equals("")) {
 			if (displayOrder.equals(editableQuestionIndex)) {
@@ -2501,7 +2439,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 		    }
 		}
-		QaMonitoringAction.logger.debug("qaQuestionContentDTO found:" + qaQuestionContentDTO);
+		
 
 		qaQuestionContentDTO.setQuestion(newQuestion);
 		qaQuestionContentDTO.setFeedback(feedback);
@@ -2509,8 +2447,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 		listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO,
 			qaQuestionContentDTO, editableQuestionIndex);
-		QaMonitoringAction.logger.debug("post reorderUpdateListQuestionContentDTO listQuestionContentDTO: "
-			+ listQuestionContentDTO);
 	    }
 	} else {
 	    QaMonitoringAction.logger.debug("entry blank, not adding");
@@ -2518,13 +2454,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
+	
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaMonitoringAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaMonitoringAction.logger.debug("richTextInstructions: " + richTextInstructions);
+	
+	
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -2552,15 +2488,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
 	qaAuthoringForm.setCurrentTab("3");
 
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO.getMapQuestionContent(); "
-		+ qaGeneralAuthoringDTO.getMapQuestionContent());
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
@@ -2581,11 +2515,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	QaMonitoringAction.logger.debug("final qaGeneralMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, "All");
@@ -2598,7 +2532,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.setAttribute(QaAppConstants.NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
 
 	    String userExceptionNoToolSessions = qaGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-	    QaMonitoringAction.logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
+	    
 
 	    if (userExceptionNoToolSessions.equals("true")) {
 		QaMonitoringAction.logger.debug("there are no online student activity but there are reflections : ");
@@ -2624,13 +2558,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispathcing  addSingleQuestion");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String httpSessionID = request.getParameter("httpSessionID");
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
@@ -2646,16 +2580,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	if (qaContent == null) {
 	    QaMonitoringAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    qaContent = qaService.loadQa(new Long(defaultContentIdStr).longValue());
 	}
-	QaMonitoringAction.logger.debug("final qaContent: " + qaContent);
+	
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
@@ -2663,16 +2597,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 
 	String newQuestion = request.getParameter("newQuestion");
-	QaMonitoringAction.logger.debug("newQuestion: " + newQuestion);
+	
 
 	String feedback = request.getParameter("feedback");
-	QaMonitoringAction.logger.debug("feedback: " + feedback);
+	
 
 	int listSize = listQuestionContentDTO.size();
-	QaMonitoringAction.logger.debug("listSize: " + listSize);
+	
 
 	if (newQuestion != null && newQuestion.length() > 0) {
 	    boolean duplicates = AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
@@ -2685,7 +2619,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		qaQuestionContentDTO.setQuestion(newQuestion);
 
 		listQuestionContentDTO.add(qaQuestionContentDTO);
-		QaMonitoringAction.logger.debug("updated listQuestionContentDTO: " + listQuestionContentDTO);
+		
 	    } else {
 		QaMonitoringAction.logger.debug("entry duplicate, not adding");
 	    }
@@ -2699,8 +2633,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaMonitoringAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaMonitoringAction.logger.debug("richTextInstructions: " + richTextInstructions);
+	
+	
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -2726,16 +2660,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
 	qaAuthoringForm.setCurrentTab("3");
 
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO.getMapQuestionContent(); "
-		+ qaGeneralAuthoringDTO.getMapQuestionContent());
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
@@ -2755,12 +2686,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	QaMonitoringAction.logger.debug("final qaGeneralMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, "All");
@@ -2799,13 +2730,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispathcing  newQuestionBox");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String httpSessionID = request.getParameter("httpSessionID");
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
@@ -2821,23 +2752,23 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	if (qaContent == null) {
 	    QaMonitoringAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    qaContent = qaService.loadQa(new Long(defaultContentIdStr).longValue());
 	}
-	QaMonitoringAction.logger.debug("final qaContent: " + qaContent);
+	
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaMonitoringAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaMonitoringAction.logger.debug("richTextInstructions: " + richTextInstructions);
+	
+	
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -2847,7 +2778,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
@@ -2867,12 +2798,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	QaMonitoringAction.logger.debug("final qaGeneralMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, "All");
@@ -2912,13 +2843,13 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispathcing  newEditableQuestionBox");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String httpSessionID = request.getParameter("httpSessionID");
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	String questionIndex = request.getParameter("questionIndex");
 	QaMonitoringAction.logger.debug("questionIndex: " + questionIndex);
@@ -2926,15 +2857,15 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaAuthoringForm.setEditableQuestionIndex(questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 
 	String editableQuestion = "";
 	String editableFeedback = "";
 	Iterator listIterator = listQuestionContentDTO.iterator();
 	while (listIterator.hasNext()) {
 	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-	    QaMonitoringAction.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-	    QaMonitoringAction.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
+	    
+	    
 	    String question = qaQuestionContentDTO.getQuestion();
 	    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
 
@@ -2942,14 +2873,14 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		if (displayOrder.equals(questionIndex)) {
 		    editableFeedback = qaQuestionContentDTO.getFeedback();
 		    editableQuestion = qaQuestionContentDTO.getQuestion();
-		    QaMonitoringAction.logger.debug("editableFeedback found :" + editableFeedback);
+		    
 		    break;
 		}
 
 	    }
 	}
-	QaMonitoringAction.logger.debug("editableFeedback found :" + editableFeedback);
-	QaMonitoringAction.logger.debug("editableQuestion found :" + editableQuestion);
+	
+	
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	QaMonitoringAction.logger.debug("contentFolderID: " + contentFolderID);
@@ -2965,23 +2896,23 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	if (qaContent == null) {
 	    QaMonitoringAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    qaContent = qaService.loadQa(new Long(defaultContentIdStr).longValue());
 	}
-	QaMonitoringAction.logger.debug("final qaContent: " + qaContent);
+	
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaMonitoringAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaMonitoringAction.logger.debug("richTextInstructions: " + richTextInstructions);
+	
+	
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -2994,7 +2925,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralAuthoringDTO.setEditableQuestionFeedback(editableFeedback);
 	qaAuthoringForm.setFeedback(editableFeedback);
 
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -3015,12 +2946,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	QaMonitoringAction.logger.debug("final qaGeneralMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, "All");
@@ -3061,26 +2992,26 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispathcing  removeQuestion");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String httpSessionID = request.getParameter("httpSessionID");
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	String questionIndex = request.getParameter("questionIndex");
 	QaMonitoringAction.logger.debug("questionIndex: " + questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 
 	QaQuestionContentDTO qaQuestionContentDTO = null;
 	Iterator listIterator = listQuestionContentDTO.iterator();
 	while (listIterator.hasNext()) {
 	    qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-	    QaMonitoringAction.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-	    QaMonitoringAction.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
+	    
+	    
 
 	    String question = qaQuestionContentDTO.getQuestion();
 	    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
@@ -3094,12 +3025,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    }
 	}
 
-	QaMonitoringAction.logger.debug("qaQuestionContentDTO found:" + qaQuestionContentDTO);
+	
 	qaQuestionContentDTO.setQuestion("");
-	QaMonitoringAction.logger.debug("listQuestionContentDTO after remove:" + listQuestionContentDTO);
+	
 
 	listQuestionContentDTO = AuthoringUtil.reorderListQuestionContentDTO(listQuestionContentDTO, questionIndex);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO reordered:" + listQuestionContentDTO);
+	
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
@@ -3111,10 +3042,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	QaMonitoringAction.logger.debug("richTextTitle: " + richTextTitle);
+	
 
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-	QaMonitoringAction.logger.debug("richTextInstructions: " + richTextInstructions);
+	
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
@@ -3126,16 +3057,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	if (qaContent == null) {
 	    QaMonitoringAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    qaContent = qaService.loadQa(new Long(defaultContentIdStr).longValue());
 	}
-	QaMonitoringAction.logger.debug("final qaContent: " + qaContent);
+	
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -3163,10 +3094,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaAuthoringForm.setCurrentTab("3");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	QaMonitoringAction.logger.debug("qaQuestionContentDTO now: " + qaQuestionContentDTO);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
+	
+	
 
-	QaMonitoringAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -3186,12 +3117,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	QaMonitoringAction.logger.debug("final qaGeneralMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, "All");
@@ -3231,25 +3162,25 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispathcing  moveQuestionDown");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String httpSessionID = request.getParameter("httpSessionID");
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	String questionIndex = request.getParameter("questionIndex");
 	QaMonitoringAction.logger.debug("questionIndex: " + questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 
 	listQuestionContentDTO = AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "down", null);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO after swap: " + listQuestionContentDTO);
+	
 
 	listQuestionContentDTO = AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO after reordersimple: " + listQuestionContentDTO);
+	
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
@@ -3261,10 +3192,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	QaMonitoringAction.logger.debug("richTextTitle: " + richTextTitle);
+	
 
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-	QaMonitoringAction.logger.debug("richTextInstructions: " + richTextInstructions);
+	
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
@@ -3276,16 +3207,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	if (qaContent == null) {
 	    QaMonitoringAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    qaContent = qaService.loadQa(new Long(defaultContentIdStr).longValue());
 	}
-	QaMonitoringAction.logger.debug("final qaContent: " + qaContent);
+	
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -3312,9 +3243,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaAuthoringForm.setCurrentTab("3");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
+	
 
-	QaMonitoringAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -3334,12 +3265,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	QaMonitoringAction.logger.debug("final qaGeneralMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, "All");
@@ -3380,25 +3311,25 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("dispathcing  moveQuestionDown");
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaMonitoringAction.logger.debug("qaService: " + qaService);
+	
 
 	String httpSessionID = request.getParameter("httpSessionID");
 	QaMonitoringAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaMonitoringAction.logger.debug("sessionMap: " + sessionMap);
+	
 
 	String questionIndex = request.getParameter("questionIndex");
 	QaMonitoringAction.logger.debug("questionIndex: " + questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 
 	listQuestionContentDTO = AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "up", null);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO after swap: " + listQuestionContentDTO);
+	
 
 	listQuestionContentDTO = AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO after reordersimple: " + listQuestionContentDTO);
+	
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
@@ -3410,10 +3341,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	QaMonitoringAction.logger.debug("richTextTitle: " + richTextTitle);
+	
 
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-	QaMonitoringAction.logger.debug("richTextInstructions: " + richTextInstructions);
+	
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
@@ -3425,16 +3356,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaMonitoringAction.logger.debug("qaContent: " + qaContent);
+	
 
 	if (qaContent == null) {
 	    QaMonitoringAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    qaContent = qaService.loadQa(new Long(defaultContentIdStr).longValue());
 	}
-	QaMonitoringAction.logger.debug("final qaContent: " + qaContent);
+	
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -3462,9 +3393,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaAuthoringForm.setCurrentTab("3");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	QaMonitoringAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
+	
 
-	QaMonitoringAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -3484,12 +3415,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralMonitoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
 	List attachmentList = qaService.retrieveQaUploadedFiles(qaContent);
-	QaMonitoringAction.logger.debug("attachmentList: " + attachmentList);
+	
 	qaGeneralMonitoringDTO.setAttachmentList(attachmentList);
-	QaMonitoringAction.logger.debug("final qaGeneralMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 
 	qaGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	QaMonitoringAction.logger.debug("final generalMonitoringDTO: " + qaGeneralMonitoringDTO);
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
 	prepareReflectionData(request, qaContent, qaService, null, false, "All");
@@ -3521,7 +3452,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
     public void prepareReflectionData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
 	    String userID, boolean exportMode, String currentSessionId) {
-	QaMonitoringAction.logger.debug("starting prepareReflectionData: " + qaContent);
+	
 	QaMonitoringAction.logger.debug("currentSessionId: " + currentSessionId);
 	QaMonitoringAction.logger.debug("userID: " + userID);
 	QaMonitoringAction.logger.debug("exportMode: " + exportMode);
@@ -3535,7 +3466,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	reflectionsContainerDTO = getReflectionList(qaContent, userID, qaService);
 
-	QaMonitoringAction.logger.debug("reflectionsContainerDTO: " + reflectionsContainerDTO);
+	
 	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
 	if (exportMode) {
@@ -3560,18 +3491,18 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    QaMonitoringAction.logger.debug("all users mode");
 	    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) {
 		QaSession qaSession = (QaSession) sessionIter.next();
-		QaMonitoringAction.logger.debug("qaSession: " + qaSession);
+		
 		QaMonitoringAction.logger.debug("qaSession sessionId: " + qaSession.getQaSessionId());
 
 		for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) {
 		    QaQueUsr user = (QaQueUsr) userIter.next();
-		    QaMonitoringAction.logger.debug("user: " + user);
+		    QaMonitoringAction.logger.debug("user: " + user.getUsername());
 
 		    NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
 			    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
 				    .getQueUsrId().toString()));
 
-		    QaMonitoringAction.logger.debug("notebookEntry: " + notebookEntry);
+		    
 
 		    if (notebookEntry != null) {
 			ReflectionDTO reflectionDTO = new ReflectionDTO();
@@ -3589,10 +3520,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    QaMonitoringAction.logger.debug("single user mode");
 	    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) {
 		QaSession qaSession = (QaSession) sessionIter.next();
-		QaMonitoringAction.logger.debug("qaSession: " + qaSession);
+		
 		for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) {
 		    QaQueUsr user = (QaQueUsr) userIter.next();
-		    QaMonitoringAction.logger.debug("user: " + user);
+		    QaMonitoringAction.logger.debug("user: " + user.getUsername());
 
 		    if (user.getQueUsrId().toString().equals(userID)) {
 			QaMonitoringAction.logger.debug("getting reflection for user with  userID: " + userID);
@@ -3600,7 +3531,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 				CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
 					.getQueUsrId().toString()));
 
-			QaMonitoringAction.logger.debug("notebookEntry: " + notebookEntry);
+			
 
 			if (notebookEntry != null) {
 			    ReflectionDTO reflectionDTO = new ReflectionDTO();
@@ -3642,20 +3573,20 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    QaMonitoringAction.logger.debug("all users mode");
 	    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) {
 		QaSession qaSession = (QaSession) sessionIter.next();
-		QaMonitoringAction.logger.debug("qaSession: " + qaSession);
+		
 		QaMonitoringAction.logger.debug("qaSession sessionId: " + qaSession.getQaSessionId());
 
 		if (currentSessionId.equals(qaSession.getQaSessionId())) {
 
 		    for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) {
 			QaQueUsr user = (QaQueUsr) userIter.next();
-			QaMonitoringAction.logger.debug("user: " + user);
+			QaMonitoringAction.logger.debug("user: " + user.getUsername());
 
 			NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
 				CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
 					.getQueUsrId().toString()));
 
-			QaMonitoringAction.logger.debug("notebookEntry: " + notebookEntry);
+			
 
 			if (notebookEntry != null) {
 			    ReflectionDTO reflectionDTO = new ReflectionDTO();
@@ -3674,12 +3605,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    QaMonitoringAction.logger.debug("single user mode");
 	    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) {
 		QaSession qaSession = (QaSession) sessionIter.next();
-		QaMonitoringAction.logger.debug("qaSession: " + qaSession);
+		
 
 		if (currentSessionId.equals(qaSession.getQaSessionId())) {
 		    for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) {
 			QaQueUsr user = (QaQueUsr) userIter.next();
-			QaMonitoringAction.logger.debug("user: " + user);
+			QaMonitoringAction.logger.debug("user: " + user.getUsername());
 
 			if (user.getQueUsrId().toString().equals(userID)) {
 			    QaMonitoringAction.logger.debug("getting reflection for user with  userID: " + userID);
@@ -3687,7 +3618,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 				    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
 					    .getQueUsrId().toString()));
 
-			    QaMonitoringAction.logger.debug("notebookEntry: " + notebookEntry);
+			    
 
 			    if (notebookEntry != null) {
 				ReflectionDTO reflectionDTO = new ReflectionDTO();

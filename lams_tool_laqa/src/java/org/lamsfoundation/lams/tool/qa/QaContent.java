@@ -189,7 +189,6 @@ public class QaContent implements Serializable {
 		new TreeSet<QaCondition>(new TextSearchConditionComparator()));
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
-	QaContent.logger.debug(QaContent.logger + " " + "QaContent" + " " + "after doing deepCopyQaQueContent");
 
 	newContent.setQaUploadedFiles(qa.deepCopyQaAttachments(toolContentHandler, newContent));
 	newContent.setConditions(qa.deepCopyConditions(newContent));
@@ -197,14 +196,11 @@ public class QaContent implements Serializable {
     }
 
     public Set deepCopyQaQueContent(QaContent newQaContent) {
-	QaContent.logger.debug(QaContent.logger + " " + "QaContent" + " " + "start of deepCopyQaQueContent");
 	Set newQaQueContent = new TreeSet();
 	for (Iterator i = this.getQaQueContents().iterator(); i.hasNext();) {
 	    QaQueContent queContent = (QaQueContent) i.next();
 	    newQaQueContent.add(QaQueContent.newInstance(queContent, newQaContent));
 	}
-	QaContent.logger.debug(QaContent.logger + " " + "QaContent" + " " + "returning newQaQueContent: "
-		+ newQaQueContent);
 	return newQaQueContent;
     }
 

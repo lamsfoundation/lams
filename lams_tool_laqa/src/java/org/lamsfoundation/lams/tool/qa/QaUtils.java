@@ -73,11 +73,11 @@ public abstract class QaUtils implements QaAppConstants {
     }
 
     public static String replaceNewLines(String text) {
-	logger.debug("using text: " + text);
+	
 	String newText = "";
 	if (text != null) {
 	    newText = text.replaceAll("\n", "<br>");
-	    logger.debug("newText: " + newText);
+	    
 	}
 
 	return newText;
@@ -129,34 +129,34 @@ public abstract class QaUtils implements QaAppConstants {
 	qaGeneralAuthoringDTO.setLockWhenFinished(lockWhenFinished);
 
 	String offlineInstructions = request.getParameter(OFFLINE_INSTRUCTIONS);
-	logger.debug("offlineInstructions: " + offlineInstructions);
+	
 	qaAuthoringForm.setOfflineInstructions(offlineInstructions);
 	qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	String onlineInstructions = request.getParameter(ONLINE_INSTRUCTIONS);
-	logger.debug("onlineInstructions: " + onlineInstructions);
+	
 	qaAuthoringForm.setOnlineInstructions(onlineInstructions);
 	qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	String reflect = request.getParameter(REFLECT);
-	logger.debug("reflect: " + reflect);
+	
 	qaAuthoringForm.setReflect(reflect);
 	qaGeneralAuthoringDTO.setReflect(reflect);
 
 	String reflectionSubject = request.getParameter(REFLECTION_SUBJECT);
-	logger.debug("reflectionSubject: " + reflectionSubject);
+	
 	qaAuthoringForm.setReflectionSubject(reflectionSubject);
 	qaGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
 
-	logger.debug("ending setFormProperties with qaAuthoringForm: " + qaAuthoringForm);
-	logger.debug("ending setFormProperties with qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
+	
     }
 
     public static int getCurrentUserId(HttpServletRequest request) throws QaApplicationException {
 	HttpSession ss = SessionManager.getSession();
 	/* get back login user DTO */
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	logger.debug(logger + " " + "QaUtils" + " Current user is: " + user + " with id: " + user.getUserID());
+	logger.debug(logger + " " + "QaUtils" + " Current user id: " + user.getUserID());
 	return user.getUserID().intValue();
     }
 
@@ -170,7 +170,6 @@ public abstract class QaUtils implements QaAppConstants {
      */
     public static boolean existsContent(long toolContentID, IQaService qaService) {
 	QaContent qaContent = qaService.loadQa(toolContentID);
-	logger.debug(logger + " " + "QaUtils " + "retrieving qaContent: " + qaContent);
 	if (qaContent == null)
 	    return false;
 
@@ -187,7 +186,7 @@ public abstract class QaUtils implements QaAppConstants {
     public static boolean existsSession(long toolContentID, IQaService qaService) {
 	logger.debug("existsSession");
 	QaSession qaSession = qaService.retrieveQaSessionOrNullById(toolContentID);
-	logger.debug("qaSession:" + qaSession);
+	
 
 	if (qaSession == null)
 	    return false;
@@ -196,14 +195,12 @@ public abstract class QaUtils implements QaAppConstants {
     }
 
     public static String getFormattedDateString(Date date) {
-	logger.debug(logger + " " + " QaUtils getFormattedDateString: "
-		+ DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 	return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
     }
 
     public static void configureContentRepository(HttpServletRequest request, IQaService qaService) {
 	logger.debug("attempt configureContentRepository");
-	logger.debug("qaService: " + qaService);
+	
 	logger.debug("calling configureContentRepository()");
 	qaService.configureContentRepository();
 	logger.debug("configureContentRepository ran successfully");
@@ -471,12 +468,12 @@ public abstract class QaUtils implements QaAppConstants {
      */
     public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID,
 	    IQaService qaService) {
-	logger.debug("qaService: " + qaService);
+	
 	logger.debug("value:" + value);
 	logger.debug("strToolContentID:" + strToolContentID);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	logger.debug("qaContent:" + qaContent);
+	
 	if (qaContent != null) {
 	    qaContent.setDefineLater(value);
 	    logger.debug("defineLater has been set to:" + value);
@@ -508,11 +505,11 @@ public abstract class QaUtils implements QaAppConstants {
 
     public static void setDefineLater(HttpServletRequest request, boolean value, IQaService qaService,
 	    String toolContentID) {
-	logger.debug("qaService:" + qaService);
+	
 	logger.debug("toolContentID:" + toolContentID);
 
 	QaContent qaContent = qaService.loadQa(new Long(toolContentID).longValue());
-	logger.debug("qaContent:" + qaContent);
+	
 	if (qaContent != null) {
 	    qaContent.setDefineLater(value);
 	    logger.debug("defineLater has been set to true");
@@ -523,7 +520,7 @@ public abstract class QaUtils implements QaAppConstants {
     public static String getCurrentLearnerID() {
 	String userID = "";
 	HttpSession ss = SessionManager.getSession();
-	logger.debug("ss: " + ss);
+	
 
 	if (ss != null) {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -540,7 +537,7 @@ public abstract class QaUtils implements QaAppConstants {
 	HttpSession ss = SessionManager.getSession();
 	/* get back login user DTO */
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	logger.debug("retrieving toolUser: " + toolUser);
+	
 	return toolUser;
     }
 

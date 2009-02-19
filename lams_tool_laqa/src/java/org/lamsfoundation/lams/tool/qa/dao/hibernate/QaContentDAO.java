@@ -79,7 +79,6 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 
     public void updateQa(QaContent qa) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
-	QaContentDAO.logger.debug("before updateQa: " + qa);
 	this.getHibernateTemplate().update(qa);
     }
 
@@ -100,13 +99,11 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 
     public void saveOrUpdateQa(QaContent qa) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
-	QaContentDAO.logger.debug("before saveOrUpdateQa: " + qa);
 	this.getHibernateTemplate().saveOrUpdate(qa);
     }
 
     public void createQa(QaContent qa) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
-	QaContentDAO.logger.debug("before createQa: " + qa);
 	this.getHibernateTemplate().save(qa);
     }
 

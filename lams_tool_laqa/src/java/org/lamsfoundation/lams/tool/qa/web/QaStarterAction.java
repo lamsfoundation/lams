@@ -150,7 +150,6 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
@@ -181,7 +180,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	QaUtils.cleanUpSessionAbsolute(request);
 	QaStarterAction.logger.debug("init authoring mode.");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-	QaStarterAction.logger.debug("qaAuthoringForm: " + qaAuthoringForm);
+	
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	QaStarterAction.logger.debug("contentFolderID: " + contentFolderID);
@@ -203,7 +202,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    QaStarterAction.logger.debug("obtaining qaService via proxy");
 	    qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	}
-	QaStarterAction.logger.debug("qaService: " + qaService);
+	
 
 	qaGeneralAuthoringDTO.setCurrentTab("1");
 	QaStarterAction.logger.debug("setting currrent tab to 1:");
@@ -329,10 +328,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    QaStarterAction.logger.debug("getting existing content");
 	    /* it is possible that the content is in use by learners. */
 	    qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	    QaStarterAction.logger.debug("qaContent: " + qaContent);
+	    
 	    if (qaService.studentActivityOccurredGlobal(qaContent)) {
 		QaUtils.cleanUpSessionAbsolute(request);
-		QaStarterAction.logger.debug("student activity occurred on this content:" + qaContent);
+		
 		persistError(request, "error.content.inUse");
 		QaStarterAction.logger.debug("add error.content.inUse to ActionMessages.");
 		return mapping.findForward(QaAppConstants.ERROR_LIST);
@@ -342,11 +341,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	    QaStarterAction.logger.debug("post retrive content :" + sessionMap);
 	}
-
-	QaStarterAction.logger.debug("qaGeneralAuthoringDTO.getOnlineInstructions() :"
-		+ qaGeneralAuthoringDTO.getOnlineInstructions());
-	QaStarterAction.logger.debug("qaGeneralAuthoringDTO.getOfflineInstructions():"
-		+ qaGeneralAuthoringDTO.getOfflineInstructions());
 
 	if (qaGeneralAuthoringDTO.getOnlineInstructions() == null
 		|| qaGeneralAuthoringDTO.getOnlineInstructions().length() == 0) {
@@ -368,22 +362,22 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, qaAuthoringForm);
 
-	QaStarterAction.logger.debug("final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	QaStarterAction.logger.debug("will return to jsp with: " + sourceMcStarter);
 	String destination = QaUtils.getDestination(sourceMcStarter, requestedModule);
 	QaStarterAction.logger.debug("destination: " + destination);
 
 	Map mapQuestionContentLocal = qaGeneralAuthoringDTO.getMapQuestionContent();
-	QaStarterAction.logger.debug("mapQuestionContentLocal: " + mapQuestionContentLocal);
+	
 
-	QaStarterAction.logger.debug("mapQuestionContent: " + mapQuestionContent);
+	
 	sessionMap.put(QaAppConstants.MAP_QUESTION_CONTENT_KEY, mapQuestionContent);
 
 	QaStarterAction.logger.debug("persisting sessionMap into session: " + sessionMap);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
-	QaStarterAction.logger.debug("before fwding to jsp, qaAuthoringForm : " + qaAuthoringForm);
-	QaStarterAction.logger.debug("final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
+	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	return mapping.findForward(destination);
@@ -406,7 +400,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
     protected QaContent retrieveContent(HttpServletRequest request, ActionMapping mapping,
 	    QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long toolContentID, boolean isDefaultContent,
 	    IQaService qaService, QaGeneralAuthoringDTO qaGeneralAuthoringDTO, SessionMap sessionMap) {
-	QaStarterAction.logger.debug("starting retrieveContent: " + qaService);
+	
 	QaStarterAction.logger.debug("toolContentID: " + toolContentID);
 	QaStarterAction.logger.debug("isDefaultContent: " + isDefaultContent);
 
@@ -415,7 +409,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	if (isDefaultContent && qaContent.getConditions().isEmpty()) {
 	    qaContent.getConditions().add(qaService.createDefaultComplexCondition(qaContent));
 	}
-	QaStarterAction.logger.debug("QaContent: " + qaContent);
+	
 
 	QaUtils.populateAuthoringDTO(request, qaContent, qaGeneralAuthoringDTO);
 
@@ -460,15 +454,15 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	mapQuestionContent.clear();
 	Iterator queIterator = qaContent.getQaQueContents().iterator();
 	Long mapIndex = new Long(1);
-	QaStarterAction.logger.debug("mapQuestionContent: " + mapQuestionContent);
+	
 	while (queIterator.hasNext()) {
 	    QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO();
 
 	    QaQueContent qaQueContent = (QaQueContent) queIterator.next();
 	    if (qaQueContent != null) {
-		QaStarterAction.logger.debug("question: " + qaQueContent.getQuestion());
-		QaStarterAction.logger.debug("displayorder: " + new Integer(qaQueContent.getDisplayOrder()).toString());
-		QaStarterAction.logger.debug("feedback: " + qaQueContent.getFeedback());
+		
+		
+		
 
 		mapQuestionContent.put(mapIndex.toString(), qaQueContent.getQuestion());
 
@@ -485,11 +479,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		mapIndex = new Long(mapIndex.longValue() + 1);
 	    }
 	}
-	QaStarterAction.logger.debug("Map initialized with existing contentid to: " + mapQuestionContent);
+	
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(mapQuestionContent.size()));
 
-	QaStarterAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+	
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
@@ -512,11 +506,11 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	}
 
-	QaStarterAction.logger.debug("mapQuestionContent is:" + mapQuestionContent);
+	
 	qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
 
-	QaStarterAction.logger.debug("qaContent.getOnlineInstructions():" + qaContent.getOnlineInstructions());
-	QaStarterAction.logger.debug("qaContent.getOfflineInstructions():" + qaContent.getOfflineInstructions());
+	
+	
 	qaGeneralAuthoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
 	qaGeneralAuthoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 
@@ -528,7 +522,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	QaStarterAction.logger.debug("ACTIVITY_TITLE_KEY set to:" + sessionMap.get(QaAppConstants.ACTIVITY_TITLE_KEY));
 
 	qaAuthoringForm.resetUserAction();
-	QaStarterAction.logger.debug("returning qaContent:" + qaContent);
+	
 	return qaContent;
     }
 
@@ -546,7 +540,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
      */
     public boolean readSignature(HttpServletRequest request, ActionMapping mapping, IQaService qaService,
 	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO, QaAuthoringForm qaAuthoringForm) {
-	QaStarterAction.logger.debug("qaService: " + qaService);
+	
 	/*
 	 * retrieve the default content id based on tool signature
 	 */
@@ -578,10 +572,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		persistError(request, "error.defaultContent.notSetup");
 		return false;
 	    }
-	    QaStarterAction.logger.debug("using qaContent: " + qaContent);
+	    
 	    QaStarterAction.logger.debug("using qaContent uid: " + qaContent.getUid());
 	    contentUID = qaContent.getUid().longValue();
-	    QaStarterAction.logger.debug("contentUID: " + contentUID);
+	    
 	} catch (Exception e) {
 	    QaStarterAction.logger.debug("Exception occured: No default question content");
 	    persistError(request, "error.defaultContent.notSetup");

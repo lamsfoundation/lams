@@ -210,75 +210,57 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	QaAction.logger.debug("dispathcing submitAllContent :" + form);
 
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	Map mapQuestionContent = AuthoringUtil.extractMapQuestionContent(listQuestionContentDTO);
-	QaAction.logger.debug("extracted mapQuestionContent: " + mapQuestionContent);
 
 	Map mapFeedback = AuthoringUtil.extractMapFeedback(listQuestionContentDTO);
-	QaAction.logger.debug("extracted mapFeedback: " + mapFeedback);
 
 	ActionMessages errors = new ActionMessages();
-	QaAction.logger.debug("mapQuestionContent size: " + mapQuestionContent.size());
 
 	if (mapQuestionContent.size() == 0) {
 	    ActionMessage error = new ActionMessage("questions.none.submitted");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
-	QaAction.logger.debug("errors: " + errors);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
 
-	QaAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    List attachmentListBackup = new ArrayList();
 	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("attachmentList: " + attachmentList);
 	    attachmentListBackup = attachmentList;
 
 	    List deletedAttachmentListBackup = new ArrayList();
 	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 	    deletedAttachmentListBackup = deletedAttachmentList;
 
 	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
@@ -286,8 +268,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    QaAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    QaAction.logger.debug("offlineInstructions: " + strOfflineInstructions);
 	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 
@@ -298,8 +278,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
@@ -310,17 +288,12 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 
-	QaAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
-	QaAction.logger.debug("there are no issues with input, continue and submit data");
 
 	QaContent qaContentTest = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContentTest: " + qaContentTest);
 
-	QaAction.logger.debug("errors: " + errors);
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
 	    QaAction.logger.debug("errors saved: " + errors);
@@ -329,7 +302,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaContent qaContent = qaContentTest;
 
 	if (errors.isEmpty()) {
-	    QaAction.logger.debug("errors is empty: " + errors);
 	    /*
 	     * to remove deleted entries in the questions table based on mapQuestionContent
 	     */
@@ -339,7 +311,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	    qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, mapFeedback, qaService,
 		    qaAuthoringForm, request, qaContentTest, strToolContentID, conditionSet);
-	    QaAction.logger.debug("qaContent: " + qaContent);
 
 	    long defaultContentID = 0;
 	    QaAction.logger.debug("attempt retrieving tool with signatute : " + QaAppConstants.MY_SIGNATURE);
@@ -349,7 +320,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    if (qaContent != null) {
 		qaGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
 	    }
-	    QaAction.logger.debug("updated qaGeneralAuthoringDTO to: " + qaGeneralAuthoringDTO);
 
 	    authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, qaService, qaAuthoringForm, qaContent);
 
@@ -413,7 +383,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.resetUserAction();
 	qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
 
-	QaAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
@@ -455,41 +424,26 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	QaAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
-
-	/*
-	 * if (qaContent == null) { logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-	 * qaContent=qaService.loadQa(new Long(defaultContentIdStr).longValue()); }
-	 */
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
 
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
@@ -497,16 +451,12 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	String newQuestion = request.getParameter("newQuestion");
-	QaAction.logger.debug("newQuestion: " + newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	QaAction.logger.debug("feedback: " + feedback);
 
 	String editableQuestionIndex = request.getParameter("editableQuestionIndex");
-	QaAction.logger.debug("editableQuestionIndex: " + editableQuestionIndex);
 
 	if (newQuestion != null && newQuestion.length() > 0) {
 	    if (editQuestionBoxRequest != null && editQuestionBoxRequest.equals("false")) {
@@ -519,12 +469,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		    Iterator listIterator = listQuestionContentDTO.iterator();
 		    while (listIterator.hasNext()) {
 			qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-			QaAction.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-			QaAction.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
-
+			
 			String question = qaQuestionContentDTO.getQuestion();
 			String displayOrder = qaQuestionContentDTO.getDisplayOrder();
-			QaAction.logger.debug("displayOrder:" + displayOrder);
+			
 
 			if (displayOrder != null && !displayOrder.equals("")) {
 			    if (displayOrder.equals(editableQuestionIndex)) {
@@ -533,7 +481,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 			}
 		    }
-		    QaAction.logger.debug("qaQuestionContentDTO found:" + qaQuestionContentDTO);
 
 		    qaQuestionContentDTO.setQuestion(newQuestion);
 		    qaQuestionContentDTO.setFeedback(feedback);
@@ -541,8 +488,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 		    listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO,
 			    qaQuestionContentDTO, editableQuestionIndex);
-		    QaAction.logger.debug("post reorderUpdateListQuestionContentDTO listQuestionContentDTO: "
-			    + listQuestionContentDTO);
 		} else {
 		    QaAction.logger.debug("duplicate question entry, not adding");
 		}
@@ -552,12 +497,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		Iterator listIterator = listQuestionContentDTO.iterator();
 		while (listIterator.hasNext()) {
 		    qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-		    QaAction.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-		    QaAction.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
 
 		    String question = qaQuestionContentDTO.getQuestion();
 		    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
-		    QaAction.logger.debug("displayOrder:" + displayOrder);
 
 		    if (displayOrder != null && !displayOrder.equals("")) {
 			if (displayOrder.equals(editableQuestionIndex)) {
@@ -566,7 +508,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 		    }
 		}
-		QaAction.logger.debug("qaQuestionContentDTO found:" + qaQuestionContentDTO);
 
 		qaQuestionContentDTO.setQuestion(newQuestion);
 		qaQuestionContentDTO.setFeedback(feedback);
@@ -574,8 +515,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 		listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO,
 			qaQuestionContentDTO, editableQuestionIndex);
-		QaAction.logger.debug("post reorderUpdateListQuestionContentDTO listQuestionContentDTO: "
-			+ listQuestionContentDTO);
 	    }
 	} else {
 	    QaAction.logger.debug("entry blank, not adding");
@@ -583,13 +522,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	QaAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -598,29 +534,24 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	QaAction.logger.debug("activeModule: " + activeModule);
+
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("onlineInstructions: " + onlineInstructions);
+
 	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("attachmentList: " + attachmentList);
 
 	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    QaAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    QaAction.logger.debug("offlineInstructions: " + strOfflineInstructions);
 	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 
@@ -629,7 +560,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	QaUtils.setFormProperties(request, qaService, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID,
 		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
@@ -647,15 +577,11 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-	QaAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	QaAction.logger.debug("httpSessionID: " + httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-	QaAction.logger.debug("qaGeneralAuthoringDTO.getMapQuestionContent(); "
-		+ qaGeneralAuthoringDTO.getMapQuestionContent());
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
@@ -677,41 +603,25 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     public ActionForward addSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	QaAction.logger.debug("dispathcing addSingleQuestion");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
-
-	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
-	/*
-	 * if (qaContent == null) { logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-	 * qaContent=qaService.loadQa(new Long(defaultContentIdStr).longValue()); } logger.debug("final qaContent: " +
-	 * qaContent);
-	 */
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
@@ -719,20 +629,15 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	String newQuestion = request.getParameter("newQuestion");
-	QaAction.logger.debug("newQuestion: " + newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	QaAction.logger.debug("feedback: " + feedback);
 
 	int listSize = listQuestionContentDTO.size();
-	QaAction.logger.debug("listSize: " + listSize);
 
 	if (newQuestion != null && newQuestion.length() > 0) {
 	    boolean duplicates = AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
-	    QaAction.logger.debug("duplicates: " + duplicates);
 
 	    if (!duplicates) {
 		QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO();
@@ -741,22 +646,12 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		qaQuestionContentDTO.setQuestion(newQuestion);
 
 		listQuestionContentDTO.add(qaQuestionContentDTO);
-		QaAction.logger.debug("updated listQuestionContentDTO: " + listQuestionContentDTO);
 	    } else {
 		QaAction.logger.debug("entry duplicate, not adding");
-		/*
-		 * ActionMessages errors = new ActionMessages(); ActionMessage error = new
-		 * ActionMessage("question.duplicate"); errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-		 * saveErrors(request, errors); logger.debug("errors saved: " + errors);
-		 */
+
 	    }
 	} else {
 	    QaAction.logger.debug("entry blank, not adding");
-	    /*
-	     * ActionMessages errors = new ActionMessages(); ActionMessage error = new ActionMessage("question.blank");
-	     * errors.add(ActionMessages.GLOBAL_MESSAGE, error); saveErrors(request, errors); logger.debug("errors
-	     * saved: " + errors);
-	     */
 	}
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
@@ -765,8 +660,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -778,26 +671,20 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("attachmentList: " + attachmentList);
 
 	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    QaAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    QaAction.logger.debug("offlineInstructions: " + strOfflineInstructions);
 	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -821,16 +708,11 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-	QaAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	QaAction.logger.debug("httpSessionID: " + httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	QaAction.logger.debug("qaGeneralAuthoringDTO.getMapQuestionContent(); "
-		+ qaGeneralAuthoringDTO.getMapQuestionContent());
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
@@ -856,46 +738,31 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
+	
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
-
-	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
-
-	/*
-	 * if (qaContent == null) { logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-	 * qaContent=qaService.loadQa(new Long(defaultContentIdStr).longValue()); } logger.debug("final qaContent: " +
-	 * qaContent);
-	 */
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
+	
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	
 	qaAuthoringForm.setTitle(richTextTitle);
 
 	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
@@ -907,19 +774,15 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    QaAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    QaAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
 
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-	QaAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
@@ -952,29 +815,22 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	QaAction.logger.debug("questionIndex: " + questionIndex);
 
 	qaAuthoringForm.setEditableQuestionIndex(questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	String editableQuestion = "";
 	String editableFeedback = "";
 	Iterator listIterator = listQuestionContentDTO.iterator();
 	while (listIterator.hasNext()) {
 	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-	    QaAction.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-	    QaAction.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
 	    String question = qaQuestionContentDTO.getQuestion();
 	    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
 
@@ -982,40 +838,30 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		if (displayOrder.equals(questionIndex)) {
 		    editableFeedback = qaQuestionContentDTO.getFeedback();
 		    editableQuestion = qaQuestionContentDTO.getQuestion();
-		    QaAction.logger.debug("editableFeedback found :" + editableFeedback);
 		    break;
 		}
 
 	    }
 	}
-	QaAction.logger.debug("editableFeedback found :" + editableFeedback);
-	QaAction.logger.debug("editableQuestion found :" + editableQuestion);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -1030,7 +876,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-	QaAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -1039,8 +884,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    QaAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    QaAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -1065,34 +908,25 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispatching removeQuestion");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	QaAction.logger.debug("questionIndex: " + questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	QaQuestionContentDTO qaQuestionContentDTO = null;
 	Iterator listIterator = listQuestionContentDTO.iterator();
 	while (listIterator.hasNext()) {
 	    qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-	    QaAction.logger.debug("qaQuestionContentDTO:" + qaQuestionContentDTO);
-	    QaAction.logger.debug("qaQuestionContentDTO question:" + qaQuestionContentDTO.getQuestion());
-
+	    
 	    String question = qaQuestionContentDTO.getQuestion();
 	    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
-	    QaAction.logger.debug("displayOrder:" + displayOrder);
 
 	    if (displayOrder != null && !displayOrder.equals("")) {
 		if (displayOrder.equals(questionIndex)) {
@@ -1102,7 +936,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    }
 	}
 
-	QaAction.logger.debug("qaQuestionContentDTO found:" + qaQuestionContentDTO);
 	qaQuestionContentDTO.setQuestion("");
 
 	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
@@ -1121,46 +954,36 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    }
 	}
 
-	QaAction.logger.debug("listQuestionContentDTO after remove:" + listQuestionContentDTO);
 
 	listQuestionContentDTO = AuthoringUtil.reorderListQuestionContentDTO(listQuestionContentDTO, questionIndex);
 	QaAction.logger.debug("listQuestionContentDTO reordered:" + listQuestionContentDTO);
 
-	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
+
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
 
 	if (qaContent == null) {
 	    QaAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    qaContent = qaService.loadQa(new Long(defaultContentIdStr).longValue());
 	}
-	QaAction.logger.debug("final qaContent: " + qaContent);
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -1171,25 +994,19 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    QaAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    QaAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -1214,12 +1031,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	QaAction.logger.debug("qaQuestionContentDTO now: " + qaQuestionContentDTO);
-	QaAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-	QaAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -1245,58 +1059,43 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	QaAction.logger.debug("questionIndex: " + questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
 
 	listQuestionContentDTO = AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "down", conditionSet);
-	QaAction.logger.debug("listQuestionContentDTO after swap: " + listQuestionContentDTO);
 
 	listQuestionContentDTO = AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
-	QaAction.logger.debug("listQuestionContentDTO after reordersimple: " + listQuestionContentDTO);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -1307,25 +1106,19 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    QaAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    QaAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -1350,11 +1143,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	QaAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-	QaAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -1376,60 +1167,47 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispatching moveQuestionUp");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	QaAction.logger.debug("questionIndex: " + questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
+
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
 	listQuestionContentDTO = AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "up", conditionSet);
-	QaAction.logger.debug("listQuestionContentDTO after swap: " + listQuestionContentDTO);
 
 	listQuestionContentDTO = AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
-	QaAction.logger.debug("listQuestionContentDTO after reordersimple: " + listQuestionContentDTO);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
+
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -1437,28 +1215,22 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	QaAction.logger.debug("activeModule: " + activeModule);
+
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    QaAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    qaGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    qaGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    QaAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    QaAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -1483,11 +1255,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	QaAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-	QaAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -1516,46 +1286,35 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
-
+	
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String onlineInstructions = request.getParameter(QaAppConstants.ONLINE_INSTRUCTIONS);
-	QaAction.logger.debug("onlineInstructions: " + onlineInstructions);
 
 	String offlineInstructions = request.getParameter(QaAppConstants.OFFLINE_INSTRUCTIONS);
-	QaAction.logger.debug("offlineInstructions: " + offlineInstructions);
 
 	sessionMap.put(QaAppConstants.ONLINE_INSTRUCTIONS_KEY, onlineInstructions);
 	sessionMap.put(QaAppConstants.OFFLINE_INSTRUCTIONS, offlineInstructions);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
@@ -1566,8 +1325,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -1577,14 +1334,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	QaAction.logger.debug("attachmentList: " + attachmentList);
 	List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	addFileToContentRepository(request, qaAuthoringForm, attachmentList, deletedAttachmentList, sessionMap,
 		qaGeneralAuthoringDTO);
-	QaAction.logger.debug("post addFileToContentRepository, attachmentList: " + attachmentList);
-	QaAction.logger.debug("post addFileToContentRepository, deletedAttachmentList: " + deletedAttachmentList);
 
 	sessionMap.put(QaAppConstants.ATTACHMENT_LIST_KEY, attachmentList);
 	sessionMap.put(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY, deletedAttachmentList);
@@ -1606,15 +1359,13 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
 	qaAuthoringForm.setCurrentTab("3");
 
-	QaAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	qaAuthoringForm.resetUserAction();
 
 	String strOnlineInstructions = request.getParameter("onlineInstructions");
 	String strOfflineInstructions = request.getParameter("offlineInstructions");
-	QaAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	QaAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
+
 	qaAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	qaAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 
@@ -1644,37 +1395,28 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
+	
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
@@ -1683,10 +1425,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
 	String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	QaAction.logger.debug("onlineInstructions: " + onlineInstructions);
 
 	String offlineInstructions = (String) sessionMap.get(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	QaAction.logger.debug("offlineInstructions: " + offlineInstructions);
 
 	qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 	qaGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
@@ -1696,8 +1436,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String richTextTitle = (String) sessionMap.get(QaAppConstants.ACTIVITY_TITLE_KEY);
 	String richTextInstructions = (String) sessionMap.get(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY);
 
-	QaAction.logger.debug("richTextTitle: " + richTextTitle);
-	QaAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
 
@@ -1706,14 +1444,12 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	long uuid = WebUtil.readLongParam(request, QaAppConstants.UUID);
 
 	List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	QaAction.logger.debug("attachmentList: " + attachmentList);
 
 	if (attachmentList == null) {
 	    attachmentList = new ArrayList();
 	}
 
 	List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	if (deletedAttachmentList == null) {
 	    deletedAttachmentList = new ArrayList();
@@ -1743,7 +1479,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
 	qaAuthoringForm.setCurrentTab("3");
 
-	QaAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
@@ -1780,10 +1515,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    List attachmentList, List deletedAttachmentList, SessionMap sessionMap,
 	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO) {
 	QaAction.logger.debug("attempt addFileToContentRepository");
-	QaAction.logger.debug("attachmentList: " + attachmentList);
-	QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	if (attachmentList == null) {
 	    attachmentList = new ArrayList();
@@ -1799,12 +1531,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	if (qaAuthoringForm.getTheOfflineFile() != null && qaAuthoringForm.getTheOfflineFile().getFileSize() > 0) {
 	    QaAction.logger.debug("theOfflineFile is available: ");
 	    uploadedFile = qaAuthoringForm.getTheOfflineFile();
-	    QaAction.logger.debug("uploadedFile: " + uploadedFile);
 	    fileType = IToolContentHandler.TYPE_OFFLINE;
 	} else if (qaAuthoringForm.getTheOnlineFile() != null && qaAuthoringForm.getTheOnlineFile().getFileSize() > 0) {
 	    QaAction.logger.debug("theOnlineFile is available: ");
 	    uploadedFile = qaAuthoringForm.getTheOnlineFile();
-	    QaAction.logger.debug("uploadedFile: " + uploadedFile);
 	    isOnlineFile = true;
 	    fileType = IToolContentHandler.TYPE_ONLINE;
 	} else {
@@ -1827,7 +1557,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	 */
 	deletedAttachmentList = QaUtils.moveToDelete(uploadedFile.getFileName(), isOnlineFile, attachmentList,
 		deletedAttachmentList);
-	QaAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	try {
 	    /*
@@ -1902,22 +1631,19 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     private List saveAttachments(QaContent qaContent, List attachmentList, List deletedAttachmentList,
 	    ActionMapping mapping, HttpServletRequest request) {
 
-	QaAction.logger.debug("start saveAttachments, attachmentList " + attachmentList);
-	QaAction.logger.debug("start deletedAttachmentList, deletedAttachmentList " + deletedAttachmentList);
+	QaAction.logger.debug("start saveAttachments");
 
 	if (attachmentList == null || deletedAttachmentList == null) {
 	    return null;
 	}
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	if (deletedAttachmentList != null) {
 	    QaAction.logger.debug("deletedAttachmentList is iterated...");
 	    Iterator iter = deletedAttachmentList.iterator();
 	    while (iter.hasNext()) {
 		QaUploadedFile attachment = (QaUploadedFile) iter.next();
-		QaAction.logger.debug("attachment: " + attachment);
 
 		/* remove entry from db, leave in content repository. */
 
@@ -1934,14 +1660,12 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    Iterator iter = attachmentList.iterator();
 	    while (iter.hasNext()) {
 		QaUploadedFile attachment = (QaUploadedFile) iter.next();
-		QaAction.logger.debug("attachment: " + attachment);
 		QaAction.logger.debug("attachment submission id: " + attachment.getSubmissionId());
 
 		if (attachment.getSubmissionId() == null) {
 		    /*
 		     * add entry to tool table - file already in content repository
 		     */
-		    QaAction.logger.debug("calling persistFile with  attachment: " + attachment);
 		    qaService.persistFile(qaContent, attachment);
 		}
 	    }
@@ -1972,7 +1696,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward getSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispatching proxy getSummary...start with monitoringStarter" + request);
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
 	return qaMonitoringAction.getSummary(mapping, form, request, response);
     }
@@ -1993,7 +1716,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward getInstructions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispatching proxy getInstructions..." + request);
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
 	return qaMonitoringAction.getInstructions(mapping, form, request, response);
     }
@@ -2015,7 +1737,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward getStats(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispatching proxy getStats..." + request);
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
 	// return qaMonitoringAction.getStats(mapping, form, request, response,
 	// "All");
@@ -2042,39 +1763,27 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaAction.logger.debug("dispatching editActivityQuestions...");
 
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-	QaAction.logger.debug("qaAuthoringForm: " + qaAuthoringForm);
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	QaAction.logger.debug("qaService: " + qaService);
 
 	String httpSessionID = qaAuthoringForm.getHttpSessionID();
-	QaAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	QaAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(QaAppConstants.ACTIVE_MODULE);
-	QaAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = request.getParameter(QaAppConstants.DEFAULT_CONTENT_ID_STR);
-	QaAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	QaAction.logger.debug("qaContent: " + qaContent);
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	QaAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
-	QaAction.logger.debug("title: " + qaContent.getTitle());
-	QaAction.logger.debug("instructions: " + qaContent.getInstructions());
 
 	qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
 	qaAuthoringForm.setTitle(qaContent.getTitle());
@@ -2086,13 +1795,11 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	/* determine whether the request is from Monitoring url Edit Activity */
 	String sourceMcStarter = (String) request.getAttribute(QaAppConstants.SOURCE_MC_STARTER);
-	QaAction.logger.debug("sourceMcStarter: " + sourceMcStarter);
 
 	qaAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	boolean isContentInUse = QaUtils.isContentInUse(qaContent);
-	QaAction.logger.debug("isContentInUse:" + isContentInUse);
 
 	qaGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
 	if (isContentInUse == true) {
@@ -2129,9 +1836,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	    QaQueContent qaQueContent = (QaQueContent) queIterator.next();
 	    if (qaQueContent != null) {
-		QaAction.logger.debug("question: " + qaQueContent.getQuestion());
-		QaAction.logger.debug("displayorder: " + new Integer(qaQueContent.getDisplayOrder()).toString());
-		QaAction.logger.debug("feedback: " + qaQueContent.getFeedback());
 
 		qaQuestionContentDTO.setQuestion(qaQueContent.getQuestion());
 		qaQuestionContentDTO.setDisplayOrder(new Integer(qaQueContent.getDisplayOrder()).toString());
@@ -2139,15 +1843,12 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		listQuestionContentDTO.add(qaQuestionContentDTO);
 	    }
 	}
-	QaAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaAction.logger.debug("before fwding to jsp, qaAuthoringForm: " + qaAuthoringForm);
-	QaAction.logger.debug("before saving final qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	QaAction.logger.debug("forwarding to : " + QaAppConstants.LOAD_QUESTIONS);

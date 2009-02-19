@@ -126,29 +126,6 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 	}
 	logger.debug("Number of users for quContent " +qa.getUid()+ ": " + returnInt);
 	return returnInt; 
-	
-	/*
-	String strGetUser = "from qaQueUsr in class QaQueUsr";
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(strGetUser).list();
-	logger.debug("strGetUser: " + strGetUser);
-	logger.debug("qa: " + qa);
-	logger.debug("list: " + list);
-
-	int totalUserCount = 0;
-	if (list != null && list.size() > 0) {
-	    QaQueUsr usr = (QaQueUsr) list.get(0);
-	    logger.debug("usr: " + usr);
-	    logger.debug("local usr content uid versus incoming content uid: "
-		    + usr.getQaSession().getQaContent().getUid().intValue() + " versus " + qa.getUid().intValue());
-
-	    if (usr.getQaSession().getQaContent().getUid().intValue() == qa.getUid().intValue()) {
-		++totalUserCount;
-	    }
-	}
-	logger.debug("final totalUserCount: " + totalUserCount);
-	return totalUserCount;
-	*/
     }
 
 }

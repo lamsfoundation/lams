@@ -131,8 +131,6 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     public static QaQueContent newInstance(QaQueContent queContent, QaContent newQaContent) {
 	QaQueContent newQueContent = new QaQueContent(queContent.getQuestion(), queContent.getDisplayOrder(),
 		queContent.getFeedback(), newQaContent, new TreeSet(), new TreeSet());
-	QaQueContent.logger.debug(QaQueContent.logger + " " + "QaQueContent" + " " + "returning newQueContent: "
-		+ newQueContent);
 	return newQueContent;
     }
 
