@@ -63,6 +63,10 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     private String title;
 
     private String instructions;
+    
+	boolean reflectOnActivity;
+	
+	String reflectInstructions;
 
     private boolean runOffline;
 
@@ -113,7 +117,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
 	    boolean allowUseVoice, boolean allowUseCamera, boolean allowLearnerVideoExport, boolean allowLearnerVideoVisibility,
 	    Long toolContentId, Set videoRecorderAttachments, Set videoRecorderSessions, boolean exportAll,
-	    boolean exportOffline) {
+	    boolean exportOffline, boolean reflectOnActivity, String reflectInstructions) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
@@ -133,6 +137,8 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	this.allowLearnerVideoVisibility = allowLearnerVideoVisibility;
 	this.exportOffline = exportOffline;
 	this.exportAll = exportAll;
+	this.reflectOnActivity = reflectOnActivity;
+	this.reflectInstructions = reflectInstructions;
     }
 
     // Property accessors
@@ -214,6 +220,28 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	this.instructions = instructions;
     }
 
+	/**
+	 * @hibernate.property column="reflect_on_activity" length="1"
+	 */
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	/**
+	 * @hibernate.property column="reflect_instructions" length="65535"
+	 */
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}    
+    
     /**
      * @hibernate.property column="run_offline" length="1"
      * 

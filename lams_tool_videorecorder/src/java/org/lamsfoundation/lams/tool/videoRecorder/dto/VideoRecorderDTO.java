@@ -49,6 +49,10 @@ public class VideoRecorderDTO {
 
 	public String offlineInstructions;
 	
+	public boolean reflectOnActivity;
+	
+	public String reflectInstructions;
+	
 	public boolean defineLater;
 	
 	public boolean contentInUse;
@@ -95,6 +99,8 @@ public class VideoRecorderDTO {
 		allowRatings = videoRecorder.isAllowRatings();
 		exportAll = videoRecorder.isExportAll();
 		exportOffline = videoRecorder.isExportOffline();
+		reflectOnActivity = videoRecorder.isReflectOnActivity();
+		reflectInstructions = videoRecorder.getReflectInstructions();
 
 		onlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
@@ -174,6 +180,22 @@ public class VideoRecorderDTO {
 		this.onlineInstructionsFiles = onlineInstructionsFiles;
 	}
 
+	public boolean isReflectOnActivity() {
+		return reflectOnActivity;
+	}
+
+	public void setReflectOnActivity(boolean reflectOnActivity) {
+		this.reflectOnActivity = reflectOnActivity;
+	}
+
+	public String getReflectInstructions() {
+		return reflectInstructions;
+	}
+
+	public void setReflectInstructions(String reflectInstructions) {
+		this.reflectInstructions = reflectInstructions;
+	}
+	
 	public String getTitle() {
 		return title;
 	}

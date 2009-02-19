@@ -73,13 +73,6 @@
 	</c:if>
 
 	&nbsp;
-
-	<html:form action="/learning" method="post"
-		onsubmit="return validateForm();">
-		<html:hidden property="dispatch" value="finishActivity" />
-		<html:hidden property="toolSessionID" />
-
-	</html:form>
 	
 	<div id="videoRecorder">
 		<script language="JavaScript" type="text/javascript">
@@ -158,24 +151,7 @@
 		</noscript>
 	</div>
 	
-	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="learningForm">
-		<html:hidden property="dispatch" styleId = "dispatch" value="finishActivity" />
-		<html:hidden property="toolSessionID" styleId="toolSessionID"/>
-		<html:hidden property="mode" value="${mode}" />	
-		<div class="space-bottom-top align-right">
-			<c:choose>
-				<c:when test="${!videoRecorderUserDTO.finishedActivity}">
-					<html:submit styleClass="button" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity';">
-						<fmt:message key="button.continue" />
-					</html:submit>
-				</c:when>
-					<c:otherwise>
-					<html:hidden property="dispatch" value="finishActivity" />
-					<html:submit styleClass="button" styleId="finishButton" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity';">
-						<fmt:message key="button.finish" />
-					</html:submit>
-				</c:otherwise>
-			</c:choose>
-		</div>
-	</html:form>
+	<c:if test="${mode == 'learner' || mode == 'author'}">
+		<%@ include file="parts/finishButton.jsp"%>
+	</c:if>
 </div>
