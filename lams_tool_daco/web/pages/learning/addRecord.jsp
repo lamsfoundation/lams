@@ -35,7 +35,21 @@
 
 	<p class="hint">
 		<fmt:message key="label.learning.heading.recordnumber" />
-		<span id="displayedRecordNumberSpan" class="hint">${displayedRecordNumber}</span>
+		<span id="displayedRecordNumberSpan" class="hint">
+			${displayedRecordNumber}
+			<c:if test="${not empty daco.minRecords}">
+				<br />
+				<fmt:message key="error.record.notenough">
+					<fmt:param value="${daco.minRecords}" />
+				</fmt:message>
+			</c:if>
+			<c:if test="${not empty daco.maxRecords}">
+				<br />
+				<fmt:message key="error.record.toomuch">
+					<fmt:param value="${daco.maxRecords}" />
+				</fmt:message>
+			</c:if>
+		</span>
 	</p>
 	<!-- Form to add/edit a record -->
 	<html:form action="learning/saveOrUpdateRecord" method="post" styleId="recordForm" enctype="multipart/form-data">

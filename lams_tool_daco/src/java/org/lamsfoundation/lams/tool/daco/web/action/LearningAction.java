@@ -322,24 +322,25 @@ public class LearningAction extends Action {
 	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	sessionMap.put(DacoConstants.ATTR_LEARNING_CURRENT_TAB, 1);
 
-	ActionErrors errors = validateRecordForm(recordForm, questionList);
+	List<DacoAnswer> record = null;
+	List<List<DacoAnswer>> records = (List<List<DacoAnswer>>) sessionMap.get(DacoConstants.ATTR_RECORD_LIST);
+	int recordCount = records.size();
+	int displayedRecordNumber = recordForm.getDisplayedRecordNumber();
+	boolean isEdit = false;
+	if (displayedRecordNumber <= recordCount) {
+	    record = records.get(displayedRecordNumber - 1);
+	    isEdit = true;
+	} else {
+	    record = new LinkedList<DacoAnswer>();
+	    recordCount++;
+	}
+
+	ActionErrors errors = validateRecordForm(daco, recordForm, questionList, recordCount);
 	if (!errors.isEmpty()) {
 	    this.addErrors(request, errors);
 	    refreshQuestionSummaries(mapping, request);
 	    request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, recordForm.getDisplayedRecordNumber());
 	    return mapping.findForward(DacoConstants.SUCCESS);
-	}
-
-	List<DacoAnswer> record = null;
-
-	List<List<DacoAnswer>> records = (List<List<DacoAnswer>>) sessionMap.get(DacoConstants.ATTR_RECORD_LIST);
-	int displayedRecordNumber = recordForm.getDisplayedRecordNumber();
-	boolean isEdit = false;
-	if (displayedRecordNumber <= records.size()) {
-	    record = records.get(displayedRecordNumber - 1);
-	    isEdit = true;
-	} else {
-	    record = new LinkedList<DacoAnswer>();
 	}
 
 	Iterator<DacoQuestion> questionIterator = questionList.iterator();
@@ -602,13 +603,9 @@ public class LearningAction extends Action {
 	int recordCount = ((List) sessionMap.get(DacoConstants.ATTR_RECORD_LIST)).size();
 	Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
 	Short min = daco.getMinRecords();
-	Short max = daco.getMaxRecords();
 	if (min != null && min > 0 && recordCount < min) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_NOTENOUGH, daco
 		    .getMinRecords()));
-	} else if (max != null && max > 0 && recordCount > max) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_TOOMUCH, daco
-		    .getMaxRecords()));
 	}
 	return errors;
     }
@@ -676,13 +673,21 @@ public class LearningAction extends Action {
 	return dacoUser;
     }
 
-    protected ActionErrors validateRecordForm(RecordForm recordForm, Set<DacoQuestion> questionList) {
+    protected ActionErrors validateRecordForm(Daco daco, RecordForm recordForm, Set<DacoQuestion> questionList,
+	    int recordCount) {
 	ActionErrors errors = new ActionErrors();
+	Short maxRecords = daco.getMaxRecords();
+	if (maxRecords != null && maxRecords > 0 && recordCount > maxRecords) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_TOOMUCH, daco
+		    .getMaxRecords()));
+	}
+
 	Iterator<DacoQuestion> questionIterator = questionList.iterator();
 	DacoQuestion question = null;
 	int answerNumber = 0;
 	int fileNumber = 0;
 	int questionNumber = 1;
+
 	while (questionIterator.hasNext()) {
 	    question = questionIterator.next();
 	    switch (question.getType()) {
