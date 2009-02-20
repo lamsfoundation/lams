@@ -65,6 +65,7 @@
 	LinkUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/${contentFolderID}/"
 	FlashBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/"
 	FlashUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/"
+	ContentFolderID="${contentFolderID}"
 	AutoDetectLanguage="false"
 	DefaultLanguage="${language}"
 	ToolbarStartExpanded="${displayExpanded}"/>
