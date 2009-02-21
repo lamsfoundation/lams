@@ -47,11 +47,6 @@
 				    			});		    				
 		    		        	return $("input[name^=optionAnswer]:filled").length < 1;
 			    		    }			    		    
-	    			    },
-	    			    hasOneHundredGrade: {
-		    				required: function(element) {
-	    			    		return $("select[name^='optionGrade'][value='100.0']").length < 1;
-			    		    }			    		    
 	    			    }
 		    		},
 		    		messages: {
@@ -66,9 +61,6 @@
 		    			},
 		    			hasAnswerFilled: {
 		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
-		    			},
-		    			hasOneHundredGrade: {
-		    				required: "<br><fmt:message key='error.form.validation.hundred.score'/>"
 		    			}
 		    		},
 		    	    invalidHandler: function(form, validator) {
@@ -174,7 +166,6 @@
 					<fmt:message key="label.authoring.basic.answer.options" />
 				</div>
 				<input type="hidden" name="hasAnswerFilled" id="hasAnswerFilled">
-				<input type="hidden" name="hasOneHundredGrade" id="hasOneHundredGrade">
 			</html:form>
 			
 			<!-- Options -->

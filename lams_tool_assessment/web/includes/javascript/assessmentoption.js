@@ -65,7 +65,7 @@
 		);
 	}
 	function prepareFCKEditorsForAjaxSubmit(){
-		if ((questionType == 1) || (questionType == 3)) {
+		if ((questionType == 1) || (questionType == 3) || (questionType == 7)) {
 			$("[name^=optionAnswer]").each(function() {
 				this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
 			});

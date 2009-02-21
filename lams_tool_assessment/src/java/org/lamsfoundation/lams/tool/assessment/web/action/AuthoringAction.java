@@ -314,15 +314,6 @@ public class AuthoringAction extends Action {
 
 	ToolAccessMode mode = getAccessMode(request);
 
-	ActionMessages errors = validate(assessmentForm, mapping, request);
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    if (mode.isAuthor())
-		return mapping.findForward("author");
-	    else
-		return mapping.findForward("monitor");
-	}
-
 	Assessment assessment = assessmentForm.getAssessment();
 	IAssessmentService service = getAssessmentService();
 
@@ -444,10 +435,12 @@ public class AuthoringAction extends Action {
 	assessmentForm.setAssessment(assessmentPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor())
+	if (mode.isAuthor()) {
 	    return mapping.findForward("author");
-	else
+	}
+	else {
 	    return mapping.findForward("monitor");
+	}
     }
 
     /**
@@ -847,9 +840,6 @@ public class AuthoringAction extends Action {
 	    AssessmentAnswerOption question = rList.remove(optionIndex);
 	    optionList.clear();
 	    optionList.addAll(rList);
-//	    // add to delList
-//	    List delList = getDeletedQuestionList(sessionMap);
-//	    delList.add(question);    
 	}
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
@@ -1303,9 +1293,7 @@ public class AuthoringAction extends Action {
 		new AssessmentAnswerOptionComparator());
 	for (int i = 0; i < count; i++) {
 	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
-		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
-		    || (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
-
+		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
 		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
 		if ((answerString == null) && isForSaving) {
 		    continue;
@@ -1351,6 +1339,17 @@ public class AuthoringAction extends Action {
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
 		option.setGrade(grade);    
 		option.setFeedback((String) paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
+		optionList.add(option);
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
+		if ((answerString == null) && isForSaving) {
+		    continue;
+		}
+
+		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
+		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
+		option.setAnswerString(answerString);
 		optionList.add(option);
 	    }
 	}
@@ -1476,24 +1475,4 @@ public class AuthoringAction extends Action {
 	}
 	return paramMap;
     }
-
-
-    private ActionMessages validate(AssessmentForm assessmentForm, ActionMapping mapping, HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
-	// if (StringUtils.isBlank(assessmentForm.getAssessment().getTitle())) {
-	// ActionMessage error = new ActionMessage("error.resource.question.title.blank");
-	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	// }
-
-	// define it later mode(TEACHER) skip below validation.
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
-	}
-
-	// Some other validation outside basic Tab.
-
-	return errors;
-    }
-
 }
