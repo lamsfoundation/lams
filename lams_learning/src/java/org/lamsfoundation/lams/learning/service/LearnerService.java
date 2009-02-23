@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -74,7 +73,6 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 
 /**
@@ -100,7 +98,6 @@ public class LearnerService implements ICoreLearnerService {
     private ILessonService lessonService;
     private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
     protected MessageService messageService;
-    
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -386,7 +383,8 @@ public class LearnerService implements ICoreLearnerService {
 	builder.parseLearningDesign();
 
 	Object[] retValue = new Object[2];
-	retValue[0] = (List<ActivityURL>) builder.getActivityList();;
+	retValue[0] = builder.getActivityList();
+	;
 	retValue[1] = progress.getCurrentActivity() != null ? progress.getCurrentActivity().getActivityId() : null;
 
 	return retValue;
@@ -413,7 +411,7 @@ public class LearnerService implements ICoreLearnerService {
 	    }
 
 	    progressEngine.setActivityAttempted(progress, activity);
-	    
+
 	    progress.setCurrentActivity(activity);
 	    progress.setNextActivity(activity);
 
@@ -428,61 +426,63 @@ public class LearnerService implements ICoreLearnerService {
      *      java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity,
      *      org.lamsfoundation.lams.learningdesign.Activity)
      */
-    public LearnerProgress moveToActivity(Integer learnerId, Long lessonId, Activity fromActivity, Activity toActivity) throws LearnerServiceException {
+    public LearnerProgress moveToActivity(Integer learnerId, Long lessonId, Activity fromActivity, Activity toActivity)
+	    throws LearnerServiceException {
 	int count = 0;
-    LearnerProgress progress = null;
-    
+	LearnerProgress progress = null;
+
 	// wait till lock is released
-    while(syncMap.containsKey(learnerId)) {
-    	count++;
-    	try {
-		    Thread.sleep(1000);
-		    
-	    	if(count > 100) {
-	    		throw new LearnerServiceException("Thread wait count exceeded limit.");
-	    	}
-	    	
-		} catch (InterruptedException e1) {
-		    throw new LearnerServiceException("While retrying to move activity, thread was interrupted.", e1);
+	while (LearnerService.syncMap.containsKey(learnerId)) {
+	    count++;
+	    try {
+		Thread.sleep(1000);
+
+		if (count > 100) {
+		    throw new LearnerServiceException("Thread wait count exceeded limit.");
 		}
-    }
-    
-    // lock
-    try {
-    
-	    syncMap.put(learnerId, lessonId);
-	    
+
+	    } catch (InterruptedException e1) {
+		throw new LearnerServiceException("While retrying to move activity, thread was interrupted.", e1);
+	    }
+	}
+
+	// lock
+	try {
+
+	    LearnerService.syncMap.put(learnerId, lessonId);
+
 	    progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
-		
-		if (fromActivity != null && fromActivity.getActivityId() != progress.getCurrentActivity().getActivityId()) {
-		    progress.setProgressState(fromActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
+
+	    if (fromActivity != null && fromActivity.getActivityId() != progress.getCurrentActivity().getActivityId()) {
+		progress.setProgressState(fromActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
+	    }
+
+	    if (toActivity != null) {
+		progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
+
+		if (!toActivity.getReadOnly()) {
+		    toActivity.setReadOnly(true);
+		    activityDAO.update(toActivity);
 		}
-	
-		if (toActivity != null) {    
-			progress.setProgressState(toActivity, LearnerProgress.ACTIVITY_ATTEMPTED, activityDAO);
-			
-			if(!toActivity.getReadOnly()) {
-				toActivity.setReadOnly(true);
-				activityDAO.update(toActivity);
-			}
-			
-			if(!toActivity.isFloating()) {
-				progress.setCurrentActivity(toActivity);
-				progress.setNextActivity(toActivity);
-			}
+
+		if (!toActivity.isFloating()) {
+		    progress.setCurrentActivity(toActivity);
+		    progress.setNextActivity(toActivity);
 		}
-	    
-		learnerProgressDAO.updateLearnerProgress(progress);
-    } catch(Exception e) {
-    	throw new LearnerServiceException(e.getMessage());
-    } finally {
-    	// remove lock
-    	if(syncMap.containsKey(learnerId))
-    		syncMap.remove(learnerId);
-    }
-	
+	    }
+
+	    learnerProgressDAO.updateLearnerProgress(progress);
+	} catch (Exception e) {
+	    throw new LearnerServiceException(e.getMessage());
+	} finally {
+	    // remove lock
+	    if (LearnerService.syncMap.containsKey(learnerId)) {
+		LearnerService.syncMap.remove(learnerId);
+	    }
+	}
+
 	return progress;
-	
+
     }
 
     /**
@@ -1267,30 +1267,35 @@ public class LearnerService implements ICoreLearnerService {
     /**
      * {@inheritDoc}
      */
-    public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Long groupingId) {
+    public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Grouping grouping) {
 	Lesson lesson = getLesson(lessonId);
-	LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) groupingDAO.getGroupingById(groupingId);
+	LearnerChoiceGrouping learnerChoiceGrouping = (LearnerChoiceGrouping) grouping;
 	Integer maxNumberOfLearnersPerGroup = null;
 	int learnerCount = lesson.getAllLearners().size();
 	int groupCount = grouping.getGroups().size();
-	if (grouping.getLearnersPerGroup() == null) {
+	if (learnerChoiceGrouping.getLearnersPerGroup() == null) {
 	    if (groupCount == 0) {
-		((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(grouping, 2);
+		((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(learnerChoiceGrouping, 2);
 		groupCount = grouping.getGroups().size();
 		groupingDAO.update(grouping);
 	    }
-	    if (grouping.getEqualNumberOfLearnersPerGroup()) {
+	    if (learnerChoiceGrouping.getEqualNumberOfLearnersPerGroup()) {
 		maxNumberOfLearnersPerGroup = learnerCount / groupCount + (learnerCount % groupCount == 0 ? 0 : 1);
 	    }
 	} else {
-	    maxNumberOfLearnersPerGroup = grouping.getLearnersPerGroup();
+	    maxNumberOfLearnersPerGroup = learnerChoiceGrouping.getLearnersPerGroup();
 	    int desiredGroupCount = learnerCount / maxNumberOfLearnersPerGroup
 		    + (learnerCount % maxNumberOfLearnersPerGroup == 0 ? 0 : 1);
 	    if (desiredGroupCount > groupCount) {
-		((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(grouping, desiredGroupCount - groupCount);
+		((LearnerChoiceGrouper) grouping.getGrouper()).createGroups(learnerChoiceGrouping, desiredGroupCount
+			- groupCount);
 		groupingDAO.update(grouping);
 	    }
 	}
 	return maxNumberOfLearnersPerGroup;
+    }
+
+    public Grouping getGrouping(Long groupingId) {
+	return groupingDAO.getGroupingById(groupingId);
     }
 }

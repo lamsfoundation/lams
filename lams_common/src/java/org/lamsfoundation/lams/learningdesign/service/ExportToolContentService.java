@@ -249,11 +249,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private static final String IMS_PREFIX_PROPERTY_REF = "P-";
 
     // this is not IMS standard tag, temporarily use to gather all tools
-        // node list
+    // node list
     private static final String IMS_TAG_TRANSITIONS = "transitions";
 
     // this is not IMS standard tag, term used to ref grouping/gate
-        // activities
+    // activities
     private static final String IMS_TAG_GROUPING = "group";
 
     private static final String IMS_TAG_GATE = "gate";
@@ -311,9 +311,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private ApplicationContext applicationContext;
 
     // save list of all tool file node class information. One tool may have
-        // over one file node, such as
+    // over one file node, such as
     // in share resource tool, it has contnent attachment and shared
-        // resource item attachement.
+    // resource item attachement.
     private List<NameInfo> fileHandleClassList;
 
     private Class filterClass;
@@ -344,8 +344,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format";
 
     /**
-     * Class of tool attachment file handler class and relative fields
-     * information container.
+     * Class of tool attachment file handler class and relative fields information container.
      */
     private class NameInfo {
 
@@ -463,7 +462,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		// for import : unmarshal xml to object
 		if (StringUtils.equals(method.getName(), "unmarshal") && result != null) {
 		    // During deserialize XML file into object, it will save
-                        // file node into fileNodes
+		    // file node into fileNodes
 		    for (NameInfo name : fileHandleClassList) {
 			if (name.className.equals(result.getClass().getName())) {
 			    fileNodes.add(ExportToolContentService.this.new ValueInfo(name, result));
@@ -492,8 +491,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * This class is just for later system extent tool compaiblity strategy
-     * use. Currently, it just simple to get tool by same signature.
+     * This class is just for later system extent tool compaiblity strategy use. Currently, it just simple to get tool
+     * by same signature.
      * 
      * @author Steve.Ni
      * 
@@ -525,13 +524,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    FileUtil.createDirectory(contentDir);
 
 	    // this folder put all IMS XSLT transform temporary files, so
-                // try to keep content is clean for final
+	    // try to keep content is clean for final
 	    // package!
 	    // The reason use temporary folder instead of delete temporary
-                // files from content folder is, sometimes,
+	    // files from content folder is, sometimes,
 	    // delete file does not work well
 	    // this makes the final zip file should contain some rubbish
-                // files.
+	    // files.
 	    String xsltTempDir = FileUtil.getFullPath(rootDir, ExportToolContentService.DIR_XSLT_TEMP);
 	    if (format == ExportToolContentService.PACKAGE_FORMAT_IMS) {
 		FileUtil.createDirectory(xsltTempDir);
@@ -546,7 +545,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Writer ldFile = new OutputStreamWriter(new FileOutputStream(ldFileName), "UTF-8");
 
 	    // get learning desing and serialize it to XML file. Update the
-                // version to reflect the
+	    // version to reflect the
 	    // version now, rather than the version when it was saved.
 	    ILearningDesignService service = getLearningDesignService();
 	    LearningDesignDTO ldDto = service.getLearningDesignDTO(learningDesignId, "");
@@ -557,32 +556,31 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 
 	    /*
-                 * learning design DTO is ready to be written into XML, but we
-                 * need to find out which groupings and branching mappings are
-                 * not supposed to be included into the structure (LDEV-1825)
-                 */
+	     * learning design DTO is ready to be written into XML, but we need to find out which groupings and
+	     * branching mappings are not supposed to be included into the structure (LDEV-1825)
+	     */
 	    Set<Long> groupingsToSkip = new TreeSet<Long>();
 	    // for these branching activities there will be no branching
-                // mappings saved into XML, since they will be
+	    // mappings saved into XML, since they will be
 	    // recreated in monitoring
 	    Set<Integer> branchingActivitiesToSkip = new TreeSet<Integer>();
 
 	    // iterator all activities in this learning design and export
-                // their content to given folder.
+	    // their content to given folder.
 	    // The content will contain tool.xml and attachment files of
-                // tools from LAMS repository.
+	    // tools from LAMS repository.
 	    List<AuthoringActivityDTO> activities = ldDto.getActivities();
 
 	    // create resources Dom node list for IMS package.
 	    List<Element> resChildren = new ArrayList<Element>();
 
 	    // iterator all activities and export tool.xml and its
-                // attachments
+	    // attachments
 	    for (AuthoringActivityDTO activity : activities) {
 
 		int activityTypeID = activity.getActivityTypeID().intValue();
 		// for teacher chosen and tool based branching activities there
-                // should be no groupings saved to XML
+		// should be no groupings saved to XML
 		if (activityTypeID == Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE
 			|| activityTypeID == Activity.TOOL_BRANCHING_ACTIVITY_TYPE) {
 		    Long groupingID = activity.getGroupingID();
@@ -595,7 +593,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    continue;
 		}
 		// for group based define later branching activities there
-                // should be no branching mappings saved to XML
+		// should be no branching mappings saved to XML
 		if (activityTypeID == Activity.GROUP_BRANCHING_ACTIVITY_TYPE && activity.getDefineLater()) {
 		    branchingActivitiesToSkip.add(activity.getActivityUIID());
 		}
@@ -605,7 +603,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 
 		// find out current acitivites toolContentMananger and export
-                // tool content.
+		// tool content.
 		ToolContentManager contentManager = (ToolContentManager) findToolService(toolDAO.getToolByID(activity
 			.getToolID()));
 		log.debug("Tool export content : " + activity.getActivityTitle() + " by contentID :"
@@ -616,7 +614,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    String msg = activity.getToolDisplayName() + " export tool content failed:" + e.toString();
 		    log.error(msg, e);
 		    // Try to delete tool.xml. This makes export_failed and
-                        // tool.xml does not exist simultaneously.
+		    // tool.xml does not exist simultaneously.
 		    String toolPath = FileUtil.getFullPath(contentDir, activity.getToolContentID().toString());
 		    String toolFileName = FileUtil.getFullPath(toolPath, ExportToolContentService.TOOL_FILE_NAME);
 		    File toolFile = new File(toolFileName);
@@ -634,7 +632,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    } // end all activities export
 
 	    // skipping unwanted elements; learning design DTO is altered
-                // but not persisted;
+	    // but not persisted;
 	    Iterator<GroupingDTO> groupingIter = ldDto.getGroupings().iterator();
 	    while (groupingIter.hasNext()) {
 		if (groupingsToSkip.contains(groupingIter.next().getGroupingID())) {
@@ -702,8 +700,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Generate temporary files: resources.xml and transitions.xml. <BR>
-     * Transform LAMS format learning_design.xml with resources.xml and
-     * transitions.xml into ims_learning_design.xml file.
+     * Transform LAMS format learning_design.xml with resources.xml and transitions.xml into ims_learning_design.xml
+     * file.
      * 
      * @param resChildren
      * @param rootDir
@@ -717,7 +715,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	String ldFileName = FileUtil.getFullPath(xsltDir, ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
 	// copy XSLT file to contentDir, so that the XSLT document() function
-        // does not need absolute path file.
+	// does not need absolute path file.
 	File xslt = new File(FileUtil.getFullPath(xsltDir, "ims.xslt"));
 	FileUtil.copyFile(xsltIn, xslt);
 
@@ -755,9 +753,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	List<AuthoringActivityDTO> sortedActList = getSortedActivities(ldDto);
 
 	// Need to know what activities are branching activities, so we can set
-        // up conditions for their child sequences
+	// up conditions for their child sequences
 	// Can't just do it for all sequences as the sequence could be in an
-        // optional activity
+	// optional activity
 	Set<Long> branchingActivityIds = new HashSet<Long>();
 	for (AuthoringActivityDTO actDto : sortedActList) {
 	    if (actDto.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
@@ -780,7 +778,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    + "] into Transition <learning-activity-ref> tag.");
 
 	    // All sequence activities are within braching or an optional
-                // sequence, so they don't go into the transition
+	    // sequence, so they don't go into the transition
 	    // list.
 	    if (actDto.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE)) {
 		String attributeValue = ExportToolContentService.IMS_PREFIX_COMPLEX_REF
@@ -795,7 +793,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	    } else if (actDto.getParentActivityID() == null) {
 		// Only want to add it to the list of transition activities if
-                // it is the top level, as this generates
+		// it is the top level, as this generates
 		// the initial sequence.
 		Attribute att = null;
 
@@ -847,7 +845,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		+ transFile.getAbsolutePath());
 
 	// create the properties file and conditions file - needed for gate
-        // showing gates when open and branches when
+	// showing gates when open and branches when
 	// determined
 	propertiesRoot.setChildren(propertiesChildren);
 	propertiesDom.setRootElement(propertiesRoot);
@@ -889,10 +887,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Generate the nodes for a property and the related conditions. The
-     * first element is the property, which goes in the <properties> tag,
-     * the second through fourth elements are the if-then-else that makes up
-     * the condition and goes in the <conditions> tag.
+     * Generate the nodes for a property and the related conditions. The first element is the property, which goes in
+     * the <properties> tag, the second through fourth elements are the if-then-else that makes up the condition and
+     * goes in the <conditions> tag.
      * 
      * @param activityId
      * @return
@@ -948,15 +945,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * This quite complex method will return a sorted acitivityDTO list
-     * according to current LD DTO. <BR>
-     * It considers the broken LD situation. A first activity will always be
-     * first one, but others in the broken sequence in this LD sorted by
-     * randomly. In one broken sequence, all activities will sorted by
-     * transition. <BR>
-     * The reason to use lots "for" is Activity DTO does not contain next
-     * transition information. It has to be iterator all transitions or
-     * activities.
+     * This quite complex method will return a sorted acitivityDTO list according to current LD DTO. <BR>
+     * It considers the broken LD situation. A first activity will always be first one, but others in the broken
+     * sequence in this LD sorted by randomly. In one broken sequence, all activities will sorted by transition. <BR>
+     * The reason to use lots "for" is Activity DTO does not contain next transition information. It has to be iterator
+     * all transitions or activities.
      * 
      * @param ldDto
      * @return
@@ -970,7 +963,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	HashMap<Long, AuthoringActivityDTO> activities = new HashMap<Long, AuthoringActivityDTO>();
 
 	// Put first activity into sorted list and copy the rest of the
-        // activities into a working map so we can find
+	// activities into a working map so we can find
 	// them easily.
 	// They can be removed from the map as we go so we don't reprocess them.
 	Iterator iter = ldDto.getActivities().iterator();
@@ -1015,15 +1008,15 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 
 		// already achieve one sequence end, but it still exist unsorted
-                // transition, it means
+		// transition, it means
 		// this ld is broken one, there are at least two "first act"
-                // (there is no "transition to")
+		// (there is no "transition to")
 		if (!find) {
 		    for (AuthoringActivityDTO act : activities.values()) {
 			boolean isFirst = true;
 			for (TransitionDTO tranDto : transList) {
 			    // there is some transition to this act, it is
-                                // not "head activity" then skip this act.
+			    // not "head activity" then skip this act.
 			    if (tranDto.getToActivityID().equals(act.getActivityID())) {
 				isFirst = false;
 				break;
@@ -1047,7 +1040,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	// there are some sole activities exist in this LD,append them into
-        // sorted list end.
+	// sorted list end.
 	if (activities.size() > 0) {
 	    sortedActList.addAll(activities.values());
 	}
@@ -1055,10 +1048,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Move LAMS tool.xml from tool folder to export content root folder and
-     * modify it to {toolContentID}.xml file. Cache all attachement files
-     * from this tool into ArrayList, which will be save into a temporary
-     * file (resources.xml) and used by XSLT.
+     * Move LAMS tool.xml from tool folder to export content root folder and modify it to {toolContentID}.xml file.
+     * Cache all attachement files from this tool into ArrayList, which will be save into a temporary file
+     * (resources.xml) and used by XSLT.
      * 
      * @param rootDir
      * @param activity
@@ -1088,7 +1080,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			Document doc = sax.build(new FileInputStream(toolFile));
 			Element root = doc.getRootElement();
 			// cache DTO object class and transform it into a tag :
-                        // for later import use by XStream.
+			// for later import use by XStream.
 			String mainObject = root.getName();
 			root.setName(activity.getToolSignature());
 			Namespace ns = Namespace.getNamespace(ExportToolContentService.IMS_TOOL_NS_PREFIX
@@ -1096,7 +1088,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			root.setNamespace(ns);
 
 			// add mainObject tag: it save the Tool DTO class name.
-                        // It is useful when importing by XStream
+			// It is useful when importing by XStream
 			// (perhaps a future function)
 			Element mainObjectEle = new Element(ExportToolContentService.IMS_TOOL_MAIN_OBJECT);
 			mainObjectEle.setText(mainObject);
@@ -1105,7 +1097,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			updateNamespaceForChildren(root, ns);
 
 			// create a new tools.xml file with toolContentID.xml as
-                        // name.
+			// name.
 			File imsToolFile = new File(FileUtil.getFullPath(xsltDir, activity.getToolContentID()
 				.toString()
 				+ ".xml"));
@@ -1118,19 +1110,19 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			log.error("IMS export occurs error when reading tool xml for " + toolFileName + ".");
 		    }
 		    // tool node already gather into LD root folder
-                        // imstools.xml file, delete old tool.xml from tool
+		    // imstools.xml file, delete old tool.xml from tool
 		    // folder
 		    toolFile.delete();
 		    continue;
 		}
 
 		// handle other attachment files from tools, treat them as
-                // resource of IMS package
+		// resource of IMS package
 		List<Element> fileChildren = new ArrayList<Element>();
 		// resource TAG
 		Element resEle = new Element(ExportToolContentService.IMS_TAG_RESOURCE);
 		// the resource identifier should be
-                // "R_toolSignature_toolContentId"
+		// "R_toolSignature_toolContentId"
 		Attribute resAtt = new Attribute(ExportToolContentService.IMS_ATTR_IDENTIFIER,
 			ExportToolContentService.IMS_PREFIX_RESOURCE_IDENTIFIER + activity.getToolSignature() + "-"
 				+ activity.getToolContentID().toString());
@@ -1183,7 +1175,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // serialize tool xml into local file.
 	    XStream toolXml = new XStream();
 	    // get back Xstream default convert, create proxy then register
-                // it to XStream parser.
+	    // it to XStream parser.
 	    Converter c = toolXml.getConverterLookup().defaultConverter();
 	    FileInvocationHandler handler = null;
 	    if (!fileHandleClassList.isEmpty()) {
@@ -1244,9 +1236,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Import the learning design from the given path. Set the importer as
-     * the creator. If the workspaceFolderUid is null then saves the design
-     * in the user's own workspace folder.
+     * Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
+     * null then saves the design in the user's own workspace folder.
      * 
      * @param designFile
      * @param importer
@@ -1278,13 +1269,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    badFileType(ldErrorMsgs, filename, "Not a valid wddx/xml file");
 		} else {
 		    // IExportToolContentService service =
-                        // getExportService();
+		    // getExportService();
 		    ldId = importLearningDesignV102(wddxPacket, importer, workspaceFolderUid, toolsErrorMsgs);
 		}
 	    } else if (extension.equalsIgnoreCase(".zip")) {
 		// write the file
 		// String ldPath =
-                // ZipFileUtil.expandZip(file.getInputStream(),filename);
+		// ZipFileUtil.expandZip(file.getInputStream(),filename);
 		String ldPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename);
 
 		File fullFilePath = new File(FileUtil.getFullPath(ldPath,
@@ -1327,8 +1318,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * 
      * @return learningDesingID
      * @throws ExportToolContentException
-     * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign102(String,
-     *      User, WorkspaceFolder)
+     * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign102(String, User,
+     *      WorkspaceFolder)
      */
     public Long importLearningDesignV102(String ldWddxPacket, User importer, Integer workspaceFolderUid,
 	    List<String> toolsErrorMsgs) throws ImportToolContentException {
@@ -1366,7 +1357,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		String toolPath = FileUtil.getFullPath(learningDesignPath, activity.getToolContentID().toString());
 
 		// To create a new toolContent according to imported tool
-                // signature name.
+		// signature name.
 		// get tool by signature
 		Tool newTool = new ToolCompatibleStrategy().getTool(activity.getToolSignature());
 
@@ -1401,9 +1392,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
 
 		    // If this is a tool adapter tool, pass the customCSV to
-                        // the special importToolContent method
+		    // the special importToolContent method
 		    // Otherwise invoke the normal tool
-                        // importToolContentMethod
+		    // importToolContentMethod
 		    if (contentManager instanceof ToolAdapterContentManager) {
 			ToolAdapterContentManager toolAdapterContentManager = (ToolAdapterContentManager) contentManager;
 			toolAdapterContentManager.importToolContent(newContent.getToolContentId(),
@@ -1419,7 +1410,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    log.error(error, e);
 		    toolsErrorMsgs.add(error);
 		    // remove any unsucessed activities from new Learning
-                        // design.
+		    // design.
 		    removedActMap.put(activity.getActivityID(), activity);
 		}
 	    } // end all activities import
@@ -1450,7 +1441,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 
 	    // if the design was read only (e.g. exported a runtime
-                // sequence), clear the read only flag
+	    // sequence), clear the read only flag
 	    ldDto.setDateReadOnly(null);
 	    ldDto.setReadOnly(false);
 
@@ -1466,15 +1457,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Call xstream to get the POJOs from the XML file. To make it
-     * backwardly compatible we catch any exceptions due to added fields,
-     * remove the field using the ToolContentVersionFilter functionality and
-     * try to reparse. We can't nominate the problem fields in advance as we
-     * are making XML created by newer versions of LAMS compatible with an
+     * Call xstream to get the POJOs from the XML file. To make it backwardly compatible we catch any exceptions due to
+     * added fields, remove the field using the ToolContentVersionFilter functionality and try to reparse. We can't
+     * nominate the problem fields in advance as we are making XML created by newer versions of LAMS compatible with an
      * older version.
      * 
-     * This logic depends on the exception message containing the text. When
-     * we upgrade xstream, we must check that this message doesn't change.
+     * This logic depends on the exception message containing the text. When we upgrade xstream, we must check that this
+     * message doesn't change.
      * 
      * <pre>
      * 	com.thoughtworks.xstream.converters.ConversionException: unknownField : unknownField
@@ -1497,7 +1486,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	String lastFieldRemoved = "";
 	ToolContentVersionFilter contentFilter = null;
 	// cap the maximum number of retries to 30 - if we add more than 30 new
-        // fields then we need to rethink our
+	// fields then we need to rethink our
 	// strategy
 	int maxRetries = 30;
 	int numTries = 0;
@@ -1596,8 +1585,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Extract the class name or field name from a ConversionException
-     * message
+     * Extract the class name or field name from a ConversionException message
      */
     private String extractValue(String message, String fieldToLookFor) {
 	try {
@@ -1672,7 +1660,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		filterVersion(toolFilePath, fromVersion, toVersion);
 	    }
 	    // clear and ensure next activity can get correct filter thru
-                // registerImportVersionFilterClass().
+	    // registerImportVersionFilterClass().
 	    filterClass = null;
 
 	    // read tool file after transform.
@@ -1686,7 +1674,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    Long uuid = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,
 			    fileNode.name.uuidFieldName));
 		    // For instance, item class in share resource tool may
-                        // be url or single file. If it is URL, then the
+		    // be url or single file. If it is URL, then the
 		    // file uuid will be null. Ignore it!
 		    if (uuid == null) {
 			continue;
@@ -1707,7 +1695,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    log.debug("Tool attachement files/packages are going to upload to repository " + fullFileName);
 
 		    // to check if the file is package (with extension name
-                        // ".zip") or single file (no extension name).
+		    // ".zip") or single file (no extension name).
 		    File file = new File(fullFileName);
 		    boolean isPackage = false;
 		    if (!file.exists()) {
@@ -1715,7 +1703,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			realFileName = realFileName + ExportToolContentService.EXPORT_TOOLCONTNET_ZIP_SUFFIX;
 			isPackage = true;
 			// if this file is norpackage neither single file, throw
-                        // exception.
+			// exception.
 			if (!file.exists()) {
 			    throw new ImportToolContentException("Content attached file/package can not be found: "
 				    + fullFileName + "(.zip)");
@@ -1879,8 +1867,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * If there are any errors happen during tool exporting content. Writing
-     * failed message to file.
+     * If there are any errors happen during tool exporting content. Writing failed message to file.
      */
     private void writeErrorToToolFile(String rootPath, Long toolContentId, String msg) {
 	// create tool's save path
@@ -1958,18 +1945,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	Map<Integer, Activity> activityByUIIDMapper = new HashMap<Integer, Activity>();
 
 	// as we create the activities, we need to record any "default
-        // activities" for the sequence activity
+	// activities" for the sequence activity
 	// and branching activities to process later - we can't process them now
-        // as the children won't have
+	// as the children won't have
 	// been created yet and if we leave it till later and then find all the
-        // activities we are
+	// activities we are
 	// going through the activity set over and over again for no reason.
 	Map<Integer, ComplexActivity> defaultActivityToParentActivityMapping = new HashMap<Integer, ComplexActivity>();
 
 	for (AuthoringActivityDTO actDto : actDtoList) {
 	    Activity act = getActivity(actDto, groupingMapper, toolMapper, defaultActivityToParentActivityMapping);
 	    // so far, the activitiy ID is still old one, so setup the
-                // mapping relation between old ID and new activity.
+	    // mapping relation between old ID and new activity.
 	    activityMapper.put(act.getActivityId(), act);
 	    activityByUIIDMapper.put(act.getActivityUIID(), act);
 	    // if this act is removed, then does not save it into LD
@@ -1978,7 +1965,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 	}
 	// rescan the activity list and refresh their parent activity and input
-        // activities
+	// activities
 	for (AuthoringActivityDTO actDto : actDtoList) {
 	    Activity act = activityMapper.get(actDto.getActivityID());
 	    if (removedActMap.containsKey(actDto.getActivityID())) {
@@ -1994,7 +1981,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		} else {
 		    act.setParentActivity(parent);
 		    // also add child as Complex activity: It is useless for
-                        // persist data, but helpful for validate in
+		    // persist data, but helpful for validate in
 		    // learning design!
 		    if (parent.isComplexActivity()) {
 			Set<Activity> set = ((ComplexActivity) parent).getActivities();
@@ -2028,16 +2015,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	}
 
 	// Process the "first child" for any sequence activities and the
-        // "default branch" for branching activities.
+	// "default branch" for branching activities.
 	// If the child has been removed then leave it as null as the progress
-        // engine will cope (it will pick a
+	// engine will cope (it will pick a
 	// new one based on the lack of an input transition) and in authoring
-        // the author will just have to set
+	// the author will just have to set
 	// up a new first activity. If the default branch is missing and other
-        // details are missing (e.g. missing
+	// details are missing (e.g. missing
 	// conditions)
 	// from the design then it may have to be fixed in authoring before it
-        // will run, so the default branch missing
+	// will run, so the default branch missing
 	// case needs to be picked up by the validation (done later).
 	if (defaultActivityToParentActivityMapping.size() > 0) {
 	    for (Integer childUIID : defaultActivityToParentActivityMapping.keySet()) {
@@ -2075,7 +2062,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			    boolean transitionBreak = true;
 			    for (TransitionDTO transDto : transDtoList) {
 				// find out the transition of current first
-                                // activity
+				// activity
 				if (nextActId.equals(transDto.getFromActivityID())) {
 				    transitionBreak = false;
 				    nextActId = transDto.getToActivityID();
@@ -2091,16 +2078,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				    // already found the desire transition
 				    break;
 				    // if found flag is false yet, then it
-                                        // means the 2nd node remove as well,
+				    // means the 2nd node remove as well,
 				    // continue try 3rd...
 				}
 			    }
 			    // This activity also removed!!! then retrieve
-                                // again
+			    // again
 			    // If found is false, then the nextAct is still
-                                // not available, then continue find.
+			    // not available, then continue find.
 			    // tranisitionBreak mean the activity is removed
-                                // but it can not find its transition to
+			    // but it can not find its transition to
 			    // decide next available activity.
 			    if (found || transitionBreak) {
 				break;
@@ -2156,7 +2143,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    ld.setValidDesign(false);
 	    log.error(listOfValidationErrorDTOs);
 	    // throw new ImportToolContentException("Learning design
-                // validate error.");
+	    // validate error.");
 	} else {
 	    ld.setValidDesign(true);
 	}
@@ -2170,8 +2157,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Method to sort activity DTO according to the rule: Paretns is before
-     * their children.
+     * Method to sort activity DTO according to the rule: Paretns is before their children.
      * 
      * @param activities
      * @return
@@ -2181,7 +2167,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	List<Long> actIdList = new ArrayList<Long>();
 
 	// NOTICE: this code can not handle all nodes have their parents, ie,
-        // there is at least one node parent is
+	// there is at least one node parent is
 	// null(root).
 	int failureToleranceCount = 5000;
 	while (!activities.isEmpty() && failureToleranceCount > 0) {
@@ -2213,12 +2199,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Get learning design object from this Learning design DTO object. It
-     * also following our import rules:
+     * Get learning design object from this Learning design DTO object. It also following our import rules:
      * <li>lams_license - Assume same in all lams system. Import same ID</li>
      * <li>lams_copy_type - Set to 1.This indicates it is "normal" design.</li>
-     * <li>lams_workspace_folder - An input parameters to let user choose
-     * import workspace</li>
+     * <li>lams_workspace_folder - An input parameters to let user choose import workspace</li>
      * <li>User - The person who execute import action</li>
      * <li>OriginalLearningDesign - set to null</li>
      * 
@@ -2331,6 +2315,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    ((LearnerChoiceGrouping) grouping).setNumberOfGroups(groupingDto.getNumberOfGroups());
 	    ((LearnerChoiceGrouping) grouping).setEqualNumberOfLearnersPerGroup(groupingDto
 		    .getEqualNumberOfLearnersPerGroup());
+	    ((LearnerChoiceGrouping) grouping).setViewStudentsBeforeSelection(groupingDto
+		    .getViewStudentsBeforeSelection());
 	} else {
 	    log.error("Unable to determine the grouping type. Creating a random grouping. GroupingDTO was "
 		    + groupingDto);
@@ -2365,15 +2351,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Creates the map entry between a branch sequence activity and a group.
-     * We need the group maps and the activity maps so that we can update
-     * the ids to the groups and the activities. Therefore this method must
-     * be done after all the groups are imported and the activities are
-     * imported.
+     * Creates the map entry between a branch sequence activity and a group. We need the group maps and the activity
+     * maps so that we can update the ids to the groups and the activities. Therefore this method must be done after all
+     * the groups are imported and the activities are imported.
      * 
-     * Note: there isn't an set in the learning design for the branch
-     * mappings. The group objects actually contain the link to the
-     * mappings, so this method updates the group objects.
+     * Note: there isn't an set in the learning design for the branch mappings. The group objects actually contain the
+     * link to the mappings, so this method updates the group objects.
      */
     private BranchActivityEntry getBranchActivityEntry(BranchActivityEntryDTO entryDto,
 	    Map<Integer, Group> groupByUIIDMapper, Map<Integer, Activity> activityByUIIDMapper) {
@@ -2441,7 +2424,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	trans.setFromActivity(fromAct);
 	trans.setFromUIID(fromAct.getActivityUIID());
 	// also set transition to activity: It is nonsense for persisit data,
-        // but it is help this learning design
+	// but it is help this learning design
 	// validated
 	fromAct.setTransitionTo(trans);
 	// set to null
@@ -2452,7 +2435,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	trans.setToActivity(toAct);
 	trans.setToUIID(toAct.getActivityUIID());
 	// also set transition to activity: It is nonsense for persisit data,
-        // but it is help this learning design
+	// but it is help this learning design
 	// validated
 	toAct.setTransitionFrom(trans);
 
@@ -2485,10 +2468,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	switch (act.getActivityTypeId()) {
 	case Activity.TOOL_ACTIVITY_TYPE:
 	    // get back the toolContent in new system by activityID in
-                // old system.
+	    // old system.
 	    ToolContent content = toolMapper.get(actDto.getActivityID());
 	    // if activity can not find matching tool, the content should be
-                // null.
+	    // null.
 	    if (content != null) {
 		((ToolActivity) act).setTool(content.getTool());
 		((ToolActivity) act).setToolContentId(content.getToolContentId());
@@ -2592,7 +2575,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setOrderId(actDto.getOrderID());
 
 	// temporarily set as to null, after scan all activities, then set it to
-        // valid value.
+	// valid value.
 	act.setParentActivity(null);
 
 	act.setParentUIID(actDto.getParentUIID());

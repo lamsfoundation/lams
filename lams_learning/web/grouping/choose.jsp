@@ -48,10 +48,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:out value="${group.groupName}"/>
 				</td>
 				<td width="60%">
-					<c:forEach items="${group.users}" var="user">
-						<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/><BR>
-					</c:forEach>
-					&nbsp;
+					<c:if test="${viewStudentsBeforeSelection}">
+						<c:forEach items="${group.users}" var="user">
+							<c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/><BR>
+						</c:forEach>
+						&nbsp;
+					</c:if>
 				</td>
 				<td>
 				<c:choose>

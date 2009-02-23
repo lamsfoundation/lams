@@ -112,7 +112,7 @@ public interface WDDXTAGS {
 
     /** FloatingActivity specific tags */
     public static final String MAX_ACTIVITIES = "maxActivities";
-    
+
     /** OptionsActivity specific tags */
     public static final String MAX_OPTIONS = "maxOptions";
     public static final String MIN_OPTIONS = "minOptions";
@@ -146,6 +146,7 @@ public interface WDDXTAGS {
     public static final String GROUPING_DTO = "groupingDTO";
     public static final String GROUPS = "groups";
     public static final String EQUAL_NUMBER_OF_LEARNERS_PER_GROUP = "equalNumberOfLearnersPerGroup";
+    public static final String VIEW_STUDENTS_BEFORE_SELECTION = "viewStudentsBeforeSelection";
 
     public static final String GROUP_ID = "groupID";
     public static final String GROUP_NAME = "groupName";

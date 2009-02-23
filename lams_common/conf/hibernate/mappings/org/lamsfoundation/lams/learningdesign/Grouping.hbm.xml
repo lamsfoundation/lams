@@ -109,6 +109,11 @@
         type="java.lang.Boolean"
         column="equal_number_of_learners_per_group"
         />
+        <property
+        name="viewStudentsBeforeSelection"
+        type="java.lang.Boolean"
+        column="view_students_before_selection"
+        />
     </subclass>
     
 </class>

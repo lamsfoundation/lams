@@ -27,74 +27,87 @@ import java.util.Set;
 
 /**
  * Grouping formed by learner's choice
+ * 
  * @author Marcin Cieslak
  */
 public class LearnerChoiceGrouping extends Grouping {
-	/** nullable persistent field */
-	private Boolean equalNumberOfLearnersPerGroup;
+    /** nullable persistent field */
+    private Boolean equalNumberOfLearnersPerGroup;
 
-	/** nullable persistent field */
-	private Integer numberOfGroups;
+    /** nullable persistent field */
+    private Integer numberOfGroups;
 
-	/** nullable persistent field */
-	private Integer learnersPerGroup;
+    /** nullable persistent field */
+    private Integer learnersPerGroup;
 
-	/** Creates a new instance of ChosenGrouping */
-	public LearnerChoiceGrouping() {
-		super.grouper = new LearnerChoiceGrouper();
-	}
+    /** nullable persistent field */
+    private Boolean viewStudentsBeforeSelection;
 
-	/** full constructor */
-	public LearnerChoiceGrouping(Long groupingId, Set groups, Set activities) {
-		super(groupingId, groups, activities, new LearnerChoiceGrouper());
-	}
+    /** Creates a new instance of ChosenGrouping */
+    public LearnerChoiceGrouping() {
+	super.grouper = new LearnerChoiceGrouper();
+    }
 
-	/**
-	 * This method creates a deep copy of the Grouping 
-	 * @return LearnerChoiceGrouping The deep copied Grouping object
-	 */
-	@Override
-	public Grouping createCopy(int uiidOffset) {
-		LearnerChoiceGrouping learnerChoiceGrouping = new LearnerChoiceGrouping();
-		copyGroupingFields(learnerChoiceGrouping, uiidOffset);
-		learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(getEqualNumberOfLearnersPerGroup());
-		learnerChoiceGrouping.setLearnersPerGroup(getLearnersPerGroup());
-		learnerChoiceGrouping.setNumberOfGroups(getNumberOfGroups());
-		return learnerChoiceGrouping;
-	}
+    /** full constructor */
+    public LearnerChoiceGrouping(Long groupingId, Set groups, Set activities) {
+	super(groupingId, groups, activities, new LearnerChoiceGrouper());
+    }
 
-	/**
-	 * This type of grouping doesn't have groups other than learner groups.
-	 * So it always return <code>true</code>.
-	 * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
-	 */
-	@Override
-	public boolean isLearnerGroup(Group group) {
-		return true;
-	}
+    /**
+     * This method creates a deep copy of the Grouping
+     * 
+     * @return LearnerChoiceGrouping The deep copied Grouping object
+     */
+    @Override
+    public Grouping createCopy(int uiidOffset) {
+	LearnerChoiceGrouping learnerChoiceGrouping = new LearnerChoiceGrouping();
+	copyGroupingFields(learnerChoiceGrouping, uiidOffset);
+	learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(getEqualNumberOfLearnersPerGroup());
+	learnerChoiceGrouping.setLearnersPerGroup(getLearnersPerGroup());
+	learnerChoiceGrouping.setNumberOfGroups(getNumberOfGroups());
+	learnerChoiceGrouping.setViewStudentsBeforeSelection(getViewStudentsBeforeSelection());
+	return learnerChoiceGrouping;
+    }
 
-	public Boolean getEqualNumberOfLearnersPerGroup() {
-		return equalNumberOfLearnersPerGroup;
-	}
+    /**
+     * This type of grouping doesn't have groups other than learner groups. So it always return <code>true</code>.
+     * 
+     * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
+     */
+    @Override
+    public boolean isLearnerGroup(Group group) {
+	return true;
+    }
 
-	public void setEqualNumberOfLearnersPerGroup(Boolean equalNumberOfLearnersPerGroup) {
-		this.equalNumberOfLearnersPerGroup = equalNumberOfLearnersPerGroup;
-	}
+    public Boolean getEqualNumberOfLearnersPerGroup() {
+	return equalNumberOfLearnersPerGroup;
+    }
 
-	public Integer getLearnersPerGroup() {
-		return learnersPerGroup;
-	}
+    public void setEqualNumberOfLearnersPerGroup(Boolean equalNumberOfLearnersPerGroup) {
+	this.equalNumberOfLearnersPerGroup = equalNumberOfLearnersPerGroup;
+    }
 
-	public void setLearnersPerGroup(Integer learnersPerGroup) {
-		this.learnersPerGroup = learnersPerGroup;
-	}
+    public Integer getLearnersPerGroup() {
+	return learnersPerGroup;
+    }
 
-	public Integer getNumberOfGroups() {
-		return numberOfGroups;
-	}
+    public void setLearnersPerGroup(Integer learnersPerGroup) {
+	this.learnersPerGroup = learnersPerGroup;
+    }
 
-	public void setNumberOfGroups(Integer numberOfGroups) {
-		this.numberOfGroups = numberOfGroups;
-	}
+    public Integer getNumberOfGroups() {
+	return numberOfGroups;
+    }
 
+    public void setNumberOfGroups(Integer numberOfGroups) {
+	this.numberOfGroups = numberOfGroups;
+    }
+
+    public Boolean getViewStudentsBeforeSelection() {
+	return viewStudentsBeforeSelection;
+    }
+
+    public void setViewStudentsBeforeSelection(Boolean viewStudentsBeforeSelection) {
+	this.viewStudentsBeforeSelection = viewStudentsBeforeSelection;
+    }
 }
