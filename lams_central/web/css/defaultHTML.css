@@ -1241,19 +1241,19 @@ border:0px;
 .userpage-td {border-left:1px solid #ccc;}
 
 
-.user-img {background: url('../images/css/user.jpg') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
+.user-img {background: url('../images/css/user.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
-.mycourses-monitor-img {background: url('../images/css/mycourses_monitor.jpg') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
+.mycourses-monitor-img {background: url('../images/css/mycourses_monitor.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
-.mycourses-addlesson-img {background: url('../images/css/mycourses_addlesson.jpg') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px;
+.mycourses-addlesson-img {background: url('../images/css/mycourses_addlesson.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px;
 }
 
-.mycourses-stop-img {background: url('../images/css/lesson_disabled.gif') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+.mycourses-stop-img {background: url('../images/css/lesson_disabled.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
-.mycourses-completed-img {background: url('../images/css/lesson_completed.gif') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+.mycourses-completed-img {background: url('../images/css/lesson_completed.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
 
