@@ -16,7 +16,7 @@
 		}
 		
 		body {
-			width: 550px;
+			width: 760px;
 		}
 				
 		div.FCKdiv {
@@ -95,13 +95,13 @@
 					value="${formBean.questionList[questionIndex-1]}"
 					contentFolderID="${formBean.contentFolderID}"
 	                toolbarSet="Custom-Pedplanner" height="150px"
-	                width="545px" displayExpanded="false">
+	                width="760px" displayExpanded="false">
 				</lams:FCKEditor>
 			</div>
 			<div class="space-left">
 				<c:forEach var="candidateAnswerIndex" begin="1" end="${formBean.candidateAnswerCount[questionIndex-1]}" >
 					${candidateAnswerIndex}.
-					<input size="55" type="text" name="candidateAnswer${questionIndex}-${candidateAnswerIndex}" id="candidateAnswer${questionIndex}-${candidateAnswerIndex}" />
+					<input size=90" type="text" name="candidateAnswer${questionIndex}-${candidateAnswerIndex}" id="candidateAnswer${questionIndex}-${candidateAnswerIndex}" />
 					<html:radio property="correct[${questionIndex-1}]" value="${candidateAnswerIndex}" />
 					<br />
 				</c:forEach>

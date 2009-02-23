@@ -47,7 +47,7 @@
 			value="${formBean.wikiBody}"
 			contentFolderID="${formBean.contentFolderID}"
 			toolbarSet="Custom-Pedplanner" height="150px"
-			width="545px" displayExpanded="false">
+			width="760px" displayExpanded="false">
 		</lams:FCKEditor>
 	</html:form>
 </body>
