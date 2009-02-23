@@ -21,6 +21,13 @@
 <div id="page">
 <div id="content">
 	<h1 style="text-align: center" class="small-space-top"><fmt:message key="planner.title" /></h1>
+	<logic:messagesPresent> 
+		<p class="warning">
+			<html:messages id="error">
+		       <c:out value="${error}" escapeXml="false"/><br/>
+		    </html:messages>
+	    </p>
+	</logic:messagesPresent>
 	<table>
 		<tr>
 			<td colspan="2">
@@ -137,13 +144,6 @@
 		<c:when test="${node.edit}">
 			<%-- Form for editing the node --%>
 			<hr style="margin: auto" />
-			<logic:messagesPresent> 
-				<p class="warning">
-					<html:messages id="error">
-				       <c:out value="${error}" escapeXml="false"/><br/>
-				    </html:messages>
-			    </p>
-			</logic:messagesPresent>
 			
 			<%-- Do we edit the current node or create a subnode? --%>
 			<c:choose>
@@ -221,7 +221,7 @@
 									</c:otherwise>
 								</c:choose>
 								<br />
-								<html:file property="file" size="66" />
+								<html:file property="file" size="80" />
 							</div>
 						</div>
 					</html:form>

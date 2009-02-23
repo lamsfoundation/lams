@@ -9,6 +9,7 @@ CSS for PedagogicalPlanner
 
 .toolFrame {
     width: 780px;
+    height: 220px;
     border: 1px lightgrey solid;
    }
    
@@ -60,7 +61,7 @@ div#pedagogicalPlannerErrorArea{
 a.editingAdvice{
 	display: none;
 	font-size: smaller;
-	margin: 0px 0px 0px 500px;
+	margin: 0px 0px 0px 700px;
 }
 
 td.branchFirstActivity {

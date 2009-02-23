@@ -11,7 +11,7 @@
 	<lams:css style="core" />
 </lams:head>
 <body>	
-	<div style="width: 100%; margin-top: 55px; text-align: center; vertical-align: middle; font-weight: bold;">
+	<div style="width: 100%; margin-top: 90px; text-align: center; vertical-align: middle; font-weight: bold;">
 		<h3>
 			<c:choose>
 				<c:when test="${empty param.formMessage}">

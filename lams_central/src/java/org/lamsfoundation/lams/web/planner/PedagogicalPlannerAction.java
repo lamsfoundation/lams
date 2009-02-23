@@ -77,7 +77,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -126,9 +125,15 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static ToolContentHandler contentHandler;
 
     // Error messages used in class
-    private static final String ERROR_TOOL_ERRORS = "There were tool errors.";
-    private static final String ERROR_LEARNING_DESIGN_ERRORS = "There were learning design errors.";
-    private static final String ERROR_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED = "Learning design could not be retrieved.";
+    private static final String ERROR_KEY_TOOL_ERRORS = "error.planner.tools.";
+    private static final String ERROR_KEY_NODE_TITLE_BLANK = "error.planner.node.title.blank";
+    private static final String ERROR_KEY_REPOSITORY = "error.planner.repository";
+    private static final String ERROR_KEY_FILE_BAD_EXTENSION = "error.planner.file.bad.extension";
+    private static final String ERROR_KEY_FILE_EMPTY = "error.planner.file.empty";
+    private static final String ERROR_KEY_FILE_OPEN = "error.planner.file.open";
+    private static final String ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED = "error.planner.learning.design.retrieve";
+    private static final String ERROR_KEY_EDITOR = "error.planner.editor";
+
     private static final String ERROR_USER_NOT_FOUND = "User not found.";
     private static final String ERROR_NOT_PROPER_FILE = "The sequence template does not exist or is not a proper file.";
     private static final String ERROR_TOO_MANY_OPTIONS = "Number of options in options activity is limited to "
@@ -137,10 +142,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String ERROR_NESTED_BRANCHING = "Nested branching activities are not allowed in Pedagogical Planner.";
     private static final String ERROR_TOO_MANY_BRANCHES = "Number of branches in branching activity is limited to "
 	    + CentralConstants.PLANNER_MAX_BRANCHES + " in Pedagogical Planner.";
-    private static final String ERROR_PLANNER_NODE_TITLE_BLANK = "error.planner.node.title.blank";
-    private static final String ERROR_PLANNER_REPOSITORY = "error.planner.repository";
-    private static final String ERROR_PLANNER_FILE_BAD_EXTENSION = "error.planner.file.bad.extension";
-    private static final String ERROR_PLANNER_FILE_EMPTY = "error.planner.file.empty";
+
     private static Logger log = Logger.getLogger(PedagogicalPlannerAction.class);
 
     private static final String PEDAGOGICAL_PLANNER_DAO_BEAN_NAME = "pedagogicalPlannerDAO";
@@ -165,35 +167,31 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @param request
      * @param response
      * @return
-     * @throws IOException
      * @throws ServletException
+     * @throws IOException
      */
-    private ActionForward openTemplate(ActionMapping mapping, HttpServletRequest request, Long fileUuid, String fileName)
-	    throws IOException, ServletException {
+    private ActionForward openTemplate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    Long fileUuid, String fileName) throws ServletException {
 	// Get the learning design template zip file
+	ActionMessages errors = new ActionMessages();
 
 	File designFile = null;
 
 	try {
-	    InputStream inputStream = getContentHandler().getFileNode(fileUuid).getFile();
-	    designFile = new File(FileUtil.TEMP_DIR, fileName);
-	    FileOutputStream fileOutputStream = new FileOutputStream(designFile);
-	    byte[] data = new byte[1024];
-	    int read = 0;
-	    do {
-		read = inputStream.read(data);
-		if (read > 0) {
-		    fileOutputStream.write(data, 0, read);
-		}
-	    } while (read > 0);
-	    fileOutputStream.close();
-	    inputStream.close();
+	    designFile = copyFileFromRepository(fileUuid, fileName);
 	} catch (Exception e) {
-	    throw new ServletException(e);
+	    PedagogicalPlannerAction.log.error(e);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
+	    saveErrors(request, errors);
+	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
 	if (!designFile.exists() || designFile.isDirectory()) {
-	    throw new IOException(PedagogicalPlannerAction.ERROR_NOT_PROPER_FILE);
+	    PedagogicalPlannerAction.log.error(PedagogicalPlannerAction.ERROR_NOT_PROPER_FILE);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
+	    saveErrors(request, errors);
+	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
+
 	HttpSession session = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
 	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
@@ -205,6 +203,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	LearningDesign learningDesign = null;
 	List<String> learningDesignErrorMsgs = new ArrayList<String>();
 	// Extract the template
+
 	try {
 	    Object[] ldResults = getExportService().importLearningDesign(designFile, user, null, toolsErrorMsgs, "");
 	    designFile.delete();
@@ -213,38 +212,59 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    toolsErrorMsgs = (List<String>) ldResults[2];
 	    learningDesign = getAuthoringService().getLearningDesign(learningDesignID);
 	} catch (ImportToolContentException e) {
-	    throw new ServletException(e.getMessage());
+	    PedagogicalPlannerAction.log.error(e);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    saveErrors(request, errors);
+	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
+
 	if ((learningDesignID == null || learningDesignID.longValue() == -1) && learningDesignErrorMsgs.size() == 0) {
-	    throw new ServletException(PedagogicalPlannerAction.ERROR_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    saveErrors(request, errors);
+	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
 	if (learningDesignErrorMsgs.size() > 0) {
 	    for (String error : learningDesignErrorMsgs) {
 		PedagogicalPlannerAction.log.error(error);
 	    }
-	    throw new ServletException(PedagogicalPlannerAction.ERROR_LEARNING_DESIGN_ERRORS);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    saveErrors(request, errors);
+	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
 	if (toolsErrorMsgs.size() > 0) {
 	    for (String error : toolsErrorMsgs) {
 		PedagogicalPlannerAction.log.error(error);
 	    }
-	    throw new ServletException(PedagogicalPlannerAction.ERROR_TOOL_ERRORS);
+	    errors
+		    .add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			    PedagogicalPlannerAction.ERROR_KEY_TOOL_ERRORS));
+	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
 
 	List<PedagogicalPlannerActivityDTO> activities = new ArrayList<PedagogicalPlannerActivityDTO>();
 
 	// create DTOs that hold all the necessary information of the activities
 	Activity activity = learningDesign.getFirstActivity();
-	while (activity != null) {
-
-	    // Iterate through all the activities
-	    addActivityToPlanner(learningDesign, activities, activity);
-	    Transition transitionTo = activity.getTransitionTo();
-	    if (transitionTo == null) {
-		activity = null;
-	    } else {
-		activity = transitionTo.getToActivity();
+	try {
+	    while (activity != null) {
+		// Iterate through all the activities
+		addActivityToPlanner(learningDesign, activities, activity);
+		Transition transitionTo = activity.getTransitionTo();
+		if (transitionTo == null) {
+		    activity = null;
+		} else {
+		    activity = transitionTo.getToActivity();
+		}
 	    }
+	} catch (ServletException e) {
+	    PedagogicalPlannerAction.log.error(e);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    saveErrors(request, errors);
+	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
 
 	int activitySupportingPlannerCount = 0;
@@ -532,7 +552,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     }
 
     public ActionForward openSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    Long nodeUid) throws IOException, ServletException {
+	    Long nodeUid) throws ServletException {
 	Boolean isSysAdmin = request.isUserInRole(Role.SYSADMIN);
 	Boolean edit = WebUtil.readBooleanParam(request, CentralConstants.PARAM_EDIT, false);
 	edit &= isSysAdmin;
@@ -543,7 +563,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	} else {
 	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    if (!edit && node.getFileUuid() != null) {
-		return openTemplate(mapping, request, node.getFileUuid(), node.getFileName());
+		return openTemplate(mapping, form, request, node.getFileUuid(), node.getFileName());
 	    }
 	}
 	List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(node);
@@ -571,8 +591,15 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    try {
 			String contentFolderId = getAuthoringService().generateUniqueContentFolder();
 			nodeForm.setContentFolderId(contentFolderId);
-		    } catch (FileUtilException e) {
+		    } catch (Exception e) {
 			PedagogicalPlannerAction.log.error(e);
+			dto.setEdit(false);
+			dto.setCreateSubnode(false);
+			ActionMessages errors = new ActionMessages();
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+				PedagogicalPlannerAction.ERROR_KEY_EDITOR));
+			saveErrors(request, errors);
+			return openSequenceNode(mapping, form, request, (Long) null);
 		    }
 		} else {
 		    nodeForm.setContentFolderId(node.getParent().getContentFolderId());
@@ -645,7 +672,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	    } catch (RepositoryCheckedException e) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			PedagogicalPlannerAction.ERROR_PLANNER_REPOSITORY));
+			PedagogicalPlannerAction.ERROR_KEY_REPOSITORY));
 		PedagogicalPlannerAction.log.error(e);
 	    }
 	}
@@ -675,13 +702,13 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	ActionMessages errors = new ActionMessages();
 	if (StringUtils.isEmpty(form.getTitle())) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_PLANNER_NODE_TITLE_BLANK));
+		    PedagogicalPlannerAction.ERROR_KEY_NODE_TITLE_BLANK));
 	}
 	if (PedagogicalPlannerSequenceNodeForm.NODE_TYPE_TEMPLATE.equals(form.getNodeType())
 		&& node.getFileName() == null) {
 	    if (form.getFile() == null || form.getFile().getFileSize() == 0) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			PedagogicalPlannerAction.ERROR_PLANNER_FILE_EMPTY));
+			PedagogicalPlannerAction.ERROR_KEY_FILE_EMPTY));
 	    } else {
 		String fileName = form.getFile().getFileName();
 		boolean badExtension = false;
@@ -696,7 +723,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		}
 		if (badExtension) {
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			    PedagogicalPlannerAction.ERROR_PLANNER_FILE_BAD_EXTENSION));
+			    PedagogicalPlannerAction.ERROR_KEY_FILE_BAD_EXTENSION));
 		}
 
 	    }
@@ -738,6 +765,23 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	getPedagogicalPlannerDAO().saveOrUpdateNode(neighbourNode);
 
 	return openSequenceNode(mapping, form, request, parentUid);
+    }
+
+    private File copyFileFromRepository(Long fileUuid, String fileName) throws RepositoryCheckedException, IOException {
+	InputStream inputStream = getContentHandler().getFileNode(fileUuid).getFile();
+	File file = new File(FileUtil.TEMP_DIR, fileName);
+	FileOutputStream fileOutputStream = new FileOutputStream(file);
+	byte[] data = new byte[1024];
+	int read = 0;
+	do {
+	    read = inputStream.read(data);
+	    if (read > 0) {
+		fileOutputStream.write(data, 0, read);
+	    }
+	} while (read > 0);
+	fileOutputStream.close();
+	inputStream.close();
+	return file;
     }
 
     private IExportToolContentService getExportService() {
