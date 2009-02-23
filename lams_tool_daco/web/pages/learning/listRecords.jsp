@@ -6,6 +6,9 @@
 <c:if test="${not empty param.includeMode}">
 	<c:set var="includeMode" value="${param.includeMode}" />
 </c:if>
+<c:if test="${empty includeMode}">
+	<c:set var="includeMode" value="learning" />
+</c:if>
 
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -114,7 +117,7 @@
 			<c:otherwise>
 				<%-- Vertical view displays records as separate tables of answers. --%>
 				<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
-				<table>
+				<table style="width: 97%">
 					<tr>
 						<td class="hint">
 							<fmt:message key="label.learning.heading.recordnumber" /> ${recordStatus.index+1}

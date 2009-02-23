@@ -37,13 +37,13 @@
 		<fmt:message key="label.learning.heading.recordnumber" />
 		<span id="displayedRecordNumberSpan" class="hint">
 			${displayedRecordNumber}
-			<c:if test="${not empty daco.minRecords}">
+			<c:if test="${not (empty daco.minRecords or daco.minRecords eq 0)}">
 				<br />
 				<fmt:message key="error.record.notenough">
 					<fmt:param value="${daco.minRecords}" />
 				</fmt:message>
 			</c:if>
-			<c:if test="${not empty daco.maxRecords}">
+			<c:if test="${not (empty daco.maxRecords or daco.maxRecords eq 0)}">
 				<br />
 				<fmt:message key="error.record.toomuch">
 					<fmt:param value="${daco.maxRecords}" />
