@@ -88,6 +88,8 @@ public class RegisterServiceSoapBindingImpl implements Register {
 		try {
 			Organisation org = new Organisation();
 			org.setName(name);
+			org.setCode(code);
+			org.setDescription(description);
 			org.setParentOrganisation(service.getRootOrganisation());
 			org.setOrganisationType((OrganisationType)service.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
 			org.setOrganisationState((OrganisationState)service.findById(OrganisationState.class,OrganisationState.ACTIVE));
