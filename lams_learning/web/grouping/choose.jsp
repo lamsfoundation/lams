@@ -38,6 +38,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<fmt:message key="label.view.groups.title"/>
 				</th>
 				<th>
+					<c:if test="${viewStudentsBeforeSelection}">
+						<fmt:message key="label.view.groups.learners"/>
+					</c:if>
 				</th>
 				<th>
 				</th>

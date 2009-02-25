@@ -37,6 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<fmt:message key="label.view.groups.title"/>
 				</th>
 				<th>
+					<fmt:message key="label.view.groups.learners"/>
 				</th>
 			</tr>
 			<logic:iterate id="group" name="groups"> 
