@@ -17,7 +17,7 @@
 
 		<script type="text/javascript">
 			var questionType = ${questionType};
-			var addOptionUrl = "<c:url value='/authoring/newOption.do'/>";
+			var addOptionUrl = "<c:url value='/authoring/addOption.do'/>";
 		   	var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
     	    var upOptionUrl = "<c:url value='/authoring/upOption.do'/>";
     	    var downOptionUrl = "<c:url value='/authoring/downOption.do'/>";
@@ -54,14 +54,14 @@
 		    			      required: true,
 		    			      number: true
 		    			},
-		    			hasAnswerFilled: {
+		    			hasOptionFilled: {
 		    				required: function(element) {
-		    		        	return $("input[name^=optionAnswer]:filled").length < 1;
+		    		        	return $("input[name^=optionFloat]:filled").length < 1;
 			    		    }			    		    
 	    			    },
 	    			    hasOneHundredGrade: {
 		    				required: function(element) {
-	    			    		return $("select[name^='optionGrade'][value='100.0']").length < 1;
+	    			    		return $("select[name^='optionGrade'][value='1.0']").length < 1;
 			    		    }			    		    
 	    			    },	    			    
 		    			unitList: {
@@ -85,7 +85,7 @@
 		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
 		    			},
-		    			hasAnswerFilled: {
+		    			hasOptionFilled: {
 		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
 		    			},
 		    			hasOneHundredGrade: {
@@ -205,7 +205,7 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.numerical.answers" />
 				</div>
-				<input type="hidden" name="hasAnswerFilled" id="hasAnswerFilled">
+				<input type="hidden" name="hasOptionFilled" id="hasOptionFilled">
 				<input type="hidden" name="hasOneHundredGrade" id="hasOneHundredGrade">
 			</html:form>
 			

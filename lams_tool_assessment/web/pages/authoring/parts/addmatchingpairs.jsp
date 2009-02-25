@@ -17,7 +17,7 @@
 
 		<script type="text/javascript">
 			var questionType = ${questionType};
-			var addOptionUrl = "<c:url value='/authoring/newOption.do'/>";
+			var addOptionUrl = "<c:url value='/authoring/addOption.do'/>";
 		   	var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
     	    var upOptionUrl = "<c:url value='/authoring/upOption.do'/>";
     	    var downOptionUrl = "<c:url value='/authoring/downOption.do'/>";

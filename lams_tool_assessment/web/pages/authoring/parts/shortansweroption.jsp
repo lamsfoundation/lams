@@ -10,9 +10,7 @@
 	</tr>
 	<tr>		
 		<td style="padding-left:10px; border-bottom:0px; background:none;">	
-			<lams:FCKEditor id="optionString${status.index}" value="${option.optionString}"
-				contentFolderID="${contentFolderID}" width="622px">
-			</lams:FCKEditor>					
+			<input type="text" name="optionString${status.index}" value="${option.optionString}" styleClass="noBorder" size="99"/>
 		</td>									
 	</tr>
 	
@@ -35,7 +33,9 @@
 	</tr>
 	<tr>		
 		<td style="padding-left:10px; padding-right:0px; border-bottom:0px; background:none;" width="622px">
-			<lams:STRUTS-textarea property="optionFeedback${status.index}" rows="3" cols="75" value="${option.feedback}"/>
+			<lams:FCKEditor id="optionFeedback${status.index}" value="${option.feedback}"
+				contentFolderID="${contentFolderID}" width="622px">
+			</lams:FCKEditor>		
 		</td>
 	</tr>	
 </table>

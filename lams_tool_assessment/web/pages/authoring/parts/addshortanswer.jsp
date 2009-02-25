@@ -17,7 +17,7 @@
 
 		<script type="text/javascript">
 			var questionType = ${questionType};
-			var addOptionUrl = "<c:url value='/authoring/newOption.do'/>";
+			var addOptionUrl = "<c:url value='/authoring/addOption.do'/>";
 		   	var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
     	    var upOptionUrl = "<c:url value='/authoring/upOption.do'/>";
     	    var downOptionUrl = "<c:url value='/authoring/downOption.do'/>";
@@ -40,17 +40,14 @@
 		    			      required: true,
 		    			      number: true
 		    			},
-		    			hasAnswerFilled: {
+		    			hasOptionFilled: {
 		    				required: function(element) {
-				    			$("[name^=optionAnswer]").each(function() {
-									this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
-				    			});		    				
-		    		        	return $("input[name^=optionAnswer]:filled").length < 1;
+		    		        	return $("input[name^=optionString]:filled").length < 1;
 			    		    }			    		    
 	    			    },
 	    			    hasOneHundredGrade: {
 		    				required: function(element) {
-	    			    		return $("select[name^='optionGrade'][value='100.0']").length < 1;
+	    			    		return $("select[name^='optionGrade'][value='1.0']").length < 1;
 			    		    }			    		    
 	    			    }
 		    		},
@@ -64,7 +61,7 @@
 		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
 		    			},
-		    			hasAnswerFilled: {
+		    			hasOptionFilled: {
 		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
 		    			},
 		    			hasOneHundredGrade: {
@@ -86,7 +83,7 @@
 		    		},
 		    		debug: true,
      			    submitHandler: function(form) {
-		    			$("[name^=optionAnswer]").each(function() {
+		    			$("[name^=optionFeedback]").each(function() {
 							this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
 		    			});	     			    
 		    			$("#optionList").val($("#optionForm").serialize(true));
@@ -177,7 +174,7 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.short.answer.answers" />
 				</div>
-				<input type="hidden" name="hasAnswerFilled" id="hasAnswerFilled">
+				<input type="hidden" name="hasOptionFilled" id="hasOptionFilled">
 				<input type="hidden" name="hasOneHundredGrade" id="hasOneHundredGrade">
 			</html:form>
 			
@@ -189,6 +186,7 @@
 				</a>
 			</form>
 			
+			<br><br><br>
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="$('#assessmentQuestionForm').submit();" class="button-add-item">
 					<fmt:message key="label.authoring.short.answer.add.short.answer" /> 

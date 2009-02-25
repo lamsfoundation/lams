@@ -48,11 +48,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
@@ -60,7 +58,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswerOption;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
@@ -69,15 +67,11 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.service.UploadAssessmentFileException;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentAnswerOptionComparator;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentOverallFeedbackComparator;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionComparator;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentUnitComparator;
+import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentQuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
-import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -156,8 +150,8 @@ public class AuthoringAction extends Action {
 	    return downQuestion(mapping, form, request, response);
 	}	
 	// -----------------------Assessment Answer Option functions ---------------------------
-	if (param.equals("newOption")) {
-	    return newOption(mapping, form, request, response);
+	if (param.equals("addOption")) {
+	    return addOption(mapping, form, request, response);
 	}
 	if (param.equals("removeOption")) {
 	    return removeOption(mapping, form, request, response);
@@ -620,9 +614,9 @@ public class AuthoringAction extends Action {
 	questionForm.setDefaultGrade("1");
 	questionForm.setPenaltyFactor("0.1");
 	
-	List<AssessmentAnswerOption> optionList = new ArrayList<AssessmentAnswerOption>();
+	List<AssessmentQuestionOption> optionList = new ArrayList<AssessmentQuestionOption>();
 	for (int i = 0; i < AssessmentConstants.INITIAL_OPTIONS_NUMBER; i++) {
-	    AssessmentAnswerOption option = new AssessmentAnswerOption();
+	    AssessmentQuestionOption option = new AssessmentQuestionOption();
 	    option.setSequenceId(i+1);
 	    option.setGrade(0);
 	    optionList.add(option);
@@ -801,13 +795,13 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward newOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward addOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	TreeSet<AssessmentAnswerOption> optionList = getOptionsFromRequest(request, false);
-	AssessmentAnswerOption option = new AssessmentAnswerOption();
+	TreeSet<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
+	AssessmentQuestionOption option = new AssessmentQuestionOption();
 	int maxSeq = 1;
 	if (optionList != null && optionList.size() > 0) {
-	    AssessmentAnswerOption last = optionList.last();
+	    AssessmentQuestionOption last = optionList.last();
 	    maxSeq = last.getSequenceId() + 1;
 	}
 	option.setSequenceId(maxSeq);
@@ -833,11 +827,11 @@ public class AuthoringAction extends Action {
      */
     private ActionForward removeOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	Set<AssessmentAnswerOption> optionList = getOptionsFromRequest(request, false);
+	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
 	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
-	    List<AssessmentAnswerOption> rList = new ArrayList<AssessmentAnswerOption>(optionList);
-	    AssessmentAnswerOption question = rList.remove(optionIndex);
+	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
+	    AssessmentQuestionOption question = rList.remove(optionIndex);
 	    optionList.clear();
 	    optionList.addAll(rList);
 	}
@@ -879,15 +873,15 @@ public class AuthoringAction extends Action {
     }
 
     private ActionForward switchOption(ActionMapping mapping, HttpServletRequest request, boolean up) {
-	Set<AssessmentAnswerOption> optionList = getOptionsFromRequest(request, false);
+	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
 	
 	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
-	    List<AssessmentAnswerOption> rList = new ArrayList<AssessmentAnswerOption>(optionList);
+	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
 	    
 	    // get current and the target item, and switch their sequnece
-	    AssessmentAnswerOption option = rList.get(optionIndex);
-	    AssessmentAnswerOption repOption;
+	    AssessmentQuestionOption option = rList.get(optionIndex);
+	    AssessmentQuestionOption repOption;
 	    if (up) {
 		repOption = rList.get(--optionIndex);
 	    } else {
@@ -954,7 +948,7 @@ public class AuthoringAction extends Action {
 
 	// initial Overall feedbacks list
 	SortedSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
-		new AssessmentOverallFeedbackComparator());
+		new SequencableComparator());
 	if (!assessment.getOverallFeedbacks().isEmpty()) {
 	    overallFeedbackList.addAll(assessment.getOverallFeedbacks());
 	} else {
@@ -1035,7 +1029,7 @@ public class AuthoringAction extends Action {
 	SortedSet<AssessmentQuestion> list = (SortedSet<AssessmentQuestion>) sessionMap
 		.get(AssessmentConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
-	    list = new TreeSet<AssessmentQuestion>(new AssessmentQuestionComparator());
+	    list = new TreeSet<AssessmentQuestion>(new SequencableComparator());
 	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, list);
 	}
 	return list;
@@ -1150,7 +1144,7 @@ public class AuthoringAction extends Action {
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
-	    Set<AssessmentAnswerOption> optionList = question.getAnswerOptions();
+	    Set<AssessmentQuestionOption> optionList = question.getQuestionOptions();
 	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	}
 	if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
@@ -1238,14 +1232,14 @@ public class AuthoringAction extends Action {
 		|| (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
 		|| (type == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
 		|| (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
-	    Set<AssessmentAnswerOption> optionList = getOptionsFromRequest(request, true);
+	    Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, true);
 	    Set options = new LinkedHashSet();
 	    int seqId = 0;
-	    for (AssessmentAnswerOption option : optionList) {
+	    for (AssessmentQuestionOption option : optionList) {
 		option.setSequenceId(seqId++);
 		options.add(option);
 	    }
-	    question.setAnswerOptions(options);
+	    question.setQuestionOptions(options);
 	}
 	// set units
 	if (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
@@ -1284,25 +1278,25 @@ public class AuthoringAction extends Action {
      * @param isForSaving whether the blank options will be preserved or not 
      * 
      */
-    private TreeSet<AssessmentAnswerOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
+    private TreeSet<AssessmentQuestionOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OPTION_LIST);
 
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
 	int questionType = WebUtil.readIntParam(request,AssessmentConstants.ATTR_QUESTION_TYPE);
-	TreeSet<AssessmentAnswerOption> optionList = new TreeSet<AssessmentAnswerOption>(
-		new AssessmentAnswerOptionComparator());
+	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
+		new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
 		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
-		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
-		if ((answerString == null) && isForSaving) {
+		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
+		if ((optionString == null) && isForSaving) {
 		    continue;
 		}
 
-		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		AssessmentQuestionOption option = new AssessmentQuestionOption();
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
-		option.setAnswerString(answerString);
+		option.setOptionString(optionString);
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
 		option.setGrade(grade);
 		option.setFeedback((String) paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
@@ -1313,43 +1307,50 @@ public class AuthoringAction extends Action {
 		    continue;
 		}
 		
-		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		AssessmentQuestionOption option = new AssessmentQuestionOption();
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);		
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
-		option.setAnswerString((String) paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i));
+		option.setOptionString((String) paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i));
 		option.setQuestion(question);
 		optionList.add(option);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
-		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
-		if ((answerString == null) && isForSaving) {
+		String optionFloatStr = paramMap.get(AssessmentConstants.ATTR_OPTION_FLOAT_PREFIX + i);
+		String acceptedErrorStr = paramMap.get(AssessmentConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i);
+		String gradeStr = paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i);
+		if (optionFloatStr.equals("0.0") && optionFloatStr.equals("0.0") && gradeStr.equals("0.0") && isForSaving) {
 		    continue;
 		}
 		
-		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		AssessmentQuestionOption option = new AssessmentQuestionOption();
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
-		option.setAnswerString(answerString);
-		String acceptedErrorStr = paramMap.get(AssessmentConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i);
-		if (isForSaving && !StringUtils.isBlank(acceptedErrorStr)) {
-		    float acceptedError = Float.valueOf(acceptedErrorStr);
-		    option.setAcceptedError(acceptedError);
-		} else {
-		    option.setAcceptedErrorStr(acceptedErrorStr);
+		try {
+		    float optionFloat = Float.valueOf(optionFloatStr);
+		    option.setOptionFloat(optionFloat);		    
+		} catch (Exception e) {
+		    option.setOptionFloat(0);
 		}
+		try {
+		    float acceptedError = Float.valueOf(acceptedErrorStr);
+		    option.setAcceptedError(acceptedError);	    
+		} catch (Exception e) {
+		    option.setAcceptedError(0);
+		}		
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
 		option.setGrade(grade);    
 		option.setFeedback((String) paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 		optionList.add(option);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-		String answerString = paramMap.get(AssessmentConstants.ATTR_OPTION_ANSWER_PREFIX + i);
-		if ((answerString == null) && isForSaving) {
+		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
+		if ((optionString == null) && isForSaving) {
 		    continue;
 		}
 
-		AssessmentAnswerOption option = new AssessmentAnswerOption();
+		AssessmentQuestionOption option = new AssessmentQuestionOption();
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
-		option.setAnswerString(answerString);
+		option.setOptionString(optionString);
+		option.setAnswerInt(i);
 		optionList.add(option);
 	    }
 	}
@@ -1365,7 +1366,7 @@ public class AuthoringAction extends Action {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_UNIT_LIST);
 
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_UNIT_COUNT));
-	TreeSet<AssessmentUnit> unitList = new TreeSet<AssessmentUnit>(new AssessmentUnitComparator());
+	TreeSet<AssessmentUnit> unitList = new TreeSet<AssessmentUnit>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    String unitStr = paramMap.get(AssessmentConstants.ATTR_UNIT_UNIT_PREFIX + i);
 	    if (StringUtils.isBlank(unitStr) && isForSaving) {
@@ -1396,7 +1397,7 @@ public class AuthoringAction extends Action {
     private TreeSet<AssessmentOverallFeedback> getOverallFeedbacksFromRequest(HttpServletRequest request, boolean skipBlankOverallFeedbacks) {
 	int count = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
-		new AssessmentOverallFeedbackComparator());
+		new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    String gradeBoundaryStr = request
 		    .getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i);
@@ -1429,7 +1430,7 @@ public class AuthoringAction extends Action {
 	
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
-		new AssessmentOverallFeedbackComparator());
+		new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    String gradeBoundaryStr = paramMap
 		    .get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i);

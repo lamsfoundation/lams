@@ -24,8 +24,8 @@
 	</tr>
 	<tr>			
 		<td style="padding-left:10px; border-bottom:0px; background:none;" width="622px">	
-			<input type="text" name="optionAnswer${status.index}"
-				id="optionAnswer${status.index}" size="99" value="${option.answerString}">
+			<input type="text" name="optionString${status.index}"
+				id="optionString${status.index}" size="99" value="${option.optionString}">
 		</td>									
 	</tr>
 </table>

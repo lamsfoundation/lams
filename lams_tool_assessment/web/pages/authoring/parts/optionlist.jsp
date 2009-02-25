@@ -8,12 +8,15 @@
 			<tr>
 				<td style="padding-left:10px; padding-top:15px; padding-bottom:15px;">
 					<c:choose>
-						<c:when test="${(questionType == 1) || (questionType == 3)}">
+						<c:when test="${questionType == 1}">
 							<%@ include file="option.jsp"%>
 						</c:when>
 						<c:when test="${questionType == 2}">
 							<%@ include file="matchingpairoption.jsp"%>
 						</c:when>
+						<c:when test="${questionType == 3}">
+							<%@ include file="shortansweroption.jsp"%>
+						</c:when>						
 						<c:when test="${questionType == 4}">
 							<%@ include file="numericaloption.jsp"%>
 						</c:when>	

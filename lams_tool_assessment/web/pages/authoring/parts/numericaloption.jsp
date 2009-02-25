@@ -8,8 +8,8 @@
 			</span>
 		</td>
 		<td style="padding-left:10px; border-bottom:0px; background:none;">	
-			<input type="text" name="optionAnswer${status.index}"
-				id="optionAnswer${status.index}" size="25" value="${option.answerString}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
+			<input type="text" name="optionFloat${status.index}"
+				id="optionFloat${status.index}" size="25" value="${option.optionFloat}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 		</td>									
 	</tr>
 	
@@ -21,7 +21,7 @@
 		</td>
 		<td style="padding-left:10px; border-bottom:0px; background:none;">	
 			<input type="text" name="optionAcceptedError${status.index}"
-				id="optionAcceptedError${status.index}" size="25" value="${option.acceptedErrorStr}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
+				id="optionAcceptedError${status.index}" size="25" value="${option.acceptedError}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 		</td>									
 	</tr>	
 	
@@ -32,49 +32,7 @@
 			</span>
 		</td>
 		<td style="padding-left:10px; border-bottom:0px; background:none;">
-			<html:select property="optionGrade${status.index}" style="float: left" value="${option.grade}">
-				<html:option value="100.0">100 %</html:option>
-				<html:option value="90.0">90 %</html:option>
-				<html:option value="83.333">83.333 %</html:option>
-				<html:option value="80.0">80 %</html:option>
-				<html:option value="75.0">75%</html:option>
-				<html:option value="70.0">70 %</html:option>
-				<html:option value="66.666">66.666 %</html:option>
-				<html:option value="60.0">60 %</html:option>
-				<html:option value="50.0">50 %</html:option>
-				<html:option value="40.0">40 %</html:option>
-				<html:option value="33.333">33.333 %</html:option>
-				<html:option value="30.0">30 %</html:option>
-				<html:option value="25.0">25 %</html:option>
-				<html:option value="20.0">20 %</html:option>
-				<html:option value="16.666">16.666 %</html:option>
-				<html:option value="14.2857">14.2857 %</html:option>
-				<html:option value="12.5">12.5 %</html:option>
-				<html:option value="11.111">11.111 %</html:option>
-				<html:option value="10.0">10 %</html:option>
-				<html:option value="5.0">5 %</html:option>
-				<html:option value="0.0"><fmt:message key="label.authoring.basic.none" /></html:option>
-				<html:option value="-5.0">-5 %</html:option>	
-				<html:option value="-10.0">-10 %</html:option>
-				<html:option value="-11.111">-11.111 %</html:option>
-				<html:option value="-12.5">-12.5 %</html:option>
-				<html:option value="-14.2857">-14.2857 %</html:option>
-				<html:option value="-16.666">-16.666 %</html:option>
-				<html:option value="-20.0">-20 %</html:option>
-				<html:option value="-25.0">-25 %</html:option>
-				<html:option value="-30.0">-30 %</html:option>	
-				<html:option value="-33.333">-33.333 %</html:option>
-				<html:option value="-40.0">-40 %</html:option>
-				<html:option value="-50.0">-50 %</html:option>
-				<html:option value="-60.0">-60 %</html:option>
-				<html:option value="-66.666">-66.666 %</html:option>
-				<html:option value="-70.0">-70 %</html:option>
-				<html:option value="-75.0">-75 %</html:option>	
-				<html:option value="-80.0">-80 %</html:option>
-				<html:option value="-83.333">-83.333 %</html:option>
-				<html:option value="-90.0">-90 %</html:option>
-				<html:option value="-100.0">-100 %</html:option>
-			</html:select>
+			<%@ include file="gradeselector.jsp"%>
 		</td>
 	</tr>
 	<tr>
