@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -140,7 +139,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 
 /**
@@ -1341,7 +1339,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    String fullFilePath = FileUtil.getFullPath(learningDesignPath,
 		    ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
 	    checkImportVersion(fullFilePath, toolsErrorMsgs);
-	    LearningDesignDTO ldDto = (LearningDesignDTO) getObjectFromXML(null, fullFilePath);
+	    LearningDesignDTO ldDto = (LearningDesignDTO) FileUtil.getObjectFromXML(null, fullFilePath);
 	    log.debug("Learning design xml deserialize to LearingDesignDTO success.");
 
 	    // begin tool import
@@ -1456,97 +1454,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     }
 
-    /**
-     * Call xstream to get the POJOs from the XML file. To make it backwardly compatible we catch any exceptions due to
-     * added fields, remove the field using the ToolContentVersionFilter functionality and try to reparse. We can't
-     * nominate the problem fields in advance as we are making XML created by newer versions of LAMS compatible with an
-     * older version.
-     * 
-     * This logic depends on the exception message containing the text. When we upgrade xstream, we must check that this
-     * message doesn't change.
-     * 
-     * <pre>
-     * 	com.thoughtworks.xstream.converters.ConversionException: unknownField : unknownField
-     * 	---- Debugging information ----
-     * 	required-type       : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO 
-     * 	cause-message       : unknownField : unknownField 
-     * 	class               : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO 
-     * 	message             : unknownField : unknownField 
-     * 	line number         : 15 
-     * 	path                : /org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO/unknownField 
-     * 	cause-exception     : com.thoughtworks.xstream.alias.CannotResolveClassException 
-     * 	-------------------------------
-     * </pre>
-     */
-    private Object getObjectFromXML(XStream xStream, String fullFilePath) throws JDOMException, IOException {
-
-	Reader file = null;
-	XStream conversionXml = xStream != null ? xStream : new XStream();
-	ConversionException finalException = null;
-	String lastFieldRemoved = "";
-	ToolContentVersionFilter contentFilter = null;
-	// cap the maximum number of retries to 30 - if we add more than 30 new
-	// fields then we need to rethink our
-	// strategy
-	int maxRetries = 30;
-	int numTries = 0;
-
-	while (true) {
-	    try {
-
-		if (numTries > maxRetries) {
-		    break;
-		}
-		numTries++;
-
-		file = new InputStreamReader(new FileInputStream(fullFilePath), "UTF-8");
-		return conversionXml.fromXML(file);
-
-	    } catch (ConversionException ce) {
-		log.debug("Failed import", ce);
-		finalException = ce;
-		file.close();
-
-		if (ce.getMessage() == null) {
-		    // can't retry, so get out of here!
-		    break;
-
-		} else {
-		    // try removing the field from our XML and retry
-		    String message = ce.getMessage();
-		    String classname = extractValue(message, "required-type");
-		    String fieldname = extractValue(message, "message");
-		    if (fieldname == null || fieldname.equals("")
-			    || lastFieldRemoved.equals(classname + "." + fieldname)) {
-			// can't retry, so get out of here!
-			break;
-		    } else {
-			if (contentFilter == null) {
-			    contentFilter = new ToolContentVersionFilter();
-			}
-
-			Class problemClass = getClass(classname);
-			if (problemClass == null) {
-			    // can't retry, so get out of here!
-			    break;
-			}
-
-			contentFilter.removeField(problemClass, fieldname);
-			contentFilter.transformXML(fullFilePath);
-			lastFieldRemoved = classname + "." + fieldname;
-			log.debug("Retrying import after removing field " + fieldname);
-			continue;
-		    }
-		}
-	    } finally {
-		if (file != null) {
-		    file.close();
-		}
-	    }
-	}
-	throw finalException;
-    }
-
     private void checkImportVersion(String fullFilePath, List<String> toolsErrorMsgs) throws FileNotFoundException,
 	    JDOMException {
 
@@ -1572,36 +1479,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
 		    new Object[] { versionString, currentVersionString }));
 	}
-    }
-
-    private Class getClass(String classname) {
-	try {
-	    return Class.forName(classname);
-	} catch (ClassNotFoundException e) {
-	    log.error("Trying to remove unwanted fields from import but we can't find the matching class " + classname
-		    + ". Aborting retry.", e);
-	    return null;
-	}
-    }
-
-    /**
-     * Extract the class name or field name from a ConversionException message
-     */
-    private String extractValue(String message, String fieldToLookFor) {
-	try {
-	    int startIndex = message.indexOf(fieldToLookFor);
-	    if (startIndex > -1) {
-		startIndex = message.indexOf(":", startIndex + 1);
-		if (startIndex > -1 && startIndex + 2 < message.length()) {
-		    startIndex = startIndex + 2;
-		    int endIndex = message.indexOf(" ", startIndex);
-		    String value = message.substring(startIndex, endIndex);
-		    return value.trim();
-		}
-	    }
-	} catch (ArrayIndexOutOfBoundsException e) {
-	}
-	return "";
     }
 
     private WorkspaceFolder getWorkspaceFolderForDesign(User importer, Integer workspaceFolderUid)
@@ -1664,7 +1541,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    filterClass = null;
 
 	    // read tool file after transform.
-	    toolPOJO = getObjectFromXML(toolXml, toolFilePath);
+	    toolPOJO = FileUtil.getObjectFromXML(toolXml, toolFilePath);
 
 	    // upload file node if has
 	    if (handler != null) {

@@ -14,6 +14,10 @@
 <lams:head>
 	<lams:css style="core" />
 	<style type="text/css">
+		table {
+			width: 570px;
+			margin-top: 30px;
+		}
 		table td {
 			padding: 5px;
 		}
@@ -36,7 +40,7 @@
 	
 	<html:hidden property="groupingTypeId" />
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<table style="width: 570px; margin-top: 30px" cellpadding="0" cellspacing="0">
+	<table cellpadding="0" cellspacing="0">
 		<tr>
 			<td style="width: 30%">
 				<h2><fmt:message key="label.planner.grouping.type" /></h2>
@@ -77,15 +81,27 @@
 				</tr>
 			</c:otherwise>
 		</c:choose>
-		<c:if test="${(formBean.groupingTypeId eq 4) and (empty formBean.learnersPerGroup)}">
+		<c:if test="${formBean.groupingTypeId eq 4}">
+			<c:if test="${empty formBean.learnersPerGroup}">
+				<tr>
+					<td>
+						<h2>
+							<fmt:message key="label.planner.grouping.equal.group.size" />
+						</h2>
+					</td>
+					<td>
+						<html:checkbox property="equalGroupSizes" />
+					</td>
+				</tr>
+			</c:if>
 			<tr>
 				<td>
 					<h2>
-						<fmt:message key="label.planner.grouping.equal.group.size" />
+						<fmt:message key="label.planner.grouping.view.students" />
 					</h2>
 				</td>
 				<td>
-					<html:checkbox property="equalGroupSizes"></html:checkbox>
+					<html:checkbox property="viewStudentsBeforeSelection" />
 				</td>
 			</tr>
 		</c:if>

@@ -27,6 +27,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
 
 public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
+    public final static String NODE_TYPE_SUBNODES = "subnodes";
+    public final static String NODE_TYPE_TEMPLATE = "template";
+
     private Long uid;
     private Long parentUid;
     private String contentFolderId;
@@ -35,11 +38,8 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
     private String fullDescription;
     private FormFile file;
     private Boolean removeFile;
-    private String nodeType;
+    private String nodeType = PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES;
     private Long fileUuid;
-
-    public final static String NODE_TYPE_SUBNODES = "subnodes";
-    public final static String NODE_TYPE_TEMPLATE = "template";
 
     public Long getUid() {
 	return uid;

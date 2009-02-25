@@ -41,6 +41,7 @@ public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityFo
     private String numberOfGroups;
     private String learnersPerGroup;
     private Boolean equalGroupSizes;
+    private Boolean viewStudentsBeforeSelection;
 
     public Integer getGroupingTypeId() {
 	return groupingTypeId;
@@ -87,6 +88,7 @@ public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityFo
 		setLearnersPerGroup(number);
 
 		setEqualGroupSizes(learnerChoiceGrouping.getEqualNumberOfLearnersPerGroup());
+		setViewStudentsBeforeSelection(learnerChoiceGrouping.getViewStudentsBeforeSelection());
 	    } else {
 		String numberOfGroups = grouping.getMaxNumberOfGroups() == null ? null : String.valueOf(grouping
 			.getMaxNumberOfGroups());
@@ -135,5 +137,13 @@ public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityFo
 
     public void setEqualGroupSizes(Boolean equalGroupsSizes) {
 	equalGroupSizes = equalGroupsSizes;
+    }
+
+    public Boolean getViewStudentsBeforeSelection() {
+	return viewStudentsBeforeSelection;
+    }
+
+    public void setViewStudentsBeforeSelection(Boolean viewStudentsBeforeSelection) {
+	this.viewStudentsBeforeSelection = viewStudentsBeforeSelection;
     }
 }

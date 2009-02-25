@@ -46,7 +46,7 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
     private static final String FIND_MAX_ORDER_ID = "SELECT MAX(n.order) FROM "
 	    + PedagogicalPlannerSequenceNode.class.getName() + " AS n WHERE n.parent.uid=?";
     private static final String FIND_NEIGHBOUR_NODE = "FROM " + PedagogicalPlannerSequenceNode.class.getName()
-	    + " AS n WHERE n.parent.uid=? AND n.order=?";
+	    + " AS n WHERE ((? IS NULL AND n.parent=NULL) OR  n.parent.uid=?) AND n.order=?";
 
     public PedagogicalPlannerSequenceNode getByUid(Long uid) {
 	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().get(PedagogicalPlannerSequenceNode.class, uid);
@@ -110,8 +110,7 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	Integer order = node.getOrder() + orderDelta;
 	Long parentUid = node.getParent() == null ? null : node.getParent().getUid();
 	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().find(
-		"FROM " + PedagogicalPlannerSequenceNode.class.getName()
-			+ " AS n WHERE ((? IS NULL AND n.parent=NULL) OR  n.parent.uid=?) AND n.order=?",
-		new Object[] { parentUid, parentUid, order }).get(0);
+		PedagogicalPlannerDAOHibernate.FIND_NEIGHBOUR_NODE, new Object[] { parentUid, parentUid, order })
+		.get(0);
     }
 }

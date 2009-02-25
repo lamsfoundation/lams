@@ -155,6 +155,8 @@ public class CentralConstants {
 
     public static final String PARAM_CREATE_SUBNODE = "createSubnode";
 
+    public static final String PARAM_IMPORT_NODE = "importNode";
+
     public static final String PARAM_UID = "uid";
 
     public static final String CENTRAL_TOOL_CONTENT_HANDLER_BEAN_NAME = "centralToolContentHandler";

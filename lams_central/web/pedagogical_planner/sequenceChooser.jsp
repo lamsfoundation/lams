@@ -20,7 +20,10 @@
 <body class="stripes">
 <div id="page">
 <div id="content">
+	<%-- We might need to alter that for RTL layout --%>
 	<h1 style="text-align: center" class="small-space-top"><fmt:message key="planner.title" /></h1>
+	
+	<%-- Errors are displayed at the top of the page --%>
 	<logic:messagesPresent> 
 		<p class="warning">
 			<html:messages id="error">
@@ -28,6 +31,8 @@
 		    </html:messages>
 	    </p>
 	</logic:messagesPresent>
+	
+	<%-- List of the existing nodes --%>
 	<table>
 		<tr>
 			<td colspan="2">
@@ -37,8 +42,9 @@
 					<c:param name="method" value="openSequenceNode" />
 					<c:param name="edit" value="${node.edit}" />
 				</c:url>
-				<%-- Always add root node --%>
+				<%-- Always add root node at the beginning --%>
 				<a href="${titleUrl}"><fmt:message key="label.planner.root.node" /></a> &gt;
+				
 				<%-- Iterate through subnodes, if any --%>
 				<c:forEach var="title" items="${node.titlePath}">
 					<c:url value="/pedagogicalPlanner.do" var="titleUrl">
@@ -48,6 +54,8 @@
 					</c:url>
 					<a href="${titleUrl}"><c:out value='${title[1]}' escapeXml='true' /></a> &gt;
 				</c:forEach>
+				
+				<%-- Add title (but no link) of the current node at the end --%>
 				<c:out value='${node.title}' escapeXml='true' />
 			
 				<%-- Title and full description of the node --%>
@@ -64,7 +72,10 @@
 				
 			</td>
 		</tr>
+		
+		<%-- List of subnodes --%>
 		<c:choose>
+			<%-- If the list of subnodes is empty, we display only a message --%>
 			<c:when test="${empty node.subnodes}">
 				<tr>
 					<td colspan="2" class="align-center">
@@ -80,6 +91,7 @@
 							<%-- Cell with icons (info or actions like remove node)  --%>
 							<c:choose>
 								<c:when test="${node.edit}">
+									<%-- If we are in the edit mode, we display remove and move up/down images --%>
 									<c:url value="/pedagogicalPlanner.do" var="removeNodeUrl">
 										<c:param name="method" value="removeSequenceNode" />
 										<c:param name="edit" value="true" />
@@ -115,14 +127,21 @@
 									</c:if>
 								</c:when>
 								<c:otherwise>
+									<%-- If we are not in the edit mode and the node leads to a template rather then subnodes,
+										we display an icon --%>
 									<c:if test="${not empty subnode.fileName}">
-										<img src="<lams:LAMSURL/>images/circle_filled.gif" title="<fmt:message key="msg.planner.open.template" />" />
+										<c:url var="startPreviewUrl" value="/pedagogicalPlanner.do">
+											<c:param name="method" value="startPreview" />
+											<c:param name="uid" value="${subnode.uid}" />
+										</c:url>
+										<a class="button" href="javascript:startPreview('${startPreviewUrl}')" 
+										   title="<fmt:message key="msg.planner.open.template" />"><fmt:message key="button.planner.preview" /></a>
 									</c:if>
 								</c:otherwise>
 							</c:choose>
 						</td>
 						<td>
-							<%-- Link to node and its brief description  --%>
+							<%-- Link to the subnode and its brief description below --%>
 							<c:url value="/pedagogicalPlanner.do" var="subnodeUrl">
 								<c:param name="method" value="openSequenceNode" />		
 								<c:param name="edit" value="${node.edit}" />
@@ -147,17 +166,37 @@
 			
 			<%-- Do we edit the current node or create a subnode? --%>
 			<c:choose>
+				<%-- Import node form --%>
+				<c:when test="${node.importNode}">
+					<h2 class="align-center">
+						<fmt:message key="title.import" />
+					</h2>
+					<p>
+						<fmt:message key="label.planner.import.instruction" />
+					</p>
+					<html:form styleId="nodeForm" styleClass="space-left" action="/pedagogicalPlanner" method="post" enctype="multipart/form-data">
+						<c:set var="formBean"  value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+						<input type="hidden" id="method" name="method" value="importNode" />
+						<input type="hidden" name="edit" value="true" />
+						<input type="hidden" name="importNode" value="true" />
+						<html:file property="file" size="115"/>
+						<input style="margin: 0px 0px 20px 10px;" type="submit" value="<fmt:message key="button.import" />" class="button" />
+					</html:form>
+				</c:when>
+				<%-- If the node is locked i.e. comes with LAMS distribution, we do not allow editing --%>
 				<c:when test="${not node.createSubnode and (isRootNode or node.locked)}">
 					<h3 class="align-center"><fmt:message key="msg.planner.node.locked" /></h3>
 				</c:when>
 				<c:otherwise>
 					<html:form styleId="nodeForm" styleClass="space-left" action="/pedagogicalPlanner" method="post" enctype="multipart/form-data">
 						<c:set var="formBean"  value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-						<input type="hidden" id="method" name="method" value="saveSequenceNode" />
-						<input type="hidden" id="edit" name="edit" value="true" />
+						<input type="hidden" name="method" value="saveSequenceNode" />
+						<input type="hidden" name="edit" value="true" />
 						<html:hidden property="contentFolderId"/>
 						
 						<c:choose>
+							<%-- If we are in the create subnode mode,
+								the node we edit is actually the new subnode rather the parent node itself --%>
 							<c:when test="${node.createSubnode}">
 								<input type="hidden" id="parentUid" name="parentUid" value="${node.uid}" />
 								<h2 class="align-center"><fmt:message key="label.planner.create.subnode" /></h2>
@@ -183,7 +222,12 @@
 						<html:radio property="nodeType" styleId="hasSubnodesType" onchange="javascript:onNodeTypeChange()" value="subnodes"><fmt:message key="label.planner.node.type.subnodes" /></html:radio><br />
 						<html:radio property="nodeType" onchange="onNodeTypeChange()" value="template"><fmt:message key="label.planner.node.type.template" /></html:radio>
 						
+						<%-- DIVs below are displayed/hidden depending of the subnode type:
+							 containing subnodes or opening a template --%>
 						<c:set var="hasSubnodesType" value="${formBean.nodeType eq 'subnodes'}" />
+						
+						
+						<%-- DIV with full description FCKeditor --%>
 						<div id="fullDescriptionArea" class="space-bottom"
 							<c:if test="${not hasSubnodesType}">
 								style="display: none;"
@@ -197,6 +241,8 @@
 				                width="820px" displayExpanded="false">
 							</lams:FCKEditor>
 						</div>
+						
+						<%-- DIV with "Browse" button to find the template --%>
 						<div id="fileArea" class="space-top"
 							<c:if test="${hasSubnodesType}">
 								style="display: none;"
@@ -227,6 +273,8 @@
 					</html:form>
 				</c:otherwise>
 			</c:choose>
+			
+			<%-- Buttons below --%>
 			<div id="buttonArea" class="space-top">
 				<c:url value="/pedagogicalPlanner.do" var="closeNodeEditorUrl">
 					<c:param name="method" value="openSequenceNode" />
@@ -251,6 +299,22 @@
 						<c:param name="uid" value="${node.uid}" />
 					</c:url>
 					<a class="button pedagogicalPlannerButtons" href="javascript:leaveNodeEditor(null,'${createSubnodeUrl}');"><fmt:message key="label.planner.create.subnode" /></a>
+				</c:if>
+				<c:if test="${empty node.parentUid and not empty node.uid and not node.createSubnode}">
+					<c:url value="/pedagogicalPlanner.do" var="exportNodeUrl">
+						<c:param name="method" value="exportNode" />
+						<c:param name="edit" value="true" />
+						<c:param name="uid" value="${node.uid}" />
+					</c:url>
+					<a class="button pedagogicalPlannerButtons" href="javascript:leaveNodeEditor(null,'${exportNodeUrl}');"><fmt:message key="label.planner.export" /></a>
+				</c:if>
+				<c:if test="${isRootNode}">
+					<c:url value="/pedagogicalPlanner.do" var="importNodeUrl">
+						<c:param name="method" value="openSequenceNode" />
+						<c:param name="edit" value="true" />
+						<c:param name="importNode" value="true" />
+					</c:url>
+					<a class="button pedagogicalPlannerButtons" href="javascript:leaveNodeEditor(null,'${importNodeUrl}');"><fmt:message key="label.planner.import" /></a>
 				</c:if>
 				<c:if test="${node.createSubnode or not isRootNode }">
 					<a class="button pedagogicalPlannerButtons" href="javascript:document.getElementById('nodeForm').submit()"><fmt:message key="button.planner.save.node" /></a>

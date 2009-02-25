@@ -23,15 +23,21 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.web.planner;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -76,14 +82,21 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Action managing Pedagogical Planner base page and non-tool activities.
@@ -105,6 +118,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String FILE_EXTENSION_ZIP = ".zip";
     private static final String FILE_EXTENSION_LAS = ".las";
 
+    // ActionForwards
     private static final String FORWARD_TEMPLATE = "template";
     private static final String FORWARD_PREVIEW = "preview";
     private static final String FORWARD_SEQUENCE_CHOOSER = "sequenceChooser";
@@ -123,8 +137,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static MessageService messageService;
     private static PedagogicalPlannerDAO pedagogicalPlannerDAO;
     private static ToolContentHandler contentHandler;
+    private static final String PEDAGOGICAL_PLANNER_DAO_BEAN_NAME = "pedagogicalPlannerDAO";
 
-    // Error messages used in class
+    // Keys of error messages used in this class. They are ment to be displayed for user.
     private static final String ERROR_KEY_TOOL_ERRORS = "error.planner.tools.";
     private static final String ERROR_KEY_NODE_TITLE_BLANK = "error.planner.node.title.blank";
     private static final String ERROR_KEY_REPOSITORY = "error.planner.repository";
@@ -133,7 +148,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String ERROR_KEY_FILE_OPEN = "error.planner.file.open";
     private static final String ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED = "error.planner.learning.design.retrieve";
     private static final String ERROR_KEY_EDITOR = "error.planner.editor";
+    private static final String ERROR_KEY_EXPORT = "error.planner.export";
+    private static final String ERROR_KEY_IMPORT = "error.planner.import";
 
+    // Error messages used in this class. They are ment to be thrown.
     private static final String ERROR_USER_NOT_FOUND = "User not found.";
     private static final String ERROR_NOT_PROPER_FILE = "The sequence template does not exist or is not a proper file.";
     private static final String ERROR_TOO_MANY_OPTIONS = "Number of options in options activity is limited to "
@@ -145,19 +163,37 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(PedagogicalPlannerAction.class);
 
-    private static final String PEDAGOGICAL_PLANNER_DAO_BEAN_NAME = "pedagogicalPlannerDAO";
+    // Paths used in templateBase.jsp
     private static final String IMAGE_PATH_GATE = "images/stop.gif";
     private static final String PATH_ACTIVITY_NO_PLANNER_SUPPORT = "/pedagogical_planner/defaultActivityForm.jsp";
     private static final String IMAGE_PATH_GROUPING = "images/grouping.gif";
 
+    // Parts of paths used in importing/exporting nodes
+
+    private static final String NODE_FILE_NAME = "node.xml";
+    private static final String DIR_CONTENT = "content";
+    private static final String DIR_TEMPLATES = "template";
+
+    private static final String EXPORT_NODE_FOLDER_SUFFIX = "export_node";
+    private static final String EXPORT_NODE_CONTENT_ZIP_PREFIX = "content_";
+    private static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+    private static final String RESPONSE_CONTENT_TYPE_DOWNLOAD = "application/x-download";
+    private static final String ENCODING_UTF_8 = "UTF-8";
+    private static final String DIR_UPLOADED_NODE_SUFFIX = "_uploaded_node";
+    private static final String EXPORT_NODE_ZIP_PREFIX = "lams_planner_node_";
+
+    private static final int FILE_COPY_BUFFER_SIZE = 1024;
+
     @Override
     /**
-     * Go straight to start().
+     * Go straight to open sequence node.
      */
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	return openSequenceNode(mapping, form, request, response);
     }
+
+    /*----------------------- TEMPLATE CHOOSER METHODS --------------------*/
 
     /**
      * The main method for opening and parsing template (chosen learning desing).
@@ -165,92 +201,33 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @param mapping
      * @param form
      * @param request
-     * @param response
+     * @param fileUuid
+     * @param fileName
      * @return
      * @throws ServletException
-     * @throws IOException
      */
     private ActionForward openTemplate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    Long fileUuid, String fileName) throws ServletException {
-	// Get the learning design template zip file
+
 	ActionMessages errors = new ActionMessages();
 
-	File designFile = null;
-
-	try {
-	    designFile = copyFileFromRepository(fileUuid, fileName);
-	} catch (Exception e) {
-	    PedagogicalPlannerAction.log.error(e);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
+	// Open the learning design stored in the repository.
+	LearningDesign learningDesign = importLearningDesign(fileUuid, fileName, errors);
+	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    return openSequenceNode(mapping, form, request, (Long) null);
-	}
-	if (!designFile.exists() || designFile.isDirectory()) {
-	    PedagogicalPlannerAction.log.error(PedagogicalPlannerAction.ERROR_NOT_PROPER_FILE);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
-	    saveErrors(request, errors);
-	    return openSequenceNode(mapping, form, request, (Long) null);
-	}
-
-	HttpSession session = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
-	if (user == null) {
-	    throw new ServletException(PedagogicalPlannerAction.ERROR_USER_NOT_FOUND);
-	}
-	List<String> toolsErrorMsgs = new ArrayList<String>();
-	Long learningDesignID = null;
-	LearningDesign learningDesign = null;
-	List<String> learningDesignErrorMsgs = new ArrayList<String>();
-	// Extract the template
-
-	try {
-	    Object[] ldResults = getExportService().importLearningDesign(designFile, user, null, toolsErrorMsgs, "");
-	    designFile.delete();
-	    learningDesignID = (Long) ldResults[0];
-	    learningDesignErrorMsgs = (List<String>) ldResults[1];
-	    toolsErrorMsgs = (List<String>) ldResults[2];
-	    learningDesign = getAuthoringService().getLearningDesign(learningDesignID);
-	} catch (ImportToolContentException e) {
-	    PedagogicalPlannerAction.log.error(e);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
-	    saveErrors(request, errors);
-	    return openSequenceNode(mapping, form, request, (Long) null);
-	}
-
-	if ((learningDesignID == null || learningDesignID.longValue() == -1) && learningDesignErrorMsgs.size() == 0) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
-	    saveErrors(request, errors);
-	    return openSequenceNode(mapping, form, request, (Long) null);
-	}
-	if (learningDesignErrorMsgs.size() > 0) {
-	    for (String error : learningDesignErrorMsgs) {
-		PedagogicalPlannerAction.log.error(error);
-	    }
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
-	    saveErrors(request, errors);
-	    return openSequenceNode(mapping, form, request, (Long) null);
-	}
-	if (toolsErrorMsgs.size() > 0) {
-	    for (String error : toolsErrorMsgs) {
-		PedagogicalPlannerAction.log.error(error);
-	    }
-	    errors
-		    .add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			    PedagogicalPlannerAction.ERROR_KEY_TOOL_ERRORS));
+	    // If anything goes wrong, open the root node. Errors will be displayed at top.
+	    // This approach is used widely in this action.
 	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
 
 	List<PedagogicalPlannerActivityDTO> activities = new ArrayList<PedagogicalPlannerActivityDTO>();
 
-	// create DTOs that hold all the necessary information of the activities
+	// Create DTOs that hold all the necessary information of the activities
 	Activity activity = learningDesign.getFirstActivity();
+	PedagogicalPlannerAction.log.debug("Parsing learning design activities");
 	try {
 	    while (activity != null) {
-		// Iterate through all the activities
+		// Iterate through all the activities, detecting type of each one
 		addActivityToPlanner(learningDesign, activities, activity);
 		Transition transitionTo = activity.getTransitionTo();
 		if (transitionTo == null) {
@@ -267,6 +244,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
 
+	// Recalculate how many activities actually support the planner
 	int activitySupportingPlannerCount = 0;
 	for (PedagogicalPlannerActivityDTO activityDTO : activities) {
 	    if (activityDTO.getSupportsPlanner()) {
@@ -278,7 +256,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	planner.setActivitySupportingPlannerCount(activitySupportingPlannerCount);
 	planner.setSequenceTitle(learningDesign.getTitle());
 	planner.setActivities(activities);
-	planner.setLearningDesignID(learningDesignID);
+	planner.setLearningDesignID(learningDesign.getLearningDesignId());
 
 	// Some additional options for submitting activity forms; should be moved to configuration file in the future
 	planner.setSendInPortions(false);
@@ -287,99 +265,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	request.setAttribute(CentralConstants.ATTR_PLANNER, planner);
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
-    }
-
-    /**
-     * Saves additional, non tool bound template details - currently only the title.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     */
-    public ActionForward saveSequenceDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String sequenceTitle = WebUtil.readStrParam(request, CentralConstants.PARAM_SEQUENCE_TITLE, true);
-	Long learningDesignID = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
-	Integer callAttemptedID = WebUtil.readIntParam(request, CentralConstants.PARAM_CALL_ATTEMPTED_ID);
-	// We send a message in format "<response>&<call ID>"; it is then parsed in JavaScript
-	String responseSuffix = PedagogicalPlannerAction.CHAR_AMPERSAND + callAttemptedID;
-
-	if (StringUtils.isEmpty(sequenceTitle)) {
-	    String blankTitleError = getMessageService().getMessage(CentralConstants.ERROR_PLANNER_TITLE_BLANK);
-	    writeAJAXResponse(response, blankTitleError + responseSuffix);
-	} else {
-	    LearningDesign learningDesign = getAuthoringService().getLearningDesign(learningDesignID);
-	    learningDesign.setTitle(sequenceTitle);
-	    getAuthoringService().saveLearningDesign(learningDesign);
-	    writeAJAXResponse(response, PedagogicalPlannerAction.STRING_OK + responseSuffix);
-	}
-	return null;
-    }
-
-    public ActionForward initGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	PedagogicalPlannerGroupingForm plannerForm = (PedagogicalPlannerGroupingForm) form;
-	Long groupingId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Grouping grouping = getAuthoringService().getGroupingById(groupingId);
-	plannerForm.fillForm(grouping);
-	return mapping.findForward(CentralConstants.FORWARD_GROUPING);
-    }
-
-    public ActionForward saveOrUpdateGroupingForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	PedagogicalPlannerGroupingForm plannerForm = (PedagogicalPlannerGroupingForm) form;
-	ActionMessages errors = plannerForm.validate();
-	if (errors.isEmpty()) {
-	    Grouping grouping = getAuthoringService().getGroupingById(plannerForm.getToolContentID());
-	    if (grouping.isRandomGrouping()) {
-		RandomGrouping randomGrouping = (RandomGrouping) grouping;
-		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null : Integer
-			.parseInt(plannerForm.getNumberOfGroups());
-		randomGrouping.setNumberOfGroups(number);
-
-		number = StringUtils.isEmpty(plannerForm.getLearnersPerGroup()) ? null : Integer.parseInt(plannerForm
-			.getLearnersPerGroup());
-		randomGrouping.setLearnersPerGroup(number);
-	    } else if (grouping.isLearnerChoiceGrouping()) {
-		LearnerChoiceGrouping learnerChoiceGrouping = (LearnerChoiceGrouping) grouping;
-		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null : Integer
-			.parseInt(plannerForm.getNumberOfGroups());
-		learnerChoiceGrouping.setNumberOfGroups(number);
-
-		number = StringUtils.isEmpty(plannerForm.getLearnersPerGroup()) ? null : Integer.parseInt(plannerForm
-			.getLearnersPerGroup());
-		learnerChoiceGrouping.setLearnersPerGroup(number);
-		learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(plannerForm.getEqualGroupSizes());
-	    } else {
-		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null : Integer
-			.parseInt(plannerForm.getNumberOfGroups());
-		grouping.setMaxNumberOfGroups(number);
-	    }
-	} else {
-	    saveMessages(request, errors);
-	}
-	return mapping.findForward(CentralConstants.FORWARD_GROUPING);
-    }
-
-    public ActionForward startPreview(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	Long learningDesignID = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
-	HttpSession session = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-
-	// Start preview the same way as in authoring
-	Lesson lesson = getMonitoringService().initializeLessonForPreview("Preview", null, learningDesignID,
-		userDto.getUserID(), null, false, false, false);
-	getMonitoringService().createPreviewClassForLesson(userDto.getUserID(), lesson.getLessonId());
-
-	getMonitoringService().startLesson(lesson.getLessonId(), userDto.getUserID());
-	String newPath = mapping.findForward(PedagogicalPlannerAction.FORWARD_PREVIEW).getPath();
-	newPath = newPath + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_LESSON_ID
-		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId();
-	return new ActionForward(newPath, true);
     }
 
     /**
@@ -397,6 +282,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      */
     private PedagogicalPlannerActivityDTO addActivityToPlanner(LearningDesign learningDesign,
 	    List<PedagogicalPlannerActivityDTO> activities, Activity activity) throws ServletException {
+	PedagogicalPlannerAction.log.debug("Parsing activity: " + activity.getTitle());
+
 	// Check if the activity is contained in some complex activity: branching or options
 	boolean isNested = activity.getParentActivity() != null
 		&& (activity.getParentActivity().isBranchingActivity() || activity.isOptionsActivity());
@@ -537,6 +424,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	    addedDTO.setLastNestedActivity(true);
 	} else {
+	    // If unknown/unsupported activity
 	    addedDTO = new PedagogicalPlannerActivityDTO(null, activity.getTitle(), false,
 		    PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity.getLibraryActivityUiImage(),
 		    null, null);
@@ -545,51 +433,119 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return addedDTO;
     }
 
+    /**
+     * Starts a lesson preview, both in sequence chooser and in template base.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException
+     */
+    public ActionForward startPreview(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+
+	Long learningDesignID = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID, true);
+	if (learningDesignID == null) {
+	    Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID);
+	    PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
+	    ActionMessages errors = new ActionMessages();
+	    LearningDesign learningDesign = importLearningDesign(node.getFileUuid(), node.getFileName(), errors);
+	    if (!errors.isEmpty()) {
+		ActionMessage error = (ActionMessage) errors.get().next();
+		String errorMessage = getMessageService().getMessage(error.getKey());
+		throw new ServletException(errorMessage);
+	    }
+	    learningDesignID = learningDesign.getLearningDesignId();
+	}
+	HttpSession session = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+
+	// Start preview the same way as in authoring
+	PedagogicalPlannerAction.log.debug("Opening preview for learnind design id: " + learningDesignID);
+	Lesson lesson = getMonitoringService().initializeLessonForPreview("Preview", null, learningDesignID,
+		userDto.getUserID(), null, false, false, false);
+	getMonitoringService().createPreviewClassForLesson(userDto.getUserID(), lesson.getLessonId());
+
+	getMonitoringService().startLesson(lesson.getLessonId(), userDto.getUserID());
+	String newPath = mapping.findForward(PedagogicalPlannerAction.FORWARD_PREVIEW).getPath();
+	newPath = newPath + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_LESSON_ID
+		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId();
+	return new ActionForward(newPath, true);
+    }
+
+    /**
+     * Reads UID of the node and goes straight to
+     * {@link #openSequenceNode(ActionMapping, ActionForm, HttpServletRequest, Long)}
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward openSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 	return openSequenceNode(mapping, form, request, nodeUid);
     }
 
+    /**
+     * Opens a sequence node and fill the necessary data into DTO and form.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param nodeUid
+     * @return
+     * @throws ServletException
+     */
     public ActionForward openSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    Long nodeUid) throws ServletException {
+	// Only SysAdmin can open the editor
 	Boolean isSysAdmin = request.isUserInRole(Role.SYSADMIN);
 	Boolean edit = WebUtil.readBooleanParam(request, CentralConstants.PARAM_EDIT, false);
 	edit &= isSysAdmin;
-
+	// Do we display the root (top) node or an existing one
 	PedagogicalPlannerSequenceNode node = null;
 	if (nodeUid == null) {
 	    node = getPedagogicalPlannerDAO().getRootNode();
 	} else {
 	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    if (!edit && node.getFileUuid() != null) {
+		// If we are not in the edit mode and we open a node containing a template, then we open the template
 		return openTemplate(mapping, form, request, node.getFileUuid(), node.getFileName());
 	    }
 	}
+	PedagogicalPlannerAction.log.debug("Opening sequence node with UID: " + nodeUid);
+
+	// Fill the DTO
 	List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(node);
 	PedagogicalPlannerSequenceNodeDTO dto = new PedagogicalPlannerSequenceNodeDTO(node, titlePath);
 
+	// Additional DTO parameters
 	Boolean createSubnode = WebUtil.readBooleanParam(request, CentralConstants.PARAM_CREATE_SUBNODE, false);
+	Boolean importNode = WebUtil.readBooleanParam(request, CentralConstants.PARAM_IMPORT_NODE, false);
 	dto.setCreateSubnode(createSubnode);
 	dto.setEdit(edit);
 	dto.setIsSysAdmin(isSysAdmin);
+	dto.setImportNode(importNode);
 
 	request.setAttribute(CentralConstants.ATTR_NODE, dto);
 
 	if (edit) {
+	    // If we are in edit mode, the node form is displayed, requiring additional parameters
 	    PedagogicalPlannerSequenceNodeForm nodeForm = (PedagogicalPlannerSequenceNodeForm) form;
-	    nodeForm.setNodeType(node.getFileName() == null ? PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES
-		    : PedagogicalPlannerSequenceNodeForm.NODE_TYPE_TEMPLATE);
-	    nodeForm.setRemoveFile(false);
-	    nodeForm.setTitle(dto.getTitle());
-	    nodeForm.setBriefDescription(dto.getBriefDescription());
-	    nodeForm.setFullDescription(dto.getFullDescription());
-	    nodeForm.setFileUuid(node.getFileUuid());
 
 	    if (createSubnode) {
-		if (node.getParent() == null) {
+		// We create a new node, rather than edit the existing one
+		if (node.getContentFolderId() == null) {
 		    try {
-			String contentFolderId = getAuthoringService().generateUniqueContentFolder();
+			// If it's a new top level node, we create an uniuqe ID
+			String contentFolderId = FileUtil.generateUniqueContentFolderID();
 			nodeForm.setContentFolderId(contentFolderId);
 		    } catch (Exception e) {
 			PedagogicalPlannerAction.log.error(e);
@@ -602,13 +558,34 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 			return openSequenceNode(mapping, form, request, (Long) null);
 		    }
 		} else {
-		    nodeForm.setContentFolderId(node.getParent().getContentFolderId());
+		    // Whole node tree share the same content folder ID
+		    nodeForm.setContentFolderId(node.getContentFolderId());
 		}
+	    } else if (!importNode) {
+		// We fill the form with necessary data
+		nodeForm.setNodeType(node.getFileName() == null ? PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES
+			: PedagogicalPlannerSequenceNodeForm.NODE_TYPE_TEMPLATE);
+		nodeForm.setRemoveFile(false);
+		nodeForm.setTitle(dto.getTitle());
+		nodeForm.setBriefDescription(dto.getBriefDescription());
+		nodeForm.setFullDescription(dto.getFullDescription());
+		nodeForm.setFileUuid(node.getFileUuid());
 	    }
 	}
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_SEQUENCE_CHOOSER);
     }
 
+    /**
+     * Saves the created/edited sequence node.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward saveSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
@@ -616,6 +593,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	PedagogicalPlannerSequenceNodeForm nodeForm = (PedagogicalPlannerSequenceNodeForm) form;
 
 	if (nodeUid == null) {
+	    // It's a new subnode
 	    node = new PedagogicalPlannerSequenceNode();
 	    Long parentUid = nodeForm.getParentUid() == 0 ? null : nodeForm.getParentUid();
 	    if (parentUid != null) {
@@ -624,10 +602,13 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	    node.setOrder(getPedagogicalPlannerDAO().getNextOrderId(parentUid));
 	} else {
+	    // It's an existing node
 	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    nodeUid = node.getUid();
 	}
+	PedagogicalPlannerAction.log.debug("Saving sequence node with UID: " + nodeUid);
 
+	// If anything goes wrong, we need to put back these values
 	String title = nodeForm.getTitle();
 	String briefDescription = nodeForm.getBriefDescription();
 	String fullDescription = nodeForm.getFullDescription();
@@ -640,6 +621,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		node.setBriefDescription(briefDescription);
 		node.setContentFolderId(nodeForm.getContentFolderId());
 
+		// Different properties are set, depending on node type: with subnodes or template
 		if (PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES.equals(nodeForm.getNodeType())) {
 		    if (node.getFileUuid() != null) {
 			getContentHandler().deleteFile(node.getFileUuid());
@@ -652,22 +634,35 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    node.setFileName(null);
 		    node.setFileUuid(null);
 		    node.setFullDescription(null);
-		} else if (nodeForm.getFile() != null) {
+		} else if (nodeForm.getFile() != null && nodeForm.getFile().getFileSize() > 0) {
 		    FormFile file = nodeForm.getFile();
 		    InputStream inputStream = file.getInputStream();
 		    String fileName = file.getFileName();
 		    String type = file.getContentType();
+
+		    PedagogicalPlannerAction.log.debug("Uploading to repository file: " + fileName);
+		    // Upload to repository
 		    NodeKey nodeKey = getContentHandler().uploadFile(inputStream, fileName, type,
 			    IToolContentHandler.TYPE_OFFLINE);
 		    if (node.getFileUuid() != null) {
 			getContentHandler().deleteFile(node.getFileUuid());
 		    }
+
+		    // If there were subnodes, we delete them now
+		    Iterator<PedagogicalPlannerSequenceNode> subnodeIter = node.getSubnodes().iterator();
+		    while (subnodeIter.hasNext()) {
+			PedagogicalPlannerSequenceNode subnode = subnodeIter.next();
+			subnodeIter.remove();
+			getPedagogicalPlannerDAO().removeNode(subnode);
+		    }
+
 		    node.setFileUuid(nodeKey.getUuid());
 		    node.setFileName(fileName);
 		    node.setFullDescription(null);
 		}
 
 		getPedagogicalPlannerDAO().saveOrUpdateNode(node);
+		// If it was a new subnode, we need to retrieved the assigned UID
 		nodeUid = node.getUid();
 
 	    } catch (RepositoryCheckedException e) {
@@ -676,11 +671,15 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		PedagogicalPlannerAction.log.error(e);
 	    }
 	}
+
+	// If something went wrong and the new subnode was not saved,
+	// we need to inform the following method of that fact
 	boolean createSubnode = false;
 	if (nodeUid == null) {
 	    nodeUid = node.getParent() == null ? null : node.getParent().getUid();
 	    createSubnode = true;
 	}
+	// Set the parameters, but do not return yet
 	openSequenceNode(mapping, form, request, nodeUid);
 
 	if (!errors.isEmpty()) {
@@ -698,44 +697,75 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_SEQUENCE_CHOOSER);
     }
 
+    /**
+     * Validates node form fields.
+     * 
+     * @param node
+     * @param form
+     * @return
+     */
     private ActionMessages validateNodeForm(PedagogicalPlannerSequenceNode node, PedagogicalPlannerSequenceNodeForm form) {
 	ActionMessages errors = new ActionMessages();
+	// Title must not be blank
 	if (StringUtils.isEmpty(form.getTitle())) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 		    PedagogicalPlannerAction.ERROR_KEY_NODE_TITLE_BLANK));
 	}
+	// Template must a proper file
 	if (PedagogicalPlannerSequenceNodeForm.NODE_TYPE_TEMPLATE.equals(form.getNodeType())
 		&& node.getFileName() == null) {
-	    if (form.getFile() == null || form.getFile().getFileSize() == 0) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			PedagogicalPlannerAction.ERROR_KEY_FILE_EMPTY));
-	    } else {
-		String fileName = form.getFile().getFileName();
-		boolean badExtension = false;
-		if (fileName.length() >= 4) {
-		    String extension = fileName.substring(fileName.length() - 4);
-		    if (!(extension.equalsIgnoreCase(PedagogicalPlannerAction.FILE_EXTENSION_LAS) || extension
-			    .equalsIgnoreCase(PedagogicalPlannerAction.FILE_EXTENSION_ZIP))) {
-			badExtension = true;
-		    }
-		} else {
+	    errors.add(validateFormFile(form));
+	}
+	return errors;
+    }
+
+    /**
+     * Validates form file. Used both for templates and exported nodes.
+     * 
+     * @param form
+     * @return
+     */
+    private ActionMessages validateFormFile(PedagogicalPlannerSequenceNodeForm form) {
+	ActionMessages errors = new ActionMessages();
+	if (form.getFile() == null || form.getFile().getFileSize() == 0) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_EMPTY));
+	} else {
+	    String fileName = form.getFile().getFileName();
+	    boolean badExtension = false;
+	    if (fileName.length() >= 4) {
+		String extension = fileName.substring(fileName.length() - 4);
+		if (!(extension.equalsIgnoreCase(PedagogicalPlannerAction.FILE_EXTENSION_LAS) || extension
+			.equalsIgnoreCase(PedagogicalPlannerAction.FILE_EXTENSION_ZIP))) {
 		    badExtension = true;
 		}
-		if (badExtension) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			    PedagogicalPlannerAction.ERROR_KEY_FILE_BAD_EXTENSION));
-		}
-
+	    } else {
+		badExtension = true;
+	    }
+	    if (badExtension) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			PedagogicalPlannerAction.ERROR_KEY_FILE_BAD_EXTENSION));
 	    }
 	}
 	return errors;
     }
 
+    /**
+     * Removes the selected node and all of its subnodes
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
     public ActionForward removeSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID);
 	PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	Long parentUid = node.getParent() == null ? null : node.getParent().getUid();
+	PedagogicalPlannerAction.log.debug("Removing sequence node with UID" + nodeUid);
 	getPedagogicalPlannerDAO().removeNode(node);
 	return openSequenceNode(mapping, form, request, parentUid);
     }
@@ -767,11 +797,359 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return openSequenceNode(mapping, form, request, parentUid);
     }
 
-    private File copyFileFromRepository(Long fileUuid, String fileName) throws RepositoryCheckedException, IOException {
-	InputStream inputStream = getContentHandler().getFileNode(fileUuid).getFile();
-	File file = new File(FileUtil.TEMP_DIR, fileName);
-	FileOutputStream fileOutputStream = new FileOutputStream(file);
-	byte[] data = new byte[1024];
+    /**
+     * Exports the selected node to a ZIP file. Method is based on a similar one for exporting learning designs.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException
+     * @throws IOException
+     */
+    public ActionForward exportNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException {
+	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID);
+	ActionMessages errors = new ActionMessages();
+
+	PedagogicalPlannerAction.log.debug("Exporting sequence node with UID" + nodeUid);
+	String zipFilePath = null;
+	// Different browsers handle stream downloads differently LDEV-1243
+	String filename = null;
+	try {
+	    zipFilePath = exportNode(nodeUid);
+
+	    // get only filename
+	    String zipfile = FileUtil.getFileName(zipFilePath);
+
+	    // replace spaces (" ") with underscores ("_")
+
+	    zipfile = zipfile.replaceAll(" ", "_");
+
+	    // write zip file as response stream.
+
+	    filename = FileUtil.encodeFilenameForDownload(request, zipfile);
+
+	    PedagogicalPlannerAction.log.debug("Final filename to export: " + filename);
+
+	    response.setContentType(PedagogicalPlannerAction.RESPONSE_CONTENT_TYPE_DOWNLOAD);
+	    // response.setContentType("application/zip");
+	    response.setHeader(PedagogicalPlannerAction.HEADER_CONTENT_DISPOSITION, "attachment;filename=" + filename);
+	} catch (Exception e) {
+	    PedagogicalPlannerAction.log.error(e);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_EXPORT));
+	    saveErrors(request, errors);
+	    return openSequenceNode(mapping, form, request, nodeUid);
+	}
+	InputStream in = null;
+	ServletOutputStream out = null;
+	try {
+	    in = new BufferedInputStream(new FileInputStream(zipFilePath));
+	    out = response.getOutputStream();
+	    int count = 0;
+
+	    int ch;
+	    while ((ch = in.read()) != -1) {
+		out.write((char) ch);
+		count++;
+	    }
+	    PedagogicalPlannerAction.log.debug("Wrote out " + count + " bytes");
+	    response.setContentLength(count);
+	    out.flush();
+	} finally {
+	    /*
+	     * If anything goes wrong, we can not display it nicely for the user. Once response.getOutputStream() was
+	     * called to write the file data, we can not forward to a JSP page anymore. Maybe there is a way to avoid
+	     * it, but currently we are simply throwing an error. So no "catch" clause.
+	     */
+	    if (in != null) {
+		in.close(); // very important
+	    }
+	}
+	return null;
+    }
+
+    /**
+     * The proper method for exporting nodes.
+     * 
+     * @param nodeUid
+     * @return
+     * @throws ZipFileUtilException
+     * @throws FileUtilException
+     * @throws IOException
+     * @throws RepositoryCheckedException
+     */
+    private String exportNode(Long nodeUid) throws ZipFileUtilException, FileUtilException, IOException,
+	    RepositoryCheckedException {
+	if (nodeUid != null) {
+
+	    String rootDir = FileUtil.createTempDirectory(PedagogicalPlannerAction.EXPORT_NODE_FOLDER_SUFFIX);
+	    String contentDir = FileUtil.getFullPath(rootDir, PedagogicalPlannerAction.DIR_CONTENT);
+	    FileUtil.createDirectory(contentDir);
+
+	    String nodeFileName = FileUtil.getFullPath(contentDir, PedagogicalPlannerAction.NODE_FILE_NAME);
+	    Writer nodeFile = new OutputStreamWriter(new FileOutputStream(nodeFileName),
+		    PedagogicalPlannerAction.ENCODING_UTF_8);
+
+	    PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
+	    // exporting XML
+	    XStream designXml = new XStream();
+	    designXml.toXML(node, nodeFile);
+	    nodeFile.close();
+
+	    PedagogicalPlannerAction.log.debug("Node xml export success");
+
+	    // Copy templates' ZIP files from repository
+	    File templateDir = new File(contentDir, PedagogicalPlannerAction.DIR_TEMPLATES);
+	    exportSubnodeTemplates(node, templateDir);
+
+	    // create zip file for fckeditor unique content folder
+	    String targetZipFileName = PedagogicalPlannerAction.EXPORT_NODE_CONTENT_ZIP_PREFIX
+		    + node.getContentFolderId() + PedagogicalPlannerAction.FILE_EXTENSION_ZIP;
+	    String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
+		    + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
+	    String nodeContentDir = FileUtil.getFullPath(secureDir, node.getContentFolderId());
+
+	    if (!FileUtil.isEmptyDirectory(nodeContentDir, true)) {
+		PedagogicalPlannerAction.log.debug("Create export node content target zip file. File name is "
+			+ targetZipFileName);
+		ZipFileUtil.createZipFile(targetZipFileName, nodeContentDir, contentDir);
+	    } else {
+		PedagogicalPlannerAction.log.debug("No such directory (or empty directory): " + nodeContentDir);
+	    }
+
+	    // zip file name with full path
+	    targetZipFileName = PedagogicalPlannerAction.EXPORT_NODE_ZIP_PREFIX + node.getTitle()
+		    + PedagogicalPlannerAction.FILE_EXTENSION_ZIP;
+	    ;
+	    PedagogicalPlannerAction.log
+		    .debug("Create export node content zip file. File name is " + targetZipFileName);
+	    // create zip file and return zip full file name
+	    return ZipFileUtil.createZipFile(targetZipFileName, contentDir, rootDir);
+	}
+	return null;
+    }
+
+    /**
+     * Imports a zipped node. Thi method is based on a similar one for importing learning designs.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException
+     */
+    public ActionForward importNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+
+	PedagogicalPlannerSequenceNodeForm nodeForm = (PedagogicalPlannerSequenceNodeForm) form;
+	ActionMessages errors = validateFormFile(nodeForm);
+
+	if (errors.isEmpty()) {
+	    try {
+		String uploadPath = FileUtil.createTempDirectory(PedagogicalPlannerAction.DIR_UPLOADED_NODE_SUFFIX);
+		String fileName = nodeForm.getFile().getFileName();
+		File importFile = new File(uploadPath + fileName);
+		PedagogicalPlannerAction.log.debug("Importing a node from file: " + fileName);
+
+		// Copy the submitted file to the hard drive
+		InputStream inputStream = nodeForm.getFile().getInputStream();
+		copyFileFromRepository(inputStream, importFile);
+
+		nodeForm.setFile(null);
+
+		String rootPath = ZipFileUtil.expandZip(new FileInputStream(importFile), fileName);
+		String nodeFilePath = FileUtil.getFullPath(rootPath, PedagogicalPlannerAction.NODE_FILE_NAME);
+
+		PedagogicalPlannerSequenceNode node = (PedagogicalPlannerSequenceNode) FileUtil.getObjectFromXML(null,
+			nodeFilePath);
+
+		// begin fckeditor content folder import
+		String contentZipFileName = PedagogicalPlannerAction.EXPORT_NODE_CONTENT_ZIP_PREFIX
+			+ node.getContentFolderId() + PedagogicalPlannerAction.FILE_EXTENSION_ZIP;
+		String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
+			+ FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator
+			+ node.getContentFolderId();
+		File contentZipFile = new File(FileUtil.getFullPath(rootPath, contentZipFileName));
+
+		// unzip file to target secure dir if exists
+		if (contentZipFile.exists()) {
+		    InputStream is = new FileInputStream(contentZipFile);
+		    ZipFileUtil.expandZipToFolder(is, secureDir);
+		}
+
+		// Upload the template files back into the repository
+		File templateDir = new File(rootPath, PedagogicalPlannerAction.DIR_TEMPLATES);
+		importSubnodeTemplates(node, templateDir);
+
+		// The imported node is added as the last one
+		Integer order = getPedagogicalPlannerDAO().getNextOrderId(null);
+		node.setOrder(order);
+		getPedagogicalPlannerDAO().saveOrUpdateNode(node);
+	    } catch (Exception e) {
+		PedagogicalPlannerAction.log.error(e);
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_IMPORT));
+	    }
+	}
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	}
+	return openSequenceNode(mapping, form, request, (Long) null);
+    }
+
+    /**
+     * Imports a learning design for edit/preview template purposes.
+     * 
+     * @param fileUuid
+     * @param fileName
+     * @param errors
+     * @return
+     * @throws ServletException
+     */
+    private LearningDesign importLearningDesign(Long fileUuid, String fileName, ActionMessages errors)
+	    throws ServletException {
+	File designFile = null;
+	try {
+	    designFile = new File(FileUtil.TEMP_DIR, fileName);
+	    InputStream inputStream = getContentHandler().getFileNode(fileUuid).getFile();
+	    copyFileFromRepository(inputStream, designFile);
+	} catch (Exception e) {
+	    PedagogicalPlannerAction.log.error(e);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
+	    return null;
+	}
+	if (!designFile.exists() || designFile.isDirectory()) {
+	    PedagogicalPlannerAction.log.error(PedagogicalPlannerAction.ERROR_NOT_PROPER_FILE);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
+	    return null;
+	}
+
+	HttpSession session = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
+	if (user == null) {
+	    throw new ServletException(PedagogicalPlannerAction.ERROR_USER_NOT_FOUND);
+	}
+	List<String> toolsErrorMsgs = new ArrayList<String>();
+	Long learningDesignID = null;
+	LearningDesign learningDesign = null;
+	List<String> learningDesignErrorMsgs = new ArrayList<String>();
+	// Extract the template
+
+	try {
+	    Object[] ldResults = getExportService().importLearningDesign(designFile, user, null, toolsErrorMsgs, "");
+	    designFile.delete();
+	    learningDesignID = (Long) ldResults[0];
+	    learningDesignErrorMsgs = (List<String>) ldResults[1];
+	    toolsErrorMsgs = (List<String>) ldResults[2];
+	    learningDesign = getAuthoringService().getLearningDesign(learningDesignID);
+	} catch (ImportToolContentException e) {
+	    PedagogicalPlannerAction.log.error(e);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+
+	}
+
+	if ((learningDesignID == null || learningDesignID.longValue() == -1) && learningDesignErrorMsgs.size() == 0) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    return null;
+	}
+	if (learningDesignErrorMsgs.size() > 0) {
+	    for (String error : learningDesignErrorMsgs) {
+		PedagogicalPlannerAction.log.error(error);
+	    }
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    return null;
+	}
+	if (toolsErrorMsgs.size() > 0) {
+	    for (String error : toolsErrorMsgs) {
+		PedagogicalPlannerAction.log.error(error);
+	    }
+	    errors
+		    .add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			    PedagogicalPlannerAction.ERROR_KEY_TOOL_ERRORS));
+	    return null;
+	}
+	return learningDesign;
+    }
+
+    /**
+     * Copies the template files from repository into the selected dir.
+     * 
+     * @param node
+     * @param outputDir
+     * @throws RepositoryCheckedException
+     * @throws IOException
+     */
+    private void exportSubnodeTemplates(PedagogicalPlannerSequenceNode node, File outputDir)
+	    throws RepositoryCheckedException, IOException {
+	if (node != null) {
+	    if (node.getFileUuid() == null) {
+		if (node.getSubnodes() != null) {
+		    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
+			exportSubnodeTemplates(subnode, outputDir);
+		    }
+		}
+	    } else {
+		File uuidDir = new File(outputDir, node.getFileUuid().toString());
+		uuidDir.mkdirs();
+		File targetFile = new File(uuidDir, node.getFileName());
+		InputStream inputStream = getContentHandler().getFileNode(node.getFileUuid()).getFile();
+		PedagogicalPlannerAction.log.debug("Preparing for zipping the template file: " + node.getFileName());
+		copyFileFromRepository(inputStream, targetFile);
+	    }
+	}
+    }
+
+    /**
+     * Uploads the templates back into repository. Also sets all the nodes' UIDs to NULL.
+     * 
+     * @param node
+     * @param inputDir
+     * @throws RepositoryCheckedException
+     * @throws IOException
+     */
+    private void importSubnodeTemplates(PedagogicalPlannerSequenceNode node, File inputDir)
+	    throws RepositoryCheckedException, IOException {
+	if (node != null) {
+	    node.setUid(null);
+
+	    if (node.getFileUuid() == null) {
+		if (node.getSubnodes() != null) {
+		    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
+			importSubnodeTemplates(subnode, inputDir);
+		    }
+		}
+	    } else {
+		File uuidDir = new File(inputDir, node.getFileUuid().toString());
+		File file = new File(uuidDir, node.getFileName());
+		InputStream inputStream = new FileInputStream(file);
+		String fileName = node.getFileName();
+		PedagogicalPlannerAction.log.debug("Uploading into repository a template file: " + fileName);
+		NodeKey nodeKey = getContentHandler().uploadFile(inputStream, fileName,
+			PedagogicalPlannerAction.RESPONSE_CONTENT_TYPE_DOWNLOAD, IToolContentHandler.TYPE_OFFLINE);
+		node.setFileUuid(nodeKey.getUuid());
+	    }
+	}
+    }
+
+    /**
+     * Copies a file using the provided input stream.
+     * 
+     * @param inputStream
+     * @param targetFile
+     * @throws RepositoryCheckedException
+     * @throws IOException
+     */
+    private void copyFileFromRepository(InputStream inputStream, File targetFile) throws RepositoryCheckedException,
+	    IOException {
+
+	FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
+	byte[] data = new byte[PedagogicalPlannerAction.FILE_COPY_BUFFER_SIZE];
 	int read = 0;
 	do {
 	    read = inputStream.read(data);
@@ -781,8 +1159,103 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	} while (read > 0);
 	fileOutputStream.close();
 	inputStream.close();
-	return file;
     }
+
+    /*----------------------- GROUPING METHODS -------------------------*/
+
+    /**
+     * Fill the grouping with initial data
+     */
+    public ActionForward initGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	PedagogicalPlannerGroupingForm plannerForm = (PedagogicalPlannerGroupingForm) form;
+	Long groupingId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Grouping grouping = getAuthoringService().getGroupingById(groupingId);
+	plannerForm.fillForm(grouping);
+	return mapping.findForward(CentralConstants.FORWARD_GROUPING);
+    }
+
+    /**
+     * Saves parameters of the grouping form, depending on the grouping type.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward saveOrUpdateGroupingForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	PedagogicalPlannerAction.log.debug("Saving grouping activity");
+	PedagogicalPlannerGroupingForm plannerForm = (PedagogicalPlannerGroupingForm) form;
+	ActionMessages errors = plannerForm.validate();
+	if (errors.isEmpty()) {
+	    Grouping grouping = getAuthoringService().getGroupingById(plannerForm.getToolContentID());
+	    if (grouping.isRandomGrouping()) {
+		RandomGrouping randomGrouping = (RandomGrouping) grouping;
+		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null : Integer
+			.parseInt(plannerForm.getNumberOfGroups());
+		randomGrouping.setNumberOfGroups(number);
+
+		number = StringUtils.isEmpty(plannerForm.getLearnersPerGroup()) ? null : Integer.parseInt(plannerForm
+			.getLearnersPerGroup());
+		randomGrouping.setLearnersPerGroup(number);
+	    } else if (grouping.isLearnerChoiceGrouping()) {
+		LearnerChoiceGrouping learnerChoiceGrouping = (LearnerChoiceGrouping) grouping;
+		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null : Integer
+			.parseInt(plannerForm.getNumberOfGroups());
+		learnerChoiceGrouping.setNumberOfGroups(number);
+
+		number = StringUtils.isEmpty(plannerForm.getLearnersPerGroup()) ? null : Integer.parseInt(plannerForm
+			.getLearnersPerGroup());
+		learnerChoiceGrouping.setLearnersPerGroup(number);
+		learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(plannerForm.getEqualGroupSizes());
+		learnerChoiceGrouping.setViewStudentsBeforeSelection(plannerForm.getViewStudentsBeforeSelection());
+	    } else {
+		Integer number = StringUtils.isEmpty(plannerForm.getNumberOfGroups()) ? null : Integer
+			.parseInt(plannerForm.getNumberOfGroups());
+		grouping.setMaxNumberOfGroups(number);
+	    }
+	} else {
+	    saveMessages(request, errors);
+	}
+	return mapping.findForward(CentralConstants.FORWARD_GROUPING);
+    }
+
+    /*-------------------------- TEMPLATE BASE METHODS -----------------*/
+
+    /**
+     * Saves additional, non tool-bound template details - currently only the title.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    public ActionForward saveSequenceDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	PedagogicalPlannerAction.log.debug("Saving sequence title");
+	String sequenceTitle = WebUtil.readStrParam(request, CentralConstants.PARAM_SEQUENCE_TITLE, true);
+	Long learningDesignID = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+	Integer callAttemptedID = WebUtil.readIntParam(request, CentralConstants.PARAM_CALL_ATTEMPTED_ID);
+	// We send a message in format "<response>&<call ID>"; it is then parsed in JavaScript
+	String responseSuffix = PedagogicalPlannerAction.CHAR_AMPERSAND + callAttemptedID;
+
+	if (StringUtils.isEmpty(sequenceTitle)) {
+	    String blankTitleError = getMessageService().getMessage(CentralConstants.ERROR_PLANNER_TITLE_BLANK);
+	    writeAJAXResponse(response, blankTitleError + responseSuffix);
+	} else {
+	    LearningDesign learningDesign = getAuthoringService().getLearningDesign(learningDesignID);
+	    learningDesign.setTitle(sequenceTitle);
+	    getAuthoringService().saveLearningDesign(learningDesign);
+	    writeAJAXResponse(response, PedagogicalPlannerAction.STRING_OK + responseSuffix);
+	}
+	return null;
+    }
+
+    /*------------------------ SERVICE ACCESS METHODS --------------------*/
 
     private IExportToolContentService getExportService() {
 	if (PedagogicalPlannerAction.exportService == null) {

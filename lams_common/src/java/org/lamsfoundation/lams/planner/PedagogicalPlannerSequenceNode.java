@@ -102,7 +102,7 @@ public class PedagogicalPlannerSequenceNode {
 	this.fileName = fileName;
     }
 
-    private void setUid(Long uid) {
+    public void setUid(Long uid) {
 	this.uid = uid;
     }
 

@@ -534,8 +534,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 
 	if (design != null) { /*
-	 * only the user who is editing the design may unlock it
-	 */
+				 * only the user who is editing the design may unlock it
+				 */
 	    if (design.getEditOverrideUser().equals(user)) {
 		design.setEditOverrideLock(false);
 		design.setEditOverrideUser(null);
@@ -1363,17 +1363,18 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	HashSet<Competence> newCompeteces = new HashSet<Competence>();
 
 	Set<Competence> oldCompetences = originalLearningDesign.getCompetences();
-	for (Competence competence : oldCompetences) {
-	    Competence newCompetence = competence.createCopy(competence);
-	    newCompetence.setLearningDesign(newLearningDesign);
+	if (oldCompetences != null) {
+	    for (Competence competence : oldCompetences) {
+		Competence newCompetence = competence.createCopy(competence);
+		newCompetence.setLearningDesign(newLearningDesign);
 
-	    // check for existing competences to prevent duplicates
-	    if (competenceDAO.getCompetence(newLearningDesign, newCompetence.getTitle()) == null) {
-		competenceDAO.saveOrUpdate(newCompetence);
+		// check for existing competences to prevent duplicates
+		if (competenceDAO.getCompetence(newLearningDesign, newCompetence.getTitle()) == null) {
+		    competenceDAO.saveOrUpdate(newCompetence);
+		}
+		newCompeteces.add(newCompetence);
 	    }
-	    newCompeteces.add(newCompetence);
 	}
-
 	if (newLearningDesign.getCompetences() != null) {
 	    if (!insert) {
 		newLearningDesign.getCompetences().clear();

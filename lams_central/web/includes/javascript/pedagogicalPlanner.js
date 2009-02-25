@@ -138,7 +138,7 @@
   	if (sequenceDetailsValid &&  activitiesValid==activitiesResponded){
   	   	$('#pedagogicalPlannerInfoArea').show();
   	   	if (actionAfterCompleted==ACTION_PREVIEW){
-  	   		window.open(startPreviewUrl,'Preview','width=800,height=600,scrollbars=yes,resizable=yes');
+  	   		startPreview(startPreviewUrl);
   	   	}
   	   	else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
   	   		 window.resizeTo(authoring_width,authoring_height);
@@ -152,6 +152,10 @@
   		$('#pedagogicalPlannerErrorArea').show();
   	}
    }
+  }
+  
+  function startPreview(url){
+  	window.open(url,'Preview','width=800,height=600,scrollbars=yes,resizable=yes');
   }
   
   function closePlanner(text){
@@ -179,4 +183,6 @@
   		document.getElementById("fullDescriptionArea").style.display="none";
   		document.getElementById("fileArea").style.display="block";
   	}
+  	
+  	
   }  

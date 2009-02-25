@@ -294,6 +294,11 @@
 
    </servlet>
    <servlet>
+      <servlet-name>GetRecordingServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.webservice.GetRecordingServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>copyMultipleToolContent</servlet-name>
       <servlet-class>org.lamsfoundation.lams.authoring.web.CopyMultipleToolContentServlet</servlet-class>
 
@@ -491,6 +496,10 @@
    <servlet-mapping>
       <servlet-name>storeNotebookEntry</servlet-name>
       <url-pattern>/servlet/notebook/storeNotebookEntry</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>GetRecordingServlet</servlet-name>
+      <url-pattern>/GetRecording</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>copyMultipleToolContent</servlet-name>

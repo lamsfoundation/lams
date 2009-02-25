@@ -165,6 +165,7 @@
 				<include name="*.properties"/>
 				<include name="struts/**"/>
 				<include name="jstl/**"/>
+				<include name="fckeditor/**"/>
 				<include name="tiles/**"/>
 				<exclude name="web.xml"/>
 			</webinf>

@@ -42,6 +42,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
     private Boolean edit = false;
     private Boolean createSubnode = false;
     private Boolean isSysAdmin = true;
+    private Boolean importNode = false;
 
     public PedagogicalPlannerSequenceNodeDTO() {
     }
@@ -163,5 +164,13 @@ public class PedagogicalPlannerSequenceNodeDTO {
 
     public void setIsSysAdmin(Boolean isSysAdmin) {
 	this.isSysAdmin = isSysAdmin;
+    }
+
+    public Boolean getImportNode() {
+	return importNode;
+    }
+
+    public void setImportNode(Boolean importNode) {
+	this.importNode = importNode;
     }
 }
