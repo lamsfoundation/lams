@@ -47,11 +47,6 @@ public class AssessmentAttachment implements Cloneable {
     private String fileName;
     private Date created;
 
-    // Default contruction method
-    public AssessmentAttachment() {
-
-    }
-
     // **********************************************************
     // Function method for Attachment
     // **********************************************************

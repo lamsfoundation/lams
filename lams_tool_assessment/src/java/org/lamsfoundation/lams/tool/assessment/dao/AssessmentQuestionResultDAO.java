@@ -26,13 +26,11 @@ package org.lamsfoundation.lams.tool.assessment.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionVisitLog;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 
-public interface AssessmentQuestionVisitDAO extends DAO {
+public interface AssessmentQuestionResultDAO extends DAO {
 
-    public AssessmentQuestionVisitLog getAssessmentQuestionLog(Long questionUid, Long userId);
-
-    public int getUserViewLogCount(Long sessionId, Long userUid);
+    public AssessmentQuestionResult getAssessmentQuestionResult(Long questionUid, Long userId);
 
     /**
      * Return list which contains key pair which key is assessment question uid, value is number view.
@@ -42,6 +40,6 @@ public interface AssessmentQuestionVisitDAO extends DAO {
      */
     public Map<Long, Integer> getSummary(Long contentId);
 
-    public List<AssessmentQuestionVisitLog> getAssessmentQuestionLogBySession(Long sessionId, Long questionUid);
+    public List<AssessmentQuestionResult> getAssessmentQuestionResultBySession(Long sessionId, Long questionUid);
 
 }

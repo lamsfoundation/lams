@@ -25,22 +25,26 @@ package org.lamsfoundation.lams.tool.assessment.util;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswerOption;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+import org.lamsfoundation.lams.tool.assessment.model.Sequencable;
  
 /**
+ * AssessmentQuestionResultComparator.
  * 
  * @author Andrey Balan
  * 
  */
-public class AssessmentAnswerOptionComparator implements Comparator<AssessmentAnswerOption> {
+public class AssessmentQuestionResultComparator implements Comparator<AssessmentQuestionResult> {
 
-    public int compare(AssessmentAnswerOption o1, AssessmentAnswerOption o2) {
-	if (o1 != null && o2 != null) {
-	    return o1.getSequenceId() - o2.getSequenceId();
-	} else if (o1 != null)
+    public int compare(AssessmentQuestionResult o1, AssessmentQuestionResult o2) {
+	if ((o1 != null) && (o2 != null)) {
+	    return o1.getAssessmentQuestion().getSequenceId() - o2.getAssessmentQuestion().getSequenceId();
+	} else if (o1 != null) {
 	    return 1;
-	else
+	} else {
 	    return -1;
+	}
     }
 
 }
+ 

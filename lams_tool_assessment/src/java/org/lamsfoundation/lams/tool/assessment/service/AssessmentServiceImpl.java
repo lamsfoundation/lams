@@ -23,18 +23,15 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.assessment.service;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,8 +39,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
@@ -56,7 +53,6 @@ import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -78,19 +74,22 @@ import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentAttachmentDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionDAO;
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionVisitDAO;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionVisitLog;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
+import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -99,12 +98,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
-import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
-import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 /**
  * 
@@ -125,7 +119,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     private AssessmentSessionDAO assessmentSessionDao;
 
-    private AssessmentQuestionVisitDAO assessmentQuestionVisitDao;
+    private AssessmentQuestionResultDAO assessmentQuestionResultDao;
 
     // tool service
     private AssessmentToolContentHandler assessmentToolContentHandler;
@@ -417,46 +411,127 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     public void retrieveComplete(SortedSet<AssessmentQuestion> assessmentQuestionList, AssessmentUser user) {
 	for (AssessmentQuestion question : assessmentQuestionList) {
-	    AssessmentQuestionVisitLog log = assessmentQuestionVisitDao.getAssessmentQuestionLog(question.getUid(),
+	    AssessmentQuestionResult result = assessmentQuestionResultDao.getAssessmentQuestionResult(question.getUid(),
 		    user.getUserId());
-	    if (log == null) {
+	    if (result == null) {
 		question.setComplete(false);
 	    } else {
-		question.setComplete(log.isComplete());
+		question.setComplete(result.isProcessed());
 	    }
 	}
     }
 
-    public void setQuestionComplete(Long assessmentQuestionUid, Long userId, Long sessionId) {
-	AssessmentQuestionVisitLog log = assessmentQuestionVisitDao.getAssessmentQuestionLog(assessmentQuestionUid,
+    public void setQuestionStartDate(Long assessmentQuestionUid, Long userId, Long sessionId) {
+	AssessmentQuestionResult result = assessmentQuestionResultDao.getAssessmentQuestionResult(assessmentQuestionUid,
 		userId);
-	if (log == null) {
-	    log = new AssessmentQuestionVisitLog();
+	if (result == null) {
+	    result = new AssessmentQuestionResult();
 	    AssessmentQuestion question = assessmentQuestionDao.getByUid(assessmentQuestionUid);
-	    log.setAssessmentQuestion(question);
+	    result.setAssessmentQuestion(question);
 	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	    log.setUser(user);
-	    log.setSessionId(sessionId);
-	    log.setAccessDate(new Timestamp(new Date().getTime()));
+	    result.setUser(user);
+	    result.setProcessed(false);
+	    result.setSessionId(sessionId);
+	    result.setStartDate(new Timestamp(new Date().getTime()));
+	    assessmentQuestionResultDao.saveObject(result);
 	}
-	log.setComplete(true);
-	assessmentQuestionVisitDao.saveObject(log);
     }
-
-    public void setQuestionAccess(Long assessmentQuestionUid, Long userId, Long sessionId) {
-	AssessmentQuestionVisitLog log = assessmentQuestionVisitDao.getAssessmentQuestionLog(assessmentQuestionUid,
-		userId);
-	if (log == null) {
-	    log = new AssessmentQuestionVisitLog();
-	    AssessmentQuestion question = assessmentQuestionDao.getByUid(assessmentQuestionUid);
-	    log.setAssessmentQuestion(question);
+    
+    public AssessmentQuestionResult processUserAnswer(AssessmentQuestionResult userResult, Long userId, Long sessionId, boolean isFinish) {
+	Long questionUid = userResult.getAssessmentQuestion().getUid();
+	AssessmentQuestion question = userResult.getAssessmentQuestion();
+	AssessmentQuestionResult result = assessmentQuestionResultDao.getAssessmentQuestionResult(questionUid, userId);
+	if (result != null) {
+	    for (AssessmentAnswer dbResultAnswer : result.getAnswers()) {
+		for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
+		    if (dbResultAnswer.getSequenceId() == questionOption.getSequenceId()) {
+			dbResultAnswer.setAnswerBoolean(questionOption.getAnswerBoolean());
+			dbResultAnswer.setAnswerInt(questionOption.getAnswerInt());
+			break;
+		    }
+		}
+	    }
+	} else {
+	    result = new AssessmentQuestionResult();
+	    Set<AssessmentAnswer> answers = result.getAnswers();
+	    for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
+		AssessmentAnswer resultAnswer = new AssessmentAnswer();
+		resultAnswer.setSequenceId(questionOption.getSequenceId());
+		resultAnswer.setAnswerBoolean(questionOption.getAnswerBoolean());
+		resultAnswer.setAnswerInt(questionOption.getAnswerInt());
+		answers.add(resultAnswer);
+	    }	
 	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	    log.setUser(user);
-	    log.setComplete(false);
-	    log.setSessionId(sessionId);
-	    log.setAccessDate(new Timestamp(new Date().getTime()));
-	    assessmentQuestionVisitDao.saveObject(log);
+	    result.setUser(user);
+	    result.setProcessed(true);
+	    result.setSessionId(sessionId);
+	    result.setStartDate(new Timestamp(new Date().getTime()));	   
 	}
+	if (isFinish) {
+	    result.setFinishDate(new Timestamp(new Date().getTime()));
+	}
+	result.setAssessmentQuestion(question);
+	result.setAnswerBoolean(question.getAnswerBoolean());
+	result.setAnswerFloat(question.getAnswerFloat());
+	result.setAnswerString(question.getAnswerString());
+	
+	float mark = 0;
+	float maxMark = question.getDefaultGrade();
+	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		if (option.getAnswerBoolean()) {
+		    mark += option.getGrade()*maxMark;
+		}
+	    }
+	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+	    float maxMarkForCorrectAnswer = maxMark / question.getQuestionOptions().size();
+	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		if (option.getAnswerInt() == option.getSequenceId()) {
+		    mark += maxMarkForCorrectAnswer;
+		}
+	    }
+	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
+	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		if (option.getOptionString().equals(question.getAnswerString())) {
+		    mark = option.getGrade()*maxMark;
+		    break;
+		}
+	    }
+	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+	    try {
+		float answerFloat = Float.valueOf(question.getAnswerString());
+		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		    if ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError()))
+			    && (answerFloat <= (option.getOptionFloat() + option.getAcceptedError()))) {
+			mark = option.getGrade() * maxMark;
+			break;
+		    }
+		}
+		//TODO may be NumberFormatException and smth else
+	    } catch (Exception e) {
+	    }
+	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
+	    if (question.getAnswerBoolean() == question.getCorrectAnswer()) {
+		mark = maxMark;
+	    }
+	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+	    float maxMarkForCorrectAnswer = maxMark / question.getQuestionOptions().size();
+	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		//TODO correct answer
+		if (option.getAnswerInt() == option.getSequenceId()) {
+		    mark += maxMarkForCorrectAnswer*maxMark;
+		}
+	    }
+	}
+	if (mark > maxMark) {
+	    mark = maxMark;
+	} else if (mark < 0) {
+	    mark = 0;
+	}
+	result.setMark(mark);
+
+	assessmentQuestionResultDao.saveObject(result);
+	return result;
     }
 
     public String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException {
@@ -488,7 +563,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	List<Summary> group = new ArrayList<Summary>();
 
 	// get all question which is accessed by user
-	Map<Long, Integer> visitCountMap = assessmentQuestionVisitDao.getSummary(contentId);
+	Map<Long, Integer> visitCountMap = assessmentQuestionResultDao.getSummary(contentId);
 
 	Assessment assessment = assessmentDao.getByContentId(contentId);
 	Set<AssessmentQuestion> resQuestionList = assessment.getQuestions();
@@ -563,12 +638,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     public List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid) {
-	List<AssessmentQuestionVisitLog> logList = assessmentQuestionVisitDao.getAssessmentQuestionLogBySession(
+	List<AssessmentQuestionResult> logList = assessmentQuestionResultDao.getAssessmentQuestionResultBySession(
 		sessionId, questionUid);
 	List<AssessmentUser> userList = new ArrayList(logList.size());
-	for (AssessmentQuestionVisitLog visit : logList) {
+	for (AssessmentQuestionResult visit : logList) {
 	    AssessmentUser user = visit.getUser();
-	    user.setAccessDate(visit.getAccessDate());
+	    user.setAccessDate(visit.getStartDate());
 	    userList.add(user);
 	}
 	return userList;
@@ -722,12 +797,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	this.toolService = toolService;
     }
 
-    public AssessmentQuestionVisitDAO getAssessmentQuestionVisitDao() {
-	return assessmentQuestionVisitDao;
+    public AssessmentQuestionResultDAO getAssessmentQuestionResultDao() {
+	return assessmentQuestionResultDao;
     }
 
-    public void setAssessmentQuestionVisitDao(AssessmentQuestionVisitDAO assessmentQuestionVisitDao) {
-	this.assessmentQuestionVisitDao = assessmentQuestionVisitDao;
+    public void setAssessmentQuestionResultDao(AssessmentQuestionResultDAO assessmentQuestionResultDao) {
+	this.assessmentQuestionResultDao = assessmentQuestionResultDao;
     }
 
     // *******************************************************************************

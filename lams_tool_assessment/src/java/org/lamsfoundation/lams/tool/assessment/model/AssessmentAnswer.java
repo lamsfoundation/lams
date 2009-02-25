@@ -26,27 +26,23 @@ package org.lamsfoundation.lams.tool.assessment.model;
 import org.apache.log4j.Logger;
  
 /**
- * AssessmentUnit
+ * AssessmentAnswer
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_assessment_unit"
+ * @hibernate.class table="tl_laasse10_assessment_answer"
  */
-public class AssessmentUnit implements Cloneable, Sequencable {
-    private static final Logger log = Logger.getLogger(AssessmentUnit.class);
+public class AssessmentAnswer implements Cloneable, Sequencable {
+    private static final Logger log = Logger.getLogger(AssessmentAnswer.class);
 
     private Long uid;
-
+    
     private Integer sequenceId;
-
-    private String unit;
     
-    private float multiplier;
+    private int answerInt;
     
-    // *************** NON Persist Fields ********************    
-    private String multiplierStr = "0.0";
+    private boolean answerBoolean;
     
-
     // **********************************************************
     // Get/Set methods
     // **********************************************************
@@ -59,14 +55,14 @@ public class AssessmentUnit implements Cloneable, Sequencable {
 	return uid;
     }
 
-    private void setUid(Long uuid) {
-	uid = uuid;
+    private void setUid(Long uid) {
+	this.uid = uid;
     }
-
+    
     /**
-     * Returns image sequence number.
+     * Returns answer's sequence number.
      * 
-     * @return image sequence number
+     * @return answer's sequence number
      * 
      * @hibernate.property column="sequence_id"
      */
@@ -75,60 +71,39 @@ public class AssessmentUnit implements Cloneable, Sequencable {
     }
 
     /**
-     * Sets image sequence number.
+     * Sets answer's sequence number.
      * 
      * @param sequenceId
-     *                image sequence number
+     *                answer's sequence number
      */
     public void setSequenceId(int sequenceId) {
 	this.sequenceId = sequenceId;
     }
-
-    /**
-     * @hibernate.property column="multiplier"
-     * 
-     * @return Returns multiplier.
-     */
-    public float getMultiplier() {
-	return multiplier;
-    }
-
-    public void setMultiplier(float multiplier) {
-	this.multiplier = multiplier;
-    }
-    
-    public String getMultiplierStr() {
-	return multiplierStr;
-    }
-
-    public void setMultiplierStr(String multiplierStr) {
-	this.multiplierStr = multiplierStr;
-    }    
     
     /**
-     * @hibernate.property column="unit"
+     * @hibernate.property column="answer_int"
      * 
-     * @return Returns unit.
+     * @return Returns the possible numeric answer.
      */
-    public String getUnit() {
-	return unit;
+    public int getAnswerInt() {
+	return answerInt;
     }
 
-    public void setUnit(String unit) {
-	this.unit = unit;
+    public void setAnswerInt(int answerInt) {
+	this.answerInt = answerInt;
+    }
+    
+    /**
+     * @hibernate.property column="answer_boolean"
+     * 
+     * @return Returns the boolean answer.
+     */
+    public boolean getAnswerBoolean() {
+	return answerBoolean;
     }
 
-    @Override
-    public Object clone() {
-	AssessmentUnit obj = null;
-	try {
-	    obj = (AssessmentUnit) super.clone();
-	    obj.setUid(null);
-	} catch (CloneNotSupportedException e) {
-	    AssessmentUnit.log.error("When clone " + AssessmentUnit.class + " failed");
-	}
-
-	return obj;
+    public void setAnswerBoolean(boolean answerBoolean) {
+	this.answerBoolean = answerBoolean;
     }
 }
 

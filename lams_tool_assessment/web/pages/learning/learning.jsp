@@ -12,34 +12,15 @@
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	</c:if>
-
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
 	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="assessment" value="${sessionMap.assessment}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+	<c:set var="pageNumber" value="${sessionMap.pageNumber}" />
 
 	<script type="text/javascript">
 	<!--
-		function gotoURL(){
- 		    var reqIDVar = new Date();
-			var gurl = "<c:url value="/learning/addurl.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
-	      	showMessage(gurl);
-	      	return false;
-		}
-		function gotoFile(){
- 		    var reqIDVar = new Date();
- 		    var gurl = "<c:url value="/learning/addfile.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
-	      	showMessage(gurl);
-	      	return false;
-		}
-		function checkNew(){
- 		    var reqIDVar = new Date();
-			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
- 		    return false;
-		}
-
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
@@ -48,16 +29,48 @@
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-		
-		function showMessage(url) {
-			var area=document.getElementById("reourceInputArea");
-			if(area != null){
-				area.style.width="100%";
-				area.style.height="100%";
-				area.src=url;
-				area.style.display="block";
-			}
+		function nextPage(pageNumber){
+        	var myForm = $("answers");
+        	myForm.action = "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber;
+        	myForm.submit();
+		}		
+		function submitPage(){
+        	var myForm = $("answers");
+        	myForm.action = "<c:url value='/learning/submitPage.do?sessionMapID=${sessionMapID}'/>";
+        	myForm.submit();
 		}
+		function submitAll(){
+        	var myForm = $("answers");
+        	myForm.action = "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>";
+        	myForm.submit();
+		}	
+		var orderingTargetDiv = "orderingArea";
+		function upOption(questionUid, idx){
+			var url = "<c:url value="/learning/upOption.do"/>";
+			var param = "sessionMapID=${sessionMapID}&optionIndex=" + idx + "&questionUid=" + questionUid;
+		    var myAjax = new Ajax.Updater(
+		    		orderingTargetDiv,
+			    	url,
+			    	{
+			    		method:'get',
+			    		parameters:param,
+			    		evalScripts:false
+			    	}
+		    );
+		}
+		function downOption(questionUid, idx){
+			var url = "<c:url value="/learning/downOption.do"/>";
+			var param = "sessionMapID=${sessionMapID}&optionIndex=" + idx + "&questionUid=" + questionUid;
+		    var myAjax = new Ajax.Updater(
+		    		orderingTargetDiv,
+			    	url,
+			    	{
+			    		method:'get',
+			    		parameters:param,
+			    		evalScripts:false
+			    	}
+		    );
+		}			
 	-->        
     </script>
 </lams:head>
@@ -87,127 +100,53 @@
 		</c:if>
 
 		<%@ include file="/common/messages.jsp"%>
+		<br><br>
+		
+		<form id="answers" name="answers" method="post" >
+			<table cellspacing="0" class="alternative-color">
+				<c:forEach var="result" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
+					<c:set var="question" value="${result.assessmentQuestion}" />
+					<tr>
+						<td style="padding-left: 15px; vertical-align: middle; width: 10px;" >
+							${status.index + 1} 
+						</td>
+						<td style="padding-left: 0px;">
+							<input type="hidden" name="questionUid${status.index}" id="questionUid${status.index}" value="${question.uid}" />						
+							
+							<div class="field-name" style="padding: 10px 15px 15px;">
+								${question.question}
+							</div>
+							
+							<c:choose>
+								<c:when test="${question.type == 1}">
+									<%@ include file="parts/multiplechoice.jsp"%>
+								</c:when>
+								<c:when test="${question.type == 2}">
+									<%@ include file="parts/matchingpairs.jsp"%>
+								</c:when>
+								<c:when test="${question.type == 3}">
+									<%@ include file="parts/shortanswer.jsp"%>
+								</c:when>
+								<c:when test="${question.type == 4}">
+									<%@ include file="parts/numerical.jsp"%>
+								</c:when>
+								<c:when test="${question.type == 5}">
+									<%@ include file="parts/truefalse.jsp"%>
+								</c:when>
+								<c:when test="${question.type == 6}">
+									<%@ include file="parts/essay.jsp"%>
+								</c:when>
+								<c:when test="${question.type == 7}">
+									<%@ include file="parts/ordering.jsp"%>
+								</c:when>
+							</c:choose>
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
+		</form>
 
-		<table cellspacing="0" class="alternative-color">
-			<tr>
-				<th width="70%">
-					<fmt:message key="label.resoruce.to.review" />
-				</th>
-				<th align="center">
-					<fmt:message key="label.completed" />
-				</th>
-			</tr>
-			<c:forEach var="item" items="${sessionMap.assessmentList}">
-				<tr>
-					<td>
-						<a href="javascript:;" onclick="viewItem(${item.uid})">
-							${item.title} </a>
-
-						<c:if test="${!item.createByAuthor && item.createBy != null}">
-								[${item.createBy.loginName}]
-							</c:if>
-					</td>
-					<td align="center">
-						<c:choose>
-							<c:when test="${item.complete}">
-								<img src="<html:rewrite page='/includes/images/tick.gif'/>"
-									border="0">
-							</c:when>
-							<c:otherwise>
-								-
-							</c:otherwise>
-						</c:choose>
-					</td>
-				</tr>
-			</c:forEach>
-
-			<c:if test="${assessment.miniViewAssessmentNumber > 0}">
-				<tr>
-					<td colspan="3" align="left">
-						<b>${assessment.miniViewNumberStr}</b>
-					</td>
-				</tr>
-			</c:if>
-		</table>
-
-
-		<c:if test="${mode != 'teacher'}">
-			<p>
-				<a href="#" onclick="return checkNew()" class="button"> <fmt:message
-						key="label.check.for.new" /> </a>
-			</p>
-		</c:if>
-
-		<c:if test="${mode != 'teacher' && (not finishedLock)}">
-			<c:if test="${assessment.allowAddFiles || assessment.allowAddUrls}">
-
-				<h2>
-					<fmt:message key="label.suggest.new" />
-				</h2>
-
-				<div class="small-space-top">
-					<c:choose>
-						<c:when test="${assessment.allowAddFiles && assessment.allowAddUrls}">
-							<input type="radio" name="suggest" value="url" checked="true"
-								onclick="gotoURL()" class="noBorder">
-							<fmt:message key="label.authoring.basic.resource.url.input" /> |
-										<input type="radio" name="suggest" value="file"
-								onclick="gotoFile()" class="noBorder">
-							<fmt:message key="label.authoring.basic.resource.file.input" />
-						</c:when>
-
-						<c:when test="${assessment.allowAddFiles && !assessment.allowAddUrls}">
-							<input type="radio" name="suggest" value="file" checked="true"
-								onclick="gotoFile()" class="noBorder">
-							<fmt:message key="label.authoring.basic.resource.file.input" />
-						</c:when>
-
-						<c:when test="${!assessment.allowAddFiles && assessment.allowAddUrls}">
-							<input type="radio" name="suggest" value="url" checked="true"
-								onclick="gotoURL()" class="noBorder">
-							<fmt:message key="label.authoring.basic.resource.url.input" />
-						</c:when>
-					</c:choose>
-				</div>
-
-				<iframe
-					onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-					id="reourceInputArea" name="reourceInputArea"
-					style="width: 0px; height: 0px; border: 0px; display: none"
-					frameborder="no" scrolling="no">
-				</iframe>
-
-
-
-			</c:if>
-
-			<c:choose>
-				<c:when test="${assessment.allowAddFiles && assessment.allowAddUrls}">
-					<script type="text/javascript">
-					<!--
-						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					-->
-				</script>
-				</c:when>
-				<c:when test="${assessment.allowAddFiles && !assessment.allowAddUrls}">
-					<script type="text/javascript">
-					<!--
-						showMessage("<c:url value='/learning/addfile.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					-->
-				</script>
-				</c:when>
-				<c:when test="${!assessment.allowAddFiles && assessment.allowAddUrls}">
-					<script type="text/javascript">
-					<!--
-						showMessage("<c:url value='/learning/addurl.do'/>?sessionMapID=${sessionMapID}&mode=${mode}");
-					-->
-				</script>
-				</c:when>
-			</c:choose>
-			<%-- end mode != teacher --%>
-		</c:if>
-
-
+<%--
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h2>
@@ -236,20 +175,40 @@
 				</c:if>
 			</div>
 		</c:if>
+--%>		
+
+		<!--Paging-->
+		<c:if test="${fn:length(sessionMap.pagedQuestions) > 1}">
+			<div style="text-align: center; padding-top: 60px;">
+				<fmt:message key="label.learning.page" />
+				<c:forEach var="questions" items="${sessionMap.pagedQuestions}" varStatus="status">
+					<c:choose>
+						<c:when	test="${(status.index+1) == pageNumber}">
+							<a href="javascript:;" onclick="return nextPage(${status.index + 1})" style="margin-left: 10px; font-size: 130%; color: red;">
+						</c:when>
+						<c:otherwise>
+							<a href="javascript:;" onclick="return nextPage(${status.index + 1})" style="margin-left: 10px; font-size: 130%;">
+						</c:otherwise>
+					</c:choose>				
+						${status.index + 1} 
+					</a>
+				</c:forEach>		
+			</div>
+		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when
-						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<html:button property="FinishButton"
-							onclick="return continueReflect()" styleClass="button">
-							<fmt:message key="label.continue" />
+					<c:when	test="${(not sessionMap.userFinished)}">
+						<html:button property="submitPage" onclick="return submitPage();" styleClass="button">
+							<fmt:message key="label.learning.submit.page" />
 						</html:button>
+						<html:button property="submitAll" onclick="return submitAll();" styleClass="button">
+							<fmt:message key="label.learning.submit.all" />
+						</html:button>	
 					</c:when>
 					<c:otherwise>
-						<html:button property="FinishButton" styleId="finishButton"
-							onclick="return finishSession()" styleClass="button">
+						<html:button property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button">
 							<fmt:message key="label.finished" />
 						</html:button>
 					</c:otherwise>

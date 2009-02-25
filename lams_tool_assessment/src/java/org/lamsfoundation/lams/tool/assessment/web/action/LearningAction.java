@@ -25,11 +25,15 @@
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
-import java.sql.Timestamp;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -39,7 +43,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
@@ -48,25 +54,23 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
-import org.lamsfoundation.lams.tool.assessment.service.UploadAssessmentFileException;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionComparator;
-import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentQuestionForm;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
+import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -77,8 +81,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * 
  * @author Andrey Balan
- * 
- * @version $Revision$
  */
 public class LearningAction extends Action {
 
@@ -93,22 +95,33 @@ public class LearningAction extends Action {
 	if (param.equals("start")) {
 	    return start(mapping, form, request, response);
 	}
-	if (param.equals("complete")) {
-	    return complete(mapping, form, request, response);
+	if (param.equals("nextPage")) {
+	    return nextPage(mapping, form, request, response);
 	}
-
+	if (param.equals("submitPage")) {
+	    return submitPage(mapping, form, request, response);
+	}
+	if (param.equals("submitAll")) {
+	    return submitAll(mapping, form, request, response);
+	}	
 	if (param.equals("finish")) {
 	    return finish(mapping, form, request, response);
 	}
-	if (param.equals("addfile")) {
-	    return addQuestion(mapping, form, request, response);
+//	if (param.equals("addfile")) {
+//	    return addQuestion(mapping, form, request, response);
+//	}
+//	if (param.equals("addurl")) {
+//	    return addQuestion(mapping, form, request, response);
+//	}
+//	if (param.equals("saveOrUpdateQuestion")) {
+//	    return saveOrUpdateQuestion(mapping, form, request, response);
+//	}
+	if (param.equals("upOption")) {
+	    return upOption(mapping, form, request, response);
 	}
-	if (param.equals("addurl")) {
-	    return addQuestion(mapping, form, request, response);
-	}
-	if (param.equals("saveOrUpdateQuestion")) {
-	    return saveOrUpdateQuestion(mapping, form, request, response);
-	}
+	if (param.equals("downOption")) {
+	    return downOption(mapping, form, request, response);
+	}	
 
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
@@ -122,44 +135,28 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Initial page for add assessment question (single file or URL).
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward addQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
-	questionForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
-	questionForm.setSessionMapID(WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID));
-	return mapping.findForward(AssessmentConstants.SUCCESS);
-    }
-
-    /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
      * 
      * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page",
+     * @throws ServletException 
      * 
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws ServletException {
 
-	// initial Session Map
+	// initialize Session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
-	Long sessionId = new Long(request.getParameter(AssessmentConstants.PARAM_TOOL_SESSION_ID));
+	Long toolSessionId = new Long(request.getParameter(AssessmentConstants.PARAM_TOOL_SESSION_ID));
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 
 	// get back the assessment and question list and display them on page
 	IAssessmentService service = getAssessmentService();
@@ -167,40 +164,26 @@ public class LearningAction extends Action {
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // assessmentUser may be null if the user was force completed.
-	    assessmentUser = getSpecifiedUser(service, sessionId, WebUtil.readIntParam(request,
+	    assessmentUser = getSpecifiedUser(service, toolSessionId, WebUtil.readIntParam(request,
 		    AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    assessmentUser = getCurrentUser(service, sessionId);
+	    assessmentUser = getCurrentUser(service, toolSessionId);
 	}
 
-	List<AssessmentQuestion> questions = null;
+	List<AssessmentQuestion> questionsFromDB = null;
 	Assessment assessment;
-	questions = service.getAssessmentQuestionsBySessionId(sessionId);
-	assessment = service.getAssessmentBySessionId(sessionId);
+	questionsFromDB = service.getAssessmentQuestionsBySessionId(toolSessionId);
+	assessment = service.getAssessmentBySessionId(toolSessionId);
 
 	// check whehter finish lock is on/off
-	//TODO!!
-	boolean lock = true;//assessment.getTimeLimit() && assessmentUser != null && assessmentUser.isSessionFinished();
-
-	// check whether there is only one assessment question and run auto flag is true or not.
-	boolean runAuto = false;
-	int questionsNumber = 0;
-	if (assessment.getQuestions() != null) {
-	    questionsNumber = assessment.getQuestions().size();
-//	    if (assessment.isRunAuto() && questionsNumber == 1) {
-//		AssessmentQuestion question = (AssessmentQuestion) assessment.getAssessmentQuestions().iterator().next();
-//		// only visible question can be run auto.
-//		if (!question.isHide()) {
-//		    runAuto = true;
-//		    request.setAttribute(AssessmentConstants.ATTR_QUESTION_UID, question.getUid());
-//		}
-//	    }
-	}
+	// TODO!!
+	boolean lock = true;// assessment.getTimeLimit() && assessmentUser != null &&
+			    // assessmentUser.isSessionFinished();
 
 	// get notebook entry
 	String entryText = new String();
 	if (assessmentUser != null) {
-	    NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+	    NotebookEntry notebookEntry = service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		    AssessmentConstants.TOOL_SIGNATURE, assessmentUser.getUserId().intValue());
 	    if (notebookEntry != null) {
 		entryText = notebookEntry.getEntry();
@@ -211,17 +194,16 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_TITLE, assessment.getTitle());
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_FINISH_LOCK, lock);
-	sessionMap.put(AssessmentConstants.ATTR_LOCK_ON_FINISH, assessment.getTimeLimit());
+	//sessionMap.put(AssessmentConstants.ATTR_LOCK_ON_FINISH, assessment.getTimeLimit());
 	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, assessmentUser != null
 		&& assessmentUser.isSessionFinished());
 
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// reflection information
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ON, assessment.isReflectOnActivity());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
-	sessionMap.put(AssessmentConstants.ATTR_RUN_AUTO, new Boolean(runAuto));
 
 	// add define later support
 	if (assessment.isDefineLater()) {
@@ -241,52 +223,128 @@ public class LearningAction extends Action {
 	    sessionMap.put(AssessmentConstants.PARAM_RUN_OFFLINE, false);
 	}
 
-	// init assessment question list
-	SortedSet<AssessmentQuestion> assessmentQuestionList = getAssessmentQuestionList(sessionMap);
-	assessmentQuestionList.clear();
-	if (questions != null) {
+	SortedSet<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>(new SequencableComparator());
+	if (questionsFromDB != null) {
 	    // remove hidden questions.
-	    for (AssessmentQuestion question : questions) {
+	    for (AssessmentQuestion question : questionsFromDB) {
 		// becuase in webpage will use this login name. Here is just
-		// initial it to avoid session close error in proxy object.
+		// initialize it to avoid session close error in proxy object.
 		if (question.getCreateBy() != null) {
 		    question.getCreateBy().getLoginName();
 		}
 		if (!question.isHide()) {
-		    assessmentQuestionList.add(question);
+		    questionList.add(question);
 		}
 	    }
 	}
+	
+	//paging
+	ArrayList<SortedSet<AssessmentQuestionResult>> pagedResults = new ArrayList<SortedSet<AssessmentQuestionResult>>();
+	int maxQuestionsPerPage = (assessment.getQuestionsPerPage() != 0) ? assessment.getQuestionsPerPage()
+		: questionList.size();
+	SortedSet<AssessmentQuestionResult> resultsForOnePage = new TreeSet<AssessmentQuestionResult>(
+		new AssessmentQuestionResultComparator());
+	pagedResults.add(resultsForOnePage);
 
+	int count = 0;
+	for (AssessmentQuestion question : questionList) {
+	    AssessmentQuestionResult result = new AssessmentQuestionResult();
+	    result.setAssessmentQuestion(question);
+	    resultsForOnePage.add(result);
+	    count++;
+	    if ((resultsForOnePage.size() == maxQuestionsPerPage) && (count != questionList.size())) {
+		resultsForOnePage = new TreeSet<AssessmentQuestionResult>(new AssessmentQuestionResultComparator());
+		pagedResults.add(resultsForOnePage);
+	    }
+	}
+	
+	sessionMap.put(AssessmentConstants.ATTR_PAGED_QUESTIONS, pagedResults);
+	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
+	
 	// set complete flag for display purpose
 	if (assessmentUser != null) {
-	    service.retrieveComplete(assessmentQuestionList, assessmentUser);
+	    service.retrieveComplete(questionList, assessmentUser);
 	}
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, questionList);
 
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-
+    
     /**
-     * Mark assessment question as complete status.
+     * Display same entire authoring page content from HttpSession variable.
      * 
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
+     * @throws ServletException
      */
-    private ActionForward complete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-
-	doComplete(request);
-
-	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+    private ActionForward nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	popupQuestionOptionsWithUserAnswers(request);
+	
+	
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, WebUtil.readIntParam(request, AssessmentConstants.ATTR_PAGE_NUMBER));
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
+    
+    /**
+     * Display same entire authoring page content from HttpSession variable.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException
+     */
+    private ActionForward submitPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	popupQuestionOptionsWithUserAnswers(request);
+	
+	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
+	ArrayList<SortedSet<AssessmentQuestionResult>> pagedResults = (ArrayList<SortedSet<AssessmentQuestionResult>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	SortedSet<AssessmentQuestionResult> resultList = (SortedSet<AssessmentQuestionResult>) pagedResults.get(pageNumber-1);
+	processUserAnswersPage(request, resultList, false);
+	
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER));
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+    
+    /**
+     * Display same entire authoring page content from HttpSession variable.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException
+     */
+    private ActionForward submitAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	popupQuestionOptionsWithUserAnswers(request);
+	
+	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
+	ArrayList<SortedSet<AssessmentQuestionResult>> pagedResults = (ArrayList<SortedSet<AssessmentQuestionResult>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	for (SortedSet<AssessmentQuestionResult> resultList : pagedResults) {
+	    processUserAnswersPage(request, resultList, true);
+	}
+	
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER));
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }    
 
     /**
      * Finish learning session.
@@ -308,17 +366,18 @@ public class LearningAction extends Action {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	// auto run mode, when use finish the only one assessment question, mark it as complete then finish this activity as
-	// well.
-	String assessmentQuestionUid = request.getParameter(AssessmentConstants.PARAM_QUESTION_UID);
-	if (assessmentQuestionUid != null) {
-	    doComplete(request);
-	    // NOTE:So far this flag is useless(31/08/2006).
-	    // set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
-	    request.setAttribute(AssessmentConstants.ATTR_RUN_AUTO, true);
-	} else {
-	    request.setAttribute(AssessmentConstants.ATTR_RUN_AUTO, false);
-	}
+//	// auto run mode, when use finish the only one assessment question, mark it as complete then finish this
+//	// activity as
+//	// well.
+//	String assessmentQuestionUid = request.getParameter(AssessmentConstants.PARAM_QUESTION_UID);
+//	if (assessmentQuestionUid != null) {
+//	    doComplete(request);
+//	    // NOTE:So far this flag is useless(31/08/2006).
+//	    // set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
+////	    request.setAttribute(AssessmentConstants.ATTR_RUN_AUTO, true);
+//	} else {
+////	    request.setAttribute(AssessmentConstants.ATTR_RUN_AUTO, false);
+//	}
 
 	if (!validateBeforeFinish(request, sessionMapID)) {
 	    return mapping.getInputForward();
@@ -340,9 +399,9 @@ public class LearningAction extends Action {
 
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-
+    
     /**
-     * Save file or url assessment question into database.
+     * Move up current option.
      * 
      * @param mapping
      * @param form
@@ -350,87 +409,178 @@ public class LearningAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward saveOrUpdateQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward upOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	// get back SessionMap
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	return switchOption(mapping, request, true);
+    }
+
+    /**
+     * Move down current option.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward downOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	return switchOption(mapping, request, false);
+    }
+
+    private ActionForward switchOption(ActionMapping mapping, HttpServletRequest request, boolean up) {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-
-	Long sessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
-
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
-	ActionErrors errors = validateAssessmentQuestion(questionForm);
-
-	if (!errors.isEmpty()) {
-	    this.addErrors(request, errors);
-	    return findForward(questionForm.getQuestionType(), mapping);
-	}
-	short type = questionForm.getQuestionType();
-
-	// create a new Assessmentquestion
-	AssessmentQuestion question = new AssessmentQuestion();
-	IAssessmentService service = getAssessmentService();
-	AssessmentUser assessmentUser = getCurrentUser(service, sessionId);
-	question.setType(type);
-	question.setTitle(questionForm.getTitle());
-	question.setQuestion(questionForm.getQuestion());
-	question.setCreateDate(new Timestamp(new Date().getTime()));
-	question.setCreateByAuthor(false);
-	question.setCreateBy(assessmentUser);
-
-	// special attribute for URL or FILE
-	if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-//	    try {
-//		service.uploadAssessmentQuestionFile(question, questionForm.getFile());
-//	    } catch (UploadAssessmentFileException e) {
-//		LearningAction.log.error("Failed upload Assessment File " + e.toString());
-//		return mapping.findForward(AssessmentConstants.ERROR);
-//	    }
-//	} else if (type == AssessmentConstants.QUESTION_TYPE_CHOICE) {
-//	    question.setUrl(questionForm.getUrl());
-//	    question.setOpenUrlNewWindow(questionForm.isOpenUrlNewWindow());
-	}
-	// save and update session
-
-	AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
-	if (session == null) {
-	    LearningAction.log.error("Failed update AssessmentSession by ID[" + sessionId + "]");
-	    return mapping.findForward(AssessmentConstants.ERROR);
-	}
-	Set<AssessmentQuestion> questions = session.getAssessmentQuestions();
-	if (questions == null) {
-	    questions = new HashSet<AssessmentQuestion>();
-	    session.setAssessmentQuestions(questions);
-	}
-	questions.add(question);
-	service.saveOrUpdateAssessmentSession(session);
-
-	// update session value
-	SortedSet<AssessmentQuestion> assessmentQuestionList = getAssessmentQuestionList(sessionMap);
-	assessmentQuestionList.add(question);
-
-	// URL or file upload
-	request.setAttribute(AssessmentConstants.ATTR_ADD_ASSESSMENT_TYPE, new Short(type));
-	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-
-	Assessment assessment = session.getAssessment();
-	if (assessment.isNotifyTeachersOnAttemptCompletion()) {
-	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
-	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
-		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
-		}
-		String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
-		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
-			service.getLocalisedMessage("event.assigment.submit.subject", null),
-			service.getLocalisedMessage("event.assigment.submit.body", new Object[] { fullName }));
+	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
+	ArrayList<SortedSet<AssessmentQuestionResult>> pagedResults = (ArrayList<SortedSet<AssessmentQuestionResult>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	SortedSet<AssessmentQuestionResult> resultList = (SortedSet<AssessmentQuestionResult>) pagedResults.get(pageNumber-1);
+	Long questionUid = new Long(request.getParameter(AssessmentConstants.PARAM_QUESTION_UID));
+	
+	AssessmentQuestionResult result = null;
+	for (AssessmentQuestionResult resultFromSession : resultList) {
+	    if (resultFromSession.getAssessmentQuestion().getUid().equals(questionUid)) {
+		result = resultFromSession;
+		break;
 	    }
 	}
+	
+	Set<AssessmentQuestionOption> optionList = result.getAssessmentQuestion().getQuestionOptions();
+	
+	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
+	if (optionIndex != -1) {
+	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
+	    
+	    // get current and the target item, and switch their sequnece
+	    AssessmentQuestionOption option = rList.get(optionIndex);
+	    AssessmentQuestionOption repOption;
+	    if (up) {
+		repOption = rList.get(--optionIndex);
+	    } else {
+		repOption = rList.get(++optionIndex);
+	    }
+		
+	    int upSeqId = repOption.getSequenceId();
+	    repOption.setSequenceId(option.getSequenceId());
+	    option.setSequenceId(upSeqId);
+
+	    // put back list, it will be sorted again
+	    optionList = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
+	    optionList.addAll(rList);
+	    result.getAssessmentQuestion().setQuestionOptions(optionList);
+	}
+
+	request.setAttribute(AssessmentConstants.ATTR_RESULT_FOR_ORDERING, result);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
-    }
+    }    
+
+//    /**
+//     * Initial page for add assessment question (single file or URL).
+//     * 
+//     * @param mapping
+//     * @param form
+//     * @param request
+//     * @param response
+//     * @return
+//     */
+//    private ActionForward addQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+//	    HttpServletResponse response) {
+//	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
+//	questionForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
+//	questionForm.setSessionMapID(WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID));
+//	return mapping.findForward(AssessmentConstants.SUCCESS);
+//    }
+//
+//    /**
+//     * Save file or url assessment question into database.
+//     * 
+//     * @param mapping
+//     * @param form
+//     * @param request
+//     * @param response
+//     * @return
+//     */
+//    private ActionForward saveOrUpdateQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+//	    HttpServletResponse response) {
+//	// get back SessionMap
+//	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+//	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+//	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+//
+//	Long sessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
+//
+//	String mode = request.getParameter(AttributeNames.ATTR_MODE);
+//	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
+//	ActionErrors errors = validateAssessmentQuestion(questionForm);
+//
+//	if (!errors.isEmpty()) {
+//	    this.addErrors(request, errors);
+//	    return findForward(questionForm.getQuestionType(), mapping);
+//	}
+//	short type = questionForm.getQuestionType();
+//
+//	// create a new Assessmentquestion
+//	AssessmentQuestion question = new AssessmentQuestion();
+//	IAssessmentService service = getAssessmentService();
+//	AssessmentUser assessmentUser = getCurrentUser(service, sessionId);
+//	question.setType(type);
+//	question.setTitle(questionForm.getTitle());
+//	question.setQuestion(questionForm.getQuestion());
+//	question.setCreateDate(new Timestamp(new Date().getTime()));
+//	question.setCreateByAuthor(false);
+//	question.setCreateBy(assessmentUser);
+//
+//	// special attribute for URL or FILE
+//	if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+//	    // try {
+//	    // service.uploadAssessmentQuestionFile(question, questionForm.getFile());
+//	    // } catch (UploadAssessmentFileException e) {
+//	    // LearningAction.log.error("Failed upload Assessment File " + e.toString());
+//	    // return mapping.findForward(AssessmentConstants.ERROR);
+//	    // }
+//	    // } else if (type == AssessmentConstants.QUESTION_TYPE_CHOICE) {
+//	    // question.setUrl(questionForm.getUrl());
+//	    // question.setOpenUrlNewWindow(questionForm.isOpenUrlNewWindow());
+//	}
+//	// save and update session
+//
+//	AssessmentSession session = service.getAssessmentSessionBySessionId(sessionId);
+//	if (session == null) {
+//	    LearningAction.log.error("Failed update AssessmentSession by ID[" + sessionId + "]");
+//	    return mapping.findForward(AssessmentConstants.ERROR);
+//	}
+//	Set<AssessmentQuestion> questions = session.getAssessmentQuestions();
+//	if (questions == null) {
+//	    questions = new HashSet<AssessmentQuestion>();
+//	    session.setAssessmentQuestions(questions);
+//	}
+//	questions.add(question);
+//	service.saveOrUpdateAssessmentSession(session);
+//
+//	// update session value
+//	SortedSet<AssessmentQuestion> assessmentQuestionList = getAssessmentQuestionList(sessionMap);
+//	assessmentQuestionList.add(question);
+//
+//	// URL or file upload
+//	request.setAttribute(AssessmentConstants.ATTR_ADD_ASSESSMENT_TYPE, new Short(type));
+//	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+//
+//	Assessment assessment = session.getAssessment();
+//	if (assessment.isNotifyTeachersOnAttemptCompletion()) {
+//	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
+//	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
+//		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+//		for (int i = 0; i < monitoringUsersIds.length; i++) {
+//		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+//		}
+//		String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
+//		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
+//			service.getLocalisedMessage("event.assigment.submit.subject", null),
+//			service.getLocalisedMessage("event.assigment.submit.body", new Object[] { fullName }));
+//	    }
+//	}
+//	return mapping.findForward(AssessmentConstants.SUCCESS);
+//    }
 
     /**
      * Display empty reflection form.
@@ -522,8 +672,8 @@ public class LearningAction extends Action {
 	Long userID = new Long(user.getUserID().longValue());
 
 	IAssessmentService service = getAssessmentService();
-	//TODO
-	int miniViewFlag = 0;//service.checkMiniView(sessionId, userID);
+	// TODO
+	int miniViewFlag = 0;// service.checkMiniView(sessionId, userID);
 	// if current user view less than reqired view count number, then just return error message.
 	// if it is runOffline content, then need not check minimum view count
 	Boolean runOffline = (Boolean) sessionMap.get(AssessmentConstants.PARAM_RUN_OFFLINE);
@@ -544,37 +694,21 @@ public class LearningAction extends Action {
 	return (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
     }
 
-    /**
-     * List save current assessment questions.
-     * 
-     * @param request
-     * @return
-     */
-    private SortedSet<AssessmentQuestion> getAssessmentQuestionList(SessionMap sessionMap) {
-	SortedSet<AssessmentQuestion> list = (SortedSet<AssessmentQuestion>) sessionMap
-		.get(AssessmentConstants.ATTR_QUESTION_LIST);
-	if (list == null) {
-	    list = new TreeSet<AssessmentQuestion>(new AssessmentQuestionComparator());
-	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, list);
-	}
-	return list;
-    }
-
-    /**
-     * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
-     * @param request
-     * @param name
-     * @return
-     */
-    private List getListFromSession(SessionMap sessionMap, String name) {
-	List list = (List) sessionMap.get(name);
-	if (list == null) {
-	    list = new ArrayList();
-	    sessionMap.put(name, list);
-	}
-	return list;
-    }
+//    /**
+//     * List save current assessment questions.
+//     * 
+//     * @param request
+//     * @return
+//     */
+//    private SortedSet<AssessmentQuestion> getAssessmentQuestionList(SessionMap sessionMap) {
+//	SortedSet<AssessmentQuestion> list = (SortedSet<AssessmentQuestion>) sessionMap
+//		.get(AssessmentConstants.ATTR_QUESTION_LIST);
+//	if (list == null) {
+//	    list = new TreeSet<AssessmentQuestion>(new AssessmentQuestionComparator());
+//	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, list);
+//	}
+//	return list;
+//    }
 
     /**
      * Return <code>ActionForward</code> according to assessment question type.
@@ -624,81 +758,235 @@ public class LearningAction extends Action {
 	return assessmentUser;
     }
 
-    /**
-     * @param questionForm
-     * @return
-     */
-    private ActionErrors validateAssessmentQuestion(AssessmentQuestionForm questionForm) {
-	ActionErrors errors = new ActionErrors();
-	if (StringUtils.isBlank(questionForm.getTitle())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_QUESTION_NAME_BLANK));
-	}
+//    /**
+//     * @param questionForm
+//     * @return
+//     */
+//    private ActionErrors validateAssessmentQuestion(AssessmentQuestionForm questionForm) {
+//	ActionErrors errors = new ActionErrors();
+//	if (StringUtils.isBlank(questionForm.getTitle())) {
+//	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+//		    AssessmentConstants.ERROR_MSG_QUESTION_NAME_BLANK));
+//	}
+//
+//	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+//	    // if (StringUtils.isBlank(questionForm.getUrl())) {
+//	    // errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_URL_BLANK));
+//	    // // URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://address:port
+//	    // // format!!!
+//	    // // UrlValidator validator = new UrlValidator();
+//	    // // if(!validator.isValid(questionForm.getUrl()))
+//	    // // errors.add(ActionMessages.GLOBAL_MESSAGE,new
+//	    // // ActionMessage(AssessmentConstants.ERROR_MSG_INVALID_URL));
+//	    // }
+//	}
+//	// if(questionForm.getquestionType() == AssessmentConstants.RESOURCE_TYPE_WEBSITE
+//	// ||questionForm.getquestionType() == AssessmentConstants.RESOURCE_TYPE_LEARNING_OBJECT){
+//	// if(StringUtils.isBlank(questionForm.getDescription()))
+//	// errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(AssessmentConstants.ERROR_MSG_DESC_BLANK));
+//	// }
+//	// if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS
+//	// || questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP
+//	// || questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+//	//
+//	// if (questionForm.getFile() != null && FileUtil.isExecutableFile(questionForm.getFile().getFileName())) {
+//	// ActionMessage msg = new ActionMessage("error.attachment.executable");
+//	// errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
+//	// }
+//	//
+//	// // validate question size
+//	// FileValidatorUtil.validateFileSize(questionForm.getFile(), false, errors);
+//	//
+//	// // for edit validate: file already exist
+//	// if (!questionForm.isHasFile()
+//	// && (questionForm.getFile() == null || StringUtils.isEmpty(questionForm.getFile().getFileName()))) {
+//	// errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_FILE_BLANK));
+//	// }
+//	// }
+//	return errors;
+//    }
 
-	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-//	    if (StringUtils.isBlank(questionForm.getUrl())) {
-//		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_URL_BLANK));
-//		// URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://address:port
-//		// format!!!
-//		// UrlValidator validator = new UrlValidator();
-//		// if(!validator.isValid(questionForm.getUrl()))
-//		// errors.add(ActionMessages.GLOBAL_MESSAGE,new
-//		// ActionMessage(AssessmentConstants.ERROR_MSG_INVALID_URL));
-//	    }
-	}
-	// if(questionForm.getquestionType() == AssessmentConstants.RESOURCE_TYPE_WEBSITE
-	// ||questionForm.getquestionType() == AssessmentConstants.RESOURCE_TYPE_LEARNING_OBJECT){
-	// if(StringUtils.isBlank(questionForm.getDescription()))
-	// errors.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage(AssessmentConstants.ERROR_MSG_DESC_BLANK));
-	// }
-//	if (questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS
-//		|| questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP
-//		|| questionForm.getQuestionType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+//    /**
+//     * Set complete flag for given assessment question.
+//     * 
+//     * @param request
+//     * @param sessionId
+//     */
+//    private void doComplete(HttpServletRequest request) {
+//	// get back sessionMap
+//	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+//	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 //
-//	    if (questionForm.getFile() != null && FileUtil.isExecutableFile(questionForm.getFile().getFileName())) {
-//		ActionMessage msg = new ActionMessage("error.attachment.executable");
-//		errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
-//	    }
+//	Long assessmentQuestionUid = new Long(request.getParameter(AssessmentConstants.PARAM_QUESTION_UID));
+//	IAssessmentService service = getAssessmentService();
+//	HttpSession ss = SessionManager.getSession();
+//	// get back login user DTO
+//	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 //
-//	    // validate question size
-//	    FileValidatorUtil.validateFileSize(questionForm.getFile(), false, errors);
+//	Long sessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
+//	service.setQuestionComplete(assessmentQuestionUid, new Long(user.getUserID().intValue()), sessionId);
 //
-//	    // for edit validate: file already exist
-//	    if (!questionForm.isHasFile()
-//		    && (questionForm.getFile() == null || StringUtils.isEmpty(questionForm.getFile().getFileName()))) {
-//		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(AssessmentConstants.ERROR_MSG_FILE_BLANK));
+//	SortedSet<AssessmentQuestion> questionList = (SortedSet<AssessmentQuestion>) sessionMap
+//		.get(AssessmentConstants.ATTR_QUESTION_LIST);
+//	SortedSet<AssessmentQuestion> assessmentQuestionList = questionList;
+//	// set assessment question complete tag	
+//	for (AssessmentQuestion question : assessmentQuestionList) {
+//	    if (question.getUid().equals(assessmentQuestionUid)) {
+//		question.setComplete(true);
+//		break;
 //	    }
 //	}
-	return errors;
-    }
+//    }
+    
+//    /**
+//     * Set complete flag for given assessment question.
+//     * 
+//     * @param request
+//     * @param sessionId
+//     */
+//    private void setResults(HttpServletRequest request) {
+//	// get back sessionMap
+//	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+//	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+//
+//	Long assessmentQuestionUid = new Long(request.getParameter(AssessmentConstants.PARAM_QUESTION_UID));
+//	IAssessmentService service = getAssessmentService();
+//	HttpSession ss = SessionManager.getSession();
+//	// get back login user DTO
+//	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+//	Long sessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
+//	service.setQuestionComplete(assessmentQuestionUid, new Long(user.getUserID().intValue()), sessionId);
+//
+//	SortedSet<AssessmentQuestion> questionList = (SortedSet<AssessmentQuestion>) sessionMap
+//		.get(AssessmentConstants.ATTR_QUESTION_LIST);
+//	SortedSet<AssessmentQuestion> assessmentQuestionList = questionList;
+//	// set assessment question complete tag	
+//	for (AssessmentQuestion question : assessmentQuestionList) {
+//	    if (question.getUid().equals(assessmentQuestionUid)) {
+//		question.setComplete(true);
+//		break;
+//	    }
+//	}
+//    }
+    
+    private void popupQuestionOptionsWithUserAnswers(HttpServletRequest request){
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
+	ArrayList<SortedSet<AssessmentQuestionResult>> pagedResults = (ArrayList<SortedSet<AssessmentQuestionResult>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	SortedSet<AssessmentQuestionResult> resultList = (SortedSet<AssessmentQuestionResult>) pagedResults.get(pageNumber-1);
+	int count = resultList.size(); 
+	
+	for (int i = 0; i < count; i++) {
+	    Long assessmentQuestionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID + i);
+	    AssessmentQuestion question = null;
+	    for (AssessmentQuestionResult result : resultList) {
+		if (result.getAssessmentQuestion().getUid().equals(assessmentQuestionUid)) {
+		    question = result.getAssessmentQuestion();
+		    break;
+		}
+	    }
+	    if (question == null) {
+		throw new RuntimeException("You screwed up!");
+	    }
+	    int questionType = question.getType();
 
+	    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		    boolean answerBoolean = false;
+		    if (question.isMultipleAnswersAllowed()) {
+			String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_"
+				+ option.getSequenceId());
+			answerBoolean = !StringUtils.isBlank(answerString);
+		    } else {
+			String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+			if (answerString != null) {
+			    int optionSequenceId = Integer.parseInt(answerString);
+			    answerBoolean = (option.getSequenceId() == optionSequenceId);
+			}
+		    }
+		    option.setAnswerBoolean(answerBoolean);
+		}
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		    int answerInt = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + option.getSequenceId()); 
+		    option.setAnswerInt(answerInt);
+		}
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
+		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		question.setAnswerString(answerString);
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		question.setAnswerString(answerString);
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
+		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		if (answerString != null) {
+		    question.setAnswerBoolean(Boolean.parseBoolean(answerString));
+		    question.setAnswerString("not null");
+		}
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ESSAY) {
+		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		question.setAnswerString(answerString);
+	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+		//TODO correct answer
+		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		    String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_"
+				+ option.getSequenceId());
+		    option.setAnswerInt(option.getSequenceId());
+		}
+	    }
+	}
+    }
+    
     /**
-     * Set complete flag for given assessment question.
+     * Get answer options from <code>HttpRequest</code>
      * 
      * @param request
-     * @param sessionId
+     * 
      */
-    private void doComplete(HttpServletRequest request) {
-	// get back sessionMap
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+    private void processUserAnswersPage(HttpServletRequest request, SortedSet<AssessmentQuestionResult> resultList, boolean isFinish) {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-	Long assessmentQuestionUid = new Long(request.getParameter(AssessmentConstants.PARAM_QUESTION_UID));
 	IAssessmentService service = getAssessmentService();
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	Long sessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
-	service.setQuestionComplete(assessmentQuestionUid, new Long(user.getUserID().intValue()), sessionId);
-
-	// set assessment question complete tag
-	SortedSet<AssessmentQuestion> assessmentQuestionList = getAssessmentQuestionList(sessionMap);
-	for (AssessmentQuestion question : assessmentQuestionList) {
-	    if (question.getUid().equals(assessmentQuestionUid)) {
-		question.setComplete(true);
-		break;
+	Long userId = new Long(user.getUserID().intValue());
+	Long sessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);	
+	
+	SortedSet<AssessmentQuestionResult> savedResultList = new TreeSet<AssessmentQuestionResult>(
+		new AssessmentQuestionResultComparator()); 
+	for (AssessmentQuestionResult result : resultList) {
+	    AssessmentQuestionResult savedResult = service.processUserAnswer(result, userId, sessionId, isFinish); 
+	    savedResultList.add(savedResult);
+	}
+	resultList.clear();
+	resultList.addAll(savedResultList);
+    }
+    
+    /**
+     * Split Request Parameter from <code>HttpRequest</code>
+     * 
+     * @param request
+     * @param parameterName parameterName
+     */
+    private Map<String, String> splitRequestParameter(HttpServletRequest request, String parameterName) {
+	String list = request.getParameter(parameterName);
+	String[] params = list.split("&");
+	Map<String, String> paramMap = new HashMap<String, String>();
+	String[] pair;
+	for (String item : params) {
+	    pair = item.split("=");
+	    if (pair == null || pair.length != 2)
+		continue;
+	    try {
+		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
+	    } catch (UnsupportedEncodingException e) {
+		log.error("Error occurs when decode instruction string:" + e.toString());
 	    }
 	}
+	return paramMap;
     }
 
 }

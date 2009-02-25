@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * 
  * @hibernate.class table="tl_laasse10_assessment_overall_feedback"
  */
-public class AssessmentOverallFeedback implements Cloneable {
+public class AssessmentOverallFeedback implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentOverallFeedback.class);
 
     private Long uid;

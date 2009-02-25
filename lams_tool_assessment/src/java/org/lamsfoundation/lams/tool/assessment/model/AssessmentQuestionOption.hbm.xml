@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionVisitLog"
-        table="tl_laasse10_question_log"
+        name="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption"
+        table="tl_laasse10_question_option"
     >
 
         <id
@@ -19,59 +19,71 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-AssessmentQuestionVisitLog.xml 
+                  hibernate-generator-params-AssessmentQuestionOption.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <property
-            name="accessDate"
-            type="java.util.Date"
+            name="sequenceId"
+            type="int"
             update="true"
             insert="true"
-            column="access_date"
-        />
-
-        <many-to-one
-            name="assessmentQuestion"
-            class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion"
-            cascade="none"
-            outer-join="auto"
-            update="true"
-            insert="true"
-            column="assessment_question_uid"
-        />
-
-        <many-to-one
-            name="user"
-            class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
-            cascade="none"
-            outer-join="auto"
-            update="true"
-            insert="true"
-            column="user_uid"
+            column="sequence_id"
         />
 
         <property
-            name="complete"
-            type="boolean"
+            name="question"
+            type="text"
             update="true"
             insert="true"
-            column="complete"
+            column="question"
         />
 
         <property
-            name="sessionId"
-            type="java.lang.Long"
+            name="optionString"
+            type="text"
             update="true"
             insert="true"
-            column="session_id"
+            column="option_string"
+        />
+
+        <property
+            name="optionFloat"
+            type="float"
+            update="true"
+            insert="true"
+            column="option_float"
+        />
+
+        <property
+            name="acceptedError"
+            type="float"
+            update="true"
+            insert="true"
+            column="accepted_error"
+        />
+
+        <property
+            name="grade"
+            type="float"
+            update="true"
+            insert="true"
+            column="grade"
+        />
+
+        <property
+            name="feedback"
+            type="text"
+            update="true"
+            insert="true"
+            column="feedback"
         />
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-AssessmentQuestionVisitLog.xml
+                hibernate-properties-AssessmentQuestionOption.xml
             containing the additional properties and place it in your merge dir.
         -->
 

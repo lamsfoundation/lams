@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.assessment.dto;
 
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentWebUtils;
 
 /**
  * List contains following element: <br>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult"
+        table="tl_laasse10_question_result"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-AssessmentQuestionResult.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <many-to-one
+            name="user"
+            class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="user_uid"
+        />
+
+        <many-to-one
+            name="assessmentQuestion"
+            class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="assessment_question_uid"
+        />
+
+        <property
+            name="answerString"
+            type="text"
+            update="true"
+            insert="true"
+            column="answer_string"
+        />
+
+        <property
+            name="answerFloat"
+            type="float"
+            update="true"
+            insert="true"
+            column="answer_float"
+        />
+
+        <property
+            name="answerBoolean"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="answer_boolean"
+        />
+
+        <property
+            name="mark"
+            type="java.lang.Float"
+            update="true"
+            insert="true"
+            column="mark"
+        />
+
+        <property
+            name="penalty"
+            type="java.lang.Float"
+            update="true"
+            insert="true"
+            column="penalty"
+        />
+
+        <property
+            name="startDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="start_date"
+        />
+
+        <property
+            name="finishDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="finish_date"
+        />
+
+        <property
+            name="sessionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="session_id"
+        />
+
+        <set
+            name="answers"
+            lazy="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="sequence_id asc"
+        >
+
+            <key
+                column="result_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswer"
+            />
+
+        </set>
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-AssessmentQuestionResult.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>

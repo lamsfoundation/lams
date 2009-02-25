@@ -26,14 +26,14 @@ package org.lamsfoundation.lams.tool.assessment.model;
 import org.apache.log4j.Logger;
 
 /**
- * AssessmentAnswerOption
+ * AssessmentQuestionOption
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_answer_options"
+ * @hibernate.class table="tl_laasse10_question_option"
  */
-public class AssessmentAnswerOption implements Cloneable {
-    private static final Logger log = Logger.getLogger(AssessmentAnswerOption.class);
+public class AssessmentQuestionOption implements Cloneable, Sequencable {
+    private static final Logger log = Logger.getLogger(AssessmentQuestionOption.class);
 
     private Long uid;
 
@@ -41,9 +41,9 @@ public class AssessmentAnswerOption implements Cloneable {
     
     private String question;
 
-    private String answerString;
+    private String optionString;
     
-    private Long answerLong;
+    private float optionFloat;
     
     private float acceptedError;
     
@@ -52,7 +52,9 @@ public class AssessmentAnswerOption implements Cloneable {
     private String feedback;
     
     // *************** NON Persist Fields ********************    
-    private String acceptedErrorStr = "0.0";;
+    private int answerInt = -1;
+    
+    private boolean answerBoolean;
 
     // **********************************************************
     // Get/Set methods
@@ -71,9 +73,9 @@ public class AssessmentAnswerOption implements Cloneable {
     }
 
     /**
-     * Returns image sequence number.
+     * Returns option's sequence number.
      * 
-     * @return image sequence number
+     * @return option's sequence number
      * 
      * @hibernate.property column="sequence_id"
      */
@@ -82,10 +84,10 @@ public class AssessmentAnswerOption implements Cloneable {
     }
 
     /**
-     * Sets image sequence number.
+     * Sets option's sequence number.
      * 
      * @param sequenceId
-     *                image sequence number
+     *                option's sequence number
      */
     public void setSequenceId(int sequenceId) {
 	this.sequenceId = sequenceId;
@@ -105,29 +107,29 @@ public class AssessmentAnswerOption implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="answer_string" type="text"
+     * @hibernate.property column="option_string" type="text"
      * 
      * @return Returns the possible answer.
      */
-    public String getAnswerString() {
-	return answerString;
+    public String getOptionString() {
+	return optionString;
     }
 
-    public void setAnswerString(String answerString) {
-	this.answerString = answerString;
+    public void setOptionString(String optionString) {
+	this.optionString = optionString;
     }
     
     /**
-     * @hibernate.property column="answer_long"
+     * @hibernate.property column="option_float"
      * 
      * @return Returns the possible numeric answer.
      */
-    public Long getAnswerLong() {
-	return answerLong;
+    public float getOptionFloat() {
+	return optionFloat;
     }
 
-    public void setAnswerLong(Long answerLong) {
-	this.answerLong = answerLong;
+    public void setOptionFloat(float optionFloat) {
+	this.optionFloat = optionFloat;
     }
 
     /**
@@ -177,21 +179,28 @@ public class AssessmentAnswerOption implements Cloneable {
 	this.feedback = feedback;
     }
     
-    public String getAcceptedErrorStr() {
-	return acceptedErrorStr;
+    public int getAnswerInt() {
+	return answerInt;
     }
-    public void setAcceptedErrorStr(String acceptedErrorStr) {
-	this.acceptedErrorStr = acceptedErrorStr;
+    public void setAnswerInt(int answerInt) {
+	this.answerInt = answerInt;
     }
+    
+    public boolean getAnswerBoolean() {
+	return answerBoolean;
+    }
+    public void setAnswerBoolean(boolean answerBoolean) {
+	this.answerBoolean = answerBoolean;
+    }    
 
     @Override
     public Object clone() {
-	AssessmentAnswerOption obj = null;
+	AssessmentQuestionOption obj = null;
 	try {
-	    obj = (AssessmentAnswerOption) super.clone();
+	    obj = (AssessmentQuestionOption) super.clone();
 	    obj.setUid(null);
 	} catch (CloneNotSupportedException e) {
-	    AssessmentAnswerOption.log.error("When clone " + AssessmentAnswerOption.class + " failed");
+	    AssessmentQuestionOption.log.error("When clone " + AssessmentQuestionOption.class + " failed");
 	}
 
 	return obj;

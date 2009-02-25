@@ -129,9 +129,9 @@
 	
 		<!-- ==========  Authroing Definitions: Assessment Answer Option methods ========== -->
 		
-		<action path="/authoring/newOption"
+		<action path="/authoring/addOption"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
-			parameter="newOption">
+			parameter="addOption">
 			<forward name="success" path="/pages/authoring/parts/optionlist.jsp" />
 		</action>
 		<action path="/authoring/removeOption"
@@ -177,10 +177,25 @@
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="start" >
-			<forward name="success" path="/pages/learning/start.jsp" />
+			<forward name="success" path="/pages/learning/learning.jsp" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />			
 		</action>
+		<action path="/learning/nextPage"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="nextPage" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>
+		<action path="/learning/submitPage"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="submitPage" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>
+		<action path="/learning/submitAll"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="submitAll" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>				
 		<action path="/learning/completeQuestion"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="complete" >
@@ -219,6 +234,16 @@
 			<forward name="file" path="/pages/learning/addfile.jsp" />
 			<forward name="success" path="/pages/learning/success.jsp" />
 		</action>
+		<action path="/learning/upOption"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="upOption">
+			<forward name="success" path="/pages/learning/parts/ordering.jsp" />
+		</action>
+		<action path="/learning/downOption"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="downOption">
+			<forward name="success" path="/pages/learning/parts/ordering.jsp" />
+		</action>		
 		
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"

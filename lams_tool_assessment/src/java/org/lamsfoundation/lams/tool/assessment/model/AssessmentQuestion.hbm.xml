@@ -181,7 +181,7 @@
         />
 
         <set
-            name="answerOptions"
+            name="questionOptions"
             lazy="false"
             cascade="all"
             sort="unsorted"
@@ -194,7 +194,7 @@
             </key>
 
             <one-to-many
-                  class="org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswerOption"
+                  class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption"
             />
 
         </set>

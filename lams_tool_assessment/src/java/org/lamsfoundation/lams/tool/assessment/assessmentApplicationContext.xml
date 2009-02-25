@@ -22,10 +22,11 @@
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentUser.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/Assessment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestion.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentAnswerOption.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestionOption.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentOverallFeedback.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentUnit.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestionVisitLog.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestionResult.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentAnswer.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentSession.hbm.xml</value>
             </list>
@@ -43,7 +44,7 @@
             <ref local="assessmentSessionFactory"/>
         </property>
     </bean>
-    <bean id="assessmentQuestionVisitDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionVisitDAOHibernate">
+    <bean id="assessmentQuestionResultDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionResultDAOHibernate">
         <property name="sessionFactory">
             <ref local="assessmentSessionFactory"/>
         </property>
@@ -80,8 +81,8 @@
         <property name="assessmentQuestionDao">
             <ref local="assessmentQuestionDao"/>
         </property>
-        <property name="assessmentQuestionVisitDao">
-            <ref local="assessmentQuestionVisitDao"/>
+        <property name="assessmentQuestionResultDao">
+            <ref local="assessmentQuestionResultDao"/>
         </property>
         <property name="assessmentAttachmentDao">
             <ref local="assessmentAttachmentDao"/>
@@ -138,6 +139,8 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="processUserAnswer">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setQuestionStartDate">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setQuestionComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

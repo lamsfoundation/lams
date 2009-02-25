@@ -90,9 +90,11 @@ public class AssessmentConstants {
     
     public static final String ATTR_OPTION_COUNT = "optionCount";
     
-    public static final String ATTR_OPTION_ANSWER_PREFIX = "optionAnswer";
+    public static final String ATTR_OPTION_STRING_PREFIX = "optionString";
     
     public static final String ATTR_OPTION_GRADE_PREFIX = "optionGrade";
+    
+    public static final String ATTR_OPTION_FLOAT_PREFIX = "optionFloat";
     
     public static final String ATTR_OPTION_ACCEPTED_ERROR_PREFIX = "optionAcceptedError";
     
@@ -101,6 +103,8 @@ public class AssessmentConstants {
     public static final String ATTR_OPTION_SEQUENCE_ID_PREFIX = "optionSequenceId";
     
     public static final String ATTR_OPTION_QUESTION_PREFIX = "optionQuestion";
+    
+    public static final String ATTR_QUESTION_PREFIX = "question";
     
     public static final String ATTR_QUESTION_TYPE = "questionType";
 
@@ -169,6 +173,8 @@ public class AssessmentConstants {
     public static final String ATTR_PAGE_NUMBER = "pageNumber";
     
     public static final String ATTR_PAGED_QUESTIONS = "pagedQuestions";
+    
+    public static final String ATTR_RESULT_FOR_ORDERING = "resultForOrdering";
 
     // error message keys
     public static final String ERROR_MSG_QUESTION_NAME_BLANK = "error.question.name.blank";
@@ -179,14 +185,6 @@ public class AssessmentConstants {
     
     public static final String ERROR_MSG_PENALTY_FACTOR_WRONG_FORMAT = "error.penalty.factor.wrong.format";
     
-    public static final String ERROR_MSG_NOT_ENOUGH_OPTIONS = "error.not.enough.options";
-
-    public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
-
-    public static final String ERROR_MSG_INVALID_URL = "error.resource.item.invalid.url";
-
-    public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
-
     public static final String PAGE_EDITABLE = "isPageEditable";
 
     public static final String MODE_AUTHOR_SESSION = "author_session";

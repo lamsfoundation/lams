@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.assessment.web.form;
 
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.upload.FormFile;
 
 /**
  * Assessment Question Form.

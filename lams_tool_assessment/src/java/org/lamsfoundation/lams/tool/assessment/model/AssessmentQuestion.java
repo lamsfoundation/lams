@@ -24,11 +24,12 @@
 package org.lamsfoundation.lams.tool.assessment.model;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 /**
  * Assessment Question
@@ -38,11 +39,11 @@ import org.apache.log4j.Logger;
  * @hibernate.class table="tl_laasse10_assessment_question"
  * 
  */
-public class AssessmentQuestion implements Cloneable {
+public class AssessmentQuestion implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);
 
     private Long uid;
-    // Assessment Type:1=URL,2=File,3=Website,4=Learning Object
+
     private short type;
 
     private String title;
@@ -82,16 +83,22 @@ public class AssessmentQuestion implements Cloneable {
     // ***********************************************
     // Non persistant fields:
     
-    private Set answerOptions;
+    private Set<AssessmentQuestionOption> questionOptions;
     
-    private Set units;
+    private Set<AssessmentUnit> units;
     
     // DTO fields:
     private boolean complete;
     
+    private String answerString;
+    
+    private float answerFloat;
+    
+    private boolean answerBoolean;
+    
     public AssessmentQuestion() {
-	answerOptions = new HashSet();
-	units = new HashSet();
+	questionOptions = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
+	units = new TreeSet<AssessmentUnit>(new SequencableComparator());
     }
 
     public Object clone() {
@@ -100,22 +107,22 @@ public class AssessmentQuestion implements Cloneable {
 	    obj = (AssessmentQuestion) super.clone();
 	    ((AssessmentQuestion) obj).setUid(null);
 	    
-	    // clone answerOptions
-	    if (answerOptions != null) {
-		Iterator iter = answerOptions.iterator();
-		Set set = new HashSet();
+	    // clone questionOptions
+	    if (questionOptions != null) {
+		Iterator<AssessmentQuestionOption> iter = questionOptions.iterator();
+		Set<AssessmentQuestionOption> set = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
 		while (iter.hasNext()) {
-		    AssessmentAnswerOption answerOption = (AssessmentAnswerOption) iter.next();
-		    AssessmentAnswerOption newAnswerOption = (AssessmentAnswerOption) answerOption.clone();
+		    AssessmentQuestionOption answerOption = (AssessmentQuestionOption) iter.next();
+		    AssessmentQuestionOption newAnswerOption = (AssessmentQuestionOption) answerOption.clone();
 		    set.add(newAnswerOption);
 		}
-		obj.answerOptions = set;
+		obj.questionOptions = set;
 	    }
 	    
 	    // clone units
 	    if (units != null) {
-		Iterator iter = units.iterator();
-		Set set = new HashSet();
+		Iterator<AssessmentUnit> iter = units.iterator();
+		Set<AssessmentUnit> set = new TreeSet<AssessmentUnit>(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentUnit unit = (AssessmentUnit) iter.next();
 		    AssessmentUnit newUnit = (AssessmentUnit) unit.clone();
@@ -397,19 +404,19 @@ public class AssessmentQuestion implements Cloneable {
      * 
      * @hibernate.set cascade="all" order-by="sequence_id asc"
      * @hibernate.collection-key column="question_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswerOption"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption"
      * 
-     * @return a set of answerOptions to this AssessmentQuestion.
+     * @return a set of questionOptions to this AssessmentQuestion.
      */
-    public Set getAnswerOptions() {
-	return answerOptions;
+    public Set<AssessmentQuestionOption> getQuestionOptions() {
+	return questionOptions;
     }
 
     /**
-     * @param answerOptions answerOptions to set.
+     * @param questionOptions questionOptions to set.
      */
-    public void setAnswerOptions(Set answerOptions) {
-	this.answerOptions = answerOptions;
+    public void setQuestionOptions(Set<AssessmentQuestionOption> answerOptions) {
+	this.questionOptions = answerOptions;
     }
     
     /**
@@ -420,22 +427,42 @@ public class AssessmentQuestion implements Cloneable {
      * 
      * @return a set of units to this AssessmentQuestion.
      */
-    public Set getUnits() {
+    public Set<AssessmentUnit> getUnits() {
 	return units;
     }
 
     /**
-     * @param answerOptions units to set.
+     * @param questionOptions units to set.
      */
-    public void setUnits(Set units) {
+    public void setUnits(Set<AssessmentUnit> units) {
 	this.units = units;
     }
     
     public void setComplete(boolean complete) {
 	this.complete = complete;
     }
-
     public boolean isComplete() {
 	return complete;
     }
+    
+    public String getAnswerString() {
+	return answerString;
+    }
+    public void setAnswerString(String answerString) {
+	this.answerString = answerString;
+    }
+    
+    public float getAnswerFloat() {
+	return answerFloat;
+    }
+    public void setAnswerFloat(float answerFloat) {
+	this.answerFloat = answerFloat;
+    }
+    
+    public boolean getAnswerBoolean() {
+	return answerBoolean;
+    }
+    public void setAnswerBoolean(boolean answerBoolean) {
+	this.answerBoolean = answerBoolean;
+    }   
 }

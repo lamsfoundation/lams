@@ -18,31 +18,31 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.tool.assessment.util;  
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.assessment.util;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
- 
+import org.lamsfoundation.lams.tool.assessment.model.Sequencable;
+
 /**
+ * SequencableComparator.
  * 
  * @author Andrey Balan
  * 
  */
-public class AssessmentUnitComparator implements Comparator<AssessmentUnit> {
+public class SequencableComparator implements Comparator<Sequencable> {
 
-    public int compare(AssessmentUnit o1, AssessmentUnit o2) {
-	if (o1 != null && o2 != null) {
+    public int compare(Sequencable o1, Sequencable o2) {
+	if ((o1 != null) && (o2 != null)) {
 	    return o1.getSequenceId() - o2.getSequenceId();
-	} else if (o1 != null)
+	} else if (o1 != null) {
 	    return 1;
-	else
+	} else {
 	    return -1;
+	}
     }
 
 }
- 

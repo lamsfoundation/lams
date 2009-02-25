@@ -25,10 +25,10 @@ package org.lamsfoundation.lams.tool.assessment.model;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -36,6 +36,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
+import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 /**
  * Assessment
@@ -119,9 +120,9 @@ public class Assessment implements Cloneable {
      * 
      */
     public Assessment() {
-	attachments = new HashSet();
-	questions = new HashSet();
-	overallFeedbacks = new HashSet();
+	attachments = new TreeSet(new SequencableComparator());
+	questions = new TreeSet(new SequencableComparator());
+	overallFeedbacks = new TreeSet(new SequencableComparator());
     }
 
     // **********************************************************
@@ -154,7 +155,7 @@ public class Assessment implements Cloneable {
 	    assessment.setUid(null);
 	    if (questions != null) {
 		Iterator iter = questions.iterator();
-		Set set = new HashSet();
+		Set set = new TreeSet(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentQuestion question = (AssessmentQuestion) iter.next();
 		    AssessmentQuestion newQuestion = (AssessmentQuestion) question.clone();
@@ -166,7 +167,7 @@ public class Assessment implements Cloneable {
 	    // clone OverallFeedbacks
 	    if (overallFeedbacks != null) {
 		Iterator iter = overallFeedbacks.iterator();
-		Set set = new HashSet();
+		Set set = new TreeSet(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentOverallFeedback overallFeedback = (AssessmentOverallFeedback) iter.next();
 		    AssessmentOverallFeedback newOverallFeedback = (AssessmentOverallFeedback) overallFeedback.clone();
@@ -178,7 +179,7 @@ public class Assessment implements Cloneable {
 	    // clone attachment
 	    if (attachments != null) {
 		Iterator iter = attachments.iterator();
-		Set set = new HashSet();
+		Set set = new TreeSet(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentAttachment file = (AssessmentAttachment) iter.next();
 		    AssessmentAttachment newFile = (AssessmentAttachment) file.clone();

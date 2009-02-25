@@ -23,20 +23,22 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.assessment.service;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -168,9 +170,9 @@ public interface IAssessmentService {
 
     void retrieveComplete(SortedSet<AssessmentQuestion> assessmentQuestionList, AssessmentUser user);
 
-    void setQuestionComplete(Long assessmentQuestionUid, Long userId, Long sessionId);
-
-    void setQuestionAccess(Long assessmentQuestionUid, Long userId, Long sessionId);
+    void setQuestionStartDate(Long assessmentQuestionUid, Long userId, Long sessionId);
+    
+    AssessmentQuestionResult processUserAnswer(AssessmentQuestionResult result, Long userId, Long sessionId, boolean isFinish);
 
     /**
      * If success return next activity's url, otherwise return null.

@@ -2,9 +2,10 @@ SET FOREIGN_KEY_CHECKS=0;
 drop table if exists tl_laasse10_attachment;
 drop table if exists tl_laasse10_assessment;
 drop table if exists tl_laasse10_assessment_question;
-drop table if exists tl_laasse10_answer_options;
+drop table if exists tl_laasse10_question_option;
 drop table if exists tl_laasse10_assessment_overall_feedback;
-drop table if exists tl_laasse10_assessment_question_visit_log;
+drop table if exists tl_laasse10_assessment_question_result;
+drop table if exists tl_laasse10_assessment_answer;
 drop table if exists tl_laasse10_session;
 drop table if exists tl_laasse10_user;
 create table tl_laasse10_attachment (
@@ -68,13 +69,13 @@ create table tl_laasse10_assessment_question (
    session_uid bigint,
    primary key (uid)
 )type=innodb;
-create table tl_laasse10_answer_options (
+create table tl_laasse10_question_option (
    uid bigint not null unique auto_increment,
    question_uid bigint,
    sequence_id integer,
    question text,
-   answer_string text,
-   answer_long bigint,
+   option_string text,
+   option_float float,
    accepted_error float,
    grade float,
    feedback text,
@@ -96,15 +97,26 @@ create table tl_laasse10_assessment_unit (
    unit varchar(255),
    primary key (uid)
 )type=innodb;
-create table tl_laasse10_question_log (
+create table tl_laasse10_question_result (
    uid bigint not null auto_increment,
-   access_date datetime,
+   start_date datetime,
+   finish_date datetime,
    assessment_question_uid bigint,
    answer_string text,
    answer_float float,
+   answer_boolean boolean,
+   mark float,
+   penalty float,
    user_uid bigint,
-   complete tinyint,
    session_id bigint,
+   primary key (uid)
+)type=innodb;
+create table tl_laasse10_assessment_answer (
+   uid bigint not null unique auto_increment,
+   result_uid bigint,
+   sequence_id integer,
+   answer_boolean boolean,
+   answer_int integer,
    primary key (uid)
 )type=innodb;
 create table tl_laasse10_session (
@@ -133,11 +145,12 @@ alter table tl_laasse10_assessment add index FK_NEW_1720029621_89093BF758092FB (
 alter table tl_laasse10_assessment_question add index FK_NEW_1720029621_F52D1F93758092FB (create_by), add constraint FK_NEW_1720029621_F52D1F93758092FB foreign key (create_by) references tl_laasse10_user (uid);
 alter table tl_laasse10_assessment_question add index FK_NEW_1720029621_F52D1F9330E79035 (assessment_uid), add constraint FK_NEW_1720029621_F52D1F9330E79035 foreign key (assessment_uid) references tl_laasse10_assessment (uid);
 alter table tl_laasse10_assessment_question add index FK_NEW_1720029621_F52D1F93EC0D3147 (session_uid), add constraint FK_NEW_1720029621_F52D1F93EC0D3147 foreign key (session_uid) references tl_laasse10_session (uid);
-alter table tl_laasse10_answer_options add index FK_tl_laasse10_answer_options_1 (question_uid), add constraint FK_tl_laasse10_answer_options_1 foreign key (question_uid) references tl_laasse10_assessment_question (uid);
+alter table tl_laasse10_question_option add index FK_tl_laasse10_question_option_1 (question_uid), add constraint FK_tl_laasse10_question_option_1 foreign key (question_uid) references tl_laasse10_assessment_question (uid);
 alter table tl_laasse10_assessment_overall_feedback add index FK_tl_laasse10_assessment_overall_feedback_1 (assessment_uid), add constraint FK_tl_laasse10_assessment_overall_feedback_1 foreign key (assessment_uid) references tl_laasse10_assessment (uid);
 alter table tl_laasse10_assessment_unit add index FK_tl_laasse10_assessment_unit_1 (question_uid), add constraint FK_tl_laasse10_assessment_unit_1 foreign key (question_uid) references tl_laasse10_assessment_question (uid);
-alter table tl_laasse10_question_log add index FK_NEW_1720029621_693580A438BF8DFE (assessment_question_uid), add constraint FK_NEW_1720029621_693580A438BF8DFE foreign key (assessment_question_uid) references tl_laasse10_assessment_question (uid);
-alter table tl_laasse10_question_log add index FK_NEW_1720029621_693580A441F9365D (user_uid), add constraint FK_NEW_1720029621_693580A441F9365D foreign key (user_uid) references tl_laasse10_user (uid);
+alter table tl_laasse10_question_result add index FK_NEW_1720029621_693580A438BF8DFE (assessment_question_uid), add constraint FK_NEW_1720029621_693580A438BF8DFE foreign key (assessment_question_uid) references tl_laasse10_assessment_question (uid);
+alter table tl_laasse10_question_result add index FK_NEW_1720029621_693580A441F9365D (user_uid), add constraint FK_NEW_1720029621_693580A441F9365D foreign key (user_uid) references tl_laasse10_user (uid);
+alter table tl_laasse10_assessment_answer add index FK_tl_laasse10_assessment_answer_1 (result_uid), add constraint FK_tl_laasse10_assessment_answer_1 foreign key (result_uid) references tl_laasse10_question_result (uid);
 alter table tl_laasse10_session add index FK_NEW_1720029621_24AA78C530E79035 (assessment_uid), add constraint FK_NEW_1720029621_24AA78C530E79035 foreign key (assessment_uid) references tl_laasse10_assessment (uid);
 alter table tl_laasse10_user add index FK_NEW_1720029621_30113BFCEC0D3147 (session_uid), add constraint FK_NEW_1720029621_30113BFCEC0D3147 foreign key (session_uid) references tl_laasse10_session (uid);
 alter table tl_laasse10_user add index FK_NEW_1720029621_30113BFC309ED320 (assessment_uid), add constraint FK_NEW_1720029621_30113BFC309ED320 foreign key (assessment_uid) references tl_laasse10_assessment (uid);

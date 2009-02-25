@@ -21,27 +21,27 @@
  */  
  
 /* $Id$ */  
-package org.lamsfoundation.lams.tool.assessment.util;  
+package org.lamsfoundation.lams.tool.assessment.model;
 
-import java.util.Comparator;
-
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
- 
 /**
+ * Sequencable
  * 
  * @author Andrey Balan
- * 
  */
-public class AssessmentOverallFeedbackComparator implements Comparator<AssessmentOverallFeedback> {
+public interface Sequencable {
 
-    public int compare(AssessmentOverallFeedback o1, AssessmentOverallFeedback o2) {
-	if (o1 != null && o2 != null) {
-	    return o1.getSequenceId() - o2.getSequenceId();
-	} else if (o1 != null)
-	    return 1;
-	else
-	    return -1;
-    }
+    /**
+     * Returns sequence number.
+     * 
+     * @return sequence number
+     */
+    public int getSequenceId();
 
+    /**
+     * Sets sequence number.
+     * 
+     * @param sequenceId
+     *            sequence number
+     */
+    public void setSequenceId(int sequenceId);
 }
- 
