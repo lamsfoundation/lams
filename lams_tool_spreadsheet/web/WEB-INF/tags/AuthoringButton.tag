@@ -86,10 +86,10 @@
 </script>	
 <p id="saveCancelButtons" >
 		<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="button right-buttons space-left">
-			<fmt:message key="${cancelButtonLabelKey}" />
+			<span class="cancelIcon"><fmt:message key="${cancelButtonLabelKey}" /></span>
 		</html:link>
 		<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button right-buttons space-left">
-			<fmt:message key="${saveButtonLabelKey}" /> 
+			<span class="okIcon"><fmt:message key="${saveButtonLabelKey}" /></span>
 		</html:link>
 </p>
 <!-- end tab content -->
