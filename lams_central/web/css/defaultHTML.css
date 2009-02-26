@@ -360,7 +360,7 @@ Layout of main content section
 	color: #999;
 	background: url('../images/css/btn_off.gif') repeat-x 0px 2px;
 	border: 0px none;
-	padding:5px 20px 6px 20px;
+	padding:5px 20px 6px 10px;
 	}
 
 #saveCancelButtons a:hover.button {
@@ -369,6 +369,20 @@ Layout of main content section
 	border: 0px none;
 	padding:5px 20px 6px 20px;
 	text-decoration: none;
+}
+
+/* OK and Cancel icon buttons */
+.okIcon {
+	padding: 0 0 5px 18px; 
+	background: url('../images/css/disk.png') no-repeat;
+	
+}
+
+/* OK and Cancel icon buttons */
+.cancelIcon {
+	padding: 0 0 5px 18px; 
+	background: url('../images/css/cancel.png') no-repeat;
+	
 }
 
 /*layout of a general button*/
