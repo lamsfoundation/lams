@@ -28,8 +28,8 @@ import java.util.List;
 public class PedagogicalPlannerTemplateDTO {
     private String sequenceTitle;
     private Boolean sendInPortions;
-    private Integer activitiesInPortion;
-    private Long submitDelay;
+    private Integer activitiesPerPortion;
+    private Integer submitDelay;
     private List<PedagogicalPlannerActivityDTO> activities;
     private Long learningDesignID;
     private Integer activitySupportingPlannerCount = 0;
@@ -50,19 +50,19 @@ public class PedagogicalPlannerTemplateDTO {
 	this.sendInPortions = sendInPortions;
     }
 
-    public Integer getActivitiesInPortion() {
-	return activitiesInPortion;
+    public Integer getActivitiesPerPortion() {
+	return activitiesPerPortion;
     }
 
-    public void setActivitiesInPortion(Integer activitiesInPortion) {
-	this.activitiesInPortion = activitiesInPortion;
+    public void setActivitiesPerPortion(Integer activitiesInPortion) {
+	activitiesPerPortion = activitiesInPortion;
     }
 
-    public Long getSubmitDelay() {
+    public Integer getSubmitDelay() {
 	return submitDelay;
     }
 
-    public void setSubmitDelay(Long submitDelay) {
+    public void setSubmitDelay(Integer submitDelay) {
 	this.submitDelay = submitDelay;
     }
 

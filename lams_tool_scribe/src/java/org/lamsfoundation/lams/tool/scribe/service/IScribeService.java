@@ -37,129 +37,127 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Defines the services available to the web layer from the Scribe Service
  */
 public interface IScribeService {
-	/**
-	 * Makes a copy of the default content and assigns it a newContentID
-	 * 
-	 * @params newContentID
-	 * @return
-	 */
-	public Scribe copyDefaultContent(Long newContentID);
+    /**
+     * Makes a copy of the default content and assigns it a newContentID
+     * 
+     * @params newContentID
+     * @return
+     */
+    public Scribe copyDefaultContent(Long newContentID);
 
-	/**
-	 * Returns an instance of the Scribe tools default content.
-	 * 
-	 * @return
-	 */
-	public Scribe getDefaultContent();
+    /**
+     * Returns an instance of the Scribe tools default content.
+     * 
+     * @return
+     */
+    public Scribe getDefaultContent();
 
-	/**
-	 * @param toolSignature
-	 * @return
-	 */
-	public Long getDefaultContentIdBySignature(String toolSignature);
+    /**
+     * @param toolSignature
+     * @return
+     */
+    public Long getDefaultContentIdBySignature(String toolSignature);
 
-	/**
-	 * @param toolContentID
-	 * @return
-	 */
-	public Scribe getScribeByContentId(Long toolContentID);
+    /**
+     * @param toolContentID
+     * @return
+     */
+    public Scribe getScribeByContentId(Long toolContentID);
 
-	/**
-	 * @param toolContentId
-	 * @param file
-	 * @param type
-	 * @return
-	 */
-	public ScribeAttachment uploadFileToContent(Long toolContentId,
-			FormFile file, String type);
+    /**
+     * @param toolContentId
+     * @param file
+     * @param type
+     * @return
+     */
+    public ScribeAttachment uploadFileToContent(Long toolContentId, FormFile file, String type);
 
-	/**
-	 * @param uuid
-	 * @param versionID
-	 */
-	public void deleteFromRepository(Long uuid, Long versionID)
-			throws ScribeException;
+    /**
+     * @param uuid
+     * @param versionID
+     */
+    public void deleteFromRepository(Long uuid, Long versionID) throws ScribeException;
 
-	/**
-	 * @param contentID
-	 * @param uuid
-	 * @param versionID
-	 * @param type
-	 */
-	public void deleteInstructionFile(Long contentID, Long uuid,
-			Long versionID, String type);
+    /**
+     * @param contentID
+     * @param uuid
+     * @param versionID
+     * @param type
+     */
+    public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type);
 
-	/**
-	 * @param scribe
-	 */
-	public void saveOrUpdateScribe(Scribe scribe);
+    /**
+     * @param scribe
+     */
+    public void saveOrUpdateScribe(Scribe scribe);
 
-	/**
-	 * @param toolSessionId
-	 * @return
-	 */
-	public ScribeSession getSessionBySessionId(Long toolSessionId);
+    /**
+     * @param toolSessionId
+     * @return
+     */
+    public ScribeSession getSessionBySessionId(Long toolSessionId);
 
-	/**
-	 * @param scribeSession
-	 */
-	public void saveOrUpdateScribeSession(ScribeSession scribeSession);
+    /**
+     * @param scribeSession
+     */
+    public void saveOrUpdateScribeSession(ScribeSession scribeSession);
 
-	/**
-	 * 
-	 * @param userId
-	 * @param toolSessionId
-	 * @return
-	 */
-	public ScribeUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
+    /**
+     * 
+     * @param userId
+     * @param toolSessionId
+     * @return
+     */
+    public ScribeUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
-	/**
-	 * 
-	 * @param loginName
-	 * @param sessionID
-	 * @return
-	 */
-	public ScribeUser getUserByLoginNameAndSessionId(String loginName,
-			Long sessionId);
+    /**
+     * 
+     * @param loginName
+     * @param sessionID
+     * @return
+     */
+    public ScribeUser getUserByLoginNameAndSessionId(String loginName, Long sessionId);
 
-	/**
-	 * 
-	 * @param uid
-	 * @return
-	 */
-	public ScribeUser getUserByUID(Long uid);
+    /**
+     * 
+     * @param uid
+     * @return
+     */
+    public ScribeUser getUserByUID(Long uid);
 
-	/**
-	 * 
-	 * @param scribeUser
-	 */
-	public void saveOrUpdateScribeUser(ScribeUser scribeUser);
+    /**
+     * 
+     * @param scribeUser
+     */
+    public void saveOrUpdateScribeUser(ScribeUser scribeUser);
 
-	/**
-	 * 
-	 * @param user
-	 * @param scribeSession
-	 * @return
-	 */
-	public ScribeUser createScribeUser(UserDTO user, ScribeSession scribeSession);
+    /**
+     * 
+     * @param user
+     * @param scribeSession
+     * @return
+     */
+    public ScribeUser createScribeUser(UserDTO user, ScribeSession scribeSession);
 
-	public Long createNotebookEntry(Long id, Integer idType, String signature,
-			Integer userID, String entry);
+    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
-	public NotebookEntry getEntry(Long id, Integer idType, String signature,
-			Integer userID);
+    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
-	/**
-	 * Delete heading's report by given heading UID.
-	 * @param uid
-	 */
-	public void deleteHeadingReport(Long uid);
-	
-	/**
-	 * Clone heading from scribe content.
-	 * @param toolSessionId
-	 */
-	public void createReportEntry(Long toolSessionId);
-	
-	boolean isGroupedActivity(long toolContentID);
+    /**
+     * Delete heading's report by given heading UID.
+     * 
+     * @param uid
+     */
+    public void deleteHeadingReport(Long uid);
+
+    /**
+     * Clone heading from scribe content.
+     * 
+     * @param toolSessionId
+     */
+    public void createReportEntry(Long toolSessionId);
+
+    boolean isGroupedActivity(long toolContentID);
+
+    public void deleteHeading(Long headingUid);
 }

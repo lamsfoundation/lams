@@ -22,6 +22,7 @@
  */
 package org.lamsfoundation.lams.web;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +74,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action-forward name="lessons" path="/profile.do?method=lessons"
  */
 public class IndexAction extends Action {
+
+    private static final String PATH_PEDAGOGICAL_PLANNER = "pedagogical_planner";
+    private static final String PATH_LAMS_CENTRAL = "lams-central.war";
 
     private static Logger log = Logger.getLogger(IndexAction.class);
     private static IUserManagementService userManagementService;
@@ -142,7 +146,9 @@ public class IndexAction extends Action {
     private void setHeaderLinks(HttpServletRequest request) {
 	List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
 	if (request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
-	    headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
+	    if (isPedagogicalPlannerAvailable()) {
+		headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
+	    }
 	    headerLinks.add(new IndexLinkBean("index.author", "javascript:openAuthor()"));
 	}
 	headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?tab=profile"));
@@ -185,5 +191,13 @@ public class IndexAction extends Action {
 	    IndexAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return IndexAction.userManagementService;
+    }
+
+    private boolean isPedagogicalPlannerAvailable() {
+	String lamsEarPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
+	String plannerPath = lamsEarPath + File.separator + IndexAction.PATH_LAMS_CENTRAL + File.separator
+		+ IndexAction.PATH_PEDAGOGICAL_PLANNER;
+	File plannerDir = new File(plannerPath);
+	return plannerDir.isDirectory() && plannerDir.list().length > 0;
     }
 }

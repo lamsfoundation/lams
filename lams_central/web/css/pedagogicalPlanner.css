@@ -48,7 +48,7 @@ CSS for PedagogicalPlanner
 }
 
 div#buttonArea{
-	padding: 0px 10px 40px 0px;
+	padding: 10px 10px 40px 0px;
 }
 div#pedagogicalPlannerBusy{
 	margin: 0px 0px 20px 40%;
@@ -73,7 +73,13 @@ td.branchFirstActivity {
 td.optionFirstActivity {
 	border-bottom: thick lightgreen solid;
 	text-align: center;
-	color:lightgreen;
+	color: lightgreen;
+}
+
+td.parallelFirstActivity {
+	border-bottom: thick orange solid;
+	text-align: center;
+	color: orange;
 }
 
 td.branchLastActivity {
@@ -84,12 +90,20 @@ td.optionLastActivity {
 	border-bottom: thick lightgreen solid;
 }
 
+td.parallelLastActivity {
+	border-bottom: thick orange solid;
+}
+
 td.branch {
 	border-left: thick blue solid;
 }
 
 td.option {
 	border-left: thick lightgreen solid;
+}
+
+td.parallel {
+	border-left: thick orange solid;
 }
 
 td.group1{
@@ -129,8 +143,8 @@ h3.group4{
 }
 
 .sequenceActionImage {
-	height: 15px;
-	width: 15px;
+	height: 16px;
+	width: 16px;
 	cursor: pointer;
 	float: left;
 	margin-left: 5px;

@@ -46,7 +46,7 @@
  
  	for (var activityIndex = 1;activityIndex<=activityCount;activityIndex++){
      //we calculate delay before the form should be submitted
-     var effectiveDelay = sendInPortions ? Math.floor((activityIndex - 1) / activitiesInPortion) * submitDelay : 0;
+     var effectiveDelay = sendInPortions ? Math.floor((activityIndex - 1) / activitiesPerPortion) * submitDelay : 0;
      //each tool will implement an interface that will provide a simplified authoring page with form named "pedagogicalPlannerForm"
      $('#activity'+activityIndex).contents().find('#callID').val(callAttemptedID);
      $('#activity'+activityIndex).contents().find('#activityOrderNumber').val(activityIndex);
@@ -178,11 +178,10 @@
   	if (document.getElementById("hasSubnodesType").checked){
   		document.getElementById("fileArea").style.display="none";
   		document.getElementById("fullDescriptionArea").style.display="block";
+  		
   	}
   	else {
   		document.getElementById("fullDescriptionArea").style.display="none";
   		document.getElementById("fileArea").style.display="block";
   	}
-  	
-  	
   }  

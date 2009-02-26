@@ -15,7 +15,7 @@
 	   var activityCount = ${fn:length(planner.activities)}; //How many activities are there in the sequence
 	   var activitySupportingPlannerCount = ${planner.activitySupportingPlannerCount}; //How many of activities support the planner (their data will be submitted)
 	   var sendInPortions = ${planner.sendInPortions}; //Should the forms be send all at once or rather in parts
-	   var activitiesInPortion =  ${planner.activitiesInPortion}; //After how many submitted forms the script should pause
+	   var activitiesPerPortion =  ${planner.activitiesPerPortion}; //After how many submitted forms the script should pause
 	   var submitDelay =  ${planner.submitDelay}; //How many miliseconds should the script wait before sending another portion of forms
 	   var saveDetailsUrl = "<c:url value='/pedagogicalPlanner.do'/>";
 	   var errorPlannerNotSaved = '<fmt:message key="planner.not.saved" />';
@@ -114,6 +114,9 @@
 				<c:when test="${activity.complexActivityType eq 2}">
 					<c:set var="complexActivityType" value="option" />
 				</c:when>
+				<c:when test="${activity.complexActivityType eq 3}">
+					<c:set var="complexActivityType" value="parallel" />
+				</c:when>
 			</c:choose>
 			
 			<%-- Small row with a down arrow --%>
@@ -155,7 +158,7 @@
 			<tr>
 				<td class="titleCell
 				<c:if test="${not empty activity.group}">
-					${complexActivityType}	group${activity.group}
+					${complexActivityType} group${activity.group}
 				</c:if>
 				<c:if test="${activity.lastNestedActivity}">
 					${complexActivityType}LastActivity

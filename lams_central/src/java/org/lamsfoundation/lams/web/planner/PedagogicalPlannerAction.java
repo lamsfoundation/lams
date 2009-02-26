@@ -63,6 +63,7 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -158,8 +159,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    + CentralConstants.PLANNER_MAX_OPTIONS + " in Pedagogical Planner.";
     private static final String ERROR_NESTED_OPTIONS = "Nested optional activities are not allowed in Pedagogical Planner.";
     private static final String ERROR_NESTED_BRANCHING = "Nested branching activities are not allowed in Pedagogical Planner.";
+    private static final String ERROR_NESTED_PARALLEL = "Nested parallel activities are not allowed in Pedagogical Planner.";
     private static final String ERROR_TOO_MANY_BRANCHES = "Number of branches in branching activity is limited to "
 	    + CentralConstants.PLANNER_MAX_BRANCHES + " in Pedagogical Planner.";
+    private static final String ERROR_TOO_MANY_PARALLEL_ACTIVITIES = "Number of parallel activities is limited to "
+	    + CentralConstants.PLANNER_MAX_PARALLEL_ACTIVITIES + " in Pedagogical Planner.";
 
     private static Logger log = Logger.getLogger(PedagogicalPlannerAction.class);
 
@@ -260,8 +264,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	// Some additional options for submitting activity forms; should be moved to configuration file in the future
 	planner.setSendInPortions(false);
-	planner.setSubmitDelay(5000L);
-	planner.setActivitiesInPortion(2);
+	planner.setSubmitDelay(5000);
+	planner.setActivitiesPerPortion(2);
 
 	request.setAttribute(CentralConstants.ATTR_PLANNER, planner);
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
@@ -420,6 +424,27 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    addedDTO.setGroup(option);
 		    addedDTO.setComplexActivityType(PedagogicalPlannerActivityDTO.TYPE_OPTIONAL_ACTIVITY);
 		}
+		option++;
+	    }
+	    addedDTO.setLastNestedActivity(true);
+	} else if (activity.isParallelActivity()) {
+	    if (isNested) {
+		throw new ServletException(PedagogicalPlannerAction.ERROR_NESTED_PARALLEL);
+	    }
+	    ParallelActivity parallelActivity = (ParallelActivity) activity;
+	    Set<Activity> nestedActivities = parallelActivity.getActivities();
+	    short option = 1;
+	    for (Activity nestedActivity : nestedActivities) {
+		// Currently Planner supports only parallel activities, but there is no logical reason for that;
+		// just add colours in CSS and change this value for additional options
+		if (option > CentralConstants.PLANNER_MAX_PARALLEL_ACTIVITIES) {
+		    throw new ServletException(PedagogicalPlannerAction.ERROR_TOO_MANY_PARALLEL_ACTIVITIES);
+		}
+
+		addedDTO = addActivityToPlanner(learningDesign, activities, nestedActivity);
+		addedDTO.setParentActivityTitle(activity.getTitle());
+		addedDTO.setGroup(option);
+		addedDTO.setComplexActivityType(PedagogicalPlannerActivityDTO.TYPE_PARALLEL_ACTIVITY);
 		option++;
 	    }
 	    addedDTO.setLastNestedActivity(true);

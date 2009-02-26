@@ -87,7 +87,8 @@
 			<%-- Iterate through subnodes --%>
 				<c:forEach var="subnode" items="${node.subnodes}" varStatus="subnodeStatus">
 					<tr>
-						<td class="align-right" style="width: 60px;">
+						<%-- Width is in percent, otherwise IE does not display it as desired --%>
+						<td class="align-right" style="width: 10%;" >
 							<%-- Cell with icons (info or actions like remove node)  --%>
 							<c:choose>
 								<c:when test="${node.edit}">
@@ -179,7 +180,7 @@
 						<input type="hidden" id="method" name="method" value="importNode" />
 						<input type="hidden" name="edit" value="true" />
 						<input type="hidden" name="importNode" value="true" />
-						<html:file property="file" size="115"/>
+						<html:file style="float: left" property="file" size="106"/>
 						<input style="margin: 0px 0px 20px 10px;" type="submit" value="<fmt:message key="button.import" />" class="button" />
 					</html:form>
 				</c:when>
@@ -219,8 +220,8 @@
 						</lams:FCKEditor>
 						
 						<br /><br /><fmt:message key="label.planner.node.type" /><br />
-						<html:radio property="nodeType" styleId="hasSubnodesType" onchange="javascript:onNodeTypeChange()" value="subnodes"><fmt:message key="label.planner.node.type.subnodes" /></html:radio><br />
-						<html:radio property="nodeType" onchange="onNodeTypeChange()" value="template"><fmt:message key="label.planner.node.type.template" /></html:radio>
+						<html:radio property="nodeType" styleId="hasSubnodesType" onclick="javascript:onNodeTypeChange();" value="subnodes"><fmt:message key="label.planner.node.type.subnodes" /></html:radio><br />
+						<html:radio property="nodeType" onclick="javascript:onNodeTypeChange();" value="template"><fmt:message key="label.planner.node.type.template" /></html:radio>
 						
 						<%-- DIVs below are displayed/hidden depending of the subnode type:
 							 containing subnodes or opening a template --%>
@@ -255,7 +256,7 @@
 								</c:url>
 								<fmt:message key="label.planner.uploaded.template" /> <a href="${downloadTemplateFile}">${node.fileName}</a>
 								<br /><br />
-								<html:checkbox onchange="onRemoveFileCheckboxChange()" styleId="removeFile" property="removeFile"><fmt:message key="label.planner.remove.file" /></html:checkbox>
+								<html:checkbox onclick="javscript:onRemoveFileCheckboxChange()" styleId="removeFile" property="removeFile"><fmt:message key="label.planner.remove.file" /></html:checkbox>
 							</c:if>
 							<div id="fileInputArea"	class="small-space-top space-bottom">
 								<c:choose>

@@ -39,6 +39,7 @@ public class PedagogicalPlannerActivityDTO {
 
     public static final short TYPE_BRANCHING_ACTIVITY = 1;
     public static final short TYPE_OPTIONAL_ACTIVITY = 2;
+    public static final short TYPE_PARALLEL_ACTIVITY = 3;
 
     public Boolean getSupportsPlanner() {
 	return supportsPlanner;
@@ -113,7 +114,7 @@ public class PedagogicalPlannerActivityDTO {
     }
 
     public void setGroup(Short branch) {
-	this.group = branch;
+	group = branch;
     }
 
     public String getParentActivityTitle() {
