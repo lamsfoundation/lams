@@ -123,7 +123,7 @@ class org.lamsfoundation.lams.authoring.tb.ToolbarController extends AbstractCon
 		}else if(tgt.indexOf("branch") != -1){
 			_app.getCanvas().toggleBranchTool();
 			
-		}else if(tgt.indexOf("preview") != -1){
+		}else if(tgt.indexOf("preview") != -1 && tgt.indexOf("preview_btn_click_target") == -1){
 			Cursor.showCursor(Application.C_HOURGLASS);
 			_toolbarModel.setButtonState("preview_btn", false, true);
 			_app.getCanvas().launchPreviewWindow();
