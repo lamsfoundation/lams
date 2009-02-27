@@ -801,6 +801,9 @@ class CanvasHelper {
 		if (canvasModel.currentBranchingActivity == null && canvasModel.getReferenceActivityOnCanvas() == null) {
 			Application.getInstance().getToolbar().setButtonState("support_act_btn", true, false);
 		}
+		if (canvasModel.activeView instanceof CanvasView) {
+			LFMenuBar.getInstance().enableArrangeActivities(true);
+		}
 		
 		if(canvasModel.activeView instanceof CanvasComplexView)
 			CanvasComplexView(canvasModel.activeView).branchingToClear.push(branchingAct);

@@ -141,6 +141,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 				Debugger.log('setting activie :' + event.updateType + " event.data: " + event.data + " condition: " + (event.data == this),Debugger.CRITICAL,'update','org.lamsfoundation.lams.CanvasView');
 				transparentCover._visible = (event.data == this) ? false : true;
 				break;
+			case 'ARRANGE_ACTIVITIES' :
+				//event.data contains an array activity UIIDs, ordered in terms of their position in the sequence on the current level of the design
+				if (cm.activeView instanceof CanvasView) { arrangeActivities(event.data, cm); }
+				break;
 			case 'DRAW_ALL' :
 				drawAll(event.data, cm);
 				break;
@@ -485,6 +489,58 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		
 		lastScreenWidth = newWidth;
 		lastScreenHeight = newHeight;
+	}
+	
+	public function arrangeActivities(orderedActivityUIIDArray:Array, cm:CanvasModel) {
+		var xInitialSpacing:Number = 20;
+		var xFirstActivityWidth:Number = 130; // this need only be approximate
+		var xCombinedInitialOffset:Number = xInitialSpacing + xFirstActivityWidth;
+		var xActivitySeparation:Number = 220;
+		var yRowSeparation:Number = 25;
+		
+		// the +1 is for the first activity which has already been taken into account in the xCombinedInitialOffset
+		var numActsPerRow:Number = Math.floor((canvas_scp.width - xCombinedInitialOffset)/xActivitySeparation) + 1;
+		var numRows:Number = Math.ceil(orderedActivityUIIDArray.length/numActsPerRow);
+		
+		//find row heights of each row based on the tallest activity in each row and put them in a hash table, 
+		//key = row number (starting at 0), value = tallest activity height
+		var rowHeightHash:Hashtable = new Hashtable();
+		for (var i=0; i<orderedActivityUIIDArray.length; i++) {			
+			var ca = cm.activitiesDisplayed.get(orderedActivityUIIDArray[i]);
+			var rowID:Number = Math.floor(i/numActsPerRow); // rows have id keys 0, 1, 2, 3...
+			var currentRowHeight = rowHeightHash.get(rowID);
+			
+			if (currentRowHeight == null || currentRowHeight < ca._height) {
+				rowHeightHash.put(rowID, ca._height);
+			}
+		}
+		
+		for (var i=0; i<orderedActivityUIIDArray.length; i++) {
+			var rowID:Number = Math.floor(i/numActsPerRow);
+			var yActivityOffset:Number = 35; // top vertical spacing for first row
+			var rowHeightHashKeys:Array = rowHeightHash.keys();
+			var ca = cm.activitiesDisplayed.get(orderedActivityUIIDArray[i]);
+			var act = ca.activity;
+			
+			for (var j=0; j<rowID; j++) {
+				yActivityOffset += (rowHeightHash.get(j)) + yRowSeparation;
+			}
+			
+			// position the activities
+			ca._x = xInitialSpacing + xActivitySeparation*(i%numActsPerRow);
+			ca._y = yActivityOffset + (rowHeightHash.get(rowID) - ca._height)/2; // horizontal alignment along the centre of each activity
+			act.xCoord = xInitialSpacing + xActivitySeparation*(i%numActsPerRow);
+			act.yCoord = yActivityOffset + (rowHeightHash.get(rowID) - ca._height)/2;
+		}
+		
+		var displayedTransitionsKeys:Array = cm.transitionsDisplayed.keys();
+		
+		for (var i=0; i<displayedTransitionsKeys.length; i++) {
+			var t = cm.transitionsDisplayed.remove(displayedTransitionsKeys[i]);
+			t.removeMovieClip();
+		}
+
+		cm.setDirty(); // refresh the design
 	}
 	
 	/**

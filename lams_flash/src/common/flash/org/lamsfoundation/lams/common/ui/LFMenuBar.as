@@ -178,8 +178,10 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
         tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_opt'), instanceName:"drawOptionalItem"});
         
 		tools_menu.addMenuItem({type:"separator"});
-		tools_menu.addMenuItem({label:Dictionary.getValue('competence_editor_dlg'), instanceName:"competenceEditor"});
+		tools_menu.addMenuItem({label:Dictionary.getValue('arrange_act_btn'), instanceName:"arrangeActivities"});
 		
+		tools_menu.addMenuItem({type:"separator"});
+		tools_menu.addMenuItem({label:Dictionary.getValue('competence_editor_dlg'), instanceName:"competenceEditor"});
 		//tools_menu.addMenuItem({type:"separator"});
         //tools_menu.addMenuItem({label:Dictionary.getValue('mnu_tools_prefs'), instanceName:"prefsItem", enabled:false});
 
@@ -411,6 +413,9 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 			case eventObj.menu.drawOptionalItem :
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().toggleOptionalActivity();
 				break;
+			case eventObj.menu.arrangeActivities :
+				org.lamsfoundation.lams.authoring.Application(app).getCanvas().arrangeActivitiesOnCanvas();
+				break;
 			case eventObj.menu.competenceEditor :
 				org.lamsfoundation.lams.authoring.Application(app).getCanvas().openCompetenceEditorWindow();
 				break;
@@ -466,6 +471,10 @@ class org.lamsfoundation.lams.common.ui.LFMenuBar extends MovieClip {
 	
 	public function enableRecover(enable:Boolean){
 		file_menu.setMenuItemEnabled(file_menu.getMenuItemAt(2), enable);
+	}
+	
+	public function enableArrangeActivities(enable:Boolean){
+		tools_menu.setMenuItemEnabled(tools_menu.getMenuItemAt(3), enable);
 	}
 	
 	public function get fileMenu():Menu {

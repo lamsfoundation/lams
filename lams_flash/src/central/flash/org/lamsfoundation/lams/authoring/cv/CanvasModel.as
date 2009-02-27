@@ -1127,5 +1127,43 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		
 		_lastBranchActionType = null;
 	}
-
+	
+	public function arrangeActivities():Void {
+		var orderedActUIIDs:Array = new Array();
+		
+		var currentActUIID:Number = getFirstActivityUIID();
+		while (currentActUIID != null) {
+			orderedActUIIDs.push(currentActUIID);
+			// get the next connected act uiid and assign it to the current act uiid
+			currentActUIID = getNextConnectedActivityUIID(currentActUIID);
+		}
+		
+		broadcastViewUpdate("ARRANGE_ACTIVITIES", orderedActUIIDs);
+	}
+	
+	public function getFirstActivityUIID():Number {		var transitionsOnCanvas:Array = _transitionsDisplayed.values();
+		var fromUIIDs:Array = new Array();
+		var toUIIDs:Hashtable = new Hashtable();
+		
+		for (var i=0; i<transitionsOnCanvas.length; i++) {
+			fromUIIDs.push(transitionsOnCanvas[i].transition.fromUIID);
+			toUIIDs.put(transitionsOnCanvas[i].transition.toUIID, null);
+		}
+		
+		for (var i=0; i<fromUIIDs.length; i++) {
+			if (!toUIIDs.containsKey(fromUIIDs[i]))
+				return fromUIIDs[i];
+		}
+		return null;
+	}
+	
+	public function getNextConnectedActivityUIID(currentActivityUIID:Number):Number {
+		var transitionsOnCanvas:Array = _transitionsDisplayed.values();
+		for (var i=0; i<transitionsOnCanvas.length; i++) {
+			if (transitionsOnCanvas[i].transition.fromUIID == currentActivityUIID) {
+				return transitionsOnCanvas[i].transition.toUIID;
+			}
+		}
+		return null;
+	}
 }

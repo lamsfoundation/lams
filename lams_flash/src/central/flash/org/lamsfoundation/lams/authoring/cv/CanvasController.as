@@ -594,6 +594,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 	   
 					_canvasModel.openBranchActivityContent(ca, true);
 					Application.getInstance().getToolbar().setButtonState("support_act_btn", false, false);
+					LFMenuBar.getInstance().enableArrangeActivities(false);
 					
 					// invalidate design after opening tool content window
 					_canvasModel.getCanvas().ddm.validDesign = false;

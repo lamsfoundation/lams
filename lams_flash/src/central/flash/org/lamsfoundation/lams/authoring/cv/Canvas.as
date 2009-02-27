@@ -869,6 +869,10 @@ class Canvas extends CanvasHelper {
 			Application.getInstance().getComms().sendAndReceive(_ddm.getDataForPreview(Dictionary.getValue('preview_btn'), null), "monitoring/initializeLesson", callback, false)
 		}
 	}
+	
+	public function arrangeActivitiesOnCanvas():Void {
+		canvasModel.arrangeActivities();
+	}
 
 	public function onInitPreviewResponse(r):Void{
 		if(r instanceof LFError) {
