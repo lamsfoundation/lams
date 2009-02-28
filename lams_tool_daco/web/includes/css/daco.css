@@ -136,3 +136,10 @@ td.button-cell{
 	width: 592px;
 	background: url('../images/lams_logo.gif') no-repeat 585px 10px;
 }
+
+.nextActivity {
+	padding: 0px 20px 0px 0px; 
+	background: url('../images/css/next.png') no-repeat;
+	background-position: right;
+
+}
