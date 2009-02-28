@@ -1272,10 +1272,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
 		Field titleField = new Field(PedagogicalPlannerAction.FIELD_NAME_TITLE, subnode.getTitle(),
 			Field.Store.NO, Field.Index.ANALYZED);
-		Field briefDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION, subnode
-			.getBriefDescription(), Field.Store.NO, Field.Index.ANALYZED);
-		Field fullDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION, subnode
-			.getFullDescription(), Field.Store.NO, Field.Index.ANALYZED);
+		Field briefDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION, WebUtil
+			.removeHTMLtags(subnode.getBriefDescription()), Field.Store.NO, Field.Index.ANALYZED);
+		Field fullDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION, WebUtil
+			.removeHTMLtags(subnode.getFullDescription()), Field.Store.NO, Field.Index.ANALYZED);
 		String uid = ancestorNodeUid == null ? subnode.getUid().toString() : ancestorNodeUid;
 		Field ancestorUidField = new Field(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID, uid,
 			Field.Store.YES, Field.Index.NOT_ANALYZED);
