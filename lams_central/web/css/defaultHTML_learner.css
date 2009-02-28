@@ -401,7 +401,7 @@ Buttons
 	text-decoration: none;
 }
 
-/*  style to disbable input buttons */
+/*  style to disable input buttons */
 #content a.button .disabled {
 	color: #999;
 	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
@@ -412,6 +412,14 @@ Buttons
 #content a:hover.button {
 	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
 	color: #349018;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	text-decoration: none;
+}
+
+#content a.button {
+	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
+	color: #333;
 	border: 0px none;
 	padding:5px 20px 6px 20px;
 	text-decoration: none;
@@ -510,6 +518,18 @@ input:hover.button {
 	text-decoration: none;
 	font-size: 11px;
 	font-family: verdana, arial, helvetica, sans-serif;
+}
+
+.editForm {
+	padding: 0 0 5px 18px; 
+	background: url('../images/css/report_edit.png') no-repeat;
+	
+}
+
+.close {
+	padding: 0 0 5px 18px; 
+	background: url('../images/css/cancel.png') no-repeat;
+	
 }
 
 .text-area {width:99%}

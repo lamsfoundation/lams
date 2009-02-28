@@ -32,14 +32,14 @@
 			<fmt:message key="authoring.msg.save.success" />
 		</h1>
 		<div class="space-bottom-top">
-			<html:button onclick="javascript:location.href='${param.reEditUrl}'"
+			<html:link href="javascript:;" onclick="javascript:location.href='${param.reEditUrl}'"
 				property="reedit" styleClass="button">
-				<fmt:message key="label.authoring.re.edit" />
-			</html:button>
-			<html:button onclick="javascript:closeWindow();" property="close"
+				<span class="editForm"><fmt:message key="label.authoring.re.edit" /></span>
+			</html:link>
+			<html:link href="javascript:;" onclick="javascript:closeWindow();" property="close"
 				styleClass="button">
-				<fmt:message key="label.authoring.close" />
-			</html:button>
+				<span class="close"><fmt:message key="label.authoring.close" /></span>
+			</html:link>
 		</div>
 
 	</div>
