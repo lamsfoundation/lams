@@ -32,9 +32,11 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -44,6 +46,20 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.snowball.SnowballAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.RAMDirectory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -151,6 +167,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String ERROR_KEY_EDITOR = "error.planner.editor";
     private static final String ERROR_KEY_EXPORT = "error.planner.export";
     private static final String ERROR_KEY_IMPORT = "error.planner.import";
+    private static final String ERROR_KEY_FILTER_PARSE = "error.planner.filter.parse";
 
     // Error messages used in this class. They are ment to be thrown.
     private static final String ERROR_USER_NOT_FOUND = "User not found.";
@@ -187,6 +204,14 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String EXPORT_NODE_ZIP_PREFIX = "lams_planner_node_";
 
     private static final int FILE_COPY_BUFFER_SIZE = 1024;
+
+    // Filter constants
+    private static final String FIELD_NAME_TITLE = "title";
+    private static final String FIELD_NAME_BRIEF_DESCRIPTION = "briefDescription";
+    private static final String FIELD_NAME_FULL_DESCRIPTION = "fullDescription";
+    private static final String FIELD_NAME_ANCESTOR_UID = "ancestorUid";
+    // not sfinal as it may be later swapped by different language
+    private static Analyzer ANALYZER = new SnowballAnalyzer("English", StopAnalyzer.ENGLISH_STOP_WORDS);
 
     @Override
     /**
@@ -241,7 +266,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		}
 	    }
 	} catch (ServletException e) {
-	    PedagogicalPlannerAction.log.error(e);
+	    PedagogicalPlannerAction.log.error(e, e);
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
 	    saveErrors(request, errors);
@@ -549,7 +574,22 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	// Fill the DTO
 	List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(node);
-	PedagogicalPlannerSequenceNodeDTO dto = new PedagogicalPlannerSequenceNodeDTO(node, titlePath);
+	String filterText = WebUtil.readStrParam(request, CentralConstants.PARAM_FILTER_TEXT, true);
+	Set<Long> filteredNodeUids = null;
+	try {
+	    filteredNodeUids = filterSubnodes(node, filterText);
+	} catch (Exception e) {
+	    PedagogicalPlannerAction.log.error(e, e);
+	    ActionMessages errors = new ActionMessages();
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILTER_PARSE));
+	    saveErrors(request, errors);
+	}
+	if (filteredNodeUids != null) {
+	    request.setAttribute(CentralConstants.PARAM_FILTER_TEXT, filterText);
+	}
+
+	PedagogicalPlannerSequenceNodeDTO dto = new PedagogicalPlannerSequenceNodeDTO(node, titlePath, filteredNodeUids);
 
 	// Additional DTO parameters
 	Boolean createSubnode = WebUtil.readBooleanParam(request, CentralConstants.PARAM_CREATE_SUBNODE, false);
@@ -573,7 +613,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 			String contentFolderId = FileUtil.generateUniqueContentFolderID();
 			nodeForm.setContentFolderId(contentFolderId);
 		    } catch (Exception e) {
-			PedagogicalPlannerAction.log.error(e);
+			PedagogicalPlannerAction.log.error(e, e);
 			dto.setEdit(false);
 			dto.setCreateSubnode(false);
 			ActionMessages errors = new ActionMessages();
@@ -693,7 +733,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    } catch (RepositoryCheckedException e) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 			PedagogicalPlannerAction.ERROR_KEY_REPOSITORY));
-		PedagogicalPlannerAction.log.error(e);
+		PedagogicalPlannerAction.log.error(e, e);
 	    }
 	}
 
@@ -862,7 +902,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    // response.setContentType("application/zip");
 	    response.setHeader(PedagogicalPlannerAction.HEADER_CONTENT_DISPOSITION, "attachment;filename=" + filename);
 	} catch (Exception e) {
-	    PedagogicalPlannerAction.log.error(e);
+	    PedagogicalPlannerAction.log.error(e, e);
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_EXPORT));
 	    saveErrors(request, errors);
 	    return openSequenceNode(mapping, form, request, nodeUid);
@@ -1014,7 +1054,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		node.setOrder(order);
 		getPedagogicalPlannerDAO().saveOrUpdateNode(node);
 	    } catch (Exception e) {
-		PedagogicalPlannerAction.log.error(e);
+		PedagogicalPlannerAction.log.error(e, e);
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_IMPORT));
 	    }
 	}
@@ -1041,7 +1081,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    InputStream inputStream = getContentHandler().getFileNode(fileUuid).getFile();
 	    copyFileFromRepository(inputStream, designFile);
 	} catch (Exception e) {
-	    PedagogicalPlannerAction.log.error(e);
+	    PedagogicalPlannerAction.log.error(e, e);
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
 	    return null;
 	}
@@ -1071,7 +1111,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    toolsErrorMsgs = (List<String>) ldResults[2];
 	    learningDesign = getAuthoringService().getLearningDesign(learningDesignID);
 	} catch (ImportToolContentException e) {
-	    PedagogicalPlannerAction.log.error(e);
+	    PedagogicalPlannerAction.log.error(e, e);
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
 
@@ -1184,6 +1224,72 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	} while (read > 0);
 	fileOutputStream.close();
 	inputStream.close();
+    }
+
+    private Set<Long> filterSubnodes(PedagogicalPlannerSequenceNode node, String filterText) throws ParseException,
+	    CorruptIndexException, IOException {
+	if (!StringUtils.isEmpty(filterText)) {
+
+	    Set<Document> docs = new HashSet<Document>();
+	    extractSubnodeDocuments(docs, node, null);
+	    if (docs.isEmpty()) {
+		return null;
+	    }
+
+	    MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[] {
+		    PedagogicalPlannerAction.FIELD_NAME_TITLE, PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION,
+		    PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION }, PedagogicalPlannerAction.ANALYZER);
+
+	    Query query = queryParser.parse(filterText);
+
+	    RAMDirectory dir = new RAMDirectory();
+	    IndexWriter indexWriter = new IndexWriter(dir, PedagogicalPlannerAction.ANALYZER, true,
+		    IndexWriter.MaxFieldLength.UNLIMITED);
+	    for (Document doc : docs) {
+		indexWriter.addDocument(doc);
+	    }
+	    indexWriter.optimize();
+	    indexWriter.close();
+
+	    IndexSearcher searcher = new IndexSearcher(dir);
+	    int maxHits = node.getSubnodes().size();
+	    TopDocs topDocs = searcher.search(query, null, maxHits);
+
+	    Set<Long> matchingSubnodeUids = new TreeSet<Long>();
+	    for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+		Document doc = searcher.doc(scoreDoc.doc);
+		String ancestorUid = doc.get(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID);
+		Long uid = new Long(ancestorUid);
+		matchingSubnodeUids.add(uid);
+	    }
+	    return matchingSubnodeUids;
+	}
+	return null;
+    }
+
+    private void extractSubnodeDocuments(Set<Document> docs, PedagogicalPlannerSequenceNode node, String ancestorNodeUid) {
+	if (node != null && node.getSubnodes() != null) {
+	    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
+		Field titleField = new Field(PedagogicalPlannerAction.FIELD_NAME_TITLE, subnode.getTitle(),
+			Field.Store.NO, Field.Index.ANALYZED);
+		Field briefDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION, subnode
+			.getBriefDescription(), Field.Store.NO, Field.Index.ANALYZED);
+		Field fullDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION, subnode
+			.getFullDescription(), Field.Store.NO, Field.Index.ANALYZED);
+		String uid = ancestorNodeUid == null ? subnode.getUid().toString() : ancestorNodeUid;
+		Field ancestorUidField = new Field(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID, uid,
+			Field.Store.YES, Field.Index.NOT_ANALYZED);
+
+		Document doc = new Document();
+		doc.add(titleField);
+		doc.add(briefDescField);
+		doc.add(fullDescField);
+		doc.add(ancestorUidField);
+		docs.add(doc);
+
+		extractSubnodeDocuments(docs, subnode, uid);
+	    }
+	}
     }
 
     /*----------------------- GROUPING METHODS -------------------------*/

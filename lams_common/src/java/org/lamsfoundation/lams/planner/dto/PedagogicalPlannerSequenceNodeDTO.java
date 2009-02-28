@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.planner.dto;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 
@@ -47,7 +48,8 @@ public class PedagogicalPlannerSequenceNodeDTO {
     public PedagogicalPlannerSequenceNodeDTO() {
     }
 
-    public PedagogicalPlannerSequenceNodeDTO(PedagogicalPlannerSequenceNode node, List<String[]> titlePath) {
+    public PedagogicalPlannerSequenceNodeDTO(PedagogicalPlannerSequenceNode node, List<String[]> titlePath,
+	    Set<Long> filteredUids) {
 	uid = node.getUid();
 	title = node.getTitle();
 	briefDescription = node.getBriefDescription();
@@ -60,13 +62,15 @@ public class PedagogicalPlannerSequenceNodeDTO {
 	}
 	subnodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
 	for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
-	    PedagogicalPlannerSequenceNodeDTO subnodeDTO = new PedagogicalPlannerSequenceNodeDTO();
-	    subnodeDTO.setTitle(subnode.getTitle());
-	    subnodeDTO.setBriefDescription(subnode.getBriefDescription());
-	    subnodeDTO.setLocked(subnode.getLocked());
-	    subnodeDTO.setFileName(subnode.getFileName());
-	    subnodeDTO.setUid(subnode.getUid());
-	    subnodes.add(subnodeDTO);
+	    if (filteredUids == null || filteredUids.contains(subnode.getUid())) {
+		PedagogicalPlannerSequenceNodeDTO subnodeDTO = new PedagogicalPlannerSequenceNodeDTO();
+		subnodeDTO.setTitle(subnode.getTitle());
+		subnodeDTO.setBriefDescription(subnode.getBriefDescription());
+		subnodeDTO.setLocked(subnode.getLocked());
+		subnodeDTO.setFileName(subnode.getFileName());
+		subnodeDTO.setUid(subnode.getUid());
+		subnodes.add(subnodeDTO);
+	    }
 	}
     }
 

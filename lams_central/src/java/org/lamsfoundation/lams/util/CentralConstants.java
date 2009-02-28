@@ -166,4 +166,6 @@ public class CentralConstants {
     public static final String PARAM_EDIT = "edit";
 
     public static final String USER_MANAGEMENT_SERVICE_BEAN_NAME = "userManagementService";
+
+    public static final String PARAM_FILTER_TEXT = "filterText";
 }

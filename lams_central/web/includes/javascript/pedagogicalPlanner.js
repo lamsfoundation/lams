@@ -184,4 +184,17 @@
   		document.getElementById("fullDescriptionArea").style.display="none";
   		document.getElementById("fileArea").style.display="block";
   	}
-  }  
+  }
+  
+  function filterNodes(url,doFilter){
+  	if (doFilter){
+  		url += "&filterText="+document.getElementById("filterText").value;
+  	}
+  	document.location.href=url;
+  }
+  
+  function filterNodesOnEnter(url){
+	  if (window.event && window.event.keyCode == 13){
+	  	filterNodes(url,true);
+	  }
+  }

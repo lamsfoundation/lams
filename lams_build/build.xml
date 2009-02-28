@@ -133,6 +133,7 @@
 					<include name="xstream/*.jar" />		
 					<include name="flagstone/*.jar" />		
 					<include name="slf4j/*.jar" />
+					<include name="lucene/*.jar" />
 				</patternset>
 			</fileset> 
 			<fileset dir="..">

@@ -20,6 +20,7 @@
 <body class="stripes">
 <div id="page">
 <div id="content">
+	${lamsFound}
 	<%-- We might need to alter that for RTL layout --%>
 	<h1 style="text-align: center" class="small-space-top"><fmt:message key="planner.title" /></h1>
 	
@@ -35,7 +36,7 @@
 	<%-- List of the existing nodes --%>
 	<table>
 		<tr>
-			<td colspan="2">
+			<td>
 				<%-- This part creates path like "> Root > Some node > Some subnode" 
 					 with links to upper level nodes --%>
 				<c:url value="/pedagogicalPlanner.do" var="titleUrl">
@@ -57,7 +58,29 @@
 				
 				<%-- Add title (but no link) of the current node at the end --%>
 				<c:out value='${node.title}' escapeXml='true' />
-			
+			</td>
+			<td class="align-right" style="width: 240px">
+				<c:url value="/pedagogicalPlanner.do" var="filterNodeUrl">
+					<c:param name="method" value="openSequenceNode" />
+					<c:param name="edit" value="${node.edit}" />
+					<c:param name="uid" value="${node.uid}" />
+					<c:param name="createSubnode" value="${node.createSubnode}" />
+				</c:url>
+				<span class="space-right float-left"><fmt:message key="label.planner.filter" /></span>
+				<input class="float-left" type="text" size="20" id="filterText" value="${filterText}" onkeypress="javascript:filterNodesOnEnter('${filterNodeUrl}')"/>
+				<img class="sequenceActionImage" src="<lams:LAMSURL/>images/icons/magnifier.png"
+					 onclick="javascript:filterNodes('${filterNodeUrl}',true)" />
+				<c:if test="${not empty filterText}">
+					<img class="sequenceActionImage" src="<lams:LAMSURL/>images/icons/cross.png"
+						 title="<fmt:message key="label.planner.filter.clear" />"
+						 onclick="javascript:filterNodes('${filterNodeUrl}',false)" />
+				</c:if>
+			</td>
+		</tr>
+	</table>
+	<table>
+		<tr>
+			<td colspan="2">
 				<%-- Title and full description of the node --%>
 				<c:set var="isRootNode" value="${empty node.uid and empty node.parentUid}" />
 				<c:choose>
@@ -69,10 +92,18 @@
 						<div class="space-left">${node.fullDescription}</div>
 					</c:otherwise>
 				</c:choose>
-				
 			</td>
 		</tr>
 		
+		<c:if test="${not empty filterText}">
+			<tr>
+				<td colspan="2" class="align-center">
+					<h3><fmt:message key="label.planner.filter.output" />
+					    <a href="javascript:filterNodes('${filterNodeUrl}',false)"><fmt:message key="label.planner.filter.clear" /></a>
+					</h3>
+				</td>
+			</tr>
+		</c:if>
 		<%-- List of subnodes --%>
 		<c:choose>
 			<%-- If the list of subnodes is empty, we display only a message --%>
@@ -103,7 +134,7 @@
 										<c:param name="edit" value="true" />
 										<c:param name="uid" value="${subnode.uid}" />
 									</c:url>
-									<img class="sequenceActionImage" src="<lams:LAMSURL/>images/cross.gif"
+									<img class="sequenceActionImage" src="<lams:LAMSURL/>images/icons/cross.png"
 										title="<fmt:message key="msg.planner.remove.node" />"
 										onclick="javascript:leaveNodeEditor('<fmt:message key="msg.planner.remove.warning" />','${removeNodeUrl}')" />
 									<c:if test="${not subnodeStatus.first}">
