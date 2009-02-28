@@ -532,6 +532,13 @@ input:hover.button {
 	
 }
 
+.nextActivity {
+	padding: 0px 20px 0px 0px; 
+	background: url('../images/css/next.png') no-repeat;
+	background-position: right;
+
+}
+
 .text-area {width:99%}
 
 .shading-bg {padding:5px; padding-left:10px;  padding-top:10px; margin-top:10px; margin-bottom:10px; width:99%; border-top:1px solid #ccc; background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 1px}
