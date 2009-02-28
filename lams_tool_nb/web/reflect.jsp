@@ -4,6 +4,11 @@
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
+	function submitForm(methodName){
+		var f = document.getElementById('learnerForm');
+		f.submit();
+	}
+
 </script>
 
 <div id="content">
@@ -11,7 +16,7 @@
 	<c:out value="${title}" escapeXml="false" />
 </h1>
 
-	<html:form action="/learner" method="post" onsubmit="disableFinishButton();">
+	<html:form action="/learner" method="post" onsubmit="disableFinishButton();" styleId="learnerForm">
 	 
 		<p><lams:out value="${reflectInstructions}" /></p>				
 			 
@@ -21,9 +26,9 @@
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="mode" />
 			<html:hidden property="method" value="finish"/>
-			<html:submit styleClass="button" styleId="finishButton">
-				<fmt:message key="button.finish" />
-			</html:submit>
+			<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+				<span class="nextActivity"><fmt:message key="button.finish" /></span>
+			</html:link>
 		</div>
 			 
 	</html:form>

@@ -8,7 +8,10 @@
 		var elem = document.getElementById("finishButton");
 		elem.disabled = true;
 	}
-	
+	 function submitForm(methodName){
+                var f = document.getElementById('messageForm');
+                f.submit();
+        }
 </script>
 
 
@@ -27,7 +30,7 @@
 	</logic:messagesPresent>
 	
 	<div class="align-right space-bottom-top">
-		<html:form action="/learner" target="_self" onsubmit="disableFinishButton();">
+		<html:form action="/learner" target="_self" onsubmit="disableFinishButton();" styleId="messageForm">
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="mode" />
 			<html:hidden property="method" value="finish"/>
@@ -38,9 +41,9 @@
 					</html:submit>
 				</c:when>
 				<c:otherwise>
-					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message key="button.finish" />
-					</html:submit>
+					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+						<span class="nextActivity"><fmt:message key="button.finish" /></span>
+					</html:link>
 				</c:otherwise>
 			</c:choose>
 		</html:form>

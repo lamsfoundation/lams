@@ -77,10 +77,10 @@
 					<c:otherwise>
 
 
-						<html:button property="finishButton" styleClass="button"
+						<html:link href="javascript:;" property="finishButton" styleClass="button"
 							styleId="finishButton" onclick="submitForm('finish')">
-							<fmt:message key="button.finish" />
-						</html:button>
+							<span class="nextActivity"><fmt:message key="button.finish" /></span>
+						</html:link>
 					</c:otherwise>
 				</c:choose>
 			</c:if>
