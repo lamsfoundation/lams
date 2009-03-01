@@ -67,14 +67,14 @@
 					test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 					<html:link href="javascript:;" property="FinishButton"
 						onclick="return continueReflect()" styleClass="button">
-						<span class="nextActivity"><fmt:message key="label.continue" /></span>
+						<fmt:message key="label.continue" />
 					</html:link>
 				</c:when>
 				<c:otherwise>
-					<html:button property="FinishButton" styleId="finishButton"
+					<html:link href="javascript:;" property="FinishButton" styleId="finishButton"
 						onclick="return finishSession()" styleClass="button">
-						<fmt:message key="label.finished" />
-					</html:button>
+						<span class="nextActivity"><fmt:message key="label.finished" /></span>
+					</html:link>
 				</c:otherwise>
 			</c:choose>
 		</div>
