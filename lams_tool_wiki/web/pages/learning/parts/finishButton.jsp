@@ -51,7 +51,7 @@
 		<c:choose>
 			<c:when test="${!userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
 				
-				<a href="javascript:continueOrFinish('openNotebook');" class="button"><span class="nextActivity"><fmt:message key="button.continue" /></span></a>
+				<a href="javascript:continueOrFinish('openNotebook');" class="button"><fmt:message key="button.continue" /></a>
 
 			</c:when>
 			<c:otherwise>
