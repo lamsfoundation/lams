@@ -7,10 +7,14 @@
 			finishButton.disabled = true;
 		}
 	}
+         function submitForm(methodName){
+                var f = document.getElementById('messageForm');
+                f.submit();
+        }
 </script>
 
 <div class="space-bottom">
-	<html:form action="/learning" method="post" onsubmit="disableFinishButton()">
+	<html:form action="/learning" method="post" onsubmit="disableFinishButton()" styleId="messageForm">
 		<html:hidden property="scribeUserUID" value="${scribeUserDTO.uid}" />
 		<c:choose>
 			<c:when
@@ -24,9 +28,9 @@
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
-				<html:submit styleClass="button right-buttons" styleId="finishButton">
-					<fmt:message key="button.finish" />
-				</html:submit>
+				<html:link href="javascript:;" styleClass="button right-buttons" styleId="finishButton" onclick="submitForm('finish')">
+					<span class="nextActivity"><fmt:message key="button.finish" /></span>
+				</html:link>
 			</c:otherwise>
 		</c:choose>
 	</html:form>

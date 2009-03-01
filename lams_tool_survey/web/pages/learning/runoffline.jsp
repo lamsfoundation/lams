@@ -65,10 +65,10 @@
 			<c:choose>
 				<c:when
 					test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-					<html:button property="FinishButton"
+					<html:link href="javascript:;" property="FinishButton"
 						onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.continue" />
-					</html:button>
+						<span class="nextActivity"><fmt:message key="label.continue" /></span>
+					</html:link>
 				</c:when>
 				<c:otherwise>
 					<html:button property="FinishButton" styleId="finishButton"

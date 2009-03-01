@@ -79,11 +79,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				styleClass="text-area"></html:textarea>
 
 			<div class="space-bottom-top align-right">
-				<html:button property="submitReflection" styleId="finishButton"
+				<html:link href="javascript:;" property="submitReflection" styleId="finishButton"
 					onclick="javascript:submitMethod('submitReflection');"
 					styleClass="button">
-					<fmt:message key="button.endLearning" />
-				</html:button>
+					<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
+				</html:link>
 			</div>
 		</div>
 	</html:form>

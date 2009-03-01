@@ -14,7 +14,13 @@
 </lams:head>
 <body class="stripes">
 
-	<html:form action="/learning/submitReflection" method="post" onsubmit="javascript:document.getElementById('finishButton').disabled = true;">
+<script type="text/javascript">
+         function submitForm(methodName){
+                var f = document.getElementById('messageForm');
+                f.submit();
+        }
+</script>
+	<html:form action="/learning/submitReflection" method="post" onsubmit="javascript:document.getElementById('finishButton').disabled = true;" styleId="messageForm">
 		<html:hidden property="userId" />
 		<html:hidden property="sessionId" />
 		<html:hidden property="sessionMapID" />
@@ -34,9 +40,9 @@
 				styleClass="text-area" />
 
 			<div class="space-bottom-top align-right">
-				<html:submit styleClass="button" styleId="finishButton">
-					<fmt:message key="label.learning.finished" />
-				</html:submit>
+				<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+					<span class="nextActivity"><fmt:message key="label.learning.finished" /></span>
+				</html:link>
 			</div>
 		</div>
 	</html:form>

@@ -134,10 +134,10 @@
 				</c:when>
 
 				<c:otherwise>
-					<html:button property="finish" styleId="finish"
+					<html:link href="javascript:;" property="finish" styleId="finish"
 						onclick="submitFinish();" styleClass="button">
-						<fmt:message key="label.finish" />
-					</html:button>
+						<span class="nextActivity"><fmt:message key="label.finish" /></span>
+					</html:link>
 				</c:otherwise>
 
 			</c:choose>

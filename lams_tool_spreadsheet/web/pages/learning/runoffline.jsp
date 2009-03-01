@@ -52,10 +52,10 @@
 					</c:otherwise>
 				</c:choose>
 
-				<html:button property="FinishButton"
+				<html:link href="javascript:;" property="FinishButton"
 					onclick="return continueReflect()" styleClass="button">
-					<fmt:message key="label.edit" />
-				</html:button>
+					<span class="nextActivity"><fmt:message key="label.edit" /></span>
+				</html:link>
 			</div>
 		</c:if>
 

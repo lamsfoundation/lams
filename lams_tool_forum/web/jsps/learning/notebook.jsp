@@ -6,10 +6,14 @@
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
+	function submitForm(methodName){
+        	var f = document.getElementById('messageForm');
+	        f.submit();
+        }
 </script>
 
 <html:form action="/learning/submitReflection" method="post"
-	onsubmit="disableFinishButton();">
+	onsubmit="disableFinishButton();" styleId="messageForm">
 	<html:hidden property="userID" />
 	<html:hidden property="sessionMapID" />
 
@@ -28,9 +32,9 @@
 			styleClass="text-area" />
 
 		<div class="space-bottom-top align-right">
-			<html:submit styleClass="button" styleId="finishButton">
-				<fmt:message key="label.finish" />
-			</html:submit>
+			<html:link  href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+				<span class="nextActivity"><fmt:message key="label.finish" /></span>
+			</html:link>
 		</div>
 
 	</div>

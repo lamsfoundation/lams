@@ -30,6 +30,10 @@
 			}
 			popupWindow = window.open(url,'popupWindow','resizable,width=' +width+ ',height=' +height+ ',scrollbars');
 		}
+	         function submitForm(methodName){
+	                var f = document.getElementById('messageForm');
+	                f.submit();
+	        }
 	</script>
 	
 	<body class="stripes">
@@ -40,7 +44,7 @@
 				${pixlrDTO.title}
 			</h1>
 		
-			<html:form action="/learning" method="post">
+			<html:form action="/learning" method="post" styleId="messageForm">
 				<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 				<html:hidden property="mode" value="${mode}" />
 				<html:hidden property="dispatch" styleId = "dispatch" value="finishActivity" />
@@ -109,9 +113,9 @@
 						</html:submit>
 					</c:when>
 					<c:otherwise>
-						<html:submit styleClass="button" styleId="finishButton" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity';">
-							<fmt:message key="button.finish" />
-						</html:submit>
+						<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity';">
+							<span class="nextActivity"><fmt:message key="button.finish" /></span>
+						</html:link>
 					</c:otherwise>
 				</c:choose>
 				

@@ -37,10 +37,14 @@
 			finishButton.disabled = true;
 		}
 	}
+         function submitForm(methodName){
+                var f = document.getElementById('messageForm');
+                f.submit();
+        }
 </script>
 
 <html:form action="/learning" method="post"
-	onsubmit="disableFinishButton();">
+	onsubmit="disableFinishButton();"  styleId="messageForm">
 	<html:hidden property="videoRecorderUserUID" value="${videoRecorderUserDTO.uid}" />
 	<html:hidden property="toolSessionID" value="${toolSessionId}" />
 	<div class="space-bottom-top align-right">
@@ -55,9 +59,9 @@
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
-				<html:submit styleClass="button" styleId="finishButton">
-					<fmt:message key="button.finish" />
-				</html:submit>
+				<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+					<span class="nextActivity"><fmt:message key="button.finish" /></span>
+				</html:link>
 			</c:otherwise>
 		</c:choose>
 	</div>

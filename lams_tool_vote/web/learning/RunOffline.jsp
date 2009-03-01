@@ -77,11 +77,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
-					<html:submit property="forwardtoReflection"
+					<html:link href="javascript:;" property="forwardtoReflection"
 						onclick="javascript:submitMethod('forwardtoReflection');"
 						styleClass="button">
-						<fmt:message key="label.continue" />
-					</html:submit>
+						<span class="nextActivity"><fmt:message key="label.continue" /></span>
+					</html:link>
 				</c:if>
 
 			</div>

@@ -11,6 +11,10 @@
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
+	         function submitForm(methodName){
+	                var f = document.getElementById('messageForm');
+	                f.submit();
+	        }
 	</script>	
 </lams:head>
 
@@ -18,7 +22,7 @@
 
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();">
+	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 		<html:hidden property="userID" />
 		<html:hidden property="sessionMapID" />
 		<div id="content">
@@ -36,9 +40,9 @@
 				styleClass="text-area" />
 
 			<div class="space-bottom-top align-right">
-				<html:submit styleClass="button" styleId="finishButton">
-					<fmt:message key="button.finish" />
-				</html:submit>
+				<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+					<span class="nextActivity"><fmt:message key="button.finish" /></span
+				</html:link>
 			</div>
 	</html:form>
 	<div id="footer"></div>

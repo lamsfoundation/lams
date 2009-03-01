@@ -30,7 +30,11 @@
 			function disableFinishButton() {
 				document.getElementById("finishButton").disabled = true;
 			}
-		</script>
+		         function submitForm(methodName){
+		                var f = document.getElementById('messageForm');
+		                f.submit();
+		        }
+	</script>
 	
 	<body class="stripes">
 	
@@ -40,7 +44,7 @@
 				${pixlrDTO.title}
 			</h1>
 		
-			<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
+			<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 				<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 				<html:hidden property="mode" value="${mode}" />
 				
@@ -53,9 +57,9 @@
 		
 				<div class="space-bottom-top align-right">
 					<html:hidden property="dispatch" value="submitReflection" />
-					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message>button.finish</fmt:message>
-					</html:submit>
+					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+						<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+					</html:link>
 				</div>
 			</html:form>
 				

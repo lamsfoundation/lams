@@ -6,10 +6,14 @@
 			finishButton.disabled = true;
 		}
 	}
+         function submitForm(methodName){
+                var f = document.getElementById('messageForm');
+                f.submit();
+        }
 </script>
 
 <c:if test="${pixlrUserDTO.finishedActivity and pixlrDTO.reflectOnActivity and pixlrUserDTO.finishedReflection}">
-<html:form action="/learning" method="post" styleId="reflectEditForm">
+<html:form action="/learning" method="post" styleId="reflectEditForm" styleId="messageForm">
 	<html:hidden property="dispatch" value="openNotebook" />
 	<html:hidden property="mode" value="${mode}" />	
 	<html:hidden property="toolSessionID" styleId="toolSessionID"/>
@@ -58,9 +62,9 @@
 					</c:when>
 					<c:otherwise>
 						<html:hidden property="dispatch" value="finishActivity" />
-						<html:submit styleClass="button" styleId="finishButton" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity'; ;">
-							<fmt:message key="button.finish" />
-						</html:submit>
+						<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity'; ;">
+							<span class="nextActivity"><fmt:message key="button.finish" /></span>
+						</html:link>
 					</c:otherwise>
 				</c:choose>
 			</c:otherwise>

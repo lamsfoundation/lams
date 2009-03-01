@@ -254,11 +254,11 @@
 							</html:button>
 						</c:when>
 						<c:otherwise>
-							<html:button property="finishButton"
+							<html:link href="javascript:;" property="finishButton"
 								onclick="javascript:finish();" styleClass="button"
 								styleId="finishButton">
-								<fmt:message key="button.finish" />
-							</html:button>
+								<span class="nextActivity"><fmt:message key="button.finish" /></span>
+							</html:link>
 						</c:otherwise>
 					</c:choose>
 				</div>

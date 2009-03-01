@@ -202,11 +202,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:if>						
 
 						<div class="space-bottom-top" align="right">
-								<html:button property="endLearning" styleId="finishButton"
+								<html:link href="javascript:;" property="endLearning" styleId="finishButton"
 									onclick="javascript:submitMethod('endLearning');"
 									styleClass="button">
-									<fmt:message key="button.endLearning" />
-								</html:button>
+									<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
+								</html:link>
 						</div>
 					</c:if>
 				</c:if>

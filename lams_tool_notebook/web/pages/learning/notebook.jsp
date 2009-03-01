@@ -36,7 +36,10 @@
 			}
 		}
 	}
-
+         function submitForm(methodName){
+                var f = document.getElementById('messageForm');
+                f.submit();
+        }
 -->
 </script>
 
@@ -65,7 +68,7 @@
 	&nbsp;
 
 	<html:form action="/learning" method="post"
-		onsubmit="return validateForm();">
+		onsubmit="return validateForm();" styleId="messageForm">
 		<html:hidden property="dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" />
 
@@ -89,9 +92,9 @@
 				</c:choose>
 
 				<div class="space-bottom-top align-right">
-					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message>button.finish</fmt:message>
-					</html:submit>
+					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+						<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+					</html:link>
 				</div>
 
 			</c:when>

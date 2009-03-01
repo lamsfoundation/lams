@@ -4,6 +4,10 @@
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
+         function submitForm(methodName){
+                var f = document.getElementById('messageForm');
+                f.submit();
+        }
 </script>
 
 <div id="content">
@@ -12,7 +16,7 @@
 		${scribeDTO.title}
 	</h1>
 
-	<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
+	<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 		<html:hidden property="dispatch" value="submitReflection" />
 		<html:hidden property="scribeUserUID" />
 
@@ -24,9 +28,9 @@
 			styleClass="text-area"></html:textarea>
 
 		<div class="space-bottom-top align-right">
-			<html:submit styleClass="button" styleId="finishButton">
-				<fmt:message>button.finish</fmt:message>
-			</html:submit>
+			<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+				<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+			</html:link>
 		</div>
 
 	</html:form>
