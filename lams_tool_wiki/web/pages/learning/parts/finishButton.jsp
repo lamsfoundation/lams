@@ -51,21 +51,12 @@
 		<c:choose>
 			<c:when test="${!userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
 				
-				<a href="javascript:continueOrFinish('openNotebook');" class="button"><fmt:message key="button.continue" /></a>
-				<!--  
-				<html:submit styleClass="button" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook';">
-					<fmt:message key="button.continue" />
-				</html:submit>
-				-->
+				<a href="javascript:continueOrFinish('openNotebook');" class="button"><span class="nextActivity"><fmt:message key="button.continue" /></span></a>
+
 			</c:when>
 			<c:otherwise>
-				<a href="javascript:continueOrFinish('finishActivity');" class="button"><fmt:message key="button.finish" /></a>
+				<a href="javascript:continueOrFinish('finishActivity');" class="button"><span class="nextActivity"><fmt:message key="button.finish" /></span></a>
 				
-				<!-- 
-				<html:submit styleClass="button" styleId="finishButton" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity';">
-					<fmt:message key="button.finish" />
-				</html:submit>
-				-->
 			</c:otherwise>
 		</c:choose>
 	</div>

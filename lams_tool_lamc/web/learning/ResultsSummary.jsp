@@ -44,6 +44,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				elem.disabled = true;
 			}
 		}
+	         function submitForm(methodName){
+	                var f = document.getElementById('Form1');
+	                f.submit();
+	        }
 	</script>
 </lams:head>
 
@@ -51,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="content">
 		<html:form action="/learning?method=displayMc&validate=false"
-			method="POST" target="_self" onsubmit="disableFinishButton();">
+			method="POST" target="_self" onsubmit="disableFinishButton();" styleId="Form1">
 			<html:hidden property="toolContentID" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="httpSessionID" />
@@ -126,9 +130,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
 							<html:hidden property="learnerFinished" value="Finished" />
 							
-							<html:submit styleClass="button" styleId="finishButton">
-								<fmt:message key="label.finished" />
-							</html:submit>
+							<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+								<span class="nextActivity"><fmt:message key="label.finished" /></span>
+							</html:link>
 						</c:if>
 
 						<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
