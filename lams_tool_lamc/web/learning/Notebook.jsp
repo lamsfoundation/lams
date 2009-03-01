@@ -39,21 +39,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</title>
 </lams:head>
 
-<script type="text/javascript">
-        
-        function disableFinishButton() {
-                var elem = document.getElementById("finishButton");
-                elem.disabled = true;
-        }
-         function submitForm(methodName){
-                var f = document.getElementById('messageForm');
-                f.submit();
-        }
-</script>
 <body class="stripes">
 
 	<html:form action="/learning?method=displayMc&validate=false"
-		enctype="multipart/form-data" method="POST" target="_self"  onsubmit="disableFinishButton();" styleId="messageForm">
+		enctype="multipart/form-data" method="POST" target="_self">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="httpSessionID" />
@@ -79,9 +68,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</html:textarea>
 
 			<div class="space-bottom-top align-right">
-				<html:link href="javascript:;" property="submitReflection" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-					<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
-				</html:link>
+				<html:submit property="submitReflection" styleClass="button">
+					<fmt:message key="button.endLearning" />
+				</html:submit>
 			</div>
 
 
