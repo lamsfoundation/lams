@@ -1270,23 +1270,30 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private void extractSubnodeDocuments(Set<Document> docs, PedagogicalPlannerSequenceNode node, String ancestorNodeUid) {
 	if (node != null && node.getSubnodes() != null) {
 	    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
+		Document doc = new Document();
 		Field titleField = new Field(PedagogicalPlannerAction.FIELD_NAME_TITLE, subnode.getTitle(),
 			Field.Store.NO, Field.Index.ANALYZED);
-		Field briefDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION, WebUtil
-			.removeHTMLtags(subnode.getBriefDescription()), Field.Store.NO, Field.Index.ANALYZED);
-		Field fullDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION, WebUtil
-			.removeHTMLtags(subnode.getFullDescription()), Field.Store.NO, Field.Index.ANALYZED);
+		doc.add(titleField);
+
+		String briefDesc = WebUtil.removeHTMLtags(subnode.getBriefDescription());
+		if (briefDesc != null) {
+		    Field briefDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION, briefDesc,
+			    Field.Store.NO, Field.Index.ANALYZED);
+		    doc.add(briefDescField);
+		}
+		String fullDesc = WebUtil.removeHTMLtags(subnode.getBriefDescription());
+		if (fullDesc != null) {
+		    Field fullDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION, fullDesc,
+			    Field.Store.NO, Field.Index.ANALYZED);
+		    doc.add(fullDescField);
+		}
+
 		String uid = ancestorNodeUid == null ? subnode.getUid().toString() : ancestorNodeUid;
 		Field ancestorUidField = new Field(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID, uid,
 			Field.Store.YES, Field.Index.NOT_ANALYZED);
-
-		Document doc = new Document();
-		doc.add(titleField);
-		doc.add(briefDescField);
-		doc.add(fullDescField);
 		doc.add(ancestorUidField);
-		docs.add(doc);
 
+		docs.add(doc);
 		extractSubnodeDocuments(docs, subnode, uid);
 	    }
 	}
