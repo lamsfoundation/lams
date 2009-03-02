@@ -36,6 +36,11 @@
 			return true;
 		}
 	}
+         function submitForm(methodName){
+                var f = document.getElementById('messageForm');
+                f.submit();
+        }
+
 	//-->
 </script>
 
@@ -168,7 +173,15 @@
 	</p>
 
 	<c:if test="${optionsActivityForm.finished}">
-		<html:form action="/CompleteActivity" method="post">
+	      <script language="JavaScript" type="text/JavaScript"><!--
+	           function submitForm(methodName){
+              	       var f = document.getElementById('messageForm');
+                       f.submit();
+        	   }
+		//-->
+	      </script>
+
+		<html:form action="/CompleteActivity" method="post" styleId="messageForm">
 			<input type="hidden" name="lams_token"
 				value="<c:out value='${lams_token}' />">
 			<input type="hidden" name="activityID"
@@ -179,9 +192,9 @@
 				value="<c:out value='${optionsActivityForm.progressID}' />">
 
 			<div class="align-right space-bottom-top">
-				<html:submit styleClass="button">
-					<fmt:message key="label.finish.button" />
-				</html:submit>
+                               <html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+                                     <span class="nextActivity"><fmt:message key="label.finish.button"/></span>
+                               </html:link>
 			</div>
 
 		</html:form>

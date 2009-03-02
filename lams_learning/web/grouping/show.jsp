@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-	<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self">
+	<html:form action="/grouping.do?method=completeActivity&userId=${user.userId}&lessonId=${lesson.lessonId}&activityID=${activityID}" target="_self" styleId="messageForm">
 
 	<div id="content">
 
@@ -56,8 +56,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</table>
 
 	<c:if test="${finishedButton}">
+	      <script type="text/javascript">
+	        function submitForm(methodName){
+                	 var f = document.getElementById('messageForm');
+                	 f.submit();
+		}
+	      </script>
+
 			<table><tr><td><div id="right" class="right-buttons">
-					<html:submit styleClass="button"><fmt:message key="label.finish.button"/></html:submit>
+					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+					  <span class="nextActivity"><fmt:message key="label.finish.button"/></span>
+					 </html:link>
 			</div></td></tr></table>
 	</c:if>
 

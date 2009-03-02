@@ -43,6 +43,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			return true;
 		}
 	}
+        function submitForm(methodName){
+                var f = document.getElementById('messageForm');
+                f.submit();
+        }
+
 	//-->
 </script>
 
@@ -131,7 +136,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>
 
 	<c:if test="${BranchingForm.map.showFinishButton}">
-		<html:form action="/CompleteActivity" method="post">
+		<html:form action="/CompleteActivity" method="post" styleId="messageForm">
 			<input type="hidden" name="activityID"
 				value="<c:out value='${BranchingForm.map.activityID}' />">
 			<input type="hidden" name="lessonID"
@@ -140,9 +145,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				value="<c:out value='${BranchingForm.map.progressID}' />">
 
 			<div class="align-right space-bottom-top">
-				<html:submit styleClass="button">
-					<fmt:message key="label.finish.button" />
-				</html:submit>
+			        <html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+					<span class="nextActivity"><fmt:message key="label.finish.button" /></span>
+				</html:link>
 			</div>
 
 		</html:form>
