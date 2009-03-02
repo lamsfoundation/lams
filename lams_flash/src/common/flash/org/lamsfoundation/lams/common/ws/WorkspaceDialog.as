@@ -713,7 +713,7 @@ class WorkspaceDialog extends MovieClip{
     *</code>
 	*/
     private function ok(){
-        _global.breakpoint();
+		_global.breakpoint();
 		_workspaceController = _workspaceView.getController();
 		_workspaceController.setBusy()
 		
@@ -774,6 +774,7 @@ class WorkspaceDialog extends MovieClip{
 	 */
 	private function saveFile(snode:XMLNode):Void{
 		Debugger.log('Saving a file.',Debugger.GEN,'saveFile','org.lamsfoundation.lams.WorkspaceDialog');
+		ok_btn.enabled = false;
 		
 		var snodeData = treeview.selectedNode.attributes.data;
 		var isWritable:Boolean = _workspaceModel.isWritableResource(snodeData.resourceType,snodeData.resourceID);
@@ -783,12 +784,14 @@ class WorkspaceDialog extends MovieClip{
 		
 		if(StringUtils.containsReservedChar(resourceTitle_txi.text)) {
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_save_title_reserved_chars', [StringUtils.reserved_str]), null);
+			ok_btn.enabled = true;
 			Cursor.showCursor(ApplicationParent.C_DEFAULT);
 			return;
 		}
 		
 		if(snode == treeview.dataProvider.firstChild){
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
+			ok_btn.enabled = true;
 		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_LD){
 			
 			if(snode.parentNode != null) { 
@@ -797,34 +800,42 @@ class WorkspaceDialog extends MovieClip{
 					
 					if(isWritable) {
 						//run a confirm dialogue as user is about to overwrite a design!
-						LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true));
+						LFMessage.showMessageConfirm(Dictionary.getValue('ws_chk_overwrite_resource'), Proxy.create(this,doWorkspaceDispatch,true), Proxy.create(this, enable_ok, true));
 						_workspaceController.clearBusy();
 					}
-					else // don't have permission, file is read-only
+					else { // don't have permission, file is read-only
+						ok_btn.enabled = true;
 						LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null)
+					}
 				}
-				
 			}
 			
 		} else if(snode.attributes.data.resourceType==_workspaceModel.RT_FOLDER){
 			
 			if(snode.attributes.data.resourceID < 0){	
+				ok_btn.enabled = true;
 				LFMessage.showMessageAlert(Dictionary.getValue('ws_save_folder_invalid'),null);
 				_workspaceController.clearBusy();
 			} else if (!isWritable) {
+				ok_btn.enabled = true;
 				LFMessage.showMessageAlert(Dictionary.getValue('ws_no_permission'),null,null);
 			} else if(searchForFile(snode, resourceTitle_txi.text)){
 				//run a alert dialogue as user is using the same name as an existing design!
+				ok_btn.enabled = true;
 				LFMessage.showMessageAlert(Dictionary.getValue('ws_chk_overwrite_existing', [resourceTitle_txi.text]), null);
 				_workspaceController.clearBusy();
 			}
-			
 		} else {
 			LFMessage.showMessageAlert(Dictionary.getValue('ws_click_folder_file'),null);
 			_workspaceController.clearBusy();
+			ok_btn.enabled = true;
 		}
 		
 		Cursor.showCursor(ApplicationParent.C_DEFAULT);
+	}
+	
+	private function enable_ok(e:Boolean) {
+		ok_btn.enabled = e;
 	}
 	
 	private function searchForFile(snode:XMLNode, filename:String, isParentNode:Boolean){
@@ -892,6 +903,7 @@ class WorkspaceDialog extends MovieClip{
 		if(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID)!=null){
 			if(_workspaceModel.currentMode == Workspace.MODE_SAVE || _workspaceModel.currentMode == Workspace.MODE_SAVEAS){
 				if(searchForFile(_workspaceModel.getWorkspaceResource('Folder_'+dto.workspaceFolderID), _resultDTO.resourceName)){
+					ok_btn.enabled = true;
 					//run a alert dialogue as user is using the same name as an existing design!
 					LFMessage.showMessageAlert(Dictionary.getValue('ws_chk_overwrite_existing', [_resultDTO.resourceName]), null);
 					_workspaceController.clearBusy()
@@ -963,7 +975,7 @@ class WorkspaceDialog extends MovieClip{
 	}
 	
 	public function closeThisDialogue(){
-		 close();
+		close();
 	}
 	
 	/**
@@ -1081,8 +1093,6 @@ class WorkspaceDialog extends MovieClip{
 		
 		_workspaceController.onTreeNodeChange(event);
 	}
-
-	
     
     /**
     * XML onLoad handler for treeview data
