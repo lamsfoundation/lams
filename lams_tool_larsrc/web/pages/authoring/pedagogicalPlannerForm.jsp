@@ -17,6 +17,10 @@
 			margin: 5px 0px 5px 10px;
 			float: none;
 		}
+		
+		body {
+			width: 760px;
+		}
 	</style>
 	
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
@@ -41,40 +45,58 @@
   				}
   			});
   		}
+  		
+	  	function prepareFormData(){
+			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			var content = FCKeditorAPI.GetInstance('instructions').GetXHTML();
+			document.getElementById("instructions").value=content;
+		}
   	</script>
 </lams:head>
 <body id="body">
 	<%@ include file="/common/messages.jsp"%>
-	<html:form style="width: 555px" enctype="multipart/form-data" action="/authoring/saveOrUpdatePedagogicalPlannerForm.do" styleId="pedagogicalPlannerForm" method="post">
+	<html:form enctype="multipart/form-data" action="/authoring/saveOrUpdatePedagogicalPlannerForm.do" styleId="pedagogicalPlannerForm" method="post">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
+		
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<c:forEach var="itemIndex"  begin="1" end="${formBean.itemCount}" >
-			<c:set var="itemType" value="${formBean.typeList[itemIndex-1]}" />
-			<c:set var="itemFileName" value="${formBean.fileNameList[itemIndex-1]}" />
-			<html:hidden property="type[${itemIndex-1}]" />
-			<html:hidden property="fileUuid[${itemIndex-1}]" />
-			<html:hidden property="fileVersion[${itemIndex-1}]" />
-			<html:hidden property="fileName[${itemIndex-1}]"></html:hidden>
-			<h4 class="space-left"><fmt:message key="label.authoring.basic.title"/></h4>
-			<html:text styleClass="item" size="90" property="title[${itemIndex-1}]"></html:text>
-			<c:choose>
-				<c:when test="${itemType eq 1}">
-					<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.url"/></h4>
-					<html:text styleClass="item" size="90" property="url[${itemIndex-1}]"></html:text>
-				</c:when>
-				<c:when test="${itemType eq 2}">
-					<html:hidden property="url[${itemIndex-1}]" />
-					<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.file"/>
-						<c:if test="${not empty itemFileName}">: ${itemFileName}</c:if>
-					</h4>
-					<html:file size="78" styleClass="item" property="file[${itemIndex-1}]" />
-				</c:when>
-			</c:choose>
-			<hr style="margin-left: auto; margin-right: auto; margin-top: 5px; margin-bottom: 5px; width: 450px" />
-		</c:forEach>
+		<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.instructions"/></h4>
+		<lams:FCKEditor id="instructions"
+			value="${formBean.instructions}"
+			contentFolderID="${formBean.contentFolderID}"
+               toolbarSet="Custom-Pedplanner" height="150px"
+               width="760px" displayExpanded="false">
+		</lams:FCKEditor>
+		
+		<c:if test="${formBean.itemCount ne 0}">
+			<h4 class="space-left space-top space-bottom"><fmt:message key="label.authoring.basic.resource.list.title"/></h4>
+			<c:forEach var="itemIndex"  begin="1" end="${formBean.itemCount}" >
+				<c:set var="itemType" value="${formBean.typeList[itemIndex-1]}" />
+				<c:set var="itemFileName" value="${formBean.fileNameList[itemIndex-1]}" />
+				<html:hidden property="type[${itemIndex-1}]" />
+				<html:hidden property="fileUuid[${itemIndex-1}]" />
+				<html:hidden property="fileVersion[${itemIndex-1}]" />
+				<html:hidden property="fileName[${itemIndex-1}]"></html:hidden>
+				<h4 class="space-left"><fmt:message key="label.authoring.basic.title"/></h4>
+				<html:text styleClass="item" size="90" property="title[${itemIndex-1}]"></html:text>
+				<c:choose>
+					<c:when test="${itemType eq 1}">
+						<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.url"/></h4>
+						<html:text styleClass="item" size="90" property="url[${itemIndex-1}]"></html:text>
+					</c:when>
+					<c:when test="${itemType eq 2}">
+						<html:hidden property="url[${itemIndex-1}]" />
+						<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.file"/>
+							<c:if test="${not empty itemFileName}">: ${itemFileName}</c:if>
+						</h4>
+						<html:file size="78" styleClass="item" property="file[${itemIndex-1}]" />
+					</c:when>
+				</c:choose>
+				<hr style="margin-left: auto; margin-right: auto; margin-top: 5px; margin-bottom: 5px; width: 450px" />
+			</c:forEach>
+		</c:if>
 	</html:form>
 	<a class="button" href="javascript:createItem(2);"><fmt:message key="label.authoring.basic.add.file" /></a>
 	<a class="button" href="javascript:createItem(1);"><fmt:message key="label.authoring.basic.add.url" /></a>

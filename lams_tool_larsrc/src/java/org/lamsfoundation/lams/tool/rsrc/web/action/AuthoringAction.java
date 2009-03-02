@@ -1176,6 +1176,8 @@ public class AuthoringAction extends Action {
 	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
 	if (command == null) {
 	    plannerForm.fillForm(taskList);
+	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	    plannerForm.setContentFolderID(contentFolderId);
 	    return mapping.findForward(ResourceConstants.SUCCESS);
 	} else {
 	    try {
@@ -1206,6 +1208,7 @@ public class AuthoringAction extends Action {
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
 	    Resource taskList = getResourceService().getResourceByContentId(plannerForm.getToolContentID());
+	    taskList.setInstructions(plannerForm.getInstructions());
 
 	    int itemIndex = 0;
 	    String title = null;

@@ -96,8 +96,8 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 	VotePedagogicalPlannerForm plannerForm = (VotePedagogicalPlannerForm) form;
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
-
 	    VoteContent voteContent = getVoteService().retrieveVote(plannerForm.getToolContentID());
+	    voteContent.setInstructions(plannerForm.getInstructions());
 
 	    int nominationIndex = 1;
 	    String nomination = null;

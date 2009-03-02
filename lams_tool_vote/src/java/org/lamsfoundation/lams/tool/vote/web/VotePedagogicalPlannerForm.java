@@ -37,6 +37,15 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> nomination;
     private String contentFolderID;
+    private String instructions;
+
+    public String getInstructions() {
+	return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
     public String getContentFolderID() {
 	return contentFolderID;
@@ -73,6 +82,7 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     public void fillForm(VoteContent voteContent) {
 	if (voteContent != null) {
 	    setToolContentID(voteContent.getVoteContentId());
+	    setInstructions(voteContent.getInstructions());
 
 	    nomination = new ArrayList<String>();
 	    Set questions = voteContent.getVoteQueContents();

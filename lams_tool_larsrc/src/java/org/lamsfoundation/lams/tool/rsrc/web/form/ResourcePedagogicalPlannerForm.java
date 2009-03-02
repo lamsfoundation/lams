@@ -48,6 +48,8 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
     private List<Long> fileUuid;
     private List<Long> fileVersion;
     private List<Short> type;
+    private String instructions;
+    private String contentFolderID;
 
     @Override
     public ActionMessages validate() {
@@ -96,6 +98,7 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
     public void fillForm(Resource resource) {
 	if (resource != null) {
 	    setToolContentID(resource.getContentId());
+	    setInstructions(resource.getInstructions());
 
 	    title = new ArrayList<String>();
 	    url = new ArrayList<String>();
@@ -288,5 +291,21 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
      */
     public void setFileDummy(int number, String emptyString) {
 	setFile(number, null);
+    }
+
+    public String getInstructions() {
+	return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
     }
 }

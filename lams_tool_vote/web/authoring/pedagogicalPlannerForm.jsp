@@ -35,6 +35,9 @@
   		
   		function prepareFormData(){
 			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			var content = FCKeditorAPI.GetInstance('instructions').GetXHTML();
+			document.getElementById("instructions").value=content;
+			
 			var nominationIndex = 0;
 			do{
 				var nomination = document.getElementById("nomination["+nominationIndex+"]");
@@ -49,24 +52,34 @@
 </lams:head>
 <body id="body">
 	<%@ include file="/common/messages.jsp"%>
-	<h4 class="space-left"><fmt:message key="label.nomination"/></h4>
 	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
-		<c:forEach var="nominationIndex"  begin="1" end="${formBean.nominationCount}" >
-			<div class="FCKdiv">
-				<lams:FCKEditor id="nomination[${nominationIndex-1}]"
-					value="${formBean.nominationList[nominationIndex-1]}"
-					contentFolderID="${formBean.contentFolderID}"
-	                toolbarSet="Custom-Pedplanner" height="150px"
-	                width="760px" displayExpanded="false">
-				</lams:FCKEditor>
-			</div>
-		</c:forEach>
+		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<h4 class="space-left"><fmt:message key="label.authoring.instructions"/></h4>
+		<lams:FCKEditor id="instructions"
+			value="${formBean.instructions}"
+			contentFolderID="${formBean.contentFolderID}"
+               toolbarSet="Custom-Pedplanner" height="150px"
+               width="760px" displayExpanded="false">
+		</lams:FCKEditor>
+		
+		<c:if test="${formBean.nominationCount ne 0}">
+			<h4 class="space-left space-top"><fmt:message key="label.vote.nominations"/></h4>
+			<c:forEach var="nominationIndex"  begin="1" end="${formBean.nominationCount}" >
+				<div class="FCKdiv">
+					<lams:FCKEditor id="nomination[${nominationIndex-1}]"
+						value="${formBean.nominationList[nominationIndex-1]}"
+						contentFolderID="${formBean.contentFolderID}"
+		                toolbarSet="Custom-Pedplanner" height="150px"
+		                width="760px" displayExpanded="false">
+					</lams:FCKEditor>
+				</div>
+			</c:forEach>
+		</c:if>
 	</html:form>
 	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.add.new.nomination" /></a>
 </body>
