@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
 <context-param>
   	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
   	<param-value>org.lamsfoundation.lams.learning.ApplicationResources</param-value>
@@ -21,11 +20,6 @@
 		org.springframework.web.context.ContextLoaderListener
 	</listener-class>
 </listener>	
-<listener>
-	<listener-class>
-		org.lamsfoundation.lams.web.session.SetMaxTimeoutListener
-	</listener-class>
-</listener>
 
   <filter>
 	<filter-name>HibernateFilter</filter-name>
@@ -135,11 +129,7 @@
       <servlet-name>groupingExportPortfolio</servlet-name>
       <url-pattern>/groupingExportPortfolio</url-pattern>
    </servlet-mapping>
-
-   <session-config>
-      <session-timeout>120</session-timeout>
-   </session-config>
-
+   
    <!--
    To specify mime mappings, create a file named mime-mappings.xml, put it in your project's mergedir.
    Organize mime-mappings.xml following this DTD slice:
