@@ -25,8 +25,9 @@
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestionOption.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentOverallFeedback.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentUnit.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentResult.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestionResult.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentAnswer.hbm.xml</value>
+               <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentOptionAnswer.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentAttachment.hbm.xml</value>
                <value>org/lamsfoundation/lams/tool/assessment/model/AssessmentSession.hbm.xml</value>
             </list>
@@ -45,6 +46,11 @@
         </property>
     </bean>
     <bean id="assessmentQuestionResultDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionResultDAOHibernate">
+        <property name="sessionFactory">
+            <ref local="assessmentSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="assessmentResultDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentResultDAOHibernate">
         <property name="sessionFactory">
             <ref local="assessmentSessionFactory"/>
         </property>
@@ -83,6 +89,9 @@
         </property>
         <property name="assessmentQuestionResultDao">
             <ref local="assessmentQuestionResultDao"/>
+        </property>
+        <property name="assessmentResultDao">
+            <ref local="assessmentResultDao"/>
         </property>
         <property name="assessmentAttachmentDao">
             <ref local="assessmentAttachmentDao"/>
@@ -139,7 +148,8 @@
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="processUserAnswer">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAttemptStarted">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="processUserAnswers">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setQuestionStartDate">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

@@ -16,27 +16,25 @@
 	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="assessment" value="${sessionMap.assessment}" />
-	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="pageNumber" value="${sessionMap.pageNumber}" />
+	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+	<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
 
 	<script type="text/javascript">
 	<!--
 		function finishSession(){
-			document.getElementById("finishButton").disabled = true;
+			//document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
-		}
-		function continueReflect(){
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		function nextPage(pageNumber){
         	var myForm = $("answers");
         	myForm.action = "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber;
         	myForm.submit();
 		}		
-		function submitPage(){
+		function finishTest(){
         	var myForm = $("answers");
-        	myForm.action = "<c:url value='/learning/submitPage.do?sessionMapID=${sessionMapID}'/>";
+        	myForm.action = "<c:url value='/learning/finishTest.do?sessionMapID=${sessionMapID}'/>";
         	myForm.submit();
 		}
 		function submitAll(){
@@ -44,6 +42,10 @@
         	myForm.action = "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>";
         	myForm.submit();
 		}	
+		function resubmit(){
+			document.location.href ="<c:url value='/learning/resubmit.do?sessionMapID=${sessionMapID}'/>";
+			return false;			
+		}		
 		var orderingTargetDiv = "orderingArea";
 		function upOption(questionUid, idx){
 			var url = "<c:url value="/learning/upOption.do"/>";
@@ -104,8 +106,7 @@
 		
 		<form id="answers" name="answers" method="post" >
 			<table cellspacing="0" class="alternative-color">
-				<c:forEach var="result" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
-					<c:set var="question" value="${result.assessmentQuestion}" />
+				<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 					<tr>
 						<td style="padding-left: 15px; vertical-align: middle; width: 10px;" >
 							${status.index + 1} 
@@ -199,17 +200,22 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when	test="${(not sessionMap.userFinished)}">
-						<html:button property="submitPage" onclick="return submitPage();" styleClass="button">
-							<fmt:message key="label.learning.submit.page" />
-						</html:button>
+					<c:when	test="${(not finishedLock)}">
+						<html:button property="finishTest" onclick="return finishTest();" styleClass="button">
+							<fmt:message key="label.learning.finish.test" />
+						</html:button>					
 						<html:button property="submitAll" onclick="return submitAll();" styleClass="button">
 							<fmt:message key="label.learning.submit.all" />
 						</html:button>	
 					</c:when>
 					<c:otherwise>
-						<html:button property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button">
-							<fmt:message key="label.finished" />
+						<c:if test="${isResubmitAllowed}">
+							<html:button property="resubmit" onclick="return resubmit()" styleClass="button">
+								<fmt:message key="label.learning.resubmit" />
+							</html:button>				
+						</c:if>					
+						<html:button property="FinishButton" onclick="return finishSession()" styleClass="button">
+							<fmt:message key="label.learning.next.activity" />
 						</html:button>
 					</c:otherwise>
 				</c:choose>

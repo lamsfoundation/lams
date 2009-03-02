@@ -24,8 +24,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.assessment.model;
 
-import java.util.Date;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -42,23 +40,16 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 public class AssessmentQuestionResult {
 
     private Long uid;
-    private AssessmentUser user;
     private AssessmentQuestion assessmentQuestion;
     private String answerString;
     private float answerFloat;
     private boolean answerBoolean;
     private float mark;
     private float penalty;
-    private Date startDate;
-    private Date finishDate;
-    private Long sessionId;
-    private Set<AssessmentAnswer> answers;
-
-    // DTO fields:
-    private boolean processed;
+    private Set<AssessmentOptionAnswer> optionAnswers;
     
     public AssessmentQuestionResult() {
-	answers = new TreeSet(new SequencableComparator());
+	optionAnswers = new TreeSet(new SequencableComparator());
     }
 
     /**
@@ -71,18 +62,6 @@ public class AssessmentQuestionResult {
 
     public void setUid(Long uid) {
 	this.uid = uid;
-    }
-
-    /**
-     * @hibernate.many-to-one column="user_uid" cascade="none"
-     * @return
-     */
-    public AssessmentUser getUser() {
-	return user;
-    }
-
-    public void setUser(AssessmentUser user) {
-	this.user = user;
     }
     
     /**
@@ -161,67 +140,24 @@ public class AssessmentQuestionResult {
     public void setPenalty(Float penalty) {
 	this.penalty = penalty;
     }
-
-    /**
-     * @hibernate.property column="start_date"
-     * @return
-     */
-    public Date getStartDate() {
-	return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-	this.startDate = startDate;
-    }
-    
-    /**
-     * @hibernate.property column="finish_date"
-     * @return
-     */
-    public Date getFinishDate() {
-	return finishDate;
-    }
-
-    public void setFinishDate(Date finishDate) {
-	this.finishDate = finishDate;
-    }    
-
-    /**
-     * @hibernate.property column="session_id"
-     * @return
-     */
-    public Long getSessionId() {
-	return sessionId;
-    }
-
-    public void setSessionId(Long sessionId) {
-	this.sessionId = sessionId;
-    }
     
     /**
      * 
      * @hibernate.set cascade="all" order-by="sequence_id asc"
-     * @hibernate.collection-key column="result_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswer"
+     * @hibernate.collection-key column="question_result_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer"
      * 
      * @return a set of answerOptions to this AssessmentQuestion.
      */
-    public Set<AssessmentAnswer> getAnswers() {
-	return answers;
+    public Set<AssessmentOptionAnswer> getOptionAnswers() {
+	return optionAnswers;
     }
 
     /**
      * @param answerOptions answerOptions to set.
      */
-    public void setAnswers(Set<AssessmentAnswer> answers) {
-	this.answers = answers;
+    public void setOptionAnswers(Set<AssessmentOptionAnswer> answers) {
+	this.optionAnswers = answers;
     }
-    
-    public boolean isProcessed() {
-	return processed;
-    }
-    public void setProcessed(boolean processed) {
-	this.processed = processed;
-    }
-
+ 
 }

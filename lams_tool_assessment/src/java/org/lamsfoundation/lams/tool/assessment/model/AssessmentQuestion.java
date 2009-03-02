@@ -96,6 +96,10 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     
     private boolean answerBoolean;
     
+    private float mark;
+    
+    private float penalty;
+    
     public AssessmentQuestion() {
 	questionOptions = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
 	units = new TreeSet<AssessmentUnit>(new SequencableComparator());
@@ -415,8 +419,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     /**
      * @param questionOptions questionOptions to set.
      */
-    public void setQuestionOptions(Set<AssessmentQuestionOption> answerOptions) {
-	this.questionOptions = answerOptions;
+    public void setQuestionOptions(Set<AssessmentQuestionOption> questionOptions) {
+	this.questionOptions = questionOptions;
     }
     
     /**
@@ -465,4 +469,18 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     public void setAnswerBoolean(boolean answerBoolean) {
 	this.answerBoolean = answerBoolean;
     }   
+    
+    public Float getMark() {
+	return mark;
+    }
+    public void setMark(Float mark) {
+	this.mark = mark;
+    }
+    
+    public Float getPenalty() {
+	return penalty;
+    }
+    public void setPenalty(Float penalty) {
+	this.penalty = penalty;
+    }
 }

@@ -26,14 +26,14 @@ package org.lamsfoundation.lams.tool.assessment.model;
 import org.apache.log4j.Logger;
  
 /**
- * AssessmentAnswer
+ * AssessmentOptionAnswer
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_laasse10_assessment_answer"
+ * @hibernate.class table="tl_laasse10_option_answer"
  */
-public class AssessmentAnswer implements Cloneable, Sequencable {
-    private static final Logger log = Logger.getLogger(AssessmentAnswer.class);
+public class AssessmentOptionAnswer implements Cloneable, Sequencable {
+    private static final Logger log = Logger.getLogger(AssessmentOptionAnswer.class);
 
     private Long uid;
     

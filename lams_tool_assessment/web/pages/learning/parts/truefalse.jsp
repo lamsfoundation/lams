@@ -6,7 +6,7 @@
 
 <table cellspacing="0" style="padding-bottom: 10px;">
 		<tr>
-			<c:if test="${(result.startDate != null)}">
+			<c:if test="${finishedLock}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
 					<c:if test="${(question.correctAnswer) and (question.answerString != null)}">
 						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
@@ -19,8 +19,7 @@
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; width: 5px; border-bottom:0px; ">
 						<input type="radio" name="question${status.index}" value="${true}" styleClass="noBorder"
 	 						<c:if test="${question.answerBoolean}">checked="checked"</c:if>
-	<%--						<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>
-	--%>					 
+							<c:if test="${finishedLock}">disabled="disabled"</c:if>					 
 						/>
 			</td>
 			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;">
@@ -28,7 +27,7 @@
 			</td>
 		</tr>
 		<tr>
-			<c:if test="${(result.startDate != null)}">
+			<c:if test="${finishedLock}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
 					<c:if test="${(!question.correctAnswer) and (question.answerString != null)}">
 						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
@@ -41,8 +40,7 @@
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; width: 5px; border-bottom:0px; ">
 						<input type="radio" name="question${status.index}" value="${false}" styleClass="noBorder"
 	 						<c:if test="${(!question.answerBoolean) and (question.answerString != null)}">checked="checked"</c:if>
-	<%--						<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>
-	--%>					 
+							<c:if test="${finishedLock}">disabled="disabled"</c:if>					 
 						/>
 			</td>
 			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;">
@@ -52,7 +50,7 @@
 
 </table>	
 
-<c:if test="${(result.startDate != null)}">
+<c:if test="${finishedLock}">
 	<c:choose>
 		<c:when test="${(question.answerBoolean == question.correctAnswer) and (question.answerString != null)}">
 			<div style="padding: 15px 15px 0px; font-style: italic">

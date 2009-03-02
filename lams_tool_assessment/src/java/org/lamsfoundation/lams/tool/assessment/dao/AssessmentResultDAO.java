@@ -21,29 +21,31 @@
  */  
  
 /* $Id$ */  
-package org.lamsfoundation.lams.tool.assessment.util;  
+package org.lamsfoundation.lams.tool.assessment.dao;  
 
-import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
  
-/**
- * AssessmentQuestionResultComparator.
- * 
- * @author Andrey Balan
- * 
- */
-public class AssessmentQuestionResultComparator implements Comparator<AssessmentQuestionResult> {
+public interface AssessmentResultDAO extends DAO {
 
-    public int compare(AssessmentQuestionResult o1, AssessmentQuestionResult o2) {
-	if ((o1 != null) && (o2 != null)) {
-	    return o1.getAssessmentQuestion().getSequenceId() - o2.getAssessmentQuestion().getSequenceId();
-	} else if (o1 != null) {
-	    return 1;
-	} else {
-	    return -1;
-	}
-    }
+    List<AssessmentResult> getAssessmentResult(Long assessmentUid, Long userId);
+    
+    AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
+    
+    int getAssessmentResultCount(Long toolSessionId, Long userId);
+
+//    /**
+//     * Return list which contains key pair which key is assessment question uid, value is number view.
+//     * 
+//     * @param contentId
+//     * @return
+//     */
+//    Map<Long, Integer> getSummary(Long contentId);
+
+//    List<AssessmentResult> getAssessmentResultBySession(Long sessionId, Long questionUid);
 
 }
  

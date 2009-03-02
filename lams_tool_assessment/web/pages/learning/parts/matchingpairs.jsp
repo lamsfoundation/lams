@@ -7,7 +7,7 @@
 <table cellspacing="0" style="padding-bottom: 10px;">
 	<c:forEach var="option" items="${question.questionOptions}">
 		<tr>
-			<c:if test="${(result.startDate != null)}">
+			<c:if test="${finishedLock}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
 					<c:if test="${(option.answerInt == option.sequenceId)}">
 						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
@@ -21,14 +21,14 @@
 				<c:out value="${option.question}" escapeXml="false" />
 			</td>
 			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px; ">
-				<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}">
+				<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}" disabled="${finishedLock}">
 					<html:option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></html:option>
 					<c:forEach var="selectOption" items="${question.questionOptions}">
 						<html:option value="${selectOption.sequenceId}">${selectOption.optionString}</html:option>
 					</c:forEach>
 				</html:select>
 			</td>
-			<c:if test="${(result.startDate != null) && (option.answerInt != -1)}">
+			<c:if test="${finishedLock && (option.answerInt != -1)}">
 				<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;" width="30%">
 					<c:out value="${option.feedback}" escapeXml="false" />
 				</td>		

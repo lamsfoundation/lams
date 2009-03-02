@@ -7,9 +7,7 @@
 <table cellspacing="0" style="padding-bottom: 10px;">
 	<tr>
 		<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; ">
-			<lams:STRUTS-textarea property="question${status.index}" rows="7" cols="60" value="${question.answerString}"/>
-	<%--						<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>
-	--%>					 
+			<lams:STRUTS-textarea property="question${status.index}" rows="7" cols="60" value="${question.answerString}" disabled="${finishedLock}"/>
 		</td>
 	</tr>
 </table>		

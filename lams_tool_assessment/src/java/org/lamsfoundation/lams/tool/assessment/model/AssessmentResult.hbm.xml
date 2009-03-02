@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult"
-        table="tl_laasse10_question_result"
+        name="org.lamsfoundation.lams.tool.assessment.model.AssessmentResult"
+        table="tl_laasse10_assessment_result"
     >
 
         <id
@@ -19,84 +19,77 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-AssessmentQuestionResult.xml 
+                  hibernate-generator-params-AssessmentResult.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
         </id>
 
         <many-to-one
-            name="assessmentQuestion"
-            class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion"
+            name="assessment"
+            class="org.lamsfoundation.lams.tool.assessment.model.Assessment"
             cascade="none"
             outer-join="auto"
             update="true"
             insert="true"
-            column="assessment_question_uid"
+            column="assessment_uid"
+        />
+
+        <many-to-one
+            name="user"
+            class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="user_uid"
         />
 
         <property
-            name="answerString"
-            type="text"
+            name="startDate"
+            type="java.util.Date"
             update="true"
             insert="true"
-            column="answer_string"
+            column="start_date"
         />
 
         <property
-            name="answerFloat"
-            type="float"
+            name="finishDate"
+            type="java.util.Date"
             update="true"
             insert="true"
-            column="answer_float"
+            column="finish_date"
         />
 
         <property
-            name="answerBoolean"
-            type="boolean"
+            name="sessionId"
+            type="java.lang.Long"
             update="true"
             insert="true"
-            column="answer_boolean"
-        />
-
-        <property
-            name="mark"
-            type="java.lang.Float"
-            update="true"
-            insert="true"
-            column="mark"
-        />
-
-        <property
-            name="penalty"
-            type="java.lang.Float"
-            update="true"
-            insert="true"
-            column="penalty"
+            column="session_id"
         />
 
         <set
-            name="optionAnswers"
+            name="questionResults"
             lazy="false"
             cascade="all"
             sort="unsorted"
-            order-by="sequence_id asc"
         >
 
             <key
-                column="question_result_uid"
+                column="result_uid"
             >
             </key>
 
             <one-to-many
-                  class="org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer"
+                  class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult"
             />
 
         </set>
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-AssessmentQuestionResult.xml
+                hibernate-properties-AssessmentResult.xml
             containing the additional properties and place it in your merge dir.
         -->
 

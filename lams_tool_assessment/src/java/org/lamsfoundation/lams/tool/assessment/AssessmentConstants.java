@@ -152,8 +152,6 @@ public class AssessmentConstants {
 
     public static final String ATTR_USER_LIST = "userList";
 
-    public static final String ATTR_FINISH_LOCK = "finishedLock";
-
     public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
 
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
@@ -174,7 +172,15 @@ public class AssessmentConstants {
     
     public static final String ATTR_PAGED_QUESTIONS = "pagedQuestions";
     
-    public static final String ATTR_RESULT_FOR_ORDERING = "resultForOrdering";
+    public static final String ATTR_QUESTION_FOR_ORDERING = "questionForOrdering";
+    
+    public static final String ATTR_ASSESSMENT_RESULT = "assessmentResult";
+    
+    public static final String ATTR_IS_RESUBMIT_ALLOWED = "isResubmitAllowed";
+    
+    public static final String ATTR_FINISHED_LOCK = "finishedLock";
+    
+    public static final String ATTR_USER = "user";
 
     // error message keys
     public static final String ERROR_MSG_QUESTION_NAME_BLANK = "error.question.name.blank";

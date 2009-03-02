@@ -1,8 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:if test="${not empty resultForOrdering}">
-	<c:set var="result" value="${resultForOrdering}" />
-	<c:set var="question" value="${result.assessmentQuestion}" />
+<c:if test="${not empty questionForOrdering}">
+	<c:set var="question" value="${questionForOrdering}" />
 </c:if>
 
 <div id="orderingArea">
@@ -40,7 +39,7 @@
 				</td>
 				
 				<td width="20px" style="padding:5px 0px 2px 15px; vertical-align:middle; text-align: center; background:none; border-bottom:0px;">
-					<c:if test="${not status.first}">
+					<c:if test="${not status.first and !finishedLock}">
 						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
 							border="0" title="<fmt:message key="label.authoring.basic.up"/>"
 							onclick="upOption(${question.uid},${status.index})">
@@ -51,7 +50,7 @@
 						</c:if>
 					</c:if>
 		
-					<c:if test="${not status.last}">
+					<c:if test="${not status.last and !finishedLock}">
 						<c:if test="${status.first}">
 							<img
 								src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"

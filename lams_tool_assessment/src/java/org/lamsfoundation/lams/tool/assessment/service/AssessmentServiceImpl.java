@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +39,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
@@ -75,21 +73,23 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentAttachmentDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
-import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -99,6 +99,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * 
@@ -120,6 +121,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private AssessmentSessionDAO assessmentSessionDao;
 
     private AssessmentQuestionResultDAO assessmentQuestionResultDao;
+    
+    private AssessmentResultDAO assessmentResultDao;
 
     // tool service
     private AssessmentToolContentHandler assessmentToolContentHandler;
@@ -408,72 +411,61 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void saveOrUpdateAssessmentSession(AssessmentSession resSession) {
 	assessmentSessionDao.saveObject(resSession);
     }
+    
+    public void saveOrUpdateAssessmentResult(AssessmentResult assessmentResult) {
+	assessmentResultDao.saveObject(assessmentResult);
+    }
 
     public void retrieveComplete(SortedSet<AssessmentQuestion> assessmentQuestionList, AssessmentUser user) {
-	for (AssessmentQuestion question : assessmentQuestionList) {
-	    AssessmentQuestionResult result = assessmentQuestionResultDao.getAssessmentQuestionResult(question.getUid(),
-		    user.getUserId());
-	    if (result == null) {
-		question.setComplete(false);
-	    } else {
-		question.setComplete(result.isProcessed());
-	    }
-	}
-    }
-
-    public void setQuestionStartDate(Long assessmentQuestionUid, Long userId, Long sessionId) {
-	AssessmentQuestionResult result = assessmentQuestionResultDao.getAssessmentQuestionResult(assessmentQuestionUid,
-		userId);
-	if (result == null) {
-	    result = new AssessmentQuestionResult();
-	    AssessmentQuestion question = assessmentQuestionDao.getByUid(assessmentQuestionUid);
-	    result.setAssessmentQuestion(question);
-	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	    result.setUser(user);
-	    result.setProcessed(false);
-	    result.setSessionId(sessionId);
-	    result.setStartDate(new Timestamp(new Date().getTime()));
-	    assessmentQuestionResultDao.saveObject(result);
-	}
+//	for (AssessmentQuestion question : assessmentQuestionList) {
+//	    AssessmentQuestionResult result = assessmentQuestionResultDao.getAssessmentQuestionResult(question.getUid(),
+//		    user.getUserId());
+//	    if (result == null) {
+//		question.setComplete(false);
+//	    } else {
+////		question.setComplete(result.isProcessed());
+//	    }
+//	}
     }
     
-    public AssessmentQuestionResult processUserAnswer(AssessmentQuestionResult userResult, Long userId, Long sessionId, boolean isFinish) {
-	Long questionUid = userResult.getAssessmentQuestion().getUid();
-	AssessmentQuestion question = userResult.getAssessmentQuestion();
-	AssessmentQuestionResult result = assessmentQuestionResultDao.getAssessmentQuestionResult(questionUid, userId);
-	if (result != null) {
-	    for (AssessmentAnswer dbResultAnswer : result.getAnswers()) {
-		for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
-		    if (dbResultAnswer.getSequenceId() == questionOption.getSequenceId()) {
-			dbResultAnswer.setAnswerBoolean(questionOption.getAnswerBoolean());
-			dbResultAnswer.setAnswerInt(questionOption.getAnswerInt());
-			break;
-		    }
-		}
+    public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) { 
+	AssessmentResult result = new AssessmentResult();
+	result.setAssessment(assessment);
+	result.setUser(assessmentUser);
+	result.setSessionId(toolSessionId);
+	result.setStartDate(new Timestamp(new Date().getTime()));
+	assessmentResultDao.saveObject(result);
+    }
+    
+    public void processUserAnswers(Long assessmentUid, Long userId, ArrayList<SortedSet<AssessmentQuestion>> pagedQuestions) {
+	SortedSet<AssessmentQuestionResult> questionResultList = new TreeSet<AssessmentQuestionResult>(
+		new AssessmentQuestionResultComparator());
+	for (SortedSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	    for (AssessmentQuestion question : questionsForOnePage) {
+		AssessmentQuestionResult processedAnswer = this.processUserAnswer(question);
+		questionResultList.add(processedAnswer);
 	    }
-	} else {
-	    result = new AssessmentQuestionResult();
-	    Set<AssessmentAnswer> answers = result.getAnswers();
-	    for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
-		AssessmentAnswer resultAnswer = new AssessmentAnswer();
-		resultAnswer.setSequenceId(questionOption.getSequenceId());
-		resultAnswer.setAnswerBoolean(questionOption.getAnswerBoolean());
-		resultAnswer.setAnswerInt(questionOption.getAnswerInt());
-		answers.add(resultAnswer);
-	    }	
-	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	    result.setUser(user);
-	    result.setProcessed(true);
-	    result.setSessionId(sessionId);
-	    result.setStartDate(new Timestamp(new Date().getTime()));	   
 	}
-	if (isFinish) {
-	    result.setFinishDate(new Timestamp(new Date().getTime()));
-	}
-	result.setAssessmentQuestion(question);
-	result.setAnswerBoolean(question.getAnswerBoolean());
-	result.setAnswerFloat(question.getAnswerFloat());
-	result.setAnswerString(question.getAnswerString());
+	AssessmentResult result = assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
+	result.setQuestionResults(questionResultList);
+	assessmentResultDao.saveObject(result);
+    }
+    
+    private AssessmentQuestionResult processUserAnswer(AssessmentQuestion question) {
+	AssessmentQuestionResult questionResult = new AssessmentQuestionResult();
+
+	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
+	for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
+	    AssessmentOptionAnswer optionAnswer = new AssessmentOptionAnswer();
+	    optionAnswer.setSequenceId(questionOption.getSequenceId());
+	    optionAnswer.setAnswerBoolean(questionOption.getAnswerBoolean());
+	    optionAnswer.setAnswerInt(questionOption.getAnswerInt());
+	    optionAnswers.add(optionAnswer);
+	}	
+	questionResult.setAssessmentQuestion(question);
+	questionResult.setAnswerBoolean(question.getAnswerBoolean());
+	questionResult.setAnswerFloat(question.getAnswerFloat());
+	questionResult.setAnswerString(question.getAnswerString());
 	
 	float mark = 0;
 	float maxMark = question.getDefaultGrade();
@@ -528,10 +520,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	} else if (mark < 0) {
 	    mark = 0;
 	}
-	result.setMark(mark);
-
-	assessmentQuestionResultDao.saveObject(result);
-	return result;
+	questionResult.setMark(mark);
+	return questionResult;
+    }
+    
+    public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
+	return assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
+    }
+    
+    public int getAssessmentResultCount(Long toolSessionId, Long userId) {
+	return assessmentResultDao.getAssessmentResultCount(toolSessionId, userId);
     }
 
     public String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException {
@@ -563,7 +561,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	List<Summary> group = new ArrayList<Summary>();
 
 	// get all question which is accessed by user
-	Map<Long, Integer> visitCountMap = assessmentQuestionResultDao.getSummary(contentId);
+	//TODO fix this
+	Map<Long, Integer> visitCountMap =null; 
+	    //assessmentQuestionResultDao.getSummary(contentId);
 
 	Assessment assessment = assessmentDao.getByContentId(contentId);
 	Set<AssessmentQuestion> resQuestionList = assessment.getQuestions();
@@ -637,17 +637,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return map;
     }
 
-    public List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid) {
-	List<AssessmentQuestionResult> logList = assessmentQuestionResultDao.getAssessmentQuestionResultBySession(
-		sessionId, questionUid);
-	List<AssessmentUser> userList = new ArrayList(logList.size());
-	for (AssessmentQuestionResult visit : logList) {
-	    AssessmentUser user = visit.getUser();
-	    user.setAccessDate(visit.getStartDate());
-	    userList.add(user);
-	}
-	return userList;
-    }
+    //TODO either delete or fix
+//    public List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid) {
+//	List<AssessmentQuestionResult> logList = assessmentQuestionResultDao.getAssessmentQuestionResultBySession(
+//		sessionId, questionUid);
+//	List<AssessmentUser> userList = new ArrayList(logList.size());
+//	for (AssessmentQuestionResult visit : logList) {
+////	    AssessmentUser user = visit.getUser();
+////	    user.setAccessDate(visit.getStartDate());
+////	    userList.add(user);
+//	}
+//	return userList;
+//    }
 
     public void setQuestionVisible(Long questionUid, boolean visible) {
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
@@ -797,13 +798,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	this.toolService = toolService;
     }
 
-    public AssessmentQuestionResultDAO getAssessmentQuestionResultDao() {
-	return assessmentQuestionResultDao;
-    }
+//    public AssessmentQuestionResultDAO getAssessmentQuestionResultDao() {
+//	return assessmentQuestionResultDao;
+//    }
 
     public void setAssessmentQuestionResultDao(AssessmentQuestionResultDAO assessmentQuestionResultDao) {
 	this.assessmentQuestionResultDao = assessmentQuestionResultDao;
     }
+    
+//    public AssessmentResultDAO getAssessmentResultDao() {
+//	return assessmentResultDao;
+//    }
+
+    public void setAssessmentResultDao(AssessmentResultDAO assessmentResultDao) {
+	this.assessmentResultDao = assessmentResultDao;
+    }
+
 
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods

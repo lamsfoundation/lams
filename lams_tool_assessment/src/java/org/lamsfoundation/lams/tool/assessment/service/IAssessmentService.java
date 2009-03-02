@@ -23,7 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.assessment.service;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,10 +35,10 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -167,12 +167,21 @@ public interface IAssessmentService {
      * @param resSession
      */
     void saveOrUpdateAssessmentSession(AssessmentSession resSession);
+    
+    /**
+     * Save or update assessment result.
+     * 
+     * @param assessmentResult
+     */
+    void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId);    
 
     void retrieveComplete(SortedSet<AssessmentQuestion> assessmentQuestionList, AssessmentUser user);
 
-    void setQuestionStartDate(Long assessmentQuestionUid, Long userId, Long sessionId);
+    void processUserAnswers(Long assessmentUid, Long userId, ArrayList<SortedSet<AssessmentQuestion>> pagedQuestions);
     
-    AssessmentQuestionResult processUserAnswer(AssessmentQuestionResult result, Long userId, Long sessionId, boolean isFinish);
+    AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
+    
+    int getAssessmentResultCount(Long toolSessionId, Long userId);
 
     /**
      * If success return next activity's url, otherwise return null.
@@ -193,7 +202,7 @@ public interface IAssessmentService {
      */
     List<List<Summary>> getSummary(Long contentId);
 
-    List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid);
+//    List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid);
 
     /**
      * Set a assessment question visible or not.

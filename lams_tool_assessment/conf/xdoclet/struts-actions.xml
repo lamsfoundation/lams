@@ -186,19 +186,19 @@
 			parameter="nextPage" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
 		</action>
-		<action path="/learning/submitPage"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
-			parameter="submitPage" >
-			<forward name="success" path="/pages/learning/learning.jsp" />
-		</action>
 		<action path="/learning/submitAll"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="submitAll" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
-		</action>				
-		<action path="/learning/completeQuestion"
+		</action>		
+		<action path="/learning/finishTest"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
-			parameter="complete" >
+			parameter="finishTest" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>
+		<action path="/learning/resubmit"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="resubmit" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
 		</action>
 		<action path="/learning/finish"
@@ -206,33 +206,6 @@
 			input="/pages/learning/learning.jsp"
 			parameter="finish" >
 			<forward name="success" path="/pages/learning/finish.jsp" />
-		</action>
-		
-		<action path="/learning/addfile"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
-			parameter="addfile"
-			name="assessmentQuestionForm" 
-			scope="request" 
-			validate="false">
-			<forward name="success" path="/pages/learning/addfile.jsp" />
-		</action>
-		<action path="/learning/addurl"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
-			parameter="addurl"
-			name="assessmentQuestionForm" 
-			scope="request" 
-			validate="false">
-			<forward name="success" path="/pages/learning/addurl.jsp" />
-		</action>
-		<action path="/learning/saveOrUpdateQuestion"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
-			parameter="saveOrUpdateQuestion"
-			name="assessmentQuestionForm" 
-			scope="request" 
-			validate="false">
-			<forward name="url" path="/pages/learning/addurl.jsp" />
-			<forward name="file" path="/pages/learning/addfile.jsp" />
-			<forward name="success" path="/pages/learning/success.jsp" />
 		</action>
 		<action path="/learning/upOption"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"

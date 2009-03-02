@@ -7,8 +7,8 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.tool.assessment.model.AssessmentAnswer"
-        table="tl_laasse10_assessment_answer"
+        name="org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer"
+        table="tl_laasse10_option_answer"
     >
 
         <id
@@ -19,7 +19,7 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-AssessmentAnswer.xml 
+                  hibernate-generator-params-AssessmentOptionAnswer.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
@@ -51,7 +51,7 @@
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-AssessmentAnswer.xml
+                hibernate-properties-AssessmentOptionAnswer.xml
             containing the additional properties and place it in your merge dir.
         -->
 

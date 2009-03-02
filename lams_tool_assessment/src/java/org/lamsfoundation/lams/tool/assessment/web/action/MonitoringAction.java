@@ -67,9 +67,9 @@ public class MonitoringAction extends Action {
 	    return summary(mapping, form, request, response);
 	}
 
-	if (param.equals("listuser")) {
-	    return listUser(mapping, form, request, response);
-	}
+//	if (param.equals("listuser")) {
+//	    return listUser(mapping, form, request, response);
+//	}
 	if (param.equals("showQuestion")) {
 	    return showQuestion(mapping, form, request, response);
 	}
@@ -165,19 +165,19 @@ public class MonitoringAction extends Action {
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
-    private ActionForward listUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	Long itemUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
-
-	// get user list by given item uid
-	IAssessmentService service = getAssessmentService();
-	List list = service.getUserListBySessionQuestion(sessionId, itemUid);
-
-	// set to request
-	request.setAttribute(AssessmentConstants.ATTR_USER_LIST, list);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
-    }
+//    private ActionForward listUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+//	    HttpServletResponse response) {
+//	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+//	Long itemUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
+//
+//	// get user list by given item uid
+//	IAssessmentService service = getAssessmentService();
+//	List list = service.getUserListBySessionQuestion(sessionId, itemUid);
+//
+//	// set to request
+//	request.setAttribute(AssessmentConstants.ATTR_USER_LIST, list);
+//	return mapping.findForward(AssessmentConstants.SUCCESS);
+//    }
 
     private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
