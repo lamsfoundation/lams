@@ -35,7 +35,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -47,6 +49,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.snowball.SnowballAnalyzer;
 import org.apache.lucene.document.Document;
@@ -210,8 +213,29 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String FIELD_NAME_BRIEF_DESCRIPTION = "briefDescription";
     private static final String FIELD_NAME_FULL_DESCRIPTION = "fullDescription";
     private static final String FIELD_NAME_ANCESTOR_UID = "ancestorUid";
-    // not sfinal as it may be later swapped by different language
-    private static Analyzer ANALYZER = new SnowballAnalyzer("English", StopAnalyzer.ENGLISH_STOP_WORDS);
+
+    private static final Map<String, String> filterLanguageMap = new TreeMap<String, String>();
+    private static final Map<String, String[]> filterStopWordsMap = new TreeMap<String, String[]>();
+
+    static {
+	PedagogicalPlannerAction.filterLanguageMap.put("en", "English");
+	PedagogicalPlannerAction.filterLanguageMap.put("nl", "Dutch");
+	PedagogicalPlannerAction.filterLanguageMap.put("da", "Danish");
+	PedagogicalPlannerAction.filterLanguageMap.put("nl", "Finnish");
+	PedagogicalPlannerAction.filterLanguageMap.put("fr", "French");
+	PedagogicalPlannerAction.filterLanguageMap.put("de", "German");
+	PedagogicalPlannerAction.filterLanguageMap.put("hu", "Hungarian");
+	PedagogicalPlannerAction.filterLanguageMap.put("it", "Italian");
+	PedagogicalPlannerAction.filterLanguageMap.put("no", "Norwegian");
+	PedagogicalPlannerAction.filterLanguageMap.put("pt", "Portuguese");
+	PedagogicalPlannerAction.filterLanguageMap.put("ru", "Russian");
+	PedagogicalPlannerAction.filterLanguageMap.put("es", "Spanish");
+	PedagogicalPlannerAction.filterLanguageMap.put("sv", "Swedish");
+	PedagogicalPlannerAction.filterLanguageMap.put("tr", "Turkish");
+
+	PedagogicalPlannerAction.filterStopWordsMap.put("English", StopAnalyzer.ENGLISH_STOP_WORDS);
+	// ^[\s\|]+(\S+).*$
+    }
 
     @Override
     /**
@@ -559,6 +583,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Boolean isSysAdmin = request.isUserInRole(Role.SYSADMIN);
 	Boolean edit = WebUtil.readBooleanParam(request, CentralConstants.PARAM_EDIT, false);
 	edit &= isSysAdmin;
+	String filterText = WebUtil.readStrParam(request, CentralConstants.PARAM_FILTER_TEXT, true);
 	// Do we display the root (top) node or an existing one
 	PedagogicalPlannerSequenceNode node = null;
 	if (nodeUid == null) {
@@ -573,31 +598,51 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	PedagogicalPlannerAction.log.debug("Opening sequence node with UID: " + nodeUid);
 
 	// Fill the DTO
-	List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(node);
-	String filterText = WebUtil.readStrParam(request, CentralConstants.PARAM_FILTER_TEXT, true);
-	Set<Long> filteredNodeUids = null;
-	try {
-	    filteredNodeUids = filterSubnodes(node, filterText);
-	} catch (Exception e) {
-	    PedagogicalPlannerAction.log.error(e, e);
-	    ActionMessages errors = new ActionMessages();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILTER_PARSE));
-	    saveErrors(request, errors);
-	}
-	if (filteredNodeUids != null) {
-	    request.setAttribute(CentralConstants.PARAM_FILTER_TEXT, filterText);
+	PedagogicalPlannerSequenceNodeDTO dto = null;
+	if (filterText != null) {
+	    try {
+		// Filtering = display node and all the subnodes that were found in the search (not the immediate
+		// children of the node)
+		Set<Long> filteredNodeUids = filterSubnodes(node, filterText);
+		if (filteredNodeUids != null) {
+		    request.setAttribute(CentralConstants.PARAM_FILTER_TEXT, filterText);
+
+		    Set<PedagogicalPlannerSequenceNode> filteredNodes = new HashSet<PedagogicalPlannerSequenceNode>(
+			    filteredNodeUids.size());
+		    for (Long filteredUid : filteredNodeUids) {
+			PedagogicalPlannerSequenceNode subnode = getPedagogicalPlannerDAO().getByUid(filteredUid);
+			filteredNodes.add(subnode);
+		    }
+
+		    dto = new PedagogicalPlannerSequenceNodeDTO(node, filteredNodes);
+		    for (PedagogicalPlannerSequenceNodeDTO subnodeDTO : dto.getSubnodes()) {
+			List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(subnodeDTO.getUid());
+			subnodeDTO.setTitlePath(titlePath);
+		    }
+		}
+	    } catch (Exception e) {
+		PedagogicalPlannerAction.log.error(e, e);
+		ActionMessages errors = new ActionMessages();
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			PedagogicalPlannerAction.ERROR_KEY_FILTER_PARSE));
+		saveErrors(request, errors);
+	    }
 	}
 
-	PedagogicalPlannerSequenceNodeDTO dto = new PedagogicalPlannerSequenceNodeDTO(node, titlePath, filteredNodeUids);
+	if (dto == null) {
+	    // No filtering or something went wrong in filtering
+	    dto = new PedagogicalPlannerSequenceNodeDTO(node, node.getSubnodes());
+	}
 
 	// Additional DTO parameters
+	List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(nodeUid);
 	Boolean createSubnode = WebUtil.readBooleanParam(request, CentralConstants.PARAM_CREATE_SUBNODE, false);
 	Boolean importNode = WebUtil.readBooleanParam(request, CentralConstants.PARAM_IMPORT_NODE, false);
 	dto.setCreateSubnode(createSubnode);
 	dto.setEdit(edit);
 	dto.setIsSysAdmin(isSysAdmin);
 	dto.setImportNode(importNode);
+	dto.setTitlePath(titlePath);
 
 	request.setAttribute(CentralConstants.ATTR_NODE, dto);
 
@@ -1226,48 +1271,66 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	inputStream.close();
     }
 
+    /**
+     * Finds all node's descendants matching the query. Results can be not only the subnodes of the node, but also
+     * deeper descendants. This method uses Lucene project for query parsing and searchig.
+     * 
+     * @param node
+     * @param filterText
+     * @return set of nodes' uids
+     * @throws ParseException
+     * @throws CorruptIndexException
+     * @throws IOException
+     */
     private Set<Long> filterSubnodes(PedagogicalPlannerSequenceNode node, String filterText) throws ParseException,
 	    CorruptIndexException, IOException {
+	Set<Long> matchingSubnodeUids = new TreeSet<Long>();
 	if (!StringUtils.isEmpty(filterText)) {
 
-	    Set<Document> docs = new HashSet<Document>();
-	    extractSubnodeDocuments(docs, node, null);
-	    if (docs.isEmpty()) {
-		return null;
+	    Set<Document> docs = extractSubnodeDocuments(node);
+	    if (!docs.isEmpty()) {
+		Analyzer analyzer = getAnalyzer();
+		// Searching is performed in title, brief description and full description of the node.
+		MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[] {
+			PedagogicalPlannerAction.FIELD_NAME_TITLE,
+			PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION,
+			PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION }, analyzer);
+
+		Query query = queryParser.parse(filterText);
+
+		// Index is store in the operational memory (not on a hard drive)
+		RAMDirectory dir = new RAMDirectory();
+		IndexWriter indexWriter = new IndexWriter(dir, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+		for (Document doc : docs) {
+		    indexWriter.addDocument(doc);
+		}
+		indexWriter.optimize();
+		indexWriter.close();
+
+		IndexSearcher searcher = new IndexSearcher(dir);
+
+		TopDocs topDocs = searcher.search(query, null, docs.size());
+
+		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+		    Document doc = searcher.doc(scoreDoc.doc);
+		    String ancestorUid = doc.get(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID);
+		    Long uid = new Long(ancestorUid);
+		    matchingSubnodeUids.add(uid);
+		}
 	    }
-
-	    MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[] {
-		    PedagogicalPlannerAction.FIELD_NAME_TITLE, PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION,
-		    PedagogicalPlannerAction.FIELD_NAME_BRIEF_DESCRIPTION }, PedagogicalPlannerAction.ANALYZER);
-
-	    Query query = queryParser.parse(filterText);
-
-	    RAMDirectory dir = new RAMDirectory();
-	    IndexWriter indexWriter = new IndexWriter(dir, PedagogicalPlannerAction.ANALYZER, true,
-		    IndexWriter.MaxFieldLength.UNLIMITED);
-	    for (Document doc : docs) {
-		indexWriter.addDocument(doc);
-	    }
-	    indexWriter.optimize();
-	    indexWriter.close();
-
-	    IndexSearcher searcher = new IndexSearcher(dir);
-	    int maxHits = node.getSubnodes().size();
-	    TopDocs topDocs = searcher.search(query, null, maxHits);
-
-	    Set<Long> matchingSubnodeUids = new TreeSet<Long>();
-	    for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-		Document doc = searcher.doc(scoreDoc.doc);
-		String ancestorUid = doc.get(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID);
-		Long uid = new Long(ancestorUid);
-		matchingSubnodeUids.add(uid);
-	    }
-	    return matchingSubnodeUids;
 	}
-	return null;
+	return matchingSubnodeUids;
     }
 
-    private void extractSubnodeDocuments(Set<Document> docs, PedagogicalPlannerSequenceNode node, String ancestorNodeUid) {
+    /**
+     * Adds documents made of subnodes' title, descriptions and uid, then descents deeper into descendants.
+     * 
+     * @param node
+     *                its subnodes will be parsed
+     * @return documents made of all of node's descendants
+     */
+    private Set<Document> extractSubnodeDocuments(PedagogicalPlannerSequenceNode node) {
+	Set<Document> docs = new HashSet<Document>();
 	if (node != null && node.getSubnodes() != null) {
 	    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
 		Document doc = new Document();
@@ -1281,22 +1344,38 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 			    Field.Store.NO, Field.Index.ANALYZED);
 		    doc.add(briefDescField);
 		}
-		String fullDesc = WebUtil.removeHTMLtags(subnode.getBriefDescription());
+		String fullDesc = WebUtil.removeHTMLtags(subnode.getFullDescription());
 		if (fullDesc != null) {
 		    Field fullDescField = new Field(PedagogicalPlannerAction.FIELD_NAME_FULL_DESCRIPTION, fullDesc,
 			    Field.Store.NO, Field.Index.ANALYZED);
 		    doc.add(fullDescField);
 		}
 
-		String uid = ancestorNodeUid == null ? subnode.getUid().toString() : ancestorNodeUid;
-		Field ancestorUidField = new Field(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID, uid,
-			Field.Store.YES, Field.Index.NOT_ANALYZED);
-		doc.add(ancestorUidField);
-
+		Field uidField = new Field(PedagogicalPlannerAction.FIELD_NAME_ANCESTOR_UID, subnode.getUid()
+			.toString(), Field.Store.YES, Field.Index.NOT_ANALYZED);
+		doc.add(uidField);
 		docs.add(doc);
-		extractSubnodeDocuments(docs, subnode, uid);
+
+		Set<Document> subnodeDocs = extractSubnodeDocuments(subnode);
+		docs.addAll(subnodeDocs);
 	    }
 	}
+	return docs;
+    }
+
+    private Analyzer getAnalyzer() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	String languageCode = user == null ? null : user.getLocaleLanguage();
+	String language = PedagogicalPlannerAction.filterLanguageMap.get(languageCode);
+	if (language == null) {
+	    return new SimpleAnalyzer();
+	}
+	String[] stopWords = PedagogicalPlannerAction.filterStopWordsMap.get(language);
+	if (stopWords == null) {
+	    return new SnowballAnalyzer(language);
+	}
+	return new SnowballAnalyzer(language, stopWords);
     }
 
     /*----------------------- GROUPING METHODS -------------------------*/

@@ -36,7 +36,7 @@ public interface PedagogicalPlannerDAO {
 
     void removeNode(PedagogicalPlannerSequenceNode node);
 
-    List<String[]> getTitlePath(PedagogicalPlannerSequenceNode node);
+    List<String[]> getTitlePath(Long nodeUid);
 
     Integer getNextOrderId(Long parentUid);
 

@@ -48,28 +48,27 @@ public class PedagogicalPlannerSequenceNodeDTO {
     public PedagogicalPlannerSequenceNodeDTO() {
     }
 
-    public PedagogicalPlannerSequenceNodeDTO(PedagogicalPlannerSequenceNode node, List<String[]> titlePath,
-	    Set<Long> filteredUids) {
+    public PedagogicalPlannerSequenceNodeDTO(PedagogicalPlannerSequenceNode node,
+	    Set<PedagogicalPlannerSequenceNode> subnodes) {
 	uid = node.getUid();
 	title = node.getTitle();
 	briefDescription = node.getBriefDescription();
 	fullDescription = node.getFullDescription();
 	fileName = node.getFileName();
 	locked = node.getLocked();
-	this.titlePath = titlePath;
 	if (node.getParent() != null) {
 	    parentUid = node.getParent().getUid();
 	}
-	subnodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
-	for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
-	    if (filteredUids == null || filteredUids.contains(subnode.getUid())) {
+	this.subnodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
+	if (subnodes != null) {
+	    for (PedagogicalPlannerSequenceNode subnode : subnodes) {
 		PedagogicalPlannerSequenceNodeDTO subnodeDTO = new PedagogicalPlannerSequenceNodeDTO();
 		subnodeDTO.setTitle(subnode.getTitle());
 		subnodeDTO.setBriefDescription(subnode.getBriefDescription());
 		subnodeDTO.setLocked(subnode.getLocked());
 		subnodeDTO.setFileName(subnode.getFileName());
 		subnodeDTO.setUid(subnode.getUid());
-		subnodes.add(subnodeDTO);
+		this.subnodes.add(subnodeDTO);
 	    }
 	}
     }

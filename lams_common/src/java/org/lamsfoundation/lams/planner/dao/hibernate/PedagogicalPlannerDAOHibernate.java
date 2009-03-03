@@ -62,11 +62,8 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	return rootNode;
     }
 
-    public List<String[]> getTitlePath(PedagogicalPlannerSequenceNode node) {
-	if (node.getParent() == null) {
-	    return null;
-	}
-	Long currentUid = node.getUid();
+    public List<String[]> getTitlePath(Long nodeUid) {
+	Long currentUid = nodeUid;
 	LinkedList<String[]> titlePath = new LinkedList<String[]>();
 	List<Object[]> result;
 	Object[] row;
@@ -74,7 +71,7 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	    result = getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.FIND_PARENT_TITLE, currentUid);
 	    if (result.size() > 0) {
 		row = result.get(0);
-		if (!currentUid.equals(node.getUid())) {
+		if (!currentUid.equals(nodeUid)) {
 		    String title = (String) row[1];
 		    titlePath.addFirst(new String[] { currentUid.toString(), title });
 		}

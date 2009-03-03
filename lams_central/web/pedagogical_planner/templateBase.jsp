@@ -20,15 +20,15 @@
 	   var saveDetailsUrl = "<c:url value='/pedagogicalPlanner.do'/>";
 	   var errorPlannerNotSaved = '<fmt:message key="planner.not.saved" />';
 	  </script>
-	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
-	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>loadVars.jsp"></script>
-	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
-	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
-	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dimensions.pack.js"></script>
-	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cluetip.js"></script>
-	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/pedagogicalPlanner.js"></script>
-	  <script language="JavaScript" type="text/javascript">
+	  <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
+	  <script type="text/javascript" src="<lams:LAMSURL/>loadVars.jsp"></script>
+	  <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
+	  <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
+	  <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+	  <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dimensions.pack.js"></script>
+	  <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cluetip.js"></script>
+	  <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/pedagogicalPlanner.js"></script>
+	  <script type="text/javascript">
 	  /* Add tooltips for Editing advice. First we make a call to tool's Action and check if there is any Editing advice.
 	  	 If yes, we show the previously hidden link and add clueTip functionality to it. */
 	  	$(document).ready(function() {

@@ -12,7 +12,7 @@
 <lams:head>
 	  <title><fmt:message key="title.lams"/> :: <fmt:message key="planner.title" /></title>
 
-	  <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/pedagogicalPlanner.js"></script>
+	  <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/pedagogicalPlanner.js"></script>
 	  
 	  <lams:css style="main" />
 	  <link href="<lams:LAMSURL />css/pedagogicalPlanner.css" rel="stylesheet" type="text/css">
@@ -39,12 +39,12 @@
 			<td>
 				<%-- This part creates path like "> Root > Some node > Some subnode" 
 					 with links to upper level nodes --%>
-				<c:url value="/pedagogicalPlanner.do" var="titleUrl">
+				<c:url value="/pedagogicalPlanner.do" var="rootUrl">
 					<c:param name="method" value="openSequenceNode" />
 					<c:param name="edit" value="${node.edit}" />
 				</c:url>
 				<%-- Always add root node at the beginning --%>
-				<a href="${titleUrl}"><fmt:message key="label.planner.root.node" /></a> &gt;
+				<a href="${rootUrl}"><fmt:message key="label.planner.root.node" /></a> &gt;
 				
 				<%-- Iterate through subnodes, if any --%>
 				<c:forEach var="title" items="${node.titlePath}">
@@ -55,16 +55,13 @@
 					</c:url>
 					<a href="${titleUrl}"><c:out value='${title[1]}' escapeXml='true' /></a> &gt;
 				</c:forEach>
-				
-				<%-- Add title (but no link) of the current node at the end --%>
 				<c:out value='${node.title}' escapeXml='true' />
 			</td>
-			<td class="align-right" style="width: 240px">
+			<td class="align-right" style="width: 250px">
 				<c:url value="/pedagogicalPlanner.do" var="filterNodeUrl">
 					<c:param name="method" value="openSequenceNode" />
 					<c:param name="edit" value="${node.edit}" />
 					<c:param name="uid" value="${node.uid}" />
-					<c:param name="createSubnode" value="${node.createSubnode}" />
 				</c:url>
 				<span class="space-right float-left"><fmt:message key="label.planner.filter" /></span>
 				<input class="float-left" type="text" size="20" id="filterText" value="${filterText}" onkeypress="javascript:filterNodesOnEnter('${filterNodeUrl}')"/>
@@ -78,32 +75,48 @@
 			</td>
 		</tr>
 	</table>
+	
+	<c:set var="isRootNode" value="${empty node.uid and empty node.parentUid}" />
 	<table>
-		<tr>
-			<td colspan="2">
-				<%-- Title and full description of the node --%>
-				<c:set var="isRootNode" value="${empty node.uid and empty node.parentUid}" />
-				<c:choose>
-					<c:when test="${isRootNode}">
-						<div class="space-left space-top"><fmt:message key="label.planner.root.choose" /></div>
-					</c:when>
-					<c:otherwise>
-						<h3 class="space-top"><c:out value='${node.title}' escapeXml='true' /></h3>
-						<div class="space-left">${node.fullDescription}</div>
-					</c:otherwise>
-				</c:choose>
-			</td>
-		</tr>
-		
-		<c:if test="${not empty filterText}">
-			<tr>
-				<td colspan="2" class="align-center">
-					<h3><fmt:message key="label.planner.filter.output" />
-					    <a href="javascript:filterNodes('${filterNodeUrl}',false)"><fmt:message key="label.planner.filter.clear" /></a>
-					</h3>
-				</td>
-			</tr>
-		</c:if>
+		<c:choose>
+		    <c:when test="${empty filterText}">
+		    	 <tr>
+					<td colspan="2">
+						<%-- Title and full description of the node, only if we are not in filtering mode--%>
+						<c:choose>
+							<c:when test="${isRootNode}">
+								<div class="space-left space-top"><fmt:message key="label.planner.root.choose" /></div>
+							</c:when>
+							<c:otherwise>
+								<h3><c:out value='${node.title}' escapeXml='true' /></h3>
+								<div class="space-left">${node.fullDescription}</div>
+							</c:otherwise>
+						</c:choose>
+					  </td>
+				</tr>
+		    </c:when>
+		    <c:otherwise>
+			    <tr>
+					<td colspan="2" class="align-center">
+						<%-- Filter mode: what were we looking for and in what node --%>
+						<h3><fmt:message key="label.planner.filter.results.beginning" 
+						    /><c:out value='${filterText}' escapeXml='true' 
+						    /><fmt:message key="label.planner.filter.results.ending" 
+						    />
+						    <c:choose>
+							    <c:when test="${isRootNode}">
+							    	<a href="${rootUrl}"><fmt:message key="label.planner.root.node" /></a>
+							    </c:when>
+							    <c:otherwise>
+									<a href="${filterNodeUrl}"><c:out value='${node.title}' escapeXml='true' /></a>
+							    </c:otherwise>
+						    </c:choose>
+						</h3>
+					</td>
+				</tr>
+		    </c:otherwise>
+	    </c:choose>
+
 		<%-- List of subnodes --%>
 		<c:choose>
 			<%-- If the list of subnodes is empty, we display only a message --%>
@@ -123,39 +136,41 @@
 							<%-- Cell with icons (info or actions like remove node)  --%>
 							<c:choose>
 								<c:when test="${node.edit}">
-									<%-- If we are in the edit mode, we display remove and move up/down images --%>
-									<c:url value="/pedagogicalPlanner.do" var="removeNodeUrl">
-										<c:param name="method" value="removeSequenceNode" />
-										<c:param name="edit" value="true" />
-										<c:param name="uid" value="${subnode.uid}" />
-									</c:url>
-									<c:url value="/pedagogicalPlanner.do" var="downNodeUrl">
-										<c:param name="method" value="moveNodeDown" />
-										<c:param name="edit" value="true" />
-										<c:param name="uid" value="${subnode.uid}" />
-									</c:url>
-									<img class="sequenceActionImage" src="<lams:LAMSURL/>images/icons/cross.png"
-										title="<fmt:message key="msg.planner.remove.node" />"
-										onclick="javascript:leaveNodeEditor('<fmt:message key="msg.planner.remove.warning" />','${removeNodeUrl}')" />
-									<c:if test="${not subnodeStatus.first}">
-										<c:url value="/pedagogicalPlanner.do" var="upNodeUrl">
-											<c:param name="method" value="moveNodeUp" />
+									<c:if test="${empty filterText}">
+										<%-- If we are in the edit mode (and not in filter mode), we display remove and move up/down images --%>
+										<c:url value="/pedagogicalPlanner.do" var="removeNodeUrl">
+											<c:param name="method" value="removeSequenceNode" />
 											<c:param name="edit" value="true" />
 											<c:param name="uid" value="${subnode.uid}" />
 										</c:url>
-										<img class="sequenceActionImage" src="<lams:LAMSURL/>images/css/up.gif"
-											title="<fmt:message key="msg.planner.move.node.up" />"
-											onclick="javascript:leaveNodeEditor(null,'${upNodeUrl}')" />
-									</c:if>
-									<c:if test="${not subnodeStatus.last}">
 										<c:url value="/pedagogicalPlanner.do" var="downNodeUrl">
 											<c:param name="method" value="moveNodeDown" />
 											<c:param name="edit" value="true" />
 											<c:param name="uid" value="${subnode.uid}" />
 										</c:url>
-										<img class="sequenceActionImage" src="<lams:LAMSURL/>images/css/down.gif"
-											title="<fmt:message key="msg.planner.move.node.down" />"
-											onclick="javascript:leaveNodeEditor(null,'${downNodeUrl}')" />
+										<img class="sequenceActionImage" src="<lams:LAMSURL/>images/icons/cross.png"
+											title="<fmt:message key="msg.planner.remove.node" />"
+											onclick="javascript:leaveNodeEditor('<fmt:message key="msg.planner.remove.warning" />','${removeNodeUrl}')" />
+										<c:if test="${not subnodeStatus.first}">
+											<c:url value="/pedagogicalPlanner.do" var="upNodeUrl">
+												<c:param name="method" value="moveNodeUp" />
+												<c:param name="edit" value="true" />
+												<c:param name="uid" value="${subnode.uid}" />
+											</c:url>
+											<img class="sequenceActionImage" src="<lams:LAMSURL/>images/css/up.gif"
+												title="<fmt:message key="msg.planner.move.node.up" />"
+												onclick="javascript:leaveNodeEditor(null,'${upNodeUrl}')" />
+										</c:if>
+										<c:if test="${not subnodeStatus.last}">
+											<c:url value="/pedagogicalPlanner.do" var="downNodeUrl">
+												<c:param name="method" value="moveNodeDown" />
+												<c:param name="edit" value="true" />
+												<c:param name="uid" value="${subnode.uid}" />
+											</c:url>
+											<img class="sequenceActionImage" src="<lams:LAMSURL/>images/css/down.gif"
+												title="<fmt:message key="msg.planner.move.node.down" />"
+												onclick="javascript:leaveNodeEditor(null,'${downNodeUrl}')" />
+										</c:if>
 									</c:if>
 								</c:when>
 								<c:otherwise>
@@ -181,9 +196,28 @@
 							</c:url>
 							<a href="${subnodeUrl}"><c:out escapeXml='true' value='${subnode.title}' />
 								<c:if test="${node.edit and subnode.locked}">
-									(locked)
+									<fmt:message key="label.planner.locked" />
 								</c:if>
-							</a> 
+							</a>
+							
+							<c:if test="${not empty filterText}">
+								<div  class="space-left small-space-top" style="font-size: smaller;">
+									<%-- If we are in filter mode, we display the path where was the subnode found --%>
+									<fmt:message key="label.planner.filter.find.location" />
+									<%-- Always add root node at the beginning --%>
+									<a href="${rootUrl}"><fmt:message key="label.planner.root.node" /></a> &gt;
+									<%-- Iterate through subnodes, if any --%>
+									<c:forEach var="title" items="${subnode.titlePath}">
+										<c:url value="/pedagogicalPlanner.do" var="titleUrl">
+											<c:param name="method" value="openSequenceNode" />
+											<c:param name="uid" value="${title[0]}" />
+											<c:param name="edit" value="${node.edit}" />
+										</c:url>
+										<a href="${titleUrl}"><c:out value='${title[1]}' escapeXml='true' /></a> &gt;
+									</c:forEach>
+								</div>
+							</c:if>
+							
 							<div class="space-left small-space-top">${subnode.briefDescription}</div>
 						</td>
 					</tr>
@@ -192,7 +226,7 @@
 		</c:choose>
 	</table>
 	<c:choose>
-		<c:when test="${node.edit}">
+		<c:when test="${node.edit and empty filterText}">
 			<%-- Form for editing the node --%>
 			<hr style="margin: auto" />
 			
@@ -356,7 +390,7 @@
 		<c:otherwise>
 			<div id="buttonArea">
 				<a class="button pedagogicalPlannerButtons" href="javascript:closePlanner();"><fmt:message key="button.close" /></a>
-				<c:if test="${node.isSysAdmin}">
+				<c:if test="${node.isSysAdmin and not node.edit}">
 					<c:url value="/pedagogicalPlanner.do" var="openEditorUrl">
 						<c:param name="method" value="openSequenceNode" />
 						<c:param name="edit" value="true" />
