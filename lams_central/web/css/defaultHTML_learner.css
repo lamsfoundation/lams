@@ -532,6 +532,13 @@ input:hover.button {
 	
 }
 
+.import {
+	padding: 0 0 5px 18px; 
+	background: url('../images/css/import.png') no-repeat;
+	
+}
+
+
 .nextActivity {
 	padding: 0px 20px 0px 0px; 
 	background: url('../images/css/next.png') no-repeat;

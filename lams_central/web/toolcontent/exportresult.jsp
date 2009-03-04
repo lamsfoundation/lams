@@ -45,7 +45,7 @@
 	</c:choose>
 		
 	<table><tr><td>
-		<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a></div>
+		<div class="right-buttons"><a href="javascript:;" onclick="closeWin();" class="button"><span class="close"><fmt:message key="button.close" /></span></a></div>
 	</td></tr></table>
 	</div>  <!--closes content-->
 

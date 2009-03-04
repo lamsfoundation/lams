@@ -14,13 +14,15 @@
 				window.close();
 			}
 			
-			function verifyFilenameLength() {
+			function verifyAndSubmit() {
 				if (document.getElementById("UPLOAD_FILE").value.length == 0)	{
 					var msg = "<fmt:message key="button.select.importfile"/>";
 					alert(msg);
 					return (false);
+				} else {
+					var f = document.getElementById('importForm');
+				        f.submit();
 				}
-				return (true);
 			}
 			
 		</script>
@@ -41,12 +43,12 @@
 				<p>
 					<fmt:message key="msg.import.file.format"/>
 				</p>
-				<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data">
+				<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data" id="importForm">
 					<p>
 						<fmt:message key="label.ld.zip.file" />
 						<input type="hidden" name="customCSV" id="customCSV" value="${customCSV}" />
 						<input type="file" name="UPLOAD_FILE" id="UPLOAD_FILE"/>
-						<input type="submit" name="import" value="<fmt:message key="button.import" />" class="button" onclick="javascript:if (!verifyFilenameLength()) {return false;} "/>
+						<a href="javascript:;" class="button" onclick="verifyAndSubmit();"><span class="import"><fmt:message key="button.import" /></span></a>
 					</p>
 				</form>
 

@@ -51,8 +51,8 @@
 		</td></tr></table>
 	</div>
 	<div class="right-buttons">
-		<a href="#" onclick="goDownload();" class="button"><fmt:message key="button.export" /></a>
-		<a href="javascript:;" onclick="closeWin();" class="button"><fmt:message key="button.close" /></a>
+		<a href="#" onclick="goDownload();" class="button"><span class="import"><fmt:message key="button.export" /></span></a>
+		<a href="javascript:;" onclick="closeWin();" class="button"><span class="close"><fmt:message key="button.close" /></span></a>
 	</div>
 
 		</div>  <!--closes content-->
