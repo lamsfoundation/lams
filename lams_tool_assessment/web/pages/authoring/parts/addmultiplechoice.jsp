@@ -50,7 +50,7 @@
 	    			    },
 	    			    hasOneHundredGrade: {
 		    				required: function(element) {
-	    			    		return $("select[name^='optionGrade'][value='1.0']").length < 1;
+	    			    		return ($("select[name^='optionGrade'][value='1.0']").length < 1) && !eval($("#multipleAnswersAllowed").val());
 			    		    }			    		    
 	    			    }
 		    		},
@@ -173,7 +173,7 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.choice.one.multiple.answers" />
 				</div>
-				<html:select property="multipleAnswersAllowed">
+				<html:select property="multipleAnswersAllowed" styleId="multipleAnswersAllowed">
 					<html:option value="false"><fmt:message key="label.authoring.choice.one.answer" /></html:option>
 					<html:option value="true"><fmt:message key="label.authoring.choice.multiple.answers" /></html:option>
 				</html:select>

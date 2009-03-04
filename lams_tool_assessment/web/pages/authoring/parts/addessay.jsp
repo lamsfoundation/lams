@@ -51,7 +51,6 @@
      			    submitHandler: function(form) {
 		    			$("#question").val(FCKeditorAPI.GetInstance("question").GetXHTML());
 		    			$("#generalFeedback").val(FCKeditorAPI.GetInstance("generalFeedback").GetXHTML());
-		    			$("#feedback").val(FCKeditorAPI.GetInstance("feedback").GetXHTML());
 	     			    
 		    	    	var options = { 
 		    	    		target:  parent.jQuery('#questionListArea'), 
@@ -113,13 +112,6 @@
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
 				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-					contentFolderID="${formBean.contentFolderID}" width="622px">
-				</lams:FCKEditor>				
-				
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.feedback" />
-				</div>
-				<lams:FCKEditor id="feedback" value="${formBean.feedback}"
 					contentFolderID="${formBean.contentFolderID}" width="622px">
 				</lams:FCKEditor>				
 

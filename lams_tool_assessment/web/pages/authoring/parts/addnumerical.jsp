@@ -56,12 +56,23 @@
 		    			},
 		    			hasOptionFilled: {
 		    				required: function(element) {
-		    		        	return $("input[name^=optionFloat]:filled").length < 1;
+		    		        	return $("input[name^=optionFloat][value!='0.0']").length < 1;
 			    		    }			    		    
 	    			    },
 	    			    hasOneHundredGrade: {
 		    				required: function(element) {
 	    			    		return $("select[name^='optionGrade'][value='1.0']").length < 1;
+			    		    }			    		    
+	    			    },
+	    			    allAcceptedErrorsPositive: {
+		    				required: function(element) {
+		    					var count = 0;
+		    					$("input[name^=optionAcceptedError]").each(function(){
+			    					if (eval(this.value) < 0) {
+				    					count++;
+			    					}
+		    					});
+	    		        		return  count > 0;
 			    		    }			    		    
 	    			    },	    			    
 		    			unitList: {
@@ -90,7 +101,10 @@
 		    			},
 		    			hasOneHundredGrade: {
 		    				required: "<br><fmt:message key='error.form.validation.hundred.score'/>"
-		    			},		 
+		    			},		
+		    			allAcceptedErrorsPositive: {
+		    				required: "<br><fmt:message key='error.form.validation.positive.accepted.errors'/>"
+		    			}, 
 		    			unitList: {
 		    				required: ""
 		    			},
@@ -207,6 +221,7 @@
 				</div>
 				<input type="hidden" name="hasOptionFilled" id="hasOptionFilled">
 				<input type="hidden" name="hasOneHundredGrade" id="hasOneHundredGrade">
+				<input type="hidden" name="allAcceptedErrorsPositive" id="allAcceptedErrorsPositive">
 			</html:form>
 			
 			<!-- Options -->
