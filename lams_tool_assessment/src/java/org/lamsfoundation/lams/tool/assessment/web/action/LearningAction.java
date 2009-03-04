@@ -29,12 +29,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -52,6 +53,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -69,6 +71,7 @@ import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -168,7 +171,15 @@ public class LearningAction extends Action {
 
 	// check whehter finish lock is on/off
 	// TODO!! assessment.getTimeLimit()
-	boolean finishedLock = (assessmentUser != null && assessmentUser.isSessionFinished());
+	HttpSession ss = SessionManager.getSession();
+	//TODO check this user out
+	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = new Long(userDTO.getUserID().longValue());
+	AssessmentUser user = service.getUserByIDAndSession(userID, toolSessionId);
+	int dbResultCount = service.getAssessmentResultCount(toolSessionId, userID);
+	int attemptsAllowed = assessment.getAttemptsAllowed();
+	boolean finishedLock = ((assessmentUser != null) && assessmentUser.isSessionFinished())
+		|| ((attemptsAllowed <= dbResultCount) && (attemptsAllowed != 0));
 
 	// get notebook entry
 	String entryText = new String();
@@ -215,7 +226,8 @@ public class LearningAction extends Action {
 	    sessionMap.put(AssessmentConstants.PARAM_RUN_OFFLINE, false);
 	}
 
-	SortedSet<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>(new SequencableComparator());
+	
+	Set<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>(new SequencableComparator());
 	if (questionsFromDB != null) {
 	    // remove hidden questions.
 	    for (AssessmentQuestion question : questionsFromDB) {
@@ -229,19 +241,37 @@ public class LearningAction extends Action {
 		}
 	    }
 	}
+
+	// shuffling
+	if (assessment.isShuffled()) {
+	    ArrayList<AssessmentQuestion> shuffledList = new ArrayList<AssessmentQuestion>(questionList);
+	    Collections.shuffle(shuffledList);
+	    questionList = new LinkedHashSet<AssessmentQuestion>(shuffledList);
+	}
+	for (AssessmentQuestion question : questionList) {
+	    if (question.isShuffle() || (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
+		ArrayList<AssessmentQuestionOption> shuffledList = new ArrayList<AssessmentQuestionOption>(question.getQuestionOptions());
+		Collections.shuffle(shuffledList);
+		question.setQuestionOptions(new LinkedHashSet<AssessmentQuestionOption>(shuffledList));
+	    }
+	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+		ArrayList<AssessmentQuestionOption> shuffledList = new ArrayList<AssessmentQuestionOption>(question.getQuestionOptions());
+		Collections.shuffle(shuffledList);
+		question.setMatchingPairOptions(new LinkedHashSet<AssessmentQuestionOption>(shuffledList));
+	    }	    
+	}
 	
 	// TODO it moght need to be changed 
 	//setAttemptStarted
-//	if (mode != null && mode.isLearner()) {
+//	if (! finishedLock) {
 	    service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
 //	}
 	
 	//paging
-	ArrayList<SortedSet<AssessmentQuestion>> pagedQuestions = new ArrayList<SortedSet<AssessmentQuestion>>();
+	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = new ArrayList<LinkedHashSet<AssessmentQuestion>>();
 	int maxQuestionsPerPage = (assessment.getQuestionsPerPage() != 0) ? assessment.getQuestionsPerPage()
 		: questionList.size();
-	SortedSet<AssessmentQuestion> questionsForOnePage = new TreeSet<AssessmentQuestion>(
-		new SequencableComparator());
+	LinkedHashSet<AssessmentQuestion> questionsForOnePage = new LinkedHashSet<AssessmentQuestion>();
 	pagedQuestions.add(questionsForOnePage);
 
 	int count = 0;
@@ -249,22 +279,17 @@ public class LearningAction extends Action {
 	    questionsForOnePage.add(question);
 	    count++;
 	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questionList.size())) {
-		questionsForOnePage = new TreeSet<AssessmentQuestion>(new SequencableComparator());
+		questionsForOnePage = new LinkedHashSet<AssessmentQuestion>();
 		pagedQuestions.add(questionsForOnePage);
 	    }
 	}
 	
 	sessionMap.put(AssessmentConstants.ATTR_PAGED_QUESTIONS, pagedQuestions);
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, 1);	
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
-	sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, questionList);
 	
-	// set complete flag for display purpose
-	//TODO check this out
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userID = new Long(user.getUserID().longValue());
-	int dbResultCount = service.getAssessmentResultCount(toolSessionId, userID);
+	// loadupLastAttempt for display purpose
 	if (dbResultCount > 0) {
 	    loadupLastAttempt(sessionMap);    
 	}
@@ -291,7 +316,15 @@ public class LearningAction extends Action {
 	    preserveUserAnswers(request);    
 	}
 	
-	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, WebUtil.readIntParam(request, AssessmentConstants.ATTR_PAGE_NUMBER));
+	int pageNumber = WebUtil.readIntParam(request, AssessmentConstants.ATTR_PAGE_NUMBER);
+	int questionNumberingOffset = 0;
+	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	for (int i = 0; i < pageNumber-1; i++) {
+	    LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(i);
+	    questionNumberingOffset += questionsForOnePage.size();
+	}
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, ++questionNumberingOffset);
+	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumber);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);	
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
@@ -316,7 +349,6 @@ public class LearningAction extends Action {
 	
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed(sessionMap));
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
-	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER));
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }    
@@ -352,7 +384,6 @@ public class LearningAction extends Action {
 	
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed(sessionMap));
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
-	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER));
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }   
@@ -404,19 +435,6 @@ public class LearningAction extends Action {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-//	// auto run mode, when use finish the only one assessment question, mark it as complete then finish this
-//	// activity as
-//	// well.
-//	String assessmentQuestionUid = request.getParameter(AssessmentConstants.PARAM_QUESTION_UID);
-//	if (assessmentQuestionUid != null) {
-//	    doComplete(request);
-//	    // NOTE:So far this flag is useless(31/08/2006).
-//	    // set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
-////	    request.setAttribute(AssessmentConstants.ATTR_RUN_AUTO, true);
-//	} else {
-////	    request.setAttribute(AssessmentConstants.ATTR_RUN_AUTO, false);
-//	}
-
 	IAssessmentService service = getAssessmentService();
 	// get sessionId from HttpServletRequest
 	String nextActivityUrl = null;
@@ -466,8 +484,8 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
-	ArrayList<SortedSet<AssessmentQuestion>> pagedResults = (ArrayList<SortedSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	SortedSet<AssessmentQuestion> questionsForOnePage = (SortedSet<AssessmentQuestion>) pagedResults.get(pageNumber-1);
+	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber-1);
 	Long questionUid = new Long(request.getParameter(AssessmentConstants.PARAM_QUESTION_UID));
 	
 	AssessmentQuestion question = null;
@@ -485,21 +503,15 @@ public class LearningAction extends Action {
 	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
 	    
 	    // get current and the target item, and switch their sequnece
-	    AssessmentQuestionOption option = rList.get(optionIndex);
-	    AssessmentQuestionOption repOption;
+	    AssessmentQuestionOption option = rList.remove(optionIndex);
 	    if (up) {
-		repOption = rList.get(--optionIndex);
+		rList.add(--optionIndex, option);
 	    } else {
-		repOption = rList.get(++optionIndex);
+		rList.add(++optionIndex, option);
 	    }
 		
-	    int upSeqId = repOption.getSequenceId();
-	    repOption.setSequenceId(option.getSequenceId());
-	    option.setSequenceId(upSeqId);
-
-	    // put back list, it will be sorted again
-	    optionList = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
-	    optionList.addAll(rList);
+	    // put back list
+	    optionList = new LinkedHashSet<AssessmentQuestionOption>(rList);
 	    question.setQuestionOptions(optionList);
 	}
 
@@ -590,8 +602,8 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
-	ArrayList<SortedSet<AssessmentQuestion>> pagedQuestions = (ArrayList<SortedSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	SortedSet<AssessmentQuestion> questionsForOnePage = (SortedSet<AssessmentQuestion>) pagedQuestions.get(pageNumber-1);
+	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber-1);
 	int count = questionsForOnePage.size(); 
 	
 	for (int i = 0; i < count; i++) {
@@ -642,25 +654,24 @@ public class LearningAction extends Action {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		question.setAnswerString(answerString);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-		//TODO correct answer
-		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
-		    String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_"
-				+ option.getSequenceId());
-		    option.setAnswerInt(option.getSequenceId());
-		}
+//		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+//		    int statusIndex = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_"
+//			    + option.getSequenceId());
+//		    option.setAnswerInt(statusIndex);
+//		}
 	    }
 	}
     }
     
     private void loadupResultMarks(SessionMap sessionMap){
-	ArrayList<SortedSet<AssessmentQuestion>> pagedQuestions = (ArrayList<SortedSet<AssessmentQuestion>>) sessionMap
+	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
 	AssessmentResult result = service.getLastAssessmentResult(assessmentUid,userId);
 	
-	for(SortedSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	for(LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
 		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
@@ -673,14 +684,14 @@ public class LearningAction extends Action {
     }    
     
     private void loadupLastAttempt(SessionMap sessionMap){
-	ArrayList<SortedSet<AssessmentQuestion>> pagedQuestions = (ArrayList<SortedSet<AssessmentQuestion>>) sessionMap
+	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
 	AssessmentResult result = service.getLastAssessmentResult(assessmentUid,userId);
 	
-	for(SortedSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	for(LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
 		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
@@ -713,12 +724,34 @@ public class LearningAction extends Action {
      * 
      */
     private void processUserAnswers(SessionMap sessionMap) {
-	ArrayList<SortedSet<AssessmentQuestion>> pagedQuestions = (ArrayList<SortedSet<AssessmentQuestion>>) sessionMap
+	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
 	service.processUserAnswers(assessmentUid, userId, pagedQuestions);
+	
+	// notify teachers
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	if ((mode != null) && !mode.isTeacher()) {
+	    Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	    Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	    if (assessment.isNotifyTeachersOnAttemptCompletion()) {
+		List<User> monitoringUsers = service.getMonitorsByToolSessionId(toolSessionId);
+		if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
+		    Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+		    for (int i = 0; i < monitoringUsersIds.length; i++) {
+			monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+		    }
+		    AssessmentUser assessmentUser = getCurrentUser(service, toolSessionId);
+		    String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
+		    service.getEventNotificationService().sendMessage(monitoringUsersIds,
+			    DeliveryMethodMail.getInstance(),
+			    service.getLocalisedMessage("event.learner.completes.attempt.subject", null),
+			    service.getLocalisedMessage("event.learner.completes.attempt.body", new Object[] { fullName }));
+		}
+	    }
+	}
     }
     
     /**
@@ -794,38 +827,5 @@ public class LearningAction extends Action {
 	}
 	return assessmentUser;
     }
-
-
-//    /**
-//     * Set complete flag for given assessment question.
-//     * 
-//     * @param request
-//     * @param sessionId
-//     */
-//    private void doComplete(HttpServletRequest request) {
-//	// get back sessionMap
-//	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-//	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-//
-//	Long assessmentQuestionUid = new Long(request.getParameter(AssessmentConstants.PARAM_QUESTION_UID));
-//	IAssessmentService service = getAssessmentService();
-//	HttpSession ss = SessionManager.getSession();
-//	// get back login user DTO
-//	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-//
-//	Long sessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
-//	service.setQuestionComplete(assessmentQuestionUid, new Long(user.getUserID().intValue()), sessionId);
-//
-//	SortedSet<AssessmentQuestion> questionList = (SortedSet<AssessmentQuestion>) sessionMap
-//		.get(AssessmentConstants.ATTR_QUESTION_LIST);
-//	SortedSet<AssessmentQuestion> assessmentQuestionList = questionList;
-//	// set assessment question complete tag	
-//	for (AssessmentQuestion question : assessmentQuestionList) {
-//	    if (question.getUid().equals(assessmentQuestionUid)) {
-//		question.setComplete(true);
-//		break;
-//	    }
-//	}
-//    }
 
 }

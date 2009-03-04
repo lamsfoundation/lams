@@ -181,6 +181,8 @@ public class AssessmentConstants {
     public static final String ATTR_FINISHED_LOCK = "finishedLock";
     
     public static final String ATTR_USER = "user";
+    
+    public static final String ATTR_QUESTION_NUMBERING_OFFSET = "questionNumberingOffset";
 
     // error message keys
     public static final String ERROR_MSG_QUESTION_NAME_BLANK = "error.question.name.blank";

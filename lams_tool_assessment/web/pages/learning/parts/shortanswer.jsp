@@ -6,30 +6,36 @@
 
 <table cellspacing="0" style="padding-bottom: 10px;">
 	<tr>
-		<c:forEach var="option" items="${question.questionOptions}">
-		
-		</c:forEach>
 		<c:if test="${finishedLock}">
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
-				<c:if test="${question.answerString == option.optionString}">
-					<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
-				</c:if>
-				<c:if test="${question.answerString != option.optionString}">
-					<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">	
-				</c:if>	
+				<c:choose>
+					<c:when	test="${question.mark > 0}">
+						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">
+					</c:when>
+					<c:otherwise>
+						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">
+					</c:otherwise>
+				</c:choose>				
 			</td>		
 		</c:if>	
 		<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; ">
-			<input type="text" name="question${status.index}" value="${question.answerString}" styleClass="noBorder" size="75"
+			<input type="text" name="question${status.index}" value="${question.answerString}" styleClass="noBorder" size="70"
 				<c:if test="${finishedLock}">disabled="disabled"</c:if>					 
 			/>	
 		</td>
-		<c:if test="${finishedLock && (option.answerInt != -1)}">
-			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;" width="30%">
-				<c:out value="${option.feedback}" escapeXml="false" />
-			</td>		
-		</c:if>			
 	</tr>
-</table>		
+</table>	
+
+<c:if test="${finishedLock && (question.mark > 0)}">
+	<c:forEach var="option" items="${question.questionOptions}">
+		<c:if test="${option.answerBoolean}">
+			<c:set var="optionFeedback" value="${option.feedback}" />	
+		</c:if>		
+	</c:forEach>		
+		
+	<div style="padding: 10px 15px 0px; font-style: italic">
+		<c:out value="${optionFeedback}" escapeXml="false" />
+	</div>
+</c:if>	
 
 <%@ include file="markandpenaltyarea.jsp"%>

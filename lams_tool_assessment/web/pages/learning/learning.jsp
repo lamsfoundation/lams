@@ -109,7 +109,7 @@
 				<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 					<tr>
 						<td style="padding-left: 15px; vertical-align: middle; width: 10px;" >
-							${status.index + 1} 
+							${status.index + sessionMap.questionNumberingOffset} 
 						</td>
 						<td style="padding-left: 0px;">
 							<input type="hidden" name="questionUid${status.index}" id="questionUid${status.index}" value="${question.uid}" />						

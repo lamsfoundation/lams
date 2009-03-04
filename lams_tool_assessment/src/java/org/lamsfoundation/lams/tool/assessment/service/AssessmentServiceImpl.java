@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +39,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -90,6 +92,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
+import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -415,18 +418,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void saveOrUpdateAssessmentResult(AssessmentResult assessmentResult) {
 	assessmentResultDao.saveObject(assessmentResult);
     }
-
-    public void retrieveComplete(SortedSet<AssessmentQuestion> assessmentQuestionList, AssessmentUser user) {
-//	for (AssessmentQuestion question : assessmentQuestionList) {
-//	    AssessmentQuestionResult result = assessmentQuestionResultDao.getAssessmentQuestionResult(question.getUid(),
-//		    user.getUserId());
-//	    if (result == null) {
-//		question.setComplete(false);
-//	    } else {
-////		question.setComplete(result.isProcessed());
-//	    }
-//	}
-    }
     
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) { 
 	AssessmentResult result = new AssessmentResult();
@@ -437,10 +428,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessmentResultDao.saveObject(result);
     }
     
-    public void processUserAnswers(Long assessmentUid, Long userId, ArrayList<SortedSet<AssessmentQuestion>> pagedQuestions) {
+    public void processUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions) {
 	SortedSet<AssessmentQuestionResult> questionResultList = new TreeSet<AssessmentQuestionResult>(
 		new AssessmentQuestionResultComparator());
-	for (SortedSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
 		AssessmentQuestionResult processedAnswer = this.processUserAnswer(question);
 		questionResultList.add(processedAnswer);
@@ -484,8 +475,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
-		if (option.getOptionString().equals(question.getAnswerString())) {
+		String optionString = option.getOptionString().replaceAll("\\*", ".*");
+		Pattern pattern;
+		if (question.isCaseSensitive()) {
+		    pattern = Pattern.compile(optionString, java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
+		} else {
+		    pattern = Pattern.compile(optionString);
+		}		
+		boolean isAnswerCorrect = pattern.matcher(question.getAnswerString()).matches();
+		
+		if (isAnswerCorrect) {
 		    mark = option.getGrade()*maxMark;
+		    //for display purposes
+		    option.setAnswerBoolean(true);
 		    break;
 		}
 	    }
@@ -496,10 +498,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    if ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError()))
 			    && (answerFloat <= (option.getOptionFloat() + option.getAcceptedError()))) {
 			mark = option.getGrade() * maxMark;
+			//for display purposes
+			option.setAnswerBoolean(true);
 			break;
 		    }
 		}
-		//TODO may be NumberFormatException and smth else
 	    } catch (Exception e) {
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
@@ -508,9 +511,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    float maxMarkForCorrectAnswer = maxMark / question.getQuestionOptions().size();
+	    TreeSet<AssessmentQuestionOption> correctOptionSet = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
+	    correctOptionSet.addAll(question.getQuestionOptions());
+	    ArrayList<AssessmentQuestionOption> correctOptionList = new ArrayList<AssessmentQuestionOption>(correctOptionSet);
+	    int i = 0;
 	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
-		//TODO correct answer
-		if (option.getAnswerInt() == option.getSequenceId()) {
+		if (option.getUid() == correctOptionList.get(i++).getUid()) {
 		    mark += maxMarkForCorrectAnswer*maxMark;
 		}
 	    }
@@ -561,7 +567,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	List<Summary> group = new ArrayList<Summary>();
 
 	// get all question which is accessed by user
-	//TODO fix this
 	Map<Long, Integer> visitCountMap =null; 
 	    //assessmentQuestionResultDao.getSummary(contentId);
 
@@ -637,7 +642,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return map;
     }
 
-    //TODO either delete or fix
 //    public List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid) {
 //	List<AssessmentQuestionResult> logList = assessmentQuestionResultDao.getAssessmentQuestionResultBySession(
 //		sessionId, questionUid);

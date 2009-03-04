@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -175,9 +176,7 @@ public interface IAssessmentService {
      */
     void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId);    
 
-    void retrieveComplete(SortedSet<AssessmentQuestion> assessmentQuestionList, AssessmentUser user);
-
-    void processUserAnswers(Long assessmentUid, Long userId, ArrayList<SortedSet<AssessmentQuestion>> pagedQuestions);
+    void processUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions);
     
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
     

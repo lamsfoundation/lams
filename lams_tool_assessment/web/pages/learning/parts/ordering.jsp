@@ -12,27 +12,6 @@
 	<table cellspacing="0" style="padding-bottom: 10px;">
 		<c:forEach var="option" items="${question.questionOptions}" varStatus="status">
 			<tr>
-	<%--				
-				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; width: 5px; border-bottom:0px; ">
-					<c:choose>
-						<c:when test="${question.multipleAnswersAllowed}">
-							<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}" styleClass="noBorder"
-		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-								<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>
-							 
-							/>						
-						</c:when>
-						<c:otherwise>
-							<input type="radio" name="question${status.index}" value="${option.sequenceId}" styleClass="noBorder"
-		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-								<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>
-							 
-							/>
-						</c:otherwise>
-					</c:choose>
-					
-				</td>
-	--%>			
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; ">
 					<input type="hidden" name="question${status.index}_${option.sequenceId}" value="${option.sequenceId}" />
 					<c:out value="${option.optionString}" escapeXml="false" />
@@ -64,7 +43,20 @@
 				</td>			
 			</tr>
 		</c:forEach>
-	</table>		
+	</table>	
+	
+	<c:if test="${finishedLock}">
+		<div style="padding: 10px 15px 0px; font-style: italic">
+			<c:choose>
+				<c:when	test="${question.mark > 0}">
+					<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
+				</c:when>
+				<c:otherwise>
+					<c:out value="${question.feedbackOnIncorrect}" escapeXml="false" />
+				</c:otherwise>
+			</c:choose>		
+		</div>
+	</c:if>		
 
 	<%@ include file="markandpenaltyarea.jsp"%>
 </div>

@@ -100,6 +100,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     
     private float penalty;
     
+    private Set<AssessmentQuestionOption> matchingPairOptions;
+    
     public AssessmentQuestion() {
 	questionOptions = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
 	units = new TreeSet<AssessmentUnit>(new SequencableComparator());
@@ -482,5 +484,12 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     }
     public void setPenalty(Float penalty) {
 	this.penalty = penalty;
+    }
+    
+    public Set<AssessmentQuestionOption> getMatchingPairOptions() {
+	return matchingPairOptions;
+    }
+    public void setMatchingPairOptions(Set<AssessmentQuestionOption> matchingPairOptions) {
+	this.matchingPairOptions = matchingPairOptions;
     }
 }

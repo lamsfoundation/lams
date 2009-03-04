@@ -23,7 +23,7 @@
 			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px; ">
 				<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}" disabled="${finishedLock}">
 					<html:option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></html:option>
-					<c:forEach var="selectOption" items="${question.questionOptions}">
+					<c:forEach var="selectOption" items="${question.matchingPairOptions}">
 						<html:option value="${selectOption.sequenceId}">${selectOption.optionString}</html:option>
 					</c:forEach>
 				</html:select>
