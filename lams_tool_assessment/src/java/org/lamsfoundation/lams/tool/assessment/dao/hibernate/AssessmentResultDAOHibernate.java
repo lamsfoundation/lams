@@ -42,8 +42,8 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     private static final String FIND_BY_ASSESSMENT_AND_SESSION = "from " + AssessmentResult.class.getName()
 	    + " as r where r.sessionId = ? and r.assessment.uid=?";
 
-    private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_USER = "select count(*) from "
-	    + AssessmentResult.class.getName() + " as r where  r.sessionId=? and  r.user.userId =?";
+    private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select count(*) from "
+	    + AssessmentResult.class.getName() + " as r where r.user.userId=? and r.assessment.uid=?";
 
 // private static final String FIND_SUMMARY = "select v.assessmentQuestion.uid, count(v.assessmentQuestion) from  "
 //	    + AssessmentQuestionResult.class.getName() + " as v , " + AssessmentSession.class.getName() + " as s, "
@@ -60,12 +60,12 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {
-	    return (AssessmentResult) list.get(0);
+	    return (AssessmentResult) list.get(list.size()-1);
 	}
     }
 
-    public int getAssessmentResultCount(Long toolSessionId, Long userId) {
-	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_COUNT_BY_USER, new Object[] { toolSessionId, userId });
+    public int getAssessmentResultCount(Long assessmentUid, Long userId) {
+	List list = getHibernateTemplate().find(FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER, new Object[] { userId, assessmentUid });
 	if (list == null || list.size() == 0) {
 	    return 0;   
 	} else {

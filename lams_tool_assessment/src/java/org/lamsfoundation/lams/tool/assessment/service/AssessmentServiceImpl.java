@@ -426,23 +426,33 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	result.setSessionId(toolSessionId);
 	result.setStartDate(new Timestamp(new Date().getTime()));
 	assessmentResultDao.saveObject(result);
+	int dd = 22;
     }
     
     public void processUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions) {
 	SortedSet<AssessmentQuestionResult> questionResultList = new TreeSet<AssessmentQuestionResult>(
 		new AssessmentQuestionResultComparator());
+	int maximumGrade = 0;
+	float grade = 0;
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
-		AssessmentQuestionResult processedAnswer = this.processUserAnswer(question);
+		int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid, userId, question.getUid());
+		AssessmentQuestionResult processedAnswer = this.processUserAnswer(question, numberWrongAnswers);
 		questionResultList.add(processedAnswer);
+		
+		maximumGrade += question.getDefaultGrade();
+		grade += processedAnswer.getMark();
 	    }
 	}
 	AssessmentResult result = assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
 	result.setQuestionResults(questionResultList);
+	result.setMaximumGrade(maximumGrade);
+	result.setGrade(grade);
+	result.setFinishDate(new Timestamp(new Date().getTime()));
 	assessmentResultDao.saveObject(result);
     }
     
-    private AssessmentQuestionResult processUserAnswer(AssessmentQuestion question) {
+    private AssessmentQuestionResult processUserAnswer(AssessmentQuestion question, int numberWrongAnswers) {
 	AssessmentQuestionResult questionResult = new AssessmentQuestionResult();
 
 	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
@@ -482,7 +492,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		} else {
 		    pattern = Pattern.compile(optionString);
 		}		
-		boolean isAnswerCorrect = pattern.matcher(question.getAnswerString()).matches();
+		boolean isAnswerCorrect = (question.getAnswerString() != null) ? 
+			pattern.matcher(question.getAnswerString()).matches() : false;
 		
 		if (isAnswerCorrect) {
 		    mark = option.getGrade()*maxMark;
@@ -523,7 +534,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	if (mark > maxMark) {
 	    mark = maxMark;
-	} else if (mark < 0) {
+	}
+	if (mark > 0) {
+	    float penalty = question.getPenaltyFactor()*numberWrongAnswers; 
+	    mark -= penalty;
+	    questionResult.setPenalty(penalty);
+	}
+	if (mark < 0) {
 	    mark = 0;
 	}
 	questionResult.setMark(mark);
@@ -534,8 +551,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
     }
     
-    public int getAssessmentResultCount(Long toolSessionId, Long userId) {
-	return assessmentResultDao.getAssessmentResultCount(toolSessionId, userId);
+    public int getAssessmentResultCount(Long assessmentUid, Long userId) {
+	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
     }
 
     public String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException {

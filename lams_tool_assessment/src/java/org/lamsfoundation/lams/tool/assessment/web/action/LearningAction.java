@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
@@ -176,7 +178,7 @@ public class LearningAction extends Action {
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userID = new Long(userDTO.getUserID().longValue());
 	AssessmentUser user = service.getUserByIDAndSession(userID, toolSessionId);
-	int dbResultCount = service.getAssessmentResultCount(toolSessionId, userID);
+	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userID);
 	int attemptsAllowed = assessment.getAttemptsAllowed();
 	boolean finishedLock = ((assessmentUser != null) && assessmentUser.isSessionFinished())
 		|| ((attemptsAllowed <= dbResultCount) && (attemptsAllowed != 0));
@@ -292,6 +294,9 @@ public class LearningAction extends Action {
 	// loadupLastAttempt for display purpose
 	if (dbResultCount > 0) {
 	    loadupLastAttempt(sessionMap);    
+	    if (finishedLock) {
+		loadupResultMarks(sessionMap);
+	    }
 	}
 
 	return mapping.findForward(AssessmentConstants.SUCCESS);
@@ -666,10 +671,10 @@ public class LearningAction extends Action {
     private void loadupResultMarks(SessionMap sessionMap){
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	AssessmentResult result = service.getLastAssessmentResult(assessmentUid,userId);
+	AssessmentResult result = service.getLastAssessmentResult(assessment.getUid(), userId);
 	
 	for(LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
@@ -681,6 +686,23 @@ public class LearningAction extends Action {
 		}		
 	    }
 	}
+	
+	Date timeTaken = new Date(result.getFinishDate().getTime() - result.getStartDate().getTime()); 
+	result.setTimeTaken(timeTaken);
+	if (assessment.isAllowOverallFeedbackAfterQuestion()) {
+	    int percentageCorrectAnswers = (int) (result.getGrade() * 100 / result.getMaximumGrade());
+	    ArrayList<AssessmentOverallFeedback> overallFeedbacks = new ArrayList<AssessmentOverallFeedback>(assessment.getOverallFeedbacks());
+	    int lastBorder = 0;
+	    for (int i = overallFeedbacks.size()-1; i >= 0; i--) {
+		AssessmentOverallFeedback overallFeedback = overallFeedbacks.get(i);
+		if ((percentageCorrectAnswers >= lastBorder) && (percentageCorrectAnswers <= overallFeedback.getGradeBoundary())) {
+		    result.setOverallFeedback(overallFeedback.getFeedback());
+		    break;
+		}
+		lastBorder = overallFeedback.getGradeBoundary();
+	    }
+	}
+	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
     }    
     
     private void loadupLastAttempt(SessionMap sessionMap){
@@ -762,14 +784,14 @@ public class LearningAction extends Action {
      */
     private boolean isResubmitAllowed(SessionMap sessionMap) {
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	IAssessmentService service = getAssessmentService();
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userID = new Long(userDTO.getUserID().longValue());
 	AssessmentUser user = service.getUserByIDAndSession(userID, toolSessionId);
 	
-	int dbResultCount = service.getAssessmentResultCount(toolSessionId, userID);
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userID);
 	int attemptsAllowed = assessment.getAttemptsAllowed();
 	return ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0)) && !user.isSessionFinished();
     }
@@ -778,29 +800,6 @@ public class LearningAction extends Action {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
 	return (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
-    }
-
-    /**
-     * Return <code>ActionForward</code> according to assessment question type.
-     * 
-     * @param type
-     * @param mapping
-     * @return
-     */
-    private ActionForward findForward(short type, ActionMapping mapping) {
-	ActionForward forward;
-	switch (type) {
-	case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-	    forward = mapping.findForward("file");
-	    break;
-	case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-	    forward = mapping.findForward("website");
-	    break;
-	default:
-	    forward = null;
-	    break;
-	}
-	return forward;
     }
 
     private AssessmentUser getCurrentUser(IAssessmentService service, Long sessionId) {

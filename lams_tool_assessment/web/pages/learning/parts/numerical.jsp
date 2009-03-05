@@ -6,7 +6,7 @@
 
 <table cellspacing="0" style="padding-bottom: 10px;">
 	<tr>
-		<c:if test="${finishedLock}">
+		<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
 				<c:choose>
 					<c:when	test="${question.mark > 0}">
@@ -26,7 +26,7 @@
 	</tr>
 </table>		
 
-<c:if test="${finishedLock && (question.mark > 0)}">
+<c:if test="${finishedLock && (question.mark > 0) && assessment.allowQuestionFeedback}">
 	<c:forEach var="option" items="${question.questionOptions}">
 		<c:if test="${option.answerBoolean}">
 			<c:set var="optionFeedback" value="${option.feedback}" />	

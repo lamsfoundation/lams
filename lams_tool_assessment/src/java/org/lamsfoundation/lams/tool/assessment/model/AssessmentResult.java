@@ -45,7 +45,13 @@ public class AssessmentResult {
     private Date finishDate;
     private AssessmentUser user;
     private Long sessionId;
+    private int maximumGrade;
+    private float grade;
     private Set<AssessmentQuestionResult> questionResults;
+    
+    // DTO fields:
+    private Date timeTaken;
+    private String overallFeedback;
     
     public AssessmentResult() {
 	questionResults = new TreeSet<AssessmentQuestionResult>(new AssessmentQuestionResultComparator());
@@ -124,6 +130,30 @@ public class AssessmentResult {
     }
     
     /**
+     * @hibernate.property column="maximum_grade"
+     * @return
+     */
+    public int getMaximumGrade() {
+	return maximumGrade;
+    }
+
+    public void setMaximumGrade(int maximumGrade) {
+	this.maximumGrade = maximumGrade;
+    }
+    
+    /**
+     * @hibernate.property column="grade"
+     * @return
+     */
+    public float getGrade() {
+	return grade;
+    }
+
+    public void setGrade(float grade) {
+	this.grade = grade;
+    }
+    
+    /**
      * 
      * @hibernate.set cascade="all"
      * @hibernate.collection-key column="result_uid"
@@ -142,6 +172,19 @@ public class AssessmentResult {
 	this.questionResults = questionResults;
     }
     
+    public Date getTimeTaken() {
+	return timeTaken;
+    }
+    public void setTimeTaken(Date timeTaken) {
+	this.timeTaken = timeTaken;
+    }
+    
+    public String getOverallFeedback() {
+	return overallFeedback;
+    }
+    public void setOverallFeedback(String overallFeedback) {
+	this.overallFeedback = overallFeedback;
+    }
 }
 
  

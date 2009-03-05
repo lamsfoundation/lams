@@ -6,7 +6,7 @@
 
 <table cellspacing="0" style="padding-bottom: 10px;">
 		<tr>
-			<c:if test="${finishedLock}">
+			<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
 					<c:if test="${(question.correctAnswer) and (question.answerString != null)}">
 						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
@@ -27,7 +27,7 @@
 			</td>
 		</tr>
 		<tr>
-			<c:if test="${finishedLock}">
+			<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
 					<c:if test="${(!question.correctAnswer) and (question.answerString != null)}">
 						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
@@ -50,7 +50,7 @@
 
 </table>	
 
-<c:if test="${finishedLock}">
+<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
 	<c:choose>
 		<c:when test="${(question.answerBoolean == question.correctAnswer) and (question.answerString != null)}">
 			<div style="padding: 15px 15px 0px; font-style: italic">

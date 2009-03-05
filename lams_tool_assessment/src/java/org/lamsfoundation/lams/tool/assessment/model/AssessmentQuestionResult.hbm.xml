@@ -36,6 +36,14 @@
         />
 
         <property
+            name="resultUid"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="result_uid"
+        />
+
+        <property
             name="answerString"
             type="text"
             update="true"

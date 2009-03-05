@@ -69,6 +69,22 @@
             column="session_id"
         />
 
+        <property
+            name="maximumGrade"
+            type="int"
+            update="true"
+            insert="true"
+            column="maximum_grade"
+        />
+
+        <property
+            name="grade"
+            type="float"
+            update="true"
+            insert="true"
+            column="grade"
+        />
+
         <set
             name="questionResults"
             lazy="false"

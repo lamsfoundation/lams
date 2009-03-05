@@ -11,3 +11,5 @@
 		</td>
 	</tr>
 </table>		
+
+<%@ include file="markandpenaltyarea.jsp"%>

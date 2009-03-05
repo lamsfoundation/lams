@@ -29,6 +29,8 @@ import java.util.Map;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 
 public interface AssessmentQuestionResultDAO extends DAO {
+    
+    int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid);
 
 //    public AssessmentQuestionResult getAssessmentQuestionResult(Long questionUid, Long userId);
 //

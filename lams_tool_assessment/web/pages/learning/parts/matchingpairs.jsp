@@ -7,7 +7,7 @@
 <table cellspacing="0" style="padding-bottom: 10px;">
 	<c:forEach var="option" items="${question.questionOptions}">
 		<tr>
-			<c:if test="${finishedLock}">
+			<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
 					<c:if test="${(option.answerInt == option.sequenceId)}">
 						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
@@ -28,7 +28,7 @@
 					</c:forEach>
 				</html:select>
 			</td>
-			<c:if test="${finishedLock && (option.answerInt != -1)}">
+			<c:if test="${finishedLock && (option.answerInt != -1) && assessment.allowQuestionFeedback}">
 				<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;" width="30%">
 					<c:out value="${option.feedback}" escapeXml="false" />
 				</td>		

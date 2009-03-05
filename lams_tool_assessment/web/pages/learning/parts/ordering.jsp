@@ -2,6 +2,8 @@
 
 <c:if test="${not empty questionForOrdering}">
 	<c:set var="question" value="${questionForOrdering}" />
+	<c:set var="assessment" value="${sessionMap.assessment}" />
+	<c:set var="result" value="${sessionMap.assessmentResult}" />	
 </c:if>
 
 <div id="orderingArea">
@@ -45,7 +47,7 @@
 		</c:forEach>
 	</table>	
 	
-	<c:if test="${finishedLock}">
+	<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
 		<div style="padding: 10px 15px 0px; font-style: italic">
 			<c:choose>
 				<c:when	test="${question.mark > 0}">

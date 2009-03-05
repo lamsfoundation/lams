@@ -14,7 +14,7 @@
 <table cellspacing="0" style="padding-bottom: 10px;">
 	<c:forEach var="option" items="${question.questionOptions}">
 		<tr>
-			<c:if test="${finishedLock}">
+			<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
 					<c:if test="${option.answerBoolean && (option.grade > 0)}">
 						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
@@ -44,7 +44,7 @@
 			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;">
 				<c:out value="${option.optionString}" escapeXml="false" />
 			</td>
-			<c:if test="${finishedLock && option.answerBoolean}">
+			<c:if test="${finishedLock && option.answerBoolean && assessment.allowQuestionFeedback}">
 				<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;" width="30%">
 					<c:out value="${option.feedback}" escapeXml="false" />
 				</td>		
@@ -53,7 +53,7 @@
 	</c:forEach>
 </table>	
 
-<c:if test="${finishedLock}">
+<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
 	<c:choose>
 		<c:when test="${question.mark == question.defaultGrade}">
 			<div style="padding: 15px 15px 0px; font-style: italic">

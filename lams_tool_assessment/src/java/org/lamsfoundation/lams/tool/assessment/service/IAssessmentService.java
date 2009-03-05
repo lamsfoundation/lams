@@ -180,7 +180,7 @@ public interface IAssessmentService {
     
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
     
-    int getAssessmentResultCount(Long toolSessionId, Long userId);
+    int getAssessmentResultCount(Long assessmentUid, Long userId);
 
     /**
      * If success return next activity's url, otherwise return null.

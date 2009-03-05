@@ -19,6 +19,7 @@
 	<c:set var="pageNumber" value="${sessionMap.pageNumber}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
+	<c:set var="result" value="${sessionMap.assessmentResult}" />
 
 	<script type="text/javascript">
 	<!--
@@ -104,6 +105,49 @@
 		<%@ include file="/common/messages.jsp"%>
 		<br><br>
 		
+		<c:if test="${finishedLock}">
+			<table class="forum" style="background:none; border: 1px solid #cacdd1; margin-bottom:60px; padding-top:0px; margin-bottom: 10px;" cellspacing="0">
+				<tr>
+					<th style="width: 130px; border-left: none; padding-top:0px; " >
+						<fmt:message key="label.learning.summary.started.on" />
+					</th>
+					<td >
+						<lams:Date value="${result.startDate}"/>
+					</td>
+				</tr>
+				
+				<tr>
+					<th style="width: 130px;" >
+						<fmt:message key="label.learning.summary.completed.on" />
+					</th>
+					<td>
+						<lams:Date value="${result.finishDate}" />
+					</td>
+				</tr>
+				<tr>
+					<th style="width: 130px;" >
+						<fmt:message key="label.learning.summary.time.taken" />
+					</th>
+					<td>
+						<fmt:formatDate value="${result.timeTaken}" pattern="H" timeZone="GMT" /> <fmt:message key="label.learning.summary.hours" />
+						<fmt:formatDate value="${result.timeTaken}" pattern="m" timeZone="GMT" /> <fmt:message key="label.learning.summary.minutes" />
+					</td>
+				</tr>
+				<c:if test="${assessment.allowGradesAfterAttempt}">
+					<tr>
+						<th style="width: 130px;" >
+							<fmt:message key="label.learning.summary.grade" />
+						</th>
+						<td>
+							<fmt:formatNumber value="${result.grade}" maxFractionDigits="3"/>
+							<fmt:message key="label.learning.summary.out.of.maximum" />
+							${result.maximumGrade} (<fmt:formatNumber value="${result.grade * 100 / result.maximumGrade}" maxFractionDigits="2"/>%)
+						</td>
+					</tr>
+				</c:if>
+			</table>
+		</c:if>			
+		
 		<form id="answers" name="answers" method="post" >
 			<table cellspacing="0" class="alternative-color">
 				<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
@@ -146,37 +190,6 @@
 				</c:forEach>
 			</table>
 		</form>
-
-<%--
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h2>
-					${sessionMap.reflectInstructions}
-				</h2>
-
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> <fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-
-				<c:if test="${mode != 'teacher'}">
-					<html:button property="FinishButton"
-						onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
-			</div>
-		</c:if>
---%>		
 
 		<!--Paging-->
 		<c:if test="${fn:length(sessionMap.pagedQuestions) > 1}">

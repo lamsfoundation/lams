@@ -41,6 +41,7 @@ public class AssessmentQuestionResult {
 
     private Long uid;
     private AssessmentQuestion assessmentQuestion;
+    private Long resultUid;
     private String answerString;
     private float answerFloat;
     private boolean answerBoolean;
@@ -49,7 +50,7 @@ public class AssessmentQuestionResult {
     private Set<AssessmentOptionAnswer> optionAnswers;
     
     public AssessmentQuestionResult() {
-	optionAnswers = new TreeSet(new SequencableComparator());
+	optionAnswers = new TreeSet<AssessmentOptionAnswer>(new SequencableComparator());
     }
 
     /**
@@ -74,6 +75,19 @@ public class AssessmentQuestionResult {
 
     public void setAssessmentQuestion(AssessmentQuestion question) {
 	this.assessmentQuestion = question;
+    }
+    
+    /**
+     * @hibernate.property column="result_uid"
+     * 
+     * @return Returns resultUid.
+     */
+    public Long getResultUid() {
+	return resultUid;
+    }
+
+    public void setResultUid(Long resultUid) {
+	this.resultUid = resultUid;
     }
     
     /**

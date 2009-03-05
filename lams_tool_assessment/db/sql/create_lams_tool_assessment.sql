@@ -106,6 +106,8 @@ create table tl_laasse10_assessment_result (
    finish_date datetime,
    user_uid bigint,
    session_id bigint,
+   maximum_grade integer,
+   grade float,
    primary key (uid)
 )type=innodb;
 create table tl_laasse10_question_result (
