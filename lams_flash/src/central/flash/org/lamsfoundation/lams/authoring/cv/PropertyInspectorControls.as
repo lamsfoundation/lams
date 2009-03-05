@@ -544,9 +544,6 @@ class PropertyInspectorControls extends MovieClip {
 			preview_student_groups_chk.visible = false;
 			equalGroupSizes_lbl.visible = false;
 			equalGroupSizes_chk.visible = false;
-			numGroups_stp.visible = true;
-			numRandomGroups_stp.visible = false;
-			numLearners_stp.visible = false;
 			numLearners_rdo.visible = false;
 			numGroups_rdo.visible = false;
 			
@@ -556,6 +553,9 @@ class PropertyInspectorControls extends MovieClip {
 				numGroups_lbl.enabled = e;
 				_group_naming_btn.enabled = e;
 			}
+
+			checkGroupRadioOptions(e);
+			checkEnableGroupsOptions(e);
 		} 
 		else if(g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING){
 			numGroups_lbl.visible = true;
@@ -564,9 +564,6 @@ class PropertyInspectorControls extends MovieClip {
 			preview_student_groups_chk.visible = true;
 			equalGroupSizes_lbl.visible = true;
 			equalGroupSizes_chk.visible = true;
-			numRandomGroups_stp.visible = false;
-			numGroups_stp.visible = true;
-			numLearners_stp.visible = true;
 			numLearners_rdo.visible = true;
 			numGroups_rdo.visible = true;
 			
@@ -594,9 +591,6 @@ class PropertyInspectorControls extends MovieClip {
 			preview_student_groups_chk.visible = false;
 			equalGroupSizes_lbl.visible = false;
 			equalGroupSizes_chk.visible = false;
-			numGroups_stp.visible = false;
-			numRandomGroups_stp.visible = true;
-			numLearners_stp.visible = true;
 			numLearners_rdo.visible = true;
 			numGroups_rdo.visible = true;
 			
@@ -624,17 +618,22 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function reDrawTroublesomeSteppers(e:Boolean){
-		numLearners_stp.visible = true;
-		
 		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		
 		if (g.groupingTypeID == Grouping.RANDOM_GROUPING) {
 			numRandomGroups_stp.visible = true; 
 			numGroups_stp.visible = false;
+			numLearners_stp.visible = true;
+		} 
+		else if (g.groupingTypeID == Grouping.CHOSEN_GROUPING) {
+			numRandomGroups_stp.visible = false;
+			numGroups_stp.visible = true;
+			numLearners_stp.visible = false;
 		}
 		else if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
 			numRandomGroups_stp.visible = false;
 			numGroups_stp.visible = true;
+			numLearners_stp.visible = true;
 		}
 	}
 	
@@ -676,38 +675,27 @@ class PropertyInspectorControls extends MovieClip {
 		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		
 		if(groupingBy == 'num_learners'){
-			numRandomGroups_stp.value = 0;
-			numGroups_stp.value = 0;
-			g.numberOfGroups = 0;
-			g.equalGroupSizes = null;
+			numRandomGroups_stp.value = 2;
+			numGroups_stp.value = 2;
 			equalGroupSizes_chk.selected = false;
 			
 			numRandomGroups_stp.enabled = false;
 			numGroups_stp.enabled = false;
-			
 			numLearners_stp.enabled = (e != null) ? e : true;
-			
-			equalGroupSizes_lbl.visible = false;
-			equalGroupSizes_chk.visible = false;
 			_group_naming_btn.visible = false;
 			
 		}else{
+			numLearners_stp.value = 1;
+			
 			numRandomGroups_stp.enabled = (e != null) ? e : true;
 			numGroups_stp.enabled = (e != null) ? e : true;
-			
-			numLearners_stp.value = 0;
-			g.learnersPerGroups = 0;
-			
 			numLearners_stp.enabled = false;
-			
 			_group_naming_btn.enabled = (e != null) ? e : true;
 			_group_naming_btn.visible = true;
 			
 			if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
 				equalGroupSizes_chk.enabled = (e != null) ? e : true;
 				preview_student_groups_chk.enabled = (e != null) ? e : true;
-				preview_student_groups_lbl.visible = true;
-				preview_student_groups_chk.visible = true;
 				equalGroupSizes_lbl.visible = true;
 				equalGroupSizes_chk.visible = true;
 			}
@@ -719,32 +707,50 @@ class PropertyInspectorControls extends MovieClip {
 		
 	}
 	
+	// Show relevant controls depending on the grouptype and grouping approach (by number of groups, or by number of learners)
 	private function checkGroupRadioOptions(e:Boolean) {
 		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		
-		if(g.numberOfGroups > 0 && g.learnersPerGroups <= 0) { 	
-			numGroups_rdo.selected = true; 
-			_group_naming_btn.visible = true; 
+		_group_naming_btn.visible = false;
+		equalGroupSizes_lbl.visible = false;
+		equalGroupSizes_chk.visible = false;
+		preview_student_groups_lbl.visible = false;
+		preview_student_groups_chk.visible = false;
+		
+		if (g.groupingTypeID == Grouping.RANDOM_GROUPING) {
+			if(g.learnersPerGroups > 0) {
+				numLearners_rdo.selected = true;
+			} 
+			else {
+				numGroups_rdo.selected = true;
+				_group_naming_btn.visible = true;
+				_group_naming_btn.enabled = (e != null) ? e : true;
+			}
+		} 
+		else if (g.groupingTypeID == Grouping.CHOSEN_GROUPING) {
+			numGroups_rdo.selected = true;
+			_group_naming_btn.visible = true;
 			_group_naming_btn.enabled = (e != null) ? e : true;
+		} 
+		else if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
+			preview_student_groups_lbl.visible = true;
+			preview_student_groups_chk.visible = true;
 			
-			equalGroupSizes_lbl.visible = false;
-			equalGroupSizes_chk.visible = false;
-						
-		} else if(g.learnersPerGroups > 0 && g.numberOfGroups <= 0) { 
-			numLearners_rdo.selected = true; 
-			_group_naming_btn.visible = false;
-			
-			if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
-				preview_student_groups_lbl.visible = true;
-				preview_student_groups_chk.visible = true;
+			if(g.learnersPerGroups > 0) {
+				numLearners_rdo.selected = true;
+			} 
+			else {
+				numGroups_rdo.selected = true;
+				_group_naming_btn.visible = true;
+				_group_naming_btn.enabled = (e != null) ? e : true;
 				equalGroupSizes_lbl.visible = true;
 				equalGroupSizes_chk.visible = true;
 			}
-		}
-		else { // this is the case where both the steppers have 0 values
-			Debugger.log("checkGroupRadioOptions else", Debugger.GEN, "checkGroupRadioOptions", "PIC*");
+		} 
+		else {
 			numGroups_rdo.selected = true;
-			_group_naming_btn.visible = false;
+			_group_naming_btn.visible = true;
+			_group_naming_btn.enabled = (e != null) ? e : true;
 		}
 	}
 	
@@ -758,26 +764,23 @@ class PropertyInspectorControls extends MovieClip {
 		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(ga.createGroupingUIID);
 		toolDisplayName_lbl.text = "<b>"+Dictionary.getValue('pi_title')+"</b> - "+Dictionary.getValue('pi_activity_type_grouping');
 		
-		Debugger.log('This is the grouping object:',Debugger.GEN,'populateGroupingProperties','PropertyInspectorControls');
-		ObjectUtils.printObject(g);
-		
 		//loop through combo to fins SI of our gate activity type
 		for (var i=0; i<groupType_cmb.dataProvider.length;i++)
 			if(g.groupingTypeID == groupType_cmb.dataProvider[i].data) groupType_cmb.selectedIndex=i;
 		
 		if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
-			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 0;
-			numRandomGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 0;
+			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 1;//0;
+			numRandomGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 2;//0;
 		}
 		else if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
 			
-			numGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 0;
-			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 0;
+			numGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 2;//0;
+			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 1;//0;
 			equalGroupSizes_chk.selected = (g.equalGroupSizes != null && g.equalGroupSizes != undefined) ? g.equalGroupSizes : false;
 			preview_student_groups_chk.selected = (g.viewStudentsBeforeSelection != null && g.viewStudentsBeforeSelection != undefined) ? g.viewStudentsBeforeSelection : false;
 		}
 		else { // Teacher Chosen Grouping
-			numGroups_stp.value = (g.maxNumberOfGroups != null) ? g.maxNumberOfGroups : 0;
+			numGroups_stp.value = (g.maxNumberOfGroups != null) ? g.maxNumberOfGroups : 2;//0;
 		}
 		
 	}
@@ -800,26 +803,33 @@ class PropertyInspectorControls extends MovieClip {
 	}
 	
 	private function doUpdateGroupingMethodData(g:Grouping) {
+		var groupingBy = rndGroup_radio.selection.data;
+		
+		Debugger.log("doUpdateGroupingMethodData->groupingBy: "+groupingBy, Debugger.GEN, "doUpdateGroupingMethodData", "PIC*");
 		
 		if(g.groupingTypeID == Grouping.RANDOM_GROUPING){
 			//note only one of these should actually have a non 0 value
-			g.learnersPerGroups = numLearners_stp.value;
-			g.numberOfGroups = numRandomGroups_stp.value;
+			if (groupingBy == 'num_learners') {
+				g.learnersPerGroups = numLearners_stp.value;
+				g.numberOfGroups = 0; 
+			} else {
+				g.numberOfGroups = numRandomGroups_stp.value;
+				g.learnersPerGroups = 0;
+			}
 			
-			numGroups_stp.value = 0;
 			g.maxNumberOfGroups = 0;
 		}
 		else if(g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING){
-			g.learnersPerGroups = numLearners_stp.value;
-			g.numberOfGroups = numGroups_stp.value;
+			if (groupingBy == 'num_learners') {
+				g.learnersPerGroups = numLearners_stp.value;
+			} else {
+				g.numberOfGroups = numGroups_stp.value;
+				g.equalGroupSizes = equalGroupSizes_chk.selected;
+			}
 			g.maxNumberOfGroups = 0;
-			g.equalGroupSizes = equalGroupSizes_chk.selected;
 			g.viewStudentsBeforeSelection = preview_student_groups_chk.selected;
 		}else{
 			g.maxNumberOfGroups = numGroups_stp.value;
-			
-			numRandomGroups_stp.value = 0;
-			numLearners_stp.value = 0;
 			g.learnersPerGroups = 0;
 			g.numberOfGroups = 0;
 		}
@@ -1289,7 +1299,7 @@ class PropertyInspectorControls extends MovieClip {
 	 */
 	private function onGroupingMethodChange(evt:Object){
 		checkEnableGroupsOptions(!_canvasModel.selectedItem.activity.readOnly);
-		
+		updateGroupingMethodData(evt);
 		setModified();
 	}
 	

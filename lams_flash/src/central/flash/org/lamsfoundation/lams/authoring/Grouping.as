@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.common.util.*;/**
 class org.lamsfoundation.lams.authoring.Grouping {
 	
 	public static var RANDOM_GROUPING:Number = 1;
-	public static var CHOSEN_GROUPING:Number = 2;
+	public static var CHOSEN_GROUPING:Number = 2; //TeacherChosen
 	public static var LEARNER_CHOICE_GROUPING:Number = 4;
 	
 	private var _equalGroupSizes:Boolean;
