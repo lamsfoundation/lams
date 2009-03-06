@@ -88,13 +88,13 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     private Set<AssessmentUnit> units;
     
     // DTO fields:
-    private boolean complete;
-    
     private String answerString;
     
     private float answerFloat;
     
     private boolean answerBoolean;
+    
+    private String questionFeedback;
     
     private float mark;
     
@@ -444,13 +444,6 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
 	this.units = units;
     }
     
-    public void setComplete(boolean complete) {
-	this.complete = complete;
-    }
-    public boolean isComplete() {
-	return complete;
-    }
-    
     public String getAnswerString() {
 	return answerString;
     }
@@ -471,6 +464,13 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     public void setAnswerBoolean(boolean answerBoolean) {
 	this.answerBoolean = answerBoolean;
     }   
+    
+    public void setQuestionFeedback(String questionFeedback) {
+	this.questionFeedback = questionFeedback;
+    }
+    public String getQuestionFeedback() {
+	return questionFeedback;
+    }
     
     public Float getMark() {
 	return mark;

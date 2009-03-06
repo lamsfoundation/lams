@@ -26,15 +26,9 @@
 	</tr>
 </table>		
 
-<c:if test="${finishedLock && (question.mark > 0) && assessment.allowQuestionFeedback}">
-	<c:forEach var="option" items="${question.questionOptions}">
-		<c:if test="${option.answerBoolean}">
-			<c:set var="optionFeedback" value="${option.feedback}" />	
-		</c:if>		
-	</c:forEach>		
-		
-	<div style="padding: 10px 15px 0px; font-style: italic">
-		<c:out value="${optionFeedback}" escapeXml="false" />
+<c:if test="${finishedLock && assessment.allowQuestionFeedback && (question.questionFeedback != null)}">
+	<div style="padding: 10px 15px 0px; font-style: italic; color:#47bc23;">
+		<c:out value="${question.questionFeedback}" escapeXml="false" />
 	</div>
 </c:if>	
 

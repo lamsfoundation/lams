@@ -1214,7 +1214,7 @@ public class AuthoringAction extends Action {
 	} else if ((type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	} else if ((type == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE)) {
-	    question.setPenaltyFactor(1);
+	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setCorrectAnswer(questionForm.isCorrectAnswer());
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());	    

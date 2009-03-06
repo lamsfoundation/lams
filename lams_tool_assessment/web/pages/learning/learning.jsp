@@ -145,6 +145,16 @@
 						</td>
 					</tr>
 				</c:if>
+				<c:if test="${assessment.allowOverallFeedbackAfterQuestion && (result.overallFeedback != null)}">
+					<tr>
+						<th style="width: 130px;" >
+							<fmt:message key="label.learning.summary.feedback" />
+						</th>
+						<td>
+							${result.overallFeedback}
+						</td>
+					</tr>			
+				</c:if>				
 			</table>
 		</c:if>			
 		
@@ -190,7 +200,13 @@
 				</c:forEach>
 			</table>
 		</form>
-
+<!--		
+		<c:if test="${finishedLock && assessment.allowOverallFeedbackAfterQuestion && (result.overallFeedback != null)}">
+			<div style="padding: 10px 45px 0px; font-weight: 700; color:#47bc23; ">
+				Overall Feedback: ${result.overallFeedback}
+			</div>
+		</c:if>
+-->
 		<!--Paging-->
 		<c:if test="${fn:length(sessionMap.pagedQuestions) > 1}">
 			<div style="text-align: center; padding-top: 60px;">

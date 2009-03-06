@@ -68,6 +68,14 @@
         />
 
         <property
+            name="submittedOptionUid"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="submitted_option_uid"
+        />
+
+        <property
             name="mark"
             type="java.lang.Float"
             update="true"

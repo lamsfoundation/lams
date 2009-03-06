@@ -497,8 +497,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		
 		if (isAnswerCorrect) {
 		    mark = option.getGrade()*maxMark;
-		    //for display purposes
-		    option.setAnswerBoolean(true);
+		    questionResult.setSubmittedOptionUid(option.getUid());
 		    break;
 		}
 	    }
@@ -509,15 +508,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    if ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError()))
 			    && (answerFloat <= (option.getOptionFloat() + option.getAcceptedError()))) {
 			mark = option.getGrade() * maxMark;
-			//for display purposes
-			option.setAnswerBoolean(true);
+			questionResult.setSubmittedOptionUid(option.getUid());
 			break;
 		    }
 		}
 	    } catch (Exception e) {
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
-	    if (question.getAnswerBoolean() == question.getCorrectAnswer()) {
+	    if ((question.getAnswerBoolean() == question.getCorrectAnswer()) && (question.getAnswerString() != null)) {
 		mark = maxMark;
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {

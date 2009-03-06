@@ -52,13 +52,13 @@
 
 <c:if test="${finishedLock && assessment.allowQuestionFeedback}">
 	<c:choose>
-		<c:when test="${(question.answerBoolean == question.correctAnswer) and (question.answerString != null)}">
-			<div style="padding: 15px 15px 0px; font-style: italic">
+		<c:when test="${question.answerBoolean and (question.answerString != null)}">
+			<div style="padding: 15px 15px 0px; font-style: italic; color:#47bc23;">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</div>
 		</c:when>
-		<c:when test="${(question.answerBoolean != question.correctAnswer) and (question.answerString != null)}">
-			<div style="padding: 15px 15px 0px; font-style: italic">
+		<c:when test="${!question.answerBoolean and (question.answerString != null)}">
+			<div style="padding: 15px 15px 0px; font-style: italic; color:#47bc23;">
 				<c:out value="${question.feedbackOnIncorrect}" escapeXml="false" />
 			</div>
 		</c:when>		

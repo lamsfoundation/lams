@@ -659,11 +659,6 @@ public class LearningAction extends Action {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		question.setAnswerString(answerString);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-//		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
-//		    int statusIndex = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_"
-//			    + option.getSequenceId());
-//		    option.setAnswerInt(statusIndex);
-//		}
 	    }
 	}
     }
@@ -682,6 +677,14 @@ public class LearningAction extends Action {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
 			question.setMark(questionResult.getMark());
 			question.setPenalty(questionResult.getPenalty());
+			
+			question.setQuestionFeedback(null);
+			for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
+			    if (questionOption.getUid().equals(questionResult.getSubmittedOptionUid())) {
+				question.setQuestionFeedback(questionOption.getFeedback());
+				break;
+			    }
+			}
 		    }
 		}		
 	    }

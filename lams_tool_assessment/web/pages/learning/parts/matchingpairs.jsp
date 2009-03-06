@@ -28,11 +28,6 @@
 					</c:forEach>
 				</html:select>
 			</td>
-			<c:if test="${finishedLock && (option.answerInt != -1) && assessment.allowQuestionFeedback}">
-				<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;" width="30%">
-					<c:out value="${option.feedback}" escapeXml="false" />
-				</td>		
-			</c:if>						
 		</tr>
 	</c:forEach>
 </table>		

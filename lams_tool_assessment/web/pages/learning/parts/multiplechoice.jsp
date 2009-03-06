@@ -45,7 +45,7 @@
 				<c:out value="${option.optionString}" escapeXml="false" />
 			</td>
 			<c:if test="${finishedLock && option.answerBoolean && assessment.allowQuestionFeedback}">
-				<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;" width="30%">
+				<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px; font-style: italic; color:#47bc23;" width="30%">
 					<c:out value="${option.feedback}" escapeXml="false" />
 				</td>		
 			</c:if>
@@ -56,17 +56,17 @@
 <c:if test="${finishedLock && assessment.allowQuestionFeedback}">
 	<c:choose>
 		<c:when test="${question.mark == question.defaultGrade}">
-			<div style="padding: 15px 15px 0px; font-style: italic">
+			<div style="padding: 15px 15px 0px; font-style: italic; color:#47bc23;">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</div>
 		</c:when>
 		<c:when test="${question.mark > 0}">
-			<div style="padding: 15px 15px 0px; font-style: italic">
+			<div style="padding: 15px 15px 0px; font-style: italic; color:#47bc23;">
 				<c:out value="${question.feedbackOnPartiallyCorrect}" escapeXml="false" />
 			</div>
 		</c:when>
 		<c:when test="${question.mark <= 0}">
-			<div style="padding: 15px 15px 0px; font-style: italic">
+			<div style="padding: 15px 15px 0px; font-style: italic; color:#47bc23;">
 				<c:out value="${question.feedbackOnIncorrect}" escapeXml="false" />
 			</div>
 		</c:when>		

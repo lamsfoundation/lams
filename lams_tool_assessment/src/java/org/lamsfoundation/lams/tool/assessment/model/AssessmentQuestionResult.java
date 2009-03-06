@@ -45,6 +45,7 @@ public class AssessmentQuestionResult {
     private String answerString;
     private float answerFloat;
     private boolean answerBoolean;
+    private Long submittedOptionUid;    
     private float mark;
     private float penalty;
     private Set<AssessmentOptionAnswer> optionAnswers;
@@ -127,6 +128,19 @@ public class AssessmentQuestionResult {
 
     public void setAnswerBoolean(boolean answerBoolean) {
 	this.answerBoolean = answerBoolean;
+    }
+    
+    /**
+     * @hibernate.property column="submitted_option_uid"
+     * 
+     * @return Returns submittedOptionUid.
+     */
+    public Long getSubmittedOptionUid() {
+	return submittedOptionUid;
+    }
+
+    public void setSubmittedOptionUid(Long submittedOptionUid) {
+	this.submittedOptionUid = submittedOptionUid;
     }
     
     /**

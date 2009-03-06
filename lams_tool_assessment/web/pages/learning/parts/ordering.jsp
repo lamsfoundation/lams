@@ -48,7 +48,7 @@
 	</table>	
 	
 	<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
-		<div style="padding: 10px 15px 0px; font-style: italic">
+		<div style="padding: 10px 15px 0px; font-style: italic; color:#47bc23;">
 			<c:choose>
 				<c:when	test="${question.mark > 0}">
 					<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />

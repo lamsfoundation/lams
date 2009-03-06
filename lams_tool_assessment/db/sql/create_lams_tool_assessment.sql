@@ -117,6 +117,7 @@ create table tl_laasse10_question_result (
    answer_string text,
    answer_float float,
    answer_boolean boolean,
+   submitted_option_uid bigint,
    mark float,
    penalty float,
    primary key (uid)

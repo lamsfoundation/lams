@@ -27,6 +27,10 @@
 		    			defaultGrade: {
 		    			      required: true,
 		    			      digits: true
+		    			},
+		    			penaltyFactor: {
+		    			      required: true,
+		    			      number: true
 		    			}
 		    		},
 		    		messages: {
@@ -34,6 +38,10 @@
 		    			defaultGrade: {
 		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
+		    			},
+		    			penaltyFactor: {
+		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
+		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
 		    			}
 		    		},
 		    	    invalidHandler: function(form, validator) {
@@ -116,7 +124,7 @@
 					<fmt:message key="label.authoring.basic.penalty.factor" />
 					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
 				</div>
-				1
+				<html:text property="penaltyFactor" size="3" />
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />
@@ -146,12 +154,12 @@
 				<lams:FCKEditor id="feedbackOnIncorrect" value="${formBean.feedbackOnIncorrect}"
 					contentFolderID="${formBean.contentFolderID}" width="622px">
 				</lams:FCKEditor>				
-				
 			</html:form>
 			
+			<br><br>
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="$('#assessmentQuestionForm').submit();" class="button-add-item">
-					<fmt:message key="label.authoring.choice.add.multiple.choice" /> 
+					<fmt:message key="label.authoring.true.false.add.true.false" /> 
 				</a>
 				<a href="#" onclick="self.parent.tb_remove();" class="button space-left">
 					<fmt:message key="label.cancel" /> 
