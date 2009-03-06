@@ -374,7 +374,7 @@ Layout of main content section
 /* OK and Cancel icon buttons */
 .okIcon {
 	padding: 0 0 5px 18px; 
-	background: url('../images/css/disk.png') no-repeat;
+	background: url('../images/css/accept.png') no-repeat;
 	
 }
 
