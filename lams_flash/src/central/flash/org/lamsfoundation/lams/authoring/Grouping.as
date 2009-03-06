@@ -37,6 +37,9 @@ class org.lamsfoundation.lams.authoring.Grouping {
 	public static var CHOSEN_GROUPING:Number = 2; //TeacherChosen
 	public static var LEARNER_CHOICE_GROUPING:Number = 4;
 	
+	public static var MINIMUM_NUMBER_OF_GROUPS = 2;
+	public static var MINIMUM_NUMBER_OF_LEARNERS = 1;
+	
 	private var _equalGroupSizes:Boolean;
 	private var _viewStudentsBeforeSelection:Boolean;
 	

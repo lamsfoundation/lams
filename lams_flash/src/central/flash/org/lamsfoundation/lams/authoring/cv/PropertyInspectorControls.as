@@ -675,8 +675,8 @@ class PropertyInspectorControls extends MovieClip {
 		var g:Grouping = _canvasModel.getCanvas().ddm.getGroupingByUIID(_canvasModel.selectedItem.activity.createGroupingUIID);
 		
 		if(groupingBy == 'num_learners'){
-			numRandomGroups_stp.value = 2;
-			numGroups_stp.value = 2;
+			numRandomGroups_stp.value = Grouping.MINIMUM_NUMBER_OF_GROUPS;
+			numGroups_stp.value = Grouping.MINIMUM_NUMBER_OF_GROUPS;
 			equalGroupSizes_chk.selected = false;
 			
 			numRandomGroups_stp.enabled = false;
@@ -685,7 +685,7 @@ class PropertyInspectorControls extends MovieClip {
 			_group_naming_btn.visible = false;
 			
 		}else{
-			numLearners_stp.value = 1;
+			numLearners_stp.value = Grouping.MINIMUM_NUMBER_OF_LEARNERS;
 			
 			numRandomGroups_stp.enabled = (e != null) ? e : true;
 			numGroups_stp.enabled = (e != null) ? e : true;
@@ -769,18 +769,18 @@ class PropertyInspectorControls extends MovieClip {
 			if(g.groupingTypeID == groupType_cmb.dataProvider[i].data) groupType_cmb.selectedIndex=i;
 		
 		if(g.groupingTypeID == Grouping.RANDOM_GROUPING) {
-			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 1;//0;
-			numRandomGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 2;//0;
+			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : Grouping.MINIMUM_NUMBER_OF_LEARNERS;
+			numRandomGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : Grouping.MINIMUM_NUMBER_OF_GROUPS;
 		}
 		else if (g.groupingTypeID == Grouping.LEARNER_CHOICE_GROUPING) {
 			
-			numGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : 2;//0;
-			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : 1;//0;
+			numGroups_stp.value = (g.numberOfGroups != null) ? g.numberOfGroups : Grouping.MINIMUM_NUMBER_OF_GROUPS;
+			numLearners_stp.value = (g.learnersPerGroups != null) ? g.learnersPerGroups : Grouping.MINIMUM_NUMBER_OF_LEARNERS;
 			equalGroupSizes_chk.selected = (g.equalGroupSizes != null && g.equalGroupSizes != undefined) ? g.equalGroupSizes : false;
 			preview_student_groups_chk.selected = (g.viewStudentsBeforeSelection != null && g.viewStudentsBeforeSelection != undefined) ? g.viewStudentsBeforeSelection : false;
 		}
 		else { // Teacher Chosen Grouping
-			numGroups_stp.value = (g.maxNumberOfGroups != null) ? g.maxNumberOfGroups : 2;//0;
+			numGroups_stp.value = (g.maxNumberOfGroups != null) ? g.maxNumberOfGroups : Grouping.MINIMUM_NUMBER_OF_GROUPS;
 		}
 		
 	}

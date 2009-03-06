@@ -229,6 +229,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		//first create the grouping object
 		var newGrouping = new Grouping(_cv.ddm.newUIID());
 		newGrouping.groupingTypeID = _defaultGroupingTypeID;
+		newGrouping.numberOfGroups = Grouping.MINIMUM_NUMBER_OF_GROUPS; // set defualt number of groups
 		
 		_cv.ddm.addGrouping(newGrouping);
 		
