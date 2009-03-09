@@ -345,6 +345,7 @@
 				<c:url value="/pedagogicalPlanner.do" var="closeNodeEditorUrl">
 					<c:param name="method" value="openSequenceNode" />
 					<c:param name="edit" value="false" />
+					<c:param name="uid" value="${empty node.fileName ? node.uid : node.parentUid}" />
 				</c:url>
 				<a class="button pedagogicalPlannerButtons" 
 				<c:choose>
@@ -352,10 +353,10 @@
 						href="javascript:leaveNodeEditor(null,'${closeNodeEditorUrl}');"
 					</c:when>
 					<c:otherwise>
-						href="javascript:leaveNodeEditor('<fmt:message key="msg.planner.not.saved" />','${closeNodeEditorUrl}');"
+						href="javascript:leaveNodeEditor('<fmt:message key="msg.planner.editor.not.saved" />','${closeNodeEditorUrl}');"
 					</c:otherwise>
 				</c:choose>
-				><fmt:message key="button.close" /></a>
+				><fmt:message key="button.cancel" /></a>
 				
 				<c:if test="${not node.createSubnode and empty node.fileName}">
 					<c:url value="/pedagogicalPlanner.do" var="createSubnodeUrl">
