@@ -23,24 +23,24 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
-import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 
 public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate implements AssessmentQuestionResultDAO {
 
 //    private static final String FIND_BY_QUESTION_AND_USER = "from " + AssessmentQuestionResult.class.getName()
 //	    + " as r where r.user.userId = ? and r.assessmentQuestion.uid=?";
 //
-//    private static final String FIND_BY_QUESTION_AND_SESSION = "from " + AssessmentQuestionResult.class.getName()
-//	    + " as r where r.sessionId = ? and r.assessmentQuestion.uid=?";
-//
+    private static final String FIND_BY_ASSESSMENT_QUESTION_AND_USER = "from "
+	    + AssessmentQuestionResult.class.getName()
+	    + " as q, "
+	    + AssessmentResult.class.getName()
+	    + " as r "
+	    + " where q.resultUid = r.uid and r.assessment.uid = ? and r.user.userId =? and q.assessmentQuestion.uid =? order by r.startDate asc";
+
 ////    private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from "
 ////	    + AssessmentQuestionResult.class.getName() + " as r where  r.sessionId=? and  r.user.userId =?";
 //
@@ -55,7 +55,7 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 	    + " as q, "
 	    + AssessmentResult.class.getName()
 	    + " as r "
-	    + " where q.resultUid = r.uid and r.assessment.uid = ? and r.user.userId =? and q.assessmentQuestion.uid =? and q.mark = 0";
+	    + " where q.resultUid = r.uid and r.assessment.uid = ? and r.user.userId =? and q.assessmentQuestion.uid =? and q.mark < q.assessmentQuestion.defaultGrade";
     
 //    public AssessmentQuestionResult getAssessmentQuestionResult(Long questionUid, Long userId) {
 //	List list = getHibernateTemplate().find(FIND_BY_QUESTION_AND_USER, new Object[] { userId, questionUid });
@@ -86,7 +86,7 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 //    }
 //
 //    public List<AssessmentQuestionResult> getAssessmentQuestionResultBySession(Long sessionId, Long questionUid) {
-//	return getHibernateTemplate().find(FIND_BY_QUESTION_AND_SESSION, new Object[] { sessionId, questionUid });
+//	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_QUESTION_AND_USER, new Object[] { sessionId, questionUid });
 //    }
 
     public int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid) {
@@ -96,6 +96,10 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 	} else {
 	    return ((Number) list.get(0)).intValue();
 	}
+    }
+
+    public List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
+	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_QUESTION_AND_USER, new Object[] { assessmentUid, userId, questionUid });
     }
 
 }

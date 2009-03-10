@@ -165,22 +165,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	if (group.size() > 0)
 	    groupList.add(group);
 
-	// Add flag to indicate whether to render user notebook entries
-	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
-
-	// Create reflectList if reflection is enabled.
-	if (content.isReflectOnActivity()) {
-	    // Create reflectList, need to follow same structure used in teacher
-	    // see service.getReflectList();
-	    Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
-	    Set<ReflectDTO> reflectDTOSet = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-	    reflectDTOSet.add(getReflectionEntry(learner));
-	    map.put(toolSessionID, reflectDTOSet);
-
-	    // Add reflectList to sessionMap
-	    sessionMap.put(AssessmentConstants.ATTR_REFLECT_LIST, map);
-	}
-
 	sessionMap.put(AssessmentConstants.ATTR_TITLE, content.getTitle());
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, content.getInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, groupList);
@@ -208,16 +192,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    for (List<Summary> list : groupList) {
 		saveFileToLocal(list, directoryName);
 	    }
-	}
-
-	// Add flag to indicate whether to render user notebook entries
-	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
-
-	// Create reflectList if reflection is enabled.
-	if (content.isReflectOnActivity()) {
-	    Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId(), true);
-	    // Add reflectList to sessionMap
-	    sessionMap.put(AssessmentConstants.ATTR_REFLECT_LIST, reflectList);
 	}
 
 	// put it into HTTPSession
@@ -264,19 +238,5 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    handler = (AssessmentToolContentHandler) wac.getBean(AssessmentConstants.TOOL_CONTENT_HANDLER_NAME);
 	}
 	return handler;
-    }
-
-    private ReflectDTO getReflectionEntry(AssessmentUser assessmentUser) {
-	ReflectDTO reflectDTO = new ReflectDTO(assessmentUser);
-	NotebookEntry notebookEntry = service.getEntry(assessmentUser.getSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, AssessmentConstants.TOOL_SIGNATURE, assessmentUser.getUserId()
-			.intValue());
-
-	// check notebookEntry is not null
-	if (notebookEntry != null) {
-	    reflectDTO.setReflect(notebookEntry.getEntry());
-	    logger.debug("Could not find notebookEntry for AssessmentUser: " + assessmentUser.getUid());
-	}
-	return reflectDTO;
     }
 }

@@ -102,7 +102,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * 
@@ -426,7 +425,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	result.setSessionId(toolSessionId);
 	result.setStartDate(new Timestamp(new Date().getTime()));
 	assessmentResultDao.saveObject(result);
-	int dd = 22;
     }
     
     public void processUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions) {
@@ -458,7 +456,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
 	for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
 	    AssessmentOptionAnswer optionAnswer = new AssessmentOptionAnswer();
-	    optionAnswer.setSequenceId(questionOption.getSequenceId());
+	    optionAnswer.setQuestionOptionUid(questionOption.getUid());
 	    optionAnswer.setAnswerBoolean(questionOption.getAnswerBoolean());
 	    optionAnswer.setAnswerInt(questionOption.getAnswerInt());
 	    optionAnswers.add(optionAnswer);
@@ -479,7 +477,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 	    float maxMarkForCorrectAnswer = maxMark / question.getQuestionOptions().size();
 	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
-		if (option.getAnswerInt() == option.getSequenceId()) {
+		if (option.getAnswerInt() == option.getUid()) {
 		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
@@ -488,9 +486,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		String optionString = option.getOptionString().replaceAll("\\*", ".*");
 		Pattern pattern;
 		if (question.isCaseSensitive()) {
-		    pattern = Pattern.compile(optionString, java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
-		} else {
 		    pattern = Pattern.compile(optionString);
+		} else {
+		    pattern = Pattern.compile(optionString, java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 		}		
 		boolean isAnswerCorrect = (question.getAnswerString() != null) ? 
 			pattern.matcher(question.getAnswerString()).matches() : false;
@@ -551,6 +549,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
+    }
+    
+    public List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
+	return assessmentQuestionResultDao.getAssessmentQuestionResultList(assessmentUid, userId, questionUid);
     }
 
     public String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException {
@@ -627,36 +629,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     }
 
-    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
-
-	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
-	for (AssessmentSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getAssessment().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-	    // get all users in this session
-	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
-	    for (AssessmentUser user : users) {
-		ReflectDTO ref = new ReflectDTO(user);
-
-		if (setEntry) {
-		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    AssessmentConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		    if (entry != null) {
-			ref.setReflect(entry.getEntry());
-		    }
-		}
-
-		ref.setHasRefection(hasRefection);
-		list.add(ref);
-	    }
-	    map.put(sessionId, list);
-	}
-
-	return map;
-    }
-
 //    public List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid) {
 //	List<AssessmentQuestionResult> logList = assessmentQuestionResultDao.getAssessmentQuestionResultBySession(
 //		sessionId, questionUid);
@@ -687,28 +659,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    question.setHide(!visible);
 	    assessmentQuestionDao.saveObject(question);
 	}
-    }
-
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    /**
-     * @param notebookEntry
-     */
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     public AssessmentUser getUser(Long uid) {
@@ -1062,9 +1012,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    throw new DataMissingException("Unable to set reflective data titled " + title
 		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
 	}
-
-	toolContentObj.setReflectOnActivity(Boolean.TRUE);
-	toolContentObj.setReflectInstructions(description);
     }
 
     /* =================================================================================== */

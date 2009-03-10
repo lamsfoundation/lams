@@ -24,9 +24,7 @@
 package org.lamsfoundation.lams.tool.assessment.dao;  
 
 import java.util.List;
-import java.util.Map;
 
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
  
 public interface AssessmentResultDAO extends DAO {

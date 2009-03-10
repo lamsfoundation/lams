@@ -20,149 +20,154 @@
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
 	<c:set var="result" value="${sessionMap.assessmentResult}" />
+	<c:choose>
+		<c:when test="${not empty param.secondsLeft}">
+			<c:set var="secondsLeft" value="${param.secondsLeft}" />		
+		</c:when>
+		<c:otherwise>
+			<c:set var="secondsLeft" value="${assessment.timeLimit * 60}" />		
+		</c:otherwise>
+	</c:choose>	
+	
+	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.countdown.css'/>" />
 
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script> 
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.countdown.js'/>"></script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.blockUI.js'/>"></script>
 	<script type="text/javascript">
-	<!--
+	<!--	
+		<c:if test="${not finishedLock && assessment.timeLimit > 0}">	
+			$(document).ready(function(){
+				displayCountdown();
+				
+				<c:if test="${empty param.secondsLeft}">	
+					$.blockUI({ message: $('#question'), css: { width: '325px', height: '85px'} }); 
+			        $('#ok').click(function() {
+			        	$.unblockUI();
+			        	displayCountdown();
+			        });
+	        	</c:if>
+			});
+			function displayCountdown(){
+				var countdown = '<div id="countdown" style="width: 150px; position: absolute; font-size: 110%; font-style: italic; color:#47bc23;"></div>' 
+					$.blockUI({ 
+						message: countdown, 
+						showOverlay: false,
+						focusInput: false,
+						css: { 
+							top: '40px',
+							left: '',
+							right: '0%',
+				            opacity: '.8', 
+				            width: '230px',
+				            cursor: 'default',
+				            border: 'none'
+			        	}   
+					});
+					$('#countdown').countdown({
+						until: '+${secondsLeft}S', 
+						format: 'hMS',
+						compact: true,
+						onExpiry: liftoffTime,
+						description: "<div style='font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;' >Time left</div>"
+					});
+			}			
+			function liftoffTime(){
+		        $.blockUI({ message: '<h1 style="font-size: 145%;"><img src="<html:rewrite page='/includes/images/indicator.gif'/>" border="0" > <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
+		        
+		        setTimeout(function() { 
+		            $.unblockUI({ 
+		                onUnblock: submitAll 
+		            }); 
+		        }, 4000); 
+			}	
+		</c:if>
+		
 		function finishSession(){
-			//document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
 		function nextPage(pageNumber){
-        	var myForm = $("answers");
-        	myForm.action = "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber;
+			var secondsLeft = 0;
+			if (${not finishedLock && assessment.timeLimit > 0}) {
+				var times = $("#countdown").countdown('getTimes'); 
+				secondsLeft = times[4]*3600 + times[5]*60 + times[6];
+			}
+        	var myForm = $("#answers");
+        	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber + "&secondsLeft=" + secondsLeft);
         	myForm.submit();
 		}		
 		function finishTest(){
-        	var myForm = $("answers");
-        	myForm.action = "<c:url value='/learning/finishTest.do?sessionMapID=${sessionMapID}'/>";
+        	var myForm = $("#answers");
+        	myForm.attr("action", "<c:url value='/learning/finishTest.do?sessionMapID=${sessionMapID}'/>");
         	myForm.submit();
 		}
 		function submitAll(){
-        	var myForm = $("answers");
-        	myForm.action = "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>";
+        	var myForm = $("#answers");
+        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>");
         	myForm.submit();
 		}	
 		function resubmit(){
 			document.location.href ="<c:url value='/learning/resubmit.do?sessionMapID=${sessionMapID}'/>";
 			return false;			
 		}		
-		var orderingTargetDiv = "orderingArea";
+		var orderingArea = "#orderingArea";
 		function upOption(questionUid, idx){
 			var url = "<c:url value="/learning/upOption.do"/>";
-			var param = "sessionMapID=${sessionMapID}&optionIndex=" + idx + "&questionUid=" + questionUid;
-		    var myAjax = new Ajax.Updater(
-		    		orderingTargetDiv,
-			    	url,
-			    	{
-			    		method:'get',
-			    		parameters:param,
-			    		evalScripts:false
-			    	}
-		    );
+			$(orderingArea).load(
+					url,
+					{
+						questionUid: questionUid,
+						optionIndex: idx, 
+						sessionMapID: "${sessionMapID}"
+					}
+			);
 		}
 		function downOption(questionUid, idx){
 			var url = "<c:url value="/learning/downOption.do"/>";
-			var param = "sessionMapID=${sessionMapID}&optionIndex=" + idx + "&questionUid=" + questionUid;
-		    var myAjax = new Ajax.Updater(
-		    		orderingTargetDiv,
-			    	url,
-			    	{
-			    		method:'get',
-			    		parameters:param,
-			    		evalScripts:false
-			    	}
-		    );
-		}			
+			$(orderingArea).load(
+					url,
+					{
+						questionUid: questionUid,
+						optionIndex: idx, 
+						sessionMapID: "${sessionMapID}"
+					}
+			);		    
+		}		
 	-->        
     </script>
 </lams:head>
 <body class="stripes">
-
 
 	<div id="content">
 		<h1>
 			${assessment.title}
 		</h1>
 
-		<p>
-			${assessment.instructions}
-		</p>
-
-		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-				<div class="info">
-					<c:choose>
-						<c:when test="${sessionMap.userFinished}">
-							<fmt:message key="message.activityLocked" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="message.warnLockOnFinish" />
-						</c:otherwise>
-					</c:choose>
-				</div>
+		<c:if test="${not finishedLock}">
+			<p>
+				${assessment.instructions}
+			</p>
 		</c:if>
-
+		
+		<div id="question" style="display:none; cursor: default"> 
+	        <h1 style="padding: 30 10 50">
+	        	You are going to participate in activity that has time limitation. Are you ready to start?
+	        </h1>
+    	    <input type="button" id="ok" value="OK" />
+    	    <br>  
+		</div>
+		
 		<%@ include file="/common/messages.jsp"%>
-		<br><br>
+		<br>
 		
-		<c:if test="${finishedLock}">
-			<table class="forum" style="background:none; border: 1px solid #cacdd1; margin-bottom:60px; padding-top:0px; margin-bottom: 10px;" cellspacing="0">
-				<tr>
-					<th style="width: 130px; border-left: none; padding-top:0px; " >
-						<fmt:message key="label.learning.summary.started.on" />
-					</th>
-					<td >
-						<lams:Date value="${result.startDate}"/>
-					</td>
-				</tr>
-				
-				<tr>
-					<th style="width: 130px;" >
-						<fmt:message key="label.learning.summary.completed.on" />
-					</th>
-					<td>
-						<lams:Date value="${result.finishDate}" />
-					</td>
-				</tr>
-				<tr>
-					<th style="width: 130px;" >
-						<fmt:message key="label.learning.summary.time.taken" />
-					</th>
-					<td>
-						<fmt:formatDate value="${result.timeTaken}" pattern="H" timeZone="GMT" /> <fmt:message key="label.learning.summary.hours" />
-						<fmt:formatDate value="${result.timeTaken}" pattern="m" timeZone="GMT" /> <fmt:message key="label.learning.summary.minutes" />
-					</td>
-				</tr>
-				<c:if test="${assessment.allowGradesAfterAttempt}">
-					<tr>
-						<th style="width: 130px;" >
-							<fmt:message key="label.learning.summary.grade" />
-						</th>
-						<td>
-							<fmt:formatNumber value="${result.grade}" maxFractionDigits="3"/>
-							<fmt:message key="label.learning.summary.out.of.maximum" />
-							${result.maximumGrade} (<fmt:formatNumber value="${result.grade * 100 / result.maximumGrade}" maxFractionDigits="2"/>%)
-						</td>
-					</tr>
-				</c:if>
-				<c:if test="${assessment.allowOverallFeedbackAfterQuestion && (result.overallFeedback != null)}">
-					<tr>
-						<th style="width: 130px;" >
-							<fmt:message key="label.learning.summary.feedback" />
-						</th>
-						<td>
-							${result.overallFeedback}
-						</td>
-					</tr>			
-				</c:if>				
-			</table>
-		</c:if>			
-		
+		<%@ include file="parts/attemptsummary.jsp"%>
+
 		<form id="answers" name="answers" method="post" >
 			<table cellspacing="0" class="alternative-color">
 				<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 					<tr>
-						<td style="padding-left: 15px; vertical-align: middle; width: 10px;" >
+						<td style="padding-left: 15px; vertical-align: middle; width: 10px; " >
 							${status.index + sessionMap.questionNumberingOffset} 
 						</td>
 						<td style="padding-left: 0px;">
@@ -195,18 +200,14 @@
 									<%@ include file="parts/ordering.jsp"%>
 								</c:when>
 							</c:choose>
+							
+							<%@ include file="parts/questionsummary.jsp"%>
 						</td>
 					</tr>
 				</c:forEach>
 			</table>
 		</form>
-<!--		
-		<c:if test="${finishedLock && assessment.allowOverallFeedbackAfterQuestion && (result.overallFeedback != null)}">
-			<div style="padding: 10px 45px 0px; font-weight: 700; color:#47bc23; ">
-				Overall Feedback: ${result.overallFeedback}
-			</div>
-		</c:if>
--->
+		
 		<!--Paging-->
 		<c:if test="${fn:length(sessionMap.pagedQuestions) > 1}">
 			<div style="text-align: center; padding-top: 60px;">
@@ -229,7 +230,7 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when	test="${(not finishedLock)}">
+					<c:when	test="${not finishedLock}">
 						<html:button property="finishTest" onclick="return finishTest();" styleClass="button">
 							<fmt:message key="label.learning.finish.test" />
 						</html:button>					

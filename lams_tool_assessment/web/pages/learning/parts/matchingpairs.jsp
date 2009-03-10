@@ -9,10 +9,10 @@
 		<tr>
 			<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
-					<c:if test="${(option.answerInt == option.sequenceId)}">
+					<c:if test="${(option.answerInt == option.uid)}">
 						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
 					</c:if>
-					<c:if test="${(option.answerInt != -1) && (option.answerInt != option.sequenceId)}">
+					<c:if test="${(option.answerInt != -1) && (option.answerInt != option.uid)}">
 						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>"	border="0">	
 					</c:if>	
 				</td>		
@@ -24,7 +24,7 @@
 				<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}" disabled="${finishedLock}">
 					<html:option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></html:option>
 					<c:forEach var="selectOption" items="${question.matchingPairOptions}">
-						<html:option value="${selectOption.sequenceId}">${selectOption.optionString}</html:option>
+						<html:option value="${selectOption.uid}">${selectOption.optionString}</html:option>
 					</c:forEach>
 				</html:select>
 			</td>

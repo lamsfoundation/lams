@@ -32,12 +32,12 @@ import org.apache.log4j.Logger;
  * 
  * @hibernate.class table="tl_laasse10_option_answer"
  */
-public class AssessmentOptionAnswer implements Cloneable, Sequencable {
+public class AssessmentOptionAnswer implements Cloneable {
     private static final Logger log = Logger.getLogger(AssessmentOptionAnswer.class);
 
     private Long uid;
     
-    private Integer sequenceId;
+    private Long questionOptionUid;
     
     private int answerInt;
     
@@ -60,24 +60,24 @@ public class AssessmentOptionAnswer implements Cloneable, Sequencable {
     }
     
     /**
-     * Returns answer's sequence number.
+     * Returns question Option's Uid.
      * 
-     * @return answer's sequence number
+     * @return question Option's Uid
      * 
-     * @hibernate.property column="sequence_id"
+     * @hibernate.property column="question_option_uid"
      */
-    public int getSequenceId() {
-	return sequenceId;
+    public Long getQuestionOptionUid() {
+	return questionOptionUid;
     }
 
     /**
-     * Sets answer's sequence number.
+     * Sets question Option's Uid.
      * 
-     * @param sequenceId
-     *                answer's sequence number
+     * @param questionOptionUid
+     *                question Option's Uid
      */
-    public void setSequenceId(int sequenceId) {
-	this.sequenceId = sequenceId;
+    public void setQuestionOptionUid(Long questionOptionUid) {
+	this.questionOptionUid = questionOptionUid;
     }
     
     /**

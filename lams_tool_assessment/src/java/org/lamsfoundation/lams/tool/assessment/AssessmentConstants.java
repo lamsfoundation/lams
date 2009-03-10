@@ -80,6 +80,8 @@ public class AssessmentConstants {
     public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
 
     public static final String PARAM_TITLE = "title";
+    
+    public static final String PARAM_SECONDS_LEFT = "secondsLeft";
 
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";

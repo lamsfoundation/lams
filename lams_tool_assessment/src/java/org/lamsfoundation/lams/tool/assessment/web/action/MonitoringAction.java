@@ -154,14 +154,11 @@ public class MonitoringAction extends Action {
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	assessment.toDTO();
 
-	Map<Long, Set<ReflectDTO>> relectList = service.getReflectList(contentId, false);
-
 	// cache into sessionMap
 	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, groupList);
 	sessionMap.put(AssessmentConstants.PAGE_EDITABLE, assessment.isContentInUse());
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	sessionMap.put(AssessmentConstants.ATTR_TOOL_CONTENT_ID, contentId);
-	sessionMap.put(AssessmentConstants.ATTR_REFLECT_LIST, relectList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
@@ -187,22 +184,20 @@ public class MonitoringAction extends Action {
 
 	IAssessmentService service = getAssessmentService();
 	AssessmentUser user = service.getUser(uid);
-	NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		AssessmentConstants.TOOL_SIGNATURE, user.getUserId().intValue());
 
 	AssessmentSession session = service.getAssessmentSessionBySessionId(sessionID);
 
-	ReflectDTO refDTO = new ReflectDTO(user);
-	if (notebookEntry == null) {
-	    refDTO.setFinishReflection(false);
-	    refDTO.setReflect(null);
-	} else {
-	    refDTO.setFinishReflection(true);
-	    refDTO.setReflect(notebookEntry.getEntry());
-	}
-	refDTO.setReflectInstrctions(session.getAssessment().getReflectInstructions());
+//	ReflectDTO refDTO = new ReflectDTO(user);
+//	if (notebookEntry == null) {
+//	    refDTO.setFinishReflection(false);
+//	    refDTO.setReflect(null);
+//	} else {
+//	    refDTO.setFinishReflection(true);
+//	    refDTO.setReflect(notebookEntry.getEntry());
+//	}
+//	refDTO.setReflectInstrctions(session.getAssessment().getReflectInstructions());
 
-	request.setAttribute("userDTO", refDTO);
+//	request.setAttribute("userDTO", refDTO);
 	return mapping.findForward("success");
     }
 

@@ -26,11 +26,11 @@
         </id>
 
         <property
-            name="sequenceId"
-            type="int"
+            name="questionOptionUid"
+            type="java.lang.Long"
             update="true"
             insert="true"
-            column="sequence_id"
+            column="question_option_uid"
         />
 
         <property

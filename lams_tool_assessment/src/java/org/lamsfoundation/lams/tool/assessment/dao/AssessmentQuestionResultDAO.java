@@ -24,13 +24,15 @@
 package org.lamsfoundation.lams.tool.assessment.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+
 
 public interface AssessmentQuestionResultDAO extends DAO {
     
     int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid);
+    
+    List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
 
 //    public AssessmentQuestionResult getAssessmentQuestionResult(Long questionUid, Long userId);
 //

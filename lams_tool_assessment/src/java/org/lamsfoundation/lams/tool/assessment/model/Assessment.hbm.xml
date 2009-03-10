@@ -240,22 +240,6 @@
         />
 
         <property
-            name="reflectInstructions"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="reflect_instructions"
-        />
-
-        <property
-            name="reflectOnActivity"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="reflect_on_activity"
-        />
-
-        <property
             name="notifyTeachersOnAttemptCompletion"
             type="boolean"
             update="true"

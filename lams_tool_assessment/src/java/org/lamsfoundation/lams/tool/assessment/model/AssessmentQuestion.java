@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.model;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -101,6 +102,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     private float penalty;
     
     private Set<AssessmentQuestionOption> matchingPairOptions;
+    
+    private List<AssessmentQuestionResult> questionResults;
     
     public AssessmentQuestion() {
 	questionOptions = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
@@ -491,5 +494,12 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     }
     public void setMatchingPairOptions(Set<AssessmentQuestionOption> matchingPairOptions) {
 	this.matchingPairOptions = matchingPairOptions;
+    }
+    
+    public List<AssessmentQuestionResult> getQuestionResults() {
+	return questionResults;
+    }
+    public void setQuestionResults(List<AssessmentQuestionResult> questionResults) {
+	this.questionResults = questionResults;
     }
 }

@@ -41,8 +41,6 @@ create table tl_laasse10_assessment (
    allow_grades_after_attempt tinyint,
    questions_per_page integer DEFAULT 0,
    shuffled tinyint,
-   reflect_instructions varchar(255), 
-   reflect_on_activity smallint,
    attempt_completion_notify tinyint DEFAULT 0,
    primary key (uid)
 )type=innodb;
@@ -125,7 +123,7 @@ create table tl_laasse10_question_result (
 create table tl_laasse10_option_answer (
    uid bigint not null unique auto_increment,
    question_result_uid bigint,
-   sequence_id integer,
+   question_option_uid bigint,
    answer_boolean boolean,
    answer_int integer,
    primary key (uid)
@@ -170,7 +168,7 @@ alter table tl_laasse10_user add index FK_NEW_1720029621_30113BFC309ED320 (asses
 
 INSERT INTO `tl_laasse10_assessment` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`, 
  `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `allow_question_feedback`, 
- `allow_overall_feedback`, `allow_right_wrong_answers`, `allow_grades_after_attempt`, `shuffled`,`reflect_on_activity`) VALUES
-  (1,NULL,NULL,NULL,'Assessment','0','Instructions ',null,null,0,0,${default_content_id},0,0,0,0,0,0);
+ `allow_overall_feedback`, `allow_right_wrong_answers`, `allow_grades_after_attempt`, `shuffled`) VALUES
+  (1,NULL,NULL,NULL,'Assessment','0','Instructions ',null,null,0,0,${default_content_id},0,0,0,0,0);
 
 SET FOREIGN_KEY_CHECKS=1;

@@ -28,7 +28,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -181,6 +180,8 @@ public interface IAssessmentService {
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
     
     int getAssessmentResultCount(Long assessmentUid, Long userId);
+    
+    List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
 
     /**
      * If success return next activity's url, otherwise return null.
@@ -224,42 +225,6 @@ public interface IAssessmentService {
     public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
 
     public List<List<Summary>> exportByContentId(Long contentId);
-
-    /**
-     * Create refection entry into notebook tool.
-     * 
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     * 
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    public void updateEntry(NotebookEntry notebookEntry);
-
-    /**
-     * Get Reflect DTO list grouped by sessionID.
-     * 
-     * @param contentId
-     * @return
-     */
-    Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
     /**
      * Get user by UID

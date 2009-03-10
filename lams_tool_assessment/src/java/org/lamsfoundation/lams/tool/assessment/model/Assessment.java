@@ -104,10 +104,6 @@ public class Assessment implements Cloneable {
     
     private Set overallFeedbacks;
 
-    private boolean reflectOnActivity;
-
-    private String reflectInstructions;
-
     // *************** NON Persist Fields ********************
     private IToolContentHandler toolContentHandler;
 
@@ -615,30 +611,6 @@ public class Assessment implements Cloneable {
 
     public void setToolContentHandler(IToolContentHandler toolContentHandler) {
 	this.toolContentHandler = toolContentHandler;
-    }
-
-    /**
-     * @hibernate.property column="reflect_instructions"
-     * @return
-     */
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    /**
-     * @hibernate.property column="reflect_on_activity"
-     * @return
-     */
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     /**

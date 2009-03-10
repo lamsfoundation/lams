@@ -23,27 +23,21 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.assessment.dao.hibernate;  
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
-import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
  
 public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements AssessmentResultDAO {
 
     private static final String FIND_BY_ASSESSMENT_AND_USER = "from " + AssessmentResult.class.getName()
-	    + " as r where r.user.userId = ? and r.assessment.uid=? order by start_date asc";
+	    + " as r where r.user.userId = ? and r.assessment.uid=? order by r.startDate asc";
     
     private static final String FIND_BY_ASSESSMENT_AND_SESSION = "from " + AssessmentResult.class.getName()
 	    + " as r where r.sessionId = ? and r.assessment.uid=?";
 
     private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select count(*) from "
-	    + AssessmentResult.class.getName() + " as r where r.user.userId=? and r.assessment.uid=?";
+	    + AssessmentResult.class.getName() + " as r where r.user.userId=? and r.assessment.uid=? and (r.finishDate != null)";
 
 // private static final String FIND_SUMMARY = "select v.assessmentQuestion.uid, count(v.assessmentQuestion) from  "
 //	    + AssessmentQuestionResult.class.getName() + " as v , " + AssessmentSession.class.getName() + " as s, "

@@ -24,6 +24,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -51,7 +52,7 @@ public class AssessmentQuestionResult {
     private Set<AssessmentOptionAnswer> optionAnswers;
     
     public AssessmentQuestionResult() {
-	optionAnswers = new TreeSet<AssessmentOptionAnswer>(new SequencableComparator());
+	optionAnswers = new LinkedHashSet<AssessmentOptionAnswer>();
     }
 
     /**
@@ -171,7 +172,7 @@ public class AssessmentQuestionResult {
     
     /**
      * 
-     * @hibernate.set cascade="all" order-by="sequence_id asc"
+     * @hibernate.set cascade="all" 
      * @hibernate.collection-key column="question_result_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer"
      * 

@@ -25,17 +25,11 @@
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -48,12 +42,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -70,7 +61,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -95,7 +85,6 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) throws IOException, ServletException {
 
 	String param = mapping.getParameter();
-	// -----------------------Assessment Learner function ---------------------------
 	if (param.equals("start")) {
 	    return start(mapping, form, request, response);
 	}
@@ -120,14 +109,6 @@ public class LearningAction extends Action {
 	if (param.equals("downOption")) {
 	    return downOption(mapping, form, request, response);
 	}	
-
-	// ================ Reflection =======================
-	if (param.equals("newReflection")) {
-	    return newReflection(mapping, form, request, response);
-	}
-	if (param.equals("submitReflection")) {
-	    return submitReflection(mapping, form, request, response);
-	}
 
 	return mapping.findForward(AssessmentConstants.ERROR);
     }
@@ -183,16 +164,6 @@ public class LearningAction extends Action {
 	boolean finishedLock = ((assessmentUser != null) && assessmentUser.isSessionFinished())
 		|| ((attemptsAllowed <= dbResultCount) && (attemptsAllowed != 0));
 
-	// get notebook entry
-	String entryText = new String();
-	if (assessmentUser != null) {
-	    NotebookEntry notebookEntry = service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    AssessmentConstants.TOOL_SIGNATURE, assessmentUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
-	}
-
 	// basic information
 	sessionMap.put(AssessmentConstants.ATTR_TITLE, assessment.getTitle());
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
@@ -205,10 +176,6 @@ public class LearningAction extends Action {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_USER, assessmentUser);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	// reflection information
-	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ON, assessment.isReflectOnActivity());
-	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
-	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	// add define later support
 	if (assessment.isDefineLater()) {
@@ -263,11 +230,10 @@ public class LearningAction extends Action {
 	    }	    
 	}
 	
-	// TODO it moght need to be changed 
 	//setAttemptStarted
-//	if (! finishedLock) {
+	if (! finishedLock) {
 	    service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
-//	}
+	}
 	
 	//paging
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = new ArrayList<LinkedHashSet<AssessmentQuestion>>();
@@ -318,7 +284,9 @@ public class LearningAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	boolean finishedLock = (Boolean) sessionMap.get(AssessmentConstants.ATTR_FINISHED_LOCK);
 	if (! finishedLock) {
-	    preserveUserAnswers(request);    
+	    preserveUserAnswers(request);   
+	    request.setAttribute(AssessmentConstants.PARAM_SECONDS_LEFT, 
+		    request.getParameter(AssessmentConstants.PARAM_SECONDS_LEFT));
 	}
 	
 	int pageNumber = WebUtil.readIntParam(request, AssessmentConstants.ATTR_PAGE_NUMBER);
@@ -387,7 +355,7 @@ public class LearningAction extends Action {
 	    LearningAction.log.error("Failed finishing tool session:" + e.getMessage());
 	}
 	
-	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed(sessionMap));
+	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, false);
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
@@ -525,80 +493,6 @@ public class LearningAction extends Action {
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }    
 
-    /**
-     * Display empty reflection form.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-
-	ReflectionForm refForm = (ReflectionForm) form;
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-	IAssessmentService submitFilesService = getAssessmentService();
-
-	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		AssessmentConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
-	}
-
-	return mapping.findForward(AssessmentConstants.SUCCESS);
-    }
-
-    /**
-     * Submit reflection form input database.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	ReflectionForm refForm = (ReflectionForm) form;
-	Integer userId = refForm.getUserID();
-
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	IAssessmentService service = getAssessmentService();
-
-	// check for existing notebook entry
-	NotebookEntry entry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		AssessmentConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    AssessmentConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    service.updateEntry(entry);
-	}
-
-	return finish(mapping, form, request, response);
-    }
-
     // *************************************************************************************
     // Private method
     // *************************************************************************************
@@ -659,6 +553,10 @@ public class LearningAction extends Action {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		question.setAnswerString(answerString);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+		int j = 0;
+		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
+		    option.setAnswerInt(j++);
+		}		
 	    }
 	}
     }
@@ -671,13 +569,13 @@ public class LearningAction extends Action {
 	IAssessmentService service = getAssessmentService();
 	AssessmentResult result = service.getLastAssessmentResult(assessment.getUid(), userId);
 	
-	for(LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
 		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
 			question.setMark(questionResult.getMark());
 			question.setPenalty(questionResult.getPenalty());
-			
+
 			question.setQuestionFeedback(null);
 			for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
 			    if (questionOption.getUid().equals(questionResult.getSubmittedOptionUid())) {
@@ -685,8 +583,12 @@ public class LearningAction extends Action {
 				break;
 			    }
 			}
+
+			List<AssessmentQuestionResult> questionResults = service.getAssessmentQuestionResultList(
+				assessment.getUid(), userId, question.getUid());
+			question.setQuestionResults(questionResults);
 		    }
-		}		
+		}
 	    }
 	}
 	
@@ -728,7 +630,7 @@ public class LearningAction extends Action {
 			
 			for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
 			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
-				if (questionOption.getSequenceId() == optionAnswer.getSequenceId()) {
+				if (questionOption.getUid().equals(optionAnswer.getQuestionOptionUid())) {
 				    questionOption.setAnswerBoolean(optionAnswer.getAnswerBoolean());
 				    questionOption.setAnswerInt(optionAnswer.getAnswerInt());
 				    break;
