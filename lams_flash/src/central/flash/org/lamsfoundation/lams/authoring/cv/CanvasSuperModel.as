@@ -1022,6 +1022,12 @@ class org.lamsfoundation.lams.authoring.cv.CanvasSuperModel extends Observable {
 		removeActivity(ca.activity.activityUIID);
 		if(doRemoveParent) removeActivity(parentID);
 		
+		if (activeView instanceof CanvasBranchView) {
+			if(_cv.ddm.getComplexActivityChildren(activeView.defaultSequenceActivity.activityUIID).length <= 0) {
+				activeView.defaultSequenceActivity.empty = true;
+			}
+		}
+		
 		setDirty();
 	}
 	

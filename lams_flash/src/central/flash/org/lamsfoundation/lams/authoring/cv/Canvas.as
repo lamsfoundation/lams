@@ -446,17 +446,17 @@ class Canvas extends CanvasHelper {
 		
 		//select the new thing
 		if (taParent != undefined || taParent != null){
-			var sequenceAct:Activity = canvasModel.getCanvas().ddm.getActivityByUIID(taParent);
-			if(sequenceAct.isSequenceActivity() && sequence != null) {
-				actToAdd.orderID = canvasModel.getCanvas().ddm.getNextSequenceOrderID(sequenceAct.activityUIID);
+			var parentActivity:Activity = canvasModel.getCanvas().ddm.getActivityByUIID(taParent);
+			if(parentActivity.isSequenceActivity() && sequence != null) {
+				actToAdd.orderID = canvasModel.getCanvas().ddm.getNextSequenceOrderID(parentActivity.activityUIID);
 				
 				Debugger.log("sequence.lastActivity: " + sequence.lastActivity, Debugger.CRITICAL, "setDroppedTemplateActivity", "Canvas");
 				
 				if(actToAdd.orderID > 1) canvasModel.createSequenceTransition(sequence.lastActivity, actToAdd);
-				else ComplexActivity(sequenceAct).firstActivityUIID = actToAdd.activityUIID;							
+				else ComplexActivity(parentActivity).firstActivityUIID = actToAdd.activityUIID;							
 				
 				if(!(canvasModel.activeView instanceof CanvasComplexView)) {
-					canvasModel.removeActivity(sequenceAct.parentUIID); 
+					canvasModel.removeActivity(parentActivity.parentUIID); 
 				}
 			}
 			
@@ -467,6 +467,12 @@ class Canvas extends CanvasHelper {
 				canvasModel.removeActivity(actToAdd.activityUIID);
 			} else {
 				canvasModel.activeView.updateActivity();
+			}
+			
+			if (canvasModel.activeView instanceof CanvasBranchView) {
+				if(_ddm.getComplexActivityChildren(canvasModel.activeView.defaultSequenceActivity.activityUIID).length <= 0) {
+					canvasModel.activeView.defaultSequenceActivity.empty = true;
+				}
 			}
 			
 			canvasModel.setDirty();
