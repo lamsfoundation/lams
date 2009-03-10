@@ -20,7 +20,7 @@
 <body class="stripes">
 <div id="page">
 <div id="content">
-	${lamsFound}
+
 	<%-- We might need to alter that for RTL layout --%>
 	<h1 style="text-align: center" class="small-space-top"><fmt:message key="planner.title" /></h1>
 	
@@ -89,6 +89,24 @@
 							</c:when>
 							<c:otherwise>
 								<h3><c:out value='${node.title}' escapeXml='true' /></h3>
+								<%-- If we are not in the edit mode and the node leads to a template rather then subnodes,
+									we display links --%>
+								<c:if test="${not node.edit and not empty node.fileName}">
+									<div class="space-left small-space-bottom">
+										<c:url var="startPreviewUrl" value="/pedagogicalPlanner.do">
+											<c:param name="method" value="startPreview" />
+											<c:param name="uid" value="${node.uid}" />
+										</c:url>
+										<a class="space-right" href="javascript:startPreview('${startPreviewUrl}')" 
+										   title="<fmt:message key="msg.planner.preview" />"><fmt:message key="label.planner.preview" /></a>
+										<c:url value="/pedagogicalPlanner.do" var="openTemplateUrl">
+											<c:param name="method" value="openTemplate" />		
+											<c:param name="uid" value="${node.uid}" />
+										</c:url>
+										<a href="${openTemplateUrl}"
+										   title="<fmt:message key="msg.planner.template.open" />"><fmt:message key="label.planner.editor" /></a>
+									</div>
+								</c:if>
 								<div class="space-left">${node.fullDescription}</div>
 							</c:otherwise>
 						</c:choose>
@@ -121,11 +139,13 @@
 		<c:choose>
 			<%-- If the list of subnodes is empty, we display only a message --%>
 			<c:when test="${empty node.subnodes}">
-				<tr>
-					<td colspan="2" class="align-center">
-						<h3><fmt:message key="label.planner.empty.subnode" /></h3>
-					</td>
-				</tr>
+				<c:if test="${empty node.fileName}">
+					<tr>
+						<td colspan="2" class="align-center">
+							<h3><fmt:message key="label.planner.empty.subnode" /></h3>
+						</td>
+					</tr>
+				</c:if>
 			</c:when>
 			<c:otherwise>
 			<%-- Iterate through subnodes --%>
@@ -134,58 +154,44 @@
 						<%-- Width is in percent, otherwise IE does not display it as desired --%>
 						<td class="align-right" style="width: 10%;" >
 							<%-- Cell with icons (info or actions like remove node)  --%>
-							<c:choose>
-								<c:when test="${node.edit}">
-									<c:if test="${empty filterText}">
-										<%-- If we are in the edit mode (and not in filter mode), we display remove and move up/down images --%>
-										<c:url value="/pedagogicalPlanner.do" var="removeNodeUrl">
-											<c:param name="method" value="removeSequenceNode" />
+							<c:if test="${node.edit}">
+								<c:if test="${empty filterText}">
+									<%-- If we are in the edit mode (and not in filter mode), we display remove and move up/down images --%>
+									<c:url value="/pedagogicalPlanner.do" var="removeNodeUrl">
+										<c:param name="method" value="removeSequenceNode" />
+										<c:param name="edit" value="true" />
+										<c:param name="uid" value="${subnode.uid}" />
+									</c:url>
+									<c:url value="/pedagogicalPlanner.do" var="downNodeUrl">
+										<c:param name="method" value="moveNodeDown" />
+										<c:param name="edit" value="true" />
+										<c:param name="uid" value="${subnode.uid}" />
+									</c:url>
+									<img class="sequenceActionImage" src="<lams:LAMSURL/>images/icons/cross.png"
+										title="<fmt:message key="msg.planner.remove.node" />"
+										onclick="javascript:leaveNodeEditor('<fmt:message key="msg.planner.remove.warning" />','${removeNodeUrl}')" />
+									<c:if test="${not subnodeStatus.first}">
+										<c:url value="/pedagogicalPlanner.do" var="upNodeUrl">
+											<c:param name="method" value="moveNodeUp" />
 											<c:param name="edit" value="true" />
 											<c:param name="uid" value="${subnode.uid}" />
 										</c:url>
+										<img class="sequenceActionImage" src="<lams:LAMSURL/>images/css/up.gif"
+											title="<fmt:message key="msg.planner.move.node.up" />"
+											onclick="javascript:leaveNodeEditor(null,'${upNodeUrl}')" />
+									</c:if>
+									<c:if test="${not subnodeStatus.last}">
 										<c:url value="/pedagogicalPlanner.do" var="downNodeUrl">
 											<c:param name="method" value="moveNodeDown" />
 											<c:param name="edit" value="true" />
 											<c:param name="uid" value="${subnode.uid}" />
 										</c:url>
-										<img class="sequenceActionImage" src="<lams:LAMSURL/>images/icons/cross.png"
-											title="<fmt:message key="msg.planner.remove.node" />"
-											onclick="javascript:leaveNodeEditor('<fmt:message key="msg.planner.remove.warning" />','${removeNodeUrl}')" />
-										<c:if test="${not subnodeStatus.first}">
-											<c:url value="/pedagogicalPlanner.do" var="upNodeUrl">
-												<c:param name="method" value="moveNodeUp" />
-												<c:param name="edit" value="true" />
-												<c:param name="uid" value="${subnode.uid}" />
-											</c:url>
-											<img class="sequenceActionImage" src="<lams:LAMSURL/>images/css/up.gif"
-												title="<fmt:message key="msg.planner.move.node.up" />"
-												onclick="javascript:leaveNodeEditor(null,'${upNodeUrl}')" />
-										</c:if>
-										<c:if test="${not subnodeStatus.last}">
-											<c:url value="/pedagogicalPlanner.do" var="downNodeUrl">
-												<c:param name="method" value="moveNodeDown" />
-												<c:param name="edit" value="true" />
-												<c:param name="uid" value="${subnode.uid}" />
-											</c:url>
-											<img class="sequenceActionImage" src="<lams:LAMSURL/>images/css/down.gif"
-												title="<fmt:message key="msg.planner.move.node.down" />"
-												onclick="javascript:leaveNodeEditor(null,'${downNodeUrl}')" />
-										</c:if>
+										<img class="sequenceActionImage" src="<lams:LAMSURL/>images/css/down.gif"
+											title="<fmt:message key="msg.planner.move.node.down" />"
+											onclick="javascript:leaveNodeEditor(null,'${downNodeUrl}')" />
 									</c:if>
-								</c:when>
-								<c:otherwise>
-									<%-- If we are not in the edit mode and the node leads to a template rather then subnodes,
-										we display an icon --%>
-									<c:if test="${not empty subnode.fileName}">
-										<c:url var="startPreviewUrl" value="/pedagogicalPlanner.do">
-											<c:param name="method" value="startPreview" />
-											<c:param name="uid" value="${subnode.uid}" />
-										</c:url>
-										<a class="button" href="javascript:startPreview('${startPreviewUrl}')" 
-										   title="<fmt:message key="msg.planner.open.template" />"><fmt:message key="button.planner.preview" /></a>
-									</c:if>
-								</c:otherwise>
-							</c:choose>
+								</c:if>
+							</c:if>
 						</td>
 						<td>
 							<%-- Link to the subnode and its brief description below --%>
@@ -199,7 +205,22 @@
 									<fmt:message key="label.planner.locked" />
 								</c:if>
 							</a>
-							
+							<c:if test="${not node.edit and not empty subnode.fileName}">
+								<div>
+									<c:url var="startPreviewUrl" value="/pedagogicalPlanner.do">
+										<c:param name="method" value="startPreview" />
+										<c:param name="uid" value="${subnode.uid}" />
+									</c:url>
+									<a class="space-right" href="javascript:startPreview('${startPreviewUrl}')" 
+									   title="<fmt:message key="msg.planner.preview" />"><fmt:message key="label.planner.preview" /></a>
+									<c:url value="/pedagogicalPlanner.do" var="openTemplateUrl">
+										<c:param name="method" value="openTemplate" />		
+										<c:param name="uid" value="${subnode.uid}" />
+									</c:url>
+									<a href="${openTemplateUrl}"
+									   title="<fmt:message key="msg.planner.template.open" />"><fmt:message key="label.planner.editor" /></a>
+								</div>
+							</c:if>
 							<c:if test="${not empty filterText}">
 								<div  class="space-left small-space-top" style="font-size: smaller;">
 									<%-- If we are in filter mode, we display the path where was the subnode found --%>
@@ -245,7 +266,7 @@
 						<input type="hidden" id="method" name="method" value="importNode" />
 						<input type="hidden" name="edit" value="true" />
 						<input type="hidden" name="importNode" value="true" />
-						<html:file style="float: left" property="file" size="106"/>
+						<html:file styleClass="float-left" property="file" size="106"/>
 						<input style="margin: 0px 0px 20px 10px;" type="submit" value="<fmt:message key="button.import" />" class="button" />
 					</html:form>
 				</c:when>
@@ -291,22 +312,14 @@
 						<%-- DIVs below are displayed/hidden depending of the subnode type:
 							 containing subnodes or opening a template --%>
 						<c:set var="hasSubnodesType" value="${formBean.nodeType eq 'subnodes'}" />
-						
-						
-						<%-- DIV with full description FCKeditor --%>
-						<div id="fullDescriptionArea" class="space-bottom"
-							<c:if test="${not hasSubnodesType}">
-								style="display: none;"
-							</c:if>
-						>
-							<div class="field-name space-top"><fmt:message key="label.planner.description.full" /></div>
-							<lams:FCKEditor id="fullDescription"
-								value="${formBean.fullDescription}"
-								contentFolderID="${formBean.contentFolderId}"
-				                toolbarSet="Custom-Pedplanner" height="150px"
-				                width="820px" displayExpanded="false">
-							</lams:FCKEditor>
-						</div>
+				
+						<div class="field-name space-top"><fmt:message key="label.planner.description.full" /></div>
+						<lams:FCKEditor id="fullDescription"
+							value="${formBean.fullDescription}"
+							contentFolderID="${formBean.contentFolderId}"
+			                toolbarSet="Custom-Pedplanner" height="150px"
+			                width="820px" displayExpanded="false">
+						</lams:FCKEditor>
 						
 						<%-- DIV with "Browse" button to find the template --%>
 						<div id="fileArea" class="space-top"

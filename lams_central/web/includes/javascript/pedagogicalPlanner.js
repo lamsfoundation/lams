@@ -175,15 +175,7 @@
   }
   
   function onNodeTypeChange(){
-  	if (document.getElementById("hasSubnodesType").checked){
-  		document.getElementById("fileArea").style.display="none";
-  		document.getElementById("fullDescriptionArea").style.display="block";
-  		
-  	}
-  	else {
-  		document.getElementById("fullDescriptionArea").style.display="none";
-  		document.getElementById("fileArea").style.display="block";
-  	}
+  	 document.getElementById("fileArea").style.display = document.getElementById("hasSubnodesType").checked ? "none" : "block";
   }
   
   function filterNodes(url,doFilter){

@@ -34,11 +34,11 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -259,18 +259,19 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @return
      * @throws ServletException
      */
-    private ActionForward openTemplate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    Long fileUuid, String fileName) throws ServletException {
+    public ActionForward openTemplate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
 
 	ActionMessages errors = new ActionMessages();
+	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID);
+	PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 
 	// Open the learning design stored in the repository.
-	LearningDesign learningDesign = importLearningDesign(fileUuid, fileName, errors);
+	LearningDesign learningDesign = importLearningDesign(node.getFileUuid(), node.getFileName(), errors);
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    // If anything goes wrong, open the root node. Errors will be displayed at top.
-	    // This approach is used widely in this action.
-	    return openSequenceNode(mapping, form, request, (Long) null);
+	    // If anything goes wrong, errors will be displayed at top. This approach is used widely in this action.
+	    return openSequenceNode(mapping, form, request, nodeUid);
 	}
 
 	List<PedagogicalPlannerActivityDTO> activities = new ArrayList<PedagogicalPlannerActivityDTO>();
@@ -294,7 +295,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
 	    saveErrors(request, errors);
-	    return openSequenceNode(mapping, form, request, (Long) null);
+	    return openSequenceNode(mapping, form, request, nodeUid);
 	}
 
 	// Recalculate how many activities actually support the planner
@@ -590,10 +591,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    node = getPedagogicalPlannerDAO().getRootNode();
 	} else {
 	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
-	    if (!edit && node.getFileUuid() != null) {
-		// If we are not in the edit mode and we open a node containing a template, then we open the template
-		return openTemplate(mapping, form, request, node.getFileUuid(), node.getFileName());
-	    }
 	}
 	PedagogicalPlannerAction.log.debug("Opening sequence node with UID: " + nodeUid);
 
@@ -607,7 +604,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		if (filteredNodeUids != null) {
 		    request.setAttribute(CentralConstants.PARAM_FILTER_TEXT, filterText);
 
-		    Set<PedagogicalPlannerSequenceNode> filteredNodes = new HashSet<PedagogicalPlannerSequenceNode>(
+		    Set<PedagogicalPlannerSequenceNode> filteredNodes = new LinkedHashSet<PedagogicalPlannerSequenceNode>(
 			    filteredNodeUids.size());
 		    for (Long filteredUid : filteredNodeUids) {
 			PedagogicalPlannerSequenceNode subnode = getPedagogicalPlannerDAO().getByUid(filteredUid);
@@ -653,20 +650,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    if (createSubnode) {
 		// We create a new node, rather than edit the existing one
 		if (node.getContentFolderId() == null) {
-		    try {
-			// If it's a new top level node, we create an uniuqe ID
-			String contentFolderId = FileUtil.generateUniqueContentFolderID();
-			nodeForm.setContentFolderId(contentFolderId);
-		    } catch (Exception e) {
-			PedagogicalPlannerAction.log.error(e, e);
-			dto.setEdit(false);
-			dto.setCreateSubnode(false);
-			ActionMessages errors = new ActionMessages();
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				PedagogicalPlannerAction.ERROR_KEY_EDITOR));
-			saveErrors(request, errors);
-			return openSequenceNode(mapping, form, request, (Long) null);
-		    }
+		    // If it's a new top level node, we create an uniuqe ID
+		    String contentFolderId = FileUtil.generateUniqueContentFolderID();
+		    nodeForm.setContentFolderId(contentFolderId);
 		} else {
 		    // Whole node tree share the same content folder ID
 		    nodeForm.setContentFolderId(node.getContentFolderId());
@@ -729,6 +715,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    try {
 		node.setTitle(title);
 		node.setBriefDescription(briefDescription);
+		node.setFullDescription(fullDescription);
 		node.setContentFolderId(nodeForm.getContentFolderId());
 
 		// Different properties are set, depending on node type: with subnodes or template
@@ -743,7 +730,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    getContentHandler().deleteFile(node.getFileUuid());
 		    node.setFileName(null);
 		    node.setFileUuid(null);
-		    node.setFullDescription(null);
 		} else if (nodeForm.getFile() != null && nodeForm.getFile().getFileSize() > 0) {
 		    FormFile file = nodeForm.getFile();
 		    InputStream inputStream = file.getInputStream();
@@ -768,7 +754,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 		    node.setFileUuid(nodeKey.getUuid());
 		    node.setFileName(fileName);
-		    node.setFullDescription(null);
 		}
 
 		getPedagogicalPlannerDAO().saveOrUpdateNode(node);
@@ -1232,6 +1217,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		if (node.getSubnodes() != null) {
 		    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
 			importSubnodeTemplates(subnode, inputDir);
+			subnode.setParent(node);
 		    }
 		}
 	    } else {
@@ -1284,7 +1270,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      */
     private Set<Long> filterSubnodes(PedagogicalPlannerSequenceNode node, String filterText) throws ParseException,
 	    CorruptIndexException, IOException {
-	Set<Long> matchingSubnodeUids = new TreeSet<Long>();
+	Set<Long> matchingSubnodeUids = new LinkedHashSet<Long>();
 	if (!StringUtils.isEmpty(filterText)) {
 
 	    Set<Document> docs = extractSubnodeDocuments(node);
@@ -1336,6 +1322,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		Document doc = new Document();
 		Field titleField = new Field(PedagogicalPlannerAction.FIELD_NAME_TITLE, subnode.getTitle(),
 			Field.Store.NO, Field.Index.ANALYZED);
+		titleField.setBoost(10);
 		doc.add(titleField);
 
 		String briefDesc = WebUtil.removeHTMLtags(subnode.getBriefDescription());

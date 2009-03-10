@@ -42,7 +42,7 @@
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<table cellpadding="0" cellspacing="0">
 		<tr>
-			<td style="width: 30%">
+			<td style="width: 45%">
 				<h2><fmt:message key="label.planner.grouping.type" /></h2>
 			</td>
 			<td>
