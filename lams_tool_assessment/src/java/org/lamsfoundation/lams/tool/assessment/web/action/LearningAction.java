@@ -553,10 +553,6 @@ public class LearningAction extends Action {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		question.setAnswerString(answerString);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-		int j = 0;
-		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
-		    option.setAnswerInt(j++);
-		}		
 	    }
 	}
     }

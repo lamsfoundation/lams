@@ -1,4 +1,4 @@
-<c:if test="${finishedLock && (fn:length(question.questionResults) > 1)}">
+<c:if test="${finishedLock && (fn:length(question.questionResults) > 1) && assessment.allowHistoryResponses}">
 	<div style="padding: 2px 15px 10px; font-style: italic; color:#47bc23;">
 		<fmt:message key="label.learning.question.summary.history.responces" />
 	</div>
@@ -84,9 +84,9 @@
 							${questionResult.answerString}
 						</c:when>
 						<c:when test="${question.type == 7}">
-							<c:forEach var="i" begin="0" end="${fn:length(questionResult.optionAnswers)}" step="1">
+							<c:forEach var="i" begin="0" end="${fn:length(questionResult.optionAnswers) - 1}" step="1">
 								<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
-									<c:if test="${optionAnswer.answerInt == i}">			
+									<c:if test="${optionAnswer.answerInt == i}">		
 										<c:forEach var="questionOption" items="${question.questionOptions}">
 											<c:if test="${optionAnswer.questionOptionUid == questionOption.uid}">
 												${questionOption.optionString}

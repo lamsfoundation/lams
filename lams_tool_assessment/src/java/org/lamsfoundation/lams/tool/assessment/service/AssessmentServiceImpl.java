@@ -88,6 +88,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
@@ -167,27 +168,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    throws AssessmentApplicationException {
 
 	ITicket tic = getRepositoryLoginTicket();
-
 	try {
-
 	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-
 	} catch (AccessDeniedException e) {
-
 	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
 		    + " path " + relativePath + ".";
-
 	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
 	    AssessmentServiceImpl.log.error(error);
 	    throw new AssessmentApplicationException(error, e);
-
 	} catch (Exception e) {
-
 	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
 		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
 	    AssessmentServiceImpl.log.error(error);
 	    throw new AssessmentApplicationException(error, e);
-
 	}
     }
 
@@ -249,7 +242,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    throw new UploadAssessmentFileException(messageService.getMessage("error.msg.upload.file.not.found",
 		    new Object[] { uploadFile }));
 	}
-
 	// upload file to repository
 	NodeKey nodeKey = processFile(uploadFile, fileType);
 
@@ -269,15 +261,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     public AssessmentUser getUserByIDAndContent(Long userId, Long contentId) {
-
 	return assessmentUserDao.getUserByUserIDAndContentID(userId, contentId);
-
     }
 
     public AssessmentUser getUserByIDAndSession(Long userId, Long sessionId) {
-
 	return assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-
     }
 
     public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws AssessmentApplicationException {
@@ -454,12 +442,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	AssessmentQuestionResult questionResult = new AssessmentQuestionResult();
 
 	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
+	int j = 0;
 	for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
 	    AssessmentOptionAnswer optionAnswer = new AssessmentOptionAnswer();
 	    optionAnswer.setQuestionOptionUid(questionOption.getUid());
 	    optionAnswer.setAnswerBoolean(questionOption.getAnswerBoolean());
 	    optionAnswer.setAnswerInt(questionOption.getAnswerInt());
 	    optionAnswers.add(optionAnswer);
+	    
+	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+		optionAnswer.setAnswerInt(j++);
+	    }
 	}	
 	questionResult.setAssessmentQuestion(question);
 	questionResult.setAnswerBoolean(question.getAnswerBoolean());
@@ -500,17 +493,44 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		}
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
-	    try {
-		float answerFloat = Float.valueOf(question.getAnswerString());
+	    String answerString = question.getAnswerString();
+	    if (answerString != null) {
 		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
-		    if ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError()))
-			    && (answerFloat <= (option.getOptionFloat() + option.getAcceptedError()))) {
+		    boolean isAnswerCorrect = false;
+		    try {
+			float answerFloat = Float.valueOf(question.getAnswerString());
+			isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError())) 
+				&& (answerFloat <= (option.getOptionFloat() + option.getAcceptedError())));
+		    } catch (Exception e) {
+		    }
+
+		    if (!isAnswerCorrect) {
+			for (AssessmentUnit unit : question.getUnits()) {
+			    String regex = ".*" + unit.getUnit() + "$";
+			    Pattern pattern = Pattern.compile(regex, java.util.regex.Pattern.CASE_INSENSITIVE
+				    | java.util.regex.Pattern.UNICODE_CASE);
+			    if (pattern.matcher(answerString).matches()) {
+				String answerFloatStr = answerString.substring(0, answerString.length()	- unit.getUnit().length());
+				try {
+				    float answerFloat = Float.valueOf(answerFloatStr);
+				    answerFloat = answerFloat / unit.getMultiplier();
+				    isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option
+					    .getAcceptedError())) && (answerFloat <= (option.getOptionFloat() + option
+					    .getAcceptedError())));
+				    if (isAnswerCorrect) {
+					break;
+				    }
+				} catch (Exception e) {
+				}
+			    }
+			}
+		    }
+		    if (isAnswerCorrect) {
 			mark = option.getGrade() * maxMark;
 			questionResult.setSubmittedOptionUid(option.getUid());
 			break;
 		    }
 		}
-	    } catch (Exception e) {
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
 	    if ((question.getAnswerBoolean() == question.getCorrectAnswer()) && (question.getAnswerString() != null)) {

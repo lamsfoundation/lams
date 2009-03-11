@@ -22,7 +22,7 @@
 	<c:set var="result" value="${sessionMap.assessmentResult}" />
 	<c:choose>
 		<c:when test="${not empty param.secondsLeft}">
-			<c:set var="secondsLeft" value="${param.secondsLeft}" />		
+			<c:set var="secondsLeft" value="${param.secondsLeft - 1}" />		
 		</c:when>
 		<c:otherwise>
 			<c:set var="secondsLeft" value="${assessment.timeLimit * 60}" />		
@@ -38,16 +38,17 @@
 	<!--	
 		<c:if test="${not finishedLock && assessment.timeLimit > 0}">	
 			$(document).ready(function(){
-				displayCountdown();
-				
-				<c:if test="${empty param.secondsLeft}">	
-					$.blockUI({ message: $('#question'), css: { width: '325px', height: '85px'} }); 
+				if (${empty param.secondsLeft}) {
+					$.blockUI({ message: $('#question'), css: { width: '325px', height: '85px'}, overlayCSS: { opacity: '.98'} }); 
 			        $('#ok').click(function() {
 			        	$.unblockUI();
 			        	displayCountdown();
-			        });
-	        	</c:if>
+			        });					
+				} else {
+					displayCountdown();
+				}
 			});
+			
 			function displayCountdown(){
 				var countdown = '<div id="countdown" style="width: 150px; position: absolute; font-size: 110%; font-style: italic; color:#47bc23;"></div>' 
 					$.blockUI({ 
@@ -65,13 +66,19 @@
 			        	}   
 					});
 					$('#countdown').countdown({
-						until: '+${secondsLeft}S', 
+						until: '+${secondsLeft}S',  
 						format: 'hMS',
 						compact: true,
+						onTick: checkFor30Seconds,
 						onExpiry: liftoffTime,
-						description: "<div style='font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;' >Time left</div>"
+						description: "<div style='font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;' ><fmt:message key='label.learning.countdown.time.left' /></div>"
 					});
-			}			
+			}	
+			function checkFor30Seconds(periods) {
+				if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
+					$('#countdown').css('color', '#FF3333');
+				}
+			}					
 			function liftoffTime(){
 		        $.blockUI({ message: '<h1 style="font-size: 145%;"><img src="<html:rewrite page='/includes/images/indicator.gif'/>" border="0" > <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
 		        
@@ -152,7 +159,7 @@
 		
 		<div id="question" style="display:none; cursor: default"> 
 	        <h1 style="padding: 30 10 50">
-	        	You are going to participate in activity that has time limitation. Are you ready to start?
+	        	<fmt:message key='label.learning.blockui.are.you.ready' />
 	        </h1>
     	    <input type="button" id="ok" value="OK" />
     	    <br>  

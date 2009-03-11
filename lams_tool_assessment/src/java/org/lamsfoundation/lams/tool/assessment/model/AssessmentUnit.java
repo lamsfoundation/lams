@@ -42,10 +42,6 @@ public class AssessmentUnit implements Cloneable, Sequencable {
     private String unit;
     
     private float multiplier;
-    
-    // *************** NON Persist Fields ********************    
-    private String multiplierStr = "0.0";
-    
 
     // **********************************************************
     // Get/Set methods
@@ -96,14 +92,6 @@ public class AssessmentUnit implements Cloneable, Sequencable {
     public void setMultiplier(float multiplier) {
 	this.multiplier = multiplier;
     }
-    
-    public String getMultiplierStr() {
-	return multiplierStr;
-    }
-
-    public void setMultiplierStr(String multiplierStr) {
-	this.multiplierStr = multiplierStr;
-    }    
     
     /**
      * @hibernate.property column="unit"
