@@ -76,15 +76,14 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Competence;
-import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -493,8 +492,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * This class is just for later system extent tool compaiblity strategy use.
-     * Currently, it just simple to get tool by same signature.
+     * This class is just for later system extent tool compaiblity strategy use. Currently, it just simple to get tool
+     * by same signature.
      * 
      * @author Steve.Ni
      * 
@@ -889,10 +888,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Generate the nodes for a property and the related conditions. The first
-     * element is the property, which goes in the <properties> tag, the second
-     * through fourth elements are the if-then-else that makes up the condition
-     * and goes in the <conditions> tag.
+     * Generate the nodes for a property and the related conditions. The first element is the property, which goes in
+     * the <properties> tag, the second through fourth elements are the if-then-else that makes up the condition and
+     * goes in the <conditions> tag.
      * 
      * @param activityId
      * @return
@@ -1051,9 +1049,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Move LAMS tool.xml from tool folder to export content root folder and
-     * modify it to {toolContentID}.xml file. Cache all attachement files from
-     * this tool into ArrayList, which will be save into a temporary file
+     * Move LAMS tool.xml from tool folder to export content root folder and modify it to {toolContentID}.xml file.
+     * Cache all attachement files from this tool into ArrayList, which will be save into a temporary file
      * (resources.xml) and used by XSLT.
      * 
      * @param rootDir
@@ -1240,9 +1237,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Import the learning design from the given path. Set the importer as the
-     * creator. If the workspaceFolderUid is null then saves the design in the
-     * user's own workspace folder.
+     * Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
+     * null then saves the design in the user's own workspace folder.
      * 
      * @param designFile
      * @param importer
@@ -1896,14 +1892,15 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // persist
 	    act.setActivityId(null);
 	    activityDAO.insert(act);
-	
+
 	    // Once the activity is saved, we can import the ActivityEvaluations
-	    for (String toolOutputDefinition : actDto.getActivityEvaluations())
-	    {
-		ActivityEvaluation activityEvaluation = new ActivityEvaluation();
-		activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
-		activityEvaluation.setActivity(act);
-		baseDAO.insertOrUpdate(activityEvaluation);
+	    if (actDto.getActivityEvaluations() != null) {
+		for (String toolOutputDefinition : actDto.getActivityEvaluations()) {
+		    ActivityEvaluation activityEvaluation = new ActivityEvaluation();
+		    activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
+		    activityEvaluation.setActivity(act);
+		    baseDAO.insertOrUpdate(activityEvaluation);
+		}
 	    }
 	}
 
@@ -2017,47 +2014,47 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // leave it to learning design to save it.
 	    // transitionDAO.insert(trans);
 	}
-	
+
 	// Once the learning design is saved, we can import the competences
 	Set<Competence> competenceList = new HashSet<Competence>();
-	for (CompetenceDTO competenceDTO : dto.getCompetences()){
+	for (CompetenceDTO competenceDTO : dto.getCompetences()) {
 	    Competence competence = new Competence();
 	    competence.setDescription(competenceDTO.getDescription());
 	    competence.setTitle(competenceDTO.getTitle());
 	    competenceList.add(competence);
 	}
-	
+
 	// TODO: Save competence mappings on import.
-//	for (AuthoringActivityDTO actDto : actDtoList)
-//	{
-//	    if (removedActMap.containsKey(actDto.getActivityID())) {
-//		continue;
-//	    }
-//	    if (actDto.getIisToolActivity())
-//	    {
-//		for (Activity act : actList)
-//		{
-//    		Set<CompetenceMapping> competenceMappings = new HashSet<CompetenceMapping>();
-//    		CompetenceMapping competenceMapping = new CompetenceMapping();
-//    		for(Competence competence : competenceList)
-//    		{
-//    		    for (String comptenceMappingStr : actDto.getCompetenceMappingTitles())
-//    		    {
-//    			if (competence.getTitle() == comptenceMappingStr)
-//    			{
-//    			    if (activityMapper.get(actDto.getActivityID()).getActivityId() == act.getActivityId() )
-//    			    {
-//    				competenceMapping.setToolActivity((ToolActivity)act);
-//    				competenceMapping.setCompetence(competence);
-//    				break;
-//    			    }
-//    			}		    
-//    		    }
-//    		}
-//    		((ToolActivity)activityMapper.get(actDto.getActivityID())).setCompetenceMappings(competenceMappings);
-//		}
-//	    }
-//	}
+	// for (AuthoringActivityDTO actDto : actDtoList)
+	// {
+	// if (removedActMap.containsKey(actDto.getActivityID())) {
+	// continue;
+	// }
+	// if (actDto.getIisToolActivity())
+	// {
+	// for (Activity act : actList)
+	// {
+	// Set<CompetenceMapping> competenceMappings = new HashSet<CompetenceMapping>();
+	// CompetenceMapping competenceMapping = new CompetenceMapping();
+	// for(Competence competence : competenceList)
+	// {
+	// for (String comptenceMappingStr : actDto.getCompetenceMappingTitles())
+	// {
+	// if (competence.getTitle() == comptenceMappingStr)
+	// {
+	// if (activityMapper.get(actDto.getActivityID()).getActivityId() == act.getActivityId() )
+	// {
+	// competenceMapping.setToolActivity((ToolActivity)act);
+	// competenceMapping.setCompetence(competence);
+	// break;
+	// }
+	// }
+	// }
+	// }
+	// ((ToolActivity)activityMapper.get(actDto.getActivityID())).setCompetenceMappings(competenceMappings);
+	// }
+	// }
+	// }
 
 	// branch mappings - maps groups to branches, map conditions to branches
 	List<BranchActivityEntryDTO> entryDtoList = dto.getBranchMappings();
@@ -2068,7 +2065,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		entryList.add(entry);
 	    }
 	}
-	
+
 	LearningDesign ld = getLearningDesign(dto, importer, folder, actList, transList, activityMapper, competenceList);
 
 	// validate learning design
@@ -2086,24 +2083,19 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	// persist
 	learningDesignDAO.insert(ld);
-	
-	
-	
-	
+
 	// Once we have the competences saved, we can save the competence mappings
-//	for (AuthoringActivityDTO actDto : actDtoList) {
-//            for (String competenceMappingStr : actDto.getActivityEvaluations()) {
-//
-//        	CompetenceMapping competenceMapping = new CompetenceMapping();
-//     		ActivityEvaluation activityEvaluation = new ActivityEvaluation();
-//    		activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
-//    		activityEvaluation.setActivity(act);
-//    		activityEvaluation.setActivityEvaluationSessions(new HashSet<ActivityEvaluationSession>());
-//    		baseDAO.insertOrUpdate(activityEvaluation);
-//    	    }
-//    	}
-	
-	
+	// for (AuthoringActivityDTO actDto : actDtoList) {
+	// for (String competenceMappingStr : actDto.getActivityEvaluations()) {
+	//
+	// CompetenceMapping competenceMapping = new CompetenceMapping();
+	// ActivityEvaluation activityEvaluation = new ActivityEvaluation();
+	// activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
+	// activityEvaluation.setActivity(act);
+	// activityEvaluation.setActivityEvaluationSessions(new HashSet<ActivityEvaluationSession>());
+	// baseDAO.insertOrUpdate(activityEvaluation);
+	// }
+	// }
 
 	return ld.getLearningDesignId();
     }
@@ -2151,8 +2143,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Get learning design object from this Learning design DTO object. It also
-     * following our import rules:
+     * Get learning design object from this Learning design DTO object. It also following our import rules:
      * <li>lams_license - Assume same in all lams system. Import same ID</li>
      * <li>lams_copy_type - Set to 1.This indicates it is "normal" design.</li>
      * <li>lams_workspace_folder - An input parameters to let user choose import workspace</li>
@@ -2310,14 +2301,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Creates the map entry between a branch sequence activity and a group. We
-     * need the group maps and the activity maps so that we can update the ids
-     * to the groups and the activities. Therefore this method must be done
-     * after all the groups are imported and the activities are imported.
+     * Creates the map entry between a branch sequence activity and a group. We need the group maps and the activity
+     * maps so that we can update the ids to the groups and the activities. Therefore this method must be done after all
+     * the groups are imported and the activities are imported.
      * 
-     * Note: there isn't an set in the learning design for the branch mappings.
-     * The group objects actually contain the link to the mappings, so this
-     * method updates the group objects.
+     * Note: there isn't an set in the learning design for the branch mappings. The group objects actually contain the
+     * link to the mappings, so this method updates the group objects.
      */
     private BranchActivityEntry getBranchActivityEntry(BranchActivityEntryDTO entryDto,
 	    Map<Integer, Group> groupByUIIDMapper, Map<Integer, Activity> activityByUIIDMapper) {
