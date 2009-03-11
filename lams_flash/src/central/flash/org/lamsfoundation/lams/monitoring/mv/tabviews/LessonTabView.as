@@ -191,6 +191,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 					mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
 					hideMainExp(mm);
 					mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
+					mm.broadcastViewUpdate("TIMECHARTSHOWHIDE", false);
 					
 					if(mm.getIsProgressChangedLesson()){
 						reloadProgress(false);
@@ -207,6 +208,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 						mm.getMonitor().getMV().getMonitorLessonScp()._visible = true;
 						hideMainExp(mm);
 						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
+						mm.broadcastViewUpdate("TIMECHARTSHOWHIDE", false);
 						
 						MovieClipUtils.doLater(Proxy.create(this,draw));
 					

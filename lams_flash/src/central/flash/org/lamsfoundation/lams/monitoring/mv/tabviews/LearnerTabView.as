@@ -158,6 +158,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					if (infoObj.tabID == _tabID && !mm.locked){
 						hideMainExp(mm);
 						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", true);
+						mm.broadcastViewUpdate("TIMECHARTSHOWHIDE", true);
 						adjustLearnerPanel(mm);
 						
 						if (mm.activitiesDisplayed.isEmpty()){
@@ -430,6 +431,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var nameTextFormat = new TextFormat();
 		
 		var exp_url = _root.serverURL+"learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID="+_root.lessonID+"&userID="+learner.getLearnerId();
+		var learnerTimeChart_url = _root.serverURL+"monitoring/monitoring.do?method=viewTimeChart&lessonID="+_root.lessonID+"&learnerID="+learner.getLearnerId();
 		
 		if(_nameLayer_mc["learnerName"+learner.getLearnerId()] != undefined) {
 			_nameLayer_mc["learnerName"+learner.getLearnerId()+"_btn"].removeTextField();
@@ -442,17 +444,28 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		}
 		
 		_nameLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"_btn", _nameLayer_mc.getNextHighestDepth(),{label:EP_btn_label, _x:z.w-110, _y:ACT_Y+2, styleName:styleObj} )
+		_nameLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"timeChart_btn", _nameLayer_mc.getNextHighestDepth(),{label:"View Time Chart", _x:z.w-220, _y:ACT_Y+2, styleName:styleObj} )
 		
 		var learnerName_txt = _nameLayer_mc["learnerName"+learner.getLearnerId()];
 		var learnerExp_btn = _nameLayer_mc["learnerName"+learner.getLearnerId()+"_btn"];
+		var learnerTimeChart_btn = _nameLayer_mc["learnerName"+learner.getLearnerId()+"timeChart_btn"];
 		
 		learnerExp_btn.setSize(90, 17);
 		learnerExp_btn.onRelease = function (){
 			JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
 		}
 		
+		learnerTimeChart_btn.setSize(94, 17);
+		learnerTimeChart_btn.onRelease = function (){
+			Debugger.log("learnerTimeChart_url: "+learnerTimeChart_url, Debugger.GEN, "printLearner", "LearnerTabView");
+			JsPopup.getInstance().launchPopupWindow(learnerTimeChart_url, 'TimeChart'+learner.getLearnerId(), 600, 400, true, true, false, false, false);
+		}
+		
 		learnerExp_btn.onRollOver = Proxy.create(this,this['showToolTip'], learnerExp_btn, "learner_exportPortfolio_btn_tooltip");
 		learnerExp_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
+		
+		learnerTimeChart_btn.onRollOver = Proxy.create(this,this['showToolTip'], learnerTimeChart_btn, "learner_timeChart_btn_tooltip");
+		learnerTimeChart_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		var sLearner:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("LTVLearnerText");
 		
@@ -469,6 +482,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		
 		var tempObj = new Object();
 		tempObj.learnerName = learnerName_txt;
+		tempObj.learnerTimeChartButton = learnerTimeChart_btn;
 		tempObj.learnerButton = learnerExp_btn;
 		learnerListArr.push(tempObj);
 		Debugger.log("learnerListArr.length: "+learnerListArr.length, Debugger.GEN, "printLearner", "LearnerTabView");
@@ -615,6 +629,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		var newWidth:Number = (_activityLayer_mc._width < scpWidth) ? scpWidth - 6 : _activityLayer_mc._width;
 		for (var i=0; i<learnerListArr.length; i++){
 			learnerListArr[i].learnerName._width = newWidth;
+			learnerListArr[i].learnerTimeChartButton._x = newWidth-220;
 			learnerListArr[i].learnerButton._x = newWidth-110;
 		}
 

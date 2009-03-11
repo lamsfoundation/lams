@@ -484,6 +484,12 @@ class MonitorController extends AbstractController {
 			_monitorModel.changeTab(evt.target.selectedIndex);
 	}
 	
+	private function viewClassTimeChart():Void {
+		var classTimeChart_url:String = _root.serverURL+"monitoring/monitoring.do?method=viewTimeChart&lessonID="+_root.lessonID;
+		Debugger.log("classTimeChart_url: "+classTimeChart_url, Debugger.GEN, "viewClassTimeChart", "MonitorController");
+		JsPopup.getInstance().launchPopupWindow(classTimeChart_url, 'ClassTimeChart', 600, 400, true, true, false, false, false);
+	}
+	
 	private function exportClassPortfolio():Void{
 		var exp_url:String = _root.serverURL+"learning/exportWaitingPage.jsp?mode=teacher&lessonID="+_root.lessonID;
 		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
@@ -513,6 +519,8 @@ class MonitorController extends AbstractController {
 			_monitorModel.setDialogOpen("VM_DIALOG");
 		} else if(tgt.indexOf("start_btn") != -1){
 			_monitorModel.getMonitor().startLesson(false, _root.lessonID);
+		} else if(tgt.indexOf("viewAllTimeChart_btn") != -1){
+			viewClassTimeChart();
 		} else if(tgt.indexOf("exportPortfolio_btn") != -1){
 			exportClassPortfolio();
 		}else if(tgt.indexOf("refresh_btn") != -1){
