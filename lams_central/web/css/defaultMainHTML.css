@@ -1122,5 +1122,28 @@ border:0px;
 	text-align: center;
 }
 
+/* Index Page more actions drop down menu */
+ul.more-actions-list {
+	background: white;
+	position: absolute; 
+	z-index: 99; 
+	display: none;
+	margin: 0px;
+	padding: 0px;
+	border:thin solid gray;
+}
 
+ul.more-actions-list li {
+	padding: 10px;
+	margin: 0px;
+	list-style: none;
+}
 
+#content a.more-actions-button {
+	background: url('../images/css/add_lesson.jpg') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+}
