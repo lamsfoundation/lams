@@ -30,7 +30,7 @@
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="javascript" type="text/javascript" src="loadVars.jsp"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.1.4.pack.js"></script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-latest.pack.js"></script>
 	<script type="text/javascript">
 		var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
 	</script>
