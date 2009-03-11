@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -54,6 +56,7 @@ public class LanguageUtil {
 
     private static IUserManagementService getService() {
 	if (service == null) {
+	    ServletContext context = HttpSessionManager.getInstance().getServletContext();
 	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
 		    .getInstance().getServletContext());
 	    service = (IUserManagementService) ctx.getBean("userManagementService");

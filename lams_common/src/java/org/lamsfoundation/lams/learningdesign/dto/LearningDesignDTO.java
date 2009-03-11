@@ -32,13 +32,9 @@ import java.util.TreeSet;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityDTOOrderComparator;
-import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.Competence;
-import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
@@ -87,7 +83,7 @@ public class LearningDesignDTO extends BaseDTO {
     private ArrayList activities;
     private ArrayList transitions;
     private ArrayList branchMappings;
-    private ArrayList competences;
+    private ArrayList<CompetenceDTO> competences;
 
     public LearningDesignDTO() {
     }
@@ -133,7 +129,7 @@ public class LearningDesignDTO extends BaseDTO {
 	this.activities = new ArrayList();
 	this.transitions = new ArrayList();
 	this.branchMappings = new ArrayList();
-	this.competences = new ArrayList();
+	this.competences = new ArrayList<CompetenceDTO>();
     }
 
     public LearningDesignDTO(LearningDesign learningDesign, ActivityDAO activityDAO, GroupingDAO groupingDAO,
@@ -459,7 +455,7 @@ public class LearningDesignDTO extends BaseDTO {
 	return transitions;
     }
 
-    public ArrayList populateCompetences(LearningDesign design) {
+    public ArrayList<CompetenceDTO> populateCompetences(LearningDesign design) {
 	ArrayList<CompetenceDTO> competenceDTOs = new ArrayList<CompetenceDTO>();
 	if (design.getCompetences() != null) {
 	    Iterator iterator = design.getCompetences().iterator();
@@ -802,11 +798,11 @@ public class LearningDesignDTO extends BaseDTO {
 	this.branchMappings = branchMappings;
     }
 
-    public ArrayList getCompetences() {
+    public ArrayList<CompetenceDTO> getCompetences() {
 	return competences;
     }
 
-    public void setCompetences(ArrayList competences) {
+    public void setCompetences(ArrayList<CompetenceDTO> competences) {
 	this.competences = competences;
     }
 

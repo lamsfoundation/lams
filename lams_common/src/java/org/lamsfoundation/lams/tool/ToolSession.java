@@ -34,19 +34,17 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
-
-/** 
- *        @hibernate.class
- *         table="lams_tool_session"
- *     
-*/
+/**
+ * @hibernate.class table="lams_tool_session"
+ * 
+ */
 public abstract class ToolSession implements Serializable {
-    
+
     /** Tool session type id for grouped */
     public static final int GROUPED_TYPE = 1;
     /** Tool session type id for non-grouped - all learners in a separate session */
     public static final int NON_GROUPED_TYPE = 2;
-    
+
     /** Tool session state id for started tool session */
     public static final int STARTED_STATE = 1;
     /** Tool session state id for completed tool session */
@@ -55,10 +53,10 @@ public abstract class ToolSession implements Serializable {
     public static final String UNIQUE_KEY_PREFIX = "uq";
     /** identifier field */
     private Long toolSessionId;
-    
-    /** Persistent field **/
+
+    /** Persistent field * */
     private String toolSessionName;
-    
+
     /** persistent field */
     private ToolActivity toolActivity;
 
@@ -67,144 +65,136 @@ public abstract class ToolSession implements Serializable {
 
     /** persistent field */
     private int toolSessionStateId;
-    
+
     private String uniqueKey;
-    
+
     private Lesson lesson;
 
     /** Get all the learners who may be part of this tool session. */
-    public abstract Set<User> getLearners(); 
+    public abstract Set<User> getLearners();
 
     /** full constructor */
-    public ToolSession(Long toolSessionId, 
-                       ToolActivity toolActivity, 
-                       Date createDateTime, 
-                       int toolSessionStateId,
-                       Lesson lesson) {
-        this.toolSessionId = toolSessionId;
-        this.toolActivity = toolActivity;
-        this.createDateTime = createDateTime;
-        this.toolSessionStateId = toolSessionStateId;
-        this.lesson = lesson;
+    public ToolSession(Long toolSessionId, ToolActivity toolActivity, Date createDateTime, int toolSessionStateId,
+	    Lesson lesson) {
+	this.toolSessionId = toolSessionId;
+	this.toolActivity = toolActivity;
+	this.createDateTime = createDateTime;
+	this.toolSessionStateId = toolSessionStateId;
+	this.lesson = lesson;
     }
 
     /** default constructor */
     public ToolSession() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="tool_session_id"
-     *         
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long"
+     *               column="tool_session_id"
+     * 
      */
     public Long getToolSessionId() {
-        return this.toolSessionId;
+	return this.toolSessionId;
     }
 
     public void setToolSessionId(Long toolSessionId) {
-        this.toolSessionId = toolSessionId;
+	this.toolSessionId = toolSessionId;
     }
 
-    /** 
+    /**
      * 
      * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="activity_id"      
+     * @hibernate.column name="activity_id"
      */
     public ToolActivity getToolActivity() {
-        return this.toolActivity;
+	return this.toolActivity;
     }
 
     public void setToolActivity(ToolActivity toolActivity) {
-        this.toolActivity = toolActivity;
+	this.toolActivity = toolActivity;
     }
 
-    /** 
-     * @hibernate.property column="create_date_time" length="19"
-     *             		   not-null="true"
+    /**
+     * @hibernate.property column="create_date_time" length="19" not-null="true"
      */
     public Date getCreateDateTime() {
-        return this.createDateTime;
+	return this.createDateTime;
     }
 
     public void setCreateDateTime(Date createDateTime) {
-        this.createDateTime = createDateTime;
+	this.createDateTime = createDateTime;
     }
+
     /**
-     * @hibernate.property column="unique_key" length="128"
-     *             not-null="true"
+     * @hibernate.property column="unique_key" length="128" not-null="true"
      * @return Returns the uniqueKey.
      */
-    public String getUniqueKey()
-    {
-        return uniqueKey;
+    public String getUniqueKey() {
+	return uniqueKey;
     }
+
     /**
-     * @param uniqueKey The uniqueKey to set.
+     * @param uniqueKey
+     *                The uniqueKey to set.
      */
-    public void setUniqueKey(String uniqueKey)
-    {
-        this.uniqueKey = uniqueKey;
+    public void setUniqueKey(String uniqueKey) {
+	this.uniqueKey = uniqueKey;
     }
+
     /**
-     * @hibernate.property column="tool_session_name"
-     * length="255" not-null="true"
+     * @hibernate.property column="tool_session_name" length="255"
+     *                     not-null="true"
      * @return
      */
-	public String getToolSessionName() {
-		return toolSessionName;
-	}
+    public String getToolSessionName() {
+	return toolSessionName;
+    }
 
-	public void setToolSessionName(String toolSessionName) {
-		this.toolSessionName = toolSessionName;
-	}
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="tool_session_state_id"         
-     *         
+    public void setToolSessionName(String toolSessionName) {
+	this.toolSessionName = toolSessionName;
+    }
+
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="tool_session_state_id"
+     * 
      */
     public int getToolSessionStateId() {
-        return this.toolSessionStateId;
+	return this.toolSessionStateId;
     }
 
     public void setToolSessionStateId(int toolSessionStateId) {
-        this.toolSessionStateId = toolSessionStateId;
+	this.toolSessionStateId = toolSessionStateId;
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("toolSessionId", getToolSessionId())
-            .toString();
+	return new ToStringBuilder(this).append("toolSessionId", getToolSessionId()).toString();
     }
 
     public boolean equals(Object other) {
-        if ( (this == other ) ) return true;
-        if ( !(other instanceof ToolSession) ) return false;
-        ToolSession castOther = (ToolSession) other;
-        return new EqualsBuilder()
-            .append(this.getToolSessionId(), castOther.getToolSessionId())
-            .isEquals();
+	if ((this == other))
+	    return true;
+	if (!(other instanceof ToolSession))
+	    return false;
+	ToolSession castOther = (ToolSession) other;
+	return new EqualsBuilder().append(this.getToolSessionId(), castOther.getToolSessionId()).isEquals();
     }
 
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(getToolSessionId())
-            .toHashCode();
+	return new HashCodeBuilder().append(getToolSessionId()).toHashCode();
     }
 
-	public int getToolSessionTypeId() {
-	    if(this instanceof NonGroupedToolSession)
-	        return NON_GROUPED_TYPE;
-	    else
-	        return GROUPED_TYPE;
-	}
-	public Lesson getLesson() {
-        return lesson;
+    public int getToolSessionTypeId() {
+	if (this instanceof NonGroupedToolSession)
+	    return NON_GROUPED_TYPE;
+	else
+	    return GROUPED_TYPE;
     }
+
+    public Lesson getLesson() {
+	return lesson;
+    }
+
     public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
+	this.lesson = lesson;
     }
-
 }

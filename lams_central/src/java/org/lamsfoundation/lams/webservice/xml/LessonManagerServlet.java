@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,12 +38,20 @@ import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.tool.OutputType;
+import org.lamsfoundation.lams.tool.ToolOutput;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -67,6 +77,8 @@ public class LessonManagerServlet extends HttpServlet {
     private static ILessonService lessonService = null;
 
     private static IExportToolContentService exportService = null;
+
+    private static ILamsCoreToolService toolService = null;
 
     /**
      * Constructor of the object.
@@ -118,6 +130,7 @@ public class LessonManagerServlet extends HttpServlet {
 	String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	String filePath = request.getParameter(CentralConstants.PARAM_FILEPATH);
 	String progressUser = request.getParameter(CentralConstants.PARAM_PROGRESS_USER);
+	String outputsUser = request.getParameter("outputsUser");
 	String learnerIds = request.getParameter(CentralConstants.PARAM_LEARNER_IDS);
 	String monitorIds = request.getParameter(CentralConstants.PARAM_MONITOR_IDS);
 
@@ -196,6 +209,18 @@ public class LessonManagerServlet extends HttpServlet {
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lsIdStr);
 
+	    } else if (method.equals("toolOutputsAllUsers")) {
+		lsId = new Long(lsIdStr);
+		element = getToolOutputs(document, serverId, datetime, hashValue, username, lsId, courseId, false);
+	    } else if (method.equals("authoredToolOutputsAllUsers")) {
+		lsId = new Long(lsIdStr);
+		element = getToolOutputs(document, serverId, datetime, hashValue, username, lsId, courseId, true);
+	    } else if (method.equals("toolOutputsUser")) {
+		lsId = new Long(lsIdStr);
+		element = getToolOutputsForUser(document, serverId, datetime, hashValue, username, lsId, courseId, false, outputsUser);
+	    } else if (method.equals("authoredToolOutputsUser")) {
+		lsId = new Long(lsIdStr);
+		element = getToolOutputsForUser(document, serverId, datetime, hashValue, username, lsId, courseId, true, outputsUser);
 	    } else {
 		String msg = "Method :" + method + " is not recognised";
 		log.error(msg);
@@ -329,20 +354,6 @@ public class LessonManagerServlet extends HttpServlet {
 		while (iterator.hasNext()) {
 		    LearnerProgress learnProg = (LearnerProgress) iterator.next();
 		    LearnerProgressDTO learnerProgress = learnProg.getLearnerProgressData();
-
-		    //Iterator activities = learnProg.getLesson().getLearningDesign().getActivities().iterator();
-
-		    //String currActivity = "";
-		    //while (activities.hasNext())
-		    //{
-		    //	Activity act = (Activity)iterator.next();
-		    //	
-		    //	if (learnerProgress.getCurrentActivityId() == ((Activity)iterator.next()).getActivityId())
-		    //	{
-		    //		currActivity = act.getTitle();
-		    //		break;
-		    //	}
-		    //}
 
 		    // get the username with the integration prefix removed
 		    String userNoPrefixName = learnerProgress.getUserName().substring(prefix.length() + 1);
@@ -550,7 +561,7 @@ public class LessonManagerServlet extends HttpServlet {
      * Initialization of the servlet. <br>
      * 
      * @throws ServletException
-     *                 if an error occure
+     *                 if an error occured
      */
     public void init() throws ServletException {
 	service = (IWorkspaceManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(
@@ -567,6 +578,9 @@ public class LessonManagerServlet extends HttpServlet {
 
 	exportService = (IExportToolContentService) WebApplicationContextUtils.getRequiredWebApplicationContext(
 		getServletContext()).getBean("exportToolContentService");
+
+	toolService = (ILamsCoreToolService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		getServletContext()).getBean("lamsCoreToolService");
 
     }
 
@@ -690,4 +704,296 @@ public class LessonManagerServlet extends HttpServlet {
 	}
     }
 
+    /**
+     * 
+     * This method gets the tool outputs for an entire lesson and returns
+     * them in an XML format.
+     * 
+     * @param document
+     * @param serverId
+     * @param hashValue
+     * @param username
+     * @param lsId
+     * @param courseID
+     * @param isAuthoredToolOutputs
+     * @throws Exception
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public Element getToolOutputs(Document document, String serverId, String datetime, String hashValue,
+	    String username, Long lsId, String courseID, boolean isAuthoredToolOutputs) throws Exception {
+	try {
+	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+
+	    // TODO: Un-comment once finished testing as well as the prefix stuff
+	    //Authenticator.authenticate(serverMap, datetime, username, hashValue);
+
+	    // Get the lesson and activitied given an lsId
+	    Lesson lesson = lessonService.getLesson(lsId);
+	    Set<Activity> activities = (Set<Activity>) lesson.getLearningDesign().getActivities();
+
+	    // Create the root node of the xml document
+	    Element toolOutputsElement = document.createElement("ToolOutputs");
+
+	    if (lesson != null) {
+		log.debug("Getting tool ouputs report for: " + lsId + ". With learning design: "
+			+ lesson.getLearningDesign().getLearningDesignId());
+
+		toolOutputsElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
+		toolOutputsElement.setAttribute("name", lesson.getLessonName());
+
+		Iterator learnerIterator = lesson.getAllLearners().iterator();
+		while (learnerIterator.hasNext()) {
+		    User learner = (User) learnerIterator.next();
+		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities, isAuthoredToolOutputs));
+		}
+	    } else {
+		// TODO: handle this error instead of throwing an exception
+		log.debug("No lesson exists for: " + lsId + ". Cannot get tool outputs report.");
+		throw new Exception("Lesson with lessonID: " + lsId + " could not be found for learner progresses");
+	    }
+
+	    return toolOutputsElement;
+
+	} catch (Exception e) {
+	    log.error("Problem creating tool output report for lesson: " + lsId.toString(), e);
+	    throw new Exception(e);
+	}
+
+    }
+
+    /**
+     * 
+     * This method gets the tool outputs for a specific user in a lesson and 
+     * returns them in XML format.
+     * 
+     * @param document
+     * @param serverId
+     * @param hashValue
+     * @param username
+     * @param lsId
+     * @param courseID
+     * @param isAuthoredToolOutputs
+     * @param userId
+     * @throws Exception
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public Element getToolOutputsForUser(Document document, String serverId, String datetime, String hashValue,
+	    String username, Long lsId, String courseID, boolean isAuthoredToolOutputs, String userStr) throws Exception {
+	try {
+	    // Create the root node of the xml document
+	    Element toolOutputsElement = document.createElement("ToolOutputs");
+
+	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+
+	    // TODO: Un-comment once finished testing as well as the prefix stuff
+	    //Authenticator.authenticate(serverMap, datetime, username, hashValue);
+
+	    ExtUserUseridMap userMap = integrationService.getExistingExtUserUseridMap(serverMap, userStr);
+	    if (userMap != null) {
+		User learner = (User) userMap.getUser();
+
+		// Get the lesson and activitied given an lsId
+		Lesson lesson = lessonService.getLesson(lsId);
+		Set<Activity> activities = (Set<Activity>) lesson.getLearningDesign().getActivities();
+
+		if (lesson != null) {
+		    log.debug("Getting tool ouputs report for: " + lsId + ". With learning design: "
+			    + lesson.getLearningDesign().getLearningDesignId());
+
+		    toolOutputsElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
+		    toolOutputsElement.setAttribute("name", lesson.getLessonName());
+		    
+		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities, isAuthoredToolOutputs));
+		}
+	    } else {
+		// TODO: handle this error instead of throwing an exception
+		log.debug("No user exists for: " + userStr + ". Cannot get tool outputs report.");
+		throw new Exception("No user exists for: " + userStr + ". Cannot get tool outputs report.");
+	    }
+
+	    return toolOutputsElement;
+
+	} catch (Exception e) {
+	    log.error("Problem creating tool output report for lesson: " + lsId.toString(), e);
+	    throw new Exception(e);
+	}
+
+    }
+
+    /**
+     * Gets the outputs for an activity for a specific learner and returns them
+     * in XML format
+     * 
+     * @param document
+     * @param learner
+     * @param lesson
+     * @param activities
+     * @param isAuthoredToolOutputs
+     * @return
+     */
+    private Element getLearnerOutputsElement(Document document, User learner, Lesson lesson, Set<Activity> activities,
+	    boolean isAuthoredToolOutputs) {
+	Element learnerElement = document.createElement("LearnerOutput");
+	//String userNoPrefixName = learner.getLogin().substring(serverMap.getPrefix().length() + 1);
+	learnerElement.setAttribute("userName", learner.getLogin());
+	learnerElement.setAttribute("lamsUserName", learner.getLogin());
+	learnerElement.setAttribute("lamsUserId", learner.getUserId().toString());
+	learnerElement.setAttribute("firstName", learner.getFirstName());
+	learnerElement.setAttribute("lastName", learner.getLastName());
+
+	LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
+		.getLessonId());
+
+	if (learnerProgress != null)
+	{
+	    learnerElement.setAttribute("completedLesson", "" + learnerProgress.isComplete());
+	}
+	
+	/*
+	 * Hibernate CGLIB is failing to load the first activity in
+	 * the sequence as a ToolActivity for some mysterious reason
+	 * Causes a ClassCastException when you try to cast it, even
+	 * if it is a ToolActivity.
+	 * 
+	 * THIS IS A HACK to retrieve the first tool activity 
+	 * manually so it can be cast as a ToolActivity
+	 */
+	Activity firstActivity = monitoringService.getActivityById(lesson.getLearningDesign().getFirstActivity()
+		.getActivityId());
+	log.debug("Getting tool ouputs for first activity: " + firstActivity.getActivityId() + ". For user: "
+		+ learner.getUserId());
+	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
+	    learnerElement.appendChild(getActivityOutputsElement(document, (ToolActivity) firstActivity, learner,
+		    learnerProgress, isAuthoredToolOutputs));
+	}
+
+	for (Activity activity : activities) {
+
+	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()) {
+
+		log.debug("Getting tool ouputs for activity: " + activity.getActivityId() + ". For user: "
+			+ learner.getUserId());
+
+		if (activity.isToolActivity() && activity instanceof ToolActivity) {
+
+		    learnerElement.appendChild(getActivityOutputsElement(document, (ToolActivity) activity, learner,
+			    learnerProgress, isAuthoredToolOutputs));
+		}
+	    }
+	}
+	return learnerElement;
+    }
+
+    /**
+     * Gets the tool output for a specified activity and learner and returns an
+     * XML representation of the data
+     * 
+     * @param document
+     * @param toolAct
+     * @param learner
+     * @param progress
+     * @param isAuthoredToolOutputs
+     * @return
+     */
+    private Element getActivityOutputsElement(Document document, ToolActivity toolAct, User learner,
+	    LearnerProgress progress, boolean isAuthoredToolOutputs) {
+	Element activityElement = document.createElement("Activity");
+	activityElement.setAttribute("title", toolAct.getTitle());
+	activityElement.setAttribute("activityId", toolAct.getActivityId().toString());
+	if (toolAct.getOrderId() != null) {
+	    activityElement.setAttribute("orderId", toolAct.getOrderId().toString());
+	}
+
+	boolean activityAttempted = false;
+	if (progress != null) {
+	    boolean completed = (progress.getProgressState(toolAct) == LearnerProgress.ACTIVITY_COMPLETED);
+	    activityElement.setAttribute("completed", "" + completed);
+
+	    activityAttempted = completed || (progress.getProgressState(toolAct) == LearnerProgress.ACTIVITY_ATTEMPTED);
+	    activityElement.setAttribute("attempted", "" + activityAttempted);
+
+	} else {
+	    activityElement.setAttribute("attempted", "" + false);
+	    activityElement.setAttribute("completed", "" + false);
+	}
+
+	if (activityAttempted) {
+	    ToolSession toolSession = toolService.getToolSessionByLearner(learner, toolAct);
+	    SortedMap<String, ToolOutputDefinition> map = toolService.getOutputDefinitionsFromTool(toolAct
+		    .getToolContentId());
+
+	    if (toolSession != null) {
+
+		for (String outputName : map.keySet()) {
+
+		    try {
+
+			if (isAuthoredToolOutputs) {
+			    Set<ActivityEvaluation> activityEvaluations = toolAct.getActivityEvaluations();
+			    if (activityEvaluations != null) {
+				for (ActivityEvaluation evaluation : activityEvaluations) {
+				    if (outputName.equals(evaluation.getToolOutputDefinition())) {
+					ToolOutput toolOutput = toolService.getOutputFromTool(outputName, toolSession,
+						learner.getUserId());
+					activityElement.appendChild(getOutputElement(document, toolOutput));
+				    }
+				}
+			    }
+			} else {
+			    ToolOutput toolOutput = toolService.getOutputFromTool(outputName, toolSession, learner
+				    .getUserId());
+
+			    if (toolOutput != null) {
+				activityElement.appendChild(getOutputElement(document, toolOutput));
+
+			    }
+
+			}
+
+		    } catch (RuntimeException e) {
+			log.debug("Runtime exception when attempted to get outputs for activity: "
+				+ toolAct.getActivityId() + ", continuing for other activities", e);
+		    }
+		}
+
+	    }
+	}
+	return activityElement;
+    }
+
+    /**
+     * Returns an XML element containing the tool output data for one instance
+     * 
+     * @param document
+     * @param toolOutput
+     * @return
+     */
+    private Element getOutputElement(Document document, ToolOutput toolOutput) {
+	Element toolOutputElement = document.createElement("ToolOutput");
+	toolOutputElement.setAttribute("name", toolOutput.getName());
+	toolOutputElement.setAttribute("description", toolOutput.getDescription());
+	toolOutputElement.setAttribute("output", toolOutput.getValue().getString());
+	
+	String type;
+	OutputType outputType = toolOutput.getValue().getType();
+	
+	if (outputType == OutputType.OUTPUT_BOOLEAN) {
+	    type = "boolean";
+	} else if (outputType == OutputType.OUTPUT_COMPLEX){
+	    type = "complex";
+	} else if (outputType == OutputType.OUTPUT_DOUBLE){
+	    type = "double";
+	} else if (outputType == OutputType.OUTPUT_LONG){
+	    type = "long";
+	} else if (outputType == OutputType.OUTPUT_SET_BOOLEAN){
+	    type = "set_boolean";
+	} else {
+	    type = "string";
+	}
+	
+	toolOutputElement.setAttribute("type", type);
+	return toolOutputElement;
+    }
 }

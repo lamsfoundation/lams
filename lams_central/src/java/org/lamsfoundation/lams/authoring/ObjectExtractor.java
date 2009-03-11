@@ -35,6 +35,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
@@ -832,6 +833,12 @@ public class ObjectExtractor implements IObjectExtractor {
 		Hashtable activityDetails = (Hashtable) iterator.next();
 		Activity activity = extractActivityObject(activityDetails);
 		activityDAO.insertOrUpdate(activity);
+
+		// if its a tool activity, extract evaluation details
+		if (activity.isToolActivity()) {
+		    extractEvaluationObject(activityDetails, (ToolActivity) activity);
+		}
+
 		newActivityMap.put(activity.getActivityUIID(), activity);
 	    }
 	}
@@ -853,8 +860,59 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Parses the list of activities sent from the WDDX packet for competence mappings. Each activity's new set of
-     * competenceMapping is compared against the old set and the db is updated accordingly
+     * This method extracts and saves the evaluation object for each activity.
+     * 
+     * Here we would normally go through the tool activity evaluation list and
+     * check if there have been any added/removed. But since our current
+     * implementation only allows 1 tool output per activity to go to Gradebook,
+     * we only need to fetch the first.
+     * 
+     * This implementation will need to be changed if we ever choose to allow
+     * more than one output per activity to go to Gradebook
+     * 
+     * @param activityDetails
+     * @param toolActivity
+     */
+    private void extractEvaluationObject(Hashtable activityDetails, ToolActivity toolActivity)
+	    throws WDDXProcessorConversionException, ObjectExtractorException {
+
+	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
+	ActivityEvaluation activityEvaluation;
+
+	// Get the first (only) ActivityEvaluation if it exists
+	if (activityEvaluations != null && activityEvaluations.size() >= 1) {
+	    activityEvaluation = (ActivityEvaluation) activityEvaluations.iterator().next();
+	} else {
+	    activityEvaluation = new ActivityEvaluation();
+	}
+
+	if (keyExists(activityDetails, WDDXTAGS.TOOL_OUTPUT_DEFINITION)
+		&& WDDXProcessor.convertToString(activityDetails, WDDXTAGS.TOOL_OUTPUT_DEFINITION) != null 
+		&& !WDDXProcessor.convertToString(activityDetails, WDDXTAGS.TOOL_OUTPUT_DEFINITION).equals("")) {
+	    activityEvaluations = new HashSet<ActivityEvaluation>();
+	    activityEvaluation.setActivity(toolActivity);
+	    activityEvaluation.setToolOutputDefinition(WDDXProcessor.convertToString(activityDetails,
+		    WDDXTAGS.TOOL_OUTPUT_DEFINITION));
+	    activityEvaluations.add(activityEvaluation);
+	    toolActivity.setActivityEvaluations(activityEvaluations);
+	    baseDAO.insertOrUpdate(activityEvaluation);
+
+	    // update the parent toolActivity
+	    toolActivity.setActivityEvaluations(activityEvaluations);
+	    activityDAO.insertOrUpdate(toolActivity);
+
+	} else if (activityEvaluation.getUid() != null) {
+	    // update the parent toolActivity
+	    toolActivity.setActivityEvaluations(new HashSet<ActivityEvaluation>());
+	    activityDAO.insertOrUpdate(toolActivity);
+	    baseDAO.delete(activityEvaluation);
+	}
+    }
+
+    /**
+     * Parses the list of activities sent from the WDDX packet for competence
+     * mappings. Each activity's new set of competenceMapping is compared
+     * against the old set and the db is updated accordingly
      * 
      * @param activitiesList
      *                The list of activities from the WDDX packet.

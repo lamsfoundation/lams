@@ -60,6 +60,17 @@ INSERT into lams_workspace_folder_type VALUES (3, 'PUBLIC SEQUENCES');
 -- LDEV-2115 --------------
 ALTER TABLE lams_progress_completed ADD COLUMN completed_date_time DATETIME NOT NULL;
 
+-- LDEV-2163 --------------
+CREATE TABLE lams_activity_evaluation (
+	  activity_evaluation_id BIGINT(20) NOT NULL auto_increment
+	, activity_id	BIGINT(20) NOT NULL
+	, tool_output_definition VARCHAR(255) NOT NULL
+	, INDEX (activity_id)
+	, CONSTRAINT FK_lams_activity_evaluation_1 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
+	, PRIMARY KEY (activity_evaluation_id)
+)TYPE=InnoDB;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

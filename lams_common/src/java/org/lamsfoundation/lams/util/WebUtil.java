@@ -1,8 +1,13 @@
 package org.lamsfoundation.lams.util;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Principal;
@@ -477,6 +482,120 @@ public class WebUtil {
 	}
 
 	return is;
+    }
+    
+    /**
+     * Uploads a file to the given url. Uses a multi-part http post to
+     * post the file as well as the user, course, and hash server-authentication
+     * strings.
+     * 
+     * Some of the java multipart posting libraries clashed with existing jboss
+     * libraries So instead, the multipart post is put together manually
+     * 
+     * @param f
+     * @param urlString
+     * @param timestamp
+     * @param extUsername
+     * @param extCourseId
+     * @param hash
+     * @return
+     * @throws IOException
+     */
+    public static InputStream performMultipartFilePost(File f, String fileParamName, String urlString,
+	    HashMap<String, String> params) throws MalformedURLException, IOException, Exception {
+	HttpURLConnection conn = null;
+	DataOutputStream dos = null;
+	String lineEnd = "\r\n";
+	String twoHyphens = "--";
+	String boundary = "*****";
+	int bytesRead, bytesAvailable, bufferSize;
+	byte[] buffer;
+	int maxBufferSize = 1 * 1024 * 1024;
+
+	//------------------ CLIENT REQUEST
+	FileInputStream fileInputStream = new FileInputStream(f);
+
+	log.debug("Performing multipart post to: " + urlString);
+	
+	// open a URL connection to the Servlet 
+	URL url = new URL(urlString);
+
+	// Open a HTTP connection to the URL
+	conn = (HttpURLConnection) url.openConnection();
+	
+	
+	if (!(conn instanceof HttpURLConnection)) {
+	    log.error("Fail to connect to external server though url:  " + urlString);
+	    throw new Exception("Fail to connect to external server though url:  " + urlString);
+	}
+
+	// Allow Inputs
+	conn.setDoInput(true);
+
+	// Allow Outputs
+	conn.setDoOutput(true);
+
+	// Don't use a cached copy.
+	conn.setUseCaches(false);
+
+	String httpRequest = "";
+	for (Entry<String, String> entry : params.entrySet()) {
+	    httpRequest += twoHyphens + boundary + lineEnd;
+	    httpRequest += "Content-Disposition: form-data; name=\"" + entry.getKey() + "\";" + lineEnd;
+	    httpRequest += lineEnd;
+	    httpRequest += entry.getValue() + lineEnd;
+	}
+	httpRequest += twoHyphens + boundary + lineEnd;
+	httpRequest += "Content-Disposition: form-data; name=\"" + fileParamName + "\";" + " filename=\"" + f.getName()
+		+ "\"" + lineEnd;
+	httpRequest += lineEnd;
+
+	// Use a post method.
+	conn.setRequestMethod("POST");
+	conn.setRequestProperty("Connection", "Keep-Alive");
+	conn.setRequestProperty("Content-Length", new Long(f.length() + httpRequest.getBytes().length + 64).toString());
+	log.debug(f.length());
+	log.debug(httpRequest.getBytes().length);
+	log.debug("" + f.length() + httpRequest.getBytes().length + 64);
+	log.debug(httpRequest);
+
+	conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+
+	dos = new DataOutputStream(conn.getOutputStream());
+	dos.writeBytes(httpRequest);
+
+	// create a buffer of maximum size
+	bytesAvailable = fileInputStream.available();
+	bufferSize = Math.min(bytesAvailable, maxBufferSize);
+	buffer = new byte[bufferSize];
+
+	// read file and write it into form...
+	bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+	while (bytesRead > 0) {
+	    dos.write(buffer, 0, bufferSize);
+	    bytesAvailable = fileInputStream.available();
+	    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+	    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+	}
+
+	// send multipart form data necessary after file data...
+	dos.writeBytes(lineEnd);
+	dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+	// Write the file part  into the post-------------------------------
+
+	// close streams
+	fileInputStream.close();
+	dos.flush();
+	dos.close();
+	
+	InputStream ret = conn.getInputStream();
+	if (ret == null) {
+	    log.error("Fail to get response from extenal server, return InputStream null:  " + urlString);
+	    throw new Exception("Fail to fetch data from external server, return inputStream null:  " + urlString);
+	}
+	
+
+	return conn.getInputStream();
     }
 
 }

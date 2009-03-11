@@ -400,6 +400,23 @@ Ant build file.
 	</target>
 	
 	<!-- =================================================================== -->
+	<!-- Generate Evaluation hibernate xml files                             	 -->
+	<!-- =================================================================== -->
+	<target name="generate-evaluation-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
+
+		<taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="all-libs" />
+
+		<echo message="Building hbm.xml files for evaluation model using XDoclet" />
+
+		<hibernatedoclet destdir="${conf.hibernate.mapping.dir}" excludedtags="@version,@author,@todo" force="true" verbose="true">
+			<fileset dir="${src.java.dir}">
+				<include name="**/ActivityEvaluation.java" />
+			</fileset>
+			<hibernate version="3.0" />
+		</hibernatedoclet>
+	</target>
+	
+	<!-- =================================================================== -->
 	<!-- Generate Event Notification and Pedagogical Planner hibernate xml files                             	 -->
 	<!-- =================================================================== -->
 	<target name="generate-additional-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">

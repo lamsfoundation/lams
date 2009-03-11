@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -246,6 +247,8 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     /** List of the UIIDs of the activities that are input activities for this activity */
     private Integer toolActivityUIID;
+    
+    private ArrayList<String> activityEvaluations;
 
     /**
      * Used by a sequence activity to determine the start of the transition based sequence and used by tool based
@@ -412,6 +415,14 @@ public class AuthoringActivityDTO extends BaseDTO {
 		String competenceMappingTitle = competenceMapping.getCompetence().getTitle();
 
 		competenceMappingTitles.add(competenceMappingTitle);
+	    }
+	}
+	
+	activityEvaluations = new ArrayList<String>();
+	if (toolActivity.getActivityEvaluations() != null){
+	    for(ActivityEvaluation eval : toolActivity.getActivityEvaluations())
+	    {
+		activityEvaluations.add(eval.getToolOutputDefinition());
 	    }
 	}
     }
@@ -1328,5 +1339,13 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     public void setCompetenceMappingTitles(ArrayList<String> competenceMappingTitles) {
 	this.competenceMappingTitles = competenceMappingTitles;
+    }
+
+    public ArrayList<String> getActivityEvaluations() {
+        return activityEvaluations;
+    }
+
+    public void setActivityEvaluations(ArrayList<String> activityEvaluations) {
+        this.activityEvaluations = activityEvaluations;
     }
 }

@@ -238,5 +238,7 @@ public interface WDDXTAGS {
 
     /** Tool adapters specific tags */
     public static final String CUSTOM_CSV = "customCSV";
-
+    
+    /** Evaluation tool output tag */
+    public static final String TOOL_OUTPUT_DEFINITION = "gradebookToolOutputDefinitionName";
 }

@@ -1091,3 +1091,13 @@ CREATE TABLE lams_planner_nodes (
 	CONSTRAINT FK_lams_planner_node_parent FOREIGN KEY (parent_uid)
 	               REFERENCES lams_planner_nodes(uid) ON DELETE CASCADE ON UPDATE CASCADE
 )TYPE=InnoDB; 
+
+CREATE TABLE lams_activity_evaluation (
+	  activity_evaluation_id BIGINT(20) NOT NULL auto_increment
+	, activity_id	BIGINT(20) NOT NULL
+	, tool_output_definition VARCHAR(255) NOT NULL
+	, INDEX (activity_id)
+	, CONSTRAINT FK_lams_activity_evaluation_1 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
+	, PRIMARY KEY (activity_evaluation_id)
+)TYPE=InnoDB;

@@ -48,7 +48,7 @@
 				<value>classpath:org/lamsfoundation/lams/learningdesign/LearningLibrary.hbm.xml</value>	
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Transition.hbm.xml</value>	
 				<value>classpath:org/lamsfoundation/lams/learningdesign/License.hbm.xml</value>	
-				
+				<value>classpath:org/lamsfoundation/lams/learningdesign/ActivityEvaluation.hbm.xml</value>
 				
 				<!-- lesson related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>

@@ -32,6 +32,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
@@ -59,6 +60,8 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     private Set toolSessions;
 
     private Set<CompetenceMapping> competenceMappings;
+    
+    private Set<ActivityEvaluation> activityEvaluations;
 
     /** full constructor */
     public ToolActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
@@ -66,13 +69,14 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
 	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Tool tool, Long toolContentId,
-	    Set branchActivityEntries, Set competenceMappings) {
+	    Set branchActivityEntries, Set<CompetenceMapping> competenceMappings, Set<ActivityEvaluation> activityEvaluations) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, defineLater, createDateTime,
 		learningLibrary, parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId,
 		transitionTo, transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
 	this.tool = tool;
 	this.toolContentId = toolContentId;
 	this.competenceMappings = competenceMappings;
+	this.activityEvaluations = activityEvaluations;
 	super.simpleActivityStrategy = new ToolActivityStrategy(this);
     }
 
@@ -96,7 +100,8 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     }
 
     /**
-     * Makes a copy of the ToolActivity for authoring, preview and monitoring enviornment
+     * Makes a copy of the ToolActivity for authoring, preview and monitoring
+     * environment
      * 
      * @return ToolActivity Returns a deep-copy of the originalActivity
      */
@@ -107,36 +112,49 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	newToolActivity.setTool(this.getTool());
 	newToolActivity.setToolContentId(this.getToolContentId());
 
-	Set<CompetenceMapping> newCompetenceMappings = new HashSet();
-	if (competenceMappings != null) {
-	    for (CompetenceMapping compMap : competenceMappings) {
-		CompetenceMapping newComp = new CompetenceMapping();
-		newComp.setCompetence(compMap.getCompetence());
-		newComp.setToolActivity(compMap.getToolActivity());
-		newCompetenceMappings.add(compMap);
-	    }
+	Set<CompetenceMapping> newCompetenceMappings = new HashSet<CompetenceMapping>();
+	for (CompetenceMapping compMap : this.competenceMappings) {
+	    CompetenceMapping newComp = new CompetenceMapping();
+	    newComp.setCompetence(compMap.getCompetence());
+	    newComp.setToolActivity(compMap.getToolActivity());
+	    newCompetenceMappings.add(compMap);
 	}
 	newToolActivity.setCompetenceMappings(newCompetenceMappings);
+	
+	Set<ActivityEvaluation> newEvaluations = new HashSet<ActivityEvaluation>();
+	for (ActivityEvaluation evaluation : this.activityEvaluations)
+	{
+	    ActivityEvaluation newEvaluation = new ActivityEvaluation();
+	    newEvaluation.setActivity(newToolActivity);
+	    newEvaluation.setToolOutputDefinition(evaluation.getToolOutputDefinition());
+	    newEvaluations.add(newEvaluation);
+	}
+	newToolActivity.setActivityEvaluations(newEvaluations);
 
 	return newToolActivity;
     }
 
     /**
-     * Factory method to create a new tool session for a single user when he is running current activity. Does not check
-     * to see if a tool session already exists.
+     * Factory method to create a new tool session for a single user when he is
+     * running current activity. Does not check to see if a tool session already
+     * exists.
      * <p>
-     * If the activity has groupingSupportType = GROUPING_SUPPORT_NONE then a new tool session is created for each
-     * learner.
+     * If the activity has groupingSupportType = GROUPING_SUPPORT_NONE then a
+     * new tool session is created for each learner.
      * <p>
-     * If the activity has groupingSupportType = GROUPING_SUPPORT_REQUIRED then a new tool session is created for each
-     * group of learners. It will fall back to a class group if no grouping is found - the user interface should not
-     * have allowed this!
+     * If the activity has groupingSupportType = GROUPING_SUPPORT_REQUIRED then
+     * a new tool session is created for each group of learners. It will fall
+     * back to a class group if no grouping is found - the user interface should
+     * not have allowed this!
      * <p>
-     * If the activity has groupingSupportType = GROUPING_SUPPORT_OPTIONAL then a new tool session is created for each
-     * group of learners. If no grouping is available then a whole of class group is created.
+     * If the activity has groupingSupportType = GROUPING_SUPPORT_OPTIONAL then
+     * a new tool session is created for each group of learners. If no grouping
+     * is available then a whole of class group is created.
      * <p>
-     * If groupingSupportType is not set then defaults to GROUPING_SUPPORT_NONE. If for some reason a grouped session if
-     * also does the equivalent of GROUPING_SUPPORT_NONE. This way the system will still function, if not as expected!
+     * If groupingSupportType is not set then defaults to GROUPING_SUPPORT_NONE.
+     * If for some reason a grouped session if also does the equivalent of
+     * GROUPING_SUPPORT_NONE. This way the system will still function, if not as
+     * expected!
      * <p>
      * 
      * @param learner
@@ -149,7 +167,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	ToolSession session = null;
 
 	if (supportType != null
-		&& (supportType.intValue() == Activity.GROUPING_SUPPORT_REQUIRED || supportType.intValue() == Activity.GROUPING_SUPPORT_OPTIONAL)) {
+		&& (supportType.intValue() == GROUPING_SUPPORT_REQUIRED || supportType.intValue() == GROUPING_SUPPORT_OPTIONAL)) {
 
 	    // Both cases create a small group if a grouping exists, otherwise creates a class group.
 	    Group learners = null;
@@ -157,8 +175,8 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 		learners = this.getGroupFor(learner);
 	    }
 
-	    if (supportType.intValue() == Activity.GROUPING_SUPPORT_REQUIRED && learners == null) {
-		ToolActivity.log
+	    if (supportType.intValue() == GROUPING_SUPPORT_REQUIRED && learners == null) {
+		log
 			.error("Activity "
 				+ getActivityId()
 				+ " requires grouping (groupingSupportType=GROUPING_SUPPORT_REQUIRED) but no grouping was available. "
@@ -174,7 +192,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    if (learners != null && !learners.isNull()) {
 		session = new GroupedToolSession(this, now, ToolSession.STARTED_STATE, learners, lesson);
 	    } else {
-		ToolActivity.log
+		log
 			.error("Unable to get the group for a new tool session for Activity " + getActivityId()
 				+ " Falling back to one learner per session." + " Learner " + learner + ", lesson is "
 				+ lesson);
@@ -182,8 +200,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	}
 
 	if (session == null) {
-	    // Either GROUPING_SUPPORT_NONE was selected, supportType == null or the grouped tool sessions could not be
-	    // created.
+	    // Either GROUPING_SUPPORT_NONE was selected, supportType == null or the grouped tool sessions could not be created.
 	    // So create one session per user.
 	    session = new NonGroupedToolSession(this, now, ToolSession.STARTED_STATE, learner, lesson);
 	}
@@ -203,7 +220,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
      */
     public Long getToolContentId() {
 
-	return toolContentId;
+	return this.toolContentId;
     }
 
     /**
@@ -224,7 +241,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
      */
     public Tool getTool() {
 
-	return tool;
+	return this.tool;
     }
 
     /**
@@ -280,12 +297,23 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     }
 
     /**
-     * Get all the tool activities in this activity. Called by Activity.getAllToolActivities() As we are a tool
-     * activity, just add ourself.
+     * Get all the tool activities in this activity. Called by
+     * Activity.getAllToolActivities() As we are a tool activity, just add
+     * ourself.
      */
     @Override
     protected void getToolActivitiesInActivity(SortedSet toolActivities) {
 	toolActivities.add(this);
     }
+
+    public Set<ActivityEvaluation> getActivityEvaluations() {
+        return activityEvaluations;
+    }
+
+    public void setActivityEvaluations(Set<ActivityEvaluation> activityEvaluations) {
+        this.activityEvaluations = activityEvaluations;
+    }
+    
+    
 
 }
