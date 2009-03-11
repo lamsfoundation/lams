@@ -17,6 +17,7 @@
 							registerToolTip(element);
 							jQuery(element).css("display", "block");
 							tb_init('a.thickbox'+jQuery(element).attr("id"));
+							initMoreActions(element);
 						}
 					);
 				}
@@ -25,7 +26,7 @@
 					jQuery("a.j-group-header, span.j-group-icon", element).click(function() {
 						var row = jQuery("div.row", element);
 						var orgId = jQuery(row).parent("div.course-bg").attr("id");
-						var course = jQuery(row).next("div.j-course-contents");
+						var course = jQuery(row).nextAll("div.j-course-contents");
 						var groupIcon = jQuery("span.j-group-icon", element);
 						if (jQuery(course).html() == null) {
 							loadGroupContents(orgId, stateId);
@@ -88,6 +89,30 @@
 							jQuery(element).attr("title", newTitle);
 						}
 					});
+				}
+				
+				function initMoreActions(element) {
+				    
+					var id = jQuery(element).attr("id");
+					var menuSelector = "a#more-actions-button-" + id;
+					var ulSelector = "ul#more-actions-list-" + id;
+				    
+				    $(menuSelector).click( function() {
+				    	// slide up all other menus
+		    		    $("ul[id^=more-actions-list-]:visible:not(" + ulSelector + ")").slideUp("fast");
+		    		    				    	
+				    	// show this menu
+				    	$(ulSelector).css("top", $(this).position().bottom);
+				    	$(ulSelector).css("left", $(this).position().left);
+				    	$(ulSelector).slideToggle("fast"); return false;
+				    });
+				    
+				    $(window).resize(function(){
+				    	$(ulSelector).css("top", $(menuSelector).position().bottom);
+				    	$(ulSelector).css("left", $(menuSelector).position().left);
+			    	});
+			    	
+
 				}
 				
 				function makeOrgSortable(orgId) {
