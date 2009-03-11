@@ -46,6 +46,7 @@ public class IndexOrgBean implements Comparable {
 	private Date archivedDate;
 	private Integer type;
 	private List<IndexLinkBean> links;
+	private List<IndexLinkBean> moreLinks;
 	private List<IndexLessonBean> lessons;
 	private List<IndexOrgBean> childIndexOrgBeans;
 	
@@ -93,6 +94,19 @@ public class IndexOrgBean implements Comparable {
 	 */
 	public void setLinks(List<IndexLinkBean> links) {
 		this.links = links;
+	}
+	/**
+	 * @return Returns the moreLinks
+	 */
+	public List<IndexLinkBean> getMoreLinks() {
+	    return moreLinks;
+	}
+	/**
+	 * 
+	 * @param moreLinks The moreLinks to set
+	 */
+	public void setMoreLinks(List<IndexLinkBean> moreLinks) {
+	    this.moreLinks = moreLinks;
 	}
 	/**
 	 * @return Returns the id.
