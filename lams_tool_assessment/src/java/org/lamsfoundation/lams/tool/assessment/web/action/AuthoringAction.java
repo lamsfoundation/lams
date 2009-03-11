@@ -624,8 +624,12 @@ public class AuthoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	
 	List<AssessmentUnit> unitList = new ArrayList<AssessmentUnit>();
-	for (int i = 0; i < AssessmentConstants.INITIAL_UNITS_NUMBER; i++) {
-	    AssessmentUnit unit = new AssessmentUnit();
+	AssessmentUnit unit = new AssessmentUnit();
+	unit.setSequenceId(1);
+	unit.setMultiplier(1);
+	unitList.add(unit);	
+	for (int i = 1; i < AssessmentConstants.INITIAL_UNITS_NUMBER; i++) {
+	    unit = new AssessmentUnit();
 	    unit.setSequenceId(i+1);
 	    unit.setMultiplier(0);
 	    unitList.add(unit);
@@ -1377,15 +1381,11 @@ public class AuthoringAction extends Action {
 	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_UNIT_SEQUENCE_ID_PREFIX + i);	    
 	    unit.setSequenceId(NumberUtils.stringToInt(sequenceId));
 	    unit.setUnit(unitStr);
-	    String multiplierStr = (String) paramMap.get(AssessmentConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i);
-	    if (isForSaving && !StringUtils.isBlank(multiplierStr)) {
-		float multiplier = Float.valueOf(multiplierStr);
-		unit.setMultiplier(multiplier);
-	    } else {
-		unit.setMultiplierStr(multiplierStr);
-	    }	    
+	    float multiplier = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i));
+	    unit.setMultiplier(multiplier);
 	    unitList.add(unit);
 	}
+	
 	return unitList;
     }
     

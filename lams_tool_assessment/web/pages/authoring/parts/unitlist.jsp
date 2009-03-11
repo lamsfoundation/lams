@@ -32,12 +32,12 @@
 							<td style="padding-left:0px; border-bottom:0px; background:none;">	
 							<c:choose>
 								<c:when test="${status.index == 0}">
-									<input type="hidden" name="unitMultiplier0" id="unitMultiplier0" value="1">
-									1
+									<input type="hidden" name="unitMultiplier0" id="unitMultiplier0" value="${unit.multiplier}">
+									${unit.multiplier}
 								</c:when>
 								<c:otherwise>
 									<input type="text" name="unitMultiplier${status.index}"
-										id="unitMultiplier${status.index}" size="20" value="${unit.multiplierStr}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
+										id="unitMultiplier${status.index}" size="20" value="${unit.multiplier}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 								</c:otherwise>
 							</c:choose>							
 							</td>									

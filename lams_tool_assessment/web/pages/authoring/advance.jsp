@@ -80,6 +80,14 @@
 </p>
 
 <p>
+	<html:checkbox property="assessment.allowHistoryResponses" styleClass="noBorder" styleId="allowHistoryResponsesAfterAttempt">
+	</html:checkbox>
+	<label for="allowHistoryResponsesAfterAttempt">
+		<fmt:message key="label.authoring.advance.allow.students.history.responses" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="assessment.notifyTeachersOnAttemptCompletion"
 		styleClass="noBorder" styleId="notifyTeachersOnAttemptCompletion">
 	</html:checkbox>

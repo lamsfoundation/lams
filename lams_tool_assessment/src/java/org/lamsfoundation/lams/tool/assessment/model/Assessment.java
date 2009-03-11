@@ -79,6 +79,8 @@ public class Assessment implements Cloneable {
     
     private boolean allowGradesAfterAttempt;
     
+    private boolean allowHistoryResponses;
+    
     private boolean defineLater;
 
     private boolean contentInUse;
@@ -553,6 +555,18 @@ public class Assessment implements Cloneable {
 
     public void setAllowGradesAfterAttempt(boolean allowGradesAfterAttempt) {
 	this.allowGradesAfterAttempt = allowGradesAfterAttempt;
+    }
+    
+    /**
+     * @hibernate.property column="allow_history_responses"
+     * @return
+     */
+    public boolean isAllowHistoryResponses() {
+	return allowHistoryResponses;
+    }
+
+    public void setAllowHistoryResponses(boolean allowHistoryResponses) {
+	this.allowHistoryResponses = allowHistoryResponses;
     }
     
     /**

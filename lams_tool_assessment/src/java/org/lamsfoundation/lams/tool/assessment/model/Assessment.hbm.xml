@@ -216,6 +216,14 @@
         />
 
         <property
+            name="allowHistoryResponses"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_history_responses"
+        />
+
+        <property
             name="questionsPerPage"
             type="int"
             update="true"
