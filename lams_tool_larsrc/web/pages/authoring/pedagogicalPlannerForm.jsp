@@ -19,7 +19,19 @@
 		}
 		
 		body {
-			width: 760px;
+			width: 750px;
+		}
+		
+		table#itemTable td {
+			margin: 0px;
+			padding: 5px 0px 5px 0px;
+			border-bottom: thin inset;
+		}
+		
+		img.clearEntry {
+			maring: 0px;
+			padding: 0px;
+			cursor: pointer;
 		}
 	</style>
 	
@@ -51,6 +63,11 @@
 			var content = FCKeditorAPI.GetInstance('instructions').GetXHTML();
 			document.getElementById("instructions").value=content;
 		}
+		
+		function clearEntry(entryIndex){
+			document.getElementById("title"+entryIndex).value="";
+			document.getElementById("entry"+entryIndex).value="";
+		}
   	</script>
 </lams:head>
 <body id="body">
@@ -67,35 +84,45 @@
 			value="${formBean.instructions}"
 			contentFolderID="${formBean.contentFolderID}"
                toolbarSet="Custom-Pedplanner" height="150px"
-               width="760px" displayExpanded="false">
+               width="750px" displayExpanded="false">
 		</lams:FCKEditor>
 		
 		<c:if test="${formBean.itemCount ne 0}">
 			<h4 class="space-left space-top space-bottom"><fmt:message key="label.authoring.basic.resource.list.title"/></h4>
-			<c:forEach var="itemIndex"  begin="1" end="${formBean.itemCount}" >
-				<c:set var="itemType" value="${formBean.typeList[itemIndex-1]}" />
-				<c:set var="itemFileName" value="${formBean.fileNameList[itemIndex-1]}" />
-				<html:hidden property="type[${itemIndex-1}]" />
-				<html:hidden property="fileUuid[${itemIndex-1}]" />
-				<html:hidden property="fileVersion[${itemIndex-1}]" />
-				<html:hidden property="fileName[${itemIndex-1}]"></html:hidden>
-				<h4 class="space-left"><fmt:message key="label.authoring.basic.title"/></h4>
-				<html:text styleClass="item" size="90" property="title[${itemIndex-1}]"></html:text>
-				<c:choose>
-					<c:when test="${itemType eq 1}">
-						<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.url"/></h4>
-						<html:text styleClass="item" size="90" property="url[${itemIndex-1}]"></html:text>
-					</c:when>
-					<c:when test="${itemType eq 2}">
-						<html:hidden property="url[${itemIndex-1}]" />
-						<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.file"/>
-							<c:if test="${not empty itemFileName}">: ${itemFileName}</c:if>
-						</h4>
-						<html:file size="78" styleClass="item" property="file[${itemIndex-1}]" />
-					</c:when>
-				</c:choose>
-				<hr style="margin-left: auto; margin-right: auto; margin-top: 5px; margin-bottom: 5px; width: 450px" />
-			</c:forEach>
+			<table id="itemTable" cellpadding="0" cellspacing="0">
+				<c:forEach var="itemIndex"  begin="1" end="${formBean.itemCount}">
+					<tr>
+						<td>
+							<c:set var="itemType" value="${formBean.typeList[itemIndex-1]}" />
+							<c:set var="itemFileName" value="${formBean.fileNameList[itemIndex-1]}" />
+							<html:hidden property="type[${itemIndex-1}]" />
+							<html:hidden property="fileUuid[${itemIndex-1}]" />
+							<html:hidden property="fileVersion[${itemIndex-1}]" />
+							<html:hidden property="fileName[${itemIndex-1}]"></html:hidden>
+							<h4 class="space-left" id="title${status.index}"><fmt:message key="label.authoring.basic.title"/></h4>
+							<html:text styleId="title${itemIndex-1}" styleClass="item" size="90" property="title[${itemIndex-1}]"></html:text>
+							<c:choose>
+								<c:when test="${itemType eq 1}">
+									<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.url"/></h4>
+									<html:text styleId="entry${itemIndex-1}" styleClass="item" size="90" property="url[${itemIndex-1}]"></html:text>
+								</c:when>
+								<c:when test="${itemType eq 2}">
+									<html:hidden property="url[${itemIndex-1}]" />
+									<h4 class="space-left"><fmt:message key="label.authoring.basic.resource.file"/>
+										<c:if test="${not empty itemFileName}">: ${itemFileName}</c:if>
+									</h4>
+									<html:file styleId="entry${itemIndex-1}" size="78" styleClass="item" property="file[${itemIndex-1}]" />
+								</c:when>
+							</c:choose>
+						</td>
+						<td>
+							<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
+								title="<fmt:message key="msg.planner.clear.entry" />"
+								onclick="javascript:clearEntry(${itemIndex-1})" />
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
 		</c:if>
 	</html:form>
 	<a class="button" href="javascript:createItem(2);"><fmt:message key="label.authoring.basic.add.file" /></a>

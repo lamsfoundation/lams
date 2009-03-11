@@ -12,11 +12,22 @@
 		}
 		
 		body {
-			width: 760px;
+			width: 750px;
 		}
 		
-		div.FCKdiv {
-			margin-top: 5px;
+		table#nominationTable td {
+			maring: 0px;
+			padding: 0px;
+		}
+		
+		table#nominationTable td.FCKcell {
+			padding: 10px 0px 0px 5px;
+		}
+		
+		img.clearEntry {
+			maring: 0px;
+			padding: 0px;
+			cursor: pointer;
 		}
 	</style>
 	
@@ -48,6 +59,10 @@
 				}
 			} while (nomination!=null);
 		}
+		
+		function clearEntry(nominationIndex){
+			FCKeditorAPI.GetInstance("nomination["+nominationIndex+"]").SetHTML("");
+		}
   	</script>
 </lams:head>
 <body id="body">
@@ -64,21 +79,30 @@
 			value="${formBean.instructions}"
 			contentFolderID="${formBean.contentFolderID}"
                toolbarSet="Custom-Pedplanner" height="150px"
-               width="760px" displayExpanded="false">
+               width="750px" displayExpanded="false">
 		</lams:FCKEditor>
 		
 		<c:if test="${formBean.nominationCount ne 0}">
 			<h4 class="space-left space-top"><fmt:message key="label.vote.nominations"/></h4>
-			<c:forEach var="nominationIndex"  begin="1" end="${formBean.nominationCount}" >
-				<div class="FCKdiv">
-					<lams:FCKEditor id="nomination[${nominationIndex-1}]"
-						value="${formBean.nominationList[nominationIndex-1]}"
-						contentFolderID="${formBean.contentFolderID}"
-		                toolbarSet="Custom-Pedplanner" height="150px"
-		                width="760px" displayExpanded="false">
-					</lams:FCKEditor>
-				</div>
-			</c:forEach>
+			<table id="nominationTable" cellpadding="0" cellspacing="0">
+				<c:forEach var="nominationIndex"  begin="1" end="${formBean.nominationCount}" >
+					<tr>
+						<td class="FCKcell">
+							<lams:FCKEditor id="nomination[${nominationIndex-1}]"
+								value="${formBean.nominationList[nominationIndex-1]}"
+								contentFolderID="${formBean.contentFolderID}"
+				                toolbarSet="Custom-Pedplanner" height="150px"
+				                width="705px" displayExpanded="false">
+							</lams:FCKEditor>
+						</td>
+						<td>
+							<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
+								title="<fmt:message key="msg.planner.clear.entry" />"
+								onclick="javascript:clearEntry(${nominationIndex-1})" />
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
 		</c:if>
 	</html:form>
 	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.add.new.nomination" /></a>

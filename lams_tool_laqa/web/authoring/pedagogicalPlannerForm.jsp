@@ -12,12 +12,24 @@
 		}
 		
 		body {
-			 width: 760px;
+			 width: 750px;
 		}
 			
-		div.FCKdiv {
-			margin-top: 10px;
+		table#questionTable td {
+			margin: 0px;
+			padding: 0px;
 		}
+		
+		table#questionTable td.FCKcell {
+			padding: 10px 0px 0px 5px;
+		}
+		
+		img.clearEntry {
+			maring: 0px;
+			padding: 0px;
+			cursor: pointer;
+		}
+		
 	</style>
 	
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
@@ -45,6 +57,10 @@
 				}
 			} while (question!=null);
 		}
+		
+		function clearEntry(questionIndex){
+			FCKeditorAPI.GetInstance("question["+questionIndex+"]").SetHTML("");
+		}
   	</script>
 </lams:head>
 <body id="body">
@@ -57,16 +73,25 @@
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
-		<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}" >
-			<div class="FCKdiv">
-				<lams:FCKEditor id="question[${questionIndex-1}]"
-					value="${formBean.questionList[questionIndex-1]}"
-					contentFolderID="${formBean.contentFolderID}"
-	                toolbarSet="Custom-Pedplanner" height="150px"
-	                width="760px" displayExpanded="false">
-				</lams:FCKEditor>
-			</div>
-		</c:forEach>
+		<table id="questionTable" cellpadding="0" cellspacing="0">
+			<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}">
+				<tr>
+					<td class="FCKcell">
+						<lams:FCKEditor id="question[${questionIndex-1}]"
+							value="${formBean.questionList[questionIndex-1]}"
+							contentFolderID="${formBean.contentFolderID}"
+		 	   	            toolbarSet="Custom-Pedplanner" height="150px"
+		  	              width="705px" displayExpanded="false">
+						</lams:FCKEditor>
+						</td>
+					<td>
+						<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
+							title="<fmt:message key="msg.planner.clear.entry" />"
+							onclick="javascript:clearEntry(${questionIndex-1})" />
+					</td>
+				</tr>
+			</c:forEach>
+		</table>
 	</html:form>
 	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.add.new.question" /></a>
 </body>

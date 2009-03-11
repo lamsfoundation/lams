@@ -13,9 +13,23 @@
 			float: right;
 		}
 		
+		body {
+			width: 750px;
+		}
+		
 		input.item {
 			margin: 5px 0px 5px 10px;
-			float: none;
+		}
+		
+		table#taskTable td {
+			margin: 0px;
+			padding: 0px;
+		}
+		
+		img.clearEntry {
+			maring: 0px;
+			padding: 0px 10px 0px 0px;
+			cursor: pointer;
 		}
 	</style>
 	
@@ -30,6 +44,10 @@
   				}
   			});
   		}
+  		
+  		function clearEntry(itemIndex){
+			document.getElementById("item"+itemIndex).value="";
+		}
   	</script>
 </lams:head>
 <body id="body">
@@ -42,9 +60,20 @@
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
-		<c:forEach var="itemIndex"  begin="1" end="${formBean.taskListItemCount}" >
-			<html:text styleClass="item" size="90" property="taskListItem[${itemIndex-1}]"></html:text>
-		</c:forEach>
+		<table id="taskTable" cellpadding="0" cellspacing="0">
+			<c:forEach var="itemIndex"  begin="1" end="${formBean.taskListItemCount}" >
+				<tr>
+					<td>
+						<html:text styleId="item${itemIndex-1}" styleClass="item" size="100" property="taskListItem[${itemIndex-1}]"></html:text>
+					</td>
+					<td>
+						<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
+							title="<fmt:message key="msg.planner.clear.entry" />"
+							onclick="javascript:clearEntry(${itemIndex-1})" />
+						</td>
+				</tr>
+			</c:forEach>
+		</table>
 	</html:form>
 	<a class="button" href="javascript:createItem();"><fmt:message key="label.authoring.basic.add.task" /></a>
 </body>

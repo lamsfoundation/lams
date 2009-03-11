@@ -16,11 +16,22 @@
 		}
 		
 		body {
-			width: 760px;
+			width: 750px;
 		}
 				
-		div.FCKdiv {
-			margin-top: 10px;
+		table#questionTable td {
+			margin: 0px;
+			padding: 0px;
+		}
+		
+		table#questionTable td.FCKcell {
+			padding: 10px 0px 0px 0px;
+		}
+		
+		img.clearEntry {
+			maring: 0px;
+			padding: 0px;
+			cursor: pointer;
 		}
 	</style>
 	
@@ -68,6 +79,10 @@
 	  			}
   			}
 		}
+		
+		function clearEntry(questionIndex){
+			FCKeditorAPI.GetInstance("question["+questionIndex+"]").SetHTML("");
+		}
 				
 		$(document).ready(function(){
 			fillForm();
@@ -89,25 +104,36 @@
 		<html:hidden property="candidateAnswersString" styleId="candidateAnswersString" />
 		<input type="hidden" id="questionCount" value="${formBean.questionCount}" />
 		
-		<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}" >
-			<div class="FCKdiv">
-				<lams:FCKEditor id="question[${questionIndex-1}]"
-					value="${formBean.questionList[questionIndex-1]}"
-					contentFolderID="${formBean.contentFolderID}"
-	                toolbarSet="Custom-Pedplanner" height="150px"
-	                width="760px" displayExpanded="false">
-				</lams:FCKEditor>
-			</div>
-			<div class="space-left">
-				<c:forEach var="candidateAnswerIndex" begin="1" end="${formBean.candidateAnswerCount[questionIndex-1]}" >
-					${candidateAnswerIndex}.
-					<input size=90" type="text" name="candidateAnswer${questionIndex}-${candidateAnswerIndex}" id="candidateAnswer${questionIndex}-${candidateAnswerIndex}" />
-					<html:radio property="correct[${questionIndex-1}]" value="${candidateAnswerIndex}" />
-					<br />
-				</c:forEach>
-				<input type="hidden" name="candidateAnswerCount${questionIndex}" value="${formBean.candidateAnswerCount[questionIndex-1]}" />
-			</div>
-		</c:forEach>
+		<table id="questionTable" cellpadding="0" cellspacing="0">
+			<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}">
+				<tr>
+					<td class="FCKcell">
+						<lams:FCKEditor id="question[${questionIndex-1}]"
+							value="${formBean.questionList[questionIndex-1]}"
+							contentFolderID="${formBean.contentFolderID}"
+			                toolbarSet="Custom-Pedplanner" height="150px"
+			                width="705px" displayExpanded="false">
+						</lams:FCKEditor>
+					</td>
+					<td>
+						<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
+							title="<fmt:message key="msg.planner.clear.entry" />"
+							onclick="javascript:clearEntry(${questionIndex-1})" />
+					</td>
+				</tr>
+				<tr>
+					<td class="space-left" colspan="2">
+						<c:forEach var="candidateAnswerIndex" begin="1" end="${formBean.candidateAnswerCount[questionIndex-1]}" >
+							${candidateAnswerIndex}.
+							<input size=90" type="text" name="candidateAnswer${questionIndex}-${candidateAnswerIndex}" id="candidateAnswer${questionIndex}-${candidateAnswerIndex}" />
+							<html:radio property="correct[${questionIndex-1}]" value="${candidateAnswerIndex}" />
+							<br />
+						</c:forEach>
+						<input type="hidden" name="candidateAnswerCount${questionIndex}" value="${formBean.candidateAnswerCount[questionIndex-1]}" />
+					</td>
+				</tr>
+			</c:forEach>
+		</table>
 	</html:form>
 	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.addNewQuestion" /></a>
 </body>

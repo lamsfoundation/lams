@@ -14,11 +14,22 @@
 		}
 		
 		body{
-			width: 760px;
+			width: 750px;
 		}
-					
-		div.FCKdiv {
-			margin-top: 10px;
+		
+		table#topicTable td {
+			margin: 0px;
+			padding: 0px;
+		}
+		
+		table#topicTable td.FCKcell {
+			padding: 10px 0px 0px 5px;
+		}
+		
+		img.clearEntry {
+			maring: 0px;
+			padding: 0px;
+			cursor: pointer;
 		}
 	</style>
 	
@@ -46,6 +57,10 @@
 				}
 			} while (topic!=null);
 		}
+		
+		function clearEntry(topicIndex){
+			FCKeditorAPI.GetInstance("topic["+topicIndex+"]").SetHTML("");
+		}
   	</script>
 </lams:head>
 <body id="body">
@@ -58,16 +73,25 @@
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
-		<c:forEach var="topicIndex"  begin="1" end="${formBean.topicCount}" >
-			<div class="FCKdiv">
-				<lams:FCKEditor id="topic[${topicIndex-1}]"
-					value="${formBean.topicList[topicIndex-1]}"
-					contentFolderID="${formBean.contentFolderID}"
-	                toolbarSet="Custom-Pedplanner" height="150px"
-	                width="760px" displayExpanded="false">
-				</lams:FCKEditor>
-			</div>
-		</c:forEach>
+		<table id="topicTable" cellpadding="0" cellspacing="0">
+			<c:forEach var="topicIndex" begin="1" end="${formBean.topicCount}">
+				<tr>
+					<td class="FCKcell">
+						<lams:FCKEditor id="topic[${topicIndex-1}]"
+							value="${formBean.topicList[topicIndex-1]}"
+							contentFolderID="${formBean.contentFolderID}"
+			                toolbarSet="Custom-Pedplanner" height="150px"
+			                width="705px" displayExpanded="false">
+						</lams:FCKEditor>
+					</td>
+					<td>
+						<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
+							title="<fmt:message key="msg.planner.clear.entry" />"
+							onclick="javascript:clearEntry(${topicIndex-1})" />
+					</td>
+				</tr>
+			</c:forEach>
+		</table>
 	</html:form>
 	<a class="button" href="javascript:createTopic();"><fmt:message key="label.authoring.create.new.topic" /></a>
 </body>
