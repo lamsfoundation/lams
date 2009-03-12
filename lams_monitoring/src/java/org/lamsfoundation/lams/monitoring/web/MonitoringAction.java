@@ -73,7 +73,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                validate="false"
  * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
  * @struts.action-forward name = "notsupported" path = ".notsupported"
- * @struts.action-forward name = "timeChart" path = "/timeChart"
+ * @struts.action-forward name = "timeChart" path = "/timeChart.jsp"
  * 
  * ----------------XDoclet Tags--------------------
  */
