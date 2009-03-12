@@ -409,8 +409,15 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 	private function checkIfBranchActive():Void {
 		for(var i=0; i<children_mc.length; i++) {
 			var learnerAct = children_mc[i];
-			if((learnerAct.isAttempted || learnerAct.isCompleted) && children_mc[i].activity.isBranchingActivity())
-				activeSequence = null;			// Possibly closing any other open sequence if a branching activity is active. TODO: review.
+			if((learnerAct.isAttempted || learnerAct.isCompleted) && learnerAct.activity.isBranchingActivity()) {
+				
+				if(!(model.findParent(learnerAct.activity, activeSequence))) {
+					activeSequence =  null;			// Possibly closing any other open sequence if a branching activity is active. TODO: review.
+				}
+				
+				if (_root.mode != 'preview' && isLearnerModule())
+					activeSequence = null;
+			}
 		}
 	}
 	
@@ -454,7 +461,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 				// check children of sequence (level 1) for current activity
 				if(model.checkComplexHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeSequence))
 					removeAllChildrenAndInputSequence(children_mc[i].activity, false);
-			} else if(isChildAttempted && (children_mc[i].activity.isOptionsWithSequencesActivity() || children_mc[i].activity.isOptionalActivity() || children_mc[i].activity.isParallelActivity())) {
+			} else if(isChildAttempted && (children_mc[i].activity.isOptionsWithSequencesActivity() || children_mc[i].activity.isOptionalActivity() || children_mc[i].activity.isParallelActivity() || (children_mc[i].activity.isBranchingActivity() && (_root.mode == 'preview')))) {
 				if(model.checkComplexHasCurrentActivity(children_mc[i].activity, learner) && (children_mc[i].activity != activeComplex))
 					removeAllChildrenAndInputComplex(children_mc[i].activity, children_mc[i].level, false);
 			}
