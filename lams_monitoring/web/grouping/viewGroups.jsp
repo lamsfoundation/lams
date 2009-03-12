@@ -64,7 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    var MMdoctitle = document.title;
 		
 			AC_FL_RunContent(
-				"src", "<lams:LAMSURL/>/monitoring/grouping/playerProductInstall",
+				"src", "<lams:LAMSURL/>/includes/flash/playerProductInstall",
 				"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+'&lessonID='+'${lessonID}'+'&activityID='+'${activityID}'+'&serverUrl=<lams:LAMSURL/>'+'&mayDelete='+'${mayDelete}'+'&viewMode='+'${viewMode}'+'&usedForBranching='+'${usedForBranching}'+'&maxNumberOfGroups='+'${maxNumberOfGroups}'+'&languageXML='+"${languageXML}"+"",
 				"width", "640",
 				"height", "460",
