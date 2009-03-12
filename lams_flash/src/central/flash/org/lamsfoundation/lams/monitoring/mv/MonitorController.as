@@ -487,7 +487,7 @@ class MonitorController extends AbstractController {
 	private function viewClassTimeChart():Void {
 		var classTimeChart_url:String = _root.serverURL+"monitoring/monitoring.do?method=viewTimeChart&lessonID="+_root.lessonID;
 		Debugger.log("classTimeChart_url: "+classTimeChart_url, Debugger.GEN, "viewClassTimeChart", "MonitorController");
-		JsPopup.getInstance().launchPopupWindow(classTimeChart_url, 'ClassTimeChart', 600, 400, true, true, false, false, false);
+		JsPopup.getInstance().launchPopupWindow(classTimeChart_url, 'ClassTimeChart', 600, 800, true, true, false, false, false);
 	}
 	
 	private function exportClassPortfolio():Void{

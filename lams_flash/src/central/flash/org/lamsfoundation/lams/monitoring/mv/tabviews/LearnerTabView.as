@@ -458,7 +458,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		learnerTimeChart_btn.setSize(94, 17);
 		learnerTimeChart_btn.onRelease = function (){
 			Debugger.log("learnerTimeChart_url: "+learnerTimeChart_url, Debugger.GEN, "printLearner", "LearnerTabView");
-			JsPopup.getInstance().launchPopupWindow(learnerTimeChart_url, 'TimeChart'+learner.getLearnerId(), 600, 400, true, true, false, false, false);
+			JsPopup.getInstance().launchPopupWindow(learnerTimeChart_url, 'TimeChart'+learner.getLearnerId(), 600, 800, true, true, false, false, false);
 		}
 		
 		learnerExp_btn.onRollOver = Proxy.create(this,this['showToolTip'], learnerExp_btn, "learner_exportPortfolio_btn_tooltip");
