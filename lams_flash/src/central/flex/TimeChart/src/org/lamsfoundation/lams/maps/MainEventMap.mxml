@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EventMap xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="http://mate.asfusion.com/">
+	
+	<mx:Script>
+		<![CDATA[
+			import com.asfusion.mate.actions.builders.EventAnnouncer;
+			import com.asfusion.mate.actions.builders.HTTPServiceInvoker;
+			import mx.core.Application;
+			
+			import mx.events.*;
+			import org.lamsfoundation.lams.events.*;
+			import org.lamsfoundation.lams.business.*;
+			import org.lamsfoundation.lams.views.*;
+			
+			import org.lamsfoundation.lams.common.dictionary.XMLDictionary;
+	
+			[Bindable]
+			private var serverURL:String;
+			
+			public function init(url:String):void {
+				trace('serverUrl: ' + url);
+				serverURL = url;
+			}
+		]]>
+	</mx:Script>
+	
+	<!-- FlexEvent.PREINITIALIZE __________________________________________________________________ -->
+	
+	<EventHandlers type="{FlexEvent.PREINITIALIZE}">
+		<ObjectBuilder id="chartManager" generator="{ChartManager}"/>
+	</EventHandlers>
+	
+	<!-- FlexEvent.APPLICATION_COMPLETE ___________________________________________________________ -->
+	<EventHandlers type="{FlexEvent.APPLICATION_COMPLETE}">
+		<EventAnnouncer generator="{ChartEvent}" type="{DictionaryEvent.LOAD}" />
+		<EventAnnouncer generator="{ChartEvent}" type="{ChartEvent.LOAD}" />
+	</EventHandlers>
+	
+	<!-- DictionaryEvent.LOAD ___________________________________________________________ -->
+	<EventHandlers type="{DictionaryEvent.LOAD}">
+		<!-- load dict data -->
+		<HTTPServiceInvoker instance="{dictionaryService}">
+			<resultHandlers>
+				<MethodInvoker generator="{ChartManager}" method="setDictionary" arguments="{resultObject}" />
+				<EventAnnouncer generator="{DictionaryEvent}" type="{DictionaryEvent.UPDATE}" />
+			</resultHandlers>
+		</HTTPServiceInvoker>
+	</EventHandlers>
+	
+	<!-- DictionaryEvent.GET ___________________________________________________________ -->
+	<EventHandlers type="{DictionaryEvent.GET}">
+		<MethodInvoker generator="{ChartManager}" method="setLabel" arguments="{[event, event.labelKey]}" />
+	</EventHandlers>
+	
+	<!-- ChartEvent.LOAD_CLASS ___________________________________________________________ -->
+	<EventHandlers type="{ChartEvent.LOAD_CLASS}">
+		
+		<!-- load data -->
+		<HTTPServiceInvoker instance="{learnerProgressService}">
+			<Request lessonID="{event.lessonID}" />
+			<resultHandlers>
+				<MethodInvoker generator="{WDDXParser}" 
+					method="parseObject" arguments="{resultObject}" />
+				
+				<MethodInvoker generator="{ChartManager}" method="loadChartData" arguments="{[lastReturn, event.type]}" />
+				<EventAnnouncer generator="{ChartEvent}" type="{ChartEvent.UPDATE}" />
+			</resultHandlers>
+		</HTTPServiceInvoker>
+		
+	</EventHandlers>
+
+
+	<!-- ChartEvent.LOAD_LEARNER ___________________________________________________________ -->
+	<EventHandlers type="{ChartEvent.LOAD_LEARNER}">
+		
+		<!-- load data -->
+		<HTTPServiceInvoker instance="{learnerProgressService}">
+			<Request lessonID="{event.lessonID}" learnerID="{event.learnerID}" />
+			<resultHandlers>
+				<MethodInvoker generator="{WDDXParser}" 
+					method="parseObject" arguments="{resultObject}" />
+				
+				<MethodInvoker generator="{ChartManager}" method="loadChartData" arguments="{[lastReturn, event.type]}" />
+				<EventAnnouncer generator="{ChartEvent}" type="{ChartEvent.UPDATE}" />
+			</resultHandlers>
+		</HTTPServiceInvoker>
+		
+	</EventHandlers>
+	
+	<!-- ChartEvent.UPDATE ____________________________________________________________________ -->
+	
+	<EventHandlers type="{ChartEvent.UPDATE}">
+		<!-- assume everything was ok, make chart show up -->
+		<EventAnnouncer generator="{NavigationEvent}" type="{NavigationEvent.CHART}"/>
+	</EventHandlers>
+	
+	<!-- ChartEvent.SELECT ____________________________________________________________________ -->
+	
+	<EventHandlers type="{ChartEvent.SELECT}">
+		<MethodInvoker generator="{ChartManager}" method="showLearnerProgress" arguments="{event.learnerProgress}"/>
+		<!-- show chart view -->
+		<EventAnnouncer generator="{NavigationEvent}" type="{NavigationEvent.CHART}"/>
+	</EventHandlers>
+	
+	<!-- ======================================================================================== -->
+	<!-- Services   Note: you can have an external file if you have more services -->
+	<!-- _________________________________________________________________________________________ -->
+	
+	<mx:HTTPService id="learnerProgressService" url="{serverURL}monitoring/monitoring.do?method=getAllCompletedActivities" resultFormat="xml" />
+	<mx:HTTPService id="dictionaryService" url="{serverURL}monitoring/monitoring.do?method=getDictionaryXML" resultFormat="e4x" />         
+</EventMap>

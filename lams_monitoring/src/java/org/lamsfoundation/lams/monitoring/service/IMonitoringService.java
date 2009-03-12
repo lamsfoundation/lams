@@ -456,11 +456,31 @@ public interface IMonitoringService {
      *            required
      * @param userID
      *            The user id of the user requesting the progress details
+     * @param completedOnly
+     * 			  true if the data we are affect is completed activities data (included completed time values).
      * @return String The requested information in wddx format
      * @throws IOException
      */
-    public String getAllLearnersProgress(Long lessonID, Integer userID) throws IOException;
+    public String getAllLearnersProgress(Long lessonID, Integer userID, Boolean completedOnly) throws IOException;
 
+    /**
+     * This method returns the progress information of all learners in a given
+     * Lesson.
+     * 
+     * @param lessonID
+     *            The lesson_id of the Lesson whose progress information is
+     *            required
+     * @param learnerID
+     * 			  The learner_id of the class learner whose progress information is required
+     * 			  If null, provide all learner's progress information.
+     * @param userID
+     *            The user id of the user requesting the progress details
+     * @return String The requested information in wddx format
+     * @throws IOException
+     */
+    public String getAllCompletedActivities(Long lessonID, Long learnerID, Integer userID) throws IOException;
+
+    
     /**
      * This method returns a batch of progress information of learners in a
      * given Lesson. It returns the first batch of users, using the learner's
@@ -851,4 +871,8 @@ public interface IMonitoringService {
      * Set a groups name
      */
 	public void setGroupName(Long groupID, String name);
+	
+	/** Open Time Chart */
+	public Boolean openTimeChart(long lessonId, Integer userId) throws UserAccessDeniedException;
+	
 }

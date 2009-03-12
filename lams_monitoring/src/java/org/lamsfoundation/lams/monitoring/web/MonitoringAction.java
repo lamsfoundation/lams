@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.monitoring.web;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -45,6 +47,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -70,6 +73,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *                validate="false"
  * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
  * @struts.action-forward name = "notsupported" path = ".notsupported"
+ * @struts.action-forward name = "timeChart" path = ".timeChart"
  * 
  * ----------------XDoclet Tags--------------------
  */
@@ -85,6 +89,8 @@ public class MonitoringAction extends LamsDispatchAction
     //---------------------------------------------------------------------
 	private static final String PREVIEW_DELETED_REPORT_SCREEN = "previewdeleted";
 	private static final String NOT_SUPPORTED_SCREEN = "notsupported";
+	private static final String TIME_CHART_SCREEN = "timeChart";
+	private static final String ERROR = "error";
 	
 	/** See deleteOldPreviewLessons */
 	public static final String NUM_DELETED = "numDeleted";
@@ -648,7 +654,7 @@ public class MonitoringAction extends LamsDispatchAction
     	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
     	try{
     		Long lessonID = WebUtil.readLongParam(request,"lessonID",false);
-    		wddxPacket = monitoringService.getAllLearnersProgress(lessonID, getUserId());
+    		wddxPacket = monitoringService.getAllLearnersProgress(lessonID, getUserId(), false);
      	}catch (Exception e) {
      		wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
     	}
@@ -657,6 +663,70 @@ public class MonitoringAction extends LamsDispatchAction
         writer.println(wddxPacket);
         return null;
     }
+    
+    public ActionForward getDictionaryXML(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)  throws IOException {
+    	
+    	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+    	MessageService messageService = monitoringService.getMessageService();
+    	
+    	ArrayList<String> languageCollection = new ArrayList<String>();
+		languageCollection.add(new String("chart.btn.activity.split"));
+		languageCollection.add(new String("chart.btn_completion.rate"));
+		languageCollection.add(new String("chart.series.completed.time"));
+		languageCollection.add(new String("chart.series.average.time"));
+		languageCollection.add(new String("chart.series.duration"));
+		languageCollection.add(new String("chart.legend.average"));
+		languageCollection.add(new String("show.average.checkbox"));
+		languageCollection.add(new String("search.learner.textbox"));
+		languageCollection.add(new String("chart.learner.linear.axis.title")); 
+		languageCollection.add(new String("chart.learner.category.axis.title"));
+		languageCollection.add(new String("chart.learner.datatip.average"));
+		
+		languageCollection.add(new String("label.learner"));
+		languageCollection.add(new String("time.chart.panel.title"));
+		languageCollection.add(new String("chart.time.format.hours"));
+		languageCollection.add(new String("chart.time.format.minutes"));
+		languageCollection.add(new String("chart.time.format.seconds"));
+		languageCollection.add(new String("label.completed"));
+		
+		String languageOutput = "<xml><language>";
+		
+		for(int i = 0; i < languageCollection.size(); i++){
+			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
+		}
+		
+		languageOutput += "</language></xml>";
+		
+	    PrintWriter writer = response.getWriter();
+        writer.println(languageOutput);
+        return null;
+    }
+    
+    public ActionForward getAllCompletedActivities(ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response)throws IOException{
+    	
+	    String wddxPacket;
+	    IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+	    try{
+	    	Long lessonID = WebUtil.readLongParam(request,"lessonID",false);
+	    	Long learnerID = WebUtil.readLongParam(request,"learnerID",true);
+	    	wddxPacket = monitoringService.getAllCompletedActivities(lessonID, learnerID, getUserId());
+	     	
+	    }catch (Exception e) {
+     		wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
+    	}
+	    
+	    PrintWriter writer = response.getWriter();
+        writer.println(wddxPacket);
+        return null;
+    		
+    }
+    
     /** Get the first batch of learner progress data learners in a lesson. This is called by the learner progress tab in monitoring */
     public ActionForward getInitialLearnersProgress(ActionMapping mapping,
             ActionForm form,
@@ -1009,5 +1079,32 @@ public class MonitoringAction extends LamsDispatchAction
         PrintWriter writer = response.getWriter();
         writer.println(wddxPacket);
         return null;
-    }  
+    } 
+    
+	/** Open Time Chart display  */
+	public ActionForward viewTimeChart(ActionMapping mapping,
+										ActionForm form, HttpServletRequest request,
+										HttpServletResponse response) throws IOException, ServletException {
+		
+		IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet().getServletContext());
+		
+		try {
+			
+			long lessonID = WebUtil.readLongParam(request, "lessonID");
+			
+			// check monitor privledges
+			monitoringService.openTimeChart(lessonID, getUserId());
+			
+			request.setAttribute("lessonID", lessonID);
+			request.setAttribute("learnerID", WebUtil.readLongParam(request, "learnerID", true));
+			
+		} catch (Exception e) {
+			request.setAttribute("errorName","MonitoringAction");
+			request.setAttribute("errorMessage", e.getMessage());
+
+			return mapping.findForward(ERROR);
+		}
+		
+		return mapping.findForward(TIME_CHART_SCREEN);
+	}
 }

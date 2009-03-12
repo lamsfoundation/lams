@@ -1170,7 +1170,18 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 	return gate;
     }
-
+    
+    public Boolean openTimeChart(long lessonId, Integer userId) {
+    	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
+    	if (requestedLesson == null) {
+    	    throw new MonitoringServiceException("Lesson for id=" + lessonId
+    		    + " is missing. Unable to open.");
+    	}
+    	
+    	checkOwnerOrStaffMember(userId, requestedLesson, "open the time chart");
+    	
+    	return true;
+    }
     public GateActivity openGateForSingleUser(Long gateId, Integer userId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	if (gate != null && userId != null && userId >= 0) {
@@ -1495,7 +1506,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLearnersProgress(java.lang.Long,
      *      java.lang.Integer)
      */
-    public String getAllLearnersProgress(Long lessonID, Integer userID) throws IOException {
+    public String getAllLearnersProgress(Long lessonID, Integer userID, Boolean completedDataOnly) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	FlashMessage flashMessage;
 
@@ -1504,15 +1515,42 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    Vector progressData = new Vector();
 	    Iterator iterator = lesson.getLearnerProgresses().iterator();
 	    while (iterator.hasNext()) {
-		LearnerProgress learnerProgress = (LearnerProgress) iterator.next();
-		progressData.add(learnerProgress.getLearnerProgressData());
+	    	LearnerProgress learnerProgress = (LearnerProgress) iterator.next();
+			if(!completedDataOnly)
+				progressData.add(learnerProgress.getLearnerProgressData());
+			else
+				progressData.add(learnerProgress.getLearnerProgressCompletedData());
 	    }
-	    flashMessage = new FlashMessage("getAllLearnersProgress", progressData);
+	    flashMessage = (!completedDataOnly) ? new FlashMessage("getAllLearnersProgress", progressData)
+	    									: new FlashMessage("getAllCompletedActivities", progressData);
 	} else {
 	    flashMessage = new FlashMessage("getAllLearnersProgress", messageService.getMessage("NO.SUCH.LESSON",
 		    new Object[] { lessonID }), FlashMessage.ERROR);
 	}
 	return flashMessage.serializeMessage();
+    }
+    
+    public String getAllCompletedActivities(Long lessonID, Long learnerID, Integer userID) throws IOException {
+    	Lesson lesson = lessonDAO.getLesson(lessonID);
+    	FlashMessage flashMessage;
+
+    	if (lesson != null) {
+    	    checkOwnerOrStaffMember(userID, lesson, "get all learners progress");
+    	    Vector progressData = new Vector();
+    	    
+    	    if(learnerID != null) {
+    	    	LearnerProgress learnerProgress = learnerService.getProgress(userID, lessonID);
+    	    	progressData.add(learnerProgress.getLearnerProgressCompletedData());
+    	    	flashMessage = new FlashMessage("getAllCompletedActivities", progressData);
+    	    } else {
+    	    	return getAllLearnersProgress(lessonID, userID, true);
+    	    }
+    	    
+    	} else {
+    	    flashMessage = new FlashMessage("getAllCompletedActivities", messageService.getMessage("NO.SUCH.LESSON",
+    		    new Object[] { lessonID }), FlashMessage.ERROR);
+    	} 
+    	return flashMessage.serializeMessage();
     }
 
     /**
