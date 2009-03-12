@@ -28,6 +28,8 @@ import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
+import org.lamsfoundation.lams.lesson.dto.LearnerProgressCompletedDTO;
+import org.lamsfoundation.lams.lesson.dto.CompletedActivityDTO;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -494,6 +496,21 @@ public class LearnerProgress implements Serializable
                                       isComplete());
     }
     
+    public LearnerProgressCompletedDTO getLearnerProgressCompletedData()
+    {
+    	return new LearnerProgressCompletedDTO(this.lesson.getLessonId(),
+									           this.lesson.getLessonName(),
+									           this.user.getLogin(),
+									           this.user.getLastName(),
+									           this.user.getFirstName(),
+									           this.user.getUserId(),
+									           this.createCompletedActivityArrayFrom(this.completedActivities),
+									           isComplete(),
+									           this.lesson.getStartDateTime().getTime(),
+									           this.startDate.getTime());
+    	
+    }
+    
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
@@ -517,6 +534,25 @@ public class LearnerProgress implements Serializable
         
         return (Long [])activitiesIds.toArray(new Long[activitiesIds.size()]);
     }
+    
+    private CompletedActivityDTO[] createCompletedActivityArrayFrom(Map activities)
+    {
+        if(activities == null)
+            throw new IllegalArgumentException("Fail to create id array" +
+            		" from null activity set");
+        
+        ArrayList<CompletedActivityDTO> activitiesCompleted = new ArrayList<CompletedActivityDTO>();
+        
+        for(Iterator i= activities.keySet().iterator();i.hasNext();)
+        {
+            Activity activity = (Activity)i.next();
+            Long completedTime = ((Date)activities.get(activity)).getTime() - startDate.getTime();
+            activitiesCompleted.add(new CompletedActivityDTO(activity, completedTime));
+        }
+        
+        return (CompletedActivityDTO [])activitiesCompleted.toArray(new CompletedActivityDTO[activitiesCompleted.size()]);
+    }
+    
     
 	public Date getFinishDate() {
 		return finishDate;
