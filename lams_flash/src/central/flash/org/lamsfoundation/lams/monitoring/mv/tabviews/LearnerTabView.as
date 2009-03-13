@@ -427,6 +427,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 
 		var styleObj = _tm.getStyleObject('button');
 		var EP_btn_label:String = Dictionary.getValue('learner_exportPortfolio_btn')
+		var timeChart_btn_label:String = Dictionary.getValue('view_time_chart_btn')
 		
 		var nameTextFormat = new TextFormat();
 		
@@ -444,7 +445,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		}
 		
 		_nameLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"_btn", _nameLayer_mc.getNextHighestDepth(),{label:EP_btn_label, _x:z.w-110, _y:ACT_Y+2, styleName:styleObj} )
-		_nameLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"timeChart_btn", _nameLayer_mc.getNextHighestDepth(),{label:"View Time Chart", _x:z.w-220, _y:ACT_Y+2, styleName:styleObj} )
+		_nameLayer_mc.attachMovie("Button", "learnerName"+learner.getLearnerId()+"timeChart_btn", _nameLayer_mc.getNextHighestDepth(),{label:timeChart_btn_label, _x:z.w-220, _y:ACT_Y+2, styleName:styleObj} )
 		
 		var learnerName_txt = _nameLayer_mc["learnerName"+learner.getLearnerId()];
 		var learnerExp_btn = _nameLayer_mc["learnerName"+learner.getLearnerId()+"_btn"];
@@ -464,7 +465,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		learnerExp_btn.onRollOver = Proxy.create(this,this['showToolTip'], learnerExp_btn, "learner_exportPortfolio_btn_tooltip");
 		learnerExp_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
-		learnerTimeChart_btn.onRollOver = Proxy.create(this,this['showToolTip'], learnerTimeChart_btn, "learner_timeChart_btn_tooltip");
+		learnerTimeChart_btn.onRollOver = Proxy.create(this,this['showToolTip'], learnerTimeChart_btn, "view_time_chart_btn_tooltip");
 		learnerTimeChart_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		var sLearner:mx.styles.CSSStyleDeclaration = _tm.getStyleObject("LTVLearnerText");

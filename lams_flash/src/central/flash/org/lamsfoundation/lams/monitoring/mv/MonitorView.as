@@ -285,7 +285,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 		help_btn.onRollOver = Proxy.create(this,this['showToolTip'], help_btn, "help_btn_tooltip");
 		help_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
-		viewAllTimeChart_btn.onRollOver = Proxy.create(this,this['showToolTip'], viewAllTimeChart_btn, "class_timeChart_btn_tooltip");
+		viewAllTimeChart_btn.onRollOver = Proxy.create(this,this['showToolTip'], viewAllTimeChart_btn, "view_time_graph_btn_tooltip");
 		viewAllTimeChart_btn.onRollOut = Proxy.create(this,this['hideToolTip']);
 		
 		exportPortfolio_btn.onRollOver = Proxy.create(this,this['showToolTip'], exportPortfolio_btn, "class_exportPortfolio_btn_tooltip");
@@ -393,7 +393,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	private function setLabels():Void{
 		refresh_btn.label = Dictionary.getValue('refresh_btn');
 		help_btn.label = Dictionary.getValue('help_btn');
-		viewAllTimeChart_btn.label = "View Time Chart";
+		viewAllTimeChart_btn.label = Dictionary.getValue('view_time_graph_btn');
 		exportPortfolio_btn.label = Dictionary.getValue('learner_exportPortfolio_btn');
 		viewJournals_btn.label = Dictionary.getValue('learner_viewJournals_btn');
 		editFly_btn.label = Dictionary.getValue('ls_sequence_live_edit_btn');
