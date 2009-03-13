@@ -438,7 +438,12 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			return;
 		}
 		
-		var closeBox:Boolean = true;
+		var closeBox:Boolean;
+		if (actStatus == null || actStatus == undefined){
+			actStatus = Progress.compareProgressData(learner, _activity.activityID);
+		}
+		
+		closeBox = (activityStatus == "completed_mc") ? true : false;
 		
 		var tempActiveSequence:SequenceActivity = _activeSequence;
 		var tempActiveComplex:ComplexActivity = _activeComplex;
@@ -447,6 +452,8 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			
 			var isChildCurrent:Boolean = children_mc[i].isCurrent;
 			var isChildAttempted:Boolean = children_mc[i].isAttempted;
+			
+			if (children_mc[i].activity == activeSequence) closeBox = false;
 			
 			if(isChildCurrent && children_mc[i].activity.isSequenceActivity()) {
 				// set activesequence if is current
@@ -467,12 +474,11 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 			}
 			
 			if(children_mc[i].activityStatus == "completed_mc" && isLearnerModule()) {
-				if(children_mc[i].activity == activeSequence) 
-					removeAllChildrenAndInputSequence(activeSequence, false);
-				else if(children_mc[i].activity == activeComplex)  
+				if(children_mc[i].activity == activeSequence) {
+					//removeAllChildrenAndInputSequence(activeSequence, false);
+					removeAllChildrenAndInputSequence(null, false);
+				} else if(children_mc[i].activity == activeComplex)  
 					removeAllChildrenAndInputComplex(null, null, false);
-			} else {
-				closeBox = false;
 			}
 			
 			if(children_mc[i] instanceof LearnerActivity) children_mc[i].refresh();
