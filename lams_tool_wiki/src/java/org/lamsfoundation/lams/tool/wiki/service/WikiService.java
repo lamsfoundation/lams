@@ -834,7 +834,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * @throws SubmitFilesException
      */
     private ITicket getRepositoryLoginTicket() throws WikiException {
-	repositoryService = RepositoryProxy.getRepositoryService();
 	ICredentials credentials = new SimpleCredentials(WikiToolContentHandler.repositoryUser,
 		WikiToolContentHandler.repositoryId);
 	try {
@@ -1082,6 +1081,14 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
+    }
+    
+    public IRepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+
+    public void setRepositoryService(IRepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
     }
     
 }

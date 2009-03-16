@@ -482,7 +482,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
      * @throws SubmitFilesException
      */
     private ITicket getRepositoryLoginTicket() throws NotebookException {
-	repositoryService = RepositoryProxy.getRepositoryService();
 	ICredentials credentials = new SimpleCredentials(NotebookToolContentHandler.repositoryUser,
 		NotebookToolContentHandler.repositoryId);
 	try {
@@ -613,6 +612,14 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+    
+    public IRepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+
+    public void setRepositoryService(IRepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
     }
 
     public NotebookOutputFactory getNotebookOutputFactory() {

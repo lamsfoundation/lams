@@ -71,6 +71,7 @@
 		<property name="messageService"><ref bean="sbmtMessageService"/></property>
 		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
 		<property name="lessonService"><ref bean="lessonService"/></property> 
+		<property name="repositoryService"><ref bean="repositoryService" /></property>
 	</bean>
 	
 	<bean id="submitFilesService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

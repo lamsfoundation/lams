@@ -414,7 +414,6 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * @throws SubmitFilesException
      */
     private ITicket getRepositoryLoginTicket() throws SubmitFilesException {
-	repositoryService = RepositoryProxy.getRepositoryService();
 	ICredentials credentials = new SimpleCredentials(SbmtToolContentHandler.repositoryUser,
 		SbmtToolContentHandler.repositoryId);
 	try {
@@ -1066,6 +1065,14 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
+    }
+    
+    public IRepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+
+    public void setRepositoryService(IRepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
     }
 
     public ILamsToolService getToolService() {

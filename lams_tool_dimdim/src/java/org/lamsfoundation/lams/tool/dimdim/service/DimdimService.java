@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -624,7 +623,6 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
      * @throws SubmitFilesException
      */
     private ITicket getRepositoryLoginTicket() throws DimdimException {
-	repositoryService = RepositoryProxy.getRepositoryService();
 	ICredentials credentials = new SimpleCredentials(DimdimToolContentHandler.repositoryUser,
 		DimdimToolContentHandler.repositoryId);
 	try {
@@ -770,5 +768,13 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+    
+    public IRepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+
+    public void setRepositoryService(IRepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
     }
 }

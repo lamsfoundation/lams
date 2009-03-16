@@ -1557,9 +1557,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * @throws SubmitFilesException
      */
     public ITicket getRepositoryLoginTicket() throws VoteApplicationException {
-	repositoryService = RepositoryProxy.getRepositoryService();
-	logger.debug("retrieved repositoryService : " + repositoryService);
-
 	ICredentials credentials = new SimpleCredentials(repositoryUser, repositoryId);
 	try {
 	    ITicket ticket = repositoryService.login(credentials, VoteServicePOJO.repositoryWorkspaceName);

@@ -515,7 +515,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
      * @throws SubmitFilesException
      */
     private ITicket getRepositoryLoginTicket() throws ScribeException {
-	repositoryService = RepositoryProxy.getRepositoryService();
 	ICredentials credentials = new SimpleCredentials(ScribeToolContentHandler.repositoryUser,
 		ScribeToolContentHandler.repositoryId);
 	try {
@@ -602,6 +601,14 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+    
+    public IRepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+
+    public void setRepositoryService(IRepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
     }
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {

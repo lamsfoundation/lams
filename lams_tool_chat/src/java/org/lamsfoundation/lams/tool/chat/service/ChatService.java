@@ -62,7 +62,6 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -819,6 +818,14 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return chatMessageDAO.getLatest(chatSession, max);
     }
 
+    public IRepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+
+    public void setRepositoryService(IRepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
+    }
+
     public IAuditService getAuditService() {
 	return auditService;
     }
@@ -901,7 +908,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      * @throws SubmitFilesException
      */
     private ITicket getRepositoryLoginTicket() throws ChatException {
-	repositoryService = RepositoryProxy.getRepositoryService();
 	ICredentials credentials = new SimpleCredentials(ChatToolContentHandler.repositoryUser,
 		ChatToolContentHandler.repositoryId);
 	try {

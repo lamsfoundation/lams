@@ -48,7 +48,6 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -120,6 +119,12 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	public void setAuthoringService(IAuthoringService authoringService) {
 		this.authoringService = authoringService;
 	}	
+	/**
+	 * @param repositoryService The repositoryService to set.  
+	 */
+	public void setRepositoryService(IRepositoryService repositoryService) {
+	    this.repositoryService = repositoryService;
+	}
 	/**
 	 * @param learningDesignDAO The learningDesignDAO to set.
 	 */
@@ -813,7 +818,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @return ITicket The ticket for repostory access
 	 */
 	private ITicket getRepositoryLoginTicket(){
-		repositoryService = RepositoryProxy.getLocalRepositoryService();
 		ICredentials credentials = new SimpleCredentials(IWorkspaceManagementService.REPOSITORY_USERNAME,
 				 										 IWorkspaceManagementService.REPOSITORY_PASSWORD.toCharArray());		
 		ITicket ticket = null;

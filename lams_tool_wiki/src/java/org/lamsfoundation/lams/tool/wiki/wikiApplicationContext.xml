@@ -46,6 +46,7 @@
 		   		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
 		   		<property name="messageService"><ref bean="wikiMessageService"/></property>
 		   		<property name="lessonService"><ref bean="lessonService"/></property> 
+		   		<property name="repositoryService"><ref bean="repositoryService"/></property> 
 			</bean>
 		</property>
 		<property name="transactionAttributes">

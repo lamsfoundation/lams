@@ -1903,9 +1903,6 @@ public class McServicePOJO implements
 	 * @throws SubmitFilesException
 	 */
 	public ITicket getRepositoryLoginTicket() throws McApplicationException {
-		repositoryService = RepositoryProxy.getRepositoryService();
-    	logger.debug("retrieved repositoryService : " + repositoryService);
-		
 		ICredentials credentials = new SimpleCredentials(
 				repositoryUser,
 				repositoryId);

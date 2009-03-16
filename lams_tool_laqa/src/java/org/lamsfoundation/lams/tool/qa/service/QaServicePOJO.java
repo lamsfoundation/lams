@@ -1372,8 +1372,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      * @throws SubmitFilesException
      */
     public ITicket getRepositoryLoginTicket() throws QaApplicationException {
-	repositoryService = RepositoryProxy.getRepositoryService();
-
 	ICredentials credentials = new SimpleCredentials(repositoryUser, repositoryId);
 	try {
 	    ITicket ticket = repositoryService.login(credentials, repositoryWorkspace);
