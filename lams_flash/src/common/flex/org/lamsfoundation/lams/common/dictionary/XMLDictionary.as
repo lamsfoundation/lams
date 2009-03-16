@@ -14,7 +14,7 @@ package org.lamsfoundation.lams.common.dictionary
 			eventDispatcher = new EventDispatcher();
 			dictionaryXML = new XML(xml);
 			
-			eventDispatcher.dispatchEvent(new XMLDictionaryEvent("COMPELTE"));
+			eventDispatcher.dispatchEvent(new XMLDictionaryEvent(XMLDictionaryEvent.COMPLETE));
 		}
 		
 		public function getLabel(s:String):String{
