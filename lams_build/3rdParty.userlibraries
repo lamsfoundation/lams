@@ -44,7 +44,7 @@
 <archive path="/lams_build/lib/quartz/quartz.jar"/>
 <archive javadoc="http://static.springframework.org/spring/docs/1.2.x/api/" path="/lams_build/lib/spring/spring.jar" source="/lams_build/lib/spring/src/spring-framework-1.2.8-src.zip"/>
 <archive path="/lams_build/lib/struts/struts-el.jar"/>
-<archive javadoc="http://struts.apache.org/1.x/apidocs/" path="/lams_build/lib/struts/struts.jar" source="/lams_build/lib/struts/src/jakarta-struts-1.2.4-src.zip"/>
+<archive javadoc="http://struts.apache.org/1.x/apidocs/" path="/lams_build/lib/struts/struts.jar" source="/lams_build/lib/struts/src/struts-1.2.9-src.zip"/>
 <archive path="/lams_build/lib/struts/antlr.jar"/>
 <archive path="/lams_build/lib/struts/jakarta-oro.jar"/>
 <archive path="/lams_build/lib/strutstestcase/strutstest-2.1.3.jar" source="/lams_build/lib/strutstestcase/src/strutstest-213-src.zip"/>
