@@ -46,8 +46,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -62,7 +60,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
-import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -140,7 +137,7 @@ public class LearningAction extends Action {
 	// get back the assessment and question list and display them on page
 	IAssessmentService service = getAssessmentService();
 	AssessmentUser assessmentUser = null;
-	if (mode != null && mode.isTeacher()) {
+	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // assessmentUser may be null if the user was force completed.
 	    assessmentUser = getSpecifiedUser(service, toolSessionId, WebUtil.readIntParam(request,
@@ -152,16 +149,12 @@ public class LearningAction extends Action {
 	List<AssessmentQuestion> questionsFromDB = service.getAssessmentQuestionsBySessionId(toolSessionId);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 
-	// check whehter finish lock is on/off
-	// TODO!! assessment.getTimeLimit()
-	HttpSession ss = SessionManager.getSession();
-	//TODO check this user out
-	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userID = new Long(userDTO.getUserID().longValue());
-	AssessmentUser user = service.getUserByIDAndSession(userID, toolSessionId);
-	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userID);
+	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), assessmentUser.getUserId());
 	int attemptsAllowed = assessment.getAttemptsAllowed();
+	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());	
+	boolean finishedLockForMonitor =  (mode != null) && mode.isTeacher() && (lastResult != null) && (lastResult.getFinishDate() != null);	
 	boolean finishedLock = ((assessmentUser != null) && assessmentUser.isSessionFinished())
+		|| finishedLockForMonitor
 		|| ((attemptsAllowed <= dbResultCount) && (attemptsAllowed != 0));
 
 	// basic information
@@ -169,7 +162,6 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, false);
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, finishedLock);
-	//sessionMap.put(AssessmentConstants.ATTR_LOCK_ON_FINISH, assessment.getTimeLimit());
 	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, assessmentUser != null
 		&& assessmentUser.isSessionFinished());
 
@@ -231,7 +223,7 @@ public class LearningAction extends Action {
 	}
 	
 	//setAttemptStarted
-	if (! finishedLock) {
+	if (!finishedLock) {
 	    service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
 	}
 	
