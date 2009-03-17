@@ -25,11 +25,13 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 public class GradeBookUserDTO extends GradeBookGridRow {
-
-    UserDTO userDTO;
+    String login;
+    String firstName;
+    String lastName;
+    String status;
     Double totalLessonMark;
 
     public GradeBookUserDTO() {
@@ -39,9 +41,10 @@ public class GradeBookUserDTO extends GradeBookGridRow {
     public ArrayList<String> toStringArray() {
 	ArrayList<String> ret = new ArrayList<String>();
 
-	ret.add(userDTO.getLogin());
-	ret.add(userDTO.getLastName());
-	ret.add(userDTO.getFirstName());
+	ret.add(login);
+	ret.add(firstName);
+	ret.add(lastName);
+	ret.add(status);
 
 	if (totalLessonMark != null && totalLessonMark != 0.0) {
 	    ret.add(totalLessonMark.toString());
@@ -54,15 +57,7 @@ public class GradeBookUserDTO extends GradeBookGridRow {
 
     @Override
     public String getRowId() {
-	return userDTO.getLogin();
-    }
-
-    public UserDTO getUserDTO() {
-	return userDTO;
-    }
-
-    public void setUserDTO(UserDTO userDTO) {
-	this.userDTO = userDTO;
+	return login;
     }
 
     public Double getTotalLessonMark() {
@@ -71,5 +66,37 @@ public class GradeBookUserDTO extends GradeBookGridRow {
 
     public void setTotalLessonMark(Double totalLessonMark) {
 	this.totalLessonMark = totalLessonMark;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

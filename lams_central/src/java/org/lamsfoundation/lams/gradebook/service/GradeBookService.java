@@ -47,12 +47,14 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /**
  * @author lfoxton
  * 
  * This service handles all gradebook-related service calls
- *
+ * 
  */
 public class GradeBookService implements IGradeBookService {
 
@@ -70,6 +72,7 @@ public class GradeBookService implements IGradeBookService {
      * @param learner
      * @return Collection<GradeBookGridRow>
      */
+    @SuppressWarnings("unchecked")
     public Collection<GradeBookGridRow> getUserGradeBookActivityDTOs(Lesson lesson, User learner) {
 
 	logger.debug("Getting gradebook data for lesson: " + lesson.getLessonId() + ". For user: "
@@ -170,7 +173,12 @@ public class GradeBookService implements IGradeBookService {
 
 		Set<ToolOutput> toolOutputs = new HashSet<ToolOutput>();
 
-		// TODO: Work out a way to do multiple outputs, for now just the first, then break
+		// Set the activityLearner URL for this gradebook activity
+		gactivityDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
+			+ toolAct.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
+			+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
+
+		// Setting the tool outputs
 		String toolOutputsStr = "";
 		for (String outputName : map.keySet()) {
 
@@ -204,6 +212,7 @@ public class GradeBookService implements IGradeBookService {
      * @param lesson
      * @return ArrayList<GradeBookUserDTO>
      */
+    @SuppressWarnings("unchecked")
     public ArrayList<GradeBookUserDTO> getGradeBookLessonData(Lesson lesson) {
 
 	ArrayList<GradeBookUserDTO> gradeBookUserDTOs = new ArrayList<GradeBookUserDTO>();
@@ -215,7 +224,22 @@ public class GradeBookService implements IGradeBookService {
 
 		for (User learner : learners) {
 		    GradeBookUserDTO gradeBookUserDTO = new GradeBookUserDTO();
-		    gradeBookUserDTO.setUserDTO(learner.getUserDTO());
+		    gradeBookUserDTO.setLogin(learner.getLogin());
+		    gradeBookUserDTO.setFirstName(learner.getFirstName());
+		    gradeBookUserDTO.setLastName(learner.getLastName());
+
+		    // Setting the status for the user's lesson
+		    gradeBookUserDTO.setStatus("NOT STARTED");
+		    LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
+			    .getLessonId());
+		    if (learnerProgress != null) {
+			if (learnerProgress.isComplete()) {
+			    gradeBookUserDTO.setStatus("FINISHED");
+			} else if (learnerProgress.getAttemptedActivities() != null
+				&& learnerProgress.getAttemptedActivities().size() > 0) {
+			    gradeBookUserDTO.setStatus("STARTED");
+			}
+		    }
 
 		    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson
 			    .getLessonId(), learner.getUserId());
@@ -266,6 +290,8 @@ public class GradeBookService implements IGradeBookService {
      */
     public void updateUserActivityGradeBookData(Lesson lesson, User learner, Activity activity, Double mark) {
 	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
+	    
+	    // First, update the mark for the activity
 	    GradeBookUserActivity gradeBookUserActivity = gradeBookDAO.getGradeBookUserDataForActivity(activity
 		    .getActivityId(), learner.getUserId());
 
@@ -274,8 +300,6 @@ public class GradeBookService implements IGradeBookService {
 		gradeBookUserActivity.setLearner(learner);
 		gradeBookUserActivity.setActivity((ToolActivity) activity);
 	    }
-	    Double currentActivityMark = (gradeBookUserActivity.getMark() != null) ? gradeBookUserActivity.getMark()
-		    : 0.0;
 
 	    gradeBookUserActivity.setMark(mark);
 	    gradeBookDAO.insertOrUpdate(gradeBookUserActivity);
@@ -284,37 +308,19 @@ public class GradeBookService implements IGradeBookService {
 	    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(),
 		    learner.getUserId());
 
-	    Double newLessonMark = null;
 	    if (gradeBookUserLesson == null) {
 		gradeBookUserLesson = new GradeBookUserLesson();
 		gradeBookUserLesson.setLearner(learner);
 		gradeBookUserLesson.setLesson(lesson);
-		newLessonMark = mark;
-	    } else {
-
-//		Double currentLessonMark = gradeBookUserLesson.getMark();
-//
-//		// If the lesson exists, but has no mark, simply set it to the activity mark
-//		if (currentLessonMark == null) {
-//		    newLessonMark = mark;
-//		} else {
-//		    // If there is an existing activity mark, add the difference
-//		    if (currentActivityMark == null) {
-//			newLessonMark = currentLessonMark + mark;
-//		    } else {
-//			newLessonMark = currentLessonMark - currentActivityMark + mark;
-//		    }
-//		}
-		
-		aggregateTotalMarkForLesson(gradeBookUserLesson);
-
-	    }
-
+	    } 
+	    
+	    aggregateTotalMarkForLesson(gradeBookUserLesson);
 	}
     }
-    
+
     private void aggregateTotalMarkForLesson(GradeBookUserLesson gradeBookUserLesson) {
-	Double totalMark = gradeBookDAO.getGradeBookUserActivityMarkSum(gradeBookUserLesson.getLesson().getLessonId(), gradeBookUserLesson.getLearner().getUserId());
+	Double totalMark = gradeBookDAO.getGradeBookUserActivityMarkSum(gradeBookUserLesson.getLesson().getLessonId(),
+		gradeBookUserLesson.getLearner().getUserId());
 	gradeBookUserLesson.setMark(totalMark);
 	gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
     }

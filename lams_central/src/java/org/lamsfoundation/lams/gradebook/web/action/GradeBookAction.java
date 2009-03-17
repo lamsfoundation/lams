@@ -24,9 +24,7 @@
 package org.lamsfoundation.lams.gradebook.web.action;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -37,20 +35,12 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
-import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
-import org.lamsfoundation.lams.gradebook.dao.IGradeBookDAO;
-import org.lamsfoundation.lams.gradebook.dto.GradeBookActivityDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRow;
 import org.lamsfoundation.lams.gradebook.service.IGradeBookService;
 import org.lamsfoundation.lams.gradebook.util.GradeBookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradeBookUtil;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;

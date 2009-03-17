@@ -33,15 +33,14 @@ public class GradeBookUserLastNameComparator implements Comparator {
     public int compare(Object gradeBookUserDTO, Object anotherGradeBookUserDTO) {
 
 	if (gradeBookUserDTO instanceof GradeBookUserDTO && anotherGradeBookUserDTO instanceof GradeBookUserDTO) {
-	    String lastName1 = ((GradeBookUserDTO) gradeBookUserDTO).getUserDTO().getLastName().toUpperCase();
-	    String lastName2 = ((GradeBookUserDTO) anotherGradeBookUserDTO).getUserDTO().getLastName().toUpperCase();
+	    String lastName1 = ((GradeBookUserDTO) gradeBookUserDTO).getLastName().toUpperCase();
+	    String lastName2 = ((GradeBookUserDTO) anotherGradeBookUserDTO).getLastName().toUpperCase();
 
 	    int ret;
 	    if (lastName1.equals(lastName2)) {
-		String firstName1 = ((GradeBookUserDTO) gradeBookUserDTO).getUserDTO().getFirstName().toUpperCase();
-		String firstName2 = ((GradeBookUserDTO) anotherGradeBookUserDTO).getUserDTO().getFirstName().toUpperCase();
+		String firstName1 = ((GradeBookUserDTO) gradeBookUserDTO).getFirstName().toUpperCase();
+		String firstName2 = ((GradeBookUserDTO) anotherGradeBookUserDTO).getFirstName().toUpperCase();
 		ret = firstName1.compareTo(firstName2);
-		
 	    }
 	    else {
 		ret = lastName1.compareTo(lastName2);

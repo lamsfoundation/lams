@@ -28,6 +28,7 @@ import java.util.ArrayList;
 public class GradeBookActivityDTO extends GradeBookGridRow{
     long activityId;
     String activityTitle;
+    String activityUrl;
     //String toolString;
     String status;
     String output;
@@ -36,6 +37,8 @@ public class GradeBookActivityDTO extends GradeBookGridRow{
     //double timeTaken;
     Double mark;
     
+    // http://172.20.100.188:8080/lams//tool/lamc11/learningStarter.do?mode=teacher&userID=5&toolSessionID=1
+    
     public GradeBookActivityDTO() {}
     
     @Override
@@ -43,7 +46,15 @@ public class GradeBookActivityDTO extends GradeBookGridRow{
 	ArrayList<String> ret = new ArrayList<String>();
 	
 	ret.add("" + activityId);
-	ret.add(activityTitle);
+	
+	
+	if (activityUrl != null && activityUrl.length() != 0) {
+	    ret.add("<a href='javascript:launchPopup(\"" +activityUrl+ "\",\"" +activityTitle+ "\")'>" +activityTitle +"</a>");
+	} else {
+	    ret.add(activityTitle);
+	}
+	
+	
 	ret.add(status);
 	ret.add(output);
 	ret.add(competences);
@@ -113,6 +124,14 @@ public class GradeBookActivityDTO extends GradeBookGridRow{
 
     public void setCompetences(String competences) {
         this.competences = competences;
+    }
+
+    public String getActivityUrl() {
+        return activityUrl;
+    }
+
+    public void setActivityUrl(String activityUrl) {
+        this.activityUrl = activityUrl;
     }
 }
  

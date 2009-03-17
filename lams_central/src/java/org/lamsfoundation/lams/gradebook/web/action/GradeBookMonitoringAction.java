@@ -77,8 +77,6 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 
     private static Logger logger = Logger.getLogger(GradeBookMonitoringAction.class);
 
-    private static final String PARAM_MARK = "mark";
-
     private static IGradeBookService gradeBookService;
     private static IUserManagementService userService;
     private static ILessonService lessonService;

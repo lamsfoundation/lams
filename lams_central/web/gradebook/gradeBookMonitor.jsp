@@ -6,10 +6,6 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 
-<c:set var="gradebookContext">
-	<lams:LAMSURL />gradebook
-</c:set>
-
 <lams:html>
 <lams:head>
 	<title>GradeBook Monitor</title>
@@ -38,11 +34,12 @@
 			    rowList:[5,20,30],
 			    rowNum:5,
 				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}&login=test1",
-			    colNames:["", 'Last Name','First Name', 'Total Mark'],
+			    colNames:["", 'Last Name','First Name', 'Progress', 'Total Mark'],
 			    colModel:[
 			      {name:'login', index:'login', sortable:false, editable:false, hidden:true},
 			      {name:'lastName',index:'lastName', sortable:true, editable:false},
 			      {name:'firstName',index:'firstName', sortable:true, editable:false},
+			      {name:'status',index:'status', sortable:false, editable:false},
 			      {name:'totalMark',index:'totalMark', sortable:true, editable:true, editrules:{number:true}}
 			    ],
 			    imgpath: 'themes/basic/images',
@@ -88,9 +85,19 @@
 					  })
 					  
 					  
-				 }
-			})
-	});
+				 	}
+				})
+		});
+		
+		
+		function launchPopup(url,title) {
+			var wd = null;
+			if(wd && wd.open && !wd.closed){
+				wd.close();
+			}
+			wd = window.open(url,title,'resizable,width=796,height=570,scrollbars');
+			wd.window.focus();
+		}	
 	</script>
 	
 </lams:head>
@@ -100,11 +107,13 @@
 		
 		<div id="header-no-tabs"></div> <!--closes footer-->
 		<div id="content" >
-			<h1 class="no-tabs-below">${lessonDetails.lessonName} GradeBook</h1> 
-			
-				<table id="users" class="scroll" width="100%"></table>
-				<div id="pager" class="scroll" style="text-align:center;"></div>
-			
+			<h1 class="no-tabs-below">GradeBook for ${lessonDetails.lessonName}</h1> 
+			<div style="width:707px; margin-left:auto; margin-right:auto;">
+			<br />
+			<div style="width:707px; margin-left:auto; margin-right:auto;">
+				<table id="users" class="scroll" ></table>
+				<div id="pager" class="scroll" ></div>
+			</div>
 		</div> <!-- Closes content -->
 	
 		<div id="footer"></div><!--closes footer-->
