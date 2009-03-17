@@ -89,6 +89,16 @@
 				class="org.lamsfoundation.lams.lesson.LearnerProgress" />
 		</set>
 		
+		<!-- bi-directional one-to-many association to gradeBookUserLessons -->
+		<set name="gradeBookUserLessons" lazy="true" inverse="true"
+			cascade="all-delete-orphan">
+			<key>
+				<column name="lesson_id" />
+			</key>
+			<one-to-many
+				class="org.lamsfoundation.lams.gradebook.GradeBookUserLesson" />
+		</set>
+		
 		<!-- bi-directional many-to-one association to LessonClass -->
 		<many-to-one name="lessonClass"
 			class="org.lamsfoundation.lams.lesson.LessonClass"

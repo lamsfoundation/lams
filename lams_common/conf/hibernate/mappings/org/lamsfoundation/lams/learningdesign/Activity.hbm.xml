@@ -170,6 +170,15 @@
 			        <key><column name="activity_id" /></key>
 			        <one-to-many class="org.lamsfoundation.lams.learningdesign.ActivityEvaluation"/>
 			    </set>
+			    
+			    <set name="gradeBookUserActivities" lazy="true" inverse="true" cascade="none" >
+			        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none"
+        												@hibernate.collection-key column="gradebook_user_activity_id"
+        										        @hibernate.collection-one-to-many class="org.lamsfoundation.lams.gradebook.GradeBookUserActivity"
+			        </meta>
+			        <key><column name="activity_id" /></key>
+			        <one-to-many class="org.lamsfoundation.lams.gradebook.GradeBookUserActivity"/>
+			    </set>
 				
 				<set name="toolSessions" lazy="true" inverse="true" cascade="none" >
 			        <meta attribute="field-description">@hibernate.set lazy="false" inverse="true" cascade="none"

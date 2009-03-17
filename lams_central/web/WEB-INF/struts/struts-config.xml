@@ -189,6 +189,26 @@
       />
     </action>
     <action
+      path="/gradebook/gradebook"
+      type="org.lamsfoundation.lams.gradebook.web.action.GradeBookAction"
+      name="gradeBookForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+      <forward
+        name="message"
+        path=".message"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/password"
       type="org.lamsfoundation.lams.web.PasswordAction"
       name="PasswordChangeActionForm"
@@ -512,6 +532,31 @@
       <forward
         name="result"
         path="/toolcontent/exportresult.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/gradebook/gradebookMonitoring"
+      type="org.lamsfoundation.lams.gradebook.web.action.GradeBookMonitoringAction"
+      name="monitoringForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="monitorgradebook"
+        path="/gradebook/gradeBookMonitor.jsp"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+      <forward
+        name="message"
+        path=".message"
         redirect="false"
       />
     </action>

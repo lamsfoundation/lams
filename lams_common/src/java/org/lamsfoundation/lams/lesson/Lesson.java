@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
@@ -119,6 +120,9 @@ public class Lesson implements Serializable {
 
     /** persistent field */
     private Set learnerProgresses;
+    
+    /** persistent field */
+    private Set<GradeBookUserLesson> gradeBookUserLessons;
 
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean learnerExportAvailable;
@@ -192,6 +196,7 @@ public class Lesson implements Serializable {
         this.organisation = organisation;
         this.learnerProgresses = learnerProgresses;
         this.liveEditEnabled = liveEditEnabled;
+        this.gradeBookUserLessons = new HashSet<GradeBookUserLesson>();
     }
     /**
      * Factory method that create a new lesson. It initialized all necessary
@@ -608,4 +613,11 @@ public class Lesson implements Serializable {
     			|| stateId.equals(ARCHIVED_STATE) || stateId.equals(REMOVED_STATE) ) ) ;
     }
 
+    public Set<GradeBookUserLesson> getGradeBookUserLessons() {
+        return gradeBookUserLessons;
+    }
+
+    public void setGradeBookUserLessons(Set<GradeBookUserLesson> gradeBookUserLessons) {
+        this.gradeBookUserLessons = gradeBookUserLessons;
+    }
 }

@@ -81,8 +81,11 @@
 				<!-- Pedagogical Planner related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/planner/PedagogicalPlannerSequenceNode.hbm.xml</value>
 				
+				<!-- Gradebook related mapping files -->
+				<value>classpath:org/lamsfoundation/lams/gradebook/GradeBookUserActivity.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/gradebook/GradeBookUserLesson.hbm.xml</value>
+				
 				<!-- Mapping files for tools with complex conditions -->
-
 				<value>classpath*:org/lamsfoundation/lams/tool/**/*.hbm.xml</value>
 				<value>classpath*:org/lamsfoundation/lams/tool/**/model/*.hbm.xml</value>
 				<value>classpath*:org/lamsfoundation/lams/tool/**/persistence/*.hbm.xml</value>
@@ -378,6 +381,11 @@
 	
 	<!--  Pedagogical Planner related beans -->
 	<bean id="pedagogicalPlannerDAO" class="org.lamsfoundation.lams.planner.dao.hibernate.PedagogicalPlannerDAOHibernate">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Gradebook related beans -->
+	<bean id="gradeBookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradeBookDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	

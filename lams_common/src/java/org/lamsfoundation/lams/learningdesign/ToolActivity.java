@@ -32,7 +32,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
+import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
@@ -60,8 +60,10 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     private Set toolSessions;
 
     private Set<CompetenceMapping> competenceMappings;
-    
+
     private Set<ActivityEvaluation> activityEvaluations;
+
+    private Set<GradeBookUserActivity> gradeBookUserActivities;
 
     /** full constructor */
     public ToolActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
@@ -69,7 +71,8 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
 	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Tool tool, Long toolContentId,
-	    Set branchActivityEntries, Set<CompetenceMapping> competenceMappings, Set<ActivityEvaluation> activityEvaluations) {
+	    Set branchActivityEntries, Set<CompetenceMapping> competenceMappings,
+	    Set<ActivityEvaluation> activityEvaluations, Set<GradeBookUserActivity> gradeBookUserActivities) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, defineLater, createDateTime,
 		learningLibrary, parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId,
 		transitionTo, transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
@@ -78,6 +81,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	this.competenceMappings = competenceMappings;
 	this.activityEvaluations = activityEvaluations;
 	super.simpleActivityStrategy = new ToolActivityStrategy(this);
+	this.gradeBookUserActivities = gradeBookUserActivities;
     }
 
     /** default constructor */
@@ -113,23 +117,38 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	newToolActivity.setToolContentId(this.getToolContentId());
 
 	Set<CompetenceMapping> newCompetenceMappings = new HashSet<CompetenceMapping>();
-	for (CompetenceMapping compMap : this.competenceMappings) {
-	    CompetenceMapping newComp = new CompetenceMapping();
-	    newComp.setCompetence(compMap.getCompetence());
-	    newComp.setToolActivity(compMap.getToolActivity());
-	    newCompetenceMappings.add(compMap);
+	if (this.competenceMappings != null) {
+	    for (CompetenceMapping compMap : this.competenceMappings) {
+		CompetenceMapping newComp = new CompetenceMapping();
+		newComp.setCompetence(compMap.getCompetence());
+		newComp.setToolActivity(compMap.getToolActivity());
+		newCompetenceMappings.add(compMap);
+	    }
 	}
+
 	newToolActivity.setCompetenceMappings(newCompetenceMappings);
-	
+
 	Set<ActivityEvaluation> newEvaluations = new HashSet<ActivityEvaluation>();
-	for (ActivityEvaluation evaluation : this.activityEvaluations)
-	{
-	    ActivityEvaluation newEvaluation = new ActivityEvaluation();
-	    newEvaluation.setActivity(newToolActivity);
-	    newEvaluation.setToolOutputDefinition(evaluation.getToolOutputDefinition());
-	    newEvaluations.add(newEvaluation);
+	if (this.activityEvaluations != null) {
+	    for (ActivityEvaluation evaluation : this.activityEvaluations) {
+		ActivityEvaluation newEvaluation = new ActivityEvaluation();
+		newEvaluation.setActivity(newToolActivity);
+		newEvaluation.setToolOutputDefinition(evaluation.getToolOutputDefinition());
+		newEvaluations.add(newEvaluation);
+	    }
 	}
 	newToolActivity.setActivityEvaluations(newEvaluations);
+
+	Set<GradeBookUserActivity> newGradeBookUserActivities = new HashSet<GradeBookUserActivity>();
+	if (this.gradeBookUserActivities != null) {
+	    for (GradeBookUserActivity gradeBookAct : this.gradeBookUserActivities) {
+		GradeBookUserActivity newGradeBookAct = new GradeBookUserActivity();
+		newGradeBookAct.setActivity(newToolActivity);
+		newGradeBookAct.setLearner(gradeBookAct.getLearner());
+		newGradeBookAct.setMark(gradeBookAct.getMark());
+	    }
+	}
+	newToolActivity.setGradeBookUserActivities(newGradeBookUserActivities);
 
 	return newToolActivity;
     }
@@ -307,13 +326,18 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     }
 
     public Set<ActivityEvaluation> getActivityEvaluations() {
-        return activityEvaluations;
+	return activityEvaluations;
     }
 
     public void setActivityEvaluations(Set<ActivityEvaluation> activityEvaluations) {
-        this.activityEvaluations = activityEvaluations;
+	this.activityEvaluations = activityEvaluations;
     }
-    
-    
 
+    public Set<GradeBookUserActivity> getGradeBookUserActivities() {
+	return gradeBookUserActivities;
+    }
+
+    public void setGradeBookUserActivities(Set<GradeBookUserActivity> gradeBookUserActivities) {
+	this.gradeBookUserActivities = gradeBookUserActivities;
+    }
 }

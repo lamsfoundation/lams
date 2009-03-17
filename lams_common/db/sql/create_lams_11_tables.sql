@@ -1101,3 +1101,30 @@ CREATE TABLE lams_activity_evaluation (
                   REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
 	, PRIMARY KEY (activity_evaluation_id)
 )TYPE=InnoDB;
+
+CREATE TABLE lams_gradebook_user_activity (
+	  uid BIGINT(20) NOT NULL auto_increment
+	, activity_id BIGINT(20) NOT NULL
+	, user_id BIGINT (20) NOT NULL
+	, mark DOUBLE PRECISION 
+	, INDEX (activity_id, user_id)
+	, CONSTRAINT FK_lams_gradebook_user_activity_1 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
+	, CONSTRAINT FK_lams_gradebook_user_activity_2 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+	, PRIMARY KEY (uid)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_gradebook_user_lesson (
+	  uid BIGINT(20) NOT NULL auto_increment
+	, lesson_id BIGINT(20) NOT NULL
+	, user_id BIGINT (20) NOT NULL
+	, mark DOUBLE PRECISION
+	, INDEX (lesson_id, user_id)
+	, CONSTRAINT FK_lams_gradebook_user_lesson_1 FOREIGN KEY (lesson_id)
+                  REFERENCES lams_lesson (lesson_id)
+	, CONSTRAINT FK_lams_gradebook_user_lesson_2 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+	, PRIMARY KEY (uid)
+)TYPE=InnoDB;
+
