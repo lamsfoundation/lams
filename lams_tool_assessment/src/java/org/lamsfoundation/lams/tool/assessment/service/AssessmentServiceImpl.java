@@ -28,12 +28,10 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -61,8 +59,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -78,8 +74,9 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
-import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
@@ -92,7 +89,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
-import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
@@ -320,31 +316,31 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	// initial assessment questions list
 	List<Summary> questionList = new ArrayList();
-	Set<AssessmentQuestion> resList = session.getAssessment().getQuestions();
-	for (AssessmentQuestion question : resList) {
-	    if (skipHide && question.isHide()) {
-		continue;
-	    }
-	    // if question is create by author
-	    if (question.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question, false);
-		questionList.add(sum);
-	    }
-	}
-
-	// get this session's all assessment questions
-	Set<AssessmentQuestion> sessList = session.getAssessmentQuestions();
-	for (AssessmentQuestion question : sessList) {
-	    if (skipHide && question.isHide()) {
-		continue;
-	    }
-
-	    // to skip all question create by author
-	    if (!question.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question, false);
-		questionList.add(sum);
-	    }
-	}
+//	Set<AssessmentQuestion> resList = session.getAssessment().getQuestions();
+//	for (AssessmentQuestion question : resList) {
+//	    if (skipHide && question.isHide()) {
+//		continue;
+//	    }
+//	    // if question is create by author
+//	    if (question.isCreateByAuthor()) {
+//		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question, false);
+//		questionList.add(sum);
+//	    }
+//	}
+//
+//	// get this session's all assessment questions
+//	Set<AssessmentQuestion> sessList = session.getAssessmentQuestions();
+//	for (AssessmentQuestion question : sessList) {
+//	    if (skipHide && question.isHide()) {
+//		continue;
+//	    }
+//
+//	    // to skip all question create by author
+//	    if (!question.isCreateByAuthor()) {
+//		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question, false);
+//		questionList.add(sum);
+//	    }
+//	}
 
 	return questionList;
     }
@@ -353,35 +349,35 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	Assessment assessment = assessmentDao.getByContentId(contentId);
 	List<List<Summary>> groupList = new ArrayList();
 
-	// create init assessment questions list
-	List<Summary> initList = new ArrayList();
-	groupList.add(initList);
-	Set<AssessmentQuestion> resList = assessment.getQuestions();
-	for (AssessmentQuestion question : resList) {
-	    if (question.isCreateByAuthor()) {
-		Summary sum = new Summary(null, null, question, true);
-		initList.add(sum);
-	    }
-	}
-
-	// session by session
-	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
-	for (AssessmentSession session : sessionList) {
-	    List<Summary> group = new ArrayList<Summary>();
-	    // get this session's all assessment questions
-	    Set<AssessmentQuestion> sessList = session.getAssessmentQuestions();
-	    for (AssessmentQuestion question : sessList) {
-		// to skip all question create by author
-		if (!question.isCreateByAuthor()) {
-		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question, false);
-		    group.add(sum);
-		}
-	    }
-	    if (group.size() == 0) {
-		group.add(new Summary(session.getSessionId(), session.getSessionName(), null, false));
-	    }
-	    groupList.add(group);
-	}
+//	// create init assessment questions list
+//	List<Summary> initList = new ArrayList();
+//	groupList.add(initList);
+//	Set<AssessmentQuestion> resList = assessment.getQuestions();
+//	for (AssessmentQuestion question : resList) {
+//	    if (question.isCreateByAuthor()) {
+//		Summary sum = new Summary(null, null, question, true);
+//		initList.add(sum);
+//	    }
+//	}
+//
+//	// session by session
+//	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
+//	for (AssessmentSession session : sessionList) {
+//	    List<Summary> group = new ArrayList<Summary>();
+//	    // get this session's all assessment questions
+//	    Set<AssessmentQuestion> sessList = session.getAssessmentQuestions();
+//	    for (AssessmentQuestion question : sessList) {
+//		// to skip all question create by author
+//		if (!question.isCreateByAuthor()) {
+//		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question, false);
+//		    group.add(sum);
+//		}
+//	    }
+//	    if (group.size() == 0) {
+//		group.add(new Summary(session.getSessionId(), session.getSessionName(), null, false));
+//	    }
+//	    groupList.add(group);
+//	}
 
 	return groupList;
     }
@@ -599,54 +595,75 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return assessmentQuestionDao.getByUid(questionUid);
     }
 
-    public List<List<Summary>> getSummary(Long contentId) {
-	List<List<Summary>> groupList = new ArrayList<List<Summary>>();
-	List<Summary> group = new ArrayList<Summary>();
+    public List<Summary> getSummaryList(Long contentId) {
+	List<Summary> summaryList = new ArrayList<Summary>();
 
-	// get all question which is accessed by user
-	Map<Long, Integer> visitCountMap =null; 
-	    //assessmentQuestionResultDao.getSummary(contentId);
-
-	Assessment assessment = assessmentDao.getByContentId(contentId);
-	Set<AssessmentQuestion> resQuestionList = assessment.getQuestions();
-
-	// get all sessions in a assessment and retrieve all assessment questions under this session
-	// plus initial assessment questions by author creating (resquestionList)
 	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
 	for (AssessmentSession session : sessionList) {
-	    // one new group for one session.
-	    group = new ArrayList<Summary>();
-	    // firstly, put all initial assessment question into this group.
-	    for (AssessmentQuestion question : resQuestionList) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question);
-		// set viewNumber according visit log
-		if (visitCountMap.containsKey(question.getUid())) {
-		    sum.setViewNumber(visitCountMap.get(question.getUid()).intValue());
+	    Long sessionId = session.getSessionId();
+	    // one new summary for one session.
+	    Summary summary = new Summary(sessionId, session.getSessionName());
+
+	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
+	    ArrayList<AssessmentResult> assessmentResults = new ArrayList<AssessmentResult>();
+	    for (AssessmentUser user : users) {
+		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResult(contentId, user.getUserId());
+		if (assessmentResult == null) {
+		    assessmentResult = new AssessmentResult();
+		    assessmentResult.setUser(user);
+		} else {
+		    Set<AssessmentQuestionResult> sortedQuestionResults = new TreeSet<AssessmentQuestionResult>(
+			    new AssessmentQuestionResultComparator());
+		    sortedQuestionResults.addAll(assessmentResult.getQuestionResults());
+		    assessmentResult.setQuestionResults(sortedQuestionResults);		    
 		}
-		group.add(sum);
+		assessmentResults.add(assessmentResult);
 	    }
-	    // get this session's all assessment questions
-	    Set<AssessmentQuestion> sessQuestionList = session.getAssessmentQuestions();
-	    for (AssessmentQuestion question : sessQuestionList) {
-		// to skip all question create by author
-		if (!question.isCreateByAuthor()) {
-		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question);
-		    // set viewNumber according visit log
-		    if (visitCountMap.containsKey(question.getUid())) {
-			sum.setViewNumber(visitCountMap.get(question.getUid()).intValue());
-		    }
-		    group.add(sum);
-		}
-	    }
-	    // so far no any question available, so just put session name info to Summary
-	    if (group.size() == 0) {
-		group.add(new Summary(session.getSessionId(), session.getSessionName(), null));
-	    }
-	    groupList.add(group);
+	    summary.setAssessmentResults(assessmentResults);
+	    summaryList.add(summary);
 	}
 
-	return groupList;
+	return summaryList;
+    }
+    
+    public UserSummary getUserSummary(Long contentId, Long userId) {
+	UserSummary userSummary = new UserSummary();
+	
+	AssessmentUser user = assessmentUserDao.getUserByUserIDAndContentID(userId, contentId);
+	userSummary.setUser(user);
+	List<AssessmentResult> results = assessmentResultDao.getAssessmentResults(contentId, userId);
+	userSummary.setNumberOfAttempts(results.size());
+	
+	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResult(contentId, userId);
+	long timeTaken = (lastFinishedResult == null) ? 0 : (lastFinishedResult.getFinishDate().getTime() - lastFinishedResult.getStartDate().getTime()); 
+	userSummary.setTimeOfLastAttempt(new Date(timeTaken));
+	if (lastFinishedResult != null) {
+	    userSummary.setLastAttemptGrade(lastFinishedResult.getGrade());
+	}
+	
+	Assessment assessment = assessmentDao.getByContentId(contentId);
+	ArrayList<UserSummaryItem> userSummaryItems = new ArrayList<UserSummaryItem>();
+	Set<AssessmentQuestion> questions = assessment.getQuestions();
+	for (AssessmentQuestion question : questions) {
+	    UserSummaryItem userSummaryItem = new UserSummaryItem(question);
+	    List<AssessmentQuestionResult> questionResultsForSummary = new ArrayList<AssessmentQuestionResult>();
+	    
+	    for (AssessmentResult result : results) {
+		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+			questionResult.setFinishDate(result.getFinishDate());
+			questionResultsForSummary.add(questionResult);
+			break;
+		    }
+		}
+		
+	    }
+	    userSummaryItem.setQuestionResults(questionResultsForSummary);
+	    userSummaryItems.add(userSummaryItem);
+	}
+	userSummary.setUserSummaryItems(userSummaryItems);
 
+	return userSummary;
     }
 
 //    public List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid) {

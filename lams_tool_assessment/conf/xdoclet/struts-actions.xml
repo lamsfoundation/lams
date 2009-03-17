@@ -218,17 +218,28 @@
 			<forward name="success" path="/pages/learning/parts/ordering.jsp" />
 		</action>		
 
-		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
+		<!-- ========== Monitoring Definitions ============================== -->
 		<action path="/monitoring/summary"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
-		<action path="/monitoring/listuser"
+		<action path="/monitoring/questionSummary"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
-			parameter="listuser" >
-			<forward name="success" path="/pages/monitoring/userlist.jsp" />
+			parameter="questionSummary" >
+			<forward name="success" path="/pages/monitoring/parts/questionsummary.jsp" />
 		</action>
+		<action path="/monitoring/userSummary"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="userSummary" >
+			<forward name="success" path="/pages/monitoring/parts/usersummary.jsp" />
+		</action>
+		<action path="/monitoring/saveUserGrade"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="saveUserGrade" >
+			<forward name="question" path="/pages/monitoring/parts/questionsummary.jsp" />			
+			<forward name="user" path="/pages/monitoring/parts/usersummary.jsp" />
+		</action>				
 		<action path="/monitoring/hideQuestion"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
 			parameter="hideQuestion" >
@@ -240,12 +251,7 @@
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
 		
-		<action path="/monitoring/viewReflection"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
-			parameter="viewReflection">
-			<forward name="success" path="/pages/monitoring/notebook.jsp" />
-		</action>
-		<!-- ========== BEGIN: Common ============================== -->
+		<!-- ========== Common Definitions ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.ClearSessionAction">
 		</action>

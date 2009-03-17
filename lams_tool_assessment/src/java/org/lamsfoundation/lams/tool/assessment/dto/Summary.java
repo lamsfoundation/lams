@@ -24,7 +24,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.assessment.dto;
 
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 
 /**
  * List contains following element: <br>
@@ -39,23 +41,8 @@ public class Summary {
 
     private Long sessionId;
     private String sessionName;
-    private Long questionUid;
-    private short questionType;
-    private boolean questionCreateByAuthor;
-    private boolean questionHide;
-    private String questionTitle;
-    private String username;
-    private int viewNumber;
-
-    // following is used for export portfolio programs:
-//    private String url;
-//    private Long fileUuid;
-//    private Long fileVersionId;
-//    private String fileName;
-    private String attachmentLocalUrl;
-
-    // true: initial group question, false, belong to some group.
-    private boolean isInitGroup;
+    
+    private List<AssessmentResult> assessmentResults;
 
     public Summary() {
     }
@@ -69,92 +56,11 @@ public class Summary {
      * @param question
      * @param isInitGroup
      */
-    public Summary(Long sessionId, String sessionName, AssessmentQuestion question) {
+    public Summary(Long sessionId, String sessionName) {
 	this.sessionId = sessionId;
 	this.sessionName = sessionName;
-	if (question != null) {
-	    this.questionUid = question.getUid();
-	    this.questionType = question.getType();
-	    this.questionCreateByAuthor = question.isCreateByAuthor();
-	    this.questionHide = question.isHide();
-	    this.questionTitle = question.getTitle();
-	    this.username = question.getCreateBy() == null ? "" : question.getCreateBy().getLoginName();
-//	    this.url = AssessmentWebUtils.protocol(question.getUrl());
-//	    this.fileName = question.getFileName();
-//	    this.fileUuid = question.getFileUuid();
-//	    this.fileVersionId = question.getFileVersionId();
-	} else
-	    this.questionUid = new Long(-1);
     }
-
-    /**
-     * Contruction method for export profolio function.
-     * 
-     * <B>Don't not set sessionId and viewNumber fields</B>
-     * 
-     * @param sessionName
-     * @param question
-     * @param isInitGroup
-     */
-    public Summary(Long sessionId, String sessionName, AssessmentQuestion question, boolean isInitGroup) {
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
-	if (question != null) {
-	    this.questionUid = question.getUid();
-	    this.questionType = question.getType();
-	    this.questionCreateByAuthor = question.isCreateByAuthor();
-	    this.questionHide = question.isHide();
-	    this.questionTitle = question.getTitle();
-	    this.username = question.getCreateBy() == null ? "" : question.getCreateBy().getLoginName();
-//	    this.url = AssessmentWebUtils.protocol(question.getUrl());
-//	    this.fileName = question.getFileName();
-//	    this.fileUuid = question.getFileUuid();
-//	    this.fileVersionId = question.getFileVersionId();
-	} else
-	    this.questionUid = new Long(-1);
-	this.isInitGroup = isInitGroup;
-    }
-
-    public boolean isQuestionCreateByAuthor() {
-	return questionCreateByAuthor;
-    }
-
-    public void setQuestionCreateByAuthor(boolean questionCreateByAuthor) {
-	this.questionCreateByAuthor = questionCreateByAuthor;
-    }
-
-    public boolean isQuestionHide() {
-	return questionHide;
-    }
-
-    public void setQuestionHide(boolean questionHide) {
-	this.questionHide = questionHide;
-    }
-
-    public String getQuestionTitle() {
-	return questionTitle;
-    }
-
-    public void setQuestionTitle(String questionTitle) {
-	this.questionTitle = questionTitle;
-    }
-
-    public short getQuestionType() {
-	return questionType;
-    }
-
-    public void setQuestionType(short questionType) {
-	this.questionType = questionType;
-    }
-
-    public Long getQuestionUid() {
-	return questionUid;
-    }
-
-    public void setQuestionUid(Long questionUid) {
-	this.questionUid = questionUid;
-    }
-
+    
     public Long getSessionId() {
 	return sessionId;
     }
@@ -171,68 +77,12 @@ public class Summary {
 	this.sessionName = sessionName;
     }
 
-    public String getUsername() {
-	return username;
+    public List<AssessmentResult> getAssessmentResults() {
+	return assessmentResults;
     }
 
-    public void setUsername(String username) {
-	this.username = username;
+    public void setAssessmentResults(List<AssessmentResult> assessmentResults) {
+	this.assessmentResults = assessmentResults;
     }
-
-    public int getViewNumber() {
-	return viewNumber;
-    }
-
-    public void setViewNumber(int viewNumber) {
-	this.viewNumber = viewNumber;
-    }
-
-//    public Long getFileUuid() {
-//	return fileUuid;
-//    }
-//
-//    public void setFileUuid(Long fileUuid) {
-//	this.fileUuid = fileUuid;
-//    }
-//
-//    public Long getFileVersionId() {
-//	return fileVersionId;
-//    }
-//
-//    public void setFileVersionId(Long fileVersionId) {
-//	this.fileVersionId = fileVersionId;
-//    }
-//
-//    public String getUrl() {
-//	return url;
-//    }
-//
-//    public void setUrl(String url) {
-//	this.url = url;
-//    }
-
-    public boolean isInitGroup() {
-	return isInitGroup;
-    }
-
-    public void setInitGroup(boolean isInitGroup) {
-	this.isInitGroup = isInitGroup;
-    }
-
-    public String getAttachmentLocalUrl() {
-	return attachmentLocalUrl;
-    }
-
-    public void setAttachmentLocalUrl(String attachmentLocalUrl) {
-	this.attachmentLocalUrl = attachmentLocalUrl;
-    }
-
-//    public String getFileName() {
-//	return fileName;
-//    }
-//
-//    public void setFileName(String fileName) {
-//	this.fileName = fileName;
-//    }
 
 }

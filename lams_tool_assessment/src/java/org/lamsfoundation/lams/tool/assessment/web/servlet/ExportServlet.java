@@ -25,13 +25,9 @@
 
 package org.lamsfoundation.lams.tool.assessment.web.servlet;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -40,11 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
@@ -53,8 +46,6 @@ import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationExce
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceProxy;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
-import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -62,18 +53,16 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Export portfolio servlet to export all shared assessment into offline HTML package.
+ * Export portfolio servlet to export all assessment questions into offline HTML package.
  * 
  * @author Steve.Ni
- * 
- * @version $Revision$
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
     private static final long serialVersionUID = -4529093489007108143L;
 
     private static Logger logger = Logger.getLogger(ExportServlet.class);
 
-    private final String FILENAME = "shared_assessment_main.html";
+    private final String FILENAME = "assessment_main.html";
 
     private AssessmentToolContentHandler handler;
 
@@ -207,26 +196,26 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 //	    if (summary.getQuestionType() == AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP
 //		    || summary.getQuestionType() == AssessmentConstants.QUESTION_TYPE_CHOICE)
 //		continue;
-	    try {
-		int idx = 1;
-		String userName = summary.getUsername();
-		String localDir;
-		while (true) {
-		    localDir = FileUtil.getFullPath(directoryName, userName + "/" + idx);
-		    File local = new File(localDir);
-		    if (!local.exists()) {
-			local.mkdirs();
-			break;
-		    }
-		    idx++;
-		}
+//	    try {
+//		int idx = 1;
+//		String userName = summary.getUsername();
+//		String localDir;
+//		while (true) {
+//		    localDir = FileUtil.getFullPath(directoryName, userName + "/" + idx);
+//		    File local = new File(localDir);
+//		    if (!local.exists()) {
+//			local.mkdirs();
+//			break;
+//		    }
+//		    idx++;
+//		}
 //		summary.setAttachmentLocalUrl(userName + "/" + idx + "/" + summary.getFileUuid() + '.'
 //			+ FileUtil.getFileExtension(summary.getFileName()));
 //		handler.saveFile(summary.getFileUuid(), FileUtil.getFullPath(directoryName, summary
 //			.getAttachmentLocalUrl()));
-	    } catch (Exception e) {
-		logger.error("Export forum topic attachment failed: " + e.toString());
-	    }
+//	    } catch (Exception e) {
+//		logger.error("Export forum topic attachment failed: " + e.toString());
+//	    }
 	}
 
     }

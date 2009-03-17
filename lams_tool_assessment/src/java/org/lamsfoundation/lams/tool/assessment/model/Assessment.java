@@ -153,7 +153,7 @@ public class Assessment implements Cloneable {
 	    assessment.setUid(null);
 	    if (questions != null) {
 		Iterator iter = questions.iterator();
-		Set set = new TreeSet(new SequencableComparator());
+		Set<AssessmentQuestion> set = new TreeSet<AssessmentQuestion>(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentQuestion question = (AssessmentQuestion) iter.next();
 		    AssessmentQuestion newQuestion = (AssessmentQuestion) question.clone();
@@ -165,7 +165,7 @@ public class Assessment implements Cloneable {
 	    // clone OverallFeedbacks
 	    if (overallFeedbacks != null) {
 		Iterator iter = overallFeedbacks.iterator();
-		Set set = new TreeSet(new SequencableComparator());
+		Set<AssessmentOverallFeedback> set = new TreeSet<AssessmentOverallFeedback>(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentOverallFeedback overallFeedback = (AssessmentOverallFeedback) iter.next();
 		    AssessmentOverallFeedback newOverallFeedback = (AssessmentOverallFeedback) overallFeedback.clone();
@@ -434,7 +434,7 @@ public class Assessment implements Cloneable {
 
     /**
      * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
+     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="sequence_id asc"
      * @hibernate.collection-key column="assessment_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion"
      * 
@@ -447,15 +447,6 @@ public class Assessment implements Cloneable {
     public void setQuestions(Set assessmentQuestions) {
 	this.questions = assessmentQuestions;
     }
-    
-    /**
-     * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
-     * @hibernate.collection-key column="assessment_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion"
-     * 
-     * @return
-     */
     
     /**
      * 

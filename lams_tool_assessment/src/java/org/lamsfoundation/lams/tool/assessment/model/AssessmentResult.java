@@ -155,7 +155,7 @@ public class AssessmentResult {
     
     /**
      * 
-     * @hibernate.set cascade="all"
+     * @hibernate.set cascade="all" 
      * @hibernate.collection-key column="result_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult"
      * 

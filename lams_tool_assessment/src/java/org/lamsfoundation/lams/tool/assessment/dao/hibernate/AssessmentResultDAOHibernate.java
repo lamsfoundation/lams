@@ -29,28 +29,32 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
  
 public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements AssessmentResultDAO {
-
+    
     private static final String FIND_BY_ASSESSMENT_AND_USER = "from " + AssessmentResult.class.getName()
 	    + " as r where r.user.userId = ? and r.assessment.uid=? order by r.startDate asc";
     
-    private static final String FIND_BY_ASSESSMENT_AND_SESSION = "from " + AssessmentResult.class.getName()
-	    + " as r where r.sessionId = ? and r.assessment.uid=?";
+    private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "from "
+	    + AssessmentResult.class.getName()
+	    + " as r where r.user.userId = ? and r.assessment.uid=? and (r.finishDate != null) order by r.startDate asc";
 
     private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select count(*) from "
 	    + AssessmentResult.class.getName() + " as r where r.user.userId=? and r.assessment.uid=? and (r.finishDate != null)";
 
-// private static final String FIND_SUMMARY = "select v.assessmentQuestion.uid, count(v.assessmentQuestion) from  "
-//	    + AssessmentQuestionResult.class.getName() + " as v , " + AssessmentSession.class.getName() + " as s, "
-//	    + Assessment.class.getName() + "  as r " + " where v.sessionId = s.sessionId "
-//	    + " and s.assessment.uid = r.uid " + " and r.contentId =? "
-//	    + " group by v.sessionId, v.assessmentQuestion.uid ";
-
-    public List<AssessmentResult> getAssessmentResult(Long assessmentUid, Long userId) {
-	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER, new Object[] { userId, assessmentUid });
+    public List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId) {
+	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED, new Object[] { userId, assessmentUid });
     }
     
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
 	List list = getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER, new Object[] { userId, assessmentUid });
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return (AssessmentResult) list.get(list.size()-1);
+	}
+    }
+    
+    public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
+	List list = getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED, new Object[] { userId, assessmentUid });
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {
@@ -66,23 +70,6 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	    return ((Number) list.get(0)).intValue();
 	}
     }
-
-//    public Map<Long, Integer> getSummary(Long contentId) {
-//	// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-//	List<Object[]> result = getHibernateTemplate().find(FIND_SUMMARY, contentId);
-//	Map<Long, Integer> summaryList = new HashMap<Long, Integer>(result.size());
-//	for (Object[] list : result) {
-//	    if (list[1] != null) {
-//		summaryList.put((Long) list[0], new Integer(((Number) list[1]).intValue()));
-//	    }
-//	}
-//	return summaryList;
-//
-//    }
-
-//    public List<AssessmentResult> getAssessmentResultBySession(Long sessionId, Long assessmentUid) {
-//	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_SESSION, new Object[] { sessionId, assessmentUid });
-//    }
 
 }
 

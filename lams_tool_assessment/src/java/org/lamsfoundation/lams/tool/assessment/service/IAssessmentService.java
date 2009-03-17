@@ -26,14 +26,11 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentAttachment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
@@ -200,9 +197,16 @@ public interface IAssessmentService {
      * @param contentId
      * @return
      */
-    List<List<Summary>> getSummary(Long contentId);
-
-//    List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid);
+    List<Summary> getSummaryList(Long contentId);
+    
+    /**
+     * Return user summary. This summary contains list of all attempts made by user.
+     * 
+     * @param contentId
+     * @param userId
+     * @return
+     */
+    UserSummary getUserSummary(Long contentId, Long userId);
 
     /**
      * Set a assessment question visible or not.

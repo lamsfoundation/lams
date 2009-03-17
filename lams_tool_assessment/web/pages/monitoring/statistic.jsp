@@ -9,10 +9,10 @@
 			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
 		</div>
 	</c:if>
+	<%-- 
 	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
 		<c:set var="groupSize" value="${fn:length(group)}" />
 		<c:forEach var="item" items="${group}" varStatus="status">
-			<%-- display group name on first row--%>
 			<c:if test="${status.index == 0}">
 				<tr>
 					<td colspan="4">
@@ -88,4 +88,5 @@
 			</c:if>
 		</c:forEach>
 	</c:forEach>
+	 --%>
 </table>

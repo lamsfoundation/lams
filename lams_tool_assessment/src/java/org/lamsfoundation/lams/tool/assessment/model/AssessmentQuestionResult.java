@@ -24,11 +24,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
-
-import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 /**
  * Assessment Question Result
@@ -50,6 +48,9 @@ public class AssessmentQuestionResult {
     private float mark;
     private float penalty;
     private Set<AssessmentOptionAnswer> optionAnswers;
+    
+    // DTO fields:
+    private Date finishDate;
     
     public AssessmentQuestionResult() {
 	optionAnswers = new LinkedHashSet<AssessmentOptionAnswer>();
@@ -187,6 +188,13 @@ public class AssessmentQuestionResult {
      */
     public void setOptionAnswers(Set<AssessmentOptionAnswer> answers) {
 	this.optionAnswers = answers;
+    }
+    
+    public Date getFinishDate() {
+	return finishDate;
+    }
+    public void setFinishDate(Date finishDate) {
+	this.finishDate = finishDate;
     }
  
 }

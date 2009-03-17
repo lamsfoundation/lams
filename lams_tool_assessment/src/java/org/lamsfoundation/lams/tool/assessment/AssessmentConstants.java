@@ -151,6 +151,8 @@ public class AssessmentConstants {
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 
     public static final String ATTR_SUMMARY_LIST = "summaryList";
+    
+    public static final String ATTR_USER_SUMMARY = "userSummary";
 
     public static final String ATTR_USER_LIST = "userList";
 

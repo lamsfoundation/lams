@@ -29,9 +29,11 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
  
 public interface AssessmentResultDAO extends DAO {
 
-    List<AssessmentResult> getAssessmentResult(Long assessmentUid, Long userId);
+    List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId);
     
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
+    
+    AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
     
     int getAssessmentResultCount(Long assessmentUid, Long userId);
 
