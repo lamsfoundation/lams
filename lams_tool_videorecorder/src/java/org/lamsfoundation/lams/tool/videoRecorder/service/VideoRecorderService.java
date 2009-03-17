@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -55,8 +54,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -68,9 +65,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
-import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRatingDTO;
-import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderAttachmentDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderCommentDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderDAO;
@@ -78,6 +73,9 @@ import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderRatingDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderRecordingDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderSessionDAO;
 import org.lamsfoundation.lams.tool.videoRecorder.dao.IVideoRecorderUserDAO;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRatingDTO;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderAttachment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
@@ -89,7 +87,6 @@ import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderConstants;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderException;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderToolContentHandler;
-import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -592,7 +589,6 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
      * @throws SubmitFilesException
      */
     private ITicket getRepositoryLoginTicket() throws VideoRecorderException {
-	repositoryService = RepositoryProxy.getRepositoryService();
 	ICredentials credentials = new SimpleCredentials(VideoRecorderToolContentHandler.repositoryUser,
 		VideoRecorderToolContentHandler.repositoryId);
 	try {
@@ -762,6 +758,14 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 
     public void setVideoRecorderOutputFactory(VideoRecorderOutputFactory videoRecorderOutputFactory) {
 	this.videoRecorderOutputFactory = videoRecorderOutputFactory;
+    }
+
+    public IRepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+
+    public void setRepositoryService(IRepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
     }
 
     /**
