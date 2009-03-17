@@ -49,18 +49,17 @@ public class AdminServiceProxy {
 	
 	public static final IUserManagementService getService(ServletContext servletContext) {
 		if (manageService == null) {
-			return (IUserManagementService)getDomainService(servletContext, "userManagementService");
-		} else {
-			return manageService;
+			manageService = (IUserManagementService)getDomainService(servletContext, "userManagementService");
 		}
+		return manageService;
 	}
 	
 	public static final MessageService getMessageService(ServletContext servletContext) {
 		if (messageService == null) {
-			return (MessageService)getDomainService(servletContext, "adminMessageService");
-		} else {
-			return messageService;
+			messageService = (MessageService)getDomainService(servletContext, "adminMessageService");
 		}
+		return messageService;
+
 	}
 	
 	public static final IIntegrationService getIntegrationService(ServletContext servletContext) {
