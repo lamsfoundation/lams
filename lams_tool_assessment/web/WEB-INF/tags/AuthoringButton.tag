@@ -62,14 +62,22 @@
 	<c:set var="accessMode" value="author" scope="request"/>
 </c:if>
 
+<c:set var="unableToSaveMsgKey" value="authoring.msg.one.question.to.be.saved" scope="request"/>
+
 <!-- begin tab content -->
 <script type="text/javascript">
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
        	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
 	}
     function doSubmit_Form_Only() {
-    	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
-    	document.getElementById("${formID}").submit();
+    	var length = $('#questionTable tr').size();
+
+		if( length <= 1 ) {
+        	alert("<fmt:message key='${unableToSaveMsgKey}'/>")
+		} else {
+	    	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
+	    	document.getElementById("${formID}").submit();
+		}
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
