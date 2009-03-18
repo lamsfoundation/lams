@@ -59,6 +59,15 @@
             column="mark"
         />
 
+        <property
+            name="feedback"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="feedback"
+            length="65535"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-GradeBookUserActivity.xml

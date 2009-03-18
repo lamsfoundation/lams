@@ -132,6 +132,7 @@ public class GradeBookService implements IGradeBookService {
 		activity.getActivityId(), learner.getUserId());
 	if (gradeBookActivity != null) {
 	    gactivityDTO.setMark(gradeBookActivity.getMark());
+	    gactivityDTO.setFeedback(gradeBookActivity.getFeedback());
 	}
 	if (learnerProgress != null) {
 	    byte progressState = learnerProgress.getProgressState(activity);
@@ -243,11 +244,10 @@ public class GradeBookService implements IGradeBookService {
 
 		    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson
 			    .getLessonId(), learner.getUserId());
-		    if (gradeBookUserLesson != null && gradeBookUserLesson.getMark() != null) {
+		    if (gradeBookUserLesson != null) {
 			gradeBookUserDTO.setTotalLessonMark(gradeBookUserLesson.getMark());
-		    } else {
-			gradeBookUserDTO.setTotalLessonMark(0.0);
-		    }
+			gradeBookUserDTO.setFeedback(gradeBookUserLesson.getFeedback());
+		    } 
 		    gradeBookUserDTOs.add(gradeBookUserDTO);
 		}
 	    }
@@ -264,15 +264,13 @@ public class GradeBookService implements IGradeBookService {
      * @param learner
      * @param mark
      */
-    public void updateUserLessonGradeBookData(Lesson lesson, User learner, Double mark) {
+    public void updateUserLessonGradeBookMark(Lesson lesson, User learner, Double mark) {
 	if (lesson != null && learner != null) {
 	    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(),
 		    learner.getUserId());
 
 	    if (gradeBookUserLesson == null) {
-		gradeBookUserLesson = new GradeBookUserLesson();
-		gradeBookUserLesson.setLearner(learner);
-		gradeBookUserLesson.setLesson(lesson);
+		gradeBookUserLesson = new GradeBookUserLesson(lesson, learner);
 	    }
 	    gradeBookUserLesson.setMark(mark);
 	    gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
@@ -288,17 +286,15 @@ public class GradeBookService implements IGradeBookService {
      * @param activity
      * @param mark
      */
-    public void updateUserActivityGradeBookData(Lesson lesson, User learner, Activity activity, Double mark) {
+    public void updateUserActivityGradeBookMark(Lesson lesson, User learner, Activity activity, Double mark) {
 	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
-	    
+
 	    // First, update the mark for the activity
 	    GradeBookUserActivity gradeBookUserActivity = gradeBookDAO.getGradeBookUserDataForActivity(activity
 		    .getActivityId(), learner.getUserId());
 
 	    if (gradeBookUserActivity == null) {
-		gradeBookUserActivity = new GradeBookUserActivity();
-		gradeBookUserActivity.setLearner(learner);
-		gradeBookUserActivity.setActivity((ToolActivity) activity);
+		gradeBookUserActivity = new GradeBookUserActivity((ToolActivity) activity, learner);
 	    }
 
 	    gradeBookUserActivity.setMark(mark);
@@ -312,17 +308,62 @@ public class GradeBookService implements IGradeBookService {
 		gradeBookUserLesson = new GradeBookUserLesson();
 		gradeBookUserLesson.setLearner(learner);
 		gradeBookUserLesson.setLesson(lesson);
-	    } 
-	    
+	    }
+
 	    aggregateTotalMarkForLesson(gradeBookUserLesson);
 	}
     }
 
+    /**
+     * Adds up the total mark for a lesson based on the activity marks
+     * 
+     * @param gradeBookUserLesson
+     */
     private void aggregateTotalMarkForLesson(GradeBookUserLesson gradeBookUserLesson) {
 	Double totalMark = gradeBookDAO.getGradeBookUserActivityMarkSum(gradeBookUserLesson.getLesson().getLessonId(),
 		gradeBookUserLesson.getLearner().getUserId());
 	gradeBookUserLesson.setMark(totalMark);
 	gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
+    }
+
+    /**
+     * Updates the feedback for a learners performance in a lesson
+     * 
+     * @param lesson
+     * @param learner
+     * @param feedback
+     */
+    public void updateUserLessonGradeBookFeedback(Lesson lesson, User learner, String feedback) {
+
+	GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(),
+		learner.getUserId());
+
+	if (gradeBookUserLesson == null) {
+	    gradeBookUserLesson = new GradeBookUserLesson(lesson, learner);
+	}
+
+	gradeBookUserLesson.setFeedback(feedback);
+	gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
+    }
+
+    /**
+     * Updates the feedback for a learner's performance in an Activity
+     * 
+     * @param activity
+     * @param learner
+     * @param feedback
+     */
+    public void updateUserActivityGradeBookFeedback(Activity activity, User learner, String feedback) {
+
+	GradeBookUserActivity gradeBookUserActivity = gradeBookDAO.getGradeBookUserDataForActivity(activity
+		.getActivityId(), learner.getUserId());
+
+	if (gradeBookUserActivity == null) {
+	    gradeBookUserActivity = new GradeBookUserActivity((ToolActivity) activity, learner);
+	}
+
+	gradeBookUserActivity.setFeedback(feedback);
+	gradeBookDAO.insertOrUpdate(gradeBookUserActivity);
     }
 
     public IMonitoringService getMonitoringService() {

@@ -44,9 +44,13 @@ public interface IGradeBookService {
     
     public ArrayList<GradeBookUserDTO> getGradeBookLessonData(Lesson lesson);
 
-    public void updateUserLessonGradeBookData(Lesson lesson, User learner, Double mark);
+    public void updateUserLessonGradeBookMark(Lesson lesson, User learner, Double mark);
     
-    public void updateUserActivityGradeBookData(Lesson lesson, User learner, Activity activity, Double mark);
+    public void updateUserActivityGradeBookMark(Lesson lesson, User learner, Activity activity, Double mark);
+    
+    public void updateUserActivityGradeBookFeedback(Activity activity, User learner, String feedback);
+    
+    public void updateUserLessonGradeBookFeedback(Lesson lesson, User learner, String feedback);
     
 }
  

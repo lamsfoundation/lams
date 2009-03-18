@@ -62,7 +62,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * Handles the monitor interface for gradebook
  * 
- * This is where marking for an activity takes place
+ * This is where marking for an activity/lesson takes place
  * 
  * 
  * @struts.action path="/gradebook/gradebookMonitoring" parameter="dispatch"
@@ -186,7 +186,7 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 		}
 
 	    }
-	    
+
 	    String ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, page, totalPages);
 	    response.setContentType("text/xml");
 	    PrintWriter out = response.getWriter();
@@ -211,14 +211,22 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	initServices();
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String login = WebUtil.readStrParam(request, "id");
-	Double mark = Double.parseDouble(WebUtil.readStrParam(request, "totalMark"));
-
+	String markStr = WebUtil.readStrParam(request, "mark", true);
+	String feedback =  WebUtil.readStrParam(request, "feedback", true);
 	Lesson lesson = lessonService.getLesson(lessonID);
 	User learner = userService.getUserByLogin(login);
 
 	if (lesson != null && learner != null) {
-	    gradeBookService.updateUserLessonGradeBookData(lesson, learner, mark);
-	  
+	    
+	    if (markStr != null && !markStr.equals("")) {
+		Double mark = Double.parseDouble(markStr);
+		gradeBookService.updateUserLessonGradeBookMark(lesson, learner, mark);
+	    }
+	    
+	    if (feedback != null && !feedback.equals("")) {
+		gradeBookService.updateUserLessonGradeBookFeedback(lesson, learner, feedback);
+	    }
+
 	} else {
 	    // TODO: handle error
 	}
@@ -242,7 +250,9 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Long activityID = WebUtil.readLongParam(request, "id");
 	String login = WebUtil.readStrParam(request, GradeBookConstants.PARAM_LOGIN);
-	Double mark = Double.parseDouble(WebUtil.readStrParam(request, "mark"));
+
+	String markStr = WebUtil.readStrParam(request, "mark", true);
+	String feedback =  WebUtil.readStrParam(request, "feedback", true);
 
 	Activity activity = monitoringService.getActivityById(activityID);
 	User learner = userService.getUserByLogin(login);
@@ -250,8 +260,15 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 
 	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
 	    
-	    gradeBookService.updateUserActivityGradeBookData(lesson, learner, activity, mark);
-
+	    if (markStr != null && !markStr.equals("")) {
+		Double mark = Double.parseDouble(markStr);
+		gradeBookService.updateUserActivityGradeBookMark(lesson, learner, activity, mark);
+	    }
+	    
+	    if (feedback != null && !feedback.equals("")) {
+		gradeBookService.updateUserActivityGradeBookFeedback(activity, learner, feedback);
+	    }
+	    
 	} else {
 	    // TODO: handle error
 	}

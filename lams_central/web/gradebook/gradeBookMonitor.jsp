@@ -31,15 +31,16 @@
 			    sortorder: "asc", 
 			    sortname: "lastName", 
 			    pager: 'pager',
-			    rowList:[5,20,30],
-			    rowNum:5,
+			    rowList:[5,10,20,30],
+			    rowNum:10,
 				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}&login=test1",
-			    colNames:["", 'Last Name','First Name', 'Progress', 'Total Mark'],
+			    colNames:["", 'Last Name','First Name', 'Progress', 'Lesson FeedBack', 'Total Mark'],
 			    colModel:[
 			      {name:'login', index:'login', sortable:false, editable:false, hidden:true},
 			      {name:'lastName',index:'lastName', sortable:true, editable:false},
 			      {name:'firstName',index:'firstName', sortable:true, editable:false},
 			      {name:'status',index:'status', sortable:false, editable:false},
+			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} },
 			      {name:'totalMark',index:'totalMark', sortable:true, editable:true, editrules:{number:true}}
 			    ],
 			    imgpath: 'themes/basic/images',
@@ -58,13 +59,14 @@
 					     cellEdit:true,
 					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&login=" + userName,
 					     ExpandColumn: "Outputs",
-					     colNames: ['Id','Activity','Status','Outputs', 'Competences', 'Mark'],
+					     colNames: ['Id','Activity','Status','Outputs', 'Competences', 'Activity FeedBack', 'Mark'],
 					     colModel: [
 					       	{name:'activityId', width:10, index:'activityId', sortable:false, hidden:true},
 							{name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
 							{name:'status', width:100, index:'status', sortable:false, editable:false},
 							{name:'output', width:250, index:'output', sortable:false, editable: false},
-							{name:'competences', width:250, index:'output', sortable:false, editable: false},
+							{name:'competences', width:250, index:'competences', sortable:false, editable: false},
+							{name:'feedback', width:250, index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}},
 							{name:'mark', width:100, index:'mark', sortable:false, editable: true, editrules:{number:true} }
 					                   ],
 					     editurl: "server.php",
@@ -83,8 +85,6 @@
 					     },
 						 imgpath: 'themes/basic/images'
 					  })
-					  
-					  
 				 	}
 				})
 		});

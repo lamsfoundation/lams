@@ -71,6 +71,7 @@ public class GradeBookUtil {
 
 		for (String gradeBookItem : gactivityDTO.toStringArray()) {
 		    Element cellElement = document.createElement("cell");
+		    gradeBookItem = (gradeBookItem != null) ? gradeBookItem : "";
 		    cellElement.appendChild(document.createTextNode(gradeBookItem));
 		    rowElement.appendChild(cellElement);
 		}
@@ -121,6 +122,7 @@ public class GradeBookUtil {
 
 		for (String gradeBookItem : gridRow.toStringArray()) {
 		    Element cellElement = document.createElement("cell");
+		    gradeBookItem = (gradeBookItem != null) ? gradeBookItem : "";
 		    cellElement.appendChild(document.createTextNode(gradeBookItem));
 		    rowElement.appendChild(cellElement);
 		}

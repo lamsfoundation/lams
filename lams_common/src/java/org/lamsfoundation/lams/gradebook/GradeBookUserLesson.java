@@ -38,8 +38,14 @@ public class GradeBookUserLesson {
     private Lesson lesson;
     private User learner;
     private Double mark;
+    private String feedback;
     
     public GradeBookUserLesson() {}
+    
+    public GradeBookUserLesson(Lesson lesson, User learner) {
+	this.lesson = lesson;
+	this.learner = learner;
+    }
 
     /**
      * @hibernate.id column="uid" generator-class="native" type="java.lang.Long"
@@ -85,6 +91,17 @@ public class GradeBookUserLesson {
 
     public void setMark(Double mark) {
         this.mark = mark;
+    }
+    
+    /**
+     * @hibernate.property column="feedback" length="65535"
+     */
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
     }
 }
  

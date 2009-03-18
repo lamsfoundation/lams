@@ -25,14 +25,13 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
-import org.lamsfoundation.lams.lesson.LearnerProgress;
-
 public class GradeBookUserDTO extends GradeBookGridRow {
     String login;
     String firstName;
     String lastName;
     String status;
     Double totalLessonMark;
+    String feedback;
 
     public GradeBookUserDTO() {
     }
@@ -45,6 +44,7 @@ public class GradeBookUserDTO extends GradeBookGridRow {
 	ret.add(firstName);
 	ret.add(lastName);
 	ret.add(status);
+	ret.add(feedback);
 
 	if (totalLessonMark != null && totalLessonMark != 0.0) {
 	    ret.add(totalLessonMark.toString());
@@ -98,5 +98,13 @@ public class GradeBookUserDTO extends GradeBookGridRow {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
     }
 }

@@ -36,9 +36,8 @@ public class GradeBookActivityDTO extends GradeBookGridRow{
     String competences;
     //double timeTaken;
     Double mark;
-    
-    // http://172.20.100.188:8080/lams//tool/lamc11/learningStarter.do?mode=teacher&userID=5&toolSessionID=1
-    
+    String feedback;
+      
     public GradeBookActivityDTO() {}
     
     @Override
@@ -58,6 +57,8 @@ public class GradeBookActivityDTO extends GradeBookGridRow{
 	ret.add(status);
 	ret.add(output);
 	ret.add(competences);
+	
+	ret.add(feedback);
 	
 	if (mark != null) {
 	    ret.add(mark.toString());
@@ -132,6 +133,14 @@ public class GradeBookActivityDTO extends GradeBookGridRow{
 
     public void setActivityUrl(String activityUrl) {
         this.activityUrl = activityUrl;
+    }
+
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
     }
 }
  

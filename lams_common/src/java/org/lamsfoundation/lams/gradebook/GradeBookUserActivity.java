@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -39,8 +40,14 @@ public class GradeBookUserActivity {
     private ToolActivity activity;
     private User learner;
     private Double mark;
+    private String feedback;
 
     public GradeBookUserActivity() {
+    }
+    
+    public GradeBookUserActivity(ToolActivity activity, User learner){
+	this.activity = activity;
+	this.learner = learner;
     }
 
     /**
@@ -87,5 +94,16 @@ public class GradeBookUserActivity {
 
     public void setMark(Double mark) {
 	this.mark = mark;
+    }
+
+    /**
+     * @hibernate.property column="feedback" length="65535"
+     */
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
     }
 }
