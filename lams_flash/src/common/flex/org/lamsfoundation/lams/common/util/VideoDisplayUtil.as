@@ -8,11 +8,17 @@ package org.lamsfoundation.lams.common.util
 		public function VideoDisplayUtil() {}
 		
 		// prints an info object
-	 	public static function printInfoObject(caller:String, infoObject:Object):void{
-        	trace("caller: " + caller);
+	 	public static function printInfoObject(infoObject:Object, caller:String=null):String{
+	 		var printedString:String = "";
+	 		
+	 		if(caller){
+	 			printedString += "caller: " + caller + "\n";
+	 		}
+	 		
        		for (var prop in infoObject) {
-    			trace("\t"+prop+":\t"+infoObject[prop]);
+    			printedString += prop + ":\t" + infoObject[prop] + "\n";
 			}
+			return printedString;
         }
 	    
 	    // create a filename for the video recorder tool
@@ -56,9 +62,11 @@ package org.lamsfoundation.lams.common.util
 			cam = Camera.getCamera();
 				
 			// setting dimensions and framerate
-			cam.setMode(320, 240, 30);
-			// set to minimum of 70% quality
-			cam.setQuality(0,70);
+			var iFps:int = cam.fps;
+			cam.setMode (320, 240, iFps);
+			
+			// set to minimum of 90% quality
+			cam.setQuality(0, 90);
 			
 			return cam;
 		}

@@ -6,7 +6,9 @@ package org.lamsfoundation.lams.common.ui.components
 	{
 		public static const RESET:String = "videoDisplayReset";
 		public static const READY:String = "videoDisplayReady";
+		public static const READYSEEK:String = "videoDisplayReadySeek";
 		public static const PAUSE:String = "videoDisplayPause";
+		public static const PAUSESEEK:String = "videoDisplayPauseSeek";
 		public static const UNPAUSE:String = "videoDisplayUnpause";
 		public static const METADATA:String = "videoDisplayMetadata";
 		public static const STARTCAM:String = "videoDisplayStartCam";

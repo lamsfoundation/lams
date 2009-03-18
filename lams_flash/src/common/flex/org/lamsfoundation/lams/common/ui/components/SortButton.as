@@ -11,11 +11,11 @@ package org.lamsfoundation.lams.common.ui.components
 	
 	public class SortButton extends HBox
 	{
-		[Embed(source="../../../../../../assets/images/upArrow.swf")]
+		[Embed(source="../../../../../../../../../../lams_central/web/images/icons/bullet_arrow_up.png")]
 		[Bindable]
 		private var upArrow:Class;
 		
-		[Embed(source="../../../../../../assets/images/downArrow.swf")]
+		[Embed(source="../../../../../../../../../../lams_central/web/images/icons/bullet_arrow_down.png")]
 		[Bindable]
 		private var downArrow:Class;
 		
