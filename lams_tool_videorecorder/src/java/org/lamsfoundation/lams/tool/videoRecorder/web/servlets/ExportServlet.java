@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.ExternalServerUtil;
+import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -336,14 +337,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				VideoRecorderRecordingDTO vr = (VideoRecorderRecordingDTO) iter.next();
 				
 				// get the stream from the external server
-			    InputStream is = ExternalServerUtil.getResponseInputStreamFromExternalServer(VIDEORECORDER_RECORDINGS_FOLDER_SRC + vr.getFilename(), new HashMap<String, String>());
+			    int success = HttpUrlConnectionUtil.writeResponseToFile(VIDEORECORDER_RECORDINGS_FOLDER_SRC, VIDEORECORDER_RECORDINGS_FOLDER_DEST, vr.getFilename(), new Cookie[0]);
 			    
-			    // write the flv file locally
-			    File file = ExternalServerUtil.writeFile(is, VIDEORECORDER_RECORDINGS_FOLDER_DEST + vr.getFilename());
-			    
-			    // add the filename to the list
-			    fileArray[1].add(vr.getFilename());
-			}
+			    // if success
+			    if(success == 1){
+				    // add the filename to the list
+				    fileArray[1].add(vr.getFilename());
+				    logger.debug("file copy complete");
+			    }else{
+			    	logger.debug("file copy failed");
+			    }
+		    }
 		} catch (Exception e) {
 			logger.error("Could not find files on Red5 server", e);
 		}

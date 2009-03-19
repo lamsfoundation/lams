@@ -59,7 +59,7 @@
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="videoRecorderOutputFactory"><ref bean="videoRecorderOutputFactory"/></property>
 		   		<property name="messageService"><ref bean="videoRecorderMessageService"/></property>  
-		   		<property name="respositoryService"><ref bean="repositoryService" /></property>
+		   		<property name="repositoryService"><ref bean="repositoryService" /></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">

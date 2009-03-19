@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.service.IVideoRecorderService;
 import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderService;
 import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderServiceProxy;
+import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderCommentComparator;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderRecordingComparator;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRatingDTO;
@@ -470,6 +471,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 		for(VideoRecorderRecordingDTO videoRecorderRecordingDTO: videoRecorderRecordingDTOs){
 			VideoRecorderUser user = videoRecorderRecordingDTO.getCreateBy();
 			Set<VideoRecorderCommentDTO> comments = videoRecorderRecordingDTO.getComments();
+		    
 			Set<VideoRecorderRatingDTO> ratings = videoRecorderRecordingDTO.getRatings();
 			
 			xmlOutput += "<recording>";
@@ -508,7 +510,11 @@ public class VideoRecorderAction extends LamsDispatchAction {
 	private String buildVideoCommentsXML(Set<VideoRecorderCommentDTO> comments){
 		String xmlOutput = "<comments>";
 		
-		for(VideoRecorderCommentDTO comment: comments){
+		VideoRecorderCommentDTO[] commentArray = (VideoRecorderCommentDTO[])comments.toArray(new VideoRecorderCommentDTO[comments.size()]);
+
+		//for(VideoRecorderCommentDTO comment: comments){
+		for(int i = commentArray.length - 1; i >= 0; i--){
+			VideoRecorderCommentDTO comment = commentArray[i];
 			xmlOutput += "<comment>";
 			xmlOutput += "<author>" + comment.getCreateBy().getFirstName() + " " + comment.getCreateBy().getLastName() + "</author>";
 			xmlOutput += "<createDate>" + comment.getCreateDate().toLocaleString() + "</createDate>";

@@ -69,6 +69,24 @@
         />
 
         <property
+            name="reflectOnActivity"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="reflect_on_activity"
+            length="1"
+        />
+
+        <property
+            name="reflectInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="reflect_instructions"
+            length="65535"
+        />
+
+        <property
             name="runOffline"
             type="boolean"
             update="true"
@@ -114,15 +132,6 @@
         />
 
         <property
-            name="allowLearnerVideoExport"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="allow_learner_video_export"
-            length="1"
-        />
-
-        <property
             name="allowComments"
             type="boolean"
             update="true"
@@ -137,6 +146,24 @@
             update="true"
             insert="true"
             column="allow_ratings"
+            length="1"
+        />
+
+        <property
+            name="exportOffline"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="export_offline"
+            length="1"
+        />
+
+        <property
+            name="exportAll"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="export_all"
             length="1"
         />
 

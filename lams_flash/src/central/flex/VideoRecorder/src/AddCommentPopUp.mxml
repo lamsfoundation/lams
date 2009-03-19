@@ -24,7 +24,7 @@
         ]]>
     </mx:Script>
 	<mx:Label x="10" y="10" text="Comment:" id="commentLabel"/>
-	<mx:TextArea x="83" y="9" width="259" height="75" wordWrap="true" editable="true" text="Enter comment here" id="commentInput"/>
+	<mx:TextArea wordWrap="true" editable="true" text="Enter comment here" id="commentInput" left="83" right="14" top="9" bottom="10"/>
 	<mx:ControlBar height="41" y="431">
 		<mx:HBox width="100%" height="100%" horizontalAlign="right">
 			<mx:Button label="Cancel" id="cancelButton" click="PopUpManager.removePopUp(this)"/>

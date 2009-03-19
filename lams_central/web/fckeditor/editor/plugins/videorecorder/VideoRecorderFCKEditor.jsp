@@ -21,7 +21,7 @@ Learn more about Flex at http://flex.org
 <lams:css style="core"/>
 
 <title></title>
-<script src="AC_OETags.js" language="javascript"></script>
+<script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
 
 <!--  BEGIN Browser History required section -->
@@ -67,7 +67,7 @@ if(oEditor && typeof(oEditor.FCKVideoRecorder)!='undefined')
 
 function getLanguageXML(){
 	var languageCollection = new Array('videorecorder_video_player', 'videorecorder_video_recorder',
-		'videorecorder_web_application_not_available', 'videorecorder_net_connection_not_connected',
+		'videorecorder_web_application_not_available', 'videorecorder_net_connection_not_connected', 'videorecorder_buffering',
 		'videorecorder_net_connection_closed', 'videorecorder_playing', 'videorecorder_ready', 'videorecorder_recording',
 		'videorecorder_paused', 'videorecorder_waiting', 'videorecorder_description', 'videorecorder_title',
 		'videorecorder_new_recording_details', 'videorecorder_recording_complete_authoring',
@@ -147,7 +147,7 @@ function saveToFCKEditor(eventObj) {
 			    var MMdoctitle = document.title;
 			
 				AC_FL_RunContent(
-					"src", "playerProductInstall",
+					"src", "<lams:LAMSURL/>/includes/flash/playerProductInstall",
 					"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
 					"width", "361",
 					"height", "331",

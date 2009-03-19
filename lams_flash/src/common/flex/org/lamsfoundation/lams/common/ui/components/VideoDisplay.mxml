@@ -179,7 +179,8 @@
 			
 			// called from metadata callback
 			private function checkReady(event:TimerEvent):void{	
-				if(playMode == INIT_MODE && _isBufferFull){
+				// if we are in init and the buffer is full or the movie is completely loaded
+				if(playMode == INIT_MODE && (_isBufferFull || _ns.bytesLoaded == _ns.bytesTotal)){
 					setReady(event);
 				}
 			}
@@ -205,7 +206,7 @@
 			
 			// called from metadata callback
 			private function checkReadySeek(event:TimerEvent):void{	
-				if(playMode == PAUSE_MODE && _isBufferFull){
+				if(playMode == PAUSE_MODE && (_isBufferFull || _ns.bytesLoaded == _ns.bytesTotal)){
 					setReadySeek(event);
 				}
 			}
@@ -611,7 +612,7 @@
     				}
     				case "NetStream.Play.Complete":{
     					// alert
-    					//Alert.show("NetStream.Play.Complete");
+    					// Alert.show("NetStream.Play.Complete from red5 callback");
     					makeReadyAgain();
     					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.COMPLETE));
 						break;
@@ -623,6 +624,7 @@
 			// checks end of the stream (called every second from the timer)
 			private function checkEndStream(event:TimerEvent):void{
 				if(_ns.time >= metadata.duration){
+					// Alert.show("NetStream.Play.Complete from checkStream");
 					makeReadyAgain();
 					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.COMPLETE));
 				}

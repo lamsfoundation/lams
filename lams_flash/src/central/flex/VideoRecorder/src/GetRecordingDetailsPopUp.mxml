@@ -36,8 +36,8 @@
     
 	<mx:Label x="10" y="10" text="Title:" id="titleLabel"/>
 	<mx:Label x="10" y="39" text="Description:" id="descriptionLabel"/>
-	<mx:TextInput x="89" y="8" width="253" editable="true" id="titleInput" text="Enter title here"/>
-	<mx:TextArea x="89" y="38" width="253" height="75" wordWrap="true" editable="true" text="Enter description here" id="descriptionInput"/>
+	<mx:TextInput y="8" editable="true" id="titleInput" text="Enter title here" left="89" right="14"/>
+	<mx:TextArea wordWrap="true" editable="true" text="Enter description here" id="descriptionInput" left="89" right="14" top="38" bottom="10"/>
 	<mx:ControlBar height="41" y="431">
 		<mx:HBox width="100%" height="100%" horizontalAlign="right">
 			<mx:Button label="Done" id="doneButton" click="dispatchEvent(new Event('popUpClose'))"/>

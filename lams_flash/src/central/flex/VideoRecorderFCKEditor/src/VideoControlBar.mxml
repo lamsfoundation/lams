@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:ControlBar xmlns:mx="http://www.adobe.com/2006/mxml" height="38" y="248" creationComplete="onCreationComplete(event)">
+<mx:ControlBar xmlns:mx="http://www.adobe.com/2006/mxml" height="38" y="248" creationComplete="onCreationComplete(event)" xmlns:ns1="org.lamsfoundation.lams.common.ui.components.*">
 
 	<mx:Script>
 		<![CDATA[
+			import mx.core.Application;
 			private var _mode:String;
 			
 			private function onCreationComplete(event:Event):void{
@@ -22,7 +23,6 @@
 	
 	<mx:Button width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" id="playButton"/>
 	<mx:Button width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" id="recordButton"/>
-	<mx:HSlider width="100%" id="seekSlider"/>
-	<mx:Label text="0:00 / 0:00" width="70" textAlign="center" id="timerLabel"/>
+	<ns1:SeekSlider id="seekSlider" width="100%" videoDisplay="{Application.application.videoDisplay}"/>
 	<mx:Button width="20" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" id="saveAndCloseButton"/>
 </mx:ControlBar>

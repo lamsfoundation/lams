@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script src="./includes/flash/AC_OETags.js" language="javascript"></script>
+<script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
 <script type="text/javascript">
 <!--
 	var evalcomixWindow = null;
@@ -192,7 +192,7 @@
 	    var MMdoctitle = document.title;
 	
 		AC_FL_RunContent(
-			"src", "./includes/flash/playerProductInstall",
+			"src", "<lams:LAMSURL/>/includes/flash/playerProductInstall",
 			"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
 			"width", "100%",
 			"height", "676",

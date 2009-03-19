@@ -32,21 +32,24 @@ public class VideoRecorderRecordingComparator implements Comparator<VideoRecorde
 			if(user2 == null)
 				return 1;
 			
-			Long userId1 = user1.getUid();
-			Long userId2 = user2.getUid();
+			String userName1 = user1.getFirstName() + " " + user1.getLastName();
+			String userName2 = user2.getFirstName() + " " + user2.getLastName();
+			userName1 = userName1.toLowerCase();
+			userName2 = userName2.toLowerCase();
 				
-			if(userId1 > userId2) {
-				if(sortDirection == "ascending")
-					return -1;
-				else
-					return 1;
-			} else if(userId1 == userId2) {
-				return 0;
-			} else {
-				if(sortDirection == "ascending")
-					return 1;
-				else
-					return -1;
+			int difference = userName1.compareTo(userName2);
+			
+			if(Math.abs(difference) == 0)
+				return 1;
+			
+			if(sortDirection.compareTo("ascending") == 0){
+				
+				int result = difference / Math.abs(difference);
+				return result;
+			}
+			else if(sortDirection.compareTo("descending") == 0){
+				int result = -difference / Math.abs(difference);
+				return result;
 			}
 		}
 		else if(sortBy.compareTo("date") == 0){
@@ -87,8 +90,8 @@ public class VideoRecorderRecordingComparator implements Comparator<VideoRecorde
 			if(user2 == null)
 				return 1;
 			
-			String title1 = dto1.getTitle();
-			String title2 = dto2.getTitle();
+			String title1 = dto1.getTitle().toLowerCase();
+			String title2 = dto2.getTitle().toLowerCase();
 			
 			int difference = title1.compareTo(title2);
 			

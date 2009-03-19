@@ -136,5 +136,5 @@
 		<!-- <mx:ProgressBar id ="seekSliderProgress" height="0" labelWidth="0" width="97%" mode="manual"/> -->
 	</mx:VBox>
 
-	<mx:Label id="seekSliderTimerLabel"  text="0:00" width="32"/>	
+	<mx:Label id="seekSliderTimerLabel"  text="0:0 / 0:0" width="70" textAlign="center"/>	
 </mx:HBox>

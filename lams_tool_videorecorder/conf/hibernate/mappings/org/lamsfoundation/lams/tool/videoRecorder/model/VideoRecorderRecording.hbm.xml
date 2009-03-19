@@ -26,6 +26,14 @@
         </id>
 
         <property
+            name="toolContentId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="tool_content_id"
+        />
+
+        <property
             name="createDate"
             type="java.util.Date"
             update="true"

@@ -1,5 +1,9 @@
 // creates an httpservice and gets video recordings
 private function getRecordingsFromServer(sortBy:String, sortDirection:String):void{
+	// show an overlay over the video listings
+	LamsAjaxOverlayManager.showOverlay(videoList);
+	
+	// create and set the service
 	var videoRecorderActions:HTTPService = new HTTPService();
 	videoRecorderActions.url = serverUrl;
 	videoRecorderActions.method = "POST";
@@ -9,8 +13,10 @@ private function getRecordingsFromServer(sortBy:String, sortDirection:String):vo
 	videoRecorderActions.request.toolContentId = toolContentId;
 	videoRecorderActions.request.userId = userId;
 	
+	// if we are in teacher mode or are allowing recording visibility, get all recordings
 	if(allowLearnerVideoVisibility || mode == "teacher")
 		videoRecorderActions.request.getAll = true;
+	// otherwise, get only the users own recordings
 	else
 		videoRecorderActions.request.getAll = false;
 	
@@ -27,15 +33,23 @@ private function getRecordingsFromServer(sortBy:String, sortDirection:String):vo
 private function getRecordingsSuccessHandler(e:ResultEvent):void {
 	// update the rating from the servlet's returned xml
 	videoRecordings = e.result.recording;
+	
+	// hide the overlay
+	LamsAjaxOverlayManager.hideOverlay(videoList);
 }
 
 // fault handler for get recordings
   private function getRecordingsFaultHandler(e:FaultEvent):void {
+  	// hide the overlay
+  	LamsAjaxOverlayManager.hideOverlay(videoList);
+  	
+  	// show an alert with the error
   	Alert.show(e.toString());
 }
 
 // creates an httpservice and saves a video recording
 private function saveRecordingToServer(userId:int, title:String, description:String, filename:String, rating:Number, toolSessionId:int, recordingId:int):void{
+	// create and set the service
 	var videoRecorderActions:HTTPService  = new HTTPService();
 	videoRecorderActions.url = serverUrl;
 	videoRecorderActions.method = "POST";
@@ -76,6 +90,10 @@ private function saveRecordingSuccessHandler(e:ResultEvent):void {
 
 // creates an httpservice and saves a comment
 private function saveCommentToServer(toolSessionId:int, recordingId:int, userId:int, commentId:int, comment:String):void{
+	// show an overlay over the recording information
+	LamsAjaxOverlayManager.showOverlay(videoInformation);
+	
+	// create and set the service
 	var videoRecorderActions:HTTPService  = new HTTPService();
 	videoRecorderActions.url = serverUrl;
 	videoRecorderActions.method = "POST";
@@ -102,16 +120,27 @@ private function saveCommentSuccessHandler(e:ResultEvent):void {
 	getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);	
 	
 	// scroll the video information box to the position of the "Comments:" label
-	videoInformation.verticalScrollPosition = videoInformation.commentsLabel.y;
+	videoInformation.verticalScrollPosition = videoInformation.addCommentButton.y;
+	
+	// hide the overlay
+  	LamsAjaxOverlayManager.hideOverlay(videoInformation);
 }
 
 // fault handler for save recording
   private function saveCommentFaultHandler(e:FaultEvent):void {
+	// hide the overlay
+  	LamsAjaxOverlayManager.hideOverlay(videoInformation);
+  	
+  	// print the error
   	Alert.show(e.toString());
 }
        
 // creates an httpservice and saves a rating
 private function saveRatingToServer(toolSessionId:int, ratingId:int, userId:int, rating:Number, recordingId:int):void{
+	// show an overlay over the recording information
+	LamsAjaxOverlayManager.showOverlay(videoInformation);
+	
+	// create and set the service	
 	var videoRecorderActions:HTTPService  = new HTTPService();
 	videoRecorderActions.url = serverUrl;
 	videoRecorderActions.method = "POST";
@@ -142,13 +171,20 @@ private function saveRatingSuccessHandler(e:ResultEvent):void {
 	
 	// fix the tooltip
 	ratingClicked.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.already.rated", [" ", String(e.result.userRating)]);
-
+	
+	// hide the overlay
+  	LamsAjaxOverlayManager.hideOverlay(videoInformation);
+  	
 	// update the video recordings
-	getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);	
+	getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);
 }
 
 // fault handler for save rating
   private function saveRatingFaultHandler(e:FaultEvent):void {
+  	// hide the overlay
+  	LamsAjaxOverlayManager.hideOverlay(videoInformation);
+  	
+  	// show the error
   	Alert.show(e.toString());
 }
 

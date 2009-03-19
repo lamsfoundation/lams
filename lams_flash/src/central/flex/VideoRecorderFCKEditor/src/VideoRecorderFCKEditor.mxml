@@ -54,11 +54,11 @@
 			private static var toolServletLocation:String = "tool/lavidr10/videoRecorderActions.do";
 			private static var saveToLamsServletLocation:String = "GetRecording";
 			
-			// embeds
-			[Embed(source="./assets/images/playIcon.swf")] [Bindable] private var playIcon:Class;
-			[Embed(source="./assets/images/pauseIcon.swf")] [Bindable] private var pauseIcon:Class;
-			[Embed(source="./assets/images/recordIcon.swf")] [Bindable] private var recordIcon:Class;
-			[Embed(source="./assets/images/okIcon.swf")] [Bindable] private var saveIcon:Class;
+			// icon embeds
+			[Embed(source="../../../../../../lams_central/web/images/icons/control_play.png")] [Bindable] private var playIcon:Class;
+			[Embed(source="../../../../../../lams_central/web/images/icons/control_pause.png")] [Bindable] private var pauseIcon:Class;
+			[Embed(source="../../../../../../lams_central/web/images/icons/control_record.png")] [Bindable] private var recordIcon:Class;
+			[Embed(source="../../../../../../lams_central/web/images/icons/accept.png")] [Bindable] private var saveIcon:Class;
 			
 			// called first of all, before any components are initialized
 			private function onPreinitialize(event:Event):void{
@@ -108,7 +108,7 @@
 				
 				// init buttons states
 				videoControlBar.playButton.enabled = false;
-				videoControlBar.seekSlider.enabled = false;
+				videoControlBar.seekSlider.enable(false);
 				videoControlBar.saveAndCloseButton.enabled = false;
 				
 				// add listeners
@@ -148,7 +148,6 @@
 					case "playerModeOffline":{
 						var nc:NetConnection = new NetConnection();
 						nc.connect(null);
-						videoDisplay.bufferTime = 0;
 						videoDisplay.setNetConnection(nc);
 						videoDisplay.makeReadyVideo(filename);
 						break;
@@ -166,7 +165,6 @@
 						mic = VideoDisplayUtil.setupMic();
 						videoDisplay.attachCamera(cam);
 						videoDisplay.attachMic(mic);
-						videoDisplay.bufferTime = 2;
 						createConnection();
 						break;
 					}
@@ -183,7 +181,6 @@
 						mic = VideoDisplayUtil.setupMic();
 						videoDisplay.attachCamera(cam);
 						videoDisplay.attachMic(mic);
-						videoDisplay.bufferTime = 2;
 						createConnection();
 
 						break;
@@ -216,12 +213,13 @@
 				videoDisplay.addEventListener(VideoDisplayEvent.COMPLETE, onComplete);
 				videoDisplay.addEventListener(VideoDisplayEvent.STARTPUBLISH, onStartPublish);
 				videoDisplay.addEventListener(VideoDisplayEvent.STOPPUBLISH, onStopPublish);
+				videoDisplay.addEventListener(VideoDisplayEvent.PAUSESEEK, onPauseSeek);
+				videoDisplay.addEventListener(VideoDisplayEvent.READYSEEK, onReadySeek);	
 				
 				videoControlBar.playButton.addEventListener(MouseEvent.CLICK, playClick);
-				videoControlBar.seekSlider.addEventListener(SliderEvent.CHANGE, seekSliderChange);
-				videoControlBar.seekSlider.addEventListener(SliderEvent.THUMB_PRESS, seekSliderClick);
-				videoControlBar.seekSlider.addEventListener(SliderEvent.THUMB_RELEASE, seekSliderClick);
-				videoControlBar.seekSlider.dataTipFormatFunction = VideoDisplayUtil.secondsToString;
+				
+				videoControlBar.seekSlider.addEventListener(SliderEvent.THUMB_PRESS, onSeekPress);
+				videoControlBar.seekSlider.addEventListener(SliderEvent.THUMB_RELEASE, onSeekRelease);
 				
 				switch(mode){
 					case "recorderModeFCK":{
@@ -356,10 +354,7 @@
 						videoDisplay.makeReadyVideo(filename);
 						
 						// update tooltip
-						videoControlBar.recordButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.recording.next");
-										
-						// change the panel status
-						videoDisplayPanel.status = dictionary.getLabel("videorecorder.ready");	
+						videoControlBar.recordButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.recording.again");
 					}
 
 				}
@@ -391,10 +386,10 @@
 				trace("securityErrorHandler: " + event);
 			} 
 	    	
-	    	// ugly onBW callback
-			NetConnection.prototype.onBWDone = function(infoObject) {
+        	// bw detection handler
+			public function onBWDone(infoObject:Object):void {
 				// print its properties
-				VideoDisplayUtil.printInfoObject("onBWDone", infoObject)
+    			trace(VideoDisplayUtil.printInfoObject(infoObject, "onBWDone"));
 			}
 			
 			// play button click handler
@@ -447,18 +442,15 @@
 			// onMetaData callback, called from videoDisplay
 			private function onMetaData(event:VideoDisplayEvent):void{
 				videoDisplayPanel.status = dictionary.getLabel("videorecorder.buffering");
-				videoControlBar.seekSlider.minimum = 0;
-				videoControlBar.seekSlider.maximum = event.metadata.duration;
-				
-				playTimer = new Timer(10);
-				playTimer.addEventListener(TimerEvent.TIMER, updateSeekSlider);
-				playTimer.start();
+				videoControlBar.seekSlider.setMiniMaxValues(0, event.metadata.duration);
+				videoControlBar.seekSlider.setValue(0);
+				videoControlBar.seekSlider.startTimerLabel();
 			}
 			
 			// onReady callback, called from videoDisplay
 			private function onReady(event:VideoDisplayEvent):void{
 				videoControlBar.playButton.enabled = true;
-				videoControlBar.seekSlider.enabled = true;
+				videoControlBar.seekSlider.enable(true);
 				videoControlBar.playButton.setStyle("icon", playIcon);
 				videoControlBar.playButton.toolTip = dictionary.getLabel("videorecorder.tooltip.play");
 				videoDisplayPanel.status = dictionary.getLabel("videorecorder.ready");
@@ -494,17 +486,18 @@
 				videoControlBar.playButton.enabled = false;
 				videoControlBar.playButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.play", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
 				
-				videoControlBar.seekSlider.enabled = false;
-				videoControlBar.seekSlider.minimum = 0;
-				videoControlBar.seekSlider.maximum = 0;
-				videoControlBar.seekSlider.value = videoControlBar.seekSlider.minimum;
+				// reset the seek slider timer
+				videoControlBar.seekSlider.resetTimerLabel();
+				videoControlBar.seekSlider.setMiniMaxValues(0, 0);
+				videoControlBar.seekSlider.setValue(0);
+				videoControlBar.seekSlider.enable(false);
 				
 				videoControlBar.recordButton.toolTip = dictionary.getLabel("videorecorder.tooltip.stop.recording");
 				
 				videoDisplayPanel.status = dictionary.getLabel("videorecorder.recording");
 				
 				recTimer = new Timer(250);
-				recTimer.addEventListener(TimerEvent.TIMER, updateTimerLabelForRecording);
+				recTimer.addEventListener(TimerEvent.TIMER, videoControlBar.seekSlider.updateTimerLabelForRecording);
 				recTimer.start();
 			}
 			
@@ -541,49 +534,33 @@
 				recTimer.stop();
 			}
 						
-			// update method called from a timer (launched when metadata is received)
-			private function updateSeekSlider(event:TimerEvent):void{
-				// if the video isn't actually playing yet
-				if(videoDisplay.playMode == videoDisplay.INIT_MODE || videoDisplay. playMode == videoDisplay.READY_MODE){
-					videoControlBar.seekSlider.value = 0;
-					videoControlBar.timerLabel.text = "0:00" + " / " + VideoDisplayUtil.secondsToString(String(videoDisplay.duration));
-				}
-				// otherwise, if it is playing
-				else if(videoDisplay.playMode == videoDisplay.PLAY_MODE || videoDisplay.playMode == videoDisplay.PAUSE_MODE){
-					videoControlBar.seekSlider.value = videoDisplay.time;
-					videoControlBar.timerLabel.text = VideoDisplayUtil.secondsToString(String(videoDisplay.time)) + " / " + VideoDisplayUtil.secondsToString(String(videoDisplay.duration));					
-				}
+			// onSeekPress callback, called from seekSlider
+			private function onSeekPress(event:SliderEvent):void{
+
 			}
 			
-			// updates timerLabel when recording
-			private function updateTimerLabelForRecording(event:TimerEvent):void{
-				var timer:Timer = Timer(event.currentTarget);
-				videoControlBar.timerLabel.text = VideoDisplayUtil.secondsToString(String(timer.currentCount * timer.delay / 1000));
+			// onSeekRelease callback, called from seekSlider
+			private function onSeekRelease(event:SliderEvent):void{
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.buffering");
+				videoControlBar.playButton.setStyle("icon", playIcon);
+				videoControlBar.playButton.enabled = false;
+				videoControlBar.playButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.play", [" (", dictionary.getLabel("videorecorder.disabled"), ")"]);
+				videoControlBar.seekSlider.enable(false);
 			}
 			
-			// seek slider click handler
-			private function seekSliderClick(event:SliderEvent):void {
-				// if seekslider is enabled
-				
-				if(videoControlBar.seekSlider.enabled){
-					// if the mouse is pressed
-					if(event.type == SliderEvent.THUMB_PRESS){
-						// stop the timer so that the bar seekSlider can manually be controlled
-						playTimer.stop();
-					}
-					// if the mouse is released
-					else if(event.type == SliderEvent.THUMB_RELEASE){
-						// start the timer again and allow it to regain control of the seekSlider
-						playTimer.start();
-					}
-				}
+			// onPauseSeek callback, called from seekSlider
+			private function onPauseSeek(event:VideoDisplayEvent):void{
+
 			}
 			
-			// seeks to the given place in the movie
-			private function seekSliderChange(event:SliderEvent):void {
-				videoDisplay.seek(event.value);
+			// onReadySeek callback, called from videoDisplay
+			private function onReadySeek(event:VideoDisplayEvent):void{
+				videoControlBar.playButton.enabled = true;
+				videoControlBar.playButton.toolTip = dictionary.getLabel("videorecorder.tooltip.resume");
+				videoControlBar.seekSlider.enable(true);
+				videoDisplayPanel.status = dictionary.getLabel("videorecorder.ready");
 			}
-			
+	
 		]]>
 	</mx:Script>
 	<mx:Panel x="10" y="10" width="340" height="310" layout="absolute" id="videoDisplayPanel">

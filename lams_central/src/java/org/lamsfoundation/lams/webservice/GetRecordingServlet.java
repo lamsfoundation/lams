@@ -28,12 +28,13 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.util.ExternalServerUtil;
+import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.WebUtil;
  
 /**
@@ -51,15 +52,28 @@ public class GetRecordingServlet extends HttpServlet {
 
 		try {
 			String urlStr = WebUtil.readStrParam(request, "urlStr");
-			//HashMap<String, String> params = (HashMap<String, String>)request.getAttribute("params");
 			String filename = WebUtil.readStrParam(request, "filename");
 			String dir = WebUtil.readStrParam(request, "dir");
 			
-			InputStream is = ExternalServerUtil.getResponseInputStreamFromExternalServer(urlStr, new HashMap<String,String>());
-			File file = ExternalServerUtil.writeFileAndDir(is, filename, dir);
+			String absoluteFilePath = dir + filename;
 			
-			logger.debug("file copy complete");
+			File newPath = new File(dir);
+			newPath.mkdirs();
 			
+			File newFile = new File(absoluteFilePath);
+			newFile.createNewFile();
+			
+			// get the stream from the external server
+		    int success = HttpUrlConnectionUtil.writeResponseToFile(urlStr, dir, filename, new Cookie[0]);
+		    
+		    // if success
+		    if(success == 1){
+			    // add the filename to the list
+		    	logger.debug("file copy complete");
+		    }else{
+		    	logger.debug("file copy failed");
+		    }
+
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}		

@@ -480,7 +480,7 @@ Ant build file.
 
 	</target>
 	
-	<target name="deploy-tool" depends="create-deploy-package, run-deploy-package" 
+	<target name="deploy-tool" depends="create-deploy-package, run-deploy-package, explode-tool" 
 	   description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
 	</target>
 

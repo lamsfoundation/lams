@@ -9,7 +9,7 @@
 <c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 <c:set var="dto" value="${videoRecorderDTO}" />
 
-<script src="./includes/flash/AC_OETags.js" language="javascript"></script>
+<script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
 <!--
 // -----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ var requiredRevision = 124;
 			    var MMdoctitle = document.title;
 			
 				AC_FL_RunContent(
-					"src", "./includes/flash/playerProductInstall",
+					"src", "<lams:LAMSURL/>/includes/flash/playerProductInstall",
 					"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
 					"width", "361",
 					"height", "331",
