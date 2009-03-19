@@ -29,16 +29,14 @@
 	  					width: 500,
 	  					shrinkToFit: true,
 	  					
-	  				   	colNames:['<fmt:message key="label.monitoring.user.summary.attempt" />',
-	  							'questionResultUid',
-	  							'<fmt:message key="label.monitoring.user.summary.time" />',
+	  				   	colNames:['questionResultUid',
+	  		  				   	'<fmt:message key="label.monitoring.summary.user.name" />',
 	  							'<fmt:message key="label.monitoring.user.summary.response" />',
 	  						    '<fmt:message key="label.monitoring.user.summary.grade" />'],
 	  						    
 	  				   	colModel:[
-	  				   		{name:'id', index:'id', width:50, sorttype:"int"},
-	  				   		{name:'questionResultUid', index:'questionResultUid', width:0},
-	  				   		{name:'time', index:'time', width:150, sorttype:'date', datefmt:'Y-m-d'},
+							{name:'questionResultUid', index:'questionResultUid', width:0},
+							{name:'userName',index:'userName', width:100},
 	  				   		{name:'response', index:'response', width:200, sortable:false},
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }		
 	  				   	],
@@ -77,9 +75,8 @@
 	  	   	        	var responseStr = "";
 	  	   	       		<%@ include file="userresponse.jsp"%>
 	  	   	     		jQuery("#user${question.uid}").addRowData(${i.index + 1}, {
-	  	   	   	     		id:"${i.index + 1}",
-	  	   	   	   			questionResultUid:"${questionResult.uid}",
-	  	   	   	   			time:"${questionResult.finishDate}",
+	  	   	     			questionResultUid:"${questionResult.uid}",
+	  	   	     			userName:"${assessmentResult.user.loginName}",
 	  	   	   	   			response:responseStr,
 	  	   	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
 	  	   	   	   	    });

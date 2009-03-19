@@ -82,6 +82,14 @@ public class AssessmentConstants {
     public static final String PARAM_TITLE = "title";
     
     public static final String PARAM_SECONDS_LEFT = "secondsLeft";
+    
+    public static final String PARAM_NOT_A_NUMBER = "nan";
+    
+    public static final String PARAM_GRADE = "grade";
+    
+    public static final String PARAM_SESSION_ID = "sessionId";
+    
+    public static final String PARAM_QUESTION_RESULT_UID = "questionResultUid";
 
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
@@ -153,6 +161,8 @@ public class AssessmentConstants {
     public static final String ATTR_SUMMARY_LIST = "summaryList";
     
     public static final String ATTR_USER_SUMMARY = "userSummary";
+    
+    public static final String ATTR_QUESTION_SUMMARY = "questionSummary";
 
     public static final String ATTR_USER_LIST = "userList";
 

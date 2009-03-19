@@ -33,17 +33,7 @@ public interface AssessmentQuestionResultDAO extends DAO {
     int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid);
     
     List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
-
-//    public AssessmentQuestionResult getAssessmentQuestionResult(Long questionUid, Long userId);
-//
-//    /**
-//     * Return list which contains key pair which key is assessment question uid, value is number view.
-//     * 
-//     * @param contentId
-//     * @return
-//     */
-//    public Map<Long, Integer> getSummary(Long contentId);
-//
-//    public List<AssessmentQuestionResult> getAssessmentQuestionResultBySession(Long sessionId, Long questionUid);
+    
+    AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid);
 
 }

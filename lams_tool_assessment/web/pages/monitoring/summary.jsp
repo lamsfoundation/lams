@@ -1,6 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<% pageContext.setAttribute("doublequote", "\""); %>
-<% pageContext.setAttribute("singlequote", "'"); %>
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
@@ -19,15 +17,17 @@
 				
 			   	colNames:['#',
 						'userId',
+						'sessionId',
 						'<fmt:message key="label.monitoring.summary.user.name" />',
 			   	        <c:forEach var="question" items="${assessment.questions}">
-			   	     		"${fn:replace(question.title, doublequote, singlequote)}", 
+			   	     		"${question.title}", 
 			   	        </c:forEach>
 					    '<fmt:message key="label.monitoring.summary.total" />'],
 					    
 			   	colModel:[
 			   		{name:'id',index:'id', width:20, sorttype:"int"},
 			   		{name:'userId',index:'userId', width:0},
+			   		{name:'sessionId',index:'sessionId', width:0},
 			   		{name:'userName',index:'userName', width:100},
 		   	        <c:forEach var="question" items="${assessment.questions}">
 		   	     		{name:'${question.uid}', index:'${question.uid}', width:60, align:"right", sorttype:"float"},
@@ -41,17 +41,19 @@
 			   	ondblClickRow: function(rowid) {
 				   	
 			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
+			   		var sessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
 					var userSummaryUrl = '<c:url value="/monitoring/userSummary.do?sessionMapID=${sessionMapID}"/>';
-					var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&KeepThis=true&TB_iframe=true&height=540&width=650&modal=true";
+					var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&height=540&width=650&modal=true";
 					$("#userSummaryHref").attr("href", newUserSummaryHref);	
 					$("#userSummaryHref").click(); 		
 			  	} 
-			}).hideCol("userId");
+			}).hideCol("userId").hideCol("sessionId");
 			
    	        <c:forEach var="assessmentResult" items="${summary.assessmentResults}" varStatus="i">
    	     		jQuery("#list${summary.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:"${i.index + 1}",
    	   	     		userId:"${assessmentResult.user.userId}",
+   	   	     		sessionId:"${assessmentResult.user.session.sessionId}",
    	   	     		userName:"${assessmentResult.user.loginName}",
 		   	   	  	<c:choose>
 		   	   			<c:when test="${not empty assessmentResult.questionResults}">
@@ -73,12 +75,13 @@
 		</c:forEach>
 	});
 
-	function createNewQuestionInitHref() {
-		var questionTypeDropdown = document.getElementById("questionType");
-		var questionType = questionTypeDropdown.selectedIndex + 1;
-		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true";
-		$("#newQuestionInitHref").attr("href", newQuestionInitHref)
+	function createQuestionSummaryHref() {
+		var questionUid = $("#questionUid").val();
+		var questionSummaryUrl = '<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>';
+		var questionSummaryHref = "${questionSummaryUrl}&questionUid=" + questionUid + "&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true";
+		$("#questionSummaryHref").attr("href", questionSummaryHref)
 	};
+	
 	function refreshThickbox(){   
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 		imgLoader = new Image();// preload image
@@ -143,14 +146,14 @@
 				<fmt:message key="label.monitoring.summary.results.question" />
 			</div>
 
-			<select id="questionType" style="float: left">
-				<option selected="selected"><fmt:message key="label.monitoring.summary.choose" /></option>
+			<select id="questionUid" style="float: left">
+				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="question" items="${assessment.questions}">
-					<option>${question.title}</option>
+					<option value="question.uid">${question.title}</option>
 			   	</c:forEach>
 			</select>
 			
-			<a onclick="createNewQuestionInitHref();return false;" href="" class="button space-left thickbox" id="newQuestionInitHref">  
+			<a onclick="showQuestionSummary();return false;" href="" class="button space-left thickbox" id="questionSummaryHref">  
 				<fmt:message key="label.monitoring.summary.see.results" />
 			</a>
 		</div>

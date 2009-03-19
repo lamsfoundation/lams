@@ -51,6 +51,7 @@ public class AssessmentQuestionResult {
     
     // DTO fields:
     private Date finishDate;
+    private AssessmentUser user;
     
     public AssessmentQuestionResult() {
 	optionAnswers = new LinkedHashSet<AssessmentOptionAnswer>();
@@ -195,6 +196,13 @@ public class AssessmentQuestionResult {
     }
     public void setFinishDate(Date finishDate) {
 	this.finishDate = finishDate;
+    }
+    
+    public AssessmentUser getUser() {
+	return user;
+    }
+    public void setUser(AssessmentUser user) {
+	this.user = user;
     }
  
 }

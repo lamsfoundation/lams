@@ -26,9 +26,13 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
  
 public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements AssessmentResultDAO {
+    
+    private static final String FIND_BY_UID = "from " + AssessmentResult.class.getName()
+    + " as r where r.uid = ?";
     
     private static final String FIND_BY_ASSESSMENT_AND_USER = "from " + AssessmentResult.class.getName()
 	    + " as r where r.user.userId = ? and r.assessment.uid=? order by r.startDate asc";
@@ -69,6 +73,13 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	} else {
 	    return ((Number) list.get(0)).intValue();
 	}
+    }
+    
+    public AssessmentResult getAssessmentResultByUid(Long assessmentResultUid) {
+	List list = getHibernateTemplate().find(FIND_BY_UID, new Object[] { assessmentResultUid });
+	if (list == null || list.size() == 0)
+	    return null;
+	return (AssessmentResult) list.get(0);
     }
 
 }

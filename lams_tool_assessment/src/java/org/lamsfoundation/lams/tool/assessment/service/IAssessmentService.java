@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -206,16 +207,11 @@ public interface IAssessmentService {
      * @param userId
      * @return
      */
-    UserSummary getUserSummary(Long contentId, Long userId);
-
-    /**
-     * Set a assessment question visible or not.
-     * 
-     * @param questionUid
-     * @param visible
-     *            true, question is visible. False, question is invisible.
-     */
-    void setQuestionVisible(Long questionUid, boolean visible);
+    UserSummary getUserSummary(Long contentId, Long userId, Long sessionId);
+    
+    QuestionSummary getQuestionSummary(Long contentId, Long questionUid);
+    
+    void changeQuestionResultMark(Long questionResultUid, float newMark);
 
     /**
      * Get assessment question <code>Summary</code> list according to sessionId and skipHide flag.

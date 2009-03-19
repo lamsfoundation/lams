@@ -74,6 +74,7 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
@@ -626,10 +627,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return summaryList;
     }
     
-    public UserSummary getUserSummary(Long contentId, Long userId) {
+    public UserSummary getUserSummary(Long contentId, Long userId, Long sessionId) {
 	UserSummary userSummary = new UserSummary();
-	
-	AssessmentUser user = assessmentUserDao.getUserByUserIDAndContentID(userId, contentId);
+	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	userSummary.setUser(user);
 	List<AssessmentResult> results = assessmentResultDao.getAssessmentResults(contentId, userId);
 	userSummary.setNumberOfAttempts(results.size());
@@ -665,37 +665,62 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	return userSummary;
     }
-
-//    public List<AssessmentUser> getUserListBySessionQuestion(Long sessionId, Long questionUid) {
-//	List<AssessmentQuestionResult> logList = assessmentQuestionResultDao.getAssessmentQuestionResultBySession(
-//		sessionId, questionUid);
-//	List<AssessmentUser> userList = new ArrayList(logList.size());
-//	for (AssessmentQuestionResult visit : logList) {
-////	    AssessmentUser user = visit.getUser();
-////	    user.setAccessDate(visit.getStartDate());
-////	    userList.add(user);
-//	}
-//	return userList;
-//    }
-
-    public void setQuestionVisible(Long questionUid, boolean visible) {
+    
+    public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
+	QuestionSummary questionSummary = new QuestionSummary();
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
-	if (question != null) {
-	    // createBy should be null for system default value.
-	    Long userId = 0L;
-	    String loginName = "No user";
-	    if (question.getCreateBy() != null) {
-		userId = question.getCreateBy().getUserId();
-		loginName = question.getCreateBy().getLoginName();
+	questionSummary.setQuestion(question);
+
+	List<List<AssessmentQuestionResult>> questionResults = new ArrayList<List<AssessmentQuestionResult>>();
+	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
+	for (AssessmentSession session : sessionList) {
+	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(session.getSessionId());
+	    // Set<AssessmentQuestionResult> sessionQuestionResults = new TreeSet<AssessmentQuestionResult>(
+	    // new AssessmentQuestionResultComparator());
+	    ArrayList<AssessmentQuestionResult> sessionQuestionResults = new ArrayList<AssessmentQuestionResult>();
+	    for (AssessmentUser user : users) {
+		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResult(contentId, user.getUserId());
+		AssessmentQuestionResult questionResult = null;
+		if (assessmentResult == null) {
+		    questionResult = new AssessmentQuestionResult();
+		} else {
+		    for (AssessmentQuestionResult dbQuestionResult : assessmentResult.getQuestionResults()) {
+			if (dbQuestionResult.getAssessmentQuestion().getUid().equals(questionUid)) {
+			    questionResult = dbQuestionResult;
+			    break;
+			}
+		    }
+		}
+		questionResult.setUser(user);
+		sessionQuestionResults.add(questionResult);
 	    }
-	    if (visible) {
-		auditService.logShowEntry(AssessmentConstants.TOOL_SIGNATURE, userId, loginName, question.toString());
-	    } else {
-		auditService.logHideEntry(AssessmentConstants.TOOL_SIGNATURE, userId, loginName, question.toString());
-	    }
-	    question.setHide(!visible);
-	    assessmentQuestionDao.saveObject(question);
+	    questionResults.add(sessionQuestionResults);
 	}
+	questionSummary.setQuestionResultsPerSession(questionResults);
+	
+	int count = 0;
+	float total = 0;
+	for(List<AssessmentQuestionResult> sessionQuestionResults : questionResults) {
+	    for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
+		count++;
+		total+=questionResult.getMark();
+	    }
+	}
+	float averageMark = (count == 0) ? 0 : total/count;
+	questionSummary.setAverageMark(averageMark);
+	
+	return questionSummary;
+    }
+    
+    public void changeQuestionResultMark(Long questionResultUid, float newMark) {
+	AssessmentQuestionResult questionResult = assessmentQuestionResultDao.getAssessmentQuestionResultByUid(questionResultUid);
+	float oldMark = questionResult.getMark();
+	questionResult.setMark(newMark);
+	assessmentQuestionResultDao.saveObject(questionResult);
+	
+	AssessmentResult result = assessmentResultDao.getAssessmentResultByUid(questionResult.getResultUid());
+	result.setGrade(result.getGrade() - oldMark + newMark);
+	assessmentResultDao.saveObject(result);
     }
 
     public AssessmentUser getUser(Long uid) {

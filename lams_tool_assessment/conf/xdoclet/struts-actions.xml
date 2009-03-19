@@ -240,16 +240,6 @@
 			<forward name="question" path="/pages/monitoring/parts/questionsummary.jsp" />			
 			<forward name="user" path="/pages/monitoring/parts/usersummary.jsp" />
 		</action>				
-		<action path="/monitoring/hideQuestion"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
-			parameter="hideQuestion" >
-			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
-		</action>
-		<action path="/monitoring/showQuestion"
-			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
-			parameter="showQuestion" >
-			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
-		</action>
 		
 		<!-- ========== Common Definitions ============================== -->
 		<action path="/clearsession"

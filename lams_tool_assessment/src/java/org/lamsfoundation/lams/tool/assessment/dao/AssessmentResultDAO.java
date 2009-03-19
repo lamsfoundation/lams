@@ -36,16 +36,8 @@ public interface AssessmentResultDAO extends DAO {
     AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
     
     int getAssessmentResultCount(Long assessmentUid, Long userId);
-
-//    /**
-//     * Return list which contains key pair which key is assessment question uid, value is number view.
-//     * 
-//     * @param contentId
-//     * @return
-//     */
-//    Map<Long, Integer> getSummary(Long contentId);
-
-//    List<AssessmentResult> getAssessmentResultBySession(Long sessionId, Long questionUid);
+    
+    AssessmentResult getAssessmentResultByUid(Long assessmentResultUid);
 
 }
  

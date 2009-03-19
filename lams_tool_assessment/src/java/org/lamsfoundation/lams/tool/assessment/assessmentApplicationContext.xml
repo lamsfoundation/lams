@@ -151,10 +151,10 @@
                 <prop key="setAttemptStarted">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="processUserAnswers">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setQuestionStartDate">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="changeQuestionResultMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setQuestionComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setQuestionVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setQuestionAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

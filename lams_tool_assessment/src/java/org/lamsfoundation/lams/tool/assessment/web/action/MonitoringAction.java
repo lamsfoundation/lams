@@ -37,9 +37,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -69,14 +75,6 @@ public class MonitoringAction extends Action {
 	    return saveUserGrade(mapping, form, request, response);
 	}
 
-	// not using now
-	if (param.equals("showQuestion")) {
-	    return showQuestion(mapping, form, request, response);
-	}
-	if (param.equals("hideQuestion")) {
-	    return hideQuestion(mapping, form, request, response);
-	}
-
 	return mapping.findForward(AssessmentConstants.ERROR);
     }
 
@@ -90,6 +88,14 @@ public class MonitoringAction extends Action {
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	IAssessmentService service = getAssessmentService();
 	List<Summary> summaryList = service.getSummaryList(contentId);
+	
+	for (Summary summary : summaryList) {
+	    for (AssessmentResult result : summary.getAssessmentResults()) {
+		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+		    escapeQuotesInQuestionResult(questionResult);
+		}
+	    }
+	}
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	assessment.toDTO();
@@ -110,8 +116,18 @@ public class MonitoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	
-
-
+	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
+	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
+	IAssessmentService service = getAssessmentService();
+	QuestionSummary questionSummary = service.getQuestionSummary(contentId, questionUid);
+	
+	for (List<AssessmentQuestionResult> sessionQuestionResults : questionSummary.getQuestionResultsPerSession()) {
+	    for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
+		escapeQuotesInQuestionResult(questionResult);
+	    }
+	}
+	
+	request.setAttribute(AssessmentConstants.ATTR_QUESTION_SUMMARY, questionSummary);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
@@ -122,76 +138,31 @@ public class MonitoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
+	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
 	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	IAssessmentService service = getAssessmentService();
-	UserSummary userSummary = service.getUserSummary(contentId, userId);
+	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
+	
+	for (UserSummaryItem userSummaryItem : userSummary.getUserSummaryItems()) {
+	    for (AssessmentQuestionResult questionResult : userSummaryItem.getQuestionResults()) {
+		escapeQuotesInQuestionResult(questionResult);
+	    }
+	}
+	
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
     private ActionForward saveUserGrade(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	
-	
+	if (request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null) {
+	    Long questionResultUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_RESULT_UID);
+	    float newGrade = Float.valueOf(request.getParameter(AssessmentConstants.PARAM_GRADE));	    
+	    IAssessmentService service = getAssessmentService();
+	    service.changeQuestionResultMark(questionResultUid, newGrade);
+	}
 
-	return mapping.findForward(AssessmentConstants.SUCCESS);
-    }
-
-    private ActionForward hideQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Long itemUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
-	IAssessmentService service = getAssessmentService();
-	service.setQuestionVisible(itemUid, false);
-
-	// get back SessionMap
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-
-//	// update session value
-//	List<List> groupList = (List<List>) sessionMap.get(AssessmentConstants.ATTR_SUMMARY_LIST);
-//	if (groupList != null) {
-//	    for (List<Summary> group : groupList) {
-//		for (Summary sum : group) {
-//		    if (itemUid.equals(sum.getQuestionUid())) {
-//			sum.setQuestionHide(true);
-//			break;
-//		    }
-//		}
-//	    }
-//	}
-
-	return mapping.findForward(AssessmentConstants.SUCCESS);
-    }
-
-    private ActionForward showQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	Long itemUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
-	IAssessmentService service = getAssessmentService();
-	service.setQuestionVisible(itemUid, true);
-
-	// get back SessionMap
-	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-
-//	// update session value
-//	List<List> groupList = (List<List>) sessionMap.get(AssessmentConstants.ATTR_SUMMARY_LIST);
-//	if (groupList != null) {
-//	    for (List<Summary> group : groupList) {
-//		for (Summary sum : group) {
-//		    if (itemUid.equals(sum.getQuestionUid())) {
-//			sum.setQuestionHide(false);
-//			break;
-//		    }
-//		}
-//	    }
-//	}
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return null;
     }
 
     // *************************************************************************************
@@ -201,5 +172,30 @@ public class MonitoringAction extends Action {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
 	return (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
+    }
+    
+    private void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
+	String answerString = questionResult.getAnswerString();
+	if (answerString != null) {
+	    questionResult.setAnswerString(answerString.replaceAll("[\"]", "&quot;"));
+	}
+
+	AssessmentQuestion question = questionResult.getAssessmentQuestion();
+	String title = question.getTitle();
+	if (title != null) {
+	    question.setTitle(title.replaceAll("[\"]", "&quot;"));
+	}
+
+	for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
+	    String questionStr = questionOption.getQuestion();
+	    if (questionStr != null) {
+		questionOption.setQuestion(questionStr.replaceAll("[\"]", "&quot;"));
+	    }
+
+	    String optionStr = questionOption.getOptionString();
+	    if (optionStr != null) {
+		questionOption.setOptionString(optionStr.replaceAll("[\"]", "&quot;"));
+	    }
+	}
     }
 }
