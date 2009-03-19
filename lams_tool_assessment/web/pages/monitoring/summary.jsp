@@ -1,4 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
+<% pageContext.setAttribute("doublequote", "\""); %>
+<% pageContext.setAttribute("singlequote", "'"); %>
+
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
@@ -18,7 +21,7 @@
 						'userId',
 						'<fmt:message key="label.monitoring.summary.user.name" />',
 			   	        <c:forEach var="question" items="${assessment.questions}">
-							'${question.title}',
+			   	     		"${fn:replace(question.title, doublequote, singlequote)}", 
 			   	        </c:forEach>
 					    '<fmt:message key="label.monitoring.summary.total" />'],
 					    

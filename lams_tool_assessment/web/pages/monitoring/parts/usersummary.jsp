@@ -2,6 +2,9 @@
 		"http://www.w3.org/TR/html4/loose.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
+<% pageContext.setAttribute("doublequote", "\""); %>
+<% pageContext.setAttribute("singlequote", "'"); %>
+
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
@@ -39,14 +42,14 @@
 	  				   		{name:'questionResultUid', index:'questionResultUid', width:0},
 	  				   		{name:'time', index:'time', width:150, sorttype:'date', datefmt:'Y-m-d'},
 	  				   		{name:'response', index:'response', width:200, sortable:false},
-	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, editrules:{required:false, number:true} }		
+	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }		
 	  				   	],
 	  				   	
 	  				   	imgpath:  "<html:rewrite page='/includes/images/'/>" + "jqGrid.basic.theme", 
 	  				   	multiselect: false,
-	  				   	caption: "${question.title}",
-	  				  	editurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
-	  				  	cellEdit: true
+	  				   	caption: "${fn:replace(question.title, doublequote, singlequote)}",
+	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
+	  				  	cellEdit: true	  				  	
 	  				}).hideCol("questionResultUid");
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
