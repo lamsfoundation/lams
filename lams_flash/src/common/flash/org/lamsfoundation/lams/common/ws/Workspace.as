@@ -111,7 +111,9 @@ class org.lamsfoundation.lams.common.ws.Workspace {
 		var callback:Function = Proxy.create(this,recievedFolderContents);
 		if(funcToCall != undefined || funcToCall != null){ callback = funcToCall; }
         var uid:Number = Config.getInstance().userID;
-		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getFolderContents&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid,callback, false);
+		var nowTime:Number = new Date().getTime();
+		//dummyVar added to make request unique because IE was using a cached version of the workspace tree after renaming/deleting a sequence and not refreshing the tree as it should have been doing
+		ApplicationParent.getInstance().getComms().getRequest('workspace.do?method=getFolderContents&folderID='+folderID+'&mode='+Config.getInstance().mode+'&userID='+uid+'&dummyVar='+nowTime,callback, false);
 	}
 	
 	/**
