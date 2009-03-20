@@ -22,44 +22,43 @@
 		
 		jQuery(document).ready(function(){
   
-			jQuery("#users").jqGrid({
+			jQuery("#userView").jqGrid({
+				caption: "Learner View",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getLessonGradeBookData&lessonID=${lessonDetails.lessonID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getUserViewLessonGradeBookData&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
 			    width: 707,
 			    cellEdit: true,
 			    sortorder: "asc", 
-			    sortname: "lastName", 
-			    pager: 'pager',
+			    sortname: "fullName", 
+			    pager: 'userViewPager',
 			    rowList:[5,10,20,30],
 			    rowNum:10,
 				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}&login=test1",
-			    colNames:["", 'Last Name','First Name', 'Progress', 'Lesson FeedBack', 'Total Mark'],
+			    colNames:["", 'Name', 'Progress', 'Lesson FeedBack', 'Total Mark'],
 			    colModel:[
 			      {name:'login', index:'login', sortable:false, editable:false, hidden:true},
-			      {name:'lastName',index:'lastName', sortable:true, editable:false},
-			      {name:'firstName',index:'firstName', sortable:true, editable:false},
+			      {name:'fullName',index:'fullName', sortable:true, editable:false},
 			      {name:'status',index:'status', sortable:false, editable:false},
 			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} },
-			      {name:'totalMark',index:'totalMark', sortable:true, editable:true, editrules:{number:true}}
+			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}}
 			    ],
-			    imgpath: 'themes/basic/images',
-			    caption: "Learners",
+			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 				   var subgrid_table_id;
-				   var userName = jQuery("#users").getRowData(row_id)["login"];
+				   var userName = jQuery("#userView").getRowData(row_id)["login"];
 				   subgrid_table_id = subgrid_id+"_t";
 					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table>");
 					   jQuery("#"+subgrid_table_id).jqGrid({
 					     datatype: "xml",
-					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getLessonGradeBookDataForUser&lessonID=${lessonDetails.lessonID}&login=" + userName,
+					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGradeBookActivitiesForUserView&lessonID=${lessonDetails.lessonID}&login=" + userName,
 					     height: "100%",
 					     width: 650,
 					     cellEdit:true,
-					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&login=" + userName,
+					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
 					     ExpandColumn: "Outputs",
-					     colNames: ['Id','Activity','Status','Outputs', 'Competences', 'Activity FeedBack', 'Mark'],
+					     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Activity FeedBack', 'Mark'],
 					     colModel: [
 					       	{name:'activityId', width:10, index:'activityId', sortable:false, hidden:true},
 							{name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
@@ -69,26 +68,103 @@
 							{name:'feedback', width:250, index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}},
 							{name:'mark', width:100, index:'mark', sortable:false, editable: true, editrules:{number:true} }
 					                   ],
-					     editurl: "server.php",
 					     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
-					     	var ids = jQuery("#"+subgrid_table_id).getDataIDs()
-					     	var totalMark = 0.0;
-					     	for (var i=0; i < ids.length; i++) {
-					     		var rowData = jQuery("#"+subgrid_table_id).getRowData(ids[i]);
-					     		var activityMark = rowData["mark"];
-					     		
-					     		if (activityMark != "-") {
-					     			totalMark += parseFloat(activityMark);
-					     		}
+					     	
+					     	// Update the total lesson mark for the user
+					     	if (cellname == "mark") {
+						     	var ids = jQuery("#"+subgrid_table_id).getDataIDs()
+						     	var totalMark = 0.0;
+						     	for (var i=0; i < ids.length; i++) {
+						     		var rowData = jQuery("#"+subgrid_table_id).getRowData(ids[i]);
+						     		var userMark = rowData["mark"];
+						     		
+						     		if (userMark != "-") {
+						     			totalMark += parseFloat(userMark);
+						     		}
+						     	}
+						     	jQuery("#userView").setCell(row_id, "mark", totalMark, "", "");
 					     	}
-					     	jQuery("#users").setCell(row_id, "totalMark", totalMark, "", "");
 					     },
-						 imgpath: 'themes/basic/images'
+						 imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images'
 					  })
 				 	}
+				});
+				
+				jQuery("#activityView").jqGrid({
+					caption: "Activity View",
+				    datatype: "xml",
+				    url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getActivityViewLessonGradeBookData&lessonID=${lessonDetails.lessonID}",
+				    height: "100%",
+				    width: 707,
+				    cellEdit: true,
+				    sortorder: "asc", 
+				    sortname: "activityId", 
+				    colNames:["", 'Activity Name', 'Competences', 'Average Mark'],
+				    colModel:[
+				      {name:'activityId', width:10, index:'activityId', sortable:false, hidden:true},
+					  {name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
+				      {name:'competences', width:250, index:'competences', sortable:false, editable: false},
+				      {name:'average',index:'average', sortable:false, editable:false}
+				    ],
+				    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
+				    subGrid: true,
+					subGridRowExpanded: function(subgrid_id, row_id) {
+					   var subgrid_table_id;
+					   var activityID = jQuery("#activityView").getRowData(row_id)["activityId"];
+					   subgrid_table_id = subgrid_id+"_t";
+						 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table>");
+						   jQuery("#"+subgrid_table_id).jqGrid({
+						     datatype: "xml",
+						     url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getUserGradeBookActivitiesForActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID,
+						     height: "100%",
+						     width: 650,
+						     cellEdit:true,
+						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=activityView&activityID=" + activityID,
+						     ExpandColumn: "Outputs",
+						     colNames: ['','Full Name','Status','Outputs', 'Activity Feedback', 'Mark'],
+						     colModel:[
+						     	{name:'login', index:'login', sortable:false, editable:false, hidden:true},
+						     	{name:'fullName',index:'fullName', sortable:true, editable:false},
+						      	{name:'status',index:'status', sortable:false, editable:false},
+						      	{name:'output', index:'output', sortable:false, editable: false},
+						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} },
+						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}}
+						     ],
+						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
+						     	
+						     	// update the activity average mark
+						     	if (cellname == "mark") {
+						     		var ids = jQuery("#"+subgrid_table_id).getDataIDs()
+							     	var sumMarks = 0.0;
+							     	var count = 0;
+							     	for (var i = 0; i < ids.length; i++) {
+							     		var rowData = jQuery("#"+subgrid_table_id).getRowData(ids[i]);
+							     		var activityMark = rowData["mark"];
+							     		
+							     		if (activityMark != "-") {
+							     			sumMarks += parseFloat(activityMark);
+							     			count ++;
+							     		}
+							     	}						     	
+							     	var average;
+							     	if (count>0) {
+							     		average = sumMarks / count;
+							     	} else {
+							     		average = value;
+							     	}
+
+							     	jQuery("#activityView").setCell(row_id, "average", average, "", "");
+						     	}
+						     },
+							 imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images'
+						 })
+					 }
 				})
+				
+				
+				
+				
 		});
-		
 		
 		function launchPopup(url,title) {
 			var wd = null;
@@ -111,8 +187,16 @@
 			<div style="width:707px; margin-left:auto; margin-right:auto;">
 			<br />
 			<div style="width:707px; margin-left:auto; margin-right:auto;">
-				<table id="users" class="scroll" ></table>
-				<div id="pager" class="scroll" ></div>
+				<table id="userView" class="scroll" ></table>
+				<div id="userViewPager" class="scroll" ></div>
+				
+				<br />
+				<br />
+				<br />
+				
+				<table id="activityView" class="scroll" ></table>
+				
+				
 			</div>
 		</div> <!-- Closes content -->
 	

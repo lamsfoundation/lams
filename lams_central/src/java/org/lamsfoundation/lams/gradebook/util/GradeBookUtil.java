@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.gradebook.util;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -36,65 +37,17 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.lamsfoundation.lams.gradebook.dto.GradeBookActivityDTO;
-import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRow;
+import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class GradeBookUtil {
 
-    public static String toGridXML2(Collection<GradeBookActivityDTO> gactivityDTOs, int page, int rowLimit) {
-	String xml = "";
-	try {
-	    Document document = getDocument();
+    public static final int GRID_TYPE_MONITOR_USER_VIEW = 0;
+    public static final int GRID_TYPE_MONITOR_ACTIVITY_VIEW = 1;
 
-	    // root element
-	    Element rootElement = document.createElement("rows");
-
-	    Element pageElement = document.createElement("page");
-	    pageElement.appendChild(document.createTextNode("" + page));
-	    rootElement.appendChild(pageElement);
-
-	    int totalPages = (gactivityDTOs.size() > rowLimit) ? (gactivityDTOs.size() / rowLimit) : 1;
-	    
-	    Element totalPageElement = document.createElement("total");
-	    totalPageElement.appendChild(document.createTextNode("" + totalPages));
-	    rootElement.appendChild(totalPageElement);
-
-	    Element recordsElement = document.createElement("records");
-	    recordsElement.appendChild(document.createTextNode("" + gactivityDTOs.size()));
-	    rootElement.appendChild(recordsElement);
-
-	    for (GradeBookActivityDTO gactivityDTO : gactivityDTOs) {
-		Element rowElement = document.createElement("row");
-		rowElement.setAttribute("id", "" + gactivityDTO.getActivityId());
-
-		for (String gradeBookItem : gactivityDTO.toStringArray()) {
-		    Element cellElement = document.createElement("cell");
-		    gradeBookItem = (gradeBookItem != null) ? gradeBookItem : "";
-		    cellElement.appendChild(document.createTextNode(gradeBookItem));
-		    rowElement.appendChild(cellElement);
-		}
-		rootElement.appendChild(rowElement);
-	    }
-	    
-	    document.appendChild(rootElement);
-
-	    xml = getStringFromDocument(document);
-	    
-	} catch (ParserConfigurationException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (TransformerException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
-
-	return xml;
-    }
-    
     @SuppressWarnings("unchecked")
-    public static String toGridXML(Collection gridRows, int page, int totalPages) {
+    public static String toGridXML(Collection gridRows, int page, int totalPages, int gridType) {
 	String xml = "";
 	try {
 	    Document document = getDocument();
@@ -105,7 +58,7 @@ public class GradeBookUtil {
 	    Element pageElement = document.createElement("page");
 	    pageElement.appendChild(document.createTextNode("" + page));
 	    rootElement.appendChild(pageElement);
-	    
+
 	    Element totalPageElement = document.createElement("total");
 	    totalPageElement.appendChild(document.createTextNode("" + totalPages));
 	    rootElement.appendChild(totalPageElement);
@@ -116,11 +69,23 @@ public class GradeBookUtil {
 
 	    Iterator iter = gridRows.iterator();
 	    while (iter.hasNext()) {
-		GradeBookGridRow gridRow = (GradeBookGridRow) iter.next();
+		GradeBookGridRowDTO gridRow = (GradeBookGridRowDTO) iter.next();
 		Element rowElement = document.createElement("row");
 		rowElement.setAttribute("id", gridRow.getRowId());
 
-		for (String gradeBookItem : gridRow.toStringArray()) {
+		// Work out which grid we want to put the data into
+		ArrayList<String> gridRowStringArray = new ArrayList<String>();
+		switch (gridType) {
+    		case GRID_TYPE_MONITOR_USER_VIEW:
+    		    gridRowStringArray = gridRow.toMonitorUserViewStringArray();
+    		    break;
+    		case GRID_TYPE_MONITOR_ACTIVITY_VIEW:
+    		    gridRowStringArray = gridRow.toMonitorActViewStringArray();
+    		    break;
+
+		}
+
+		for (String gradeBookItem : gridRowStringArray) {
 		    Element cellElement = document.createElement("cell");
 		    gradeBookItem = (gradeBookItem != null) ? gradeBookItem : "";
 		    cellElement.appendChild(document.createTextNode(gradeBookItem));
@@ -128,10 +93,10 @@ public class GradeBookUtil {
 		}
 		rootElement.appendChild(rowElement);
 	    }
-	    
+
 	    document.appendChild(rootElement);
 	    xml = getStringFromDocument(document);
-	    
+
 	} catch (ParserConfigurationException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();

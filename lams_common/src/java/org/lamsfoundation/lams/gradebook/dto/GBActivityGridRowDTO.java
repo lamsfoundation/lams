@@ -25,23 +25,28 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
  
-public class GradeBookActivityDTO extends GradeBookGridRow{
+public class GBActivityGridRowDTO extends GradeBookGridRowDTO{
     long activityId;
     String activityTitle;
-    String activityUrl;
+    String competences;
     //String toolString;
+    
+    // Properties for user view
     String status;
     String output;
-    //String instructions;
-    String competences;
+    String activityUrl;
     //double timeTaken;
-    Double mark;
+    Double mark; 
     String feedback;
+    
+    // Properties for activity view
+    Double average;	
+    
       
-    public GradeBookActivityDTO() {}
+    public GBActivityGridRowDTO() {}
     
     @Override
-    public ArrayList<String> toStringArray() {
+    public ArrayList<String> toMonitorUserViewStringArray() {
 	ArrayList<String> ret = new ArrayList<String>();
 	
 	ret.add("" + activityId);
@@ -66,6 +71,25 @@ public class GradeBookActivityDTO extends GradeBookGridRow{
 	    ret.add("-"); 
 	}
 	
+	
+	return ret;
+    }
+    
+    @Override
+    public ArrayList<String> toMonitorActViewStringArray() {
+	ArrayList<String> ret = new ArrayList<String>();
+	
+	ret.add("" + activityId);
+
+	ret.add(activityTitle);
+
+	ret.add(competences);
+	
+	if (average != null) {
+	    ret.add(average.toString());
+	} else {
+	    ret.add("-"); 
+	}
 	
 	return ret;
     }
@@ -142,5 +166,15 @@ public class GradeBookActivityDTO extends GradeBookGridRow{
     public void setFeedback(String feedback) {
         this.feedback = feedback;
     }
+
+    public Double getAverage() {
+        return average;
+    }
+
+    public void setAverage(Double average) {
+        this.average = average;
+    }
+    
+    
 }
  

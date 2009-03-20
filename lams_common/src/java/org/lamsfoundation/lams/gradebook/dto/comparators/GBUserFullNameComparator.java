@@ -25,25 +25,25 @@ package org.lamsfoundation.lams.gradebook.dto.comparators;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.gradebook.dto.GradeBookUserDTO;
+import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 
 @SuppressWarnings("unchecked")
-public class GradeBookUserFirstNameComparator implements Comparator {
+public class GBUserFullNameComparator implements Comparator {
 
     public int compare(Object gradeBookUserDTO, Object anotherGradeBookUserDTO) {
 
-	if (gradeBookUserDTO instanceof GradeBookUserDTO && anotherGradeBookUserDTO instanceof GradeBookUserDTO) {
-	    String firstName1 = ((GradeBookUserDTO) gradeBookUserDTO).getFirstName().toUpperCase();
-	    String firstName2 = ((GradeBookUserDTO) anotherGradeBookUserDTO).getFirstName().toUpperCase();
+	if (gradeBookUserDTO instanceof GBUserGridRowDTO && anotherGradeBookUserDTO instanceof GBUserGridRowDTO) {
+	    String lastName1 = ((GBUserGridRowDTO) gradeBookUserDTO).getLastName().toUpperCase();
+	    String lastName2 = ((GBUserGridRowDTO) anotherGradeBookUserDTO).getLastName().toUpperCase();
 
 	    int ret;
-	    if (firstName1.equals(firstName2)) {
-		String lastName1 = ((GradeBookUserDTO) gradeBookUserDTO).getLastName().toUpperCase();
-		String lastName2 = ((GradeBookUserDTO) anotherGradeBookUserDTO).getLastName().toUpperCase();
-		ret = lastName1.compareTo(lastName2);
+	    if (lastName1.equals(lastName2)) {
+		String firstName1 = ((GBUserGridRowDTO) gradeBookUserDTO).getFirstName().toUpperCase();
+		String firstName2 = ((GBUserGridRowDTO) anotherGradeBookUserDTO).getFirstName().toUpperCase();
+		ret = firstName1.compareTo(firstName2);
 	    }
 	    else {
-		ret = firstName1.compareTo(firstName2);
+		ret = lastName1.compareTo(lastName2);
 	    }
 	    return ret;
 	} else {

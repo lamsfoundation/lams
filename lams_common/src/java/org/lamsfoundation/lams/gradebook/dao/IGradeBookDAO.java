@@ -23,6 +23,8 @@
 /* $Id$ */ 
 package org.lamsfoundation.lams.gradebook.dao; 
 
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
@@ -34,6 +36,8 @@ public interface IGradeBookDAO extends IBaseDAO{
     public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID);
     
     public Double getGradeBookUserActivityMarkSum(Long lessonID, Integer userID);
+    
+    public List<GradeBookUserActivity> getAllGradeBookUserActivitiesForActivity(Long activityID);
 
 }
  

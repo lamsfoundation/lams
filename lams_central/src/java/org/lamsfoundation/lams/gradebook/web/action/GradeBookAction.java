@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.gradebook.web.action;
 
 import java.io.PrintWriter;
-import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRow;
+import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradeBookService;
 import org.lamsfoundation.lams.gradebook.util.GradeBookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradeBookUtil;
@@ -76,9 +76,9 @@ public class GradeBookAction extends LamsDispatchAction {
     }
 
     /**
-     * Returns an xml representation of a user's lesson gradebook data. It is
+     * Returns an xml representation of a user's a gradebook data. It is
      * essential a list of the activities and the user's output for those
-     * activities.
+     * activities. This corresponds to the learner view
      * 
      * This is in the sub-grid area of gradebook, and is called when the teacher
      * clicks to expand the gradebook info for a specified user
@@ -90,7 +90,7 @@ public class GradeBookAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward getLessonGradeBookDataForUser(ActionMapping mapping, ActionForm form,
+    public ActionForward getUserGradeBookActivitiesForUserView(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 	initServices();
 	int page = WebUtil.readIntParam(request, GradeBookConstants.PARAM_PAGE);
@@ -102,13 +102,11 @@ public class GradeBookAction extends LamsDispatchAction {
 
 	Lesson lesson = lessonService.getLesson(lessonID);
 	User learner = userService.getUserByLogin(login);
-	
-	
 
 	if (lesson != null && learner != null) {
 	    
-	    Collection<GradeBookGridRow> gradeBookActivityDTOs = gradeBookService.getUserGradeBookActivityDTOs(lesson, learner);
-	    String ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, rowLimit);
+	    List<GradeBookGridRowDTO> gradeBookActivityDTOs = gradeBookService.getUserGradeBookActivityDTOs(lesson, learner);
+	    String ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, rowLimit, GradeBookUtil.GRID_TYPE_MONITOR_USER_VIEW);
 
 	    response.setContentType("text/xml");
 	    PrintWriter out = response.getWriter();

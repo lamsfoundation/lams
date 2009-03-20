@@ -18,17 +18,30 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dto; 
+ */
 
-import java.util.ArrayList;
- 
-public abstract class GradeBookGridRow {
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.dto.comparators;
 
-    public abstract ArrayList<String> toStringArray();
-    
-    public abstract String getRowId();
+import java.util.Comparator;
+
+import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
+
+@SuppressWarnings("unchecked")
+public class GBUserMarkComparator implements Comparator {
+
+    public int compare(Object gradeBookUserDTO, Object anotherGradeBookUserDTO) {
+
+	if (gradeBookUserDTO instanceof GBUserGridRowDTO && anotherGradeBookUserDTO instanceof GBUserGridRowDTO) {
+	   
+	    Double mark1 = ((GBUserGridRowDTO) gradeBookUserDTO).getMark();
+	    Double mark2 = ((GBUserGridRowDTO) anotherGradeBookUserDTO).getMark();
+	    
+	    mark1 = (mark1 == null) ? 0.0 : mark1;
+	    mark2 = (mark2 == null) ? 0.0 : mark2;
+	    return new Double(mark1 - mark2).intValue();    
+	} else {
+	    return 0;
+	}
+    }
 }
- 

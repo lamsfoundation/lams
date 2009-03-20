@@ -23,13 +23,11 @@
 /* $Id$ */ 
 package org.lamsfoundation.lams.gradebook.service; 
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
-import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
-import org.lamsfoundation.lams.gradebook.dto.GradeBookActivityDTO;
-import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRow;
-import org.lamsfoundation.lams.gradebook.dto.GradeBookUserDTO;
+import org.lamsfoundation.lams.gradebook.dto.GBActivityGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -38,11 +36,17 @@ import org.lamsfoundation.lams.usermanagement.User;
 public interface IGradeBookService {
     
     
-    public GradeBookActivityDTO getGradeBookActivityDTO(Activity activity, User learner, LearnerProgress learnerProgress);
+    public GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, User learner, LearnerProgress learnerProgress);
     
-    public Collection<GradeBookGridRow> getUserGradeBookActivityDTOs(Lesson lesson, User learner);
+    public List<GradeBookGridRowDTO> getUserGradeBookActivityDTOs(Lesson lesson, User learner);
     
-    public ArrayList<GradeBookUserDTO> getGradeBookLessonData(Lesson lesson);
+    public List<GradeBookGridRowDTO> getUserGradeBookActivityDTOs(Lesson lesson, Activity activity);
+    
+    public List<GradeBookGridRowDTO> getUserGradeBookActivityDTOsActivityView(Lesson lesson, User learner);
+    
+    public List<GradeBookGridRowDTO> getActivityGradeBookUserDTOs(Lesson lesson);
+    
+    public List<GBUserGridRowDTO> getGradeBookLessonData(Lesson lesson);
 
     public void updateUserLessonGradeBookMark(Lesson lesson, User learner, Double mark);
     

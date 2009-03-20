@@ -38,13 +38,12 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
     private static final String GET_GRADEBOOK_USER_LESSON = "from GradeBookUserLesson gles where "
 	    + "gles.learner.userId=:userID and gles.lesson.lessonId=:lessonID";
 
-//    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON = "select sum(gact.mark) from GradeBookUserActivity gact, Lesson lesson where "
-//	    + "gact.learner.userId=:userID and lesson.lessonId=:lessonID and gact.activity in lesson.learningDesign.activities";
-
-
-    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON = "select sum(gact.mark) from GradeBookUserActivity gact, ToolSession tses where "
+    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM = "select sum(gact.mark) from GradeBookUserActivity gact, ToolSession tses where "
 	    + "gact.learner.userId=:userID and tses.toolActivity=gact.activity and tses.lesson.lessonId=:lessonID";
 
+    private static final String GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY = "from GradeBookUserActivity gact where "
+	    + "gact.activity.activityId=:activityID";
+    
     
     @SuppressWarnings("unchecked")
     public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID) {
@@ -72,7 +71,7 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 
     @SuppressWarnings("unchecked")
     public Double getGradeBookUserActivityMarkSum(Long lessonID, Integer userID) {
-	List result = getSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON).setInteger("userID",
+	List result = getSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM).setInteger("userID",
 		userID.intValue()).setLong("lessonID", lessonID.longValue()).list();
 	
 	if (result != null && result.size() > 0) {
@@ -81,5 +80,13 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 	    return 0.0;
 	}
 
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<GradeBookUserActivity> getAllGradeBookUserActivitiesForActivity(Long activityID) {
+	List result = getSession().createQuery(GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY)
+		.setLong("activityID", activityID.longValue()).list();
+	
+	return (List<GradeBookUserActivity>)result;
     }
 }

@@ -18,28 +18,19 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */
+ */ 
+ 
+/* $Id$ */ 
+package org.lamsfoundation.lams.gradebook.dto; 
 
-/* $Id$ */
-package org.lamsfoundation.lams.gradebook.dto.comparators;
-
-import java.util.Comparator;
-
-import org.lamsfoundation.lams.gradebook.dto.GradeBookUserDTO;
-
-@SuppressWarnings("unchecked")
-public class GradeBookUserMarkComparator implements Comparator {
-
-    public int compare(Object gradeBookUserDTO, Object anotherGradeBookUserDTO) {
-
-	if (gradeBookUserDTO instanceof GradeBookUserDTO && anotherGradeBookUserDTO instanceof GradeBookUserDTO) {
-	   
-	    Double mark1 = ((GradeBookUserDTO) gradeBookUserDTO).getTotalLessonMark();
-	    Double mark2 = ((GradeBookUserDTO) anotherGradeBookUserDTO).getTotalLessonMark();
-
-	    return new Double(mark1 - mark2).intValue();    
-	} else {
-	    return 0;
-	}
-    }
+import java.util.ArrayList;
+ 
+public abstract class GradeBookGridRowDTO{
+    
+    public abstract ArrayList<String> toMonitorUserViewStringArray();
+    
+    public abstract ArrayList<String> toMonitorActViewStringArray();
+    
+    public abstract String getRowId();
 }
+ 

@@ -25,29 +25,62 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
-public class GradeBookUserDTO extends GradeBookGridRow {
+public class GBUserGridRowDTO extends GradeBookGridRowDTO {
     String login;
     String firstName;
     String lastName;
     String status;
-    Double totalLessonMark;
     String feedback;
+    
+    // For user view, this represents total lesson mark in the grid
+    // For activity view, this represents an activity mark
+    Double mark;
+    
+    // For activity view
+    String output;
+    String activityUrl;
+    
 
-    public GradeBookUserDTO() {
+    public GBUserGridRowDTO() {
     }
-
+    
     @Override
-    public ArrayList<String> toStringArray() {
+    public ArrayList<String> toMonitorUserViewStringArray() {
 	ArrayList<String> ret = new ArrayList<String>();
 
 	ret.add(login);
-	ret.add(firstName);
-	ret.add(lastName);
+	ret.add(lastName + " " + firstName);
 	ret.add(status);
 	ret.add(feedback);
 
-	if (totalLessonMark != null && totalLessonMark != 0.0) {
-	    ret.add(totalLessonMark.toString());
+	if (mark != null) {
+	    ret.add(mark.toString());
+	} else {
+	    ret.add("-");
+	}
+
+	return ret;
+    }
+    
+    @Override
+    public ArrayList<String> toMonitorActViewStringArray() {
+	ArrayList<String> ret = new ArrayList<String>();
+	
+	ret.add(login);
+	
+	String fullName = lastName + " " + firstName;
+	if (activityUrl != null && activityUrl.length() != 0) {
+	    ret.add("<a href='javascript:launchPopup(\"" +activityUrl+ "\",\"" +fullName+ "\")'>" +fullName +"</a>");
+	} else {
+	    ret.add(login);
+	}
+	
+	ret.add(status);
+	ret.add(output);
+	ret.add(feedback);
+
+	if (mark != null) {
+	    ret.add(mark.toString());
 	} else {
 	    ret.add("-");
 	}
@@ -60,12 +93,12 @@ public class GradeBookUserDTO extends GradeBookGridRow {
 	return login;
     }
 
-    public Double getTotalLessonMark() {
-	return totalLessonMark;
+    public Double getMark() {
+	return mark;
     }
 
-    public void setTotalLessonMark(Double totalLessonMark) {
-	this.totalLessonMark = totalLessonMark;
+    public void setMark(Double mark) {
+	this.mark = mark;
     }
 
     public String getLogin() {
@@ -106,5 +139,21 @@ public class GradeBookUserDTO extends GradeBookGridRow {
 
     public void setFeedback(String feedback) {
         this.feedback = feedback;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
+    }
+
+    public String getActivityUrl() {
+        return activityUrl;
+    }
+
+    public void setActivityUrl(String activityUrl) {
+        this.activityUrl = activityUrl;
     }
 }
