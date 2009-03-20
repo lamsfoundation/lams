@@ -563,8 +563,7 @@ function lamstwo_delete_lesson($username,$lsid) {
  */
 function lamstwo_verify($url, $id, $key){
     $relativeurl="/services/VerificationService?wsdl";
-    $wsdl = $url.$relativeurl;
-    $s = new soap_client($wsdl,true,false,false,false,false,3,3);
+    $s = lamstwo_get_soap_client($relativeurl);
     if(is_null($s)){
         return NULL;
     }
