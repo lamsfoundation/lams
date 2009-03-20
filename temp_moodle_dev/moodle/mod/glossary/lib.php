@@ -356,7 +356,7 @@ function glossary_update_grades($glossary=null, $userid=0, $nullifnone=true) {
         $sql = "SELECT g.*, cm.idnumber as cmidnumber
                   FROM {$CFG->prefix}glossary g, {$CFG->prefix}course_modules cm, {$CFG->prefix}modules m
                  WHERE m.name='glossary' AND m.id=cm.module AND cm.instance=g.id";
-        if ($rs = get_et_sql($sql)) {
+        if ($rs = get_recordset_sql($sql)) {
             while ($glossary = rs_fetch_next_record($rs)) {
                 if ($glossary->assessed) {
                     glossary_update_grades($glossary, 0, false);
