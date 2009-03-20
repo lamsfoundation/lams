@@ -19,11 +19,13 @@
 
   	    <script>
   	    	<!--
+  	    	var previousCellValue = "";
+  	    	var numberOfValues = 0;
 	  	  	$(document).ready(function(){
-	  			<c:forEach var="userSummaryItem" items="${userSummary.userSummaryItems}" varStatus="status">
-	  				<c:set var="question" value="${userSummaryItem.question}"/>
-	  			
-	  				jQuery("#user${question.uid}").jqGrid({
+	  			<c:forEach var="questionResultsPerSession" items="${questionSummary.questionResultsPerSession}" varStatus="status">
+	  				<c:set var="session" value="${questionResultsPerSession[0].user.session}"/>
+		  			
+	  				jQuery("#session${session.sessionId}").jqGrid({
 	  					datatype: "local",
 	  					height: 'auto',
 	  					width: 500,
@@ -43,19 +45,28 @@
 	  				   	
 	  				   	imgpath:  "<html:rewrite page='/includes/images/'/>" + "jqGrid.basic.theme", 
 	  				   	multiselect: false,
-	  				   	caption: "${question.title}",
+	  				   	caption: "${session.sessionName}",
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
 	  				  	cellEdit: true,
+	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
+	  				  		previousCellValue = val;
+	  				  	},
 	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
-	  				  		if (isNaN(val)) {
-	  				  			jQuery("#user${question.uid}").restoreCell(iRow,iCol); 
-	  				  		}
+	  				  		var questionResultUid = jQuery("#session${session.sessionId}").getCell(rowid, 'questionResultUid');
+	  				  		alert(isNaN(val));
+	  				  		if (isNaN(val) || (questionResultUid=="")) {
+	  				  			jQuery("#session${session.sessionId}").restoreCell(iRow,iCol); 
+	  				  			alert(jQuery("#session${session.sessionId}").getCell(iRow,iCol));
+	  				  		} else {
+	  				  			var averageMark = (eval($("#averageMark").html())*numberOfValues - eval(previousCellValue) + eval(val))/numberOfValues;
+	  				  			$("#averageMark").html(averageMark);
+	  				  		}	
   						},	  		
 	  				  	beforeSubmitCell : function (rowid,name,val,iRow,iCol){
 	  				  		if (isNaN(val)) {
 	  				  			return {nan:true};
 	  				  		} else {
-	  							var questionResultUid = jQuery("#user${question.uid}").getCell(rowid, 'questionResultUid');
+	  							var questionResultUid = jQuery("#session${session.sessionId}").getCell(rowid, 'questionResultUid');
 	  							return {questionResultUid:questionResultUid};		  				  		
 	  				  		}
 	  					}
@@ -67,29 +78,39 @@
 	  						$("[id^='user']").resetSelection();
 	  					},
 	  					onCellSelect: function (rowid, iCol, cellcontent){
-	  						jQuery("#user${question.uid+1}").resetSelection();
+	  						jQuery("#session${session.sessionId}}").resetSelection();
 	  					}*/ 	  				  	
 	  				}).hideCol("questionResultUid");
 	  				
-	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
-	  	   	        	var responseStr = "";
-	  	   	       		<%@ include file="userresponse.jsp"%>
-	  	   	     		jQuery("#user${question.uid}").addRowData(${i.index + 1}, {
+	  	   	        <c:forEach var="questionResult" items="${questionResultsPerSession}" varStatus="i">
+			   	   	  	<c:choose>
+			   	   			<c:when test="${questionResult.uid != null}">
+			  	   	        	var responseStr = "";
+								numberOfValues++;
+			  	   	       		<c:set var="question" value="${questionResult.assessmentQuestion}"/>			  	   	        	
+			  	   	       		<%@ include file="userresponse.jsp"%>	
+			  	   	       		var grade = "<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>";	
+			   	   			</c:when>
+			   	   			<c:otherwise>
+			  	   	        	var responseStr = "-";
+			  	   	       		var grade = "-";	
+			   	   			</c:otherwise>
+		   	   			</c:choose>		  	   	        
+
+	  	   	     		jQuery("#session${session.sessionId}").addRowData(${i.index + 1}, {
 	  	   	     			questionResultUid:"${questionResult.uid}",
-	  	   	     			userName:"${assessmentResult.user.loginName}",
+	  	   	     			userName:"${questionResult.user.firstName} ${questionResult.user.lastName}",
 	  	   	   	   			response:responseStr,
-	  	   	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
+	  	   	   	   			grade:grade
 	  	   	   	   	    });
 	  		        </c:forEach>			
 	  				
 	  			</c:forEach>
 	  		});  	    	
-
-    		// post-submit callback 
-    		function afterRatingSubmit(responseText, statusText)  { 
-    			self.parent.refreshThickbox()
-    			self.parent.tb_remove();
-    		}    
+	  		
+    		function refreshSummaryPage()  { 
+    			self.parent.window.parent.location.href = "<c:url value="/monitoring/summary.do"/>?toolContentID=${sessionMap.toolContentID}&contentFolderID=${sessionMap.contentFolderID}";
+    		}
   			-->
   		</script>
 		
@@ -100,7 +121,7 @@
 		<div id="content" >
 		
 			<h1>
-				<fmt:message key="label.monitoring.user.summary.history.responses" />
+				<fmt:message key="label.monitoring.question.summary.history.responses" />
 			</h1>
 			<br><br>		
 			<%@ include file="/common/messages.jsp"%>
@@ -108,72 +129,66 @@
 			<table class="forum" style="background:none; border: 1px solid #cacdd1; margin-bottom:60px; padding-top:0px; margin-bottom: 10px;" cellspacing="0">
 				<tr>
 					<th style="width: 180px; border-left: none; padding-top:0px; " >
-						<fmt:message key="label.monitoring.user.summary.user.name" />
+						<fmt:message key="label.monitoring.question.summary.title" />
 					</th>
 					<td >
-						${userSummary.user.firstName} ${userSummary.user.lastName}
+						${questionSummary.question.title}
 					</td>
 				</tr>
 				
 				<tr>
 					<th style="width: 180px;" >
-						<fmt:message key="label.monitoring.user.summary.number.attempts" />
+						<fmt:message key="label.monitoring.question.summary.question" />
 					</th>
 					<td>
-						${userSummary.numberOfAttempts}
+						${questionSummary.question.question}
 					</td>
 				</tr>
 					
 				<tr>
 					<th style="width: 180px;" >
-						<fmt:message key="label.monitoring.user.summary.time.last.attempt" />
+						<fmt:message key="label.monitoring.question.summary.default.mark" />
 					</th>
 					<td>
-						<fmt:formatDate value="${userSummary.timeOfLastAttempt}" pattern="H" timeZone="GMT" /> <fmt:message key="label.learning.summary.hours" />
-						<fmt:formatDate value="${userSummary.timeOfLastAttempt}" pattern="m" timeZone="GMT" /> <fmt:message key="label.learning.summary.minutes" />
+						${questionSummary.question.defaultGrade}
 					</td>
 				</tr>
 					
 				<tr>
 					<th style="width: 180px;" >
-						<fmt:message key="label.monitoring.user.summary.last.attempt.grade" />
+						<fmt:message key="label.monitoring.question.summary.penalty" />
 					</th>
 					<td>
-						${userSummary.lastAttemptGrade}
+						${questionSummary.question.penaltyFactor}
 					</td>
 				</tr>
+				
+				<tr>
+					<th style="width: 180px;" >
+						<fmt:message key="label.monitoring.question.summary.average.mark" />
+					</th>
+					<td>
+						<div id="averageMark">${questionSummary.averageMark}</div>
+					</td>
+				</tr>				
 			</table>
 			<br><br>
 			
-			<c:forEach var="userSummaryItem" items="${userSummary.userSummaryItems}" varStatus="status">
+			<c:forEach var="questionResultsPerSession" items="${questionSummary.questionResultsPerSession}" varStatus="status">
+				<c:set var="session" value="${questionResultsPerSession[0].user.session}"/>
 				<div style="padding-left: 0px; padding-bottom: 30px;">
-					<table style="font-size: small; padding-bottom: 5px;">
-						<tr>
-							<td width="50px;">
-								<fmt:message key="label.monitoring.user.summary.title" />
-							</td>
-							<td>
-								 ${userSummaryItem.question.title}
-							</td>
-						</tr>					
-						<tr>
-							<td width="50px;">
-								<fmt:message key="label.monitoring.user.summary.question" />
-							</td>
-							<td>
-								${userSummaryItem.question.question}
-							</td>
-						</tr>
-					</table>
+					<div style="font-size: small; padding-bottom: 5px;">
+						<fmt:message key="label.monitoring.question.summary.group" /> ${session.sessionName}
+					</div>
 					
-					<table id="user${userSummaryItem.question.uid}" class="scroll" cellpadding="0" cellspacing="0" ></table>
+					<table id="session${session.sessionId}" class="scroll" cellpadding="0" cellspacing="0" ></table>
 				</div>	
 			</c:forEach>	
 
 
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="self.parent.tb_remove();" class="button space-left" style="float:right; margin-right:40px; padding-top:5px;">
-					<fmt:message key="label.monitoring.user.summary.ok" /> 
+				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:40px; padding-top:5px;">
+					<fmt:message key="label.monitoring.question.summary.ok" /> 
 				</a>
 			</lams:ImgButtonWrapper>
 

@@ -88,11 +88,9 @@
 	  			</c:forEach>
 	  		});  	    	
 
-    		// post-submit callback 
-    		function afterRatingSubmit(responseText, statusText)  { 
-    			self.parent.refreshThickbox()
-    			self.parent.tb_remove();
-    		}    
+    		function refreshSummaryPage()  { 
+    			self.parent.window.parent.location.href = "<c:url value="/monitoring/summary.do"/>?toolContentID=${sessionMap.toolContentID}&contentFolderID=${sessionMap.contentFolderID}";
+    		}
   			-->
   		</script>
 		
@@ -175,7 +173,7 @@
 
 
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="self.parent.tb_remove();" class="button space-left" style="float:right; margin-right:40px; padding-top:5px;">
+				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:40px; padding-top:5px;">
 					<fmt:message key="label.monitoring.user.summary.ok" /> 
 				</a>
 			</lams:ImgButtonWrapper>

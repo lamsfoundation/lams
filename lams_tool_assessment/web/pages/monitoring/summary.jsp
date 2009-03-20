@@ -73,13 +73,22 @@
 	        </c:forEach>			
 			
 		</c:forEach>
-	});
 
+		$("#questionUid").change(function() {
+			var questionUid = $("#questionUid").val();
+			var questionSummaryUrl = '<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>';
+			var questionSummaryHref = questionSummaryUrl + "&questionUid=" + questionUid + "&KeepThis=true&TB_iframe=true&height=400&width=650&modal=true";
+			$("#questionSummaryHref").attr("href", questionSummaryHref);	
+			$("#questionSummaryHref").click(); 		 
+	    }); 
+	});
+/*
 	function createQuestionSummaryHref() {
-		var questionUid = $("#questionUid").val();
-		var questionSummaryUrl = '<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>';
-		var questionSummaryHref = "${questionSummaryUrl}&questionUid=" + questionUid + "&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true";
-		$("#questionSummaryHref").attr("href", questionSummaryHref)
+
+	};
+*/
+	function updateRowData(rowid){   
+		jQuery("#list").setRowData( rowid, { tax:"5", total:"205" }) 
 	};
 	
 	function refreshThickbox(){   
@@ -141,7 +150,7 @@
 	
 		<!-- Dropdown menu for choosing a question type -->
 	
-		<div style="padding-left: 30px; margin-bottom: 30px; margin-top: 15px;">	
+		<div style="padding-left: 30px; margin-bottom: 50px; margin-top: 15px;">	
 			<div style="margin-bottom: 5px; font-size: small;">
 				<fmt:message key="label.monitoring.summary.results.question" />
 			</div>
@@ -149,13 +158,16 @@
 			<select id="questionUid" style="float: left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="question" items="${assessment.questions}">
-					<option value="question.uid">${question.title}</option>
+					<option value="${question.uid}">${question.title}</option>
 			   	</c:forEach>
 			</select>
 			
-			<a onclick="showQuestionSummary();return false;" href="" class="button space-left thickbox" id="questionSummaryHref">  
+			<a onclick="" href="return false;" class="thickbox" id="questionSummaryHref" style="display: none;"></a>
+			<!--
+			<a onclick="createQuestionSummaryHref();return false;" href="" class="button space-left thickbox" id="questionSummaryHref">  
 				<fmt:message key="label.monitoring.summary.see.results" />
 			</a>
+			-->
 		</div>
 		
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">

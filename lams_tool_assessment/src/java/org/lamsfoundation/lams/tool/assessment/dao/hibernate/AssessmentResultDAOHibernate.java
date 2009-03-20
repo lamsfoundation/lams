@@ -31,9 +31,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
  
 public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements AssessmentResultDAO {
     
-    private static final String FIND_BY_UID = "from " + AssessmentResult.class.getName()
-    + " as r where r.uid = ?";
-    
     private static final String FIND_BY_ASSESSMENT_AND_USER = "from " + AssessmentResult.class.getName()
 	    + " as r where r.user.userId = ? and r.assessment.uid=? order by r.startDate asc";
     
@@ -41,11 +38,22 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	    + AssessmentResult.class.getName()
 	    + " as r where r.user.userId = ? and r.assessment.uid=? and (r.finishDate != null) order by r.startDate asc";
 
+    private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED = "from "
+	    + AssessmentResult.class.getName()
+	    + " as r where r.user.userId = ? and r.sessionId=? and (r.finishDate != null) order by r.startDate asc";
+
     private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select count(*) from "
-	    + AssessmentResult.class.getName() + " as r where r.user.userId=? and r.assessment.uid=? and (r.finishDate != null)";
+	    + AssessmentResult.class.getName()
+	    + " as r where r.user.userId=? and r.assessment.uid=? and (r.finishDate != null)";
+
+    private static final String FIND_BY_UID = "from " + AssessmentResult.class.getName() + " as r where r.uid = ?";
 
     public List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId) {
 	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED, new Object[] { userId, assessmentUid });
+    }
+    
+    public List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId) {
+	return getHibernateTemplate().find(FIND_BY_SESSION_AND_USER_AND_FINISHED, new Object[] { userId, sessionId });
     }
     
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
@@ -59,6 +67,15 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
 	List list = getHibernateTemplate().find(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED, new Object[] { userId, assessmentUid });
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return (AssessmentResult) list.get(list.size()-1);
+	}
+    }
+    
+    public AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId) {
+	List list = getHibernateTemplate().find(FIND_BY_SESSION_AND_USER_AND_FINISHED, new Object[] { userId, sessionId });
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {

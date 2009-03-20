@@ -18,30 +18,31 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.tool.assessment.dao;  
+ */
 
-import java.util.List;
+/* $Id$ */
+package org.lamsfoundation.lams.tool.assessment.util;
 
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
- 
-public interface AssessmentResultDAO extends DAO {
+import java.util.Comparator;
 
-    List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId);
-    
-    List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId);
-    
-    AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
-    
-    AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 
-    AssessmentResult getLastFinishedAssessmentResultBySessionId(Long sessionId, Long userId);
-    
-    int getAssessmentResultCount(Long assessmentUid, Long userId);
-    
-    AssessmentResult getAssessmentResultByUid(Long assessmentResultUid);
+/**
+ * AssessmentSessionComparator.
+ * 
+ * @author Andrey Balan
+ * 
+ */
+public class AssessmentSessionComparator implements Comparator<AssessmentSession> {
+
+    public int compare(AssessmentSession o1, AssessmentSession o2) {
+	if ((o1 != null) && (o2 != null) & (o1.getSessionStartDate() != null) && (o2.getSessionStartDate() != null)) {
+	    return (o1.getSessionStartDate().getTime() - o2.getSessionStartDate().getTime()) > 0 ? 1 : -1;
+	} else if (o1 != null) {
+	    return 1;
+	} else {
+	    return -1;
+	}
+    }
 
 }
- 

@@ -89,6 +89,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -399,10 +400,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessmentSessionDao.saveObject(resSession);
     }
     
-    public void saveOrUpdateAssessmentResult(AssessmentResult assessmentResult) {
-	assessmentResultDao.saveObject(assessmentResult);
-    }
-    
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) { 
 	AssessmentResult result = new AssessmentResult();
 	result.setAssessment(assessment);
@@ -608,7 +605,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
 	    ArrayList<AssessmentResult> assessmentResults = new ArrayList<AssessmentResult>();
 	    for (AssessmentUser user : users) {
-		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResult(contentId, user.getUserId());
+		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId, user.getUserId());
 		if (assessmentResult == null) {
 		    assessmentResult = new AssessmentResult();
 		    assessmentResult.setUser(user);
@@ -631,10 +628,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	UserSummary userSummary = new UserSummary();
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	userSummary.setUser(user);
-	List<AssessmentResult> results = assessmentResultDao.getAssessmentResults(contentId, userId);
+	List<AssessmentResult> results = assessmentResultDao.getAssessmentResultsBySession(sessionId, userId);
 	userSummary.setNumberOfAttempts(results.size());
 	
-	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResult(contentId, userId);
+	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResult(sessionId, userId);
 	long timeTaken = (lastFinishedResult == null) ? 0 : (lastFinishedResult.getFinishDate().getTime() - lastFinishedResult.getStartDate().getTime()); 
 	userSummary.setTimeOfLastAttempt(new Date(timeTaken));
 	if (lastFinishedResult != null) {
@@ -672,17 +669,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	questionSummary.setQuestion(question);
 
 	List<List<AssessmentQuestionResult>> questionResults = new ArrayList<List<AssessmentQuestionResult>>();
-	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
+	SortedSet<AssessmentSession> sessionList = new TreeSet<AssessmentSession>(new AssessmentSessionComparator());
+	sessionList.addAll(assessmentSessionDao.getByContentId(contentId));
 	for (AssessmentSession session : sessionList) {
-	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(session.getSessionId());
+	    Long sessionId = session.getSessionId();
+	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
 	    // Set<AssessmentQuestionResult> sessionQuestionResults = new TreeSet<AssessmentQuestionResult>(
 	    // new AssessmentQuestionResultComparator());
 	    ArrayList<AssessmentQuestionResult> sessionQuestionResults = new ArrayList<AssessmentQuestionResult>();
 	    for (AssessmentUser user : users) {
-		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResult(contentId, user.getUserId());
+		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId, user.getUserId());
 		AssessmentQuestionResult questionResult = null;
 		if (assessmentResult == null) {
 		    questionResult = new AssessmentQuestionResult();
+		    questionResult.setAssessmentQuestion(question);
 		} else {
 		    for (AssessmentQuestionResult dbQuestionResult : assessmentResult.getQuestionResults()) {
 			if (dbQuestionResult.getAssessmentQuestion().getUid().equals(questionUid)) {
@@ -702,8 +702,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	float total = 0;
 	for(List<AssessmentQuestionResult> sessionQuestionResults : questionResults) {
 	    for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
-		count++;
-		total+=questionResult.getMark();
+		if (questionResult.getUid() != null) {
+		    count++;
+		    total += questionResult.getMark();
+		}
 	    }
 	}
 	float averageMark = (count == 0) ? 0 : total/count;
@@ -829,17 +831,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	this.toolService = toolService;
     }
 
-//    public AssessmentQuestionResultDAO getAssessmentQuestionResultDao() {
-//	return assessmentQuestionResultDao;
-//    }
-
     public void setAssessmentQuestionResultDao(AssessmentQuestionResultDAO assessmentQuestionResultDao) {
 	this.assessmentQuestionResultDao = assessmentQuestionResultDao;
     }
-    
-//    public AssessmentResultDAO getAssessmentResultDao() {
-//	return assessmentResultDao;
-//    }
 
     public void setAssessmentResultDao(AssessmentResultDAO assessmentResultDao) {
 	this.assessmentResultDao = assessmentResultDao;

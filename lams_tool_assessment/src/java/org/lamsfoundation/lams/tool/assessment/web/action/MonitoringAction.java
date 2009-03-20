@@ -31,6 +31,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -117,6 +118,9 @@ public class MonitoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	
 	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
+	if (questionUid.equals(-1)) {
+	    return null;
+	}
 	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	IAssessmentService service = getAssessmentService();
 	QuestionSummary questionSummary = service.getQuestionSummary(contentId, questionUid);
@@ -155,7 +159,9 @@ public class MonitoringAction extends Action {
 
     private ActionForward saveUserGrade(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	if (request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null) {
+	
+	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null) && 
+		!StringUtils.isEmpty(request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
 	    Long questionResultUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_RESULT_UID);
 	    float newGrade = Float.valueOf(request.getParameter(AssessmentConstants.PARAM_GRADE));	    
 	    IAssessmentService service = getAssessmentService();
