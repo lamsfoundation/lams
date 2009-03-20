@@ -222,7 +222,7 @@ function lamstwo_get_soap_client($relativeurl) {
         return NULL;
     }
     $wsdl = $CFG->lamstwo_serverurl.$relativeurl;
-    $s = new soap_client($wsdl,true,false,false,false,false,5,5);
+    $s = new soap_client($wsdl,true,false,false,false,false);
 	$s->soap_defencoding = 'UTF-8';
 	$s->decode_utf8 = false; 
     return $s;
