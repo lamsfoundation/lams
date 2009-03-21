@@ -45,6 +45,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsAction;
@@ -56,8 +57,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts.action path = "/authoring/exportToolContent" validate = "false"
  * @struts.action-forward name = "choice" path = "/toolcontent/exportchoice.jsp"
- * @struts.action-forward name = "loading" path =
- *                        "/toolcontent/exportloading.jsp"
+ * @struts.action-forward name = "loading" path = "/toolcontent/exportloading.jsp"
  * @struts.action-forward name = "result" path = "/toolcontent/exportresult.jsp"
  * 
  * Export tool content action. It needs learingDesignID as input parameter.
@@ -67,7 +67,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class ExportToolContentAction extends LamsAction {
 
     private static final long serialVersionUID = 1L;
-    public static final String EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME = "exportToolContentService";
     public static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
     public static final String ATTR_TOOLS_ERROR_MESSAGE = "toolsErrorMessages";
     public static final String ATTR_LD_ERROR_MESSAGE = "ldErrorMessages";
@@ -81,35 +80,36 @@ public class ExportToolContentAction extends LamsAction {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	String param = request.getParameter("method");
-	//-----------------------Resource Author function ---------------------------
+	// -----------------------Resource Author function ---------------------------
 	if (StringUtils.equals(param, "loading")) {
-	    Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
-	    request.setAttribute(PARAM_LEARING_DESIGN_ID, learningDesignId);
-	    int format = WebUtil.readIntParam(request, PARAM_EXPORT_FORMAT);
-	    request.setAttribute(PARAM_EXPORT_FORMAT, format);
-	    //display initial page for automatically loading download pgm
+	    Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentAction.PARAM_LEARING_DESIGN_ID);
+	    request.setAttribute(ExportToolContentAction.PARAM_LEARING_DESIGN_ID, learningDesignId);
+	    int format = WebUtil.readIntParam(request, ExportToolContentAction.PARAM_EXPORT_FORMAT);
+	    request.setAttribute(ExportToolContentAction.PARAM_EXPORT_FORMAT, format);
+	    // display initial page for automatically loading download pgm
 	    return mapping.findForward("loading");
 	} else if (StringUtils.equals(param, "export")) {
-	    //the export LD pgm
+	    // the export LD pgm
 	    return exportLD(mapping, request, response);
-	} else { //choice format
-	    Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
-	    request.setAttribute(PARAM_LEARING_DESIGN_ID, learningDesignId);
-	    //display choose IMS or LAMS format page
+	} else { // choice format
+	    Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentAction.PARAM_LEARING_DESIGN_ID);
+	    request.setAttribute(ExportToolContentAction.PARAM_LEARING_DESIGN_ID, learningDesignId);
+	    // display choose IMS or LAMS format page
 	    return mapping.findForward("choice");
 	}
     }
 
     private ActionForward exportLD(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response) {
-	Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
-	int format = WebUtil.readIntParam(request, PARAM_EXPORT_FORMAT);
+	Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentAction.PARAM_LEARING_DESIGN_ID);
+	int format = WebUtil.readIntParam(request, ExportToolContentAction.PARAM_EXPORT_FORMAT);
 	IExportToolContentService service = getExportService();
 	List<String> ldErrorMsgs = new ArrayList<String>();
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 
 	try {
-	    File xslt = new File(this.getServlet().getServletContext().getRealPath(IMS_XSLT_PATH) + File.separator
-		    + IMS_XSLT_NAME);
+	    File xslt = new File(this.getServlet().getServletContext().getRealPath(
+		    ExportToolContentAction.IMS_XSLT_PATH)
+		    + File.separator + ExportToolContentAction.IMS_XSLT_NAME);
 	    String zipFilename = service.exportLearningDesign(learningDesignId, toolsErrorMsgs, format, xslt);
 
 	    // get only filename
@@ -119,14 +119,14 @@ public class ExportToolContentAction extends LamsAction {
 
 	    zipfile = zipfile.replaceAll(" ", "_");
 
-	    //write zip file as response stream. 
+	    // write zip file as response stream.
 
 	    // Different browsers handle stream downloads differently LDEV-1243
 	    String filename = FileUtil.encodeFilenameForDownload(request, zipfile);
 	    log.debug("Final filename to export: " + filename);
 
 	    response.setContentType("application/x-download");
-	    //			response.setContentType("application/zip");
+	    // response.setContentType("application/zip");
 	    response.setHeader("Content-Disposition", "attachment;filename=" + filename);
 	    InputStream in = null;
 	    OutputStream out = null;
@@ -148,10 +148,12 @@ public class ExportToolContentAction extends LamsAction {
 		throw new ExportToolContentException(e);
 	    } finally {
 		try {
-		    if (in != null)
+		    if (in != null) {
 			in.close(); // very important
-		    if (out != null)
+		    }
+		    if (out != null) {
 			out.close();
+		    }
 		} catch (Exception e) {
 		    log.error("Error Closing file. File already written out - no exception being thrown.", e);
 		}
@@ -161,10 +163,10 @@ public class ExportToolContentAction extends LamsAction {
 	} catch (Exception e1) {
 	    log.error("Unable to export tool content: " + e1.toString());
 	    ldErrorMsgs.add(0, e1.getClass().getName());
-	    request.setAttribute(ATTR_LD_ERROR_MESSAGE, ldErrorMsgs);
-	    request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
+	    request.setAttribute(ExportToolContentAction.ATTR_LD_ERROR_MESSAGE, ldErrorMsgs);
+	    request.setAttribute(ExportToolContentAction.ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
 	}
-	//display initial page for upload
+	// display initial page for upload
 	return mapping.findForward("result");
     }
 
@@ -177,15 +179,16 @@ public class ExportToolContentAction extends LamsAction {
      * @return
      */
     private ActionForward exportLDToLC(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response) {
-	Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
-	int format = WebUtil.readIntParam(request, PARAM_EXPORT_FORMAT);
+	Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentAction.PARAM_LEARING_DESIGN_ID);
+	int format = WebUtil.readIntParam(request, ExportToolContentAction.PARAM_EXPORT_FORMAT);
 	IExportToolContentService service = getExportService();
 	List<String> ldErrorMsgs = new ArrayList<String>();
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 
 	try {
-	    File xslt = new File(this.getServlet().getServletContext().getRealPath(IMS_XSLT_PATH) + File.separator
-		    + IMS_XSLT_NAME);
+	    File xslt = new File(this.getServlet().getServletContext().getRealPath(
+		    ExportToolContentAction.IMS_XSLT_PATH)
+		    + File.separator + ExportToolContentAction.IMS_XSLT_NAME);
 	    String zipFilename = service.exportLearningDesign(learningDesignId, toolsErrorMsgs, format, xslt);
 
 	    // get only filename
@@ -200,38 +203,37 @@ public class ExportToolContentAction extends LamsAction {
 		HashMap<String, String> authParams = LamsCommunityUtil.getAuthParams();
 		InputStream is = WebUtil.performMultipartFilePost(uploadFile,
 			LamsCommunityUtil.LAMS_COMMUNITY_EXPORT_URL, zipFilename, authParams);
-	    
+
 		BufferedReader isReader = new BufferedReader(new InputStreamReader(is));
 		String responseStr = isReader.readLine();
-		
-		if (responseStr != null && responseStr.trim().equals("success")){
+
+		if (responseStr != null && responseStr.trim().equals("success")) {
 		    // successful export to lams community
 		    // Get the ldID and forward user to the lamscommunity form
-		}
-		else if(responseStr!=null){
+		} else if (responseStr != null) {
 		    // get the failure type and add it to the errors
-		}else {
+		} else {
 		    // general failure
 		}
 	    }
-	    
+
 	    return null;
 	} catch (Exception e1) {
 	    log.error("Unable to export tool content: " + e1.toString());
 	    ldErrorMsgs.add(0, e1.getClass().getName());
-	    request.setAttribute(ATTR_LD_ERROR_MESSAGE, ldErrorMsgs);
-	    request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
+	    request.setAttribute(ExportToolContentAction.ATTR_LD_ERROR_MESSAGE, ldErrorMsgs);
+	    request.setAttribute(ExportToolContentAction.ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
 	}
-	//display initial page for upload
+	// display initial page for upload
 	return mapping.findForward("result");
     }
 
-    //***************************************************************************************
+    // ***************************************************************************************
     // Private method
-    //***************************************************************************************
+    // ***************************************************************************************
     private IExportToolContentService getExportService() {
 	WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this
 		.getServlet().getServletContext());
-	return (IExportToolContentService) webContext.getBean(EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);
+	return (IExportToolContentService) webContext.getBean(CentralConstants.EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);
     }
 }

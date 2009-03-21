@@ -87,6 +87,7 @@ import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -142,6 +143,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String FORWARD_TEMPLATE = "template";
     private static final String FORWARD_PREVIEW = "preview";
     private static final String FORWARD_SEQUENCE_CHOOSER = "sequenceChooser";
+    public static final String FORWARD_GROUPING = "grouping";
 
     // Several chars and strings used for building HTML requests
     private static final String CHAR_QUESTION_MARK = "?";
@@ -156,8 +158,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static IMonitoringService monitoringService;
     private static MessageService messageService;
     private static PedagogicalPlannerDAO pedagogicalPlannerDAO;
+    private static ActivityDAO activityDAO;
     private static ToolContentHandler contentHandler;
     private static final String PEDAGOGICAL_PLANNER_DAO_BEAN_NAME = "pedagogicalPlannerDAO";
+    private static final String ACTIVITY_DAO_BEAN_NAME = "activityDAO";
 
     // Keys of error messages used in this class. They are ment to be displayed for user.
     private static final String ERROR_KEY_TOOL_ERRORS = "error.planner.tools.";
@@ -171,6 +175,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String ERROR_KEY_EXPORT = "error.planner.export";
     private static final String ERROR_KEY_IMPORT = "error.planner.import";
     private static final String ERROR_KEY_FILTER_PARSE = "error.planner.filter.parse";
+    private static final String ERROR_KEY_EXPORT_TEMPLATE = "error.planner.export.template";
 
     // Error messages used in this class. They are ment to be thrown.
     private static final String ERROR_USER_NOT_FOUND = "User not found.";
@@ -249,15 +254,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     /*----------------------- TEMPLATE CHOOSER METHODS --------------------*/
 
     /**
-     * The main method for opening and parsing template (chosen learning desing).
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param fileUuid
-     * @param fileName
-     * @return
-     * @throws ServletException
+     * Opens template from sequence chooser.
      */
     public ActionForward openTemplate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
@@ -268,11 +265,28 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	// Open the learning design stored in the repository.
 	LearningDesign learningDesign = importLearningDesign(node.getFileUuid(), node.getFileName(), errors);
+	if (errors.isEmpty()) {
+	    errors = openTemplate(request, learningDesign);
+	}
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
 	    // If anything goes wrong, errors will be displayed at top. This approach is used widely in this action.
 	    return openSequenceNode(mapping, form, request, nodeUid);
 	}
+	return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
+    }
+
+    /**
+     * The main method for opening and parsing template (chosen learning desing).
+     * 
+     * @param request
+     * @param learningDesign
+     * @return
+     * @throws ServletException
+     */
+    public ActionMessages openTemplate(HttpServletRequest request, LearningDesign learningDesign)
+	    throws ServletException {
+	ActionMessages errors = new ActionMessages();
 
 	List<PedagogicalPlannerActivityDTO> activities = new ArrayList<PedagogicalPlannerActivityDTO>();
 
@@ -283,19 +297,18 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    while (activity != null) {
 		// Iterate through all the activities, detecting type of each one
 		addActivityToPlanner(learningDesign, activities, activity);
-		Transition transitionTo = activity.getTransitionTo();
-		if (transitionTo == null) {
+		Transition transitionFrom = activity.getTransitionFrom();
+		if (transitionFrom == null) {
 		    activity = null;
 		} else {
-		    activity = transitionTo.getToActivity();
+		    activity = transitionFrom.getToActivity();
 		}
 	    }
 	} catch (ServletException e) {
 	    PedagogicalPlannerAction.log.error(e, e);
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 		    PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
-	    saveErrors(request, errors);
-	    return openSequenceNode(mapping, form, request, nodeUid);
+	    return errors;
 	}
 
 	// Recalculate how many activities actually support the planner
@@ -318,7 +331,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	planner.setActivitiesPerPortion(2);
 
 	request.setAttribute(CentralConstants.ATTR_PLANNER, planner);
-	return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
+	return errors;
     }
 
     /**
@@ -343,6 +356,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		&& (activity.getParentActivity().isBranchingActivity() || activity.isOptionsActivity());
 
 	PedagogicalPlannerActivityDTO addedDTO = null;
+
+	// Load the real object, otherwise we get an error when casting to concrete Activity classes
+	activity = getActivityDAO().getActivityByActivityId(activity.getActivityId());
+
 	// Simple tool activity
 	if (activity.isToolActivity()) {
 	    ToolActivity toolActivity = (ToolActivity) activity;
@@ -937,31 +954,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    saveErrors(request, errors);
 	    return openSequenceNode(mapping, form, request, nodeUid);
 	}
-	InputStream in = null;
-	ServletOutputStream out = null;
-	try {
-	    in = new BufferedInputStream(new FileInputStream(zipFilePath));
-	    out = response.getOutputStream();
-	    int count = 0;
-
-	    int ch;
-	    while ((ch = in.read()) != -1) {
-		out.write((char) ch);
-		count++;
-	    }
-	    PedagogicalPlannerAction.log.debug("Wrote out " + count + " bytes");
-	    response.setContentLength(count);
-	    out.flush();
-	} finally {
-	    /*
-	     * If anything goes wrong, we can not display it nicely for the user. Once response.getOutputStream() was
-	     * called to write the file data, we can not forward to a JSP page anymore. Maybe there is a way to avoid
-	     * it, but currently we are simply throwing an error. So no "catch" clause.
-	     */
-	    if (in != null) {
-		in.close(); // very important
-	    }
-	}
+	writeOutFile(response, zipFilePath);
 	return null;
     }
 
@@ -1376,7 +1369,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Long groupingId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Grouping grouping = getAuthoringService().getGroupingById(groupingId);
 	plannerForm.fillForm(grouping);
-	return mapping.findForward(CentralConstants.FORWARD_GROUPING);
+	return mapping.findForward(PedagogicalPlannerAction.FORWARD_GROUPING);
     }
 
     /**
@@ -1423,7 +1416,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	} else {
 	    saveMessages(request, errors);
 	}
-	return mapping.findForward(CentralConstants.FORWARD_GROUPING);
+	return mapping.findForward(PedagogicalPlannerAction.FORWARD_GROUPING);
     }
 
     /*-------------------------- TEMPLATE BASE METHODS -----------------*/
@@ -1459,7 +1452,61 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return null;
     }
 
-    /*------------------------ SERVICE ACCESS METHODS --------------------*/
+    public ActionForward exportTemplate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	Long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+
+	List<String> toolsErrorMsgs = new ArrayList<String>();
+	ActionMessages errors = new ActionMessages();
+	String zipFilePath = null;
+	boolean valid = false;
+	try {
+	    zipFilePath = getExportService().exportLearningDesign(learningDesignId, toolsErrorMsgs, 1, null);
+	    if (toolsErrorMsgs.isEmpty()) {
+
+		// get only filename
+		String zipfile = FileUtil.getFileName(zipFilePath);
+
+		// replace spaces (" ") with underscores ("_")
+
+		zipfile = zipfile.replaceAll(" ", "_");
+
+		// write zip file as response stream.
+
+		// Different browsers handle stream downloads differently LDEV-1243
+		String filename = FileUtil.encodeFilenameForDownload(request, zipfile);
+		PedagogicalPlannerAction.log.debug("Final filename to export: " + filename);
+
+		response.setContentType(PedagogicalPlannerAction.RESPONSE_CONTENT_TYPE_DOWNLOAD);
+		// response.setContentType("application/zip");
+		response.setHeader(PedagogicalPlannerAction.HEADER_CONTENT_DISPOSITION, "attachment;filename="
+			+ filename);
+		valid = true;
+	    }
+
+	} catch (Exception e) {
+	    PedagogicalPlannerAction.log.error(e, e);
+	}
+	if (!valid) {
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+		    PedagogicalPlannerAction.ERROR_KEY_EXPORT_TEMPLATE));
+	    saveErrors(request, errors);
+	    for (String error : toolsErrorMsgs) {
+		PedagogicalPlannerAction.log.error(error);
+	    }
+	    LearningDesign learningDesign = getAuthoringService().getLearningDesign(learningDesignId);
+	    errors = openTemplate(request, learningDesign);
+	    if (!errors.isEmpty()) {
+		throw new ServletException(getMessageService().getMessage(
+			PedagogicalPlannerAction.ERROR_KEY_LEARNING_DESIGN_COULD_NOT_BE_RETRIEVED));
+	    }
+	    return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
+	}
+	writeOutFile(response, zipFilePath);
+	return null;
+    }
+
+    /*------------------------ COMMON METHODS --------------------*/
 
     private IExportToolContentService getExportService() {
 	if (PedagogicalPlannerAction.exportService == null) {
@@ -1521,6 +1568,16 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return PedagogicalPlannerAction.pedagogicalPlannerDAO;
     }
 
+    private ActivityDAO getActivityDAO() {
+	if (PedagogicalPlannerAction.activityDAO == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    PedagogicalPlannerAction.activityDAO = (ActivityDAO) wac
+		    .getBean(PedagogicalPlannerAction.ACTIVITY_DAO_BEAN_NAME);
+	}
+	return PedagogicalPlannerAction.activityDAO;
+    }
+
     private ToolContentHandler getContentHandler() {
 	if (PedagogicalPlannerAction.contentHandler == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
@@ -1529,5 +1586,33 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    .getBean(CentralConstants.CENTRAL_TOOL_CONTENT_HANDLER_BEAN_NAME);
 	}
 	return PedagogicalPlannerAction.contentHandler;
+    }
+
+    private void writeOutFile(HttpServletResponse response, String zipFilePath) throws IOException {
+	InputStream in = null;
+	ServletOutputStream out = null;
+	try {
+	    in = new BufferedInputStream(new FileInputStream(zipFilePath));
+	    out = response.getOutputStream();
+	    int count = 0;
+
+	    int ch;
+	    while ((ch = in.read()) != -1) {
+		out.write((char) ch);
+		count++;
+	    }
+	    PedagogicalPlannerAction.log.debug("Wrote out " + count + " bytes");
+	    response.setContentLength(count);
+	    out.flush();
+	} finally {
+	    /*
+	     * If anything goes wrong, we can not display it nicely for the user. Once response.getOutputStream() was
+	     * called to write the file data, we can not forward to a JSP page anymore. Maybe there is a way to avoid
+	     * it, but currently we are simply throwing an error. So no "catch" clause.
+	     */
+	    if (in != null) {
+		in.close(); // very important
+	    }
+	}
     }
 }

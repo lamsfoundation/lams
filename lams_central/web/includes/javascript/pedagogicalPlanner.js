@@ -11,6 +11,7 @@
    var ACTION_DO_NOTHING = 0; //After successful submit do nothing
    var ACTION_PREVIEW = 1; //After successful submit start preview
    var ACTION_OPEN_AUTHOR = 2; //After successful submit open full authoring
+   var ACTION_EXPORT = 3; //After successful submit export the learning design 
    var END_HEAD_REGEX_PATTERN = new RegExp('</head','i'); //Regex to find "head" element in a html pages
    var FILE_ELEMENT_NAME = "file[";
        
@@ -21,7 +22,7 @@
     if (actionAfterCompleted==ACTION_PREVIEW){
     	startPreviewUrl=additionalParameter;
     }
-    else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
+    else if (actionAfterCompleted==ACTION_OPEN_AUTHOR || actionAfterCompleted==ACTION_EXPORT){
   	    learningDesignId=additionalParameter;
     }
     callAttemptedID++;
@@ -143,6 +144,9 @@
   	   	else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
   	   		 window.resizeTo(authoring_width,authoring_height);
   	   		 document.location.href="home.do?method=author&learningDesignID="+learningDesignId;
+  	   	}
+  	   	else if (actionAfterCompleted==ACTION_EXPORT){
+  	   		 document.getElementById("downloadFileDummyIframe").src="pedagogicalPlanner.do?method=exportTemplate&ldId="+learningDesignId;
   	   	}
   	}
   	else {

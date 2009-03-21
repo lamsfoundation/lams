@@ -6,6 +6,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-function" prefix="fn" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 <lams:html>
 <lams:head>
 	  <title><fmt:message key="title.lams"/> :: <fmt:message key="planner.title" /></title>
@@ -67,7 +68,9 @@
 	  				);
 	  			}
 	  		}
-
+			if (jQuery.trim($('#pedagogicalPlannerErrorArea').html())!=""){
+				$('#pedagogicalPlannerErrorArea').show();
+			}
 		});
 	  </script>
 	  
@@ -229,6 +232,9 @@
 	
 	<%-- DIVs for messages from server, hidden by default --%>
 	<div id="pedagogicalPlannerErrorArea" style="display:none;" class="warning" >
+		<html:messages id="error">
+		   <c:out value="${error}" escapeXml="false"/><br/>
+		</html:messages>
 	</div>
 	
 	<div  id="pedagogicalPlannerInfoArea" style="display:none;" class="info" >
@@ -247,8 +253,13 @@
 		<a class="button pedagogicalPlannerButtons" href="javascript:closePlanner('<fmt:message key="msg.planner.not.saved" />');"><fmt:message key="button.planner.template.close" /></a>
 		<a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_PREVIEW,'${startPreviewUrl}')"><fmt:message key="label.planner.preview" /></a>
 		<a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_DO_NOTHING,null)"><fmt:message key="button.planner.save" /></a>
+		<a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_EXPORT,${planner.learningDesignID})"><fmt:message key="label.planner.export.sequence" /></a>
 		<a class="button pedagogicalPlannerButtons" href="javascript:submitAll(ACTION_OPEN_AUTHOR,${planner.learningDesignID})"><fmt:message key="button.planner.view.full.author" /></a>
 	</div>
+	<!-- This frame is needed for proper "Export sequence" functioning. 
+		 If target for download was the window itself, AJAX calls to FCKeditor would be cancelled in the middle,
+		 preventing them to download completely -->
+	<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
 </div>
 <div id="footer"></div>
 </div>

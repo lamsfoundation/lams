@@ -141,8 +141,6 @@ public class CentralConstants {
 
     public static final String RESOURCE_KEY_BRANCH_EMPTY = "label.planner.branch.empty";
 
-    public static final String FORWARD_GROUPING = "grouping";
-
     public static final int PLANNER_MAX_BRANCHES = 4;
 
     public static final int PLANNER_MAX_OPTIONS = 4;
