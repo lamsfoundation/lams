@@ -345,8 +345,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format";
 
     /**
-     * Class of tool attachment file handler class and relative fields
-     * information container.
+     * Class of tool attachment file handler class and relative fields information container.
      */
     private class NameInfo {
 
@@ -493,8 +492,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * This class is just for later system extent tool compaiblity strategy use.
-     * Currently, it just simple to get tool by same signature.
+     * This class is just for later system extent tool compaiblity strategy use. Currently, it just simple to get tool
+     * by same signature.
      * 
      * @author Steve.Ni
      * 
@@ -702,8 +701,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Generate temporary files: resources.xml and transitions.xml. <BR>
-     * Transform LAMS format learning_design.xml with resources.xml and
-     * transitions.xml into ims_learning_design.xml file.
+     * Transform LAMS format learning_design.xml with resources.xml and transitions.xml into ims_learning_design.xml
+     * file.
      * 
      * @param resChildren
      * @param rootDir
@@ -889,10 +888,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Generate the nodes for a property and the related conditions. The first
-     * element is the property, which goes in the <properties> tag, the second
-     * through fourth elements are the if-then-else that makes up the condition
-     * and goes in the <conditions> tag.
+     * Generate the nodes for a property and the related conditions. The first element is the property, which goes in
+     * the <properties> tag, the second through fourth elements are the if-then-else that makes up the condition and
+     * goes in the <conditions> tag.
      * 
      * @param activityId
      * @return
@@ -948,15 +946,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * This quite complex method will return a sorted acitivityDTO list
-     * according to current LD DTO. <BR>
-     * It considers the broken LD situation. A first activity will always be
-     * first one, but others in the broken sequence in this LD sorted by
-     * randomly. In one broken sequence, all activities will sorted by
-     * transition. <BR>
-     * The reason to use lots "for" is Activity DTO does not contain next
-     * transition information. It has to be iterator all transitions or
-     * activities.
+     * This quite complex method will return a sorted acitivityDTO list according to current LD DTO. <BR>
+     * It considers the broken LD situation. A first activity will always be first one, but others in the broken
+     * sequence in this LD sorted by randomly. In one broken sequence, all activities will sorted by transition. <BR>
+     * The reason to use lots "for" is Activity DTO does not contain next transition information. It has to be iterator
+     * all transitions or activities.
      * 
      * @param ldDto
      * @return
@@ -1055,9 +1049,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Move LAMS tool.xml from tool folder to export content root folder and
-     * modify it to {toolContentID}.xml file. Cache all attachement files from
-     * this tool into ArrayList, which will be save into a temporary file
+     * Move LAMS tool.xml from tool folder to export content root folder and modify it to {toolContentID}.xml file.
+     * Cache all attachement files from this tool into ArrayList, which will be save into a temporary file
      * (resources.xml) and used by XSLT.
      * 
      * @param rootDir
@@ -1244,9 +1237,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Import the learning design from the given path. Set the importer as the
-     * creator. If the workspaceFolderUid is null then saves the design in the
-     * user's own workspace folder.
+     * Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
+     * null then saves the design in the user's own workspace folder.
      * 
      * @param designFile
      * @param importer
@@ -1327,8 +1319,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * 
      * @return learningDesingID
      * @throws ExportToolContentException
-     * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign102(String,
-     *      User, WorkspaceFolder)
+     * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign102(String, User,
+     *      WorkspaceFolder)
      */
     public Long importLearningDesignV102(String ldWddxPacket, User importer, Integer workspaceFolderUid,
 	    List<String> toolsErrorMsgs) throws ImportToolContentException {
@@ -1755,8 +1747,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * If there are any errors happen during tool exporting content. Writing
-     * failed message to file.
+     * If there are any errors happen during tool exporting content. Writing failed message to file.
      */
     private void writeErrorToToolFile(String rootPath, Long toolContentId, String msg) {
 	// create tool's save path
@@ -2112,8 +2103,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Method to sort activity DTO according to the rule: Paretns is before
-     * their children.
+     * Method to sort activity DTO according to the rule: Paretns is before their children.
      * 
      * @param activities
      * @return
@@ -2155,12 +2145,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Get learning design object from this Learning design DTO object. It also
-     * following our import rules:
+     * Get learning design object from this Learning design DTO object. It also following our import rules:
      * <li>lams_license - Assume same in all lams system. Import same ID</li>
      * <li>lams_copy_type - Set to 1.This indicates it is "normal" design.</li>
-     * <li>lams_workspace_folder - An input parameters to let user choose
-     * import workspace</li>
+     * <li>lams_workspace_folder - An input parameters to let user choose import workspace</li>
      * <li>User - The person who execute import action</li>
      * <li>OriginalLearningDesign - set to null</li>
      * 
@@ -2315,14 +2303,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * Creates the map entry between a branch sequence activity and a group. We
-     * need the group maps and the activity maps so that we can update the ids
-     * to the groups and the activities. Therefore this method must be done
-     * after all the groups are imported and the activities are imported.
+     * Creates the map entry between a branch sequence activity and a group. We need the group maps and the activity
+     * maps so that we can update the ids to the groups and the activities. Therefore this method must be done after all
+     * the groups are imported and the activities are imported.
      * 
-     * Note: there isn't an set in the learning design for the branch mappings.
-     * The group objects actually contain the link to the mappings, so this
-     * method updates the group objects.
+     * Note: there isn't an set in the learning design for the branch mappings. The group objects actually contain the
+     * link to the mappings, so this method updates the group objects.
      */
     private BranchActivityEntry getBranchActivityEntry(BranchActivityEntryDTO entryDto,
 	    Map<Integer, Group> groupByUIIDMapper, Map<Integer, Activity> activityByUIIDMapper) {
@@ -2392,7 +2378,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// also set transition to activity: It is nonsense for persisit data,
 	// but it is help this learning design
 	// validated
-	fromAct.setTransitionTo(trans);
+	fromAct.setTransitionFrom(trans);
 	// set to null
 	// trans.setLearningDesign();
 	trans.setTitle(transDto.getTitle());
@@ -2403,7 +2389,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// also set transition to activity: It is nonsense for persisit data,
 	// but it is help this learning design
 	// validated
-	toAct.setTransitionFrom(trans);
+	toAct.setTransitionTo(trans);
 
 	trans.setTransitionId(transDto.getTransitionID());
 	trans.setTransitionUIID(transDto.getTransitionUIID());
