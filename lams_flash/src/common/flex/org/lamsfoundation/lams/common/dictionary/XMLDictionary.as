@@ -1,8 +1,6 @@
-package org.lamsfoundation.lams.common.dictionary
+﻿package org.lamsfoundation.lams.common.dictionary
 {
 	import flash.events.EventDispatcher;
-	
-	import mx.controls.Alert;
 	
 	public class XMLDictionary
 	{
