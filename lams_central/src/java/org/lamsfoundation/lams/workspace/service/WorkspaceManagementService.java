@@ -118,13 +118,13 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public void setAuthoringService(IAuthoringService authoringService) {
 		this.authoringService = authoringService;
-	}	
+	}
 	/**
 	 * @param repositoryService The repositoryService to set.  
 	 */
 	public void setRepositoryService(IRepositoryService repositoryService) {
 	    this.repositoryService = repositoryService;
-	}
+	}	
 	/**
 	 * @param learningDesignDAO The learningDesignDAO to set.
 	 */
@@ -1458,7 +1458,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 */
 	public Vector<UserFlashDTO> getUsersFromOrganisationByRole(Integer organisationID, String roleName) 
 	{
-		return (Vector<UserFlashDTO>) userMgmtService.getUsersFromOrganisationByRole(organisationID, roleName, true);
+		return (Vector<UserFlashDTO>) userMgmtService.getUsersFromOrganisationByRole(organisationID, roleName, true, false);
 	}
 	
 	

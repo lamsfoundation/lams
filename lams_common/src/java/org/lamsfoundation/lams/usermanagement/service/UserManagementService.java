@@ -366,10 +366,12 @@ public class UserManagementService implements IUserManagementService {
      * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,
      *      java.lang.String)
      */
-    public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall) {
+    public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall, boolean getUser) {
 	Vector users = null;
 	if (isFlashCall)
 	    users = new Vector<UserFlashDTO>();
+	else if(getUser)
+		users = new Vector<User>();
 	else
 	    users = new Vector<UserDTO>();
 
@@ -385,10 +387,12 @@ public class UserManagementService implements IUserManagementService {
 			UserOrganisationRole userOrganisationRole = (UserOrganisationRole) userOrganisationRoleIterator
 				.next();
 			if (userOrganisationRole.getRole().getName().equals(roleName))
-			    if (isFlashCall)
-				users.add(userOrganisation.getUser().getUserFlashDTO());
+			    if (isFlashCall && !getUser)
+			    	users.add(userOrganisation.getUser().getUserFlashDTO());
+			    else if(getUser)
+			    	users.add(userOrganisation.getUser());
 			    else
-				users.add(userOrganisation.getUser().getUserDTO());
+			    	users.add(userOrganisation.getUser().getUserDTO());
 		    }
 		}
 	    }
@@ -534,7 +538,7 @@ public class UserManagementService implements IUserManagementService {
 		// get course managers and give them staff role in this new
 		// class
 		Vector<UserDTO> managers = getUsersFromOrganisationByRole(pOrg.getOrganisationId(), Role.GROUP_MANAGER,
-			false);
+			false, false);
 		for (UserDTO m : managers) {
 		    User user = (User) findById(User.class, m.getUserID());
 		    UserOrganisation uo = new UserOrganisation(user, organisation);

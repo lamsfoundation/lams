@@ -81,10 +81,12 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
@@ -518,29 +520,35 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	try {
 	    Hashtable table = (Hashtable) WDDXProcessor.deserialize(lessonPacket);
+	    
 	    // todo: convert:data type:
 	    Integer orgId = WDDXProcessor.convertToInteger(MonitoringConstants.KEY_ORGANISATION_ID, table
 		    .get(MonitoringConstants.KEY_ORGANISATION_ID));
 	    long lessonId = WDDXProcessor.convertToLong(MonitoringConstants.KEY_LESSON_ID,
 		    table.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
+	    
 	    // get leaner group info
 	    Hashtable learnerMap = (Hashtable) table.get(MonitoringConstants.KEY_LEARNER);
 	    List learners = (List) learnerMap.get(MonitoringConstants.KEY_USERS);
 	    String learnerGroupName = WDDXProcessor.convertToString(learnerMap, MonitoringConstants.KEY_GROUP_NAME);
+	    
 	    // get staff group info
 	    Hashtable staffMap = (Hashtable) table.get(MonitoringConstants.KEY_STAFF);
 	    List staffs = (List) staffMap.get(MonitoringConstants.KEY_USERS);
 	    String staffGroupName = WDDXProcessor.convertToString(staffMap, MonitoringConstants.KEY_GROUP_NAME);
 
-	    if (learners == null) {
-		learners = new LinkedList();
-	    }
-	    if (staffs == null) {
-		staffs = new LinkedList();
-	    }
-
 	    Organisation organisation = (Organisation) baseDAO.find(Organisation.class, orgId);
 	    User creator = (User) baseDAO.find(User.class, creatorUserId);
+	    
+	    if (learners == null || learners.size() <= 0) {
+			learners = new LinkedList();
+			Vector<User> learnersList = userManagementService.getUsersFromOrganisationByRole(orgId, Role.LEARNER, false, true);
+			learners.addAll(learnersList);    
+	    }  
+	    
+	    if (staffs == null || staffs.size() <= 0) {
+		   	staffs = new LinkedList();
+		}
 
 	    // create the lesson class - add all the users in this organisation
 	    // to the lesson class
@@ -549,8 +557,15 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    Iterator iter = learners.iterator();
 	    while (iter.hasNext()) {
 		try {
-		    int id = ((Double) iter.next()).intValue();
-		    learnerList.add((User) baseDAO.find(User.class, id));
+			Object user = iter.next();
+			
+			if(user instanceof User)
+				learnerList.add((User) user);
+			else {
+				int id = ((Double) user).intValue();
+				learnerList.add((User) baseDAO.find(User.class, id));
+			}
+			
 		} catch (Exception e) {
 		    MonitoringService.log.error("Error parsing learner ID from " + lessonPacket);
 		    continue;
@@ -560,6 +575,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    List<User> staffList = new LinkedList<User>();
 	    staffList.add(creator);
 	    iter = staffs.iterator();
+	    
 	    while (iter.hasNext()) {
 		try {
 		    int id = ((Double) iter.next()).intValue();

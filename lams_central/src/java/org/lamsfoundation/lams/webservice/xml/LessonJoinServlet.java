@@ -285,7 +285,7 @@ public class LessonJoinServlet extends HttpServlet {
 			ownerUserId = ld.getUser().getUserId();
 			learnerGroupName = org.getName() + " Learners";
 			staffGroupName = org.getName() + " Staff";
-			Vector userDTOs = userService.getUsersFromOrganisationByRole(orgId, Role.MONITOR, false);
+			Vector userDTOs = userService.getUsersFromOrganisationByRole(orgId, Role.MONITOR, false, false);
 			staffList = getUsersFromDTOs(userDTOs);
 		}
 		Lesson lesson = monitoringService.initializeLesson(lessonName, lessonDescription, learnerExportAvailable, 

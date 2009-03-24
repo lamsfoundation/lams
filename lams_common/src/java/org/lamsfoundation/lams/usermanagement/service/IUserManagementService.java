@@ -218,9 +218,10 @@ public interface IUserManagementService {
 	 * @param organisationID
 	 * @param roleName
 	 * @param isFlashCall
+	 * @param getUser
 	 * @return UserFlashDTO objects (in a Vector to suit WDDX)
 	 */
-	public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall);	
+	public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall, boolean getUser);	
 
 	public Organisation getRootOrganisation();
 	
