@@ -131,9 +131,9 @@ public class GradeBookService implements IGradeBookService {
      * @return Collection<GradeBookGridRow>
      */
     @SuppressWarnings("unchecked")
-    public List<GradeBookGridRowDTO> getUserGradeBookActivityDTOs(Lesson lesson, Activity activity) {
+    public List<GBUserGridRowDTO> getUserGradeBookActivityDTOs(Lesson lesson, Activity activity) {
 
-	List<GradeBookGridRowDTO> gradeBookUserDTOs = new ArrayList<GradeBookGridRowDTO>();
+	List<GBUserGridRowDTO> gradeBookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 
 	Set<User> learners = (Set<User>) lesson.getAllLearners();
 
@@ -584,16 +584,29 @@ public class GradeBookService implements IGradeBookService {
     }
 
     public String getLessonStatusStr(LearnerProgress learnerProgress) {
-	String status = "NOT STARTED";
+//	String status = "NOT STARTED";
+//
+//	if (learnerProgress != null) {
+//	    if (learnerProgress.isComplete()) {
+//		status = "FINISHED";
+//	    } else if (learnerProgress.getAttemptedActivities() != null
+//		    && learnerProgress.getAttemptedActivities().size() > 0) {
+//		status = "STARTED";
+//	    }
+//	}
+	
+	String status = "-";
 
 	if (learnerProgress != null) {
 	    if (learnerProgress.isComplete()) {
-		status = "FINISHED";
+		status = "<img src='images/tick.png' />";
 	    } else if (learnerProgress.getAttemptedActivities() != null
 		    && learnerProgress.getAttemptedActivities().size() > 0) {
-		status = "STARTED";
+		status = "<img src='images/pencil.png' />";
 	    }
 	}
+	
+	
 
 	return status;
     }
@@ -603,15 +616,13 @@ public class GradeBookService implements IGradeBookService {
 	if (learnerProgress != null) {
 	    byte statusByte = learnerProgress.getProgressState(activity);
 	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED) {
-		return "ATTEMPTED";
+		return "<img src='images/pencil.png' />";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
-		return "COMPLETED";
-	    } else {
-		return "NOT ATTEMPTED";
-	    }
-	} else {
-	    return "NOT ATTEMPTED";
-	}
+		return "<img src='images/tick.png' />";
+	    } 
+	} 
+	
+	return "-";
 
     }
 

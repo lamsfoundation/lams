@@ -25,9 +25,9 @@
 			jQuery("#userView").jqGrid({
 				caption: "Learner View",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getUserViewLessonGradeBookData&lessonID=${lessonDetails.lessonID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getGradeBookUserRows&method=userView&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
-			    width: 707,
+			    width: 990,
 			    cellEdit: true,
 			    sortorder: "asc", 
 			    sortname: "fullName", 
@@ -39,7 +39,7 @@
 			    colModel:[
 			      {name:'login', index:'login', sortable:false, editable:false, hidden:true},
 			      {name:'fullName',index:'fullName', sortable:true, editable:false},
-			      {name:'status',index:'status', sortable:false, editable:false},
+			      {name:'status',index:'status', align:'center', width:30, sortable:false, editable:false},
 			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} },
 			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}}
 			    ],
@@ -49,20 +49,22 @@
 				   var subgrid_table_id;
 				   var userName = jQuery("#userView").getRowData(row_id)["login"];
 				   subgrid_table_id = subgrid_id+"_t";
-					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table>");
+					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   jQuery("#"+subgrid_table_id).jqGrid({
 					     datatype: "xml",
-					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGradeBookActivitiesForUserView&lessonID=${lessonDetails.lessonID}&login=" + userName,
+					     url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getActivityViewLessonGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
 					     height: "100%",
-					     width: 650,
+					     width: 920,
 					     cellEdit:true,
+					     pager: subgrid_table_id + "_pager",
+						 rowList:[5,10,20,30],
+						 rowNum:10,
 					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
-					     ExpandColumn: "Outputs",
 					     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Activity FeedBack', 'Mark'],
 					     colModel: [
 					       	{name:'activityId', width:10, index:'activityId', sortable:false, hidden:true},
 							{name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
-							{name:'status', width:100, index:'status', sortable:false, editable:false},
+							{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false},
 							{name:'output', width:250, index:'output', sortable:false, editable: false},
 							{name:'competences', width:250, index:'competences', sortable:false, editable: false},
 							{name:'feedback', width:250, index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}},
@@ -88,15 +90,21 @@
 						 imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images'
 					  })
 				 	}
-				});
+				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false});
+				
+
+				
 				
 				jQuery("#activityView").jqGrid({
 					caption: "Activity View",
 				    datatype: "xml",
-				    url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getActivityViewLessonGradeBookData&lessonID=${lessonDetails.lessonID}",
+				    url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getActivityViewLessonGradeBookData&method=activityView&lessonID=${lessonDetails.lessonID}",
 				    height: "100%",
-				    width: 707,
+				    width: 990,
 				    cellEdit: true,
+				    pager: "activityViewPager",
+				    rowList:[5,10,20,30],
+			    	rowNum:10,
 				    sortorder: "asc", 
 				    sortname: "activityId", 
 				    colNames:["", 'Activity Name', 'Competences', 'Average Mark'],
@@ -112,21 +120,25 @@
 					   var subgrid_table_id;
 					   var activityID = jQuery("#activityView").getRowData(row_id)["activityId"];
 					   subgrid_table_id = subgrid_id+"_t";
-						 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table>");
-						   jQuery("#"+subgrid_table_id).jqGrid({
+					   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+					   jQuery("#"+subgrid_table_id).jqGrid({
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getUserGradeBookActivitiesForActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID,
+						     url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getGradeBookUserRows&method=activityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID,
 						     height: "100%",
-						     width: 650,
+						     width: 920,
 						     cellEdit:true,
 						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=activityView&activityID=" + activityID,
-						     ExpandColumn: "Outputs",
-						     colNames: ['','Full Name','Status','Outputs', 'Activity Feedback', 'Mark'],
+						     sortorder: "asc", 
+							 sortname: "fullName", 
+							 pager: subgrid_table_id + "_pager",
+							 rowList:[5,10,20,30],
+							 rowNum:10,
+						     colNames: ['','Full Name','Progress','Outputs', 'Activity Feedback', 'Mark'],
 						     colModel:[
 						     	{name:'login', index:'login', sortable:false, editable:false, hidden:true},
 						     	{name:'fullName',index:'fullName', sortable:true, editable:false},
-						      	{name:'status',index:'status', sortable:false, editable:false},
-						      	{name:'output', index:'output', sortable:false, editable: false},
+						      	{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false},
+						      	{name:'output', width:220, index:'output', sortable:false, editable: false},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} },
 						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}}
 						     ],
@@ -159,11 +171,7 @@
 							 imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images'
 						 })
 					 }
-				})
-				
-				
-				
-				
+				}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false});
 		});
 		
 		function launchPopup(url,title) {
@@ -184,9 +192,9 @@
 		<div id="header-no-tabs"></div> <!--closes footer-->
 		<div id="content" >
 			<h1 class="no-tabs-below">GradeBook for ${lessonDetails.lessonName}</h1> 
-			<div style="width:707px; margin-left:auto; margin-right:auto;">
+			<div style="width:990px; margin-left:auto; margin-right:auto;">
 			<br />
-			<div style="width:707px; margin-left:auto; margin-right:auto;">
+			<div style="width:990px; margin-left:auto; margin-right:auto;">
 				<table id="userView" class="scroll" ></table>
 				<div id="userViewPager" class="scroll" ></div>
 				
@@ -195,7 +203,7 @@
 				<br />
 				
 				<table id="activityView" class="scroll" ></table>
-				
+				<div id="activityViewPager" class="scroll" ></div>	
 				
 			</div>
 		</div> <!-- Closes content -->

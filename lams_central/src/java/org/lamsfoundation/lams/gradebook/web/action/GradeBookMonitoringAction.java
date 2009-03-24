@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.gradebook.web.action;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -135,7 +136,7 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public ActionForward getUserViewLessonGradeBookData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward getGradeBookUserRows(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	initServices();
 	int page = WebUtil.readIntParam(request, GradeBookConstants.PARAM_PAGE);
@@ -143,12 +144,28 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	String sortOrder = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SIDX, true);
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	
+	String method = WebUtil.readStrParam(request, "method");
 
 	Lesson lesson = lessonService.getLesson(lessonID);
 
 	if (lesson != null) {
+	    
 	    // Get the user gradebook list from the db
-	    List<GBUserGridRowDTO> gradeBookUserDTOs = gradeBookService.getGradeBookLessonData(lesson);
+	    List<GBUserGridRowDTO> gradeBookUserDTOs = new ArrayList<GBUserGridRowDTO>();
+	    
+	    if (method.equals("userView")) {
+		gradeBookUserDTOs = gradeBookService.getGradeBookLessonData(lesson);
+	    } else if (method.equals("activityView")) {
+		Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+		
+		Activity activity = monitoringService.getActivityById(activityID);
+		if(activity != null) {
+		    gradeBookUserDTOs = gradeBookService.getUserGradeBookActivityDTOs(lesson, activity);
+		} else {
+		    // TODO: handle error
+		}
+	    }
 
 	    // Sort the list appropriately
 	    if (sortBy != null) {
@@ -185,10 +202,19 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 
 	    }
 
-	    String ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, page, totalPages, GradeBookUtil.GRID_TYPE_MONITOR_USER_VIEW);
+	    String ret = "";
+	    
+	    if (method.equals("userView")) {
+		ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, page, totalPages, GradeBookUtil.GRID_TYPE_MONITOR_USER_VIEW); 
+	    } else if (method.equals("activityView")) {
+		ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, page, totalPages, GradeBookUtil.GRID_TYPE_MONITOR_ACTIVITY_VIEW);
+	    }
+	    
 	    response.setContentType("text/xml");
 	    PrintWriter out = response.getWriter();
 	    out.print(ret);
+	} else {
+	    // TODO: handle error
 	}
 
 	return null;
@@ -218,34 +244,58 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	String sortOrder = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SIDX, true);
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	String method = WebUtil.readStrParam(request, "method");
 
 	Lesson lesson = lessonService.getLesson(lessonID);
 
 	if (lesson != null) {
+	    
+	    List<GradeBookGridRowDTO> gradeBookActivityDTOs = new ArrayList<GradeBookGridRowDTO>(); 
+	    
 	    // Get the user gradebook list from the db
-	    List<GradeBookGridRowDTO> gradeBookUserDTOs = gradeBookService.getActivityGradeBookUserDTOs(lesson);
-
+	    // A slightly different list is needed for userview or activity view
+	    if (method.equals("userView")) {
+		String login = WebUtil.readStrParam(request, GradeBookConstants.PARAM_LOGIN);
+		User learner = userService.getUserByLogin(login);
+		if (learner != null) {
+		    gradeBookActivityDTOs = gradeBookService.getUserGradeBookActivityDTOs(lesson, learner);
+		} else {
+		    // TODO: handle error
+		}
+	    } else if (method.equals("activityView")) {
+		gradeBookActivityDTOs = gradeBookService.getActivityGradeBookUserDTOs(lesson);
+	    }
+	    
+	    
 	    // Work out the sublist to fetch based on rowlimit and current page.
 	    int totalPages = 1;
-	    if (rowLimit < gradeBookUserDTOs.size()) {
+	    if (rowLimit < gradeBookActivityDTOs.size()) {
 
-		totalPages = new Double(Math.ceil(new Integer(gradeBookUserDTOs.size()).doubleValue()
+		totalPages = new Double(Math.ceil(new Integer(gradeBookActivityDTOs.size()).doubleValue()
 			/ new Integer(rowLimit).doubleValue())).intValue();
 		int firstRow = (page - 1) * rowLimit;
 		int lastRow = firstRow + rowLimit;
 
-		if (lastRow > gradeBookUserDTOs.size()) {
-		    gradeBookUserDTOs = gradeBookUserDTOs.subList(firstRow, gradeBookUserDTOs.size());
+		if (lastRow > gradeBookActivityDTOs.size()) {
+		    gradeBookActivityDTOs = gradeBookActivityDTOs.subList(firstRow, gradeBookActivityDTOs.size());
 		} else {
-		    gradeBookUserDTOs = gradeBookUserDTOs.subList(firstRow, lastRow);
+		    gradeBookActivityDTOs = gradeBookActivityDTOs.subList(firstRow, lastRow);
 		}
 
 	    }
-
-	    String ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, page, totalPages, GradeBookUtil.GRID_TYPE_MONITOR_ACTIVITY_VIEW);
+	    
+	    String ret = "";
+	    if (method.equals("userView")) {
+		ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, rowLimit, GradeBookUtil.GRID_TYPE_MONITOR_USER_VIEW);
+	    } else if (method.equals("activityView")){
+		ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, totalPages, GradeBookUtil.GRID_TYPE_MONITOR_ACTIVITY_VIEW);
+	    }
+	    
 	    response.setContentType("text/xml");
 	    PrintWriter out = response.getWriter();
 	    out.print(ret);
+	} else {
+	    // TODO: handle error
 	}
 
 	return null;
@@ -353,34 +403,34 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward getUserGradeBookActivitiesForActivityView(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws Exception {
-	initServices();
-	int page = WebUtil.readIntParam(request, GradeBookConstants.PARAM_PAGE);
-	int rowLimit = WebUtil.readIntParam(request, GradeBookConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SIDX, true);
-	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-
-	Lesson lesson = lessonService.getLesson(lessonID);
-	Activity activity = monitoringService.getActivityById(activityID);
-
-	if (lesson != null && activity != null) {
-	    
-	    List<GradeBookGridRowDTO> gradeBookActivityDTOs = gradeBookService.getUserGradeBookActivityDTOs(lesson, activity);
-	    String ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, rowLimit, GradeBookUtil.GRID_TYPE_MONITOR_ACTIVITY_VIEW);
-
-	    response.setContentType("text/xml");
-	    PrintWriter out = response.getWriter();
-	    out.print(ret);
-
-	} else {
-	    // Handle error
-	}
-
-	return null;
-    }
+//    public ActionForward getUserGradeBookActivitiesForActivityView(ActionMapping mapping, ActionForm form,
+//	    HttpServletRequest request, HttpServletResponse response) throws Exception {
+//	initServices();
+//	int page = WebUtil.readIntParam(request, GradeBookConstants.PARAM_PAGE);
+//	int rowLimit = WebUtil.readIntParam(request, GradeBookConstants.PARAM_ROWS);
+//	String sortOrder = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SORD);
+//	String sortBy = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SIDX, true);
+//	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+//	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+//
+//	Lesson lesson = lessonService.getLesson(lessonID);
+//	Activity activity = monitoringService.getActivityById(activityID);
+//
+//	if (lesson != null && activity != null) {
+//	    
+//	    List<GradeBookGridRowDTO> gradeBookActivityDTOs = gradeBookService.getUserGradeBookActivityDTOs(lesson, activity);
+//	    String ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, rowLimit, GradeBookUtil.GRID_TYPE_MONITOR_ACTIVITY_VIEW);
+//
+//	    response.setContentType("text/xml");
+//	    PrintWriter out = response.getWriter();
+//	    out.print(ret);
+//
+//	} else {
+//	    // Handle error
+//	}
+//
+//	return null;
+//    }
 
     private UserDTO getUser() {
 	HttpSession ss = SessionManager.getSession();

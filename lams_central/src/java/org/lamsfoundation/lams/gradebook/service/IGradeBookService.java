@@ -40,7 +40,7 @@ public interface IGradeBookService {
     
     public List<GradeBookGridRowDTO> getUserGradeBookActivityDTOs(Lesson lesson, User learner);
     
-    public List<GradeBookGridRowDTO> getUserGradeBookActivityDTOs(Lesson lesson, Activity activity);
+    public List<GBUserGridRowDTO> getUserGradeBookActivityDTOs(Lesson lesson, Activity activity);
     
     public List<GradeBookGridRowDTO> getUserGradeBookActivityDTOsActivityView(Lesson lesson, User learner);
     
