@@ -147,22 +147,6 @@
         />
 
         <property
-            name="hide"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="hide"
-        />
-
-        <property
-            name="createByAuthor"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="create_by_author"
-        />
-
-        <property
             name="createDate"
             type="java.util.Date"
             update="true"

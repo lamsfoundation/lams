@@ -24,40 +24,23 @@
 package org.lamsfoundation.lams.tool.assessment.dto;  
 
 import java.util.List;
-
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
  
-/**
- * List contains following element: <br>
- * 
- * <li>session_id</li> <li>session_name</li> <li>AssessmentQuestion.uid</li> <li>AssessmentQuestion.question_type</li> <li>
- * AssessmentQuestion.create_by_author</li> <li>AssessmentQuestion.is_hide</li> <li>AssessmentQuestion.title</li> <li>
- * User.login_name</li> <li>count(assessment_question_uid)</li>
- * 
- * @author Andrey Balan
- */
-public class UserSummaryItem {
+public class JQGridRow {
     
-    private AssessmentQuestion question;
-    private List<AssessmentQuestionResult> questionResults;
+    private Integer id; 
+    private List<String> cell;
     
-    public UserSummaryItem(AssessmentQuestion question) {
-	this.question = question;
+    public Integer getId() {
+        return id;
     }
-
-    public AssessmentQuestion getQuestion() {
-	return question;
+    public void setId(Integer id) {
+        this.id = id;
     }
-    public void setQuestion(AssessmentQuestion question) {
-	this.question = question;
+    public List<String> getCell() {
+        return cell;
     }
-
-    public List<AssessmentQuestionResult> getQuestionResults() {
-	return questionResults;
-    }
-    public void setQuestionResults(List<AssessmentQuestionResult> questionResults) {
-	this.questionResults = questionResults;
+    public void setCell(List<String> cell) {
+        this.cell = cell;
     }
 
 }

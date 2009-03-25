@@ -74,9 +74,6 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     private boolean caseSensitive;
     
     private boolean correctAnswer;
-    
-    private boolean hide;
-    private boolean isCreateByAuthor;
 
     private Date createDate;
     private AssessmentUser createBy;
@@ -358,30 +355,6 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
 
     public void setCorrectAnswer(boolean correctAnswer) {
 	this.correctAnswer = correctAnswer;
-    }
-    
-    /**
-     * @hibernate.property column="hide"
-     * @return
-     */
-    public boolean isHide() {
-	return hide;
-    }
-
-    public void setHide(boolean hide) {
-	this.hide = hide;
-    }
-
-    /**
-     * @hibernate.property column="create_by_author"
-     * @return
-     */
-    public boolean isCreateByAuthor() {
-	return isCreateByAuthor;
-    }
-
-    public void setCreateByAuthor(boolean isCreateByAuthor) {
-	this.isCreateByAuthor = isCreateByAuthor;
     }
 
     /**

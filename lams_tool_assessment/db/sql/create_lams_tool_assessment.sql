@@ -62,8 +62,6 @@ create table tl_laasse10_assessment_question (
    shuffle tinyint,
    case_sensitive tinyint,
    correct_answer tinyint DEFAULT 0,
-   hide tinyint,
-   create_by_author tinyint,
    create_date datetime,
    create_by bigint,
    assessment_uid bigint,

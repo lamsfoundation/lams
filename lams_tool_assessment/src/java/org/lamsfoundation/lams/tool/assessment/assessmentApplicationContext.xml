@@ -34,6 +34,11 @@
         </property>
     </bean>
 
+    <!-- OutputFactory -->
+	<bean id="assessmentOutputFactory" class="org.lamsfoundation.lams.tool.assessment.service.AssessmentOutputFactory">  
+    	<property name="toolMessageService"><ref bean="messageService"/></property>  
+	</bean> 
+	
     <!-- core beans -->
     <bean id="assessmentDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentDAOHibernate">
         <property name="sessionFactory">
@@ -131,6 +136,9 @@
 		<property name="lessonService">
    			<ref bean="lessonService"/>
    		</property>
+   		<property name="assessmentOutputFactory">
+   			<ref bean="assessmentOutputFactory"/>
+   		</property> 
 				
     </bean>
 

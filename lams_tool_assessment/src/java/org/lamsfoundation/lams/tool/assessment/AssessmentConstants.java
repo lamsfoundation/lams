@@ -163,6 +163,8 @@ public class AssessmentConstants {
     public static final String ATTR_USER_SUMMARY = "userSummary";
     
     public static final String ATTR_QUESTION_SUMMARY = "questionSummary";
+    
+    public static final String ATTR_QUESTION_SUMMARY_LIST = "questionSummaryList";
 
     public static final String ATTR_USER_LIST = "userList";
 

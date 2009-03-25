@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.assessment.dto;
 import java.util.Date;
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
  
 /**

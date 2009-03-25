@@ -1196,8 +1196,6 @@ public class AuthoringAction extends Action {
 
 	question.setTitle(questionForm.getTitle());
 	question.setQuestion(questionForm.getQuestion());
-	question.setCreateByAuthor(true);
-	question.setHide(false);
 	
 	question.setDefaultGrade(Integer.parseInt(questionForm.getDefaultGrade()));
 	question.setGeneralFeedback(questionForm.getGeneralFeedback());

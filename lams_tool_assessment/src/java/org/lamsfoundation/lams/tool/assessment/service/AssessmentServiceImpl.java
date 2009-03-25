@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -129,6 +128,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private AssessmentToolContentHandler assessmentToolContentHandler;
 
     private MessageService messageService;
+    
+    private AssessmentOutputFactory assessmentOutputFactory;
 
     // system services
     private IRepositoryService repositoryService;
@@ -308,80 +309,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	questions.addAll(session.getAssessmentQuestions());
 
 	return questions;
-    }
-
-    public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
-	AssessmentSession session = assessmentSessionDao.getSessionBySessionId(sessionId);
-	if (session == null) {
-	    AssessmentServiceImpl.log.error("Failed get AssessmentSession by ID [" + sessionId + "]");
-	    return null;
-	}
-	// initial assessment questions list
-	List<Summary> questionList = new ArrayList();
-//	Set<AssessmentQuestion> resList = session.getAssessment().getQuestions();
-//	for (AssessmentQuestion question : resList) {
-//	    if (skipHide && question.isHide()) {
-//		continue;
-//	    }
-//	    // if question is create by author
-//	    if (question.isCreateByAuthor()) {
-//		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question, false);
-//		questionList.add(sum);
-//	    }
-//	}
-//
-//	// get this session's all assessment questions
-//	Set<AssessmentQuestion> sessList = session.getAssessmentQuestions();
-//	for (AssessmentQuestion question : sessList) {
-//	    if (skipHide && question.isHide()) {
-//		continue;
-//	    }
-//
-//	    // to skip all question create by author
-//	    if (!question.isCreateByAuthor()) {
-//		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question, false);
-//		questionList.add(sum);
-//	    }
-//	}
-
-	return questionList;
-    }
-
-    public List<List<Summary>> exportByContentId(Long contentId) {
-	Assessment assessment = assessmentDao.getByContentId(contentId);
-	List<List<Summary>> groupList = new ArrayList();
-
-//	// create init assessment questions list
-//	List<Summary> initList = new ArrayList();
-//	groupList.add(initList);
-//	Set<AssessmentQuestion> resList = assessment.getQuestions();
-//	for (AssessmentQuestion question : resList) {
-//	    if (question.isCreateByAuthor()) {
-//		Summary sum = new Summary(null, null, question, true);
-//		initList.add(sum);
-//	    }
-//	}
-//
-//	// session by session
-//	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
-//	for (AssessmentSession session : sessionList) {
-//	    List<Summary> group = new ArrayList<Summary>();
-//	    // get this session's all assessment questions
-//	    Set<AssessmentQuestion> sessList = session.getAssessmentQuestions();
-//	    for (AssessmentQuestion question : sessList) {
-//		// to skip all question create by author
-//		if (!question.isCreateByAuthor()) {
-//		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), question, false);
-//		    group.add(sum);
-//		}
-//	    }
-//	    if (group.size() == 0) {
-//		group.add(new Summary(session.getSessionId(), session.getSessionName(), null, false));
-//	    }
-//	    groupList.add(group);
-//	}
-
-	return groupList;
     }
 
     public Assessment getAssessmentBySessionId(Long sessionId) {
@@ -620,8 +547,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    summary.setAssessmentResults(assessmentResults);
 	    summaryList.add(summary);
 	}
+	
+	escapeQuotes(summaryList);
 
 	return summaryList;
+    }
+    
+    public AssessmentResult getUserMasterDetail(Long sessionId, Long userId) {
+	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId, userId);
+	SortedSet questionResults = new TreeSet(new AssessmentQuestionResultComparator());
+	questionResults.addAll(lastFinishedResult.getQuestionResults());
+	lastFinishedResult.setQuestionResults(questionResults);
+	escapeQuotes(lastFinishedResult);
+
+	return lastFinishedResult;
     }
     
     public UserSummary getUserSummary(Long contentId, Long userId, Long sessionId) {
@@ -631,7 +570,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	List<AssessmentResult> results = assessmentResultDao.getAssessmentResultsBySession(sessionId, userId);
 	userSummary.setNumberOfAttempts(results.size());
 	
-	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResult(sessionId, userId);
+	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId, userId);
 	long timeTaken = (lastFinishedResult == null) ? 0 : (lastFinishedResult.getFinishDate().getTime() - lastFinishedResult.getStartDate().getTime()); 
 	userSummary.setTimeOfLastAttempt(new Date(timeTaken));
 	if (lastFinishedResult != null) {
@@ -659,6 +598,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    userSummaryItems.add(userSummaryItem);
 	}
 	userSummary.setUserSummaryItems(userSummaryItems);
+	
+	escapeQuotes(userSummary);
 
 	return userSummary;
     }
@@ -711,6 +652,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	float averageMark = (count == 0) ? 0 : total/count;
 	questionSummary.setAverageMark(averageMark);
 	
+	escapeQuotes(questionSummary);
+	
 	return questionSummary;
     }
     
@@ -732,6 +675,67 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // *****************************************************************************
     // private methods
     // *****************************************************************************
+    
+    private static void escapeQuotes(Object object) {
+	if (object instanceof UserSummary) {
+	    UserSummary userSummary = (UserSummary) object;
+	    for (UserSummaryItem userSummaryItem : userSummary.getUserSummaryItems()) {
+		for (AssessmentQuestionResult questionResult : userSummaryItem.getQuestionResults()) {
+		    escapeQuotesInQuestionResult(questionResult);
+		}
+	    }
+	} else if (object instanceof QuestionSummary) {
+	    QuestionSummary questionSummary = (QuestionSummary) object;
+
+	    for (List<AssessmentQuestionResult> sessionQuestionResults : questionSummary.getQuestionResultsPerSession()) {
+		for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
+		    escapeQuotesInQuestionResult(questionResult);
+		}
+	    }
+	} else if (object instanceof List) {
+	    List<Summary> summaryList = (List<Summary>) object;
+
+	    for (Summary summary : summaryList) {
+		for (AssessmentResult result : summary.getAssessmentResults()) {
+		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+			escapeQuotesInQuestionResult(questionResult);
+		    }
+		}
+	    }
+	} else if (object instanceof AssessmentResult) {
+	    AssessmentResult assessmentResult = (AssessmentResult) object;
+
+	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+		escapeQuotesInQuestionResult(questionResult);
+	    }
+	}
+    }
+    
+    private static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
+	String answerString = questionResult.getAnswerString();
+	if (answerString != null) {
+	    questionResult.setAnswerString(answerString.replaceAll("[\"]", "&quot;"));
+	}
+
+	AssessmentQuestion question = questionResult.getAssessmentQuestion();
+	String title = question.getTitle();
+	if (title != null) {
+	    question.setTitle(title.replaceAll("[\"]", "&quot;"));
+	}
+
+	for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
+	    String questionStr = questionOption.getQuestion();
+	    if (questionStr != null) {
+		questionOption.setQuestion(questionStr.replaceAll("[\"]", "&quot;"));
+	    }
+
+	    String optionStr = questionOption.getOptionString();
+	    if (optionStr != null) {
+		questionOption.setOptionString(optionStr.replaceAll("[\"]", "&quot;"));
+	    }
+	}
+    }
+    
     private Assessment getDefaultAssessment() throws AssessmentApplicationException {
 	Long defaultAssessmentId = getToolDefaultContentIdBySignature(AssessmentConstants.TOOL_SIGNATURE);
 	Assessment defaultAssessment = getAssessmentByContentId(defaultAssessmentId);
@@ -922,7 +926,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	if (assessment == null) {
+	    assessment = getDefaultAssessment();
+	}
+	return getAssessmentOutputFactory().getToolOutputDefinitions(assessment);
     }
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
@@ -1038,7 +1046,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
      *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return assessmentOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     /**
@@ -1048,7 +1056,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
      *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	return assessmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
@@ -1106,6 +1114,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
+    }
+    
+    public AssessmentOutputFactory getAssessmentOutputFactory() {
+	return assessmentOutputFactory;
+    }
+
+    public void setAssessmentOutputFactory(AssessmentOutputFactory assessmentOutputFactory) {
+	this.assessmentOutputFactory = assessmentOutputFactory;
     }
 
     public ILessonService getLessonService() {

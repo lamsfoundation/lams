@@ -197,9 +197,7 @@ public class LearningAction extends Action {
 		if (question.getCreateBy() != null) {
 		    question.getCreateBy().getLoginName();
 		}
-		if (!question.isHide()) {
-		    questionList.add(question);
-		}
+		questionList.add(question);
 	    }
 	}
 

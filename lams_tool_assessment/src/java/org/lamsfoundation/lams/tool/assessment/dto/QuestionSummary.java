@@ -23,12 +23,10 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.assessment.dto;  
 
-import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
  
 /**
  * List contains following element: <br>

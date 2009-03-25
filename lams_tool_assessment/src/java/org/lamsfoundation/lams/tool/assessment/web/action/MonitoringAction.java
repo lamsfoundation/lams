@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -38,6 +39,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.tool.assessment.dto.JQGridJSONModel;
+import org.lamsfoundation.lams.tool.assessment.dto.JQGridRow;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
@@ -66,6 +69,9 @@ public class MonitoringAction extends Action {
 	if (param.equals("summary")) {
 	    return summary(mapping, form, request, response);
 	}
+	if (param.equals("userMasterDetail")) {
+	    return userMasterDetail(mapping, form, request, response);
+	}
 	if (param.equals("questionSummary")) {
 	    return questionSummary(mapping, form, request, response);
 	}
@@ -89,14 +95,6 @@ public class MonitoringAction extends Action {
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	IAssessmentService service = getAssessmentService();
 	List<Summary> summaryList = service.getSummaryList(contentId);
-	
-	for (Summary summary : summaryList) {
-	    for (AssessmentResult result : summary.getAssessmentResults()) {
-		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-		    escapeQuotesInQuestionResult(questionResult);
-		}
-	    }
-	}
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	assessment.toDTO();
@@ -108,6 +106,43 @@ public class MonitoringAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
 		AttributeNames.PARAM_CONTENT_FOLDER_ID));	
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+    
+    private ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
+	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
+	IAssessmentService service = getAssessmentService();
+	AssessmentResult result = service.getUserMasterDetail(sessionId, userId);
+	
+//	// Construct the json data
+//	JQGridJSONModel json = new JQGridJSONModel(); 
+//	json.setPage("1"); 
+//	int records = (result.getQuestionResults() == null) ? 0 : result.getQuestionResults().size();
+//	json.setRecords(records); 
+//	json.setTotal("1");
+//	
+//	List<JQGridRow> rows = new ArrayList<JQGridRow>(); 
+//	     
+//	for (AssessmentQuestionResult questionResult : result.getQuestionResults()) { 
+//	  JQGridRow row = new JQGridRow(); 
+//	  row.setId(questionResult.getAssessmentQuestion().getSequenceId()); 
+//	  List<String> cells = new ArrayList<String>(); 
+//	  cells.add(questionResult.getUid().toString()); 
+//	  cells.add(questionResult.getFinishDate().toString()); 
+//	  cells.add(questionResult.getAnswerString());
+//	  cells.add(questionResult.getMark().toString());
+//	  row.setCell(cells); 
+//	  rows.add(row); 
+//	} 
+//	json.setRows(rows);
+//
+//	JSONSerializer serializer = new JSONSerializer(); 
+//	String jsonResult = serializer.exclude("*.class").deepSerialize(json); 
+	
+	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
+
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
@@ -125,12 +160,6 @@ public class MonitoringAction extends Action {
 	IAssessmentService service = getAssessmentService();
 	QuestionSummary questionSummary = service.getQuestionSummary(contentId, questionUid);
 	
-	for (List<AssessmentQuestionResult> sessionQuestionResults : questionSummary.getQuestionResultsPerSession()) {
-	    for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
-		escapeQuotesInQuestionResult(questionResult);
-	    }
-	}
-	
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_SUMMARY, questionSummary);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
@@ -146,12 +175,6 @@ public class MonitoringAction extends Action {
 	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
 	IAssessmentService service = getAssessmentService();
 	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
-	
-	for (UserSummaryItem userSummaryItem : userSummary.getUserSummaryItems()) {
-	    for (AssessmentQuestionResult questionResult : userSummaryItem.getQuestionResults()) {
-		escapeQuotesInQuestionResult(questionResult);
-	    }
-	}
 	
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
@@ -179,29 +202,5 @@ public class MonitoringAction extends Action {
 		.getServletContext());
 	return (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
     }
-    
-    private void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
-	String answerString = questionResult.getAnswerString();
-	if (answerString != null) {
-	    questionResult.setAnswerString(answerString.replaceAll("[\"]", "&quot;"));
-	}
 
-	AssessmentQuestion question = questionResult.getAssessmentQuestion();
-	String title = question.getTitle();
-	if (title != null) {
-	    question.setTitle(title.replaceAll("[\"]", "&quot;"));
-	}
-
-	for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
-	    String questionStr = questionOption.getQuestion();
-	    if (questionStr != null) {
-		questionOption.setQuestion(questionStr.replaceAll("[\"]", "&quot;"));
-	    }
-
-	    String optionStr = questionOption.getOptionString();
-	    if (optionStr != null) {
-		questionOption.setOptionString(optionStr.replaceAll("[\"]", "&quot;"));
-	    }
-	}
-    }
 }

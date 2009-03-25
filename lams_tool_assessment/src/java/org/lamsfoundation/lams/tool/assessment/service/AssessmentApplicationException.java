@@ -23,7 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.assessment.service;
 
-public class AssessmentApplicationException extends Exception {
+public class AssessmentApplicationException extends RuntimeException {
+
+    private static final long serialVersionUID = -6341565277044152316L;
 
     public AssessmentApplicationException() {
 	super();

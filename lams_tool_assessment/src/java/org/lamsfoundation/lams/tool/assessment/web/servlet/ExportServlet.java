@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.assessment.web.servlet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -38,14 +39,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceProxy;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentBundler;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -95,6 +101,16 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 		+ request.getContextPath();
+	
+	// Attempting to export required js and image files
+	try {
+	    AssessmentBundler imageBundler = new AssessmentBundler();
+	    imageBundler.bundle(request, cookies, directoryName);
+	} catch (Exception e) {
+	    logger.error(
+		    "Could not export spreadsheet javascript files, some files may be missing in export portfolio", e);
+	}
+	
 	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
 		directoryName, FILENAME, cookies);
 
@@ -146,17 +162,18 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error(error);
 	    throw new AssessmentApplicationException(error);
 	}
+	
+	AssessmentSession session = service.getAssessmentSessionBySessionId(toolSessionID);
+	if (session == null) {
+	    String error = "Failed get AssessmentSession by ID [" + toolSessionID + "]";
+	    logger.error(error);
+	    throw new AssessmentApplicationException(error);
+	}
 
-	List<Summary> group = service.exportBySessionId(toolSessionID, true);
-	saveFileToLocal(group, directoryName);
+	UserSummary userSummary = service.getUserSummary(content.getContentId(), userID, toolSessionID);
 
-	List<List> groupList = new ArrayList<List>();
-	if (group.size() > 0)
-	    groupList.add(group);
-
-	sessionMap.put(AssessmentConstants.ATTR_TITLE, content.getTitle());
-	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, content.getInstructions());
-	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, groupList);
+	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, content);
+	sessionMap.put(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
     }
 
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName,
@@ -176,48 +193,20 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error(error);
 	    throw new AssessmentApplicationException(error);
 	}
-	List<List<Summary>> groupList = service.exportByContentId(toolContentID);
-	if (groupList != null) {
-	    for (List<Summary> list : groupList) {
-		saveFileToLocal(list, directoryName);
-	    }
+	
+	List<Summary> summaryList = service.getSummaryList(toolContentID);
+	
+	ArrayList<QuestionSummary> questionSummaryList = new ArrayList<QuestionSummary>();
+	Set<AssessmentQuestion> questions = content.getQuestions();
+	for (AssessmentQuestion question : questions) {
+	    QuestionSummary questionSummary = service.getQuestionSummary(toolContentID, question.getUid());
+	    questionSummaryList.add(questionSummary);
 	}
 
-	// put it into HTTPSession
-	sessionMap.put(AssessmentConstants.ATTR_TITLE, content.getTitle());
-	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, content.getInstructions());
-	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, groupList);
-    }
-
-    private void saveFileToLocal(List<Summary> list, String directoryName) {
-	handler = getToolContentHandler();
-	for (Summary summary : list) {
-	    // for learning object, it just display "No offlice pakcage avaliable" information.
-//	    if (summary.getQuestionType() == AssessmentConstants.QUESTION_TYPE_FILL_THE_GAP
-//		    || summary.getQuestionType() == AssessmentConstants.QUESTION_TYPE_CHOICE)
-//		continue;
-//	    try {
-//		int idx = 1;
-//		String userName = summary.getUsername();
-//		String localDir;
-//		while (true) {
-//		    localDir = FileUtil.getFullPath(directoryName, userName + "/" + idx);
-//		    File local = new File(localDir);
-//		    if (!local.exists()) {
-//			local.mkdirs();
-//			break;
-//		    }
-//		    idx++;
-//		}
-//		summary.setAttachmentLocalUrl(userName + "/" + idx + "/" + summary.getFileUuid() + '.'
-//			+ FileUtil.getFileExtension(summary.getFileName()));
-//		handler.saveFile(summary.getFileUuid(), FileUtil.getFullPath(directoryName, summary
-//			.getAttachmentLocalUrl()));
-//	    } catch (Exception e) {
-//		logger.error("Export forum topic attachment failed: " + e.toString());
-//	    }
-	}
-
+	// cache into sessionMap
+	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, content);	
+	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, summaryList);
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_SUMMARY_LIST, questionSummaryList);
     }
 
     private AssessmentToolContentHandler getToolContentHandler() {

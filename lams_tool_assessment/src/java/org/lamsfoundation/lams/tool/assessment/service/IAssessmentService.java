@@ -200,6 +200,8 @@ public interface IAssessmentService {
      */
     List<Summary> getSummaryList(Long contentId);
     
+    AssessmentResult getUserMasterDetail(Long sessionId, Long userId);
+    
     /**
      * Return user summary. This summary contains list of all attempts made by user.
      * 
@@ -212,19 +214,6 @@ public interface IAssessmentService {
     QuestionSummary getQuestionSummary(Long contentId, Long questionUid);
     
     void changeQuestionResultMark(Long questionResultUid, float newMark);
-
-    /**
-     * Get assessment question <code>Summary</code> list according to sessionId and skipHide flag.
-     * 
-     * @param sessionId
-     * @param skipHide
-     *            true, don't get assessment question if its <code>isHide</code> flag is true. Otherwise, get all assessment
-     *            question
-     * @return
-     */
-    public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
-
-    public List<List<Summary>> exportByContentId(Long contentId);
 
     /**
      * Get user by UID

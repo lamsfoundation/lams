@@ -1,21 +1,18 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-		"http://www.w3.org/TR/html4/loose.dtd">
-
-<%@ include file="/common/taglibs.jsp"%>
-
 <lams:html>
 	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+		<title><fmt:message key="export.title" /></title>
+		<lams:css localLinkPath="../"/>
+
+		<c:set var="lams">	<lams:LAMSURL /></c:set>
+		<c:set var="userSummary" value="${sessionMap.userSummary}"/>
 		<c:set var="assessment" value="${sessionMap.assessment}"/>
 		
-		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jqGrid.grid.css'/>" />
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
+		<link rel="stylesheet" type="text/css" href="./javascript/css/jqGrid.grid.css" />
+		<script type="text/javascript" src="./javascript/jquery-1.2.6.pack.js"></script>
 		<script type="text/javascript"> 
-			var pathToJsFolder = "<html:rewrite page='/includes/javascript/'/>"; 
+			var pathToJsFolder = "./javascript/"; 
 		</script>
-	 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jqGrid.js'/>"></script>
+	 	<script type="text/javascript" src="./javascript/jquery.jqGrid.js"></script>
 
   	    <script>
   	    	<!--
@@ -30,37 +27,20 @@
 	  					shrinkToFit: true,
 	  					
 	  				   	colNames:['<fmt:message key="label.monitoring.user.summary.attempt" />',
-	  							'questionResultUid',
 	  							'<fmt:message key="label.monitoring.user.summary.time" />',
 	  							'<fmt:message key="label.monitoring.user.summary.response" />',
 	  						    '<fmt:message key="label.monitoring.user.summary.grade" />'],
 	  						    
 	  				   	colModel:[
 	  				   		{name:'id', index:'id', width:55, sorttype:"int"},
-	  				   		{name:'questionResultUid', index:'questionResultUid', width:0},
 	  				   		{name:'time', index:'time', width:150, sorttype:'date', datefmt:'Y-m-d'},
 	  				   		{name:'response', index:'response', width:200, sortable:false},
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }		
 	  				   	],
 	  				   	
-	  				   	imgpath:  "<html:rewrite page='/includes/images/'/>" + "jqGrid.basic.theme", 
+	  				   	imgpath:  "./javascript/images/jqGrid.basic.theme", 
 	  				   	multiselect: false,
-	  				   	caption: "${question.title}",
-	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
-	  				  	cellEdit: true,
-	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
-	  				  		if (isNaN(val)) {
-	  				  			jQuery("#user${question.uid}").restoreCell(iRow,iCol); 
-	  				  		}
-  						},	  		
-	  				  	beforeSubmitCell : function (rowid,name,val,iRow,iCol){
-	  				  		if (isNaN(val)) {
-	  				  			return {nan:true};
-	  				  		} else {
-	  							var questionResultUid = jQuery("#user${question.uid}").getCell(rowid, 'questionResultUid');
-	  							return {questionResultUid:questionResultUid};		  				  		
-	  				  		}
-	  					}
+	  				   	caption: "${question.title}"
   						/*  resetSelection() doesn't work in this version
 						    hope it'll be fixed in the next one
 						    
@@ -71,14 +51,13 @@
 	  					onCellSelect: function (rowid, iCol, cellcontent){
 	  						jQuery("#user${question.uid+1}").resetSelection();
 	  					}*/ 	  				  	
-	  				}).hideCol("questionResultUid");
+	  				});
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
 	  	   	        	var responseStr = "";
 	  	   	       		<%@ include file="userresponse.jsp"%>
 	  	   	     		jQuery("#user${question.uid}").addRowData(${i.index + 1}, {
 	  	   	   	     		id:"${i.index + 1}",
-	  	   	   	   			questionResultUid:"${questionResult.uid}",
 	  	   	   	   			time:"${questionResult.finishDate}",
 	  	   	   	   			response:responseStr,
 	  	   	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
@@ -86,25 +65,21 @@
 	  		        </c:forEach>			
 	  				
 	  			</c:forEach>
-	  		});  	    	
-
-    		function refreshSummaryPage()  { 
-    			self.parent.window.parent.location.href = "<c:url value="/monitoring/summary.do"/>?toolContentID=${sessionMap.toolContentID}&contentFolderID=${sessionMap.contentFolderID}";
-    		}
+	  		});  	
   			-->
   		</script>
 		
 		
 	</lams:head>
 	
-	<body class="stripes" onload="parent.resizeIframe();">
+	<body class="stripes" >
 		<div id="content" >
 		
-			<h1>
-				<fmt:message key="label.monitoring.user.summary.history.responses" />
-			</h1>
+			<h1>${assessment.title} </h1>
+			
+			<h2>${assessment.instructions} </h2>
+			
 			<br><br>		
-			<%@ include file="/common/messages.jsp"%>
 			
 			<table class="forum" style="background:none; border: 1px solid #cacdd1; margin-bottom:60px; padding-top:0px; margin-bottom: 10px;" cellspacing="0">
 				<tr>
@@ -171,13 +146,6 @@
 				</div>	
 			</c:forEach>	
 
-
-			<lams:ImgButtonWrapper>
-				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:40px; padding-top:5px;">
-					<fmt:message key="label.monitoring.user.summary.ok" /> 
-				</a>
-			</lams:ImgButtonWrapper>
-
 		</div>
 		<!--closes content-->
 	
@@ -187,3 +155,4 @@
 		
 	</body>
 </lams:html>
+	

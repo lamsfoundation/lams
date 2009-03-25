@@ -39,14 +39,33 @@
 			   	multiselect: false,
 			   	caption: "${summary.sessionName}",
 			   	ondblClickRow: function(rowid) {
-				   	
 			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
 			   		var sessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
 					var userSummaryUrl = '<c:url value="/monitoring/userSummary.do?sessionMapID=${sessionMapID}"/>';
 					var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&height=540&width=650&modal=true";
 					$("#userSummaryHref").attr("href", newUserSummaryHref);	
 					$("#userSummaryHref").click(); 		
-			  	} 
+			  	},
+			  	onSelectRow: function(rowid) { 
+			  	    if(rowid == null) { 
+			  	    	rowid=0; 
+			  	    } 
+			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
+			   		var sessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
+					var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
+					//userMasterDetailUrl += "?userID=" + userId + "&sessionId=" + sessionId;
+		  	        jQuery("#userSummary${summary.sessionId}").clearGridData().setGridParam({gridstate: "visible",caption:"ss"}).trigger("reloadGrid");
+		  	   //   jQuery("#userSummary${summary.sessionId}").setGridParam({caption:"ss"});
+		  	     // jQuery("#userSummary${summary.sessionId}").trigger("reloadGrid");
+		  	        $("#masterDetailArea").load(
+		  	        	userMasterDetailUrl,
+		  	        	{
+		  	        		userID: userId,
+		  	        		sessionId: sessionId
+		  	       		}
+		  	       	);
+				  	        
+	  	  		} 
 			}).hideCol("userId").hideCol("sessionId");
 			
    	        <c:forEach var="assessmentResult" items="${summary.assessmentResults}" varStatus="i">
@@ -54,7 +73,7 @@
    	   	     		id:"${i.index + 1}",
    	   	     		userId:"${assessmentResult.user.userId}",
    	   	     		sessionId:"${assessmentResult.user.session.sessionId}",
-   	   	     		userName:"${assessmentResult.user.loginName}",
+   	   	     		userName:"${assessmentResult.user.lastName}, ${assessmentResult.user.firstName}",
 		   	   	  	<c:choose>
 		   	   			<c:when test="${not empty assessmentResult.questionResults}">
 				   	        <c:forEach var="questionResult" items="${assessmentResult.questionResults}">
@@ -70,7 +89,49 @@
    	   	     		
    	   	     		total:"<fmt:formatNumber value='${assessmentResult.grade}' maxFractionDigits='3'/>"
    	   	   	    });
-	        </c:forEach>			
+	        </c:forEach>		
+
+			jQuery("#userSummary${summary.sessionId}").jqGrid({
+				datatype: "local",
+				
+				hiddengrid: true,
+				height: 90,
+				width: 530,
+				shrinkToFit: false,
+				
+			   	colNames:['#',
+						'questionResultUid',
+  						'Question',
+  						'<fmt:message key="label.monitoring.user.summary.response" />',
+  						'<fmt:message key="label.monitoring.user.summary.grade" />'],
+					    
+			   	colModel:[
+	  			   		{name:'id', index:'id', width:25, sorttype:"int"},
+	  			   		{name:'questionResultUid', index:'questionResultUid', width:0},
+	  			   		{name:'title', index:'title', width:200},
+	  			   		{name:'response', index:'response', width:200, sortable:false},
+	  			   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }
+			   	],
+			   	
+			   	imgpath:  pathToImageFolder + "jqGrid.basic.theme", 
+			   	multiselect: false,
+			   	caption: "User summary",
+				cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
+  				cellEdit: true,
+  				afterSaveCell : function (rowid,name,val,iRow,iCol){
+  					if (isNaN(val)) {
+  						jQuery("#userSummary${summary.sessionId}").restoreCell(iRow,iCol); 
+  					}
+				},	  		
+  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
+  					if (isNaN(val)) {
+  						return {nan:true};
+  					} else {
+  						var questionResultUid = jQuery("#userSummary${summary.sessionId}").getCell(rowid, 'questionResultUid');
+  						return {questionResultUid:questionResultUid};		  				  		
+  				  	}
+  				}
+			}).hideCol("questionResultUid");	
 			
 		</c:forEach>
 
@@ -82,14 +143,6 @@
 			$("#questionSummaryHref").click(); 		 
 	    }); 
 	});
-/*
-	function createQuestionSummaryHref() {
-
-	};
-*/
-	function updateRowData(rowid){   
-		jQuery("#list").setRowData( rowid, { tax:"5", total:"205" }) 
-	};
 	
 	function refreshThickbox(){   
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
@@ -114,24 +167,6 @@
 		}
 	};
 	window.onresize = resizeIframe;
-
-	/*
-	function resizeIframe() {
-		
-		    var width = this.window.innerWidth;
-		    alert(width);
-		    if ( width == undefined || width == 0 ) {
-		    	// IE doesn't use window.innerWidth.
-		    	width = document.documentElement.clientWidth;
-		    	// alert("using clientWidth");
-		    }
-			alert("doc width "+width);
-			var newWidth = width * 0.8;
-			
-		    jQuery("#list4").setGridWidth(newWidth, true);
-	};
-	window.onresize = resizeIframe;	
-	*/
 	-->		
 </script>
 
@@ -146,10 +181,13 @@
 	</c:when>
 	<c:otherwise>
 	
+		<div id="masterDetailArea">
+			<%@ include file="parts/masterDetailLoadUp.jsp"%>
+		</div>
+	
 		<a onclick="" href="return false;" class="thickbox" id="userSummaryHref" style="display: none;"></a>	
 	
 		<!-- Dropdown menu for choosing a question type -->
-	
 		<div style="padding-left: 30px; margin-bottom: 50px; margin-top: 15px;">	
 			<div style="margin-bottom: 5px; font-size: small;">
 				<fmt:message key="label.monitoring.summary.results.question" />
@@ -163,11 +201,6 @@
 			</select>
 			
 			<a onclick="" href="return false;" class="thickbox" id="questionSummaryHref" style="display: none;"></a>
-			<!--
-			<a onclick="createQuestionSummaryHref();return false;" href="" class="button space-left thickbox" id="questionSummaryHref">  
-				<fmt:message key="label.monitoring.summary.see.results" />
-			</a>
-			-->
 		</div>
 		
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">
@@ -177,6 +210,9 @@
 				</div>
 				
 				<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+				<div style="margin-top: 10px;">
+					<table id="userSummary${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+				</div>
 			</div>	
 		</c:forEach>	
 	
