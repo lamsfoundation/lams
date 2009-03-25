@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,19 +67,11 @@ public class GradeBookService implements IGradeBookService {
     private IGradeBookDAO gradeBookDAO;
 
     /**
-     * Gets a list of GradeBookGridRowDTO for a given lesson and learner
-     * 
-     * The result should be used for the "user view" of gradebook, where users
-     * are listed, then expanding a sub-grid will bring up the activites
-     * 
-     * the mark applies to the ebture kessib
-     * 
-     * @param lesson
-     * @param learner
-     * @return Collection<GradeBookGridRow>
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBActivityRowsForLearner(org.lamsfoundation.lams.lesson.Lesson,
+     *      org.lamsfoundation.lams.usermanagement.User)
      */
     @SuppressWarnings("unchecked")
-    public List<GradeBookGridRowDTO> getUserGradeBookActivityDTOs(Lesson lesson, User learner) {
+    public List<GradeBookGridRowDTO> getGBActivityRowsForLearner(Lesson lesson, User learner) {
 
 	logger.debug("Getting gradebook user data for lesson: " + lesson.getLessonId() + ". For user: "
 		+ learner.getUserId());
@@ -119,19 +110,11 @@ public class GradeBookService implements IGradeBookService {
     }
 
     /**
-     * Gets a list of GradeBookGridRowDTO for a given lesson and learner
-     * 
-     * The result should be used for the "user view" of gradebook, where users
-     * are listed, then expanding a sub-grid will bring up the activites
-     * 
-     * the mark applies to the activity
-     * 
-     * @param lesson
-     * @param learner
-     * @return Collection<GradeBookGridRow>
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBUserRowsForActivity(org.lamsfoundation.lams.lesson.Lesson,
+     *      org.lamsfoundation.lams.learningdesign.Activity)
      */
     @SuppressWarnings("unchecked")
-    public List<GBUserGridRowDTO> getUserGradeBookActivityDTOs(Lesson lesson, Activity activity) {
+    public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, Activity activity) {
 
 	List<GBUserGridRowDTO> gradeBookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 
@@ -151,7 +134,6 @@ public class GradeBookService implements IGradeBookService {
 		LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
 			.getLessonId());
 		gUserDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
-
 
 		// Set the outputs and activity url, if there is one
 		if (activity.isToolActivity() && activity instanceof ToolActivity) {
@@ -184,59 +166,10 @@ public class GradeBookService implements IGradeBookService {
     }
 
     /**
-     * Gets the user gradebook and outputs data for a given lesson, which is a
-     * list of GBActivityGridRowDTO, this one is specifically for the user view
-     * 
-     * @param lesson
-     * @param learner
-     * @return Collection<GradeBookGridRow>
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBActivityRowsForLesson(org.lamsfoundation.lams.lesson.Lesson)
      */
     @SuppressWarnings("unchecked")
-    public List<GradeBookGridRowDTO> getUserGradeBookActivityDTOsActivityView(Lesson lesson, User learner) {
-
-	logger.debug("Getting gradebook user data for lesson: " + lesson.getLessonId() + ". For user: "
-		+ learner.getUserId());
-
-	List<GradeBookGridRowDTO> gradeBookActivityDTOs = new ArrayList<GradeBookGridRowDTO>();
-
-	LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
-		.getLessonId());
-
-	Set<Activity> activities = (Set<Activity>) lesson.getLearningDesign().getActivities();
-
-	/*
-	 * Hibernate CGLIB is failing to load the first activity in
-	 * the sequence as a ToolActivity for some mysterious reason
-	 * Causes a ClassCastException when you try to cast it, even
-	 * if it is a ToolActivity.
-	 * 
-	 * THIS IS A HACK to retrieve the first tool activity 
-	 * manually so it can be cast as a ToolActivity - if it is one
-	 */
-	Activity firstActivity = monitoringService.getActivityById(lesson.getLearningDesign().getFirstActivity()
-		.getActivityId());
-
-	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
-	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(firstActivity, learner, learnerProgress);
-	    gradeBookActivityDTOs.add(activityDTO);
-	}
-
-	for (Activity activity : activities) {
-	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()) {
-		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(activity, learner, learnerProgress);
-		gradeBookActivityDTOs.add(activityDTO);
-	    }
-	}
-	return gradeBookActivityDTOs;
-    }
-
-    /**
-     * Given a lesson, this method returns the GBUserGridRowDTO for act
-     * 
-     * @param lesson
-     * @return
-     */
-    public List<GradeBookGridRowDTO> getActivityGradeBookUserDTOs(Lesson lesson) {
+    public List<GradeBookGridRowDTO> getGBActivityRowsForLesson(Lesson lesson) {
 
 	logger.debug("Getting gradebook data for lesson: " + lesson.getLessonId());
 
@@ -273,12 +206,148 @@ public class GradeBookService implements IGradeBookService {
     }
 
     /**
-     * Gets the gradebook data for a user for a given activity and lesson
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBUserRowsForLesson(org.lamsfoundation.lams.lesson.Lesson)
+     */
+    @SuppressWarnings("unchecked")
+    public ArrayList<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson) {
+
+	ArrayList<GBUserGridRowDTO> gradeBookUserDTOs = new ArrayList<GBUserGridRowDTO>();
+
+	if (lesson != null) {
+	    Set<User> learners = (Set<User>) lesson.getAllLearners();
+
+	    if (learners != null) {
+
+		for (User learner : learners) {
+		    GBUserGridRowDTO gradeBookUserDTO = new GBUserGridRowDTO();
+		    gradeBookUserDTO.setLogin(learner.getLogin());
+		    gradeBookUserDTO.setFirstName(learner.getFirstName());
+		    gradeBookUserDTO.setLastName(learner.getLastName());
+
+		    // Setting the status for the user's lesson
+		    LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
+			    .getLessonId());
+		    gradeBookUserDTO.setStatus(getLessonStatusStr(learnerProgress));
+
+		    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson
+			    .getLessonId(), learner.getUserId());
+		    if (gradeBookUserLesson != null) {
+			gradeBookUserDTO.setMark(gradeBookUserLesson.getMark());
+			gradeBookUserDTO.setFeedback(gradeBookUserLesson.getFeedback());
+		    }
+		    gradeBookUserDTOs.add(gradeBookUserDTO);
+		}
+	    }
+	}
+
+	return gradeBookUserDTOs;
+
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#updateUserLessonGradeBookMark(org.lamsfoundation.lams.lesson.Lesson,
+     *      org.lamsfoundation.lams.usermanagement.User, java.lang.Double)
+     */
+    public void updateUserLessonGradeBookMark(Lesson lesson, User learner, Double mark) {
+	if (lesson != null && learner != null) {
+	    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(),
+		    learner.getUserId());
+
+	    if (gradeBookUserLesson == null) {
+		gradeBookUserLesson = new GradeBookUserLesson(lesson, learner);
+	    }
+	    gradeBookUserLesson.setMark(mark);
+	    gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
+	}
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#updateUserActivityGradeBookMark(org.lamsfoundation.lams.lesson.Lesson,
+     *      org.lamsfoundation.lams.usermanagement.User,
+     *      org.lamsfoundation.lams.learningdesign.Activity, java.lang.Double)
+     */
+    public void updateUserActivityGradeBookMark(Lesson lesson, User learner, Activity activity, Double mark) {
+	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
+
+	    // First, update the mark for the activity
+	    GradeBookUserActivity gradeBookUserActivity = gradeBookDAO.getGradeBookUserDataForActivity(activity
+		    .getActivityId(), learner.getUserId());
+
+	    if (gradeBookUserActivity == null) {
+		gradeBookUserActivity = new GradeBookUserActivity((ToolActivity) activity, learner);
+	    }
+
+	    gradeBookUserActivity.setMark(mark);
+	    gradeBookDAO.insertOrUpdate(gradeBookUserActivity);
+
+	    // Now update the lesson mark
+	    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(),
+		    learner.getUserId());
+
+	    if (gradeBookUserLesson == null) {
+		gradeBookUserLesson = new GradeBookUserLesson();
+		gradeBookUserLesson.setLearner(learner);
+		gradeBookUserLesson.setLesson(lesson);
+	    }
+
+	    aggregateTotalMarkForLesson(gradeBookUserLesson);
+	}
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#updateUserLessonGradeBookFeedback(org.lamsfoundation.lams.lesson.Lesson,
+     *      org.lamsfoundation.lams.usermanagement.User, java.lang.String)
+     */
+    public void updateUserLessonGradeBookFeedback(Lesson lesson, User learner, String feedback) {
+
+	GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(),
+		learner.getUserId());
+
+	if (gradeBookUserLesson == null) {
+	    gradeBookUserLesson = new GradeBookUserLesson(lesson, learner);
+	}
+
+	gradeBookUserLesson.setFeedback(feedback);
+	gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#updateUserActivityGradeBookFeedback(org.lamsfoundation.lams.learningdesign.Activity,
+     *      org.lamsfoundation.lams.usermanagement.User, java.lang.String)
+     */
+    public void updateUserActivityGradeBookFeedback(Activity activity, User learner, String feedback) {
+
+	GradeBookUserActivity gradeBookUserActivity = gradeBookDAO.getGradeBookUserDataForActivity(activity
+		.getActivityId(), learner.getUserId());
+
+	if (gradeBookUserActivity == null) {
+	    gradeBookUserActivity = new GradeBookUserActivity((ToolActivity) activity, learner);
+	}
+
+	gradeBookUserActivity.setFeedback(feedback);
+	gradeBookDAO.insertOrUpdate(gradeBookUserActivity);
+    }
+
+    /**
+     * Adds a mark to the aggregated total and saves it
+     * 
+     * @param gradeBookUserLesson
+     */
+    private void aggregateTotalMarkForLesson(GradeBookUserLesson gradeBookUserLesson) {
+	Double totalMark = gradeBookDAO.getGradeBookUserActivityMarkSum(gradeBookUserLesson.getLesson().getLessonId(),
+		gradeBookUserLesson.getLearner().getUserId());
+	gradeBookUserLesson.setMark(totalMark);
+	gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
+    }
+
+    /**
+     * Gets the GBActivityGridRowDTO fro a given activity and lesson
      * 
      * @param activity
-     * @return GradeBookActivityDTO
+     * @param lesson
+     * @return
      */
-    public GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, Lesson lesson) {
+    private GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, Lesson lesson) {
 	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
 	gactivityDTO.setActivityId(activity.getActivityId());
 	gactivityDTO.setActivityTitle(activity.getTitle());
@@ -326,14 +395,15 @@ public class GradeBookService implements IGradeBookService {
     }
 
     /**
-     * Gets the gradebook data for a user for a given activity and user
+     * Gets the GBActivityGridRowDTO for a given user and activity
      * 
      * @param activity
      * @param learner
      * @param learnerProgress
-     * @return GradeBookActivityDTO
+     * @return
      */
-    public GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, User learner, LearnerProgress learnerProgress) {
+    private GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, User learner,
+	    LearnerProgress learnerProgress) {
 
 	logger.debug("Getting gradebook data for activity: " + activity.getActivityId() + ". For user: "
 		+ learner.getUserId());
@@ -378,53 +448,6 @@ public class GradeBookService implements IGradeBookService {
 			+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
 
 		gactivityDTO.setOutput(this.getToolOutputsStr(toolAct, toolSession, learner));
-
-		//		SortedMap<String, ToolOutputDefinition> map = toolService.getOutputDefinitionsFromTool(toolAct
-		//			.getToolContentId());
-		//
-		//		Set<ToolOutput> toolOutputs = new HashSet<ToolOutput>();
-		//
-		//		
-		//
-		//		// Setting the tool outputs
-		//		String toolOutputsStr = "";
-		//		boolean noOutputs = true;
-		//		if (map.keySet().size() > 0) {
-		//
-		//		    for (String outputName : map.keySet()) {
-		//
-		//			try {
-		//			    ToolOutput toolOutput = toolService.getOutputFromTool(outputName, toolSession, learner
-		//				    .getUserId());
-		//
-		//			    if (toolOutput != null && toolOutput.getValue().getType() != OutputType.OUTPUT_COMPLEX) {
-		//				toolOutputs.add(toolOutput);
-		//
-		//				toolOutputsStr += "<option style='width:100%;'>";
-		//				toolOutputsStr += toolOutput.getDescription() + ": "
-		//					+ toolOutput.getValue().getString();
-		//				toolOutputsStr += "</option>";
-		//
-		//				noOutputs = false;
-		//			    }
-		//
-		//			} catch (RuntimeException e) {
-		//			    logger.debug("Runtime exception when attempted to get outputs for activity: "
-		//				    + toolAct.getActivityId() + ", continuing for other activities", e);
-		//			}
-		//		    }
-		//		    toolOutputsStr += "</select>";
-		//		}
-		//
-		//		// Fix up outputs html if there are not outputs available
-		//		if (noOutputs) {
-		//		    toolOutputsStr = "No output available.";
-		//		} else {
-		//		    toolOutputsStr = "<select style='width:150px;'><option style='width:100%;'>View outputs</option>"
-		//			    + toolOutputsStr;
-		//		}
-		//
-		//		gactivityDTO.setOutput(toolOutputsStr);
 	    }
 	}
 
@@ -432,169 +455,12 @@ public class GradeBookService implements IGradeBookService {
     }
 
     /**
-     * Returns the gradebook data for an entire lesson, which is essentailly a
-     * list of GradeBookUserDTOs
+     * Returns the lesson status string which is a reference to an image
      * 
-     * @param lesson
-     * @return ArrayList<GradeBookUserDTO>
+     * @param learnerProgress
+     * @return
      */
-    @SuppressWarnings("unchecked")
-    public ArrayList<GBUserGridRowDTO> getGradeBookLessonData(Lesson lesson) {
-
-	ArrayList<GBUserGridRowDTO> gradeBookUserDTOs = new ArrayList<GBUserGridRowDTO>();
-
-	if (lesson != null) {
-	    Set<User> learners = (Set<User>) lesson.getAllLearners();
-
-	    if (learners != null) {
-
-		for (User learner : learners) {
-		    GBUserGridRowDTO gradeBookUserDTO = new GBUserGridRowDTO();
-		    gradeBookUserDTO.setLogin(learner.getLogin());
-		    gradeBookUserDTO.setFirstName(learner.getFirstName());
-		    gradeBookUserDTO.setLastName(learner.getLastName());
-
-		    // Setting the status for the user's lesson
-		    LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
-			    .getLessonId());
-		    gradeBookUserDTO.setStatus(getLessonStatusStr(learnerProgress));
-
-		    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson
-			    .getLessonId(), learner.getUserId());
-		    if (gradeBookUserLesson != null) {
-			gradeBookUserDTO.setMark(gradeBookUserLesson.getMark());
-			gradeBookUserDTO.setFeedback(gradeBookUserLesson.getFeedback());
-		    }
-		    gradeBookUserDTOs.add(gradeBookUserDTO);
-		}
-	    }
-	}
-
-	return gradeBookUserDTOs;
-
-    }
-
-    /**
-     * Updates a user's mark for an entire lesson
-     * 
-     * @param lesson
-     * @param learner
-     * @param mark
-     */
-    public void updateUserLessonGradeBookMark(Lesson lesson, User learner, Double mark) {
-	if (lesson != null && learner != null) {
-	    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(),
-		    learner.getUserId());
-
-	    if (gradeBookUserLesson == null) {
-		gradeBookUserLesson = new GradeBookUserLesson(lesson, learner);
-	    }
-	    gradeBookUserLesson.setMark(mark);
-	    gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
-	}
-    }
-
-    /**
-     * Updates a user mark for an activity, when then aggregates their total
-     * lesson mark
-     * 
-     * @param lesson
-     * @param learner
-     * @param activity
-     * @param mark
-     */
-    public void updateUserActivityGradeBookMark(Lesson lesson, User learner, Activity activity, Double mark) {
-	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
-
-	    // First, update the mark for the activity
-	    GradeBookUserActivity gradeBookUserActivity = gradeBookDAO.getGradeBookUserDataForActivity(activity
-		    .getActivityId(), learner.getUserId());
-
-	    if (gradeBookUserActivity == null) {
-		gradeBookUserActivity = new GradeBookUserActivity((ToolActivity) activity, learner);
-	    }
-
-	    gradeBookUserActivity.setMark(mark);
-	    gradeBookDAO.insertOrUpdate(gradeBookUserActivity);
-
-	    // Now update the lesson mark
-	    GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(),
-		    learner.getUserId());
-
-	    if (gradeBookUserLesson == null) {
-		gradeBookUserLesson = new GradeBookUserLesson();
-		gradeBookUserLesson.setLearner(learner);
-		gradeBookUserLesson.setLesson(lesson);
-	    }
-
-	    aggregateTotalMarkForLesson(gradeBookUserLesson);
-	}
-    }
-
-    /**
-     * Adds up the total mark for a lesson based on the activity marks
-     * 
-     * @param gradeBookUserLesson
-     */
-    private void aggregateTotalMarkForLesson(GradeBookUserLesson gradeBookUserLesson) {
-	Double totalMark = gradeBookDAO.getGradeBookUserActivityMarkSum(gradeBookUserLesson.getLesson().getLessonId(),
-		gradeBookUserLesson.getLearner().getUserId());
-	gradeBookUserLesson.setMark(totalMark);
-	gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
-    }
-
-    /**
-     * Updates the feedback for a learners performance in a lesson
-     * 
-     * @param lesson
-     * @param learner
-     * @param feedback
-     */
-    public void updateUserLessonGradeBookFeedback(Lesson lesson, User learner, String feedback) {
-
-	GradeBookUserLesson gradeBookUserLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(),
-		learner.getUserId());
-
-	if (gradeBookUserLesson == null) {
-	    gradeBookUserLesson = new GradeBookUserLesson(lesson, learner);
-	}
-
-	gradeBookUserLesson.setFeedback(feedback);
-	gradeBookDAO.insertOrUpdate(gradeBookUserLesson);
-    }
-
-    /**
-     * Updates the feedback for a learner's performance in an Activity
-     * 
-     * @param activity
-     * @param learner
-     * @param feedback
-     */
-    public void updateUserActivityGradeBookFeedback(Activity activity, User learner, String feedback) {
-
-	GradeBookUserActivity gradeBookUserActivity = gradeBookDAO.getGradeBookUserDataForActivity(activity
-		.getActivityId(), learner.getUserId());
-
-	if (gradeBookUserActivity == null) {
-	    gradeBookUserActivity = new GradeBookUserActivity((ToolActivity) activity, learner);
-	}
-
-	gradeBookUserActivity.setFeedback(feedback);
-	gradeBookDAO.insertOrUpdate(gradeBookUserActivity);
-    }
-
-    public String getLessonStatusStr(LearnerProgress learnerProgress) {
-//	String status = "NOT STARTED";
-//
-//	if (learnerProgress != null) {
-//	    if (learnerProgress.isComplete()) {
-//		status = "FINISHED";
-//	    } else if (learnerProgress.getAttemptedActivities() != null
-//		    && learnerProgress.getAttemptedActivities().size() > 0) {
-//		status = "STARTED";
-//	    }
-//	}
-	
+    private String getLessonStatusStr(LearnerProgress learnerProgress) {
 	String status = "-";
 
 	if (learnerProgress != null) {
@@ -605,13 +471,17 @@ public class GradeBookService implements IGradeBookService {
 		status = "<img src='images/pencil.png' />";
 	    }
 	}
-	
-	
-
 	return status;
     }
 
-    public String getActivityStatusStr(LearnerProgress learnerProgress, Activity activity) {
+    /**
+     * Returns the activity status string which is a reference to an image
+     * 
+     * @param learnerProgress
+     * @param activity
+     * @return
+     */
+    private String getActivityStatusStr(LearnerProgress learnerProgress, Activity activity) {
 
 	if (learnerProgress != null) {
 	    byte statusByte = learnerProgress.getProgressState(activity);
@@ -619,14 +489,21 @@ public class GradeBookService implements IGradeBookService {
 		return "<img src='images/pencil.png' />";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
 		return "<img src='images/tick.png' />";
-	    } 
-	} 
-	
+	    }
+	}
 	return "-";
-
     }
 
-    public String getToolOutputsStr(ToolActivity toolAct, ToolSession toolSession, User learner) {
+    /**
+     * Gets the outputs for a tool activity and returns the html for the ouputs
+     * cell in the grid
+     * 
+     * @param toolAct
+     * @param toolSession
+     * @param learner
+     * @return
+     */
+    private String getToolOutputsStr(ToolActivity toolAct, ToolSession toolSession, User learner) {
 	String toolOutputsStr = "";
 	boolean noOutputs = true;
 
@@ -676,7 +553,7 @@ public class GradeBookService implements IGradeBookService {
 	return toolOutputsStr;
     }
 
-    // Getter and setter methods below -----------------------------------------
+    // Getter and setter methods -----------------------------------------------
 
     public IMonitoringService getMonitoringService() {
 	return monitoringService;
@@ -701,6 +578,6 @@ public class GradeBookService implements IGradeBookService {
     public void setGradeBookDAO(IGradeBookDAO gradeBookDAO) {
 	this.gradeBookDAO = gradeBookDAO;
     }
-
-    // Getter and setter methods above -----------------------------------------
+    
+    // -------------------------------------------------------------------------
 }
