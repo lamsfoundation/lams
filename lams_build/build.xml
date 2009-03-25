@@ -134,6 +134,8 @@
 					<include name="flagstone/*.jar" />		
 					<include name="slf4j/*.jar" />
 					<include name="lucene/*.jar" />
+					<include name="excel/*.jar" />
+					<include name="csv/*.jar" />
 				</patternset>
 			</fileset> 
 			<fileset dir="..">

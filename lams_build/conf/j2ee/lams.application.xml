@@ -250,6 +250,12 @@
 	<module>
 		<java>lucene-snowball-2.4.0.jar</java>
 	</module>
+	<module>
+		<java>jxl.jar</java>
+	</module>
+	<module>
+		<java>opencsv-1.8.jar</java>
+	</module>
 	<!--  END For xstream -->
     <!--  End Third Party JAR Files -->
     

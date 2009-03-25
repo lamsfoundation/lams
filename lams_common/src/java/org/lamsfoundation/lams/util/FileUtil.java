@@ -29,8 +29,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.util.Date;
@@ -38,6 +40,14 @@ import java.util.Properties;
 
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
+
+import jxl.JXLException;
+import jxl.Workbook;
+import jxl.write.DateTime;
+import jxl.write.Label;
+import jxl.write.WritableCell;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -48,6 +58,8 @@ import org.hibernate.id.UUIDHexGenerator;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -760,5 +772,81 @@ public class FileUtil {
 		    + classname + ". Aborting retry.", e);
 	    return null;
 	}
+    }
+
+    public static void exportToExcel(OutputStream out, String sheetName, String title, String dateHeader,
+	    String[] columnNames, Object[][] data) throws IOException, JXLException {
+	WritableWorkbook workbook = Workbook.createWorkbook(out);
+	WritableSheet sheet = workbook.createSheet(sheetName, 0);
+	if (!StringUtils.isEmpty(title)) {
+	    sheet.addCell(new Label(0, 0, title));
+	}
+	if (!StringUtils.isEmpty(dateHeader)) {
+	    sheet.addCell(new Label(0, 1, dateHeader));
+	    sheet.addCell(new DateTime(1, 1, new Date()));
+	}
+	if (columnNames != null) {
+	    for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++) {
+		sheet.addCell(new Label(columnIndex, 3, columnNames[columnIndex]));
+	    }
+	}
+	if (data != null) {
+	    for (int columnIndex = 0; columnIndex < data.length; columnIndex++) {
+		for (int rowIndex = 0; rowIndex < data[columnIndex].length; rowIndex++) {
+		    Object content = data[columnIndex][rowIndex];
+		    if (content != null) {
+			WritableCell cell = null;
+			if (content instanceof Number) {
+			    Number number = (Number) content;
+			    cell = new jxl.write.Number(columnIndex, rowIndex, number.doubleValue());
+			} else if (content instanceof Date) {
+			    Date date = (Date) content;
+			    cell = new DateTime(columnIndex, rowIndex, date);
+			} else if (content instanceof Boolean) {
+			    Boolean bool = (Boolean) content;
+			    cell = new jxl.write.Boolean(columnIndex, rowIndex, bool);
+			} else {
+			    cell = new Label(columnIndex, rowIndex, content.toString());
+			}
+			sheet.addCell(cell);
+		    }
+		}
+	    }
+	}
+	workbook.write();
+	workbook.close();
+    }
+
+    public static void exportToCSV(OutputStream out, String title, String dateHeader, String[] columnNames,
+	    Object[][] data) throws IOException {
+	Writer writer = new OutputStreamWriter(out);
+	CSVWriter csv = new CSVWriter(writer);
+	String[] line = null;
+	if (!StringUtils.isEmpty(title)) {
+	    line = new String[] { title };
+	    csv.writeNext(line);
+	}
+	if (!StringUtils.isEmpty(dateHeader)) {
+	    line = new String[] { dateHeader, new Date().toString() };
+	    csv.writeNext(line);
+	}
+	if (columnNames != null) {
+	    line = new String[] {};
+	    csv.writeNext(line);
+	    csv.writeNext(columnNames);
+	}
+	if (data != null) {
+	    for (int columnIndex = 0; columnIndex < data.length; columnIndex++) {
+		line = new String[data[columnIndex].length];
+		for (int rowIndex = 0; rowIndex < data[columnIndex].length; rowIndex++) {
+		    Object content = data[columnIndex][rowIndex];
+		    if (content != null) {
+			line[rowIndex] = content.toString();
+		    }
+		}
+		csv.writeNext(line);
+	    }
+	}
+	csv.close();
     }
 }

@@ -166,4 +166,12 @@ public class CentralConstants {
     public static final String USER_MANAGEMENT_SERVICE_BEAN_NAME = "userManagementService";
 
     public static final String PARAM_FILTER_TEXT = "filterText";
+
+    public static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+
+    public static final String RESPONSE_CONTENT_TYPE_DOWNLOAD = "application/x-download";
+
+    public static final String FILE_EXTENSION_XLS = ".xls";
+
+    public static final String FILE_EXTENSION_CSV = ".csv";
 }

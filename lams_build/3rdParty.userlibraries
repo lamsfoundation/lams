@@ -112,5 +112,7 @@
 <archive path="/lams_build/lib/slf4j/slf4j-log4j12-1.5.2.jar"/>
 <archive javadoc="http://lucene.apache.org/java/2_4_0/api/core/" path="/lams_build/lib/lucene/lucene-core-2.4.0.jar" source="/lams_build/lib/lucene/src/lucene-2.4.0-src.zip"/>
 <archive javadoc="http://lucene.apache.org/java/2_4_0/api/contrib-snowball/" path="/lams_build/lib/lucene/lucene-snowball-2.4.0.jar" source="/lams_build/lib/lucene/src/lucene-snowball-2.4.0-src.zip"/>
+<archive javadoc="http://opencsv.sourceforge.net/api/" path="/lams_build/lib/csv/opencsv-1.8.jar" source="/lams_build/lib/csv/src/opencsv-1.8-src.zip"/>
+<archive javadoc="http://jexcelapi.sourceforge.net/resources/javadocs/2_6/docs/" path="/lams_build/lib/excel/jxl.jar" source="/lams_build/lib/excel/src/jexcelapi-2.6-src.zip"/>
 </library>
 </eclipse-userlibraries>
