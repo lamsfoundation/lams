@@ -468,7 +468,7 @@ public class GradeBookService implements IGradeBookService {
 		status = "<img src='images/tick.png' />";
 	    } else if (learnerProgress.getAttemptedActivities() != null
 		    && learnerProgress.getAttemptedActivities().size() > 0) {
-		status = "<img src='images/pencil.png' />";
+		status = "<img src='images/cog.png' />";
 	    }
 	}
 	return status;
@@ -486,7 +486,7 @@ public class GradeBookService implements IGradeBookService {
 	if (learnerProgress != null) {
 	    byte statusByte = learnerProgress.getProgressState(activity);
 	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED) {
-		return "<img src='images/pencil.png' />";
+		return "<img src='images/cog.png' />";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
 		return "<img src='images/tick.png' />";
 	    }

@@ -25,9 +25,10 @@
 			jQuery("#userView").jqGrid({
 				caption: "Learner View",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getGradeBookUserRows&method=userView&lessonID=${lessonDetails.lessonID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&method=userView&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
 			    width: 990,
+			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 			    cellEdit: true,
 			    sortorder: "asc", 
 			    sortname: "fullName", 
@@ -43,7 +44,10 @@
 			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} },
 			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}}
 			    ],
-			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
+			    loadError: function(xhr,st,err) {
+			    	jQuery("#userView").clearGridData();
+			    	alert("There was an error loading the Learner View grid");
+			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 				   var subgrid_table_id;
@@ -52,7 +56,7 @@
 					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   jQuery("#"+subgrid_table_id).jqGrid({
 					     datatype: "xml",
-					     url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getActivityViewLessonGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
+					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
 					     height: "100%",
 					     width: 920,
 					     cellEdit:true,
@@ -69,7 +73,11 @@
 							{name:'competences', width:250, index:'competences', sortable:false, editable: false},
 							{name:'feedback', width:250, index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}},
 							{name:'mark', width:100, index:'mark', sortable:false, editable: true, editrules:{number:true} }
-					                   ],
+					     ],
+					     loadError: function(xhr,st,err) {
+					    	jQuery("#"+subgrid_table_id).clearGridData();
+					    	alert("There was an error loading the Learner View grid");
+					     },
 					     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
 					     	
 					     	// Update the total lesson mark for the user
@@ -98,7 +106,7 @@
 				jQuery("#activityView").jqGrid({
 					caption: "Activity View",
 				    datatype: "xml",
-				    url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getActivityViewLessonGradeBookData&method=activityView&lessonID=${lessonDetails.lessonID}",
+				    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&method=activityView&lessonID=${lessonDetails.lessonID}",
 				    height: "100%",
 				    width: 990,
 				    cellEdit: true,
@@ -114,6 +122,10 @@
 				      {name:'competences', width:250, index:'competences', sortable:false, editable: false},
 				      {name:'average',index:'average', sortable:false, editable:false}
 				    ],
+				    loadError: function(xhr,st,err) {
+			    		jQuery("#activityView").clearGridData();
+			    		alert("There was an error loading the Activity View grid");
+			    	},
 				    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 				    subGrid: true,
 					subGridRowExpanded: function(subgrid_id, row_id) {
@@ -123,7 +135,7 @@
 					   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   jQuery("#"+subgrid_table_id).jqGrid({
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=getGradeBookUserRows&method=activityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID,
+						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&method=activityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID,
 						     height: "100%",
 						     width: 920,
 						     cellEdit:true,
@@ -142,6 +154,10 @@
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} },
 						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}}
 						     ],
+						     loadError: function(xhr,st,err) {
+					    		jQuery("#"+subgrid_table_id).clearGridData();
+					    		alert("There was an error loading the Activity View grid");
+					    	 },
 						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
 						     	
 						     	// update the activity average mark

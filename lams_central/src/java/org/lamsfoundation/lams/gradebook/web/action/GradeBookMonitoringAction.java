@@ -143,7 +143,7 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	    }
 
 	} else {
-	    // TODO: handle error
+	    logger.error("No lesson could be found for: " + lessonID);
 	}
 	return null;
     }
@@ -197,7 +197,7 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	    }
 	    
 	} else {
-	    // TODO: handle error
+	    logger.error("Lesson or activity missing for lesson: " + lessonID + "and activity: " + activityID);
 	}
 	return null;
     }

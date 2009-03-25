@@ -129,7 +129,9 @@ public class GradeBookAction extends LamsDispatchAction {
 		if (learner != null) {
 		    gradeBookActivityDTOs = gradeBookService.getGBActivityRowsForLearner(lesson, learner);
 		} else {
-		    // TODO: handle error
+		    // return null and the grid will report the error
+		    logger.error("No learner found for: " + login);
+		    return null;
 		}
 	    } else if (method.equals("activityView")) {
 		gradeBookActivityDTOs = gradeBookService.getGBActivityRowsForLesson(lesson);
@@ -164,7 +166,7 @@ public class GradeBookAction extends LamsDispatchAction {
 	    PrintWriter out = response.getWriter();
 	    out.print(ret);
 	} else {
-	    // TODO: handle error
+	    logger.error("No lesson could be found for: " + lessonID);
 	}
 
 	return null;
@@ -216,7 +218,9 @@ public class GradeBookAction extends LamsDispatchAction {
 		if(activity != null) {
 		    gradeBookUserDTOs = gradeBookService.getGBUserRowsForActivity(lesson, activity);
 		} else {
-		    // TODO: handle error
+		    // return null and the grid will report an error
+		    logger.error("No activity found for: " + activityID);
+		    return null;
 		}
 	    }
 
@@ -267,7 +271,7 @@ public class GradeBookAction extends LamsDispatchAction {
 	    PrintWriter out = response.getWriter();
 	    out.print(ret);
 	} else {
-	    // TODO: handle error
+	    logger.error("No lesson could be found for: " + lessonID);
 	}
 
 	return null;
