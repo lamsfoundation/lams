@@ -1,6 +1,6 @@
 function jqGridInclude()
 {
-    var pathtojsfiles = "js/"; // need to be ajusted
+    var pathtojsfiles = "/lams/includes/javascript/jqgrid/js/"; // need to be ajusted
     // set include to false if you do not want some modules to be included
     var combineIntoOne = false;
     var combinedInclude = new Array();

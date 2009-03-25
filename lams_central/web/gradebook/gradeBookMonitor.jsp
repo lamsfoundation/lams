@@ -13,10 +13,10 @@
 	
 	<link rel="stylesheet" type="text/css" media="screen" href="<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/grid.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="<lams:LAMSURL />includes/javascript/jqgrid/themes/jqModal.css" />
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />includes/javascript/jqgrid/js/jquery.jqGrid.js" ></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />includes/javascript/jqgrid/js/jqModal.js" ></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />includes/javascript/jqgrid/js/jqDnR.js" ></script>
+	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jquery-latest.pack.js"></script>
+	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jqgrid/js/jquery.jqGrid.js" ></script>
+	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jqgrid/js/jqModal.js" ></script>
+	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jqgrid/js/jqDnR.js" ></script>
 	
 	<script type="text/javascript">
 		

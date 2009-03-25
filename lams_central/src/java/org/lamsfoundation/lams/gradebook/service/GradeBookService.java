@@ -60,6 +60,8 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 public class GradeBookService implements IGradeBookService {
 
     private static Logger logger = Logger.getLogger(GradeBookService.class);
+    
+    private static final String IMAGES_DIR = Configuration.get(ConfigurationKeys.SERVER_URL) + "images";
 
     // Services 
     private IMonitoringService monitoringService;
@@ -465,10 +467,10 @@ public class GradeBookService implements IGradeBookService {
 
 	if (learnerProgress != null) {
 	    if (learnerProgress.isComplete()) {
-		status = "<img src='images/tick.png' />";
+		status = "<img src='" + IMAGES_DIR + "/tick.png' />";
 	    } else if (learnerProgress.getAttemptedActivities() != null
 		    && learnerProgress.getAttemptedActivities().size() > 0) {
-		status = "<img src='images/cog.png' />";
+		status = "<img src='" + IMAGES_DIR + "/cog.png' />";
 	    }
 	}
 	return status;
@@ -486,9 +488,9 @@ public class GradeBookService implements IGradeBookService {
 	if (learnerProgress != null) {
 	    byte statusByte = learnerProgress.getProgressState(activity);
 	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED) {
-		return "<img src='images/cog.png' />";
+		return "<img src='" + IMAGES_DIR + "/cog.png' />";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
-		return "<img src='images/tick.png' />";
+		return "<img src='" + IMAGES_DIR + "/tick.png' />";
 	    }
 	}
 	return "-";
