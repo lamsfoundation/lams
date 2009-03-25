@@ -195,32 +195,47 @@
 						</td>
 						<td>
 							<%-- Link to the subnode and its brief description below --%>
-							<c:url value="/pedagogicalPlanner.do" var="subnodeUrl">
-								<c:param name="method" value="openSequenceNode" />		
-								<c:param name="edit" value="${node.edit}" />
-								<c:param name="uid" value="${subnode.uid}" />
-							</c:url>
-							<a href="${subnodeUrl}"><c:out escapeXml='true' value='${subnode.title}' />
-								<c:if test="${node.edit and subnode.locked}">
-									<fmt:message key="label.planner.locked" />
-								</c:if>
-							</a>
-							<c:if test="${not node.edit and not empty subnode.fileName}">
-								<div>
-									<c:url var="startPreviewUrl" value="/pedagogicalPlanner.do">
-										<c:param name="method" value="startPreview" />
+							<c:set var="showPreviewAndEditorLinks" value="${not node.edit and not empty subnode.fileName and empty subnode.fullDescription }" />
+							<c:choose>
+								<c:when test="${showPreviewAndEditorLinks}">
+									<span class="dummyLink">
+								</c:when>
+								<c:otherwise>
+									<c:url value="/pedagogicalPlanner.do" var="subnodeUrl">
+										<c:param name="method" value="openSequenceNode" />		
+										<c:param name="edit" value="${node.edit}" />
 										<c:param name="uid" value="${subnode.uid}" />
 									</c:url>
-									<a class="space-right" href="javascript:startPreview('${startPreviewUrl}')" 
-									   title="<fmt:message key="msg.planner.preview" />"><fmt:message key="label.planner.preview" /></a>
-									<c:url value="/pedagogicalPlanner.do" var="openTemplateUrl">
-										<c:param name="method" value="openTemplate" />		
-										<c:param name="uid" value="${subnode.uid}" />
-									</c:url>
-									<a href="${openTemplateUrl}"
-									   title="<fmt:message key="msg.planner.template.open" />"><fmt:message key="label.planner.editor" /></a>
-								</div>
+									<a href="${subnodeUrl}">
+								</c:otherwise>
+							</c:choose>
+							<c:out escapeXml='true' value='${subnode.title}' />
+							<c:if test="${node.edit and subnode.locked}">
+								<fmt:message key="label.planner.locked" />
 							</c:if>
+							<c:choose>
+								<c:when test="${showPreviewAndEditorLinks}">
+									</span>
+									<div>
+										<c:url var="startPreviewUrl" value="/pedagogicalPlanner.do">
+											<c:param name="method" value="startPreview" />
+											<c:param name="uid" value="${subnode.uid}" />
+										</c:url>
+										<a class="space-right" href="javascript:startPreview('${startPreviewUrl}')" 
+										   title="<fmt:message key="msg.planner.preview" />"><fmt:message key="label.planner.preview" /></a>
+										<c:url value="/pedagogicalPlanner.do" var="openTemplateUrl">
+											<c:param name="method" value="openTemplate" />		
+											<c:param name="uid" value="${subnode.uid}" />
+										</c:url>
+										<a href="${openTemplateUrl}"
+										   title="<fmt:message key="msg.planner.template.open" />"><fmt:message key="label.planner.editor" /></a>
+									</div>
+								</c:when>
+								<c:otherwise>
+									</a>
+								</c:otherwise>
+							</c:choose>
+
 							<c:if test="${not empty filterText}">
 								<div  class="space-left small-space-top" style="font-size: smaller;">
 									<%-- If we are in filter mode, we display the path where was the subnode found --%>

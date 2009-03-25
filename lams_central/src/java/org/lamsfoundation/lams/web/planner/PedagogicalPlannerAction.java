@@ -205,8 +205,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     private static final String EXPORT_NODE_FOLDER_SUFFIX = "export_node";
     private static final String EXPORT_NODE_CONTENT_ZIP_PREFIX = "content_";
-    private static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
-    private static final String RESPONSE_CONTENT_TYPE_DOWNLOAD = "application/x-download";
     private static final String ENCODING_UTF_8 = "UTF-8";
     private static final String DIR_UPLOADED_NODE_SUFFIX = "_uploaded_node";
     private static final String EXPORT_NODE_ZIP_PREFIX = "lams_planner_node_";
@@ -945,9 +943,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	    PedagogicalPlannerAction.log.debug("Final filename to export: " + filename);
 
-	    response.setContentType(PedagogicalPlannerAction.RESPONSE_CONTENT_TYPE_DOWNLOAD);
+	    response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
 	    // response.setContentType("application/zip");
-	    response.setHeader(PedagogicalPlannerAction.HEADER_CONTENT_DISPOSITION, "attachment;filename=" + filename);
+	    response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION, "attachment;filename=" + filename);
 	} catch (Exception e) {
 	    PedagogicalPlannerAction.log.error(e, e);
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_EXPORT));
@@ -1220,7 +1218,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		String fileName = node.getFileName();
 		PedagogicalPlannerAction.log.debug("Uploading into repository a template file: " + fileName);
 		NodeKey nodeKey = getContentHandler().uploadFile(inputStream, fileName,
-			PedagogicalPlannerAction.RESPONSE_CONTENT_TYPE_DOWNLOAD, IToolContentHandler.TYPE_OFFLINE);
+			CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD, IToolContentHandler.TYPE_OFFLINE);
 		node.setFileUuid(nodeKey.getUuid());
 	    }
 	}
@@ -1477,10 +1475,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		String filename = FileUtil.encodeFilenameForDownload(request, zipfile);
 		PedagogicalPlannerAction.log.debug("Final filename to export: " + filename);
 
-		response.setContentType(PedagogicalPlannerAction.RESPONSE_CONTENT_TYPE_DOWNLOAD);
+		response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
 		// response.setContentType("application/zip");
-		response.setHeader(PedagogicalPlannerAction.HEADER_CONTENT_DISPOSITION, "attachment;filename="
-			+ filename);
+		response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION, "attachment;filename=" + filename);
 		valid = true;
 	    }
 

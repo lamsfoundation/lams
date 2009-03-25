@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 
 public class PedagogicalPlannerSequenceNodeDTO {
@@ -44,6 +45,8 @@ public class PedagogicalPlannerSequenceNodeDTO {
     private Boolean createSubnode = false;
     private Boolean isSysAdmin = true;
     private Boolean importNode = false;
+
+    private static final String FULL_DESCRIPTION_NOT_EMPTY = "FULL";
 
     public PedagogicalPlannerSequenceNodeDTO() {
     }
@@ -65,6 +68,9 @@ public class PedagogicalPlannerSequenceNodeDTO {
 		PedagogicalPlannerSequenceNodeDTO subnodeDTO = new PedagogicalPlannerSequenceNodeDTO();
 		subnodeDTO.setTitle(subnode.getTitle());
 		subnodeDTO.setBriefDescription(subnode.getBriefDescription());
+		if (!StringUtils.isEmpty(subnode.getFullDescription())) {
+		    subnodeDTO.setFullDescription(PedagogicalPlannerSequenceNodeDTO.FULL_DESCRIPTION_NOT_EMPTY);
+		}
 		subnodeDTO.setLocked(subnode.getLocked());
 		subnodeDTO.setFileName(subnode.getFileName());
 		subnodeDTO.setUid(subnode.getUid());
