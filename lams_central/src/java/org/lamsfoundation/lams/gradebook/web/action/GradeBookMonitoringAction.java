@@ -138,7 +138,7 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 		gradeBookService.updateUserLessonGradeBookMark(lesson, learner, mark);
 	    }
 	    
-	    if (feedback != null && !feedback.equals("")) {
+	    if (feedback != null) {
 		gradeBookService.updateUserLessonGradeBookFeedback(lesson, learner, feedback);
 	    }
 
@@ -192,7 +192,7 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 		gradeBookService.updateUserActivityGradeBookMark(lesson, learner, activity, mark);
 	    }
 	    
-	    if (feedback != null && !feedback.equals("")) {
+	    if (feedback != null) {
 		gradeBookService.updateUserActivityGradeBookFeedback(activity, learner, feedback);
 	    }
 	    

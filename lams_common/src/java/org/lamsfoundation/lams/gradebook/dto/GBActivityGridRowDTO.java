@@ -40,7 +40,8 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO{
     String feedback;
     
     // Properties for activity view
-    Double average;	
+    Double average;
+    String monitorUrl;
     
       
     public GBActivityGridRowDTO() {}
@@ -81,7 +82,11 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO{
 	
 	ret.add("" + activityId);
 
-	ret.add(activityTitle);
+	if (monitorUrl != null && monitorUrl.length() != 0) {
+	    ret.add("<a href='javascript:launchPopup(\"" +monitorUrl+ "\",\"" +activityTitle+ "\")'>" +activityTitle +"</a>");
+	} else {
+	    ret.add(activityTitle);
+	}
 
 	ret.add(competences);
 	
@@ -174,7 +179,13 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO{
     public void setAverage(Double average) {
         this.average = average;
     }
-    
-    
+
+    public String getMonitorUrl() {
+        return monitorUrl;
+    }
+
+    public void setMonitorUrl(String monitorUrl) {
+        this.monitorUrl = monitorUrl;
+    }
 }
  

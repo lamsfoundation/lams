@@ -36,14 +36,14 @@ $.fn.extend({
 				viewModal("#"+IDs.themodal,{modal:p.modal});
 				if(onAfterShow) { p.afterShowForm($("#"+dtbl)); }
 			} else {
-				var tbl =$("<br /><table id='"+dtbl+"' class='ColTable'><tbody></tbody></table>");
+				var tbl =$("<table id='"+dtbl+"' class='ColTable'><tbody></tbody></table>");
 				for(i=0;i<this.p.colNames.length;i++){
 					if(!$t.p.colModel[i].hidedlg) { // added from T. Tomov
 						$(tbl).append("<tr><td ><input type='checkbox' id='col_" + this.p.colModel[i].name + "' class='cbox' value='T' " + 
-						((this.p.colModel[i].hidden==undefined)?"checked":"") + "/>" +  "<label for='col_" + this.p.colModel[i].name + "'> " + this.p.colNames[i] + "</label></td></tr>");
+						((this.p.colModel[i].hidden==undefined)?"checked":"") + "/>" +  "<label for='col_" + this.p.colModel[i].name + "'>" + this.p.colNames[i] + "(" + this.p.colModel[i].name + ")</label></td></tr>");
 					}
 				}
-				var bS  ="<br /><input id='dData' type='button' value='"+p.bSubmit+"'/>";
+				var bS  ="<input id='dData' type='button' value='"+p.bSubmit+"'/>";
 				var bC  ="<input id='eData' type='button' value='"+p.bCancel+"'/>";
 				$(tbl).append("<tr><td class='ColButton'>"+bS+"&nbsp;"+bC+"</td></tr>");
 				createModal(IDs,tbl,p,$t.grid.hDiv,$t.grid.hDiv);

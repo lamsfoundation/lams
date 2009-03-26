@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author lfoxton
@@ -60,7 +61,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 public class GradeBookService implements IGradeBookService {
 
     private static Logger logger = Logger.getLogger(GradeBookService.class);
-    
+
     private static final String IMAGES_DIR = Configuration.get(ConfigurationKeys.SERVER_URL) + "images";
 
     // Services 
@@ -357,6 +358,12 @@ public class GradeBookService implements IGradeBookService {
 	if (activity.isToolActivity() && activity instanceof ToolActivity) {
 	    ToolActivity toolAct = (ToolActivity) activity;
 
+	    String monitorUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + toolAct.getTool().getMonitorUrl()
+		    + "?" + AttributeNames.PARAM_CONTENT_FOLDER_ID + "="
+		    + lesson.getLearningDesign().getContentFolderID() + "&" + AttributeNames.PARAM_TOOL_CONTENT_ID
+		    + "=" + toolAct.getToolContentId();
+	    gactivityDTO.setMonitorUrl(monitorUrl);
+
 	    // Get the competences for this activity
 	    Set<CompetenceMapping> competenceMappings = toolAct.getCompetenceMappings();
 	    String competenceMappingsStr = "";
@@ -580,6 +587,6 @@ public class GradeBookService implements IGradeBookService {
     public void setGradeBookDAO(IGradeBookDAO gradeBookDAO) {
 	this.gradeBookDAO = gradeBookDAO;
     }
-    
+
     // -------------------------------------------------------------------------
 }

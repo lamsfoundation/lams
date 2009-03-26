@@ -19,6 +19,35 @@
 	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jqgrid/js/jqDnR.js" ></script>
 	
 	<script type="text/javascript">
+	
+		// Set up the jqgrid lang entries
+		$.jgrid.edit = {
+		    addCaption: "Add Record",
+		    editCaption: "Edit Record",
+		    bSubmit: "Submit",
+		    bCancel: "Cancel",
+			bClose: "Close",
+		    processData: "Processing...",
+		    msg: {
+		        required:"Field is required",
+		        number:"Please, enter valid number",
+		        minValue:"value must be greater than or equal to ",
+		        maxValue:"value must be less than or equal to",
+		        email: "is not a valid e-mail",
+		        integer: "Please, enter valid integer value",
+				date: "Please, enter valid date value"
+		    }
+		};
+		
+		$.jgrid.search = {
+			    caption: "Search Names...",
+			    Find: "Find",
+			    Reset: "Reset",
+			    odata : ['equal', 'not equal', 'less', 'less or equal','greater','greater or equal', 'begins with','ends with','contains' ]
+		};
+	
+	
+	
 		
 		jQuery(document).ready(function(){
   
@@ -36,13 +65,13 @@
 			    rowList:[5,10,20,30],
 			    rowNum:10,
 				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}&login=test1",
-			    colNames:["", 'Name', 'Progress', 'Lesson FeedBack', 'Total Mark'],
+			    colNames:["", 'Name', 'Progress', 'Lesson FeedBack', 'Lesson Mark'],
 			    colModel:[
-			      {name:'login', index:'login', sortable:false, editable:false, hidden:true},
+			      {name:'login', index:'login', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'fullName',index:'fullName', sortable:true, editable:false},
-			      {name:'status',index:'status', align:'center', width:30, sortable:false, editable:false},
-			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} },
-			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}}
+			      {name:'status',index:'status', align:'center', width:30, sortable:false, editable:false, search:false},
+			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
+			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false}
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#userView").clearGridData();
@@ -66,7 +95,7 @@
 					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
 					     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Activity FeedBack', 'Mark'],
 					     colModel: [
-					       	{name:'activityId', width:10, index:'activityId', sortable:false, hidden:true},
+					       	{name:'activityId', width:10, index:'activityId', sortable:false, hidden:true, hidedlg:true},
 							{name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
 							{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false},
 							{name:'output', width:250, index:'output', sortable:false, editable: false},
@@ -96,12 +125,42 @@
 					     	}
 					     },
 						 imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images'
-					  })
+					  }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false});
+					  
+					  jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
+							caption: "",
+							title: "Show/Hide Columns",
+							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
+							onClickButton: function(){
+								jQuery("#"+subgrid_table_id).setColumns();
+							}
+						});
 				 	}
-				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false});
+				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false})
 				
-
+				jQuery("#userView").navButtonAdd('#userViewPager',{
+					caption: "",
+					title: "Search Names",
+					buttonimg:"<lams:LAMSURL />images/find.png", 
+					onClickButton: function(){
+						jQuery("#userView").searchGrid({
+															Find: "Find", 
+															Clear: "Clear", 
+															top:10, 
+															left:10,
+															sopt:['cn','bw','eq','ne','ew']
+														});
+					}
+				});
 				
+				jQuery("#userView").navButtonAdd('#userViewPager',{
+					caption: "",
+					title: "Show/Hide Columns",
+					buttonimg:"<lams:LAMSURL />images/table_edit.png", 
+					onClickButton: function(){
+						jQuery("#userView").setColumns();
+					}
+				});
 				
 				jQuery("#activityView").jqGrid({
 					caption: "Activity View",
@@ -117,7 +176,7 @@
 				    sortname: "activityId", 
 				    colNames:["", 'Activity Name', 'Competences', 'Average Mark'],
 				    colModel:[
-				      {name:'activityId', width:10, index:'activityId', sortable:false, hidden:true},
+				      {name:'activityId', width:10, index:'activityId', sortable:false, hidden:true, hidedlg:true},
 					  {name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
 				      {name:'competences', width:250, index:'competences', sortable:false, editable: false},
 				      {name:'average',index:'average', sortable:false, editable:false}
@@ -147,12 +206,12 @@
 							 rowNum:10,
 						     colNames: ['','Full Name','Progress','Outputs', 'Activity Feedback', 'Mark'],
 						     colModel:[
-						     	{name:'login', index:'login', sortable:false, editable:false, hidden:true},
+						     	{name:'login', index:'login', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'fullName',index:'fullName', sortable:true, editable:false},
-						      	{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false},
-						      	{name:'output', width:220, index:'output', sortable:false, editable: false},
-						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} },
-						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}}
+						      	{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false, search:false},
+						      	{name:'output', width:220, index:'output', sortable:false, editable: false, search:false},
+						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false},
+						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false}
 						     ],
 						     loadError: function(xhr,st,err) {
 					    		jQuery("#"+subgrid_table_id).clearGridData();
@@ -185,9 +244,40 @@
 						     	}
 						     },
 							 imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images'
-						 })
+						 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false})
+						 
+						 jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
+								caption: "",
+								buttonimg:"<lams:LAMSURL />images/find.png", 
+								onClickButton: function(){
+									jQuery("#"+subgrid_table_id).searchGrid({
+																		Find: "Find", 
+																		Clear: "Clear", 
+																		top:10, 
+																		left:10,
+																		sopt:['cn','bw','eq','ne','ew']
+																	});
+								}
+						  });
+						  jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
+							caption: "",
+							title: "Show/Hide Columns",
+							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
+							onClickButton: function(){
+								jQuery("#"+subgrid_table_id).setColumns();
+							}
+						  });
 					 }
 				}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false});
+				
+				jQuery("#activityView").navButtonAdd('#activityViewPager',{
+					caption: "",
+					title: "Show/Hide Columns",
+					buttonimg:"<lams:LAMSURL />images/table_edit.png", 
+					onClickButton: function(){
+						jQuery("#activityView").setColumns();
+					}
+				});
 		});
 		
 		function launchPopup(url,title) {
@@ -214,7 +304,6 @@
 				<table id="userView" class="scroll" ></table>
 				<div id="userViewPager" class="scroll" ></div>
 				
-				<br />
 				<br />
 				<br />
 				
