@@ -142,7 +142,7 @@ public class DisplayGroupAction extends Action {
 				}
 				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson", "javascript:openAddLesson(" + org.getOrganisationId()+",'')", "add-lesson-button", null));
-					moreLinks.add(new IndexLinkBean("index.searchlesson",  Configuration.get(ConfigurationKeys.SERVER_URL) + "/findUserLessons.do?dispatch=getResults&courseID=" + org.getOrganisationId()+"&KeepThis=true&TB_iframe=true&height=400&width=600", "thickbox"+org.getOrganisationId(), "index.searchlesson.tooltip")); 
+					moreLinks.add(new IndexLinkBean("index.searchlesson",  Configuration.get(ConfigurationKeys.SERVER_URL) + "/findUserLessons.do?dispatch=getResults&courseID=" + org.getOrganisationId()+"&KeepThis=true&TB_iframe=true&height=400&width=600", "search-lesson thickbox"+org.getOrganisationId(), "index.searchlesson.tooltip")); 
 			}else{//CLASS_TYPE
 				if(contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,Role.ROLE_MONITOR))
 					links.add(new IndexLinkBean("index.addlesson","javascript:openAddLesson("+org.getParentOrganisation().getOrganisationId()+","+org.getOrganisationId()+")", "add-lesson-button", null));

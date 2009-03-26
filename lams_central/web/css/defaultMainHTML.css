@@ -1129,12 +1129,13 @@ ul.more-actions-list {
 	z-index: 99; 
 	display: none;
 	margin: 0px;
-	padding: 0px;
+	padding: 2px;
 	border:thin solid gray;
 }
 
 ul.more-actions-list li {
-	padding: 10px;
+	padding: 6px;
+	font-size: 10px;
 	margin: 0px;
 	list-style: none;
 }
@@ -1146,4 +1147,31 @@ ul.more-actions-list li {
 	text-decoration: none;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
+}
+
+#content a:hover.more-actions-button {
+        background: url('../images/css/more_options.png') no-repeat 0px 0px;
+        color: #47bc23;
+        padding: 5px 12px 6px 30px;
+        text-decoration: none;
+        border-right:1px solid #d2d2d2;
+        border-bottom: 0px;
+}
+
+#content a.search-lesson {
+	background: url('../images/css/search_lesson.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+}
+
+#content a:hover.search-lesson {
+	background: url('../images/css/search_lesson.png') no-repeat 0px 0px;
+        color: #47bc23;
+        padding: 5px 12px 6px 30px;
+        text-decoration: none;
+        border-right:1px solid #d2d2d2;
+        border-bottom: 0px;
 }
