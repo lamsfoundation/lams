@@ -117,7 +117,6 @@
 					<include name="jakarta-commons/*.jar" />
 					<include name="jakarta-poi/*.jar" />
 					<include name="jakarta-taglibs/*.jar" />
-					<include name="jboss/*.jar" />
 					<include name="jdom/*.jar" />
 					<include name="jfreechart/*.jar" />
 					<include name="log4j/*.jar" />
@@ -498,6 +497,88 @@
 		<ant antfile="../${tool_wiki_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		
 	</target>
-
-
+	
+	<target name="slim-jboss" description="makes a backup and removes unnecessary services from JBoss 4.0.2;
+		do not run it twice, otherwise you will need to copy standardjboss.xml and ejb-deployer.xml
+		from the original JBoss distribution and then build the whole LAMS project">
+		<!-- Backup -->
+		<copy todir="${jboss.server.instance}/slim-backup/deploy">
+			<fileset dir="${jboss.ear.deploy}/">
+				<include name="ejb-deployer.xml"/>
+				<include name="client-deployer-service.xml"/>
+				<include name="schedule-manager-service.xml"/>
+				<include name="scheduler-service.xml"/>
+				<include name="bsh-deployer.xml"/>
+				<include name="jboss-aop.deployer/"/>
+				<include name="jboss-ws4ee.sar/"/>
+				<include name="jmx-console.war/"/>
+				<include name="http-invoker.sar/"/>
+			</fileset>
+		</copy>
+		
+		<copy todir="${jboss.server.instance}/slim-backup/conf">
+			<fileset dir="${jboss.server.instance}/conf">
+				<include name="jboss-service.xml"/>
+				<include name="standardjboss.xml"/>
+			</fileset>
+		</copy>
+		
+		<copy todir="${jboss.server.instance}/slim-backup/lib">
+			<fileset dir="${jboss.server.instance.lib}">
+				<include name="autonumber-plugin.jar"/>
+				<include name="bcel.jar"/>
+				<include name="jboss-jaxrpc.jar"/>
+				<include name="jboss-saaj.jar"/>
+				<include name="scheduler-plugin.jar"/>
+				<include name="scheduler-plugin-example.jar"/>
+				<include name="bsh-1.3.0.jar"/>
+				<include name="bsh-deployer.jar"/>
+			</fileset>
+		</copy>
+		
+		<!-- Configuring -->
+		<copy overwrite="yes" file="${conf.jboss}/ejb-deployer.slim.xml" tofile="${jboss.ear.deploy}/ejb-deployer.xml" />
+		<copy overwrite="yes" file="${conf.jboss}/jboss-service.slim.xml" tofile="${jboss.server.instance}/conf/jboss-service.xml" />
+		<copy overwrite="yes" file="${conf.jboss}/standardjboss.slim.xml" tofile="${jboss.server.instance}/conf/standardjboss.xml" />
+		
+		
+		<delete dir="${jboss.ear.deploy}jboss-aop.deployer" />
+		<delete dir="${jboss.ear.deploy}/jboss-ws4ee.sar" />
+		<delete dir="${jboss.ear.deploy}/jmx-console.war"/>
+		<delete dir="${jboss.ear.deploy}/http-invoker.sar"/>
+		
+		<delete file="${jboss.ear.deploy}/client-deployer-service.xml"/>
+		<delete file="${jboss.ear.deploy}/schedule-manager-service.xml"/>
+		<delete file="${jboss.ear.deploy}/scheduler-service.xml"/>
+		<delete file="${jboss.ear.deploy}/bsh-deployer.xml"/>
+		
+		<delete file="${jboss.server.instance.lib}/autonumber-plugin.jar"/>
+		<delete file="${jboss.server.instance.lib}/bcel.jar"/>
+		<delete file="${jboss.server.instance.lib}/jboss-jaxrpc.jar"/>
+		<delete file="${jboss.server.instance.lib}/jboss-saaj.jar"/>
+		<delete file="${jboss.server.instance.lib}/scheduler-plugin.jar"/>
+		<delete file="${jboss.server.instance.lib}/scheduler-plugin-example.jar"/>
+		<delete file="${jboss.server.instance.lib}/bsh-1.3.0.jar"/>
+		<delete file="${jboss.server.instance.lib}/bsh-deployer.jar"/>
+	</target>
+	
+	<target name="slim-jboss-revert" description="reverts changes made by slim-jboss task">
+		<copy overwrite="yes" todir="${jboss.ear.deploy}">
+			<fileset dir="${jboss.server.instance}/slim-backup/deploy/">
+				<include name="*/"/>
+			</fileset>
+		</copy>
+		
+		<copy overwrite="yes" todir="${jboss.server.instance}/conf">
+			<fileset dir="${jboss.server.instance}/slim-backup/conf">
+				<include name="*.xml"/>
+			</fileset>
+		</copy>
+		
+		<copy overwrite="yes" todir="${jboss.server.instance.lib}">
+			<fileset dir="${jboss.server.instance}/slim-backup/lib">
+				<include name="*"/>
+			</fileset>
+		</copy>
+	</target>
 </project>

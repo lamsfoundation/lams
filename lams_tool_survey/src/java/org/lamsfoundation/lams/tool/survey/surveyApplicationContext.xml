@@ -7,65 +7,46 @@
 	<bean id="lasurvMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.tool.survey.ApplicationResources</value></property>
 	</bean>
-	<bean id="lasurvMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="lasurvMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource"><ref local="lasurvMessageSource"/></property>										
 	</bean>
-    <!-- Hibernate SessionFactory -->
-    <bean id="lasurvSurveySessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="toolDataSource"/></property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
 
-        <!-- Must references all OR mapping files. -->
-        <property name="mappingResources">
-            <list>
-          	   <value>org/lamsfoundation/lams/learningdesign/BranchCondition.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveyUser.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/Survey.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveyQuestion.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveyOption.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveyAnswer.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveyAttachment.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveySession.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/survey/model/SurveyCondition.hbm.xml</value>
-            </list>
-        </property>
-    </bean>
     <!-- OutputFactory -->
-	<bean id="surveyOutputFactory" class="org.lamsfoundation.lams.tool.survey.service.SurveyOutputFactory" singleton="true">  
+	<bean id="surveyOutputFactory" class="org.lamsfoundation.lams.tool.survey.service.SurveyOutputFactory" >  
     	<property name="toolMessageService"><ref bean="lasurvMessageService"/></property>  
 	</bean> 
     <!-- core beans -->
     <bean id="lasurvSurveyDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lasurvSurveySessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
     <bean id="lasurvSurveyQuestionDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyQuestionDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lasurvSurveySessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
     <bean id="lasurvSurveyAnswerDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyAnswerDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lasurvSurveySessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
    <bean id="lasurvSurveyAttachmentDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyAttachmentDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lasurvSurveySessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
    <bean id="lasurvSurveyUserDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyUserDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lasurvSurveySessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
    <bean id="lasurvSurveySessionDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveySessionDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lasurvSurveySessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 

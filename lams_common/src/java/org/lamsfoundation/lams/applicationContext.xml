@@ -34,16 +34,6 @@
 		<property name="jndiName"><value>java:jdbc/lams-ds</value></property>
 	</bean>
 
-	<!-- JNDI DataSource for all tools				      -->
-	<!-- uses tool-ds datasource set up in the app-server -->
-	<bean id="toolDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName"><value>java:jdbc/tool-ds</value></property>
-	</bean>
-	
-	<bean id="quartzDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName"><value>java:jdbc/quartz-ds</value></property>
-	</bean>
-
 	<!--  Transaction manager for all transactions involving the core classes or the content repository. -->
 	
 	<!--  If your code calls classes in the content repository or in the core, and your data needs   -->
@@ -55,4 +45,3 @@
 	<bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/>
 
 </beans>
-

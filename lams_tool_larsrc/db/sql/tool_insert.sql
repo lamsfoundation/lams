@@ -28,8 +28,6 @@ moderation_url,
 pedagogical_planner_url,
 help_url,
 language_file,
-classpath_addition,
-context_file,
 create_date_time,
 modified_date_time
 )
@@ -59,8 +57,6 @@ NULL,
 'tool/larsrc11/authoring/initPedagogicalPlannerForm.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/larsrc11',
 'org.lamsfoundation.lams.tool.rsrc.ApplicationResources',
-'lams-tool-larsrc11.jar',
-'/org/lamsfoundation/lams/tool/rsrc/rsrcApplicationContext.xml',
 NOW(),
 NOW()
 )

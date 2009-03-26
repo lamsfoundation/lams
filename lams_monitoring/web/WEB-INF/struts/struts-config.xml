@@ -44,22 +44,27 @@
   <global-forwards>
       <forward
       	name="error"
-      	path="/error.jsp"
+      	path=".systemError"
       />
 </global-forwards>
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/toolBranching"
-      type="org.lamsfoundation.lams.monitoring.web.ToolOutputBranchingAction"
+      path="/grouping"
+      type="org.lamsfoundation.lams.monitoring.web.GroupingAJAXAction"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
-        name="viewBranches"
-        path=".viewBranches"
+        name="chosenGrouping"
+        path="/grouping/chosenGrouping.jsp"
+        redirect="false"
+      />
+      <forward
+        name="viewGroups"
+        path=".viewGroups"
         redirect="false"
       />
     </action>
@@ -94,61 +99,21 @@
       />
     </action>
     <action
-      path="/complexProgress"
-      type="org.lamsfoundation.lams.monitoring.web.ComplexLearnerProgressAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="complexProgress"
-        path=".complexProgress"
-        redirect="false"
-      />
-      <forward
-        name="parallelProgress"
-        path="/parallelProgress.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/grouping"
-      type="org.lamsfoundation.lams.monitoring.web.GroupingAJAXAction"
+      path="/groupedBranching"
+      type="org.lamsfoundation.lams.monitoring.web.GroupBasedBranchingAJAXAction"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
-        name="chosenGrouping"
-        path="/grouping/chosenGrouping.jsp"
+        name="groupedSelection"
+        path="/branching/groupedSelection.jsp"
         redirect="false"
       />
       <forward
-        name="viewGroups"
-        path=".viewGroups"
+        name="viewBranches"
+        path=".viewBranches"
         redirect="false"
-      />
-    </action>
-    <action
-      path="/monitoring"
-      type="org.lamsfoundation.lams.monitoring.web.MonitoringAction"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="previewdeleted"
-        path="/previewdeleted.jsp"
-        redirect="false"
-      />
-      <forward
-        name="notsupported"
-        path=".notsupported"
-        redirect="false"
-      />
-      <forward
-      	name="timeChart"
-      	path="/timeChart.jsp"
-      	redirect="false" 
       />
     </action>
     <action
@@ -170,17 +135,35 @@
       />
     </action>
     <action
-      path="/groupedBranching"
-      type="org.lamsfoundation.lams.monitoring.web.GroupBasedBranchingAJAXAction"
+      path="/monitoring"
+      type="org.lamsfoundation.lams.monitoring.web.MonitoringAction"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
-        name="groupedSelection"
-        path="/branching/groupedSelection.jsp"
+        name="previewdeleted"
+        path="/previewdeleted.jsp"
         redirect="false"
       />
+      <forward
+        name="notsupported"
+        path=".notsupported"
+        redirect="false"
+      />
+      <forward
+        name="timeChart"
+        path="/timeChart.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/toolBranching"
+      type="org.lamsfoundation.lams.monitoring.web.ToolOutputBranchingAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
       <forward
         name="viewBranches"
         path=".viewBranches"
@@ -197,6 +180,23 @@
       <forward
         name="viewSequence"
         path=".viewSequence"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/complexProgress"
+      type="org.lamsfoundation.lams.monitoring.web.ComplexLearnerProgressAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="complexProgress"
+        path=".complexProgress"
+        redirect="false"
+      />
+      <forward
+        name="parallelProgress"
+        path="/parallelProgress.jsp"
         redirect="false"
       />
     </action>

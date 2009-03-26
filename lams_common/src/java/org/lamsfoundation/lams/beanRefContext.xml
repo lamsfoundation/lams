@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+   <bean id="context.central"
+         class="org.springframework.context.support.ClassPathXmlApplicationContext">
+     <constructor-arg>
+       <list>
+       		<value>/org/lamsfoundation/lams/applicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/toolApplicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/contentrepository/applicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/learning/learningApplicationContext.xml</value>
+			<value>classpath*:org/lamsfoundation/lams/tool/**/*pplicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/web/webApplicationContext.xml</value>
+			<value>/org/lamsfoundation/lams/integrationContext.xml</value>
+			<value>/org/lamsfoundation/lams/usermanagement/ldapContext.xml</value>
+       </list>
+     </constructor-arg>
+   </bean>
+</beans>

@@ -4,7 +4,7 @@
 	<bean id="adminMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.admin.ApplicationResources</value></property>
 	</bean>
-	<bean id="adminMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="adminMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource"><ref local="adminMessageSource"/></property>										
 	</bean>
 	

@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_monitoring"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>

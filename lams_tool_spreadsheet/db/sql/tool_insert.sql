@@ -27,8 +27,6 @@ contribute_url,
 moderation_url,
 help_url,
 language_file,
-classpath_addition,
-context_file,
 create_date_time,
 modified_date_time
 )
@@ -57,8 +55,6 @@ NULL,
 'tool/lasprd10/moderate.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lasprd10',
 'org.lamsfoundation.lams.tool.spreadsheet.ApplicationResources',
-'lams-tool-lasprd10.jar',
-'/org/lamsfoundation/lams/tool/spreadsheet/spreadsheetApplicationContext.xml',
 NOW(),
 NOW()
 )

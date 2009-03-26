@@ -26,8 +26,6 @@ moderation_url,
 pedagogical_planner_url,
 help_url,
 language_file,
-classpath_addition,
-context_file,
 create_date_time,
 modified_date_time
 )
@@ -57,8 +55,6 @@ NULL,
 'tool/lascrb11/pedagogicalPlanner.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lascrb11',
 'org.lamsfoundation.lams.tool.scribe.ApplicationResources',
-'lams-tool-lascrb11.jar',
-'/org/lamsfoundation/lams/tool/scribe/scribeApplicationContext.xml',
 NOW(),
 NOW()
 )

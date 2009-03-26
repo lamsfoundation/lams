@@ -10,30 +10,16 @@
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-	<bean id="pixlrMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="pixlrMessageService" class="org.lamsfoundation.lams.util.MessageService">
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename"><value>org.lamsfoundation.lams.tool.pixlr.ApplicationResources</value></property>
 			</bean>
 		</property>										
 	</bean>
-	<!-- Hibernate SessionFactory -->
-	  <bean id="pixlrSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="toolDataSource"/></property>
-		<property name="mappingResources">
-			<list>	
-				<value>org/lamsfoundation/lams/tool/pixlr/model/Pixlr.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/pixlr/model/PixlrSession.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/pixlr/model/PixlrUser.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/pixlr/model/PixlrAttachment.hbm.xml</value> 
-				<value>org/lamsfoundation/lams/tool/pixlr/model/PixlrConfigItem.hbm.xml</value> 
-			</list>
-		</property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
-	</bean>
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
-	<bean id="pixlrOutputFactory" class="org.lamsfoundation.lams.tool.pixlr.service.PixlrOutputFactory" singleton="true">  
+	<bean id="pixlrOutputFactory" class="org.lamsfoundation.lams.tool.pixlr.service.PixlrOutputFactory">  
     	<property name="toolMessageService"><ref bean="pixlrMessageService"/></property>  
 	</bean> 
 	<bean id="pixlrService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -80,19 +66,19 @@
 	
 	<!--  DAO classes -->
 	<bean id="pixlrDAO" class="org.lamsfoundation.lams.tool.pixlr.dao.hibernate.PixlrDAO">
-		<property name="sessionFactory"><ref local="pixlrSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
 
 	<bean id="pixlrSessionDAO" class="org.lamsfoundation.lams.tool.pixlr.dao.hibernate.PixlrSessionDAO">
-		<property name="sessionFactory"><ref local="pixlrSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="pixlrUserDAO" class="org.lamsfoundation.lams.tool.pixlr.dao.hibernate.PixlrUserDAO">
-		<property name="sessionFactory"><ref local="pixlrSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="pixlrAttachmentDAO" class="org.lamsfoundation.lams.tool.pixlr.dao.hibernate.PixlrAttachmentDAO">
-		<property name="sessionFactory"><ref local="pixlrSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
  	<bean id="pixlrToolContentHandler" class="org.lamsfoundation.lams.tool.pixlr.util.PixlrToolContentHandler">
@@ -100,7 +86,7 @@
 	</bean>  
 	
 	<bean id="pixlrConfigItemDAO" class="org.lamsfoundation.lams.tool.pixlr.dao.hibernate.PixlrConfigItemDAO">
- 		<property name="sessionFactory"><ref local="pixlrSessionFactory"/></property>
+ 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
 </beans>

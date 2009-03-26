@@ -1,19 +1,27 @@
+<context-param>
+	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+	<param-value>org.lamsfoundation.lams.learning.ApplicationResources</param-value>
+</context-param>
 
 <context-param>
-  	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
-  	<param-value>org.lamsfoundation.lams.learning.ApplicationResources</param-value>
+	<param-name>messageSource</param-name>
+	<param-value>learningMessageSource</param-value>
+</context-param>
+
+<context-param> 
+	<param-name>contextConfigLocation</param-name>
+	<param-value></param-value>
 </context-param>
 <context-param>
-	<param-name>contextConfigLocation</param-name>
-	<param-value>
-		classpath:/org/lamsfoundation/lams/applicationContext.xml
-		classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
-		classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
-		classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
-		classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml		
-		<!--  Add tool contexts after this -->
-	</param-value>
+   <param-name>locatorFactorySelector</param-name>
+   <param-value>classpath*:/org/lamsfoundation/lams/**/beanRefContext.xml</param-value>
 </context-param>
+<context-param>
+	<param-name>parentContextKey</param-name>
+	<param-value>context.central</param-value>
+</context-param>
+
+
 <listener>
 	<listener-class>
 		org.springframework.web.context.ContextLoaderListener

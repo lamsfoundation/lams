@@ -22,6 +22,10 @@
       type="org.lamsfoundation.lams.tool.wiki.web.forms.LearningForm"
     />
     <form-bean
+      name="pedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.wiki.web.forms.WikiPedagogicalPlannerForm"
+    />
+    <form-bean
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.wiki.web.forms.AuthoringForm"
     />
@@ -145,6 +149,21 @@
       <forward
         name="message_page"
         path="tiles:/generic/message"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/pedagogicalPlanner"
+      type="org.lamsfoundation.lams.tool.wiki.web.actions.PedagogicalPlannerAction"
+      name="pedagogicalPlannerForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/pages/authoring/pedagogicalPlannerForm.jsp"
         redirect="false"
       />
     </action>

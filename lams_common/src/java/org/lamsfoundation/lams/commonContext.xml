@@ -81,11 +81,19 @@
 				<!-- Pedagogical Planner related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/planner/PedagogicalPlannerSequenceNode.hbm.xml</value>
 				
-				<!-- Gradebook related mapping files -->
+								<!-- Gradebook related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/gradebook/GradeBookUserActivity.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/gradebook/GradeBookUserLesson.hbm.xml</value>
 				
+				<value>classpath:org/lamsfoundation/lams/contentrepository/CrCredential.hbm.xml</value>
+ 				<value>classpath:org/lamsfoundation/lams/contentrepository/CrNode.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/contentrepository/CrNodeVersion.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/contentrepository/CrNodeVersionProperty.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/contentrepository/CrWorkspace.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/contentrepository/CrWorkspaceCredential.hbm.xml</value>
+				
 				<!-- Mapping files for tools with complex conditions -->
+
 				<value>classpath*:org/lamsfoundation/lams/tool/**/*.hbm.xml</value>
 				<value>classpath*:org/lamsfoundation/lams/tool/**/model/*.hbm.xml</value>
 				<value>classpath*:org/lamsfoundation/lams/tool/**/persistence/*.hbm.xml</value>
@@ -204,7 +212,7 @@
 	</bean>
 	
     <!--  Processes a LAMS 1.0.2 import file. Called by exportToolContentService -->
-	<bean id="ld102Importer" class="org.lamsfoundation.lams.learningdesign.service.LD102Importer"  singleton="false">
+	<bean id="ld102Importer" class="org.lamsfoundation.lams.learningdesign.service.LD102Importer" singleton="false">
 		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
@@ -220,11 +228,11 @@
 	<!--  Access a message service related to a programatically loaded message file. -->
 	<!--  Can be used to arbitrarily access any message file that is on the classpath -->
 	<!--  as long as you know the file's name and full path.                          -->
-	<bean id="loadedMessageSourceService" class="org.lamsfoundation.lams.util.LoadedMessageSourceService" singleton="true">
+	<bean id="loadedMessageSourceService" class="org.lamsfoundation.lams.util.LoadedMessageSourceService">
     </bean>
     	
     <!--  Each message service created by loadedMessageService is a ResourceBundleMessageSource -->
-	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource"  singleton="false">
+	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource" singleton="false">
 	</bean>
 			
 	<!--  Core Notebook Service -->
@@ -256,8 +264,8 @@
 	
 	<!-- Event notification Service -->
 
-	 <bean id="eventNotificationScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" singleton="true">
-        <property name="applicationContextSchedulerContextKey" value="eventNotificationContext"/>
+	 <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="applicationContextSchedulerContextKey" value="context.central"/>
     	<property name="quartzProperties">
 			<props>
 				<prop key="org.quartz.jobStore.class">org.springframework.scheduling.quartz.LocalDataSourceJobStore</prop>
@@ -265,18 +273,18 @@
 				<prop key="org.quartz.jobStore.tablePrefix">lams_qtz_</prop>
 			</props>
 		</property> 
-		<property name="dataSource"><ref bean="quartzDataSource"/></property>     
+		<property name="dataSource"><ref bean="dataSource"/></property>     
     </bean>
 
 
-    <bean id="eventNotificationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" singleton="true">
-		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+    <bean id="eventNotificationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.events.EventNotificationService">
 				<property name="eventDAO"><ref bean="eventDAO" /></property>
 				<property name="userManagementService"><ref bean="userManagementService"/></property>
 				<constructor-arg>
-         		  <ref bean="eventNotificationScheduler"/>
+         		  <ref bean="scheduler"/>
         		</constructor-arg>
 			</bean>	
 		</property>  
@@ -294,13 +302,13 @@
 	</bean>
 	
 	<!--  Configuration service -->
-	<bean id="configurationService" class="org.lamsfoundation.lams.util.Configuration" singleton="true">
+	<bean id="configurationService" class="org.lamsfoundation.lams.util.Configuration">
 		<property name="configurationDAO"><ref bean="configurationDAO" /></property>
 		<property name="registrationDAO"><ref bean="registrationDAO" /></property>
 	</bean>
 	
 	<!-- auditing service -->
-	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService"  singleton="true">
+	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService" >
 		<property name="messageService"><ref bean="commonMessageService"/></property>
     </bean>
 
@@ -381,11 +389,6 @@
 	
 	<!--  Pedagogical Planner related beans -->
 	<bean id="pedagogicalPlannerDAO" class="org.lamsfoundation.lams.planner.dao.hibernate.PedagogicalPlannerDAOHibernate">
-		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
-	</bean>
-	
-	<!--  Gradebook related beans -->
-	<bean id="gradeBookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradeBookDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	

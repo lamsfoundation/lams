@@ -10,20 +10,6 @@
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-	<!-- Hibernate SessionFactory -->
-	  <bean id="dimdimSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="toolDataSource"/></property>
-		<property name="mappingResources">
-			<list>	
-				<value>org/lamsfoundation/lams/tool/dimdim/model/Dimdim.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/dimdim/model/DimdimSession.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/dimdim/model/DimdimUser.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/dimdim/model/DimdimAttachment.hbm.xml</value> 
-				<value>org/lamsfoundation/lams/tool/dimdim/model/DimdimConfig.hbm.xml</value>
-			</list>
-		</property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
-	</bean>
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 	<bean id="dimdimService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -69,23 +55,23 @@
 	
 	<!--  DAO classes -->
 	<bean id="dimdimDAO" class="org.lamsfoundation.lams.tool.dimdim.dao.hibernate.DimdimDAO">
-		<property name="sessionFactory"><ref local="dimdimSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
 
 	<bean id="dimdimSessionDAO" class="org.lamsfoundation.lams.tool.dimdim.dao.hibernate.DimdimSessionDAO">
-		<property name="sessionFactory"><ref local="dimdimSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="dimdimUserDAO" class="org.lamsfoundation.lams.tool.dimdim.dao.hibernate.DimdimUserDAO">
-		<property name="sessionFactory"><ref local="dimdimSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="dimdimAttachmentDAO" class="org.lamsfoundation.lams.tool.dimdim.dao.hibernate.DimdimAttachmentDAO">
-		<property name="sessionFactory"><ref local="dimdimSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="dimdimConfigDAO" class="org.lamsfoundation.lams.tool.dimdim.dao.hibernate.DimdimConfigDAO">
-		<property name="sessionFactory"><ref local="dimdimSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
  	<bean id="dimdimToolContentHandler" class="org.lamsfoundation.lams.tool.dimdim.util.DimdimToolContentHandler">

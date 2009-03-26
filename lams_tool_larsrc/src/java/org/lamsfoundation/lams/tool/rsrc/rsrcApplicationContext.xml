@@ -4,64 +4,45 @@
 
 <beans>
 
-	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="resourceMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename"><value>org.lamsfoundation.lams.tool.rsrc.ApplicationResources</value></property>
 			</bean>
 		</property>										
 	</bean>
-    <!-- Hibernate SessionFactory -->
-    <bean id="resourceSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="toolDataSource"/></property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
-
-        <!-- Must references all OR mapping files. -->
-        <property name="mappingResources">
-            <list>
-               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceUser.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/rsrc/model/Resource.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceItem.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceItemInstruction.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceItemVisitLog.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceAttachment.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/rsrc/model/ResourceSession.hbm.xml</value>
-            </list>
-        </property>
-    </bean>
-
     <!-- core beans -->
     <bean id="resourceDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceDAOHibernate">
         <property name="sessionFactory">
-            <ref local="resourceSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
     <bean id="resourceItemDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceItemDAOHibernate">
         <property name="sessionFactory">
-            <ref local="resourceSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
     <bean id="resourceItemVisitDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceItemVisitDAOHibernate">
         <property name="sessionFactory">
-            <ref local="resourceSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
    <bean id="resourceAttachmentDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceAttachmentDAOHibernate">
         <property name="sessionFactory">
-            <ref local="resourceSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
    <bean id="resourceUserDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceUserDAOHibernate">
         <property name="sessionFactory">
-            <ref local="resourceSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
    <bean id="resourceSessionDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceSessionDAOHibernate">
         <property name="sessionFactory">
-            <ref local="resourceSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
@@ -111,7 +92,7 @@
    		<property name="exportContentService">
    			<ref bean="exportToolContentService"/>
    		</property>
-   		<property name="messageService"><ref bean="messageService"/></property>
+   		<property name="messageService"><ref bean="resourceMessageService"/></property>
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>

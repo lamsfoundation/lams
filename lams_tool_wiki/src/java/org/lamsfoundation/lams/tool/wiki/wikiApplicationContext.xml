@@ -10,21 +10,6 @@
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-	<!-- Hibernate SessionFactory -->
-	  <bean id="wikiSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="toolDataSource"/></property>
-		<property name="mappingResources">
-			<list>	
-				<value>org/lamsfoundation/lams/tool/wiki/model/Wiki.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/wiki/model/WikiPage.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/wiki/model/WikiPageContent.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/wiki/model/WikiSession.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/wiki/model/WikiUser.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/wiki/model/WikiAttachment.hbm.xml</value> 
-			</list>
-		</property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
-	</bean>
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 	<bean id="wikiService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -74,34 +59,34 @@
 	
 	<!--  DAO classes -->
 	<bean id="wikiDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiDAO">
-		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
 	
 	<bean id="wikiPageDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiPageDAO">
-		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean> 
 	
 	<bean id="wikiPageContentDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiPageContentDAO">
-		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean> 
 
 	<bean id="wikiSessionDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiSessionDAO">
-		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="wikiUserDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiUserDAO">
-		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="wikiAttachmentDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiAttachmentDAO">
-		<property name="sessionFactory"><ref local="wikiSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
  	<bean id="wikiToolContentHandler" class="org.lamsfoundation.lams.tool.wiki.util.WikiToolContentHandler">
  		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean>  
 	
-	<bean id="wikiMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="wikiMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename"><value>org.lamsfoundation.lams.tool.wiki.ApplicationResources</value></property>

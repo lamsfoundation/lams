@@ -4,7 +4,7 @@
 <!-- Application context definition for Submit Files Tool -->
 
 <beans>
-	<bean id="sbmtMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="sbmtMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename"><value>org.lamsfoundation.lams.tool.sbmt.ApplicationResources</value></property>
@@ -13,46 +13,31 @@
 	</bean>
 	
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-  	<!-- Hibernate SessionFactory -->
-	<bean id="sbmtSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="toolDataSource"/></property>
-		<property name="mappingResources">
-			<list>
-				<value>org/lamsfoundation/lams/tool/sbmt/SubmitFilesContent.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/sbmt/SubmitFilesReport.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/sbmt/SubmitFilesSession.hbm.xml</value>				
-				<value>org/lamsfoundation/lams/tool/sbmt/SubmissionDetails.hbm.xml</value>				
-				<value>org/lamsfoundation/lams/tool/sbmt/InstructionFiles.hbm.xml</value>				
-				<value>org/lamsfoundation/lams/tool/sbmt/SubmitUser.hbm.xml</value>				
-			</list>
-		</property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
-	</bean>
 
 	<!-- Submit Files related beans-->
 	
 	<bean id="submitFilesContentDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.SubmitFilesContentDAO">
-		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="submitFilesSessionDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.SubmitFilesSessionDAO">
-		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="submitFilesReportDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.SubmitFilesReportDAO">
-		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>	
 	
 	<bean id="submissionDetailsDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.SubmissionDetailsDAO">
-		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
 	<bean id="submitUserDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.SubmitUserDAO">
-		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
 	<bean id="attachmentDAO" class="org.lamsfoundation.lams.tool.sbmt.dao.hibernate.AttachmentDAO">
-		<property name="sessionFactory"><ref local="sbmtSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="submitFilesServiceTarget" class="org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesService">

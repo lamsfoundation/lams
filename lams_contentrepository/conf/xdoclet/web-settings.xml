@@ -1,7 +1,12 @@
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>
-			classpath:/org/lamsfoundation/lams/applicationContext.xml
-			classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
-		</param-value>
-	</context-param>
+<context-param> 
+	<param-name>contextConfigLocation</param-name>
+	<param-value></param-value>
+</context-param>
+<context-param>
+   <param-name>locatorFactorySelector</param-name>
+   <param-value>classpath*:/org/lamsfoundation/lams/**/beanRefContext.xml</param-value>
+</context-param>
+<context-param>
+	<param-name>parentContextKey</param-name>
+	<param-value>context.central</param-value>
+</context-param>

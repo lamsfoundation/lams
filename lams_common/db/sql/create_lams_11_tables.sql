@@ -474,8 +474,6 @@ CREATE TABLE lams_tool (
      , create_date_time DATETIME NOT NULL
      , language_file VARCHAR(255)
      , modified_date_time DATETIME
-     , classpath_addition VARCHAR(255)
-     , context_file VARCHAR(255)
      , admin_url TEXT
      , supports_outputs TINYINT(1) DEFAULT 0
 	 , ext_lms_id VARCHAR(255) DEFAULT NULL

@@ -35,33 +35,33 @@
 
 
 	<bean id="voteContentDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteContentDAO">
-		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
 
 	<bean id="voteSessionDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteSessionDAO">
-		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
 	<bean id="voteUserDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUserDAO">
-		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="voteQueContentDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteQueContentDAO">
-		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="voteOptionsContentDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteOptionsContentDAO">
-		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	
 	<bean id="voteUsrAttemptDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUsrAttemptDAO">
-		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
 
 	<bean id="voteUploadedFileDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUploadedFileDAO">
-		<property name="sessionFactory"><ref local="voteSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="voteToolContentHandler" class="org.lamsfoundation.lams.tool.vote.util.VoteToolContentHandler">

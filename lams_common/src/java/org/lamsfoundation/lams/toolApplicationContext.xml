@@ -24,7 +24,7 @@
 	
 	
 	<bean id="toolContentIDGeneratorTarget" class="org.lamsfoundation.lams.tool.ToolContentIDGenerator"
-		singleton="true"
+		
 	>
 		<property name="toolContentDao"><ref local="toolContentDAO"/></property>
 	</bean>	
@@ -39,9 +39,7 @@
 		</property>
 	</bean>
 	
-	<bean id="lamsCoreToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsCoreToolService"
-		singleton="false"
-	>
+	<bean id="lamsCoreToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsCoreToolService" singleton="false">
 		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>

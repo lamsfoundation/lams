@@ -7,15 +7,17 @@
   	<param-value>org.lamsfoundation.lams.admin.ApplicationResources</param-value>
 </context-param>
 
-<context-param>
+<context-param> 
 	<param-name>contextConfigLocation</param-name>
-	<param-value>
-		classpath:/org/lamsfoundation/lams/applicationContext.xml
-		classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
-		classpath:/org/lamsfoundation/lams/integrationContext.xml
-		classpath:/org/lamsfoundation/lams/admin/adminApplicationContext.xml
-		classpath:/org/lamsfoundation/lams/usermanagement/ldapContext.xml
-	</param-value>
+	<param-value>classpath:/org/lamsfoundation/lams/admin/adminApplicationContext.xml</param-value>
+</context-param>
+<context-param>
+   <param-name>locatorFactorySelector</param-name>
+   <param-value>classpath*:/org/lamsfoundation/lams/**/beanRefContext.xml</param-value>
+</context-param>
+<context-param>
+	<param-name>parentContextKey</param-name>
+	<param-value>context.central</param-value>
 </context-param>
 
 <context-param>

@@ -8,18 +8,18 @@
 	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
 	-->
 <beans>
+		<bean id="monitoringMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+			<property name="basename">
+				<value>org.lamsfoundation.lams.monitoring.ApplicationResources</value>
+			</property>
+		</bean>
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
-		<bean id="monitoringMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
-		<property name="messageSource">
-			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-				<property name="basename">
-					<value>org.lamsfoundation.lams.monitoring.ApplicationResources</value>
-				</property>
-			</bean>
-		</property>
-		
-	</bean>
+		<bean id="monitoringMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+			<property name="messageSource">
+				<ref bean="monitoringMessageSource"/>
+			</property>
+		</bean>
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 
 
@@ -27,10 +27,8 @@
 	  - Lams monitoring primary business object (default implementation), as an inner bean wrapped
 		- by an outer transactional proxy. The two bean definitions could have been separate,
 		- but this is cleaner as there is no need to ever access the unwrapped object.
-	-->   
-	<bean id="monitoringServiceTarget" class="org.lamsfoundation.lams.monitoring.service.MonitoringService"
-		singleton="false"
-	>
+	-->
+	<bean id="monitoringServiceTarget" class="org.lamsfoundation.lams.monitoring.service.MonitoringService" singleton="false">
 		<property name="baseDAO"><ref bean="baseDAO"/></property>
 		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
@@ -97,18 +95,6 @@
         <property name="jobClass">
             <value>org.lamsfoundation.lams.monitoring.quartz.job.FinishScheduleLessonJob</value>
         </property>
-    </bean>
-    
-    <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="applicationContextSchedulerContextKey" value="monitoringApplicationContext"/>
-    	<property name="quartzProperties">
-			<props>
-				<prop key="org.quartz.jobStore.class">org.springframework.scheduling.quartz.LocalDataSourceJobStore</prop>
-				<prop key="org.quartz.jobStore.driverDelegateClass">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</prop>
-				<prop key="org.quartz.jobStore.tablePrefix">lams_qtz_</prop>
-			</props>
-		</property> 
-		<property name="dataSource"><ref bean="quartzDataSource"/></property>     
     </bean>
     
 </beans>

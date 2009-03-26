@@ -18,12 +18,12 @@
       type="org.lamsfoundation.lams.learning.web.form.TestDblSubmitForm"
     />
     <form-bean
-      name="optionsActivityForm"
-      type="org.lamsfoundation.lams.learning.web.form.OptionsActivityForm"
-    />
-    <form-bean
       name="activityForm"
       type="org.lamsfoundation.lams.learning.web.form.ActivityForm"
+    />
+    <form-bean
+      name="optionsActivityForm"
+      type="org.lamsfoundation.lams.learning.web.form.OptionsActivityForm"
     />
 
    <form-bean name="GroupingForm"  type="org.apache.struts.action.DynaActionForm">
@@ -94,38 +94,65 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/gate"
-      type="org.lamsfoundation.lams.learning.web.action.GateAction"
-      name="GateForm"
+      path="/grouping"
+      type="org.lamsfoundation.lams.learning.web.action.GroupingAction"
+      name="GroupingForm"
       scope="request"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
-        name="permissionGate"
-        path=".permissionGate"
+        name="viewGroup"
+        path="/grouping.do?method=viewGrouping"
         redirect="false"
       />
       <forward
-        name="scheduleGate"
-        path=".scheduleGate"
+        name="showGroup"
+        path=".showgroup"
         redirect="false"
       />
       <forward
-        name="synchGate"
-        path=".synchGate"
+        name="waitGroup"
+        path=".waitgroup"
         redirect="false"
       />
       <forward
-        name="conditionGate"
-        path=".conditionGate"
+        name="chooseGroup"
+        path=".choosegroup"
         redirect="false"
       />
     </action>
     <action
-      path="/ChooseActivity"
-      type="org.lamsfoundation.lams.learning.web.action.ChooseActivityAction"
+      path="/learner"
+      type="org.lamsfoundation.lams.learning.web.action.LearnerAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayActivity"
+        path="/DisplayActivity.do"
+        redirect="false"
+      />
+      <forward
+        name="displayProgress"
+        path="/progress.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/CompleteActivity"
+      type="org.lamsfoundation.lams.learning.web.action.CompleteActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/DisplayToolActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayToolActivityAction"
       name="activityForm"
       scope="request"
       unknown="false"
@@ -168,45 +195,32 @@
       />
     </action>
     <action
-      path="/DisplayParallelActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayParallelActivityAction"
+      path="/LessonComplete"
+      type="org.lamsfoundation.lams.learning.web.action.LessonCompleteActivityAction"
       name="activityForm"
       scope="request"
       unknown="false"
       validate="false"
     >
       <forward
-        name="displayParallel"
-        path=".parallelActivity"
+        name="lessonComplete"
+        path=".lessonComplete"
         redirect="false"
       />
     </action>
     <action
-      path="/learner"
-      type="org.lamsfoundation.lams.learning.web.action.LearnerAction"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="displayActivity"
-        path="/DisplayActivity.do"
-        redirect="false"
-      />
-      <forward
-        name="displayProgress"
-        path="/progress.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/SequenceActivity"
-      type="org.lamsfoundation.lams.learning.web.action.SequenceActivityAction"
-      name="activityForm"
+      path="/test/DblSubmit"
+      type="org.lamsfoundation.lams.learning.web.action.TestDblSubmitAction"
+      name="testDblSubmitForm"
       scope="request"
       unknown="false"
       validate="false"
     >
+      <forward
+        name="display"
+        path="/test/dblSubmitTest.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/branching"
@@ -225,6 +239,60 @@
       <forward
         name="displayBranchingPreview"
         path=".branchingActivityPreview"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/ChooseActivity"
+      type="org.lamsfoundation.lams.learning.web.action.ChooseActivityAction"
+      name="activityForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/DisplayOptionsActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayOptionsActivityAction"
+      name="optionsActivityForm"
+      scope="request"
+      input="/Activity.do"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayOptions"
+        path=".optionsActivity"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/gate"
+      type="org.lamsfoundation.lams.learning.web.action.GateAction"
+      name="GateForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="permissionGate"
+        path=".permissionGate"
+        redirect="false"
+      />
+      <forward
+        name="scheduleGate"
+        path=".scheduleGate"
+        redirect="false"
+      />
+      <forward
+        name="synchGate"
+        path=".synchGate"
+        redirect="false"
+      />
+      <forward
+        name="conditionGate"
+        path=".conditionGate"
         redirect="false"
       />
     </action>
@@ -248,32 +316,13 @@
       />
     </action>
     <action
-      path="/test/DblSubmit"
-      type="org.lamsfoundation.lams.learning.web.action.TestDblSubmitAction"
-      name="testDblSubmitForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="display"
-        path="/test/dblSubmitTest.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/LessonComplete"
-      type="org.lamsfoundation.lams.learning.web.action.LessonCompleteActivityAction"
+      path="/SequenceActivity"
+      type="org.lamsfoundation.lams.learning.web.action.SequenceActivityAction"
       name="activityForm"
       scope="request"
       unknown="false"
       validate="false"
     >
-      <forward
-        name="lessonComplete"
-        path=".lessonComplete"
-        redirect="false"
-      />
     </action>
     <action
       path="/DisplayActivity"
@@ -310,67 +359,18 @@
       />
     </action>
     <action
-      path="/DisplayToolActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayToolActivityAction"
+      path="/DisplayParallelActivity"
+      type="org.lamsfoundation.lams.learning.web.action.DisplayParallelActivityAction"
       name="activityForm"
       scope="request"
       unknown="false"
       validate="false"
     >
-    </action>
-    <action
-      path="/grouping"
-      type="org.lamsfoundation.lams.learning.web.action.GroupingAction"
-      name="GroupingForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
       <forward
-        name="viewGroup"
-        path="/grouping.do?method=viewGrouping"
+        name="displayParallel"
+        path=".parallelActivity"
         redirect="false"
       />
-      <forward
-        name="showGroup"
-        path=".showgroup"
-        redirect="false"
-      />
-      <forward
-        name="waitGroup"
-        path=".waitgroup"
-        redirect="false"
-      />
-      <forward
-        name="chooseGroup"
-        path=".choosegroup"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/DisplayOptionsActivity"
-      type="org.lamsfoundation.lams.learning.web.action.DisplayOptionsActivityAction"
-      name="optionsActivityForm"
-      scope="request"
-      input="/Activity.do"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="displayOptions"
-        path=".optionsActivity"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/CompleteActivity"
-      type="org.lamsfoundation.lams.learning.web.action.CompleteActivityAction"
-      name="activityForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
     </action>
 
 <action path="/index"

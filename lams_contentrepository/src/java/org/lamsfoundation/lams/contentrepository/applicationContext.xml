@@ -7,22 +7,6 @@
  -->
 <beans>
 
-	<!-- Hibernate SessionFactory -->
-	<bean id="crSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="dataSource"/></property>
-		<property name="mappingResources">
-			<list>	
-				<value>org/lamsfoundation/lams/contentrepository/CrCredential.hbm.xml</value>
- 				<value>org/lamsfoundation/lams/contentrepository/CrNode.hbm.xml</value>
-				<value>org/lamsfoundation/lams/contentrepository/CrNodeVersion.hbm.xml</value>
-				<value>org/lamsfoundation/lams/contentrepository/CrNodeVersionProperty.hbm.xml</value>
-				<value>org/lamsfoundation/lams/contentrepository/CrWorkspace.hbm.xml</value>
-				<value>org/lamsfoundation/lams/contentrepository/CrWorkspaceCredential.hbm.xml</value>
-			</list>
-		</property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
-	</bean>
-
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
 
 	<!--  repository (as repositoryAdminService) and ticket are the two main interfaces -->
@@ -90,15 +74,15 @@
 
 	<!--  DAO classes -->
 	<bean id="workspaceDAO" class="org.lamsfoundation.lams.contentrepository.dao.hibernate.WorkspaceDAO">
-		<property name="sessionFactory"><ref local="crSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
 
 	<bean id="credentialDAO" class="org.lamsfoundation.lams.contentrepository.dao.hibernate.CredentialDAO">
-		<property name="sessionFactory"><ref local="crSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
 
 	<bean id="nodeDAO" class="org.lamsfoundation.lams.contentrepository.dao.hibernate.NodeDAO">
-		<property name="sessionFactory"><ref local="crSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
 
 	<!--  Most DAO's are for Hibernate. fileDAO manages reading and writing files to the filesystem -->

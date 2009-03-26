@@ -11,7 +11,7 @@
 	<bean id="centralMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.central.ApplicationResources</value></property>
 	</bean>
-	<bean id="centralMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="centralMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource"><ref local="centralMessageSource"/></property>										
 	</bean>
 	

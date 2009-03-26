@@ -31,25 +31,25 @@ import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
 /**
- * All Quartz Job Bean super classes in monitoring. It provides a simple helper method to 
- * get monitoringService.
+ * All Quartz Job Bean super classes in monitoring. It provides a simple helper method to get monitoringService.
  * 
  * @author Steve.Ni
  * 
  * @version $Revision$
  */
-public abstract class MonitoringJob extends QuartzJobBean{
-	private static final String CONTEXT_NAME = "monitoringApplicationContext";
-	private static final String SERVICE_NAME = "monitoringService";
-	
-	protected IMonitoringService getMonitoringService(JobExecutionContext context) throws JobExecutionException{
-		try {
-			SchedulerContext  sc = context.getScheduler().getContext();
-			ApplicationContext cxt = (ApplicationContext) sc.get(CONTEXT_NAME);
-			return (IMonitoringService) cxt.getBean(SERVICE_NAME);
-		} catch (SchedulerException e) {
-			throw new JobExecutionException("Failed look up the Scheduler" + e.toString());
-		}
+public abstract class MonitoringJob extends QuartzJobBean {
+    private static final String CONTEXT_NAME = "context.central";
+    private static final String SERVICE_NAME = "monitoringService";
+
+    protected IMonitoringService getMonitoringService(JobExecutionContext context) throws JobExecutionException {
+	try {
+	    SchedulerContext sc = context.getScheduler().getContext();
+	    ApplicationContext cxt = (ApplicationContext) sc.get(MonitoringJob.CONTEXT_NAME);
+	    return (IMonitoringService) cxt.getBean(MonitoringJob.SERVICE_NAME);
+	} catch (SchedulerException e) {
+	    throw new JobExecutionException("Failed look up the Scheduler" + e.toString());
 	}
+    }
 }

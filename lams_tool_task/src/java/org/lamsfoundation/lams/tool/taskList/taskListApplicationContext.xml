@@ -7,29 +7,9 @@
 	<bean id="lataskMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.tool.taskList.ApplicationResources</value></property>
 	</bean>
-	<bean id="lataskMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="lataskMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource"><ref local="lataskMessageSource"/></property>										
 	</bean>
-    <!-- Hibernate SessionFactory -->
-    <bean id="lataskTaskListSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="toolDataSource"/></property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
-
-        <!-- Must references all OR mapping files. -->
-        <property name="mappingResources">
-            <list>
-               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListUser.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/taskList/model/TaskList.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItem.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItemVisitLog.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItemAttachment.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListItemComment.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListAttachment.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListSession.hbm.xml</value>
-               <value>org/lamsfoundation/lams/tool/taskList/model/TaskListCondition.hbm.xml</value>
-            </list>
-        </property>
-    </bean>
 
 	<!-- OutputFactory -->
 	<bean id="taskListOutputFactory" class="org.lamsfoundation.lams.tool.taskList.service.TaskListOutputFactory">  
@@ -39,41 +19,41 @@
     <!-- core beans -->
     <bean id="lataskTaskListDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lataskTaskListSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
     <bean id="lataskTaskListItemDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListItemDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lataskTaskListSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
     <bean id="lataskTaskListItemVisitDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListItemVisitDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lataskTaskListSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
    <bean id="lataskTaskListAttachmentDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListAttachmentDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lataskTaskListSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
     
     <bean id="lataskTaskListConditionDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListConditionDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lataskTaskListSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
    <bean id="lataskTaskListUserDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListUserDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lataskTaskListSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
    <bean id="lataskTaskListSessionDao" class="org.lamsfoundation.lams.tool.taskList.dao.hibernate.TaskListSessionDAOHibernate">
         <property name="sessionFactory">
-            <ref local="lataskTaskListSessionFactory"/>
+            <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 

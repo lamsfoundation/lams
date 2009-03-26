@@ -12,7 +12,7 @@
     </filter-class>
 	<init-param>
 		<param-name>sessionFactoryBeanName</param-name>
-		<param-value>videoRecorderSessionFactory</param-value>
+		<param-value>coreSessionFactory</param-value>
 	</init-param>
    </filter>
    

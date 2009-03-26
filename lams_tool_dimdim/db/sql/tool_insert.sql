@@ -26,8 +26,6 @@ moderation_url,
 help_url,
 admin_url,
 language_file,
-classpath_addition,
-context_file,
 create_date_time,
 modified_date_time
 )
@@ -57,8 +55,6 @@ NULL,
 'http://wiki.lamsfoundation.org/display/lamsdocs/laddim10',
 'tool/laddim10/admin/view.do',
 'org.lamsfoundation.lams.tool.dimdim.ApplicationResources',
-'lams-tool-laddim10.jar',
-'/org/lamsfoundation/lams/tool/dimdim/dimdimApplicationContext.xml',
 NOW(),
 NOW()
 )

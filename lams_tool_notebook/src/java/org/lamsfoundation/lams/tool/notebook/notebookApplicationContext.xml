@@ -10,31 +10,16 @@
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-	<bean id="notebookMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+	<bean id="notebookMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename"><value>org.lamsfoundation.lams.tool.notebook.ApplicationResources</value></property>
 			</bean>
 		</property>										
 	</bean>
-	<!-- Hibernate SessionFactory -->
-	  <bean id="notebookSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource"><ref bean="toolDataSource"/></property>
-		<property name="mappingResources">
-			<list>	
-				<value>org/lamsfoundation/lams/learningdesign/BranchCondition.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/notebook/model/Notebook.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/notebook/model/NotebookSession.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/notebook/model/NotebookUser.hbm.xml</value>
-				<value>org/lamsfoundation/lams/tool/notebook/model/NotebookAttachment.hbm.xml</value> 
-				<value>org/lamsfoundation/lams/tool/notebook/model/NotebookCondition.hbm.xml</value> 
-			</list>
-		</property>
-		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
-	</bean>
 
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
-	<bean id="notebookOutputFactory" class="org.lamsfoundation.lams.tool.notebook.service.NotebookOutputFactory" singleton="true">  
+	<bean id="notebookOutputFactory" class="org.lamsfoundation.lams.tool.notebook.service.NotebookOutputFactory" >  
     	<property name="toolMessageService"><ref bean="notebookMessageService"/></property>  
 	</bean> 
 	<bean id="notebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -80,19 +65,19 @@
 	
 	<!--  DAO classes -->
 	<bean id="notebookDAO" class="org.lamsfoundation.lams.tool.notebook.dao.hibernate.NotebookDAO">
-		<property name="sessionFactory"><ref local="notebookSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
 
 	<bean id="notebookSessionDAO" class="org.lamsfoundation.lams.tool.notebook.dao.hibernate.NotebookSessionDAO">
-		<property name="sessionFactory"><ref local="notebookSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="notebookUserDAO" class="org.lamsfoundation.lams.tool.notebook.dao.hibernate.NotebookUserDAO">
-		<property name="sessionFactory"><ref local="notebookSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
 	<bean id="notebookAttachmentDAO" class="org.lamsfoundation.lams.tool.notebook.dao.hibernate.NotebookAttachmentDAO">
-		<property name="sessionFactory"><ref local="notebookSessionFactory"/></property>
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
  	<bean id="notebookToolContentHandler" class="org.lamsfoundation.lams.tool.notebook.util.NotebookToolContentHandler">

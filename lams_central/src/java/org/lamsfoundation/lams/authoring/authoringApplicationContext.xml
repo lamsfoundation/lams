@@ -9,7 +9,7 @@
 	      <property name="proxyTargetClass"><value>true</value></property>     
 	</bean-->
 		<!-- ========================= GENERAL DEFINITIONS ========================= -->
-		<bean id="authoringMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<bean id="authoringMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename">

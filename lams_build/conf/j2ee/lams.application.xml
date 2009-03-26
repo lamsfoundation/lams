@@ -142,12 +142,6 @@
 		<java>jaxrpc.jar</java>
 	</module>
 	<module>
-		<java>jboss-cache.jar</java>
-	</module>
-	<module>
-		<java>jgroups.jar</java>
-	</module>
-	<module>
 		<java>jdom.jar</java>
 	</module>
 	<module>

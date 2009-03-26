@@ -26,8 +26,6 @@ moderation_url,
 pedagogical_planner_url,
 help_url,
 language_file,
-classpath_addition,
-context_file,
 create_date_time,
 modified_date_time
 )
@@ -57,8 +55,6 @@ NULL,
 'tool/lanb11/pedagogicalPlanner.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lanb11',
 'org.lamsfoundation.lams.tool.noticeboard.ApplicationResources',
-'lams-tool-lanb11.jar',
-'/org/lamsfoundation/lams/tool/noticeboard/applicationContext.xml',
 NOW(),
 NOW()
 );
