@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
- <display-name>Shared Assessment</display-name>
+ <display-name>Assessment</display-name>
 <description>
-	Shared Assessment tool
+	Assessment tool
 </description>
 <context-param>
 	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
@@ -11,7 +11,7 @@
 </context-param>
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
-	<param-value></param-value>
+	<param-value>classpath:/org/lamsfoundation/lams/tool/assessment/dbupdates/autopatchContext.xml</param-value>
 </context-param>
 <context-param>
    <param-name>locatorFactorySelector</param-name>
@@ -130,7 +130,7 @@
 		<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
 	    <init-param>
 	      <param-name>toolContentHandlerBeanName</param-name>
-	      <param-value>assessmentToolContentHandler</param-value>
+	      <param-value>laasseAssessmentToolContentHandler</param-value>
 	    </init-param>
 	    <load-on-startup>3</load-on-startup>
 	</servlet>

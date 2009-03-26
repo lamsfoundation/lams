@@ -32,7 +32,7 @@
 		   	        <c:forEach var="question" items="${assessment.questions}">
 		   	     		{name:'${question.uid}', index:'${question.uid}', width:60, align:"right", sorttype:"float"},
 	   	        	</c:forEach>			   				
-			   		{name:'total',index:'total', width:50,align:"right",sorttype:"float"}		
+			   		{name:'total',index:'total', width:50,align:"right",sorttype:"float", formatter:'number', formatoptions:{decimalPlaces: 2}}		
 			   	],
 			   	
 			   	imgpath:  pathToImageFolder + "jqGrid.basic.theme", 
@@ -53,10 +53,7 @@
 			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
 			   		var sessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
 					var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
-					//userMasterDetailUrl += "?userID=" + userId + "&sessionId=" + sessionId;
-		  	        jQuery("#userSummary${summary.sessionId}").clearGridData().setGridParam({gridstate: "visible",caption:"ss"}).trigger("reloadGrid");
-		  	   //   jQuery("#userSummary${summary.sessionId}").setGridParam({caption:"ss"});
-		  	     // jQuery("#userSummary${summary.sessionId}").trigger("reloadGrid");
+		  	        jQuery("#userSummary${summary.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
 		  	        $("#masterDetailArea").load(
 		  	        	userMasterDetailUrl,
 		  	        	{
@@ -93,12 +90,12 @@
 
 			jQuery("#userSummary${summary.sessionId}").jqGrid({
 				datatype: "local",
-				
-				hiddengrid: true,
+				gridstate:"hidden",
+				//hiddengrid:true,
 				height: 90,
 				width: 530,
 				shrinkToFit: false,
-				
+				caption: '<fmt:message key="label.monitoring.summary.learner.summary" />',
 			   	colNames:['#',
 						'questionResultUid',
   						'Question',
@@ -115,12 +112,19 @@
 			   	
 			   	imgpath:  pathToImageFolder + "jqGrid.basic.theme", 
 			   	multiselect: false,
-			   	caption: "User summary",
+
 				cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
   				cellEdit: true,
   				afterSaveCell : function (rowid,name,val,iRow,iCol){
+					//var questionResultUid = jQuery("#session${session.sessionId}").getCell(rowid, 'questionResultUid');   || (questionResultUid=="")
   					if (isNaN(val)) {
   						jQuery("#userSummary${summary.sessionId}").restoreCell(iRow,iCol); 
+  					} else {
+  						var parentSelectedRowId = jQuery("#list${summary.sessionId}").getGridParam("selrow");
+  						var previousValue =  eval(jQuery("#list${summary.sessionId}").getCell(parentSelectedRowId, eval(rowid)+3));
+  						var previousTotal =  eval(jQuery("#list${summary.sessionId}").getCell(parentSelectedRowId, 'total'));
+  						jQuery("#list${summary.sessionId}").setCell(parentSelectedRowId, eval(rowid)+3, val, {}, {});
+  						jQuery("#list${summary.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - previousValue + eval(val), {}, {});
   					}
 				},	  		
   				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
@@ -180,6 +184,9 @@
 		</div>	
 	</c:when>
 	<c:otherwise>
+	
+
+	
 	
 		<div id="masterDetailArea">
 			<%@ include file="parts/masterDetailLoadUp.jsp"%>

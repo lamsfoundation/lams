@@ -4,90 +4,89 @@
 
 <beans>
 
-	<bean id="messageService" class="org.lamsfoundation.lams.util.MessageService">
+	<bean id="laasseMessageService" class="org.lamsfoundation.lams.util.MessageService">
 		<property name="messageSource">
-			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+			<bean id="laasseMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename"><value>org.lamsfoundation.lams.tool.assessment.ApplicationResources</value></property>
 			</bean>
 		</property>										
 	</bean>
-    <!-- Hibernate SessionFactory -->
 
     <!-- OutputFactory -->
 	<bean id="assessmentOutputFactory" class="org.lamsfoundation.lams.tool.assessment.service.AssessmentOutputFactory">  
-    	<property name="toolMessageService"><ref bean="messageService"/></property>  
+    	<property name="toolMessageService"><ref bean="laasseMessageService"/></property>  
 	</bean> 
 	
     <!-- core beans -->
-    <bean id="assessmentDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentDAOHibernate">
+    <bean id="laasseAssessmentDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentDAOHibernate">
         <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
+             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
-    <bean id="assessmentQuestionDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionDAOHibernate">
+    <bean id="laasseAssessmentQuestionDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionDAOHibernate">
         <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
+             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
-    <bean id="assessmentQuestionResultDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionResultDAOHibernate">
+    <bean id="laasseAssessmentQuestionResultDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionResultDAOHibernate">
         <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
+             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
-    <bean id="assessmentResultDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentResultDAOHibernate">
+    <bean id="laasseAssessmentResultDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentResultDAOHibernate">
         <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
-
-   <bean id="assessmentAttachmentDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentAttachmentDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
+             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
-   <bean id="assessmentUserDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentUserDAOHibernate">
+   <bean id="laasseAssessmentAttachmentDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentAttachmentDAOHibernate">
         <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
+             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
-   <bean id="assessmentSessionDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentSessionDAOHibernate">
+   <bean id="laasseAssessmentUserDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentUserDAOHibernate">
         <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
+             <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="laasseAssessmentSessionDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentSessionDAOHibernate">
+        <property name="sessionFactory">
+             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
 
 
     <!-- Managers -->
-	<bean id="assessmentToolContentHandler" class="org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler">
+	<bean id="laasseAssessmentToolContentHandler" class="org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler">
 	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 	</bean> 
 	
-    <bean id="assessmentManagerTarget" class="org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl">
+    <bean id="laasseAssessmentManagerTarget" class="org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl">
         <property name="assessmentDao">
-            <ref local="assessmentDao"/>
+            <ref local="laasseAssessmentDao"/>
         </property>
         <property name="assessmentQuestionDao">
-            <ref local="assessmentQuestionDao"/>
+            <ref local="laasseAssessmentQuestionDao"/>
         </property>
         <property name="assessmentQuestionResultDao">
-            <ref local="assessmentQuestionResultDao"/>
+            <ref local="laasseAssessmentQuestionResultDao"/>
         </property>
         <property name="assessmentResultDao">
-            <ref local="assessmentResultDao"/>
+            <ref local="laasseAssessmentResultDao"/>
         </property>
         <property name="assessmentAttachmentDao">
-            <ref local="assessmentAttachmentDao"/>
+            <ref local="laasseAssessmentAttachmentDao"/>
         </property>
         <property name="assessmentUserDao">
-            <ref local="assessmentUserDao"/>
+            <ref local="laasseAssessmentUserDao"/>
         </property>
         <property name="assessmentSessionDao">
-            <ref local="assessmentSessionDao"/>
+            <ref local="laasseAssessmentSessionDao"/>
         </property>
         <property name="assessmentToolContentHandler">
-            <ref local="assessmentToolContentHandler"/>
+            <ref local="laasseAssessmentToolContentHandler"/>
         </property>
         <property name="repositoryService">
             <ref bean="repositoryService"/>
@@ -107,8 +106,12 @@
    		<property name="exportContentService">
    			<ref bean="exportToolContentService"/>
    		</property>
-   		<property name="messageService"><ref bean="messageService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
+   		<property name="messageService">
+   			<ref bean="laasseMessageService"/>
+   		</property>
+		<property name="coreNotebookService">
+			<ref bean="coreNotebookService"/>
+		</property>   
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
 		</property>   
@@ -121,10 +124,10 @@
 				
     </bean>
 
-    <bean id="assessmentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="laasseAssessmentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
         <property name="target">
-            <ref local="assessmentManagerTarget"/>
+            <ref local="laasseAssessmentManagerTarget"/>
         </property>
         <property name="proxyTargetClass">
             <value>false</value>
@@ -154,4 +157,3 @@
         </property>
     </bean>
 </beans>
-

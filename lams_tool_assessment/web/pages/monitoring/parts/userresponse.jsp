@@ -9,27 +9,28 @@
 							</c:forEach>						
 						</c:when>
 						<c:when test="${question.type == 2}">
-							responseStr +='<table style="padding: 0px; margin: 0px; border: none; " cellspacing="0" cellpadding="0">';
-								<c:forEach var="questionOption" items="${question.questionOptions}">
-									responseStr +='<tr>';
-										responseStr +='<td style="width:40%; background: none; padding: 0px; margin: 0px; border: none;">';
-											responseStr +="${questionOption.question}";
-										responseStr +='</td>';
-										responseStr +='<td style="background: none; padding: 0px; margin: 0px; border: none; vertical-align: middle;">';
-											responseStr +='-'; 
-											<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
-												<c:if test="${questionOption.uid == optionAnswer.questionOptionUid}">
-													<c:forEach var="questionOption2" items="${question.questionOptions}">
-														<c:if test="${questionOption2.uid == optionAnswer.answerInt}">
-															responseStr +="${questionOption2.optionString}";
-														</c:if>
-													</c:forEach>
-												</c:if>
-											</c:forEach>										
-										responseStr +='</td>';
-									responseStr +='</tr>';
-								</c:forEach>
-							responseStr +='</table>';
+							<c:forEach var="questionOption" items="${question.questionOptions}">
+								responseStr +='<div>';
+									responseStr +='<div style="float: left;">';
+										responseStr +="${questionOption.question}";
+									responseStr +='</div>';
+									responseStr +='<div style=" float: right; width: 50%;">';
+										responseStr +=' - '; 
+										<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
+											<c:if test="${questionOption.uid == optionAnswer.questionOptionUid}">
+												<c:forEach var="questionOption2" items="${question.questionOptions}">
+													<c:if test="${questionOption2.uid == optionAnswer.answerInt}">
+														responseStr +="${questionOption2.optionString}";
+													</c:if>
+												</c:forEach>
+											</c:if>
+										</c:forEach>										
+									responseStr +='</div>';
+								responseStr +='</div>';
+								responseStr +='<br>';
+								
+							</c:forEach>
+
 						</c:when>
 						<c:when test="${question.type == 3}">
 							responseStr +="${questionResult.answerString}";

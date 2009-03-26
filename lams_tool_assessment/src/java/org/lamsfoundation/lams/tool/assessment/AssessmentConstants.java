@@ -26,9 +26,9 @@ package org.lamsfoundation.lams.tool.assessment;
 public class AssessmentConstants {
     public static final String TOOL_SIGNATURE = "laasse10";
 
-    public static final String ASSESSMENT_SERVICE = "assessmentService";
+    public static final String ASSESSMENT_SERVICE = "laasseAssessmentService";
 
-    public static final String TOOL_CONTENT_HANDLER_NAME = "assessmentToolContentHandler";
+    public static final String TOOL_CONTENT_HANDLER_NAME = "laasseAssessmentToolContentHandler";
 
     public static final int COMPLETED = 1;
     

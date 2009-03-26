@@ -53,10 +53,8 @@
 	  				  	},
 	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
 	  				  		var questionResultUid = jQuery("#session${session.sessionId}").getCell(rowid, 'questionResultUid');
-	  				  		//alert(isNaN(val));
 	  				  		if (isNaN(val) || (questionResultUid=="")) {
 	  				  			jQuery("#session${session.sessionId}").restoreCell(iRow,iCol); 
-	  				  			//alert(jQuery("#session${session.sessionId}").getCell(iRow,iCol));
 	  				  		} else {
 	  				  			var averageMark = (eval($("#averageMark").html())*numberOfValues - eval(previousCellValue) + eval(val))/numberOfValues;
 	  				  			$("#averageMark").html(averageMark);

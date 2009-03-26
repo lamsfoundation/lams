@@ -34,10 +34,10 @@ supports_outputs
 VALUES
 (
 'laasse10',
-'assessmentService',
-'Shared Assessment',
-'Shared Assessment',
-'sharedassessment',
+'laasseAssessmentService',
+'Assessment',
+'Assessment',
+'assessment',
 '@tool_version@',
 NULL,
 NULL,

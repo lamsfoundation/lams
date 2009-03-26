@@ -49,7 +49,7 @@
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
 	  				  	cellEdit: true,
 	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
-	  				  		if (isNaN(val)) {
+	  				  		if (isNaN(val) || (questionResultUid=="")) {
 	  				  			jQuery("#user${question.uid}").restoreCell(iRow,iCol); 
 	  				  		}
   						},	  		

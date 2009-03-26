@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
-<script type="text/javascript" event="">
+<script type="text/javascript">
+	<!--
 	function masterDetailLoadUp(){   
  	        <c:forEach var="questionResult" items="${assessmentResult.questionResults}" varStatus="i">
 	       		<c:set var="question" value="${questionResult.assessmentQuestion}"/>
@@ -15,5 +16,6 @@
 	        </c:forEach>
 	};	  	   	  
 	masterDetailLoadUp();
+	-->	
 </script>
    	  
