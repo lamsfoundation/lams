@@ -153,7 +153,7 @@ public class LearningAction extends Action {
 	int attemptsAllowed = assessment.getAttemptsAllowed();
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());	
 	boolean finishedLockForMonitor =  (mode != null) && mode.isTeacher() && (lastResult != null) && (lastResult.getFinishDate() != null);	
-	boolean finishedLock = ((assessmentUser != null) && assessmentUser.isSessionFinished())
+	boolean finishedLock = ((assessmentUser != null) && assessmentUser.isSessionFinished() && (attemptsAllowed != 0))
 		|| finishedLockForMonitor
 		|| ((attemptsAllowed <= dbResultCount) && (attemptsAllowed != 0));
 
@@ -162,8 +162,6 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, false);
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, finishedLock);
-	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, assessmentUser != null
-		&& assessmentUser.isSessionFinished());
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_USER, assessmentUser);
@@ -310,7 +308,18 @@ public class LearningAction extends Action {
 	processUserAnswers(sessionMap);
 	loadupResultMarks(sessionMap);
 	
-	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed(sessionMap));
+	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	IAssessmentService service = getAssessmentService();
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = new Long(userDTO.getUserID().longValue());
+	//AssessmentUser user = service.getUserByIDAndSession(userID, toolSessionId);
+	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userID);
+	int attemptsAllowed = assessment.getAttemptsAllowed();
+	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));// && !user.isSessionFinished();
+	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
+	
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
@@ -665,26 +674,6 @@ public class LearningAction extends Action {
 		}
 	    }
 	}
-    }
-    
-    /**
-     * Checks if the resubmit action allowed.
-     * 
-     * @param request
-     * 
-     */
-    private boolean isResubmitAllowed(SessionMap sessionMap) {
-	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	IAssessmentService service = getAssessmentService();
-	HttpSession ss = SessionManager.getSession();
-	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userID = new Long(userDTO.getUserID().longValue());
-	AssessmentUser user = service.getUserByIDAndSession(userID, toolSessionId);
-	
-	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userID);
-	int attemptsAllowed = assessment.getAttemptsAllowed();
-	return ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0)) && !user.isSessionFinished();
     }
     
     private IAssessmentService getAssessmentService() {

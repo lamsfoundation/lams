@@ -19,6 +19,8 @@
 
   	    <script>
   	    	<!--
+	    	var isEdited = false;
+  	    	var previousCellValue = "";  	    	
 	  	  	$(document).ready(function(){
 	  			<c:forEach var="userSummaryItem" items="${userSummary.userSummaryItems}" varStatus="status">
 	  				<c:set var="question" value="${userSummaryItem.question}"/>
@@ -48,10 +50,18 @@
 	  				   	caption: "${question.title}",
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
 	  				  	cellEdit: true,
+	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
+  				  			previousCellValue = val;
+  				  		},	  				  	
 	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
-	  				  		if (isNaN(val) || (questionResultUid=="")) {
+	  				  		//var questionResultUid = jQuery("#user${question.uid}").getCell(rowid, 'questionResultUid');
+	  				  		if (isNaN(val)) { //|| (questionResultUid=="")) {
 	  				  			jQuery("#user${question.uid}").restoreCell(iRow,iCol); 
-	  				  		}
+	  				  		} else {
+	  				  			isEdited = true;
+	  				  			var lastAttemptGrade = eval($("#lastAttemptGrade").html()) - eval(previousCellValue) + eval(val);
+	  				  			$("#lastAttemptGrade").html(lastAttemptGrade);
+	  				  		}		
   						},	  		
 	  				  	beforeSubmitCell : function (rowid,name,val,iRow,iCol){
 	  				  		if (isNaN(val)) {
@@ -89,7 +99,11 @@
 	  		});  	    	
 
     		function refreshSummaryPage()  { 
-    			self.parent.window.parent.location.href = "<c:url value="/monitoring/summary.do"/>?toolContentID=${sessionMap.toolContentID}&contentFolderID=${sessionMap.contentFolderID}";
+        		if (isEdited) {
+    				self.parent.window.parent.location.href = "<c:url value="/monitoring/summary.do"/>?toolContentID=${sessionMap.toolContentID}&contentFolderID=${sessionMap.contentFolderID}";
+        		} else {
+        			self.parent.tb_remove();
+        		}
     		}
   			-->
   		</script>
@@ -140,7 +154,7 @@
 						<fmt:message key="label.monitoring.user.summary.last.attempt.grade" />
 					</th>
 					<td>
-						${userSummary.lastAttemptGrade}
+						<div id="lastAttemptGrade">${userSummary.lastAttemptGrade}</div>
 					</td>
 				</tr>
 			</table>

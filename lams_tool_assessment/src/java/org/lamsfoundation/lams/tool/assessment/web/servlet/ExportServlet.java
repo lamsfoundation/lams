@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceProxy;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentBundler;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;

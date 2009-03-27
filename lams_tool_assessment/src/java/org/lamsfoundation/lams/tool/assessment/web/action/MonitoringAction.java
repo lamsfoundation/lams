@@ -24,9 +24,11 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.PrintWriter;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,20 +36,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dto.JQGridJSONModel;
-import org.lamsfoundation.lams.tool.assessment.dto.JQGridRow;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
@@ -80,6 +83,9 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("saveUserGrade")) {
 	    return saveUserGrade(mapping, form, request, response);
+	}
+	if (param.equals("exportSummary")) {
+	    return exportSummary(mapping, form, request, response);
 	}
 
 	return mapping.findForward(AssessmentConstants.ERROR);
@@ -116,33 +122,7 @@ public class MonitoringAction extends Action {
 	IAssessmentService service = getAssessmentService();
 	AssessmentResult result = service.getUserMasterDetail(sessionId, userId);
 	
-//	// Construct the json data
-//	JQGridJSONModel json = new JQGridJSONModel(); 
-//	json.setPage("1"); 
-//	int records = (result.getQuestionResults() == null) ? 0 : result.getQuestionResults().size();
-//	json.setRecords(records); 
-//	json.setTotal("1");
-//	
-//	List<JQGridRow> rows = new ArrayList<JQGridRow>(); 
-//	     
-//	for (AssessmentQuestionResult questionResult : result.getQuestionResults()) { 
-//	  JQGridRow row = new JQGridRow(); 
-//	  row.setId(questionResult.getAssessmentQuestion().getSequenceId()); 
-//	  List<String> cells = new ArrayList<String>(); 
-//	  cells.add(questionResult.getUid().toString()); 
-//	  cells.add(questionResult.getFinishDate().toString()); 
-//	  cells.add(questionResult.getAnswerString());
-//	  cells.add(questionResult.getMark().toString());
-//	  row.setCell(cells); 
-//	  rows.add(row); 
-//	} 
-//	json.setRows(rows);
-//
-//	JSONSerializer serializer = new JSONSerializer(); 
-//	String jsonResult = serializer.exclude("*.class").deepSerialize(json); 
-	
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
-
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
@@ -193,6 +173,156 @@ public class MonitoringAction extends Action {
 
 	return null;
     }
+    
+    /**
+     * Export Excel format survey data.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward exportSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	
+	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
+	IAssessmentService service = getAssessmentService();
+	List<Summary> summaryList = service.getSummaryList(contentId);
+	Assessment assessment = service.getAssessmentByContentId(contentId);
+
+	String errors = null;
+	try {
+	    // create an empty excel file
+	    HSSFWorkbook wb = new HSSFWorkbook();
+	    HSSFSheet sheet = wb.createSheet("Assessment");
+	    sheet.setColumnWidth((short) 0, (short) 3000);
+	    sheet.setColumnWidth((short) 1, (short) 2000);
+	    sheet.setColumnWidth((short) 2, (short) 3000);
+	    for (short i=0; i < assessment.getQuestions().size(); i++) {
+		sheet.setColumnWidth((short) (i+3), (short) 4000);
+	    }
+
+	    HSSFRow row;
+	    HSSFCell cell;
+	    int idx = 0;
+
+	    // display survey title, instruction and questions
+	    // survey title
+	    row = sheet.createRow(idx++);
+	    cell = row.createCell((short) 0);
+	    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+	    cell.setCellValue(removeHTMLTags(assessment.getTitle()));
+
+	    // survey instruction
+	    row = sheet.createRow(idx++);
+	    cell = row.createCell((short) 0);
+	    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+	    cell.setCellValue(removeHTMLTags(assessment.getInstructions()));
+
+	    for (Summary summary : summaryList) {
+
+		// display 2 empty row
+		row = sheet.createRow(idx++);
+		cell = row.createCell((short) 0);
+		cell.setCellValue("");
+		row = sheet.createRow(idx++);
+		cell = row.createCell((short) 0);
+		cell.setCellValue("");
+
+		// display session name
+		row = sheet.createRow(idx++);
+		cell = row.createCell((short) 0);
+		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		cell.setCellValue(service.getLocalisedMessage("monitoring.label.group", null) + " " + removeHTMLTags(summary.getSessionName()));
+		
+		//header
+		short cellIdx = 0; 
+		row = sheet.createRow(idx++);
+		
+		cell = row.createCell(cellIdx++);
+		cell.setCellValue("");
+		
+		cell = row.createCell(cellIdx++);
+		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		cell.setCellValue("#");
+
+		cell = row.createCell(cellIdx++);
+		//cell.setCellStyle(new HSSFCellStyle());
+		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		cell.setCellValue(service.getLocalisedMessage("monitoring.label.user.name", null));
+		
+		Set<AssessmentQuestion> questions = assessment.getQuestions();
+		for (AssessmentQuestion question : questions) {
+		    cell = row.createCell(cellIdx++);
+		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell.setCellValue(removeHTMLTags(question.getTitle()));
+		}
+		
+		cell = row.createCell(cellIdx++);
+		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		cell.setCellValue(service.getLocalisedMessage("label.monitoring.summary.total", null));
+		
+		// begin to display question and its answers
+		int questionNumber = 1;
+		for (AssessmentResult result : summary.getAssessmentResults()) {
+		    cellIdx = 0;
+		    row = sheet.createRow(idx++);
+		    
+		    cell = row.createCell(cellIdx++);
+		    cell.setCellValue("");
+		    
+		    cell = row.createCell(cellIdx++);
+		    cell.setCellValue(questionNumber++);
+		    
+		    cell = row.createCell(cellIdx++);
+		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell.setCellValue(removeHTMLTags(result.getUser().getLastName() + ", " + result.getUser().getFirstName()));
+		    
+		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+			cell = row.createCell(cellIdx++);
+			if (questionResult.getUid() != null) {
+			    cell.setCellValue(questionResult.getMark());
+			} else {
+			    cell.setCellValue("-");
+			}
+		    }
+		    
+		    cell = row.createCell(cellIdx++);
+		    cell.setCellValue(result.getGrade());
+		}
+	    }
+	    
+	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	    wb.write(bos);
+	    // construct download file response header
+	    String fileName = "lams_assessment_" + contentId + ".xls";
+	    String mineType = "application/vnd.ms-excel";
+	    String header = "attachment; filename=\"" + fileName + "\";";
+	    response.setContentType(mineType);
+	    response.setHeader("Content-Disposition", header);
+
+	    byte[] data = bos.toByteArray();
+	    response.getOutputStream().write(data, 0, data.length);
+	    response.getOutputStream().flush();
+	} catch (Exception e) {
+	    MonitoringAction.log.error(e);
+	    errors = new ActionMessage("error.monitoring.export.excel", e.toString()).toString();
+	}
+
+	if (errors != null) {
+	    try {
+		PrintWriter out = response.getWriter();
+		out.write(errors);
+		out.flush();
+	    } catch (IOException e) {
+	    }
+	}
+	return null;
+    }
 
     // *************************************************************************************
     // Private method
@@ -201,6 +331,15 @@ public class MonitoringAction extends Action {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
 	return (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
+    }
+    
+    /**
+     * Removes all the html tags from a string
+     * @param string
+     * @return
+     */
+    private String removeHTMLTags(String string) {
+	return string.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
     }
 
 }

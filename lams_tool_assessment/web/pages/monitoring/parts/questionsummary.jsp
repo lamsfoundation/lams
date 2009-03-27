@@ -19,7 +19,8 @@
 
   	    <script>
   	    	<!--
-  	    	var previousCellValue = "";
+  	    	var isEdited = false;
+  	    	var previousCellValue = "";  	    	
   	    	var numberOfValues = 0;
 	  	  	$(document).ready(function(){
 	  			<c:forEach var="questionResultsPerSession" items="${questionSummary.questionResultsPerSession}" varStatus="status">
@@ -56,6 +57,7 @@
 	  				  		if (isNaN(val) || (questionResultUid=="")) {
 	  				  			jQuery("#session${session.sessionId}").restoreCell(iRow,iCol); 
 	  				  		} else {
+	  				  			isEdited = true;
 	  				  			var averageMark = (eval($("#averageMark").html())*numberOfValues - eval(previousCellValue) + eval(val))/numberOfValues;
 	  				  			$("#averageMark").html(averageMark);
 	  				  		}	
@@ -107,7 +109,11 @@
 	  		});  	    	
 	  		
     		function refreshSummaryPage()  { 
-    			self.parent.window.parent.location.href = "<c:url value="/monitoring/summary.do"/>?toolContentID=${sessionMap.toolContentID}&contentFolderID=${sessionMap.contentFolderID}";
+        		if (isEdited) {
+        			self.parent.window.parent.location.href = "<c:url value="/monitoring/summary.do"/>?toolContentID=${sessionMap.toolContentID}&contentFolderID=${sessionMap.contentFolderID}";	
+        		} else {
+        			self.parent.tb_remove();
+        		}
     		}
   			-->
   		</script>

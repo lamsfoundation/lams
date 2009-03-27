@@ -501,10 +501,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	user.setSessionFinished(true);
 	assessmentUserDao.saveObject(user);
 
-	// AssessmentSession session = assessmentSessionDao.getSessionBySessionId(toolSessionId);
-	// session.setStatus(AssessmentConstants.COMPLETED);
-	// assessmentSessionDao.saveObject(session);
-
 	String nextUrl = null;
 	try {
 	    nextUrl = this.leaveToolSession(toolSessionId, userId);

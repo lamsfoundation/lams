@@ -77,8 +77,6 @@ public class AssessmentConstants {
 
     public static final String PARAM_RUN_OFFLINE = "runOffline";
 
-    public static final String PARAM_OPEN_URL_POPUP = "popupUrl";
-
     public static final String PARAM_TITLE = "title";
     
     public static final String PARAM_SECONDS_LEFT = "secondsLeft";
@@ -148,8 +146,6 @@ public class AssessmentConstants {
     
     public static final String ATTR_OVERALL_FEEDBACK_SEQUENCE_ID_PREFIX = "overallFeedbackSequenceId";
 
-    public static final String ATT_LEARNING_OBJECT = "cpPackage";
-
     public static final String ATTR_ASSESSMENT = "assessment";
 
     public static final String ATTR_RUN_AUTO = "runAuto";
@@ -174,15 +170,11 @@ public class AssessmentConstants {
 
     public static final String ATTR_ASSESSMENT_FORM = "assessmentForm";
 
-    public static final String ATTR_ADD_ASSESSMENT_TYPE = "addType";
-
     public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 
     public static final String ATTR_TITLE = "title";
 
     public static final String ATTR_INSTRUCTIONS = "instructions";
-
-    public static final String ATTR_USER_FINISHED = "userFinished";
     
     public static final String ATTR_PAGE_NUMBER = "pageNumber";
     
@@ -210,16 +202,6 @@ public class AssessmentConstants {
     public static final String ERROR_MSG_PENALTY_FACTOR_WRONG_FORMAT = "error.penalty.factor.wrong.format";
     
     public static final String PAGE_EDITABLE = "isPageEditable";
-
-    public static final String MODE_AUTHOR_SESSION = "author_session";
-
-    public static final String ATTR_REFLECTION_ON = "reflectOn";
-
-    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
-
-    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-
-    public static final String ATTR_REFLECT_LIST = "reflectList";
 
     public static final String ATTR_USER_UID = "userUid";
 

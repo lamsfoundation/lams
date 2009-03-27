@@ -30,7 +30,7 @@
 			   		{name:'sessionId',index:'sessionId', width:0},
 			   		{name:'userName',index:'userName', width:100},
 		   	        <c:forEach var="question" items="${assessment.questions}">
-		   	     		{name:'${question.uid}', index:'${question.uid}', width:60, align:"right", sorttype:"float"},
+		   	     		{name:'${question.uid}', index:'${question.uid}', width:80, align:"right", sorttype:"float"},
 	   	        	</c:forEach>			   				
 			   		{name:'total',index:'total', width:50,align:"right",sorttype:"float", formatter:'number', formatoptions:{decimalPlaces: 2}}		
 			   	],
@@ -88,13 +88,22 @@
    	   	   	    });
 	        </c:forEach>		
 
+			<c:choose>
+				<c:when	test="${(fn:length(assessment.questions) * 4.5) <= 30}">
+					<c:set var="width" value="${630 + (fn:length(assessment.questions) * 4.5) mod 30}"/>
+				</c:when>
+				<c:otherwise>
+					<c:set var="width" value="${670}"/>
+				</c:otherwise>
+			</c:choose>
+	        
 			jQuery("#userSummary${summary.sessionId}").jqGrid({
 				datatype: "local",
 				gridstate:"hidden",
 				//hiddengrid:true,
 				height: 90,
-				width: 530,
-				shrinkToFit: false,
+				width: ${width},
+				shrinkToFit: true,
 				caption: '<fmt:message key="label.monitoring.summary.learner.summary" />',
 			   	colNames:['#',
 						'questionResultUid',
@@ -103,9 +112,9 @@
   						'<fmt:message key="label.monitoring.user.summary.grade" />'],
 					    
 			   	colModel:[
-	  			   		{name:'id', index:'id', width:25, sorttype:"int"},
+	  			   		{name:'id', index:'id', width:20, sorttype:"int"},
 	  			   		{name:'questionResultUid', index:'questionResultUid', width:0},
-	  			   		{name:'title', index:'title', width:200},
+	  			   		{name:'title', index:'title', width: 200},
 	  			   		{name:'response', index:'response', width:200, sortable:false},
 	  			   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }
 			   	],
@@ -141,17 +150,21 @@
 
 		$("#questionUid").change(function() {
 			var questionUid = $("#questionUid").val();
-			var questionSummaryUrl = '<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>';
-			var questionSummaryHref = questionSummaryUrl + "&questionUid=" + questionUid + "&KeepThis=true&TB_iframe=true&height=400&width=650&modal=true";
-			$("#questionSummaryHref").attr("href", questionSummaryHref);	
-			$("#questionSummaryHref").click(); 		 
+			if (questionUid != -1) {
+				var questionSummaryUrl = '<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>';
+				var questionSummaryHref = questionSummaryUrl + "&questionUid=" + questionUid + "&KeepThis=true&TB_iframe=true&height=400&width=650&modal=true";
+				$("#questionSummaryHref").attr("href", questionSummaryHref);	
+				$("#questionSummaryHref").click(); 		 
+			}
 	    }); 
 	});
 	
-	function refreshThickbox(){   
-		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
-		imgLoader = new Image();// preload image
-		imgLoader.src = tb_pathToImage;
+	function exportSummary(){   
+		var url = "<c:url value='/monitoring/exportSummary.do'/>";
+	    var reqIDVar = new Date();
+		var param = "?sessionMapID=${sessionMapID}&reqID="+reqIDVar.getTime();
+		url = url + param;
+		location.href=url;
 	};
 
 	function resizeIframe() {
@@ -185,18 +198,47 @@
 	</c:when>
 	<c:otherwise>
 	
-
+		<div style="padding-left: 30px; color:#47bc23; font-size:22px; margin-bottom: 10px; margin-top: 15px;">
+			<fmt:message key="label.monitoring.summary.summary" />
+		</div>	
 	
-	
+		<div style="padding-left: 30px; font-size: small; margin-bottom: 20px; font-style: italic;">
+			<fmt:message key="label.monitoring.summary.double.click" />
+		</div>
+			
 		<div id="masterDetailArea">
 			<%@ include file="parts/masterDetailLoadUp.jsp"%>
 		</div>
-	
 		<a onclick="" href="return false;" class="thickbox" id="userSummaryHref" style="display: none;"></a>	
 	
+		<c:forEach var="summary" items="${summaryList}" varStatus="status">
+			<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
+				<div style="padding-bottom: 5px; font-size: small;">
+					<B><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}
+				</div>
+				
+				<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+				<div style="margin-top: 10px;">
+					<table id="userSummary${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+				</div>
+			</div>	
+			<c:if test="${! status.last}">
+			
+			</c:if>
+		</c:forEach>	
+		
+		<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="button space-left" style="margin-left:590px; ">
+			<fmt:message key="label.monitoring.summary.export.summary" />
+		</html:link>
+		
+		<div style="padding-left: 30px; color:#47bc23;  font-size:22px; margin-bottom: 15px; margin-top: 30px;">
+			<fmt:message key="label.monitoring.summary.report.by.question" />
+		</div>
+		
 		<!-- Dropdown menu for choosing a question type -->
-		<div style="padding-left: 30px; margin-bottom: 50px; margin-top: 15px;">	
-			<div style="margin-bottom: 5px; font-size: small;">
+		
+		<div style="padding-left: 30px; margin-top: 10px; margin-bottom: 25px;">	
+			<div style="margin-bottom: 6px; font-size: small; font-style: italic;">
 				<fmt:message key="label.monitoring.summary.results.question" />
 			</div>
 
@@ -209,19 +251,6 @@
 			
 			<a onclick="" href="return false;" class="thickbox" id="questionSummaryHref" style="display: none;"></a>
 		</div>
-		
-		<c:forEach var="summary" items="${summaryList}" varStatus="status">
-			<div style="padding-left: 30px; padding-bottom: 30px;">
-				<div style="padding-bottom: 5px; font-size: small;">
-					<B><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}
-				</div>
-				
-				<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				<div style="margin-top: 10px;">
-					<table id="userSummary${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				</div>
-			</div>	
-		</c:forEach>	
 	
 	</c:otherwise>
 </c:choose>

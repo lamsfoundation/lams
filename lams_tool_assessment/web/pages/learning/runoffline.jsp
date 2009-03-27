@@ -14,10 +14,6 @@
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&runOffline=true"/>';
 			return false;
 		}
-		function continueReflect(){
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}
-		
 	-->        
     </script>
 </lams:head>
@@ -32,49 +28,11 @@
 			<fmt:message key="run.offline.message" />
 		</p>
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="small-space-top">
-				<h2>
-					${sessionMap.reflectInstructions}
-				</h2>
-
-				<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> <fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-				</c:choose>
-
-				<html:button property="FinishButton"
-					onclick="return continueReflect()" styleClass="button">
-					<fmt:message key="label.edit" />
-				</html:button>
-			</div>
-		</c:if>
-
 		<div class="space-bottom-top align-right">
-			<c:choose>
-				<c:when
-					test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-					<html:button property="FinishButton"
-						onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.continue" />
-					</html:button>
-				</c:when>
-				<c:otherwise>
-					<html:button property="FinishButton" styleId="finishButton"
-						onclick="return finishSession()" styleClass="button">
-						<fmt:message key="label.finished" />
-					</html:button>
-				</c:otherwise>
-			</c:choose>
+			<html:button property="FinishButton" styleId="finishButton"
+				onclick="return finishSession()" styleClass="button">
+				<fmt:message key="label.finished" />
+			</html:button>
 		</div>
 	</div>
 	<div id="footer">

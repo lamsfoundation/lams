@@ -63,7 +63,7 @@
 			});
     		// post-submit callback 
     		function afterRatingSubmit(responseText, statusText)  { 
-    			self.parent.refreshThickbox()
+    			self.parent.refreshThickbox();
     			self.parent.tb_remove();
     		}    
   		--></script>
