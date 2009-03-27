@@ -41,7 +41,8 @@ import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 
 /**
- * Output factory for Notebook tool. Currently it provides only one type of output - the entry that user provided.
+ * Output factory for Notebook tool. Currently it provides only one type of
+ * output - the entry that user provided.
  * 
  * @author Marcin Cieslak
  */
@@ -125,12 +126,14 @@ public class NotebookOutputFactory extends OutputFactory {
 	    Notebook notebook = chatService.getSessionBySessionId(toolSessionId).getNotebook();
 
 	    NotebookUser user = chatService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
-	    NotebookEntry entry = chatService.getEntry(user.getEntryUID());
 
-	    String value = entry == null ? null : entry.getEntry();
+	    if (user != null) {
+		NotebookEntry entry = chatService.getEntry(user.getEntryUID());
 
-	    return new ToolOutput(name, getI18NText(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME, true), value);
+		String value = entry == null ? null : entry.getEntry();
 
+		return new ToolOutput(name, getI18NText(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME, true), value);
+	    }
 	}
 	return null;
     }
@@ -149,7 +152,8 @@ public class NotebookOutputFactory extends OutputFactory {
     }
 
     /**
-     * Creates a default condition so teachers know how to use complex conditions for this tool.
+     * Creates a default condition so teachers know how to use complex
+     * conditions for this tool.
      * 
      * @param notebook
      *                content of the tool
