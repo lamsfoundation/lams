@@ -36,16 +36,19 @@
 			return null;
 		}
 		
-		public function getLabelAndReplace(s:String, a:Array):String{
-			if(!isEmpty()){
+		public function getLabelAndReplace(s:String, a:Array, useKey:Boolean):String{
+			if(!isEmpty()) {
 				var label:String = getLabel(s);
 				
 				for(var i:int = 0; i < a.length; i++){
-					label = label.replace("{" + String(i) + "}", getLabel(a[i]));
+					var replaceStr:String = (useKey) ? getLabel(a[i]) : a[i];
+					label = label.replace("{" + String(i) + "}", replaceStr);
 				}
+				
+				return label;
 			}
 			
-			return label;
+			return null;
 		}
 		
 		public function isEmpty():Boolean{
