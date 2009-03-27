@@ -898,34 +898,39 @@ public class AuthoringAction extends Action {
      * 
      * @param request
      */
-    private List<String> getInstructionsFromRequest(HttpServletRequest request) {
-	String list = request.getParameter("instructionList");
-	String[] params = list.split("&");
-	Map<String, String> paramMap = new HashMap<String, String>();
-	String[] pair;
-	for (String item : params) {
-	    pair = item.split("=");
-	    if (pair == null || pair.length != 2) {
-		continue;
-	    }
-	    try {
-		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
-	    } catch (UnsupportedEncodingException e) {
-		AuthoringAction.log.error("Error occurs when decode instruction string:" + e.toString());
-	    }
-	}
+	private List<String> getInstructionsFromRequest(HttpServletRequest request) {
+		String list = request.getParameter("instructionList");
+		String[] params = list.split("&");
+		Map<String, String> paramMap = new HashMap<String, String>();
+		String[] pair;
+		for (String item : params) {
+			pair = item.split("=");
+			if (pair == null || pair.length != 2) {
+				continue;
+			}
+			try {
+				paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				AuthoringAction.log
+						.error("Error occurs when decode instruction string:"
+								+ e.toString());
+			}
+		}
+		
+		int count = paramMap.keySet().size();
+		List<String> instructionList = new ArrayList<String>();
+		
+		for (int idx = 0; idx < count; idx++) {
+			String item = paramMap.get(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
+			if (item == null) 
+				continue;
+			
+			instructionList.add(item);
+		}
+		
+		return instructionList;
 
-	int count = NumberUtils.stringToInt(paramMap.get(AuthoringAction.INSTRUCTION_ITEM_COUNT));
-	List<String> instructionList = new ArrayList<String>();
-	for (int idx = 0; idx < count; idx++) {
-	    String item = paramMap.get(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
-	    if (item == null) {
-		continue;
-	    }
-	    instructionList.add(item);
 	}
-	return instructionList;
-    }
 
     /**
      * Get back relative <code>ActionForward</code> from request.

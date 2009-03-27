@@ -104,9 +104,11 @@
 	}
 	
 	function submitResourceItem(){
-		$("instructionList").value = Form.serialize("instructionForm");
-		$("resourceItemForm").submit();
-		//after submit, it direct to itemlist.jsp, 
+		//$("instructionList").value = Form.serialize("instructionForm");
+		document.getElementById("instructionList").value = $("#instructionForm").serialize();
+		//$("#resourceItemForm").value = $("#instructionForm").serialize();
+		$("#resourceItemForm").submit();
+		// after submit, it direct to itemlist.jsp, 
 		// then refresh "basic tab" resourcelist and close this window.
 	}
 	function cancelResourceItem(){
