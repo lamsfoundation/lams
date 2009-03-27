@@ -71,6 +71,9 @@ CREATE TABLE lams_activity_evaluation (
 	, PRIMARY KEY (activity_evaluation_id)
 )TYPE=InnoDB;
 
+-- LDEV-2174 -------------
+ALTER TABLE lams_tool DROP COLUMN classpath_addition, context_file;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

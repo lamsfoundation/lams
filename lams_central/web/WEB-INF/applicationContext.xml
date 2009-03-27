@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
+<!-- 
+	Even though this bean list is empty, this file MUST not be deleted,
+	otherwise there will be errors when creating shared application context.
+	The same goes for all web applications that do not declare any private application context XML files.
+	In each of them there must be a file named "applicationContext.xml" with an empty bean definition list.
+ -->
 </beans>
