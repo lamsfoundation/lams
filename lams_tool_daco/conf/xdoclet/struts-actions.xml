@@ -158,5 +158,9 @@
 <action path="/monitoring/changeView" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction" parameter="changeView">
 	<forward name="success" path="/pages/monitoring/listRecords.jsp" />
 </action>
+<!--  ========= Export to spreadsheet =============== -->
+<action path="/monitoring/exportToSpreadsheet" type="org.lamsfoundation.lams.tool.daco.web.action.MonitoringAction"
+	validate="false" input="/pages/export/exportToSpreadsheet.jsp" parameter="exportToSpreadsheet" scope="request">
+</action>
 <!-- ========== BEGIN: Common ============================== -->
 <action path="/clearsession" type="org.lamsfoundation.lams.tool.daco.web.action.ClearSessionAction"></action>

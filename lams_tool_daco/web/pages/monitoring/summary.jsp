@@ -206,5 +206,11 @@
 		<a href="#" onclick="javascript:launchPopup('${viewRecordList}','RecordList')" class="button space-left">
 			<fmt:message key="label.monitoring.viewrecords.all" />
 		</a>
+		<c:url var="exportToSpreadsheetUrl" value="/pages/export/exportToSpreadsheet.jsp">
+			<c:param name="sessionMapID" value="${sessionMapID}"></c:param>
+		</c:url>
+		<a href="#" onclick="javascript:window.open('${exportToSpreadsheetUrl}','ExportToSpreadsheet','width=796,height=250')" class="button space-left">
+			<fmt:message key="button.export" />
+		</a>
 	</c:if>
 </p>

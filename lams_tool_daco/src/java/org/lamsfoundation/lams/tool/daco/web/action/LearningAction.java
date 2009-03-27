@@ -361,6 +361,7 @@ public class LearningAction extends Action {
 		answer.setRecordId(displayedRecordNumber);
 		answer.setUser(user);
 	    }
+	    answer.setCreateDate(new Date());
 
 	    switch (question.getType()) {
 	    case DacoConstants.QUESTION_TYPE_NUMBER: {

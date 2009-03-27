@@ -89,17 +89,19 @@ CREATE TABLE tl_ladaco10_users (
    PRIMARY KEY (uid)
 )TYPE=innodb;
 
-CREATE TABLE tl_ladaco10_answers 
-(uid bigint NOT NULL UNIQUE auto_increment,
-user_uid bigint,
-question_uid bigint,
-record_id smallint unsigned,
-answer text,
+CREATE TABLE tl_ladaco10_answers (
+   uid bigint NOT NULL UNIQUE auto_increment,
+   user_uid bigint,
+   question_uid bigint,
+   record_id smallint unsigned,
+   answer text,
    file_type varchar(255),
    file_name varchar(255),
    file_uuid bigint,
    file_version_id bigint,
-PRIMARY KEY (uid)) TYPE=innodb;
+   create_date datetime,
+   PRIMARY KEY (uid)
+)TYPE=innodb;
 
 ALTER TABLE tl_ladaco10_attachments ADD INDEX (content_uid), ADD CONSTRAINT  FOREIGN KEY (content_uid) REFERENCES tl_ladaco10_contents (uid);
 ALTER TABLE tl_ladaco10_contents ADD INDEX  (create_by), ADD CONSTRAINT DacoToUser FOREIGN KEY (create_by) REFERENCES tl_ladaco10_users (uid);

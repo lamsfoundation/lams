@@ -25,13 +25,21 @@
 package org.lamsfoundation.lams.tool.daco.web.action;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import jxl.JXLException;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -44,9 +52,14 @@ import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
 import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummaryUserDTO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
 import org.lamsfoundation.lams.tool.daco.model.Daco;
+import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
+import org.lamsfoundation.lams.tool.daco.model.DacoAnswerOption;
+import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 import org.lamsfoundation.lams.tool.daco.service.IDacoService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -59,7 +72,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, JXLException, ParseException {
 	String param = mapping.getParameter();
 
 	if (param.equals("summary")) {
@@ -74,6 +87,9 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("changeView")) {
 	    return changeView(mapping, request);
+	}
+	if (param.equals("exportToSpreadsheet")) {
+	    return exportToSpreadsheet(request, response);
 	}
 
 	return mapping.findForward(DacoConstants.ERROR);
@@ -194,5 +210,176 @@ public class MonitoringAction extends Action {
 	    sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_HORIZONTAL);
 	}
 	return mapping.findForward(DacoConstants.SUCCESS);
+    }
+
+    /**
+     * Exports all learners' data to an Excel or CSV file.
+     * 
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws JXLException
+     * @throws ParseException
+     */
+    protected ActionForward exportToSpreadsheet(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, JXLException, ParseException {
+	// Get required parameters
+	String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
+	int format = WebUtil.readIntParam(request, DacoConstants.PARAM_FORMAT);
+	IDacoService service = getDacoService();
+
+	// Prepare headers and column names
+	String title = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_TITLE, null);
+	String dateHeader = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_DATE, null);
+
+	Set<DacoQuestion> questions = daco.getDacoQuestions();
+	// First two columns are "user" and date when was the answer added
+	int columnIndex = 2;
+	String[] columnNames = new String[questions.size() + 2];
+	short[] questionTypes = new short[questions.size()];
+	columnNames[0] = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_USER, null);
+	columnNames[1] = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_ANSWER_DATE, null);
+	for (DacoQuestion question : questions) {
+	    columnNames[columnIndex] = WebUtil.removeHTMLtags(question.getDescription());
+	    questionTypes[columnIndex - 2] = question.getType();
+	    columnIndex++;
+	}
+
+	// Some strings used in building cell values
+	String longitudeHeader = service.getLocalisedMessage(DacoConstants.KEY_LABEL_LEARNING_LONGLAT_LONGITUDE, null);
+	String longitudeUnit = service.getLocalisedMessage(DacoConstants.KEY_LABEL_LEARNING_LONGLAT_LONGITUDE_UNIT,
+		null);
+	String latitudeHeader = service.getLocalisedMessage(DacoConstants.KEY_LABEL_LEARNING_LONGLAT_LATITUDE, null);
+	String latitudeUnit = service.getLocalisedMessage(DacoConstants.KEY_LABEL_LEARNING_LONGLAT_LATITUDE_UNIT, null);
+
+	List<Object[]> rows = new LinkedList<Object[]>();
+	// We get all sessions with all users with all their records from the given Daco content
+	List<MonitoringSummarySessionDTO> monitoringSummary = service.getMonitoringSummary(daco.getContentId(), null);
+	for (MonitoringSummarySessionDTO summarySession : monitoringSummary) {
+	    // Maybe we'll need delimiter between sessions one day - here is the place to add an empty row
+	    for (MonitoringSummaryUserDTO user : summarySession.getUsers()) {
+		List<List<DacoAnswer>> records = user.getRecords();
+		for (int rowIndex = 0; rowIndex < records.size(); rowIndex++) {
+		    Object[] row = new Object[questions.size() + 2];
+		    row[0] = user.getFullName();
+
+		    List<DacoAnswer> record = records.get(rowIndex);
+		    columnIndex = 2;
+		    for (int answerIndex = 0; answerIndex < record.size(); answerIndex++) {
+			DacoAnswer answer = record.get(answerIndex);
+			// we set the date of the whole row to the latest from all the participating answers
+			if (row[1] == null) {
+			    row[1] = answer.getCreateDate();
+			} else {
+			    Date currentDate = (Date) row[1];
+			    Date newDate = answer.getCreateDate();
+			    if (currentDate.compareTo(newDate) < 0) {
+				row[1] = newDate;
+			    }
+			}
+			Object cell = null;
+			String answerString = answer.getAnswer();
+			// we extract answers and add them to "data" array in readable form
+			switch (questionTypes[columnIndex - 2]) {
+			case DacoConstants.QUESTION_TYPE_DATE:
+			    if (!StringUtils.isBlank(answerString)) {
+				cell = DacoConstants.DEFAULT_DATE_FORMAT.parse(answerString);
+			    }
+			    break;
+			case DacoConstants.QUESTION_TYPE_CHECKBOX:
+			    if (!StringUtils.isBlank(answerString)) {
+				DacoQuestion question = answer.getQuestion();
+				DacoQuestion currentQuestion = question;
+				List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(question
+					.getAnswerOptions());
+				StringBuilder cellStringBuilder = new StringBuilder();
+				// instead of number, we create a comma-separated string of chosen options
+				do {
+				    int chosenAnswer = Integer.parseInt(answerString) - 1;
+				    String chosenAnswerOption = answerOptions.get(chosenAnswer).getAnswerOption();
+				    cellStringBuilder.append(chosenAnswerOption).append(", ");
+				    answerIndex++;
+				    answer = record.get(answerIndex);
+				    currentQuestion = answer.getQuestion();
+				    answerString = answer.getAnswer();
+				} while (currentQuestion.equals(question));
+				// we went one answer too far, so we go back
+				answerIndex--;
+				cell = cellStringBuilder.delete(cellStringBuilder.length() - 2,
+					cellStringBuilder.length()).toString();
+			    }
+			    break;
+			case DacoConstants.QUESTION_TYPE_LONGLAT:
+			    // Both longitude and latitude go in the same cell
+			    if (StringUtils.isBlank(answerString)) {
+				// If longitude was not entered, then latitude also is blank, so skip the next answer
+				answerIndex++;
+			    } else {
+				StringBuilder cellStringBuilder = new StringBuilder(longitudeHeader).append(' ')
+					.append(answerString).append(' ').append(longitudeUnit).append("; ");
+				answerIndex++;
+				answer = record.get(answerIndex);
+				cellStringBuilder.append(latitudeHeader).append(' ').append(answer.getAnswer()).append(
+					' ').append(latitudeUnit);
+				cell = cellStringBuilder.toString();
+			    }
+			    break;
+			case DacoConstants.QUESTION_TYPE_FILE:
+			case DacoConstants.QUESTION_TYPE_IMAGE:
+			    if (!StringUtils.isBlank(answer.getFileName())) {
+				// Just get the file name, instead of the real file
+				cell = answer.getFileName();
+			    }
+			    break;
+			case DacoConstants.QUESTION_TYPE_RADIO:
+			case DacoConstants.QUESTION_TYPE_DROPDOWN:
+			    if (!StringUtils.isBlank(answerString)) {
+				List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(answer
+					.getQuestion().getAnswerOptions());
+				int chosenAnswer = Integer.parseInt(answerString) - 1;
+				cell = answerOptions.get(chosenAnswer).getAnswerOption();
+			    }
+			    break;
+			default:
+			    cell = answer.getAnswer();
+			    break;
+			}
+			row[columnIndex] = cell;
+			columnIndex++;
+		    }
+		    rows.add(row);
+		}
+
+	    }
+	}
+	// Convert from Collection to array
+	Object[][] data = rows.toArray(new Object[][] {});
+
+	// Prepare response headers
+	String fileName = DacoConstants.EXPORT_TO_SPREADSHEET_FILE_NAME
+		+ (format == 1 ? CentralConstants.FILE_EXTENSION_XLS : CentralConstants.FILE_EXTENSION_CSV);
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+	response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
+	response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION, CentralConstants.HEADER_CONTENT_ATTACHMENT
+		+ fileName);
+	MonitoringAction.log.debug("Exporting to a spreadsheet tool content with UID: " + daco.getUid());
+	ServletOutputStream out = response.getOutputStream();
+
+	switch (format) {
+	case 1:
+	    // Export to XLS
+	    String sheetName = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_SHEET, null);
+	    FileUtil.exportToolToExcel(out, sheetName, title, dateHeader, columnNames, data);
+	    break;
+	case 2:
+	    // Export to CSV
+	    FileUtil.exportToolToCSV(out, title, dateHeader, columnNames, data);
+	    break;
+	}
+	// Return the file inside response, but not any JSP page
+	return null;
     }
 }

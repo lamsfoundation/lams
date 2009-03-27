@@ -22,6 +22,8 @@
  */
 package org.lamsfoundation.lams.tool.daco.model;
 
+import java.util.Date;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -32,148 +34,160 @@ import org.apache.log4j.Logger;
  * @hibernate.class table="tl_ladaco10_answers"
  */
 public class DacoAnswer implements Cloneable {
-	private static final Logger log = Logger.getLogger(DacoQuestion.class);
+    private static final Logger log = Logger.getLogger(DacoQuestion.class);
 
-	private Long uid;
+    private Long uid;
 
-	private DacoUser user;
+    private DacoUser user;
 
-	private Integer recordId;
+    private Integer recordId;
 
-	private String answer;
+    private String answer;
 
-	private DacoQuestion question;
+    private DacoQuestion question;
 
-	private Long fileUuid;
+    private Long fileUuid;
 
-	private Long fileVersionId;
+    private Long fileVersionId;
 
-	private String fileName;
+    private String fileName;
 
-	private String fileType;
+    private String fileType;
 
-	@Override
-	public Object clone() {
-		DacoAnswer cloned = null;
-		try {
-			cloned = (DacoAnswer) super.clone();
-			cloned.setUid(null);
-		}
-		catch (CloneNotSupportedException e) {
-			DacoAnswer.log.error("Cloning " + DacoQuestion.class + " failed");
-		}
+    private Date createDate;
 
-		return cloned;
+    @Override
+    public Object clone() {
+	DacoAnswer cloned = null;
+	try {
+	    cloned = (DacoAnswer) super.clone();
+	    cloned.setUid(null);
+	} catch (CloneNotSupportedException e) {
+	    DacoAnswer.log.error("Cloning " + DacoQuestion.class + " failed");
 	}
 
-	// **********************************************************
-	// Get/Set methods
-	// **********************************************************
+	return cloned;
+    }
 
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * @return Returns the answer ID.
-	 */
-	public Long getUid() {
-		return uid;
-	}
+    // **********************************************************
+    // Get/Set methods
+    // **********************************************************
 
-	public void setUid(Long uuid) {
-		uid = uuid;
-	}
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * @return Returns the answer ID.
+     */
+    public Long getUid() {
+	return uid;
+    }
 
-	/**
-	 * @hibernate.many-to-one column="user_uid" cascade="none" foreign-key="AnswerToUser" 
-	 * @return
-	 */
-	public DacoUser getUser() {
-		return user;
-	}
+    public void setUid(Long uuid) {
+	uid = uuid;
+    }
 
-	public void setUser(DacoUser user) {
-		this.user = user;
-	}
+    /**
+     * @hibernate.many-to-one column="user_uid" cascade="none" foreign-key="AnswerToUser"
+     * @return
+     */
+    public DacoUser getUser() {
+	return user;
+    }
 
-	/**
-	 * @hibernate.property column="record_id"
-	 * @return Returns the record ID.
-	 */
-	public Integer getRecordId() {
-		return recordId;
-	}
+    public void setUser(DacoUser user) {
+	this.user = user;
+    }
 
-	public void setRecordId(Integer recordId) {
-		this.recordId = recordId;
-	}
+    /**
+     * @hibernate.property column="record_id"
+     * @return Returns the record ID.
+     */
+    public Integer getRecordId() {
+	return recordId;
+    }
 
-	/**
-	 * @hibernate.property column="answer"
-	 * @return Returns the answer.
-	 */
-	public String getAnswer() {
-		return answer;
-	}
+    public void setRecordId(Integer recordId) {
+	this.recordId = recordId;
+    }
 
-	public void setAnswer(String answer) {
-		this.answer = answer;
-	}
+    /**
+     * @hibernate.property column="answer"
+     * @return Returns the answer.
+     */
+    public String getAnswer() {
+	return answer;
+    }
 
-	/**
-	 * @hibernate.many-to-one column="question_uid" cascade="none" foreign-key="AnswerToQuestion"
-	 * @return
-	 */
-	public DacoQuestion getQuestion() {
-		return question;
-	}
+    public void setAnswer(String answer) {
+	this.answer = answer;
+    }
 
-	public void setQuestion(DacoQuestion question) {
-		this.question = question;
-	}
+    /**
+     * @hibernate.many-to-one column="question_uid" cascade="none" foreign-key="AnswerToQuestion"
+     * @return
+     */
+    public DacoQuestion getQuestion() {
+	return question;
+    }
 
-	/**
-	 * @hibernate.property column="file_uuid"
-	 * 
-	 * @return
-	 */
-	public Long getFileUuid() {
-		return fileUuid;
-	}
+    public void setQuestion(DacoQuestion question) {
+	this.question = question;
+    }
 
-	public void setFileUuid(Long crUuid) {
-		fileUuid = crUuid;
-	}
+    /**
+     * @hibernate.property column="file_uuid"
+     * 
+     * @return
+     */
+    public Long getFileUuid() {
+	return fileUuid;
+    }
 
-	/**
-	 * @hibernate.property column="file_version_id"
-	 * @return
-	 */
-	public Long getFileVersionId() {
-		return fileVersionId;
-	}
+    public void setFileUuid(Long crUuid) {
+	fileUuid = crUuid;
+    }
 
-	public void setFileVersionId(Long crVersionId) {
-		fileVersionId = crVersionId;
-	}
+    /**
+     * @hibernate.property column="file_version_id"
+     * @return
+     */
+    public Long getFileVersionId() {
+	return fileVersionId;
+    }
 
-	/**
-	 * @hibernate.property column="file_type"
-	 */
-	public String getFileType() {
-		return fileType;
-	}
+    public void setFileVersionId(Long crVersionId) {
+	fileVersionId = crVersionId;
+    }
 
-	public void setFileType(String type) {
-		fileType = type;
-	}
+    /**
+     * @hibernate.property column="file_type"
+     */
+    public String getFileType() {
+	return fileType;
+    }
 
-	/**
-	 * @hibernate.property column="file_name"
-	 */
-	public String getFileName() {
-		return fileName;
-	}
+    public void setFileType(String type) {
+	fileType = type;
+    }
 
-	public void setFileName(String name) {
-		fileName = name;
-	}
+    /**
+     * @hibernate.property column="file_name"
+     */
+    public String getFileName() {
+	return fileName;
+    }
+
+    public void setFileName(String name) {
+	fileName = name;
+    }
+
+    /**
+     * @hibernate.property column="create_date"
+     */
+    public Date getCreateDate() {
+	return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+	this.createDate = createDate;
+    }
 }

@@ -288,4 +288,28 @@ public class DacoConstants {
     public static final String PAGE_EDITABLE = "isPageEditable";
 
     public final static String LEARNER_NUM_POSTS_DEFINITION_NAME = "learner.number.of.posts";
+
+    // for export to spreadsheet
+
+    public static final String EXPORT_TO_SPREADSHEET_FILE_NAME = "Data_Collection_Export";
+
+    public static final String PARAM_FORMAT = "format";
+
+    public static final String KEY_LABEL_EXPORT_FILE_SHEET = "label.export.file.sheet";
+
+    public static final String KEY_LABEL_LEARNING_LONGLAT_LATITUDE_UNIT = "label.learning.longlat.latitude.unit";
+
+    public static final String KEY_LABEL_LEARNING_LONGLAT_LATITUDE = "label.learning.longlat.latitude";
+
+    public static final String KEY_LABEL_LEARNING_LONGLAT_LONGITUDE_UNIT = "label.learning.longlat.longitude.unit";
+
+    public static final String KEY_LABEL_LEARNING_LONGLAT_LONGITUDE = "label.learning.longlat.longitude";
+
+    public static final String KEY_LABEL_EXPORT_FILE_USER = "label.export.file.user";
+
+    public static final String KEY_LABEL_EXPORT_FILE_DATE = "label.export.file.date";
+
+    public static final String KEY_LABEL_EXPORT_FILE_TITLE = "label.export.file.title";
+
+    public static final String KEY_LABEL_EXPORT_FILE_ANSWER_DATE = "label.export.file.answer.date";
 }

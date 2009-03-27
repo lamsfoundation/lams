@@ -174,4 +174,6 @@ public class CentralConstants {
     public static final String FILE_EXTENSION_XLS = ".xls";
 
     public static final String FILE_EXTENSION_CSV = ".csv";
+
+    public static final String HEADER_CONTENT_ATTACHMENT = "attachment;filename=";
 }
