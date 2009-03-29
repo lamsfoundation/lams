@@ -221,7 +221,7 @@
 					<c:if test="${not empty activity.checkEditingAdviceUrl}">
 						<a href="<lams:LAMSURL/>${activity.editingAdviceUrl}" title=""
 							rel="<lams:LAMSURL/>${activity.checkEditingAdviceUrl}" 
-							class="editingAdvice"
+							class="editing-advice-button"
 							id="editingAdvice${activityStatus.index+1}"><fmt:message key="label.planner.editing.advice" /></a>
 					</c:if>
 				</td>

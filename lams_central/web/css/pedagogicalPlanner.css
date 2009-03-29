@@ -61,7 +61,7 @@ div#pedagogicalPlannerErrorArea{
 a.editingAdvice{
 	display: none;
 	font-size: smaller;
-	margin: 0px 0px 0px 700px;
+	margin: 0px 0px 0px 660px;
 }
 
 td.branchFirstActivity {
@@ -157,3 +157,16 @@ h3.group4{
 .dummyLink {
 	color: #47bc23;
 }
+
+#content a.editing-advice-button {
+	display: none;
+	font-size: smaller;
+	margin: 0px 0px 0px 660px;
+	background: url('../images/css/editing_advice.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+}
+
