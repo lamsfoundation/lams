@@ -123,6 +123,26 @@ function xmldb_lamstwo_upgrade($oldversion=0) {
         
         $result = $result && create_table($table);
     }
+    
+    // LDEV-1965 add more meaningful log info
+    if ($result && $olversion < 2009033000) {
+      $log_display->module = 'lamstwo';
+      $log_display->action = 'add';
+      $log_display->mtable = 'lamstwo';
+      $log_display->field = 'name';
+      insert_record('log_display', $log_display);
+      
+      $log_display->action = 'add lesson';
+      $log_display->mtable = 'lamstwo_lesson';
+      insert_record('log_display', $log_display);
+      
+      $log_display->action = 'update';
+      $log_display->mtable = 'lamstwo';
+      insert_record('log_display', $log_display);
+      
+      $log_display->action = 'view lamstwo';
+      insert_record('log_display', $log_display);
+    }
 
     return $result;
 }

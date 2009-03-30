@@ -410,6 +410,13 @@ function lamstwo_add_lesson($form) {
     $result = lamstwo_fill_lesson($USER->username, $form->lesson_id,
         $form->course, $locale['country'], $locale['lang'], $members['learners'], $members['monitors']
     );
+    
+    // log adding of lesson
+    $cmid = 0;
+    if ($cm = get_coursemodule_from_instance('lamstwo', $lamstwo->id, $lamstwo->course)) {
+      $cmid = $cm->id;
+    }
+    add_to_log($form->course, 'lamstwo', 'add lesson', 'view.php?id='.$cmid, $form->id, $cmid);
 	
     return $form->id;
 }

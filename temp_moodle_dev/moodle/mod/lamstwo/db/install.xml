@@ -47,4 +47,14 @@
       </KEYS>
     </TABLE>
   </TABLES>
+  <STATEMENTS>
+    <STATEMENT NAME="insert log_display" TYPE="insert" TABLE="log_display" COMMENT="Initial insert of records on table log_display">
+      <SENTENCES>
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('lamstwo', 'add', 'lamstwo', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('lamstwo', 'add lesson', 'lamstwo_lesson', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('lamstwo', 'update', 'lamstwo', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('lamstwo', 'view lamstwo', 'lamstwo', 'name')" />
+      </SENTENCES>
+    </STATEMENT>
+  </STATEMENTS>
 </XMLDB>
