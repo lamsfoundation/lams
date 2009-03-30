@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -60,6 +61,7 @@ import org.lamsfoundation.lams.tool.daco.service.IDacoService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -258,6 +260,16 @@ public class MonitoringAction extends Action {
 	List<Object[]> rows = new LinkedList<Object[]>();
 	// We get all sessions with all users with all their records from the given Daco content
 	List<MonitoringSummarySessionDTO> monitoringSummary = service.getMonitoringSummary(daco.getContentId(), null);
+	// Get current user's locale to format numbers properly
+	Locale monitoringUserLocale = null;
+	HttpSession ss = SessionManager.getSession();
+	if (ss != null) {
+	    UserDTO systemUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if (systemUser != null) {
+		monitoringUserLocale = new Locale(systemUser.getLocaleLanguage(), systemUser.getLocaleCountry());
+	    }
+	}
+
 	for (MonitoringSummarySessionDTO summarySession : monitoringSummary) {
 	    // Maybe we'll need delimiter between sessions one day - here is the place to add an empty row
 	    for (MonitoringSummaryUserDTO user : summarySession.getUsers()) {
@@ -284,6 +296,16 @@ public class MonitoringAction extends Action {
 			String answerString = answer.getAnswer();
 			// we extract answers and add them to "data" array in readable form
 			switch (questionTypes[columnIndex - 2]) {
+			case DacoConstants.QUESTION_TYPE_NUMBER:
+			    if (!StringUtils.isBlank(answerString)) {
+				Short fractionDigits = answer.getQuestion().getDigitsDecimal();
+				if (fractionDigits == null) {
+				    fractionDigits = Short.MAX_VALUE;
+				}
+				cell = NumberUtil.formatLocalisedNumber(Double.parseDouble(answerString),
+					monitoringUserLocale, fractionDigits);
+			    }
+			    break;
 			case DacoConstants.QUESTION_TYPE_DATE:
 			    if (!StringUtils.isBlank(answerString)) {
 				cell = DacoConstants.DEFAULT_DATE_FORMAT.parse(answerString);
