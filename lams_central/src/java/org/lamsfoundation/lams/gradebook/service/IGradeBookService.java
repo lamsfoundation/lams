@@ -25,10 +25,12 @@ package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
  
 public interface IGradeBookService {
@@ -110,6 +112,14 @@ public interface IGradeBookService {
      * @param feedback
      */
     public void updateUserLessonGradeBookFeedback(Lesson lesson, User learner, String feedback);
+    
+    /**
+     * Gets the lesson row dtos for a given organisation
+     * 
+     * @param organisation
+     * @return
+     */
+    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user);
     
 }
  

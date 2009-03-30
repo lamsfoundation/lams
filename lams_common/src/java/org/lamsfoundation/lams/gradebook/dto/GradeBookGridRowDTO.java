@@ -27,9 +27,7 @@ import java.util.ArrayList;
  
 public abstract class GradeBookGridRowDTO{
     
-    public abstract ArrayList<String> toMonitorUserViewStringArray();
-    
-    public abstract ArrayList<String> toMonitorActViewStringArray();
+    public abstract ArrayList<String> toStringArray(String view);
     
     public abstract String getRowId();
 }

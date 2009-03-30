@@ -9,6 +9,7 @@
 	<bean id="gradeBookServiceTarget" class="org.lamsfoundation.lams.gradebook.service.GradeBookService">
 		<property name="monitoringService"><ref bean="monitoringService"/></property>
 		<property name="toolService"><ref bean="lamsCoreToolService"/></property> 	
+		<property name="lessonService"><ref bean="lessonService"/></property> 	
 		<property name="gradeBookDAO"><ref bean="gradeBookDAO"/></property> 	
 	</bean>
 	
@@ -16,15 +17,18 @@
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target"><ref bean="gradeBookServiceTarget"/></property>
 		<property name="transactionAttributes">
-			<props>
-				<prop key="create*">PROPAGATION_REQUIRED</prop>
+			<props>	
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="store*">PROPAGATION_REQUIRED</prop>
 				<prop key="copy*">PROPAGATION_REQUIRED</prop>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="validate*">PROPAGATION_REQUIRED</prop>
+				<prop key="setup*">PROPAGATION_REQUIRED</prop>
+				<prop key="finish*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>		
+				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>	
+				<prop key="add*">PROPAGATION_REQUIRED</prop>	
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
-				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
-				<prop key="remove*">PROPAGATION_REQUIRED</prop>
-				<prop key="add*">PROPAGATION_REQUIRED</prop>				
 			</props>
 		</property>
 	</bean>

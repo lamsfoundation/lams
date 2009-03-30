@@ -18,174 +18,166 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dto; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
- 
-public class GBActivityGridRowDTO extends GradeBookGridRowDTO{
+
+public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
+    
+    public static final String VIEW_USER = "userView";
+    public static final String VIEW_ACTIVITY = "activityView";
+    
     long activityId;
     String activityTitle;
     String competences;
     //String toolString;
-    
+
     // Properties for user view
     String status;
     String output;
     String activityUrl;
     //double timeTaken;
-    Double mark; 
+    Double mark;
     String feedback;
-    
+
     // Properties for activity view
     Double average;
     String monitorUrl;
-    
-      
-    public GBActivityGridRowDTO() {}
-    
-    @Override
-    public ArrayList<String> toMonitorUserViewStringArray() {
-	ArrayList<String> ret = new ArrayList<String>();
-	
-	ret.add("" + activityId);
-	
-	
-	if (activityUrl != null && activityUrl.length() != 0) {
-	    ret.add("<a href='javascript:launchPopup(\"" +activityUrl+ "\",\"" +activityTitle+ "\")'>" +activityTitle +"</a>");
-	} else {
-	    ret.add(activityTitle);
-	}
-	
-	
-	ret.add(status);
-	ret.add(output);
-	ret.add(competences);
-	
-	ret.add(feedback);
-	
-	if (mark != null) {
-	    ret.add(mark.toString());
-	} else {
-	    ret.add("-"); 
-	}
-	
-	
-	return ret;
+
+    public GBActivityGridRowDTO() {
     }
-    
+
     @Override
-    public ArrayList<String> toMonitorActViewStringArray() {
+    public ArrayList<String> toStringArray(String view) {
 	ArrayList<String> ret = new ArrayList<String>();
-	
 	ret.add("" + activityId);
 
-	if (monitorUrl != null && monitorUrl.length() != 0) {
-	    ret.add("<a href='javascript:launchPopup(\"" +monitorUrl+ "\",\"" +activityTitle+ "\")'>" +activityTitle +"</a>");
-	} else {
-	    ret.add(activityTitle);
+	if (view.equals(VIEW_USER)) {
+	    if (activityUrl != null && activityUrl.length() != 0) {
+		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + activityTitle + "\")'>"
+			+ activityTitle + "</a>");
+	    } else {
+		ret.add(activityTitle);
+	    }
+	    ret.add(status);
+	    ret.add(output);
+	    ret.add(competences);
+	    ret.add(feedback);
+	    if (mark != null) {
+		ret.add(mark.toString());
+	    } else {
+		ret.add("-");
+	    }
+	    
+	} else if (view.equals(VIEW_ACTIVITY)) {
+	    if (monitorUrl != null && monitorUrl.length() != 0) {
+		ret.add("<a href='javascript:launchPopup(\"" + monitorUrl + "\",\"" + activityTitle + "\")'>"
+			+ activityTitle + "</a>");
+	    } else {
+		ret.add(activityTitle);
+	    }
+
+	    ret.add(competences);
+
+	    if (average != null) {
+		ret.add(average.toString());
+	    } else {
+		ret.add("-");
+	    }
 	}
 
-	ret.add(competences);
-	
-	if (average != null) {
-	    ret.add(average.toString());
-	} else {
-	    ret.add("-"); 
-	}
-	
 	return ret;
     }
-    
+
     @Override
     public String getRowId() {
 	return "" + activityId;
     }
-    
-    public int getId(){
+
+    public int getId() {
 	return new Long(activityId).intValue();
     }
 
     public long getActivityId() {
-        return activityId;
+	return activityId;
     }
 
     public void setActivityId(long activityId) {
-        this.activityId = activityId;
+	this.activityId = activityId;
     }
 
     public String getActivityTitle() {
-        return activityTitle;
+	return activityTitle;
     }
 
     public void setActivityTitle(String activityTitle) {
-        this.activityTitle = activityTitle;
+	this.activityTitle = activityTitle;
     }
 
     public String getStatus() {
-        return status;
+	return status;
     }
 
     public void setStatus(String status) {
-        this.status = status;
+	this.status = status;
     }
 
     public String getOutput() {
-        return output;
+	return output;
     }
 
     public void setOutput(String output) {
-        this.output = output;
+	this.output = output;
     }
 
     public Double getMark() {
-        return mark;
+	return mark;
     }
 
     public void setMark(Double mark) {
-        this.mark = mark;
+	this.mark = mark;
     }
 
     public String getCompetences() {
-        return competences;
+	return competences;
     }
 
     public void setCompetences(String competences) {
-        this.competences = competences;
+	this.competences = competences;
     }
 
     public String getActivityUrl() {
-        return activityUrl;
+	return activityUrl;
     }
 
     public void setActivityUrl(String activityUrl) {
-        this.activityUrl = activityUrl;
+	this.activityUrl = activityUrl;
     }
 
     public String getFeedback() {
-        return feedback;
+	return feedback;
     }
 
     public void setFeedback(String feedback) {
-        this.feedback = feedback;
+	this.feedback = feedback;
     }
 
     public Double getAverage() {
-        return average;
+	return average;
     }
 
     public void setAverage(Double average) {
-        this.average = average;
+	this.average = average;
     }
 
     public String getMonitorUrl() {
-        return monitorUrl;
+	return monitorUrl;
     }
 
     public void setMonitorUrl(String monitorUrl) {
-        this.monitorUrl = monitorUrl;
+	this.monitorUrl = monitorUrl;
     }
 }
- 

@@ -43,18 +43,21 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 
     private static final String GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY = "from GradeBookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
-    
-    
+
+    private static final String GET_AVERAGE_MARK_FOR_LESSON = "select avg(gles.mark) from GradeBookUserLesson gles where "
+	    + "gles.lesson.lessonId=:lessonID";
+
     @SuppressWarnings("unchecked")
     public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID) {
 	List result = getSession().createQuery(GET_GRADEBOOK_USER_ACTIVITY).setInteger("userID", userID.intValue())
 		.setLong("activityID", activityID.longValue()).list();
 
-	if (result != null && result.size() > 0) {
-	    return (GradeBookUserActivity) result.get(0);
-	} else {
-	    return null;
-	}
+	if (result != null) {
+	    if (result.size() > 0)
+		return (GradeBookUserActivity) result.get(0);
+	} 
+	    
+	return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -62,31 +65,48 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 	List result = getSession().createQuery(GET_GRADEBOOK_USER_LESSON).setInteger("userID", userID.intValue())
 		.setLong("lessonID", lessonID.longValue()).list();
 
-	if (result != null && result.size() > 0) {
-	    return (GradeBookUserLesson) result.get(0);
-	} else {
-	    return null;
-	}
+	if (result != null) {
+	    if (result.size() > 0)
+		return (GradeBookUserLesson) result.get(0);
+	} 
+	
+	return null;
+	
     }
 
     @SuppressWarnings("unchecked")
     public Double getGradeBookUserActivityMarkSum(Long lessonID, Integer userID) {
 	List result = getSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM).setInteger("userID",
 		userID.intValue()).setLong("lessonID", lessonID.longValue()).list();
+
+	if (result != null) {
+	    if (result.size() > 0)
+		return (Double) result.get(0);
+	} 
 	
-	if (result != null && result.size() > 0) {
-	    return (Double) result.get(0);
-	} else {
-	    return 0.0;
-	}
+	return 0.0;
+	
 
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<GradeBookUserActivity> getAllGradeBookUserActivitiesForActivity(Long activityID) {
-	List result = getSession().createQuery(GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY)
-		.setLong("activityID", activityID.longValue()).list();
-	
-	return (List<GradeBookUserActivity>)result;
+	List result = getSession().createQuery(GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY).setLong("activityID",
+		activityID.longValue()).list();
+
+	return (List<GradeBookUserActivity>) result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Double getAverageMarkForLesson(Long lessonID) {
+	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_LESSON).setLong("lessonID", lessonID.longValue())
+		.list();
+
+	if (result != null) {
+	    if (result.size() > 0)
+		return (Double) result.get(0);
+	}
+	    
+	return 0.0;
     }
 }

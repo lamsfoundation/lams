@@ -8,7 +8,7 @@
 
 <lams:html>
 <lams:head>
-	<title>GradeBook Monitor</title>
+	<title>Lesson GradeBook Monitor</title>
 	<lams:css/>
 	
 	<link rel="stylesheet" type="text/css" media="screen" href="<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/grid.css" />
@@ -64,7 +64,7 @@
 			    pager: 'userViewPager',
 			    rowList:[5,10,20,30],
 			    rowNum:10,
-				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}&login=test1",
+				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}",
 			    colNames:["", 'Name', 'Progress', 'Lesson FeedBack', 'Lesson Mark'],
 			    colModel:[
 			      {name:'login', index:'login', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
@@ -297,7 +297,7 @@
 		
 		<div id="header-no-tabs"></div> <!--closes footer-->
 		<div id="content" >
-			<h1 class="no-tabs-below">GradeBook for ${lessonDetails.lessonName}</h1> 
+			<h1 class="no-tabs-below">Lesson GradeBook for ${lessonDetails.lessonName}</h1> 
 			<div style="width:990px; margin-left:auto; margin-right:auto;">
 			<br />
 			<div style="width:990px; margin-left:auto; margin-right:auto;">

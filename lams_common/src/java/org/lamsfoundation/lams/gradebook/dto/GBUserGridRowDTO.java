@@ -26,58 +26,56 @@ package org.lamsfoundation.lams.gradebook.dto;
 import java.util.ArrayList;
 
 public class GBUserGridRowDTO extends GradeBookGridRowDTO {
+    
+    public static final String VIEW_USER = "userView";
+    public static final String VIEW_ACTIVITY = "activityView";
+    public static final String VIEW_COURSE_MONITOR = "courseMonitorView";
+    
     String login;
     String firstName;
     String lastName;
     String status;
     String feedback;
-    
+
     // For user view, this represents total lesson mark in the grid
     // For activity view, this represents an activity mark
     Double mark;
-    
+
     // For activity view
     String output;
     String activityUrl;
-    
 
     public GBUserGridRowDTO() {
     }
-    
+
     @Override
-    public ArrayList<String> toMonitorUserViewStringArray() {
+    public ArrayList<String> toStringArray(String view) {
 	ArrayList<String> ret = new ArrayList<String>();
 
-	ret.add(login);
-	ret.add(lastName + " " + firstName);
-	ret.add(status);
-	ret.add(feedback);
-
-	if (mark != null) {
-	    ret.add(mark.toString());
-	} else {
-	    ret.add("-");
-	}
-
-	return ret;
-    }
-    
-    @Override
-    public ArrayList<String> toMonitorActViewStringArray() {
-	ArrayList<String> ret = new ArrayList<String>();
-	
-	ret.add(login);
-	
 	String fullName = lastName + " " + firstName;
-	if (activityUrl != null && activityUrl.length() != 0) {
-	    ret.add("<a href='javascript:launchPopup(\"" +activityUrl+ "\",\"" +fullName+ "\")'>" +fullName +"</a>");
-	} else {
-	    ret.add(login);
+	ret.add(login);
+
+	if (view.equals(VIEW_USER)) {
+	    ret.add(fullName);
+	    ret.add(status);
+	    ret.add(feedback);
+	} else if (view.equals(VIEW_ACTIVITY)) {
+	    if (activityUrl != null && activityUrl.length() != 0) {
+		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + fullName + "\")'>" + fullName
+			+ "</a>");
+	    } else {
+		ret.add(fullName);
+	    }
+
+	    ret.add(status);
+	    ret.add(output);
+	    ret.add(feedback);
+	} else if (view.equals(VIEW_COURSE_MONITOR)){
+	    ret.add(fullName);
+	    ret.add(status);
+	    ret.add(feedback);
+	    
 	}
-	
-	ret.add(status);
-	ret.add(output);
-	ret.add(feedback);
 
 	if (mark != null) {
 	    ret.add(mark.toString());
@@ -102,58 +100,58 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
     }
 
     public String getLogin() {
-        return login;
+	return login;
     }
 
     public void setLogin(String login) {
-        this.login = login;
+	this.login = login;
     }
 
     public String getFirstName() {
-        return firstName;
+	return firstName;
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+	this.firstName = firstName;
     }
 
     public String getLastName() {
-        return lastName;
+	return lastName;
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+	this.lastName = lastName;
     }
 
     public String getStatus() {
-        return status;
+	return status;
     }
 
     public void setStatus(String status) {
-        this.status = status;
+	this.status = status;
     }
-    
+
     public String getFeedback() {
-        return feedback;
+	return feedback;
     }
 
     public void setFeedback(String feedback) {
-        this.feedback = feedback;
+	this.feedback = feedback;
     }
 
     public String getOutput() {
-        return output;
+	return output;
     }
 
     public void setOutput(String output) {
-        this.output = output;
+	this.output = output;
     }
 
     public String getActivityUrl() {
-        return activityUrl;
+	return activityUrl;
     }
 
     public void setActivityUrl(String activityUrl) {
-        this.activityUrl = activityUrl;
+	this.activityUrl = activityUrl;
     }
 }

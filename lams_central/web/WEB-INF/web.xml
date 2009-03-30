@@ -8,22 +8,15 @@
 
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
-	<param-value>
-				classpath:/org/lamsfoundation/lams/applicationContext.xml
-				classpath:/org/lamsfoundation/lams/toolApplicationContext.xml
-				classpath:/org/lamsfoundation/lams/contentrepository/applicationContext.xml
-				classpath:/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml
-				classpath:/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml
-				classpath:/org/lamsfoundation/lams/workspace/workspaceApplicationContext.xml
-				classpath:/org/lamsfoundation/lams/web/webApplicationContext.xml
-				classpath:/org/lamsfoundation/lams/integrationContext.xml
-				classpath:/org/lamsfoundation/lams/usermanagement/ldapContext.xml
-				classpath:/org/lamsfoundation/lams/gradebook/gradeBookApplicationContext.xml
-				<!--  Needed to communicate with the tools -->
-				classpath:/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml
-				classpath:/org/lamsfoundation/lams/learning/learningApplicationContext.xml
-				<!--  Add tool contexts after this -->
-	</param-value>
+	<param-value></param-value>
+</context-param>
+<context-param>
+   <param-name>locatorFactorySelector</param-name>
+   <param-value>classpath*:/org/lamsfoundation/lams/**/beanRefContext.xml</param-value>
+</context-param>
+<context-param>
+	<param-name>parentContextKey</param-name>
+	<param-value>context.central</param-value>
 </context-param>
 
     <filter>

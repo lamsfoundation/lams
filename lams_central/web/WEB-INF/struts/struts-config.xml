@@ -550,6 +550,11 @@
         redirect="false"
       />
       <forward
+        name="monitorcoursegradebook"
+        path="/gradebook/gradeBookCourseMonitor.jsp"
+        redirect="false"
+      />
+      <forward
         name="error"
         path=".error"
         redirect="false"

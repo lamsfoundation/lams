@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
 import org.lamsfoundation.lams.gradebook.dao.IGradeBookDAO;
 import org.lamsfoundation.lams.gradebook.dto.GBActivityGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -41,12 +42,14 @@ import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -62,12 +65,11 @@ public class GradeBookService implements IGradeBookService {
 
     private static Logger logger = Logger.getLogger(GradeBookService.class);
 
-    private static final String IMAGES_DIR = Configuration.get(ConfigurationKeys.SERVER_URL) + "images";
-
     // Services 
     private IMonitoringService monitoringService;
     private ILamsCoreToolService toolService;
     private IGradeBookDAO gradeBookDAO;
+    private ILessonService lessonService;
 
     /**
      * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBActivityRowsForLearner(org.lamsfoundation.lams.lesson.Lesson,
@@ -332,6 +334,51 @@ public class GradeBookService implements IGradeBookService {
     }
 
     /**
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBLessonRows(org.lamsfoundation.lams.usermanagement.Organisation)
+     */
+    @SuppressWarnings("unchecked")
+    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user) {
+	List<GBLessonGridRowDTO> lessonRows = new ArrayList<GBLessonGridRowDTO>();
+
+	if (organisation != null) {
+
+	    List<Lesson> lessons = lessonService.getLessonsByGroupAndUser(user.getUserId(), organisation
+		    .getOrganisationId());
+	    if (lessons != null) {
+
+		for (Lesson lesson : lessons) {
+		    if (lesson.getLessonClass().isStaffMember(user)) {
+			GBLessonGridRowDTO lessonRow = new GBLessonGridRowDTO();
+			lessonRow.setLessonName(lesson.getLessonName());
+			lessonRow.setLessonId(lesson.getLessonId());
+			lessonRow.setLessonDescription(lesson.getLessonDescription());
+			lessonRow.setMark(gradeBookDAO.getAverageMarkForLesson(lesson.getLessonId()));
+			
+			
+			String gbMonURL = Configuration.get(ConfigurationKeys.SERVER_URL)
+				    + "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
+			
+			lessonRow.setGradeBookMonitorURL(gbMonURL);
+			if (lesson.getOrganisation().getOrganisationId() != organisation.getOrganisationId()) {
+			    lessonRow.setSubGroup(lesson.getOrganisation().getName());  
+			} else {
+			    lessonRow.setSubGroup("-");
+			}
+			
+			lessonRows.add(lessonRow);
+
+		    }
+		}
+	    }
+
+	} else {
+	    logger.error("Request for gradebook grid with a null organisation");
+	}
+
+	return lessonRows;
+    }
+
+    /**
      * Adds a mark to the aggregated total and saves it
      * 
      * @param gradeBookUserLesson
@@ -472,6 +519,7 @@ public class GradeBookService implements IGradeBookService {
     private String getLessonStatusStr(LearnerProgress learnerProgress) {
 	String status = "-";
 
+	final String IMAGES_DIR = Configuration.get(ConfigurationKeys.SERVER_URL) + "images";
 	if (learnerProgress != null) {
 	    if (learnerProgress.isComplete()) {
 		status = "<img src='" + IMAGES_DIR + "/tick.png' />";
@@ -492,6 +540,7 @@ public class GradeBookService implements IGradeBookService {
      */
     private String getActivityStatusStr(LearnerProgress learnerProgress, Activity activity) {
 
+	final String IMAGES_DIR = Configuration.get(ConfigurationKeys.SERVER_URL) + "images";
 	if (learnerProgress != null) {
 	    byte statusByte = learnerProgress.getProgressState(activity);
 	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED) {
@@ -588,5 +637,12 @@ public class GradeBookService implements IGradeBookService {
 	this.gradeBookDAO = gradeBookDAO;
     }
 
+    public ILessonService getLessonService() {
+	return lessonService;
+    }
+
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
     // -------------------------------------------------------------------------
 }

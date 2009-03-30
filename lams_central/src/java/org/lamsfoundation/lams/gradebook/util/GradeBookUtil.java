@@ -43,11 +43,8 @@ import org.w3c.dom.Element;
 
 public class GradeBookUtil {
 
-    public static final int GRID_TYPE_MONITOR_USER_VIEW = 0;
-    public static final int GRID_TYPE_MONITOR_ACTIVITY_VIEW = 1;
-
     @SuppressWarnings("unchecked")
-    public static String toGridXML(Collection gridRows, int page, int totalPages, int gridType) {
+    public static String toGridXML(Collection gridRows, int page, int totalPages, String view) {
 	String xml = "";
 	try {
 	    Document document = getDocument();
@@ -75,16 +72,9 @@ public class GradeBookUtil {
 
 		// Work out which grid we want to put the data into
 		ArrayList<String> gridRowStringArray = new ArrayList<String>();
-		switch (gridType) {
-    		case GRID_TYPE_MONITOR_USER_VIEW:
-    		    gridRowStringArray = gridRow.toMonitorUserViewStringArray();
-    		    break;
-    		case GRID_TYPE_MONITOR_ACTIVITY_VIEW:
-    		    gridRowStringArray = gridRow.toMonitorActViewStringArray();
-    		    break;
 
-		}
-
+		gridRowStringArray = gridRow.toStringArray(view);
+		
 		for (String gradeBookItem : gridRowStringArray) {
 		    Element cellElement = document.createElement("cell");
 		    gradeBookItem = (gradeBookItem != null) ? gradeBookItem : "";

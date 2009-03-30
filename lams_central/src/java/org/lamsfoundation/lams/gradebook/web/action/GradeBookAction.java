@@ -27,8 +27,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -37,8 +37,11 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBLessonMarkComparator;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBLessonNameComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBUserFullNameComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBUserMarkComparator;
 import org.lamsfoundation.lams.gradebook.service.IGradeBookService;
@@ -48,6 +51,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -55,6 +59,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -154,14 +159,7 @@ public class GradeBookAction extends LamsDispatchAction {
 
 	    }
 
-	    String ret = "";
-	    if (method.equals("userView")) {
-		ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, rowLimit,
-			GradeBookUtil.GRID_TYPE_MONITOR_USER_VIEW);
-	    } else if (method.equals("activityView")) {
-		ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, totalPages,
-			GradeBookUtil.GRID_TYPE_MONITOR_ACTIVITY_VIEW);
-	    }
+	    String ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, rowLimit, method);
 
 	    response.setContentType("text/xml");
 	    PrintWriter out = response.getWriter();
@@ -176,13 +174,16 @@ public class GradeBookAction extends LamsDispatchAction {
     /**
      * Returns an xml representation of the user grid for gradebook
      * 
-     * This has two modes, userView and activityView
+     * This has three modes: userView, activityView and courseMonitorView
      * 
      * User view will get all the learners in a lesson and print their gradebook
-     * data with their mark for the entire lesson]
+     * data with their mark for the entire lesson
      * 
      * Activity view will take an extra parameter (activityID) and instead show
      * the user's mark just for one activity
+     * 
+     * Course monitor view gets the same as the user view, but the link is set
+     * to the lesson level gradebook instead of learner
      * 
      * @param mapping
      * @param form
@@ -210,7 +211,7 @@ public class GradeBookAction extends LamsDispatchAction {
 	    // Get the user gradebook list from the db
 	    List<GBUserGridRowDTO> gradeBookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 
-	    if (method.equals("userView")) {
+	    if (method.equals("userView") || method.equals("courseMonitorView")) {
 		gradeBookUserDTOs = gradeBookService.getGBUserRowsForLesson(lesson);
 	    } else if (method.equals("activityView")) {
 		Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
@@ -245,8 +246,7 @@ public class GradeBookAction extends LamsDispatchAction {
 		String searchString = WebUtil.readStrParam(request, "searchString");
 		gradeBookUserDTOs = doUserSearch(gradeBookUserDTOs, searchField, searchOper, searchString.toLowerCase());
 	    }
-	    
-	    
+
 	    // Reverse the order if requested
 	    if (sortOrder != null && sortOrder.equals("desc")) {
 		Collections.reverse(gradeBookUserDTOs);
@@ -269,15 +269,7 @@ public class GradeBookAction extends LamsDispatchAction {
 
 	    }
 
-	    String ret = "";
-
-	    if (method.equals("userView")) {
-		ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, page, totalPages,
-			GradeBookUtil.GRID_TYPE_MONITOR_USER_VIEW);
-	    } else if (method.equals("activityView")) {
-		ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, page, totalPages,
-			GradeBookUtil.GRID_TYPE_MONITOR_ACTIVITY_VIEW);
-	    }
+	    String ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, page, totalPages, method);
 
 	    response.setContentType("text/xml");
 	    PrintWriter out = response.getWriter();
@@ -289,40 +281,179 @@ public class GradeBookAction extends LamsDispatchAction {
 	return null;
     }
 
+    /**
+     * Returns an xml representation of the lesson grid for a course for
+     * gradebook
+     * 
+     * This has two modes, learnerView and monitorView
+     * 
+     * Learner view will get the data specific to one user
+     * 
+     * Monitor will get the data average for whole lessons
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward getCourseGridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	initServices();
+	int page = WebUtil.readIntParam(request, GradeBookConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, GradeBookConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SIDX, true);
+	Boolean isSearch = WebUtil.readBooleanParam(request, "_search");
+	String method = WebUtil.readStrParam(request, "method");
+
+	User user = getRealUser();
+
+	Integer courseID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	Organisation organisation = (Organisation) userService.findById(Organisation.class, courseID);
+
+	if (organisation != null && user != null) {
+
+	    Set<Lesson> lessons = (Set<Lesson>) organisation.getLessons();
+	    if (lessons != null) {
+
+		List<GBLessonGridRowDTO> gradeBookLessonDTOs = new ArrayList<GBLessonGridRowDTO>();
+
+		gradeBookLessonDTOs = gradeBookService.getGBLessonRows(organisation, user);
+
+		// if it is a search fix up the set
+		if (isSearch) {
+		    String searchField = WebUtil.readStrParam(request, "searchField");
+		    String searchOper = WebUtil.readStrParam(request, "searchOper");
+		    String searchString = WebUtil.readStrParam(request, "searchString");
+		    gradeBookLessonDTOs = doLessonSearch(gradeBookLessonDTOs, searchField, searchOper, searchString
+			    .toLowerCase());
+		}
+
+		// Sort the list appropriately
+		if (sortBy != null) {
+		    if (sortBy.equals("lessonName")) {
+			Collections.sort(gradeBookLessonDTOs, new GBLessonNameComparator());
+		    } else if (sortBy.equals("mark")) {
+			Collections.sort(gradeBookLessonDTOs, new GBLessonMarkComparator());
+		    } else {
+			Collections.sort(gradeBookLessonDTOs, new GBLessonNameComparator());
+		    }
+		} else {
+		    Collections.sort(gradeBookLessonDTOs, new GBLessonNameComparator());
+		}
+
+		// Reverse the order if requested
+		if (sortOrder != null && sortOrder.equals("desc")) {
+		    Collections.reverse(gradeBookLessonDTOs);
+		}
+
+		// Work out the sublist to fetch based on rowlimit and current page.
+		int totalPages = 1;
+		if (rowLimit < gradeBookLessonDTOs.size()) {
+
+		    totalPages = new Double(Math.ceil(new Integer(gradeBookLessonDTOs.size()).doubleValue()
+			    / new Integer(rowLimit).doubleValue())).intValue();
+
+		    int firstRow = (page - 1) * rowLimit;
+		    int lastRow = firstRow + rowLimit;
+
+		    if (lastRow > gradeBookLessonDTOs.size()) {
+			gradeBookLessonDTOs = gradeBookLessonDTOs.subList(firstRow, gradeBookLessonDTOs.size());
+		    } else {
+			gradeBookLessonDTOs = gradeBookLessonDTOs.subList(firstRow, lastRow);
+		    }
+
+		}
+
+		String ret = GradeBookUtil.toGridXML(gradeBookLessonDTOs, page, totalPages, method);
+
+		response.setContentType("text/xml");
+		PrintWriter out = response.getWriter();
+		out.print(ret);
+
+	    }
+
+	} else {
+	    // Grid will handle error, just log and return null
+	    logger.error("Error: request for course gradebook data with null user or course. CourseID: " + courseID);
+	}
+
+	return null;
+    }
+
     private List<GBUserGridRowDTO> doUserSearch(List<GBUserGridRowDTO> gradeBookUserDTOs, String searchField,
 	    String searchOper, String searchString) {
 	List<GBUserGridRowDTO> ret = new ArrayList<GBUserGridRowDTO>();
-	
-	if (searchField.equals("fullName")){
+
+	if (searchField.equals("fullName")) {
 	    for (GBUserGridRowDTO userRow : gradeBookUserDTOs) {
-		
+
 		String fullName = userRow.getLastName() + " " + userRow.getFirstName();
 		fullName = fullName.toLowerCase();
-		
+
 		if (searchOper.equals("eq")) {
 		    if (fullName.equals(searchString)) {
 			ret.add(userRow);
 		    }
-		} else if (searchOper.equals("ne")){
+		} else if (searchOper.equals("ne")) {
 		    if (!fullName.equals(searchString)) {
 			ret.add(userRow);
-		    } 
-		} else if (searchOper.equals("bw")){
+		    }
+		} else if (searchOper.equals("bw")) {
 		    if (fullName.startsWith(searchString)) {
 			ret.add(userRow);
 		    }
-		} else if (searchOper.equals("ew")){
+		} else if (searchOper.equals("ew")) {
 		    if (fullName.endsWith(searchString)) {
 			ret.add(userRow);
 		    }
-		}else if (searchOper.equals("cn")){
+		} else if (searchOper.equals("cn")) {
 		    if (fullName.contains(searchString)) {
 			ret.add(userRow);
 		    }
 		}
 	    }
 	}
-	return ret; 
+	return ret;
+    }
+    
+    private List<GBLessonGridRowDTO> doLessonSearch(List<GBLessonGridRowDTO> gradeBookLessonDTOs , String searchField,
+	    String searchOper, String searchString) {
+	List<GBLessonGridRowDTO> ret = new ArrayList<GBLessonGridRowDTO>();
+
+	if (searchField.equals("lessonName")) {
+	    for (GBLessonGridRowDTO lessonRow : gradeBookLessonDTOs) {
+
+		String lessonName = lessonRow.getLessonName();
+		lessonName = lessonName.toLowerCase();
+
+		if (searchOper.equals("eq")) {
+		    if (lessonName.equals(searchString)) {
+			ret.add(lessonRow);
+		    }
+		} else if (searchOper.equals("ne")) {
+		    if (!lessonName.equals(searchString)) {
+			ret.add(lessonRow);
+		    }
+		} else if (searchOper.equals("bw")) {
+		    if (lessonName.startsWith(searchString)) {
+			ret.add(lessonRow);
+		    }
+		} else if (searchOper.equals("ew")) {
+		    if (lessonName.endsWith(searchString)) {
+			ret.add(lessonRow);
+		    }
+		} else if (searchOper.equals("cn")) {
+		    if (lessonName.contains(searchString)) {
+			ret.add(lessonRow);
+		    }
+		}
+	    }
+	}
+	return ret;
     }
 
     private UserDTO getUser() {
@@ -330,16 +461,13 @@ public class GradeBookAction extends LamsDispatchAction {
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
     }
 
-    public static IGradeBookService getGradeBookService() {
-	return gradeBookService;
-    }
-
-    public static IUserManagementService getUserService() {
-	return userService;
-    }
-
-    public static ILessonService getLessonService() {
-	return lessonService;
+    private User getRealUser() {
+	UserDTO userDTO = getUser();
+	if (userDTO != null) {
+	    return getUserService().getUserByLogin(userDTO.getLogin());
+	} else {
+	    return null;
+	}
     }
 
     private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
@@ -348,22 +476,46 @@ public class GradeBookAction extends LamsDispatchAction {
     }
 
     private void initServices() {
-	ServletContext context = this.getServlet().getServletContext();
-
-	if (gradeBookService == null)
-	    gradeBookService = (IGradeBookService) WebApplicationContextUtils.getRequiredWebApplicationContext(context)
-		    .getBean("gradeBookService");
-
-	if (userService == null)
-	    userService = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(context)
-		    .getBean("userManagementService");
-
-	if (lessonService == null)
-	    lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(context)
-		    .getBean("lessonService");
-
-	if (monitoringService == null)
-	    monitoringService = (IMonitoringService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		    context).getBean("monitoringService");
+	getUserService();
+	getLessonService();
+	getMonitoringServiceService();
+	getGradeBookService();
     }
+
+    private IUserManagementService getUserService() {
+	if (userService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    userService = (IUserManagementService) ctx.getBean("userManagementService");
+	}
+	return userService;
+    }
+
+    private ILessonService getLessonService() {
+	if (lessonService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    lessonService = (ILessonService) ctx.getBean("lessonService");
+	}
+	return lessonService;
+    }
+
+    private IMonitoringService getMonitoringServiceService() {
+	if (monitoringService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
+	}
+	return monitoringService;
+    }
+
+    private IGradeBookService getGradeBookService() {
+	if (gradeBookService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    gradeBookService = (IGradeBookService) ctx.getBean("gradeBookService");
+	}
+	return gradeBookService;
+    }
+
 }

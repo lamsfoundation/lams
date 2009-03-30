@@ -18,28 +18,28 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dao; 
+ */
 
-import java.util.List;
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.dto.comparators;
 
-import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
-import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
- 
-public interface IGradeBookDAO extends IBaseDAO{
-    
-    public GradeBookUserLesson getGradeBookUserDataForLesson(Long lessonID, Integer userID);
-    
-    public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID);
-    
-    public Double getGradeBookUserActivityMarkSum(Long lessonID, Integer userID);
-    
-    public List<GradeBookUserActivity> getAllGradeBookUserActivitiesForActivity(Long activityID);
-    
-    public Double getAverageMarkForLesson(Long lessonID);
+import java.util.Comparator;
 
+import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
+
+@SuppressWarnings("unchecked")
+public class GBLessonNameComparator implements Comparator {
+
+    public int compare(Object gbLessonRowDTO, Object anotherGbLessonRowDTO) {
+
+	if (gbLessonRowDTO instanceof GBLessonGridRowDTO && anotherGbLessonRowDTO instanceof GBLessonGridRowDTO) {    
+
+	    String name1 = ((GBLessonGridRowDTO)gbLessonRowDTO).getLessonName();
+	    String name2 = ((GBLessonGridRowDTO)anotherGbLessonRowDTO).getLessonName();
+
+	    return name1.compareTo(name2);
+	} else {
+	    return 0;
+	}
+    }
 }
- 

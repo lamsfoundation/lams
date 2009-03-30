@@ -18,28 +18,30 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dao; 
+ */
 
-import java.util.List;
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.dto.comparators;
 
-import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
-import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
- 
-public interface IGradeBookDAO extends IBaseDAO{
-    
-    public GradeBookUserLesson getGradeBookUserDataForLesson(Long lessonID, Integer userID);
-    
-    public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID);
-    
-    public Double getGradeBookUserActivityMarkSum(Long lessonID, Integer userID);
-    
-    public List<GradeBookUserActivity> getAllGradeBookUserActivitiesForActivity(Long activityID);
-    
-    public Double getAverageMarkForLesson(Long lessonID);
+import java.util.Comparator;
 
+import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
+
+@SuppressWarnings("unchecked")
+public class GBLessonMarkComparator implements Comparator {
+
+    public int compare(Object gbLessonRowDTO, Object anotherGbLessonRowDTO) {
+
+	if (gbLessonRowDTO instanceof GBLessonGridRowDTO && anotherGbLessonRowDTO instanceof GBLessonGridRowDTO) {
+	   
+	    Double mark1 = ((GBLessonGridRowDTO) gbLessonRowDTO).getMark();
+	    Double mark2 = ((GBLessonGridRowDTO) anotherGbLessonRowDTO).getMark();
+
+	    mark1 = (mark1 == null) ? 0.0 : mark1;
+	    mark2 = (mark2 == null) ? 0.0 : mark2;
+	    return new Double(mark1 - mark2).intValue();    
+	} else {
+	    return 0;
+	}
+    }
 }
- 
