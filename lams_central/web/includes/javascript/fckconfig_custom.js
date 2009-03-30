@@ -29,7 +29,7 @@ FCKConfig.ToolbarSets["Custom-Wiki"] = [
 ] ;
 
 FCKConfig.ToolbarSets["Custom-Pedplanner"] = [
-	['FitWindow', 'Preview','PasteWord','Bold','Italic','Underline', '-','OrderedList','UnorderedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','TextColor','BGColor','Equation'], 
+					      ['Source','-','FitWindow','Preview','PasteWord','Bold','Italic','Underline', '-','OrderedList','UnorderedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','TextColor','BGColor','Equation'], 
 	['Image','Link','Table','Smiley','FontName','FontSize']
 ] ;
 
