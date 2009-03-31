@@ -48,8 +48,8 @@
 				<small>(<fmt:message key="label.archived"/> <lams:Date value="${childOrg.archivedDate}"/>)</small>
 			</c:if>
 			<c:forEach var="childlink" items="${childOrg.links}">
-				<a href="<c:out value='${childlink.url}'/>" class="sequence-action-link"> 
-					<span class="mycourses-addlesson-img">
+				<a href="<c:out value='${childlink.url}'/>" class="sequence-action-link thickbox<c:out value="${orgBean.id}"/>"> 
+					<span class="mycourses-addlesson-img" >
 						<fmt:message key="${childlink.name}" />
 					</span>
 				</a>

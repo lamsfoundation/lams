@@ -8,7 +8,7 @@
 
 <lams:html>
 <lams:head>
-	<META HTTP-EQUIV="Refresh" CONTENT="0;URL=monitoring/addLesson.jsp?courseID=<c:out value="${courseID}"/>&classID=<c:out value="${classID}"/>"/>
+	<META HTTP-EQUIV="Refresh" CONTENT="0;URL=monitoring/addLesson.jsp?organisationID=<c:out value="${organisationID}"/>&orgName=<c:out value="${orgName}"/>"/>
 	<TITLE><fmt:message key="title.add.lesson.window"/></TITLE>
 	<lams:css/>
 </lams:head>

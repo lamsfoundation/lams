@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
@@ -278,8 +279,10 @@ public class HomeAction extends DispatchAction {
 
 	try {
 	    log.debug("request addLesson");
+	    
 	    Integer courseId = WebUtil.readIntParam(req, AttributeNames.PARAM_COURSE_ID, false);
 	    Integer classId = WebUtil.readIntParam(req, AttributeNames.PARAM_CLASS_ID, true);
+	    
 	    UserDTO user = getUser();
 	    if (user == null) {
 		log.error("admin: User missing from session. ");
@@ -289,10 +292,11 @@ public class HomeAction extends DispatchAction {
 		if (getService().isUserInRole(user.getUserID(), orgId, Role.MONITOR)
 			|| getService().isUserInRole(user.getUserID(), orgId, Role.GROUP_MANAGER)) {
 		    log.debug("user is staff");
-		    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-		    req.setAttribute("serverUrl", serverUrl);
-		    req.setAttribute(AttributeNames.PARAM_COURSE_ID, courseId);
-		    req.setAttribute(AttributeNames.PARAM_CLASS_ID, classId);
+		    String orgName = ((Organisation) getService().findById(Organisation.class, orgId)).getName();
+		    
+		    req.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, orgId);
+		    req.setAttribute(AttributeNames.PARAM_ORGANISATION_NAME, orgName);
+		   
 		    return mapping.findForward("addLesson");
 		} else {
 		    log.error("User " + user.getLogin()

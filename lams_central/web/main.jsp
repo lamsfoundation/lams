@@ -62,6 +62,11 @@
 			function refresh(){
 				document.location.reload();
 			}
+
+			function closeWizard() {
+				setTimeout(refresh, 1000);
+				tb_remove();
+			}
 		//-->
 	</script>
 </lams:head>
