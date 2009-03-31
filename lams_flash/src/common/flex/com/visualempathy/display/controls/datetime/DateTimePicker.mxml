@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" paddingBottom="2" paddingLeft="2" paddingRight="2" paddingTop="2" horizontalGap="0" verticalAlign="middle">
+    
+    <mx:Metadata>
+        [Event(name="change", type="flash.events.Event")]
+    </mx:Metadata>
+
+	<mx:Script>
+		<![CDATA[
+			
+			[Bindable] private var _selectedDate:Date = new Date();
+			
+			[Bindable] 
+			[Inspectable(defaultValue='5', category="Other", enumeration="1,5,10,15,30")] 
+			public var minuteIncrement:int = 5;
+			
+			
+			public function get selectedDate():Date
+			{
+				this.validateNow();
+				return this._selectedDate;
+			}
+			
+			[Bindable]
+			public function set selectedDate(value:Date):void
+			{
+				this._selectedDate = value
+				this.date.selectedDate = this._selectedDate
+				if(value.getHours() >= 12)
+				{
+					this.ampm.selectedValue = 2;
+				}
+				else
+				{
+					this.ampm.selectedValue = 1;
+				}
+				
+				if(value.getHours() < 13 )
+					this.hours.value = value.getHours()
+				else
+					this.hours.value = value.getHours() - 12
+				
+				if(value.getHours() == 0)
+					this.hours.value = 12;
+				
+				this.minutes.value = value.getMinutes()
+				this.validateNow();
+			}
+			
+			override public function validateProperties():void
+			{
+				super.validateProperties();
+
+			}
+			
+			public function handleChange():void
+			{
+				
+				var militaryHours:int = hours.value;
+				if(ampm.selectedValue == 2 && hours.value != 12)
+					militaryHours = hours.value+12; 
+				else if(ampm.selectedValue == 1 && hours.value == 12)
+					militaryHours = 0;
+				var selDate:Date = this.date.selectedDate;
+				var date:Date = new Date(
+										selDate.getFullYear(),
+										selDate.getMonth(),
+										selDate.getDate(),
+										militaryHours,
+										minutes.value)
+				this.selectedDate = date;
+				
+				this.invalidateProperties();
+				this.validateNow();
+				this.dispatchEvent(new Event("change"));
+
+			}
+		]]>
+	</mx:Script>
+	<mx:DateField id="date" selectedDate="{new Date()}" change="handleChange()"/>
+	<mx:Spacer width="20"/>
+	<mx:NumericStepper id="hours" minimum="1" maximum="12" stepSize="1" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
+	<mx:Label text=":" textAlign="center"/>
+	<mx:NumericStepper id="minutes" minimum="0"  maximum="55" stepSize="{minuteIncrement}" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
+	<mx:Spacer width="10"/>
+	<mx:RadioButtonGroup id="ampm" selectedValue="1" change="this.handleChange()"/>
+	<mx:RadioButton id="am" value="1" label="AM" group="{ampm}"/>
+	<mx:RadioButton id="pm" value="2" label="PM" group="{ampm}"/>
+</mx:HBox>
