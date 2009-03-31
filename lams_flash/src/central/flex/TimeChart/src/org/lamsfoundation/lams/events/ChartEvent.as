@@ -13,13 +13,10 @@ package org.lamsfoundation.lams.events
 		
 		public static const UPDATE: String 				= "updateLearnerProgressEvent";
 		public static const SELECT: String 				= "showLearnerProgressEvent";
-		//public static const HIDE: String 				= "hideLearnerProgressEvent";
 		
 		public static const LOAD: String 				= "loadLearnerProgressEvent";
 		public static const LOAD_LEARNER: String  		= "loadLearnerProgressSingleEvent";
 		public static const LOAD_CLASS: String 			= "loadLearnerProgressAllEvent";
-		
-		public static const DICTIONARY: String			= "loadDictionaryEvent";
 		
 		/*-.........................................Properties..........................................*/
 		public var learnerProgressList:ArrayCollection;

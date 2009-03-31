@@ -9,7 +9,7 @@ import org.lamsfoundation.lams.vos.LearnerProgress;
 		_averageProgressList = averageProgressList;
 		
 		if(_averageProgressList.length > 0)
-		trace('avg first: ' + _averageProgressList.getItemAt(0).Completed);
+		//trace('avg first: ' + _averageProgressList.getItemAt(0).Completed);
 		
 		if(_averageProgressList.length > 0)
 			showAverage.enabled = true;
@@ -28,14 +28,14 @@ import org.lamsfoundation.lams.vos.LearnerProgress;
 			return;
 		}
 		
-		chart_lbl.htmlText = "<b>" + learner_lbl + " :: " + selectedLearnerProgress.learner_fname + " " + selectedLearnerProgress.learner_lname + "</b>";
+		chart_lbl.htmlText = "<b>" + dictionary.getLabel("label.learner") + " :: " + selectedLearnerProgress.learner_fname + " " + selectedLearnerProgress.learner_lname + "</b>";
 		
 		for each(var cp:CompletedActivity in selectedLearnerProgress.completedActivities) {
 			_learnerProgressList.addItem(cp.dataObject);
 				
-			trace('adding new c: ' + cp.dataObject.Completed);
-			trace('adding new t: ' + cp.dataObject.Title);
-			trace('adding new d: ' + cp.dataObject.Duration);
+			//trace('adding new c: ' + cp.dataObject.Completed);
+			//trace('adding new t: ' + cp.dataObject.Title);
+			//trace('adding new d: ' + cp.dataObject.Duration);
 		} 
 		
 	}
@@ -77,10 +77,10 @@ import org.lamsfoundation.lams.vos.LearnerProgress;
 	    var Hours:Number = (value/3600);
    		
    		if(Hours > 1) 
-   			formatStr += Hours.toFixed(0) + " " + chart_time_hrs_lbl + " ";
+   			formatStr += Hours.toFixed(0) + " " + dictionary.getLabel('chart.time.format.hours') + " ";
    			
-   		if(Minutes > 1) formatStr += Number(Minutes).toFixed(1) + " " + chart_time_mins_lbl + " ";
-   		else formatStr += Seconds + " " + chart_time_secs_lbl;
+   		if(Minutes > 1) formatStr += Number(Minutes).toFixed(1) + " " + dictionary.getLabel('chart.time.format.minutes') + " ";
+   		else formatStr += Seconds + " " + dictionary.getLabel('chart.time.format.seconds');
    		
    		return formatStr;
 	}
@@ -90,7 +90,7 @@ import org.lamsfoundation.lams.vos.LearnerProgress;
 		var lp:LearnerProgress = item as LearnerProgress;
 		var name:String = learnerName(lp);
 		
-		trace('searching... : ' + name);
+		//trace('searching... : ' + name);
 		
 		if(learnerName(lp).search(searchLearner_txt.text) >= 0)
 			return true;

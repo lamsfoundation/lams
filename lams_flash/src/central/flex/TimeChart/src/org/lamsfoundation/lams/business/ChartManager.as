@@ -5,7 +5,7 @@ package org.lamsfoundation.lams.business
 	
 	import mx.collections.ArrayCollection;
 	
-	import org.lamsfoundation.lams.common.dictionary.XMLDictionary;
+	import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 	import org.lamsfoundation.lams.events.DictionaryEvent;
 	import org.lamsfoundation.lams.vos.CompletedActivity;
 	import org.lamsfoundation.lams.vos.LearnerProgress;
@@ -22,11 +22,13 @@ package org.lamsfoundation.lams.business
 		
 		private var _settings:Array;
 		private var _loadType:String;
-		private var _dictionary:XMLDictionary;
+		
+		private var _dictionaryRegistry:XMLDictionaryRegistry;
 		
 		/*-.........................................Constructor..........................................*/
 		 public function ChartManager()
         {
+        	_dictionaryRegistry = new XMLDictionaryRegistry(new XML());
         	_averageProgress = new ArrayCollection();
         }
         
@@ -50,10 +52,10 @@ package org.lamsfoundation.lams.business
 			return _learnerProgress;
 		}
 		
-		[Bindable (event="chartDictionaryChanged")]
-		public function get dictionary():XMLDictionary
+		[Bindable (event="dictionaryUpdated")]
+		public function get dictionaryRegistry():XMLDictionaryRegistry
 		{
-			return _dictionary;
+			return _dictionaryRegistry;
 		}
 		
 		public function get loadType():String
@@ -62,11 +64,9 @@ package org.lamsfoundation.lams.business
 		}
 		
 		public function setDictionary(xml:XML):void {
-			_dictionary = new XMLDictionary(xml);
-		}
-		
-		public function setLabel(event:DictionaryEvent, key:String):void {
-			event.result = _dictionary.getLabel(key);
+			_dictionaryRegistry.xml = xml;
+			
+			dispatchEvent(new Event("dictionaryUpdated"));
 		}
 
 		/*-.........................................Methods..........................................*/

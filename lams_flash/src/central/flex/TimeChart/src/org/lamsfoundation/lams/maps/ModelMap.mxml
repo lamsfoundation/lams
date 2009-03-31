@@ -12,6 +12,7 @@
 	<!-- Chart  __________________________________________________________________ -->
 	
 	<Injectors target="{Chart}" >
+		<PropertyInjector targetKey="dictionary" source="{ChartManager}" sourceKey="dictionaryRegistry" />
 		<PropertyInjector targetKey="selectedLearnerProgress" source="{ChartManager}" sourceKey="learnerProgress" />
 		<PropertyInjector targetKey="learnerProgressData" source="{ChartManager}" sourceKey="progressList" />
 		<PropertyInjector targetKey="averageProgressList" source="{ChartManager}" sourceKey="averageProgress" />

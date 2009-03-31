@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" width="100%" height="100%"
 	xmlns:vos="org.lamsfoundation.lams.vos.*" xmlns:mate="http://mate.asfusion.com/"
-	title="{chartTitle}" xmlns:model="org.lamsfoundation.lams.model.*" horizontalAlign="center">
+	xmlns:model="org.lamsfoundation.lams.model.*" 
+	title="{dictionary.getLabel('time.chart.panel.title')}" 
+	horizontalAlign="center">
 
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 		
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionary;
 			import mx.charts.chartClasses.IAxis;
@@ -41,16 +44,19 @@
 			[Bindable]
 			public var _averageProgressList:ArrayCollection = new ArrayCollection();
 			
+			[Bindable]
+			public var dictionary:XMLDictionaryRegistry;
 			
 			include 'Chart_functions.as'
 			include 'Chart_eventHandlers.as'
-			include 'Chart_labels.as'
 
 			public function loadLearner():void {
 				chartViews.selectedIndex = LEARNER;
 				
 				showAverage.visible = false;
 				selectLearnerForm.visible = false;
+				
+				initButtons();
 				
 				Button(chart_button_bar.getChildAt(ACTIVITY_SPLIT__BUTTON)).enabled = false;
 				Button(chart_button_bar.getChildAt(COMPLETION__BUTTON)).enabled = true;
@@ -61,16 +67,24 @@
 				
 				showAverage.selected = true;
 				
+				initButtons();
+				
 				Button(chart_button_bar.getChildAt(ACTIVITY_SPLIT__BUTTON)).enabled = true;
 				Button(chart_button_bar.getChildAt(COMPLETION__BUTTON)).enabled = false;
 				
 			}
+			
+			private function initButtons():void {
+	   			Button(chart_button_bar.getChildAt(ACTIVITY_SPLIT__BUTTON)).label = dictionary.getLabel('chart.btn.activity.split');
+				Button(chart_button_bar.getChildAt(COMPLETION__BUTTON)).label = dictionary.getLabel('chart.btn_completion.rate');
+   			}
 
 			[Bindable]
    			public var learnerFillColor:Number = 0x0000FF;
 
     		[Bindable]
    			public var avgFillColor:Number = 0x008000;
+   			
    			
 		]]>
 	</mx:Script>
@@ -80,8 +94,7 @@
 	<mate:Listener type="{ChartEvent.LOAD_CLASS}" 			receive="loadClass()" />
 	<mate:Listener type="{ChartEvent.UPDATE}"				receive="loadSelectedLearner()" />
 	<mate:Listener type="{ChartEvent.SELECT}"				receive="loadSelectedLearner()" />
-	<mate:Listener type="{DictionaryEvent.UPDATE}"			receive="updateLabels()" />
-	
+
 	<!-- Model ______________________________________________________________________ -->
 	
 	<!-- GUI ______________________________________________________________________ -->
@@ -96,10 +109,10 @@
 				
 		<!-- Button row -->
 		<mx:ButtonBar id="chart_button_bar" horizontalGap="2" itemClick="chartControlHandler(event)">
-			<mx:dataProvider>
+			<mx:dataProvider >
 				<mx:Array>
-					<mx:String>1</mx:String>
-					<mx:String>2</mx:String>
+					<mx:String> </mx:String>
+					<mx:String> </mx:String>
 				</mx:Array>
 			</mx:dataProvider>
 		</mx:ButtonBar>
@@ -125,7 +138,7 @@
 					<mx:CartesianChart id="learnerLineChart" dataProvider="{_learnerProgressList}" width="100%" showDataTips="true" dataTipFunction="learnerPlotDataTrip" dataTipMode="single" height="100%">
 						<mx:verticalAxis>
 			                <mx:LinearAxis 
-			                    title="{learner_linear_axis_lbl}" 
+			                    title="{dictionary.getLabel('chart.learner.linear.axis.title')}" 
 			                    minimum="0"
 			                    labelFunction="labelLinAxis"
 			                />
@@ -135,16 +148,16 @@
 							<mx:CategoryAxis 
 				           		dataFunction="dataLearnerPlot"
 				           		labelFunction="labelLearnerPlot"
-				           		title="{learner_category_axis_lbl}"
+				           		title="{dictionary.getLabel('chart.learner.category.axis.title')}"
 				            />
 						</mx:horizontalAxis>
 						<mx:series>
 							<!-- learner plot -->
-							<mx:PlotSeries xField="Activity" yField="Completed" itemRenderer="mx.charts.renderers.TriangleItemRenderer" displayName="{chart_completed_time_lbl}" />
+							<mx:PlotSeries xField="Activity" yField="Completed" itemRenderer="mx.charts.renderers.TriangleItemRenderer" displayName="{dictionary.getLabel('chart.series.completed.time')}" />
 							<mx:LineSeries name="completion" xField="Activity" yField="Completed" form="curve" lineStroke="{s1}" />
 							
 							<!-- average plot -->
-							<mx:PlotSeries dataProvider="{_averageProgressList}" xField="Activity" yField="Completed" itemRenderer="mx.charts.renderers.TriangleItemRenderer" displayName="{chart_average_time_lbl}" visible="{showAverage.selected}" />
+							<mx:PlotSeries dataProvider="{_averageProgressList}" xField="Activity" yField="Completed" itemRenderer="mx.charts.renderers.TriangleItemRenderer" displayName="{dictionary.getLabel('chart.series.average.time')}" visible="{showAverage.selected}" />
 							<mx:LineSeries dataProvider="{_averageProgressList}" name="average" xField="Activity" yField="Completed" form="curve" lineStroke="{s2}" visible="{showAverage.selected}" />
 						</mx:series>
 					</mx:CartesianChart>
@@ -157,7 +170,7 @@
 								<mx:SolidColor color="{learnerFillColor}" />
 							</mx:fill>
 						</mx:LegendItem>
-						<mx:LegendItem visible="{showAverage.selected}" label="{chart_legend_average_lbl}" fontWeight="bold">
+						<mx:LegendItem visible="{showAverage.selected}" label="{dictionary.getLabel('chart.legend.average')}" fontWeight="bold">
 							<mx:fill>
 								<mx:SolidColor color="{avgFillColor}" />
 							</mx:fill>
@@ -177,8 +190,8 @@
 				            />
 				        </mx:horizontalAxis>
 			            <mx:series>
-				    		<mx:ColumnSeries id="cols_ser" xField="Title" yField="Duration" displayName="{chart_duration_lbl}"/>
-				    		<mx:ColumnSeries id="avg_ser" xField="Title" yField="Duration" displayName="{chart_legend_average_lbl}" visible="{showAverage.selected}" />
+				    		<mx:ColumnSeries id="cols_ser" xField="Title" yField="Duration" displayName="{dictionary.getLabel('chart.series.duration')}"/>
+				    		<mx:ColumnSeries id="avg_ser" xField="Title" yField="Duration" displayName="{dictionary.getLabel('chart.legend.average')}" visible="{showAverage.selected}" />
 						</mx:series>
 					</mx:ColumnChart>
 				</mx:VBox>
@@ -186,10 +199,10 @@
 			</mx:ViewStack>
 			
 			<mx:Form id="selectLearnerForm">
-				<mx:CheckBox id="showAverage" visible="true" enabled="true" selected="false" label="{chart_average_cb_lbl}" />
+				<mx:CheckBox id="showAverage" visible="true" enabled="true" selected="false" label="{dictionary.getLabel('show.average.checkbox')}" />
 				<mx:HBox>
 					<mx:ComboBox id="selectedLearner_cmb" dataProvider="{learnerProgressData}" labelFunction="learnerName" selectedIndex="{learnerProgressData.getItemIndex(selectedLearnerProgress)}" change="selectLearnerEvent(event)"/>
-					<mx:TextInput id="searchLearner_txt" text="{search_learner_txt_lbl}" width="200" enabled="true" click="clearSearch(event)" change="applyFilter()" />
+					<mx:TextInput id="searchLearner_txt" text="{dictionary.getLabel('search.learner.textbox')}" width="200" enabled="true" click="clearSearch(event)" change="applyFilter()" />
 				</mx:HBox>
 			</mx:Form>
 		</mx:VBox>

@@ -30,8 +30,8 @@ import flash.events.Event;
 		
 		var formatStr:String = "<b>" + hd.item.Title + "</b>";
 		
-		formatStr += " " + completed_lbl + " <br>" + formatTime(hd.item.Completed);
-		if(hd.item.Average) formatStr += "<br><i>" + learner_datatip_average + "</i>";
+		formatStr += " " + dictionary.getLabel("label.completed") + " <br>" + formatTime(hd.item.Completed);
+		if(hd.item.Average) formatStr += "<br><i>" + dictionary.getLabel("chart.learner.datatip.average") + "</i>";
 		
 		return formatStr;
 	}
@@ -62,7 +62,7 @@ import flash.events.Event;
 		
 		learnerProgressData.refresh();
 		
-		trace('applying filter: ' + learnerProgressData.length);
+		//trace('applying filter: ' + learnerProgressData.length);
 		
 		var idx:int = learnerProgressData.getItemIndex(selectedLearnerProgress);
 		
