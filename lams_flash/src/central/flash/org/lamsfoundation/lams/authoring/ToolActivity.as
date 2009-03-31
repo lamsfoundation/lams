@@ -57,6 +57,7 @@ class ToolActivity extends Activity{
 	
 	private var _gradebookToolOutputDefinitionName:String;
 	
+	private var _activityEvaluations:Array;
 	private var _competenceMappings:Array; // competences to which this activity is mapped
 	
 	private var _toolOutputDefinitions:Hashtable;
@@ -144,9 +145,16 @@ class ToolActivity extends Activity{
 			
 			if(StringUtils.isWDDXNull(dto.extLmsId)) { _extLmsId = null }
 			else { _extLmsId = dto.extLmsId; }
-			 
-			if(StringUtils.isWDDXNull(dto.gradebookToolOutputDefinitionName)) { _gradebookToolOutputDefinitionName = null }
-			else { _gradebookToolOutputDefinitionName = dto.gradebookToolOutputDefinitionName; }
+			
+			if(!StringUtils.isWDDXNull(dto.activityEvaluations)) {
+				_activityEvaluations = new Array();
+				for (var i=0; i<dto.activityEvaluations.length; i++) {
+					_activityEvaluations.push(dto.activityEvaluations[i]);
+				}
+				if (_activityEvaluations[0] != null) { // currently only one output sent to gradebook
+					_gradebookToolOutputDefinitionName = _activityEvaluations[0];
+				}
+			}
 			
 			//TODO: Have the backend send this to flash for all tool activities in the design on startup
 			if(!StringUtils.isWDDXNull(dto.toolOutputDefinitions)) {
@@ -270,6 +278,12 @@ class ToolActivity extends Activity{
 		return n;
 	}
 	
+	public function addEvaluation(dto:Object):Void {
+		if (!_toolOutputDefinitions.containsKey(dto.name)) {
+			_toolOutputDefinitions.put(dto.name, dto);
+		}
+	}
+	
 	public function addDefinition(dto:Object):Void {
 		if (!_toolOutputDefinitions.containsKey(dto.name)) {
 			_toolOutputDefinitions.put(dto.name, dto);
@@ -282,6 +296,10 @@ class ToolActivity extends Activity{
 	
 	public function get definitions():Array {
 		return _toolOutputDefinitions.values();
+	}
+	
+	public function get activityEvaluations():Array {
+		return _activityEvaluations;
 	}
 	
 	public function get competenceMappings():Array {

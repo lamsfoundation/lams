@@ -406,6 +406,7 @@ class PropertyInspector extends PropertyInspectorControls {
 				showToolActivityProperties(ToolActivity(a));
 				showAppliedGroupingProperties(a);
 				
+				loadGradebookOuputDataIfNotLoaded(ToolActivity(a));
 				showActivityOutputProperties(a);
 			}
 			
@@ -783,6 +784,18 @@ class PropertyInspector extends PropertyInspectorControls {
 		}	
 	}
 	
+	private function loadGradebookOuputDataIfNotLoaded(ta:ToolActivity) {
+		if (ta.supportsOutputs) {
+			if (outputToGradebook_cmb.labelFunction == null) {
+				outputToGradebook_cmb.labelFunction = function(itemObj) {
+					return (itemObj.type == null) ? Dictionary.getValue("to_conditions_dlg_defin_item_header_lbl") : Dictionary.getValue("to_conditions_dlg_defin_item_fn_lbl", [itemObj.description, ToolOutputConditionsDialog.getOutputType(itemObj.type)]);
+				}
+			}
+			if (ta.definitions == null || ta.definitions.length <= 0) {
+				_canvasModel.getCanvas().getToolOutputDefinitions(ta, false);
+			}
+		}
+	}
 	
 	private function setGradebookOutput(evt:Object) {
 		
@@ -809,13 +822,7 @@ class PropertyInspector extends PropertyInspectorControls {
 						outputToGradebook_cmb.selectedIndex = i;
 					}
 				}
-			} else if(toolAct.supportsOutputs) {
-				if (outputToGradebook_cmb.labelFunction == null) {
-					outputToGradebook_cmb.labelFunction = function(itemObj) {
-						return (itemObj.type == null) ? Dictionary.getValue("to_conditions_dlg_defin_item_header_lbl") : Dictionary.getValue("to_conditions_dlg_defin_item_fn_lbl", [itemObj.description, ToolOutputConditionsDialog.getOutputType(itemObj.type)]);
-					}
-				}
-			} else {
+			}else if (!toolAct.supportsOutputs) {
 				gradebook_lbl.visible = false;
 				outputToGradebook_cmb.visible = false;
 			}
