@@ -32,9 +32,6 @@ package org.lamsfoundation.lams.vos
 		public function Lesson() {
 			learners = new UserCollection();
 			staff = new UserCollection();
-			
-			numberLessonsSplit = null;
-			numberLearnersSplit = null;
 		}
 		
 		public function get toData():Object {

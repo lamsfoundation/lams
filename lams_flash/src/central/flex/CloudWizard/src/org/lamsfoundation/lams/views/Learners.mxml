@@ -211,13 +211,13 @@
 			<mx:DataGrid id="staff_dgd" width="50%" height="100%" dataProvider="{staffUnselected}" dropEnabled="true" dragEnabled="true" dragMoveEnabled="true" allowDragSelection="true" allowMultipleSelection="true" 
 						 dragDrop="doDragExit(event)" dragExit="doDragExit(event)" dragOver="dragOverHandler(event)" creationComplete="showDataGridOverlay(event)" sortableColumns="true">
 				<mx:columns>
-					<mx:DataGridColumn headerText="{dictionary.getLabel('class.tab.staff.available.label')}" labelFunction="printName" sortCompareFunction="sortCompareUsers"/>
+					<mx:DataGridColumn headerText="{dictionary.getLabelAndInsert('staff.lbl', [dictionary.getLabel('class.tab.available.label')])}" labelFunction="printName" sortCompareFunction="sortCompareUsers"/>
 				</mx:columns>
 			</mx:DataGrid>
 			<mx:DataGrid id="staffSel_dgd" width="50%" height="100%" dataProvider="{staffSelected}" dragEnabled="true" dragMoveEnabled="true" dropEnabled="true" allowDragSelection="true" allowMultipleSelection="true" 
 						 dragDrop="doDragExit(event)" dragExit="doDragExit(event)" dragOver="dragOverHandler(event)" creationComplete="showDataGridOverlay(event)" sortableColumns="true">
 				<mx:columns>
-					<mx:DataGridColumn headerText="{dictionary.getLabel('class.tab.staff.selected.label')}" labelFunction="printName" sortCompareFunction="sortCompareUsers"/>
+					<mx:DataGridColumn headerText="{dictionary.getLabelAndInsert('staff.lbl', [dictionary.getLabel('class.tab.selected.label')])}" labelFunction="printName" sortCompareFunction="sortCompareUsers"/>
 				</mx:columns>
 			</mx:DataGrid>
 		</mx:HDividedBox>
@@ -227,13 +227,13 @@
 			<mx:DataGrid id="learners_dgd" width="50%" height="100%" dataProvider="{learnersUnselected}" dragEnabled="true" dragMoveEnabled="true" dropEnabled="true" allowDragSelection="true" allowMultipleSelection="true" 
 						 dragDrop="doDragExit(event)" dragExit="doDragExit(event)" dragOver="dragOverHandler(event)" creationComplete="showDataGridOverlay(event)" sortableColumns="true">
 				<mx:columns>
-					<mx:DataGridColumn headerText="{dictionary.getLabel('class.tab.learners.available.label')}" labelFunction="printName" sortCompareFunction="sortCompareUsers"/>
+					<mx:DataGridColumn headerText="{dictionary.getLabelAndInsert('learner.lbl', [dictionary.getLabel('class.tab.available.label')])}" labelFunction="printName" sortCompareFunction="sortCompareUsers"/>
 				</mx:columns>
 			</mx:DataGrid>
 			<mx:DataGrid id="learnersSel_dgd" width="50%" height="100%" dataProvider="{learnersSelected}" dragEnabled="true" dragMoveEnabled="true" dropEnabled="true" allowDragSelection="true" allowMultipleSelection="true" 
 						 dragDrop="doDragExit(event)" dragExit="doDragExit(event)" dragOver="dragOverHandler(event)" creationComplete="showDataGridOverlay(event)" sortableColumns="true">
 				<mx:columns>
-					<mx:DataGridColumn headerText="{dictionary.getLabel('class.tab.learners.selected.label')}" labelFunction="printName" sortCompareFunction="sortCompareUsers" />
+					<mx:DataGridColumn headerText="{dictionary.getLabelAndInsert('learner.lbl', [dictionary.getLabel('class.tab.selected.label')])}" labelFunction="printName" sortCompareFunction="sortCompareUsers" />
 				</mx:columns>
 			</mx:DataGrid>
 		</mx:HDividedBox>

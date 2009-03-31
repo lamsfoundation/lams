@@ -64,7 +64,7 @@
    			}
    			
    			private function createInitWorkspace():void {
-   				organisationID = 4; // Application.application.properties.organisationID;
+   				organisationID = Application.application.parameters.organisationID;
    				
    				var wizardEvent:WizardEvent = new WizardEvent(WizardEvent.INIT_WORKSPACE);
    				this.dispatchEvent(wizardEvent);
