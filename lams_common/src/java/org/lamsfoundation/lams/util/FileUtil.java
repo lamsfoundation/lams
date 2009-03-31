@@ -74,7 +74,7 @@ import com.thoughtworks.xstream.converters.ConversionException;
  */
 public class FileUtil {
 
-    public static final String ENCODING_UTF_8 = "UTF-8";
+    public static final String ENCODING_UTF_8 = "UTF8";
     public static final String EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT = "dd.MM.yyyy h a";
     public static final String EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT = "dd.MM.yyyy";
 
