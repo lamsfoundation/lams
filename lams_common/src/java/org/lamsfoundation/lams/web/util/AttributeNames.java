@@ -58,6 +58,7 @@ public class AttributeNames {
 
     public static final String PARAM_LEARNINGDESIGN_ID = "learningDesignID";
     public static final String PARAM_ORGANISATION_ID = "organisationID";
+    public static final String PARAM_ORGANISATION_NAME = "orgName";
 
     public static final String PARAM_LEARNER_PROGRESS_ID = "progressID";
     public static final String PARAM_LESSON_ID = "lessonID";
