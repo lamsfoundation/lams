@@ -159,7 +159,7 @@ public class GradeBookAction extends LamsDispatchAction {
 
 	    }
 
-	    String ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, rowLimit, method);
+	    String ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, totalPages, method);
 
 	    response.setContentType("text/xml");
 	    PrintWriter out = response.getWriter();

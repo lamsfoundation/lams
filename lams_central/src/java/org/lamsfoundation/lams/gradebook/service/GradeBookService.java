@@ -24,10 +24,13 @@
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
@@ -100,14 +103,42 @@ public class GradeBookService implements IGradeBookService {
 	Activity firstActivity = monitoringService.getActivityById(lesson.getLearningDesign().getFirstActivity()
 		.getActivityId());
 
+	long accumulatedTime = 0;
+	long startTime = 0;
+	if (learnerProgress != null) {
+	    startTime = learnerProgress.getStartDate().getTime();
+	}
+
 	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
-	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(firstActivity, learner, learnerProgress);
+	    long firstActivityTime = 0;
+	    if (learnerProgress != null) {
+		if (learnerProgress.getCompletedActivities().get(firstActivity) != null) {
+		    firstActivityTime = ((Date) learnerProgress.getCompletedActivities().get(firstActivity))
+			    .getTime()- startTime - accumulatedTime;
+		    accumulatedTime += firstActivityTime;
+		}
+	    }
+
+	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(firstActivity, learner, learnerProgress, firstActivityTime);
 	    gradeBookActivityDTOs.add(activityDTO);
 	}
 
-	for (Activity activity : activities) {
+	SortedSet<Activity> sortedActivities = new TreeSet<Activity>(activities);
+	
+	for (Activity activity : sortedActivities) {
 	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()) {
-		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(activity, learner, learnerProgress);
+		
+		long activityTime = 0;
+		if (learnerProgress != null) {
+		    if (learnerProgress.getCompletedActivities().get(activity) != null) {
+			    activityTime = ((Date) learnerProgress.getCompletedActivities().get(activity))
+				    .getTime() - startTime - accumulatedTime;
+			    accumulatedTime += activityTime;
+			}
+		    
+		}
+
+		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(activity, learner, learnerProgress, activityTime);
 		gradeBookActivityDTOs.add(activityDTO);
 	    }
 	}
@@ -353,18 +384,17 @@ public class GradeBookService implements IGradeBookService {
 			lessonRow.setLessonId(lesson.getLessonId());
 			lessonRow.setLessonDescription(lesson.getLessonDescription());
 			lessonRow.setMark(gradeBookDAO.getAverageMarkForLesson(lesson.getLessonId()));
-			
-			
+
 			String gbMonURL = Configuration.get(ConfigurationKeys.SERVER_URL)
-				    + "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
-			
+				+ "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
+
 			lessonRow.setGradeBookMonitorURL(gbMonURL);
 			if (lesson.getOrganisation().getOrganisationId() != organisation.getOrganisationId()) {
-			    lessonRow.setSubGroup(lesson.getOrganisation().getName());  
+			    lessonRow.setSubGroup(lesson.getOrganisation().getName());
 			} else {
 			    lessonRow.setSubGroup("-");
 			}
-			
+
 			lessonRows.add(lessonRow);
 
 		    }
@@ -459,7 +489,7 @@ public class GradeBookService implements IGradeBookService {
      * @return
      */
     private GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, User learner,
-	    LearnerProgress learnerProgress) {
+	    LearnerProgress learnerProgress, long activityTime) {
 
 	logger.debug("Getting gradebook data for activity: " + activity.getActivityId() + ". For user: "
 		+ learner.getUserId());
@@ -467,6 +497,7 @@ public class GradeBookService implements IGradeBookService {
 	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
 	gactivityDTO.setActivityId(activity.getActivityId());
 	gactivityDTO.setActivityTitle(activity.getTitle());
+	gactivityDTO.setTimeTakenInMillis(activityTime);
 
 	GradeBookUserActivity gradeBookActivity = gradeBookDAO.getGradeBookUserDataForActivity(
 		activity.getActivityId(), learner.getUserId());

@@ -18,9 +18,25 @@
 	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jqgrid/js/jqModal.js" ></script>
 	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jqgrid/js/jqDnR.js" ></script>
 	
-	<script type="text/javascript">
+	<style>
+	  .tooltip{
+	      position:absolute;
+	      z-index:999;
+	      left:-9999px;
+	      background-color:#dedede;
+	      padding:5px;
+	      border:1px solid #fff;
+	      width:250px;
+	      font-size: 1.1em;
+	  }
+	</style>
 	
-		// Set up the jqgrid lang entries
+	
+	<script type="text/javascript">
+		
+		// JQGRID LANGUAGE ENTRIES ---------------------------------------------
+		
+		// editing entries
 		$.jgrid.edit = {
 		    addCaption: "Add Record",
 		    editCaption: "Edit Record",
@@ -39,18 +55,101 @@
 		    }
 		};
 		
+		// search entries
 		$.jgrid.search = {
 			    caption: "Search Names...",
 			    Find: "Find",
 			    Reset: "Reset",
 			    odata : ['equal', 'not equal', 'less', 'less or equal','greater','greater or equal', 'begins with','ends with','contains' ]
 		};
-	
-	
-	
 		
+		// ---------------------------------------------------------------------
+		
+		
+		// Applies tooltips to a jqgrid
+		function toolTip(gRowObject) {
+			var my_tooltip = $('#tooltip'); // Div created for tooltip
+			gRowObject.css({ 
+				cursor: 'pointer' 
+	        }).mouseover(function(kmouse){ 
+                if (checkCell(kmouse)) {
+                	showToolTip(my_tooltip, kmouse);
+                	//setTimeout(function(){showToolTip(my_tooltip, kmouse);}, 1000);
+                }
+	        }).mousemove(function(kmouse){ 
+                if (checkCell(kmouse)) {
+                	moveToolTipBox(my_tooltip, kmouse);
+                	//setTimeout(function(){moveToolTipBox(my_tooltip, kmouse);}, 1000);
+                }
+            }).mouseout(function(){ 
+                my_tooltip.stop().fadeOut(400); 
+        	}).css({cursor:'pointer'}).click(function(e){
+                my_tooltip.stop().fadeOut(400); 
+        	});
+		}
+		
+		// Check a cell before opening tooltip to make sure empty or invalid cells do not display
+		function checkCell(kmouse) {
+			var cell = $(kmouse.target).html();
+			if (cell != null && cell !="" && cell !="&nbsp;" && cell != "-" && cell.charAt(0) != '<') {
+				return true;
+			}
+			return false;
+		}
+		
+		// Shows a tootip and applies the cell value
+		function showToolTip(my_tooltip, kmouse) {
+			
+			var cell = $(kmouse.target).html();
+			my_tooltip.html(cell);
+               my_tooltip.css({ 
+               	opacity: 0.85, 
+               	display: "none" 
+           	}).stop().fadeIn(400);
+		}
+		
+		// Moves the tooltip box so it is not in the way of the mouse
+		function moveToolTipBox(my_tooltip, kmouse) {
+			var border_top = $(window).scrollTop(); 
+	        var border_right = $(window).width(); 
+	        var left_pos; 
+	        var top_pos; 
+	        var offset = 15;  
+	        if (border_right - (offset * 2) >= my_tooltip.width() + kmouse.pageX)  
+	        { 
+	        	left_pos = kmouse.pageX + offset;  
+	        }  
+	        else  
+	        { 
+	       		left_pos = border_right - my_tooltip.width() - offset; 
+	        }  
+	        if (border_top + (offset * 2) >= kmouse.pageY - my_tooltip.height())  
+	        { 
+	        	top_pos = border_top + offset;  
+	        }  
+	        else  
+	        { 
+	        	top_pos = kmouse.pageY - my_tooltip.height() - offset; 
+	        } 
+	        my_tooltip.css({ 
+		        left: left_pos, 
+		        top: top_pos 
+	        }); 
+		}
+		
+		// launches a popup from the page
+		function launchPopup(url,title) {
+			var wd = null;
+			if(wd && wd.open && !wd.closed){
+				wd.close();
+			}
+			wd = window.open(url,title,'resizable,width=796,height=570,scrollbars');
+			wd.window.focus();
+		}
+	
 		jQuery(document).ready(function(){
   
+			// Create the user view grid with sub grid for activities	
 			jQuery("#userView").jqGrid({
 				caption: "Learner View",
 			    datatype: "xml",
@@ -59,6 +158,7 @@
 			    width: 990,
 			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 			    cellEdit: true,
+			    viewrecords: true,
 			    sortorder: "asc", 
 			    sortname: "fullName", 
 			    pager: 'userViewPager',
@@ -83,51 +183,56 @@
 				   var userName = jQuery("#userView").getRowData(row_id)["login"];
 				   subgrid_table_id = subgrid_id+"_t";
 					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
-					   jQuery("#"+subgrid_table_id).jqGrid({
-					     datatype: "xml",
-					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
-					     height: "100%",
-					     width: 920,
-					     cellEdit:true,
-					     pager: subgrid_table_id + "_pager",
-						 rowList:[5,10,20,30],
-						 rowNum:10,
-					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
-					     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Activity FeedBack', 'Mark'],
-					     colModel: [
-					       	{name:'activityId', width:10, index:'activityId', sortable:false, hidden:true, hidedlg:true},
-							{name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
-							{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false},
-							{name:'output', width:250, index:'output', sortable:false, editable: false},
-							{name:'competences', width:250, index:'competences', sortable:false, editable: false},
-							{name:'feedback', width:250, index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}},
-							{name:'mark', width:100, index:'mark', sortable:false, editable: true, editrules:{number:true} }
-					     ],
-					     loadError: function(xhr,st,err) {
-					    	jQuery("#"+subgrid_table_id).clearGridData();
-					    	alert("There was an error loading the Learner View grid");
-					     },
-					     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
-					     	
-					     	// Update the total lesson mark for the user
-					     	if (cellname == "mark") {
-						     	var ids = jQuery("#"+subgrid_table_id).getDataIDs()
-						     	var totalMark = 0.0;
-						     	for (var i=0; i < ids.length; i++) {
-						     		var rowData = jQuery("#"+subgrid_table_id).getRowData(ids[i]);
-						     		var userMark = rowData["mark"];
-						     		
-						     		if (userMark != "-") {
-						     			totalMark += parseFloat(userMark);
-						     		}
+					   	jQuery("#"+subgrid_table_id).jqGrid({
+						     datatype: "xml",
+						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
+						     height: "100%",
+						     width: 920,
+						     cellEdit:true,
+						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
+						     pager: subgrid_table_id + "_pager",
+							 rowList:[5,10,20,30],
+							 rowNum:10,
+						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
+						     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Time Taken', 'Activity FeedBack', 'Mark'],
+						     colModel: [
+						       	{name:'activityId', width:10, index:'activityId', sortable:false, hidden:true, hidedlg:true},
+								{name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
+								{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false},
+								{name:'output', width:250, index:'output', sortable:false, editable: false},
+								{name:'competences', width:250, index:'competences', sortable:false, editable: false, hidden:true},
+								{name:'timeTaken', width:50, index:'timeTaken', sortable:false, editable: false},
+								{name:'feedback', width:250, index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}},
+								{name:'mark', width:100, index:'mark', sortable:false, editable: true, editrules:{number:true} }
+						     ],
+						     loadError: function(xhr,st,err) {
+						    	jQuery("#"+subgrid_table_id).clearGridData();
+						    	alert("There was an error loading the Learner View grid");
+						     },
+						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
+						     	
+						     	// Update the total lesson mark for the user
+						     	if (cellname == "mark") {
+							     	var ids = jQuery("#"+subgrid_table_id).getDataIDs()
+							     	var totalMark = 0.0;
+							     	for (var i=0; i < ids.length; i++) {
+							     		var rowData = jQuery("#"+subgrid_table_id).getRowData(ids[i]);
+							     		var userMark = rowData["mark"];
+							     		
+							     		if (userMark != "-") {
+							     			totalMark += parseFloat(userMark);
+							     		}
+							     	}
+							     	jQuery("#userView").setCell(row_id, "mark", totalMark, "", "");
 						     	}
-						     	jQuery("#userView").setCell(row_id, "mark", totalMark, "", "");
-					     	}
-					     },
-						 imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images'
-					  }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false});
+						     },
+							 gridComplete: function(){
+							 	toolTip($(".jqgrow"));
+							 }
+					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 					  
-					  jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
+					  	// Adding button for show/hiding collumn
+					  	jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
 							caption: "",
 							title: "Show/Hide Columns",
 							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
@@ -135,24 +240,29 @@
 								jQuery("#"+subgrid_table_id).setColumns();
 							}
 						});
-				 	}
-				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false})
+					},
+					gridComplete: function(){
+						toolTip($(".jqgrow"));  // allowing tooltips for this grid	
+					}
+				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 				
+				// Allowing search for this grid
 				jQuery("#userView").navButtonAdd('#userViewPager',{
 					caption: "",
 					title: "Search Names",
 					buttonimg:"<lams:LAMSURL />images/find.png", 
 					onClickButton: function(){
 						jQuery("#userView").searchGrid({
-															Find: "Find", 
-															Clear: "Clear", 
-															top:10, 
-															left:10,
-															sopt:['cn','bw','eq','ne','ew']
-														});
-					}
+								Find: "Find", 
+								Clear: "Clear", 
+								top:10, 
+								left:10,
+								sopt:['cn','bw','eq','ne','ew']
+							});
+						}
 				});
 				
+				// Allowing column editing for this grid
 				jQuery("#userView").navButtonAdd('#userViewPager',{
 					caption: "",
 					title: "Show/Hide Columns",
@@ -162,6 +272,8 @@
 					}
 				});
 				
+				
+				// Creating activity view with sub learner view
 				jQuery("#activityView").jqGrid({
 					caption: "Activity View",
 				    datatype: "xml",
@@ -178,7 +290,7 @@
 				    colModel:[
 				      {name:'activityId', width:10, index:'activityId', sortable:false, hidden:true, hidedlg:true},
 					  {name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
-				      {name:'competences', width:250, index:'competences', sortable:false, editable: false},
+				      {name:'competences', width:250, index:'competences', sortable:false, editable: false, hidden:true},
 				      {name:'average',index:'average', sortable:false, editable:false}
 				    ],
 				    loadError: function(xhr,st,err) {
@@ -198,6 +310,7 @@
 						     height: "100%",
 						     width: 920,
 						     cellEdit:true,
+						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=activityView&activityID=" + activityID,
 						     sortorder: "asc", 
 							 sortname: "fullName", 
@@ -243,9 +356,12 @@
 							     	jQuery("#activityView").setCell(row_id, "average", average, "", "");
 						     	}
 						     },
-							 imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images'
-						 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false})
+							 gridComplete: function(){
+							 	toolTip($(".jqgrow"));	// applying tooltips for this grid
+							 }
+						 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}) // applying refresh button
 						 
+						 // allowing search for this grid
 						 jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
 								caption: "",
 								buttonimg:"<lams:LAMSURL />images/find.png", 
@@ -259,6 +375,8 @@
 																	});
 								}
 						  });
+						  
+						  // Allowing column editing for this grid
 						  jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
 							caption: "",
 							title: "Show/Hide Columns",
@@ -267,9 +385,13 @@
 								jQuery("#"+subgrid_table_id).setColumns();
 							}
 						  });
-					 }
-				}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false});
+					 },
+					 gridComplete: function(){
+					 	toolTip($(".jqgrow"));	// enable tooltips for grid
+					 }	 
+				}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}); // enable refresh button
 				
+				// Enable show/hide columns
 				jQuery("#activityView").navButtonAdd('#activityViewPager',{
 					caption: "",
 					title: "Show/Hide Columns",
@@ -279,15 +401,6 @@
 					}
 				});
 		});
-		
-		function launchPopup(url,title) {
-			var wd = null;
-			if(wd && wd.open && !wd.closed){
-				wd.close();
-			}
-			wd = window.open(url,title,'resizable,width=796,height=570,scrollbars');
-			wd.window.focus();
-		}	
 	</script>
 	
 </lams:head>
@@ -309,6 +422,8 @@
 				
 				<table id="activityView" class="scroll" ></table>
 				<div id="activityViewPager" class="scroll" ></div>	
+				
+				<div class="tooltip" id="tooltip"></div>
 				
 			</div>
 		</div> <!-- Closes content -->

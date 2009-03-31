@@ -26,10 +26,10 @@ package org.lamsfoundation.lams.gradebook.dto;
 import java.util.ArrayList;
 
 public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
-    
+
     public static final String VIEW_USER = "userView";
     public static final String VIEW_ACTIVITY = "activityView";
-    
+
     long activityId;
     String activityTitle;
     String competences;
@@ -42,6 +42,7 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
     //double timeTaken;
     Double mark;
     String feedback;
+    String timeTaken = "-";
 
     // Properties for activity view
     Double average;
@@ -65,13 +66,17 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 	    ret.add(status);
 	    ret.add(output);
 	    ret.add(competences);
+	    
+	    ret.add(timeTaken);
+	    
 	    ret.add(feedback);
+	    
 	    if (mark != null) {
 		ret.add(mark.toString());
 	    } else {
 		ret.add("-");
 	    }
-	    
+
 	} else if (view.equals(VIEW_ACTIVITY)) {
 	    if (monitorUrl != null && monitorUrl.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + monitorUrl + "\",\"" + activityTitle + "\")'>"
@@ -180,4 +185,36 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
     public void setMonitorUrl(String monitorUrl) {
 	this.monitorUrl = monitorUrl;
     }
+
+
+
+    public void setTimeTakenInMillis(long timeTakenInMillis) {
+	if (timeTakenInMillis > 1000) {
+	    long totalTimeInSeconds = timeTakenInMillis / 1000;
+
+	    long seconds = (totalTimeInSeconds >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds); 
+	    long minutes = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds; 
+	    long hours = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 24 ? totalTimeInSeconds % 24 : totalTimeInSeconds; 
+	    long days = (totalTimeInSeconds = (totalTimeInSeconds / 24)); 
+
+	    StringBuilder sb = new StringBuilder();
+	    
+	    if (days != 0 ) { sb.append("" + days + "d, "); }
+	    if (hours != 0 ) { sb.append("" + hours + "h, "); }
+	    if (minutes != 0 ) { sb.append("" + minutes + "m, "); }
+	    if (seconds != 0 ) { sb.append("" + seconds + "s"); }
+	    
+	    this.timeTaken = sb.toString();
+	}
+    }
+
+    public String getTimeTaken() {
+        return timeTaken;
+    }
+
+    public void setTimeTaken(String timeTaken) {
+        this.timeTaken = timeTaken;
+    }
+    
+    
 }
