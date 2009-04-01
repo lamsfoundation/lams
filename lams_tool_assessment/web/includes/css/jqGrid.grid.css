@@ -6,8 +6,9 @@
 
 .Header th { 
 	font-size: 100%; font-weight: bold; text-align: left;
-	padding: 3px;
-	background-image: url('../images/jqGrid.basic.theme/headerbg.gif'); color: #ffffff;
+	padding: 2px;
+	background-image: url(../images/jqGrid.basic.theme/headerbg.gif) ;
+	color: #FFFFFF;
 	width: 100%;
 	white-space: nowrap;
 	}
@@ -23,58 +24,57 @@
 	background-image: url(../images/jqGrid.basic.theme/headerbg.gif);	
 }
 .HeaderButton img{
-	width: 20px;
+	width: 17px;
 }
 
 .HeaderLeft img{
-	width: 4px;
+	width: 14px;
 	}
 
 .HeaderRight img{
-	width: 9px;
+	width: 10px;
 	}
+
 .GridHeader table {margin:0;}
 .GridHeader td, tr {padding:0;}
-
 /* Grid */
 table.scroll {
 	table-layout: fixed;
-	margin-bottom :0px;
+	/*border-right: 1px solid #D4D0C8;*/
+	margin-bottom:0;
 }
 table.scroll tbody tr {
-	background-color: #fffcf2; 
+	background-color: #ffffff; 
 }
 
 table.scroll tbody tr.alt {
-	background-color: #ecf7e4;
+	background-color: #F9F9F9;
 }
 	
 table.scroll tr.over td{
-	background-color: #FFDEAD;
+	background-color: #E1DCF4;
 }
 	
-	table.scroll tbody tr.selected td {
-	background: #3c964b;
-	color: #ecf7e4;
+	table.scroll tr.selected td {
+	background: #3d84cc;
+	color: White;
 }
 
 	table.scroll tbody td  {
-	
 	padding: 2px;
 	text-align: left;
-	border-bottom: 1px solid #3c964b;
-	border-left: 1px solid #3c964b; 
+	border-bottom: 1px solid #D4D0C8;
+	border-left: 1px solid #D4D0C8; 
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
 	height : auto;
 }
 	
-table.scroll thead th  {
-	
+	table.scroll thead th  {
 	padding: 2px;
-	border-bottom: 1px solid #3c964b; 
-	border-left: 1px solid #3c964b; 
+	border-bottom: 1px solid #CBC7B8; 
+	border-left: 1px solid #D4D0C8; 
 	text-align: left;
 	font-weight: normal;
 	overflow: hidden;
@@ -83,24 +83,22 @@ table.scroll thead th  {
 	height : 17px;
 }
 	
-table.scroll th div {
+	table.scroll th div {
 	overflow: hidden;
 /*	white-space: nowrap;*/
 	word-wrap: break-word;
 	height : 17px;
 }
-table.scroll th span {
+	table.scroll th span {
 	cursor: e-resize;
+/*	border-right: 1px solid #D6D2C2;  */
 	width: 10px;
 	float: right;
 	display: block;
 	margin: -2px -1px -2px 0px;
-	height: 18px;
+	height: 17px;
 	overflow: hidden;
 	white-space: nowrap;
-}
-	
-table.scroll thead {
 }
 
 /* End Grid */
@@ -112,11 +110,8 @@ div.scroll {
 	white-space: nowrap;
 	text-align: center;
 	background-image: url(../images/jqGrid.basic.theme/grid-blue-ft.gif);
-/*
-	border-left: 1px solid #3c964b;
-	border-right: 1px solid #3c964b;
-	border-bottom: 1px solid #3c964b;
-*/
+	display : none;
+
 }
 div.scroll span {
 	vertical-align : top; 	
@@ -131,7 +126,6 @@ input.selbox{
 }
 .pgbuttons {
 	margin-top :2px;
-	width: 19px;
 }
 .nav-table-left {
 	padding:1px;
@@ -142,27 +136,25 @@ input.selbox{
 	padding:1px;
 	float: right;
 }
-table.navtable {margin-bottom:0; width: auto;}
 
+table.navtable {margin-bottom:0; width: auto;}
 table.navtable tr{
 	background-image: url(../images/jqGrid.basic.theme/grid-blue-ft.gif);	
 }
 
 table.navtable td.nav-button {
-/*	margin-top:2px;*/
 	border: 1px solid #E2ECF8;
 	white-space: nowrap;
 }
 
 table.navtable td.nav-hover {
-	border: 1px solid #3c964b;
+	border: 1px solid #83B4D8;
 }
 
 table.tbutton tr td{
 	border : none;
 	padding:0px;
 }
-
 
 img.jsHover { /*not used */
 	border: 1px solid #99CCFF;
@@ -208,16 +200,13 @@ div.loadingui div.msgbox {
    padding:2px;
    margin: 0px;
 } 
-
 /* end loading div */
 /* toolbar */
 div.userdata {
 	margin-top: 0px;
-	background-color : #fffcf2;
+	background-color : #EAF9F9;
 	height : 20px;
-	border-left: 1px solid #3c964b;
-	border-right: 1px solid #3c964b;
-	overflow: hidden;
+	overflow: hidden;	
 }
 /* end toolbar */
 /*Subgrid  text mode*/
@@ -256,15 +245,16 @@ div.userdata {
 /* End Subgrid */
 
 /* InLine editing */
-input.editable[type="text"]  {
+input.editable[type="text"] {
 	font-size: x-small;
 	overflow: hidden;
+	height : 15px;
 }
 input.editable[type="checkbox"]  {
 }
 
 textarea.editable {
-	overflow-y: auto;
+	overflow: hidden;
 }
 
 select.editable {
@@ -272,31 +262,31 @@ select.editable {
 }
 /* End Inline Editing */
 
-
-/* Modal window */
-.modaltext{ /*caption */
+/*Modal Window */
+.modaltext{ 
     text-align : left;
 }
 .modalwin{
     border:1px solid #555555;
+    background:#F9F9F9;
     text-align:left;
     margin: 0 auto;
-	background: #F9F9F9;
-	overflow: auto;	
+	overflow: auto;
 }
 
-.modalhead{
+
+.modalhead {
 	background-image: url(../images/jqGrid.basic.theme/grid-blue-hd.gif);
 	height: 20px;
+	
 }
 .modalcontent {
-    overflow : auto;
-    background:#F9F9F9;
-	margin-bottom: 10px;
-	margin-left: 5px;	
+	overflow: auto;
+	margin-bottom: 9px;
+	margin-left: 5px;
 }
-/* End modal window */
-/*search dialog */
+/* end Modal window*/
+/* Search window */
 input.search {
 	margin: 2px;
 	width: 70px;
@@ -329,6 +319,7 @@ select.search {
 .FormData { /* tr */
 	
 }
+
 #FormError td {
 	font-size: 90%;
 	color: #FF0000;
@@ -353,8 +344,8 @@ select.search {
 	border-bottom: 1px solid #D4D0C8;
 	text-align: center;
 }
-.navButton input {
-	width:18px;
+.navButton input{
+	width:17px;
 }
 input.EditButton { /* buttons are at footer tr */
 	font-size: 10px;
@@ -388,7 +379,7 @@ select.FormElement {
 }
 /* End Eorm edit */
 
-/*delete dialog */
+/* Delete Dialog */
 .DelButton > input { /* buttons are at footer tr */
 	font-size: 10px;
 	color: #15428B;
@@ -397,7 +388,7 @@ select.FormElement {
 	text-align: right;
 }
 /* End Delete Dialog */
-/* Resizing corner */
+
 img.jqResize {
 	position:absolute;
 	bottom: 0px;
@@ -413,7 +404,6 @@ img.jqResize {
 	vertical-align: top;
 	background-color: #f7f7f7; 
 }
-
 /* Tree Grid */
 .tree-wrap
 {
@@ -452,8 +442,8 @@ img.jqResize {
 	cursor: pointer;
 }
 .edit-cell {
-	background-color: #FFDEAD !important;
+	background-color: #E1DCF4 !important;
 }
 .selected-row, .selected-row TD {
-	background-color: #3c964b; 
+	background-color: #3d84cc; 
 }

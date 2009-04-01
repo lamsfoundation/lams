@@ -174,7 +174,7 @@
 			<table cellspacing="0" class="alternative-color">
 				<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 					<tr>
-						<td style="padding-left: 15px; vertical-align: middle; width: 10px; " >
+						<td style="padding: 15px 15px 15px; width: 10px; font-weight: bold;" >
 							${status.index + sessionMap.questionNumberingOffset} 
 						</td>
 						<td style="padding-left: 0px;">

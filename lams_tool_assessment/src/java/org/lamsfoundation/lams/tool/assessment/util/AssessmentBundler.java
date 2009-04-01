@@ -81,7 +81,7 @@ public class AssessmentBundler extends Bundler {
 
 	String[] imageNames = new String[] { "cd_run.gif", "dirty.gif", "down.gif",
 		"find.gif", "first.gif", "folder.png", "grid-blue-ft.gif", "grid-blue-hd.gif", "headerbg.gif",
-		"headerleft.gif", "headerright.gif", "ico-close.gif", "last.gif", "leaf.gif", "line3.gif",
+		"headerleft.gif", "headerright.gif", "ico-close.gif", "last.gif", "line3.gif",
 		"loading.gif", "minus.gif", "next.gif", "nochild.gif", "off-first.gif", "off-last.gif", "off-next.gif",
 		"off-prev.gif", "plus.gif", "prev.gif", "refresh.gif", "resize.gif", "row_add.gif", "row_delete.gif",
 		"row_edit.gif", "sort_asc.gif", "sort_desc.gif", "spacer.gif", "tab_close-on.gif", "tree_leaf.gif",

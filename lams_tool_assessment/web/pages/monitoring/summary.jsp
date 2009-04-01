@@ -198,8 +198,8 @@
 	</c:when>
 	<c:otherwise>
 	
-		<div style="padding-left: 30px; color:#47bc23; font-size:22px; margin-bottom: 10px; margin-top: 15px;">
-			<fmt:message key="label.monitoring.summary.summary" />
+		<div style="padding-left: 20px; margin-bottom: 10px; margin-top: 15px;">
+			<H1><fmt:message key="label.monitoring.summary.summary" /></H1>
 		</div>	
 	
 		<div style="padding-left: 30px; font-size: small; margin-bottom: 20px; font-style: italic;">
@@ -231,8 +231,8 @@
 			<fmt:message key="label.monitoring.summary.export.summary" />
 		</html:link>
 		
-		<div style="padding-left: 30px; color:#47bc23;  font-size:22px; margin-bottom: 15px; margin-top: 30px;">
-			<fmt:message key="label.monitoring.summary.report.by.question" />
+		<div style="padding-left: 20px; margin-bottom: 15px; margin-top: 30px;">
+			<H1><fmt:message key="label.monitoring.summary.report.by.question" /></H1>
 		</div>
 		
 		<!-- Dropdown menu for choosing a question type -->
