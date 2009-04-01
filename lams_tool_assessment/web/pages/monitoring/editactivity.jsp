@@ -29,15 +29,17 @@
 		</td>
 	</tr>
 
-	<tr>
-		<td colspan="2">
-			<c:url  var="authoringUrl" value="/definelater.do">
-				<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
-				<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
-			</c:url>
-			<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="button">
-				<fmt:message key="label.monitoring.edit.activity.edit" />
-			</html:link>
-		</td>
-	</tr>
+	<c:if test="${! sessionMap.isPageEditable}">
+		<tr>
+			<td colspan="2">
+				<c:url  var="authoringUrl" value="/definelater.do">
+					<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
+					<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
+				</c:url>
+				<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="button">
+					<fmt:message key="label.monitoring.edit.activity.edit" />
+				</html:link>
+			</td>
+		</tr>
+	</c:if>	
 </table>

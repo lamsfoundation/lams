@@ -416,8 +416,10 @@ public class AuthoringAction extends Action {
 	}
 	
 	// ************************* Handle assessment overall feedbacks *******************
-	TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
-	assessmentPO.setOverallFeedbacks(overallFeedbackList);
+	 if (mode.isAuthor()) {
+	     TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
+	     assessmentPO.setOverallFeedbacks(overallFeedbackList);
+	 }
 
 	// **********************************************
 	// finally persist assessmentPO again

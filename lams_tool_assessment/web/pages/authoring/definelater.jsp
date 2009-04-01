@@ -8,7 +8,6 @@
 <%Set tabs = new HashSet();
 			tabs.add("label.authoring.heading.basic");
 			pageContext.setAttribute("tabs", tabs);
-
 			%>
 <lams:html>
 <lams:head>
@@ -16,9 +15,14 @@
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<%@ include file="/common/fckeditorheader.jsp"%>
+	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
+	<script type="text/javascript"> 
+		var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
+	</script>
+ 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
 
 	<script>
-        
         function init(){
             selectTab(1); //select the default tab;
             
@@ -36,13 +40,9 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
         } 
-        
-       
     </script>
-	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
-
-
 </lams:head>
+
 <body class="stripes" onLoad="init()">
 <div id="page">
 	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
