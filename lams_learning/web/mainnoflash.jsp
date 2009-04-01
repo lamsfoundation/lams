@@ -29,89 +29,49 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <lams:html>
-	
 	<lams:head>
 		<lams:css/>
-				
-        <link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="<lams:LAMSURL/>css/thickbox.css" type="text/css" media="screen">
+        
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox-compressed.js"></script>
+		
+		<script type="text/javascript">
+			var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
+
+			function resizeIframe() {
+			    var height = $(window).height();
+
+			    height -= $('#contentFrame').offset().top;
+			    $('#contentFrame').css({'height': height + "px"});
+			    
+			    <c:if test="${param.presenceEnabledPatch}">
+			    	resizeChat();
+			    </c:if>
+			}
+			
+			window.onresize = resizeIframe;
+		</script>
 		
 		<title><fmt:message key="learner.title"/></title>
-
-        <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
-        <script type="text/javascript">
-			var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
-		</script>
-        <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox-compressed.js"></script>
-        
-        <script type="text/javascript" src="/lams/learning/includes/jsjac-1.3.1/jsjac.js"></script>
-		<script type="text/javascript" src="/lams/learning/includes/presence.js"></script>
-
-      	<c:if test="${param.presenceEnabledPatch}"> 		 
-        <script type="text/javascript">
-     		var HTTPBASE = "<lams:LAMSURL/>JHB";
-     		var presenceLabel = "<fmt:message key='label.presence'/>";
-     		var roomName = "${param.lessonID}" + "${param.createDateTime}";
-     		roomName = correctPresenceRoomName(roomName);
-     		
-	    	window.onload=function(){
-				// if presence is enabled, attempt to login once the window is loaded
-				attemptLogin();
-			}
-			
-			function attemptLogin(){
-				doLogin("${param.presenceUrl}", "<lams:user property="userID"/>", "<lams:user property="userID"/>", "<lams:user property="userID"/>", roomName, "<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>", false, false);
-			}
-			
-			function attemptRegistration(){
-				$.get("<lams:LAMSURL/>Presence.do", {method: "createXmppId"}, handlePresenceRegistration);
-			}
-			
-			function handlePresenceRegistration(registrationInfo){
-				// if registrationInfo exists, registration worked
-				if (registrationInfo) {
-					// attempt to re-login
-					attemptLogin();
-				}
-			}
-			
-			function doPresenceClick() {
-				$("#roster").slideToggle("slow");
-			}
-		</script>
-		</c:if>
-		
 	</lams:head>
 
 	<body>
 		<c:set var="joinLessonURL"></c:set>
-		<div style="float:top">
+		<div style="float:bottom">
 		<span class="h2font"><c:out value="${param.title}"/></span>&nbsp;&nbsp; &nbsp;&nbsp;
 		<a target='_new' href="learner.do?method=displayProgress&lessonID=<c:out value="${param.lessonID}"/>&keepThis=true&TB_iframe=true&height=300&width=400" title="<c:out value="${param.title}"/> - <fmt:message key="label.my.progress"/>" class="thickbox"><fmt:message key="label.my.progress"/></a> &nbsp;&nbsp;
 		<a href="#" onclick="javascript:window.location.href='<lams:LAMSURL/>/home.do?method=learner&lessonID=<c:out value="${param.lessonID}"/>'"/><fmt:message key="label.resume"/></a> &nbsp;&nbsp;
 		<c:if test="${param.portfolioEnabled}"><a target='_new' href="exportWaitingPage.jsp?mode=learner&lessonID=<c:out value="${param.lessonID}"/>&hideClose=true&keepThis=true&TB_iframe=true&height=300&width=400" title="<fmt:message key="label.export.portfolio"/>" class="thickbox"><fmt:message key="label.export.portfolio"/></a> &nbsp;&nbsp;</c:if>
-		<c:if test="${param.presenceEnabledPatch}"><a href=javascript:doPresenceClick()><fmt:message key="label.presence"/></a>&nbsp;&nbsp;</c:if>
 		<a href="#" onclick="javascript:window.open('notebook.do?method=viewAll&lessonID=<c:out value="${param.lessonID}"/>')"><fmt:message key="mynotes.title"/></a> &nbsp;&nbsp;
 		<lams:help style="small" page="learner"/>
-		</div> 
+		</div>
 		
-		<div id="roster" style="position: absolute; width: 150px; right: 18px; bottom: 0;background: #ffffff; display: none; padding: 5px; border: 1px #000000 solid;"></div>
+		<c:if test="${param.presenceEnabledPatch}">
+		    <%@ include file="/includes/presenceChat.jsp" %>
+		</c:if>
 		
-		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame"  frameborder="no" scrolling="yes"  src="learner.do?method=joinLesson&lessonID=<c:out value="${param.lessonID}"/>" width="100%" ></iframe>
-		<script type="text/javascript">
-		
-		function resizeIframe() {
-		    var height = top.window.innerHeight;
-		    if ( height == undefined || height == 0 ) {
-		    	// IE doesn't use window.innerHeight.
-		    	height = document.documentElement.clientHeight;
-		    	// alert("using clientHeight");
-		    }
-			// alert("doc height "+height);
-		    height -= document.getElementById('contentFrame').offsetTop;
-		    document.getElementById('contentFrame').style.height = height +"px";
-		};
-		window.onresize = resizeIframe;
-		</script>
+		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame" frameborder="no" scrolling="auto"  src="learner.do?method=joinLesson&lessonID=<c:out value="${param.lessonID}"/>" width="100%" ></iframe>
 	</body>
 
 </lams:html>

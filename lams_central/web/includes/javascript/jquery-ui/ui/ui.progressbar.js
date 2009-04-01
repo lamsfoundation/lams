@@ -1,11 +1,11 @@
 /*
- * jQuery UI ProgressBar @VERSION
+ * jQuery UI Progressbar 1.7.1
  *
- * Copyright (c) 2008 Eduardo Lundgren
+ * Copyright (c) 2009 AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  *
- * http://docs.jquery.com/UI/ProgressBar
+ * http://docs.jquery.com/UI/Progressbar
  *
  * Depends:
  *   ui.core.js
@@ -13,183 +13,100 @@
 (function($) {
 
 $.widget("ui.progressbar", {
+
 	_init: function() {
 
-		this._interval = this.options.interval;
+		this.element
+			.addClass("ui-progressbar"
+				+ " ui-widget"
+				+ " ui-widget-content"
+				+ " ui-corner-all")
+			.attr({
+				role: "progressbar",
+				"aria-valuemin": this._valueMin(),
+				"aria-valuemax": this._valueMax(),
+				"aria-valuenow": this._value()
+			});
 
-		var self = this,
-			options = this.options,
-			id = (new Date()).getTime()+Math.random(),
-			text = options.text || '0%';
+		this.valueDiv = $('<div class="ui-progressbar-value ui-widget-header ui-corner-left"></div>').appendTo(this.element);
 
-		this.element.addClass("ui-progressbar").width(options.width);
+		this._refreshValue();
 
-		$.extend(this, {
-			active: false,
-			pixelState: 0,
-			percentState: 0,
-			identifier: id,
-			bar: $('<div class="ui-progressbar-bar ui-hidden"></div>').css({
-				width: '0px', overflow: 'hidden', zIndex: 100
-			}),
-			textElement: $('<div class="ui-progressbar-text"></div>').html(text).css({
-				width: '0px', overflow: 'hidden'
-			}),
-			textBg: $('<div class="ui-progressbar-text ui-progressbar-text-back"></div>').html(text).css({
-					width: this.element.width()
-			}),
-			wrapper: $('<div class="ui-progressbar-wrap"></div>')
-		});
-
-		this.wrapper
-			.append(this.bar.append(this.textElement.addClass(options.textClass)), this.textBg)
-			.appendTo(this.element);
-	},
-
-	plugins: {},
-	ui: function(e) {
-		return {
-			instance: this,
-			identifier: this.identifier,
-			options: this.options,
-			element: this.bar,
-			textElement: this.textElement,
-			pixelState: this.pixelState,
-			percentState: this.percentState
-		};
-	},
-
-	_propagate: function(n,e) {
-		$.ui.plugin.call(this, n, [e, this.ui()]);
-		this.element.triggerHandler(n == "progressbar" ? n : ["progressbar", n].join(""), [e, this.ui()], this.options[n]);
 	},
 
 	destroy: function() {
-		this.stop();
 
 		this.element
-			.removeClass("ui-progressbar ui-progressbar-disabled")
-			.removeData("progressbar").unbind(".progressbar")
-			.find('.ui-progressbar-wrap').remove();
+			.removeClass("ui-progressbar"
+				+ " ui-widget"
+				+ " ui-widget-content"
+				+ " ui-corner-all")
+			.removeAttr("role")
+			.removeAttr("aria-valuemin")
+			.removeAttr("aria-valuemax")
+			.removeAttr("aria-valuenow")
+			.removeData("progressbar")
+			.unbind(".progressbar");
 
-		delete jQuery.easing[this.identifier];
+		this.valueDiv.remove();
+
+		$.widget.prototype.destroy.apply(this, arguments);
+
 	},
 
-	enable: function() {
-		this.element.removeClass("ui-progressbar-disabled");
-		this.disabled = false;
+	value: function(newValue) {
+		arguments.length && this._setData("value", newValue);
+		return this._value();
 	},
 
-	disable: function() {
-		this.element.addClass("ui-progressbar-disabled");
-		this.disabled = true;
-	},
+	_setData: function(key, value) {
 
-	start: function() {
-		var self = this, options = this.options;
-
-		if (this.disabled) {
-			return;
+		switch (key) {
+			case 'value':
+				this.options.value = value;
+				this._refreshValue();
+				this._trigger('change', null, {});
+				break;
 		}
 
-		jQuery.easing[this.identifier] = function (x, t, b, c, d) {
-			var inc = options.increment,
-				width = options.width,
-				step = ((inc > width ? width : inc)/width),
-				state = Math.round(x/step)*step;
-			return state > 1 ? 1 : state;
-		};
+		$.widget.prototype._setData.apply(this, arguments);
 
-		self.active = true;
-
-		setTimeout(
-			function() {
-				self.active = false;
-			},
-			options.duration
-		);
-
-		this._animate();
-
-		this._propagate('start', this.ui());
-		return false;
 	},
 
-	_animate: function() {
-		var self = this,
-			options = this.options,
-			interval = options.interval;
+	_value: function() {
 
-		this.bar.animate(
-			{
-				width: options.width
-			},
-			{
-				duration: interval,
-				easing: this.identifier,
-				step: function(step, b) {
-					self.progress((step/options.width)*100);
-					var timestamp = new Date().getTime(), elapsedTime  = (timestamp - b.startTime);
-					options.interval = interval - elapsedTime;
-				},
-				complete: function() {
-					delete jQuery.easing[self.identifier];
-					self.pause();
+		var val = this.options.value;
+		if (val < this._valueMin()) val = this._valueMin();
+		if (val > this._valueMax()) val = this._valueMax();
 
-					if (self.active) {
-						/*TODO*/
-					}
-				}
-			}
-		);
+		return val;
+
 	},
 
-	pause: function() {
-		if (this.disabled) return;
-		this.bar.stop();
-		this._propagate('pause', this.ui());
+	_valueMin: function() {
+		var valueMin = 0;
+		return valueMin;
 	},
 
-	stop: function() {
-		this.bar.stop();
-		this.bar.width(0);
-		this.textElement.width(0);
-		this.bar.addClass('ui-hidden');
-		this.options.interval = this._interval;
-		this._propagate('stop', this.ui());
+	_valueMax: function() {
+		var valueMax = 100;
+		return valueMax;
 	},
 
-	text: function(text){
-		this.textElement.html(text);
-		this.textBg.html(text);
-	},
-
-	progress: function(percentState) {
-		if (this.bar.is('.ui-hidden')) {
-			this.bar.removeClass('ui-hidden');
-		}
-
-		this.percentState = percentState > 100 ? 100 : percentState;
-		this.pixelState = (this.percentState/100)*this.options.width;
-		this.bar.width(this.pixelState);
-		this.textElement.width(this.pixelState);
-
-		if (this.options.range && !this.options.text) {
-			this.textElement.html(Math.round(this.percentState) + '%');
-		}
-		this._propagate('progress', this.ui());
+	_refreshValue: function() {
+		var value = this.value();
+		this.valueDiv[value == this._valueMax() ? 'addClass' : 'removeClass']("ui-corner-right");
+		this.valueDiv.width(value + '%');
+		this.element.attr("aria-valuenow", value);
 	}
+
 });
 
-$.ui.progressbar.defaults = {
-	width: 300,
-	duration: 3000,
-	interval: 200,
-	increment: 1,
-	range: true,
-	text: '',
-	addClass: '',
-	textClass: ''
-};
+$.extend($.ui.progressbar, {
+	version: "1.7.1",
+	defaults: {
+		value: 0
+	}
+});
 
 })(jQuery);

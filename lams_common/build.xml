@@ -315,6 +315,8 @@ Ant build file.
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
 			<!-- Create tables for Core Notebook Service -->
 			<transaction src="${db.scripts}/create_notebook_tables.sql"/>
+			<!-- Create tables for Presence Chat Service -->
+			<transaction src="${db.scripts}/create_presence_chat_tables.sql"/>
 			<!-- Test the scripts for translations -->
             <!-- <transaction src="${db.scripts}/shaun/all.sql"/> -->
 		</sql>

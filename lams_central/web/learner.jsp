@@ -13,10 +13,10 @@
 	
 <c:choose>
 	<c:when test="${enableFlash}">
-		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainflash.jsp?lessonID=<c:out value="${lessonID}"/>&portfolioEnabled=<c:out value="${portfolioEnabled}"/>&presenceEnabledPatch=<c:out value="${presenceEnabledPatch}"/>&presenceImEnabled=<c:out value="${presenceImAvailable}"/>&presenceUrl=<c:out value="${presenceUrl}"/>&title=<c:out value="${title}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if>">
+		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainflash.jsp?lessonID=<c:out value="${lessonID}"/>&portfolioEnabled=<c:out value="${portfolioEnabled}"/>&presenceEnabledPatch=<c:out value="${presenceEnabledPatch}"/>&presenceImEnabled=<c:out value="${presenceImEnabled}"/>&presenceUrl=<c:out value="${presenceUrl}"/>&createDateTime=<c:out value="${createDateTime}"/>&title=<c:out value="${title}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if>">
 	</c:when>
 	<c:otherwise>
-		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainnoflash.jsp?lessonID=<c:out value="${lessonID}"/>&portfolioEnabled=<c:out value="${portfolioEnabled}"/>&presenceEnabledPatch=<c:out value="${presenceEnabledPatch}"/>&presenceImEnabled=<c:out value="${presenceImAvailable}"/>&presenceUrl=<c:out value="${presenceUrl}"/>&createDateTime=<c:out value="${createDateTime}"/>&title=<c:out value="${title}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if>">
+		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainnoflash.jsp?lessonID=<c:out value="${lessonID}"/>&portfolioEnabled=<c:out value="${portfolioEnabled}"/>&presenceEnabledPatch=<c:out value="${presenceEnabledPatch}"/>&presenceImEnabled=<c:out value="${presenceImEnabled}"/>&presenceUrl=<c:out value="${presenceUrl}"/>&createDateTime=<c:out value="${createDateTime}"/>&title=<c:out value="${title}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if>">
 	</c:otherwise>
 </c:choose>
 

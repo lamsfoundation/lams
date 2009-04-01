@@ -42,7 +42,6 @@ class Application extends ApplicationParent {
 	private var _lesson:Lesson;
 	private var _header_mc:MovieClip;
 	private var _scratchpad_mc:MovieClip;
-	private var _presence_mc:MovieClip;
 	private var _reference_mc:MovieClip;
 
 	private static var SHOW_DEBUGGER:Boolean = false;
@@ -92,7 +91,6 @@ class Application extends ApplicationParent {
 	private var _lessonLoaded:Boolean;                  //Lesson loaded flag
   	private var _headerLoaded:Boolean;
 	private var _scratchpadLoaded:Boolean;
-	private var _presenceLoaded:Boolean;
 	private var _referenceLoaded:Boolean;
     
 	
@@ -100,7 +98,6 @@ class Application extends ApplicationParent {
     private static var _instance:Application = null;     
 	private var _container_mc:MovieClip;               //Main container
 	private var _debugDialog:MovieClip;                //Reference to the debug dialog
-	private var chatDialogs:Array;
 
 	/**
     * Application - Constructor
@@ -111,13 +108,11 @@ class Application extends ApplicationParent {
         _lessonLoaded = false;
 		_headerLoaded = false;
 		_scratchpadLoaded = false;
-		_presenceLoaded = false;
 		_referenceLoaded = false;
 		
 		_userDataLoaded = false;
 		
 		_module = Application.MODULE;
-		chatDialogs = new Array();
     }
     
 	/**
@@ -226,9 +221,6 @@ class Application extends ApplicationParent {
 
 		_reference_mc = _container_mc.createChildAtDepth('LReference', DepthManager.kTop, {_visible:false, _x:REF_X, _y:REF_Y, _lessonModel:_lesson.model, _lessonController:_lesson.view.getController()});
 		_reference_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
-
-		_presence_mc = _container_mc.createChildAtDepth('LPresence', DepthManager.kTop, {_x:PRES_X, _y:PRES_Y, _lessonModel:_lesson.model, _lessonController:_lesson.view.getController()});
-		_presence_mc.addEventListener('load',Proxy.create(this,UIElementLoaded));
 		
 		_scratchpad_mc = _container_mc.createChildAtDepth('LScratchPad', DepthManager.kTop, {_x:SPAD_X, _y:SPAD_Y, _lessonModel:_lesson.model, _lessonController:_lesson.view.getController()});
 		_scratchpad_mc.addEventListener('load', Proxy.create(this, UIElementLoaded));
@@ -278,11 +270,6 @@ class Application extends ApplicationParent {
 				case 'Scratchpad' :
 					_scratchpadLoaded = true;
 					break;
-				case 'Presence' :
-					_presenceLoaded = true;
-					_presence_mc._visible = false;
-					Debugger.log('PRESENCE: presence loaded and set to not visible' ,Debugger.MED,'UIElementLoaded','Application');
-					break;
 				case 'Reference' :
 					_referenceLoaded = true;
 					_reference_mc.visible = false;
@@ -291,7 +278,7 @@ class Application extends ApplicationParent {
             }
             
             //If all of them are loaded set UILoad accordingly
-            if(_lessonLoaded && _headerLoaded && _scratchpadLoaded && _presenceLoaded && _referenceLoaded){
+            if(_lessonLoaded && _headerLoaded && _scratchpadLoaded && _referenceLoaded){
                 _UILoaded=true;                
             } 
             
@@ -327,14 +314,8 @@ class Application extends ApplicationParent {
 		
 		var resizeHeight:Number;
 		
-		if (_presence_mc._visible) {
-			Debugger.log('resizeHeight set to Presence height', Debugger.MED, 'onResize', 'Application');
-			resizeHeight = LESSON_Y+_lesson.model.getPresenceHeight()+_lesson.model.getSpadHeight();
-		}
-		else {
-			Debugger.log('resizeHeight set to Spad height', Debugger.MED, 'onResize', 'Application');
-			resizeHeight = LESSON_Y+_lesson.model.getSpadHeight();
-		}		
+		Debugger.log('resizeHeight set to Spad height', Debugger.MED, 'onResize', 'Application');
+		resizeHeight = LESSON_Y+_lesson.model.getSpadHeight();	
 		
 		Debugger.log('resizeHeight: ' + resizeHeight, Debugger.MED, 'onResize', 'Application');
 		
@@ -343,21 +324,13 @@ class Application extends ApplicationParent {
 		someListener.onMouseUp = function () {
 			_lesson.setSize(w,h-resizeHeight);
 			_scratchpad_mc._y = h - _lesson.model.getSpadHeight();
-			_presence_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getPresenceHeight();
 		}
 		
 		Header(_header_mc).resize(w);
 		
 		_lesson.setSize(w,h-resizeHeight);
 		_scratchpad_mc._y = h - _lesson.model.getSpadHeight();
-		_presence_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getPresenceHeight();
-		
-		if (_presence_mc._visible) {
-			_reference_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getPresenceHeight() - _lesson.model.getReferenceHeight();
-		} else {
-			_reference_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getReferenceHeight();
-		}
-		
+		_reference_mc._y = h - _lesson.model.getSpadHeight() - _lesson.model.getReferenceHeight();
 	}
 	
 	/**
@@ -433,10 +406,6 @@ class Application extends ApplicationParent {
 	
 	public function getScratchpad():Scratchpad{
 		return Scratchpad(_scratchpad_mc);
-	}
-	
-	public function getPresence():Presence{
-		return Presence(_presence_mc)
 	}
 	
 	public function getReference():Reference {

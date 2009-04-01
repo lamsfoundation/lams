@@ -1,0 +1,76 @@
+/*
+*************************************************
+LAMS 2.0
+Date modified:  22/09/2006
+
+*************************************************
+Presence style
+********************************************** */
+
+#presenceUserListings {
+	margin: 5px;
+	padding: 2px;
+}
+
+#presenceChat {
+	position: absolute;
+	width: 600px;
+	height: 300px;
+	right: 18px;
+	z-index: 10;
+}
+
+#presenceChatTabs {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 73%;
+	height: 260px;
+}
+
+#presenceChatRoster {
+	position: absolute;
+	right: 0pt;
+	bottom: 0pt;
+	width: 25%;
+	height: 100%;
+}
+
+.presenceName {
+	width:"100%";
+}
+
+.presenceName:hover {
+	width:"100%";
+	background-color: #CBDBFF;
+	cursor: pointer;
+}
+
+.presenceMessage {
+	padding-bottom: 4px;
+}
+
+.presenceMessageFrom {
+	font-weight: bold;
+}
+
+.presenceMessageEmote {
+	font-style: italic;
+	padding-bottom: 4px;
+}
+
+.chatPanel {
+	width: 95%;
+	height: 80%;
+}
+
+.messageArea {
+	width: 100%;
+	height: 80%;
+	overflow: auto;
+}
+
+.sendArea {
+	style="width: 100%;
+	height: 20%;
+}

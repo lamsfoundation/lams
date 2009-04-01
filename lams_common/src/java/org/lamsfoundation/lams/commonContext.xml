@@ -52,6 +52,7 @@
 				<value>classpath:org/lamsfoundation/lams/learningdesign/License.hbm.xml</value>	
 				<value>classpath:org/lamsfoundation/lams/learningdesign/ActivityEvaluation.hbm.xml</value>
 				
+				
 				<!-- lesson related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
@@ -66,6 +67,9 @@
 				
 				<!-- Core Notebook Service related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/notebook/model/NotebookEntry.hbm.xml</value>
+				
+				<!-- Presence Chat Service related mapping files -->
+				<value>classpath:org/lamsfoundation/lams/presence/model/PresenceChatMessage.hbm.xml</value>
 				
 				<!-- Event notification service related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/events/Event.hbm.xml</value>
@@ -244,6 +248,11 @@
 		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO" /></property>
 	</bean>
 	
+	<!--  Presence Chat Service -->
+	<bean id="presenceChatLoggerService" class="org.lamsfoundation.lams.presence.service.PresenceChatLoggerService">
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="presenceChatMessageDAO"><ref bean="presenceChatMessageDAO" /></property>
+	</bean>
 	
 	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
@@ -370,6 +379,11 @@
 	
 	<!-- Core Notebook related beans -->
 	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>	
+	
+	<!-- Presence Chat related beans -->
+	<bean id="presenceChatMessageDAO" class="org.lamsfoundation.lams.presence.dao.hibernate.PresenceChatMessageDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>	
 	
