@@ -12,16 +12,9 @@
 	<title>Course GradeBook Monitor</title>
 	<lams:css />
 
-	<link rel="stylesheet" type="text/css" media="screen" href="<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/grid.css" />
-	<link rel="stylesheet" type="text/css" media="screen" href="<lams:LAMSURL />includes/javascript/jqgrid/themes/jqModal.css" />
-	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jquery-latest.pack.js"></script>
-	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jqgrid/js/jquery.jqGrid.js"></script>
-	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jqgrid/js/jqModal.js"></script>
-	<script language="JavaScript" type="text/javascript" src="../includes/javascript/jqgrid/js/jqDnR.js"></script>
+	<jsp:include page="jqGridIncludes.jsp"></jsp:include>
 
 	<script type="text/javascript">
-	
-		
 		jQuery(document).ready(function(){
   
 			jQuery("#organisationGrid").jqGrid({
@@ -61,6 +54,7 @@
 					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&method=courseMonitorView&lessonID=" + lessonID,
 					     height: "100%",
 					     width: 920,
+					     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 					     cellEdit:true,
 					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=" + lessonID,
 					     sortorder: "asc", 
@@ -106,7 +100,9 @@
 						     	jQuery("#organisationGrid").setCell(row_id, "mark", average, "", "");
 					     	}
 					     },
-						 imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images'
+						 gridComplete: function(){
+						 	toolTip($(".jqgrow"));	// enable tooltips for grid
+						 }	
 					 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false})
 					 
 					 jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
@@ -130,7 +126,10 @@
 							jQuery("#"+subgrid_table_id).setColumns();
 						}
 					  });
-					}
+					},
+					gridComplete: function(){
+						toolTip($(".jqgrow"));	// enable tooltips for grid
+					}	
 				}).navGrid("#organisationGridPager", {edit:false,add:false,del:false,search:false})
 				
 			jQuery("#organisationGrid").navButtonAdd("#organisationGridPager",{
@@ -182,6 +181,8 @@
 			<div style="width: 990px; margin-left: auto; margin-right: auto;">
 				<table id="organisationGrid" class="scroll"></table>
 				<div id="organisationGridPager" class="scroll"></div>
+				
+				<div class="tooltip" id="tooltip"></div>
 			</div>
 		</div> <!-- Closes content -->
 		

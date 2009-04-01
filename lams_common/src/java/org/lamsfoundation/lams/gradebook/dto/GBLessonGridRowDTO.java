@@ -60,7 +60,7 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 	
 	if (view.equals(VIEW_MONITOR)) {
 	    if (gradeBookMonitorURL != null && gradeBookMonitorURL.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + gradeBookMonitorURL + "\",\"" + lessonName + "\")'>" + lessonName
+		ret.add("<a href='javascript:launchPopup(\"" + gradeBookMonitorURL + "\",\"" + lessonName + "\",1220,600)'>" + lessonName
 			+ "</a>");
 	    } else {
 		ret.add(lessonName);
@@ -74,7 +74,7 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 	    }
 	} else if (view.equals(VIEW_LEARNER)) {
 	    if (gradeBookLearnerURL != null && gradeBookLearnerURL.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + gradeBookLearnerURL + "\",\"" + lessonName + "\")'>" + lessonName
+		ret.add("<a href='javascript:launchPopup(\"" + gradeBookLearnerURL + "\",\"" + lessonName + "\",796,570)'>" + lessonName
 			+ "</a>");
 	    } else {
 		ret.add(lessonName);

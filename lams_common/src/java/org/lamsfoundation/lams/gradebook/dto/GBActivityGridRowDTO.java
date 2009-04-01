@@ -58,7 +58,7 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 
 	if (view.equals(VIEW_USER)) {
 	    if (activityUrl != null && activityUrl.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + activityTitle + "\")'>"
+		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + activityTitle + "\",796,570)'>"
 			+ activityTitle + "</a>");
 	    } else {
 		ret.add(activityTitle);
@@ -79,7 +79,7 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 
 	} else if (view.equals(VIEW_ACTIVITY)) {
 	    if (monitorUrl != null && monitorUrl.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + monitorUrl + "\",\"" + activityTitle + "\")'>"
+		ret.add("<a href='javascript:launchPopup(\"" + monitorUrl + "\",\"" + activityTitle + "\",796,570)'>"
 			+ activityTitle + "</a>");
 	    } else {
 		ret.add(activityTitle);

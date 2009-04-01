@@ -61,7 +61,7 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
 	    ret.add(feedback);
 	} else if (view.equals(VIEW_ACTIVITY)) {
 	    if (activityUrl != null && activityUrl.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + fullName + "\")'>" + fullName
+		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + fullName + "\",796,570)'>" + fullName
 			+ "</a>");
 	    } else {
 		ret.add(fullName);
