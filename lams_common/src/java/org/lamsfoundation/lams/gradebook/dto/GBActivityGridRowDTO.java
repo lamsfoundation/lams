@@ -42,7 +42,7 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
     //double timeTaken;
     Double mark;
     String feedback;
-    String timeTaken = "-";
+    Long timeTaken;
 
     // Properties for activity view
     Double average;
@@ -67,7 +67,11 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 	    ret.add(output);
 	    ret.add(competences);
 	    
-	    ret.add(timeTaken);
+	    if (timeTaken != null) {
+		ret.add(convertTimeToString(timeTaken));
+	    } else {
+		ret.add("-");
+	    }
 	    
 	    ret.add(feedback);
 	    
@@ -93,7 +97,6 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 		ret.add("-");
 	    }
 	}
-
 	return ret;
     }
 
@@ -186,33 +189,11 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 	this.monitorUrl = monitorUrl;
     }
 
-
-
-    public void setTimeTakenInMillis(long timeTakenInMillis) {
-	if (timeTakenInMillis > 1000) {
-	    long totalTimeInSeconds = timeTakenInMillis / 1000;
-
-	    long seconds = (totalTimeInSeconds >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds); 
-	    long minutes = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds; 
-	    long hours = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 24 ? totalTimeInSeconds % 24 : totalTimeInSeconds; 
-	    long days = (totalTimeInSeconds = (totalTimeInSeconds / 24)); 
-
-	    StringBuilder sb = new StringBuilder();
-	    
-	    if (days != 0 ) { sb.append("" + days + "d, "); }
-	    if (hours != 0 ) { sb.append("" + hours + "h, "); }
-	    if (minutes != 0 ) { sb.append("" + minutes + "m, "); }
-	    if (seconds != 0 ) { sb.append("" + seconds + "s"); }
-	    
-	    this.timeTaken = sb.toString();
-	}
-    }
-
-    public String getTimeTaken() {
+    public Long getTimeTaken() {
         return timeTaken;
     }
 
-    public void setTimeTaken(String timeTaken) {
+    public void setTimeTaken(Long timeTaken) {
         this.timeTaken = timeTaken;
     }
     

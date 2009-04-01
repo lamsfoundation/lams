@@ -35,6 +35,8 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     String lessonDescription;
     Double mark;
     String subGroup;
+    String startDate;
+    Long averageTime;
     
     // Only for monitor view
     String gradeBookMonitorURL;
@@ -66,6 +68,14 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 		ret.add(lessonName);
 	    }
 	    ret.add(subGroup);
+	    ret.add(startDate);
+	    
+	    if (averageTime != null) {
+		ret.add(convertTimeToString(averageTime));
+	    } else {
+		ret.add("-");
+	    }
+	    
 	    ret.add(lessonDescription);
 	    if (mark != null) {
 		ret.add(mark.toString());
@@ -144,4 +154,22 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     public void setSubGroup(String subGroup) {
         this.subGroup = subGroup;
     }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public Long getAverageTime() {
+        return averageTime;
+    }
+
+    public void setAverageTime(Long averageTime) {
+	this.averageTime = averageTime;
+    }
+    
+    
 }

@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBLessonIDComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBLessonMarkComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBLessonNameComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBUserFullNameComparator;
@@ -339,10 +340,10 @@ public class GradeBookAction extends LamsDispatchAction {
 		    } else if (sortBy.equals("mark")) {
 			Collections.sort(gradeBookLessonDTOs, new GBLessonMarkComparator());
 		    } else {
-			Collections.sort(gradeBookLessonDTOs, new GBLessonNameComparator());
+			Collections.sort(gradeBookLessonDTOs, new GBLessonIDComparator());
 		    }
 		} else {
-		    Collections.sort(gradeBookLessonDTOs, new GBLessonNameComparator());
+		    Collections.sort(gradeBookLessonDTOs, new GBLessonIDComparator());
 		}
 
 		// Reverse the order if requested

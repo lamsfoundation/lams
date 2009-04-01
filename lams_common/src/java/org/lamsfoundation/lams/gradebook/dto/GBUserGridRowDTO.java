@@ -40,10 +40,15 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
     // For user view, this represents total lesson mark in the grid
     // For activity view, this represents an activity mark
     Double mark;
+    
+    // For user view and courseMonitor view, this represents the time taken for a lesson
+    // For activity view this represents time taken for an activity
+    Long timeTaken;
 
     // For activity view
     String output;
     String activityUrl;
+    
 
     public GBUserGridRowDTO() {
     }
@@ -58,6 +63,11 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
 	if (view.equals(VIEW_USER)) {
 	    ret.add(fullName);
 	    ret.add(status);
+	    if (timeTaken != null) {
+		ret.add(convertTimeToString(timeTaken));
+	    } else {
+		ret.add("-");
+	    }
 	    ret.add(feedback);
 	} else if (view.equals(VIEW_ACTIVITY)) {
 	    if (activityUrl != null && activityUrl.length() != 0) {
@@ -73,8 +83,12 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
 	} else if (view.equals(VIEW_COURSE_MONITOR)){
 	    ret.add(fullName);
 	    ret.add(status);
+	    if (timeTaken != null) {
+		ret.add(convertTimeToString(timeTaken));
+	    } else {
+		ret.add("-");
+	    }
 	    ret.add(feedback);
-	    
 	}
 
 	if (mark != null) {
@@ -153,5 +167,13 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
 
     public void setActivityUrl(String activityUrl) {
 	this.activityUrl = activityUrl;
+    }
+
+    public Long getTimeTaken() {
+        return timeTaken;
+    }
+
+    public void setTimeTaken(Long timeTaken) {
+        this.timeTaken = timeTaken;
     }
 }

@@ -24,6 +24,7 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.progress;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +34,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
-import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -95,7 +95,8 @@ public class ProgressEngine
         		completedActivityList.add(parentActivity.getActivityId());        	
         	}
             populateCurrentCompletedActivityList(learnerProgress, completedActivityList);
-        	return setLessonComplete(learnerProgress, LearnerProgress.LESSON_IN_DESIGN_COMPLETE);
+            learnerProgress.setFinishDate(new Date());
+            return setLessonComplete(learnerProgress, LearnerProgress.LESSON_IN_DESIGN_COMPLETE);
         } else if ( completedActivity.isFloating() && !completedActivity.getParentActivity().isParallelActivity()) {
         	// special case - floating activity and not parallel activity (floating) child.
         	return learnerProgress;
@@ -346,7 +347,8 @@ public class ProgressEngine
         }
         //lesson is meant to be completed if there is no transition and no parent.
         else {
-        	learnerProgress = setLessonComplete(learnerProgress, LearnerProgress.LESSON_END_OF_DESIGN_COMPLETE);
+            learnerProgress.setFinishDate(new Date());
+            learnerProgress = setLessonComplete(learnerProgress, LearnerProgress.LESSON_END_OF_DESIGN_COMPLETE);
         }
 
         return learnerProgress;

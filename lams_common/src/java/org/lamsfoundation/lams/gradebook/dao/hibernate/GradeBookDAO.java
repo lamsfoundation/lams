@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook.dao.hibernate;
 
+import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
@@ -47,6 +48,9 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
     private static final String GET_AVERAGE_MARK_FOR_LESSON = "select avg(gles.mark) from GradeBookUserLesson gles where "
 	    + "gles.lesson.lessonId=:lessonID";
 
+    private static final String GET_AVERAGE_COMPLETION_TIME = "select prog.finishDate, prog.startDate as x from LearnerProgress prog where "
+	    + "prog.lesson.lessonId=:lessonID";
+
     @SuppressWarnings("unchecked")
     public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID) {
 	List result = getSession().createQuery(GET_GRADEBOOK_USER_ACTIVITY).setInteger("userID", userID.intValue())
@@ -55,8 +59,8 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 	if (result != null) {
 	    if (result.size() > 0)
 		return (GradeBookUserActivity) result.get(0);
-	} 
-	    
+	}
+
 	return null;
     }
 
@@ -68,10 +72,10 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 	if (result != null) {
 	    if (result.size() > 0)
 		return (GradeBookUserLesson) result.get(0);
-	} 
-	
+	}
+
 	return null;
-	
+
     }
 
     @SuppressWarnings("unchecked")
@@ -82,10 +86,9 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 	if (result != null) {
 	    if (result.size() > 0)
 		return (Double) result.get(0);
-	} 
-	
+	}
+
 	return 0.0;
-	
 
     }
 
@@ -106,7 +109,39 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 	    if (result.size() > 0)
 		return (Double) result.get(0);
 	}
-	    
+
 	return 0.0;
+    }
+
+    @SuppressWarnings("unchecked")
+    public long getAverageDurationLesson(Long lessonID) {
+	List<Object[]> result = (List<Object[]>) getSession().createQuery(GET_AVERAGE_COMPLETION_TIME).setLong(
+		"lessonID", lessonID.longValue()).list();
+
+	if (result != null) {
+	    if (result.size() > 0) {
+
+		long sum = 0;
+		long count = 0;
+		for (Object[] dateObjs : result) {
+		    if (dateObjs != null && dateObjs.length == 2) {
+			Date finishDate = (Date) dateObjs[0];
+			Date startDate = (Date) dateObjs[1];
+
+			if (startDate != null && finishDate != null) {
+
+			    sum += finishDate.getTime() - startDate.getTime();
+			    count++;
+			}
+		    }
+		}
+
+		if (count > 0) {
+		    return sum / count;
+		}
+	    }
+
+	}
+	return 0;
     }
 }

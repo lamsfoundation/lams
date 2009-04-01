@@ -21,27 +21,29 @@
  */ 
  
 /* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dao; 
+package org.lamsfoundation.lams.gradebook.dto.comparators; 
 
-import java.util.List;
+import java.util.Comparator;
 
-import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
-import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
- 
-public interface IGradeBookDAO extends IBaseDAO{
-    
-    public GradeBookUserLesson getGradeBookUserDataForLesson(Long lessonID, Integer userID);
-    
-    public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID);
-    
-    public Double getGradeBookUserActivityMarkSum(Long lessonID, Integer userID);
-    
-    public List<GradeBookUserActivity> getAllGradeBookUserActivitiesForActivity(Long activityID);
-    
-    public Double getAverageMarkForLesson(Long lessonID);
-    
-    public long getAverageDurationLesson(Long lessonID);
+import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 
+@SuppressWarnings("unchecked")
+public class GBLessonIDComparator implements Comparator{
+    public int compare(Object gbLessonRowDTO, Object anotherGbLessonRowDTO) {
+
+	if (gbLessonRowDTO instanceof GBLessonGridRowDTO && anotherGbLessonRowDTO instanceof GBLessonGridRowDTO) {
+	   
+	    Long lessonID1 = ((GBLessonGridRowDTO) gbLessonRowDTO).getLessonId();
+	    Long lessonID2 = ((GBLessonGridRowDTO) anotherGbLessonRowDTO).getLessonId();
+
+	    if (lessonID1 == null || lessonID2 == null) {
+		return 0;
+	    }
+	    Long ret = lessonID1 - lessonID2;
+	    return ret.intValue();    
+	} else {
+	    return 0;
+	}
+    }
 }
  

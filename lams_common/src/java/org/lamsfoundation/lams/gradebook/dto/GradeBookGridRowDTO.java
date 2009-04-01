@@ -30,5 +30,34 @@ public abstract class GradeBookGridRowDTO{
     public abstract ArrayList<String> toStringArray(String view);
     
     public abstract String getRowId();
+
+    /**
+     * A shared function to convert milliseconds into a readable string
+     * 
+     * @param timeInMillis
+     * @return
+     */
+    protected String convertTimeToString(Long timeInMillis) {
+	StringBuilder sb = new StringBuilder();
+	if (timeInMillis != null && timeInMillis > 1000) {
+	    long totalTimeInSeconds = timeInMillis / 1000;
+
+	    long seconds = (totalTimeInSeconds >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds); 
+	    long minutes = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds; 
+	    long hours = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 24 ? totalTimeInSeconds % 24 : totalTimeInSeconds; 
+	    long days = (totalTimeInSeconds = (totalTimeInSeconds / 24)); 
+
+	    if (days != 0 ) { sb.append("" + days + "d, "); }
+	    if (hours != 0 ) { sb.append("" + hours + "h, "); }
+	    if (minutes != 0 ) { sb.append("" + minutes + "m, "); }
+	    if (seconds != 0 ) { sb.append("" + seconds + "s"); }
+	}
+	
+	if (sb.length() > 0) {
+	    return sb.toString();
+	} else {
+	    return null;
+	}
+    }
 }
  
