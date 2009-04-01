@@ -408,6 +408,11 @@
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
+	<!--  Gradebook related beans -->
+	<bean id="gradeBookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradeBookDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
 	<!--  System Session bean -->
 	<bean id="SystemSession"
 	    class="org.lamsfoundation.lams.web.session.SessionManager"
