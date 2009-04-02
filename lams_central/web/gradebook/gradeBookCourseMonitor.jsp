@@ -48,7 +48,7 @@
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 				   var subgrid_table_id;
-				   var lessonID = jQuery("#organisationGrid").getRowData(row_id)["lessonID"];
+				   var lessonID = jQuery("#organisationGrid").getRowData(row_id)["id"];
 				   subgrid_table_id = subgrid_id+"_t";
 				   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 				   jQuery("#"+subgrid_table_id).jqGrid({

@@ -29,9 +29,7 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 
     public static final String VIEW_USER = "userView";
     public static final String VIEW_ACTIVITY = "activityView";
-
-    long activityId;
-    String activityTitle;
+    
     String competences;
     //String toolString;
 
@@ -40,12 +38,9 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
     String output;
     String activityUrl;
     //double timeTaken;
-    Double mark;
     String feedback;
-    Long timeTaken;
 
     // Properties for activity view
-    Double average;
     String monitorUrl;
 
     public GBActivityGridRowDTO() {
@@ -54,14 +49,14 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
     @Override
     public ArrayList<String> toStringArray(String view) {
 	ArrayList<String> ret = new ArrayList<String>();
-	ret.add("" + activityId);
+	ret.add(id.toString());
 
 	if (view.equals(VIEW_USER)) {
 	    if (activityUrl != null && activityUrl.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + activityTitle + "\",796,570)'>"
-			+ activityTitle + "</a>");
+		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>"
+			+ rowName + "</a>");
 	    } else {
-		ret.add(activityTitle);
+		ret.add(rowName);
 	    }
 	    ret.add(status);
 	    ret.add(output);
@@ -83,46 +78,21 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 
 	} else if (view.equals(VIEW_ACTIVITY)) {
 	    if (monitorUrl != null && monitorUrl.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + monitorUrl + "\",\"" + activityTitle + "\",796,570)'>"
-			+ activityTitle + "</a>");
+		ret.add("<a href='javascript:launchPopup(\"" + monitorUrl + "\",\"" + rowName + "\",796,570)'>"
+			+ rowName + "</a>");
 	    } else {
-		ret.add(activityTitle);
+		ret.add(rowName);
 	    }
 
 	    ret.add(competences);
 
-	    if (average != null) {
-		ret.add(average.toString());
+	    if (mark != null) {
+		ret.add(mark.toString());
 	    } else {
 		ret.add("-");
 	    }
 	}
 	return ret;
-    }
-
-    @Override
-    public String getRowId() {
-	return "" + activityId;
-    }
-
-    public int getId() {
-	return new Long(activityId).intValue();
-    }
-
-    public long getActivityId() {
-	return activityId;
-    }
-
-    public void setActivityId(long activityId) {
-	this.activityId = activityId;
-    }
-
-    public String getActivityTitle() {
-	return activityTitle;
-    }
-
-    public void setActivityTitle(String activityTitle) {
-	this.activityTitle = activityTitle;
     }
 
     public String getStatus() {
@@ -139,14 +109,6 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 
     public void setOutput(String output) {
 	this.output = output;
-    }
-
-    public Double getMark() {
-	return mark;
-    }
-
-    public void setMark(Double mark) {
-	this.mark = mark;
     }
 
     public String getCompetences() {
@@ -173,29 +135,11 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 	this.feedback = feedback;
     }
 
-    public Double getAverage() {
-	return average;
-    }
-
-    public void setAverage(Double average) {
-	this.average = average;
-    }
-
     public String getMonitorUrl() {
 	return monitorUrl;
     }
 
     public void setMonitorUrl(String monitorUrl) {
 	this.monitorUrl = monitorUrl;
-    }
-
-    public Long getTimeTaken() {
-        return timeTaken;
-    }
-
-    public void setTimeTaken(Long timeTaken) {
-        this.timeTaken = timeTaken;
-    }
-    
-    
+    } 
 }

@@ -25,18 +25,18 @@ package org.lamsfoundation.lams.gradebook.dto.comparators;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 
 @SuppressWarnings("unchecked")
-public class GBLessonMarkComparator implements Comparator {
+public class GBMarkComparator implements Comparator {
 
-    public int compare(Object gbLessonRowDTO, Object anotherGbLessonRowDTO) {
+    public int compare(Object gradeBookGridRow, Object anotherGradeBookGridRow) {
 
-	if (gbLessonRowDTO instanceof GBLessonGridRowDTO && anotherGbLessonRowDTO instanceof GBLessonGridRowDTO) {
+	if (gradeBookGridRow instanceof GradeBookGridRowDTO && anotherGradeBookGridRow instanceof GradeBookGridRowDTO) {
 	   
-	    Double mark1 = ((GBLessonGridRowDTO) gbLessonRowDTO).getMark();
-	    Double mark2 = ((GBLessonGridRowDTO) anotherGbLessonRowDTO).getMark();
-
+	    Double mark1 = ((GradeBookGridRowDTO) gradeBookGridRow).getMark();
+	    Double mark2 = ((GradeBookGridRowDTO) anotherGradeBookGridRow).getMark();
+	    
 	    mark1 = (mark1 == null) ? 0.0 : mark1;
 	    mark2 = (mark2 == null) ? 0.0 : mark2;
 	    return new Double(mark1 - mark2).intValue();    

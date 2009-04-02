@@ -51,12 +51,12 @@
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 				   var subgrid_table_id;
-				   var userName = jQuery("#userView").getRowData(row_id)["login"];
+				   var userID = jQuery("#userView").getRowData(row_id)["id"];
 				   subgrid_table_id = subgrid_id+"_t";
 					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   	jQuery("#"+subgrid_table_id).jqGrid({
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
+						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userID,
 						     height: "100%",
 						     width: 920,
 						     cellEdit:true,
@@ -65,7 +65,7 @@
 						     pager: subgrid_table_id + "_pager",
 							 rowList:[5,10,20,30],
 							 rowNum:10,
-						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
+						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userID,
 						     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Time Taken', 'Activity FeedBack', 'Mark'],
 						     colModel: [
 						       	{name:'id', width:10, index:'id', sortable:false, hidden:true, hidedlg:true},
@@ -173,7 +173,7 @@
 				    subGrid: true,
 					subGridRowExpanded: function(subgrid_id, row_id) {
 					   var subgrid_table_id;
-					   var activityID = jQuery("#activityView").getRowData(row_id)["activityId"];
+					   var activityID = jQuery("#activityView").getRowData(row_id)["id"];
 					   subgrid_table_id = subgrid_id+"_t";
 					   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   jQuery("#"+subgrid_table_id).jqGrid({

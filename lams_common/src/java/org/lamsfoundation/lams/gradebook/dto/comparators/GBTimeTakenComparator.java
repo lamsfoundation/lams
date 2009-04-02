@@ -18,28 +18,30 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */
-
-/* $Id$ */
-package org.lamsfoundation.lams.gradebook.dto.comparators;
+ */ 
+ 
+/* $Id$ */ 
+package org.lamsfoundation.lams.gradebook.dto.comparators; 
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
-
+import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
+ 
 @SuppressWarnings("unchecked")
-public class GBLessonNameComparator implements Comparator {
+public class GBTimeTakenComparator implements Comparator{
+    public int compare(Object gradeBookGridRow, Object anotherGradeBookGridRow) {
 
-    public int compare(Object gbLessonRowDTO, Object anotherGbLessonRowDTO) {
-
-	if (gbLessonRowDTO instanceof GBLessonGridRowDTO && anotherGbLessonRowDTO instanceof GBLessonGridRowDTO) {    
-
-	    String name1 = ((GBLessonGridRowDTO)gbLessonRowDTO).getLessonName();
-	    String name2 = ((GBLessonGridRowDTO)anotherGbLessonRowDTO).getLessonName();
-
-	    return name1.compareTo(name2);
+	if (gradeBookGridRow instanceof GradeBookGridRowDTO && anotherGradeBookGridRow instanceof GradeBookGridRowDTO) {
+	   
+	    Long timeTaken1 = ((GradeBookGridRowDTO) gradeBookGridRow).getTimeTaken();
+	    Long timeTaken2 = ((GradeBookGridRowDTO) anotherGradeBookGridRow).getTimeTaken();
+	    
+	    timeTaken1 = (timeTaken1 == null) ? 0 : timeTaken1;
+	    timeTaken2 = (timeTaken2 == null) ? 0 : timeTaken2;
+	    return new Double(timeTaken1 - timeTaken2).intValue();    
 	} else {
 	    return 0;
 	}
     }
 }
+ 

@@ -30,13 +30,9 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     public static final String VIEW_MONITOR = "monitorView";
     public static final String VIEW_LEARNER = "learnerView";
 
-    Long lessonId;
-    String lessonName;
     String lessonDescription;
-    Double mark;
     String subGroup;
     String startDate;
-    Long averageTime;
     
     // Only for monitor view
     String gradeBookMonitorURL;
@@ -49,29 +45,23 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     }
 
     @Override
-    public String getRowId() {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    @Override
     public ArrayList<String> toStringArray(String view) {
 	ArrayList<String> ret = new ArrayList<String>();
 	
-	ret.add(lessonId.toString());
+	ret.add(id.toString());
 	
 	if (view.equals(VIEW_MONITOR)) {
 	    if (gradeBookMonitorURL != null && gradeBookMonitorURL.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + gradeBookMonitorURL + "\",\"" + lessonName + "\",1220,600)'>" + lessonName
+		ret.add("<a href='javascript:launchPopup(\"" + gradeBookMonitorURL + "\",\"" + rowName + "\",1220,600)'>" + rowName
 			+ "</a>");
 	    } else {
-		ret.add(lessonName);
+		ret.add(rowName);
 	    }
 	    ret.add(subGroup);
 	    ret.add(startDate);
 	    
-	    if (averageTime != null) {
-		ret.add(convertTimeToString(averageTime));
+	    if (timeTaken != null) {
+		ret.add(convertTimeToString(timeTaken));
 	    } else {
 		ret.add("-");
 	    }
@@ -84,10 +74,10 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 	    }
 	} else if (view.equals(VIEW_LEARNER)) {
 	    if (gradeBookLearnerURL != null && gradeBookLearnerURL.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + gradeBookLearnerURL + "\",\"" + lessonName + "\",796,570)'>" + lessonName
+		ret.add("<a href='javascript:launchPopup(\"" + gradeBookLearnerURL + "\",\"" + rowName + "\",796,570)'>" + rowName
 			+ "</a>");
 	    } else {
-		ret.add(lessonName);
+		ret.add(rowName);
 	    }
 	    ret.add(lessonDescription);
 	    if (mark != null) {
@@ -99,20 +89,12 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 	return ret;
     }
 
-    public Long getLessonId() {
-	return lessonId;
-    }
-
-    public void setLessonId(Long lessonId) {
-	this.lessonId = lessonId;
-    }
-
     public String getLessonName() {
-	return lessonName;
+	return rowName;
     }
 
-    public void setLessonName(String lessonName) {
-	this.lessonName = lessonName;
+    public void setLessonName(String rowName) {
+	this.rowName = rowName;
     }
 
     public String getLessonDescription() {
@@ -121,14 +103,6 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 
     public void setLessonDescription(String lessonDescription) {
 	this.lessonDescription = lessonDescription;
-    }
-
-    public Double getMark() {
-        return mark;
-    }
-
-    public void setMark(Double mark) {
-        this.mark = mark;
     }
 
     public String getGradeBookMonitorURL() {
@@ -162,14 +136,5 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
-
-    public Long getAverageTime() {
-        return averageTime;
-    }
-
-    public void setAverageTime(Long averageTime) {
-	this.averageTime = averageTime;
-    }
-    
     
 }

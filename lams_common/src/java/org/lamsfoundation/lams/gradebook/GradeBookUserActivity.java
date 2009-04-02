@@ -23,7 +23,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook;
 
-import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.usermanagement.User;
 

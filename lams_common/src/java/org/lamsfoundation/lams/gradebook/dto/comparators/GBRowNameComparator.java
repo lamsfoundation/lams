@@ -18,29 +18,24 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dto.comparators; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.dto.comparators;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 
 @SuppressWarnings("unchecked")
-public class GBLessonIDComparator implements Comparator{
-    public int compare(Object gbLessonRowDTO, Object anotherGbLessonRowDTO) {
+public class GBRowNameComparator implements Comparator {
 
-	if (gbLessonRowDTO instanceof GBLessonGridRowDTO && anotherGbLessonRowDTO instanceof GBLessonGridRowDTO) {
-	   
-	    Long lessonID1 = ((GBLessonGridRowDTO) gbLessonRowDTO).getLessonId();
-	    Long lessonID2 = ((GBLessonGridRowDTO) anotherGbLessonRowDTO).getLessonId();
-
-	    if (lessonID1 == null || lessonID2 == null) {
-		return 0;
-	    }
-	    Long ret = lessonID1 - lessonID2;
-	    return ret.intValue();    
+    public int compare(Object gradeBookGridRow, Object anotherGradeBookGridRow) {
+	if (gradeBookGridRow instanceof GradeBookGridRowDTO && anotherGradeBookGridRow instanceof GradeBookGridRowDTO) {
+	    String name1 = ((GradeBookGridRowDTO) gradeBookGridRow).getRowName().toLowerCase();
+	    String name2 = ((GradeBookGridRowDTO) anotherGradeBookGridRow).getRowName().toLowerCase();    
+	    int ret = name1.compareTo(name2);
+	    return ret;
 	} else {
 	    return 0;
 	}

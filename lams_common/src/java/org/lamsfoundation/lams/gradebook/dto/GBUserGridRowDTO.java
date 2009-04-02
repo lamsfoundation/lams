@@ -31,19 +31,8 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
     public static final String VIEW_ACTIVITY = "activityView";
     public static final String VIEW_COURSE_MONITOR = "courseMonitorView";
     
-    String login;
-    String firstName;
-    String lastName;
     String status;
     String feedback;
-
-    // For user view, this represents total lesson mark in the grid
-    // For activity view, this represents an activity mark
-    Double mark;
-    
-    // For user view and courseMonitor view, this represents the time taken for a lesson
-    // For activity view this represents time taken for an activity
-    Long timeTaken;
 
     // For activity view
     String output;
@@ -57,11 +46,10 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
     public ArrayList<String> toStringArray(String view) {
 	ArrayList<String> ret = new ArrayList<String>();
 
-	String fullName = lastName + " " + firstName;
-	ret.add(login);
+	ret.add(id.toString());
 
 	if (view.equals(VIEW_USER)) {
-	    ret.add(fullName);
+	    ret.add(rowName);
 	    ret.add(status);
 	    if (timeTaken != null) {
 		ret.add(convertTimeToString(timeTaken));
@@ -71,17 +59,17 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
 	    ret.add(feedback);
 	} else if (view.equals(VIEW_ACTIVITY)) {
 	    if (activityUrl != null && activityUrl.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + fullName + "\",796,570)'>" + fullName
+		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>" + rowName
 			+ "</a>");
 	    } else {
-		ret.add(fullName);
+		ret.add(rowName);
 	    }
 
 	    ret.add(status);
 	    ret.add(output);
 	    ret.add(feedback);
 	} else if (view.equals(VIEW_COURSE_MONITOR)){
-	    ret.add(fullName);
+	    ret.add(rowName);
 	    ret.add(status);
 	    if (timeTaken != null) {
 		ret.add(convertTimeToString(timeTaken));
@@ -98,43 +86,6 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
 	}
 
 	return ret;
-    }
-
-    @Override
-    public String getRowId() {
-	return login;
-    }
-
-    public Double getMark() {
-	return mark;
-    }
-
-    public void setMark(Double mark) {
-	this.mark = mark;
-    }
-
-    public String getLogin() {
-	return login;
-    }
-
-    public void setLogin(String login) {
-	this.login = login;
-    }
-
-    public String getFirstName() {
-	return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-	this.firstName = firstName;
-    }
-
-    public String getLastName() {
-	return lastName;
-    }
-
-    public void setLastName(String lastName) {
-	this.lastName = lastName;
     }
 
     public String getStatus() {
@@ -169,11 +120,4 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
 	this.activityUrl = activityUrl;
     }
 
-    public Long getTimeTaken() {
-        return timeTaken;
-    }
-
-    public void setTimeTaken(Long timeTaken) {
-        this.timeTaken = timeTaken;
-    }
 }

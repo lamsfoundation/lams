@@ -29,7 +29,19 @@ public abstract class GradeBookGridRowDTO{
     
     public abstract ArrayList<String> toStringArray(String view);
     
-    public abstract String getRowId();
+    // The id for a row, might be activityId, userId, lessonID etc
+    public Long id;
+    
+    // The name for the row, every gradebook row has some sort of name
+    // Be it the user's name, the activity name, the lesson name etc
+    public String rowName;
+ 
+    // A unit of time in milliseconds that  determines the time taken for the corressponding task
+    // Be it a lesson or an activity 
+    public Long timeTaken;
+    
+    // The mark for the corresponding gradebook grid row task
+    public Double mark;
 
     /**
      * A shared function to convert milliseconds into a readable string
@@ -58,6 +70,38 @@ public abstract class GradeBookGridRowDTO{
 	} else {
 	    return null;
 	}
+    }
+
+    public Long getTimeTaken() {
+        return timeTaken;
+    }
+
+    public void setTimeTaken(Long timeTaken) {
+        this.timeTaken = timeTaken;
+    }
+
+    public Double getMark() {
+        return mark;
+    }
+
+    public void setMark(Double mark) {
+        this.mark = mark;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getRowName() {
+        return rowName;
+    }
+
+    public void setRowName(String rowName) {
+        this.rowName = rowName;
     }
 }
  
