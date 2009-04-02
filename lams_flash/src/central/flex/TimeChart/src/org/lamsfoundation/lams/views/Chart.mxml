@@ -198,8 +198,8 @@
 			
 			</mx:ViewStack>
 			
-			<mx:Form id="selectLearnerForm">
-				<mx:CheckBox id="showAverage" visible="true" enabled="true" selected="false" label="{dictionary.getLabel('show.average.checkbox')}" />
+			<mx:Form id="selectLearnerForm" visible="{chartViews.selectedIndex == CLASS}">
+				<mx:CheckBox id="showAverage" enabled="true" selected="false" label="{dictionary.getLabel('show.average.checkbox')}" />
 				<mx:HBox>
 					<mx:ComboBox id="selectedLearner_cmb" dataProvider="{learnerProgressData}" labelFunction="learnerName" selectedIndex="{learnerProgressData.getItemIndex(selectedLearnerProgress)}" change="selectLearnerEvent(event)"/>
 					<mx:TextInput id="searchLearner_txt" text="{dictionary.getLabel('search.learner.textbox')}" width="200" enabled="true" click="clearSearch(event)" change="applyFilter()" />
