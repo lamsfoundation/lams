@@ -30,16 +30,17 @@
 			    cellEdit: true,
 			    viewrecords: true,
 			    sortorder: "asc", 
-			    sortname: "fullName", 
+			    sortname: "rowName", 
 			    pager: 'userViewPager',
 			    rowList:[5,10,20,30],
 			    rowNum:10,
 				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}",
-			    colNames:["", 'Name', 'Progress', 'Lesson FeedBack', 'Lesson Mark'],
+			    colNames:["", 'Name', 'Progress', 'Time Taken', 'Lesson FeedBack', 'Lesson Mark'],
 			    colModel:[
-			      {name:'login', index:'login', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-			      {name:'fullName',index:'fullName', sortable:true, editable:false},
+			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
+			      {name:'rowName',index:'rowName', sortable:true, editable:false},
 			      {name:'status',index:'status', align:'center', width:30, sortable:false, editable:false, search:false},
+			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false},
 			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
 			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false}
 			    ],
@@ -59,6 +60,7 @@
 						     height: "100%",
 						     width: 920,
 						     cellEdit:true,
+						     sortname: "id",
 						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 						     pager: subgrid_table_id + "_pager",
 							 rowList:[5,10,20,30],
@@ -66,14 +68,14 @@
 						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&login=" + userName,
 						     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Time Taken', 'Activity FeedBack', 'Mark'],
 						     colModel: [
-						       	{name:'activityId', width:10, index:'activityId', sortable:false, hidden:true, hidedlg:true},
-								{name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
+						       	{name:'id', width:10, index:'id', sortable:false, hidden:true, hidedlg:true},
+								{name:'rowName', width:60, index:'rowName', sortable:false, editable: false},
 								{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false},
 								{name:'output', width:250, index:'output', sortable:false, editable: false},
 								{name:'competences', width:250, index:'competences', sortable:false, editable: false, hidden:true},
-								{name:'timeTaken', width:50, index:'timeTaken', sortable:false, editable: false},
+								{name:'timeTaken', width:50, index:'timeTaken', sortable:true, editable: false},
 								{name:'feedback', width:250, index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}},
-								{name:'mark', width:100, index:'mark', sortable:false, editable: true, editrules:{number:true} }
+								{name:'mark', width:100, index:'mark', sortable:true, editable: true, editrules:{number:true} }
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
@@ -158,10 +160,10 @@
 				    sortname: "activityId", 
 				    colNames:["", 'Activity Name', 'Competences', 'Average Mark'],
 				    colModel:[
-				      {name:'activityId', width:10, index:'activityId', sortable:false, hidden:true, hidedlg:true},
-					  {name:'activityTitle', width:60, index:'activityTitle', sortable:false, editable: false},
+				      {name:'id', width:10, index:'id', sortable:false, hidden:true, hidedlg:true},
+					  {name:'rowName', width:60, index:'rowName', sortable:true, editable: false},
 				      {name:'competences', width:250, index:'competences', sortable:false, editable: false, hidden:true},
-				      {name:'average',index:'average', sortable:false, editable:false}
+				      {name:'mark',index:'mark', sortable:true, editable:false}
 				    ],
 				    loadError: function(xhr,st,err) {
 			    		jQuery("#activityView").clearGridData();
@@ -189,8 +191,8 @@
 							 rowNum:10,
 						     colNames: ['','Full Name','Progress','Outputs', 'Activity Feedback', 'Mark'],
 						     colModel:[
-						     	{name:'login', index:'login', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-						     	{name:'fullName',index:'fullName', sortable:true, editable:false},
+						     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
+						     	{name:'rowName',index:'rowName', sortable:true, editable:false},
 						      	{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false, search:false},
 						      	{name:'output', width:220, index:'output', sortable:false, editable: false, search:false},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false},

@@ -26,16 +26,18 @@
 			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 			    cellEdit: true,
 			    sortorder: "asc", 
-			    sortname: "lessonName", 
+			    sortname: "id", 
 			    pager: 'organisationGridPager',
 			    rowList:[5,10,20,30],
 			    rowNum:10,
-				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}&login=test1",
-			    colNames:["", 'Lesson Name', 'Sub-Group', 'Description', 'Average Mark'],
+				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}",
+			    colNames:["", 'Lesson Name', 'Sub-Group', 'Start Date', 'Average Time Taken', 'Description', 'Average Mark'],
 			    colModel:[
-			      {name:'lessonID', index:'lessonID', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-			      {name:'lessonName',index:'lessonName', sortable:true, editable:false},
-			      {name:'subGroup',index:'subGroup', sortable:true, editable:false, search:false},
+			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
+			      {name:'rowName',index:'rowName', sortable:true, editable:false},
+			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false},
+			      {name:'startDate',index:'startDate', sortable:false, editable:false, search:false},
+			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false},
 			      {name:'description',index:'description', sortable:false, editable:false, search:false},
 			      {name:'mark',index:'mark', sortable:true, editable:false, search:false}
 			    ],
@@ -58,15 +60,16 @@
 					     cellEdit:true,
 					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=" + lessonID,
 					     sortorder: "asc", 
-						 sortname: "fullName", 
+						 sortname: "rowName", 
 						 pager: subgrid_table_id + "_pager",
 						 rowList:[5,10,20,30],
 						 rowNum:10,
-					     colNames: ['','Full Name','Progress', 'Lesson Feedback', 'Lesson Mark'],
+					     colNames: ['','Full Name','Progress', 'Time Taken', 'Lesson Feedback', 'Lesson Mark'],
 					     colModel:[
-					     	{name:'login', index:'login', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
-					     	{name:'fullName',index:'fullName', sortable:true, editable:false},
+					     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
+					     	{name:'rowName',index:'rowName', sortable:true, editable:false},
 					      	{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false, search:false},
+					      	{name:'timeTaken', index:'timeTaken', sortable:true, editable:false, search:false},
 					     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false},
 					     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false}
 					     ],
@@ -155,17 +158,6 @@
 				}
 			});	
 		});
-		
-		
-		
-		function launchPopup(url,title) {
-			var wd = null;
-			if(wd && wd.open && !wd.closed){
-				wd.close();
-			}
-			wd = window.open(url,title,'resizable,width=1220,height=600,scrollbars');
-			wd.window.focus();
-		}	
 	</script>
 
 </lams:head>

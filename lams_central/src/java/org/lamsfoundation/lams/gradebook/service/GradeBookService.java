@@ -163,9 +163,8 @@ public class GradeBookService implements IGradeBookService {
 	if (learners != null) {
 	    for (User learner : learners) {
 		GBUserGridRowDTO gUserDTO = new GBUserGridRowDTO();
-		gUserDTO.setFirstName(learner.getFirstName());
-		gUserDTO.setLastName(learner.getLastName());
-		gUserDTO.setLogin(learner.getLogin());
+		gUserDTO.setRowName(learner.getLastName() + " " + learner.getFirstName());
+		gUserDTO.setId(new Long(learner.getUserId()));
 
 		GradeBookUserActivity gradeBookUserActivity = gradeBookDAO.getGradeBookUserDataForActivity(activity
 			.getActivityId(), learner.getUserId());
@@ -260,9 +259,8 @@ public class GradeBookService implements IGradeBookService {
 
 		for (User learner : learners) {
 		    GBUserGridRowDTO gradeBookUserDTO = new GBUserGridRowDTO();
-		    gradeBookUserDTO.setLogin(learner.getLogin());
-		    gradeBookUserDTO.setFirstName(learner.getFirstName());
-		    gradeBookUserDTO.setLastName(learner.getLastName());
+		    gradeBookUserDTO.setId(new Long(learner.getUserId()));
+		    gradeBookUserDTO.setRowName(learner.getLastName() +  " " + learner.getFirstName());
 
 		    // Setting the status and time taken for the user's lesson
 		    LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
@@ -391,9 +389,11 @@ public class GradeBookService implements IGradeBookService {
 		    if (lesson.getLessonClass().isStaffMember(user)) {
 			GBLessonGridRowDTO lessonRow = new GBLessonGridRowDTO();
 			lessonRow.setLessonName(lesson.getLessonName());
-			lessonRow.setLessonId(lesson.getLessonId());
+			lessonRow.setId(lesson.getLessonId());
 			lessonRow.setStartDate(getLocaleDateString(user, lesson.getStartDateTime()));
-			lessonRow.setAverageTime(gradeBookDAO.getAverageDurationLesson(lesson.getLessonId()));
+			
+			// Setting the timeTaken value as the average for the lesson, as this is not a specific user view
+			lessonRow.setTimeTaken(gradeBookDAO.getAverageDurationLesson(lesson.getLessonId()));
 
 			lessonRow.setLessonDescription(lesson.getLessonDescription());
 			lessonRow.setMark(gradeBookDAO.getAverageMarkForLesson(lesson.getLessonId()));
@@ -448,8 +448,8 @@ public class GradeBookService implements IGradeBookService {
      */
     private GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, Lesson lesson) {
 	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
-	gactivityDTO.setActivityId(activity.getActivityId());
-	gactivityDTO.setActivityTitle(activity.getTitle());
+	gactivityDTO.setId(activity.getActivityId());
+	gactivityDTO.setRowName(activity.getTitle());
 
 	if (activity.isToolActivity() && activity instanceof ToolActivity) {
 	    ToolActivity toolAct = (ToolActivity) activity;
@@ -489,8 +489,9 @@ public class GradeBookService implements IGradeBookService {
 		    }
 		}
 
+		// Settting the mark as an average for the class as this is not a specific user view
 		if (count != 0) {
-		    gactivityDTO.setAverage(sum / count);
+		    gactivityDTO.setMark(sum / count);
 		}
 	    }
 
@@ -514,8 +515,8 @@ public class GradeBookService implements IGradeBookService {
 		+ learner.getUserId());
 
 	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
-	gactivityDTO.setActivityId(activity.getActivityId());
-	gactivityDTO.setActivityTitle(activity.getTitle());
+	gactivityDTO.setId(activity.getActivityId());
+	gactivityDTO.setRowName(activity.getTitle());
 	gactivityDTO.setTimeTaken(activityTime);
 
 	GradeBookUserActivity gradeBookActivity = gradeBookDAO.getGradeBookUserDataForActivity(

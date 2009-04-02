@@ -25,8 +25,9 @@ package org.lamsfoundation.lams.gradebook.util;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,13 +39,72 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBIDComparator;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBMarkComparator;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBRowNameComparator;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBTimeTakenComparator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class GradeBookUtil {
 
+    /**
+     * Wrapper method for printing the xml for grid rows
+     * 
+     * It takes the list of rows along with the grid parameter and returns the 
+     * xml for the altered set
+     * 
+     * 
+     * @param gridRows
+     * @param view
+     * @param sortBy
+     * @param isSearch
+     * @param searchField
+     * @param searchOper
+     * @param searchString
+     * @param sortOrder
+     * @param rowLimit
+     * @param page
+     * @return
+     */
     @SuppressWarnings("unchecked")
-    public static String toGridXML(Collection gridRows, int page, int totalPages, String view) {
+    public static String toGridXML(List gridRows, String view, String sortBy, boolean isSearch, String searchField,
+	    String searchOper, String searchString, String sortOrder, int rowLimit, int page) {
+	
+	// Alter the set based on the parameters
+	gridRows = makeGridRowAlterations(gridRows, sortBy, isSearch, searchField, searchOper, searchString, sortOrder,
+		rowLimit, page);
+	// Work out the sublist to fetch based on rowlimit and current page.
+	int totalPages = 1;
+	if (rowLimit < gridRows.size()) {
+
+	    totalPages = new Double(Math.ceil(new Integer(gridRows.size()).doubleValue()
+		    / new Integer(rowLimit).doubleValue())).intValue();
+	    int firstRow = (page - 1) * rowLimit;
+	    int lastRow = firstRow + rowLimit;
+
+	    if (lastRow > gridRows.size()) {
+		gridRows = gridRows.subList(firstRow, gridRows.size());
+	    } else {
+		gridRows = gridRows.subList(firstRow, lastRow);
+	    }
+
+	}
+
+	return toGridXML(gridRows, page, totalPages, view);
+    }
+
+    /**
+     * Tranlates a list of grid rows into the required jqGrid xml
+     * 
+     * @param gridRows
+     * @param page
+     * @param totalPages
+     * @param view
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static String toGridXML(List gridRows, int page, int totalPages, String view) {
 	String xml = "";
 	try {
 	    Document document = getDocument();
@@ -68,13 +128,13 @@ public class GradeBookUtil {
 	    while (iter.hasNext()) {
 		GradeBookGridRowDTO gridRow = (GradeBookGridRowDTO) iter.next();
 		Element rowElement = document.createElement("row");
-		rowElement.setAttribute("id", gridRow.getRowId());
+		rowElement.setAttribute("id", gridRow.getId().toString());
 
 		// Work out which grid we want to put the data into
 		ArrayList<String> gridRowStringArray = new ArrayList<String>();
 
 		gridRowStringArray = gridRow.toStringArray(view);
-		
+
 		for (String gradeBookItem : gridRowStringArray) {
 		    Element cellElement = document.createElement("cell");
 		    gradeBookItem = (gradeBookItem != null) ? gradeBookItem : "";
@@ -114,6 +174,105 @@ public class GradeBookUtil {
 	Transformer transformer = tf.newTransformer();
 	transformer.transform(domSource, result);
 	return writer.toString();
+    }
+
+    /**
+     * Alters a grid row for sorting and searching
+     * 
+     * @param gridRows
+     * @param sortBy
+     * @param isSearch
+     * @param searchField
+     * @param searchOper
+     * @param searchString
+     * @param sortOrder
+     * @param rowLimit
+     * @param page
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private static List makeGridRowAlterations(List gridRows, String sortBy, boolean isSearch, String searchField,
+	    String searchOper, String searchString, String sortOrder, int rowLimit, int page) {
+
+	// Sort the list appropriately
+	if (sortBy != null) {
+	    if (sortBy.equals("rowName")) {
+		Collections.sort(gridRows, new GBRowNameComparator());
+	    } else if (sortBy.equals("mark")) {
+		Collections.sort(gridRows, new GBMarkComparator());
+	    } else if (sortBy.equals("id")) {
+		Collections.sort(gridRows, new GBIDComparator());
+	    } else if (sortBy.equals("timeTaken")) {
+		Collections.sort(gridRows, new GBTimeTakenComparator());
+	    } else {
+		Collections.sort(gridRows, new GBRowNameComparator());
+	    }
+	} else {
+	    Collections.sort(gridRows, new GBRowNameComparator());
+	}
+
+	// if it is a search fix up the set
+	if (isSearch && searchField != null && searchOper != null && searchString != null) {
+	    gridRows = (List<GradeBookGridRowDTO>) doRowNameSearch(gridRows, searchField, searchOper, searchString
+		    .toLowerCase());
+	}
+
+	// Reverse the order if requested
+	if (sortOrder != null && sortOrder.equals("desc")) {
+	    Collections.reverse(gridRows);
+	}
+
+	return gridRows;
+
+    }
+
+    /**
+     * Does the search operation on the set for row names
+     * 
+     * @param gradeBookRows
+     * @param searchField
+     * @param searchOper
+     * @param searchString
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private static List doRowNameSearch(List gradeBookRows, String searchField, String searchOper, String searchString) {
+	List<GradeBookGridRowDTO> ret = new ArrayList<GradeBookGridRowDTO>();
+
+	if (searchField.equals("rowName")) {
+	    Iterator it = gradeBookRows.iterator();
+
+	    while (it.hasNext()) {
+		GradeBookGridRowDTO userRow = (GradeBookGridRowDTO) it.next();
+
+		String rowName = userRow.getRowName();
+		rowName = rowName.toLowerCase();
+
+		if (searchOper.equals("eq")) {
+		    if (rowName.equals(searchString)) {
+			ret.add(userRow);
+		    }
+		} else if (searchOper.equals("ne")) {
+		    if (!rowName.equals(searchString)) {
+			ret.add(userRow);
+		    }
+		} else if (searchOper.equals("bw")) {
+		    if (rowName.startsWith(searchString)) {
+			ret.add(userRow);
+		    }
+		} else if (searchOper.equals("ew")) {
+		    if (rowName.endsWith(searchString)) {
+			ret.add(userRow);
+		    }
+		} else if (searchOper.equals("cn")) {
+		    if (rowName.contains(searchString)) {
+			ret.add(userRow);
+		    }
+		}
+	    }
+
+	}
+	return ret;
     }
 
 }
