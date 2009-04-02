@@ -7,7 +7,7 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 
 <link rel="stylesheet" type="text/css" media="screen" href="<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/grid.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="<lams:LAMSURL />includes/javascript/jqgrid/themes/jqModal.css" />
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery-latest.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jqgrid/js/jquery-1.2.6.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jqgrid/js/jquery.jqGrid.js" ></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jqgrid/js/jqModal.js" ></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jqgrid/js/jqDnR.js" ></script>
