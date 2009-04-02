@@ -65,7 +65,6 @@ import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.ExternalServerUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -254,18 +253,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 			
 			// save
 			videoRecorderService.saveOrUpdateVideoRecorderRecording(videoRecording);
-			
-			// if we want the recently
-			if(saveToLams){
-				// get folder dest
-				VIDEORECORDER_RECORDINGS_FOLDER_DEST = WebUtil.readStrParam(request, SAVE_TO_LAMS_DEST);
-				// get the stream from the external server
-			    InputStream is = ExternalServerUtil.getResponseInputStreamFromExternalServer(VIDEORECORDER_RECORDINGS_FOLDER_SRC + filename, new HashMap<String, String>());
-			    
-			    // write the flv file locally
-			    File file = ExternalServerUtil.writeFile(is, VIDEORECORDER_RECORDINGS_FOLDER_DEST + filename);
-			}
-			
+						
 			writeAJAXResponse(response, OK_MSG);
 			
 		}catch(Exception e){
