@@ -68,7 +68,7 @@ $.widget("ui.tabs", {
 			this.tabLabels = $(".ui-tabs-label");
 			this.imagesInTabs = $("img", this.list);
 			this.$panels = $([]);
-			this.leftMostScroll = 15;
+			this.leftMostScroll = 25;
 		}
 		else{
 			this.list = this.element.is('div') ? this.element.children('ul:first, ol:first').eq(0) : this.element;
@@ -122,7 +122,7 @@ $.widget("ui.tabs", {
 				this.$lis.addClass('ui-state-default ui-corner-top');
 				this.$panels.addClass('ui-tabs-panel ui-widget-content ui-corner-bottom');
 				
-				this.tabsHolder.animate( { scrollLeft: this.leftMostScroll}, this.scrollSpeed )
+				//this.tabsHolder.animate( { scrollLeft: this.leftMostScroll}, this.scrollSpeed )
 			}
 			else{
 				// attach necessary classes for styling
@@ -372,9 +372,13 @@ $.widget("ui.tabs", {
 				this.scrollableWidth += this.imagesInTabs[i].width;
 			}
 			
-			this.scrollableWidth += o.margins + this.leftMostScroll;
+			this.scrollableWidth += o.margins;
 			
 			$(".ui-tabs-wrapped").css("width", this.scrollableWidth + "px");
+			
+			if(init){
+				this.tabsHolder.animate( { scrollLeft: this.leftMostScroll }, this.scrollSpeed )
+			}
 		}
 		
 		// disable click if event is configured to something else
@@ -672,7 +676,7 @@ $.extend($.ui.tabs, {
 		spinner: 'Loading&#8230;',
 		tabTemplate: '<li><a href="#{href}"><span>#{label}</span></a></li>',
 		scrollable: false,
-		characterWidth: 10,
+		characterWidth: 9,
 		margins: 5,
 		scrollSpeed: 150,
 		scrollOffset: 100

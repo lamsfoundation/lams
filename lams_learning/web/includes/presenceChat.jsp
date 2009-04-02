@@ -56,11 +56,11 @@
 				<c:if test="${param.presenceImEnabled}">
 				<div id="presenceChatTabs">
 					<div id="tabWrapper">
-						<div id="scrollHolder" style="width: 580px;">
-							<div style="float: left; width: 3%;">
+						<div id="scrollHolder">
+							<div style="float: left; width: 5%; text-align: left;">
 								<a href="javascript:handleLeftScrollClick();"><img id="leftSlider" src="../images/icons/arrow_left.png" width="16" height="16" border="0" /></a>
 							</div>
-							<div id="tabsHolder" style="float: left; width: 67%; overflow:hidden;">
+							<div id="tabsHolder" style="float: left; width: 90%; overflow:hidden;">
 								<ul id="wrappedTabs">
 							        <li><a href="#groupchat">
 							        	<span>
@@ -74,7 +74,7 @@
 							        </a></li>
 								</ul>
 							</div>
-							<div style="float: left; width: 5%;">
+							<div style="float: left; width: 5%; text-align: right;">
 						 		<a href="javascript:handleRightScrollClick();"><img id="rightSlider" src="../images/icons/arrow_right.png" width="16" height="16" border="0" /></a>
 							</div>
 						</div>
@@ -98,7 +98,7 @@
 				</c:if>
 				<div id="presenceChatRoster">
 					<ul onclick="javascript:handlePresenceClick()">
-				        <li><a href="#presence" onclick="javascript:handlePresenceClick()">
+				        <li><a href="#presenceUserListings" onclick="javascript:handlePresenceClick()">
 				        	<span>
 				        		<table border="0" cellpadding="5" cellspacing="0">
 				        			<tr>
