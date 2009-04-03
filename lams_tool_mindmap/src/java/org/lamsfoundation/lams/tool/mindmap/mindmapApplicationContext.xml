@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+ 
+	<!--  $Id$ -->
+ 	<!-- Application context definition for Mindmap tool business layer. -->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	<bean id="mindmapMessageService" class="org.lamsfoundation.lams.util.MessageService" singleton="true">
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.mindmap.ApplicationResources</value></property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="mindmapOutputFactory" class="org.lamsfoundation.lams.tool.mindmap.service.MindmapOutputFactory">  
+    	<property name="toolMessageService"><ref bean="mindmapMessageService"/></property>  
+	</bean>
+	
+	<bean id="mindmapService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.tool.mindmap.service.MindmapService">
+				<property name="mindmapAttachmentDAO"><ref bean="mindmapAttachmentDAO"/></property>
+				<property name="mindmapSessionDAO"><ref bean="mindmapSessionDAO"/></property>
+				<property name="mindmapUserDAO"><ref bean="mindmapUserDAO"/></property>
+				<property name="mindmapNodeDAO"><ref bean="mindmapNodeDAO"/></property>
+				<property name="mindmapRequestDAO"><ref bean="mindmapRequestDAO"/></property>
+				<property name="mindmapDAO"><ref bean="mindmapDAO"/></property>
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+				<property name="learnerService"><ref bean="learnerService"/></property>	
+				<property name="auditService"><ref bean="auditService"/></property>		
+ 				<property name="mindmapToolContentHandler"><ref bean="mindmapToolContentHandler"/></property>
+		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
+		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		   		<property name="mindmapOutputFactory"><ref bean="mindmapOutputFactory"/></property>
+		   		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		   		<property name="mindmapMessageService"><ref bean="mindmapMessageService"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
+                <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
+
+				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED</prop>				
+			</props>
+		</property>
+	</bean>
+	
+	<!--  DAO classes -->
+	<bean id="mindmapDAO" class="org.lamsfoundation.lams.tool.mindmap.dao.hibernate.MindmapDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>  
+
+	<bean id="mindmapSessionDAO" class="org.lamsfoundation.lams.tool.mindmap.dao.hibernate.MindmapSessionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="mindmapUserDAO" class="org.lamsfoundation.lams.tool.mindmap.dao.hibernate.MindmapUserDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="mindmapNodeDAO" class="org.lamsfoundation.lams.tool.mindmap.dao.hibernate.MindmapNodeDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="mindmapRequestDAO" class="org.lamsfoundation.lams.tool.mindmap.dao.hibernate.MindmapRequestDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="mindmapAttachmentDAO" class="org.lamsfoundation.lams.tool.mindmap.dao.hibernate.MindmapAttachmentDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+ 	<bean id="mindmapToolContentHandler" class="org.lamsfoundation.lams.tool.mindmap.util.MindmapToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean>  
+
+</beans>
