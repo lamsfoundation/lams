@@ -76,10 +76,11 @@ import org.lamsfoundation.lams.vos.LearnerProgress;
 	    //Find The Hours
 	    var Hours:Number = (value/3600);
    		
-   		if(Hours > 1) 
+   		if(Hours > 1) {
    			formatStr += Hours.toFixed(0) + " " + dictionary.getLabel('chart.time.format.hours') + " ";
-   			
-   		if(Minutes > 1) formatStr += Number(Minutes).toFixed(1) + " " + dictionary.getLabel('chart.time.format.minutes') + " ";
+   			formatStr += (Minutes - (Math.floor(Hours)*60)).toFixed(1)
+   					  + " " + dictionary.getLabel('chart.time.format.minutes') + " ";
+   		} else if(Minutes > 1) formatStr += Minutes.toFixed(1) + " " + dictionary.getLabel('chart.time.format.minutes') + " ";
    		else formatStr += Seconds + " " + dictionary.getLabel('chart.time.format.seconds');
    		
    		return formatStr;
