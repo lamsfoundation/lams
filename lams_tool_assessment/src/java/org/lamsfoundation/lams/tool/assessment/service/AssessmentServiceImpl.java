@@ -475,6 +475,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	if (mark > 0) {
 	    float penalty = question.getPenaltyFactor()*numberWrongAnswers; 
 	    mark -= penalty;
+	    if (penalty > maxMark) {
+		penalty = maxMark;
+	    }
 	    questionResult.setPenalty(penalty);
 	}
 	if (mark < 0) {
@@ -486,6 +489,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
+    }
+    
+    public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
+	return assessmentResultDao.getLastFinishedAssessmentResult(assessmentUid, userId);
     }
     
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {

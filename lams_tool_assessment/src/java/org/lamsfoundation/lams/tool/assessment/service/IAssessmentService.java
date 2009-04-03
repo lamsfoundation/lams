@@ -177,6 +177,8 @@ public interface IAssessmentService {
     
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
     
+    AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
+    
     int getAssessmentResultCount(Long assessmentUid, Long userId);
     
     List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);

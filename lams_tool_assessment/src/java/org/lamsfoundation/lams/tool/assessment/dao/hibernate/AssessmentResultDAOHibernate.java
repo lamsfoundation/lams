@@ -30,7 +30,8 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
  
 public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements AssessmentResultDAO {
     
-    private static final String FIND_BY_ASSESSMENT_AND_USER = "from " + AssessmentResult.class.getName()
+    private static final String FIND_BY_ASSESSMENT_AND_USER = "from " 
+	    + AssessmentResult.class.getName()
 	    + " as r where r.user.userId = ? and r.assessment.uid=? order by r.startDate asc";
     
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "from "

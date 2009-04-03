@@ -379,7 +379,6 @@ public class LearningAction extends Action {
 	AssessmentUser assessmentUser = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 	IAssessmentService service = getAssessmentService();
 	service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
-	loadupLastAttempt(sessionMap);
 	
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, false);
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
@@ -611,7 +610,7 @@ public class LearningAction extends Action {
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	AssessmentResult result = service.getLastAssessmentResult(assessmentUid,userId);
+	AssessmentResult result = service.getLastFinishedAssessmentResult(assessmentUid,userId);
 	
 	for(LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
