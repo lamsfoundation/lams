@@ -799,6 +799,7 @@ CREATE TABLE lams_progress_completed (
        learner_progress_id BIGINT(20) NOT NULL
      , activity_id BIGINT(20) NOT NULL
      , completed_date_time DATETIME
+	 , start_date_time DATETIME
      , PRIMARY KEY (learner_progress_id, activity_id)
      , INDEX (learner_progress_id)
      , CONSTRAINT FK_lams_progress_completed_1 FOREIGN KEY (learner_progress_id)
