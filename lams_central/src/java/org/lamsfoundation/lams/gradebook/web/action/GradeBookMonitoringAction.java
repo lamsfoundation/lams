@@ -173,13 +173,13 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 	initServices();
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	String login = WebUtil.readStrParam(request, "id");
+	Integer userID = WebUtil.readIntParam(request, "id");
 	String markStr = WebUtil.readStrParam(request, "mark", true);
 	String feedback =  WebUtil.readStrParam(request, "feedback", true);
 	Lesson lesson = lessonService.getLesson(lessonID);
-	User learner = userService.getUserByLogin(login);
+	User learner = (User)userService.findById(User.class, userID);
 
-	if (lesson != null && learner != null) {
+	if (lesson != null || learner != null) {
 	    
 	    if (markStr != null && !markStr.equals("")) {
 		Double mark = Double.parseDouble(markStr);
@@ -215,22 +215,22 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	String method = WebUtil.readStrParam(request, "method");
 
 	Long activityID = null;
-	String login = null;
+	Integer userID = null;
 	
 	// Fetch the id based on which grid it came from
 	if (method.equals("activityView")) {
 	    activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	    login = WebUtil.readStrParam(request, "id");
+	    userID = WebUtil.readIntParam(request, "id");
 	} else if (method.equals("userView")) {
 	    activityID = WebUtil.readLongParam(request, "id");
-	    login = WebUtil.readStrParam(request, GradeBookConstants.PARAM_LOGIN);
+	    userID = WebUtil.readIntParam(request, "userID");
 	}
 
 	String markStr = WebUtil.readStrParam(request, "mark", true);
 	String feedback =  WebUtil.readStrParam(request, "feedback", true);
 
 	Activity activity = monitoringService.getActivityById(activityID);
-	User learner = userService.getUserByLogin(login);
+	User learner = (User)userService.findById(User.class, userID);
 	Lesson lesson = lessonService.getLesson(lessonID);
 
 	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {

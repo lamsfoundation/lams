@@ -131,7 +131,7 @@ public class GradeBookAction extends LamsDispatchAction {
 	    // Get the user gradebook list from the db
 	    // A slightly different list is needed for userview or activity view
 	    if (view.equals("userView")) {
-		Integer userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_LOGIN);
+		Integer userID = WebUtil.readIntParam(request, "userID");
 		User learner = (User) userService.findById(User.class, userID);
 		if (learner != null) {
 		    gradeBookActivityDTOs = gradeBookService.getGBActivityRowsForLearner(lesson, learner);
