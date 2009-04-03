@@ -56,6 +56,7 @@
 				<!-- lesson related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
+ 				<value>classpath:org/lamsfoundation/lams/lesson/CompletedActivityProgress.hbm.xml</value>
  				
 				<!-- Workspace related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/workspace/WorkspaceFolderContent.hbm.xml</value>

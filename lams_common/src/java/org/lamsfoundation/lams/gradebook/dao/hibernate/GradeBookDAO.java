@@ -48,8 +48,11 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
     private static final String GET_AVERAGE_MARK_FOR_LESSON = "select avg(gles.mark) from GradeBookUserLesson gles where "
 	    + "gles.lesson.lessonId=:lessonID";
 
-    private static final String GET_AVERAGE_COMPLETION_TIME = "select prog.finishDate, prog.startDate as x from LearnerProgress prog where "
+    private static final String GET_AVERAGE_COMPLETION_TIME = "select prog.finishDate, prog.startDate from LearnerProgress prog where "
 	    + "prog.lesson.lessonId=:lessonID";
+    
+    private static final String GET_AVERAGE_COMPLETION_TIME_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg, Activity act where "
+	    + "compProg.activity.activityId=:activityID";
 
     @SuppressWarnings("unchecked")
     public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID) {
@@ -117,6 +120,38 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
     public long getAverageDurationLesson(Long lessonID) {
 	List<Object[]> result = (List<Object[]>) getSession().createQuery(GET_AVERAGE_COMPLETION_TIME).setLong(
 		"lessonID", lessonID.longValue()).list();
+
+	if (result != null) {
+	    if (result.size() > 0) {
+
+		long sum = 0;
+		long count = 0;
+		for (Object[] dateObjs : result) {
+		    if (dateObjs != null && dateObjs.length == 2) {
+			Date finishDate = (Date) dateObjs[0];
+			Date startDate = (Date) dateObjs[1];
+
+			if (startDate != null && finishDate != null) {
+
+			    sum += finishDate.getTime() - startDate.getTime();
+			    count++;
+			}
+		    }
+		}
+
+		if (count > 0) {
+		    return sum / count;
+		}
+	    }
+
+	}
+	return 0;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public long getAverageDurationForActivity(Long activityID) {
+	List<Object[]> result = (List<Object[]>) getSession().createQuery(GET_AVERAGE_COMPLETION_TIME_ACTIVITY).setLong(
+		"activityID", activityID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0) {

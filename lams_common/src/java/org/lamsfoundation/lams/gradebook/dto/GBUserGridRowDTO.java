@@ -66,6 +66,12 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
 	    }
 
 	    ret.add(status);
+	    if (timeTaken != null) {
+		ret.add(convertTimeToString(timeTaken));
+	    } else {
+		ret.add("-");
+	    }
+	    
 	    ret.add(output);
 	    ret.add(feedback);
 	} else if (view.equals(VIEW_COURSE_MONITOR)){

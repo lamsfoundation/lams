@@ -83,6 +83,12 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 	    } else {
 		ret.add(rowName);
 	    }
+	    
+	    if (timeTaken != null) {
+		ret.add(convertTimeToString(timeTaken));
+	    } else {
+		ret.add("-");
+	    }
 
 	    ret.add(competences);
 

@@ -204,13 +204,13 @@ public class GradeBookService implements IGradeBookService {
 		.getActivityId());
 
 	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
-	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(firstActivity, lesson);
+	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity)firstActivity, lesson);
 	    gradeBookActivityDTOs.add(activityDTO);
 	}
 
 	for (Activity activity : activities) {
-	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()) {
-		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(activity, lesson);
+	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue() && activity instanceof ToolActivity) {
+		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity)activity, lesson);
 		gradeBookActivityDTOs.add(activityDTO);
 	    }
 	}
@@ -421,55 +421,52 @@ public class GradeBookService implements IGradeBookService {
      * @param lesson
      * @return
      */
-    private GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, Lesson lesson) {
+    private GBActivityGridRowDTO getGradeBookActivityDTO(ToolActivity activity, Lesson lesson) {
 	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
 	gactivityDTO.setId(activity.getActivityId());
 	gactivityDTO.setRowName(activity.getTitle());
+	
+	// setting the average time
+	gactivityDTO.setTimeTaken(gradeBookDAO.getAverageDurationForActivity(activity.getActivityId()));
 
-	if (activity.isToolActivity() && activity instanceof ToolActivity) {
-	    ToolActivity toolAct = (ToolActivity) activity;
+	String monitorUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + activity.getTool().getMonitorUrl() + "?"
+		+ AttributeNames.PARAM_CONTENT_FOLDER_ID + "=" + lesson.getLearningDesign().getContentFolderID() + "&"
+		+ AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + activity.getToolContentId();
+	gactivityDTO.setMonitorUrl(monitorUrl);
 
-	    String monitorUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + toolAct.getTool().getMonitorUrl()
-		    + "?" + AttributeNames.PARAM_CONTENT_FOLDER_ID + "="
-		    + lesson.getLearningDesign().getContentFolderID() + "&" + AttributeNames.PARAM_TOOL_CONTENT_ID
-		    + "=" + toolAct.getToolContentId();
-	    gactivityDTO.setMonitorUrl(monitorUrl);
-
-	    // Get the competences for this activity
-	    Set<CompetenceMapping> competenceMappings = toolAct.getCompetenceMappings();
-	    String competenceMappingsStr = "";
-	    if (competenceMappings != null) {
-		for (CompetenceMapping mapping : competenceMappings) {
-		    competenceMappingsStr += mapping.getCompetence().getTitle() + ", ";
-		}
-
-		// trim the last comma off
-		if (competenceMappingsStr.length() > 0) {
-		    competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
-		}
+	// Get the competences for this activity
+	Set<CompetenceMapping> competenceMappings = activity.getCompetenceMappings();
+	String competenceMappingsStr = "";
+	if (competenceMappings != null) {
+	    for (CompetenceMapping mapping : competenceMappings) {
+		competenceMappingsStr += mapping.getCompetence().getTitle() + ", ";
 	    }
-	    gactivityDTO.setCompetences(competenceMappingsStr);
 
-	    List<GradeBookUserActivity> gradeBookUserActivities = gradeBookDAO
-		    .getAllGradeBookUserActivitiesForActivity(activity.getActivityId());
+	    // trim the last comma off
+	    if (competenceMappingsStr.length() > 0) {
+		competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
+	    }
+	}
+	gactivityDTO.setCompetences(competenceMappingsStr);
 
-	    if (gradeBookUserActivities != null) {
+	List<GradeBookUserActivity> gradeBookUserActivities = gradeBookDAO
+		.getAllGradeBookUserActivitiesForActivity(activity.getActivityId());
 
-		double sum = 0;
-		double count = 0;
-		for (GradeBookUserActivity gact : gradeBookUserActivities) {
-		    if (gact.getMark() != null) {
-			count++;
-			sum += gact.getMark();
-		    }
-		}
+	if (gradeBookUserActivities != null) {
 
-		// Settting the mark as an average for the class as this is not a specific user view
-		if (count != 0) {
-		    gactivityDTO.setMark(sum / count);
+	    double sum = 0;
+	    double count = 0;
+	    for (GradeBookUserActivity gact : gradeBookUserActivities) {
+		if (gact.getMark() != null) {
+		    count++;
+		    sum += gact.getMark();
 		}
 	    }
 
+	    // Settting the mark as an average for the class as this is not a specific user view
+	    if (count != 0) {
+		gactivityDTO.setMark(sum / count);
+	    }
 	}
 
 	return gactivityDTO;

@@ -42,6 +42,8 @@ public interface IGradeBookDAO extends IBaseDAO{
     public Double getAverageMarkForLesson(Long lessonID);
     
     public long getAverageDurationLesson(Long lessonID);
+    
+    public long getAverageDurationForActivity(Long activityID);
 
 }
  

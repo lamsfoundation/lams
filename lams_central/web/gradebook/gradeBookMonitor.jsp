@@ -158,11 +158,12 @@
 			    	rowNum:10,
 				    sortorder: "asc", 
 				    sortname: "activityId", 
-				    colNames:["", 'Activity Name', 'Competences', 'Average Mark'],
+				    colNames:["", 'Activity Name', 'Average Time Taken', 'Competences', 'Average Mark'],
 				    colModel:[
 				      {name:'id', width:10, index:'id', sortable:false, hidden:true, hidedlg:true},
 					  {name:'rowName', width:60, index:'rowName', sortable:true, editable: false},
-				      {name:'competences', width:250, index:'competences', sortable:false, editable: false, hidden:true},
+					  {name:'timeTaken', index:'timeTaken', sortable:true, editable: false},
+					  {name:'competences', width:250, index:'competences', sortable:false, editable: false, hidden:true},
 				      {name:'mark',index:'mark', sortable:true, editable:false}
 				    ],
 				    loadError: function(xhr,st,err) {
@@ -189,11 +190,12 @@
 							 pager: subgrid_table_id + "_pager",
 							 rowList:[5,10,20,30],
 							 rowNum:10,
-						     colNames: ['','Full Name','Progress','Outputs', 'Activity Feedback', 'Mark'],
+						     colNames: ['','Full Name','Progress', 'Time Taken', 'Outputs', 'Activity Feedback', 'Mark'],
 						     colModel:[
 						     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'rowName',index:'rowName', sortable:true, editable:false},
 						      	{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false, search:false},
+						      	{name:'timeTaken', width:50, index:'timeTaken', sortable:true, editable: false},
 						      	{name:'output', width:220, index:'output', sortable:false, editable: false, search:false},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false},
 						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false}
