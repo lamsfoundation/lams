@@ -58,7 +58,11 @@ CREATE TABLE lams_registration (
 INSERT into lams_workspace_folder_type VALUES (3, 'PUBLIC SEQUENCES');
 
 -- LDEV-2115 --------------
-ALTER TABLE lams_progress_completed ADD COLUMN completed_date_time DATETIME NOT NULL;
+ALTER TABLE lams_progress_completed ADD COLUMN completed_date_time DATETIME;
+
+-- LDEV-2173 -------------- Adding in start dates for activities for gradebook
+ALTER TABLE lams_progress_attempted ADD COLUMN start_date_time DATETIME;
+ALTER TABLE lams_progress_completed ADD COLUMN start_date_time DATETIME;
 
 -- LDEV-2163 --------------
 CREATE TABLE lams_activity_evaluation (

@@ -34,21 +34,21 @@
 			
 		<property name="finishDate" type="java.util.Date"
 			column="finish_date_time" />
-
-		<!-- uni-directional one-to-many association to attempted acitivities -->
-		<set name="attemptedActivities" lazy="false" batch-size="20"
-			cascade="none" table="lams_progress_attempted">
-			<key>
-				<column name="learner_progress_id" />
-			</key>
-			<many-to-many column="activity_id"
-				class="org.lamsfoundation.lams.learningdesign.Activity" />
-		</set>
+		
+		<map name="attemptedActivities" lazy="false" batch-size="20" cascade="none" table="lams_progress_attempted">
+			<key column="learner_progress_id"/>
+			<index-many-to-many column="activity_id" class="org.lamsfoundation.lams.learningdesign.Activity"/>
+			<element column="start_date_time" type="java.util.Date"/>
+		</map>
 
 		<map name="completedActivities" lazy="false" batch-size="20" cascade="none" table="lams_progress_completed">
 			<key column="learner_progress_id"/>
 			<index-many-to-many column="activity_id" class="org.lamsfoundation.lams.learningdesign.Activity"/>
-			<element column="completed_date_time" type="java.util.Date"/>
+			
+			<composite-element class="org.lamsfoundation.lams.lesson.CompletedActivityProgress">
+		        <property name="startDate" type="java.util.Date" not-null="false" update="true" insert="true" column="start_date_time" />
+				<property name="finishDate" type="java.util.Date" update="true" insert="true" column="completed_date_time" not-null="false" />
+		    </composite-element>
 		</map>
 
 		<!-- bi-directional many-to-one association to User -->

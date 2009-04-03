@@ -310,7 +310,7 @@ public class LearningWebUtil
 		} else {
 			progressSummary.append("attempted=");
 			boolean first = true;
-			for (Object obj : learnerProgress.getAttemptedActivities()) {
+			for (Object obj : learnerProgress.getAttemptedActivities().keySet()) {
 				Activity activity = (Activity ) obj;
 				if ( ! first ) {
 					progressSummary.append("_");

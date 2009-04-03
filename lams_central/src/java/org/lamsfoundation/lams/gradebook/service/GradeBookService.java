@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -105,24 +106,9 @@ public class GradeBookService implements IGradeBookService {
 	Activity firstActivity = monitoringService.getActivityById(lesson.getLearningDesign().getFirstActivity()
 		.getActivityId());
 
-	long accumulatedTime = 0;
-	long startTime = 0;
-	if (learnerProgress != null) {
-	    startTime = learnerProgress.getStartDate().getTime();
-	}
-
 	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
-	    long firstActivityTime = 0;
-	    if (learnerProgress != null) {
-		if (learnerProgress.getCompletedActivities().get(firstActivity) != null) {
-		    firstActivityTime = ((Date) learnerProgress.getCompletedActivities().get(firstActivity)).getTime()
-			    - startTime - accumulatedTime;
-		    accumulatedTime += firstActivityTime;
-		}
-	    }
 
-	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(firstActivity, learner, learnerProgress,
-		    firstActivityTime);
+	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(firstActivity, learner, learnerProgress);
 	    gradeBookActivityDTOs.add(activityDTO);
 	}
 
@@ -131,18 +117,8 @@ public class GradeBookService implements IGradeBookService {
 	for (Activity activity : sortedActivities) {
 	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()) {
 
-		long activityTime = 0;
-		if (learnerProgress != null) {
-		    if (learnerProgress.getCompletedActivities().get(activity) != null) {
-			activityTime = ((Date) learnerProgress.getCompletedActivities().get(activity)).getTime()
-				- startTime - accumulatedTime;
-			accumulatedTime += activityTime;
-		    }
 
-		}
-
-		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(activity, learner, learnerProgress,
-			activityTime);
+		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(activity, learner, learnerProgress);
 		gradeBookActivityDTOs.add(activityDTO);
 	    }
 	}
@@ -173,6 +149,8 @@ public class GradeBookService implements IGradeBookService {
 		LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
 			.getLessonId());
 		gUserDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
+		gUserDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
+		
 
 		// Set the outputs and activity url, if there is one
 		if (activity.isToolActivity() && activity instanceof ToolActivity) {
@@ -260,7 +238,7 @@ public class GradeBookService implements IGradeBookService {
 		for (User learner : learners) {
 		    GBUserGridRowDTO gradeBookUserDTO = new GBUserGridRowDTO();
 		    gradeBookUserDTO.setId(new Long(learner.getUserId()));
-		    gradeBookUserDTO.setRowName(learner.getLastName() +  " " + learner.getFirstName());
+		    gradeBookUserDTO.setRowName(learner.getLastName() + " " + learner.getFirstName());
 
 		    // Setting the status and time taken for the user's lesson
 		    LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
@@ -391,7 +369,7 @@ public class GradeBookService implements IGradeBookService {
 			lessonRow.setLessonName(lesson.getLessonName());
 			lessonRow.setId(lesson.getLessonId());
 			lessonRow.setStartDate(getLocaleDateString(user, lesson.getStartDateTime()));
-			
+
 			// Setting the timeTaken value as the average for the lesson, as this is not a specific user view
 			lessonRow.setTimeTaken(gradeBookDAO.getAverageDurationLesson(lesson.getLessonId()));
 
@@ -509,7 +487,7 @@ public class GradeBookService implements IGradeBookService {
      * @return
      */
     private GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, User learner,
-	    LearnerProgress learnerProgress, long activityTime) {
+	    LearnerProgress learnerProgress) {
 
 	logger.debug("Getting gradebook data for activity: " + activity.getActivityId() + ". For user: "
 		+ learner.getUserId());
@@ -517,7 +495,6 @@ public class GradeBookService implements IGradeBookService {
 	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
 	gactivityDTO.setId(activity.getActivityId());
 	gactivityDTO.setRowName(activity.getTitle());
-	gactivityDTO.setTimeTaken(activityTime);
 
 	GradeBookUserActivity gradeBookActivity = gradeBookDAO.getGradeBookUserDataForActivity(
 		activity.getActivityId(), learner.getUserId());
@@ -526,6 +503,8 @@ public class GradeBookService implements IGradeBookService {
 	    gactivityDTO.setFeedback(gradeBookActivity.getFeedback());
 	}
 
+	// Setting status
+	gactivityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
 	gactivityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 
 	if (activity.isToolActivity() && activity instanceof ToolActivity) {
@@ -559,6 +538,22 @@ public class GradeBookService implements IGradeBookService {
 	}
 
 	return gactivityDTO;
+    }
+    
+    private Long getActivityDuration(LearnerProgress learnerProgress, Activity activity) {
+	if (learnerProgress != null) {
+	    if (learnerProgress.getCompletedActivities().get(activity) != null) {
+		CompletedActivityProgress compProg = learnerProgress.getCompletedActivities().get(activity);
+		if (compProg != null) {
+		    Date startTime = compProg.getStartDate();
+		    Date endTime = compProg.getFinishDate();
+		    if (startTime != null && endTime != null) {
+			return endTime.getTime() - startTime.getTime();
+		    }
+		}
+	    }
+	}
+	return null;
     }
 
     /**

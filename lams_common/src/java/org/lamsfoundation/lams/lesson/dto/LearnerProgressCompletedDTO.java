@@ -22,16 +22,15 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.lesson.dto;
 
-
 /**
  * The data transfer object for remoting data communication.
+ * 
  * @author Jacky Fang
- * @since  2005-3-11
+ * @since 2005-3-11
  * @version 1.1
  * 
  */
-public class LearnerProgressCompletedDTO
-{
+public class LearnerProgressCompletedDTO {
 
     private Long lessonId;
     private String lessonName;
@@ -39,92 +38,84 @@ public class LearnerProgressCompletedDTO
     private String lastName;
     private String firstName;
     private Integer learnerId;
-    private CompletedActivityDTO [] completedActivities;
+    private CompletedActivityDTO[] completedActivities;
     private Boolean lessonComplete;
-    
+
     private Long lessonStartTime;
     private Long learnerStartTime;
-    
-    
+
     /**
-     * Full constructor 
+     * Full constructor
      */
-    public LearnerProgressCompletedDTO(Long lessonId,
-                              String lessonName,
-                              String userName,
-                              String lastName,
-                              String firstName,
-                              Integer learnerId,
-                              CompletedActivityDTO[] completedActivities,
-                              Boolean lessonComplete,
-                              Long lessonStartTime,
-                              Long learnerStartTime)
-    {
-        this.lessonId = lessonId;
-        this.lessonName = lessonName;
-        this.userName = userName;
-        this.lastName = lastName;
-        this.firstName = firstName;
-        this.learnerId = learnerId;
-        this.completedActivities = completedActivities;
-        this.lessonComplete = lessonComplete;
-        this.lessonStartTime = lessonStartTime;
-        this.learnerStartTime = learnerStartTime;
+    public LearnerProgressCompletedDTO(Long lessonId, String lessonName, String userName, String lastName,
+	    String firstName, Integer learnerId, CompletedActivityDTO[] completedActivities, Boolean lessonComplete,
+	    Long lessonStartTime, Long learnerStartTime) {
+	this.lessonId = lessonId;
+	this.lessonName = lessonName;
+	this.userName = userName;
+	this.lastName = lastName;
+	this.firstName = firstName;
+	this.learnerId = learnerId;
+	this.completedActivities = completedActivities;
+	this.lessonComplete = lessonComplete;
+	this.lessonStartTime = lessonStartTime;
+	this.learnerStartTime = learnerStartTime;
     }
 
     /**
      * @return Returns the learnerId.
      */
-    public Integer getLearnerId()
-    {
-        return learnerId;
+    public Integer getLearnerId() {
+	return learnerId;
     }
+
     /**
      * @return Returns the lessonId.
      */
-    public Long getLessonId()
-    {
-        return lessonId;
+    public Long getLessonId() {
+	return lessonId;
     }
+
     /**
      * @return Returns the lessonName.
      */
-    public String getLessonName()
-    {
-        return lessonName;
+    public String getLessonName() {
+	return lessonName;
     }
+
     /**
      * @return Returns the userName.
      */
-    public String getUserName()
-    {
-        return userName;
+    public String getUserName() {
+	return userName;
     }
-    
+
     /**
      * @return Returns the completedActivities.
      */
-    public CompletedActivityDTO[] getCompletedActivities()
-    {
-        return completedActivities;
+    public CompletedActivityDTO[] getCompletedActivities() {
+	return completedActivities;
     }
-	public String getFirstName() {
-		return firstName;
-	}
 
-	public String getLastName() {
-		return lastName;
-	}
+    public String getFirstName() {
+	return firstName;
+    }
 
-	public Boolean getLessonComplete() {
-		return lessonComplete;
-	}    
-	
-	public Long getLessonStartTime() {
-		return lessonStartTime;
-	}
-	
-	public Long getLearnerStartTime() {
-		return learnerStartTime;
-	}
+    public String getLastName() {
+	return lastName;
+    }
+
+    public Boolean getLessonComplete() {
+	return lessonComplete;
+    }
+
+    public Long getLessonStartTime() {
+	return lessonStartTime;
+    }
+
+    public Long getLearnerStartTime() {
+	return learnerStartTime;
+    }
+    
 }
+

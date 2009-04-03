@@ -626,7 +626,7 @@ public class LessonService implements ILessonService {
 
 	boolean recordUpdated = false;
 
-	boolean removed = progress.getAttemptedActivities().remove(activity);
+	boolean removed = (progress.getAttemptedActivities().remove(activity) != null);
 	if (removed) {
 	    recordUpdated = true;
 	    LessonService.log.debug("Removed activity from attempted activities");
