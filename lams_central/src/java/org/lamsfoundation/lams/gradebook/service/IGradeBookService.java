@@ -29,6 +29,7 @@ import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -64,7 +65,7 @@ public interface IGradeBookService {
      * @param activity
      * @return
      */
-    public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, Activity activity);
+    public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity);
     
     /**
      * Gets the user rows and the user's entire lesson mark for all users 

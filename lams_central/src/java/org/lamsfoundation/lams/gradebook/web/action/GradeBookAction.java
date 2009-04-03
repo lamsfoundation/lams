@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.gradebook.web.action;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -41,13 +40,11 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
-import org.lamsfoundation.lams.gradebook.dto.comparators.GBIDComparator;
-import org.lamsfoundation.lams.gradebook.dto.comparators.GBMarkComparator;
-import org.lamsfoundation.lams.gradebook.dto.comparators.GBRowNameComparator;
 import org.lamsfoundation.lams.gradebook.service.IGradeBookService;
 import org.lamsfoundation.lams.gradebook.util.GradeBookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradeBookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -147,28 +144,6 @@ public class GradeBookAction extends LamsDispatchAction {
 		gradeBookActivityDTOs = gradeBookService.getGBActivityRowsForLesson(lesson);
 	    }
 
-	    //	    // Work out the sublist to fetch based on rowlimit and current page.
-	    //	    int totalPages = 1;
-	    //	    if (rowLimit < gradeBookActivityDTOs.size()) {
-	    //
-	    //		totalPages = new Double(Math.ceil(new Integer(gradeBookActivityDTOs.size()).doubleValue()
-	    //			/ new Integer(rowLimit).doubleValue())).intValue();
-	    //		int firstRow = (page - 1) * rowLimit;
-	    //		int lastRow = firstRow + rowLimit;
-	    //
-	    //		if (lastRow > gradeBookActivityDTOs.size()) {
-	    //		    gradeBookActivityDTOs = gradeBookActivityDTOs.subList(firstRow, gradeBookActivityDTOs.size());
-	    //		} else {
-	    //		    gradeBookActivityDTOs = gradeBookActivityDTOs.subList(firstRow, lastRow);
-	    //		}
-	    //
-	    //	    }
-
-	    //	    String ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, page, totalPages, method);
-
-	    // public static String toGridXML(List gridRows, String view, String sortBy, boolean isSearch, String searchField,
-	    //  	String searchOper, String searchString, String sortOrder, int rowLimit, int page)
-
 	    if (sortBy == null) {
 		sortBy = "id";
 	    }
@@ -238,59 +213,15 @@ public class GradeBookAction extends LamsDispatchAction {
 		Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
 		Activity activity = monitoringService.getActivityById(activityID);
-		if (activity != null) {
-		    gradeBookUserDTOs = gradeBookService.getGBUserRowsForActivity(lesson, activity);
+		if (activity != null && activity instanceof ToolActivity) {
+		    gradeBookUserDTOs = gradeBookService.getGBUserRowsForActivity(lesson, (ToolActivity)activity);
 		} else {
 		    // return null and the grid will report an error
 		    logger.error("No activity found for: " + activityID);
 		    return null;
 		}
 	    }
-
-	    //	    // Sort the list appropriately
-	    //	    if (sortBy != null) {
-	    //		if (sortBy.equals("rowName")) {
-	    //		    Collections.sort(gradeBookUserDTOs, new GBRowNameComparator());
-	    //		} else if (sortBy.equals("mark")) {
-	    //		    Collections.sort(gradeBookUserDTOs, new GBMarkComparator());
-	    //		} else {
-	    //		    Collections.sort(gradeBookUserDTOs, new GBRowNameComparator());
-	    //		}
-	    //	    } else {
-	    //		Collections.sort(gradeBookUserDTOs, new GBRowNameComparator());
-	    //	    }
-	    //
-	    //	    // if it is a search fix up the set
-	    //	    if (isSearch) {
-	    //		String searchField = WebUtil.readStrParam(request, "searchField");
-	    //		String searchOper = WebUtil.readStrParam(request, "searchOper");
-	    //		String searchString = WebUtil.readStrParam(request, "searchString");
-	    //		gradeBookUserDTOs = (List<GBUserGridRowDTO>)doRowNameSearch(gradeBookUserDTOs, searchField, searchOper, searchString.toLowerCase());
-	    //	    }
-	    //
-	    //	    // Reverse the order if requested
-	    //	    if (sortOrder != null && sortOrder.equals("desc")) {
-	    //		Collections.reverse(gradeBookUserDTOs);
-	    //	    }
-	    //
-	    //	    // Work out the sublist to fetch based on rowlimit and current page.
-	    //	    int totalPages = 1;
-	    //	    if (rowLimit < gradeBookUserDTOs.size()) {
-	    //
-	    //		totalPages = new Double(Math.ceil(new Integer(gradeBookUserDTOs.size()).doubleValue()
-	    //			/ new Integer(rowLimit).doubleValue())).intValue();
-	    //		int firstRow = (page - 1) * rowLimit;
-	    //		int lastRow = firstRow + rowLimit;
-	    //
-	    //		if (lastRow > gradeBookUserDTOs.size()) {
-	    //		    gradeBookUserDTOs = gradeBookUserDTOs.subList(firstRow, gradeBookUserDTOs.size());
-	    //		} else {
-	    //		    gradeBookUserDTOs = gradeBookUserDTOs.subList(firstRow, lastRow);
-	    //		}
-	    //
-	    //	    }
-
-	    //String ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, page, totalPages, method);
+	    
 	    String ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, view, sortBy, isSearch, searchField, searchOper,
 		    searchString, sortOrder, rowLimit, page);
 
@@ -350,51 +281,6 @@ public class GradeBookAction extends LamsDispatchAction {
 		List<GBLessonGridRowDTO> gradeBookLessonDTOs = new ArrayList<GBLessonGridRowDTO>();
 
 		gradeBookLessonDTOs = gradeBookService.getGBLessonRows(organisation, user);
-
-		//		// if it is a search fix up the set
-		//		if (isSearch) {
-		//		    String searchField = WebUtil.readStrParam(request, "searchField");
-		//		    String searchOper = WebUtil.readStrParam(request, "searchOper");
-		//		    String searchString = WebUtil.readStrParam(request, "searchString");
-		//		    gradeBookLessonDTOs = (List<GBLessonGridRowDTO>)doRowNameSearch(gradeBookLessonDTOs, searchField, searchOper, searchString
-		//			    .toLowerCase());
-		//		}
-		//
-		//		// Sort the list appropriately
-		//		if (sortBy != null) {
-		//		    if (sortBy.equals("lessonName")) {
-		//			Collections.sort(gradeBookLessonDTOs, new GBRowNameComparator());
-		//		    } else if (sortBy.equals("mark")) {
-		//			Collections.sort(gradeBookLessonDTOs, new GBMarkComparator());
-		//		    } else {
-		//			Collections.sort(gradeBookLessonDTOs, new GBIDComparator());
-		//		    }
-		//		} else {
-		//		    Collections.sort(gradeBookLessonDTOs, new GBIDComparator());
-		//		}
-		//
-		//		// Reverse the order if requested
-		//		if (sortOrder != null && sortOrder.equals("desc")) {
-		//		    Collections.reverse(gradeBookLessonDTOs);
-		//		}
-		//
-		//		// Work out the sublist to fetch based on rowlimit and current page.
-		//		int totalPages = 1;
-		//		if (rowLimit < gradeBookLessonDTOs.size()) {
-		//
-		//		    totalPages = new Double(Math.ceil(new Integer(gradeBookLessonDTOs.size()).doubleValue()
-		//			    / new Integer(rowLimit).doubleValue())).intValue();
-		//
-		//		    int firstRow = (page - 1) * rowLimit;
-		//		    int lastRow = firstRow + rowLimit;
-		//
-		//		    if (lastRow > gradeBookLessonDTOs.size()) {
-		//			gradeBookLessonDTOs = gradeBookLessonDTOs.subList(firstRow, gradeBookLessonDTOs.size());
-		//		    } else {
-		//			gradeBookLessonDTOs = gradeBookLessonDTOs.subList(firstRow, lastRow);
-		//		    }
-		//
-		//		}
 
 		if (sortBy == null) {
 		    sortBy = "id";

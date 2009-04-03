@@ -106,19 +106,21 @@ public class GradeBookService implements IGradeBookService {
 	Activity firstActivity = monitoringService.getActivityById(lesson.getLearningDesign().getFirstActivity()
 		.getActivityId());
 
-	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
+	if (firstActivity != null && firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
 
-	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(firstActivity, learner, learnerProgress);
+	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity) firstActivity, learner,
+		    learnerProgress);
 	    gradeBookActivityDTOs.add(activityDTO);
 	}
 
 	SortedSet<Activity> sortedActivities = new TreeSet<Activity>(activities);
 
 	for (Activity activity : sortedActivities) {
-	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()) {
+	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()
+		    && activity instanceof ToolActivity) {
 
-
-		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO(activity, learner, learnerProgress);
+		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity) activity, learner,
+			learnerProgress);
 		gradeBookActivityDTOs.add(activityDTO);
 	    }
 	}
@@ -130,7 +132,7 @@ public class GradeBookService implements IGradeBookService {
      *      org.lamsfoundation.lams.learningdesign.Activity)
      */
     @SuppressWarnings("unchecked")
-    public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, Activity activity) {
+    public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity) {
 
 	List<GBUserGridRowDTO> gradeBookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 
@@ -150,22 +152,17 @@ public class GradeBookService implements IGradeBookService {
 			.getLessonId());
 		gUserDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 		gUserDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
-		
 
-		// Set the outputs and activity url, if there is one
-		if (activity.isToolActivity() && activity instanceof ToolActivity) {
-		    ToolActivity toolAct = (ToolActivity) activity;
-		    // Get the tool outputs for this user if there are any
-		    ToolSession toolSession = toolService.getToolSessionByLearner(learner, toolAct);
-		    if (toolSession != null) {
-			// Set the activityLearner URL for this gradebook activity
-			gUserDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
-				+ toolAct.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
-				+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
+		// Get the tool outputs for this user if there are any
+		ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
+		if (toolSession != null) {
+		    // Set the activityLearner URL for this gradebook activity
+		    gUserDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
+			    + "&toolSessionID=" + toolSession.getToolSessionId().toString());
 
-			gUserDTO.setOutput(this.getToolOutputsStr(toolAct, toolSession, learner));
+		    gUserDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
 
-		    }
 		}
 
 		// Add marks and feedback
@@ -486,7 +483,7 @@ public class GradeBookService implements IGradeBookService {
      * @param learnerProgress
      * @return
      */
-    private GBActivityGridRowDTO getGradeBookActivityDTO(Activity activity, User learner,
+    private GBActivityGridRowDTO getGradeBookActivityDTO(ToolActivity activity, User learner,
 	    LearnerProgress learnerProgress) {
 
 	logger.debug("Getting gradebook data for activity: " + activity.getActivityId() + ". For user: "
@@ -507,39 +504,35 @@ public class GradeBookService implements IGradeBookService {
 	gactivityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
 	gactivityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 
-	if (activity.isToolActivity() && activity instanceof ToolActivity) {
-	    ToolActivity toolAct = (ToolActivity) activity;
-
-	    // Get the competences for this activity
-	    Set<CompetenceMapping> competenceMappings = toolAct.getCompetenceMappings();
-	    String competenceMappingsStr = "";
-	    if (competenceMappings != null) {
-		for (CompetenceMapping mapping : competenceMappings) {
-		    competenceMappingsStr += mapping.getCompetence().getTitle() + ", ";
-		}
-
-		// trim the last comma off
-		if (competenceMappingsStr.length() > 0) {
-		    competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
-		}
+	// Get the competences for this activity
+	Set<CompetenceMapping> competenceMappings = activity.getCompetenceMappings();
+	String competenceMappingsStr = "";
+	if (competenceMappings != null) {
+	    for (CompetenceMapping mapping : competenceMappings) {
+		competenceMappingsStr += mapping.getCompetence().getTitle() + ", ";
 	    }
-	    gactivityDTO.setCompetences(competenceMappingsStr);
 
-	    // Get the tool outputs for this user if there are any
-	    ToolSession toolSession = toolService.getToolSessionByLearner(learner, toolAct);
-	    if (toolSession != null) {
-		// Set the activityLearner URL for this gradebook activity
-		gactivityDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
-			+ toolAct.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
-			+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
-
-		gactivityDTO.setOutput(this.getToolOutputsStr(toolAct, toolSession, learner));
+	    // trim the last comma off
+	    if (competenceMappingsStr.length() > 0) {
+		competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
 	    }
+	}
+	gactivityDTO.setCompetences(competenceMappingsStr);
+
+	// Get the tool outputs for this user if there are any
+	ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
+	if (toolSession != null) {
+	    // Set the activityLearner URL for this gradebook activity
+	    gactivityDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
+		    + activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId() + "&toolSessionID="
+		    + toolSession.getToolSessionId().toString());
+
+	    gactivityDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
 	}
 
 	return gactivityDTO;
     }
-    
+
     private Long getActivityDuration(LearnerProgress learnerProgress, Activity activity) {
 	if (learnerProgress != null) {
 	    if (learnerProgress.getCompletedActivities().get(activity) != null) {
