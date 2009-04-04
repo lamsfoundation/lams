@@ -251,9 +251,9 @@
 								<fmt:message key="label.learning.resubmit" />
 							</html:button>				
 						</c:if>					
-						<html:button property="FinishButton" onclick="return finishSession()" styleClass="button">
-							<fmt:message key="label.learning.next.activity" />
-						</html:button>
+						<html:link href="javascript:;" property="FinishButton" onclick="return finishSession()" styleClass="button">
+							<span class="nextActivity"><fmt:message key="label.learning.next.activity" /></span>
+						</html:link>
 					</c:otherwise>
 				</c:choose>
 			</div>
