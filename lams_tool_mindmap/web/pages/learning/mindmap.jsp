@@ -17,6 +17,8 @@
 
 		// Sets mindmap content in Flash
 		setMindmapContent();
+		var f = document.getElementById('learnerForm');
+		f.submit();
 	}
 	
 	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", 
@@ -67,7 +69,7 @@
 
 	&nbsp;
 
-	<html:form action="/learning" method="post" onsubmit="return validateForm();">
+	<html:form action="/learning" method="post" onsubmit="return validateForm();" styleId="learnerForm">
 		<html:hidden property="userId" value="${userIdParam}" />
 		<html:hidden property="toolContentId" value="${toolContentIdParam}" />
 		<html:hidden property="toolSessionID" />
@@ -101,9 +103,9 @@
 		
 			<c:otherwise>
 				<div class="space-bottom-top align-right">
-					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message>button.next</fmt:message>
-					</html:submit>
+					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="validateForm()">
+						<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+					</html:link>
 				</div>
 			</c:otherwise>
 		</c:choose>
