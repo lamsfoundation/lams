@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -173,9 +172,9 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 	initServices();
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Integer userID = WebUtil.readIntParam(request, "id");
-	String markStr = WebUtil.readStrParam(request, "mark", true);
-	String feedback =  WebUtil.readStrParam(request, "feedback", true);
+	Integer userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_ID);
+	String markStr = WebUtil.readStrParam(request, GradeBookConstants.PARAM_MARK, true);
+	String feedback =  WebUtil.readStrParam(request, GradeBookConstants.PARAM_FEEDBACK, true);
 	Lesson lesson = lessonService.getLesson(lessonID);
 	User learner = (User)userService.findById(User.class, userID);
 
@@ -212,22 +211,23 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	initServices();
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	
-	String method = WebUtil.readStrParam(request, "method");
+	String method = WebUtil.readStrParam(request, GradeBookConstants.PARAM_METHOD);
 
 	Long activityID = null;
 	Integer userID = null;
 	
 	// Fetch the id based on which grid it came from
-	if (method.equals("activityView")) {
+	if (method.equals(GradeBookConstants.VIEW_ACTIVITY)) {
 	    activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	    userID = WebUtil.readIntParam(request, "id");
-	} else if (method.equals("userView")) {
-	    activityID = WebUtil.readLongParam(request, "id");
-	    userID = WebUtil.readIntParam(request, "userID");
+	    userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_ID);
+	    
+	} else if (method.equals(GradeBookConstants.VIEW_USER)) {
+	    activityID = WebUtil.readLongParam(request, GradeBookConstants.PARAM_ID);
+	    userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_USERID);
 	}
 
-	String markStr = WebUtil.readStrParam(request, "mark", true);
-	String feedback =  WebUtil.readStrParam(request, "feedback", true);
+	String markStr = WebUtil.readStrParam(request, GradeBookConstants.PARAM_MARK, true);
+	String feedback =  WebUtil.readStrParam(request, GradeBookConstants.PARAM_FEEDBACK, true);
 
 	Activity activity = monitoringService.getActivityById(activityID);
 	User learner = (User)userService.findById(User.class, userID);

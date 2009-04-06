@@ -113,11 +113,11 @@ public class GradeBookAction extends LamsDispatchAction {
 	int rowLimit = WebUtil.readIntParam(request, GradeBookConstants.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SIDX, true);
-	Boolean isSearch = WebUtil.readBooleanParam(request, "_search");
-	String searchField = WebUtil.readStrParam(request, "searchField", true);
-	String searchOper = WebUtil.readStrParam(request, "searchOper", true);
-	String searchString = WebUtil.readStrParam(request, "searchString", true);
-	String view = WebUtil.readStrParam(request, "method");
+	Boolean isSearch = WebUtil.readBooleanParam(request, GradeBookConstants.PARAM_SEARCH);
+	String searchField = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_FIELD, true);
+	String searchOper = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_OPERATION, true);
+	String searchString = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_STRING, true);
+	String view = WebUtil.readStrParam(request, GradeBookConstants.PARAM_METHOD);
 
 	// Getting the lesson id
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -130,8 +130,8 @@ public class GradeBookAction extends LamsDispatchAction {
 
 	    // Get the user gradebook list from the db
 	    // A slightly different list is needed for userview or activity view
-	    if (view.equals("userView")) {
-		Integer userID = WebUtil.readIntParam(request, "userID");
+	    if (view.equals(GradeBookConstants.VIEW_USER)) {
+		Integer userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_USERID);
 		User learner = (User) userService.findById(User.class, userID);
 		if (learner != null) {
 		    gradeBookActivityDTOs = gradeBookService.getGBActivityRowsForLearner(lesson, learner);
@@ -140,18 +140,18 @@ public class GradeBookAction extends LamsDispatchAction {
 		    logger.error("No learner found for: " + userID);
 		    return null;
 		}
-	    } else if (view.equals("activityView")) {
+	    } else if (view.equals(GradeBookConstants.VIEW_ACTIVITY)) {
 		gradeBookActivityDTOs = gradeBookService.getGBActivityRowsForLesson(lesson);
 	    }
 
 	    if (sortBy == null) {
-		sortBy = "id";
+		sortBy = GradeBookConstants.PARAM_ID;
 	    }
 
 	    String ret = GradeBookUtil.toGridXML(gradeBookActivityDTOs, view, sortBy, isSearch, searchField,
 		    searchOper, searchString, sortOrder, rowLimit, page);
 
-	    response.setContentType("text/xml");
+	    response.setContentType(GradeBookConstants.CONTENT_TYPE_TEXTXML);
 	    PrintWriter out = response.getWriter();
 	    out.print(ret);
 	} else {
@@ -192,11 +192,11 @@ public class GradeBookAction extends LamsDispatchAction {
 	int rowLimit = WebUtil.readIntParam(request, GradeBookConstants.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SIDX, true);
-	Boolean isSearch = WebUtil.readBooleanParam(request, "_search");
-	String searchField = WebUtil.readStrParam(request, "searchField", true);
-	String searchOper = WebUtil.readStrParam(request, "searchOper", true);
-	String searchString = WebUtil.readStrParam(request, "searchString", true);
-	String view = WebUtil.readStrParam(request, "method");
+	Boolean isSearch = WebUtil.readBooleanParam(request, GradeBookConstants.PARAM_SEARCH);
+	String searchField = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_FIELD, true);
+	String searchOper = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_OPERATION, true);
+	String searchString = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_STRING, true);
+	String view = WebUtil.readStrParam(request, GradeBookConstants.PARAM_METHOD);
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
@@ -207,9 +207,9 @@ public class GradeBookAction extends LamsDispatchAction {
 	    // Get the user gradebook list from the db
 	    List<GBUserGridRowDTO> gradeBookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 
-	    if (view.equals("userView") || view.equals("courseMonitorView")) {
+	    if (view.equals(GradeBookConstants.VIEW_USER) || view.equals("courseMonitorView")) {
 		gradeBookUserDTOs = gradeBookService.getGBUserRowsForLesson(lesson);
-	    } else if (view.equals("activityView")) {
+	    } else if (view.equals(GradeBookConstants.VIEW_ACTIVITY)) {
 		Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
 		Activity activity = monitoringService.getActivityById(activityID);
@@ -225,7 +225,7 @@ public class GradeBookAction extends LamsDispatchAction {
 	    String ret = GradeBookUtil.toGridXML(gradeBookUserDTOs, view, sortBy, isSearch, searchField, searchOper,
 		    searchString, sortOrder, rowLimit, page);
 
-	    response.setContentType("text/xml");
+	    response.setContentType(GradeBookConstants.CONTENT_TYPE_TEXTXML);
 	    PrintWriter out = response.getWriter();
 	    out.print(ret);
 	} else {
@@ -262,11 +262,11 @@ public class GradeBookAction extends LamsDispatchAction {
 	int rowLimit = WebUtil.readIntParam(request, GradeBookConstants.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SIDX, true);
-	Boolean isSearch = WebUtil.readBooleanParam(request, "_search");
-	String searchField = WebUtil.readStrParam(request, "searchField", true);
-	String searchOper = WebUtil.readStrParam(request, "searchOper", true);
-	String searchString = WebUtil.readStrParam(request, "searchString", true);
-	String view = WebUtil.readStrParam(request, "method");
+	Boolean isSearch = WebUtil.readBooleanParam(request, GradeBookConstants.PARAM_SEARCH);
+	String searchField = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_FIELD, true);
+	String searchOper = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_OPERATION, true);
+	String searchString = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_STRING, true);
+	String view = WebUtil.readStrParam(request, GradeBookConstants.PARAM_METHOD);
 
 	User user = getRealUser();
 
@@ -283,14 +283,14 @@ public class GradeBookAction extends LamsDispatchAction {
 		gradeBookLessonDTOs = gradeBookService.getGBLessonRows(organisation, user);
 
 		if (sortBy == null) {
-		    sortBy = "id";
+		    sortBy = GradeBookConstants.PARAM_ID;
 		}
 
 		// String ret = GradeBookUtil.toGridXML(gradeBookLessonDTOs, page, totalPages, method);
 		String ret = GradeBookUtil.toGridXML(gradeBookLessonDTOs, view, sortBy, isSearch, searchField,
 			searchOper, searchString, sortOrder, rowLimit, page);
 
-		response.setContentType("text/xml");
+		response.setContentType(GradeBookConstants.CONTENT_TYPE_TEXTXML);
 		PrintWriter out = response.getWriter();
 		out.print(ret);
 
@@ -303,118 +303,6 @@ public class GradeBookAction extends LamsDispatchAction {
 
 	return null;
     }
-
-    @SuppressWarnings("unchecked")
-    private List doRowNameSearch(List gradeBookRows, String searchField, String searchOper, String searchString) {
-	List<GradeBookGridRowDTO> ret = new ArrayList<GradeBookGridRowDTO>();
-
-	if (searchField.equals("rowName")) {
-	    Iterator it = gradeBookRows.iterator();
-
-	    while (it.hasNext()) {
-		GradeBookGridRowDTO userRow = (GradeBookGridRowDTO) it.next();
-
-		String rowName = userRow.getRowName();
-		rowName = rowName.toLowerCase();
-
-		if (searchOper.equals("eq")) {
-		    if (rowName.equals(searchString)) {
-			ret.add(userRow);
-		    }
-		} else if (searchOper.equals("ne")) {
-		    if (!rowName.equals(searchString)) {
-			ret.add(userRow);
-		    }
-		} else if (searchOper.equals("bw")) {
-		    if (rowName.startsWith(searchString)) {
-			ret.add(userRow);
-		    }
-		} else if (searchOper.equals("ew")) {
-		    if (rowName.endsWith(searchString)) {
-			ret.add(userRow);
-		    }
-		} else if (searchOper.equals("cn")) {
-		    if (rowName.contains(searchString)) {
-			ret.add(userRow);
-		    }
-		}
-	    }
-
-	}
-	return ret;
-    }
-
-    //    private List<GBUserGridRowDTO> doUserSearch(List<GBUserGridRowDTO> gradeBookUserDTOs, String searchField,
-    //	    String searchOper, String searchString) {
-    //	List<GBUserGridRowDTO> ret = new ArrayList<GBUserGridRowDTO>();
-    //
-    //	if (searchField.equals("fullName")) {
-    //	    for (GBUserGridRowDTO userRow : gradeBookUserDTOs) {
-    //
-    //		String fullName = userRow.getRowName();
-    //		fullName = fullName.toLowerCase();
-    //
-    //		if (searchOper.equals("eq")) {
-    //		    if (fullName.equals(searchString)) {
-    //			ret.add(userRow);
-    //		    }
-    //		} else if (searchOper.equals("ne")) {
-    //		    if (!fullName.equals(searchString)) {
-    //			ret.add(userRow);
-    //		    }
-    //		} else if (searchOper.equals("bw")) {
-    //		    if (fullName.startsWith(searchString)) {
-    //			ret.add(userRow);
-    //		    }
-    //		} else if (searchOper.equals("ew")) {
-    //		    if (fullName.endsWith(searchString)) {
-    //			ret.add(userRow);
-    //		    }
-    //		} else if (searchOper.equals("cn")) {
-    //		    if (fullName.contains(searchString)) {
-    //			ret.add(userRow);
-    //		    }
-    //		}
-    //	    }
-    //	}
-    //	return ret;
-    //    }
-    //    
-    //    private List<GBLessonGridRowDTO> doLessonSearch(List<GBLessonGridRowDTO> gradeBookLessonDTOs , String searchField,
-    //	    String searchOper, String searchString) {
-    //	List<GBLessonGridRowDTO> ret = new ArrayList<GBLessonGridRowDTO>();
-    //
-    //	if (searchField.equals("lessonName")) {
-    //	    for (GBLessonGridRowDTO lessonRow : gradeBookLessonDTOs) {
-    //
-    //		String lessonName = lessonRow.getLessonName();
-    //		lessonName = lessonName.toLowerCase();
-    //
-    //		if (searchOper.equals("eq")) {
-    //		    if (lessonName.equals(searchString)) {
-    //			ret.add(lessonRow);
-    //		    }
-    //		} else if (searchOper.equals("ne")) {
-    //		    if (!lessonName.equals(searchString)) {
-    //			ret.add(lessonRow);
-    //		    }
-    //		} else if (searchOper.equals("bw")) {
-    //		    if (lessonName.startsWith(searchString)) {
-    //			ret.add(lessonRow);
-    //		    }
-    //		} else if (searchOper.equals("ew")) {
-    //		    if (lessonName.endsWith(searchString)) {
-    //			ret.add(lessonRow);
-    //		    }
-    //		} else if (searchOper.equals("cn")) {
-    //		    if (lessonName.contains(searchString)) {
-    //			ret.add(lessonRow);
-    //		    }
-    //		}
-    //	    }
-    //	}
-    //	return ret;
-    //    }
 
     private UserDTO getUser() {
 	HttpSession ss = SessionManager.getSession();

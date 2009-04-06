@@ -110,25 +110,25 @@ public class GradeBookUtil {
 	    Document document = getDocument();
 
 	    // root element
-	    Element rootElement = document.createElement("rows");
+	    Element rootElement = document.createElement(GradeBookConstants.ELEMENT_ROWS);
 
-	    Element pageElement = document.createElement("page");
+	    Element pageElement = document.createElement(GradeBookConstants.ELEMENT_PAGE);
 	    pageElement.appendChild(document.createTextNode("" + page));
 	    rootElement.appendChild(pageElement);
 
-	    Element totalPageElement = document.createElement("total");
+	    Element totalPageElement = document.createElement(GradeBookConstants.ELEMENT_TOTAL);
 	    totalPageElement.appendChild(document.createTextNode("" + totalPages));
 	    rootElement.appendChild(totalPageElement);
 
-	    Element recordsElement = document.createElement("records");
+	    Element recordsElement = document.createElement(GradeBookConstants.ELEMENT_RECORDS);
 	    recordsElement.appendChild(document.createTextNode("" + gridRows.size()));
 	    rootElement.appendChild(recordsElement);
 
 	    Iterator iter = gridRows.iterator();
 	    while (iter.hasNext()) {
 		GradeBookGridRowDTO gridRow = (GradeBookGridRowDTO) iter.next();
-		Element rowElement = document.createElement("row");
-		rowElement.setAttribute("id", gridRow.getId().toString());
+		Element rowElement = document.createElement(GradeBookConstants.ELEMENT_ROW);
+		rowElement.setAttribute(GradeBookConstants.ELEMENT_ID, gridRow.getId().toString());
 
 		// Work out which grid we want to put the data into
 		ArrayList<String> gridRowStringArray = new ArrayList<String>();
@@ -136,7 +136,7 @@ public class GradeBookUtil {
 		gridRowStringArray = gridRow.toStringArray(view);
 
 		for (String gradeBookItem : gridRowStringArray) {
-		    Element cellElement = document.createElement("cell");
+		    Element cellElement = document.createElement(GradeBookConstants.ELEMENT_CELL);
 		    gradeBookItem = (gradeBookItem != null) ? gradeBookItem : "";
 		    cellElement.appendChild(document.createTextNode(gradeBookItem));
 		    rowElement.appendChild(cellElement);
@@ -196,13 +196,13 @@ public class GradeBookUtil {
 
 	// Sort the list appropriately
 	if (sortBy != null) {
-	    if (sortBy.equals("rowName")) {
+	    if (sortBy.equals(GradeBookConstants.PARAM_ROW_NAME)) {
 		Collections.sort(gridRows, new GBRowNameComparator());
-	    } else if (sortBy.equals("mark")) {
+	    } else if (sortBy.equals(GradeBookConstants.PARAM_MARK)) {
 		Collections.sort(gridRows, new GBMarkComparator());
-	    } else if (sortBy.equals("id")) {
+	    } else if (sortBy.equals(GradeBookConstants.PARAM_ID)) {
 		Collections.sort(gridRows, new GBIDComparator());
-	    } else if (sortBy.equals("timeTaken")) {
+	    } else if (sortBy.equals(GradeBookConstants.PARAM_TIME_TAKEN)) {
 		Collections.sort(gridRows, new GBTimeTakenComparator());
 	    } else {
 		Collections.sort(gridRows, new GBRowNameComparator());
@@ -218,7 +218,7 @@ public class GradeBookUtil {
 	}
 
 	// Reverse the order if requested
-	if (sortOrder != null && sortOrder.equals("desc")) {
+	if (sortOrder != null && sortOrder.equals(GradeBookConstants.SORT_DESC)) {
 	    Collections.reverse(gridRows);
 	}
 
@@ -239,7 +239,7 @@ public class GradeBookUtil {
     private static List doRowNameSearch(List gradeBookRows, String searchField, String searchOper, String searchString) {
 	List<GradeBookGridRowDTO> ret = new ArrayList<GradeBookGridRowDTO>();
 
-	if (searchField.equals("rowName")) {
+	if (searchField.equals(GradeBookConstants.PARAM_ROW_NAME)) {
 	    Iterator it = gradeBookRows.iterator();
 
 	    while (it.hasNext()) {
@@ -248,23 +248,23 @@ public class GradeBookUtil {
 		String rowName = userRow.getRowName();
 		rowName = rowName.toLowerCase();
 
-		if (searchOper.equals("eq")) {
+		if (searchOper.equals(GradeBookConstants.SEARCH_EQUALS)) {
 		    if (rowName.equals(searchString)) {
 			ret.add(userRow);
 		    }
-		} else if (searchOper.equals("ne")) {
+		} else if (searchOper.equals(GradeBookConstants.SEARCH_NOT_EQUALS)) {
 		    if (!rowName.equals(searchString)) {
 			ret.add(userRow);
 		    }
-		} else if (searchOper.equals("bw")) {
+		} else if (searchOper.equals(GradeBookConstants.SEARCH_BEGINS_WITH)) {
 		    if (rowName.startsWith(searchString)) {
 			ret.add(userRow);
 		    }
-		} else if (searchOper.equals("ew")) {
+		} else if (searchOper.equals(GradeBookConstants.SEARCH_ENDS_WITH)) {
 		    if (rowName.endsWith(searchString)) {
 			ret.add(userRow);
 		    }
-		} else if (searchOper.equals("cn")) {
+		} else if (searchOper.equals(GradeBookConstants.SEARCH_CONTAINS)) {
 		    if (rowName.contains(searchString)) {
 			ret.add(userRow);
 		    }

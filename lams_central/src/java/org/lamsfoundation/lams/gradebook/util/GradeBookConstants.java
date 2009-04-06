@@ -22,16 +22,60 @@
  
 /* $Id$ */ 
 package org.lamsfoundation.lams.gradebook.util; 
- 
+
+/**
+ * Constants for gradebook module
+ * 
+ * @author lfoxton
+ *
+ */
 public class GradeBookConstants {
     
-    public static String PARAM_PAGE = "page";
-    public static String PARAM_ROWS = "rows";
-    public static String PARAM_SIDX = "sidx";
-    public static String PARAM_SORD = "sord";
-    public static String PARAM_METHOD = "method";
-    public static String PARAM_DISPATCH = "dispatch";
-    public static String PARAM_LOGIN = "login";
+    // Parameters
+    public static final String PARAM_PAGE = "page";
+    public static final String PARAM_ROWS = "rows";
+    public static final String PARAM_SIDX = "sidx";
+    public static final String PARAM_SORD = "sord";
+    public static final String PARAM_METHOD = "method";
+    public static final String PARAM_DISPATCH = "dispatch";
+    public static final String PARAM_LOGIN = "login";
+    public static final String PARAM_ID = "id";
+    public static final String PARAM_MARK = "mark";
+    public static final String PARAM_FEEDBACK = "feedback";
+    public static final String PARAM_USERID = "userID";
+    public static final String PARAM_SEARCH = "_search";
+    public static final String PARAM_SEARCH_FIELD = "searchField";
+    public static final String PARAM_SEARCH_OPERATION = "searchOper";
+    public static final String PARAM_SEARCH_STRING = "searchString";
+    public static final String PARAM_ROW_NAME = "rowName";
+    public static final String PARAM_TIME_TAKEN = "timeTaken";
+    
+    // Sort
+    public static final String SORT_DESC = "desc";
+    public static final String SORT_ASC = "asc";
+    
+    // Search
+    public static final String SEARCH_EQUALS = "eq";
+    public static final String SEARCH_NOT_EQUALS = "ne";
+    public static final String SEARCH_BEGINS_WITH = "bw";
+    public static final String SEARCH_ENDS_WITH = "ew";
+    public static final String SEARCH_CONTAINS = "cn";
+    
+    // Views
+    public static final String VIEW_ACTIVITY = "activityView";
+    public static final String VIEW_USER = "userView";
+    
+    // XML Elemetns
+    public static final String ELEMENT_ROWS = "rows";
+    public static final String ELEMENT_PAGE = "page";
+    public static final String ELEMENT_TOTAL = "total";
+    public static final String ELEMENT_RECORDS = "records";
+    public static final String ELEMENT_ROW = "row";
+    public static final String ELEMENT_ID = "id";
+    public static final String ELEMENT_CELL = "cell";
+    
+    // Misc
+    public static final String CONTENT_TYPE_TEXTXML = "text/xml";
 
 }
  
