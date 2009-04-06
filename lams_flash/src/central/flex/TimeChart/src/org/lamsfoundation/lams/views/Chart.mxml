@@ -57,9 +57,6 @@
 				selectLearnerForm.visible = false;
 				
 				initButtons();
-				
-				Button(chart_button_bar.getChildAt(ACTIVITY_SPLIT__BUTTON)).enabled = false;
-				Button(chart_button_bar.getChildAt(COMPLETION__BUTTON)).enabled = true;
 			}
 	
 			public function loadClass():void {
@@ -68,10 +65,6 @@
 				showAverage.selected = true;
 				
 				initButtons();
-				
-				Button(chart_button_bar.getChildAt(ACTIVITY_SPLIT__BUTTON)).enabled = true;
-				Button(chart_button_bar.getChildAt(COMPLETION__BUTTON)).enabled = false;
-				
 			}
 			
 			private function initButtons():void {
@@ -108,14 +101,14 @@
 		<mx:Label id="chart_lbl"/>
 				
 		<!-- Button row -->
-		<mx:ButtonBar id="chart_button_bar" horizontalGap="2" itemClick="chartControlHandler(event)">
+		<mx:ToggleButtonBar id="chart_button_bar" horizontalGap="2" itemClick="chartControlHandler(event)">
 			<mx:dataProvider >
 				<mx:Array>
 					<mx:String> </mx:String>
 					<mx:String> </mx:String>
 				</mx:Array>
 			</mx:dataProvider>
-		</mx:ButtonBar>
+		</mx:ToggleButtonBar>
 		
 		<mx:VBox horizontalAlign="center" width="100%" height="100%">
 			<!-- View stack for controlling the different chart views -->    

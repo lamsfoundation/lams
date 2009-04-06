@@ -30,9 +30,6 @@
 			[Bindable]
 			public var orgName:String;
 			
-			[Bindable]
-			public var currentFault:Fault;
-			
 			private function init():void {
 				orgName = Application.application.parameters.orgName;
 			}

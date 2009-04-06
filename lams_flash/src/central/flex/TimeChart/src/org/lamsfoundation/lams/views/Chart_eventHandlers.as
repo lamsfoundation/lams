@@ -2,15 +2,7 @@
 import flash.events.Event;
 		
 	private function chartControlHandler(event:ItemClickEvent):void {
-		if(event.index == 0) {
-			Button(event.currentTarget.getChildAt(1)).enabled = true;
-			chartViews.selectedIndex = LEARNER;
-		} else {
-			chartViews.selectedIndex = CLASS;
-			Button(event.currentTarget.getChildAt(0)).enabled = true;
-		}
-		
-		Button(event.currentTarget.getChildAt(event.index)).enabled = false;
+		chartViews.selectedIndex = (event.index == 0) ? LEARNER : CLASS;
 	}
 	
 	private function dataLearnerPlot(cat:mx.charts.CategoryAxis, item:Object):Object {
