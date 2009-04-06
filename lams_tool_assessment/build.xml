@@ -123,7 +123,7 @@
 			>
 		</taskdef>
 		<schemaexport
-			properties="${conf.hibernate.mapping.dir}/hibernate.properties"
+			config="${conf.hibernate.mapping.dir}/hibernate.cfg.xml"
 			quiet="no"
 			text="no"
 			drop="no"
@@ -227,7 +227,7 @@
 			<fileset dir="${build.classes.java}">
 			</fileset>
 			<fileset dir="${conf.hibernate.mapping.dir}">
-				<exclude name="**/hibernate.properties"/>
+				<exclude name="**/hibernate.cfg.xml"/>
 			</fileset>
 		</jar> 
 	</target>

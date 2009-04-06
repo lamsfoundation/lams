@@ -305,7 +305,8 @@
 		<taskdef name="schemaexport" classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"
 			classpathref="schemaexport.classpath">
 		</taskdef>
-		<schemaexport properties="${conf.hibernate.mapping.dir}/hibernate.properties"
+		<schemaexport
+			config="${conf.hibernate.mapping.dir}/hibernate.cfg.xml"
 			quiet="no" text="no" drop="no" delimiter=";"
 			output="${db.scripts}/table-schema.sql">
 			<fileset dir="${conf.hibernate.mapping.dir}">

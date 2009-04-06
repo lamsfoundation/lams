@@ -477,7 +477,7 @@ Ant build file.
 			>
 		</taskdef>
 		<schemaexport
-			properties="${conf.hibernate.mapping.dir}/hibernate.properties"
+			config="${conf.hibernate.mapping.dir}/hibernate.cfg.xml"
 			quiet="no"
 			text="no"
 			drop="no"

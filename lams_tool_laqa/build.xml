@@ -503,7 +503,9 @@
 		<echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm" />
 		<taskdef name="schemaexport" classname="org.hibernate.tool.hbm2ddl.SchemaExportTask" classpathref="schemaexport.classpath">
 		</taskdef>
-		<schemaexport properties="${conf.hibernate.mapping.dir}/hibernate.properties" quiet="no" text="no" drop="no" delimiter=";" output="${db.scripts}/table-schema.sql">
+		<schemaexport
+			config="${conf.hibernate.mapping.dir}/hibernate.cfg.xml"
+			quiet="no" text="no" drop="no" delimiter=";" output="${db.scripts}/table-schema.sql">
 			<fileset dir="${conf.hibernate.mapping.dir}">
 				<include name="**/QaWizard*.hbm.xml" />
 				<include name="**/QaConfigItem.hbm.xml" />
