@@ -547,37 +547,19 @@ public class LearnerProgress implements Serializable {
 	    
 	    if (compProg != null) {
 		Date end = compProg.getFinishDate();
-		if (end != null && startDate != null) {
-		    Long completedTime = end.getTime() - startDate.getTime();
-		    activitiesCompleted.add(new CompletedActivityDTO(activity, completedTime));
-		}
+		Date start = compProg.getStartDate();
+			if (end != null && start != null && startDate != null) {
+			    Long completedTime = end.getTime() - startDate.getTime();
+			    Long startTime = start.getTime() - startDate.getTime();
+			    activitiesCompleted.add(new CompletedActivityDTO(activity, startTime, completedTime));
+			}
 	    }
 	}
 
 	return (CompletedActivityDTO[]) activitiesCompleted
 		.toArray(new CompletedActivityDTO[activitiesCompleted.size()]);
     }
-
-    private CompletedActivityDTO[] createCompletedActivityArrayFrom(Map<Activity, Date> activities) {
-	if (activities == null)
-	    throw new IllegalArgumentException("Fail to create id array" + " from null activity set");
-
-	ArrayList<CompletedActivityDTO> activitiesCompleted = new ArrayList<CompletedActivityDTO>();
-
-	for (Iterator i = activities.keySet().iterator(); i.hasNext();) {
-	    Activity activity = (Activity) i.next();
-	    
-	    Date completedDate = (Date) activities.get(activity);
-	    if (completedDate != null && startDate != null) {
-		Long completedTime = ((Date) activities.get(activity)).getTime() - startDate.getTime();
-		activitiesCompleted.add(new CompletedActivityDTO(activity, completedTime));
-	    }
-	}
-
-	return (CompletedActivityDTO[]) activitiesCompleted
-		.toArray(new CompletedActivityDTO[activitiesCompleted.size()]);
-    }
-
+    
     public Date getFinishDate() {
 	return finishDate;
     }
