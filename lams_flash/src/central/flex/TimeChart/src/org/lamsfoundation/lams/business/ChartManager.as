@@ -92,8 +92,7 @@ package org.lamsfoundation.lams.business
 				var c_count:int = 0;
 				trace('progress user: ' + learnerProgress.learner_username);
 				for each(var completedActivity:CompletedActivity in learnerProgress.completedActivities) {
-					var _prev:CompletedActivity = (c_count > 0) ? learnerProgress.getCompletedActivity(c_count-1) : null;
-					completedActivity.createDataObject(_prev, learnerProgress);
+					completedActivity.createDataObject(learnerProgress);
 					
 					updateAverage(completedActivity, average);
 			

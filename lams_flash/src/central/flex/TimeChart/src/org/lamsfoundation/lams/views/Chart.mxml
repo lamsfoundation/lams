@@ -65,6 +65,8 @@
 				showAverage.selected = true;
 				
 				initButtons();
+				
+				chart_button_bar.selectedIndex = COMPLETION__BUTTON;
 			}
 			
 			private function initButtons():void {
