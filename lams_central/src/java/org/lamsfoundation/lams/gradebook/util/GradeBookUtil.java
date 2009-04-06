@@ -39,6 +39,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageMarkComparator;
+import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageTimeTakenComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBIDComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBMarkComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBRowNameComparator;
@@ -204,6 +206,10 @@ public class GradeBookUtil {
 		Collections.sort(gridRows, new GBIDComparator());
 	    } else if (sortBy.equals(GradeBookConstants.PARAM_TIME_TAKEN)) {
 		Collections.sort(gridRows, new GBTimeTakenComparator());
+	    } else if (sortBy.equals(GradeBookConstants.PARAM_AVG_TIME_TAKEN)) {
+		Collections.sort(gridRows, new GBAverageTimeTakenComparator());
+	    } else if (sortBy.equals(GradeBookConstants.PARAM_AVG_MARK)) {
+		Collections.sort(gridRows, new GBAverageMarkComparator());
 	    } else {
 		Collections.sort(gridRows, new GBRowNameComparator());
 	    }

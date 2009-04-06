@@ -60,15 +60,15 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 	    ret.add(subGroup);
 	    ret.add(startDate);
 	    
-	    if (timeTaken != null) {
-		ret.add(convertTimeToString(timeTaken));
+	    if (averageTimeTaken != null) {
+		ret.add(convertTimeToString(averageTimeTaken));
 	    } else {
 		ret.add("-");
 	    }
 	    
 	    ret.add(lessonDescription);
-	    if (mark != null) {
-		ret.add(mark.toString());
+	    if (averageMark != null) {
+		ret.add(averageMark.toString());
 	    } else {
 		ret.add("-");
 	    }

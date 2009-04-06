@@ -37,11 +37,16 @@ public abstract class GradeBookGridRowDTO{
     public String rowName;
  
     // A unit of time in milliseconds that  determines the time taken for the corressponding task
-    // Be it a lesson or an activity 
     public Long timeTaken;
+    
+    // Another unit of time that represents average time taken for a corresponding task
+    public Long averageTimeTaken;
     
     // The mark for the corresponding gradebook grid row task
     public Double mark;
+    
+    // Average mark for the corresponding task
+    public Double averageMark;
 
     /**
      * A shared function to convert milliseconds into a readable string
@@ -103,5 +108,23 @@ public abstract class GradeBookGridRowDTO{
     public void setRowName(String rowName) {
         this.rowName = rowName;
     }
+
+    public Long getAverageTimeTaken() {
+        return averageTimeTaken;
+    }
+
+    public void setAverageTimeTaken(Long averageTimeTaken) {
+        this.averageTimeTaken = averageTimeTaken;
+    }
+
+    public Double getAverageMark() {
+        return averageMark;
+    }
+
+    public void setAverageMark(Double averageMark) {
+        this.averageMark = averageMark;
+    }
+    
+    
 }
  

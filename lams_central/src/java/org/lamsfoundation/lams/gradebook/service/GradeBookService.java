@@ -368,10 +368,10 @@ public class GradeBookService implements IGradeBookService {
 			lessonRow.setStartDate(getLocaleDateString(user, lesson.getStartDateTime()));
 
 			// Setting the timeTaken value as the average for the lesson, as this is not a specific user view
-			lessonRow.setTimeTaken(gradeBookDAO.getAverageDurationLesson(lesson.getLessonId()));
+			lessonRow.setAverageTimeTaken(gradeBookDAO.getAverageDurationLesson(lesson.getLessonId()));
 
 			lessonRow.setLessonDescription(lesson.getLessonDescription());
-			lessonRow.setMark(gradeBookDAO.getAverageMarkForLesson(lesson.getLessonId()));
+			lessonRow.setAverageMark(gradeBookDAO.getAverageMarkForLesson(lesson.getLessonId()));
 
 			String gbMonURL = Configuration.get(ConfigurationKeys.SERVER_URL)
 				+ "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
@@ -427,7 +427,7 @@ public class GradeBookService implements IGradeBookService {
 	gactivityDTO.setRowName(activity.getTitle());
 	
 	// setting the average time
-	gactivityDTO.setTimeTaken(gradeBookDAO.getAverageDurationForActivity(activity.getActivityId()));
+	gactivityDTO.setAverageTimeTaken(gradeBookDAO.getAverageDurationForActivity(activity.getActivityId()));
 
 	String monitorUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + activity.getTool().getMonitorUrl() + "?"
 		+ AttributeNames.PARAM_CONTENT_FOLDER_ID + "=" + lesson.getLearningDesign().getContentFolderID() + "&"
@@ -463,9 +463,9 @@ public class GradeBookService implements IGradeBookService {
 		}
 	    }
 
-	    // Settting the mark as an average for the class as this is not a specific user view
+	    // Setting the mark as an average for the class as this is not a specific user view
 	    if (count != 0) {
-		gactivityDTO.setMark(sum / count);
+		gactivityDTO.setAverageMark(sum / count);
 	    }
 	}
 

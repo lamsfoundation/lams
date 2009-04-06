@@ -66,7 +66,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * 
  * @struts.action path="/gradebook/gradebook" parameter="dispatch"
- *                scope="request" name="gradeBookForm" validate="false"
+ *                scope="request" validate="false"
  * 
  * @struts:action-forward name="error" path=".error"
  * @struts:action-forward name="message" path=".message"

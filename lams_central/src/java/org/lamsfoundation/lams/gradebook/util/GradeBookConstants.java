@@ -49,6 +49,8 @@ public class GradeBookConstants {
     public static final String PARAM_SEARCH_STRING = "searchString";
     public static final String PARAM_ROW_NAME = "rowName";
     public static final String PARAM_TIME_TAKEN = "timeTaken";
+    public static final String PARAM_AVG_TIME_TAKEN = "avgTimeTaken";
+    public static final String PARAM_AVG_MARK = "avgMark";
     
     // Sort
     public static final String SORT_DESC = "desc";

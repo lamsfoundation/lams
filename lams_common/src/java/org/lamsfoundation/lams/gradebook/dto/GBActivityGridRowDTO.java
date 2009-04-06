@@ -84,16 +84,16 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    
-	    if (timeTaken != null) {
-		ret.add(convertTimeToString(timeTaken));
+	    if (averageTimeTaken != null) {
+		ret.add(convertTimeToString(averageTimeTaken));
 	    } else {
 		ret.add("-");
 	    }
 
 	    ret.add(competences);
 
-	    if (mark != null) {
-		ret.add(mark.toString());
+	    if (averageMark != null) {
+		ret.add(averageMark.toString());
 	    } else {
 		ret.add("-");
 	    }

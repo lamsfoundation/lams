@@ -53,7 +53,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author lfoxton
  * 
- * Handles the monitor interface for gradebook
+ * Handles the monitor interfaces for gradebook
  * 
  * This is where marking for an activity/lesson takes place
  * 
