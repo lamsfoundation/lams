@@ -54,7 +54,7 @@
 	</EventHandlers>
 
 	<EventHandlers type="{WizardEvent.INIT_WORKSPACE}">
-		<MethodInvoker generator="{WizardManager}" method="initWorkspace" arguments="{event.organisationID}" />
+		<MethodInvoker generator="{WizardManager}" method="initWorkspace" />
 		<EventAnnouncer generator="{WizardEvent}" type="{WizardEvent.GET_FOLDER_CONTENTS}">
 			<Properties folder="{lastReturn}" folderID="{lastReturn.resourceID}" /> 
 		</EventAnnouncer>

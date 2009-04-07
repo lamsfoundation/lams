@@ -32,7 +32,6 @@ package org.lamsfoundation.lams.business
 		private var _usersLoaded:Boolean;
 		
 		private var _lessonID:uint;
-		private var _organisationID:uint;
 		private var _initializedLesson:Lesson;
 		
 		private var _lessonInstances:Array;
@@ -105,11 +104,10 @@ package org.lamsfoundation.lams.business
 		
 		/*-.........................................Methods..........................................*/
 		
-		public function initWorkspace(organisationID:uint):WorkspaceItem {
+		public function initWorkspace():WorkspaceItem {
 			var item:WorkspaceItem = new WorkspaceItem();
 			item.populate({name: "root", description: "root node", resourceID: -1, resourceType:WorkspaceItem.RT_FOLDER});
 			
-			_organisationID = organisationID;
 			_workspaceRoot = item;
 			
 			dispatchEvent(new Event("workspaceRootChanged"));
@@ -126,11 +124,11 @@ package org.lamsfoundation.lams.business
    				
    				newItem.parentWorkspaceFolderID = folder.workspaceFolderID;
   				
-  				if(newItem.resourceID == _organisationID)
-  					foldersToOpen.push(newItem); 
-  				
   				folder.children.addItem(newItem);
    			}
+   			
+   			if(folder.resourceID == -1)
+  				foldersToOpen.push(folder.children.getItemAt(0));
    			
    			return foldersToOpen;
 		}
