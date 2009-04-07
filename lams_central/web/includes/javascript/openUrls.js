@@ -17,6 +17,9 @@
 		var pWin = null;
 		var copyrightWin = null;
 		var customWin = null;
+		var gradeBookMonWin = null;
+		var gradeBookLrnWin = null;
+		var gradeBookMonLessonWin = null;
 		
 		function closeAllChildren(){
 			if (authorWin && !authorWin.closed) authorWin.closeWindow();
@@ -28,6 +31,8 @@
 			if (omWin && !omWin.closed) omWin.close();
 			if (pWin && !pWin.closed) pWin.close();
 			if (copyrightWin && !copyrightWin.closed) copyrightWin.close();
+			if (gradeBookMonWin && !gradeBookMonWin.closed) gradeBookMonWin.close();
+			if (gradeBookLrnWin && !gradeBookLrnWin.closed) gradeBookLrnWin.close();
 		}
 		
 		function openProfile()
@@ -306,6 +311,33 @@
 					customWin = window.open(url,'custom','resizable,left='+left+',top='+top+',scrollbars');
 					customWin.focus();
 				}
+			}
+		}
+	
+		function openGradeBookCourseMonitorPopup(winname, url, width, height, left, top) {
+			if(gradeBookMonWin && !gradeBookMonWin.closed ){
+				gradeBookMonWin.focus();
+			}else{
+				gradeBookMonWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
+				gradeBookMonWin.focus();
+			}
+		}
+		
+		function openGradeBookLearnerPopup(winname, url, width, height, left, top) {
+			if(gradeBookLrnWin && !gradeBookLrnWin.closed ){
+				gradeBookLrnWin.focus();
+			}else{
+				gradeBookLrnWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
+				gradeBookLrnWin.focus();
+			}
+		}
+		
+		function openGradeBookLessonMonitorPopup(winname, url, width, height, left, top) {
+			if(gradeBookMonLessonWin && !gradeBookMonLessonWin.closed ){
+				gradeBookMonLessonWin.focus();
+			}else{
+				gradeBookMonLessonWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
+				gradeBookMonLessonWin.focus();
 			}
 		}
 	//-->

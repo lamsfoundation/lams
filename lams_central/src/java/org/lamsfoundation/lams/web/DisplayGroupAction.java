@@ -139,6 +139,17 @@ public class DisplayGroupAction extends Action {
 			+ org.getOrganisationId() + ")", "manage-group-button", null));
 	    }
 	}
+
+	if (org.getEnableGradeBookForLearners() && contains(roles, Role.ROLE_LEARNER)) {
+
+	    String link = "javascript:openGradeBookLearnerPopup(" + "'" + org.getName() + "','"
+		    + Configuration.get(ConfigurationKeys.SERVER_URL)
+		    + "/gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID="
+		    + org.getOrganisationId() + "'," + "1220,500,0,0);";
+
+	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "manage-group-button", null));
+	}
+
 	if ((contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,
 		Role.ROLE_MONITOR))
 		&& stateId.equals(OrganisationState.ACTIVE)) {
@@ -157,11 +168,25 @@ public class DisplayGroupAction extends Action {
 			+ "/findUserLessons.do?dispatch=getResults&courseID=" + org.getOrganisationId()
 			+ "&KeepThis=true&TB_iframe=true&height=400&width=600", "search-lesson thickbox"
 			+ org.getOrganisationId(), "index.searchlesson.tooltip"));
+
+		// Adding gradebook course monitor links if enabled
+		if (org.getEnableGradeBookForMonitors() && contains(roles, Role.ROLE_GROUP_MANAGER)) {
+		    String link = "javascript:openGradeBookCourseMonitorPopup(" + "'" + org.getName() + "','"
+			    + Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
+			    + org.getOrganisationId() + "'," + "1220,500,0,0);";
+
+		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "manage-group-button",
+			    "index.coursegradebook.tooltip"));
+
+		}
+
 	    } else {//CLASS_TYPE
 		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
-		    links.add(new IndexLinkBean("index.addlesson", Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "/home.do?method=addLesson&courseID=" + org.getParentOrganisation().getOrganisationId()
-			    + "&classID=" + org.getOrganisationId()
+		    moreLinks.add(new IndexLinkBean("index.coursegradebook", Configuration
+			    .get(ConfigurationKeys.SERVER_URL)
+			    + "/gradebook/ggradebookMonitoring.do?dispatch=courseMonitor&organisationID="
+			    + org.getParentOrganisation().getOrganisationId()
 			    + "&KeepThis=true&TB_iframe=true&height=480&width=610", "add-lesson-button thickbox"
 			    + org.getOrganisationId(), null));
 	    }
@@ -258,6 +283,12 @@ public class DisplayGroupAction extends Action {
 	    }
 	}
 
+	// getting the organisation
+	Organisation org = (Organisation) service.findById(Organisation.class, orgId);
+
+	// Getting the parent organisation if applicable
+	Organisation parent = org.getParentOrganisation();
+
 	// iterate through user's lessons where they are staff, and add staff links to the beans in the map.
 	Map<Long, IndexLessonBean> staffMap = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
 		true);
@@ -272,6 +303,7 @@ public class DisplayGroupAction extends Action {
 		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR)) {
 		    lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + bean.getId()
 			    + ")"));
+
 		}
 	    } else if (stateId.equals(OrganisationState.ARCHIVED)) {
 		if (contains(roles, Role.ROLE_GROUP_MANAGER)) {
@@ -279,6 +311,18 @@ public class DisplayGroupAction extends Action {
 			    + ")"));
 		}
 	    }
+
+	    // Adding gradebook course monitor links if enabled
+	    if ((contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
+		    && org.getEnableGradeBookForMonitors()
+		    || (parent != null && parent.getEnableGradeBookForMonitors())) {
+		String link = "javascript:openGradeBookLessonMonitorPopup(" + "'" + org.getName() + "','"
+			+ Configuration.get(ConfigurationKeys.SERVER_URL)
+			+ "/gradebook/gradebookMonitoring.do?lessonID=" + bean.getId() + "'," + "1220,700,0,0);";
+
+		lessonLinks.add(new IndexLinkBean("index.coursegradebookmonitor", link));
+	    }
+
 	    if (lessonLinks.size() > 0) {
 		bean.setLinks(lessonLinks);
 	    }
