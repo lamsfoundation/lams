@@ -1,5 +1,21 @@
 <%@ include file="/taglibs.jsp"%>
 
+<script type="text/javascript">
+	function selectMonitorGradebook() {
+		document.getElementById("enableGradeBookForMonitors").checked = true;
+	}
+	
+	function unSelectLearnerGradebook() {
+		var mon = document.getElementById("enableGradeBookForMonitors");
+		var lrn = document.getElementById("enableGradeBookForLearners");
+		
+		if (lrn.checked) {
+			lrn.checked = mon.checked;
+		}
+	}
+
+</script>
+
 <html-el:form action="/orgsave.do" method="post">
 <html-el:hidden property="orgId" />
 <html-el:hidden property="parentId" />
@@ -83,6 +99,18 @@
 		<td colspan=2>
 			<html-el:checkbox property="courseAdminCanChangeStatusOfCourse" />
 			<fmt:message key="admin.can.change.status"/>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
+			<html-el:checkbox onclick="unSelectLearnerGradebook();" styleId="enableGradeBookForMonitors" property="enableGradeBookForMonitors" />
+			<fmt:message key="admin.gradebook.monitor.enable"/>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
+			<html-el:checkbox onclick="selectMonitorGradebook();" styleId="enableGradeBookForLearners" property="enableGradeBookForLearners" />
+			<fmt:message key="admin.gradebook.learner.enable"/>
 		</td>
 	</tr>
 	</logic:equal>

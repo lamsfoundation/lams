@@ -227,6 +227,8 @@ CREATE TABLE lams_organisation (
      , admin_browse_all_users TINYINT(1) NOT NULL DEFAULT 0
      , admin_change_status TINYINT(1) NOT NULL DEFAULT 0
      , admin_create_guest TINYINT(1) NOT NULL DEFAULT 0
+	 , enable_monitor_gradebook TINYINT(1) NOT NULL DEFAULT 0
+     , enable_learner_gradebook TINYINT(1) NOT NULL DEFAULT 0
      , locale_id INTEGER
      , archived_date DATETIME
      , ordered_lesson_ids TEXT

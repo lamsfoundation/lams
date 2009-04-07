@@ -94,6 +94,12 @@ public class Organisation implements Serializable, Comparable {
     private Boolean courseAdminCanCreateGuestAccounts;
     
     /** persistent field */
+    private Boolean enableGradeBookForMonitors;
+    
+    /** persistent field */
+    private Boolean enableGradeBookForLearners;
+    
+    /** persistent field */
     private Date archivedDate;
     
     private String orderedLessonIds;
@@ -103,7 +109,7 @@ public class Organisation implements Serializable, Comparable {
     			Date createDate, User createdBy, Workspace workspace, 
     			OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons,
     			Boolean courseAdminCanAddNewUsers, Boolean courseAdminCanBrowseAllUsers, Boolean courseAdminCanChangeStatusOfCourse, 
-    			Boolean courseAdminCanCreateGuestAccounts, String orderedLessonIds) {
+    			Boolean courseAdminCanCreateGuestAccounts, String orderedLessonIds, Boolean enableGradeBookForLearners, Boolean enableGradeBookForMonitors) {
         this.name = name;
         this.description = description;
         this.parentOrganisation = parentOrganisation;
@@ -119,6 +125,8 @@ public class Organisation implements Serializable, Comparable {
         this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
         this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
         this.orderedLessonIds = orderedLessonIds;
+        this.enableGradeBookForLearners = enableGradeBookForLearners;
+        this.enableGradeBookForMonitors = enableGradeBookForMonitors;
     }
 
     /** default constructor */
@@ -127,6 +135,8 @@ public class Organisation implements Serializable, Comparable {
         this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
         this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
         this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
+        this.enableGradeBookForLearners = Boolean.FALSE;
+        this.enableGradeBookForMonitors = Boolean.FALSE;
 
     }
 
@@ -144,6 +154,8 @@ public class Organisation implements Serializable, Comparable {
         this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
         this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
         this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
+        this.enableGradeBookForLearners = Boolean.FALSE;
+        this.enableGradeBookForMonitors = Boolean.FALSE;
     }
     public Organisation(String name, 
     					String description,						
@@ -485,6 +497,36 @@ public class Organisation implements Serializable, Comparable {
     public void setOrderedLessonIds(String orderedLessonIds)
     {
         this.orderedLessonIds = orderedLessonIds;
+    }
+
+    /** 
+     *            @hibernate.property
+     *              column="enable_teacher_gradebook"
+     *              length="1"
+     *              not-null="true"
+     *         
+     */
+    public Boolean getEnableGradeBookForMonitors() {
+        return enableGradeBookForMonitors;
+    }
+
+    public void setEnableGradeBookForMonitors(Boolean enableGradeBookForMonitors) {
+        this.enableGradeBookForMonitors = enableGradeBookForMonitors;
+    }
+
+    /** 
+     *            @hibernate.property
+     *              column="enable_learner_gradebook"
+     *              length="1"
+     *              not-null="true"
+     *         
+     */
+    public Boolean getEnableGradeBookForLearners() {
+        return enableGradeBookForLearners;
+    }
+
+    public void setEnableGradeBookForLearners(Boolean enableGradeBookForLearners) {
+        this.enableGradeBookForLearners = enableGradeBookForLearners;
     }
 
 }

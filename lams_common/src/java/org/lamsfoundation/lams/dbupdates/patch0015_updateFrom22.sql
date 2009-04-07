@@ -78,6 +78,10 @@ CREATE TABLE lams_activity_evaluation (
 -- LDEV-2174 -------------
 ALTER TABLE lams_tool DROP COLUMN classpath_addition, context_file;
 
+-- LDEV-2205 ------------ Adding couse level settings for gradebook
+ALTER TABLE lams_organisation ADD COLUMN enable_monitor_gradebook TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE lams_organisation ADD COLUMN enable_learner_gradebook TINYINT(1) NOT NULL DEFAULT 0;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
