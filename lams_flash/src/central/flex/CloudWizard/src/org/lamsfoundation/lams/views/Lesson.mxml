@@ -64,7 +64,7 @@
    				organisationID = Application.application.parameters.organisationID;
    				
    				var wizardEvent:WizardEvent = new WizardEvent(WizardEvent.INIT_WORKSPACE);
-   				wizardEvent.organisationID = 4;
+   				wizardEvent.organisationID = organisationID;
    				
    				this.dispatchEvent(wizardEvent);
    				
