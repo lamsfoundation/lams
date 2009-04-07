@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
+import org.lamsfoundation.lams.gradebook.util.GBGridView;
+
 public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 
     public static final String VIEW_MONITOR = "monitorView";
@@ -39,18 +41,19 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     
     // Only for learner view
     String gradeBookLearnerURL;
-
+    String finishDate;
+    String status;
     
     public GBLessonGridRowDTO() {
     }
 
     @Override
-    public ArrayList<String> toStringArray(String view) {
+    public ArrayList<String> toStringArray(GBGridView view) {
 	ArrayList<String> ret = new ArrayList<String>();
 	
 	ret.add(id.toString());
 	
-	if (view.equals(VIEW_MONITOR)) {
+	if (view == GBGridView.MON_COURSE) {
 	    if (gradeBookMonitorURL != null && gradeBookMonitorURL.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + gradeBookMonitorURL + "\",\"" + rowName + "\",1220,600)'>" + rowName
 			+ "</a>");
@@ -58,33 +61,24 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    ret.add(subGroup);
-	    ret.add(startDate);
-	    
-	    if (averageTimeTaken != null) {
-		ret.add(convertTimeToString(averageTimeTaken));
-	    } else {
-		ret.add("-");
-	    }
-	    
 	    ret.add(lessonDescription);
-	    if (averageMark != null) {
-		ret.add(averageMark.toString());
-	    } else {
-		ret.add("-");
-	    }
-	} else if (view.equals(VIEW_LEARNER)) {
+	    ret.add(startDate);
+	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
+	    ret.add((averageMark != null) ? averageMark.toString() : CELL_EMPTY);
+	    
+	} else if (view == GBGridView.LRN_COURSE) {
 	    if (gradeBookLearnerURL != null && gradeBookLearnerURL.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + gradeBookLearnerURL + "\",\"" + rowName + "\",796,570)'>" + rowName
 			+ "</a>");
 	    } else {
 		ret.add(rowName);
 	    }
+	    ret.add(subGroup);
 	    ret.add(lessonDescription);
-	    if (mark != null) {
-		ret.add(mark.toString());
-	    } else {
-		ret.add("-");
-	    }
+	    ret.add(status);
+	    ret.add(startDate);
+	    ret.add((finishDate != null) ? finishDate : CELL_EMPTY);
+	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
 	}
 	return ret;
     }
@@ -136,5 +130,20 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
-    
+
+    public String getFinishDate() {
+        return finishDate;
+    }
+
+    public void setFinishDate(String finishDate) {
+        this.finishDate = finishDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

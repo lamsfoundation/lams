@@ -18,34 +18,14 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dao; 
+ */
 
-import java.util.List;
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.util;
 
-import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
-import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
- 
-public interface IGradeBookDAO extends IBaseDAO{
-    
-    public GradeBookUserLesson getGradeBookUserDataForLesson(Long lessonID, Integer userID);
-    
-    public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID);
-    
-    public Double getGradeBookUserActivityMarkSum(Long lessonID, Integer userID);
-    
-    public List<GradeBookUserActivity> getAllGradeBookUserActivitiesForActivity(Long activityID);
-    
-    public Double getAverageMarkForLesson(Long lessonID);
-    
-    public long getAverageDurationLesson(Long lessonID);
-    
-    public long getAverageDurationForActivity(Long activityID);
-    
-    public Double getAverageMarkForActivity(Long activityID);
-
+public enum GBGridView {
+    MON_USER, 
+    MON_ACTIVITY, 
+    MON_COURSE, 
+    LRN_COURSE
 }
- 

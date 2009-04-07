@@ -51,6 +51,7 @@ public class GradeBookConstants {
     public static final String PARAM_TIME_TAKEN = "timeTaken";
     public static final String PARAM_AVG_TIME_TAKEN = "avgTimeTaken";
     public static final String PARAM_AVG_MARK = "avgMark";
+    public static final String PARAM_VIEW = "view";
     
     // Sort
     public static final String SORT_DESC = "desc";
@@ -64,9 +65,11 @@ public class GradeBookConstants {
     public static final String SEARCH_CONTAINS = "cn";
     
     // Views
-    public static final String VIEW_ACTIVITY = "activityView";
-    public static final String VIEW_USER = "userView";
-    
+    public static final String VIEW_MON_ACTIVITY = "monActivityView";
+    public static final String VIEW_MON_USER = "monUserView";
+    public static final String VIEW_MON_COURSE= "monCourse";
+    public static final String VIEW_LRN_COURSE = "lrnCourse";
+
     // XML Elemetns
     public static final String ELEMENT_ROWS = "rows";
     public static final String ELEMENT_PAGE = "page";

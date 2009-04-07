@@ -32,7 +32,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.service.IGradeBookService;
+import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradeBookConstants;
+import org.lamsfoundation.lams.gradebook.util.GradeBookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
@@ -145,8 +147,6 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 
 		logger.debug("user is staff");
 		
-
-
 		request.setAttribute("organisationID", oranisationID);
 		request.setAttribute("organisationName", organisation.getName());
 		
@@ -211,17 +211,17 @@ public class GradeBookMonitoringAction extends LamsDispatchAction {
 	initServices();
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	
-	String method = WebUtil.readStrParam(request, GradeBookConstants.PARAM_METHOD);
+	GBGridView view = GradeBookUtil.readGBGridViewParam(request, GradeBookConstants.PARAM_VIEW, false);
 
 	Long activityID = null;
 	Integer userID = null;
 	
 	// Fetch the id based on which grid it came from
-	if (method.equals(GradeBookConstants.VIEW_ACTIVITY)) {
+	if (view == GBGridView.MON_ACTIVITY) {
 	    activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	    userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_ID);
 	    
-	} else if (method.equals(GradeBookConstants.VIEW_USER)) {
+	} else if (view == GBGridView.MON_USER) {
 	    activityID = WebUtil.readLongParam(request, GradeBookConstants.PARAM_ID);
 	    userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_USERID);
 	}

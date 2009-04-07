@@ -25,11 +25,9 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
+import org.lamsfoundation.lams.gradebook.util.GBGridView;
+
 public class GBUserGridRowDTO extends GradeBookGridRowDTO {
-    
-    public static final String VIEW_USER = "userView";
-    public static final String VIEW_ACTIVITY = "activityView";
-    public static final String VIEW_COURSE_MONITOR = "courseMonitorView";
     
     String status;
     String feedback;
@@ -43,52 +41,39 @@ public class GBUserGridRowDTO extends GradeBookGridRowDTO {
     }
 
     @Override
-    public ArrayList<String> toStringArray(String view) {
+    public ArrayList<String> toStringArray(GBGridView view) {
 	ArrayList<String> ret = new ArrayList<String>();
 
 	ret.add(id.toString());
-
-	if (view.equals(VIEW_USER)) {
+	
+	if (view == GBGridView.MON_USER) {
+	    
 	    ret.add(rowName);
 	    ret.add(status);
-	    if (timeTaken != null) {
-		ret.add(convertTimeToString(timeTaken));
-	    } else {
-		ret.add("-");
-	    }
+	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
-	} else if (view.equals(VIEW_ACTIVITY)) {
+	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    
+	} else if (view == GBGridView.MON_ACTIVITY){
+	    
 	    if (activityUrl != null && activityUrl.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>" + rowName
 			+ "</a>");
 	    } else {
 		ret.add(rowName);
 	    }
-
 	    ret.add(status);
-	    if (timeTaken != null) {
-		ret.add(convertTimeToString(timeTaken));
-	    } else {
-		ret.add("-");
-	    }
-	    
+	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(output);
 	    ret.add(feedback);
-	} else if (view.equals(VIEW_COURSE_MONITOR)){
+	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    
+	} else if (view == GBGridView.MON_COURSE){
 	    ret.add(rowName);
 	    ret.add(status);
-	    if (timeTaken != null) {
-		ret.add(convertTimeToString(timeTaken));
-	    } else {
-		ret.add("-");
-	    }
+	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
-	}
-
-	if (mark != null) {
-	    ret.add(mark.toString());
-	} else {
-	    ret.add("-");
+	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
 	}
 
 	return ret;

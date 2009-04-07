@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 
+import org.lamsfoundation.lams.gradebook.util.GBGridView;
+
 public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 
     public static final String VIEW_USER = "userView";
@@ -47,11 +49,12 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
     }
 
     @Override
-    public ArrayList<String> toStringArray(String view) {
+    public ArrayList<String> toStringArray(GBGridView view) {
 	ArrayList<String> ret = new ArrayList<String>();
 	ret.add(id.toString());
 
-	if (view.equals(VIEW_USER)) {
+	if (view == GBGridView.MON_USER) {
+	    
 	    if (activityUrl != null && activityUrl.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>"
 			+ rowName + "</a>");
@@ -61,22 +64,12 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 	    ret.add(status);
 	    ret.add(output);
 	    ret.add(competences);
-	    
-	    if (timeTaken != null) {
-		ret.add(convertTimeToString(timeTaken));
-	    } else {
-		ret.add("-");
-	    }
-	    
+	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
-	    
-	    if (mark != null) {
-		ret.add(mark.toString());
-	    } else {
-		ret.add("-");
-	    }
+	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
 
-	} else if (view.equals(VIEW_ACTIVITY)) {
+	} else if (view == GBGridView.MON_ACTIVITY) {
+	   
 	    if (monitorUrl != null && monitorUrl.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + monitorUrl + "\",\"" + rowName + "\",796,570)'>"
 			+ rowName + "</a>");
@@ -84,20 +77,11 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    
-	    if (averageTimeTaken != null) {
-		ret.add(convertTimeToString(averageTimeTaken));
-	    } else {
-		ret.add("-");
-	    }
-
+	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add(competences);
-
-	    if (averageMark != null) {
-		ret.add(averageMark.toString());
-	    } else {
-		ret.add("-");
-	    }
+	    ret.add((averageMark != null) ? averageMark.toString() : CELL_EMPTY);
 	}
+	
 	return ret;
     }
 

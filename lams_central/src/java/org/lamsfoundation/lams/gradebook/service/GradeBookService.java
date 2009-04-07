@@ -42,6 +42,8 @@ import org.lamsfoundation.lams.gradebook.dto.GBActivityGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
+import org.lamsfoundation.lams.gradebook.util.GBGridView;
+import org.lamsfoundation.lams.gradebook.util.GradeBookConstants;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -204,13 +206,14 @@ public class GradeBookService implements IGradeBookService {
 		.getActivityId());
 
 	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
-	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity)firstActivity, lesson);
+	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity) firstActivity, lesson);
 	    gradeBookActivityDTOs.add(activityDTO);
 	}
 
 	for (Activity activity : activities) {
-	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue() && activity instanceof ToolActivity) {
-		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity)activity, lesson);
+	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()
+		    && activity instanceof ToolActivity) {
+		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity) activity, lesson);
 		gradeBookActivityDTOs.add(activityDTO);
 	    }
 	}
@@ -351,7 +354,7 @@ public class GradeBookService implements IGradeBookService {
      * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBLessonRows(org.lamsfoundation.lams.usermanagement.Organisation)
      */
     @SuppressWarnings("unchecked")
-    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user) {
+    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, GBGridView view) {
 	List<GBLessonGridRowDTO> lessonRows = new ArrayList<GBLessonGridRowDTO>();
 
 	if (organisation != null) {
@@ -367,16 +370,38 @@ public class GradeBookService implements IGradeBookService {
 			lessonRow.setId(lesson.getLessonId());
 			lessonRow.setStartDate(getLocaleDateString(user, lesson.getStartDateTime()));
 
-			// Setting the timeTaken value as the average for the lesson, as this is not a specific user view
-			lessonRow.setAverageTimeTaken(gradeBookDAO.getAverageDurationLesson(lesson.getLessonId()));
-
 			lessonRow.setLessonDescription(lesson.getLessonDescription());
-			lessonRow.setAverageMark(gradeBookDAO.getAverageMarkForLesson(lesson.getLessonId()));
 
-			String gbMonURL = Configuration.get(ConfigurationKeys.SERVER_URL)
-				+ "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
+			
+			if (view == GBGridView.MON_COURSE) {
+			    
+			    // Setting the averages for monitor view
+			    lessonRow.setAverageTimeTaken(gradeBookDAO.getAverageDurationLesson(lesson.getLessonId()));
+			    lessonRow.setAverageMark(gradeBookDAO.getAverageMarkForLesson(lesson.getLessonId()));
 
-			lessonRow.setGradeBookMonitorURL(gbMonURL);
+			    // Set the gradebook monitor url
+			    String gbMonURL = Configuration.get(ConfigurationKeys.SERVER_URL)
+				    + "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
+			    lessonRow.setGradeBookMonitorURL(gbMonURL);
+			} else if (view == GBGridView.LRN_COURSE) {
+			    
+			    GradeBookUserLesson gbLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(), user.getUserId());
+			    
+			    if (gbLesson != null) {
+				lessonRow.setMark(gbLesson.getMark());
+			    }
+			    
+			    LearnerProgress learnerProgress = monitoringService.getLearnerProgress(user.getUserId(), lesson
+				    .getLessonId());
+			    lessonRow.setStatus(getLessonStatusStr(learnerProgress));
+			    if (learnerProgress != null) {
+				if (learnerProgress.getStartDate() != null && learnerProgress.getFinishDate() != null) {
+				    lessonRow.setTimeTaken(learnerProgress.getFinishDate().getTime()
+					    - learnerProgress.getStartDate().getTime());
+				}
+			    }
+			}
+
 			if (lesson.getOrganisation().getOrganisationId() != organisation.getOrganisationId()) {
 			    lessonRow.setSubGroup(lesson.getOrganisation().getName());
 			} else {
@@ -425,8 +450,9 @@ public class GradeBookService implements IGradeBookService {
 	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
 	gactivityDTO.setId(activity.getActivityId());
 	gactivityDTO.setRowName(activity.getTitle());
-	
-	// setting the average time
+
+	// Setting averages 
+	gactivityDTO.setAverageMark(gradeBookDAO.getAverageMarkForActivity(activity.getActivityId()));
 	gactivityDTO.setAverageTimeTaken(gradeBookDAO.getAverageDurationForActivity(activity.getActivityId()));
 
 	String monitorUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + activity.getTool().getMonitorUrl() + "?"
@@ -448,26 +474,6 @@ public class GradeBookService implements IGradeBookService {
 	    }
 	}
 	gactivityDTO.setCompetences(competenceMappingsStr);
-
-	List<GradeBookUserActivity> gradeBookUserActivities = gradeBookDAO
-		.getAllGradeBookUserActivitiesForActivity(activity.getActivityId());
-
-	if (gradeBookUserActivities != null) {
-
-	    double sum = 0;
-	    double count = 0;
-	    for (GradeBookUserActivity gact : gradeBookUserActivities) {
-		if (gact.getMark() != null) {
-		    count++;
-		    sum += gact.getMark();
-		}
-	    }
-
-	    // Setting the mark as an average for the class as this is not a specific user view
-	    if (count != 0) {
-		gactivityDTO.setAverageMark(sum / count);
-	    }
-	}
 
 	return gactivityDTO;
     }
@@ -500,6 +506,10 @@ public class GradeBookService implements IGradeBookService {
 	// Setting status
 	gactivityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
 	gactivityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
+
+	// Setting averages 
+	gactivityDTO.setAverageMark(gradeBookDAO.getAverageMarkForActivity(activity.getActivityId()));
+	gactivityDTO.setAverageTimeTaken(gradeBookDAO.getAverageDurationForActivity(activity.getActivityId()));
 
 	// Get the competences for this activity
 	Set<CompetenceMapping> competenceMappings = activity.getCompetenceMappings();

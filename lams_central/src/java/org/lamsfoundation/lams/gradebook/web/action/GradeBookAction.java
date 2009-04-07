@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.gradebook.web.action;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -41,6 +40,7 @@ import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradeBookService;
+import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradeBookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradeBookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -117,7 +117,7 @@ public class GradeBookAction extends LamsDispatchAction {
 	String searchField = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_FIELD, true);
 	String searchOper = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_OPERATION, true);
 	String searchString = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_STRING, true);
-	String view = WebUtil.readStrParam(request, GradeBookConstants.PARAM_METHOD);
+	GBGridView view = GradeBookUtil.readGBGridViewParam(request, GradeBookConstants.PARAM_VIEW, false);
 
 	// Getting the lesson id
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -130,7 +130,7 @@ public class GradeBookAction extends LamsDispatchAction {
 
 	    // Get the user gradebook list from the db
 	    // A slightly different list is needed for userview or activity view
-	    if (view.equals(GradeBookConstants.VIEW_USER)) {
+	    if (view == GBGridView.MON_USER) {
 		Integer userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_USERID);
 		User learner = (User) userService.findById(User.class, userID);
 		if (learner != null) {
@@ -140,7 +140,7 @@ public class GradeBookAction extends LamsDispatchAction {
 		    logger.error("No learner found for: " + userID);
 		    return null;
 		}
-	    } else if (view.equals(GradeBookConstants.VIEW_ACTIVITY)) {
+	    } else if (view == GBGridView.MON_ACTIVITY) {
 		gradeBookActivityDTOs = gradeBookService.getGBActivityRowsForLesson(lesson);
 	    }
 
@@ -196,7 +196,7 @@ public class GradeBookAction extends LamsDispatchAction {
 	String searchField = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_FIELD, true);
 	String searchOper = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_OPERATION, true);
 	String searchString = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_STRING, true);
-	String view = WebUtil.readStrParam(request, GradeBookConstants.PARAM_METHOD);
+	GBGridView view = GradeBookUtil.readGBGridViewParam(request, GradeBookConstants.PARAM_VIEW, false);
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
@@ -207,9 +207,9 @@ public class GradeBookAction extends LamsDispatchAction {
 	    // Get the user gradebook list from the db
 	    List<GBUserGridRowDTO> gradeBookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 
-	    if (view.equals(GradeBookConstants.VIEW_USER) || view.equals("courseMonitorView")) {
+	    if (view == GBGridView.MON_USER || view == GBGridView.MON_COURSE) {
 		gradeBookUserDTOs = gradeBookService.getGBUserRowsForLesson(lesson);
-	    } else if (view.equals(GradeBookConstants.VIEW_ACTIVITY)) {
+	    } else if (view == GBGridView.MON_ACTIVITY) {
 		Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
 		Activity activity = monitoringService.getActivityById(activityID);
@@ -266,7 +266,7 @@ public class GradeBookAction extends LamsDispatchAction {
 	String searchField = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_FIELD, true);
 	String searchOper = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_OPERATION, true);
 	String searchString = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_STRING, true);
-	String view = WebUtil.readStrParam(request, GradeBookConstants.PARAM_METHOD);
+	GBGridView view = GradeBookUtil.readGBGridViewParam(request, GradeBookConstants.PARAM_VIEW, false);
 
 	User user = getRealUser();
 
@@ -280,7 +280,7 @@ public class GradeBookAction extends LamsDispatchAction {
 
 		List<GBLessonGridRowDTO> gradeBookLessonDTOs = new ArrayList<GBLessonGridRowDTO>();
 
-		gradeBookLessonDTOs = gradeBookService.getGBLessonRows(organisation, user);
+		gradeBookLessonDTOs = gradeBookService.getGBLessonRows(organisation, user, view);
 
 		if (sortBy == null) {
 		    sortBy = GradeBookConstants.PARAM_ID;
@@ -316,11 +316,6 @@ public class GradeBookAction extends LamsDispatchAction {
 	} else {
 	    return null;
 	}
-    }
-
-    private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
-	req.setAttribute("messageKey", messageKey);
-	return mapping.findForward("message");
     }
 
     private void initServices() {

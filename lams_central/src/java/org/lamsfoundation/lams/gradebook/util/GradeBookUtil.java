@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,6 +46,7 @@ import org.lamsfoundation.lams.gradebook.dto.comparators.GBIDComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBMarkComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBRowNameComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBTimeTakenComparator;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -70,7 +72,7 @@ public class GradeBookUtil {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static String toGridXML(List gridRows, String view, String sortBy, boolean isSearch, String searchField,
+    public static String toGridXML(List gridRows, GBGridView view, String sortBy, boolean isSearch, String searchField,
 	    String searchOper, String searchString, String sortOrder, int rowLimit, int page) {
 	
 	// Alter the set based on the parameters
@@ -106,7 +108,7 @@ public class GradeBookUtil {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static String toGridXML(List gridRows, int page, int totalPages, String view) {
+    public static String toGridXML(List gridRows, int page, int totalPages, GBGridView view) {
 	String xml = "";
 	try {
 	    Document document = getDocument();
@@ -279,6 +281,22 @@ public class GradeBookUtil {
 
 	}
 	return ret;
+    }
+    
+    public static GBGridView readGBGridViewParam(HttpServletRequest request, String param_mode, boolean optional) {
+	String view = WebUtil.readStrParam(request, param_mode, optional);
+	if (view == null) {
+	    return null;
+	} else if (view.equals(GradeBookConstants.VIEW_MON_USER))
+	    return GBGridView.MON_USER;
+	else if (view.equals(GradeBookConstants.VIEW_MON_ACTIVITY))
+	    return GBGridView.MON_ACTIVITY;
+	else if (view.equals(GradeBookConstants.VIEW_MON_COURSE))
+	    return GBGridView.MON_COURSE;
+	else if (view.equals(GradeBookConstants.VIEW_LRN_COURSE))
+	    return GBGridView.LRN_COURSE;
+	else
+	    throw new IllegalArgumentException("[" + view + "] is not a legal mode" + "in LAMS");
     }
 
 }

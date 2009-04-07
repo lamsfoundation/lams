@@ -23,7 +23,7 @@
 			jQuery("#userView").jqGrid({
 				caption: "Learner View",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&method=userView&lessonID=${lessonDetails.lessonID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monUserView&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
 			    width: 990,
 			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
@@ -56,7 +56,7 @@
 					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   	jQuery("#"+subgrid_table_id).jqGrid({
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&method=userView&userID=" + userID,
+						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     height: "100%",
 						     width: 920,
 						     cellEdit:true,
@@ -65,7 +65,7 @@
 						     pager: subgrid_table_id + "_pager",
 							 rowList:[5,10,20,30],
 							 rowNum:10,
-						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=userView&userID=" + userID,
+						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Time Taken', 'Activity FeedBack', 'Mark'],
 						     colModel: [
 						       	{name:'id', width:10, index:'id', sortable:false, hidden:true, hidedlg:true},
@@ -149,7 +149,7 @@
 				jQuery("#activityView").jqGrid({
 					caption: "Activity View",
 				    datatype: "xml",
-				    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&method=activityView&lessonID=${lessonDetails.lessonID}",
+				    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}",
 				    height: "100%",
 				    width: 990,
 				    cellEdit: true,
@@ -162,9 +162,9 @@
 				    colModel:[
 				      {name:'id', width:10, index:'id', sortable:false, hidden:true, hidedlg:true},
 					  {name:'rowName', width:60, index:'rowName', sortable:true, editable: false},
-					  {name:'timeTaken', index:'timeTaken', sortable:true, editable: false},
+					  {name:'avgTimeTaken', index:'avgTimeTaken', sortable:true, editable: false},
 					  {name:'competences', width:250, index:'competences', sortable:false, editable: false, hidden:true},
-				      {name:'mark',index:'mark', sortable:true, editable:false}
+				      {name:'avgMark',index:'avgMark', sortable:true, editable:false}
 				    ],
 				    loadError: function(xhr,st,err) {
 			    		jQuery("#activityView").clearGridData();
@@ -179,12 +179,12 @@
 					   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   jQuery("#"+subgrid_table_id).jqGrid({
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&method=activityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID,
+						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID,
 						     height: "100%",
 						     width: 920,
 						     cellEdit:true,
 						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
-						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&method=activityView&activityID=" + activityID,
+						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&view=monActivityView&activityID=" + activityID,
 						     sortorder: "asc", 
 							 sortname: "fullName", 
 							 pager: subgrid_table_id + "_pager",

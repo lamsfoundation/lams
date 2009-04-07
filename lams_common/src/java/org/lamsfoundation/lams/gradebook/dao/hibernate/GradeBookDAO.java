@@ -50,9 +50,12 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 
     private static final String GET_AVERAGE_COMPLETION_TIME = "select prog.finishDate, prog.startDate from LearnerProgress prog where "
 	    + "prog.lesson.lessonId=:lessonID";
-    
+
     private static final String GET_AVERAGE_COMPLETION_TIME_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg, Activity act where "
 	    + "compProg.activity.activityId=:activityID";
+
+    private static final String GET_AVERAGE_MARK_FOR_ACTIVTY = "select avg(gact.mark) from GradeBookUserActivity gact where "
+	    + "gact.activity.activityId=:activityID";
 
     @SuppressWarnings("unchecked")
     public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID) {
@@ -147,11 +150,11 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 	}
 	return 0;
     }
-    
+
     @SuppressWarnings("unchecked")
     public long getAverageDurationForActivity(Long activityID) {
-	List<Object[]> result = (List<Object[]>) getSession().createQuery(GET_AVERAGE_COMPLETION_TIME_ACTIVITY).setLong(
-		"activityID", activityID.longValue()).list();
+	List<Object[]> result = (List<Object[]>) getSession().createQuery(GET_AVERAGE_COMPLETION_TIME_ACTIVITY)
+		.setLong("activityID", activityID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0) {
@@ -178,5 +181,19 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
 
 	}
 	return 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Double getAverageMarkForActivity(Long activityID) {
+	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_ACTIVTY).setLong("activityID", activityID.longValue())
+		.list();
+
+	if (result != null) {
+	    if (result.size() > 0)
+		return (Double) result.get(0);
+	}
+
+	return 0.0;
+
     }
 }

@@ -24,10 +24,14 @@
 package org.lamsfoundation.lams.gradebook.dto; 
 
 import java.util.ArrayList;
+
+import org.lamsfoundation.lams.gradebook.util.GBGridView;
  
 public abstract class GradeBookGridRowDTO{
     
-    public abstract ArrayList<String> toStringArray(String view);
+    public abstract ArrayList<String> toStringArray(GBGridView view);
+    
+    public static final String CELL_EMPTY = "-";
     
     // The id for a row, might be activityId, userId, lessonID etc
     public Long id;

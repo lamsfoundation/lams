@@ -28,6 +28,7 @@ import java.util.List;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
+import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -120,7 +121,7 @@ public interface IGradeBookService {
      * @param organisation
      * @return
      */
-    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user);
+    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, GBGridView view);
     
 }
  

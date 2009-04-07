@@ -15,31 +15,30 @@
 	<jsp:include page="jqGridIncludes.jsp"></jsp:include>
 
 	<script type="text/javascript">
+		
 		jQuery(document).ready(function(){
   
 			jQuery("#organisationGrid").jqGrid({
 				caption: "${organisationName}",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&method=monitorView&organisationID=${organisationID}",
+			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=monCourse&organisationID=${organisationID}",
 			    height: "100%",
 			    width: 990,
 			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
-			    cellEdit: true,
 			    sortorder: "asc", 
 			    sortname: "id", 
 			    pager: 'organisationGridPager',
 			    rowList:[5,10,20,30],
 			    rowNum:10,
-				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradeBookData&lessonID=${lessonDetails.lessonID}",
-			    colNames:["", 'Lesson Name', 'Sub-Group', 'Start Date', 'Average Time Taken', 'Description', 'Average Mark'],
+				colNames:["", 'Lesson Name', 'Sub-Group', 'Start Date', 'Average Time Taken', 'Description', 'Average Mark'],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
 			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false},
-			      {name:'startDate',index:'startDate', sortable:false, editable:false, search:false},
-			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false},
 			      {name:'description',index:'description', sortable:false, editable:false, search:false},
-			      {name:'mark',index:'mark', sortable:true, editable:false, search:false}
+			      {name:'startDate',index:'startDate', sortable:false, editable:false, search:false},
+			      {name:'avgTimeTaken',index:'avgTimeTaken', sortable:true, editable:false, search:false},
+			      {name:'avgMark',index:'avgMark', sortable:true, editable:false, search:false}
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#organisationGrid").clearGridData();
@@ -53,7 +52,7 @@
 				   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 				   jQuery("#"+subgrid_table_id).jqGrid({
 					     datatype: "xml",
-					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&method=courseMonitorView&lessonID=" + lessonID,
+					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monCourse&lessonID=" + lessonID,
 					     height: "100%",
 					     width: 920,
 					     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
