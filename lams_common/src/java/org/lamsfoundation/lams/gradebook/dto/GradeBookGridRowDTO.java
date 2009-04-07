@@ -80,6 +80,10 @@ public abstract class GradeBookGridRowDTO{
 	    return null;
 	}
     }
+    
+    protected String toItalic(String string) {
+	return "<i>" + string + "</i>";
+    }
 
     public Long getTimeTaken() {
         return timeTaken;

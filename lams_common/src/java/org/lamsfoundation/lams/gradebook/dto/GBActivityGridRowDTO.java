@@ -80,6 +80,14 @@ public class GBActivityGridRowDTO extends GradeBookGridRowDTO {
 	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add(competences);
 	    ret.add((averageMark != null) ? averageMark.toString() : CELL_EMPTY);
+	} else if (view == GBGridView.LRN_ACTIVITY) {
+	    ret.add(rowName);
+	    ret.add(status);
+	    ret.add(feedback);
+	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
+	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add((averageMark != null) ? averageMark.toString() : CELL_EMPTY); 
+	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY); 
 	}
 	
 	return ret;

@@ -69,6 +69,7 @@ public class GradeBookConstants {
     public static final String VIEW_MON_USER = "monUserView";
     public static final String VIEW_MON_COURSE= "monCourse";
     public static final String VIEW_LRN_COURSE = "lrnCourse";
+    public static final String VIEW_LRN_ACTIVITY = "lrnActivity";
 
     // XML Elemetns
     public static final String ELEMENT_ROWS = "rows";

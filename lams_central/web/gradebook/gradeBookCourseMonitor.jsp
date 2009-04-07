@@ -30,12 +30,11 @@
 			    pager: 'organisationGridPager',
 			    rowList:[5,10,20,30],
 			    rowNum:10,
-				colNames:["", 'Lesson Name', 'Sub-Group', 'Start Date', 'Average Time Taken', 'Description', 'Average Mark'],
+				colNames:["", 'Lesson Name', 'Sub-Group', 'Start Date', 'Average Time Taken', 'Average Mark'],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
 			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false},
-			      {name:'description',index:'description', sortable:false, editable:false, search:false},
 			      {name:'startDate',index:'startDate', sortable:false, editable:false, search:false},
 			      {name:'avgTimeTaken',index:'avgTimeTaken', sortable:true, editable:false, search:false},
 			      {name:'avgMark',index:'avgMark', sortable:true, editable:false, search:false}

@@ -119,9 +119,20 @@ public class GradeBookAction extends LamsDispatchAction {
 	String searchString = WebUtil.readStrParam(request, GradeBookConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradeBookUtil.readGBGridViewParam(request, GradeBookConstants.PARAM_VIEW, false);
 
-	// Getting the lesson id
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
+	
+	// Getting userID param, it is passed differently from different views
+	Integer userID = null;
+	if (view == GBGridView.MON_USER) {
+	    userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_USERID);
+	} else if (view == GBGridView.LRN_ACTIVITY) {
+	    
+	    UserDTO userDTO = getUser();
+	    if (userDTO != null) {
+		userID = userDTO.getUserID();
+	    }
+	}
+	
 	Lesson lesson = lessonService.getLesson(lessonID);
 
 	if (lesson != null) {
@@ -130,8 +141,8 @@ public class GradeBookAction extends LamsDispatchAction {
 
 	    // Get the user gradebook list from the db
 	    // A slightly different list is needed for userview or activity view
-	    if (view == GBGridView.MON_USER) {
-		Integer userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_USERID);
+	    if (view == GBGridView.MON_USER || view == GBGridView.LRN_ACTIVITY) {
+		//Integer userID = WebUtil.readIntParam(request, GradeBookConstants.PARAM_USERID);
 		User learner = (User) userService.findById(User.class, userID);
 		if (learner != null) {
 		    gradeBookActivityDTOs = gradeBookService.getGBActivityRowsForLearner(lesson, learner);

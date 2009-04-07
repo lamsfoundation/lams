@@ -27,5 +27,6 @@ public enum GBGridView {
     MON_USER, 
     MON_ACTIVITY, 
     MON_COURSE, 
-    LRN_COURSE
+    LRN_COURSE,
+    LRN_ACTIVITY
 }

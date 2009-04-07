@@ -32,7 +32,6 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     public static final String VIEW_MONITOR = "monitorView";
     public static final String VIEW_LEARNER = "learnerView";
 
-    String lessonDescription;
     String subGroup;
     String startDate;
     
@@ -43,6 +42,7 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     String gradeBookLearnerURL;
     String finishDate;
     String status;
+    String feedback;
     
     public GBLessonGridRowDTO() {
     }
@@ -61,9 +61,8 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    ret.add(subGroup);
-	    ret.add(lessonDescription);
 	    ret.add(startDate);
-	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
+	    ret.add((averageTimeTaken != null && averageTimeTaken != 0) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add((averageMark != null) ? averageMark.toString() : CELL_EMPTY);
 	    
 	} else if (view == GBGridView.LRN_COURSE) {
@@ -74,11 +73,15 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    ret.add(subGroup);
-	    ret.add(lessonDescription);
-	    ret.add(status);
-	    ret.add(startDate);
+	    ret.add((status != null) ? status : CELL_EMPTY);
+	    ret.add(feedback);
+	    ret.add((startDate != null) ? startDate : CELL_EMPTY);
 	    ret.add((finishDate != null) ? finishDate : CELL_EMPTY);
+	    ret.add((averageTimeTaken != null && averageTimeTaken != 0) ? toItalic(convertTimeToString(averageTimeTaken)) : CELL_EMPTY);
+	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add((averageMark != null) ? toItalic(averageMark.toString()) : CELL_EMPTY);
 	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    
 	}
 	return ret;
     }
@@ -89,14 +92,6 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
 
     public void setLessonName(String rowName) {
 	this.rowName = rowName;
-    }
-
-    public String getLessonDescription() {
-	return lessonDescription;
-    }
-
-    public void setLessonDescription(String lessonDescription) {
-	this.lessonDescription = lessonDescription;
     }
 
     public String getGradeBookMonitorURL() {
@@ -146,4 +141,14 @@ public class GBLessonGridRowDTO extends GradeBookGridRowDTO {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
+    
+    
 }

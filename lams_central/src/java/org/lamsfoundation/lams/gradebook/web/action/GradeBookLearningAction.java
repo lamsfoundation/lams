@@ -74,7 +74,7 @@ public class GradeBookLearningAction extends LamsDispatchAction{
     }
     
     @SuppressWarnings("unchecked")
-    public ActionForward courseMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward courseLearner(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	try {

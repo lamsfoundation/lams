@@ -295,8 +295,10 @@ public class GradeBookUtil {
 	    return GBGridView.MON_COURSE;
 	else if (view.equals(GradeBookConstants.VIEW_LRN_COURSE))
 	    return GBGridView.LRN_COURSE;
+	else if (view.equals(GradeBookConstants.VIEW_LRN_ACTIVITY))
+	    return GBGridView.LRN_ACTIVITY;
 	else
-	    throw new IllegalArgumentException("[" + view + "] is not a legal mode" + "in LAMS");
+	    throw new IllegalArgumentException("[" + view + "] is not a legal gradebook view");
     }
 
 }

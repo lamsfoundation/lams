@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
-import org.lamsfoundation.lams.gradebook.util.GradeBookConstants;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -128,6 +127,47 @@ public class GradeBookService implements IGradeBookService {
 	}
 	return gradeBookActivityDTOs;
     }
+    
+    /**
+     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBActivityRowsForLesson(org.lamsfoundation.lams.lesson.Lesson)
+     */
+    @SuppressWarnings("unchecked")
+    public List<GradeBookGridRowDTO> getGBActivityRowsForLesson(Lesson lesson) {
+
+	logger.debug("Getting gradebook data for lesson: " + lesson.getLessonId());
+
+	List<GradeBookGridRowDTO> gradeBookActivityDTOs = new ArrayList<GradeBookGridRowDTO>();
+
+	Set<Activity> activities = (Set<Activity>) lesson.getLearningDesign().getActivities();
+
+	/*
+	 * Hibernate CGLIB is failing to load the first activity in
+	 * the sequence as a ToolActivity for some mysterious reason
+	 * Causes a ClassCastException when you try to cast it, even
+	 * if it is a ToolActivity.
+	 * 
+	 * THIS IS A HACK to retrieve the first tool activity 
+	 * manually so it can be cast as a ToolActivity - if it is one
+	 */
+	Activity firstActivity = monitoringService.getActivityById(lesson.getLearningDesign().getFirstActivity()
+		.getActivityId());
+
+	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
+	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity) firstActivity, lesson);
+	    gradeBookActivityDTOs.add(activityDTO);
+	}
+
+	for (Activity activity : activities) {
+	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()
+		    && activity instanceof ToolActivity) {
+		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity) activity, lesson);
+		gradeBookActivityDTOs.add(activityDTO);
+	    }
+	}
+
+	return gradeBookActivityDTOs;
+
+    }
 
     /**
      * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBUserRowsForActivity(org.lamsfoundation.lams.lesson.Lesson,
@@ -181,46 +221,7 @@ public class GradeBookService implements IGradeBookService {
 
     }
 
-    /**
-     * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBActivityRowsForLesson(org.lamsfoundation.lams.lesson.Lesson)
-     */
-    @SuppressWarnings("unchecked")
-    public List<GradeBookGridRowDTO> getGBActivityRowsForLesson(Lesson lesson) {
 
-	logger.debug("Getting gradebook data for lesson: " + lesson.getLessonId());
-
-	List<GradeBookGridRowDTO> gradeBookActivityDTOs = new ArrayList<GradeBookGridRowDTO>();
-
-	Set<Activity> activities = (Set<Activity>) lesson.getLearningDesign().getActivities();
-
-	/*
-	 * Hibernate CGLIB is failing to load the first activity in
-	 * the sequence as a ToolActivity for some mysterious reason
-	 * Causes a ClassCastException when you try to cast it, even
-	 * if it is a ToolActivity.
-	 * 
-	 * THIS IS A HACK to retrieve the first tool activity 
-	 * manually so it can be cast as a ToolActivity - if it is one
-	 */
-	Activity firstActivity = monitoringService.getActivityById(lesson.getLearningDesign().getFirstActivity()
-		.getActivityId());
-
-	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
-	    GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity) firstActivity, lesson);
-	    gradeBookActivityDTOs.add(activityDTO);
-	}
-
-	for (Activity activity : activities) {
-	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()
-		    && activity instanceof ToolActivity) {
-		GBActivityGridRowDTO activityDTO = getGradeBookActivityDTO((ToolActivity) activity, lesson);
-		gradeBookActivityDTOs.add(activityDTO);
-	    }
-	}
-
-	return gradeBookActivityDTOs;
-
-    }
 
     /**
      * @see org.lamsfoundation.lams.gradebook.service.IGradeBookService#getGBUserRowsForLesson(org.lamsfoundation.lams.lesson.Lesson)
@@ -370,9 +371,6 @@ public class GradeBookService implements IGradeBookService {
 			lessonRow.setId(lesson.getLessonId());
 			lessonRow.setStartDate(getLocaleDateString(user, lesson.getStartDateTime()));
 
-			lessonRow.setLessonDescription(lesson.getLessonDescription());
-
-			
 			if (view == GBGridView.MON_COURSE) {
 			    
 			    // Setting the averages for monitor view
@@ -387,8 +385,12 @@ public class GradeBookService implements IGradeBookService {
 			    
 			    GradeBookUserLesson gbLesson = gradeBookDAO.getGradeBookUserDataForLesson(lesson.getLessonId(), user.getUserId());
 			    
+			    lessonRow.setAverageTimeTaken(gradeBookDAO.getAverageDurationLesson(lesson.getLessonId()));
+			    lessonRow.setAverageMark(gradeBookDAO.getAverageMarkForLesson(lesson.getLessonId()));
+			    
 			    if (gbLesson != null) {
 				lessonRow.setMark(gbLesson.getMark());
+				lessonRow.setFeedback(gbLesson.getFeedback());
 			    }
 			    
 			    LearnerProgress learnerProgress = monitoringService.getLearnerProgress(user.getUserId(), lesson
@@ -399,6 +401,8 @@ public class GradeBookService implements IGradeBookService {
 				    lessonRow.setTimeTaken(learnerProgress.getFinishDate().getTime()
 					    - learnerProgress.getStartDate().getTime());
 				}
+				
+				lessonRow.setFinishDate(getLocaleDateString(user, learnerProgress.getFinishDate()));
 			    }
 			}
 
@@ -422,6 +426,10 @@ public class GradeBookService implements IGradeBookService {
     }
 
     private String getLocaleDateString(User user, Date date) {
+	if (user == null || date == null) {
+	    return null;
+	}
+	
 	Locale locale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
 	String dateStr = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale).format(date);
 	return dateStr;
