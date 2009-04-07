@@ -5,8 +5,6 @@
 	
 	<mx:Script>
 		<![CDATA[
-			import mx.rpc.Fault;
-			import mx.binding.utils.BindingUtils;
 			import mx.controls.Alert;
 			import mx.core.Application;
 			import mx.events.IndexChangedEvent;
@@ -15,6 +13,7 @@
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryEvent;
 			import org.lamsfoundation.lams.common.managers.LamsAjaxOverlayManager;
+			
 			import org.lamsfoundation.lams.events.*;
 		
 			public static const LESSON_INDEX:uint = 0;

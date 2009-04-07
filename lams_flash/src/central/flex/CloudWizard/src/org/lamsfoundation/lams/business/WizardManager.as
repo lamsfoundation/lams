@@ -7,10 +7,8 @@ package org.lamsfoundation.lams.business
 	import flash.utils.setInterval;
 	
 	import mx.collections.ArrayCollection;
-	import mx.rpc.Fault;
 	
 	import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
-	import org.lamsfoundation.lams.events.WizardErrorEvent;
 	import org.lamsfoundation.lams.vos.Lesson;
 	import org.lamsfoundation.lams.vos.WorkspaceItem;
 	
@@ -34,6 +32,7 @@ package org.lamsfoundation.lams.business
 		private var _usersLoaded:Boolean;
 		
 		private var _lessonID:uint;
+		private var _organisationID:uint;
 		private var _initializedLesson:Lesson;
 		
 		private var _lessonInstances:Array;
@@ -106,10 +105,11 @@ package org.lamsfoundation.lams.business
 		
 		/*-.........................................Methods..........................................*/
 		
-		public function initWorkspace():WorkspaceItem {
+		public function initWorkspace(organisationID:uint):WorkspaceItem {
 			var item:WorkspaceItem = new WorkspaceItem();
 			item.populate({name: "root", description: "root node", resourceID: -1, resourceType:WorkspaceItem.RT_FOLDER});
 			
+			_organisationID = organisationID;
 			_workspaceRoot = item;
 			
 			dispatchEvent(new Event("workspaceRootChanged"));
@@ -117,14 +117,22 @@ package org.lamsfoundation.lams.business
 			return workspaceRoot;
 		}
 		
-		public function setFolderContents(contents:Object, folder:WorkspaceItem):void {
+		public function setFolderContents(contents:Object, folder:WorkspaceItem):Array {
+			var foldersToOpen:Array = new Array();
+			
 			for each(var content:Object in contents.contents as ArrayCollection) {
    				var newItem:WorkspaceItem = new WorkspaceItem();
    				newItem.populate(content);	
-   				newItem.parentWorkspaceFolderID = folder.workspaceFolderID;
    				
-   				folder.children.addItem(newItem);
+   				newItem.parentWorkspaceFolderID = folder.workspaceFolderID;
+  				
+  				if(newItem.resourceID == _organisationID)
+  					foldersToOpen.push(newItem); 
+  				
+  				folder.children.addItem(newItem);
    			}
+   			
+   			return foldersToOpen;
 		}
 		
 		public function setUsersLoaded(value:Boolean):void {

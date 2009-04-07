@@ -54,7 +54,7 @@
 	</EventHandlers>
 
 	<EventHandlers type="{WizardEvent.INIT_WORKSPACE}">
-		<MethodInvoker generator="{WizardManager}" method="initWorkspace" />
+		<MethodInvoker generator="{WizardManager}" method="initWorkspace" arguments="{event.organisationID}" />
 		<EventAnnouncer generator="{WizardEvent}" type="{WizardEvent.GET_FOLDER_CONTENTS}">
 			<Properties folder="{lastReturn}" folderID="{lastReturn.resourceID}" /> 
 		</EventAnnouncer>
@@ -69,7 +69,7 @@
 					method="parseObject" arguments="{resultObject}" />
 				<MethodInvoker generator="{WizardManager}" method="setFolderContents" arguments="{[lastReturn, event.folder]}" />
 				<EventAnnouncer generator="{WizardEvent}" type="{WizardEvent.OPEN_FOLDER}">
-					<Properties folder="{event.folder}" />
+					<Properties folder="{event.folder}" folders="{lastReturn}" />
 				</EventAnnouncer>
 			</resultHandlers>
 		</HTTPServiceInvoker>

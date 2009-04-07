@@ -38,6 +38,7 @@ package org.lamsfoundation.lams.events
 		
 		public var folderID:int = -1;
 		public var folder:WorkspaceItem;
+		public var folders:Array;
 		
 		public var organisationID:uint = Application.application.parameters.organisationID;
 		
