@@ -145,7 +145,7 @@ public class DisplayGroupAction extends Action {
 	    String link = "javascript:openGradeBookLearnerPopup(" + "'" + org.getName() + "','"
 		    + Configuration.get(ConfigurationKeys.SERVER_URL)
 		    + "/gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID="
-		    + org.getOrganisationId() + "'," + "1220,500,0,0);";
+		    + org.getOrganisationId() + "'," + "750,400,0,0);";
 
 	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "manage-group-button", null));
 	}
@@ -174,7 +174,7 @@ public class DisplayGroupAction extends Action {
 		    String link = "javascript:openGradeBookCourseMonitorPopup(" + "'" + org.getName() + "','"
 			    + Configuration.get(ConfigurationKeys.SERVER_URL)
 			    + "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
-			    + org.getOrganisationId() + "'," + "1220,500,0,0);";
+			    + org.getOrganisationId() + "'," + "850,400,0,0);";
 
 		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "manage-group-button",
 			    "index.coursegradebook.tooltip"));
@@ -318,7 +318,7 @@ public class DisplayGroupAction extends Action {
 		    || (parent != null && parent.getEnableGradeBookForMonitors())) {
 		String link = "javascript:openGradeBookLessonMonitorPopup(" + "'" + org.getName() + "','"
 			+ Configuration.get(ConfigurationKeys.SERVER_URL)
-			+ "/gradebook/gradebookMonitoring.do?lessonID=" + bean.getId() + "'," + "1220,700,0,0);";
+			+ "/gradebook/gradebookMonitoring.do?lessonID=" + bean.getId() + "'," + "850,700,0,0);";
 
 		lessonLinks.add(new IndexLinkBean("index.coursegradebookmonitor", link));
 	    }

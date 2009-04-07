@@ -25,7 +25,7 @@
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monUserView&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
-			    width: 990,
+			    width: 700,
 			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 			    cellEdit: true,
 			    viewrecords: true,
@@ -39,10 +39,10 @@
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
-			      {name:'status',index:'status', align:'center', width:30, sortable:false, editable:false, search:false},
-			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false},
+			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
+			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
-			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false}
+			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#userView").clearGridData();
@@ -58,7 +58,7 @@
 						     datatype: "xml",
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     height: "100%",
-						     width: 920,
+						     width: 650,
 						     cellEdit:true,
 						     sortname: "id",
 						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
@@ -68,14 +68,14 @@
 						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Time Taken', 'Activity FeedBack', 'Mark'],
 						     colModel: [
-						       	{name:'id', width:10, index:'id', sortable:false, hidden:true, hidedlg:true},
-								{name:'rowName', width:60, index:'rowName', sortable:false, editable: false},
-								{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false},
-								{name:'output', width:250, index:'output', sortable:false, editable: false},
-								{name:'competences', width:250, index:'competences', sortable:false, editable: false, hidden:true},
-								{name:'timeTaken', width:50, index:'timeTaken', sortable:true, editable: false},
-								{name:'feedback', width:250, index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}},
-								{name:'mark', width:100, index:'mark', sortable:true, editable: true, editrules:{number:true} }
+						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
+								{name:'rowName',  index:'rowName', sortable:false, editable: false},
+								{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
+								{name:'output',  index:'output', sortable:false, editable: false, width:200},
+								{name:'competences',  index:'competences', sortable:false, editable: false, hidden:true},
+								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
+								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:200},
+								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:50, align:"center" }
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
@@ -151,7 +151,7 @@
 				    datatype: "xml",
 				    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}",
 				    height: "100%",
-				    width: 990,
+				    width: 700,
 				    cellEdit: true,
 				    pager: "activityViewPager",
 				    rowList:[5,10,20,30],
@@ -160,11 +160,11 @@
 				    sortname: "activityId", 
 				    colNames:["", 'Activity Name', 'Average Time Taken', 'Competences', 'Average Mark'],
 				    colModel:[
-				      {name:'id', width:10, index:'id', sortable:false, hidden:true, hidedlg:true},
-					  {name:'rowName', width:60, index:'rowName', sortable:true, editable: false},
-					  {name:'avgTimeTaken', index:'avgTimeTaken', sortable:true, editable: false},
-					  {name:'competences', width:250, index:'competences', sortable:false, editable: false, hidden:true},
-				      {name:'avgMark',index:'avgMark', sortable:true, editable:false}
+				      {name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
+					  {name:'rowName', index:'rowName', sortable:true, editable: false},
+					  {name:'avgTimeTaken', index:'avgTimeTaken', sortable:true, editable: false, width:80, align:"center"},
+					  {name:'competences', index:'competences', sortable:false, editable: false, hidden:true},
+				      {name:'avgMark',index:'avgMark', sortable:true, editable:false, width:50, align:"center"}
 				    ],
 				    loadError: function(xhr,st,err) {
 			    		jQuery("#activityView").clearGridData();
@@ -181,7 +181,7 @@
 						     datatype: "xml",
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID,
 						     height: "100%",
-						     width: 920,
+						     width: 600,
 						     cellEdit:true,
 						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradeBookData&lessonID=${lessonDetails.lessonID}&view=monActivityView&activityID=" + activityID,
@@ -194,11 +194,11 @@
 						     colModel:[
 						     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'rowName',index:'rowName', sortable:true, editable:false},
-						      	{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false, search:false},
-						      	{name:'timeTaken', width:50, index:'timeTaken', sortable:true, editable: false},
-						      	{name:'output', width:220, index:'output', sortable:false, editable: false, search:false},
-						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false},
-						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false}
+						      	{name:'status', align:'center', width:30, index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
+						      	{name:'timeTaken', index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
+						      	{name:'output', index:'output', sortable:false, editable: false, search:false, width:200},
+						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, width:200},
+						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 						     ],
 						     loadError: function(xhr,st,err) {
 					    		jQuery("#"+subgrid_table_id).clearGridData();
