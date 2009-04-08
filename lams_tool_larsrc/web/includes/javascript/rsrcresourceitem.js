@@ -79,9 +79,9 @@
 		switchValue(currId,repId);
 	}
 	function switchValue(currId,repId){
-		var temp = $(repId).value;
-		$(repId).value =  $(currId).value;
-		$(currId).value= temp;
+		var temp = document.getElementById(repId).value;
+		document.getElementById(repId).value = document.getElementById(currId).value;
+		document.getElementById(currId).value = temp;
 	}
 	function removeInstructionLoading(){
 		showBusy(instructionTargetDiv);
