@@ -186,7 +186,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:forEach var="vote"
 						items="${requestScope.listUserEntriesContent}">
 						<div>
-							<c:out value="${vote}" escapeXml="false" />
+							<c:out value="${vote.userEntry}" escapeXml="false" /> 
 						</div>
 					</c:forEach>
 					<div>&nbsp;</div>
