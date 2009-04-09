@@ -94,10 +94,10 @@ public class Organisation implements Serializable, Comparable {
     private Boolean courseAdminCanCreateGuestAccounts;
     
     /** persistent field */
-    private Boolean enableGradeBookForMonitors;
+    private Boolean enableGradebookForMonitors;
     
     /** persistent field */
-    private Boolean enableGradeBookForLearners;
+    private Boolean enableGradebookForLearners;
     
     /** persistent field */
     private Date archivedDate;
@@ -109,7 +109,7 @@ public class Organisation implements Serializable, Comparable {
     			Date createDate, User createdBy, Workspace workspace, 
     			OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons,
     			Boolean courseAdminCanAddNewUsers, Boolean courseAdminCanBrowseAllUsers, Boolean courseAdminCanChangeStatusOfCourse, 
-    			Boolean courseAdminCanCreateGuestAccounts, String orderedLessonIds, Boolean enableGradeBookForLearners, Boolean enableGradeBookForMonitors) {
+    			Boolean courseAdminCanCreateGuestAccounts, String orderedLessonIds, Boolean enableGradebookForLearners, Boolean enableGradebookForMonitors) {
         this.name = name;
         this.description = description;
         this.parentOrganisation = parentOrganisation;
@@ -125,8 +125,8 @@ public class Organisation implements Serializable, Comparable {
         this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
         this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
         this.orderedLessonIds = orderedLessonIds;
-        this.enableGradeBookForLearners = enableGradeBookForLearners;
-        this.enableGradeBookForMonitors = enableGradeBookForMonitors;
+        this.enableGradebookForLearners = enableGradebookForLearners;
+        this.enableGradebookForMonitors = enableGradebookForMonitors;
     }
 
     /** default constructor */
@@ -135,8 +135,8 @@ public class Organisation implements Serializable, Comparable {
         this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
         this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
         this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
-        this.enableGradeBookForLearners = Boolean.FALSE;
-        this.enableGradeBookForMonitors = Boolean.FALSE;
+        this.enableGradebookForLearners = Boolean.FALSE;
+        this.enableGradebookForMonitors = Boolean.FALSE;
 
     }
 
@@ -154,8 +154,8 @@ public class Organisation implements Serializable, Comparable {
         this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
         this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
         this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
-        this.enableGradeBookForLearners = Boolean.FALSE;
-        this.enableGradeBookForMonitors = Boolean.FALSE;
+        this.enableGradebookForLearners = Boolean.FALSE;
+        this.enableGradebookForMonitors = Boolean.FALSE;
     }
     public Organisation(String name, 
     					String description,						
@@ -506,12 +506,12 @@ public class Organisation implements Serializable, Comparable {
      *              not-null="true"
      *         
      */
-    public Boolean getEnableGradeBookForMonitors() {
-        return enableGradeBookForMonitors;
+    public Boolean getEnableGradebookForMonitors() {
+        return enableGradebookForMonitors;
     }
 
-    public void setEnableGradeBookForMonitors(Boolean enableGradeBookForMonitors) {
-        this.enableGradeBookForMonitors = enableGradeBookForMonitors;
+    public void setEnableGradebookForMonitors(Boolean enableGradebookForMonitors) {
+        this.enableGradebookForMonitors = enableGradebookForMonitors;
     }
 
     /** 
@@ -521,12 +521,12 @@ public class Organisation implements Serializable, Comparable {
      *              not-null="true"
      *         
      */
-    public Boolean getEnableGradeBookForLearners() {
-        return enableGradeBookForLearners;
+    public Boolean getEnableGradebookForLearners() {
+        return enableGradebookForLearners;
     }
 
-    public void setEnableGradeBookForLearners(Boolean enableGradeBookForLearners) {
-        this.enableGradeBookForLearners = enableGradeBookForLearners;
+    public void setEnableGradebookForLearners(Boolean enableGradebookForLearners) {
+        this.enableGradebookForLearners = enableGradebookForLearners;
     }
 
 }

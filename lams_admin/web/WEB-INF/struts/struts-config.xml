@@ -55,8 +55,8 @@
 	<form-property name="courseAdminCanAddNewUsers" type="java.lang.Boolean" initial="false"/>
 	<form-property name="courseAdminCanBrowseAllUsers" type="java.lang.Boolean" initial="false"/>
 	<form-property name="courseAdminCanChangeStatusOfCourse" type="java.lang.Boolean" initial="false"/>
-	<form-property name="enableGradeBookForLearners" type="java.lang.Boolean" initial="false"/>
-	<form-property name="enableGradeBookForMonitors" type="java.lang.Boolean" initial="false"/>
+	<form-property name="enableGradebookForLearners" type="java.lang.Boolean" initial="false"/>
+	<form-property name="enableGradebookForMonitors" type="java.lang.Boolean" initial="false"/>
 </form-bean>
 
 <form-bean name="UserRolesForm" type="org.apache.struts.action.DynaActionForm">

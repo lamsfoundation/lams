@@ -96,7 +96,7 @@
 			</meta>
 		</property>
 		
-		<property name="enableGradeBookForMonitors"
+		<property name="enableGradebookForMonitors"
 			type="java.lang.Boolean" column="enable_monitor_gradebook"
 			not-null="false" length="1">
 			<meta attribute="field-description">
@@ -105,7 +105,7 @@
 			</meta>
 		</property>
 		
-		<property name="enableGradeBookForLearners"
+		<property name="enableGradebookForLearners"
 			type="java.lang.Boolean" column="enable_learner_gradebook"
 			not-null="false" length="1">
 			<meta attribute="field-description">

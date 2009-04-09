@@ -140,9 +140,9 @@ public class DisplayGroupAction extends Action {
 	    }
 	}
 
-	if (org.getEnableGradeBookForLearners() && contains(roles, Role.ROLE_LEARNER)) {
+	if (org.getEnableGradebookForLearners() && contains(roles, Role.ROLE_LEARNER)) {
 
-	    String link = "javascript:openGradeBookLearnerPopup(" + "'" + org.getName() + "','"
+	    String link = "javascript:openGradebookLearnerPopup(" + "'" + org.getName() + "','"
 		    + Configuration.get(ConfigurationKeys.SERVER_URL)
 		    + "/gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID="
 		    + org.getOrganisationId() + "'," + "750,400,0,0);";
@@ -170,8 +170,8 @@ public class DisplayGroupAction extends Action {
 			+ org.getOrganisationId(), "index.searchlesson.tooltip"));
 
 		// Adding gradebook course monitor links if enabled
-		if (org.getEnableGradeBookForMonitors() && contains(roles, Role.ROLE_GROUP_MANAGER)) {
-		    String link = "javascript:openGradeBookCourseMonitorPopup(" + "'" + org.getName() + "','"
+		if (org.getEnableGradebookForMonitors() && contains(roles, Role.ROLE_GROUP_MANAGER)) {
+		    String link = "javascript:openGradebookCourseMonitorPopup(" + "'" + org.getName() + "','"
 			    + Configuration.get(ConfigurationKeys.SERVER_URL)
 			    + "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
 			    + org.getOrganisationId() + "'," + "850,400,0,0);";
@@ -314,9 +314,9 @@ public class DisplayGroupAction extends Action {
 
 	    // Adding gradebook course monitor links if enabled
 	    if ((contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
-		    && org.getEnableGradeBookForMonitors()
-		    || (parent != null && parent.getEnableGradeBookForMonitors())) {
-		String link = "javascript:openGradeBookLessonMonitorPopup(" + "'" + org.getName() + "','"
+		    && org.getEnableGradebookForMonitors()
+		    || (parent != null && parent.getEnableGradebookForMonitors())) {
+		String link = "javascript:openGradebookLessonMonitorPopup(" + "'" + org.getName() + "','"
 			+ Configuration.get(ConfigurationKeys.SERVER_URL)
 			+ "/gradebook/gradebookMonitoring.do?lessonID=" + bean.getId() + "'," + "850,700,0,0);";
 

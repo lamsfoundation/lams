@@ -2,12 +2,12 @@
 
 <script type="text/javascript">
 	function selectMonitorGradebook() {
-		document.getElementById("enableGradeBookForMonitors").checked = true;
+		document.getElementById("enableGradebookForMonitors").checked = true;
 	}
 	
 	function unSelectLearnerGradebook() {
-		var mon = document.getElementById("enableGradeBookForMonitors");
-		var lrn = document.getElementById("enableGradeBookForLearners");
+		var mon = document.getElementById("enableGradebookForMonitors");
+		var lrn = document.getElementById("enableGradebookForLearners");
 		
 		if (lrn.checked) {
 			lrn.checked = mon.checked;
@@ -103,13 +103,13 @@
 	</tr>
 	<tr>
 		<td colspan=2>
-			<html-el:checkbox onclick="unSelectLearnerGradebook();" styleId="enableGradeBookForMonitors" property="enableGradeBookForMonitors" />
+			<html-el:checkbox onclick="unSelectLearnerGradebook();" styleId="enableGradebookForMonitors" property="enableGradebookForMonitors" />
 			<fmt:message key="admin.gradebook.monitor.enable"/>
 		</td>
 	</tr>
 	<tr>
 		<td colspan=2>
-			<html-el:checkbox onclick="selectMonitorGradebook();" styleId="enableGradeBookForLearners" property="enableGradeBookForLearners" />
+			<html-el:checkbox onclick="selectMonitorGradebook();" styleId="enableGradebookForLearners" property="enableGradebookForLearners" />
 			<fmt:message key="admin.gradebook.learner.enable"/>
 		</td>
 	</tr>
