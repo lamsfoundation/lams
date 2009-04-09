@@ -55,6 +55,8 @@
 		<ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/>
 		<ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
 		<ant antfile="../${lams_www}/build.xml" target="build-war" inheritAll="false"/>
+		<ant antfile="../${lams_gradebook}/build.xml" target="build-jar" inheritAll="false"/>
+		<ant antfile="../${lams_gradebook}/build.xml" target="build-war" inheritAll="false"/>
 	</target>
 
 	<!-- build tool deployment utility -->
@@ -148,6 +150,8 @@
 				<include name="${lams_admin}/${sub.build.lib}/*.jar"/>
 				<include name="${lams_admin}/${sub.build.lib}/*.war"/>
 				<include name="${lams_www}/${sub.build.lib}/*.war"/>
+				<include name="${lams_gradebook}/${sub.build.lib}/*.jar"/>
+				<include name="${lams_gradebook}/${sub.build.lib}/*.war"/>
 			</fileset>
 		</copy> 
 		<!-- lams-central.war is already expanded -->
@@ -165,6 +169,7 @@
 			<fileset dir="../${lams_monitoring}/${sub.build.language}"><include name="**" /></fileset>
 			<fileset dir="../${lams_learning}/${sub.build.language}"><include name="**" /></fileset>
 			<fileset dir="../${lams_admin}/${sub.build.language}"><include name="**" /></fileset>
+			<fileset dir="../${lams_gradebook}/${sub.build.language}"><include name="**" /></fileset>
 		</copy>
 
 		<!-- create a temporary ear -->

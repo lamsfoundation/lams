@@ -73,6 +73,13 @@
             <context-root>/rams/www</context-root>
 		</web>
     </module>
+    <module>
+        <web>
+            <web-uri>lams-gradebook.war</web-uri>
+            <context-root>/lams/gradebook</context-root>
+		</web>
+    </module>
+    
 
     <!--  Third Party JAR Files -->
     <module>

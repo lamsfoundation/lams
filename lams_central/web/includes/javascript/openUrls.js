@@ -17,9 +17,9 @@
 		var pWin = null;
 		var copyrightWin = null;
 		var customWin = null;
-		var gradeBookMonWin = null;
-		var gradeBookLrnWin = null;
-		var gradeBookMonLessonWin = null;
+		var gradebookMonWin = null;
+		var gradebookLrnWin = null;
+		var gradebookMonLessonWin = null;
 		
 		function closeAllChildren(){
 			if (authorWin && !authorWin.closed) authorWin.closeWindow();
@@ -31,8 +31,8 @@
 			if (omWin && !omWin.closed) omWin.close();
 			if (pWin && !pWin.closed) pWin.close();
 			if (copyrightWin && !copyrightWin.closed) copyrightWin.close();
-			if (gradeBookMonWin && !gradeBookMonWin.closed) gradeBookMonWin.close();
-			if (gradeBookLrnWin && !gradeBookLrnWin.closed) gradeBookLrnWin.close();
+			if (gradebookMonWin && !gradebookMonWin.closed) gradebookMonWin.close();
+			if (gradebookLrnWin && !gradebookLrnWin.closed) gradebookLrnWin.close();
 		}
 		
 		function openProfile()
@@ -314,30 +314,30 @@
 			}
 		}
 	
-		function openGradeBookCourseMonitorPopup(winname, url, width, height, left, top) {
-			if(gradeBookMonWin && !gradeBookMonWin.closed ){
-				gradeBookMonWin.focus();
+		function openGradebookCourseMonitorPopup(winname, url, width, height, left, top) {
+			if(gradebookMonWin && !gradebookMonWin.closed ){
+				gradebookMonWin.focus();
 			}else{
-				gradeBookMonWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
-				gradeBookMonWin.focus();
+				gradebookMonWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
+				gradebookMonWin.focus();
 			}
 		}
 		
-		function openGradeBookLearnerPopup(winname, url, width, height, left, top) {
-			if(gradeBookLrnWin && !gradeBookLrnWin.closed ){
-				gradeBookLrnWin.focus();
+		function openGradebookLearnerPopup(winname, url, width, height, left, top) {
+			if(gradebookLrnWin && !gradebookLrnWin.closed ){
+				gradebookLrnWin.focus();
 			}else{
-				gradeBookLrnWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
-				gradeBookLrnWin.focus();
+				gradebookLrnWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
+				gradebookLrnWin.focus();
 			}
 		}
 		
-		function openGradeBookLessonMonitorPopup(winname, url, width, height, left, top) {
-			if(gradeBookMonLessonWin && !gradeBookMonLessonWin.closed ){
-				gradeBookMonLessonWin.focus();
+		function openGradebookLessonMonitorPopup(winname, url, width, height, left, top) {
+			if(gradebookMonLessonWin && !gradebookMonLessonWin.closed ){
+				gradebookMonLessonWin.focus();
 			}else{
-				gradeBookMonLessonWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
-				gradeBookMonLessonWin.focus();
+				gradebookMonLessonWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
+				gradebookMonLessonWin.focus();
 			}
 		}
 	//-->

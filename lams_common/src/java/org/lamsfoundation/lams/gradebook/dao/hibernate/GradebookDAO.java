@@ -27,25 +27,25 @@ import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
-import org.lamsfoundation.lams.gradebook.GradeBookUserLesson;
-import org.lamsfoundation.lams.gradebook.dao.IGradeBookDAO;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
+import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
+import org.lamsfoundation.lams.gradebook.dao.IGradebookDAO;
 
-public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
+public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
-    private static final String GET_GRADEBOOK_USER_ACTIVITY = "from GradeBookUserActivity gact where "
+    private static final String GET_GRADEBOOK_USER_ACTIVITY = "from GradebookUserActivity gact where "
 	    + "gact.learner.userId=:userID and gact.activity.activityId=:activityID";
 
-    private static final String GET_GRADEBOOK_USER_LESSON = "from GradeBookUserLesson gles where "
+    private static final String GET_GRADEBOOK_USER_LESSON = "from GradebookUserLesson gles where "
 	    + "gles.learner.userId=:userID and gles.lesson.lessonId=:lessonID";
 
-    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM = "select sum(gact.mark) from GradeBookUserActivity gact, ToolSession tses where "
+    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM = "select sum(gact.mark) from GradebookUserActivity gact, ToolSession tses where "
 	    + "gact.learner.userId=:userID and tses.toolActivity=gact.activity and tses.lesson.lessonId=:lessonID";
 
-    private static final String GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY = "from GradeBookUserActivity gact where "
+    private static final String GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY = "from GradebookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
 
-    private static final String GET_AVERAGE_MARK_FOR_LESSON = "select avg(gles.mark) from GradeBookUserLesson gles where "
+    private static final String GET_AVERAGE_MARK_FOR_LESSON = "select avg(gles.mark) from GradebookUserLesson gles where "
 	    + "gles.lesson.lessonId=:lessonID";
 
     private static final String GET_AVERAGE_COMPLETION_TIME = "select prog.finishDate, prog.startDate from LearnerProgress prog where "
@@ -54,30 +54,30 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
     private static final String GET_AVERAGE_COMPLETION_TIME_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg, Activity act where "
 	    + "compProg.activity.activityId=:activityID";
 
-    private static final String GET_AVERAGE_MARK_FOR_ACTIVTY = "select avg(gact.mark) from GradeBookUserActivity gact where "
+    private static final String GET_AVERAGE_MARK_FOR_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
 
     @SuppressWarnings("unchecked")
-    public GradeBookUserActivity getGradeBookUserDataForActivity(Long activityID, Integer userID) {
+    public GradebookUserActivity getGradebookUserDataForActivity(Long activityID, Integer userID) {
 	List result = getSession().createQuery(GET_GRADEBOOK_USER_ACTIVITY).setInteger("userID", userID.intValue())
 		.setLong("activityID", activityID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0)
-		return (GradeBookUserActivity) result.get(0);
+		return (GradebookUserActivity) result.get(0);
 	}
 
 	return null;
     }
 
     @SuppressWarnings("unchecked")
-    public GradeBookUserLesson getGradeBookUserDataForLesson(Long lessonID, Integer userID) {
+    public GradebookUserLesson getGradebookUserDataForLesson(Long lessonID, Integer userID) {
 	List result = getSession().createQuery(GET_GRADEBOOK_USER_LESSON).setInteger("userID", userID.intValue())
 		.setLong("lessonID", lessonID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0)
-		return (GradeBookUserLesson) result.get(0);
+		return (GradebookUserLesson) result.get(0);
 	}
 
 	return null;
@@ -85,7 +85,7 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
     }
 
     @SuppressWarnings("unchecked")
-    public Double getGradeBookUserActivityMarkSum(Long lessonID, Integer userID) {
+    public Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID) {
 	List result = getSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM).setInteger("userID",
 		userID.intValue()).setLong("lessonID", lessonID.longValue()).list();
 
@@ -99,11 +99,11 @@ public class GradeBookDAO extends BaseDAO implements IGradeBookDAO {
     }
 
     @SuppressWarnings("unchecked")
-    public List<GradeBookUserActivity> getAllGradeBookUserActivitiesForActivity(Long activityID) {
+    public List<GradebookUserActivity> getAllGradebookUserActivitiesForActivity(Long activityID) {
 	List result = getSession().createQuery(GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY).setLong("activityID",
 		activityID.longValue()).list();
 
-	return (List<GradeBookUserActivity>) result;
+	return (List<GradebookUserActivity>) result;
     }
 
     @SuppressWarnings("unchecked")

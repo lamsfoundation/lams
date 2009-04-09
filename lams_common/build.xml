@@ -413,8 +413,8 @@ Ant build file.
 		<hibernatedoclet destdir="${conf.hibernate.mapping.dir}" excludedtags="@version,@author,@todo" force="true" verbose="true">
 			<fileset dir="${src.java.dir}">
 				<include name="**/ActivityEvaluation.java" />
-				<include name="**/GradeBookUserActivity.java" />
-				<include name="**/GradeBookUserLesson.java" />
+				<include name="**/GradebookUserActivity.java" />
+				<include name="**/GradebookUserLesson.java" />
 			</fileset>
 			<hibernate version="3.0" />
 		</hibernatedoclet>

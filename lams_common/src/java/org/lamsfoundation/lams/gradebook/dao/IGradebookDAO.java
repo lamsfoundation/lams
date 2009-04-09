@@ -21,27 +21,31 @@
  */ 
  
 /* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dto.comparators; 
+package org.lamsfoundation.lams.gradebook.dao; 
 
-import java.util.Comparator;
+import java.util.List;
 
-import org.lamsfoundation.lams.gradebook.dto.GradeBookGridRowDTO;
+import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
+import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
  
-@SuppressWarnings("unchecked")
-public class GBAverageTimeTakenComparator implements Comparator{
-    public int compare(Object gradeBookGridRow, Object anotherGradeBookGridRow) {
+public interface IGradebookDAO extends IBaseDAO{
+    
+    public GradebookUserLesson getGradebookUserDataForLesson(Long lessonID, Integer userID);
+    
+    public GradebookUserActivity getGradebookUserDataForActivity(Long activityID, Integer userID);
+    
+    public Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID);
+    
+    public List<GradebookUserActivity> getAllGradebookUserActivitiesForActivity(Long activityID);
+    
+    public Double getAverageMarkForLesson(Long lessonID);
+    
+    public long getAverageDurationLesson(Long lessonID);
+    
+    public long getAverageDurationForActivity(Long activityID);
+    
+    public Double getAverageMarkForActivity(Long activityID);
 
-	if (gradeBookGridRow instanceof GradeBookGridRowDTO && anotherGradeBookGridRow instanceof GradeBookGridRowDTO) {
-	   
-	    Long timeTaken1 = ((GradeBookGridRowDTO) gradeBookGridRow).getAverageTimeTaken();
-	    Long timeTaken2 = ((GradeBookGridRowDTO) anotherGradeBookGridRow).getAverageTimeTaken();
-	    
-	    timeTaken1 = (timeTaken1 == null) ? 0 : timeTaken1;
-	    timeTaken2 = (timeTaken2 == null) ? 0 : timeTaken2;
-	    return new Double(timeTaken1 - timeTaken2).intValue();    
-	} else {
-	    return 0;
-	}
-    }
 }
  

@@ -32,7 +32,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.gradebook.GradeBookUserActivity;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
@@ -63,7 +63,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     private Set<ActivityEvaluation> activityEvaluations;
 
-    private Set<GradeBookUserActivity> gradeBookUserActivities;
+    private Set<GradebookUserActivity> gradebookUserActivities;
 
     /** full constructor */
     public ToolActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
@@ -72,7 +72,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
 	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Tool tool, Long toolContentId,
 	    Set branchActivityEntries, Set<CompetenceMapping> competenceMappings,
-	    Set<ActivityEvaluation> activityEvaluations, Set<GradeBookUserActivity> gradeBookUserActivities) {
+	    Set<ActivityEvaluation> activityEvaluations, Set<GradebookUserActivity> gradebookUserActivities) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, defineLater, createDateTime,
 		learningLibrary, parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId,
 		transitionTo, transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
@@ -81,7 +81,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	this.competenceMappings = competenceMappings;
 	this.activityEvaluations = activityEvaluations;
 	super.simpleActivityStrategy = new ToolActivityStrategy(this);
-	this.gradeBookUserActivities = gradeBookUserActivities;
+	this.gradebookUserActivities = gradebookUserActivities;
     }
 
     /** default constructor */
@@ -139,16 +139,16 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	}
 	newToolActivity.setActivityEvaluations(newEvaluations);
 
-	Set<GradeBookUserActivity> newGradeBookUserActivities = new HashSet<GradeBookUserActivity>();
-	if (this.gradeBookUserActivities != null) {
-	    for (GradeBookUserActivity gradeBookAct : this.gradeBookUserActivities) {
-		GradeBookUserActivity newGradeBookAct = new GradeBookUserActivity();
-		newGradeBookAct.setActivity(newToolActivity);
-		newGradeBookAct.setLearner(gradeBookAct.getLearner());
-		newGradeBookAct.setMark(gradeBookAct.getMark());
+	Set<GradebookUserActivity> newGradebookUserActivities = new HashSet<GradebookUserActivity>();
+	if (this.gradebookUserActivities != null) {
+	    for (GradebookUserActivity gradebookAct : this.gradebookUserActivities) {
+		GradebookUserActivity newGradebookAct = new GradebookUserActivity();
+		newGradebookAct.setActivity(newToolActivity);
+		newGradebookAct.setLearner(gradebookAct.getLearner());
+		newGradebookAct.setMark(gradebookAct.getMark());
 	    }
 	}
-	newToolActivity.setGradeBookUserActivities(newGradeBookUserActivities);
+	newToolActivity.setGradebookUserActivities(newGradebookUserActivities);
 
 	return newToolActivity;
     }
@@ -333,11 +333,11 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	this.activityEvaluations = activityEvaluations;
     }
 
-    public Set<GradeBookUserActivity> getGradeBookUserActivities() {
-	return gradeBookUserActivities;
+    public Set<GradebookUserActivity> getGradebookUserActivities() {
+	return gradebookUserActivities;
     }
 
-    public void setGradeBookUserActivities(Set<GradeBookUserActivity> gradeBookUserActivities) {
-	this.gradeBookUserActivities = gradeBookUserActivities;
+    public void setGradebookUserActivities(Set<GradebookUserActivity> gradebookUserActivities) {
+	this.gradebookUserActivities = gradebookUserActivities;
     }
 }

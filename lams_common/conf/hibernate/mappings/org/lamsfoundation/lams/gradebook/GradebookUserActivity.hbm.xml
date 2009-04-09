@@ -7,7 +7,7 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.gradebook.GradeBookUserActivity"
+        name="org.lamsfoundation.lams.gradebook.GradebookUserActivity"
         table="lams_gradebook_user_activity"
     >
 
@@ -19,7 +19,7 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-GradeBookUserActivity.xml 
+                  hibernate-generator-params-GradebookUserActivity.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
@@ -70,7 +70,7 @@
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-GradeBookUserActivity.xml
+                hibernate-properties-GradebookUserActivity.xml
             containing the additional properties and place it in your merge dir.
         -->
 

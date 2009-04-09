@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.usermanagement.User;
  * 
  * @hibernate.class table="lams_gradebook_user_activity"
  */
-public class GradeBookUserActivity {
+public class GradebookUserActivity {
 
     private long uid;
     private ToolActivity activity;
@@ -41,10 +41,10 @@ public class GradeBookUserActivity {
     private Double mark;
     private String feedback;
 
-    public GradeBookUserActivity() {
+    public GradebookUserActivity() {
     }
     
-    public GradeBookUserActivity(ToolActivity activity, User learner){
+    public GradebookUserActivity(ToolActivity activity, User learner){
 	this.activity = activity;
 	this.learner = learner;
     }

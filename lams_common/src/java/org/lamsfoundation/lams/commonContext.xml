@@ -89,8 +89,8 @@
 				<value>classpath:org/lamsfoundation/lams/planner/PedagogicalPlannerSequenceNode.hbm.xml</value>
 				
 								<!-- Gradebook related mapping files -->
-				<value>classpath:org/lamsfoundation/lams/gradebook/GradeBookUserActivity.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/gradebook/GradeBookUserLesson.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/gradebook/GradebookUserActivity.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/gradebook/GradebookUserLesson.hbm.xml</value>
 				
 				<value>classpath:org/lamsfoundation/lams/contentrepository/CrCredential.hbm.xml</value>
  				<value>classpath:org/lamsfoundation/lams/contentrepository/CrNode.hbm.xml</value>
@@ -410,10 +410,10 @@
 	</bean>
 	
 	<!--  Gradebook related beans -->
-	<bean id="gradeBookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradeBookDAO">
+	<bean id="gradebookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradebookDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
-	
+
 	<!--  System Session bean -->
 	<bean id="SystemSession"
 	    class="org.lamsfoundation.lams.web.session.SessionManager"
