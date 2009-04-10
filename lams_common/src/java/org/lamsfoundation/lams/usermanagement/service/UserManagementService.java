@@ -1111,31 +1111,31 @@ public class UserManagementService implements IUserManagementService {
 
     public List searchUserSingleTerm(String term) {
 	term = StringEscapeUtils.escapeSql(term);
-	String query = "select u from User u where" + " (u.login like '%" + term + "%'" + " or u.firstName like '%"
-		+ term + "%'" + " or u.lastName like '%" + term + "%'" + " or u.email like '%" + term + "%')"
-		+ " and u.disabledFlag=0" + " order by u.login";
+	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%"
+		+ term + "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
+		+ " and u.disabledFlag=0 order by u.login";
 	List list = baseDAO.find(query);
 	return list;
     }
 
     public List searchUserSingleTerm(String term, Integer filteredOrgId) {
 	term = StringEscapeUtils.escapeSql(term);
-	String query = "select u from User u where" + " (u.login like '%" + term + "%'" + " or u.firstName like '%"
-		+ term + "%'" + " or u.lastName like '%" + term + "%'" + " or u.email like '%" + term + "%')"
-		+ " and u.disabledFlag=0" + " and u.userId not in" + " (select uo.user.userId from UserOrganisation uo"
-		+ " where uo.organisation.organisationId=" + filteredOrgId + ")" + " order by u.login";
+	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%"
+		+ term + "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
+		+ " and u.disabledFlag=0 and u.userId not in (select uo.user.userId from UserOrganisation uo"
+		+ " where uo.organisation.organisationId=" + filteredOrgId + ") order by u.login";
 	List list = baseDAO.find(query);
 	return list;
     }
 
     public List searchUserSingleTerm(String term, Integer orgId, Integer filteredOrgId) {
 	term = StringEscapeUtils.escapeSql(term);
-	String query = "select uo.user from UserOrganisation uo where" + " (uo.user.login like '%" + term + "%'"
-		+ " or uo.user.firstName like '%" + term + "%'" + " or uo.user.lastName like '%" + term + "%'"
-		+ " or uo.user.email like 'u.email like)" + " and uo.user.disabledFlag=0"
+	String query = "select uo.user from UserOrganisation uo where (uo.user.login like '%" + term + "%'"
+		+ " or uo.user.firstName like '%" + term + "%' or uo.user.lastName like '%" + term + "%'"
+		+ " or uo.user.email like '%" + term + "%') and uo.user.disabledFlag=0"
 		+ " and uo.organisation.organisationId=" + orgId + " and uo.user.userId not in"
-		+ " (select uo.user.userId from UserOrganisation uo" + " where uo.organisation.organisationId="
-		+ filteredOrgId + ")" + " order by uo.user.login";
+		+ " (select uo.user.userId from UserOrganisation uo where uo.organisation.organisationId="
+		+ filteredOrgId + ") order by uo.user.login";
 	List list = baseDAO.find(query);
 	return list;
     }
@@ -1147,10 +1147,10 @@ public class UserManagementService implements IUserManagementService {
 	    whereClause = " or uo.organisation.parentOrganisation.organisationId=" + orgId;
 	}
 
-	String query = "select u from User u where" + " (u.login like '%" + term + "%'" + " or u.firstName like '%"
-		+ term + "%'" + " or u.lastName like '%" + term + "%'" + " or u.email like '%" + term + "%')"
-		+ " and u.disabledFlag=0" + " and u.userId in" + " (select uo.user.userId from UserOrganisation uo"
-		+ " where uo.organisation.organisationId=" + orgId + whereClause + ")" + " order by u.login";
+	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%"
+		+ term + "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
+		+ " and u.disabledFlag=0 and u.userId in (select uo.user.userId from UserOrganisation uo"
+		+ " where uo.organisation.organisationId=" + orgId + whereClause + ") order by u.login";
 	List list = baseDAO.find(query);
 	return list;
     }
@@ -1161,8 +1161,8 @@ public class UserManagementService implements IUserManagementService {
     }
 
     public List getAllUsers(Integer filteredOrgId) {
-	String query = "from User u where u.disabledFlag=0" + " and u.userId not in"
-		+ " (select uo.user.userId from UserOrganisation uo" + " where uo.organisation.organisationId="
+	String query = "from User u where u.disabledFlag=0 and u.userId not in"
+		+ " (select uo.user.userId from UserOrganisation uo where uo.organisation.organisationId="
 		+ filteredOrgId + ")" + " order by u.login";
 	return baseDAO.find(query);
     }
@@ -1173,9 +1173,9 @@ public class UserManagementService implements IUserManagementService {
     }
 
     public List getUsersFromOrganisation(Integer orgId, Integer filteredOrgId) {
-	String query = "select uo.user from UserOrganisation uo" + " where uo.organisation.organisationId=" + orgId
-		+ " and uo.user.userId not in" + " (select uo.user.userId from UserOrganisation uo"
-		+ " where uo.organisation.organisationId=" + filteredOrgId + ")" + " order by uo.user.login";
+	String query = "select uo.user from UserOrganisation uo where uo.organisation.organisationId=" + orgId
+		+ " and uo.user.userId not in (select uo.user.userId from UserOrganisation uo"
+		+ " where uo.organisation.organisationId=" + filteredOrgId + ") order by uo.user.login";
 	return baseDAO.find(query);
     }
 
