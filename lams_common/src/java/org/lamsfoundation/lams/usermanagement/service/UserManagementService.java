@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -1109,6 +1110,7 @@ public class UserManagementService implements IUserManagementService {
     }
 
     public List searchUserSingleTerm(String term) {
+	term = StringEscapeUtils.escapeSql(term);
 	String query = "select u from User u where" + " (u.login like '%" + term + "%'" + " or u.firstName like '%"
 		+ term + "%'" + " or u.lastName like '%" + term + "%'" + " or u.email like '%" + term + "%')"
 		+ " and u.disabledFlag=0" + " order by u.login";
@@ -1117,6 +1119,7 @@ public class UserManagementService implements IUserManagementService {
     }
 
     public List searchUserSingleTerm(String term, Integer filteredOrgId) {
+	term = StringEscapeUtils.escapeSql(term);
 	String query = "select u from User u where" + " (u.login like '%" + term + "%'" + " or u.firstName like '%"
 		+ term + "%'" + " or u.lastName like '%" + term + "%'" + " or u.email like '%" + term + "%')"
 		+ " and u.disabledFlag=0" + " and u.userId not in" + " (select uo.user.userId from UserOrganisation uo"
@@ -1126,6 +1129,7 @@ public class UserManagementService implements IUserManagementService {
     }
 
     public List searchUserSingleTerm(String term, Integer orgId, Integer filteredOrgId) {
+	term = StringEscapeUtils.escapeSql(term);
 	String query = "select uo.user from UserOrganisation uo where" + " (uo.user.login like '%" + term + "%'"
 		+ " or uo.user.firstName like '%" + term + "%'" + " or uo.user.lastName like '%" + term + "%'"
 		+ " or uo.user.email like 'u.email like)" + " and uo.user.disabledFlag=0"
@@ -1137,7 +1141,7 @@ public class UserManagementService implements IUserManagementService {
     }
 
     public List searchUserSingleTerm(String term, Integer orgId, boolean includeChildOrgs) {
-
+	term = StringEscapeUtils.escapeSql(term);
 	String whereClause = "";
 	if (includeChildOrgs) {
 	    whereClause = " or uo.organisation.parentOrganisation.organisationId=" + orgId;
