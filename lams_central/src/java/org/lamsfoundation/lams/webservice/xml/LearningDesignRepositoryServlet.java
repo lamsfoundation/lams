@@ -272,7 +272,6 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	try {
-
 	    // get parameters
 	    String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
@@ -288,12 +287,21 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
 	    String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
 	    String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
-
+	    
 	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null
 		    || country == null || lang == null || modeStr == null) {
 		String msg = "Parameters missing";
 		log.error(msg);
 		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
+	    }
+	    
+	    // LDEV-2196 preserve character encoding if necessary
+	    if (request.getCharacterEncoding() == null) {
+	    	log.debug("request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
+	    	username = new String(username.getBytes("8859_1"), "UTF-8");
+	    	if (courseName != null) {
+	    		courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
+	    	}
 	    }
 
 	    Integer mode = new Integer(modeStr);
@@ -352,6 +360,10 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    response.sendError(response.SC_BAD_REQUEST, "Problem with LearningDesignRepositoryServlet request");
 	}
 
+    }
+    
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	doGet(request, response);
     }
 
     public void exportLD(HttpServletRequest request, HttpServletResponse response) {

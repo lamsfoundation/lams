@@ -279,12 +279,7 @@ public class LessonManagerServlet extends HttpServlet {
      *                 if an error occurred
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-	// TODO services should be implemented as POST
-	response.setContentType("text/html");
-	PrintWriter out = response.getWriter();
-	out.flush();
-	out.close();
+		doGet(request, response);
     }
 
     public Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,

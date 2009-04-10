@@ -120,6 +120,16 @@ public class LoginRequestServlet extends HttpServlet {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - login parameters missing");
 	    return;
 	}
+	
+	// LDEV-2196 preserve character encoding if necessary
+    if (request.getCharacterEncoding() == null) {
+    	log.debug("request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
+    	extUsername = new String(extUsername.getBytes("8859_1"), "UTF-8");
+    	if (courseName != null) {
+    		courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
+    	}
+    }
+	
 	ExtServerOrgMap serverMap = getService().getExtServerOrgMap(serverId);
 
 	try {
