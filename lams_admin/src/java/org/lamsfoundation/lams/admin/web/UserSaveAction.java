@@ -157,6 +157,7 @@ public class UserSaveAction extends Action {
 		BeanUtils.copyProperties(user, userForm);
 		user.setLocale(locale);
 		user.setAuthenticationMethod(authenticationMethod);
+		UserSaveAction.service.save(user);
 	    } else { // create user
 		user = new User();
 		userForm.set("password", HashUtil.sha1((String) userForm.get("password")));

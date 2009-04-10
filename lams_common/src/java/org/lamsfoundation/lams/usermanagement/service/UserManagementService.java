@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.usermanagement.service;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
@@ -149,16 +151,41 @@ public class UserManagementService implements IUserManagementService {
 	try {
 	    if (object instanceof User) {
 		User user = (User) object;
-		if (user.getUserId() == null) {
-		    baseDAO.insertOrUpdate(user); // creating a workspace needs
-		    // a userId
-		    object = createWorkspaceForUser(user);
-		}
+		object = saveUser(user);
 	    }
 	    baseDAO.insertOrUpdate(object);
 	} catch (Exception e) {
 	    log.debug(e);
 	}
+    }
+    
+    protected User saveUser(User user) {
+	if (user != null) {
+	    // LDEV-2196 ensure names saved as UTF-8
+	    try {
+    	    	user.setFirstName(new String(user.getFirstName().getBytes(), "UTF-8"));
+    	    	user.setLastName(new String(user.getLastName().getBytes(), "UTF-8"));
+	    } catch (UnsupportedEncodingException e) {
+		log.error("Unsupported encoding...", e);
+	    }
+	    // create user
+	    if (user.getUserId() == null) {
+		baseDAO.insertOrUpdate(user); // creating a workspace needs a userId
+        	user = createWorkspaceForUser(user);
+	    } 
+	    // LDEV-2030 update workspace name if name changed
+	    Workspace workspace = user.getWorkspace();
+	    if (workspace != null && !StringUtils.equals(user.getFullName(), workspace.getName())){
+		workspace.setName(user.getFullName());
+		save(workspace);
+		WorkspaceFolder folder = workspace.getDefaultFolder();
+		if (folder != null) {
+		    folder.setName(workspace.getName());
+		    save(folder);
+		}
+	    }
+	}
+	return user;
     }
 
     public void saveAll(Collection objects) {
