@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.usermanagement.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -491,34 +492,40 @@ public class LdapService implements ILdapService {
 		// do the search for all ldap users
 		NamingEnumeration<SearchResult> results = ctx.search(baseDN, filter, ctrl);
 		while (results.hasMore()) {
-		    SearchResult result = results.next();
-		    Attributes attrs = result.getAttributes();
+		    try {
+                        SearchResult result = results.next();
+                        Attributes attrs = result.getAttributes();
 
-		    // add or update this user to LAMS
-		    boolean disabled = getDisabledBoolean(attrs);
-		    String login = getSingleAttributeString(attrs.get(Configuration
-			    .get(ConfigurationKeys.LDAP_LOGIN_ATTR)));
-		    if (login != null && login.trim().length() > 0) {
-			int code = bulkUpdateLDAPUser(login, attrs, disabled);
-			switch (code) {
-			case BULK_UPDATE_CREATED:
-			    createdUsers++;
-			    break;
-			case BULK_UPDATE_UPDATED:
-			    updatedUsers++;
-			    break;
-			case BULK_UPDATE_DISABLED:
-			    disabledUsers++;
-			    break;
-			}
-		    } else {
-			log.error("Couldn't find login attribute for user using attribute name: "
-				+ Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR) + ".  Dumping attributes...");
-			NamingEnumeration enumAttrs = attrs.getAll();
-			while (enumAttrs.hasMoreElements()) {
-			    log.error(enumAttrs.next());
-			}
-		    }
+                        // add or update this user to LAMS
+                        boolean disabled = getDisabledBoolean(attrs);
+                        String login = getSingleAttributeString(attrs.get(Configuration
+                                .get(ConfigurationKeys.LDAP_LOGIN_ATTR)));
+                        if (login != null && login.trim().length() > 0) {
+                            int code = bulkUpdateLDAPUser(login, attrs, disabled);
+                            switch (code) {
+                            case BULK_UPDATE_CREATED:
+                                createdUsers++;
+                                break;
+                            case BULK_UPDATE_UPDATED:
+                                updatedUsers++;
+                                break;
+                            case BULK_UPDATE_DISABLED:
+                                disabledUsers++;
+                                break;
+                            }
+                        } else {
+                            log.error("Couldn't find login attribute for user using attribute name: "
+                                            + Configuration.get(ConfigurationKeys.LDAP_LOGIN_ATTR)
+                                            + ".  Dumping attributes...");
+                            NamingEnumeration enumAttrs = attrs.getAll();
+                            while (enumAttrs.hasMoreElements()) {
+                                log.error(enumAttrs.next());
+                            }
+                        }
+                    } catch (Exception e) {
+                        // continue processing
+                        messages.add("Error processing context result number " + contextResults + ": " + e.getMessage());
+                    }
 
 		    contextResults++;
 		}
@@ -531,8 +538,11 @@ public class LdapService implements ILdapService {
 	    } while (cookie != null);
 	    log.info("Ldap context " + baseDN + " returned " + contextResults + " users.");
 	    ctx.close();
-	} catch (Exception e) {
+	} catch (NamingException e) {
 	    messages.add("Error while processing " + baseDN + ": " + e.getMessage());
+	    log.error(e, e);
+	} catch (IOException e) {
+	    messages.add("Error setting response cookie to continue paged ldap search results: " + e.getMessage());
 	    log.error(e, e);
 	}
 	totalResults += contextResults;
