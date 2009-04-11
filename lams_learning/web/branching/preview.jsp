@@ -74,7 +74,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<td width="2%">
 							<c:choose>
 								<c:when test="${activityURL.complete}">
-									<%--html:img page="/images/tick.gif" /--%>
+									<img src="<lams:LAMSURL/>/images/tick.gif" />
 								</c:when>
 								<c:when test="${activityURL.defaultURL}">
 									<input type="radio" name="branchID"
