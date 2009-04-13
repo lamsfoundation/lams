@@ -9,7 +9,7 @@ FCKConfig.ToolbarSets["Default-Learner"] = [
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['OrderedList','UnorderedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
-	['About'],
+	['Equation','About'],
 	['TextColor','BGColor'],
 	['Table','Rule','Smiley','SpecialChar'],
 	['FontFormat','FontName','FontSize']
@@ -22,7 +22,7 @@ FCKConfig.ToolbarSets["Custom-Wiki"] = [
 	['OrderedList','UnorderedList','-','Outdent','Indent'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
 	['WikiLink','Link','Image'],
-	['About'],
+	['Equation','About'],
 	['TextColor','BGColor'],
 	['Table','Rule','Smiley','SpecialChar'],
 	['FontFormat','FontName','FontSize']
