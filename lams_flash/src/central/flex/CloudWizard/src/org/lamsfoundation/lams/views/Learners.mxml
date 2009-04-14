@@ -72,8 +72,10 @@
    				learnersUnselected.sort = getUserSort();
    				learnersUnselected.refresh();
    				
-   				//showOverlay(learners_dgd, false);
-   				//showOverlay(learnersSel_dgd, false);
+   				if(value.length >= 1) {
+   					showOverlay(learners_dgd, false);
+   					showOverlay(learnersSel_dgd, false);
+   				}
    			}
    			
    			public function set staff(value:ArrayCollection):void {
@@ -83,6 +85,11 @@
    				staffUnselected.refresh();
    				
    				staffSelected = new ArrayCollection();
+   				
+   				if(value.length >= 1) {
+   					showOverlay(staff_dgd, false);
+   					showOverlay(staffSel_dgd, false);
+   				}
    				
    				for each(var staff:Object in staffUnselected) {
    					if(staff.userID == 4) {
@@ -94,9 +101,6 @@
    				
    				staffSelected.sort = getUserSort();
    				staffSelected.refresh();
-   				
-   				//showOverlay(staff_dgd, false);
-   				//showOverlay(staffSel_dgd, false);
    			}
    			
    			public function printName(value:Object, column:DataGridColumn=null):String {
@@ -155,7 +159,7 @@
 			}
 			
 			private function showDataGridOverlay(event:Event):void {
-				//showOverlay(UIComponent(event.currentTarget), true);
+				showOverlay(UIComponent(event.currentTarget), true);
 			}
 			
 			/* sort users (by name) for data grid columns */

@@ -60,7 +60,8 @@
    				} else
    					updateLearnersPerLesson();
    					
-   				checkUsersLoaded();
+   				if(checkUsersLoaded())
+   					noLearnersPerLesson_stp.maximum = lesson.newLesson.learners.users.length;
    			}
    			
    			public function checkUsersLoaded():Boolean {
@@ -77,8 +78,10 @@
    				var valChk:Boolean = checkUsersLoaded();
    				var learnersSize:Number = lesson.newLesson.learners.users.length;
    				
-   				if(noLearnersPerLesson_stp.value > learnersSize)
-   					noLearnersPerLesson_stp.value = (learnersSize > 0) ? learnersSize : 1;
+   				noLearnersPerLesson_stp.maximum = learnersSize;
+   				
+   				if(learnersSize <= 0)
+   					noLearnersPerLesson_stp.value = 1;
    				
    				noLearnersPerLesson = noLearnersPerLesson_stp.value;
    				
@@ -224,7 +227,7 @@
 
 			<mx:CheckBox id="enableSplitLessons" name="enableSplitLessons" selected="false" change="enableSplitLessonsOption()" label="{dictionary.getLabel('wizard.splitLearners.cb.lbl')}" labelPlacement="right" />
 			<mx:FormItem id="enableSplitLessons_fItm" label="{dictionary.getLabel('wizard.splitLearners.LearnersPerLesson.lbl')}" visible="{enableSplitLessons.selected}" >
-				<mx:NumericStepper id="noLearnersPerLesson_stp" value="1" change="updateLearnersPerLesson()"  minimum="1"/>
+				<mx:NumericStepper id="noLearnersPerLesson_stp" value="1" change="updateLearnersPerLesson()"  minimum="1" />
 			</mx:FormItem>
 			
 			<mx:VBox id="learnersNoteBox" width="100%" />

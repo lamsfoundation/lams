@@ -5,6 +5,8 @@ package org.lamsfoundation.lams.vos
 	import flash.events.IEventDispatcher;
 	
 	import mx.collections.ArrayCollection;
+	import mx.collections.Sort;
+	import mx.collections.SortField;
 	
 	import org.lamsfoundation.lams.common.util.WDDXUtil;
 	
@@ -29,6 +31,7 @@ package org.lamsfoundation.lams.vos
 		private var _resourceType:String;
 		
 		private var _children:ArrayCollection  = new ArrayCollection();
+		private var _sort:Sort;
 		
 		//private var creationDateTime:Date;
 		//private var lastModifiedDateTime:Date;
@@ -36,6 +39,9 @@ package org.lamsfoundation.lams.vos
 		public function WorkspaceItem(dispatcher:IEventDispatcher=null)
 		{
 			super(dispatcher);
+			
+			_sort = new Sort();
+			_sort.fields = [new SortField("name")];
 		}
 
 		public function get name():String {
@@ -78,6 +84,10 @@ package org.lamsfoundation.lams.vos
 			
 			if(_resourceType == RT_FOLDER)
 				_workspaceFolderID = _resourceID;
+				
+			if(_resourceID != -1) _children.sort = _sort;
+			_children.refresh();
+			
 		}
 		
 		public function set children(value:ArrayCollection):void {
@@ -85,6 +95,8 @@ package org.lamsfoundation.lams.vos
 		}
 		
 		public function get children():ArrayCollection {
+			_children.refresh();
+			
 			return _children;
 		}
 		
