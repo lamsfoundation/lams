@@ -1,6 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
 <script type="text/javascript" src="includes/javascript/swfobject.js"></script>
+<script type="text/javascript" src="includes/javascript/jquery.timer.js"></script>
+<script type="text/javascript" src="includes/javascript/mindmap.resize.js"></script>
 
 <script type="text/javascript">
 <!--
@@ -10,6 +13,14 @@
 		document.getElementById("finishButton").disabled = true;
 	}
 
+	var multiMode = ${multiMode};
+	// saving Mindmap every one minute 
+	$.timer(60000, function (timer) {
+		if (!multiMode)
+			$.post("${get}", { dispatch: "${dispatch}", mindmapId: "${mindmapId}", userId: "${userId}", 
+				content: getFlashMovie('flashContent').getMindmap() } );
+	});
+
 	function validateForm() {
 		// Validates that there's input from the user. 
 		// disables the Finish button to avoid double submittion 
@@ -17,8 +28,6 @@
 
 		// Sets mindmap content in Flash
 		setMindmapContent();
-		var f = document.getElementById('learnerForm');
-		f.submit();
 	}
 	
 	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", 
@@ -31,17 +40,21 @@
 		mindmapContent.value = getFlashMovie('flashContent').getMindmap();
 	}
 	
-	function embedFlashObject()
+	function embedFlashObject(x, y)
 	{
-		swfobject.embedSWF("${mindmapType}", "flashContent", "500", "375", "9.0.0", false, flashvars);
+		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
 	}
 	
 	function getFlashMovie(movieName) {
 		var isIE = navigator.appName.indexOf("Microsoft") != -1;
 		return (isIE) ? window[movieName] : document[movieName];
 	}
+
+	$(window).resize(function() {
+		embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
+	});
 	
-	embedFlashObject();
+	embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
 -->
 </script>
 
@@ -69,7 +82,7 @@
 
 	&nbsp;
 
-	<html:form action="/learning" method="post" onsubmit="return validateForm();" styleId="learnerForm">
+	<html:form action="/learning" method="post" onsubmit="return validateForm();" styleId="submitForm">
 		<html:hidden property="userId" value="${userIdParam}" />
 		<html:hidden property="toolContentId" value="${toolContentIdParam}" />
 		<html:hidden property="toolSessionID" />
@@ -103,9 +116,9 @@
 		
 			<c:otherwise>
 				<div class="space-bottom-top align-right">
-					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="validateForm()">
-						<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
-					</html:link>
+					<html:submit styleClass="button" styleId="finishButton">
+						<fmt:message>button.finish</fmt:message>
+					</html:submit>
 				</div>
 			</c:otherwise>
 		</c:choose>
