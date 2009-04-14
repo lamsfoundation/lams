@@ -170,7 +170,7 @@ public class DisplayGroupAction extends Action {
 			+ org.getOrganisationId(), "index.searchlesson.tooltip"));
 
 		// Adding gradebook course monitor links if enabled
-		if (org.getEnableGradebookForMonitors() && contains(roles, Role.ROLE_GROUP_MANAGER)) {
+		if (org.getEnableGradebookForMonitors() && (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
 		    String link = "javascript:openGradebookCourseMonitorPopup(" + "'" + org.getName() + "','"
 			    + Configuration.get(ConfigurationKeys.SERVER_URL)
 			    + "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="

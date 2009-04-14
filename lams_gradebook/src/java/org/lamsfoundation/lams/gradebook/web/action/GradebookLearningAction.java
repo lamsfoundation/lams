@@ -95,7 +95,7 @@ public class GradebookLearningAction extends LamsDispatchAction{
 		}
 		
 		// Validate whether this user is a monitor for this organisation
-		if (!userService.isUserInRole(user.getUserID(), oranisationID, Role.MONITOR)) {
+		if (!userService.isUserInRole(user.getUserID(), oranisationID, Role.LEARNER)) {
 		    logger.error("User " + user.getLogin()
 			    + " is not a learner in the requested course. Cannot access the course for gradebook.");
 		    return displayMessage(mapping, request, "error.authorisation");

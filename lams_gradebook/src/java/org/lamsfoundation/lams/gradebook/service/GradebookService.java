@@ -57,7 +57,9 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -77,6 +79,7 @@ public class GradebookService implements IGradebookService {
     private ILamsCoreToolService toolService;
     private IGradebookDAO gradebookDAO;
     private ILessonService lessonService;
+    private IUserManagementService userService;
 
     /**
      * @see org.lamsfoundation.lams.gradebook.service.IGradebookService#getGBActivityRowsForLearner(org.lamsfoundation.lams.lesson.Lesson,
@@ -127,7 +130,7 @@ public class GradebookService implements IGradebookService {
 	}
 	return gradebookActivityDTOs;
     }
-    
+
     /**
      * @see org.lamsfoundation.lams.gradebook.service.IGradebookService#getGBActivityRowsForLesson(org.lamsfoundation.lams.lesson.Lesson)
      */
@@ -220,8 +223,6 @@ public class GradebookService implements IGradebookService {
 	return gradebookUserDTOs;
 
     }
-
-
 
     /**
      * @see org.lamsfoundation.lams.gradebook.service.IGradebookService#getGBUserRowsForLesson(org.lamsfoundation.lams.lesson.Lesson)
@@ -365,56 +366,64 @@ public class GradebookService implements IGradebookService {
 	    if (lessons != null) {
 
 		for (Lesson lesson : lessons) {
-		    if (lesson.getLessonClass().isStaffMember(user)) {
-			GBLessonGridRowDTO lessonRow = new GBLessonGridRowDTO();
-			lessonRow.setLessonName(lesson.getLessonName());
-			lessonRow.setId(lesson.getLessonId());
-			lessonRow.setStartDate(getLocaleDateString(user, lesson.getStartDateTime()));
 
-			if (view == GBGridView.MON_COURSE) {
-			    
-			    // Setting the averages for monitor view
-			    lessonRow.setAverageTimeTaken(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()));
-			    lessonRow.setAverageMark(gradebookDAO.getAverageMarkForLesson(lesson.getLessonId()));
-
-			    // Set the gradebook monitor url
-			    String gbMonURL = Configuration.get(ConfigurationKeys.SERVER_URL)
-				    + "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
-			    lessonRow.setGradebookMonitorURL(gbMonURL);
-			} else if (view == GBGridView.LRN_COURSE) {
-			    
-			    GradebookUserLesson gbLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(), user.getUserId());
-			    
-			    lessonRow.setAverageTimeTaken(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()));
-			    lessonRow.setAverageMark(gradebookDAO.getAverageMarkForLesson(lesson.getLessonId()));
-			    
-			    if (gbLesson != null) {
-				lessonRow.setMark(gbLesson.getMark());
-				lessonRow.setFeedback(gbLesson.getFeedback());
-			    }
-			    
-			    LearnerProgress learnerProgress = monitoringService.getLearnerProgress(user.getUserId(), lesson
-				    .getLessonId());
-			    lessonRow.setStatus(getLessonStatusStr(learnerProgress));
-			    if (learnerProgress != null) {
-				if (learnerProgress.getStartDate() != null && learnerProgress.getFinishDate() != null) {
-				    lessonRow.setTimeTaken(learnerProgress.getFinishDate().getTime()
-					    - learnerProgress.getStartDate().getTime());
-				}
-				
-				lessonRow.setFinishDate(getLocaleDateString(user, learnerProgress.getFinishDate()));
-			    }
-			}
-
-			if (lesson.getOrganisation().getOrganisationId() != organisation.getOrganisationId()) {
-			    lessonRow.setSubGroup(lesson.getOrganisation().getName());
-			} else {
-			    lessonRow.setSubGroup("-");
-			}
-
-			lessonRows.add(lessonRow);
-
+		    // Dont include lesson in list if the user doesnt have permission
+		    if (!(view == GBGridView.MON_COURSE
+			    && (lesson.getLessonClass().isStaffMember(user) || userService.isUserInRole(user
+				    .getUserId(), organisation.getOrganisationId(), Role.GROUP_MANAGER)) || view == GBGridView.LRN_COURSE
+			    && lesson.getAllLearners().contains(user))) {
+			continue;
 		    }
+
+		    GBLessonGridRowDTO lessonRow = new GBLessonGridRowDTO();
+		    lessonRow.setLessonName(lesson.getLessonName());
+		    lessonRow.setId(lesson.getLessonId());
+		    lessonRow.setStartDate(getLocaleDateString(user, lesson.getStartDateTime()));
+
+		    if (view == GBGridView.MON_COURSE) {
+
+			// Setting the averages for monitor view
+			lessonRow.setAverageTimeTaken(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()));
+			lessonRow.setAverageMark(gradebookDAO.getAverageMarkForLesson(lesson.getLessonId()));
+
+			// Set the gradebook monitor url
+			String gbMonURL = Configuration.get(ConfigurationKeys.SERVER_URL)
+				+ "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
+			lessonRow.setGradebookMonitorURL(gbMonURL);
+		    } else if (view == GBGridView.LRN_COURSE) {
+
+			GradebookUserLesson gbLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
+				user.getUserId());
+
+			lessonRow.setAverageTimeTaken(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()));
+			lessonRow.setAverageMark(gradebookDAO.getAverageMarkForLesson(lesson.getLessonId()));
+
+			if (gbLesson != null) {
+			    lessonRow.setMark(gbLesson.getMark());
+			    lessonRow.setFeedback(gbLesson.getFeedback());
+			}
+
+			LearnerProgress learnerProgress = monitoringService.getLearnerProgress(user.getUserId(), lesson
+				.getLessonId());
+			lessonRow.setStatus(getLessonStatusStr(learnerProgress));
+			if (learnerProgress != null) {
+			    if (learnerProgress.getStartDate() != null && learnerProgress.getFinishDate() != null) {
+				lessonRow.setTimeTaken(learnerProgress.getFinishDate().getTime()
+					- learnerProgress.getStartDate().getTime());
+			    }
+
+			    lessonRow.setFinishDate(getLocaleDateString(user, learnerProgress.getFinishDate()));
+			}
+		    }
+
+		    if (lesson.getOrganisation().getOrganisationId() != organisation.getOrganisationId()) {
+			lessonRow.setSubGroup(lesson.getOrganisation().getName());
+		    } else {
+			lessonRow.setSubGroup("-");
+		    }
+
+		    lessonRows.add(lessonRow);
+
 		}
 	    }
 
@@ -429,7 +438,7 @@ public class GradebookService implements IGradebookService {
 	if (user == null || date == null) {
 	    return null;
 	}
-	
+
 	Locale locale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
 	String dateStr = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale).format(date);
 	return dateStr;
@@ -697,6 +706,14 @@ public class GradebookService implements IGradebookService {
 
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
+    }
+
+    public IUserManagementService getUserService() {
+	return userService;
+    }
+
+    public void setUserService(IUserManagementService userService) {
+	this.userService = userService;
     }
 
     // -------------------------------------------------------------------------
