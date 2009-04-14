@@ -1,10 +1,10 @@
 	function showBusy(targetDiv){
 		if($(targetDiv+"_Busy") != null){
-			Element.show(targetDiv+"_Busy");
+			document.getElementById(targetDiv+"_Busy").style.display = '';
 		}
 	}
 	function hideBusy(targetDiv){
 		if($(targetDiv+"_Busy") != null){
-			Element.hide(targetDiv+"_Busy");
+			document.getElementById(targetDiv+"_Busy").style.display = 'none';
 		}				
 	}

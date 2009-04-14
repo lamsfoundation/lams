@@ -3,36 +3,17 @@
 	 */
 	var instructionTargetDiv = "instructionArea";
     var itemAttachmentTargetDiv = "itemAttachmentArea";
-// Please set these 2 variables in JSP file for using tag reason:
-//    var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
-//    var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
+    var singleInstructionHeight = 40;
+    
 	function removeInstruction(idx){
-		//var id = "instructionItem" + idx;
-		//Element.remove(id);
- 		var url= removeInstructionUrl;
-	    var reqIDVar = new Date();
-	   
-	   var param = $("instructionForm").serialize(true); // Form.serialize('instructionForm');
-	   // param('instructionItemDesc' + idx) = 
-	    param.removeIdx = idx;
-	    param.reqID = reqIDVar.getTime();
-	    
+	    var param = $("#instructionForm").serialize() + "&removeIdx="+idx;
 	    removeInstructionLoading();
-	    var myAjax = new Ajax.Updater(
-		    	instructionTargetDiv,
-		    	url,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		onComplete:removeInstructionComplete,
-		    		evalScripts:true,
-		    		contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
-		    	}
-	    );
+	    $.get(removeInstructionUrl, param, function(xml) {
+	    	removeInstructionComplete();	
+	    	document.getElementById("instructionArea").innerHTML = xml;
+	    });
 	}
 	function removeItemAttachment(idx){
-		//var id = "instructionItem" + idx;
-		//Element.remove(id);
  		var url= removeItemAttachmentUrl;
 	    var reqIDVar = new Date();
 	    var param = "reqID="+reqIDVar.getTime();
@@ -49,20 +30,18 @@
 	    );
 	}
 	function addInstruction(){
-		var url= addInstructionUrl;
-	    var reqIDVar = new Date();
-	    var param = Form.serialize("instructionForm")+"&reqID="+reqIDVar.getTime();
+	    var param = $("#instructionForm").serialize();
 		addInstructionLoading();
-	    var myAjax = new Ajax.Updater(
-		    	instructionTargetDiv,
-		    	url,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		onComplete:addInstructionComplete,
-		    		evalScripts:true 
-		    	}
-	    );
+	    $.get(addInstructionUrl, param, function(xml) {
+	    	addInstructionComplete();
+	    	document.getElementById("instructionArea").innerHTML = xml;
+	    });
+	    return false;
+
+	}
+	function adjustInstructionsDisplayAreaHeight(adjustAmount){
+		var obj = window.top.document.getElementById('reourceInputArea');
+		obj.style.height=obj.contentWindow.document.body.scrollHeight+adjustAmount+'px';
 	}
 	function upItem(itemIdx){
 		if(itemIdx == 0)
@@ -88,6 +67,7 @@
 	}
 	function removeInstructionComplete(){
 		hideBusy(instructionTargetDiv);
+		adjustInstructionsDisplayAreaHeight(-singleInstructionHeight);
 	}
 	function removeItemAttachmentLoading(){
 		showBusy(itemAttachmentTargetDiv);
@@ -100,13 +80,11 @@
 	}
 	function addInstructionComplete(){
 		hideBusy(instructionTargetDiv);
-	
+		adjustInstructionsDisplayAreaHeight(singleInstructionHeight);
 	}
 	
 	function submitResourceItem(){
-		//$("instructionList").value = Form.serialize("instructionForm");
 		document.getElementById("instructionList").value = $("#instructionForm").serialize();
-		//$("#resourceItemForm").value = $("#instructionForm").serialize();
 		$("#resourceItemForm").submit();
 		// after submit, it direct to itemlist.jsp, 
 		// then refresh "basic tab" resourcelist and close this window.

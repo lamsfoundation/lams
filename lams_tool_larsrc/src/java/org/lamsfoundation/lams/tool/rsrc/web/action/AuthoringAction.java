@@ -30,6 +30,7 @@ import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -335,9 +336,9 @@ public class AuthoringAction extends Action {
      */
     private ActionForward newInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	int count = NumberUtils.stringToInt(request.getParameter(AuthoringAction.INSTRUCTION_ITEM_COUNT), 0);
-	List instructionList = new ArrayList(++count);
-	for (int idx = 0; idx < count; idx++) {
+    int numberOfInstructions = getNumberOfInstructionsInRequest(request);
+	List instructionList = new ArrayList(++numberOfInstructions);
+	for (int idx = 0; idx < numberOfInstructions; idx++) {
 	    String item = request.getParameter(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (item == null) {
 		instructionList.add("");
@@ -360,10 +361,10 @@ public class AuthoringAction extends Action {
      */
     private ActionForward removeInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	int count = NumberUtils.stringToInt(request.getParameter(AuthoringAction.INSTRUCTION_ITEM_COUNT), 0);
+    int numberOfInstructions = getNumberOfInstructionsInRequest(request);
 	int removeIdx = NumberUtils.stringToInt(request.getParameter("removeIdx"), -1);
-	List instructionList = new ArrayList(count - 1);
-	for (int idx = 0; idx < count; idx++) {
+	List instructionList = new ArrayList(numberOfInstructions - 1);
+	for (int idx = 0; idx < numberOfInstructions; idx++) {
 	    String item = request.getParameter(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (idx == removeIdx) {
 		continue;
@@ -930,6 +931,22 @@ public class AuthoringAction extends Action {
 		
 		return instructionList;
 
+	}
+	
+    /**
+     * Get number of instruction items in the <code>HttpRequest</code>
+     * 
+     * @param request the HttpServletRequest
+     * @return numberOfInstruction the number of instructions in the request
+     */
+	private int getNumberOfInstructionsInRequest(HttpServletRequest request) {
+		int numberOfInstructions = 0;
+		Enumeration e = request.getParameterNames();
+		while (e.hasMoreElements()){
+		    if (e.nextElement().toString().indexOf(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX) != -1)
+			numberOfInstructions++;
+		}
+		return numberOfInstructions;
 	}
 
     /**
