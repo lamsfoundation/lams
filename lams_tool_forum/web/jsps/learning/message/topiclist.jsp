@@ -18,8 +18,7 @@
 			<th width="25%">
 				<fmt:message key="lable.topic.title.update" />
 			</th>
-			<c:if
-				test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
+			<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
 				<th>
 					&nbsp;
 				</th>
@@ -32,12 +31,18 @@
 						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
 					</c:set>
 					<html:link href="${viewtopic}">
-						<c:out value="${topic.message.subject}" />
+						<c:choose>
+							<c:when test="${topic.newPostingsNum > 0}">
+								<b><c:out value="${topic.message.subject}" /></b>
+							</c:when>
+							<c:otherwise>
+								<c:out value="${topic.message.subject}" />
+							</c:otherwise>
+						</c:choose>
 					</html:link>
 					<c:if test="${topic.hasAttachment}">
 						<img src="<html:rewrite page="/images/paperclip.gif"/>">
 					</c:if>
-
 				</td>
 				<td>
 					<c:set var="author" value="${topic.author}"/>
@@ -59,8 +64,7 @@
 				<td>
 					<lams:Date value="${topic.lastTopicDate}"/>
 				</td>
-				<c:if
-					test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
+				<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
 					<td>
 						${topic.numOfPosts} / ${sessionMap.minimumReply}
 					</td>
