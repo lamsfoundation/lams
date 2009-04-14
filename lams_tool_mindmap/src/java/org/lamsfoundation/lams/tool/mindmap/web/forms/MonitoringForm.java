@@ -46,6 +46,7 @@ public class MonitoringForm extends ActionForm {
     String mindmapContent;
     Long userId;
     Long toolContentID;
+    Long contentFolderID;
 
     public String getMessageBody() {
 	return messageBody;
@@ -117,5 +118,13 @@ public class MonitoringForm extends ActionForm {
 
     public void setToolContentID(Long toolContentID) {
 	this.toolContentID = toolContentID;
+    }
+    
+    public Long getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(Long contentFolderID) {
+	this.contentFolderID = contentFolderID;
     }
 }

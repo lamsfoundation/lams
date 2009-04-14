@@ -184,7 +184,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	//MindmapUser mindmapUser = getUserByUserIdAndSessionId(learnerId, toolSessionId);
 	//MindmapSession mindmapSession = getSessionBySessionId(toolSessionId);
 
-	// TODO: Implement Nodes output
 	return mindmapNodeDAO.getNumNodesByUserAndSession(learnerId, toolSessionId);
     }
     
@@ -214,13 +213,30 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	Mindmap toContent = Mindmap.newInstance(fromContent, toContentId, mindmapToolContentHandler);
 	mindmapDAO.saveOrUpdate(toContent);
 
-	/* MINDMAP Code */
-
-	MindmapNode fromMindmapNode = (MindmapNode) getAuthorRootNodeByMindmapId(fromContent.getUid()).get(0);
-
-	cloneMindmapNodesForRuntime(fromMindmapNode, null, fromContent, toContent);
-
-	/* MINDMAP Code */
+	/* Copying Mindmap Nodes */
+	
+	// creating default nodes for current mindmap
+	String rootNodeName = getMindmapMessageService().getMessage("node.root.defaultName");
+	String childNodeName1 = getMindmapMessageService().getMessage("node.child1.defaultName");
+	String childNodeName2 = getMindmapMessageService().getMessage("node.child2.defaultName");
+	
+	List rootNode = getAuthorRootNodeByMindmapId(fromContent.getUid());
+	
+	MindmapNode rootMindmapNode = null;
+	if (rootNode == null || rootNode.size() == 0)
+	{
+	    // Create default content
+	    rootMindmapNode = saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, toContent);
+	    saveOrUpdateMindmapNode(rootMindmapNode);
+	    saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, toContent);
+	    saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, toContent);
+	}
+	else { 
+	    rootMindmapNode = (MindmapNode) getAuthorRootNodeByMindmapId(fromContent.getUid()).get(0);
+	}
+	
+	//MindmapNode fromMindmapNode = (MindmapNode) getAuthorRootNodeByMindmapId(fromContent.getUid()).get(0);
+	cloneMindmapNodesForRuntime(rootMindmapNode, null, fromContent, toContent);
     }
     
     /**

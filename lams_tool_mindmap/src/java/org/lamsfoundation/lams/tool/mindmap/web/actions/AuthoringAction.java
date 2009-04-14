@@ -99,9 +99,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
 
 	// set up mindmapService
@@ -130,13 +128,12 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	if (mode != null && mode.isTeacher()) {
 	    // Set the defineLater flag so that learners cannot use content
-	    // while we
-	    // are editing. This flag is released when updateContent is called.
+	    // while we are editing. This flag is released when updateContent is called.
 	    mindmap.setDefineLater(true);
 	    mindmapService.saveOrUpdateMindmap(mindmap);
 	}
 
-	/* MINDMAP Code */
+	/* Mindmap Attributes */
 
 	String mindmapContentPath = Configuration.get(ConfigurationKeys.SERVER_URL)
 		+ "tool/lamind10/authoring.do?dispatch=setMindmapContent%26mindmapId=" + mindmap.getUid();
@@ -151,16 +148,13 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	String mindmapType = "images/mindmap_singleuser.swf";
 	request.setAttribute("mindmapType", mindmapType);
-
-	/* MINDMAP Code */
 	
 	// Set up the authForm.
 	AuthoringForm authForm = (AuthoringForm) form;
 	updateAuthForm(authForm, mindmap);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(mindmap, getAccessMode(request), contentFolderID,
-		toolContentID);
+	SessionMap<String, Object> map = createSessionMap(mindmap, getAccessMode(request), contentFolderID, toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
@@ -246,8 +240,6 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	// TODO need error checking.
-
 	// get authForm and session map.
 	AuthoringForm authForm = (AuthoringForm) form;
 	SessionMap<String, Object> map = getSessionMap(request, authForm);
@@ -292,7 +284,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	request.setAttribute(MindmapConstants.ATTR_SESSION_MAP, map);
 
-	/* MINDMAP Code */
+	/* Saving Minmdap Nodes */
 
 	// getting xml data from SWF
 	String mindmapContent = authForm.getMindmapContent();
@@ -306,8 +298,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	List<NodeModel> branches = rootNodeModel.getBranch();
 
 	// saving root Node into database
-	MindmapNode rootMindmapNode = (MindmapNode) mindmapService.getAuthorRootNodeByMindmapId(mindmap.getUid())
-		.get(0);
+	MindmapNode rootMindmapNode = (MindmapNode) mindmapService.getAuthorRootNodeByMindmapId(mindmap.getUid()).get(0);
 	rootMindmapNode = mindmapService.saveMindmapNode(rootMindmapNode, null, nodeConceptModel.getId(),
 		nodeConceptModel.getText(), nodeConceptModel.getColor(), mindmapUser, mindmap);
 
@@ -322,8 +313,6 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	nodesToDeleteCondition += mindmapService.getNodesToDeleteCondition() + " and mindmap_id = " + mindmap.getUid();
 	mindmapService.deleteNodes(nodesToDeleteCondition);
-
-	/* MINDMAP Code */
 
 	return mapping.findForward("success");
     }

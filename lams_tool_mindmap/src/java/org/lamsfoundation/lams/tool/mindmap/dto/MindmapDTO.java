@@ -52,7 +52,8 @@ public class MindmapDTO {
     public Set<MindmapAttachmentDTO> offlineInstructionsFiles;
     public Set<MindmapSessionDTO> sessionDTOs = new TreeSet<MindmapSessionDTO>();
     public Long currentTab;
-
+    // reflection
+    public boolean reflectOnActivity;
     public String reflectInstructions;
 
     /* Constructors */
@@ -68,6 +69,8 @@ public class MindmapDTO {
 	contentInUse = mindmap.isContentInUse();
 	lockOnFinish = mindmap.isLockOnFinished();
 	multiUserMode = mindmap.isMultiUserMode();
+	reflectOnActivity = mindmap.isReflectOnActivity();
+	reflectInstructions = mindmap.getReflectInstructions();
 
 	onlineInstructionsFiles = new TreeSet<MindmapAttachmentDTO>();
 	offlineInstructionsFiles = new TreeSet<MindmapAttachmentDTO>();
@@ -189,6 +192,14 @@ public class MindmapDTO {
 
     public void setCurrentTab(Long currentTab) {
 	this.currentTab = currentTab;
+    }
+
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
     }
 
     public String getReflectInstructions() {

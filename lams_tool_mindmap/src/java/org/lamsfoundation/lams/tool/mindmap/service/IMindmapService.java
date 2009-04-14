@@ -175,10 +175,9 @@ public interface IMindmapService {
 
     public MessageService getMindmapMessageService();
     
-    /* Outputs */
+    /** Outputs */
     public int getNumNodes(Long learnerId, Long toolSessionId);
     
-    /* MINDMAP Code */
     public String getLanguageXML();
     
     public void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId);

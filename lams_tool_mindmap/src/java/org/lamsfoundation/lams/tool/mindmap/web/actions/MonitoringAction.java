@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.mindmap.web.actions;
 
 import java.io.IOException;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,7 +33,9 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
+import org.lamsfoundation.lams.tool.mindmap.dto.MindmapSessionDTO;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapUserDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
@@ -58,14 +59,16 @@ import com.thoughtworks.xstream.XStream;
  * @struts.action path="/monitoring" parameter="dispatch" scope="request" name="monitoringForm" validate="false"
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
  * @struts.action-forward name="mindmap_display" path="tiles:/monitoring/mindmap_display"
+ * @struts.action-forward name="reflect" path="tiles:/monitoring/reflect"
  */
 public class MonitoringAction extends LamsDispatchAction {
-    
+
     private static Logger log = Logger.getLogger(MonitoringAction.class);
     public IMindmapService mindmapService;
-    
+
     /**
-     * Default action on page load 
+     * Default action on page load
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -79,27 +82,32 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
-
+	
 	if (mindmap == null) {
-	    // TODO: error page.
+	    log.error("unspecified(): Mindmap is not found!");
+	    return null;
 	}
 
 	boolean isGroupedActivity = mindmapService.isGroupedActivity(toolContentID);
-
-	MindmapDTO mindmapDT0 = new MindmapDTO(mindmap);
+	MindmapDTO mindmapDTO = new MindmapDTO(mindmap);
 
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
-	mindmapDT0.setCurrentTab(currentTab);
+	mindmapDTO.setCurrentTab(currentTab);
 
-	request.setAttribute("mindmapDTO", mindmapDT0);
+	Object[] users = ((MindmapSessionDTO) mindmapDTO.getSessionDTOs().toArray()[0]).getUserDTOs().toArray();
+	if (users != null && users.length > 0)
+	    request.setAttribute("mindmapUser", ((MindmapUserDTO) users[0]));
+	
+	request.setAttribute("mindmapDTO", mindmapDTO);
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
 	return mapping.findForward("success");
     }
-    
+
     /**
-     * Returns the serialized XML of the Mindmap Nodes from Database 
+     * Returns the serialized XML of the Mindmap Nodes from Database
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -129,8 +137,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		mindmapUserName = rootMindmapNode.getUser().getFirstName() + " "
 			+ rootMindmapNode.getUser().getLastName();
 
-	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(), 
-		    rootMindmapNode.getText(), rootMindmapNode.getColor(), mindmapUserName));
+	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(), rootMindmapNode
+		    .getText(), rootMindmapNode.getColor(), mindmapUserName));
 	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
 		    mindmapId, rootNodeModel, null);
 	    XStream xstream = new XStream();
@@ -159,10 +167,10 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward setLocale(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	
+
 	try {
 	    response.setContentType("text/xml");
-	    //response.setCharacterEncoding("utf-8");
+	    // response.setCharacterEncoding("utf-8");
 	    response.getWriter().write(mindmapService.getLanguageXML());
 	} catch (IOException e) {
 	    e.printStackTrace();
@@ -170,9 +178,10 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     /**
-     * Shows Mindmap Nodes for each learner 
+     * Shows Mindmap Nodes for each learner
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -183,17 +192,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 
 	setupService();
-
+	
 	Long userId = new Long(WebUtil.readLongParam(request, "userUID"));
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
 	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
 
-	//NotebookEntry entry = mindmapService.getEntry(mindmapUser.getEntryUID());
-	MindmapUserDTO userDTO = new MindmapUserDTO(mindmapUser/*, entry*/);
+	MindmapUserDTO userDTO = new MindmapUserDTO(mindmapUser);
 	request.setAttribute("userDTO", userDTO);
-	
-	/* MINDMAP Code */
 
 	// mindmapType Parameter
 	String mindmapType = "images/mindmap_singleuser.swf";
@@ -201,27 +208,63 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	// Mindmap path Parameter
 	String mindmapContentPath = Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "tool/lamind10/monitoring.do?dispatch=setMindmapContent%26mindmapId=" + toolContentID + "%26userId="
-		+ userId;
+		+ "tool/lamind10/monitoring.do?dispatch=setMindmapContent%26mindmapId=" + mindmap.getUid()
+		+ "%26userId=" + userId;
 	request.setAttribute("mindmapContentPath", mindmapContentPath);
 
 	// Current user Parameter
 	String currentMindmapUser = mindmapService.getMindmapMessageService().getMessage("node.instructor.label");
 	request.setAttribute("currentMindmapUser", currentMindmapUser);
-	
-	String localizationPath = Configuration.get(ConfigurationKeys.SERVER_URL) + 
-		"tool/lamind10/monitoring.do?dispatch=setLocale";
+
+	String localizationPath = Configuration.get(ConfigurationKeys.SERVER_URL)
+		+ "tool/lamind10/monitoring.do?dispatch=setLocale";
 	request.setAttribute("localizationPath", localizationPath);
 
 	request.setAttribute("toolContentID", toolContentID);
-
-	/* MINDMAP Code */
+	request.setAttribute("contentFolderID", contentFolderID);
+	request.setAttribute("isMultiUserMode", mindmap.isMultiUserMode());
+	
+	// Attributes for AJAX calls while saving Mindmap
+	request.setAttribute("get", Configuration.get(ConfigurationKeys.SERVER_URL) + "tool/lamind10/monitoring.do");
+	request.setAttribute("dispatch", "updateContent");
+	request.setAttribute("mindmapId", mindmap.getUid());
+	request.setAttribute("userId", mindmapUser.getUid());
 
 	return mapping.findForward("mindmap_display");
     }
     
     /**
-     * Saves Mindmap Nodes to Database 
+     * Shows Notebook reflection that Learner has done.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward reflect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	Long userId = WebUtil.readLongParam(request, "userUID", false);
+	Long toolContentId = WebUtil.readLongParam(request, "toolContentID", false);
+	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
+	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentId);
+	
+	request.setAttribute("reflectTitle", mindmap.getTitle());
+	request.setAttribute("mindmapUser", mindmapUser.getFirstName() + " " + mindmapUser.getLastName());
+	
+	// Reflection
+	NotebookEntry entry = mindmapService.getEntry(mindmapUser.getEntryUID());
+	if (entry != null) {
+	    request.setAttribute("reflectEntry", entry.getEntry());
+	}
+
+	return mapping.findForward("reflect");
+    }
+    
+    /**
+     * Saves Mindmap Nodes to Database
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -230,17 +273,15 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-
-	MonitoringForm monitorForm = (MonitoringForm) form;
-
-	Mindmap mindmap = mindmapService.getMindmapByContentId(monitorForm.getToolContentID());
-
+	
+	Long userId = WebUtil.readLongParam(request, "userId", false);
+	Long toolContentId = WebUtil.readLongParam(request, "mindmapId", false);
+	String mindmapContent = WebUtil.readStrParam(request, "content", false);
+	
+	Mindmap mindmap = mindmapService.getMindmapByUid(toolContentId);
+	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
+	
 	if (!mindmap.isMultiUserMode()) {
-	    // getting xml data from SWF
-	    String mindmapContent = monitorForm.getMindmapContent();
-	    Long userId = monitorForm.getUserId();
-	    MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
-
 	    // Saving Mindmap data to XML
 	    XStream xstream = new XStream();
 	    xstream.alias("branch", NodeModel.class);
@@ -268,7 +309,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    mindmapService.deleteNodes(nodesToDeleteCondition);
 	}
 
-	return mapping.findForward("success");
+	return null;
     }
 
     /**
