@@ -28,11 +28,26 @@
 			</div>
 		</c:if>
 
-		<c:if
-			test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 or sessionMap.maximumReply ne 0)}">
+		<c:if test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 and sessionMap.maximumReply ne 0)}">
 			<div class="info">
 				<fmt:message key="label.postingLimits.forum.reminder">
 					<fmt:param value="${sessionMap.minimumReply}"></fmt:param>
+					<fmt:param value="${sessionMap.maximumReply}"></fmt:param>
+				</fmt:message>
+			</div>
+		</c:if>
+		
+		<c:if test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 and sessionMap.maximumReply eq 0)}">
+			<div class="info">
+				<fmt:message key="label.postingLimits.forum.reminder.min">
+					<fmt:param value="${sessionMap.minimumReply}"></fmt:param>
+				</fmt:message>
+			</div>
+		</c:if>
+		
+		<c:if test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply eq 0 and sessionMap.maximumReply ne 0)}">
+			<div class="info">
+				<fmt:message key="label.postingLimits.forum.reminder.max">
 					<fmt:param value="${sessionMap.maximumReply}"></fmt:param>
 				</fmt:message>
 			</div>
