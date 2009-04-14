@@ -656,7 +656,7 @@ public class GradebookService implements IGradebookService {
 
 	// Fix up outputs html if there are not outputs available
 	if (noOutputs) {
-	    toolOutputsStr = "No output available.";
+	    toolOutputsStr = "-";
 	} else {
 	    toolOutputsStr = "<select style='width:150px;'><option style='width:100%;'>View outputs</option>"
 		    + toolOutputsStr;

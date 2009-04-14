@@ -9,7 +9,7 @@
 
 <lams:html>
 <lams:head>
-	<title>Course Gradebook Monitor</title>
+	<title><fmt:message key="gradebook.title.window.courseMonitor"/></title>
 	<lams:css />
 
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
@@ -30,7 +30,14 @@
 			    pager: 'organisationGridPager',
 			    rowList:[5,10,20,30],
 			    rowNum:10,
-				colNames:["", 'Lesson Name', 'Sub-Group', 'Start Date', 'Average Time Taken', 'Average Mark'],
+				colNames:[
+					'', 
+					'<fmt:message key="gradebook.columntitle.lessonName"/>', 
+					'<fmt:message key="gradebook.columntitle.subGroup"/>', 
+					'<fmt:message key="gradebook.columntitle.startDate"/>', 
+					'<fmt:message key="gradebook.columntitle.averageTimeTaken"/>', 
+			    	'<fmt:message key="gradebook.columntitle.averageMark"/>'
+				],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
@@ -41,7 +48,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#organisationGrid").clearGridData();
-			    	alert("There was an error loading the Organisation grid");
+			    	alert('<fmt:message key="gradebook.error.loaderror"/>');
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -62,7 +69,14 @@
 						 pager: subgrid_table_id + "_pager",
 						 rowList:[5,10,20,30],
 						 rowNum:10,
-					     colNames: ['','Full Name','Progress', 'Time Taken', 'Lesson Feedback', 'Mark'],
+					     colNames: [
+					     	'',
+					     	'<fmt:message key="gradebook.columntitle.learnerName"/>',
+					     	'<fmt:message key="gradebook.columntitle.progress"/>', 
+					     	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
+					     	'<fmt:message key="gradebook.columntitle.lessonFeedBack"/>', 
+			    			'<fmt:message key="gradebook.columntitle.mark"/>'
+					     ],
 					     colModel:[
 					     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 					     	{name:'rowName',index:'rowName', sortable:true, editable:false},
@@ -73,7 +87,7 @@
 					     ],
 					     loadError: function(xhr,st,err) {
 				    		jQuery("#"+subgrid_table_id).clearGridData();
-				    		alert("There was an error loading the User View grid");
+				    		alert('<fmt:message key="gradebook.error.loaderror"/>');
 				    	 },
 					     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
 					     	
@@ -111,8 +125,6 @@
 							buttonimg:"<lams:LAMSURL />images/find.png", 
 							onClickButton: function(){
 								jQuery("#"+subgrid_table_id).searchGrid({
-									Find: "Find", 
-									Clear: "Clear", 
 									top:10, 
 									left:10,
 									sopt:['cn','bw','eq','ne','ew']
@@ -121,7 +133,6 @@
 					  });
 					  jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
 						caption: "",
-						title: "Show/Hide Columns",
 						buttonimg:"<lams:LAMSURL />images/table_edit.png", 
 						onClickButton: function(){
 							jQuery("#"+subgrid_table_id).setColumns();
@@ -138,8 +149,6 @@
 				buttonimg:"<lams:LAMSURL />images/find.png", 
 				onClickButton: function(){
 					jQuery("#organisationGrid").searchGrid({
-						Find: "Find", 
-						Clear: "Clear", 
 						top:10, 
 						left:10,
 						sopt:['cn','bw','eq','ne','ew']
@@ -149,7 +158,6 @@
 
 			jQuery("#organisationGrid").navButtonAdd('#organisationGridPager',{
 				caption: "",
-				title: "Show/Hide Columns",
 				buttonimg:"<lams:LAMSURL />images/table_edit.png", 
 				onClickButton: function(){
 					jQuery("#organisationGrid").setColumns();
@@ -166,7 +174,13 @@
 		<div id="header-no-tabs"></div>
 		
 		<div id="content">
-			<h1 class="no-tabs-below">Course Gradebook for ${organisationName}</h1>
+			<h1 class="no-tabs-below">
+				<fmt:message key="gradebook.title.courseMonitor">
+					<fmt:param>
+						${organisationName}
+					</fmt:param>
+				</fmt:message>
+			</h1>
 			<br />
 			<div style="width: 700px; margin-left: auto; margin-right: auto;">
 				<table id="organisationGrid" class="scroll"></table>

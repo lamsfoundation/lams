@@ -103,6 +103,8 @@ public class GradebookLearningAction extends LamsDispatchAction{
 
 		request.setAttribute("organisationID", oranisationID);
 		request.setAttribute("organisationName", organisation.getName());
+		request.setAttribute("fullName",user.getFirstName() + " "  + user.getLastName());
+		
 		
 		return mapping.findForward("learnercoursegradebook");
 	    }

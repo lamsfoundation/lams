@@ -31,7 +31,18 @@
 			    pager: 'organisationGridPager',
 			    rowList:[5,10,20,30],
 			    rowNum:10,
-			    colNames:["", 'Lesson Name', 'Sub-Group', 'Progress', 'FeedBack', 'Start Date', 'Finish Date', 'Average Duration', 'Duration', 'Average Mark', 'Mark'],
+			    colNames:[
+			    	'', 
+			    	'<fmt:message key="gradebook.columntitle.lessonName"/>', 
+			    	'<fmt:message key="gradebook.columntitle.subGroup"/>', 
+			    	'<fmt:message key="gradebook.columntitle.progress"/>', 
+			    	'<fmt:message key="gradebook.columntitle.lessonFeedback"/>', 
+			    	'<fmt:message key="gradebook.columntitle.startDate"/>', 
+			    	'<fmt:message key="gradebook.columntitle.completeDate"/>', 
+			    	'<fmt:message key="gradebook.columntitle.averageTimeTaken"/>', 
+			    	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
+			    	'<fmt:message key="gradebook.columntitle.averageMark"/>', 
+			    	'<fmt:message key="gradebook.columntitle.mark"/>'],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
@@ -47,7 +58,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#organisationGrid").clearGridData();
-			    	alert("There was an error loading the Organisation grid");
+			    	alert('<fmt:message key="gradebook.error.loaderror"/>');
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -65,7 +76,16 @@
 						     pager: subgrid_table_id + "_pager",
 							 rowList:[5,10,20,30],
 							 rowNum:10,
-						     colNames: ['Id','Activity','Progress', 'Feedback', 'Average Duration', 'Duration', 'Average Mark', 'Mark'],
+						     colNames: [
+						     	'',
+						     	'<fmt:message key="gradebook.columntitle.activity"/>',
+						     	'<fmt:message key="gradebook.columntitle.progress"/>', 
+						     	'<fmt:message key="gradebook.columntitle.activityFeedback"/>', 
+						     	'<fmt:message key="gradebook.columntitle.averageTimeTaken"/>', 
+						     	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
+						     	'<fmt:message key="gradebook.columntitle.aveargeMark"/>', 
+						     	'<fmt:message key="gradebook.columntitle.mark"/>'
+						     ],
 						     colModel: [
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
 								{name:'rowName', index:'rowName', sortable:false, editable: false, width:100},
@@ -78,7 +98,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	alert("There was an error loading the Learner View grid");
+						    	alert('<fmt:message key="gradebook.error.loaderror"/>');
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"));
@@ -88,7 +108,6 @@
 					  	// Adding button for show/hiding collumn
 					  	jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
 							caption: "",
-							title: "Show/Hide Columns",
 							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
 							onClickButton: function(){
 								jQuery("#"+subgrid_table_id).setColumns();
@@ -105,8 +124,6 @@
 				buttonimg:"<lams:LAMSURL />images/find.png", 
 				onClickButton: function(){
 					jQuery("#organisationGrid").searchGrid({
-						Find: "Find", 
-						Clear: "Clear", 
 						top:10, 
 						left:10,
 						sopt:['cn','bw','eq','ne','ew']
@@ -116,7 +133,6 @@
 
 			jQuery("#organisationGrid").navButtonAdd('#organisationGridPager',{
 				caption: "",
-				title: "Show/Hide Columns",
 				buttonimg:"<lams:LAMSURL />images/table_edit.png", 
 				onClickButton: function(){
 					jQuery("#organisationGrid").setColumns();
@@ -133,7 +149,13 @@
 		<div id="header-no-tabs"></div>
 		
 		<div id="content">
-			<h1 class="no-tabs-below">Course Gradebook for ${organisationName}</h1>
+			<h1 class="no-tabs-below">
+				<fmt:message key="gradebook.title.myGradebook">
+					<fmt:param>
+						${fullName}
+					</fmt:param>
+				</fmt:message>
+			</h1>
 			<br />
 			<div style="width: 600px; margin-left: auto; margin-right: auto;">
 				<table id="organisationGrid" class="scroll"></table>

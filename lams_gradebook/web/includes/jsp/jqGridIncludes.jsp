@@ -39,7 +39,7 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 		    processData: "Processing...",
 		    msg: {
 		        required:"Field is required",
-		        number:"Please, enter valid number",
+		        number:'<fmt:message key="gradebook.function.error.enterNumber"/>',
 		        minValue:"value must be greater than or equal to ",
 		        maxValue:"value must be less than or equal to",
 		        email: "is not a valid e-mail",
@@ -50,10 +50,27 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 		
 		// search entries
 		$.jgrid.search = {
-			    caption: "Search Names...",
-			    Find: "Find",
-			    Reset: "Reset",
-			    odata : ['equal', 'not equal', 'less', 'less or equal','greater','greater or equal', 'begins with','ends with','contains' ]
+			    caption: '<fmt:message key="gradebook.function.search.title"/>',
+			    Find: '<fmt:message key="label.find"/>',
+			    Reset: '<fmt:message key="label.reset"/>',
+			    odata : [
+			    	'<fmt:message key="gradebook.function.search.equalTo"/>', 
+			    	'<fmt:message key="gradebook.function.search.notEqualTo"/>', 
+			    	'less', 
+			    	'less or equal',
+			    	'greater',
+			    	'greater or equal', 
+			    	'<fmt:message key="gradebook.function.search.startsWith"/>',
+			    	'<fmt:message key="gradebook.function.search.endsWith"/>',
+			    	'<fmt:message key="gradebook.function.search.contains"/>' 
+			    ]
+		};
+		
+		// setcolumns module
+		$.jgrid.col ={
+		    caption: '<fmt:message key="gradebook.function.window.showColumns"/>',
+		    bSubmit: '<fmt:message key="label.ok"/>',
+		    bCancel: '<fmt:message key="label.cancel"/>'
 		};
 		
 		// ---------------------------------------------------------------------

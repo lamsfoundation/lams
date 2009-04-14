@@ -8,7 +8,7 @@
 
 <lams:html>
 <lams:head>
-	<title>Lesson Gradebook Monitor</title>
+	<title><fmt:message key="gradebook.title.window.lessonMonitor"/></title>
 	<lams:css/>
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
@@ -19,7 +19,7 @@
   
 			// Create the user view grid with sub grid for activities	
 			jQuery("#userView").jqGrid({
-				caption: "Learner View",
+				caption: '<fmt:message key="gradebook.gridtitle.usergrid"/>',
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monUserView&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
@@ -33,7 +33,13 @@
 			    rowList:[5,10,20,30],
 			    rowNum:10,
 				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradebookData&lessonID=${lessonDetails.lessonID}",
-			    colNames:["", 'Name', 'Progress', 'Time Taken', 'Lesson FeedBack', 'Lesson Mark'],
+			    colNames:["", 
+			    	'<fmt:message key="gradebook.columntitle.name"/>', 
+			    	'<fmt:message key="gradebook.columntitle.progress"/>', 
+			    	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
+			    	'<fmt:message key="gradebook.columntitle.lessonFeedBack"/>', 
+			    	'<fmt:message key="gradebook.columntitle.mark"/>'
+			    ],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
@@ -44,7 +50,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#userView").clearGridData();
-			    	alert("There was an error loading the Learner View grid");
+			    	alert('<fmt:message key="gradebook.error.loaderror"/>');
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -64,7 +70,16 @@
 							 rowList:[5,10,20,30],
 							 rowNum:10,
 						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradebookData&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
-						     colNames: ['Id','Activity','Progress','Outputs', 'Competences', 'Time Taken', 'Activity FeedBack', 'Mark'],
+						     colNames: [
+						     	'',
+						     	'<fmt:message key="gradebook.columntitle.activity"/>',
+						     	'<fmt:message key="gradebook.columntitle.progress"/>',
+						     	'<fmt:message key="gradebook.columntitle.outputs"/>', 
+						     	'<fmt:message key="gradebook.columntitle.competences"/>', 
+						     	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
+						     	'<fmt:message key="gradebook.columntitle.activityFeedback"/>', 
+						     	'<fmt:message key="gradebook.columntitle.mark"/>'
+						     ],
 						     colModel: [
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
 								{name:'rowName',  index:'rowName', sortable:false, editable: false},
@@ -77,7 +92,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	alert("There was an error loading the Learner View grid");
+						    	alert('<fmt:message key="gradebook.error.loaderror"/>');
 						     },
 						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
 						     	
@@ -104,7 +119,6 @@
 					  	// Adding button for show/hiding collumn
 					  	jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
 							caption: "",
-							title: "Show/Hide Columns",
 							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
 							onClickButton: function(){
 								jQuery("#"+subgrid_table_id).setColumns();
@@ -123,8 +137,6 @@
 					buttonimg:"<lams:LAMSURL />images/find.png", 
 					onClickButton: function(){
 						jQuery("#userView").searchGrid({
-								Find: "Find", 
-								Clear: "Clear", 
 								top:10, 
 								left:10,
 								sopt:['cn','bw','eq','ne','ew']
@@ -135,7 +147,6 @@
 				// Allowing column editing for this grid
 				jQuery("#userView").navButtonAdd('#userViewPager',{
 					caption: "",
-					title: "Show/Hide Columns",
 					buttonimg:"<lams:LAMSURL />images/table_edit.png", 
 					onClickButton: function(){
 						jQuery("#userView").setColumns();
@@ -145,7 +156,7 @@
 				
 				// Creating activity view with sub learner view
 				jQuery("#activityView").jqGrid({
-					caption: "Activity View",
+					caption: '<fmt:message key="gradebook.gridtitle.activitygrid"/>',
 				    datatype: "xml",
 				    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}",
 				    height: "100%",
@@ -156,7 +167,13 @@
 			    	rowNum:10,
 				    sortorder: "asc", 
 				    sortname: "activityId", 
-				    colNames:["", 'Activity Name', 'Average Time Taken', 'Competences', 'Average Mark'],
+				    colNames:[
+				    	'', 
+				    	'<fmt:message key="gradebook.columntitle.name"/>', 
+				    	'<fmt:message key="gradebook.columntitle.averageTimeTaken"/>', 
+				    	'<fmt:message key="gradebook.columntitle.competences"/>', 
+				    	'<fmt:message key="gradebook.columntitle.averageMark"/>'
+				    ],
 				    colModel:[
 				      {name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
 					  {name:'rowName', index:'rowName', sortable:true, editable: false},
@@ -166,7 +183,7 @@
 				    ],
 				    loadError: function(xhr,st,err) {
 			    		jQuery("#activityView").clearGridData();
-			    		alert("There was an error loading the Activity View grid");
+			    		alert('<fmt:message key="gradebook.error.loaderror"/>');
 			    	},
 				    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 				    subGrid: true,
@@ -188,7 +205,15 @@
 							 pager: subgrid_table_id + "_pager",
 							 rowList:[5,10,20,30],
 							 rowNum:10,
-						     colNames: ['','Full Name','Progress', 'Time Taken', 'Outputs', 'Activity Feedback', 'Mark'],
+						     colNames: [
+						     	'',
+						     	'<fmt:message key="gradebook.columntitle.name"/>',
+						     	'<fmt:message key="gradebook.columntitle.progress"/>', 
+						     	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
+						     	'<fmt:message key="gradebook.columntitle.outputs"/>', 
+						     	'<fmt:message key="gradebook.columntitle.activityFeedback"/>', 
+						     	'<fmt:message key="gradebook.columntitle.mark"/>'
+						     ],
 						     colModel:[
 						     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 						     	{name:'rowName',index:'rowName', sortable:true, editable:false},
@@ -200,7 +225,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 					    		jQuery("#"+subgrid_table_id).clearGridData();
-					    		alert("There was an error loading the Activity View grid");
+					    		alert('<fmt:message key="gradebook.error.loaderror"/>');
 					    	 },
 						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
 						     	
@@ -239,8 +264,6 @@
 								buttonimg:"<lams:LAMSURL />images/find.png", 
 								onClickButton: function(){
 									jQuery("#"+subgrid_table_id).searchGrid({
-																		Find: "Find", 
-																		Clear: "Clear", 
 																		top:10, 
 																		left:10,
 																		sopt:['cn','bw','eq','ne','ew']
@@ -251,7 +274,6 @@
 						  // Allowing column editing for this grid
 						  jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
 							caption: "",
-							title: "Show/Hide Columns",
 							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
 							onClickButton: function(){
 								jQuery("#"+subgrid_table_id).setColumns();
@@ -266,7 +288,7 @@
 				// Enable show/hide columns
 				jQuery("#activityView").navButtonAdd('#activityViewPager',{
 					caption: "",
-					title: "Show/Hide Columns",
+					title: '<fmt:message key="gradebook.function.window.showColumns"/>',
 					buttonimg:"<lams:LAMSURL />images/table_edit.png", 
 					onClickButton: function(){
 						jQuery("#activityView").setColumns();
@@ -282,7 +304,13 @@
 		
 		<div id="header-no-tabs"></div> <!--closes footer-->
 		<div id="content" >
-			<h1 class="no-tabs-below">Lesson Gradebook for ${lessonDetails.lessonName}</h1> 
+			<h1 class="no-tabs-below">
+				<fmt:message key="gradebook.title.lessonGradebook">
+					<fmt:param>
+						${lessonDetails.lessonName}
+					</fmt:param>
+				</fmt:message>
+			</h1> 
 			<br />
 			<div style="width:700px; margin-left:auto; margin-right:auto;">
 				<table id="userView" class="scroll" ></table>
