@@ -97,7 +97,7 @@ j_security_login_page
 						function isBrowserNotCompatable() {
 							if(op) return true;	// Opera
 							else if(saf) return true;		// Safari
-							else if(ie7) return false;	// IE6 IE7
+							else if(ie8 || ie7) return false;	// IE8 IE7
 							else if(ie5xwin || ie5 || ie4 || ie5mac || ie5x || ie6) return true;
 							else if(moz) 
 								if((moz_brow.indexOf("Firefox") != -1) && (moz_brow_nu >= 1.5)) return false;	// Firefox 1.5+
