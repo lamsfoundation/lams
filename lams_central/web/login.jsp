@@ -76,7 +76,7 @@ j_security_login_page
 			  	<!--Test if the browsers flash player meets requirements-->
 			  	<script language="JavaScript" type="text/javascript">
 			  		<!--			  		
-						var minFlashMajorVersion = 7; // Major version of Flash required
+						var minFlashMajorVersion = 8; // Major version of Flash required
 						var minFlashMinorVersion = 0; // Minor version of Flash required
 						var minFlashRevision = 0; // Minor version of Flash required
 						
