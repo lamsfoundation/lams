@@ -24,13 +24,6 @@
    PATH="/pages/authoring/pedagogicalPlannerForm.jsp" TARGET="page4"
    TITLE="success" TYPE="forward" model-entity="StrutsProcessItemOutput"/>
  </PROCESS-ITEM>
- <PROCESS-ITEM ID="#authoring#editCondition" NAME="action2"
-  PATH="/authoring/editCondition" SHAPE="32,641,0,0"
-  TITLE="mindmapConditionForm" TYPE="action" model-entity="StrutsProcessItem">
-  <PROCESS-ITEM-OUTPUT ID="addcondition" NAME="forward0"
-   PATH="/pages/authoring/addCondition.jsp" TARGET="page5"
-   TITLE="addcondition" TYPE="forward" model-entity="StrutsProcessItemOutput"/>
- </PROCESS-ITEM>
  <PROCESS-ITEM ID="#clearsession" NAME="action3" PATH="/clearsession"
   SHAPE="32,1857,0,0" TYPE="action" model-entity="StrutsProcessItem"/>
  <PROCESS-ITEM ID="#authoring" NAME="action4" PATH="/authoring"
@@ -42,41 +35,6 @@
    PATH="tiles:/authoring/main" TARGET="page7" TITLE="success"
    TYPE="forward" model-entity="StrutsProcessItemOutput"/>
  </PROCESS-ITEM>
- <PROCESS-ITEM ID="#authoring#downCondition" NAME="action5"
-  PATH="/authoring/downCondition" SHAPE="32,897,0,0" TYPE="action" model-entity="StrutsProcessItem">
-  <PROCESS-ITEM-OUTPUT ID="success" NAME="forward0"
-   PATH="/pages/authoring/conditionList.jsp" TARGET="page8"
-   TITLE="success" TYPE="forward" model-entity="StrutsProcessItemOutput"/>
- </PROCESS-ITEM>
- <PROCESS-ITEM ID="#authoring#saveOrUpdateCondition" NAME="action6"
-  PATH="/authoring/saveOrUpdateCondition" SHAPE="32,753,0,0"
-  TITLE="mindmapConditionForm" TYPE="action" model-entity="StrutsProcessItem">
-  <PROCESS-ITEM-OUTPUT ID="addcondition" NAME="forward0"
-   PATH="/pages/authoring/addCondition.jsp" TARGET="page5"
-   TITLE="addcondition" TYPE="forward" model-entity="StrutsProcessItemOutput"/>
-  <PROCESS-ITEM-OUTPUT ID="success" NAME="forward1"
-   PATH="/pages/authoring/conditionList.jsp" TARGET="page8"
-   TITLE="success" TYPE="forward" model-entity="StrutsProcessItemOutput"/>
- </PROCESS-ITEM>
- <PROCESS-ITEM ID="#authoring#removeCondition" NAME="action7"
-  PATH="/authoring/removeCondition" SHAPE="32,1009,0,0" TYPE="action" model-entity="StrutsProcessItem">
-  <PROCESS-ITEM-OUTPUT ID="success" NAME="forward0"
-   PATH="/pages/authoring/conditionList.jsp" TARGET="page8"
-   TITLE="success" TYPE="forward" model-entity="StrutsProcessItemOutput"/>
- </PROCESS-ITEM>
- <PROCESS-ITEM ID="#authoring#upCondition" NAME="action8"
-  PATH="/authoring/upCondition" SHAPE="32,1121,0,0" TYPE="action" model-entity="StrutsProcessItem">
-  <PROCESS-ITEM-OUTPUT ID="success" NAME="forward0"
-   PATH="/pages/authoring/conditionList.jsp" TARGET="page8"
-   TITLE="success" TYPE="forward" model-entity="StrutsProcessItemOutput"/>
- </PROCESS-ITEM>
- <PROCESS-ITEM ID="#authoring#newConditionInit" NAME="action9"
-  PATH="/authoring/newConditionInit" SHAPE="32,1233,0,0"
-  TITLE="mindmapConditionForm" TYPE="action" model-entity="StrutsProcessItem">
-  <PROCESS-ITEM-OUTPUT ID="addcondition" NAME="forward0"
-   PATH="/pages/authoring/addCondition.jsp" TARGET="page5"
-   TITLE="addcondition" TYPE="forward" model-entity="StrutsProcessItemOutput"/>
- </PROCESS-ITEM>
  <PROCESS-ITEM ID="#monitoring" NAME="action10" PATH="/monitoring"
   SHAPE="32,1601,0,0" TITLE="monitoringForm" TYPE="action" model-entity="StrutsProcessItem">
   <PROCESS-ITEM-OUTPUT ID="mindmap_display" NAME="forward0"
@@ -84,6 +42,9 @@
    TITLE="mindmap_display" TYPE="forward" model-entity="StrutsProcessItemOutput"/>
   <PROCESS-ITEM-OUTPUT ID="success" NAME="forward1"
    PATH="tiles:/monitoring/main" TARGET="page10" TITLE="success"
+   TYPE="forward" model-entity="StrutsProcessItemOutput"/>
+  <PROCESS-ITEM-OUTPUT ID="reflect" NAME="forward2"
+   PATH="tiles:/monitoring/reflect" TARGET="page12" TITLE="reflect"
    TYPE="forward" model-entity="StrutsProcessItemOutput"/>
  </PROCESS-ITEM>
  <PROCESS-ITEM NAME="page0" PATH="/pages/test.html" SHAPE="240,34,0,0"
@@ -96,16 +57,15 @@
   SHAPE="272,434,0,0" SUBTYPE="tile" TITLE="runOffline" TYPE="page" model-entity="StrutsProcessItem"/>
  <PROCESS-ITEM NAME="page4"
   PATH="/pages/authoring/pedagogicalPlannerForm.jsp" SHAPE="240,546,0,0"
-  SUBTYPE="jsp" TITLE="pedagogicalPlannerForm.jsp" TYPE="page" model-entity="StrutsProcessItem"/>
- <PROCESS-ITEM NAME="page5" PATH="/pages/authoring/addCondition.jsp"
-  SHAPE="288,658,0,0" SUBTYPE="jsp" TITLE="addCondition.jsp" TYPE="page" model-entity="StrutsProcessItem"/>
+  SUBTYPE="jsp" TITLE="pedagogicalPlannerForm.jsp" TYPE="page" model-entity="StrutsProcessItem">
+  <PROCESS-ITEM-OUTPUT NAME="link0" PATH="/pedagogicalPlanner.do"
+   SUBTYPE="confirmed" TARGET="action1" TITLE="/pedagogicalPlanner.do"
+   TYPE="link" model-entity="StrutsProcessItemOutput"/>
+ </PROCESS-ITEM>
  <PROCESS-ITEM NAME="page6" PATH="tiles:/generic/message"
   SHAPE="256,1362,0,0" SUBTYPE="tile" TITLE="message" TYPE="page" model-entity="StrutsProcessItem"/>
  <PROCESS-ITEM NAME="page7" PATH="tiles:/authoring/main"
   SHAPE="256,1506,0,0" SUBTYPE="tile" TITLE="main" TYPE="page" model-entity="StrutsProcessItem"/>
- <PROCESS-ITEM NAME="page8" PATH="/pages/authoring/conditionList.jsp"
-  SHAPE="288,770,0,0" SUBTYPE="jsp" TITLE="conditionList.jsp"
-  TYPE="page" model-entity="StrutsProcessItem"/>
  <PROCESS-ITEM NAME="page9" PATH="tiles:/monitoring/mindmap_display"
   SHAPE="256,1618,0,0" SUBTYPE="tile" TITLE="mindmap_display"
   TYPE="page" model-entity="StrutsProcessItem"/>
@@ -113,4 +73,6 @@
   SHAPE="256,1762,0,0" SUBTYPE="tile" TITLE="main" TYPE="page" model-entity="StrutsProcessItem"/>
  <PROCESS-ITEM NAME="page11" PATH="tiles:/learning/reflect"
   SHAPE="240,241,0,0" SUBTYPE="tile" TITLE="reflect" TYPE="page" model-entity="StrutsProcessItem"/>
+ <PROCESS-ITEM NAME="page12" PATH="tiles:/monitoring/reflect"
+  SHAPE="448,1601,0,0" SUBTYPE="tile" TITLE="reflect" TYPE="page" model-entity="StrutsProcessItem"/>
 </PROCESS>

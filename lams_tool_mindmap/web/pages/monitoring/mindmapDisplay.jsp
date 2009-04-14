@@ -1,21 +1,28 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
 <script type="text/javascript" src="includes/javascript/swfobject.js"></script>
+<script type="text/javascript" src="includes/javascript/mindmap.resize.js"></script>
 
 <script type="text/javascript">
 //<![CDATA[
 	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", dictionary: "${localizationPath}" }
 	
-	embedFlashObject();
+	embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
+	//embedFlashObject(700, 525);
 	
 	function getFlashMovie(movieName) {
 		var isIE = navigator.appName.indexOf("Microsoft") != -1;
 		return (isIE) ? window[movieName] : document[movieName];
 	}
+
+	$(window).resize(function() {
+		embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
+	});
 	
-	function embedFlashObject()
+	function embedFlashObject(x, y)
 	{
-		swfobject.embedSWF("${mindmapType}", "flashContent", "500", "375", "9.0.0", false, flashvars);
+		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
 	}
 	
 	function setToolContentID()
@@ -40,14 +47,18 @@
 		setUserId();
 		setToolContentID();
 	}
+
+	function updateContent()
+	{
+		$.post("${get}", { dispatch: "${dispatch}", mindmapId: "${mindmapId}", userId: "${userId}", 
+			content: getFlashMovie('flashContent').getMindmap() } );
+	}
 //]]>
 </script>
 
-<html:form action="/monitoring" method="post" onsubmit="setMindmapContent();">
-	<html:hidden property="dispatch" value="updateContent" />
-	<html:hidden property="mindmapContent" styleId="mindmapContent" />
-	<html:hidden property="userId" styleId="userId" />
-	<html:hidden property="toolContentID" styleId="toolContentID" />
+<html:form action="/monitoring" method="get">
+	<html:hidden property="toolContentID" styleId="toolContentID" value="${toolContentID}" />
+	<html:hidden property="contentFolderID" styleId="contentFolderID" value="${contentFolderID}" />
 	
 	<table>
 		<tr>
@@ -73,10 +84,17 @@
 		<html:button styleClass="button" property="backButton" onclick="history.go(-1)">
 			<fmt:message>button.back</fmt:message>
 		</html:button>
+
+		<c:choose>
+			<c:when test="${isMultiUserMode}">
+			</c:when>
+			<c:otherwise>
+				<html:submit styleClass="button" styleId="saveButton" onclick="updateContent()">
+					<fmt:message>button.save</fmt:message>
+				</html:submit>	
+			</c:otherwise>
+		</c:choose>
 		
-		<html:submit styleClass="button" styleId="saveButton">
-			<fmt:message>button.save</fmt:message>
-		</html:submit>
 	</div>
 
 </html:form>

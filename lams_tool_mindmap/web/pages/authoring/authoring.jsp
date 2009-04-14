@@ -2,7 +2,9 @@
 
 <%@ page import="org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants"%>
 
-<script type="text/javascript" src="${tool}includes/javascript/swfobject.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
+<script type="text/javascript" src="includes/javascript/swfobject.js"></script>
+<script type="text/javascript" src="includes/javascript/mindmap.resize.js"></script>
 
 <script type="text/javascript">
 //<![CDATA[  
@@ -12,8 +14,12 @@
 		var isIE = navigator.appName.indexOf("Microsoft") != -1;
 		return (isIE) ? window[movieName] : document[movieName];
 	}
-
-	embedFlashObject();
+	
+	$(window).resize(function() {
+		embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
+	});
+	
+	embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
 	
 	function setMindmapContent()
 	{
@@ -31,9 +37,9 @@
 		getFlashMovie('flashContent').setMindmap(mindmapContent.value);
 	}
 	
-	function embedFlashObject()
+	function embedFlashObject(x, y)
 	{
-		swfobject.embedSWF("${mindmapType}", "flashContent", "700", "525", "9.0.0", false, flashvars);
+		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
 	}
 //]]>
 </script>
@@ -67,7 +73,6 @@
 		<html:hidden property="currentTab" styleId="currentTab" />
 		<html:hidden property="dispatch" value="updateContent" />
 		<html:hidden property="sessionMapID" />
-		
 		<html:hidden property="mindmapContent" styleId="mindmapContent" />
 		
 		<div id="message" style="text-align: center;">

@@ -35,9 +35,12 @@
 		<c:param name="mode" value="teacher" />
 		<c:param name="contentFolderID" value="${contentFolderID}" />
 	</c:url>
-	<html:link href="${authoringUrl}" styleClass="button" target="_blank">
-		<fmt:message key="button.editActivity" />
-	</html:link>
+	
+	<c:if test="${dto.contentInUse == false}">
+		<html:link href="${authoringUrl}" styleClass="button" target="_blank">
+			<fmt:message key="button.editActivity" />
+		</html:link>
+	</c:if>
 </p>
 
 

@@ -19,7 +19,7 @@
 			<td  colspan="3" class="field-name-alternative-color">
 				<fmt:message key="label.attachments" />
 			</td>
-		</tr>		
+		</tr>
 	</c:if>
 		
 	<c:forEach var="file" items="${dto.onlineInstructionsFiles}">

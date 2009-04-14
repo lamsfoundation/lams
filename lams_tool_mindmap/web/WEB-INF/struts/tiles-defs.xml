@@ -114,6 +114,12 @@
 		<put name="body" value="/pages/monitoring/mindmapDisplay.jsp" />	
 	</definition>
 
+	<definition name="tiles:/monitoring/reflect" extends="tiles:/layout:default">
+		<put name="pageTitleKey" value="pageTitle.monitoring" />
+		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
+		<put name="body" value="/pages/monitoring/reflect.jsp" />	
+	</definition>
+
 	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:default">
 		<put name="headItems" value="/pages/monitoring/headItems.jsp" />
 	</definition>

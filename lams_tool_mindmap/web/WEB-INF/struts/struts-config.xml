@@ -64,6 +64,11 @@
         path="tiles:/monitoring/mindmap_display"
         redirect="false"
       />
+      <forward
+        name="reflect"
+        path="tiles:/monitoring/reflect"
+        redirect="false"
+      />
     </action>
     <action
       path="/authoring"
