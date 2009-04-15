@@ -64,7 +64,6 @@
 						     height: "100%",
 						     width: 650,
 						     cellEdit:true,
-						     sortname: "id",
 						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 						     pager: subgrid_table_id + "_pager",
 							 rowList:[5,10,20,30],

@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 
@@ -41,6 +42,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
     String activityUrl;
     //double timeTaken;
     String feedback;
+    Date startDate;
 
     // Properties for activity view
     String monitorUrl;
@@ -139,5 +141,13 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
     public void setMonitorUrl(String monitorUrl) {
 	this.monitorUrl = monitorUrl;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     } 
 }

@@ -155,8 +155,8 @@ public class GradebookAction extends LamsDispatchAction {
 		gradebookActivityDTOs = gradebookService.getGBActivityRowsForLesson(lesson);
 	    }
 
-	    if (sortBy == null) {
-		sortBy = GradebookConstants.PARAM_ID;
+	    if (sortBy == null || sortBy.equals("")) {
+		sortBy = GradebookConstants.PARAM_START_DATE;
 	    }
 
 	    String ret = GradebookUtil.toGridXML(gradebookActivityDTOs, view, sortBy, isSearch, searchField,

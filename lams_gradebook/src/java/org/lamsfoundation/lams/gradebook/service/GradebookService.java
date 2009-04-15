@@ -557,6 +557,12 @@ public class GradebookService implements IGradebookService {
 			+ activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
 			+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
 		gactivityDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
+		
+		if (activityState == LearnerProgress.ACTIVITY_ATTEMPTED) {
+		    gactivityDTO.setStartDate(learnerProgress.getAttemptedActivities().get(activity));
+		}else {
+		    gactivityDTO.setStartDate(learnerProgress.getCompletedActivities().get(activity).getStartDate());
+		}
 	    }
 	}
 
@@ -665,7 +671,6 @@ public class GradebookService implements IGradebookService {
 		    }
 		}
 		toolOutputsStr += "</select>";
-
 	    }
 	}
 

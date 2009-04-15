@@ -71,7 +71,6 @@
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&view=lrnActivity&lessonID=" + lessonID,
 						     height: "100%",
 						     width: 550,
-						     sortname: "id",
 						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 						     pager: subgrid_table_id + "_pager",
 							 rowList:[5,10,20,30],
