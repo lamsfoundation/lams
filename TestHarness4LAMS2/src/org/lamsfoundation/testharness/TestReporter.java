@@ -247,6 +247,8 @@ public class TestReporter {
 		    count++;
 		}
 	    }
+	    log.info("Total response time: "+total / 1000.0+" seconds");
+	    log.info("Average response time: "+total / 1000.0 /count+" seconds");
 	    context.put("totalResponseTime", total / 1000.0);
 	    context.put("averageResponseTime", total / 1000.0 / count);
 	}
