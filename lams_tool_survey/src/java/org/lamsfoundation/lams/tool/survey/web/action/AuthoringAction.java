@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -90,7 +89,7 @@ public class AuthoringAction extends Action {
     private static final int INIT_INSTRUCTION_COUNT = 2;
     private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
     private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
-    private static final int SHORT_TITLE_LENGTH = 60;
+    private static final int SHORT_TITLE_LENGTH = 200; // for Greek letters
 
     private static Logger log = Logger.getLogger(AuthoringAction.class);
 
@@ -1058,7 +1057,7 @@ public class AuthoringAction extends Action {
     public static void retriveQuestionForDisplay(SurveyQuestion item) {
 	String desc = item.getDescription();
 	desc = desc.replaceAll("<(.|\n)*?>", "");
-	item.setShortTitle(StringUtils.abbreviate(desc, AuthoringAction.SHORT_TITLE_LENGTH));
+        item.setShortTitle(StringUtils.abbreviate(desc, AuthoringAction.SHORT_TITLE_LENGTH));
     }
 
     /**
