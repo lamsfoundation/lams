@@ -312,10 +312,10 @@
 		<c:forEach var="marker" items="${session.markerDTOs}">
 			<c:choose>
 			<c:when test="${marker.isAuthored == true}">
-				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
+				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName} (<fmt:message key="label.authoring.basic.authored"></fmt:message>)', '0');
 			</c:when>
 			<c:otherwise>
-				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
+				addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, true, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');
 			</c:otherwise>
 		</c:choose>
 		</c:forEach>

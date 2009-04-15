@@ -308,6 +308,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 				gmapMarker.setCreatedBy(null);
 				gmapMarker.setGmap(null);
 				gmapMarker.setUpdatedBy(null);
+				gmapMarker.setGmapSession(null);
 				authorItems.add(gmapMarker);
 			}
 		}
@@ -357,6 +358,15 @@ public class GmapService implements ToolSessionManager, ToolContentManager,
 			
 			gmap.setCreateBy(gmapUser.getUid());
 			//gmap.setCreateBy(new Long(newUserUid.longValue()));
+			
+			// Fixing up any trailing spaces
+			if (gmap.getGmapMarkers() != null) {
+			    for (GmapMarker marker : gmap.getGmapMarkers()){
+				if (marker.getInfoWindowMessage() != null) {
+				    marker.setInfoWindowMessage(marker.getInfoWindowMessage().trim());
+				}
+			    }
+			}
 
 			gmapDAO.saveOrUpdate(gmap);
 		} catch (ImportToolContentException e) {

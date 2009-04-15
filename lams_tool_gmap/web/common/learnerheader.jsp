@@ -96,16 +96,16 @@
 		    	<c:forEach var="marker" items="${gmapSessionDTO.markerDTOs}">
 					<c:choose>
 					<c:when test="${marker.createdBy.loginName == gmapUserDTO.loginName && marker.isAuthored == false}">
-					    addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, ${gmapDTO.allowEditMarkers}, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');	
+					    addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, ${gmapDTO.allowEditMarkers}, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}');	
 						userMarkerCount ++;
 					</c:when>
 					<c:otherwise>
 						<c:choose>
 						<c:when  test="${marker.isAuthored}">
-						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, false, '<fmt:message key="label.authoring.basic.authored"></fmt:message>', '0' );
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, false, '<fmt:message key="label.authoring.basic.authored"></fmt:message>', '0' );
 						</c:when>
 						<c:when  test="${gmapDTO.allowShowAllMarkers}">
-						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), unescape('${marker.infoWindowMessage}'), unescape('${marker.title}'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}' );
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}' );
 						</c:when>
 						</c:choose>
 					</c:otherwise>

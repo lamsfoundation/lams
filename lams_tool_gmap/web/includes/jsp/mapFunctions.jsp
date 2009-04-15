@@ -7,8 +7,6 @@ Author: lfoxton
 --%>	
 
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
-<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
 <c:set var="tool">
 	<lams:WebAppURL />
@@ -80,7 +78,7 @@ function addMarker(point, infoMessage, title, uid, isSaved, editAble, createdBy,
     // set the marker's info message
     if (infoMessage!=null)
     {
-    	marker.infoMessage = unescape(infoMessage);
+    	marker.infoMessage = decode_utf8(infoMessage);
     }
     else
     {
@@ -384,6 +382,34 @@ function updateMarkerInfoWindowHtml(markerIn)
 	}	
 }
 
+// hack to ensure that the saved strings are safe to send in xml
+function encode_utf8( s )
+{
+	// "'&<>\
+	var re = new RegExp("[<>\\\\]", "g");
+	var re1 = new RegExp('"', "g");
+	var re2 = new RegExp("'", "g");
+	var re3 = new RegExp("&", "g");
+	s = s.replace(re, "_");
+	s = s.replace(re1, "&quot;");
+	s = s.replace(re2, "&apos;");
+	s = s.replace(re3, "&amp;");
+	return s;
+}
+
+// hack to ensure that the saved strings are safe to send in xml
+function decode_utf8( s )
+{
+  	var re1 = new RegExp("&quot;", "g");
+	var re2 = new RegExp("&apos;", "g");
+	var re3 = new RegExp("&amp;", "g");
+	s = s.replace(re1, '"');
+	s = s.replace(re2, "'");
+	s = s.replace(re3, "&");
+	
+  	return s;
+}
+
 
 function confirmLeavePage()
 {
@@ -428,9 +454,9 @@ function serialiseMarkers()
 			var markerString = '<marker'+
 			' latitude="'+ markers[i].getPoint().lat()+ '"'+
 			' longitude="'+ markers[i].getPoint().lng()+ '"'+
-			' infoMessage="'+ escape(markers[i].infoMessage)+ '"' +
+			' infoMessage="'+ encode_utf8(markers[i].infoMessage)+ '"' +
 			' markerUID="'+ markers[i].uid + '"' +
-			' title="'+ escape(markers[i].title) + '"' +
+			' title="'+ encode_utf8(markers[i].title) + '"' +
 			' state="'+ markers[i].state + '"' +
 			' />';
 			xmlString += markerString;
