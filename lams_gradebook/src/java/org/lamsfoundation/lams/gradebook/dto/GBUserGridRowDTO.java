@@ -64,7 +64,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    }
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add(output);
+	    ret.add((output != null) ? output.toString() : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
 	    

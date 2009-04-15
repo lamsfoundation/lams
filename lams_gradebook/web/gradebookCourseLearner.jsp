@@ -83,7 +83,7 @@
 						     	'<fmt:message key="gradebook.columntitle.activityFeedback"/>', 
 						     	'<fmt:message key="gradebook.columntitle.averageTimeTaken"/>', 
 						     	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
-						     	'<fmt:message key="gradebook.columntitle.aveargeMark"/>', 
+						     	'<fmt:message key="gradebook.columntitle.averageMark"/>', 
 						     	'<fmt:message key="gradebook.columntitle.mark"/>'
 						     ],
 						     colModel: [

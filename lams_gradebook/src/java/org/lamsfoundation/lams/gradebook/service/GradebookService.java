@@ -200,14 +200,17 @@ public class GradebookService implements IGradebookService {
 
 		// Get the tool outputs for this user if there are any
 		ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
-		if (toolSession != null) {
+		if (toolSession != null && learnerProgress != null) {
 		    // Set the activityLearner URL for this gradebook activity
-		    gUserDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
-			    + "&toolSessionID=" + toolSession.getToolSessionId().toString());
+		    byte activityState = learnerProgress.getProgressState(activity);
+		    if (activityState == LearnerProgress.ACTIVITY_ATTEMPTED
+			    || activityState == LearnerProgress.ACTIVITY_COMPLETED) {
+			gUserDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
+				+ activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
+				+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
 
-		    gUserDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
-
+			gUserDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
+		    }
 		}
 
 		// Add marks and feedback
@@ -545,13 +548,16 @@ public class GradebookService implements IGradebookService {
 
 	// Get the tool outputs for this user if there are any
 	ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
-	if (toolSession != null) {
-	    // Set the activityLearner URL for this gradebook activity
-	    gactivityDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
-		    + activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId() + "&toolSessionID="
-		    + toolSession.getToolSessionId().toString());
-
-	    gactivityDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
+	if (toolSession != null && learnerProgress != null) {
+	    byte activityState = learnerProgress.getProgressState(activity);
+	    if (activityState == LearnerProgress.ACTIVITY_ATTEMPTED
+		    || activityState == LearnerProgress.ACTIVITY_COMPLETED) {
+		// Set the activityLearner URL for this gradebook activity
+		gactivityDTO.setActivityUrl(Configuration.get(ConfigurationKeys.SERVER_URL)
+			+ activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
+			+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
+		gactivityDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
+	    }
 	}
 
 	return gactivityDTO;
