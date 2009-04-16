@@ -503,6 +503,24 @@ public class LessonService implements ILessonService {
 	    LessonService.log.debug("Added " + numAdded + " learners to lessonClass " + lessonClass.getGroupingId());
 	}
     }
+    
+    /**
+     * Set the learners in a lesson class. To be called within LAMS.
+     * 
+     * @param lesson
+     *            lesson
+     * @param users
+     *            the users to set as learners
+     */
+    public void setLearners(Lesson lesson, Collection<User> users) throws LessonServiceException {
+	LessonClass lessonClass = lesson.getLessonClass();
+	int numberOfLearners = lessonClass.setLearners(users);
+	lessonClassDAO.updateLessonClass(lessonClass);
+	if (LessonService.log.isDebugEnabled()) {
+	    LessonService.log.debug("Set " + numberOfLearners + " learners in lessonClass "
+		    + lessonClass.getGroupingId());
+	}
+    }
 
     /**
      * Add a new staff member to the lesson class. Checks for duplicates.
@@ -589,6 +607,25 @@ public class LessonService implements ILessonService {
 	}
 	if (LessonService.log.isDebugEnabled()) {
 	    LessonService.log.debug("Added " + numAdded + " staff members to lessonClass "
+		    + lessonClass.getGroupingId());
+	}
+    }
+    
+    /**
+     * Set the staff members in a lesson class. To be called within LAMS.
+     * 
+     * @param lesson
+     *            lesson
+     * @param users
+     *            the users to set as staff
+     */
+    public void setStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException {
+
+	LessonClass lessonClass = lesson.getLessonClass();
+	int numberOfStaff = lessonClass.setStaffMembers(users);
+	lessonClassDAO.updateLessonClass(lessonClass);
+	if (LessonService.log.isDebugEnabled()) {
+	    LessonService.log.debug("Set " + numberOfStaff + " staff members in lessonClass "
 		    + lessonClass.getGroupingId());
 	}
     }

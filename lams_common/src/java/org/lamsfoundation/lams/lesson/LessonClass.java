@@ -165,6 +165,21 @@ public class LessonClass extends Grouping {
    		int newNumber = learnersGroup.getUsers().size();
    		return newNumber - originalNumber;
     }
+    
+    /** 
+     * Sets the staff to the value given by the input collection.
+     * @return number of staff set
+     */ 
+    public int setLearners(Collection<User> newLearners) {
+    	if ( newLearners == null  )
+    		return 0;
+
+    	Group learnersGroup = createLearnerGroupIfMissing();
+    	learnersGroup.getUsers().clear();
+    	learnersGroup.getUsers().addAll(newLearners);
+    	int newNumber = learnersGroup.getUsers().size();
+   	return newNumber;
+    }
 
     public Group getLearnersGroup() {
 		Group learnersGroup = null; 
@@ -214,8 +229,23 @@ public class LessonClass extends Grouping {
     	Group staffGroup = createStaffGroupIfMissing();
     	int originalNumber = staffGroup.getUsers().size();
     	staffGroup.getUsers().addAll(newStaff);
-   		int newNumber = staffGroup.getUsers().size();
-   		return newNumber - originalNumber;
+   	int newNumber = staffGroup.getUsers().size();
+   	return newNumber - originalNumber;
+    }
+    
+    /** 
+     * Sets the staff to the value given by the input collection.
+     * @return number of staff set
+     */ 
+    public int setStaffMembers(Collection<User> newStaff) {
+    	if ( newStaff == null  )
+    		return 0;
+
+    	Group staffGroup = createStaffGroupIfMissing();
+    	staffGroup.getUsers().clear();
+    	staffGroup.getUsers().addAll(newStaff);
+    	int newNumber = staffGroup.getUsers().size();
+   	return newNumber;
     }
 
     /** 

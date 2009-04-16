@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.monitoring.Application;
 import org.lamsfoundation.lams.monitoring.ContributeActivity;
 import org.lamsfoundation.lams.wizard.*
 import org.lamsfoundation.lams.authoring.Activity;
+import org.lamsfoundation.lams.common.ApplicationParent;
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.mvc.*
 import org.lamsfoundation.lams.common.ToolTip;
@@ -62,6 +63,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	public static var REMOVED_STATUS:Number = 7;
 	
 	private var _className = "LessonTabView";
+	
+	private var _app:ApplicationParent;
 	
 	//constants:
 	private var _tm:ThemeManager;
@@ -147,6 +150,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		trace("loaded lesson tab view")
 		_lessonTabView = this;
 		
+		_app = ApplicationParent.getInstance();
 		_tm = ThemeManager.getInstance();
 		_tip = new ToolTip();
 		
@@ -712,8 +716,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
     * Opens the lesson manager dialog
     */
     public function showLessonManagerDialog(mm:MonitorModel) {
-		var dialog:MovieClip = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:Dictionary.getValue('ls_win_editclass_title'),closeButton:true,scrollContentPath:'selectClass'});
-		dialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
+		_app.dialog = PopUpManager.createPopUp(mm.getMonitor().root, LFWindow, true,{title:Dictionary.getValue('ls_win_editclass_title'),closeButton:true,scrollContentPath:'selectClass'});
+		_app.dialog.addEventListener('contentLoaded',Delegate.create(_monitorController,_monitorController.openDialogLoaded));
 		
     }
 	

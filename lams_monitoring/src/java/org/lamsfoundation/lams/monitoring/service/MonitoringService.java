@@ -632,8 +632,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 	checkOwnerOrStaffMember(userId, newLesson, "create lesson class");
 
-	// if lesson isn't started, can add and remove users, so its just easier
-	// to recreate the lesson class
+	// if lesson isn't started recreate the lesson class
 	if (!newLesson.isLessonStarted()) {
 
 	    if (newLesson == null) {
@@ -655,9 +654,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		lessonClassDAO.deleteLessonClass(oldLessonClass);
 	    }
 
-	} else { // if started, can only add users
-	    lessonService.addLearners(newLesson, organizationUsers);
-	    lessonService.addStaffMembers(newLesson, staffs);
+	} else {
+	    lessonService.setLearners(newLesson, organizationUsers);
+	    lessonService.setStaffMembers(newLesson, staffs);
 	}
 
 	return newLesson;

@@ -235,6 +235,17 @@ public interface ILessonService {
     public void addLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
 
     /**
+     * Set the learners in a lesson class. Learners not in the users collection will be removed. 
+     * To be called within LAMS.
+     * 
+     * @param lesson
+     *            lesson
+     * @param users
+     *            the users to set as staff
+     */
+    public void setLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
+    
+    /**
      * Add a new staff member to the lesson class. Checks for duplicates.
      * 
      * @paran userId new learner id
@@ -265,7 +276,18 @@ public interface ILessonService {
      *            the users to add as learners
      */
     public void addStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
-
+    
+    /**
+     * Set the staff members in a lesson class. Staff members not in the users collection will be removed. 
+     * To be called within LAMS.
+     * 
+     * @param lesson
+     *            lesson
+     * @param users
+     *            the users to set as staff
+     */
+    public void setStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
+    
     /**
      * Remove references to an activity from all learner progress entries. Used by Live Edit, to remove any references
      * to the system gates

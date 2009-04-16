@@ -28,6 +28,7 @@ import mx.events.*
 
 import it.sephiroth.TreeDnd
 import org.lamsfoundation.lams.common.ws.*
+import org.lamsfoundation.lams.common.ui.LFMessage
 import org.lamsfoundation.lams.common.util.*
 import org.lamsfoundation.lams.common.dict.*
 import org.lamsfoundation.lams.common.style.*
@@ -123,7 +124,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		
 		//set the reference to the StyleManager
         themeManager = ThemeManager.getInstance();
-        
+		
         setStyles();
 		setLabels();
 		
@@ -198,8 +199,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
     */
     private function ok(){
         Debugger.log('OK Clicked',Debugger.GEN,'ok','org.lamsfoundation.lams.LessonManagerDialog');
-        
-		_global.breakpoint();
 		
 		var valid:Boolean = true;
 		var snode = treeview.selectedNode;
@@ -224,6 +223,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 			}
 			
 			if(selectedLearners.length <= 0){
+				LFMessage.showMessageAlert(Dictionary.getValue("msg_no_learners_in_lesson"));
 				valid = false;
 			}
 			
@@ -517,9 +517,6 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		for(var i=0; i<_learnerList.length; i++){
 			if(org.isLearner(_learnerList[i].data.userID)){
 				_learnerList[i].user_cb.selected = true;
-				if(s.isStarted){
-					_learnerList[i].user_cb.enabled = false;
-				}
 			}
 		}
 		
@@ -568,7 +565,7 @@ class LessonManagerDialog extends MovieClip implements Dialog{
 		for(var i=0; i<_staffList.length; i++){
 			if(org.isMonitor(_staffList[i].data.userID)){
 				_staffList[i].user_cb.selected = true;
-				if(s.isStarted){
+				if(_staffList[i].data.userID == _root.userID){
 					_staffList[i].user_cb.enabled = false;
 				}
 			}
