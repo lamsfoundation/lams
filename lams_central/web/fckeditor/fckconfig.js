@@ -64,7 +64,7 @@ FCKConfig.ContentLangDirection	= 'ltr' ;
 
 FCKConfig.ProcessHTMLEntities	= true ;
 FCKConfig.IncludeLatinEntities	= true ;
-FCKConfig.IncludeGreekEntities	= true ;
+FCKConfig.IncludeGreekEntities	= false ;
 
 FCKConfig.ProcessNumericEntities = false ;
 
