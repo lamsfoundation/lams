@@ -89,7 +89,7 @@ public class AuthoringAction extends Action {
     private static final int INIT_INSTRUCTION_COUNT = 2;
     private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
     private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
-    private static final int SHORT_TITLE_LENGTH = 200; // for Greek letters
+    private static final int SHORT_TITLE_LENGTH = 60;
 
     private static Logger log = Logger.getLogger(AuthoringAction.class);
 
