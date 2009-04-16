@@ -170,7 +170,7 @@
 		<java>slf4j-log4j12-1.5.2.jar</java>
 	</module>
 	<module>
-		<java>mysql-connector-java-3.1.12-bin.jar</java>
+		<java>mysql-connector-java-5.0.8-bin.jar</java>
 	</module>
 	<module>
 		<java>odmg-3.0.jar</java>

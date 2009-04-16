@@ -39,7 +39,7 @@
 <archive javadoc="http://velocity.apache.org/engine/releases/velocity-1.4/api/" path="/lams_build/lib/middlegen/velocity-1.4-dev.jar"/>
 <archive path="/lams_build/lib/middlegen/middlegen-2.1.jar"/>
 <archive path="/lams_build/lib/middlegen/middlegen-hibernate-plugin-2.1.jar"/>
-<archive path="/lams_build/lib/mysql/mysql-connector-java-3.1.12-bin.jar"/>
+<archive path="/lams_build/lib/mysql/mysql-connector-java-5.0.8-bin.jar"/>
 <archive path="/lams_build/lib/odmg/odmg-3.0.jar"/>
 <archive path="/lams_build/lib/quartz/quartz.jar"/>
 <archive javadoc="http://static.springframework.org/spring/docs/1.2.x/api/" path="/lams_build/lib/spring/spring.jar" source="/lams_build/lib/spring/src/spring-framework-1.2.8-src.zip"/>

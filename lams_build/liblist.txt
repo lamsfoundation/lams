@@ -50,7 +50,7 @@ jfreechart        gnujaxp.jar                                                  G
 
 log4j             log4j-1.2.13.jar                      1.2.13                                                                                
 
-mysql             mysql-connector-java-3.1.12-bin.jar   3.1.12-bin                                                                            
+mysql             mysql-connector-java-5.0.8-bin.jar    5.0.8-bin                                                                            
 
 odmg              odmg-3.0.jar                          3.0                                                                                   
 
