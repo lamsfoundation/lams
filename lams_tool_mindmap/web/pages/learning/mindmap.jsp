@@ -50,11 +50,16 @@
 		return (isIE) ? window[movieName] : document[movieName];
 	}
 
-	$(window).resize(function() {
-		embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
-	});
+	$(window).resize(makeNice);
+
+	function makeNice(){
+		flash = document.getElementById('flashContent');
+		container = document.getElementById('container');
+		flash.style.width = container.clientWidth+"px";
+		flash.style.height = (container.clientWidth*0.75)+"px";
+	}
 	
-	embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
+	embedFlashObject(540, 405);
 -->
 </script>
 
@@ -99,7 +104,7 @@
 		<html:hidden property="mindmapContent" styleId="mindmapContent" />
 		<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
-		<center>
+		<center id="container">
 			<div id="flashContent">
 				<fmt:message>message.enableJavaScript</fmt:message>
 			</div>

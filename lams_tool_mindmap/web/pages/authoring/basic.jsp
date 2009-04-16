@@ -24,11 +24,10 @@
 				contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
 		</td>
 	</tr>
-	<tr>
-		<td align="center">
-			<div id="flashContent">
-				<fmt:message>message.enableJavaScript</fmt:message>
-			</div>
-		</td>
-	</tr>
 </table>
+
+<center id="container">
+	<div id="flashContent">
+		<fmt:message>message.enableJavaScript</fmt:message>
+	</div>
+</center>

@@ -15,11 +15,9 @@
 		return (isIE) ? window[movieName] : document[movieName];
 	}
 	
-	$(window).resize(function() {
-		embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
-	});
+	$(window).resize(makeNice);
 	
-	embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
+	embedFlashObject(700, 525);
 	
 	function setMindmapContent()
 	{
@@ -40,6 +38,13 @@
 	function embedFlashObject(x, y)
 	{
 		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
+	}
+
+	function makeNice(){
+		flash = document.getElementById('flashContent');
+		container = document.getElementById('container');
+		flash.style.width = container.clientWidth+"px";
+		flash.style.height = (container.clientWidth*0.75)+"px";
 	}
 //]]>
 </script>

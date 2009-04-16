@@ -8,17 +8,14 @@
 //<![CDATA[
 	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", dictionary: "${localizationPath}" }
 	
-	embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
-	//embedFlashObject(700, 525);
+	embedFlashObject(700, 525);
 	
 	function getFlashMovie(movieName) {
 		var isIE = navigator.appName.indexOf("Microsoft") != -1;
 		return (isIE) ? window[movieName] : document[movieName];
 	}
 
-	$(window).resize(function() {
-		embedFlashObject(getWindowSize("width")-100, (getWindowSize("width")-100)*0.75);
-	});
+	$(window).resize(makeNice);
 	
 	function embedFlashObject(x, y)
 	{
@@ -53,6 +50,13 @@
 		$.post("${get}", { dispatch: "${dispatch}", mindmapId: "${mindmapId}", userId: "${userId}", 
 			content: getFlashMovie('flashContent').getMindmap() } );
 	}
+
+	function makeNice(){
+		flash = document.getElementById('flashContent');
+		container = document.getElementById('container');
+		flash.style.width = container.clientWidth+"px";
+		flash.style.height = (container.clientWidth*0.75)+"px";
+	}
 //]]>
 </script>
 
@@ -72,13 +76,14 @@
 			<td class="field-name">
 				<fmt:message key="label.mindmapEntry" />
 			</td>
-			<td align="center">
-				<div id="flashContent">
-					<fmt:message>message.enableJavaScript</fmt:message>
-				</div>
-			</td>
 		</tr>
 	</table>
+	
+	<center id="container">
+		<div id="flashContent">
+			<fmt:message>message.enableJavaScript</fmt:message>
+		</div>
+	</center>
 	
 	<div class="space-bottom-top align-right">
 		<html:button styleClass="button" property="backButton" onclick="history.go(-1)">
