@@ -13,6 +13,11 @@
 		document.getElementById("finishButton").disabled = true;
 	}
 
+	function submitForm(methodName) {
+ 	 	var f = document.getElementById('submitForm');
+ 		f.submit();
+	}
+
 	var multiMode = ${multiMode};
 	// saving Mindmap every one minute 
 	$.timer(60000, function (timer) {
@@ -121,9 +126,9 @@
 		
 			<c:otherwise>
 				<div class="space-bottom-top align-right">
-					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message>button.finish</fmt:message>
-					</html:submit>
+					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+						<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+					</html:link>
 				</div>
 			</c:otherwise>
 		</c:choose>
