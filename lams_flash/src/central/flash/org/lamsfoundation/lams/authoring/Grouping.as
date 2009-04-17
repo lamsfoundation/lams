@@ -71,8 +71,7 @@ class org.lamsfoundation.lams.authoring.Grouping {
 		var types:Array = [];
 		types.addItem({label: Dictionary.getValue('random_grp_lbl'), data: RANDOM_GROUPING});
 		types.addItem({label: Dictionary.getValue('chosen_grp_lbl'), data: CHOSEN_GROUPING});
-		//types.addItem({label: Dictionary.getValue('learner_choice_grp_lbl'), data: LEARNER_CHOICE_GROUPING});
-		types.addItem({label: "Learner's choice", data: LEARNER_CHOICE_GROUPING});
+		types.addItem({label: Dictionary.getValue('learner_choice_grp_lbl'), data: LEARNER_CHOICE_GROUPING});
 		return types;
 	}
 
