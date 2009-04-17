@@ -25,8 +25,8 @@
 				
 		   		titleLabel.text = dictionary.getLabelAndConcatenate("videorecorder.title", [":"]);
 		   		descriptionLabel.text = dictionary.getLabelAndConcatenate("videorecorder.description", [":"]);
-		   		titleInput.text = dictionary.getLabelAndReplace("videorecorder.enter.something.here", ["videorecorder.title"]);
-		   		descriptionInput.text = dictionary.getLabelAndReplace("videorecorder.enter.something.here", ["videorecorder.description"]);
+		   		titleInput.text = dictionary.getLabelAndReplace("videorecorder.enter.something.here", ["videorecorder.title"], true);
+		   		descriptionInput.text = dictionary.getLabelAndReplace("videorecorder.enter.something.here", ["videorecorder.description"], true);
 		   		doneButton.label = dictionary.getLabel("button.save");
 		   		doneButton.toolTip = dictionary.getLabel("videorecorder.tooltip.save.recording");
 		   	}

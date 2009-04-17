@@ -47,4 +47,6 @@ public interface IVideoRecorderRecordingDAO extends IBaseDAO{
 	List<VideoRecorderRecording> getBySessionAndUserIds(Long toolSessionId, Long userId);
 	
 	void saveOrUpdate(VideoRecorderRecording videoRecorderRecording);
+	
+	Long getNbRecordings(Long userID, Long sessionId);
 }

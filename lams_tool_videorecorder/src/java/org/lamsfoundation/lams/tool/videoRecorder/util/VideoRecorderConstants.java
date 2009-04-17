@@ -60,4 +60,8 @@ public interface VideoRecorderConstants {
     public static final String ERROR_MSG_CONDITION = "error.condition";
     public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
     public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
+    
+    public static final String NB_RECORDINGS_DEFINITION_NAME = "number.recordings.definition.videoRecorder";
+    public static final String NB_COMMENTS_DEFINITION_NAME = "number.comments.definition.videoRecorder";
+    public static final String NB_RATINGS_DEFINITION_NAME = "number.ratings.definition.videoRecorder";
 }

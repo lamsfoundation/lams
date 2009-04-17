@@ -10,10 +10,6 @@
  * Depends:
  *	ui.core.js
  */
- 
-function breakTabs(){
-	var i = 0;
-}
 
 (function($) {
 
@@ -68,7 +64,6 @@ $.widget("ui.tabs", {
 			this.tabLabels = $(".ui-tabs-label");
 			this.imagesInTabs = $("img", this.list);
 			this.$panels = $([]);
-			this.leftMostScroll = 25;
 		}
 		else{
 			this.list = this.element.is('div') ? this.element.children('ul:first, ol:first').eq(0) : this.element;
@@ -81,9 +76,12 @@ $.widget("ui.tabs", {
 		this.$tabs.each(function(i, a) {
 			var href = $(a).attr('href');
 
+			// Fix tab IDs in IE6/7
+			href = href.substring(href.indexOf("#"));
+			
 			// inline tab
 			if (fragmentId.test(href))
-				self.$panels = self.$panels.add(self._sanitizeSelector(href));
+			self.$panels = self.$panels.add(self._sanitizeSelector(href)); 
 
 			// remote tab
 			else if (href != '#') { // prevent loading the page itself if href is just "#"
@@ -117,12 +115,10 @@ $.widget("ui.tabs", {
 				if (this.element.is('div')) {
 					this.element.addClass('ui-tabs ui-widget ui-widget-content ui-corner-all');
 				}
-				this.wrapper.addClass('ui-tabs-wrapper ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all');
+				this.wrapper.addClass('ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all');
 				this.list.addClass('ui-tabs-wrapped');
 				this.$lis.addClass('ui-state-default ui-corner-top');
 				this.$panels.addClass('ui-tabs-panel ui-widget-content ui-corner-bottom');
-				
-				//this.tabsHolder.animate( { scrollLeft: this.leftMostScroll}, this.scrollSpeed )
 			}
 			else{
 				// attach necessary classes for styling
@@ -362,44 +358,44 @@ $.widget("ui.tabs", {
 		});
 
 		if(o.scrollable){
-			this.scrollableWidth = 0;
+			/*
+			var totalWidth = 0;
 			
-			for(var i = 0; i < this.tabLabels.length; i++){
-				this.scrollableWidth += this.tabLabels[i].innerHTML.length * o.characterWidth;
+			this.$lis.each(function(){
+				totalWidth += this.offsetWidth;
+			});
+			
+			totalWidth += (this.$lis.length - 1) * 7 + 3;
+			
+			this.scrollableWidth = totalWidth;
+			*/
+			
+			if(this.$lis.length > 1){
+				var lastElem = this.$lis[this.$lis.length - 1];
+				var beforeLastElem = this.$lis[this.$lis.length - 2];
+				
+				if(this.$lis[0].offsetLeft != 0){
+					this.scrollableWidth = beforeLastElem.offsetLeft + beforeLastElem.offsetWidth + lastElem.offsetWidth;
+				}else{
+					this.scrollableWidth = this.$lis[0].parentNode.parentNode.offsetLeft + beforeLastElem.offsetLeft + beforeLastElem.offsetWidth + lastElem.offsetWidth;
+				}
 			}
-			
-			for(var i = 0; i < this.imagesInTabs.length; i++){
-				this.scrollableWidth += this.imagesInTabs[i].width;
+			else{
+				var lastElem = this.$lis[this.$lis.length - 1];
+				
+				if(this.$lis[0].offsetLeft != 0){
+					this.scrollableWidth = lastElem.offsetLeft + lastElem.offsetWidth;
+				}else{
+					this.scrollableWidth = this.$lis[0].parentNode.parentNode.offsetLeft + lastElem.offsetLeft + lastElem.offsetWidth;
+				}
+
 			}
-			
-			this.scrollableWidth += o.margins;
 			
 			$(".ui-tabs-wrapped").css("width", this.scrollableWidth + "px");
-			
-			if(init){
-				this.tabsHolder.animate( { scrollLeft: this.leftMostScroll }, this.scrollSpeed )
-			}
 		}
 		
 		// disable click if event is configured to something else
 		if (o.event != 'click') this.$tabs.bind('click.tabs', function(){return false;});	
-	},
-		
-	_tabWidth: function(index) {
-		var self = this, o = this.options;
-		var tabWidth = 0;
-		if(o.scrollable){		
-			tabWidth += this.tabLabels[index].innerHTML.length * o.characterWidth;
-
-			var imagesInTab = $("img", this.list[index]);
-			for(var i = 0; i < imagesInTab.length; i++){
-				tabWidth+= imagesInTab[i].width;
-			}
-			
-			tabWidth += o.margins;
-			
-			return tabWidth;
-		}
 	},
 	
 	scrollLeft: function() {
@@ -409,14 +405,22 @@ $.widget("ui.tabs", {
 		//var scrollOffset = _tabWidth(this.scrolledTab - 1);
 		var scrollOffset = o.scrollOffset;
 		if(this.tabsHolder[0].scrollLeft < scrollOffset){
-			newScrollLeft = this.leftMostScroll;
+			newScrollLeft = 0;
 		}
 		else{
 			newScrollLeft = this.tabsHolder[0].scrollLeft - scrollOffset;
 		}
 		
-		this.tabsHolder.animate( { scrollLeft: newScrollLeft}, this.scrollSpeed )
+		this.tabsHolder.animate( { scrollLeft: newScrollLeft}, this.scrollSpeed );
 
+	},
+	
+	scrollTo: function(position) {
+		if(this.$lis[0].offsetLeft != 0){
+			this.tabsHolder.animate( { scrollLeft: position - this.$lis[0].offsetLeft}, this.scrollSpeed );
+		}else{
+			this.tabsHolder.animate( { scrollLeft: position}, this.scrollSpeed );
+		}
 	},
 	
 	scrollRight: function() {
@@ -432,7 +436,7 @@ $.widget("ui.tabs", {
 			newScrollRight = this.tabsHolder[0].scrollLeft + scrollOffset;
 		}
 		
-		this.tabsHolder.animate( { scrollLeft: newScrollRight}, this.scrollSpeed )
+		this.tabsHolder.animate( { scrollLeft: newScrollRight}, this.scrollSpeed );
 	},
 	
 	destroy: function() {
@@ -533,7 +537,6 @@ $.widget("ui.tabs", {
 		this._trigger('add', null, this._ui(this.$tabs[index], this.$panels[index]));
 	},
 
-	
 	remove: function(index) {
 		var o = this.options, $li = this.$lis.eq(index).remove(),
 			$panel = this.$panels.eq(index).remove();
@@ -677,7 +680,7 @@ $.extend($.ui.tabs, {
 		tabTemplate: '<li><a href="#{href}"><span>#{label}</span></a></li>',
 		scrollable: false,
 		characterWidth: 9,
-		margins: 5,
+		margins: 6,
 		scrollSpeed: 150,
 		scrollOffset: 100
 	}

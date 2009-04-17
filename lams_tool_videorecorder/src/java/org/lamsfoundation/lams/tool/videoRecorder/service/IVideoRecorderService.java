@@ -287,6 +287,12 @@ public interface IVideoRecorderService {
 
     void deleteCondition(VideoRecorderCondition condition);
     
+    public Long getNbRecordings(Long userID, Long sessionId);
+    
+    public Long getNbComments(Long userID, Long sessionId);
+
+    public Long getNbRatings(Long userID, Long sessionId);
+    
     public String getLanguageXML();
     
     public String getLanguageXMLForFCK();

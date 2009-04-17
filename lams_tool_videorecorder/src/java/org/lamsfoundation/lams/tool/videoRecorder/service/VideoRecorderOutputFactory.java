@@ -61,14 +61,23 @@ public class VideoRecorderOutputFactory extends OutputFactory {
 	    videoRecorderEntryDefinition.setDefaultConditions(new ArrayList<BranchCondition>(videoRecorder.getConditions()));
 	    // if no conditions were created in the tool instance, a default condition is added;
 	    if (videoRecorderEntryDefinition.getDefaultConditions().isEmpty()) {
-		VideoRecorderCondition defaultCondition = createDefaultComplexCondition(videoRecorder);
-		videoRecorder.getConditions().add(defaultCondition);
-		videoRecorderEntryDefinition.getDefaultConditions().add(defaultCondition);
+			VideoRecorderCondition defaultCondition = createDefaultComplexCondition(videoRecorder);
+			videoRecorder.getConditions().add(defaultCondition);
+			videoRecorderEntryDefinition.getDefaultConditions().add(defaultCondition);
 	    }
 	    videoRecorderEntryDefinition.setShowConditionNameOnly(true);
 	    definitionMap.put(VideoRecorderConstants.TEXT_SEARCH_DEFINITION_NAME, videoRecorderEntryDefinition);
 	}
+	
+	ToolOutputDefinition numberOfRecordingsDefinition = buildRangeDefinition(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, new Long(0), null);
+	definitionMap.put(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, numberOfRecordingsDefinition);
+	
+	ToolOutputDefinition numberOfCommentsDefinition = buildRangeDefinition(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, new Long(0), null);
+	definitionMap.put(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, numberOfCommentsDefinition);
 
+	ToolOutputDefinition numberOfRatingsDefinition = buildRangeDefinition(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, new Long(0), null);
+	definitionMap.put(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, numberOfRatingsDefinition);
+	
 	return definitionMap;
     }
 
@@ -115,24 +124,44 @@ public class VideoRecorderOutputFactory extends OutputFactory {
 		}
 	    }
 	}
+	
+	if (names == null || names.contains(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME)) {
+	    outputs.put(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, getNbRecordings(videoRecorderService, learnerId, toolSessionId));
+	}
+
+	if (names == null || names.contains(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME)) {
+	    outputs.put(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, getNbComments(videoRecorderService, learnerId, toolSessionId));
+	}
+
+	if (names == null || names.contains(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME)) {
+	    outputs.put(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, getNbRatings(videoRecorderService, learnerId, toolSessionId));
+	}
+	
 	return outputs;
 
     }
 
-    public ToolOutput getToolOutput(String name, IVideoRecorderService chatService, Long toolSessionId, Long learnerId) {
+    public ToolOutput getToolOutput(String name, IVideoRecorderService videoRecorderService, Long toolSessionId, Long learnerId) {
+    ToolOutput toolOutput = null;
 	if (isTextSearchConditionName(name)) {
 	    // entry is loaded from DB
-	    VideoRecorder videoRecorder = chatService.getSessionBySessionId(toolSessionId).getVideoRecorder();
+	    VideoRecorder videoRecorder = videoRecorderService.getSessionBySessionId(toolSessionId).getVideoRecorder();
 
-	    VideoRecorderUser user = chatService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
-	    NotebookEntry entry = chatService.getEntry(user.getEntryUID());
+	    VideoRecorderUser user = videoRecorderService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	    NotebookEntry entry = videoRecorderService.getEntry(user.getEntryUID());
 
 	    String value = entry == null ? null : entry.getEntry();
 
-	    return new ToolOutput(name, getI18NText(VideoRecorderConstants.TEXT_SEARCH_DEFINITION_NAME, true), value);
-
+	    toolOutput = new ToolOutput(name, getI18NText(VideoRecorderConstants.TEXT_SEARCH_DEFINITION_NAME, true), value);
+	}else if (name != null && name.equals(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME)) {
+	    toolOutput = getNbRecordings(videoRecorderService, learnerId, toolSessionId);
+	}else if (name != null && name.equals(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME)) {
+	    toolOutput = getNbComments(videoRecorderService, learnerId, toolSessionId);
+	}else if (name != null && name.equals(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME)) {
+	    toolOutput = getNbRatings(videoRecorderService, learnerId, toolSessionId);
 	}
-	return null;
+	
+	return toolOutput;
     }
 
     @Override
@@ -161,5 +190,23 @@ public class VideoRecorderOutputFactory extends OutputFactory {
 	// Default condition checks if the text contains word "LAMS"
 	return new VideoRecorderCondition(null, null, 1, name, getI18NText(
 		VideoRecorderConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
+    }
+    
+    private ToolOutput getNbRecordings(IVideoRecorderService videoRecorderService, Long learnerId, Long toolSessionId) {
+    	Long nb = videoRecorderService.getNbRecordings(learnerId, toolSessionId);
+    	return new ToolOutput(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, getI18NText(
+    		VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, true), new Long(nb));
+    }
+    
+    private ToolOutput getNbComments(IVideoRecorderService videoRecorderService, Long learnerId, Long toolSessionId) {
+    	Long nb = videoRecorderService.getNbComments(learnerId, toolSessionId);
+    	return new ToolOutput(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, getI18NText(
+    		VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, true), new Long(nb));
+    }
+    
+    private ToolOutput getNbRatings(IVideoRecorderService videoRecorderService, Long learnerId, Long toolSessionId) {
+    	Long nb = videoRecorderService.getNbRatings(learnerId, toolSessionId);
+    	return new ToolOutput(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, getI18NText(
+    		VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, true), new Long(nb));
     }
 }

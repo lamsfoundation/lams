@@ -799,6 +799,18 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	}
     }
     
+    public Long getNbRecordings(Long userID, Long sessionId) {
+    	return videoRecorderRecordingDAO.getNbRecordings(userID, sessionId);
+    }
+    
+    public Long getNbComments(Long userID, Long sessionId) {
+    	return videoRecorderCommentDAO.getNbComments(userID, sessionId);
+    }
+
+    public Long getNbRatings(Long userID, Long sessionId) {
+    	return videoRecorderRatingDAO.getNbRatings(userID, sessionId);
+    }    
+
 	/**
 	 * @return String of xml with all needed language elements
 	 */ 

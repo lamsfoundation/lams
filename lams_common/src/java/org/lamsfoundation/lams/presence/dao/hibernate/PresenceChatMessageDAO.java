@@ -34,14 +34,14 @@ import org.lamsfoundation.lams.presence.model.PresenceChatMessage;
 
 public class PresenceChatMessageDAO extends BaseDAO implements IPresenceChatMessageDAO {
 
-	private static final String BY_MESSAGE_ID = "from " + PresenceChatMessage.class.getName() 
-		+ " where uid=? order by create_date desc";
+	private static final String BY_MESSAGE_ID = "from " + PresenceChatMessage.class.getName() + " msg"
+		+ " where msg.uid=? order by msg.dateSent desc";
 	
-	private static final String BY_CONVERSATION = "from " + PresenceChatMessage.class.getName() 
-		+ " where from_user=? and to_user=? order by create_date asc";
+	private static final String BY_CONVERSATION = "from " + PresenceChatMessage.class.getName() + " msg"
+		+ " where (msg.from=:from and msg.to=:to) or (msg.from=:to and msg.to=:from) and msg.roomName=:roomName order by msg.dateSent asc";
 	
-	private static final String BY_ROOM_NAME = "from " + NotebookEntry.class.getName() 
-		+ " where room_name=? order by create_date asc";
+	private static final String BY_ROOM_NAME = "from " + PresenceChatMessage.class.getName() + " msg"
+		+ " where msg.roomName=? and msg.to is null order by msg.dateSent asc";
 	
 	public void saveOrUpdate(PresenceChatMessage presenceChatMessage) {
 		this.getHibernateTemplate().saveOrUpdate(presenceChatMessage);
@@ -57,9 +57,8 @@ public class PresenceChatMessageDAO extends BaseDAO implements IPresenceChatMess
 		else return null;
 	}
 
-	public List<PresenceChatMessage> getMessagesByConversation(String from,
-			String to) {
-		return (List<PresenceChatMessage>)(getHibernateTemplate().find(BY_CONVERSATION, new Object[]{from, to}));
+	public List<PresenceChatMessage> getMessagesByConversation(String from, String to, String roomName) {
+		return (List<PresenceChatMessage>)(getHibernateTemplate().findByNamedParam(BY_CONVERSATION, new String[]{"from", "to", "roomName"}, new Object[]{from, to, roomName}));
 	}
 
 	public List<PresenceChatMessage> getMessagesByRoomName(String roomName) {

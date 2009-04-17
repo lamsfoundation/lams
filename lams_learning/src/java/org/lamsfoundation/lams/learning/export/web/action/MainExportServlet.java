@@ -228,11 +228,15 @@ public class MainExportServlet extends HttpServlet {
 	try {
 	    // String to find
 	    String fckeditorpath = "/" + lamsOrRams + "/www/secure/" + contentFolderID;
+		String fckeditorrecpath = "../" + contentFolderID + "/Recordings";
 	    String fckeditorsmiley = "/" + lamsOrRams + "/fckeditor/editor/images/smiley";
+	    String fckeditorvr = "/" + lamsOrRams + "/fckeditor/editor/plugins/videorecorder";
 
 	    // Replacing string
 	    String newfckeditorpath = "../" + contentFolderID;
+	    String newfckeditorrecpath = "../../../../" + contentFolderID + "/Recordings";
 	    String newfckeditorsmiley = "../fckeditor/editor/images/smiley";
+	    String newfckeditorvr = "../fckeditor/editor/plugins/videorecorder";
 
 	    File fin = new File(filename);
 	    //Open and input stream
@@ -244,8 +248,14 @@ public class MainExportServlet extends HttpServlet {
 	    Pattern p = Pattern.compile(fckeditorpath);
 	    Matcher m = p.matcher("");
 
-	    Pattern p2 = Pattern.compile(fckeditorsmiley);
+	    Pattern p2 = Pattern.compile(fckeditorrecpath);
 	    Matcher m2 = p2.matcher("");
+	    
+	    Pattern p3 = Pattern.compile(fckeditorsmiley);
+	    Matcher m3 = p3.matcher("");
+	    
+	    Pattern p4 = Pattern.compile(fckeditorvr);
+	    Matcher m4 = p4.matcher("");
 
 	    String aLine = null;
 	    String output = "";
@@ -256,10 +266,18 @@ public class MainExportServlet extends HttpServlet {
 		// Replace the p matching pattern with the newfckeditorpath
 		String firstpass = m.replaceAll(newfckeditorpath);
 
-		// Replace the p2 matching patterns with the newfckeditorsmiley
+		// Replace the p2 matching patterns with the newfckeditorrecpath
 		m2.reset(firstpass);
-		String result = m2.replaceAll(newfckeditorsmiley);
+		String secondpass = m2.replaceAll(newfckeditorrecpath);
 
+		// Replace the p2 matching patterns with the newfckeditorsmiley
+		m3.reset(secondpass);
+		String thirdpass = m3.replaceAll(newfckeditorsmiley);
+		
+		// Replace the p3 matching patterns with the newfckeditorvr
+		m4.reset(thirdpass);
+		String result = m4.replaceAll(newfckeditorvr);
+		
 		output = output + result + "\n";
 	    }
 	    in.close();

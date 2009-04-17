@@ -7,5 +7,4 @@
 .ui-tabs .ui-tabs-nav li.ui-tabs-selected {  padding-bottom: .1em; border-bottom: 0; }
 .ui-tabs .ui-tabs-panel { padding: 1em 1.4em;  display: block; border: 0; background: none; }
 .ui-tabs .ui-tabs-hide { display: none !important; }
-.ui-tabs .ui-tabs-wrapper { overflow: hidden }
-.ui-tabs .ui-tabs-wrapped {}
+.ui-tabs .ui-tabs-wrapped { margin-left: 0px; margin-right: 0px;}

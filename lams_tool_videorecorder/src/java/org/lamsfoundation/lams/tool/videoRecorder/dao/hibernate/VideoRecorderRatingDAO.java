@@ -51,6 +51,9 @@ public class VideoRecorderRatingDAO extends BaseDAO implements IVideoRecorderRat
 	private static final String SQL_QUERY_BY_TOOL_SESSION_ID = "from " + VideoRecorderComment.class.getName() + " as r "
 	+ "where r.videoRecorderSession.sessionId=?";
 	
+	private static final String SQL_QUERY_NB_RATINGS_BY_USER = "select count(*) from " + VideoRecorderRecording.class.getName() + " r "
+	+ " where r.createBy.userId=? and r.videoRecorderSession.sessionId=?";
+	
 	public VideoRecorderRating getRatingById(Long ratingId) {
 		List list = this.getHibernateTemplate().find(
 				SQL_QUERY_FIND_BY_RATING_ID ,
@@ -74,4 +77,12 @@ public class VideoRecorderRatingDAO extends BaseDAO implements IVideoRecorderRat
 		this.getHibernateTemplate().saveOrUpdate(videoRecorderRating);
 		this.getHibernateTemplate().flush();
     }
+    
+	public Long getNbRatings(Long userID, Long sessionId) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_NB_RATINGS_BY_USER, new Object[]{userID,sessionId});
+		if(list != null && list.size() > 0)
+			return ((Number)list.get(0)).longValue();
+		else
+			return new Long(0);
+	}
 }

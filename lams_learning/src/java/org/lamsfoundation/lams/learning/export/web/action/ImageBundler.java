@@ -109,6 +109,9 @@ public class ImageBundler extends Bundler {
 
 	    // build up a list of the misc images to copy
 	    setupMiscImages();
+	    
+	    // build up a list of things to add for vr to work
+	    setupVideoRecorderExport();
 	}
 
 	// now copy all those files
@@ -160,5 +163,29 @@ public class ImageBundler extends Bundler {
 		filesToCopy.put(outputFilename, image);
 	    }
 	}
+    }
+    
+    /**
+     * Adds VideoRecorder stuff to be exported
+     */
+    private void setupVideoRecorderExport() {
+    	String vrDirectory = lamsCentralPath + File.separatorChar + "fckeditor" + File.separatorChar + "editor"
+		+ File.separatorChar + "plugins" + File.separatorChar + "videorecorder";
+    	
+    	String outputVrDirectory = outputDirectory + File.separatorChar + "fckeditor" + File.separatorChar
+		+ "editor" + File.separatorChar + "plugins" + File.separatorChar + "videorecorder";
+	
+		directoriesRequired.add(outputVrDirectory);
+	
+		File dir = new File(vrDirectory);
+		if (!dir.canRead() || !dir.isDirectory()) {
+		    log.debug("Unable to read vr directory " + dir.getAbsolutePath());
+		} else {
+		    File[] files = dir.listFiles();
+		    for (File file : files) {
+		    	if(!file.isDirectory())
+		    		filesToCopy.put(outputVrDirectory + File.separatorChar + file.getName(), file);
+		    }
+		}
     }
 }

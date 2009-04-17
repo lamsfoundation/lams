@@ -110,7 +110,7 @@
 			// embed the Flash Content SWF when all tests are passed
 			AC_FL_RunContent(
 					"src", "./includes/flash/VideoRecorder",
-					"FlashVars", "contentEditable"+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&toolContentId='+${toolContentId}+'&mode='+'${mode}'+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowComments='+${videoRecorderDTO.allowComments}+'&allowRatings='+${videoRecorderDTO.allowRatings}+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&languageXML='+"${languageXML}"+"",
+					"FlashVars", "contentEditable="+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&toolContentId='+${toolContentId}+'&mode='+'${mode}'+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowComments='+${videoRecorderDTO.allowComments}+'&allowRatings='+${videoRecorderDTO.allowRatings}+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&languageXML='+"${languageXML}"+"",
 					"width", "100%",
 					"height", "676",
 					"align", "middle",

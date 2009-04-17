@@ -57,7 +57,7 @@
 				// if the video isn't actually playing yet
 				if(_videoDisplay.playMode == _videoDisplay.INIT_MODE){
 					seekSliderBar.value = 0;
-					seekSliderTimerLabel.text = "0:0" + " / " + VideoDisplayUtil.secondsToString(String(_videoDisplay.duration));
+					seekSliderTimerLabel.text = "0:00" + " / " + VideoDisplayUtil.secondsToString(String(_videoDisplay.duration));
 					
 					/*
 					seekSliderProgress.minimum = 0;
@@ -115,7 +115,7 @@
 			
 			// resets the timer
 			public function resetTimerLabel():void{
-				seekSliderTimerLabel.text = "0:0 / 0:0";
+				seekSliderTimerLabel.text = "0:00 / 0:00";
 			}
 			
 			// starts the timer
@@ -128,7 +128,9 @@
 				playTimer.stop();
 			}
 			
-			
+			public function resetSeekSliderPositon():void{
+				seekSliderBar.value = 0;
+			}
 		]]>
 	</mx:Script>
 	<mx:VBox width="100%" verticalGap="5" horizontalAlign="center">

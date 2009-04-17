@@ -49,6 +49,9 @@ public class VideoRecorderCommentDAO extends BaseDAO implements IVideoRecorderCo
 	private static final String SQL_QUERY_BY_TOOL_RECORDING_ID = "from " + VideoRecorderComment.class.getName() + " as c "
 	+ "where c.recording.uid=?";
 	
+	private static final String SQL_QUERY_NB_COMMENTS_BY_USER = "select count(*) from " + VideoRecorderComment.class.getName() + " c "
+	+ " where c.createBy.userId=? and c.videoRecorderSession.sessionId=?";
+	
 	public VideoRecorderComment getCommentById(Long recordingId) {
 		List list = this.getHibernateTemplate().find(
 				SQL_QUERY_FIND_BY_COMMENT_ID ,
@@ -76,4 +79,12 @@ public class VideoRecorderCommentDAO extends BaseDAO implements IVideoRecorderCo
 		this.getHibernateTemplate().saveOrUpdate(videoRecorderComment);
 		this.getHibernateTemplate().flush();
     }
+    
+	public Long getNbComments(Long userID, Long sessionId) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_NB_COMMENTS_BY_USER, new Object[]{userID,sessionId});
+		if(list != null && list.size() > 0)
+			return ((Number)list.get(0)).longValue();
+		else
+			return new Long(0);
+	}
 }

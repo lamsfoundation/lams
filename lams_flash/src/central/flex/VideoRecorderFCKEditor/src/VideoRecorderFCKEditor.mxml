@@ -123,21 +123,10 @@
 				// add the save to lams servlet location
 				saveToLamsServletUrl = serverUrl + saveToLamsServletLocation;
 				
-				/*
-				Alert.show(
-					"filename: " + filename +
-					"\nred5ServerUrl: " + red5ServerUrl +
-					"\nserverUrl: " + serverUrl +
-					"\nlanguageXML: " + languageXML +
-					"\ntoolContentId: " + toolContentId +
-					"\ntoolServletUrl: " + toolServletUrl +
-					"\nsaveToLamsServletUrl: " + saveToLamsServletUrl +
-					"\nred5RecordingsUrl: " + red5RecordingsUrl +
-					"\nsaveToLamsDestUrl: " + saveToLamsDestUrl +
-					"\nlamsEarDir: " + lamsEarDir +
-					"\nmode: " + mode);
-				*/
-				
+				// add server url and servlet url to video display
+				videoDisplay.serverUrl = serverUrl;
+				videoDisplay.servletUrl = toolServletUrl;
+								
 				// swtich on mode
 				switch(mode){
 					case "playerModeOnline":{
@@ -406,7 +395,7 @@
         			var description:String = getDetailsPopUp.descriptionInput.text;
         			
         			// call the http service to save a recording
-        			saveRecordingToServer(title, description, filename + ".flv", toolContentId);
+        			saveRecordingToServer(title, description, filename, toolContentId);
         		}
         		
         		if(event.target is TitleWindow){
@@ -417,12 +406,14 @@
 			// record button click handler
 			private function recordClick(event:MouseEvent):void{
 				if(!videoDisplay.isPublishing){
-					if(mode == "recorderModeFCK")
+					if(mode == "recorderModeFCK"){
 						filename = VideoDisplayUtil.createFilenameForFCK(userId);
-					else if(mode == "recorderModeAuthor")
+						videoDisplay.startPublish(filename, false);
+					}
+					else if(mode == "recorderModeAuthor"){
 						filename = VideoDisplayUtil.createFilenameForAuthor(toolContentId);
-						
-					videoDisplay.startPublish(filename);
+						videoDisplay.startPublish(filename, true);
+					}		
 				}
 				else if(videoDisplay.isPublishing)
 					videoDisplay.stopPublish();

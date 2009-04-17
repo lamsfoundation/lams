@@ -37,6 +37,6 @@ public interface IPresenceChatMessageDAO {
 	
 	List<PresenceChatMessage> getMessagesByRoomName(String roomName);
 	
-	List<PresenceChatMessage> getMessagesByConversation(String from, String to);
+	List<PresenceChatMessage> getMessagesByConversation(String from, String to, String roomName);
 
 }

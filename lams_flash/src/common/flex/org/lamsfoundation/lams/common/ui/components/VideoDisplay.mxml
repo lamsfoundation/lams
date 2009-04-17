@@ -3,16 +3,24 @@
 
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.common.util.NetStreamScreenShotterEvent;
+			import org.lamsfoundation.lams.common.util.NetStreamScreenShotter;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import org.lamsfoundation.lams.common.conn.ImageService;
+			import mx.core.Application;
 			import org.lamsfoundation.lams.common.util.VideoDisplayUtil;
 			import org.lamsfoundation.lams.common.popups.DebugPopUp;
 			import mx.containers.Tile;
 			import mx.controls.Alert;
 			import org.lamsfoundation.lams.common.ui.components.VideoDisplayEvent;
+			import flash.display.BitmapData;
 			
 			// flags
 			[Bindable] private var _isCameraViewed:Boolean = false;
 			[Bindable] private var _isPublishing:Boolean = false;
 			[Bindable] private var _isBufferFull:Boolean = false;
+			[Bindable] private var _isReadyForSSing:Boolean = false;
 			
 			private var _playMode:int;
 			public const INIT_MODE:int = 0;
@@ -20,23 +28,29 @@
 			public const PAUSE_MODE:int = 2;
 			public const PLAY_MODE:int = 3;
 			
+			private static var saveImageMethod:String = "saveImage";
+			
 			// embeds
 			[Embed(source="../../../../../../assets/images/playerVolume.png")] [Bindable] private var volumeEmbed:Class;
 			
 			// variables
 			private var video:Video;
-			private var timer:Timer;
+			private var screenshotter:NetStreamScreenShotter;
 			private var _cam:Camera;
 			private var _mic:Microphone;
 			private var _ns:NetStream;
 			private var _metadata:Object;
 			private var _nc:NetConnection;
+			private var _serverUrl:String;
+			private var _servletUrl:String;
 			private var _filename:String;
 			private var _bufferTime:int = 2;
 			private var _bufferAttempts:int = 5;
 			private var _debugPopUp:DebugPopUp;
-			
+
 			// timers
+			private var timer:Timer;
+			private var ssTimer:Timer;
 			private var seekTimer:Timer;
 			private var readyTimer:Timer;
 			
@@ -52,7 +66,13 @@
 				
 				// fix video player
 				player.addChild(video);
-				video.visible = true;
+				video.visible = true;		
+								
+				// create screenshotter
+				screenshotter = new NetStreamScreenShotter();
+				
+				// add listener for screenshots
+				screenshotter.addEventListener(NetStreamScreenShotterEvent.SCREENSHOTTAKEN, screenShotTaken);
 				
 				// reset to make sure everything is set to default
 				reset();
@@ -72,6 +92,7 @@
 			// attachs a nc, must be called from parent before attempting a connection
 			public function setNetConnection(nc:NetConnection):void{
 				_nc = nc;
+				screenshotter.nc = nc;
 			}
 			
 			// playMode getter
@@ -118,7 +139,7 @@
 				
 				// save filename
 				_filename = filename;
-				
+								
 				// play
 				_ns.play(_filename);
 			}
@@ -176,7 +197,7 @@
 				// dispatch the event to the parent
 				dispatchEvent(event);
 			}
-			
+						
 			// called from metadata callback
 			private function checkReady(event:TimerEvent):void{	
 				// if we are in init and the buffer is full or the movie is completely loaded
@@ -302,6 +323,8 @@
 				else
 					return null;
 			}
+
+
 			
 			// creates a new timer object
 			private function createTimer():Timer{
@@ -413,11 +436,14 @@
 			}
 			
 			// publish method
-			public function startPublish(filename:String):void{
+			public function startPublish(filename:String, takeScreenshot:Boolean):void{
 				// if we are not already publishing
 				if(!_isPublishing){
 					// store filename to use
 					_filename = filename;
+					
+					// add filename to screenshotter
+					screenshotter.filename = filename;
 					
 					// if camera is not on yet
 					if(!isCameraViewed){
@@ -425,11 +451,11 @@
 						viewCameraHelper();
 						
 						// and start publishing
-						publishHelper();
+						publishHelper(takeScreenshot);
 					}
 					else{
 						// just start publishing
-						publishHelper();
+						publishHelper(takeScreenshot);
 					}
 				}
 			}
@@ -442,51 +468,27 @@
 					viewCameraHelper();
 					
 					//stop publishing
-					publishHelper();
+					publishHelper(false);
 				}
 			}
 			
 			// publish helper method to start and stop actual publishing
-			private function publishHelper():void {
+			private function publishHelper(takeScreenshot:Boolean):void {
 				// if not publishing
 				if(!_isPublishing){
 					// create a new netstream
 					_ns = createNetStream();
 					
-					/*
-					// create the bitmap data for preview image
-					previewImage = new BitmapData(320, 240);
-
-					// start another video and attach the camera
-					var videoPreview:Video = new Video(320, 240);
-					videoPreview.attachCamera(cam);
-					
-					// draw from the video
-					previewImage.draw(videoList);
-					
-					// encode the bmp
-					var pngEncoder:PNGEncoder = new PNGEncoder();
-					var rawBytes:ByteArray = pngEncoder.encode(previewImage);
-					*/
-					
-					// save the preview image to server (using a LAMS servlet)
-					/*
-					var imageService:ImageService = new ImageService(serverUrl, "savePreviewImage");
-					imageService.addEventListener(ResultEvent.RESULT, savePreviewImageSuccessHandler);
-					imageService.addEventListener(FaultEvent.FAULT, savePreviewImageFaultHandler);
-					imageService.sendImageToServer(previewImage, imageService.JPG_EXT, filename);
-					*/
-					
-					/*
-					// save the preview image to server (using the Red5 servlet)
-					nc.call("savePreviewImage", null, rawBytes, filename);
-					*/
-					
-					// publish video to media server
 					_ns.publish(_filename, "record");
 					_isPublishing = true;
 					
 					dispatchEvent(new VideoDisplayEvent(VideoDisplayEvent.STARTPUBLISH));
+					
+					// if needed
+					if(takeScreenshot){
+						// take a screen shot
+						screenshotter.takeScreenshot();
+					}
 				}
 				// if recording
 				else {
@@ -517,6 +519,14 @@
 			
 			public function set bufferTime(bufferTime:int):void{
 				_bufferTime = bufferTime;
+			}
+
+			public function set serverUrl(serverUrl:String):void{
+				_serverUrl = serverUrl;
+			}
+			
+			public function set servletUrl(servletUrl:String):void{
+				_servletUrl = servletUrl;
 			}
 			
 			public function get time():Number{
@@ -598,7 +608,7 @@
 					default:
 				}
 			}
-			
+						
 			private function onPlayStatus(infoObject:Object):void{  
 				//_debugPopUp.log(VideoDisplayUtil.printInfoObject(infoObject), DebugPopUp.DEBUG);
 				
@@ -634,10 +644,32 @@
 				trace("securityErrorHandler: " + event);
 			}
 	
-			private  function asyncErrorHandler(event:AsyncErrorEvent):void {
+			private function asyncErrorHandler(event:AsyncErrorEvent):void {
 				trace("securityErrorHandler: " + event);
 			}
-						
+			
+			// callback from screenshotter
+			private function screenShotTaken(event:NetStreamScreenShotterEvent):void{
+				// get the preview image
+				var previewImage:BitmapData = event.previewImage;
+				
+				// set up the service
+				var imageService:ImageService = new ImageService(_servletUrl, saveImageMethod);
+				imageService.addEventListener(ResultEvent.RESULT, savePreviewImageSuccessHandler);
+				imageService.addEventListener(FaultEvent.FAULT, savePreviewImageFaultHandler);
+				
+				// send to server
+				imageService.sendImageToServer(null, _filename, imageService.JPG_EXT, previewImage);
+			}
+			
+			// handler for successful save preview image
+			private function savePreviewImageSuccessHandler(e:ResultEvent):void {
+			}
+			
+			// fault handler for save preview image
+			  private function savePreviewImageFaultHandler(e:FaultEvent):void {
+			  	Alert.show(e.toString());
+			}
 	    ]]>
 	</mx:Script>
 	
@@ -648,6 +680,9 @@
 	</mx:Canvas>
 	<mx:Canvas id="playerView" width="100%" height="100%" backgroundColor="#000000">
 		<mx:UIComponent id="player" width="100%" height="100%"/>
+	</mx:Canvas>
+	<mx:Canvas id="imageView" width="100%" height="100%" backgroundColor="#000000">
+		<mx:Image id="screenshotImage" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" scaleContent="false"/>
 	</mx:Canvas>
 	<mx:Canvas id="audioView" width="100%" height="100%" backgroundColor="#000000">
 		<mx:Image id="audioImage" width="100%" height="100%" source="{volumeEmbed}" verticalAlign="middle" horizontalAlign="center" scaleContent="false"/>

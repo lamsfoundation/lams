@@ -42,6 +42,11 @@ Presence style
 	overflow-y: scroll;
 }
 
+#minMaxIcon{
+	position:absolute;
+	top: 0px;
+	right:0px;
+}
 .presenceName {
 	width:"100%";
 }
@@ -78,6 +83,10 @@ Presence style
 }
 
 .sendArea {
-	style="width: 100%;
+	width: 100%;
 	height: 20%;
+}
+
+table.tabLabelTable {
+	width: auto;
 }

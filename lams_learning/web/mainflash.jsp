@@ -92,7 +92,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			function resizeIframe() {
 			    var width = $(window).width() - 160;
-			    $('#contentFrame').css({'width': width + "px"});
+			    var height = $(window).height();
+			    $('#contentFrame').css({'width': width + "px", 'height': height + "px"});
 			    
 			    <c:if test="${param.presenceEnabledPatch}">
 			    	resizeChat();
@@ -155,7 +156,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    <%@ include file="/includes/presenceChat.jsp" %>
 		</c:if>
 		
-		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame" src="content.do?lessonID=<c:out value="${param.lessonID}"/>" scrolling="auto" style="border: medium none ; position: absolute; height: 100%; left: 160px;">
+		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame" src="content.do?lessonID=<c:out value="${param.lessonID}"/>" scrolling="auto" style="border: none ; margin-left: 160px;">
 		</iframe>		
 	</body>
 

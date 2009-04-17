@@ -79,6 +79,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	public static final String VIDEORECORDER_RECORDINGS_HTTP_FOLDER_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "tool/lavidr10/recordings/";
 	public static final String VIDEORECORDER_RECORDINGS_FOLDER_DEST = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + "/" + "lams-tool-lavidr10.war" + "/" + "recordings" + "/";
 	public static final String VIDEORECORDER_RECORDINGS_FOLDER_SRC = Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL);
+	public static final String FLV_EXTENSION = ".flv";
 
 	private IVideoRecorderService videoRecorderService;
 
@@ -335,13 +336,31 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				// get the video recording
 				VideoRecorderRecordingDTO vr = (VideoRecorderRecordingDTO) iter.next();
 				
-				// get the stream from the external server
-			    int success = HttpUrlConnectionUtil.writeResponseToFile(VIDEORECORDER_RECORDINGS_FOLDER_SRC, VIDEORECORDER_RECORDINGS_FOLDER_DEST, vr.getFilename(), new Cookie[0]);
+				// success indicator
+				int success = 0;
+				
+				String absoluteFilePath = VIDEORECORDER_RECORDINGS_FOLDER_DEST + vr.getFilename() + FLV_EXTENSION;
+				
+				// fetch file locally
+				File f = new File(absoluteFilePath);
+
+				// if file doesn't exist locally
+				if(!f.exists()){
+					// create the file
+					f.createNewFile();
+					// fetch from server
+					success = HttpUrlConnectionUtil.writeResponseToFile(VIDEORECORDER_RECORDINGS_FOLDER_SRC + vr.getFilename() + FLV_EXTENSION, VIDEORECORDER_RECORDINGS_FOLDER_DEST, vr.getFilename() + FLV_EXTENSION, cookies);
+				}
+				// if it does exists
+				else{
+					// w00t
+					success = 1;
+				}
 			    
-			    // if success
+				// if we have a file
 			    if(success == 1){
 				    // add the filename to the list
-				    fileArray[1].add(vr.getFilename());
+				    fileArray[1].add(vr.getFilename() + FLV_EXTENSION);
 				    logger.debug("file copy complete");
 			    }else{
 			    	logger.debug("file copy failed");

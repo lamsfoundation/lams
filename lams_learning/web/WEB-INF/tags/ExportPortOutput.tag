@@ -34,7 +34,6 @@
 <%@ attribute name="actport" required="true" rtexprvalue="true" type="org.lamsfoundation.lams.learning.export.ActivityPortfolio" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <LI>
 	<c:choose>
@@ -55,14 +54,6 @@
 			</UL>
 		</c:if>
 	</c:forEach>
-	<c:if test="${not empty actport.competencesCovered}">
-		<h5><fmt:message key="export.portfolio.competences.covered.title"/></h5>
-		<ul>
-		<c:forEach var="competenceName" items="${actport.competencesCovered}">
-			<li>${competenceName}</li>
-		</c:forEach>
-		</ul>
-	</c:if>
 
 </LI>						
 

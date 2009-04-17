@@ -49,6 +49,9 @@ public class VideoRecorderRecordingDAO extends BaseDAO implements IVideoRecorder
 	private static final String SQL_QUERY_BY_SESSION_ID_AND_USER_ID = "from " + VideoRecorderRecording.class.getName() + " as vrr "
 	+ "where vrr.videoRecorderSession.sessionId=? and vrr.createBy=?";
 	
+	private static final String SQL_QUERY_NB_RECORDINGS_BY_USER = "select count(*) from " + VideoRecorderRecording.class.getName() + " vrr "
+	+ " where vrr.createBy.userId=? and vrr.videoRecorderSession.sessionId=?";
+	
 	public VideoRecorderRecording getRecordingById(Long recordingId) {
 		List list = this.getHibernateTemplate().find(
 				SQL_QUERY_FIND_BY_RECORDING_ID,
@@ -76,4 +79,12 @@ public class VideoRecorderRecordingDAO extends BaseDAO implements IVideoRecorder
 		this.getHibernateTemplate().saveOrUpdate(videoRecorderRecording);
 		this.getHibernateTemplate().flush();
     }
+    
+	public Long getNbRecordings(Long userID, Long sessionId) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_NB_RECORDINGS_BY_USER, new Object[]{userID,sessionId});
+		if(list != null && list.size() > 0)
+			return ((Number)list.get(0)).longValue();
+		else
+			return new Long(0);
+	}
 }

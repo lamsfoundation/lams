@@ -58,19 +58,7 @@
 	
 	<c:choose>
 	<c:when test="${not empty activity.url}">
-		<img src="<lams:LAMSURL/>/images/${image}" width="10"/>
-		<c:choose>
-			<c:when test="${activity.status==1 || activity.floating}">
-				<a href="#" onclick="javascript:openPopUp('${activity.url}', 'LearnerActivity', 600, 800, true, true, true, false, false);">
-			</c:when>
-			<c:otherwise>
-				<a href="#" onclick="javascript:loadFrame('${activity.url}');">
-			</c:otherwise>
-		</c:choose>
-			<font color="#${colour}">
-				<c:out value="${activity.title}"/>
-			</font>
-		</a>
+		<img src="<lams:LAMSURL/>/images/${image}" width="10"/> <a href="#" onclick="javascript:loadFrame('${activity.url}');"><font color="#${colour}"><c:out value="${activity.title}"/></font></a>
 	</c:when>
 	<c:otherwise>
 		<img src="<lams:LAMSURL/>/images/${image}" width="10"/> <font color="#${colour}">${activity.title}</font>		

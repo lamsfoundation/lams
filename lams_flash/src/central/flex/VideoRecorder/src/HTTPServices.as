@@ -5,7 +5,7 @@ private function getRecordingsFromServer(sortBy:String, sortDirection:String):vo
 	
 	// create and set the service
 	var videoRecorderActions:HTTPService = new HTTPService();
-	videoRecorderActions.url = serverUrl;
+	videoRecorderActions.url = servletUrl;
 	videoRecorderActions.method = "POST";
 	videoRecorderActions.resultFormat = "e4x";
 	videoRecorderActions.request.method = "getRecordingsByToolSessionIdAndUserId";
@@ -51,7 +51,7 @@ private function getRecordingsSuccessHandler(e:ResultEvent):void {
 private function saveRecordingToServer(userId:int, title:String, description:String, filename:String, rating:Number, toolSessionId:int, recordingId:int):void{
 	// create and set the service
 	var videoRecorderActions:HTTPService  = new HTTPService();
-	videoRecorderActions.url = serverUrl;
+	videoRecorderActions.url = servletUrl;
 	videoRecorderActions.method = "POST";
 	videoRecorderActions.resultFormat = "e4x";
 	videoRecorderActions.request.method = "saveRecording";
@@ -95,7 +95,7 @@ private function saveCommentToServer(toolSessionId:int, recordingId:int, userId:
 	
 	// create and set the service
 	var videoRecorderActions:HTTPService  = new HTTPService();
-	videoRecorderActions.url = serverUrl;
+	videoRecorderActions.url = servletUrl;
 	videoRecorderActions.method = "POST";
 	videoRecorderActions.resultFormat = "e4x";
 	videoRecorderActions.request.method = "saveComment";
@@ -142,7 +142,7 @@ private function saveRatingToServer(toolSessionId:int, ratingId:int, userId:int,
 	
 	// create and set the service	
 	var videoRecorderActions:HTTPService  = new HTTPService();
-	videoRecorderActions.url = serverUrl;
+	videoRecorderActions.url = servletUrl;
 	videoRecorderActions.method = "POST";
 	videoRecorderActions.resultFormat = "e4x";
 	videoRecorderActions.request.method = "saveRating";
@@ -191,7 +191,7 @@ private function saveRatingSuccessHandler(e:ResultEvent):void {
 // creates an httpservice and saves a rating
 private function deleteRecordingFromServer(recordingId:int):void{
 	var videoRecorderActions:HTTPService  = new HTTPService();
-	videoRecorderActions.url = serverUrl;
+	videoRecorderActions.url = servletUrl;
 	videoRecorderActions.method = "POST";
 	videoRecorderActions.resultFormat = "e4x";
 	videoRecorderActions.request.method = "deleteRecording";
@@ -216,15 +216,5 @@ private function deleteRecordingSuccessHandler(e:ResultEvent):void {
 
 // fault handler for detele recording
   private function deleteRecordingFaultHandler(e:FaultEvent):void {
-  	Alert.show(e.toString());
-}
-
-// handler for successful save preview image
-private function savePreviewImageSuccessHandler(e:ResultEvent):void {
-	Alert.show(e.toString());
-}
-
-// fault handler for save preview image
-  private function savePreviewImageFaultHandler(e:FaultEvent):void {
   	Alert.show(e.toString());
 }

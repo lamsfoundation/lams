@@ -58,6 +58,7 @@
 			[Bindable] private var allowRatings:Boolean;
 			[Bindable] private var red5ServerUrl:String;
 			[Bindable] private var serverUrl:String;
+			[Bindable] private var servletUrl:String;
 			[Bindable] private var languageXML:XML;
 			[Bindable] private var mode:String;
 
@@ -75,9 +76,7 @@
 			
 			// ui stuff
 			private var getDetailsPopUp:GetRecordingDetailsPopUp;
-			private var addCommentPopUp:AddCommentPopUp;
-			private var previewImage:BitmapData;
-			
+			private var addCommentPopUp:AddCommentPopUp;			
 			
 			// icon embeds
 			[Embed(source="../../../../../../lams_central/web/images/icons/control_play.png")] [Bindable] private var playIcon:Class;
@@ -111,8 +110,8 @@
 				if(toolSessionId == 0){
 					contentEditable = true;
 					userId = 1;
-					toolSessionId = 7;
-					toolContentId = 8;
+					toolSessionId = 1;
+					toolContentId = 5;
 					allowUseVoice = true;
 					allowUseCamera = true;
 					allowComments = true;
@@ -163,7 +162,11 @@
 				red5ServerUrl += red5App;
 				
 				// add the servlet location to the server url to complete
-				serverUrl += servletLocation;
+				servletUrl = serverUrl + servletLocation;
+				
+				// add server url and servlet url to video display
+				videoDisplay.serverUrl = serverUrl;
+				videoDisplay.servletUrl = servletUrl;
 				
 				// if the cam is to be used, set that up
 				if(allowUseCamera){
@@ -205,6 +208,13 @@
 				enablePlaybackButtons(false);
 				enableVideoList(true);
 				seekSlider.enable(false);
+				
+				// if content is not editable
+				if(!contentEditable){
+					// disable view and record buttons
+					viewCameraButton.enabled = false;
+					startRecButton.enabled = false;
+				}
 				
 				// create the connection
 				createConnection();
@@ -282,7 +292,7 @@
 			private function addListeners():void{
 				videoInformation.ratingButton.addEventListener(RatingEvent.SELECTION_CHANGE, addRatingClick);
 				videoInformation.addCommentButton.addEventListener(MouseEvent.CLICK, addCommentClick);
-				videoList.addEventListener(MouseEvent.CLICK, deleteClick);
+				videoList.addEventListener("recordingDeleted", confirmDeleteClick);
 				sortButtonGroup.addEventListener(SortEvent.EVENT_TYPE, sortRecordingsHandler);
 				playButton.addEventListener(MouseEvent.CLICK, playClick);
 				startRecButton.addEventListener(MouseEvent.CLICK, startRecordingClick);
@@ -413,7 +423,7 @@
         			var rating:Number = 0;
         			
         			// call the http service to save a recording
-        			saveRecordingToServer(userId, title, description, filename + ".flv", rating, toolSessionId, recordingId);
+        			saveRecordingToServer(userId, title, description, filename, rating, toolSessionId, recordingId);
         		}
 				// if the given popup is of type addCommentPopUp
         		else if(event.target == addCommentPopUp){
@@ -459,7 +469,7 @@
 			private function startRecordingClick(event:MouseEvent):void{
 				if(!videoDisplay.isPublishing){
 					filename = VideoDisplayUtil.createFilename(toolSessionId, userId);
-					videoDisplay.startPublish(filename);
+					videoDisplay.startPublish(filename, true);
 				}
 				else if(videoDisplay.isPublishing)
 					videoDisplay.stopPublish();
@@ -486,33 +496,30 @@
 			}
 			
 			// delete recording click handler
-			private function deleteClick(event:MouseEvent):void{
-				if(event.target.hasOwnProperty("id") && event.target.id == "deleteButton"){
-					Alert.show(dictionary.getLabel("videorecorder.message.sure.delete"), dictionary.getLabel("videorecorder.confirm"), 3, this, confirmDeleteClick);  
-				}
-			}
-			
-			// confirm delete click handler
-			private function confirmDeleteClick(event:CloseEvent):void{
-				if (event.detail==Alert.YES){
-					var recordingId:int = itemClicked.recordingId;
-                	deleteRecordingFromServer(recordingId);
-                	videoInformation.resetInformation();
-                	videoDisplay.reset();
-                }
+			private function confirmDeleteClick(event:Event):void{
+            	deleteRecordingFromServer(VideoProfile(event.target).data.recordingId);
+            	videoInformation.resetInformation();
+            	videoDisplay.reset();
 			}
 			
 			// click handler for the videoDataGrid list
 			private function videoListClick(event:ListEvent):void {
-				if(videoList.enabled){	
+				if(videoList.enabled && !event.currentTarget.isPrototypeOf(Button)){	
 					// reset video information
 					videoInformation.resetInformation();
 					
 					// store last item clicked
 					itemClicked = event.itemRenderer.data;
 					
-					// enable video information buttons
-					videoInformation.enableVideoInformationButtons(true);
+					// if content is editable
+					if(contentEditable){
+						// enable video information buttons
+						videoInformation.enableVideoInformationButtons(true);
+					}
+					else{
+						videoInformation.enableVideoInformationButtons(false);
+					}
+					
 				
 					// scroll the video information box back up to top
 					videoInformation.verticalScrollPosition = 0;
@@ -552,8 +559,7 @@
 					makeReadytItemClicked();
 				}
 				else{
-					itemClicked = null;
-					videoList.selectedItem = null;
+					resetVideoList();
 					videoInformation.resetInformation();
 				}
 			}
@@ -598,7 +604,7 @@
 				// reset play buttons
 				enablePlaybackButtons(false);
 				seekSlider.enable(false);
-				seekSlider.stopTimerLabel();
+				seekSlider.resetSeekSliderPositon();
 				
 				// set panel status label
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
@@ -721,8 +727,7 @@
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
 				
 				// clear item clicked
-				videoList.selectedItem = null;
-				itemClicked = null;
+				resetVideoList();
 				
 				// enable buttons
 				enablePlaybackButtons(true);
@@ -810,7 +815,14 @@
 					}
 				}    	
 	        }
-	        	        
+	       	
+	       	// resets video list
+	       	private function resetVideoList():void{
+				// clear item clicked
+				videoList.selectedItem = null;
+				itemClicked = null;
+	       	}
+	       	
 	        // getters
 	        public function getUserId():int{
 	        	return userId;
@@ -839,12 +851,6 @@
 	        public function getMode():String{
 	        	return mode;
 	        }
-	        
-	        /*
-	        private function showDebug():void{
-	        	DebugPopUp.getInstance().visible = true;
-	        }
-	        */
 	    ]]>
 	</mx:Script>
 
@@ -855,12 +861,12 @@
 		<ns1:SeekSlider id="seekSlider" videoDisplay="{videoDisplay}" width="100%"/>
 	</mx:ControlBar>
 	</mx:Panel>
-	<mx:Label id="videoInformationLabel" x="10" y="328" text="Video information:" fontWeight="bold"/>
-	<local:VideoInformation id="videoInformation" allowComments="{allowComments}" allowRatings="{allowRatings}" dictionary="{dictionary}" backgroundDisabledColor="#FFFFFF" cornerRadius="5"/>
+	<mx:Label id="videoInformationLabel" text="Video information:" fontWeight="bold" top="328" left="10"/>
+	<local:VideoInformation id="videoInformation" allowComments="{allowComments}" allowRatings="{allowRatings}" dictionary="{dictionary}" backgroundDisabledColor="#FFFFFF" cornerRadius="5" bottom="10" top="354" left="10" width="340"/>
 	<mx:HBox left="358" top="10" right="10">
 		<mx:Label id="videosLabel" text="Videos:" fontWeight="bold"/>
 	</mx:HBox>
-	<mx:TileList borderStyle="none" id="videoList" itemRenderer="{new ArgumentsToRendererFactory({userId:this.userId, allowLearnerVideoExport:this.allowLearnerVideoExport, allowLearnerVideoVisibility:this.allowLearnerVideoVisibility, mode:this.mode, dictionary:this.dictionary},VideoProfile)}" dataProvider="{videoRecordings}" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" itemClick="videoListClick(event)" top="62" left="358" bottom="70" right="10" backgroundDisabledColor="#FFFFFF" cornerRadius="5"></mx:TileList>
+	<mx:TileList borderStyle="solid" id="videoList" itemRenderer="{new ArgumentsToRendererFactory({userId:this.userId, allowLearnerVideoExport:this.allowLearnerVideoExport, allowLearnerVideoVisibility:this.allowLearnerVideoVisibility, mode:this.mode, dictionary:this.dictionary, contentEditable: this.contentEditable},VideoProfile)}" dataProvider="{videoRecordings}" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" itemClick="videoListClick(event)" top="62" left="358" bottom="70" cornerRadius="5" right="10"></mx:TileList>
 	<mx:HBox verticalAlign="middle" left="358" top="36" right="10">
 		<mx:Label id="sortByLabel" text="Sort by:" fontWeight="normal" fontStyle="normal"/>
 		<ns2:SortButtonGroup width="100%" horizontalGap="3" id="sortButtonGroup">

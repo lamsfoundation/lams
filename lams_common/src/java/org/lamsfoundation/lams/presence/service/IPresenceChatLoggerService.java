@@ -39,8 +39,8 @@ public interface IPresenceChatLoggerService {
 	PresenceChatMessage getMessageById(Long id);
 	
 	List<PresenceChatMessage> getMessagesByRoomName(String roomName);
-	
-	List<PresenceChatMessage> getMessagesByConversation(String from, String to);
+		
+	List<PresenceChatMessage> getMessagesByConversation(String from, String to, String roomName);
 			
 	void saveOrUpdatePresenceChatMessage(PresenceChatMessage presenceChatMessage);
 	

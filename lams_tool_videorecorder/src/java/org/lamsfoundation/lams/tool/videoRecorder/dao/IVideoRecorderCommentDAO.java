@@ -48,4 +48,6 @@ public interface IVideoRecorderCommentDAO extends IBaseDAO{
 	Set<VideoRecorderComment> getCommentsByRecordingId(Long recordingId);
 	
 	void saveOrUpdate(VideoRecorderComment videoRecorderComment);
+	
+	Long getNbComments(Long userID, Long sessionId);
 }

@@ -36,6 +36,7 @@
 						$("#presenceChatTabs").bind('tabsselect', function(event, ui) {
 							var nick = getUserFromTag(ui.panel.id).nick;
 							$('#' + ui.panel.id + '_tabLabel').html(nick);
+							$("#presenceChatTabs").tabs('scrollTo', ui.tab.offsetLeft);
 						});
 					</c:if>
 					
@@ -51,32 +52,31 @@
 				
 			</script>
 			
-			<%-- html --%>
+			<%-- initial html / presence.js adds on html into here --%>
 			<div id="presenceChat">
+				<%-- only pop the message box if im is enabled --%>
 				<c:if test="${param.presenceImEnabled}">
 				<div id="presenceChatTabs">
 					<div id="tabWrapper">
-						<div id="scrollHolder">
-							<div style="float: left; width: 5%; text-align: left;">
-								<a href="javascript:handleLeftScrollClick();"><img id="leftSlider" src="../images/icons/arrow_left.png" width="16" height="16" border="0" /></a>
-							</div>
-							<div id="tabsHolder" style="float: left; width: 90%; overflow:hidden;">
-								<ul id="wrappedTabs">
-							        <li><a href="#groupchat">
-							        	<span>
-							        		<table border="0" cellpadding="5" cellspacing="0">
-							        			<tr>
-							        				<td width="10"><img src="../images/icons/group_edit.png" width="16" height="16" border="0"/></td>
-							        				<td><div id="groupchat_tabLabel" class="ui-tabs-label">Group Chat</div></td>
-							        			</tr>
-							        		</table>
-							        	</span>
-							        </a></li>
-								</ul>
-							</div>
-							<div style="float: left; width: 5%; text-align: right;">
-						 		<a href="javascript:handleRightScrollClick();"><img id="rightSlider" src="../images/icons/arrow_right.png" width="16" height="16" border="0" /></a>
-							</div>
+						<div style="float: left; width: 5%; text-align: left;">
+							<a href="javascript:handleLeftScrollClick();"><img id="leftSlider" src="../images/icons/arrow_left.png" width="16" height="16" border="0" /></a>
+						</div>
+						<div id="tabsHolder" style="float: left; width: 90%; overflow:hidden;">
+							<ul id="wrappedTabs">
+						        <li><a href="#groupchat">
+						        	<span>
+						        		<table border="0" cellpadding="5" cellspacing="0" class="tabLabelTable">
+						        			<tr>
+						        				<td width="10"><img src="../images/icons/group_edit.png" width="16" height="16" border="0"/></td>
+						        				<td><div id="groupchat_tabLabel" class="ui-tabs-label">Group Chat</div></td>
+						        			</tr>
+						        		</table>
+						        	</span>
+						        </a></li>
+							</ul>
+						</div>
+						<div style="float: left; width: 5%; text-align: right;">
+					 		<a href="javascript:handleRightScrollClick();"><img id="rightSlider" src="../images/icons/arrow_right.png" width="16" height="16" border="0" /></a>
 						</div>
 					</div>
 				    <div id="groupchat" class="chatPanel">
@@ -85,7 +85,7 @@
 				    	<br>
 				    	<div id="groupchat_sendArea" class="sendArea">
 							<form name="groupchat_sendForm" id="groupchat_sendForm" method="get" onsubmit="return sendMsg(this)">
-								<table width="575" border="0" align="center" cellpadding="3" cellspacing="0">
+								<table border="0" align="center" cellpadding="3" cellspacing="0" style="width: 100%">
 								  <tr>
 								    <td width="85%" align="center" valign="middle"><input id="messageInput" name="messageInput" type="text" style="width: 100%;"></td>
 								    <td width="15%" align="center" valign="middle"><input type="submit" name="sendButton" id="sendButton" value="Send"></td>
@@ -100,7 +100,7 @@
 					<ul onclick="javascript:handlePresenceClick()">
 				        <li><a href="#presenceUserListings" onclick="javascript:handlePresenceClick()">
 				        	<span>
-				        		<table border="0" cellpadding="5" cellspacing="0">
+				        		<table border="0" cellpadding="5" cellspacing="0" class="tabLabelTable">
 				        			<tr>
 				        				<td width="10"><img src="../images/icons/group.png" width="16" height="16" border="0"/></td>
 				        				<td><div id="presence_tabLabel">Users</div></td>
@@ -108,6 +108,7 @@
 				        		</table>
 				        	</span>
 				        </a></li>
+				        <img id="minMaxIcon" src="../images/icons/bullet_arrow_top.png" width="16" height="16" border="0"/>
 				    </ul>
 				    <div id="presenceUserListings">
 				    </div>

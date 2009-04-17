@@ -58,8 +58,8 @@ public class PresenceChatLoggerService implements IPresenceChatLoggerService {
 		return presenceChatMessageDAO.getMessagesByRoomName(roomName);
 	}
 	
-	public List<PresenceChatMessage> getMessagesByConversation(String from, String to){
-		return presenceChatMessageDAO.getMessagesByConversation(from, to);
+	public List<PresenceChatMessage> getMessagesByConversation(String from, String to, String roomName){
+		return presenceChatMessageDAO.getMessagesByConversation(from, to, roomName);
 	}
 			
 	public void saveOrUpdatePresenceChatMessage(PresenceChatMessage presenceChatMessage){

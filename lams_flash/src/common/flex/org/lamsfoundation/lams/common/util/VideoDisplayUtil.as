@@ -89,7 +89,14 @@ package org.lamsfoundation.lams.common.util
 			var minutes:int = valInt / 60;
 			var seconds:int = valInt % 60;
 			
-			return String(minutes) + ":" + String(seconds);
+			var result:String = "";
+			result += String(minutes) + ":";
+		
+			if(seconds < 10){
+				result += "0";
+			}
+			result += String(seconds);
+			return result;
 		}
 	}
 }

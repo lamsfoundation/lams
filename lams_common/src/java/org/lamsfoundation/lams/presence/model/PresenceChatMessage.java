@@ -47,6 +47,10 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
 	
 	private String message;
 	
+	public PresenceChatMessage() {
+		
+	}
+	
 	public PresenceChatMessage(Long uid, String roomName, String from,
 			String to, Date dateSent, String message) {
 		super();
