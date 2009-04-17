@@ -44,7 +44,6 @@ import org.lamsfoundation.lams.tool.mindmap.service.IMindmapService;
 import org.lamsfoundation.lams.tool.mindmap.service.MindmapServiceProxy;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
-import org.lamsfoundation.lams.tool.mindmap.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;

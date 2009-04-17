@@ -2,11 +2,11 @@
 
 <c:set var="dto" value="${mindmapDTO}" />
 
-<c:if test="${dto.contentInUse}">
+<!--<c:if test="${dto.contentInUse}">
 	<p class="warning">
 		<fmt:message key="message.alertContentEdit" />
 	</p>
-</c:if>
+</c:if> -->
 
 <table cellspacing="0">
 	<tbody>

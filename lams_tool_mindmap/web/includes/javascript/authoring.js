@@ -22,7 +22,7 @@ function doSelectTab(tabId) {
 	
 	if (tag.value == "" || tag.value == 1) {
 		flashvars["xml"] = "";
-		embedFlashObject();
+		embedFlashObject(700, 525);
 	}
 	
 	selectTab(tabId);

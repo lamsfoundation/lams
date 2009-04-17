@@ -14,6 +14,9 @@
 	}
 
 	function submitForm(methodName) {
+		// Sets mindmap content in Flash
+		setMindmapContent();
+
  	 	var f = document.getElementById('submitForm');
  		f.submit();
 	}
@@ -30,9 +33,6 @@
 		// Validates that there's input from the user. 
 		// disables the Finish button to avoid double submittion 
 		disableFinishButton();
-
-		// Sets mindmap content in Flash
-		setMindmapContent();
 	}
 	
 	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", 
@@ -57,7 +57,7 @@
 
 	$(window).resize(makeNice);
 
-	function makeNice(){
+	function makeNice() {
 		flash = document.getElementById('flashContent');
 		container = document.getElementById('container');
 		flash.style.width = container.clientWidth+"px";
@@ -96,6 +96,7 @@
 		<html:hidden property="userId" value="${userIdParam}" />
 		<html:hidden property="toolContentId" value="${toolContentIdParam}" />
 		<html:hidden property="toolSessionID" />
+		<html:hidden property="mindmapContent" styleId="mindmapContent" />
 		
 		<c:choose>
 			<c:when test="${reflectOnActivity}">
@@ -106,7 +107,6 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<html:hidden property="mindmapContent" styleId="mindmapContent" />
 		<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 		<center id="container">
@@ -118,9 +118,9 @@
 		<c:choose>
 			<c:when test="${reflectOnActivity}">
 				<div class="space-bottom-top align-right">
-					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message>button.continue</fmt:message>
-					</html:submit>
+					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+						<span class="nextActivity"><fmt:message>button.continue</fmt:message></span>
+					</html:link>
 				</div>
 			</c:when>
 		
