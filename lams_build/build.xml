@@ -97,6 +97,11 @@
 		<echo>Building LAMS using CruiseControl</echo>
 	</target>
 	
+	<!-- cruise control task : build lams without tools -->
+	<target name="lams-cruise-min-tools" depends="assemble-ear, rebuild-db, deploy-ear, copyfiles, deploy-minimal-tools" description="builds entire LAMS without tools"> 
+		<echo>Building LAMS using CruiseControl</echo>
+	</target>
+	
 	<!-- assemble ear -->
 	<target name="assemble-ear" depends="init, clean, build-subprojects"
 		description="Assemble lams ear in exploded form">
@@ -312,8 +317,26 @@
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 			<property name="generate.for.installers" value="${generate.for.installers}"/>
 		</ant>
+		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
 	</target>
 
+	<target name="deploy-minimal-tools" description="Deploy the tools shared between LAMS and RAMS. Called by deploy-lams-tools and deploy-rams-tools">
+  		<ant antfile="../${tool_notebook_dir}/build.xml" target="deploy-tool"
+				inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
+		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
+	</target>
+	
 	<target name="deploy-lams-tools" depends="test-application, deploy-common-tools" if="isLAMS"
 			description="Deploy the LAMS tools. Called by deploy-tools.">
 		<echo>Building the LAMS set of tools.</echo>
