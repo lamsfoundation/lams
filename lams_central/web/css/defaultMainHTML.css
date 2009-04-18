@@ -722,8 +722,8 @@ My Courses Pages
 	text-decoration: none;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
-	
 	margin-left:5px;
+	display: run-in;
 }
 
 #content a.find-learners-button {
@@ -746,6 +746,7 @@ My Courses Pages
 	margin-left:5px;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
+	display: run-in;
 }
 
 #content a.manage-group-button {
@@ -1001,6 +1002,8 @@ border:0px;
 	text-decoration: none;
 	border-right:1px solid #d2d2d2;
 	margin-left:5px;
+	display: run-in;
+	
 }
 
 * html  #content a:hover.add-lesson-button {
@@ -1012,6 +1015,7 @@ border:0px;
 	margin-top:0px;
 	margin-left:5px;
 	border-right:1px solid #d2d2d2;
+	display: run-in;
 }
 
 * html  #content a.manage-group-button {
@@ -1147,15 +1151,17 @@ ul.more-actions-list li {
 	text-decoration: none;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
+	display: run-in;
 }
 
 #content a:hover.more-actions-button {
         background: url('../images/css/more_options.png') no-repeat 0px 0px;
         color: #47bc23;
-        padding: 5px 12px 6px 30px;
+	padding: 5px 12px 6px 30px;
         text-decoration: none;
         border-right:1px solid #d2d2d2;
         border-bottom: 0px;
+	display: run-in;
 }
 
 #content a.search-lesson {
@@ -1165,6 +1171,7 @@ ul.more-actions-list li {
 	text-decoration: none;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
+	display: run-in;
 }
 
 #content a:hover.search-lesson {
