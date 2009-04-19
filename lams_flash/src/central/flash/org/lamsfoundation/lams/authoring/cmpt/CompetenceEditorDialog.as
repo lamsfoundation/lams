@@ -201,7 +201,7 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceEditorDialog extends Movi
 			
 			var titleKey:String = competenceKeys[i];		
 			var descriptionValue:String = (model instanceof MonitorModel) ? app.monitor.ddm.competences.get(competenceKeys[i]) : app.getDesignDataModel().competences.get(competenceKeys[i]);
-			var competenceTitle:String = new String("competenceContainer_"+titleKey);
+			var competenceTitle:String = new String("competenceContainer_"+i);
 			var mc:MovieClip = competenceContainerLayer.attachMovie("competenceContainer", competenceTitle, competenceContainerLayer.getNextHighestDepth(), {_x:0, _y:yContainerOffset, _competenceTitle:titleKey, _description:descriptionValue, _model:m});
 			
 			containerArray.push(mc);

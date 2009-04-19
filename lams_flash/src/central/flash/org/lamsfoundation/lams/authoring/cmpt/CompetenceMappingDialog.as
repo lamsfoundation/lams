@@ -174,8 +174,8 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceMappingDialog extends Mov
 					checked = true;
 				}
 			}
-				
-			var mc:MovieClip = competenceContainerLayer.attachMovie("competenceMappingItem", competenceTitle, competenceContainerLayer.getNextHighestDepth(), {_x:0, _y:yContainerOffset, _competenceNum:(i+1), _competenceTitle:competenceTitle, _checked:checked});
+			
+			var mc:MovieClip = competenceContainerLayer.attachMovie("competenceMappingItem", "competenceMappingContainer_"+i, competenceContainerLayer.getNextHighestDepth(), {_x:0, _y:yContainerOffset, _competenceNum:(i+1), _competenceTitle:competenceTitle, _checked:checked});
 			
 			competenceItemMCs.push(mc);
 			yContainerOffset = yContainerOffset + 45;
