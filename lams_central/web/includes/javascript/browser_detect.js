@@ -3,21 +3,18 @@ Script Name: Full Featured Javascript Browser/OS detection
 Authors: Harald Hope, Tapio Markula, Websites: http://techpatterns.com/
 http://www.nic.fi/~tapio1/Teaching/index1.php3
 Script Source URI: http://techpatterns.com/downloads/javascript_browser_detection.php
-Version 4.2.2
-Copyright (C) 08 July 2005
+Version 4.2.4
+Copyright (C) 29 June 2007
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
+This program is free software; you can redistribute it and/or modify it under 
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3 of the License, or (at your option) any later version.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT 
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-Lesser GPL license text:
-http://www.gnu.org/licenses/lgpl.txt
+Get the full text of the GPL here: http://www.gnu.org/licenses/gpl.txt
 
 Coding conventions:
 http://cvs.sourceforge.net/viewcvs.py/phpbb/phpBB2/docs/codingstandards.htm?rev=1.3
@@ -50,7 +47,7 @@ http://www.nic.fi/~tapio1/Teaching/FAQ.php3
 
 ***************************************************************/
 //initialization, browser, os detection
-var d, dom, nu='', brow='', ie, ie4, ie5, ie5x, ie6, ie7;
+var d, dom, nu='', brow='', ie, ie4, ie5, ie5x, ie6, ie7, ie8;
 var ns4, moz, moz_rv_sub, release_date='', moz_brow, moz_brow_nu='', moz_brow_nu_sub='', rv_full=''; 
 var mac, win, old, lin, ie5mac, ie5xwin, konq, saf, op, op4, op5, op6, op7;
 
@@ -106,8 +103,7 @@ else if (moz)
 	// regular expression pattern that will be used to extract main version/rv numbers
 	pattern = /[(); \n]/;
 	// moz type array, add to this if you need to
-	moz_types = new Array( 'Firebird', 'Phoenix', 'Firefox', 'Galeon', 'K-Meleon', 'Camino', 'Epiphany', 
-		'Netscape6', 'Netscape', 'MultiZilla', 'Gecko Debian', 'rv' );
+	moz_types = new Array( 'Firebird', 'Phoenix', 'Firefox', 'Iceweasel', 'Galeon', 'K-Meleon', 'Camino', 'Epiphany', 'Netscape6', 'Netscape', 'MultiZilla', 'Gecko Debian', 'rv' );
 	rv_pos = nua.indexOf( 'rv' );// find 'rv' position in nua string
 	rv_full = nua.substr( rv_pos + 3, 6 );// cut out maximum size it can be, eg: 1.8a2, 1.0.0 etc
 	// search for occurance of any of characters in pattern, if found get position of that character
@@ -176,6 +172,7 @@ ie4=(ie&&!dom);
 ie5=(ie&&(nu.substring(0,1)==5));
 ie6=(ie&&(nu.substring(0,1)==6));
 ie7=(ie&&(nu.substring(0,1)==7));
+ie8=(ie&&(nu.substring(0,1)==8));
 // default to get number from navigator app version.
 if(!nu) 
 {
