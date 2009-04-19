@@ -90,7 +90,7 @@ j_security_login_page
 						
 						if(isBrowserNotCompatable()) {
 							// incompatable browser - show warning message
-							document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/>');
+							document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/> <a href=\"http://getfirefox.com\" target=\"_blank\"><img src=\"images/firefox_logo.png\"></a>');
 							document.write('<br></div>');
 						}
 						
