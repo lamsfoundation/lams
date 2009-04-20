@@ -39,8 +39,8 @@ function doRevert(id)
 
 function trim(str)
 {
-	var regX1 = /\n/gi;
-	var regX2 = /\t/gi;
+	var regX1 = /\r?\n/g;
+	var regX2 = /\t/g;
 	str = new String(str);
 	str = str.replace(/^\s+|\s+$/g, '').replace(regX1, "").replace(regX2, "");
 	return str;
