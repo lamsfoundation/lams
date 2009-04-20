@@ -115,7 +115,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	WikiPage currentPage = wikiService.getWikiPageByUid(currentPageUid);
 
 	// Check if the content is different
-	if (!currentPage.getCurrentWikiContent().getBody().equals(wikiForm.getWikiBody())) {
+	if (!currentPage.getCurrentWikiContent().getBody().equals(wikiForm.getWikiBody()) || !currentPage.getTitle().equals(wikiForm.getTitle())) {
 
 	    // Set up the wiki user if this is a tool session (learner)
 	    // Also set the editable flag here

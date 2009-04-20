@@ -4,14 +4,13 @@
 <%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
-gyig
+
 <%
 if(true)
 {
 	return;
 }
 %>
-fufy
 <script type="text/javascript">
 	if(window.top != null){
 		window.top.location.href = "${lams}index.jsp";

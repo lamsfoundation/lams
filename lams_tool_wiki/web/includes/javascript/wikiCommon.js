@@ -39,7 +39,11 @@ function doRevert(id)
 
 function trim(str)
 {
-	return str.replace(/^\s+|\s+$/g, '');
+	var regX1 = /\n/gi;
+	var regX2 = /\t/gi;
+	str = new String(str);
+	str = str.replace(/^\s+|\s+$/g, '').replace(regX1, "").replace(regX2, "");
+	return str;
 }
 
 function doRemove(confirmMessage)

@@ -17,7 +17,7 @@ public class WikiPageContentDTO implements Comparable<WikiPageContentDTO> {
 
     public WikiPageContentDTO(WikiPageContent pageContent) {
 	this.uid = pageContent.getUid();
-	this.body = pageContent.getBody();
+	this.body = pageContent.getBody().trim();
 	this.editDate = pageContent.getEditDate();
 	this.version = pageContent.getVersion();
 

@@ -399,6 +399,13 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    // reset it to new toolContentId
 	    wiki.setToolContentId(toolContentId);
 	    wiki.setCreateBy(new Long(newUserUid.longValue()));
+	    
+	    // Making sure the wiki titles do not have trailing newline characters
+	    for (WikiPage wikiPage : wiki.getWikiPages()) {
+		String title = wikiPage.getTitle();
+		title = title.replaceAll("\n", "").replaceAll("\r", "").replaceAll("\t", "");
+		wikiPage.setTitle(title);
+	    }
 
 	    insertUnsavedWikiContent(wiki);
 

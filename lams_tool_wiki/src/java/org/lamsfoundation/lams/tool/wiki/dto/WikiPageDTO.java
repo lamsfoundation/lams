@@ -15,7 +15,7 @@ public class WikiPageDTO implements Comparable<WikiPageDTO> {
 
     public WikiPageDTO(WikiPage wikiPage) {
 	this.uid = wikiPage.getUid();
-	this.title = wikiPage.getTitle();
+	this.title = wikiPage.getTitle().trim();
 	this.editable = wikiPage.getEditable();
 	this.currentWikiContentDTO = new WikiPageContentDTO(wikiPage.getCurrentWikiContent());
 	this.javaScriptTitle = this.javaScriptEscape(wikiPage.getTitle());
@@ -67,8 +67,10 @@ public class WikiPageDTO implements Comparable<WikiPageDTO> {
     
     public String javaScriptEscape(String string)
     {
+	
+	String replaced = string.replaceAll("\n", "").replaceAll("\'", "`").replaceAll("\"","\\&quot;");;
 	//return string.replaceAll("\'", "\\\\'").replaceAll("\"","\\\\\"");
-	return string.replaceAll("\'", "`").replaceAll("\"","\\&quot;");
+	return replaced;
     }
 
 }

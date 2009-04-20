@@ -18,7 +18,7 @@
 </context-param>
 <context-param>
 	<param-name>parentContextKey</param-name>
-	<param-value>context.tool</param-value>
+	<param-value>context.central</param-value>
 </context-param>
 
     <filter>
