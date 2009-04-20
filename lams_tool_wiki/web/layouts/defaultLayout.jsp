@@ -12,7 +12,7 @@
 			<h1 class="no-tabs-below">
 				<fmt:message key="${pTitleKey}" />
 			</h1>
-			<div id="header-no-tabs"></div>
+			<div id="header"></div>
 			<div id="content">
 				<tiles:insert attribute="body" />
 			</div>
