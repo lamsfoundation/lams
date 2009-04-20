@@ -11,12 +11,56 @@
 	<title><fmt:message key="gradebook.title.window.lessonMonitor"/></title>
 	<lams:css/>
 	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
+	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	
 	<script type="text/javascript">
 	
+		var marksReleased = ${marksReleased};
+		
+		
+		function toggleRelease() {
+			
+			var conf;
+			if (marksReleased) {
+				conf = confirm('<fmt:message key="gradebook.monitoy.releasemarks.check2"/>');
+			} else {
+				conf = confirm('<fmt:message key="gradebook.monitoy.releasemarks.check"/>');
+			}
+			
+			if (conf) {
+				$.get("<lams:LAMSURL/>/gradebook/gradebookMonitoring.do", {dispatch:"toggleReleaseMarks", lessonID:"${lessonDetails.lessonID}"}, function(xml) {
+			    	if (xml=="success") {
+			    		
+			    		if (marksReleased) {
+			    			marksReleased = false;
+			    		} else {
+			    			marksReleased = true;
+			    		}
+			    		displayReleaseOption();
+			    	} else {
+			    		alert('<fmt:message key="error.releasemarks.fail"/>');
+			    	}
+			    });
+		    }
+		}
+		
+		function displayReleaseOption() {
+			if (marksReleased) {
+				document.getElementById("marksReleased").style.display="block";
+				document.getElementById("marksNotReleased").style.display="none";
+			} else {
+				document.getElementById("marksReleased").style.display="none";
+				document.getElementById("marksNotReleased").style.display="block";
+			}
+		}
+		
+	
 		jQuery(document).ready(function(){
   
+			displayReleaseOption();
+			
 			// Create the user view grid with sub grid for activities	
 			jQuery("#userView").jqGrid({
 				caption: '<fmt:message key="gradebook.gridtitle.usergrid"/>',
@@ -37,7 +81,7 @@
 			    	'<fmt:message key="gradebook.columntitle.name"/>', 
 			    	'<fmt:message key="gradebook.columntitle.progress"/>', 
 			    	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
-			    	'<fmt:message key="gradebook.columntitle.lessonFeedBack"/>', 
+			    	'<fmt:message key="gradebook.columntitle.lessonFeedback"/>', 
 			    	'<fmt:message key="gradebook.columntitle.mark"/>'
 			    ],
 			    colModel:[
@@ -168,6 +212,7 @@
 				    sortname: "activityId", 
 				    colNames:[
 				    	'', 
+				    	'',
 				    	'<fmt:message key="gradebook.columntitle.name"/>', 
 				    	'<fmt:message key="gradebook.columntitle.averageTimeTaken"/>', 
 				    	'<fmt:message key="gradebook.columntitle.competences"/>', 
@@ -175,6 +220,7 @@
 				    ],
 				    colModel:[
 				      {name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
+				      {name:'groupId', index:'groupId', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 					  {name:'rowName', index:'rowName', sortable:true, editable: false},
 					  {name:'avgTimeTaken', index:'avgTimeTaken', sortable:true, editable: false, width:80, align:"center"},
 					  {name:'competences', index:'competences', sortable:false, editable: false, hidden:true},
@@ -189,11 +235,13 @@
 					subGridRowExpanded: function(subgrid_id, row_id) {
 					   var subgrid_table_id;
 					   var activityID = jQuery("#activityView").getRowData(row_id)["id"];
+					   var groupID = jQuery("#activityView").getRowData(row_id)["groupId"];
 					   subgrid_table_id = subgrid_id+"_t";
+					   
 					   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
 					   jQuery("#"+subgrid_table_id).jqGrid({
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID,
+						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID + "&groupId=" + groupID,
 						     height: "100%",
 						     width: 600,
 						     cellEdit:true,
@@ -311,6 +359,17 @@
 				</fmt:message>
 			</h1> 
 			<br />
+			
+			<div id="marksNotReleased" style="display:none">
+				<a href="javascript:toggleRelease()"><fmt:message key="gradebook.monitor.releasemarks.1" /></a> <fmt:message key="gradebook.monitor.releasemarks.3" /><br />
+				<br />
+			</div>
+			
+			<div id="marksReleased" style="display:none">
+				<a href="javascript:toggleRelease()"><fmt:message key="gradebook.monitor.releasemarks.2" /></a> <fmt:message key="gradebook.monitor.releasemarks.3" /><br />
+				<br />
+			</div>
+			
 			<div style="width:700px; margin-left:auto; margin-right:auto;">
 				<table id="userView" class="scroll" ></table>
 				<div id="userViewPager" class="scroll" ></div>

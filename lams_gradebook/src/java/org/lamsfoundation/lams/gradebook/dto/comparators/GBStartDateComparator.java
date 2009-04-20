@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import org.lamsfoundation.lams.gradebook.dto.GBActivityGridRowDTO;
+import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 
 @SuppressWarnings("unchecked")
 public class GBStartDateComparator implements Comparator {
@@ -36,10 +37,18 @@ public class GBStartDateComparator implements Comparator {
 	    Date startDate1 = ((GBActivityGridRowDTO) actGridRow).getStartDate();
 	    Date startDate2 = ((GBActivityGridRowDTO) anotherActGridRow).getStartDate();
 
-	    Long id1 = ((GBActivityGridRowDTO) actGridRow).getId();
-	    Long id2 = ((GBActivityGridRowDTO) anotherActGridRow).getId();
-
 	    if (startDate1 == null && startDate2 == null) {
+
+		Long id1 = null;
+		Long id2 = null;
+
+		try {
+		    id1 = Long.parseLong(((GradebookGridRowDTO) actGridRow).getId());
+		    id2 = Long.parseLong(((GradebookGridRowDTO) anotherActGridRow).getId());
+		} catch (NumberFormatException e) {
+		    return 0;
+		}
+
 		if (id1 == null || id2 == null) {
 		    return 0;
 		}

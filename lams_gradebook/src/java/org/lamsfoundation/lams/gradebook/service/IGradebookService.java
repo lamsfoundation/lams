@@ -64,9 +64,10 @@ public interface IGradebookService {
      * 
      * @param lesson
      * @param activity
+     * @param groupId
      * @return
      */
-    public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity);
+    public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity, Long groupId);
     
     /**
      * Gets the user rows and the user's entire lesson mark for all users 

@@ -74,7 +74,7 @@
 					     	'<fmt:message key="gradebook.columntitle.learnerName"/>',
 					     	'<fmt:message key="gradebook.columntitle.progress"/>', 
 					     	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
-					     	'<fmt:message key="gradebook.columntitle.lessonFeedBack"/>', 
+					     	'<fmt:message key="gradebook.columntitle.lessonFeedback"/>', 
 			    			'<fmt:message key="gradebook.columntitle.mark"/>'
 					     ],
 					     colModel:[

@@ -63,8 +63,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action path="/gradebookMonitoring" parameter="dispatch"
  *                scope="request" name="monitoringForm" validate="false"
  * 
- * @struts:action-forward name="monitorgradebook"
- *                        path="/gradebookMonitor.jsp"
+ * @struts:action-forward name="monitorgradebook" path="/gradebookMonitor.jsp"
  * @struts:action-forward name="monitorcoursegradebook"
  *                        path="/gradebookCourseMonitor.jsp"
  * @struts:action-forward name="error" path=".error"
@@ -108,6 +107,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
 		LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
 		request.setAttribute("lessonDetails", lessonDetatilsDTO);
+		request.setAttribute("marksReleased", lesson.getMarksReleased());
+		
 
 		return mapping.findForward("monitorgradebook");
 	    }
@@ -116,7 +117,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    return mapping.findForward("error");
 	}
     }
-    
+
     @SuppressWarnings("unchecked")
     public ActionForward courseMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -124,15 +125,15 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	try {
 	    initServices();
 	    Integer oranisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	    
+
 	    logger.debug("request monitorGradebook for organisation: " + oranisationID.toString());
 	    UserDTO user = getUser();
 	    if (user == null) {
 		logger.error("User missing from session. ");
 		return mapping.findForward("error");
 	    } else {
-		
-		Organisation organisation = (Organisation)userService.findById(Organisation.class, oranisationID);
+
+		Organisation organisation = (Organisation) userService.findById(Organisation.class, oranisationID);
 		if (organisation == null) {
 		    logger.error("Organisation " + oranisationID + " does not exist. Unable to load gradebook");
 		    return mapping.findForward("error");
@@ -146,17 +147,17 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 		}
 
 		logger.debug("user is staff");
-		
+
 		request.setAttribute("organisationID", oranisationID);
 		request.setAttribute("organisationName", organisation.getName());
-		
+
 		return mapping.findForward("monitorcoursegradebook");
 	    }
 	} catch (Exception e) {
 	    logger.error("Failed to load gradebook monitor", e);
 	    return mapping.findForward("error");
 	}
-    } 
+    }
 
     /**
      * Updates a user's mark or feedback for an entire lesson
@@ -174,17 +175,17 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
 	String markStr = WebUtil.readStrParam(request, GradebookConstants.PARAM_MARK, true);
-	String feedback =  WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
+	String feedback = WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
 	Lesson lesson = lessonService.getLesson(lessonID);
-	User learner = (User)userService.findById(User.class, userID);
+	User learner = (User) userService.findById(User.class, userID);
 
 	if (lesson != null || learner != null) {
-	    
+
 	    if (markStr != null && !markStr.equals("")) {
 		Double mark = Double.parseDouble(markStr);
 		gradebookService.updateUserLessonGradebookMark(lesson, learner, mark);
 	    }
-	    
+
 	    if (feedback != null) {
 		gradebookService.updateUserLessonGradebookFeedback(lesson, learner, feedback);
 	    }
@@ -196,8 +197,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Updates a user's mark or feedback for an activity, 
-     * then aggregates their total lesson mark
+     * Updates a user's mark or feedback for an activity, then aggregates their
+     * total lesson mark
      * 
      * @param mapping
      * @param form
@@ -210,43 +211,77 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 	initServices();
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	
+
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
 
 	Long activityID = null;
 	Integer userID = null;
-	
+
 	// Fetch the id based on which grid it came from
 	if (view == GBGridView.MON_ACTIVITY) {
-	    activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
+	    String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	    
+	    // Splitting the rowID param to get the activity/group id pair
+	    String[] split = rowID.split("_");
+	    if (split.length == 2) {
+		activityID = Long.parseLong(split[0]);
+	    } else {
+		activityID = Long.parseLong(rowID);
+	    }
+	    
+	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
+
 	} else if (view == GBGridView.MON_USER) {
 	    activityID = WebUtil.readLongParam(request, GradebookConstants.PARAM_ID);
 	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 	}
 
 	String markStr = WebUtil.readStrParam(request, GradebookConstants.PARAM_MARK, true);
-	String feedback =  WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
+	String feedback = WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
 
 	Activity activity = monitoringService.getActivityById(activityID);
-	User learner = (User)userService.findById(User.class, userID);
+	User learner = (User) userService.findById(User.class, userID);
 	Lesson lesson = lessonService.getLesson(lessonID);
 
 	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
-	    
+
 	    if (markStr != null && !markStr.equals("")) {
 		Double mark = Double.parseDouble(markStr);
 		gradebookService.updateUserActivityGradebookMark(lesson, learner, activity, mark);
 	    }
-	    
+
 	    if (feedback != null) {
 		gradebookService.updateUserActivityGradebookFeedback(activity, learner, feedback);
 	    }
-	    
+
 	} else {
 	    logger.error("Lesson or activity missing for lesson: " + lessonID + "and activity: " + activityID);
 	}
+	return null;
+    }
+    
+    /**
+     * Toggles the release mark flag for a lesson
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public ActionForward toggleReleaseMarks(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws Exception {
+	initServices();
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+
+	Lesson lesson = lessonService.getLesson(lessonID);
+	
+	lesson.setMarksReleased(!lesson.getMarksReleased());
+	userService.save(lesson);
+
+	response.setContentType("text/plain");
+	response.getWriter().write("success");
 	return null;
     }
 
@@ -270,7 +305,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	getMonitoringServiceService();
 	getGradebookService();
     }
-    
+
     private IUserManagementService getUserService() {
 	if (userService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
@@ -288,7 +323,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	}
 	return lessonService;
     }
-    
+
     private IMonitoringService getMonitoringServiceService() {
 	if (monitoringService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
@@ -297,7 +332,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	}
 	return monitoringService;
     }
-    
+
     private IGradebookService getGradebookService() {
 	if (gradebookService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()

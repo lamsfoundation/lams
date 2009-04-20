@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -221,11 +222,24 @@ public class GradebookAction extends LamsDispatchAction {
 	    if (view == GBGridView.MON_USER || view == GBGridView.MON_COURSE) {
 		gradebookUserDTOs = gradebookService.getGBUserRowsForLesson(lesson);
 	    } else if (view == GBGridView.MON_ACTIVITY) {
-		Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-
+		String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+		
+		Long activityID = null;
+		
+		// Splitting the rowID param to get the activity/group id pair
+		String[] split = rowID.split("_");
+		if (split.length == 2) {
+		    activityID = Long.parseLong(split[0]);
+		} else {
+		    activityID = Long.parseLong(rowID);
+		}
+		
+		// Getting the group id if it is there
+		Long groupId = WebUtil.readLongParam(request, GradebookConstants.PARAM_GROUP_ID, true);
+		
 		Activity activity = monitoringService.getActivityById(activityID);
 		if (activity != null && activity instanceof ToolActivity) {
-		    gradebookUserDTOs = gradebookService.getGBUserRowsForActivity(lesson, (ToolActivity)activity);
+		    gradebookUserDTOs = gradebookService.getGBUserRowsForActivity(lesson, (ToolActivity)activity, groupId);
 		} else {
 		    // return null and the grid will report an error
 		    logger.error("No activity found for: " + activityID);

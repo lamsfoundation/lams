@@ -45,6 +45,8 @@ import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -156,15 +158,46 @@ public class GradebookService implements IGradebookService {
 		.getActivityId());
 
 	if (firstActivity.isToolActivity() && firstActivity instanceof ToolActivity) {
-	    GBActivityGridRowDTO activityDTO = getGradebookActivityDTO((ToolActivity) firstActivity, lesson);
-	    gradebookActivityDTOs.add(activityDTO);
+	    Grouping grouping = firstActivity.getGrouping();
+	    if (grouping != null) {
+		Set<Group> groups = (Set<Group>) grouping.getGroups();
+		if (groups != null) {
+
+		    for (Group group : groups) {
+			GBActivityGridRowDTO activityDTO = getGradebookActivityDTO((ToolActivity) firstActivity,
+				lesson, group.getGroupName(), group.getGroupId());
+			gradebookActivityDTOs.add(activityDTO);
+		    }
+
+		}
+	    } else {
+		GBActivityGridRowDTO activityDTO = getGradebookActivityDTO((ToolActivity) firstActivity, lesson, null,
+			null);
+		gradebookActivityDTOs.add(activityDTO);
+	    }
 	}
 
 	for (Activity activity : activities) {
 	    if (activity.getActivityId().longValue() != firstActivity.getActivityId().longValue()
 		    && activity instanceof ToolActivity) {
-		GBActivityGridRowDTO activityDTO = getGradebookActivityDTO((ToolActivity) activity, lesson);
-		gradebookActivityDTOs.add(activityDTO);
+
+		Grouping grouping = activity.getGrouping();
+		if (grouping != null) {
+		    Set<Group> groups = (Set<Group>) grouping.getGroups();
+		    if (groups != null) {
+
+			for (Group group : groups) {
+			    GBActivityGridRowDTO activityDTO = getGradebookActivityDTO((ToolActivity) activity, lesson,
+				    group.getGroupName(), group.getGroupId());
+			    gradebookActivityDTOs.add(activityDTO);
+			}
+
+		    }
+		} else {
+		    GBActivityGridRowDTO activityDTO = getGradebookActivityDTO((ToolActivity) activity, lesson, null,
+			    null);
+		    gradebookActivityDTOs.add(activityDTO);
+		}
 	    }
 	}
 
@@ -177,17 +210,27 @@ public class GradebookService implements IGradebookService {
      *      org.lamsfoundation.lams.learningdesign.Activity)
      */
     @SuppressWarnings("unchecked")
-    public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity) {
+    public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity, Long groupId) {
 
 	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 
-	Set<User> learners = (Set<User>) lesson.getAllLearners();
+	Set<User> learners = null;
+	if (groupId != null) {
+	    Group group = (Group) userService.findById(Group.class, groupId);
+	    if (group != null) {
+		learners = (Set<User>) group.getUsers();
+	    } else {
+		learners = (Set<User>) lesson.getAllLearners();
+	    }
+	} else {
+	    learners = (Set<User>) lesson.getAllLearners();
+	}
 
 	if (learners != null) {
 	    for (User learner : learners) {
 		GBUserGridRowDTO gUserDTO = new GBUserGridRowDTO();
 		gUserDTO.setRowName(learner.getLastName() + " " + learner.getFirstName());
-		gUserDTO.setId(new Long(learner.getUserId()));
+		gUserDTO.setId(learner.getUserId().toString());
 
 		GradebookUserActivity gradebookUserActivity = gradebookDAO.getGradebookUserDataForActivity(activity
 			.getActivityId(), learner.getUserId());
@@ -242,7 +285,7 @@ public class GradebookService implements IGradebookService {
 
 		for (User learner : learners) {
 		    GBUserGridRowDTO gradebookUserDTO = new GBUserGridRowDTO();
-		    gradebookUserDTO.setId(new Long(learner.getUserId()));
+		    gradebookUserDTO.setId(learner.getUserId().toString());
 		    gradebookUserDTO.setRowName(learner.getLastName() + " " + learner.getFirstName());
 
 		    // Setting the status and time taken for the user's lesson
@@ -374,13 +417,13 @@ public class GradebookService implements IGradebookService {
 		    if (!(view == GBGridView.MON_COURSE
 			    && (lesson.getLessonClass().isStaffMember(user) || userService.isUserInRole(user
 				    .getUserId(), organisation.getOrganisationId(), Role.GROUP_MANAGER)) || view == GBGridView.LRN_COURSE
-			    && lesson.getAllLearners().contains(user))) {
+			    && lesson.getAllLearners().contains(user) && lesson.getMarksReleased())) {
 			continue;
 		    }
 
 		    GBLessonGridRowDTO lessonRow = new GBLessonGridRowDTO();
 		    lessonRow.setLessonName(lesson.getLessonName());
-		    lessonRow.setId(lesson.getLessonId());
+		    lessonRow.setId(lesson.getLessonId().toString());
 		    lessonRow.setStartDate(getLocaleDateString(user, lesson.getStartDateTime()));
 
 		    if (view == GBGridView.MON_COURSE) {
@@ -466,14 +509,31 @@ public class GradebookService implements IGradebookService {
      * @param lesson
      * @return
      */
-    private GBActivityGridRowDTO getGradebookActivityDTO(ToolActivity activity, Lesson lesson) {
-	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
-	gactivityDTO.setId(activity.getActivityId());
-	gactivityDTO.setRowName(activity.getTitle());
+    private GBActivityGridRowDTO getGradebookActivityDTO(ToolActivity activity, Lesson lesson, String groupName,
+	    Long groupId) {
 
-	// Setting averages 
-	gactivityDTO.setAverageMark(gradebookDAO.getAverageMarkForActivity(activity.getActivityId()));
-	gactivityDTO.setAverageTimeTaken(gradebookDAO.getAverageDurationForActivity(activity.getActivityId()));
+	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
+	gactivityDTO.setId(activity.getActivityId().toString());
+
+	// Setting name
+	// If grouped acitivty, append group name
+	gactivityDTO.setRowName(activity.getTitle());
+	if (groupName != null && groupId != null) {
+	    gactivityDTO.setGroupId(groupId);
+	    gactivityDTO.setRowName(activity.getTitle() + " (" + groupName + ")");
+	    
+	    // Need to make the id unique, so appending the group id for this row
+	    gactivityDTO.setId(activity.getActivityId().toString() + "_" + groupId.toString());
+	    
+	    // Setting averages for group
+	    gactivityDTO.setAverageMark(gradebookDAO.getAverageMarkForGroupedActivity(activity.getActivityId(), groupId));
+	    gactivityDTO.setAverageTimeTaken(gradebookDAO.getAverageDurationForGroupedActivity(activity.getActivityId(), groupId));
+	
+	} else {
+	    // Setting averages for lesson
+	    gactivityDTO.setAverageMark(gradebookDAO.getAverageMarkForActivity(activity.getActivityId()));
+	    gactivityDTO.setAverageTimeTaken(gradebookDAO.getAverageDurationForActivity(activity.getActivityId()));
+	}
 
 	String monitorUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + activity.getTool().getMonitorUrl() + "?"
 		+ AttributeNames.PARAM_CONTENT_FOLDER_ID + "=" + lesson.getLearningDesign().getContentFolderID() + "&"
@@ -513,8 +573,17 @@ public class GradebookService implements IGradebookService {
 		+ learner.getUserId());
 
 	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
-	gactivityDTO.setId(activity.getActivityId());
+	gactivityDTO.setId(activity.getActivityId().toString());
+
+	// Set the title
+	// If it is a grouped activity, and the user has a group get the group title as well
 	gactivityDTO.setRowName(activity.getTitle());
+	if (activity.getGrouping() != null) {
+	    Group group = activity.getGroupFor(learner);
+	    if (group != null) {
+		gactivityDTO.setRowName(activity.getTitle() + " (" + group.getGroupName() + ")");
+	    }
+	}
 
 	GradebookUserActivity gradebookActivity = gradebookDAO.getGradebookUserDataForActivity(
 		activity.getActivityId(), learner.getUserId());
@@ -557,10 +626,10 @@ public class GradebookService implements IGradebookService {
 			+ activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
 			+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
 		gactivityDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
-		
+
 		if (activityState == LearnerProgress.ACTIVITY_ATTEMPTED) {
 		    gactivityDTO.setStartDate(learnerProgress.getAttemptedActivities().get(activity));
-		}else {
+		} else {
 		    gactivityDTO.setStartDate(learnerProgress.getCompletedActivities().get(activity).getStartDate());
 		}
 	    }

@@ -34,7 +34,7 @@ public abstract class GradebookGridRowDTO{
     public static final String CELL_EMPTY = "-";
     
     // The id for a row, might be activityId, userId, lessonID etc
-    public Long id;
+    public String id;
     
     // The name for the row, every gradebook row has some sort of name
     // Be it the user's name, the activity name, the lesson name etc
@@ -101,11 +101,11 @@ public abstract class GradebookGridRowDTO{
         this.mark = mark;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

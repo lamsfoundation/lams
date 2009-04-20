@@ -46,6 +46,15 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
     // Properties for activity view
     String monitorUrl;
+    Long groupId;
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
 
     public GBActivityGridRowDTO() {
     }
@@ -71,7 +80,8 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
-	   
+	    
+	    ret.add(groupId != null ? groupId.toString() : "");
 	    if (monitorUrl != null && monitorUrl.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + monitorUrl + "\",\"" + rowName + "\",796,570)'>"
 			+ rowName + "</a>");
