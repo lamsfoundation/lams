@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.mindmap.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 
 /**
@@ -39,4 +38,6 @@ public interface IMindmapSessionDAO extends IBaseDAO {
 	MindmapSession getBySessionId(Long toolSessionId);
 
 	void deleteBySessionID(Long toolSessionID);
+	
+	public MindmapSession getSessionByMindmapId(Long mindmapId);
 }

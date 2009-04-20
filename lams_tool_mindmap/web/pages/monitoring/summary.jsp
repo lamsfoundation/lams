@@ -132,16 +132,9 @@
 					</td>
 					
 					<td width="40%">
-						<c:choose>
-							<c:when test="${mindmapUser.finishedActivity != true}">
-								<fmt:message key="label.notAvailable" />
-							</c:when>
-							<c:otherwise>
-								<a href="./monitoring.do?dispatch=showMindmap&amp;userUID=${mindmapUser.uid}&amp;toolContentID=${dto.toolContentId}&amp;contentFolderID=${contentFolderID}">
-									<fmt:message key="label.view" />
-								</a>
-							</c:otherwise>
-						</c:choose>
+						<a href="./learning.do?mode=learner&amp;toolSessionID=${toolSessionID}&amp;monitor=true">
+							<fmt:message key="label.view" />
+						</a>
 					</td>
 					
 					<td width="30%">

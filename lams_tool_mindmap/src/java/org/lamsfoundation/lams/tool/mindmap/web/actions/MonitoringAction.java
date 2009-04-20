@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.mindmap.dto.MindmapSessionDTO;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapUserDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
+import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 import org.lamsfoundation.lams.tool.mindmap.service.IMindmapService;
 import org.lamsfoundation.lams.tool.mindmap.service.MindmapServiceProxy;
@@ -81,6 +82,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
+	MindmapSession session = mindmapService.getSessionByMindmapId(mindmap.getUid());
 	
 	if (mindmap == null) {
 	    log.error("unspecified(): Mindmap is not found!");
@@ -100,6 +102,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("mindmapDTO", mindmapDTO);
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
+	request.setAttribute("toolSessionID", session.getUid());
 
 	return mapping.findForward("success");
     }
@@ -271,14 +274,15 @@ public class MonitoringAction extends LamsDispatchAction {
      * @return null
      */
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) {	
+	
+	Long toolContentId = WebUtil.readLongParam(request, "mindmapId", false);
+	Mindmap mindmap = mindmapService.getMindmapByUid(toolContentId);
 	
 	Long userId = WebUtil.readLongParam(request, "userId", false);
-	Long toolContentId = WebUtil.readLongParam(request, "mindmapId", false);
-	String mindmapContent = WebUtil.readStrParam(request, "content", false);
-	
-	Mindmap mindmap = mindmapService.getMindmapByUid(toolContentId);
 	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
+	
+	String mindmapContent = WebUtil.readStrParam(request, "content", false);
 	
 	if (!mindmap.isMultiUserMode()) {
 	    // Saving Mindmap data to XML

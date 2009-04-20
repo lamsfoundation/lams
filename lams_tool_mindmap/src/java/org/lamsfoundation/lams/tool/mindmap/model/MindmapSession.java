@@ -31,18 +31,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
- * 
  * Represents the tool session.
  * 
  * @hibernate.class table="tl_lamind10_session"
  */
-
 public class MindmapSession implements java.io.Serializable {
 
 	private static Logger log = Logger.getLogger(MindmapSession.class);
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4407078136514639026L;
 
 	// Fields

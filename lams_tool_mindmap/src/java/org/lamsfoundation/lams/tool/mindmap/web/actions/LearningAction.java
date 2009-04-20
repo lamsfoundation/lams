@@ -227,6 +227,10 @@ public class LearningAction extends LamsDispatchAction {
 		cloneMindmapNodesForRuntime(fromMindmapNode, null, mindmap, mindmap, mindmapUser);
 	    }
 	}
+	else {
+	    boolean isMonitor = WebUtil.readBooleanParam(request, "monitor", false);
+	    request.setAttribute("isMonitor", isMonitor);
+	}
 
 	return mapping.findForward("mindmap");
     }

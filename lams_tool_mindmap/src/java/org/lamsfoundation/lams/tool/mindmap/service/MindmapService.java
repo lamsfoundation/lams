@@ -934,4 +934,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public MessageService getMindmapMessageService() {
 	return mindmapMessageService;
     }
+    
+    public MindmapSession getSessionByMindmapId(Long mindmapId)
+    {
+	return mindmapSessionDAO.getSessionByMindmapId(mindmapId);
+    }
 }

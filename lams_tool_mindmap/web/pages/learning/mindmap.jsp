@@ -116,21 +116,34 @@
 		</center>
 		
 		<c:choose>
-			<c:when test="${reflectOnActivity}">
+			<c:when test="${isMonitor}">
 				<div class="space-bottom-top align-right">
-					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-						<span class="nextActivity"><fmt:message>button.continue</fmt:message></span>
-					</html:link>
+					<html:button styleClass="button" property="backButton" onclick="history.go(-1)">
+						<fmt:message>button.back</fmt:message>
+					</html:button>
 				</div>
 			</c:when>
-		
+			
 			<c:otherwise>
-				<div class="space-bottom-top align-right">
-					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-						<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
-					</html:link>
-				</div>
+				<c:choose>
+					<c:when test="${reflectOnActivity}">
+						<div class="space-bottom-top align-right">
+							<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+								<span class="nextActivity"><fmt:message>button.continue</fmt:message></span>
+							</html:link>
+						</div>
+					</c:when>
+		
+					<c:otherwise>
+						<div class="space-bottom-top align-right">
+							<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+								<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+							</html:link>
+						</div>
+					</c:otherwise>
+				</c:choose>
 			</c:otherwise>
+			
 		</c:choose>
 
 	</html:form>

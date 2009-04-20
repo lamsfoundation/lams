@@ -223,4 +223,6 @@ public interface IMindmapService {
     public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId);
     
     public Long getLastGlobalIdByMindmapId(Long mindmapId);
+    
+    public MindmapSession getSessionByMindmapId(Long mindmapId);
 }

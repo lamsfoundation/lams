@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.dao.IMindmapSessionDAO;
-import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 
 /**
@@ -38,6 +37,9 @@ public class MindmapSessionDAO extends BaseDAO implements IMindmapSessionDAO {
 
 	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
 			+ MindmapSession.class.getName() + " where session_id = ?";
+
+	public static final String SQL_QUERY_FIND_BY_MINDMAP_ID = "from "
+		+ MindmapSession.class.getName() + " ms where ms.mindmap.uid = ?";
 	
 	public void saveOrUpdate(MindmapSession session) {
 		this.getHibernateTemplate().saveOrUpdate(session);
@@ -58,6 +60,14 @@ public class MindmapSessionDAO extends BaseDAO implements IMindmapSessionDAO {
 			this.getHibernateTemplate().delete(session);
 			this.getHibernateTemplate().flush();
 		}
+	}
+	
+	public MindmapSession getSessionByMindmapId(Long mindmapId) {
+		List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_BY_MINDMAP_ID, mindmapId);
+		if (list == null || list.isEmpty())
+		    return null;
+		
+		return (MindmapSession) list.get(0);
 	}
 	
 }
