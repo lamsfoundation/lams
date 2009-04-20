@@ -139,6 +139,9 @@ public class Lesson implements Serializable {
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean liveEditEnabled;
     
+    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    private Boolean marksReleased;
+    
     //---------------------------------------------------------------------
     // constructors
     //---------------------------------------------------------------------
@@ -619,5 +622,17 @@ public class Lesson implements Serializable {
 
     public void setGradebookUserLessons(Set<GradebookUserLesson> gradebookUserLessons) {
         this.gradebookUserLessons = gradebookUserLessons;
+    }
+
+    /** 
+     * @hibernate.property type="java.lang.Boolean"  column="marks_released"
+     *            	       length="1"
+     */
+    public Boolean getMarksReleased() {
+        return marksReleased;
+    }
+
+    public void setMarksReleased(Boolean marksReleased) {
+        this.marksReleased = marksReleased;
     }
 }

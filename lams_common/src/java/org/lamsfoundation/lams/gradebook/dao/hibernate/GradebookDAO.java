@@ -56,6 +56,12 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     private static final String GET_AVERAGE_MARK_FOR_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
+   
+    private static final String GET_AVERAGE_MARK_FOR_GROUPED_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact, GroupUser gu, Group grp where "
+	    + "gact.activity.activityId=:activityID and grp.groupId=:groupID and gu.user=gact.learner and gu.group=grp";
+
+    private static final String GET_AVERAGE_COMPLETION_TIME_GROUPED_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg, Activity act, Group grp, GroupUser gu where "
+	    + "compProg.activity.activityId=:activityID and grp.groupId=:groupID and gu.user=compProg.learnerProgress.user and gu.group=grp";
 
     @SuppressWarnings("unchecked")
     public GradebookUserActivity getGradebookUserDataForActivity(Long activityID, Integer userID) {
@@ -185,8 +191,8 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @SuppressWarnings("unchecked")
     public Double getAverageMarkForActivity(Long activityID) {
-	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_ACTIVTY).setLong("activityID", activityID.longValue())
-		.list();
+	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_ACTIVTY).setLong("activityID",
+		activityID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0)
@@ -195,5 +201,50 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
 	return 0.0;
 
+    }
+
+    @SuppressWarnings("unchecked")
+    public Double getAverageMarkForGroupedActivity(Long activityID, Long groupID) {
+	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_GROUPED_ACTIVTY).setLong("activityID",
+		activityID.longValue()).setLong("groupID", groupID.longValue()).list();
+
+	if (result != null) {
+	    if (result.size() > 0)
+		return (Double) result.get(0);
+	}
+
+	return 0.0;
+    }
+
+    @SuppressWarnings("unchecked")
+    public long getAverageDurationForGroupedActivity(Long activityID, Long groupID) {
+	List<Object[]> result = (List<Object[]>) getSession().createQuery(GET_AVERAGE_COMPLETION_TIME_GROUPED_ACTIVITY)
+		.setLong("activityID", activityID.longValue()).setLong("groupID", groupID.longValue()).list();
+
+	if (result != null) {
+	    if (result.size() > 0) {
+
+		long sum = 0;
+		long count = 0;
+		for (Object[] dateObjs : result) {
+		    if (dateObjs != null && dateObjs.length == 2) {
+			Date finishDate = (Date) dateObjs[0];
+			Date startDate = (Date) dateObjs[1];
+
+			if (startDate != null && finishDate != null) {
+
+			    sum += finishDate.getTime() - startDate.getTime();
+			    count++;
+			}
+		    }
+		}
+
+		if (count > 0) {
+		    return sum / count;
+		}
+	    }
+
+	}
+	return 0;
     }
 }

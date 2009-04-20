@@ -42,7 +42,8 @@
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Activity.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/BranchActivityEntry.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/BranchCondition.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>				
+				<value>classpath:org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>		
+				<value>classpath:org/lamsfoundation/lams/learningdesign/GroupUser.hbm.xml</value>			
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Grouping.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/LearningDesign.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Competence.hbm.xml</value>

@@ -61,6 +61,9 @@
 		<property name="lockedForEdit" type="java.lang.Boolean"
         	column="locked_for_edit" length="1">
     	</property>
+    	<property name="marksReleased" type="java.lang.Boolean"
+        	column="marks_released" length="1">
+    	</property>
 		
 		<!-- Associations -->
 		

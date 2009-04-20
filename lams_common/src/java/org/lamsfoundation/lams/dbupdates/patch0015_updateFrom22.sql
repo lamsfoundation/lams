@@ -111,6 +111,9 @@ CREATE TABLE lams_gradebook_user_lesson (
 	, PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
+-- LDEV-2207 ------------ Adding flag in lesson to release marks for gradebook
+ALTER TABLE lams_lesson ADD COLUMN marks_released TINYINT DEFAULT 0;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

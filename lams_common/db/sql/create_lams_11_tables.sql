@@ -661,6 +661,7 @@ CREATE TABLE lams_lesson (
      , learner_im_avail TINYINT(1) DEFAULT 0
 	 , live_edit_enabled TINYINT(1) DEFAULT 0
      , locked_for_edit TINYINT DEFAULT 0
+	 , marks_released TINYINT DEFAULT 0
      , version INTEGER DEFAULT 1
      , PRIMARY KEY (lesson_id)
      , INDEX (learning_design_id)
