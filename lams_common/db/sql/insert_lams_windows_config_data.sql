@@ -230,16 +230,16 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('EnableFlash','true', 'config.flash.enable', 'config.header.features', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('AuthoringScreenSize','800x600', 'config.authoring.screen.size', 'config.header.look.feel', 'STRING', 1);
+values ('AuthoringScreenSize','1024x768', 'config.authoring.screen.size', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('MonitorScreenSize','800x600', 'config.monitor.screen.size', 'config.header.look.feel', 'STRING', 1);
+values ('MonitorScreenSize','1024x768', 'config.monitor.screen.size', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LearnerScreenSize','800x600', 'config.learner.screen.size', 'config.header.look.feel', 'STRING', 1);
+values ('LearnerScreenSize','1024x768', 'config.learner.screen.size', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('AdminScreenSize','800x600', 'config.admin.screen.size', 'config.header.look.feel', 'STRING', 1);
+values ('AdminScreenSize','1024x768', 'config.admin.screen.size', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('SMTPUser','', 'config.smtp.user', 'config.header.email', 'STRING', 0);
