@@ -574,6 +574,17 @@ class MonitorModel extends Observable{
 		_indexSelected = idxSelected;
 	}
 	
+	public function setButtonState(btnName:String, btnState:Boolean, btnVisible:Boolean, tabId:Number) {
+		setChanged();
+		infoObj = {};
+		infoObj.updateType = "BUTTON";
+		infoObj.tabID = tabId;
+		infoObj.button = btnName;
+		infoObj.buttonstate = btnState;
+		infoObj.buttonvisible = btnVisible;
+		notifyObservers(infoObj);
+	}
+	
 	public function sendButtonUpdate():Void {
 		//Set flag for notify observers
 		setChanged();

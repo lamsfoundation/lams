@@ -158,7 +158,6 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					if (infoObj.tabID == _tabID && !mm.locked){
 						hideMainExp(mm);
 						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", true);
-						mm.broadcastViewUpdate("TIMECHARTSHOWHIDE", true);
 						adjustLearnerPanel(mm);
 						
 						if (mm.activitiesDisplayed.isEmpty()){
@@ -212,12 +211,15 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 					break;
 				case 'DRAW_DESIGN' :
 					Debugger.log("DRAW_DESIGN received",Debugger.CRITICAL,"update","LearnerTabView");
-					if (infoObj.tabID == _tabID && !mm.locked){
-						adjustLearnerPanel(mm);
-						if (mm.isDesignDrawn) {
-							clearCanvas(mm);
+					if (infoObj.tabID == _tabID){
+						showEnableTimeChartButtonIfProgressMade(mm, infoObj);
+						if (!mm.locked) {
+							adjustLearnerPanel(mm);
+							if (mm.isDesignDrawn) {
+								clearCanvas(mm);
+							}
+							drawAllLearnersDesign(mm, infoObj.tabID);
 						}
-						drawAllLearnersDesign(mm, infoObj.tabID);
 					}
 					break;
 				case 'DRAW_ALL' :
@@ -231,6 +233,20 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 				default :
 					Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.LearnerTabView');
 			}
+	}
+	
+	// show the TimeChart btn, but only enable it if one of the learners has made enough progress to populate the graphs/charts
+	private function showEnableTimeChartButtonIfProgressMade(mm:MonitorModel, infoObj:Object) { 
+		if (mm.getlearnerTabActArr().length > 0) {
+			var learnerTabActArr = mm.getlearnerTabActArr();
+			for (var i=0; i<learnerTabActArr.length; i++) {
+				if (learnerTabActArr[i].getAttemptedActivities().length > 1 || learnerTabActArr[i].getCompletedActivities().length >= 1) {
+					mm.setButtonState("viewAllTimeChart_btn", true, true, _tabID);
+					return;
+				}
+			}
+		}
+		mm.setButtonState("viewAllTimeChart_btn", false, true, _tabID);
 	}
 	
 	private function drawAll(){

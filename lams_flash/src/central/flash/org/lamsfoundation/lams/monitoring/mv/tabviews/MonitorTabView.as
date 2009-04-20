@@ -142,7 +142,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.MonitorTabView extends Comm
 						mm.getMonitor().getMV().getMonitorSequenceScp()._visible = true;
 						hideMainExp(mm);
 						mm.broadcastViewUpdate("JOURNALSSHOWHIDE", false);
-						mm.broadcastViewUpdate("TIMECHARTSHOWHIDE", false);
+						mm.setButtonState("viewAllTimeChart_btn", true, false, _tabID);
 						
 						if (mm.activitiesDisplayed.isEmpty() || mm.transitionsDisplayed.isEmpty()){
 							redrawCanvas(o.hasChanged());

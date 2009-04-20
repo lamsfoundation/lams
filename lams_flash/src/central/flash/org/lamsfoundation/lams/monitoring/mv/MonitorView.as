@@ -206,19 +206,29 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 			case 'EXPORTSHOWHIDE' :
 				exportShowHide(infoObj.data);
 				break;
-			case 'TIMECHARTSHOWHIDE' :
-				timeChartShowHide(infoObj.data);
-				break;
 			case 'JOURNALSSHOWHIDE' :
 				journalsShowHide(infoObj.data);
 				break;
 			case 'EDITFLYSHOWHIDE' :
 				editFlyShowHide(infoObj.data);
 				break;
+			case 'BUTTON' :
+				if (infoObj.tabID == mm.getSelectedTab()){
+					setButtonState(infoObj);
+				}
+				break;
             default :
                 Debugger.log('unknown update type :' + infoObj.updateType,Debugger.CRITICAL,'update','org.lamsfoundation.lams.MonitorView');
 		}
 
+	}
+	
+	/**
+    * Sets a button's state, called from update
+    */
+	private function setButtonState(infoObj:Object):Void{
+		this[infoObj.button].enabled = infoObj.buttonstate;
+		this[infoObj.button].visible = (infoObj.buttonvisible != null) ? infoObj.buttonvisible : true ;
 	}
 	
 	/**
@@ -230,10 +240,6 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	
 	private function exportShowHide(v:Boolean):Void{
 		exportPortfolio_btn.visible = v;
-	}
-	
-	private function timeChartShowHide(v:Boolean):Void{
-		viewAllTimeChart_btn.visible = v;
 	}
 	
 	private function journalsShowHide(v:Boolean):Void{
