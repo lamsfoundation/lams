@@ -13,7 +13,7 @@
 </script>
 
 <c:if test="${pixlrUserDTO.finishedActivity and pixlrDTO.reflectOnActivity and pixlrUserDTO.finishedReflection}">
-<html:form action="/learning" method="post" styleId="reflectEditForm" styleId="messageForm">
+<html:form action="/learning" method="post" styleId="reflectEditForm">
 	<html:hidden property="dispatch" value="openNotebook" />
 	<html:hidden property="mode" value="${mode}" />	
 	<html:hidden property="toolSessionID" styleId="toolSessionID"/>
