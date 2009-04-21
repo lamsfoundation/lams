@@ -1079,7 +1079,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 				}
 
 				// TODO: Maybe add learningDesignID and serverURL to window title to handle multiple LAMS(s) running in same browser session.
-				JsPopup.getInstance().launchPopupWindow(url, 'ToolActivityContent_' + ta.toolContentID, 600, 800, true, true, false, false, false);
+				JsPopup.getInstance().launchPopupWindow(url, 'ToolActivityContent_' + ta.toolContentID, 700, 920, true, true, false, false, false);
 			
 				// set modified (not-saved) flag so that potential changes cannot be lost.
 				ApplicationParent.extCall('setSaved', 'false');

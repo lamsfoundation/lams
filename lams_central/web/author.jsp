@@ -156,7 +156,7 @@ function openPreview( lessonId )
 	}
 	else
 	{
-		previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=796,height=570,resizable,status=yes');
+		previewWin = window.open('home.do?method=learner&mode=preview&lessonID='+lessonId,'pWindow','width=920,height=700,resizable,status=yes');
 	}
 }
 

@@ -458,7 +458,7 @@ class MonitorController extends AbstractController {
 						_monitorModel.getMonitor().openComplexView(ca);
 					} else {
 						if(ca instanceof LearnerIcon) LearnerIcon(ca).viewLearner(URLToSend);
-						else JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+						else JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 720, 900, true, true, false, false, false);
 					}
 					
 			}
