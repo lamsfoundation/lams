@@ -127,9 +127,11 @@ public class SurveyOutputFactory extends OutputFactory {
 	if (isTextSearchConditionName(name)) {
 	    // user answers are loaded from the DB and array of strings is created
 
-	    Survey survey = surveyService.getSurveyBySessionId(toolSessionId);
-	    Set<SurveyQuestion> questions = survey.getQuestions();
-	    String[] textAnswers = new String[questions.size()];
+	    //Survey survey = surveyService.getSurveyBySessionId(toolSessionId);
+	    //Set<SurveyQuestion> questions = survey.getQuestions();
+	    //String[] textAnswers = new String[questions.size()];
+	    String[] textAnswers = null;
+	    List<String> answersList = new ArrayList<String>();
 	    SurveyUser user = surveyService.getUserByIDAndSession(learnerId, toolSessionId);
 	    List<AnswerDTO> answerDTOs = surveyService.getQuestionAnswers(toolSessionId, user.getUid());
 	    if (answerDTOs != null && !answerDTOs.isEmpty()) {
@@ -138,10 +140,11 @@ public class SurveyOutputFactory extends OutputFactory {
 		    if (surveyAnswer != null) { // check for optional questions
 			SurveyQuestion question = surveyAnswer.getSurveyQuestion();
 			if (question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
-			    textAnswers[question.getSequenceId() - 1] = surveyAnswer.getAnswerText();
+			    answersList.add(surveyAnswer.getAnswerText());
 		    }
 		}
 	    }
+	    textAnswers = (String[]) answersList.toArray(new String [answersList.size()]);
 	    return new ToolOutput(name, getI18NText(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, true), textAnswers,
 		    false);
 	}

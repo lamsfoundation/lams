@@ -85,6 +85,17 @@ public class SurveyCondition extends TextSearchCondition {
 		    // the condition "knows" it's an array of strings, i.e. user's answers
 		    String[] answers = (String[]) value.getValue();
 		    result = true;
+		    
+		    for (int i=0; i<=answers.length; i++) {
+			String textToMatch = answers[i];
+
+			result &= matches(textToMatch);
+			// if at least one answer does not satisfy the condition, there is no need to look further
+			if (!result) {
+			    break;
+			}			
+		    }
+		    /*
 		    for (SurveyQuestion question : questions) {
 			String textToMatch = answers[question.getSequenceId() - 1];
 
@@ -93,7 +104,8 @@ public class SurveyCondition extends TextSearchCondition {
 			if (!result) {
 			    break;
 			}
-		    }
+		    }*/
+		    
 		} else {
 		    throw new ToolOutputFormatException("Survey tool produced a non-complex tool output.");
 		}
