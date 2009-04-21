@@ -8,6 +8,8 @@
             <url-pattern>/authoringConfirm.jsp</url-pattern>
             <url-pattern>/community.jsp</url-pattern>
             <url-pattern>/editprofile.jsp</url-pattern>
+            <url-pattern>/findUserLessons.jsp</url-pattern>
+            <url-pattern>/findUserLessonsAutocomplete.jsp</url-pattern>
             <url-pattern>/footer.jsp</url-pattern>
             <url-pattern>/group.jsp</url-pattern>
             <url-pattern>/groupContents.jsp</url-pattern>
