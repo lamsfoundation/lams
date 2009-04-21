@@ -39,13 +39,6 @@
 	{
 		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
 	}
-
-	function makeNice(){
-		flash = document.getElementById('flashContent');
-		container = document.getElementById('container');
-		flash.style.width = container.clientWidth+"px";
-		flash.style.height = (container.clientWidth*0.75)+"px";
-	}
 //]]>
 </script>
 

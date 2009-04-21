@@ -27,3 +27,19 @@ function getWindowSize(dim) {
 	else
 		return myWidth;
 }
+
+function makeNice()
+{
+	var isIE = navigator.appName.indexOf("Microsoft") != -1;
+	flash = document.getElementById('flashContent');
+	container = document.getElementById('center12');
+	if (isIE) {
+		flash.style.width = 4;
+		flash.style.height = 3;
+		flash.style.width = container.scrollWidth;
+		flash.style.height = (container.scrollWidth * 0.75);	
+	} else {
+		flash.style.width = container.scrollWidth+"px";
+		flash.style.height = (container.scrollWidth * 0.75)+"px";
+	}
+}

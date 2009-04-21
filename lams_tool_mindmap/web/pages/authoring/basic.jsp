@@ -26,7 +26,7 @@
 	</tr>
 </table>
 
-<center id="container">
+<center id="center12">
 	<div id="flashContent">
 		<fmt:message>message.enableJavaScript</fmt:message>
 	</div>

@@ -50,13 +50,6 @@
 		$.post("${get}", { dispatch: "${dispatch}", mindmapId: "${mindmapId}", userId: "${userId}", 
 			content: getFlashMovie('flashContent').getMindmap() } );
 	}
-
-	function makeNice(){
-		flash = document.getElementById('flashContent');
-		container = document.getElementById('container');
-		flash.style.width = container.clientWidth+"px";
-		flash.style.height = (container.clientWidth*0.75)+"px";
-	}
 //]]>
 </script>
 
@@ -79,7 +72,7 @@
 		</tr>
 	</table>
 	
-	<center id="container">
+	<center id="center12">
 		<div id="flashContent">
 			<fmt:message>message.enableJavaScript</fmt:message>
 		</div>

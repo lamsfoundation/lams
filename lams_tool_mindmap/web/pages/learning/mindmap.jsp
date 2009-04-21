@@ -56,13 +56,6 @@
 	}
 
 	$(window).resize(makeNice);
-
-	function makeNice() {
-		flash = document.getElementById('flashContent');
-		container = document.getElementById('container');
-		flash.style.width = container.clientWidth+"px";
-		flash.style.height = (container.clientWidth*0.75)+"px";
-	}
 	
 	embedFlashObject(540, 405);
 -->
@@ -109,7 +102,7 @@
 		
 		<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
-		<center id="container">
+		<center id="center12">
 			<div id="flashContent">
 				<fmt:message>message.enableJavaScript</fmt:message>
 			</div>
