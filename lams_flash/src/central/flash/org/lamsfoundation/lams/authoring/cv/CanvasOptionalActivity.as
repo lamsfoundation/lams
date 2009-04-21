@@ -394,6 +394,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasOptionalActivity extends MovieC
 			container_pnl._height += 3;
 			container_pnl._width = _visibleWidth + PANEL_OFFSET_X;
 			header_pnl._width = _visibleWidth - 6 + PANEL_OFFSET_X;
+			title_lbl._width = _visibleWidth - 6;
 			
 			clickTarget_mc._width = _visibleWidth + PANEL_OFFSET_X;
 		}

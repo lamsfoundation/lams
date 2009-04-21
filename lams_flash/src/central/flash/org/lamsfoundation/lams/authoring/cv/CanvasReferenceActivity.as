@@ -190,10 +190,14 @@ class org.lamsfoundation.lams.authoring.cv.CanvasReferenceActivity extends Movie
 		
 		var numOfChildren = _children.length;
 		
-		if (numOfChildren == 0)
+		if (numOfChildren == 0) {
 			_panelWidth = 143.1;
-		else
+			title_lbl._width = _panelWidth - 15;
+		}
+		else {
 			_panelWidth = CHILD_OFFSET_X + (numOfChildren * CHILD_INCRE);
+			title_lbl._width = _panelWidth - 15;
+		}
 		
 		setStyles();
 		
