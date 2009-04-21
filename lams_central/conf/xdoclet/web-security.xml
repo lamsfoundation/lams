@@ -36,6 +36,7 @@
     		<url-pattern>/fckeditor/*</url-pattern>
     		<url-pattern>/toolcontent/*</url-pattern>
     		<url-pattern>/development/*</url-pattern>
+    		<url-pattern>/pedagogical_planner/*</url-pattern>
     		<url-pattern>/JHB/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>
