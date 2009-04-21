@@ -135,9 +135,10 @@ public class SurveyOutputFactory extends OutputFactory {
 	    if (answerDTOs != null && !answerDTOs.isEmpty()) {
 		for (AnswerDTO answerDTO : answerDTOs) {
 		    SurveyAnswer surveyAnswer = answerDTO.getAnswer();
-		    SurveyQuestion question = surveyAnswer.getSurveyQuestion();
-		    if (question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-			textAnswers[question.getSequenceId() - 1] = surveyAnswer.getAnswerText();
+		    if (surveyAnswer != null) { // check for optional questions
+			SurveyQuestion question = surveyAnswer.getSurveyQuestion();
+			if (question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+			    textAnswers[question.getSequenceId() - 1] = surveyAnswer.getAnswerText();
 		    }
 		}
 	    }
