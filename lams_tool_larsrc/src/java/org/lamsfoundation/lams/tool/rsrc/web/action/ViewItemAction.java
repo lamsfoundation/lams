@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.tool.rsrc.dto.InstructionNavDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
+import org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceProxy;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceWebUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -65,6 +66,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class ViewItemAction extends Action {
 	
 	private static final Logger log = Logger.getLogger(ViewItemAction.class);
+	
+	private static IResourceService resourceService;
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -94,10 +97,13 @@ public class ViewItemAction extends Action {
 	 * @return
 	 */
 	private ActionForward openUrlPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		String url = request.getParameter(ResourceConstants.PARAM_OPEN_URL_POPUP);
-		String title = request.getParameter(ResourceConstants.PARAM_TITLE);
-		request.setAttribute(ResourceConstants.PARAM_OPEN_URL_POPUP,url);
-		request.setAttribute(ResourceConstants.PARAM_TITLE,title);
+		Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID, false);
+		if (resourceService == null) {
+		    resourceService = ResourceServiceProxy.getResourceService(getServlet().getServletContext()); 
+		}
+		ResourceItem item = resourceService.getResourceItemByUid(itemUid);
+		request.setAttribute(ResourceConstants.PARAM_OPEN_URL_POPUP,item.getUrl());
+		request.setAttribute(ResourceConstants.PARAM_TITLE,item.getTitle());
 		return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 	/**
@@ -243,12 +249,7 @@ public class ViewItemAction extends Action {
 			boolean wikipediaInURL = matcher.find();
 			
 			if(item.isOpenUrlNewWindow() || wikipediaInURL) {
-				try {
-					url = "/openUrlPopup.do?popupUrl=" + URLEncoder.encode(ResourceWebUtils.protocol(item.getUrl()), "UTF8") + "&title="
-							+ URLEncoder.encode(item.getTitle(), "UTF8");
-				} catch (UnsupportedEncodingException e) {
-					log.error(e);
-				}
+			    url = "/openUrlPopup.do?"+ResourceConstants.PARAM_RESOURCE_ITEM_UID+"=" + item.getUid();
 			}else
 				url = ResourceWebUtils.protocol(item.getUrl());
 			break;
