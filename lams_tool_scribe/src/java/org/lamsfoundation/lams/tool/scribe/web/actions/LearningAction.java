@@ -75,6 +75,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
  * @struts.action-forward name="scribe" path="tiles:/learning/scribe"
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
+ * @struts.action-forward name="waitForScribe" path="tiles:/learning/waitForScribe"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
  * @struts.action-forward name="voteDisplay" path="/pages/parts/voteDisplay.jsp"
  * @struts.action-forward name="report" path="tiles:/learning/report"
@@ -142,7 +143,7 @@ public class LearningAction extends LamsDispatchAction {
 			if (scribe.isAutoSelectScribe() == false) {
 				// learner needs to wait until a scribe has been appointed by
 				// teacher.
-				return mapping.findForward("defineLater");
+				return mapping.findForward("waitForScribe");
 
 			} else {
 				// appoint the currentUser as the scribe
