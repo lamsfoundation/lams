@@ -15,7 +15,7 @@
 			}
 			function Ok(){
 				if(!dataSent){
-					document.getElementById('flashContent').sendData("source.php");
+					document.getElementById('flashContent').sendData("source.php");	//CHANGE SCRIPT URL HERE
 					dataSent = true;
 				}
 				return false;
@@ -36,8 +36,8 @@
 			var flashvars = {
 				dictionary: xmlDic,
 				startingImageURL: PaintCommand.startingImage,
-				userId: "126",
-				contentFolder: "someFolder"
+				userId: "126",						//JSP STUFF GOES HERE
+				contentFolder: FCKConfig.ContentFolderID		//I SUPPOSE
 			}
 			PaintCommand.startingImage = "";
 			swfobject.embedSWF("FCK Paint.swf", "flashContent", "800", "500", "9.0.0", null, flashvars);
