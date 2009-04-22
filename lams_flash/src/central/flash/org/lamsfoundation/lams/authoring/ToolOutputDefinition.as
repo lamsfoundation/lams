@@ -45,6 +45,7 @@ class ToolOutputDefinition  {
 	private var _complexDefinition:Object;
 	private var _defaultConditions:Array;
 	private var _showConditionNameOnly:Boolean;
+	private var _isDefaultGradebookMark:Boolean;
 	
 	function ToolOutputDefinition(){
 		_defaultConditions = new Array();
@@ -56,6 +57,8 @@ class ToolOutputDefinition  {
 		_type = dto.type;
 		_startValue = dto.startValue;
 		_endValue = dto.endValue;
+		_isDefaultGradebookMark = dto.isDefaultGradebookMark;
+		
 		if(dto.defaultConditions) {
 			for(var i=0; i<dto.defaultConditions.length; i++) {
 				var bdto:ToolOutputCondition = new ToolOutputCondition();
@@ -77,6 +80,7 @@ class ToolOutputDefinition  {
 		if(_type) dto.type = _type;
 		if(_startValue) dto.startValue = _startValue;
 		if(_endValue) dto.endValue = _endValue;
+		if(_isDefaultGradebookMark != null) dto.isDefaultGradebookMark = _isDefaultGradebookMark;
 		
 		return dto;
 	}
@@ -119,6 +123,14 @@ class ToolOutputDefinition  {
 	
 	public function get endValue():Object {
 		return _endValue;
+	}
+	
+	public function set isDefaultGradebookMark(a:Boolean) {
+		_isDefaultGradebookMark = a;
+	}
+	
+	public function get isDefaultGradebookMark():Boolean {
+		return _isDefaultGradebookMark;
 	}
 	
 	public function get complexDefinition():Object {

@@ -800,8 +800,8 @@ class PropertyInspector extends PropertyInspectorControls {
 	private function setGradebookOutput(evt:Object) {
 		
 		if (_canvasModel.selectedItem.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE) {
-			
 			var toolAct:ToolActivity = ToolActivity(_canvasModel.selectedItem.activity);
+			toolAct.useDefaultToolOutput = false;
 			if (evt.target.selectedIndex > 0) {
 				toolAct.gradebookToolOutputDefinitionName = evt.target.selectedItem.name;
 			} else {
@@ -811,18 +811,34 @@ class PropertyInspector extends PropertyInspectorControls {
 	}
 	
 	private function showActivityOutputProperties(a) {
-		
+		var outputExists:Boolean = false; // true if an output for this activity has been saved previously
+		var defaultIndex:Number = 0;
 		if (a.activityTypeID == Activity.TOOL_ACTIVITY_TYPE) {
 			var toolAct:ToolActivity = ToolActivity(a);
 			outputToGradebook_cmb.dataProvider = (toolAct.supportsOutputs == true) ? getToolActivityOutputTypes(toolAct) : null;
 			
-			if (toolAct.gradebookToolOutputDefinitionName != null) {
+			if (toolAct.supportsOutputs && outputToGradebook_cmb.dataProvider.length > 1) {
+				gradebook_lbl.visible = true;
+				outputToGradebook_cmb.visible = true;
+				
 				for (var i=0; i<outputToGradebook_cmb.dataProvider.length; i++) {
-					if (outputToGradebook_cmb.dataProvider[i].name == toolAct.gradebookToolOutputDefinitionName) {
-						outputToGradebook_cmb.selectedIndex = i;
+					if (toolAct.gradebookToolOutputDefinitionName != null) {
+						if (outputToGradebook_cmb.dataProvider[i].name == toolAct.gradebookToolOutputDefinitionName) { // see if a gradebook output has been saved for this tool already
+							outputExists = true;
+							outputToGradebook_cmb.selectedIndex = i;
+						}
+					}
+					if (toolAct.useDefaultToolOutput == true && outputExists == false) { // if it hasn't been saved check if this is the default output
+						if (outputToGradebook_cmb.dataProvider[i].isDefaultGradebookMark == true) {
+							defaultIndex = i;
+						}
 					}
 				}
-			}else if (!toolAct.supportsOutputs) {
+				if (toolAct.useDefaultToolOutput == true && outputExists == false) { // set to default output if no previous output saved
+					outputToGradebook_cmb.selectedIndex = defaultIndex;
+					toolAct.gradebookToolOutputDefinitionName = outputToGradebook_cmb.dataProvider[defaultIndex].name;
+				}
+			} else {
 				gradebook_lbl.visible = false;
 				outputToGradebook_cmb.visible = false;
 			}
@@ -830,7 +846,12 @@ class PropertyInspector extends PropertyInspectorControls {
 	}
 	
 	private function getToolActivityOutputTypes(toolAct:ToolActivity):Array {
-		var _definitions:Array = toolAct.definitions;
+		var _definitions:Array = new Array();
+		
+		for (var i=0; i<toolAct.definitions.length; i++) {			if (toolAct.definitions[i].type == ToolOutputDefinition.LONG) { //only support numeric outputs
+				_definitions.push(toolAct.definitions[i]);
+			}
+		}
 		_definitions.splice(0,0, new ToolOutputDefinition()); // add an empty toolOutputDefinition for first entry where itemObj.type = null
 		return _definitions;
 	}

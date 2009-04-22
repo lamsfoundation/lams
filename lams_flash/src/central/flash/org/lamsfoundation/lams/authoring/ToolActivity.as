@@ -61,6 +61,7 @@ class ToolActivity extends Activity{
 	private var _competenceMappings:Array; // competences to which this activity is mapped
 	
 	private var _toolOutputDefinitions:Hashtable;
+	private var _useDefaultToolOutput:Boolean;
 	
 	function ToolActivity(activityUIID:Number){
 		super(activityUIID);
@@ -71,6 +72,8 @@ class ToolActivity extends Activity{
 		_toolOutputDefinitions = new Hashtable("_toolOutputDefinitions");
 		
 		_competenceMappings = new Array();
+		
+		_useDefaultToolOutput = false;
 	}
 	
 	//TODO: ADD A VALIDATE() FUNCTION
@@ -581,6 +584,24 @@ class ToolActivity extends Activity{
 	 */
 	public function get gradebookToolOutputDefinitionName ():String {
 		return _gradebookToolOutputDefinitionName;
-	}	
+	}
+	
+	/**
+	 * 
+	 * @usage   sets a flag to indicate if we want the default gradebook tool output to be selected in the gradebook output combo box in the PI
+	 * @param   n the name of the tooloutput 
+	 */
+	public function set useDefaultToolOutput(n:Boolean) {
+		_useDefaultToolOutput = n;
+	}
+	
+	/**
+	 * 
+	 * @usage   
+	 * @return  _useDefaultToolOutput a flag indicating whether we want to default output for that tool to show
+	 */
+	public function get useDefaultToolOutput():Boolean {
+		return _useDefaultToolOutput;
+	}
 }
 

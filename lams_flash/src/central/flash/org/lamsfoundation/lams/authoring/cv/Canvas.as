@@ -373,6 +373,7 @@ class Canvas extends CanvasHelper {
 				actType = "Tool"
 				actToAdd = ToolActivity(actToCopy.clone());
 				actToAdd.activityUIID = _ddm.newUIID();
+				ToolActivity(actToAdd).useDefaultToolOutput = true;
 				break;
 
 			case(Activity.OPTIONAL_ACTIVITY_TYPE):
