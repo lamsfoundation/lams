@@ -13,7 +13,7 @@
 		document.getElementById("finishButton").disabled = true;
 	}
 
-	function submitForm(methodName) {
+	function submitForm() {
 		// Sets mindmap content in Flash
 		setMindmapContent();
 
@@ -26,7 +26,7 @@
 	$.timer(60000, function (timer) {
 		if (!multiMode)
 			$.post("${get}", { dispatch: "${dispatch}", mindmapId: "${mindmapId}", userId: "${userId}", 
-				content: getFlashMovie('flashContent').getMindmap() } );
+				content: document['flashContent'].getMindmap() } );
 	});
 
 	function validateForm() {
@@ -42,17 +42,12 @@
 	function setMindmapContent()
 	{
 		var mindmapContent = document.getElementById("mindmapContent");
-		mindmapContent.value = getFlashMovie('flashContent').getMindmap();
+		mindmapContent.value = document['flashContent'].getMindmap();
 	}
 	
 	function embedFlashObject(x, y)
 	{
 		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
-	}
-	
-	function getFlashMovie(movieName) {
-		var isIE = navigator.appName.indexOf("Microsoft") != -1;
-		return (isIE) ? window[movieName] : document[movieName];
 	}
 
 	$(window).resize(makeNice);
@@ -129,7 +124,7 @@
 		
 					<c:otherwise>
 						<div class="space-bottom-top align-right">
-							<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+							<html:link href="javascript:submitForm();" styleClass="button" styleId="finishButton">
 								<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
 							</html:link>
 						</div>

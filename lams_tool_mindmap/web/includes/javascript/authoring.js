@@ -15,7 +15,7 @@ function doSelectTab(tabId) {
 	var mindmapContent = document.getElementById("mindmapContent");
 	
 	if (tag.value == "" || tag.value == 1) {
-		mindmapContent.value = getFlashMovie('flashContent').getMindmap();
+		mindmapContent.value = document['flashContent'].getMindmap();
 	}
 	
 	tag.value = tabId;

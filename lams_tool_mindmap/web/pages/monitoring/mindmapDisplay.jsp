@@ -9,11 +9,6 @@
 	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", dictionary: "${localizationPath}" }
 	
 	embedFlashObject(700, 525);
-	
-	function getFlashMovie(movieName) {
-		var isIE = navigator.appName.indexOf("Microsoft") != -1;
-		return (isIE) ? window[movieName] : document[movieName];
-	}
 
 	$(window).resize(makeNice);
 	
@@ -38,7 +33,7 @@
 	{
 		var mindmapContent = document.getElementById("mindmapContent");
 		if(mindmapContent != null) {
-			mindmapContent.value = getFlashMovie('flashContent').getMindmap();
+			mindmapContent.value = document['flashContent'].getMindmap();
 		}
 
 		setUserId();
@@ -48,7 +43,7 @@
 	function updateContent()
 	{
 		$.post("${get}", { dispatch: "${dispatch}", mindmapId: "${mindmapId}", userId: "${userId}", 
-			content: getFlashMovie('flashContent').getMindmap() } );
+			content: document['flashContent'].getMindmap() } );
 	}
 //]]>
 </script>

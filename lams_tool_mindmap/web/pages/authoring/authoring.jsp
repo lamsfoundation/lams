@@ -10,11 +10,6 @@
 //<![CDATA[  
 	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", dictionary: "${localizationPath}" }
 	
-	function getFlashMovie(movieName) {
-		var isIE = navigator.appName.indexOf("Microsoft") != -1;
-		return (isIE) ? window[movieName] : document[movieName];
-	}
-	
 	$(window).resize(makeNice);
 	
 	embedFlashObject(700, 525);
@@ -25,14 +20,14 @@
 		var tag = document.getElementById("currentTab");
 		
 		if (tag.value == 1 || tag.value == "") {
-			mindmapContent.value = getFlashMovie('flashContent').getMindmap();
+			mindmapContent.value = document['flashContent'].getMindmap();
 		}
 	}
 	
 	function flashLoaded()
 	{
 		var mindmapContent = document.getElementById("mindmapContent");
-		getFlashMovie('flashContent').setMindmap(mindmapContent.value);
+		document['flashContent'].setMindmap(mindmapContent.value);
 	}
 	
 	function embedFlashObject(x, y)
