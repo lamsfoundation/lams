@@ -7,7 +7,7 @@
 		}
 	}
          function submitForm(methodName){
-                var f = document.getElementById('messageForm');
+                var f = document.getElementById('learningForm');
                 f.submit();
         }
 </script>
@@ -62,7 +62,7 @@
 					</c:when>
 					<c:otherwise>
 						<html:hidden property="dispatch" value="finishActivity" />
-						<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity'; ;">
+						<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finished');">
 							<span class="nextActivity"><fmt:message key="button.finish" /></span>
 						</html:link>
 					</c:otherwise>
