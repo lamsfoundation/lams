@@ -471,6 +471,11 @@ Ant build file.
 		
 		<!-- Creating the image directory for pixlr in lams-www.war -->
 		<mkdir dir="${jboss.deploy}/lams-www.war/images/pixlr" />
+		<copy  todir="${jboss.deploy}/lams-www.war/images/pixlr">
+			<fileset dir="${conf.web.dir}/images/">
+				<include name="blank.jpg" />
+			</fileset>
+		</copy>
 	
 	</target>
 
