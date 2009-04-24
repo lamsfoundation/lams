@@ -79,6 +79,8 @@ public class PresenceChatLoggerAction extends LamsDispatchAction {
 			    
 		    List<PresenceChatMessage> messages = presenceChatLoggerService.getMessagesByConversation(from, to, roomName);
 			
+			response.setContentType("text/xml");
+			response.setCharacterEncoding("UTF-8");
 		    writeAJAXResponse(response, buildConversationXML(to, messages));
 			
 		} catch (Exception e) {
@@ -101,6 +103,8 @@ public class PresenceChatLoggerAction extends LamsDispatchAction {
 			    
 		    List<PresenceChatMessage> messages = presenceChatLoggerService.getMessagesByRoomName(roomName);
 			
+			response.setContentType("text/xml");
+			response.setCharacterEncoding("UTF-8");
 		    writeAJAXResponse(response, buildGroupHistoryXML(messages));
 		} catch (Exception e) {
 			logger.error(e.getMessage());

@@ -31,7 +31,7 @@
 					<c:if test="${param.presenceImEnabled}">
 						// create chat tabs
 						$("#presenceChatTabs").tabs({ scrollable: true });
-
+						
 						// bind the select function which resets label to non-bold when clicked
 						$("#presenceChatTabs").bind('tabsselect', function(event, ui) {
 							var nick = getUserFromTag(ui.panel.id).nick;
@@ -42,6 +42,7 @@
 					
 					// create roster tab
 					$("#presenceChatRoster").tabs({ scrollable: false });
+
 
 					// correct room name				
 					roomName = correctPresenceRoomName(roomName);
@@ -85,12 +86,8 @@
 				    	<br>
 				    	<div id="groupchat_sendArea" class="sendArea">
 							<form name="groupchat_sendForm" id="groupchat_sendForm" method="get" onsubmit="return sendMsg(this)">
-								<table border="0" align="center" cellpadding="3" cellspacing="0" style="width: 100%">
-								  <tr>
-								    <td width="85%" align="center" valign="middle"><input id="messageInput" name="messageInput" type="text" style="width: 100%;"></td>
-								    <td width="15%" align="center" valign="middle"><input type="submit" name="sendButton" id="sendButton" value="Send"></td>
-								  </tr>
-								</table>
+								<input id="messageInput" name="messageInput" type="text" class="messageInput">
+								<input type="submit" name="sendButton" id="sendButton" value="Send" class="sendButton">
 							</form>
 						</div>
 				    </div>

@@ -189,6 +189,8 @@ Ant build file.
 				<include name="includes/**" />
 				<include name="layouts/**" />
 				<include name="pages/**" />
+				<include name="previewImages/**" />
+				<include name="recordings/**" />
 				<include name="template/**" />
 				<include name="videoRecorder_client/**" />
 				<!-- used by tiles -->

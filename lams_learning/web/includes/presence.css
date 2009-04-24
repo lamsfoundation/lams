@@ -87,6 +87,15 @@ Presence style
 	height: 20%;
 }
 
+.messageInput {
+	float: left;
+	width: 85%;
+}
+	
+.sendButton {
+	float: left;
+}
+
 table.tabLabelTable {
 	width: auto;
 }

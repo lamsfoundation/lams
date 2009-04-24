@@ -165,7 +165,7 @@ function saveToFCKEditor(eventObj) {
 				// embed the Flash Content SWF when all tests are passed
 				AC_FL_RunContent(
 						"src", "VideoRecorderFCKEditor",
-						"FlashVars", "mode=recorderModeFCK"+'&serverUrl=<%= Configuration.get(ConfigurationKeys.SERVER_URL) %>'+'&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>'+'&red5RecordingsUrl=<%= Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL) %>'+'&lamsEarDir=<%= Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) %>' +'&saveToLamsDestUrl=/lams-www.war/secure/' + FCKConfig.ContentFolderID + '/Recordings/' + '&contentFolderUrl=/lams/www/secure/' + FCKConfig.ContentFolderID + '/Recordings/' + '&languageXML=' + escape(getLanguageXML()) + "",
+						"FlashVars", "mode=recorderModeFCK"+'&serverUrl=<%= Configuration.get(ConfigurationKeys.SERVER_URL) %>'+'&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>'+'&red5RecordingsUrl=<%= Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL) %>'+'&lamsEarDir=<%= Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) %>' +'&saveToLamsDestUrl=/lams-www.war/secure/' + FCKConfig.ContentFolderID + '/Recordings/' + '&contentFolderUrl=/lams//www/secure/' + FCKConfig.ContentFolderID + '/Recordings/' + '&languageXML=' + escape(getLanguageXML()) + "",
 						"width", "361",
 						"height", "331",
 						"align", "middle",

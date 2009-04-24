@@ -29,10 +29,9 @@ function createPrivateTabContent(label, tag){
 			'<div id="' + tag + '_sendArea" class="sendArea">' + 
 				'<form name="' + tag + '_sendForm" id="' + tag + '_sendForm" method="get" onsubmit="return sendMsg(this)">' +
 				'<table border="0" align="center" cellpadding="3" cellspacing="0" style="width: 100%">' +
-					'<tr>' +
-						'<td width="85%" align="center" valign="middle"><input id="messageInput" name="messageInput" type="text" style="width: 100%;"><input type="hidden" name="sentTo" id="sendTo" value="' + label + '"></td>' +
-						'<td width="15%" align="center" valign="middle"><input type="submit" name="sendButton" id="sendButton" value="Send"></td>' +
-					'</tr>' +
+					'<input id="sendTo" name="sentTo" type="hidden" value="' + label + '">' +
+					'<input id="messageInput" name="messageInput" type="text" class="messageInput">' +
+					'<input id="sendButton" name="sendButton" type="submit" value="Send" class="sendButton">' +
 				'</table>' +
 				'</form>' +
 			'</div>';
@@ -115,7 +114,8 @@ function addTab(nick, tag){
 	// add the content
 	$("#" + tag).html(createPrivateTabContent(nick, tag));
 	
-	$.get(lamsUrl + "PresenceChatLogger.do", {method: "getConversationHistory", roomName:CONFERENCEROOM, from:NICK, to:nick}, handleGetConversation);
+	var anticache = new Date().getTime();
+	$.get(lamsUrl + "PresenceChatLogger.do", {method: "getConversationHistory", roomName:CONFERENCEROOM, from:NICK, to:nick, anticache:anticache}, handleGetConversation);
 }
 
 function htmlEnc(str) {
@@ -174,6 +174,16 @@ function tagToContextMenu(tag){
 	return tag + '_contextMenu';
 }
 
+function parseXml(xml) {  
+	if (jQuery.browser.msie) {  
+		var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");  
+		xmlDoc.loadXML(xml);  
+		xml = xmlDoc;  
+	}  
+	
+	return xml;  
+}  
+   
 function getRosterUserByNick(nick) {
 	for (var i = 0; i < this.users.length; i++) {
 		if (this.users[i].nick == nick) {
@@ -217,6 +227,10 @@ function getTime(){
 	var minutes = currentTime.getMinutes();
 	var seconds = currentTime.getSeconds();
 	
+	if (hours < 10){
+		hours = "0" + hours;
+	}
+	
 	if (minutes < 10){
 		minutes = "0" + minutes;
 	}
@@ -230,40 +244,6 @@ function getTime(){
 
 function trimTime(time){
 	return "(" + time.substring(11, 19) + ")";
-}
-
-function createElem(name, attrs, style, innerHTML) {
-	var e = document.createElement(name);
-	if (attrs) {
-		for (var key in attrs) {
-			if (key == "attrClass") {
-				e.className = attrs[key];
-			} else {
-				if (key == "attrId") {
-					e.id = attrs[key];
-				} else {
-					if(key == "onClick"){
-						// for IE (attrId must have been set to e.id)
-						e.onclick = function() {handlePresenceLeftClick(e.id);};
-						// for FF
-						e.setAttribute(key, attrs[key]);
-					} else {
-						e.setAttribute(key, attrs[key]);
-					}
-				}
-			}
-		}
-	}
-	if (style) {
-		for (key in style) {
-			e.style[key] = style[key];
-		}
-	}
-	if (innerHTML) {
-		//e.appendChild(document.createTextNode(text));
-		e.innerHTML = innerHTML;
-	}
-	return e;
 }
 
 function refreshContextMenu(tag, blocked){
@@ -318,8 +298,8 @@ function handleRightScrollClick(){
 }
 
 function handlePresenceLeftClick(divName){
-	var div = document.getElementById(divName);
-	var rosterIndex = div.getAttribute("rosterIndex");
+	var div = $("#" + divName);
+	var rosterIndex = div.attr("rosterIndex");
 	var user = roster.users[rosterIndex];
 	var tag = user.tag;
 	var nick = user.nick;
@@ -426,7 +406,7 @@ function UpdateRosterDisplay() {
 		if(listing.length == 0){
 			// create listing div
 			// note: attrId must be added to array before onClick
-			var listingDiv = createElem("div", {attrId:listingName, rosterIndex:i, onClick:"handlePresenceLeftClick('" + listingName + "');", attrClass:"presenceName"}, {}, createPresenceListing(nick, tag));
+			var listingDiv = $('<div id="' + listingName + '" rosterIndex="' + i + '" onClick="handlePresenceLeftClick(\'' + listingName + '\');" class="presenceName">' + createPresenceListing(nick, tag) + '</div>');
 			
 			// add the listing div
 			rosterDiv.append(listingDiv);
@@ -445,7 +425,7 @@ function UpdateRosterDisplay() {
 			rosterDiv.append(listing.remove());
 			
 			// refresh roster index
-			listing.attr("rosterindex", i);
+			listing.attr("rosterIndex", i);
 		}
 		
 		// get context menu div name
@@ -497,26 +477,40 @@ function setFocusOnTextarea() {
 }
 
 function generateMessageHTML(nick, message, date) {
+	var completeElem;
 	var fromElem;
+	var msgElem;
+	
+	completeElem = $('<div></div>');
 	
 	if(!date){
-		fromElem = createElem("div", {attrClass:"presenceMessageFrom"}, null, getTime() + " " + nick);
+		fromElem = $('<div class="presenceMessageFrom">' + getTime() + ' ' + nick + '</div>');
 	}else{
-		fromElem = createElem("div", {attrClass:"presenceMessageFrom"}, null, trimTime(date) + " " + nick);
+		fromElem = $('<div class="presenceMessageFrom">' + trimTime(date) + ' ' + nick + '</div>');
 	}
 	
-	var msgElem = createElem("div", {attrClass:"presenceMessage"}, null, message);
-	msgElem.insertBefore(fromElem, msgElem.firstChild);
-	return msgElem;
+	msgElem = $('<div class="presenceMessage">' + message + '</div>');
+	
+	completeElem.append(fromElem);
+	completeElem.append(msgElem);
+	
+	return completeElem;
 }
 
-function generateEmoteHTML(nick, emote){
-	return createElem("div", {attrClass:"presenceMessageEmote"}, null, getTime() + " " + nick + " " + emote);
+function generateEmoteHTML(emote){
+	return $('<div class="presenceMessageEmote">' + getTime() + ' ' + emote + '</div>');
 }
-function updateMessageDisplay(div, htmlMessage) {
-	var messageArea = document.getElementById(div);	
-	messageArea.appendChild(htmlMessage);
-	messageArea.scrollTop = messageArea.scrollHeight;
+
+function updateMessageDisplay(div, htmlMessage, prepend) {
+	var messageArea = $("#" + div);
+	
+	if(prepend){
+		messageArea.prepend(htmlMessage);
+	}else{
+		messageArea.append(htmlMessage);
+	}
+
+	messageArea.attr("scrollTop", messageArea.attr("scrollHeight"));
 }
 
 function sendMsg(aForm) {
@@ -571,7 +565,7 @@ function sendMsg(aForm) {
 	// otherwise if not groupchat and user is unavailable
 	else if(user != null && user.status == "unavailable"){
 		// generate the emote message and display it to user
-		var emoteMessage = generateEmoteHTML("Your", "previous message has not been sent because " + toNick + " is unavailable");
+		var emoteMessage = generateEmoteHTML("Your previous message has not been sent because " + toNick + " is unavailable");
 		updateMessageDisplay(nickToMessageArea(toNick), emoteMessage);
 	}
 	
@@ -612,20 +606,27 @@ function handleMessage(aJSJaCPacket) {
 			if(document.getElementById(nickToMessageArea(nick)) == null){
 				// add a tab
 				addTab(nick, tag);
-			}
-			
-			// get the selected tab
-			var selected = $("#presenceChatTabs").tabs().data('selected.tabs');
-			
-			// if the selected tab is any other than sender's tab
-			if(getUserFromTabIndex(selected).tag != tag){
+				
 				// make the sender's tab label bold
 				$('#' + tag + '_tabLabel').html('<b>' + nick + '</b>');
-				$("#presenceChatTabs").tabs('_tabify', false);
+				
+				// don't add the message, let the log take care of that
 			}
-	
-			// generate html
-			htmlMessage = generateMessageHTML(nick, message, null);
+			// if there is a tab for the send open
+			else{
+				// get the selected tab
+				var selected = $("#presenceChatTabs").tabs().data('selected.tabs');
+				
+				// if the selected tab is any other than sender's tab
+				if(getUserFromTabIndex(selected).tag != tag){
+					// make the sender's tab label bold
+					$('#' + tag + '_tabLabel').html('<b>' + nick + '</b>');
+					$("#presenceChatTabs").tabs('_tabify', false);
+				}
+				
+				// generate html
+				htmlMessage = generateMessageHTML(nick, message, null);
+			}
 			
 			// add the div to the sender's tab
 			updateMessageDisplay(nickToMessageArea(nick), htmlMessage);
@@ -721,10 +722,10 @@ function handlePresence(presence) {
 			// generate the emote message and display it to group chat
 			var emoteMessage;
 			if(user.status == "unavailable"){
-				emoteMessage = generateEmoteHTML(nick, "has gone offline");
+				emoteMessage = generateEmoteHTML(nick + "has gone offline");
 			}
 			else if(user.status == "available"){
-				emoteMessage = generateEmoteHTML(nick, "has come online");
+				emoteMessage = generateEmoteHTML(nick + "has come online");
 			}
 			updateMessageDisplay('groupchat_messageArea', emoteMessage);
 		}
@@ -741,10 +742,10 @@ function handlePresence(presence) {
 				// generate the emote message and display it to private chat
 				var emoteMessage;
 				if(user.status == "unavailable"){
-					emoteMessage = generateEmoteHTML(nick, "has gone offline");
+					emoteMessage = generateEmoteHTML(nick + "has gone offline");
 				}
 				else if(user.status == "available"){
-					emoteMessage = generateEmoteHTML(nick, "has come online");
+					emoteMessage = generateEmoteHTML(nick + "has come online");
 				}
 				updateMessageDisplay(nickToMessageArea(nick), emoteMessage);
 			}
@@ -759,7 +760,7 @@ function handleConnected() {
 	// if presence im is enabled (there is a chatbox)
 	if(presenceImEnabled == "true" && showStatus){
 		// generate the emote message and display it to group chat
-		var emoteMessage = generateEmoteHTML("You", "have been connected to LAMS instant messaging");
+		var emoteMessage = generateEmoteHTML("You have been connected to LAMS instant messaging");
 		updateMessageDisplay('groupchat_messageArea', emoteMessage);
 	}
 	
@@ -777,14 +778,15 @@ function handleConnected() {
 	roster = new Roster();
 	
 	// get group chat history
-	$.get(lamsUrl + "PresenceChatLogger.do", {method: "getGroupHistory", roomName:CONFERENCEROOM}, handleGetGroupHistory);
+	var anticache = new Date().getTime();
+	$.get(lamsUrl + "PresenceChatLogger.do", {method: "getGroupHistory", roomName:CONFERENCEROOM, anticache:anticache}, handleGetGroupHistory);
 }
 
 function handleDisconnected() {
 	// if presence im is enabled (there is a chatbox)
 	if(presenceImEnabled == "true" && showStatus){
 		// generate the emote message and display it to group chat
-		var emoteMessage = generateEmoteHTML("You", "have been disconnected from LAMS instant messaging");
+		var emoteMessage = generateEmoteHTML("You have been disconnected from LAMS instant messaging");
 		updateMessageDisplay('groupchat_messageArea', emoteMessage);
 	}
 }
@@ -807,31 +809,34 @@ function handlePresenceRegistration(registrationInfo){
 }
 
 function handleGetGroupHistory(groupHistory){
-	if(groupHistory){
-		$(groupHistory).find("clause").each(function() {
+	var xml = parseXml(groupHistory);  
+	if(xml){
+		var groupHistory = $('<div id="groupHistory"></div>');
+		$(xml).find("clause").each(function() {
 			var from = $(this).find('from').text();
 			var dateSent = $(this).find('dateSent').text();
 			var message = $(this).find('message').text();
-			var htmlMessage = generateMessageHTML(from, message, dateSent);
-			updateMessageDisplay('groupchat_messageArea', htmlMessage);
+			groupHistory.append(generateMessageHTML(from, message, dateSent));
 		});
+		
+		updateMessageDisplay("groupchat_messageArea", groupHistory, true);
 	}
 }
 
 function handleGetConversation(conversation){
-	if(conversation) {
-		var nick = $(conversation).find('nick').text();
-		$(conversation).find("clause").each(function() {
+	var xml = parseXml(conversation);
+	if(xml){
+		var nick = $(xml).find('nick').text();
+		var conversation = $('<div id="' + nickToTag(nick) + '_conversation"></div>');
+		$(xml).find("clause").each(function() {
 			var from = $(this).find('from').text();
 			var to = $(this).find('to').text();
 			var dateSent = $(this).find('dateSent').text();
 			var message = $(this).find('message').text();
-			
-			var htmlMessage = generateMessageHTML(from, message, dateSent);
-			
-			// add the div to the sender's tab
-			updateMessageDisplay(nickToMessageArea(nick), htmlMessage);
+			conversation.append(generateMessageHTML(from, message, dateSent));
 		});
+		
+		updateMessageDisplay(nickToMessageArea(nick), conversation, true);
 	}
 }
 

@@ -3,7 +3,7 @@
 
 	<mx:Script>
 		<![CDATA[
-			import org.lamsfoundation.lams.common.util.NetStreamScreenShotterEvent;
+			import org.lamsfoundation.lams.common.util.ScreenShotterEvent;
 			import org.lamsfoundation.lams.common.util.NetStreamScreenShotter;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
@@ -68,11 +68,11 @@
 				player.addChild(video);
 				video.visible = true;		
 								
-				// create screenshotter
+				// create screenshotters
 				screenshotter = new NetStreamScreenShotter();
 				
-				// add listener for screenshots
-				screenshotter.addEventListener(NetStreamScreenShotterEvent.SCREENSHOTTAKEN, screenShotTaken);
+				// add listeners for screenshots
+				screenshotter.addEventListener(ScreenShotterEvent.SCREENSHOTTAKEN, screenShotTaken);
 				
 				// reset to make sure everything is set to default
 				reset();
@@ -486,8 +486,9 @@
 					
 					// if needed
 					if(takeScreenshot){
-						// take a screen shot
-						screenshotter.takeScreenshot();
+						if(_cam){
+							screenshotter.takeScreenshot();
+						}
 					}
 				}
 				// if recording
@@ -649,7 +650,7 @@
 			}
 			
 			// callback from screenshotter
-			private function screenShotTaken(event:NetStreamScreenShotterEvent):void{
+			private function screenShotTaken(event:ScreenShotterEvent):void{
 				// get the preview image
 				var previewImage:BitmapData = event.previewImage;
 				

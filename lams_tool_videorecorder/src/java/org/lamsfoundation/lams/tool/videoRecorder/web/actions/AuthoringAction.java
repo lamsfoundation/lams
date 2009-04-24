@@ -431,7 +431,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    videoRecorder.setAllowUseCamera(authForm.isAllowUseCamera());
 	    videoRecorder.setAllowLearnerVideoVisibility(authForm.isAllowLearnerVideoVisibility());
 	    videoRecorder.setAllowComments(authForm.isAllowComments());
-	    videoRecorder.setAllowRatings(authForm.isAllowComments());
+	    videoRecorder.setAllowRatings(authForm.isAllowRatings());
 	    videoRecorder.setExportAll(authForm.isExportAll());
 	    videoRecorder.setExportOffline(authForm.isExportOffline());
 	//}

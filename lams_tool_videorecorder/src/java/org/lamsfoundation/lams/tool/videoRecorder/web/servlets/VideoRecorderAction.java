@@ -151,6 +151,9 @@ public class VideoRecorderAction extends LamsDispatchAction {
 	    Collections.sort(videoRecorderRecordingDTOs, comp);
 	    
 		String xmlOutput = buildVideoRecordingsXML(videoRecorderRecordingDTOs, userId);
+		
+		response.setContentType("text/xml");
+		response.setCharacterEncoding("UTF-8");
 		writeAJAXResponse(response, xmlOutput);
 		return null;
 	}
@@ -241,7 +244,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 			
 			// save
 			videoRecorderService.saveOrUpdateVideoRecorderRecording(videoRecording);
-						
+			
 			writeAJAXResponse(response, OK_MSG);
 			
 		}catch(Exception e){
@@ -334,6 +337,8 @@ public class VideoRecorderAction extends LamsDispatchAction {
 			Set<VideoRecorderCommentDTO> commentDTOs = VideoRecorderCommentDTO.getVideoRecorderCommentDTOs(recording.getComments());
 			
 			// return a response with all comments for current recording
+			response.setContentType("text/xml");
+			response.setCharacterEncoding("UTF-8");
 			writeAJAXResponse(response, buildVideoCommentsXML(commentDTOs));
 		}catch(Exception e){
 			writeAJAXResponse(response, ERROR_MSG + e.getMessage());
@@ -398,6 +403,8 @@ public class VideoRecorderAction extends LamsDispatchAction {
 			// refresh recording
 			recording = videoRecorderService.getRecordingById(recordingId);
 			
+			response.setContentType("text/xml");
+			response.setCharacterEncoding("UTF-8");
 			writeAJAXResponse(response, buildRatingResultXML(recording.getRating(), ratingFloat));
 		}catch(Exception e){
 			writeAJAXResponse(response, ERROR_MSG + e.getMessage());
@@ -411,6 +418,8 @@ public class VideoRecorderAction extends LamsDispatchAction {
 			HttpServletResponse response) throws IOException, ServletException {
 		// get service
 		try{
+			response.setContentType("text/xml");
+			response.setCharacterEncoding("UTF-8");
 			IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
 			writeAJAXResponse(response, videoRecorderService.getLanguageXML());
 		}catch(Exception e){
@@ -446,6 +455,8 @@ public class VideoRecorderAction extends LamsDispatchAction {
 		// get service
 		try{
 			IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
+			response.setContentType("text/xml");
+			response.setCharacterEncoding("UTF-8");
 			writeAJAXResponse(response, videoRecorderService.getLanguageXMLForFCK());
 		}catch(Exception e){
 			writeAJAXResponse(response, "");
@@ -488,7 +499,11 @@ public class VideoRecorderAction extends LamsDispatchAction {
 			xmlOutput += "<updateDate>" + videoRecorderRecordingDTO.getUpdateDate().toLocaleString() + "</updateDate>";
 			xmlOutput += "<description>" + videoRecorderRecordingDTO.getDescription() + "</description>";
 			xmlOutput += "<filename>" + videoRecorderRecordingDTO.getFilename() + FLV_EXTENSION + "</filename>";
-			xmlOutput += "<previewImage>" + VIDEORECORDER_PREVIEWIMAGES_RELATIVE_WWW + videoRecorderRecordingDTO.getFilename() + JPG_EXTENSION + "</previewImage>";
+			if(videoRecorderRecordingDTO.getIsJustSound()){
+				xmlOutput += "<previewImage>" + VIDEORECORDER_PREVIEWIMAGES_RELATIVE_WWW + "soundOnly.png</previewImage>";
+			}else{
+				xmlOutput += "<previewImage>" + VIDEORECORDER_PREVIEWIMAGES_RELATIVE_WWW + videoRecorderRecordingDTO.getFilename() + JPG_EXTENSION + "</previewImage>";
+			}
 			xmlOutput += "<rating>" + videoRecorderRecordingDTO.getRating() + "</rating>";
 			xmlOutput += "<userRating>" + buildUserRating(ratings, userId) + "</userRating>";
 			xmlOutput += "<isJustSound>" + videoRecorderRecordingDTO.getIsJustSound() + "</isJustSound>";
