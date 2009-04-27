@@ -165,7 +165,7 @@ public class UserDTO {
 	return direction;
     }
 
-    /** User's timezone. At the moment, this is always the server's timezone */
+    /** User's timezone. */
     public TimeZone getTimeZone() {
 	return timeZone;
     }

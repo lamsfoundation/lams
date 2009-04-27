@@ -474,6 +474,18 @@
         <column name="locale_id" />
     </many-to-one>
     
+        <property
+        name="timeZone"
+        type="java.lang.Short"
+        column="timezone"
+    >
+        <meta attribute="field-description">
+        name="timeZone"
+        type="java.lang.Short"
+        column="timezone"
+        </meta>    
+    </property>
+    
     <property
         name="portraitUuid"
         type="java.lang.Long"

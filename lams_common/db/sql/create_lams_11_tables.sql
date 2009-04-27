@@ -321,6 +321,7 @@ CREATE TABLE lams_user (
      , enable_flash TINYINT(1) DEFAULT 1
 	 , lams_community_token VARCHAR(255)
  	 , lams_community_username VARCHAR(255)
+ 	 , timezone TINYINT
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)

@@ -108,6 +108,9 @@ public class User implements Serializable, Comparable {
     private SupportedLocale locale;
 
     /** persistent field */
+    private Short timeZone;
+
+    /** persistent field */
     private Date createDate;
 
     /** persistent field */
@@ -154,9 +157,16 @@ public class User implements Serializable, Comparable {
 
     /** persistent field */
     private String lamsCommunityToken;
-    
+
     /** persistent field */
     private String lamsCommunityUsername;
+
+    // ------- TIMEZONES (hardcoded, there is no need to put them into database --------------
+
+    public static String[] timezoneList = new String[] { "GMT-12", "GMT-11", "GMT-10", "GMT-9", "GMT-8", "GMT-7",
+	    "GMT-6", "GMT-5", "GMT-4", "Canada/Newfoundland", "GMT-3", "GMT-2", "GMT-1", "GMT", "GMT+1", "GMT+2",
+	    "GMT+3", "Asia/Tehran", "GMT+4", "Asia/Kabul", "GMT+5", "Asia/Calcutta", "Asia/Katmandu", "GMT+6", "GMT+7",
+	    "GMT+8", "GMT+9", "Australia/Adelaide", "GMT+10", "GMT+11", "GMT+12" };
 
     /** full constructor */
     public User(String login, String password, String title, String firstName, String lastName, String addressLine1,
@@ -204,8 +214,8 @@ public class User implements Serializable, Comparable {
 
     /** default constructor */
     public User() {
-	this.changePassword = false;
-	this.enableFlash = true;
+	changePassword = false;
+	enableFlash = true;
     }
 
     /** minimal constructor */
@@ -224,17 +234,16 @@ public class User implements Serializable, Comparable {
 	this.userGroups = userGroups;
 	this.learningDesigns = learningDesigns;
 	this.lessons = lessons;
-	this.changePassword = false;
-	this.enableFlash = true;
+	changePassword = false;
+	enableFlash = true;
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Integer"
-     *               column="user_id"
+     * @hibernate.id generator-class="native" type="java.lang.Integer" column="user_id"
      * 
      */
     public Integer getUserId() {
-	return this.userId;
+	return userId;
     }
 
     public void setUserId(Integer userId) {
@@ -242,12 +251,11 @@ public class User implements Serializable, Comparable {
     }
 
     /**
-     * @hibernate.property column="login" length="255" unique="true"
-     *                     not-null="true"
+     * @hibernate.property column="login" length="255" unique="true" not-null="true"
      * 
      */
     public String getLogin() {
-	return this.login;
+	return login;
     }
 
     public void setLogin(String login) {
@@ -259,7 +267,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getPassword() {
-	return this.password;
+	return password;
     }
 
     public void setPassword(String password) {
@@ -271,7 +279,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getTitle() {
-	return this.title;
+	return title;
     }
 
     public void setTitle(String title) {
@@ -283,7 +291,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getFirstName() {
-	return this.firstName;
+	return firstName;
     }
 
     public void setFirstName(String firstName) {
@@ -295,7 +303,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getLastName() {
-	return this.lastName;
+	return lastName;
     }
 
     public void setLastName(String lastName) {
@@ -311,7 +319,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getAddressLine1() {
-	return this.addressLine1;
+	return addressLine1;
     }
 
     public void setAddressLine1(String addressLine1) {
@@ -323,7 +331,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getAddressLine2() {
-	return this.addressLine2;
+	return addressLine2;
     }
 
     public void setAddressLine2(String addressLine2) {
@@ -335,7 +343,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getAddressLine3() {
-	return this.addressLine3;
+	return addressLine3;
     }
 
     public void setAddressLine3(String addressLine3) {
@@ -347,7 +355,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getCity() {
-	return this.city;
+	return city;
     }
 
     public void setCity(String city) {
@@ -359,7 +367,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getState() {
-	return this.state;
+	return state;
     }
 
     public void setState(String state) {
@@ -371,7 +379,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getPostcode() {
-	return this.postcode;
+	return postcode;
     }
 
     public void setPostcode(String postcode) {
@@ -383,7 +391,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getCountry() {
-	return this.country;
+	return country;
     }
 
     public void setCountry(String country) {
@@ -395,7 +403,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getDayPhone() {
-	return this.dayPhone;
+	return dayPhone;
     }
 
     public void setDayPhone(String dayPhone) {
@@ -407,7 +415,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getEveningPhone() {
-	return this.eveningPhone;
+	return eveningPhone;
     }
 
     public void setEveningPhone(String eveningPhone) {
@@ -419,7 +427,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getMobilePhone() {
-	return this.mobilePhone;
+	return mobilePhone;
     }
 
     public void setMobilePhone(String mobilePhone) {
@@ -431,7 +439,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getFax() {
-	return this.fax;
+	return fax;
     }
 
     public void setFax(String fax) {
@@ -443,7 +451,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getEmail() {
-	return this.email;
+	return email;
     }
 
     public void setEmail(String email) {
@@ -455,7 +463,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Boolean getDisabledFlag() {
-	return this.disabledFlag;
+	return disabledFlag;
     }
 
     public void setDisabledFlag(Boolean disabledFlag) {
@@ -467,7 +475,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Date getCreateDate() {
-	return this.createDate;
+	return createDate;
     }
 
     public void setCreateDate(Date createDate) {
@@ -480,7 +488,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Workspace getWorkspace() {
-	return this.workspace;
+	return workspace;
     }
 
     public void setWorkspace(Workspace workspace) {
@@ -493,7 +501,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public AuthenticationMethod getAuthenticationMethod() {
-	return this.authenticationMethod;
+	return authenticationMethod;
     }
 
     public void setAuthenticationMethod(AuthenticationMethod authenticationMethod) {
@@ -506,7 +514,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public CSSThemeVisualElement getFlashTheme() {
-	return this.flashTheme;
+	return flashTheme;
     }
 
     public void setFlashTheme(CSSThemeVisualElement flashTheme) {
@@ -519,7 +527,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public CSSThemeVisualElement getHtmlTheme() {
-	return this.htmlTheme;
+	return htmlTheme;
     }
 
     public void setHtmlTheme(CSSThemeVisualElement htmlTheme) {
@@ -531,7 +539,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public String getChatId() {
-	return this.chatId;
+	return chatId;
     }
 
     public void setChatId(String chatId) {
@@ -545,7 +553,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Set getUserOrganisations() {
-	return this.userOrganisations;
+	return userOrganisations;
     }
 
     public void setUserOrganisations(Set userOrganisations) {
@@ -554,8 +562,9 @@ public class User implements Serializable, Comparable {
 
     /** This methods adds a new membership for the given user */
     public void addUserOrganisation(UserOrganisation userOrganisation) {
-	if (this.userOrganisations == null)
+	if (userOrganisations == null) {
 	    userOrganisations = new HashSet();
+	}
 	userOrganisations.add(userOrganisation);
     }
 
@@ -566,7 +575,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Set getLearnerProgresses() {
-	return this.learnerProgresses;
+	return learnerProgresses;
     }
 
     public void setLearnerProgresses(Set learnerProgresses) {
@@ -580,7 +589,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Set getUserToolSessions() {
-	return this.userToolSessions;
+	return userToolSessions;
     }
 
     public void setUserToolSessions(Set userToolSessions) {
@@ -594,7 +603,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Set getLearningDesigns() {
-	return this.learningDesigns;
+	return learningDesigns;
     }
 
     public void setLearningDesigns(Set learningDesigns) {
@@ -608,20 +617,23 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Set getLessons() {
-	return this.lessons;
+	return lessons;
     }
 
     public void setLessons(Set lessons) {
 	this.lessons = lessons;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("userId", getUserId()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if (!(other instanceof User))
+	if (!(other instanceof User)) {
 	    return false;
+	}
 	User castOther = (User) other;
 	return new EqualsBuilder().append(this.getUserId(), castOther.getUserId()).isEquals();
     }
@@ -631,6 +643,7 @@ public class User implements Serializable, Comparable {
 	return login.compareTo(u.getLogin());
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getUserId()).toHashCode();
     }
@@ -655,45 +668,47 @@ public class User implements Serializable, Comparable {
 		    .getFckLanguageMapping();
 	}
 
-	return new UserDTO(this.userId, this.firstName, this.lastName, this.login, languageIsoCode, countryIsoCode,
-		direction, this.email, new CSSThemeBriefDTO(this.flashTheme), new CSSThemeBriefDTO(this.htmlTheme),
-		//TimeZone.getTimeZone("Australia/Sydney"),
-		TimeZone.getDefault(), this.authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping,
-		enableFlash, lamsCommunityToken, lamsCommunityUsername);
+	TimeZone tz = getTimeZone() == null ? TimeZone.getDefault() : TimeZone
+		.getTimeZone(User.timezoneList[getTimeZone()]);
+
+	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
+		new CSSThemeBriefDTO(flashTheme), new CSSThemeBriefDTO(htmlTheme),
+		// TimeZone.getTimeZone("Australia/Sydney"),
+		tz, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, enableFlash,
+		lamsCommunityToken, lamsCommunityUsername);
     }
 
     public UserFlashDTO getUserFlashDTO() {
-	return new UserFlashDTO(this.userId, this.firstName, this.lastName, this.login);
+	return new UserFlashDTO(userId, firstName, lastName, login);
     }
 
     /**
      * This method checks whether user is a member of the given organisation
      */
     public boolean isMember(Organisation organisation) {
-	Iterator iterator = this.userOrganisations.iterator();
+	Iterator iterator = userOrganisations.iterator();
 	while (iterator.hasNext()) {
 	    UserOrganisation userOrganisation = (UserOrganisation) iterator.next();
 	    Integer organisationID = userOrganisation.getOrganisation().getOrganisationId();
-	    if (organisationID == organisation.getOrganisationId())
+	    if (organisationID == organisation.getOrganisationId()) {
 		return true;
+	    }
 	}
 	return false;
     }
 
     /**
-     * This method checks whether the user has membership access to the given
-     * workspaceFolder. Membership access means I am a member of the
-     * organisation relating to this folder (either as the root folder or a
-     * folder under the root folder).
+     * This method checks whether the user has membership access to the given workspaceFolder. Membership access means I
+     * am a member of the organisation relating to this folder (either as the root folder or a folder under the root
+     * folder).
      * 
-     * Membership access means that the user has read and write access but
-     * cannot modify anybody else's content/stuff
+     * Membership access means that the user has read and write access but cannot modify anybody else's content/stuff
      */
     public boolean hasMemberAccess(WorkspaceFolder workspaceFolder) {
 	boolean foundMemberFolder = false;
 	Integer workspaceFolderID = workspaceFolder != null ? workspaceFolder.getWorkspaceFolderId() : null;
 	if (workspaceFolderID != null) {
-	    Iterator iterator = this.userOrganisations.iterator();
+	    Iterator iterator = userOrganisations.iterator();
 	    while (iterator.hasNext() && !foundMemberFolder) {
 		UserOrganisation userOrganisation = (UserOrganisation) iterator.next();
 		// not all orgs have a folder
@@ -742,7 +757,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Long getPortraitUuid() {
-	return this.portraitUuid;
+	return portraitUuid;
     }
 
     public void setPortraitUuid(Long portraitUuid) {
@@ -754,7 +769,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Boolean getChangePassword() {
-	return this.changePassword;
+	return changePassword;
     }
 
     public void setChangePassword(Boolean changePassword) {
@@ -766,7 +781,7 @@ public class User implements Serializable, Comparable {
      * 
      */
     public Boolean getEnableFlash() {
-	return this.enableFlash;
+	return enableFlash;
     }
 
     public void setEnableFlash(Boolean enableFlash) {
@@ -774,8 +789,7 @@ public class User implements Serializable, Comparable {
     }
 
     /**
-     * @hibernate.property column="lams_community_token" length="255"
-     *                     not-null="false"
+     * @hibernate.property column="lams_community_token" length="255" not-null="false"
      * 
      */
     public String getLamsCommunityToken() {
@@ -786,20 +800,28 @@ public class User implements Serializable, Comparable {
 	this.lamsCommunityToken = lamsCommunityToken;
     }
 
-   
     /**
-     * @hibernate.property column="lams_community_username" length="255"
-     *                     not-null="false"
+     * @hibernate.property column="lams_community_username" length="255" not-null="false"
      * 
      */
     public String getLamsCommunityUsername() {
-        return lamsCommunityUsername;
+	return lamsCommunityUsername;
     }
 
     public void setLamsCommunityUsername(String lamsCommunityUsername) {
-        this.lamsCommunityUsername = lamsCommunityUsername;
+	this.lamsCommunityUsername = lamsCommunityUsername;
     }
-    
-    
+
+    /**
+     * @hibernate.property column="timezone"
+     * 
+     */
+    public Short getTimeZone() {
+	return timeZone;
+    }
+
+    public void setTimeZone(Short timezone) {
+	timeZone = timezone;
+    }
 
 }

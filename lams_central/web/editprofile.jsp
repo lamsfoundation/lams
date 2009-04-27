@@ -127,6 +127,18 @@
 			</html:select>
 		</td>
 	</tr>
+		<tr>
+		<td class="align-right"><fmt:message key="label.timezone.title"/>:</td>
+		<td>
+			<html:select property="timeZone">
+				<c:forEach begin="0" end="30" var="index">
+					<html:option value="${index}">
+						<fmt:message key="label.timezone.${index}"/>
+					</html:option>
+				</c:forEach>	
+			</html:select>
+		</td>
+	</tr>
 	<c:if test="${not empty lamsCommunityToken}">
 		<tr>
 			<td class="align-right">
@@ -249,7 +261,14 @@
 			</c:forEach>
 		</td>
 	</tr>
-	
+		</tr>
+		<tr>
+		<td class="align-right"><fmt:message key="label.timezone.title"/>:</td>
+		<td>
+			<c:set var="timeZone"><bean:write name="UserForm" property="timeZone" /></c:set>
+			<fmt:message key="label.timezone.${timeZone}"/>
+		</td>
+	</tr>
 </c:if>
 	
 	
