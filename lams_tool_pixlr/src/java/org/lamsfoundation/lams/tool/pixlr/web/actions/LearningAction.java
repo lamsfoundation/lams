@@ -229,8 +229,6 @@ public class LearningAction extends LamsDispatchAction {
 
 	if (imageName == null || imageName.equals("")) {
 	    imageName = FileUtil.generateUniqueContentFolderID() + ".jpg";
-	    pixlrUser.setImageFileName(imageName);
-	    pixlrService.saveOrUpdatePixlrUser(pixlrUser);
 	}
 
 	try {
@@ -248,6 +246,8 @@ public class LearningAction extends LamsDispatchAction {
 	    while ((len = is.read(buf)) > 0) {
 		out.write(buf, 0, len);
 	    }
+	    
+	    pixlrUser.setImageFileName(imageName);
 
 	    // Now save the image size
 	    BufferedImage imageBufferedFile = ImageIO.read(imageFile);
