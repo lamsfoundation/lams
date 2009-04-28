@@ -785,7 +785,6 @@ Function PostLAMSConfig
             ${endif}               
             Abort
         ${EndIf}
-        *
         
         Delete "$TEMP\lams\checkmysql.class"
         Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"
@@ -1267,42 +1266,43 @@ Function createAndDeployTools
         goto error
     
     
-    # Creating all the tools, then deploying them
-    strcpy $TOOL_SIG "ladaco10"
-    strcpy $TOOL_DIR "lams_tool_daco"
-    ;call createNewToolPackage
+    # Deoploying 2.3 tool packages
+    # assessment, pixlr, mindmap, image gallery, video recorder 
+    ############################################################################
+    
+    strcpy $TOOL_SIG "laasse10"
+    strcpy $TOOL_DIR "lams_tool_assessment"
     call filterDeployXML
     call deployTool
     call runUpdateToolContext
     
-    strcpy $TOOL_SIG "lagmap10"
-    strcpy $TOOL_DIR "lams_tool_gmap"
-    ;call createNewToolPackage
+    strcpy $TOOL_SIG "lapixl10"
+    strcpy $TOOL_DIR "lams_tool_pixlr"
     call filterDeployXML
     call deployTool
     call runUpdateToolContext
     
-    strcpy $TOOL_SIG "lawiki10"
-    strcpy $TOOL_DIR "lams_tool_wiki"
-    ;call createNewToolPackage
+    strcpy $TOOL_SIG "lamind10"
+    strcpy $TOOL_DIR "lams_tool_mindmap"
     call filterDeployXML
     call deployTool
     call runUpdateToolContext
     
-    strcpy $TOOL_SIG "lasprd10"
-    strcpy $TOOL_DIR "lams_tool_spreadsheet"
-    ;call createNewToolPackage
+    strcpy $TOOL_SIG "laimag10"
+    strcpy $TOOL_DIR "lams_tool_images"
     call filterDeployXML
     call deployTool
     call runUpdateToolContext
     
-    strcpy $TOOL_SIG "laddim10"
-    strcpy $TOOL_DIR "lams_tool_dimdim"
-    ;;call createNewToolPackage
+    strcpy $TOOL_SIG "lavidr10"
+    strcpy $TOOL_DIR "lams_tool_videorecorder"
     call filterDeployXML
     call deployTool
     call runUpdateToolContext
     
+    ############################################################################
+
+
     strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-compress-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml compress-wars'
     DetailPrint $0
     nsExec::ExecToStack $0
@@ -1478,109 +1478,112 @@ FunctionEnd
 # Creates tool packages for new tools so they can be deployed by the tool deployer
 Function createNewToolPackages
     
-    /*
-    ############################## 2.2 TOOLS ###################################
+    # Creating 2.3 tool packages
+    # assessment, pixlr, mindmap, image gallery, video recorder 
+    ############################################################################
     
-    # Adding the daco package --------------------------------------------------
-    strcpy $1 "$TEMP\lams\ladaco10"
-    
-    SetoutPath "$1"
-    File "${BASE_PROJECT_DIR}\lams_tool_daco\build.properties"
-    
-    SetoutPath "$1\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_daco\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_daco\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_daco\build\deploy\deploy.xml"
-    
-    SetoutPath "$1\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_daco\build\deploy\sql\*"
-    
-    SetoutPath "$1\build\deploy\language"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_daco\build\deploy\language\*.properties"
-    
-    # --------------------------------------------------------------------------
-    
-    
-    # Adding the gmap package --------------------------------------------------
-    strcpy $1 "$TEMP\lams\lagmap10"
-    
-    SetoutPath "$1"
-    File "${BASE_PROJECT_DIR}\lams_tool_gmap\build.properties"
-    
-    SetoutPath "$1\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_gmap\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_gmap\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_gmap\build\deploy\deploy.xml"
-    
-    SetoutPath "$1\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_gmap\build\deploy\sql\*"
-    
-    SetoutPath "$1\build\deploy\language"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_gmap\build\deploy\language\*.properties"
-    # --------------------------------------------------------------------------
-    
-    
-    # Adding the wiki package --------------------------------------------------
-    strcpy $1 "$TEMP\lams\lawiki10"
-    
-    SetoutPath "$1"
-    File "${BASE_PROJECT_DIR}\lams_tool_wiki\build.properties"
-    
-    SetoutPath "$1\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_wiki\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_wiki\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_wiki\build\deploy\deploy.xml"
-    
-    SetoutPath "$1\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_wiki\build\deploy\sql\*"
-    
-    SetoutPath "$1\build\deploy\language"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_wiki\build\deploy\language\*.properties"
-    
-    # --------------------------------------------------------------------------
-    
-    # Adding the spreadsheet package -------------------------------------------
+    # Adding the assessment package -------------------------------------------
   
-    strcpy $1 "$TEMP\lams\lasprd10"
+    strcpy $1 "$TEMP\lams\laasse10"
     
     SetoutPath "$1"
-    File "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build.properties"
+    File "${BASE_PROJECT_DIR}\lams_tool_assessment\build.properties"
     
     SetoutPath "$1\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\deploy\deploy.xml"
+    File "${BASE_PROJECT_DIR}\lams_tool_assessment\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_assessment\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_assessment\build\deploy\deploy.xml"
     
     SetoutPath "$1\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\deploy\sql\*"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_assessment\build\deploy\sql\*"
     
     SetoutPath "$1\build\deploy\language"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_spreadsheet\build\deploy\language\*.properties"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_assessment\build\deploy\language\*.properties"
     
     # --------------------------------------------------------------------------
     
-    # Adding the dimdim package -------------------------------------------
+    # Adding the pixlr package -------------------------------------------
   
-    strcpy $1 "$TEMP\lams\laddim10"
+    strcpy $1 "$TEMP\lams\lapixl10"
     
     SetoutPath "$1"
-    File "${BASE_PROJECT_DIR}\lams_tool_dimdim\build.properties"
+    File "${BASE_PROJECT_DIR}\lams_tool_pixlr\build.properties"
     
     SetoutPath "$1\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\deploy\deploy.xml"
+    File "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\deploy\deploy.xml"
     
     SetoutPath "$1\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\deploy\sql\*"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\deploy\sql\*"
     
     SetoutPath "$1\build\deploy\language"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_dimdim\build\deploy\language\*.properties"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\deploy\language\*.properties"
     
     # --------------------------------------------------------------------------
 
-    ############################## 2.2 TOOLS ###################################
-    */
+    # Adding the mindmap package -------------------------------------------
+  
+    strcpy $1 "$TEMP\lams\lamind10"
+    
+    SetoutPath "$1"
+    File "${BASE_PROJECT_DIR}\lams_tool_mindmap\build.properties"
+    
+    SetoutPath "$1\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\deploy\deploy.xml"
+    
+    SetoutPath "$1\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\deploy\sql\*"
+    
+    SetoutPath "$1\build\deploy\language"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\deploy\language\*.properties"
+    
+    # --------------------------------------------------------------------------
+    
+    # Adding the images package -------------------------------------------
+  
+    strcpy $1 "$TEMP\lams\laimag10"
+    
+    SetoutPath "$1"
+    File "${BASE_PROJECT_DIR}\lams_tool_images\build.properties"
+    
+    SetoutPath "$1\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_images\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_images\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_images\build\deploy\deploy.xml"
+    
+    SetoutPath "$1\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_images\build\deploy\sql\*"
+    
+    SetoutPath "$1\build\deploy\language"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_images\build\deploy\language\*.properties"
+    
+    # --------------------------------------------------------------------------
+    
+    # Adding the Video Recorder package -------------------------------------------
+  
+    strcpy $1 "$TEMP\lams\lavidr10"
+    
+    SetoutPath "$1"
+    File "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build.properties"
+    
+    SetoutPath "$1\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\deploy\deploy.xml"
+    
+    SetoutPath "$1\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\deploy\sql\*"
+    
+    SetoutPath "$1\build\deploy\language"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\deploy\language\*.properties"
+    
+    # --------------------------------------------------------------------------
+
+    ############################################################################
+
 FunctionEnd
 
 Function insertCustomToolContexts
@@ -1640,7 +1643,6 @@ Function DeployConfig
     File "${TEMPLATES}\wrapper.conf"
     File "${TEMPLATES}\index.html"
     File "${SQL}\update_lams_configuration.sql"
-    File "${CONF}\login-config.xml"
     File "${CONF}\log4j.xml"
       
     # create installer.properties
@@ -1994,7 +1996,6 @@ Function RemoveTempFiles
     Delete "$TEMP\index.html"
     Delete "$TEMP\lamsauthentication.xml"
     Delete "$TEMP\update_lams_configuration.sql"
-    Delete "$TEMP\login-config.xml"
     Delete "$INSTDIR\update_lams_configuration.sql"
     RMDIR /r "$WINTEMP\lams"
 FunctionEnd
