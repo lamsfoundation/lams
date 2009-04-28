@@ -668,8 +668,7 @@ public class User implements Serializable, Comparable {
 		    .getFckLanguageMapping();
 	}
 
-	TimeZone tz = getTimeZone() == null ? TimeZone.getDefault() : TimeZone
-		.getTimeZone(User.timezoneList[getTimeZone()]);
+	TimeZone tz = TimeZone.getTimeZone(User.timezoneList[getTimeZone()]);
 
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		new CSSThemeBriefDTO(flashTheme), new CSSThemeBriefDTO(htmlTheme),
@@ -813,15 +812,39 @@ public class User implements Serializable, Comparable {
     }
 
     /**
+     * Returns user's time zone. If NULL, returns server default time zone. If server default time zone is not in the
+     * list of supported time zones, returns GMT.
+     * 
      * @hibernate.property column="timezone"
      * 
      */
     public Short getTimeZone() {
+	if (timeZone == null) {
+	    TimeZone defaultTimeZone = TimeZone.getDefault();
+	    int defaultRawOffset = defaultTimeZone.getRawOffset();
+	    // initial index of GMT time zone, but later it is verified
+	    short fallbackTimeZone = 13;
+	    for (short timeZoneIndex = 0; timeZoneIndex < User.timezoneList.length; timeZoneIndex++) {
+		TimeZone candidateTimeZone = TimeZone.getTimeZone(User.timezoneList[timeZoneIndex]);
+		if (defaultRawOffset == candidateTimeZone.getRawOffset()) {
+		    // we found a time zone from the list which has the same offset as the server's one
+		    timeZone = timeZoneIndex;
+		    break;
+		} else if (candidateTimeZone.getRawOffset() == 0) {
+		    // we found GMT time zone; it will be used if server default time zone is not in the list
+		    fallbackTimeZone = timeZoneIndex;
+		}
+	    }
+	    if (timeZone == null) {
+		timeZone = fallbackTimeZone;
+	    }
+	}
 	return timeZone;
     }
 
-    public void setTimeZone(Short timezone) {
-	timeZone = timezone;
+    public void setTimeZone(Short timeZone) {
+
+	this.timeZone = timeZone;
     }
 
 }
