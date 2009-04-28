@@ -1,14 +1,14 @@
-LAMS 2.2 - Learning Activity Management System
+LAMS 2.3 - Learning Activity Management System
 ----------------------------------------------
 
-This is a pre-packaged copy of LAMS 2.2 for Windows 2000, XP, or 2003.
+This is a pre-packaged copy of LAMS 2.3 for Windows 2000, XP, or 2003.
 For the source code, please see the 'Building LAMS' wiki at 
 
 	http://wiki.lamsfoundation.org/display/lams/Building+LAMS 
 
 for more information.
 
-For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.2
+For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.3
 
 NOTE TO SYSADMINS: If you are doing an upgrade and your users report problems in 
 authoring, they may need to clear their browser cache. If you have a user see 
@@ -20,11 +20,6 @@ NOTE TO SYSADMINS: If you are updating and you have installed the FCKEditor
 flvPlayer previous to running an update, you will need to re-install to the 
 current version. Follow the instructions at:
 http://wiki.lamsfoundation.org/display/lams/flvPlayer.
-
-NOTE TO SYSADMINS: If you are updating LAMS 2.1 to LAMS 2.2, and you currently 
-use LDAP authentication, please check the LDAP wiki page for changes to the 
-configuration values in LAMS 2.2:
-http://wiki.lamsfoundation.org/display/lamsdocs/LDAP+Configuration
 
 1. Startup and Shutdown
 =======================

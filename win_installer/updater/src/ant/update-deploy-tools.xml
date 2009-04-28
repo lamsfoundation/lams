@@ -120,7 +120,8 @@
 		</path>
 		
 		<!-- 2.2 SPECIFIC UPDATE!!!!!!!!!!!! -->
-        <echo>BEGIN Updating application.xml</echo>
+		<!--
+		<echo>BEGIN Updating application.xml</echo>
         <java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
             <arg value="${jboss.deploy}" />
             <arg value="transform.jar" />
@@ -141,6 +142,7 @@
             <arg value="${jboss.deploy}" />
             <arg value="tk-discovery-1.0.0.jar" />
         </java>
+        -->
         <!-- END 2.2 SPECIFIC UPDATE!!!!!!!!!!!! -->
 		
 	</target>

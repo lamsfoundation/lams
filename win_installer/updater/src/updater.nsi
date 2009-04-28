@@ -48,13 +48,12 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.2"
-!define PREVIOUS_VERSION "2.1"
-!define PREVIOUS_VERSION_2 "2.1.1" # FOR 2.2 ONLY
+!define VERSION "2.3"
+!define PREVIOUS_VERSION "2.2"
 !define LANGUAGE_PACK_VERSION "2008-12-05"
 !define LANGUAGE_PACK_VERSION_INT "20081205"
 !define DATE_TIME_STAMP "200812050000"
-######################## Added in the extra .0 for 2.2 for constitency 
+######################## Added in the extra .0 for 2.3 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
 !define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
@@ -229,7 +228,7 @@ SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
             call updateLamswww
             
             ; Call specific update method for this version
-            call update22Specific
+            #call update22Specific
         ${endif}
     SectionEnd
     
@@ -486,9 +485,6 @@ Function checkRegistry
             MessageBox MB_OK|MB_ICONSTOP "You already have LAMS $0 Installed on your computer."
             Abort
         ${elseif} $0 == ${PREVIOUS_VERSION}
-            # This is the correct version to update to
-            strcpy $IS_UPDATE "1" 
-        ${elseif} $0 == ${PREVIOUS_VERSION_2} ############################# REMOVE AFTER 2.2
             # This is the correct version to update to
             strcpy $IS_UPDATE "1" 
         ${else}
@@ -779,30 +775,6 @@ Function PostLAMSConfig
         Pop $0
         Pop $1
         
-        ########################################################################
-        #THIS SECTION IS FOR 2.2 ONLY REMVE AFTER AND REPLACE WITH COMMENTED SECTION BELOW
-        #NEED TO CHECK FOR 2.1 and 2.1.1 datbase versions
-        ${If} $0 != 0
-            Setoutpath "$TEMP\lams\"
-            File "${BUILD_DIR}\checkmysql.class"
-            File "${LIB}\mysql-connector-java-3.1.12-bin.jar"
-            nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS ${PREVIOUS_VERSION_2}'
-            Pop $0
-            Pop $1            
-            ${If} $0 != 0
-                ${StrStr} $3 $1 "UnknownHostException"
-                ${if} $3 == "" 
-                    MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: $1"
-                ${else}
-                    MessageBox MB_OK|MB_ICONEXCLAMATION "An error occurred whilst checking your mysql configuration $\r$\n$\r$\nError: Could not connect to MySql host: $MYSQL_HOST. Please check your database configurations and try again."
-                ${endif} 
-                Abort 
-            ${endif}              
-        ${EndIf}
-        ########################################################################
-        
-        
-        /***************** REMOVE COMMENT AFTER 2.2
         ${If} $0 != 0
             ${StrStr} $3 $1 "UnknownHostException"
             
@@ -813,7 +785,7 @@ Function PostLAMSConfig
             ${endif}               
             Abort
         ${EndIf}
-        */
+        *
         
         Delete "$TEMP\lams\checkmysql.class"
         Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"
@@ -972,204 +944,6 @@ FunctionEnd
 ################################################################################
 # CODE USED FOR UPDATER                                                        #
 ################################################################################
-
-# Updates specific to the 2.1 release
-/*
-Function update21Specific
-
-    # Update the log4j.xml and the login-config.xml files
-    SetOutPath "$INSTDIR\jboss-4.0.2\server\default\conf"
-    File /a "${CONF}\log4j.xml"
-    File /a "${CONF}\login-config.xml"
-    
-    Setoutpath "$TEMP\lams\"
-    file "${BUILD_DIR}\Alter21Integration.class"
-    file "${BUILD_DIR}\Alter21Integration$OrgDTO.class"
-    
-    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
-    ReadRegStr $2 HKLM "${REG_HEAD}" "dir_repository"
-    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
-    # execute the chat update
-    Detailprint '"$3\bin\java.exe" -cp  "lib\mysql-connector-java-3.1.12-bin.jar;." Alter21Integration "$DB_NAME" "$DB_USER" "$DB_PASS" "$1"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp  "lib\mysql-connector-java-3.1.12-bin.jar;." Alter21Integration "$DB_NAME" "$DB_USER" "$DB_PASS" "$1"'
-    pop $0
-    pop $1
-    ${if} $0 != '0'
-        Messagebox MB_OK|MB_ICONSTOP "Error while updating integration classes.$\r$\nError: $1"
-        Abort
-    ${endif}
-    
-    
-    setoutpath "$TEMP\lams\"
-    File "${ANT}\update-mysql-ds-xml-2.1.xml"
-    File /a "${TEMPLATES}\mysql-ds.xml"
-    File /a "${BUILD_DIR}\lams-start.exe"
-    
-    FileOpen $0 "$TEMP\lams\update-mysql-ds.properties" w
-    IfErrors 0 +3
-        Detailprint "Problem opening update-mysql-ds.properties to write"
-        goto error
-    
-
-    # convert '\' to '/' for Ant's benefit
-    Push $INSTDIR
-    Push "\"
-    Call StrSlash
-    Pop $3        
-
-    FileWrite $0 "DEPLOYDIR=$3/jboss-4.0.2/server/default/deploy$\r$\n"
-    FileWrite $0 "DB_NAME=$DB_NAME$\r$\n"
-    FileWrite $0 "DB_USER=$DB_USER$\r$\n"
-    FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"
-    FileWrite $0 "MYSQL_HOST=$MYSQL_HOST$\r$\n"
-    FileWrite $0 "MYSQL_PORT=$MYSQL_PORT"
-
-    Fileclose $0
-    IfErrors 0 +2
-        goto error
-
-    # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\update-mysql-ds.log -buildfile $TEMP\lams\update-mysql-ds-xml-2.1.xml copy-mysql-ds.xml-2.1'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    DetailPrint "Result: $1"
-    ${if} $0 == "fail"
-    ${orif} $0 == 1
-        goto error
-    ${endif}
-    push "$INSTDIR\update-logs\update-mysql-ds.log"
-    push "FAILED"
-    Call FileSearch
-    Pop $0 #Number of times found throughout
-    Pop $3 #Found at all? yes/no
-    Pop $2 #Number of lines found in
-    StrCmp $3 yes 0 +2
-        goto error
-    
-    goto done
-    error:
-        DetailPrint "Problem while running 2.1 specific update scripts."
-        MessageBox MB_OK|MB_ICONSTOP "Problem while running 2.1 specific update scripts."
-        Abort "LAMS configuration failed."
-    done:
-    
-
-    clearerrors
-    Push "2007" #text to be replaced
-    Push "2008" #replace with
-    Push all #replace all occurrences
-    Push all #replace all occurrences
-    Push "$INSTDIR\index.html" #file to replace in
-    Call AdvReplaceInFile
-    iferrors 0 end 
-        Detailprint "Problem updating index.html"
-    end:
-FunctionEnd
-*/
-
-Function update22Specific
-
-    # update context.xml
-    # update wrapper.conf 
-    # create autopatch table
-    # update jboss-cache and jgroups and jboss-serialization jars
-    # delete jmx console wars once and for all
-    
-    # delete jmx console wars --------------------------------------------------
-    RMDir /r "$INSTDIR\jboss-4.0.2\server\default\deploy\jmx-console.war"
-    RMDir /r "$INSTDIR\jboss-4.0.2\server\default\deploy\management"
-    #---------------------------------------------------------------------------
-    
-    # update jboss-cache and jgroups and jboss-serialization jars --------------
-    SetOutPath "$INSTDIR\jboss-4.0.2\server\default\lib\"
-    File /a "${BASE_PROJECT_DIR}\lams_build\lib\jboss\jboss-cache.jar"
-    File /a "${BASE_PROJECT_DIR}\lams_build\lib\jboss\jgroups.jar"
-    File /a "${BASE_PROJECT_DIR}\lams_build\lib\jboss\jboss-serialization.jar"
-    #---------------------------------------------------------------------------
-    
-    # update context.xml -------------------------------------------------------
-    SetOutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\"
-    File /a "${CONF}\context.xml"
-    #---------------------------------------------------------------------------
-    
-    setoutpath "$TEMP\lams\"
-    File "${ANT}\update-2.2-specific.xml"
-    File /a "${CONF}\wrapper.conf"
-    File /a "${SQL}\addAutoPatchTable.sql"
-
-    #---------------------------------------------------------------------------
-    
-    # set up the ant script ----------------------------------------------------
-    FileOpen $0 "$TEMP\lams\update-2.2-specific.properties" w
-    IfErrors 0 +3
-        Detailprint "Problem opening update-mysql-ds.properties to write"
-        goto error
-    
-    # Add inst dir
-    Push $INSTDIR
-    Push "\"
-    Call StrSlash
-    Pop $3
-    FileWrite $0 "INSTDIR=$3$\r$\n"
-    
-    # Use unix slashes for config in wrapper.conf
-    Push $JDK_DIR
-    Push "\"
-    Call StrSlash
-    Pop $4
-    FileWrite $0 "JDK_DIR_UNIX_SLASH=$4$\r$\n" 
-    
-    # Use unix slashes for config in wrapper.conf
-    Push $TEMP
-    Push "\"
-    Call StrSlash
-    Pop $5
-    FileWrite $0 "TEMP=$5$\r$\n"          
-    
-    FileWrite $0 "db.name=$DB_NAME$\r$\n"
-    FileWrite $0 "db.username=$DB_USER$\r$\n"
-    FileWrite $0 "db.password=$DB_PASS$\r$\n"
-    FileWrite $0 "db.driver=com.mysql.jdbc.Driver$\r$\n"
-    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
-
-    Fileclose $0
-    IfErrors 0 +2
-        goto error
-    #---------------------------------------------------------------------------
-    
-    
-    # update wrapper.conf and create autopatch table----------------------------
-    # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\update-2.2-specific.log -buildfile $TEMP\lams\update-2.2-specific.xml copy-wrapper.conf add-autopatch-table'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    DetailPrint "Result: $1"
-    ${if} $0 == "fail"
-    ${orif} $0 == 1
-        goto error
-    ${endif}
-    push "$INSTDIR\update-logs\update-mysql-ds.log"
-    push "FAILED"
-    Call FileSearch
-    Pop $0 #Number of times found throughout
-    Pop $3 #Found at all? yes/no
-    Pop $2 #Number of lines found in
-    StrCmp $3 yes 0 +2
-        goto error
-    #---------------------------------------------------------------------------
-
-    goto done
-    error:
-        DetailPrint "Problem while running 2.2 specific update scripts."
-        MessageBox MB_OK|MB_ICONSTOP "Problem while running 2.2 specific update scripts."
-        Abort "LAMS configuration failed."
-    done:
-    
-FunctionEnd
 
 Function setupant
     
@@ -1333,9 +1107,6 @@ Function updateCoreDatabase
     FileWrite $0 "update lams_configuration set config_value='${SERVER_VERSION_NUMBER}' where config_key='LearnerClientVersion' OR config_key='ServerVersionNumber' OR config_key='MonitorClientVersion' OR config_key='AuthoringClientVersion';$\r$\n"
     Filewrite $0 "update lams_configuration set config_value='${VERSION}' where config_key='Version';$\r$\n"
     Filewrite $0 "update lams_configuration set config_value='${LANGUAGE_PACK_VERSION}' where config_key='DictionaryDateCreated';$\r$\n"
-    
-    ##### 2.2 ONLY ######
-    Filewrite $0 "update lams_learning_library set valid_flag=0 where title='Dimdim';$\r$\n"
     
     Fileclose $0
     IfErrors 0 +3
@@ -1707,6 +1478,7 @@ FunctionEnd
 # Creates tool packages for new tools so they can be deployed by the tool deployer
 Function createNewToolPackages
     
+    /*
     ############################## 2.2 TOOLS ###################################
     
     # Adding the daco package --------------------------------------------------
@@ -1808,186 +1580,8 @@ Function createNewToolPackages
     # --------------------------------------------------------------------------
 
     ############################## 2.2 TOOLS ###################################
-
+    */
 FunctionEnd
-
-
-/*
-# Creates a tool package based on $TOOL_SIG and $TOOL_DIR paramas
-Function createToolPackage
-    SetoutPath "$TEMP\lams\$TOOL_SIG"
-    File "$TOOL_DIR\build.properties"
-    
-    SetoutPath "$TEMP\lams\$TOOL_SIG\build\deploy\"
-    File "$TOOL_DIR\build\lib\*.jar"
-    File "$TOOL_DIR\build\lib\*.war"
-    File "$TOOL_DIR\build\deploy\deploy.xml"
-    
-    SetoutPath "$TEMP\lams\$TOOL_SIG\build\deploy\sql"
-    File /r "$TOOL_DIR\build\deploy\sql\*"
-    
-    SetoutPath "$TEMP\lams\$TOOL_SIG\build\deploy\language"
-    File "$TOOL_DIR\build\deploy\language\*.properties"
-FunctionEnd
-*/
-
-
-# Copying the tool-specific build.property files
-/*
-Function copyToolBuildProperties
-    
-    SetoutPath "$TEMP\lams\lachat11"
-    File "${BASE_PROJECT_DIR}\lams_tool_chat\build.properties"
-    
-    SetoutPath "$TEMP\lams\lafrum11"
-    File "${BASE_PROJECT_DIR}\lams_tool_forum\build.properties"
-    
-    SetoutPath "$TEMP\lams\lamc11"
-    File "${BASE_PROJECT_DIR}\lams_tool_lamc\build.properties"
-    
-    SetoutPath "$TEMP\lams\laqa11"
-    File "${BASE_PROJECT_DIR}\lams_tool_laqa\build.properties"
-    
-    SetoutPath "$TEMP\lams\larsrc11"
-    File "${BASE_PROJECT_DIR}\lams_tool_larsrc\build.properties"
-    
-    SetoutPath "$TEMP\lams\lanb11"
-    File "${BASE_PROJECT_DIR}\lams_tool_nb\build.properties"
-    
-    SetoutPath "$TEMP\lams\lantbk"
-    File "${BASE_PROJECT_DIR}\lams_tool_notebook\build.properties"
-    
-    SetoutPath "$TEMP\lams\lasbmt11"
-    File "${BASE_PROJECT_DIR}\lams_tool_sbmt\build.properties"
-    
-    SetoutPath "$TEMP\lams\lascrb11"
-    File "${BASE_PROJECT_DIR}\lams_tool_scribe\build.properties"
-    
-    SetoutPath "$TEMP\lams\lasurv11"
-    File "${BASE_PROJECT_DIR}\lams_tool_survey\build.properties"
-    
-    SetoutPath "$TEMP\lams\latask10"
-    File "${BASE_PROJECT_DIR}\lams_tool_task\build.properties"
-    
-    SetoutPath "$TEMP\lams\lavote11"
-    File "${BASE_PROJECT_DIR}\lams_tool_vote\build.properties"
-
-FunctionEnd
-
-# Extracting the jars and wars for each tool also copies language files and sql
-Function extractToolJars
-
-    SetoutPath "$TEMP\lams\lachat11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_chat\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_chat\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_chat\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\lachat11\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_chat\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\lachat11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_chat\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\lafrum11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_forum\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_forum\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_forum\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\lafrum11\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_forum\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\lafrum11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_forum\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\lamc11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_lamc\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_lamc\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_lamc\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\lamc11\build\deploy\sql"
-    File /r  "${BASE_PROJECT_DIR}\lams_tool_lamc\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\lamc11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_lamc\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\laqa11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_laqa\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_laqa\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_laqa\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\laqa11\build\deploy\sql"
-    File /r  "${BASE_PROJECT_DIR}\lams_tool_laqa\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\laqa11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_laqa\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\larsrc11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\larsrc11\build\deploy\sql"
-    File /r  "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\larsrc11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\lanb11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_nb\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_nb\build\lib\*.war" 
-    File "${BASE_PROJECT_DIR}\lams_tool_nb\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\lanb11\build\deploy\sql"
-    File /r  "${BASE_PROJECT_DIR}\lams_tool_nb\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\lanb11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_nb\build\deploy\language\*.properties"   
-
-    SetoutPath "$TEMP\lams\lantbk11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_notebook\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_notebook\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_notebook\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\lantbk11\build\deploy\sql"
-    File /r  "${BASE_PROJECT_DIR}\lams_tool_notebook\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\lantbk11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_notebook\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\lasbmt11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\lasbmt11\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\lasbmt11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\lascrb11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_scribe\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_scribe\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_scribe\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\lascrb11\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_scribe\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\lascrb11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_scribe\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\lasurv11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_survey\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_survey\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_survey\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\lasurv11\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_survey\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\lasurv11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_survey\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\latask10\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_task\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_task\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_task\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\latask10\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_task\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\latask10\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_task\build\deploy\language\*.properties"
-    
-    SetoutPath "$TEMP\lams\lavote11\build\deploy\"
-    File "${BASE_PROJECT_DIR}\lams_tool_vote\build\lib\*.jar"
-    File "${BASE_PROJECT_DIR}\lams_tool_vote\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_vote\build\deploy\deploy.xml"
-    SetoutPath "$TEMP\lams\lavote11\build\deploy\sql"
-    File /r "${BASE_PROJECT_DIR}\lams_tool_vote\build\deploy\sql\*"
-    SetoutPath "$TEMP\lams\lavote11\build\deploy\language"
-    File "${BASE_PROJECT_DIR}\lams_tool_vote\build\deploy\language\*.properties"
-    
-    
-FunctionEnd
-*/
 
 Function insertCustomToolContexts
 
