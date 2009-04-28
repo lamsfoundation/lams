@@ -1,5 +1,6 @@
 ﻿package {
 	import flash.net.*;
+	import flash.text.*;
 	import actions.*;
 	public class ActionLoader extends URLLoader {
 		protected var localId:int;
@@ -16,7 +17,7 @@
 			this.prevRelated = null;
 			this.nextRelated = null;
 			this.highestRelatedId = -1;
-			this.request = new URLRequest(server);
+			this.request = new URLRequest(RequestTools.antiCache(server));
 			this.request.contentType = "application/x-www-form-urlencoded";
 			this.request.method = URLRequestMethod.POST;
 			var xml:XML = action.toXml();

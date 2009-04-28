@@ -35,6 +35,9 @@
 		public function InternalConcept(word:String, color:int, free:Boolean, owned:Boolean, player:String, id:int){
 			super(word, color, free, owned, player, id);
 		}
+		public function checkButtons():void {
+			this.placeButtons();
+		}
 		override protected function createTextFormat():TextFormat {
 			var textFormat:TextFormat = super.createTextFormat();
 			textFormat.size = 16;

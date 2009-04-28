@@ -36,7 +36,7 @@
 			this.addChild(this.sons);
 			this.applyCosmetics();
 			this.expandButton = new ExpandSign();
-			this.expandButton.width = this.expandButton.height = 8;
+			this.expandButton.width = this.expandButton.height = 12;
 			this.expandButton.addEventListener(MouseEvent.MOUSE_DOWN, this.onExpandPress);
 			this.expanded = true;
 			this.proper();
@@ -80,6 +80,10 @@
 			try{
 				this.sons.removeChild(branch);
 			}catch(error:ArgumentError){};
+			if(this.sonCount==0){
+				this.expanded = true;
+				InternalConcept(this.base).checkButtons();
+			}
 			this.mindMap.conceptRemoved(InternalConcept(branch.base));
 		}
 		public function getConceptById(id:int):Concept {

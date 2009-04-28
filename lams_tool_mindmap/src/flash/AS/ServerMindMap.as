@@ -17,8 +17,8 @@
 			super(new BaseConcept("", 0, false, false, "", -1), player, dictionary);
 			this.fromXml(originalXml, false);
 			this.loaders = new Array();
-			this.pollServer = pollServer.indexOf('?')==-1?pollServer+"?":pollServer+"&";
-			this.notifyServer = notifyServer;
+			this.pollServer = pollServer;
+			this.notifyServer = RequestTools.continueURL(notifyServer)+"lastActionId="+actionId;
 			this.id = id;
 			this.lastActionId = actionId;
 			this.nextLocalId = 0;
@@ -31,7 +31,7 @@
 		}
 		protected function requestActions():void {
 			this.pollTimer.reset();
-			var request:URLRequest = new URLRequest(this.pollServer);
+			var request:URLRequest = new URLRequest(RequestTools.continueURL(RequestTools.antiCache(this.pollServer)));
 			request.method = URLRequestMethod.GET;
 			var urlVariables:URLVariables = new URLVariables("lastActionID="+this.lastActionId);
 			request.data = urlVariables;

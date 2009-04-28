@@ -3,6 +3,7 @@
 	import flash.events.*;
 	import flash.net.*;
 	import flash.external.*;
+	import flash.text.*;
 	import org.lamsfoundation.lams.common.dictionary.*;
 	public class MultiPlayer extends MovieClip{
 		protected var xmlLabels:XML;
@@ -12,7 +13,7 @@
 			if (this.loaderInfo.parameters.dictionary == undefined) {
 				request = new URLRequest("dictionary.xml");
 			}else{
-				request = new URLRequest(this.loaderInfo.parameters.dictionary);
+				request = new URLRequest(RequestTools.antiCache(this.loaderInfo.parameters.dictionary));
 			}
 			var labelsLoader:URLLoader = new URLLoader(request);
 			labelsLoader.addEventListener(Event.COMPLETE, this.onLabelsLoad);
@@ -23,7 +24,7 @@
 				if (this.loaderInfo.parameters.xml == undefined) {
 					request = new URLRequest("tree.xml");
 				}else{
-					request = new URLRequest(this.loaderInfo.parameters.xml);
+					request = new URLRequest(RequestTools.antiCache(this.loaderInfo.parameters.xml));
 				}
 				var treeLoader:URLLoader = new URLLoader(request);
 				treeLoader.addEventListener(Event.COMPLETE, this.onTreeLoad);
