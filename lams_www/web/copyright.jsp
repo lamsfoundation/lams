@@ -16,7 +16,7 @@
 		<h1 class="no-tabs-below">
 			<fmt:message key="msg.LAMS.copyright.statement.1"/>
 		</h1>
-		<div id="header-no-tabs"></div>
+		<div id="header"></div>
 		<div id="content">
 			<p><fmt:message key="msg.LAMS.copyright.statement.2"/></p>
 			<p><fmt:message key="msg.LAMS.copyright.statement.3"/></p>
