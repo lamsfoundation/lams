@@ -84,6 +84,7 @@ import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.Competence;
+import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -2026,38 +2027,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 	}
 
-	// TODO: Save competence mappings on import.
-	// for (AuthoringActivityDTO actDto : actDtoList)
-	// {
-	// if (removedActMap.containsKey(actDto.getActivityID())) {
-	// continue;
-	// }
-	// if (actDto.getIisToolActivity())
-	// {
-	// for (Activity act : actList)
-	// {
-	// Set<CompetenceMapping> competenceMappings = new HashSet<CompetenceMapping>();
-	// CompetenceMapping competenceMapping = new CompetenceMapping();
-	// for(Competence competence : competenceList)
-	// {
-	// for (String comptenceMappingStr : actDto.getCompetenceMappingTitles())
-	// {
-	// if (competence.getTitle() == comptenceMappingStr)
-	// {
-	// if (activityMapper.get(actDto.getActivityID()).getActivityId() == act.getActivityId() )
-	// {
-	// competenceMapping.setToolActivity((ToolActivity)act);
-	// competenceMapping.setCompetence(competence);
-	// break;
-	// }
-	// }
-	// }
-	// }
-	// ((ToolActivity)activityMapper.get(actDto.getActivityID())).setCompetenceMappings(competenceMappings);
-	// }
-	// }
-	// }
-
 	// branch mappings - maps groups to branches, map conditions to branches
 	List<BranchActivityEntryDTO> entryDtoList = dto.getBranchMappings();
 	if (entryDtoList != null) {
@@ -2087,23 +2056,36 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	learningDesignDAO.insert(ld);
 
 	// Once we have the competences saved, we can save the competence mappings
-	// for (AuthoringActivityDTO actDto : actDtoList) {
-	// for (String competenceMappingStr : actDto.getActivityEvaluations()) {
-	//
-	// CompetenceMapping competenceMapping = new CompetenceMapping();
-	// ActivityEvaluation activityEvaluation = new ActivityEvaluation();
-	// activityEvaluation.setToolOutputDefinition(toolOutputDefinition);
-	// activityEvaluation.setActivity(act);
-	// activityEvaluation.setActivityEvaluationSessions(new HashSet<ActivityEvaluationSession>());
-	// baseDAO.insertOrUpdate(activityEvaluation);
-	// }
-	// }
+	Set<CompetenceMapping> allCompetenceMappings = new HashSet<CompetenceMapping>(); 
+	for (AuthoringActivityDTO actDto : actDtoList) {
+		 if (removedActMap.containsKey(actDto.getActivityID())){
+			 continue;
+		 }
+		 if (actDto.getActivityTypeID().intValue() == Activity.TOOL_ACTIVITY_TYPE){
+			 for (Activity act : actList){
+				 for(Competence competence : competenceList){
+					 for (String comptenceMappingStr : actDto.getCompetenceMappingTitles()){
+						 if (competence.getTitle() == comptenceMappingStr){
+							 if (activityMapper.get(actDto.getActivityID()).getActivityId() == act.getActivityId() ){
+								 CompetenceMapping competenceMapping = new CompetenceMapping();
+								 competenceMapping.setToolActivity((ToolActivity)act);
+								 competenceMapping.setCompetence(competence);
+								 allCompetenceMappings.add(competenceMapping);
+								 break;
+							 }
+						 }
+					 }
+				 }
+			 }
+		 }
+	 }
+	 baseDAO.insertOrUpdateAll(allCompetenceMappings);
 
 	return ld.getLearningDesignId();
     }
 
     /**
-     * Method to sort activity DTO according to the rule: Paretns is before their children.
+     * Method to sort activity DTO according to the rule: Parents is before their children.
      * 
      * @param activities
      * @return
