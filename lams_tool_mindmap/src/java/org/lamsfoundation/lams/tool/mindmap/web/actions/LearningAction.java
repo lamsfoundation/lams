@@ -112,7 +112,7 @@ public class LearningAction extends LamsDispatchAction {
 	// Retrieve the session and content.
 	MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionID);
 	if (mindmapSession == null) {
-	    throw new MindmapException("Cannot retreive session with toolSessionID" + toolSessionID);
+	    throw new MindmapException("Cannot retreive session with toolSessionID: " + toolSessionID);
 	}
 
 	Mindmap mindmap = mindmapSession.getMindmap();
@@ -183,10 +183,6 @@ public class LearningAction extends LamsDispatchAction {
 		mindmapType = "images/mindmap_singleuser.swf";
 	}
 	request.setAttribute("mindmapType", mindmapType);
-
-	// Saving lastActionID
-	Long lastActionId = mindmapService.getLastGlobalIdByMindmapId(mindmap.getUid());
-	mindmap.setLastActionId(lastActionId);
 
 	// pollServer Parameter
 	String pollServerParam = Configuration.get(ConfigurationKeys.SERVER_URL)
@@ -282,7 +278,9 @@ public class LearningAction extends LamsDispatchAction {
 	int requestType = notifyRequestModel.getType();
 
 	// TODO: if request was previously created
-	Long lastActionId = mindmapService.getMindmapByUid(mindmapId).getLastActionId();
+	Long lastActionId = WebUtil.readLongParam(request, "lastActionId", false);
+				//= mindmapService.getMindmapByUid(mindmapId).getLastActionId();
+
 	MindmapRequest mindmapRequest = mindmapService.getRequestByUniqueId(notifyRequestModel.getID(), userId,
 		mindmapId, lastActionId);
 
@@ -304,14 +302,13 @@ public class LearningAction extends LamsDispatchAction {
 	    if (requestType == 0) {
 		// if node is created not by author or by other user... cannot delete
 		if (mindmapNode.getUser() == mindmapService.getUserByUID(userId)) {
-		    List childNodes = mindmapService
-			    .getMindmapNodeByParentId(notifyRequestModel.getNodeID(), mindmapId);
+		    List childNodes = mindmapService.getMindmapNodeByParentId(notifyRequestModel.getNodeID(), mindmapId);
 		    if (childNodes == null || childNodes.size() == 0) // check for Father
 		    {
 			mindmapService.deleteNodeByUniqueMindmapUser(notifyRequestModel.getNodeID(), mindmapId, userId);
 			mindmapRequest = saveMindmapRequest(mindmapRequest, requestType, notifyRequestModel, userId,
 				mindmapId, null);
-			notifyResponse = generateNotifyResponse(1, mindmapRequest.getUniqueId(), null);
+			notifyResponse = generateNotifyResponse(1, mindmapRequest.getGlobalId(), null);
 		    } else
 			notifyResponse = generateNotifyResponse(0, null, null);
 		} else {
@@ -330,7 +327,7 @@ public class LearningAction extends LamsDispatchAction {
 				.getMindmapByUid(mindmapId));
 		mindmapRequest = saveMindmapRequest(mindmapRequest, requestType, notifyRequestModel, userId, mindmapId,
 			uniqueId);
-		notifyResponse = generateNotifyResponse(1, mindmapRequest.getUniqueId(), uniqueId);
+		notifyResponse = generateNotifyResponse(1, mindmapRequest.getGlobalId(), uniqueId);
 	    }
 	    // change color
 	    else if (requestType == 2) {
@@ -340,7 +337,7 @@ public class LearningAction extends LamsDispatchAction {
 		    mindmapService.saveOrUpdateMindmapNode(mindmapNode);
 		    mindmapRequest = saveMindmapRequest(mindmapRequest, requestType, notifyRequestModel, userId,
 			    mindmapId, null);
-		    notifyResponse = generateNotifyResponse(1, mindmapRequest.getUniqueId(), null);
+		    notifyResponse = generateNotifyResponse(1, mindmapRequest.getGlobalId(), null);
 		} else {
 		    notifyResponse = generateNotifyResponse(0, null, null);
 		}
@@ -353,13 +350,16 @@ public class LearningAction extends LamsDispatchAction {
 		    mindmapService.saveOrUpdateMindmapNode(mindmapNode);
 		    mindmapRequest = saveMindmapRequest(mindmapRequest, requestType, notifyRequestModel, userId,
 			    mindmapId, null);
-		    notifyResponse = generateNotifyResponse(1, mindmapRequest.getUniqueId(), null);
+		    notifyResponse = generateNotifyResponse(1, mindmapRequest.getGlobalId(), null);
 		} else {
 		    notifyResponse = generateNotifyResponse(0, null, null);
 		}
 	    }
 	} else {
-	    notifyResponse = generateNotifyResponse(0, null, null);
+	    if (requestType == 1)
+		notifyResponse = generateNotifyResponse(1, mindmapRequest.getGlobalId(), mindmapRequest.getNodeChildId());
+	    else
+		notifyResponse = generateNotifyResponse(1, mindmapRequest.getGlobalId(), null);
 	}
 
 	try {
@@ -450,7 +450,7 @@ public class LearningAction extends LamsDispatchAction {
 		if (nodesList != null && nodesList.size() > 0)
 		    rootMindmapNode = (MindmapNode) nodesList.get(0);
 		else
-		    log.error("notifyServerAction(): Error finding node while changing text or color!");
+		    log.error("pollServerAction(): Error finding node while changing text or color!");
 	    }
 
 	    MindmapNode mindmapNode = null;
@@ -459,7 +459,7 @@ public class LearningAction extends LamsDispatchAction {
 		if (nodesList != null && nodesList.size() > 0)
 		    mindmapNode = (MindmapNode) nodesList.get(0);
 		else
-		    log.error("notifyServerAction(): Error finding node while creating a node!");
+		    log.error("pollServerAction(): Error finding node while creating a node!");
 	    }
 	    // delete node
 	    if (requestType == 0) {
@@ -560,14 +560,18 @@ public class LearningAction extends LamsDispatchAction {
 	    XStream xstream = new XStream();
 	    xstream.alias("branch", NodeModel.class);
 	    String mindmapContent = xstream.toXML(currentNodeModel);
-
+	    
+	    // Saving lastActionID
+	    Long lastActionId = mindmapService.getLastGlobalIdByMindmapId(mindmap.getUid());
+	    //mindmap.setLastActionId(lastActionId);
+	    
 	    // adding lastActionId
 	    if (mindmap.isMultiUserMode())
 		if (mindmap.isLockOnFinished() && !mindmapUser.isFinishedActivity())
-		    mindmapContent = "<mindmap>\n" + mindmapContent + "\n<lastActionId>" + mindmap.getLastActionId()
+		    mindmapContent = "<mindmap>\n" + mindmapContent + "\n<lastActionId>" + lastActionId
 			    + "</lastActionId>\n</mindmap>";
 		else if (!mindmap.isLockOnFinished())
-		    mindmapContent = "<mindmap>\n" + mindmapContent + "\n<lastActionId>" + mindmap.getLastActionId()
+		    mindmapContent = "<mindmap>\n" + mindmapContent + "\n<lastActionId>" + lastActionId
 			    + "</lastActionId>\n</mindmap>";
 
 	    try {

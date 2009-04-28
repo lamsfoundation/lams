@@ -59,7 +59,7 @@ public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
 	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUEST_BY_UNIQUE_ID, 
 		new Object[]{uniqueId, userId, mindmapId, globalId}); 
 	if (list != null && list.size() > 0)
-	    return (MindmapRequest) list.get(0);
+	    return (MindmapRequest) list.get(list.size()-1);
 	else
 	    return null;
     }

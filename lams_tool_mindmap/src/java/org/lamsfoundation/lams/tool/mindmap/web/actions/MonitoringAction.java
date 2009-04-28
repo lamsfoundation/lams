@@ -102,7 +102,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("mindmapDTO", mindmapDTO);
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
-	request.setAttribute("toolSessionID", session.getUid());
+	request.setAttribute("toolSessionID", session.getSessionId());
 
 	return mapping.findForward("success");
     }
