@@ -746,6 +746,9 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 
 						_canvasModel.removeComplexActivity(ca);	
 					} else {
+						if(ca.activity.activityTypeID == Activity.CONDITION_GATE_ACTIVITY_TYPE){
+							_canvasModel.getCanvas().ddm.removeEntries(_canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(ca.activity.activityUIID).all);
+						}
 						_canvasModel.removeActivityOnBin(ca.activity.activityUIID);
 					}
 				} else {
