@@ -119,6 +119,102 @@
 			</fileset>
 		</path>
 		
+		<!--
+		  Add
+		      - web lams-gradebook.war
+		      slf4j-api-1.5.2.jar
+		      slf4j-log4j12-1.5.2.jar
+		      lucene-core-2.4.0.jar
+		      lucene-snowball-2.4.0.jar
+		      jxl.jar
+		      opencsv-1.8.jar
+		      
+		  Edit 
+		      FCKeditor-2.3.jar - FCKeditor-2.4.1.jar
+		      mysql-connector-java-3.1.12-bin.jar - mysql-connector-java-5.0.8-bin.jar
+		      
+		  Delete 
+		      jboss-cache.jar
+		      jgroups.jar
+		-->
+
+		
+		<echo>BEGIN Updating application.xml</echo>
+		
+		<!-- Adding gradebook web module -->
+		<java classname="org.lamsfoundation.lams.tool.deploy.AddWebAppToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="lams-gradebook.war" />
+			<arg value="/lams/gradebook" />
+        </java>
+		
+		
+		<!-- Adding new third party jar modules -->
+		<java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="slf4j-api-1.5.2.jar" />
+        </java>
+		
+		<java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="slf4j-log4j12-1.5.2.jar" />
+        </java>
+			
+		<java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="lucene-core-2.4.0.jar" />
+        </java>
+			
+		<java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="lucene-snowball-2.4.0.jar" />
+        </java>
+			
+		<java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="jxl.jar" />
+        </java>
+			
+		<java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="opencsv-1.8.jar" />
+        </java>
+		
+		<!-- Removing Defunct libraries -->
+		
+		<java classname="org.lamsfoundation.lams.tool.deploy.RemoveModuleFromApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="jboss-cache.jar" />
+        </java>
+		
+		<java classname="org.lamsfoundation.lams.tool.deploy.RemoveModuleFromApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="jgroups.jar" />
+        </java>
+		
+		
+		<!-- Editing changed libraries -->
+		
+		<java classname="org.lamsfoundation.lams.tool.deploy.RemoveModuleFromApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="FCKeditor-2.3.jar" />
+        </java>
+        
+        <java classname="org.lamsfoundation.lams.tool.deploy.RemoveModuleFromApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="mysql-connector-java-3.1.12-bin.jar" />
+        </java>
+		
+		<java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="FCKeditor-2.4.1.jar" />
+        </java>
+            
+        <java classname="org.lamsfoundation.lams.tool.deploy.AddModuleToApplicationXmlTask" classpathref="deploy.lib.classpath" fork="true">
+            <arg value="${jboss.deploy}" />
+            <arg value="mysql-connector-java-5.0.8-bin.jar" />
+        </java>
+		
 		<!-- 2.2 SPECIFIC UPDATE!!!!!!!!!!!! -->
 		<!--
 		<echo>BEGIN Updating application.xml</echo>

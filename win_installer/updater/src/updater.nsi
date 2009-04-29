@@ -228,7 +228,7 @@ SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
             call updateLamswww
             
             ; Call specific update method for this version
-            #call update22Specific
+            call update23Specific
         ${endif}
     SectionEnd
     
@@ -1022,6 +1022,84 @@ Function backupLams
     ${endif}
 FunctionEnd
 
+# Specific updates for 2.3, delete for next updater
+Function update23Specific
+    
+    # Slimming jboss 
+    ############################################################################
+    
+    detailprint "Slimming jboss, files backed up at $INSTDIR\jboss-4.0.2\server\default\slim-backup"
+    
+    # Backing up files to be changed
+    strcpy $0 "$INSTDIR\jboss-4.0.2\server\default\"
+    
+    createdirectory "$0\slim-backup"
+    createdirectory "$0\slim-backup\deploy"
+    createdirectory "$0\slim-backup\conf"
+    createdirectory "$0\slim-backup\lib"
+    
+    strcpy $1 "$0\slim-backup\deploy"
+    
+    CopyFiles "$0\deploy\ejb-deployer.xml" "$1"
+    CopyFiles "$0\deploy\client-deployer-service.xml" "$1"
+    CopyFiles "$0\deploy\schedule-manager-service.xml" "$1"
+    CopyFiles "$0\deploy\scheduler-service.xml" "$1"
+    CopyFiles "$0\deploy\bsh-deployer.xml" "$1"
+    CopyFiles "$0\deploy\jboss-aop.deployer" "$1"
+    CopyFiles "$0\deploy\jboss-ws4ee.sar" "$1"
+    CopyFiles "$0\deploy\jmx-console.war" "$1"
+    CopyFiles "$0\deploy\http-invoker.sar" "$1"
+    
+    strcpy $1 "$0\slim-backup\conf"
+    
+    CopyFiles "$0\conf\jboss-service.xml" "$1"
+    CopyFiles "$0\conf\standardjboss.xml" "$1"
+    
+    strcpy $1 "$0\slim-backup\lib"
+    
+    CopyFiles "$0\autonumber-plugin.jar" "$1"
+    CopyFiles "$0\bcel.jar" "$1"
+    CopyFiles "$0\jboss-jaxrpc.jar" "$1"
+    CopyFiles "$0\jboss-saaj.jar" "$1"
+    CopyFiles "$0\scheduler-plugin.jar" "$1"
+    CopyFiles "$0\scheduler-plugin-example.jar" "$1"
+    CopyFiles "$0\bsh-deployer.jar" "$1"
+   
+    
+    # Adding the slimming jboss files
+    setoutpath $0\conf
+    file "${CONF}\jboss\*.xml"
+    
+    # Removing unwanted web apps and files
+    rmdir /r  "$0\deploy\jboss-aop.deployer"
+    rmdir /r  "$0\deploy\jboss-ws4ee.sar"
+    rmdir /r  "$0\deploy\jmx-console.war"
+    rmdir /r  "$0\deploy\http-invoker.sar"
+    
+    delete "$0\deploy\client-deployer-service.xml"
+    delete "$0\deploy\schedule-manager-service.xml"
+    delete "$0\deploy\scheduler-service.xml"
+    delete "$0\deploy\bsh-deployer.xml"
+    
+    delete "$0\lib\autonumber-plugin.jar"
+    delete "$0\lib\bcel.jar"
+    delete "$0\lib\jboss-jaxrpc.jar"
+    delete "$0\lib\jboss-saaj.jar"
+    delete "$0\lib\scheduler-plugin.jar"
+    delete "$0\lib\scheduler-plugin-example.jar"
+    delete "$0\lib\bsh-1.3.0.jar"
+    delete "$0\lib\bsh-deployer.jar.xml"
+    
+    ############################################################################
+    
+    # Remove the defunct jars
+    delete "$0\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar"
+    delete "$0\deploy\lams.ear\FCKeditor-2.3.jar"
+    delete "$0\deploy\lams.ear\jboss-cache.jar"
+    delete "$0\deploy\lams.ear\jgroups.jar"
+    
+FunctionEnd
+
 
 ; Updating the the core lams jars/wars
 ; Needs lams_build/build.xml tasks assemble-ear and deploy-ear-updater to be executed first
@@ -1241,10 +1319,10 @@ Function createAndDeployTools
     */
     
     # Get the java libraries needed for the tool deployer
+    Detailprint "Copying tool deployer fils to $TEMP\lams\lib"
     SetOutPath "$TEMP\lams\lib"
     File "${BASE_PROJECT_DIR}\lams_build\deploy-tool\lib\*.jar"
     
-
     # Exploding the lams-learning.war and lams-monitoring.war
     strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-explode-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml explode-wars'
     DetailPrint $0
@@ -1274,31 +1352,31 @@ Function createAndDeployTools
     strcpy $TOOL_DIR "lams_tool_assessment"
     call filterDeployXML
     call deployTool
-    call runUpdateToolContext
+    #call runUpdateToolContext
     
     strcpy $TOOL_SIG "lapixl10"
     strcpy $TOOL_DIR "lams_tool_pixlr"
     call filterDeployXML
     call deployTool
-    call runUpdateToolContext
+    #call runUpdateToolContext
     
     strcpy $TOOL_SIG "lamind10"
     strcpy $TOOL_DIR "lams_tool_mindmap"
     call filterDeployXML
     call deployTool
-    call runUpdateToolContext
+    #call runUpdateToolContext
     
     strcpy $TOOL_SIG "laimag10"
     strcpy $TOOL_DIR "lams_tool_images"
     call filterDeployXML
     call deployTool
-    call runUpdateToolContext
+    #call runUpdateToolContext
     
     strcpy $TOOL_SIG "lavidr10"
     strcpy $TOOL_DIR "lams_tool_videorecorder"
     call filterDeployXML
     call deployTool
-    call runUpdateToolContext
+    #call runUpdateToolContext
     
     ############################################################################
 
