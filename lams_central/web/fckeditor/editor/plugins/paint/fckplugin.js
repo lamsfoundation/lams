@@ -1,4 +1,4 @@
-FCKCommands.RegisterCommand( 'Paint canvas' , new FCKDialogCommand( FCKLang.Paint.DialogName , FCKLang.Paint.DialogTitle , FCKConfig.PluginsPath + 'paint/content.html' , 852, 610 ) ) ;
+FCKCommands.RegisterCommand( 'Paint canvas' , new FCKDialogCommand( FCKLang.Paint.DialogName , FCKLang.Paint.DialogTitle , FCKConfig.PluginsPath + 'paint/content.jsp' , 852, 610 ) ) ;
 
 var oPaintItem = new FCKToolbarButton( 'Paint canvas', FCKLang.Paint.Button ) ;
 oPaintItem.IconPath = FCKConfig.PluginsPath + 'paint/icon.png';
