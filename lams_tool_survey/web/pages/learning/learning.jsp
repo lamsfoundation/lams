@@ -31,17 +31,18 @@
 	<html:form action="/learning/doSurvey" method="post"
 		styleId="surveyForm">
 		<c:set var="formBean"
-			value="<%=request
-											.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<html:hidden property="questionSeqID" />
 		<html:hidden property="sessionMapID" />
 		<html:hidden property="position" />
 		<html:hidden property="currentIdx" />
+		<html:hidden property="userID" />
 		<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		<c:set var="position" value="${formBean.position}" />
 		<c:set var="questionSeqID" value="${formBean.questionSeqID}" />
 		<c:set var="currentIdx" value="${formBean.currentIdx}" />
+		<c:set var="userID" value="${formBean.userID}" />
 
 		<div id="content">
 			<h1>

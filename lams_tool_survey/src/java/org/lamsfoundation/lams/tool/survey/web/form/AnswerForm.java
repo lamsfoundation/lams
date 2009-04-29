@@ -36,6 +36,7 @@ public class AnswerForm extends ActionForm {
 	private Integer questionSeqID;
 	private int position;
 	private int currentIdx;
+	private Long userID;
 	
 	public int getPosition() {
 		return position;
@@ -61,6 +62,10 @@ public class AnswerForm extends ActionForm {
 	public void setCurrentIdx(int currentIdx) {
 		this.currentIdx = currentIdx;
 	}
-	
-
+	public void setUserID(Long userID) {
+	    this.userID = userID;
+	}
+	public Long getUserID() {
+	    return userID;
+	}
 }

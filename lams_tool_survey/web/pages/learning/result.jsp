@@ -23,7 +23,7 @@
 		function retakeSurvey(questionSeqId){
 			//retake for all questions
 			if(questionSeqId == -1)
-				document.location.href='<c:url value="/learning/start.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}"/>';
+				document.location.href='<c:url value="/learning/start.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&userID=${userID}"/>';
 			else
 				document.location.href='<c:url value="/learning/retake.do?sessionMapID=${sessionMapID}&questionSeqID="/>' +questionSeqId ;
 		}

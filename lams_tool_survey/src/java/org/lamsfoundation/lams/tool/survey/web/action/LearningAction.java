@@ -135,13 +135,13 @@ public class LearningAction extends Action {
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	answerForm.setSessionMapID(sessionMap.getSessionID());
-
+	
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	Long sessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 	// it will be use when runOffline or lock on finish page.
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-
+	
 	// get back the survey and question list and display them on page
 	ISurveyService service = getSurveyService();
 	SurveyUser surveyUser = null;
@@ -149,6 +149,9 @@ public class LearningAction extends Action {
 	    // monitoring mode - user is specified in URL
 	    surveyUser = getSpecifiedUser(service, sessionId, WebUtil.readIntParam(request,
 		    AttributeNames.PARAM_USER_ID, false));
+	    // setting Learner
+	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, true);
+	    answerForm.setUserID(userID);
 	} else {
 	    surveyUser = getCurrentUser(service, sessionId);
 	}
@@ -325,15 +328,26 @@ public class LearningAction extends Action {
 
     private ActionForward doSurvey(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	ISurveyService service = getSurveyService();
+	
 	AnswerForm answerForm = (AnswerForm) form;
 	Integer questionSeqID = answerForm.getQuestionSeqID();
 	String sessionMapID = answerForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
+	
 	// validate
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 	Collection<AnswerDTO> surveyItemList = surveyItemMap.values();
+	
+	SurveyUser surveyLearner = null;
+	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
+	Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, true);
+	if (userID != null) {
+	    surveyLearner = service.getUserByIDAndSession(userID, sessionId);
+	    request.setAttribute(AttributeNames.PARAM_USER_ID, userID);
+	}
+	
 	ActionErrors errors;
 	if (questionSeqID == null || questionSeqID.equals(0)) {
 	    errors = getAnswers(request);
@@ -347,16 +361,16 @@ public class LearningAction extends Action {
 	List<SurveyAnswer> answerList = new ArrayList<SurveyAnswer>();
 	for (AnswerDTO question : surveyItemList) {
 	    if (question.getAnswer() != null) {
+		if (userID != null)
+		    question.getAnswer().setUser(surveyLearner);
 		answerList.add(question.getAnswer());
 	    }
 	}
 
-	ISurveyService service = getSurveyService();
 	service.updateAnswerList(answerList);
 
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	Survey survey = service.getSurveyBySessionId(sessionId);
 	HttpSession ss = SessionManager.getSession();
 	UserDTO surveyUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
