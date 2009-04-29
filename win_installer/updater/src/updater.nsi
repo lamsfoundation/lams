@@ -532,15 +532,15 @@ Function CheckMySQL
         #StrLen $9 $MYSQL_ROOT_PASS
         
         ${if} $IS_UPDATE == "1" 
-           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"'
+           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-5.0.8-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"'
         ${elseif} $MYSQL_HOST != "localhost"
-           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"' 
+           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-5.0.8-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"' 
         ${else}
-           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/?characterEncoding=utf8" "root" "$MYSQL_ROOT_PASS"'
+           Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-5.0.8-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/?characterEncoding=utf8" "root" "$MYSQL_ROOT_PASS"'
         ${endif}
         
         File "${BUILD_DIR}\checkmysqlversion.class"
-        File "${LIB}\mysql-connector-java-3.1.12-bin.jar"
+        File "${LIB}\mysql-connector-java-5.0.8-bin.jar"
         nsExec::ExecToStack $0
         Pop $0
         Pop $1
@@ -554,7 +554,7 @@ Function CheckMySQL
             Abort
         ${EndIf}
         Delete "$TEMP\lams\checkmysql.class"
-        Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"  
+        Delete "$TEMP\mysql-connector-java-5.0.8-bin.jar"  
 FunctionEnd
 
 Function PreComponents
@@ -770,8 +770,8 @@ Function PostLAMSConfig
         
         Setoutpath "$TEMP\lams\"
         File "${BUILD_DIR}\checkmysql.class"
-        File "${LIB}\mysql-connector-java-3.1.12-bin.jar"
-        nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS ${PREVIOUS_VERSION}'
+        File "${LIB}\mysql-connector-java-5.0.8-bin.jar"
+        nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-5.0.8-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS ${PREVIOUS_VERSION}'
         Pop $0
         Pop $1
         
@@ -787,7 +787,7 @@ Function PostLAMSConfig
         ${EndIf}
         
         Delete "$TEMP\lams\checkmysql.class"
-        Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"
+        Delete "$TEMP\mysql-connector-java-5.0.8-bin.jar"
         
     ${endif}
     
@@ -2102,8 +2102,8 @@ Function copyllid
     strcpy $1 "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
     # execute llid finder
-    Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
     pop $0
     pop $CSllid
     ${if} $0 != '0'
@@ -2117,8 +2117,8 @@ Function copyllid
     strcpy $1 "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
     # execute llid finder
-    Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
     pop $0
     pop $FSllid
     ${if} $0 != '0'
@@ -2129,8 +2129,8 @@ Function copyllid
     strcpy $1 "jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
     # execute llid finder
-    Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Resource and Forum" "$1" "$DB_USER" "$DB_PASS"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Resources and Forum" "$1" "$DB_USER" "$DB_PASS"'
+    Detailprint '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Resource and Forum" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;lib\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Resources and Forum" "$1" "$DB_USER" "$DB_PASS"'
     pop $0
     pop $RFllid
     ${if} $0 != '0'
