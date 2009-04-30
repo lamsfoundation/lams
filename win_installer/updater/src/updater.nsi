@@ -1024,15 +1024,14 @@ Function update23Specific
     
     strcpy $1 "$0\slim-backup\lib"
     
-    CopyFiles "$0\autonumber-plugin.jar" "$1"
-    CopyFiles "$0\bcel.jar" "$1"
-    CopyFiles "$0\jboss-jaxrpc.jar" "$1"
-    CopyFiles "$0\jboss-saaj.jar" "$1"
-    CopyFiles "$0\scheduler-plugin.jar" "$1"
-    CopyFiles "$0\scheduler-plugin-example.jar" "$1"
-    CopyFiles "$0\bsh-deployer.jar" "$1"
+    CopyFiles "$0\lib\autonumber-plugin.jar" "$1"
+    CopyFiles "$0\lib\bcel.jar" "$1"
+    CopyFiles "$0\lib\jboss-jaxrpc.jar" "$1"
+    CopyFiles "$0\lib\jboss-saaj.jar" "$1"
+    CopyFiles "$0\lib\scheduler-plugin.jar" "$1"
+    CopyFiles "$0\lib\scheduler-plugin-example.jar" "$1"
+    CopyFiles "$0\lib\bsh-deployer.jar" "$1"
    
-    
     # Adding the slimming jboss files
     setoutpath $0\conf
     file "${CONF}\jboss\*.xml"
