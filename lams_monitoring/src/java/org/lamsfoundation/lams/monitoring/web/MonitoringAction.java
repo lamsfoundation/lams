@@ -181,8 +181,8 @@ public class MonitoringAction extends LamsDispatchAction
     		Integer organisationId = WebUtil.readIntParam(request,"organisationID",true);
     		long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
     		Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
-    		Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresencePortfolio", false);
-    		Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImPortfolio", false);
+    		Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
+    		Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
     		Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
     		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
     		
@@ -1068,9 +1068,14 @@ public class MonitoringAction extends LamsDispatchAction
     	try {
       		Long lessonID = new Long(WebUtil.readLongParam(request,"lessonID"));
 	    	Integer userID = getUserId();
-	    	Boolean presenceAvailable = WebUtil.readBooleanParam(request,"presenceAvailable",false); 
+	    	Boolean presenceAvailable = WebUtil.readBooleanParam(request,"presenceAvailable",false);
+	    	
     		monitoringService.setPresenceAvailable(lessonID, userID, presenceAvailable);
 
+    		if(!presenceAvailable){
+    			monitoringService.setPresenceImAvailable(lessonID, userID, false);
+    		}
+    		
     		flashMessage = new FlashMessage("presenceAvailable", "presenceAvailable");
        	} catch (Exception e) {
 			flashMessage = handleException(e, "presenceAvailable", monitoringService);
