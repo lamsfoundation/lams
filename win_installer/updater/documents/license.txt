@@ -36,7 +36,6 @@ jfreechart-1.0.1.jar				GNU Lesser General Public Licence
 jgroups.jar				GNU Lesser General Public Licence
 jmock-2003-03-19.jar			jMock Project License
 joda-time-0.98.jar				Joda Software License 1.0
-jsMath					Apache License 2.0
 jstl.jar					JSTL License 1.1
 log4j-1.2.13.jar				Apache Software License 1.1
 mysql-connector-				(CDDL Common Development and 

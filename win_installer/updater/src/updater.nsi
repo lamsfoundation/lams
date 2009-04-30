@@ -173,7 +173,6 @@ Var WINTEMP             ; temp dir
 Var RETAIN_DIR          ; path to directory to retain files on uninstall
 Var RETAIN_FILES        ; bool value to devide whether to retain files
 Var IS_UPDATE           ; bool value to determine whether this is an update
-Var INCLUDE_JSMATH      ; bool value to determine whether to include JBOSS
 Var TOOL_SIG            ; tool signature used for tool deployer
 Var TOOL_DIR            ; tool directory used for tool deployer
 Var TIMESTAMP           ; timestamp
@@ -363,29 +362,6 @@ SectionGroup "LAMS ${VERSION} Full Install" fullInstall
     SectionEnd
 SectionGroupEnd
 
-SectionGroup "jsMath (optional)"
-    
-    Section "jsMath (expanded)" jsmathe
-        ${if} $INCLUDE_JSMATH == 1
-            DetailPrint "Including jsMath in LAMS ${VERSION}"
-            SetOutPath "$TEMP"
-            File /a  "${BASE_PROJECT_DIR}jsmath\build\lib\jsMath.war"
-            CreateDirectory "$INSTDIR\jboss-4.0.2\server\default\deploy\jsMath.war"
-            SetOutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\jsMath.war"
-            DetailPrint "$JDK_DIR\bin\jar xvf $TEMP\jsMath.war"
-            DetailPrint "Expanding jsMath.war... This may take several minutes"
-            nsExec::ExecToStack "$JDK_DIR\bin\jar xf $TEMP\jsMath.war"
-            Pop $0
-            Pop $1
-            ${If} $0 != 0
-                DetailPrint "Failed to expand jsMath.war."
-                DetailPrint "Error: $1"
-            ${EndIf}
-            Delete "$TEMP\jsMath.war"
-         ${endif}
-    SectionEnd
-SectionGroupEnd
-
 
 # functions
 #
@@ -452,9 +428,6 @@ Function .onInit
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "wildfire.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "lams_components.ini"
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "final.ini"
-    
-    # set jsmath exploded size (assumes 4KB cluster size on destination hdd)
-    ;SectionSetSize ${jsmathe} 81816
     
 FunctionEnd
 
@@ -575,13 +548,7 @@ Function PreComponents
 FunctionEnd 
 
 Function PostComponents
-        !insertmacro MUI_INSTALLOPTIONS_READ $INCLUDE_JSMATH "lams_components.ini" "Field 5" "State"
-        ${if} $INCLUDE_JSMATH == "1"
-            SectionSetSize ${jsmathe} 81816
-        ${else}
-            SectionSetSize ${jsmathe} 0
-        ${endif}
-
+        
 FunctionEnd
 
 Function DirectoryLeave
