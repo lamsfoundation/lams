@@ -1092,12 +1092,83 @@ Function update23Specific
     
     ############################################################################
     
+    detailprint "Removing defunct java libraries for 2.3"
     # Remove the defunct jars
     delete "$0\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar"
     delete "$0\deploy\lams.ear\FCKeditor-2.3.jar"
     delete "$0\deploy\lams.ear\jboss-cache.jar"
     delete "$0\deploy\lams.ear\jgroups.jar"
     
+    # Add the pixlr dir in lams-www.war
+    createdirectory "$0\deploy\lams.ear\lams-www.war\images\pixlr"
+    setoutpath "$0\deploy\lams.ear\lams-www.war\images\pixlr"
+    file "${BASE_PROJECT_DIR}\lams_tool_pixlr\web\images\blank.jpg"
+    
+    # Update mysql-ds.xml to only have one datasource
+    ############################################################################
+    detailprint "Updating mysql-ds.xml for 2.3"
+    setoutpath "$TEMP\lams"
+    File "${TEMPLATES}\mysql-ds.xml"
+    File "${ANT}\update-23.xml"
+    
+    # generate a properties file 
+    ClearErrors
+    FileOpen $0 $TEMP\lams\update-23.properties w
+    IfErrors 0 +3
+        Detailprint "Problem opening core.properties to write"
+        goto error
+    
+    # convert '\' to '/' for Ant's benefit
+    Push $TEMP
+    Push "\"
+    Call StrSlash
+    Pop $1
+            
+    Push "$INSTDIR\jboss-4.0.2\server\default\deploy"
+    Push "\"
+    Call StrSlash
+    Pop $2
+    
+    
+    FileWrite $0 "DB_NAME=$DB_NAME$\r$\n"
+    FileWrite $0 "DB_USER=$DB_USER$\r$\n"
+    FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"
+    FileWrite $0 "MYSQL_HOST=$MYSQL_HOST$\r$\n"
+    FileWrite $0 "MYSQL_PORT=$MYSQL_PORT$\r$\n"
+    FileWrite $0 "TEMP=$1$\r$\n"
+    FileWrite $0 "DEPLOYDIR=$2$\r$\n"
+
+    Fileclose $0
+    IfErrors 0 +2
+        goto error
+        
+    # Running the ant scripts to create deploy.xml for the normal tools 
+    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-mysql-ds.log" -propertyfile "$TEMP\lams\update-23.properties"  -buildfile "$TEMP\lams\update-23.xml" update-mysql-ds'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    ${if} $0 == "error"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    DetailPrint "Result: $1"
+    
+    push "$INSTDIR\update-logs\ant-update-core-database.log"
+    push "Failed"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    StrCmp $3 yes 0 +2
+        goto error    
+    
+    goto done
+    error:
+        DetailPrint "Error updating mysql-ds.xml"
+        MessageBox MB_OK|MB_ICONSTOP "LAMS mysql-ds.xml update failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed"
+    done:
 FunctionEnd
 
 
@@ -1324,24 +1395,24 @@ Function createAndDeployTools
     File "${BASE_PROJECT_DIR}\lams_build\deploy-tool\lib\*.jar"
     
     # Exploding the lams-learning.war and lams-monitoring.war
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-explode-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml explode-wars'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    ${if} $0 == "error"
-    ${orif} $0 == 1
-        goto error
-    ${endif}
-    DetailPrint "Result: $1"
-    push "$INSTDIR\update-logs\ant-explode-wars.log"
-    push "FAILED"
-    Call FileSearch
-    Pop $0 #Number of times found throughout
-    Pop $3 #Found at all? yes/no
-    Pop $2 #Number of lines found in
-    StrCmp $3 yes 0 +2
-        goto error
+    #strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-explode-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml explode-wars'
+    #DetailPrint $0
+    #nsExec::ExecToStack $0
+    #Pop $0 ; return code, 0=success, error=fail
+    #Pop $1 ; console output
+    #${if} $0 == "error"
+    #${orif} $0 == 1
+    #    goto error
+    #${endif}
+    #DetailPrint "Result: $1"
+    #push "$INSTDIR\update-logs\ant-explode-wars.log"
+    #push "FAILED"
+    #Call FileSearch
+    #Pop $0 #Number of times found throughout
+    #Pop $3 #Found at all? yes/no
+    #Pop $2 #Number of lines found in
+    #StrCmp $3 yes 0 +2
+    #    goto error
     
     
     # Deoploying 2.3 tool packages
@@ -1381,32 +1452,32 @@ Function createAndDeployTools
     ############################################################################
 
 
-    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-compress-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml compress-wars'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    ${if} $0 == "error"
-    ${orif} $0 == 1
-        goto error
-    ${endif}
-    DetailPrint "Result: $1"
-    push "$INSTDIR\update-logs\ant-compress-wars.log"
-    push "FAILED"
-    Call FileSearch
-    Pop $0 #Number of times found throughout
-    Pop $3 #Found at all? yes/no
-    Pop $2 #Number of lines found in
-    StrCmp $3 yes 0 +2
-        goto error
+    #strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-compress-wars.log -buildfile $TEMP\lams\update-deploy-tools.xml compress-wars'
+    #DetailPrint $0
+    #nsExec::ExecToStack $0
+    #Pop $0 ; return code, 0=success, error=fail
+    #Pop $1 ; console output
+    #${if} $0 == "error"
+    #${orif} $0 == 1
+    #    goto error
+    #${endif}
+    #DetailPrint "Result: $1"
+    #push "$INSTDIR\update-logs\ant-compress-wars.log"
+    #push "FAILED"
+    #Call FileSearch
+    #Pop $0 #Number of times found throughout
+    #Pop $3 #Found at all? yes/no
+    #Pop $2 #Number of lines found in
+    #StrCmp $3 yes 0 +2
+    #   goto error
     
     
-    goto done
-    error:
-        DetailPrint "Problem compressing/expanding lams-monitoring.war and lams-learning.war"
-        MessageBox MB_OK|MB_ICONSTOP "Problem compressing/expanding lams-monitoring.war and lams-learning.war $\r$\nError:$\r$\n$\r$\n$1"
-        Abort "LAMS configuration failed"
-    done:
+    #goto done
+    #error:
+     #   DetailPrint "Problem compressing/expanding lams-monitoring.war and lams-learning.war"
+    #    MessageBox MB_OK|MB_ICONSTOP "Problem compressing/expanding lams-monitoring.war and lams-learning.war $\r$\nError:$\r$\n$\r$\n$1"
+    #    Abort "LAMS configuration failed"
+    #done:
     
 FunctionEnd
 
