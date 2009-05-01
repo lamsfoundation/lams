@@ -478,12 +478,10 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 				var c:String = Cursor.getCurrentCursor();
 				
 				if(c == ApplicationParent.C_TRANSITION){	
-					_controlKeyPressed = "";
-					_canvas.stopTransitionTool();
+					stopTransitionTool();
 				}
 			}
 		}
-		
 	}
     
     /**
@@ -516,10 +514,11 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 			if (dialog.getDepth() == null) { // only paste activity if dialogs not open
 				paste();
 			}
+			stopTransitionTool();
         }else if (Key.isDown(Key.CONTROL) && Key.isDown(Z_KEY)) {
 			//undo
 			_canvas.undo();
-			
+			stopTransitionTool();
         }else if (Key.isDown(Key.CONTROL) && Key.isDown(Y_KEY)) {
 			
 			
@@ -529,11 +528,13 @@ class org.lamsfoundation.lams.authoring.Application extends ApplicationParent {
 				_controlKeyPressed = ApplicationParent.TRANSITION;
 				_canvas.startTransitionTool()
 			}
-			
-			
 	    }
-		
     }
+	
+	private function stopTransitionTool() {
+		_controlKeyPressed = "";
+		_canvas.stopTransitionTool();
+	}
 	
 	public function transition_keyPressed(){
 		_controlKeyPressed = "transition";
