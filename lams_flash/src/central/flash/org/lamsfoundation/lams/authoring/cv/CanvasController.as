@@ -278,7 +278,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				} // Following is validation for non-tool activities being dropped into the reference activity container which we don't want.
 			} else if (referenceOnCanvas != null && 
 				ca.hitTest(referenceOnCanvas) && 
-				(ca.activity.activityUIID != referenceOnCanvas.activity.activityUIID)) {
+				(ca.activity.activityUIID != referenceOnCanvas.activity.activityUIID) &&
+				 (_canvasModel.activeView instanceof CanvasView)) {
 				
 				if ( !(ca.activity.activityTypeID == Activity.TOOL_ACTIVITY_TYPE || ca.activity.activityTypeID == Activity.PARALLEL_ACTIVITY_TYPE) ) {
 					activitySnapBack(ca);
