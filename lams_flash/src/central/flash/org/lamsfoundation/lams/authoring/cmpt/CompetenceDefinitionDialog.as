@@ -260,10 +260,9 @@ class org.lamsfoundation.lams.authoring.cmpt.CompetenceDefinitionDialog extends 
 							}
 						}
 					}
-					
-					CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).clear();
-					CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).draw();
 				}
+				CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).clear();
+				CompetenceEditorDialog(app.canvas.model.competenceEditorDialog.scrollContent).draw();
 				_container.deletePopUp();
 			}
 		}
