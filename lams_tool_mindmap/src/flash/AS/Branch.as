@@ -80,10 +80,6 @@
 			try{
 				this.sons.removeChild(branch);
 			}catch(error:ArgumentError){};
-			if(this.sonCount==0){
-				this.expanded = true;
-				InternalConcept(this.base).checkButtons();
-			}
 			this.mindMap.conceptRemoved(InternalConcept(branch.base));
 		}
 		public function getConceptById(id:int):Concept {

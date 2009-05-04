@@ -103,5 +103,12 @@
 			super.addBranch(branch);
 			branch.balance = this.balance;
 		}
+		override public function removeBranch(branch:InternalBranch):void {
+			super.removeBranch(branch);
+			if(this.sonCount==0){
+				this.expanded = true;
+				InternalConcept(this.base).checkButtons();
+			}
+		}
 	}
 }
