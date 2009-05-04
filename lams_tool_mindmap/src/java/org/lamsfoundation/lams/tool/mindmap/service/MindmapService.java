@@ -181,10 +181,10 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * @return
      */
     public int getNumNodes(Long learnerId, Long toolSessionId) {
-	//MindmapUser mindmapUser = getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	MindmapUser mindmapUser = getUserByUserIdAndSessionId(learnerId, toolSessionId);
 	//MindmapSession mindmapSession = getSessionBySessionId(toolSessionId);
 
-	return mindmapNodeDAO.getNumNodesByUserAndSession(learnerId, toolSessionId);
+	return mindmapNodeDAO.getNumNodesByUserAndSession(mindmapUser.getUid(), toolSessionId);
     }
     
     
