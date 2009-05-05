@@ -22,7 +22,7 @@
 # run script for LAMS unix version 2.0.2 and higher
 
 export JAVA_HOME="@JAVA_HOME@"
-export JAVA_OPTS="-server -Xms512m -Xmx512m -XX:MaxPermSize=512m"
+export JAVA_OPTS="-server -Xmx512m -XX:MaxPermSize=128m -XX:MaxNewSize=204m -XX:SurvivorRatio=32" 
 
 echo " "
 echo "LAMS will take a few minutes to startup..."

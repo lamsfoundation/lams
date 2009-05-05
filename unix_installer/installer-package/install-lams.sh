@@ -25,7 +25,7 @@
 # Usage: sudo ./install.sh 
 	
 # The version of this lams installer
-LAMS_VERSION=2.2
+LAMS_VERSION=2.3
 MYSQL_VERSION_STR=5.
 JAVA_REQ_VERSION=1.5
 # Transform the required version string into a number that can be used in comparisons
@@ -130,7 +130,7 @@ checkMysql()
 	if [ $SQL_HOST = localhost ]
         then
 
-		$JDK_DIR/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$MYSQL_DB_URL" "root" "$DB_ROOT_PASSWORD" "$MYSQL_VERSION_STR"
+		$JDK_DIR/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-5.0.8-bin.jar checkmysql "$MYSQL_DB_URL" "root" "$DB_ROOT_PASSWORD" "$MYSQL_VERSION_STR"
 		if [  "$?" -ne  "0" ]
         	then
         		printf "\nInstall Failed. MySql check did not pass. Please check that your DB_ROOT_PASSWORD in lams.properties is set to the root password of your MySql 5.x server\n\n"
@@ -405,6 +405,15 @@ chmod 755 $JBOSS_DIR/bin/run.sh
 if [ -f $JBOSS_DIR/bin/wrapper ]
 	then
 	chmod 755 $JBOSS_DIR/bin/wrapper
+fi
+
+# Slimming JBoss
+echo "Slimming JBoss"
+ant/bin/ant -buildfile ant-scripts/configure-deploy.xml -logfile log/slim-jboss.log slim-jboss
+if [  "$?" -ne  "0" ]
+        then
+        echo "Install Failed. Problem while slimming jboss, check log/slim-jboss.log for details."
+        installfailed
 fi
 
 # Add the sample lessons to the repository as of 2.1

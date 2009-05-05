@@ -18,7 +18,7 @@
 		</copy>
 
 		<sql driver="com.mysql.jdbc.Driver" 
-			classpath="../assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar" 
+			classpath="../assembly/lams.ear/mysql-connector-java-5.0.8-bin.jar" 
 			url="${MYSQL_DB_URL}" 
 			userid="root" 
 			password="${DB_ROOT_PASSWORD}"
@@ -32,7 +32,7 @@
 	
 	<target name="fill-database" description="fills the database">
 		<sql driver="com.mysql.jdbc.Driver"
-                        classpath="../assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar"
+                        classpath="../assembly/lams.ear/mysql-connector-java-5.0.8-bin.jar"
                         url="${SQL_URL}"
                         userid="${DB_USER}"
                         password="${DB_PASS}"

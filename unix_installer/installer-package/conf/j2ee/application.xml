@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE application PUBLIC '-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN' 'http://java.sun.com/dtd/application_1_3.dtd'>
+<!DOCTYPE application PUBLIC '-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN' 'application_1_3.dtd'>
 <application>
     <display-name>LAMS</display-name>
     <description>
@@ -73,6 +73,13 @@
             <context-root>/lams/www</context-root>
 		</web>
     </module>
+    
+    <module>
+        <web>
+            <web-uri>lams-gradebook.war</web-uri>
+            <context-root>/lams/gradebook</context-root>
+		</web>
+    </module>
 
     <!--  Third Party JAR Files -->
 	<module>
@@ -130,7 +137,7 @@
 		<java>commons-validator.jar</java>
 	</module>
 	<module>
-		<java>FCKeditor-2.3.jar</java>
+		<java>FCKeditor-2.4.1.jar</java>
 	</module>
 	<module>
 		<java>poi-2.5.1-final-20040804.jar</java>
@@ -140,12 +147,6 @@
 	</module>
 	<module>
 		<java>jaxrpc.jar</java>
-	</module>
-	<module>
-		<java>jboss-cache.jar</java>
-	</module>
-	<module>
-		<java>jgroups.jar</java>
 	</module>
 	<module>
 		<java>jdom.jar</java>
@@ -163,7 +164,13 @@
 		<java>log4j-1.2.13.jar</java>
 	</module>
 	<module>
-		<java>mysql-connector-java-3.1.12-bin.jar</java>
+		<java>slf4j-api-1.5.2.jar</java>
+	</module>
+	<module>
+		<java>slf4j-log4j12-1.5.2.jar</java>
+	</module>
+	<module>
+		<java>mysql-connector-java-5.0.8-bin.jar</java>
 	</module>
 	<module>
 		<java>odmg-3.0.jar</java>
@@ -237,6 +244,18 @@
 	</module>
 	<module>
 		<java>JabberHTTPBind-1.1.1.jar</java>
+	</module>
+	<module>
+		<java>lucene-core-2.4.0.jar</java>
+	</module>
+	<module>
+		<java>lucene-snowball-2.4.0.jar</java>
+	</module>
+	<module>
+		<java>jxl.jar</java>
+	</module>
+	<module>
+		<java>opencsv-1.8.jar</java>
 	</module>
 	<!--  END For xstream -->
     <!--  End Third Party JAR Files -->
