@@ -1,0 +1,27 @@
+! @assemblydir@ should be replaced by the ant task.
+<Deploy>
+	<dbUsername></dbUsername>
+	<dbPassword></dbPassword>
+	<dbDriverClass></dbDriverClass>
+	<dbDriverUrl></dbDriverUrl>
+    <lamsEarPath>@lamsear@</lamsEarPath>
+	<learningLibraryList>
+		<learningLibrary>
+			<libraryInsertScriptPath>@assemblydir@/learninglibrary1_insert.sql</libraryInsertScriptPath>
+			<templateActivityInsertScriptPath>@assemblydir@/libraryActivity1_insert.sql</templateActivityInsertScriptPath>
+			<toolActivityList>
+				<toolActivity>
+					<toolSignature>larsrc11</toolSignature>
+					<toolActivityInsertScriptPath>@assemblydir@/toolActivity1_insert.sql</toolActivityInsertScriptPath>	
+				</toolActivity>
+				<toolActivity>
+					<toolSignature>lafrum11</toolSignature> 
+					<toolActivityInsertScriptPath>@assemblydir@/toolActivity2_insert.sql</toolActivityInsertScriptPath>	
+				</toolActivity>
+			</toolActivityList>
+		    <languageFileDirectory>@assemblylangdir@</languageFileDirectory>
+		    <languageFileRoot>ApplicationResources</languageFileRoot>
+		</learningLibrary>
+	</learningLibraryList>
+</Deploy>
+

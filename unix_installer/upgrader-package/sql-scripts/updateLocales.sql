@@ -16,8 +16,8 @@ create table locale_temp  (
 -- given by SELECT CONCAT_WS(',',l.language_iso_code,l.country_iso_code) FROM lams_supported_locale l
 --INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined, fckeditor_code) VALUES ('ja','JP','日本語','LTR','ja,JP', 'ja');
 --INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined, fckeditor_code) VALUES ('ms', 'MY','Malay (Malaysia)','LTR','ms,MY', 'ms');
-INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined, fckeditor_code) VALUES ('tr', 'TR','Türkçe','LTR','tr,TR', 'tr');
-
+--INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined, fckeditor_code) VALUES ('tr', 'TR','Türkçe','LTR','tr,TR', 'tr');
+INSERT INTO locale_temp (language_iso_code, country_iso_code, description, direction, combined, fckeditor_code) VALUES ('ru', 'RU','Русский','LTR','ru,RU', 'ru');
 
 INSERT INTO lams_supported_locale (language_iso_code, country_iso_code, description, direction, fckeditor_code) 
 (SELECT t.language_iso_code, t.country_iso_code, t.description, t.direction, t.fckeditor_code

@@ -15,7 +15,7 @@
         	<arg value="${DB_NAME}"/>
         	<arg value="${SQL_URL}"/>
         	<classpath>
-                <pathelement path="../bin:../tools/lib/mysql-connector-java-3.1.12-bin.jar"/>
+                <pathelement path="../bin:../tools/lib/mysql-connector-java-5.0.8-bin.jar"/>
             </classpath>
         </java>
     </target>

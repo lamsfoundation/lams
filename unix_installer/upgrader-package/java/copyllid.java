@@ -18,7 +18,7 @@ public class copyllid
 		if (args.length < 5)
 		{
 			System.out.println("Usage: java copyllid JBOSS_DIR DB_USERNAME DB_PASSWORD DB_NAME DB_URL");
-			System.out.println("Make sure mysql-connector-java-3.x.x-bin.jar is in your classpath.");
+			System.out.println("Make sure mysql-connector-java-5.0.8-bin.jar is in your classpath.");
 			System.exit(1);
 		}
 

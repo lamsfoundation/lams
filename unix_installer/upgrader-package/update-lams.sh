@@ -83,10 +83,10 @@ fi
 . ./lams.properties
 
 # The version of this LAMS updater
-LAMS_VERSION=2.2
-LAMS_SERVER_VERSION=2.2.0.200812050000
-LAMS_LANGUAGE_VERSION=2008-12-05
-REQ_LAMS_VERSION=2.1
+LAMS_VERSION=2.3
+LAMS_SERVER_VERSION=2.3.0.200905010000
+LAMS_LANGUAGE_VERSION=2009-05-01
+REQ_LAMS_VERSION=2.2
 
 # Checking that the lams.properties points to a lams installation
 if [ ! -r "$JBOSS_DIR/server/default/deploy/lams.ear/lams.jar" ]
@@ -174,30 +174,14 @@ checkMysql()
     DB_URL=jdbc:mysql://${SQL_HOST}:${SQL_PORT}/${DB_NAME}?characterEncoding=utf8
     printf "Checking LAMS database...\n"
         
-    # COMMENTING THIS SECTION FOR 2.2 BECAUSE IT REQUIRES ONE OF TWO PREVIOUS
-    # LAMS VERSIONS. UN-COMMENT FOR NEXT UPDATER
-    ############################################################################
-    #$JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION" 
-    #if [  "$?" -ne  "0" ]
-    #then
-    #	installfailed
-    #fi
-    ############################################################################
-    
-    # REMOVE AFTER 2.2
-    ############################################################################
-    $JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION" > log/checkmysql.log
+
+    $JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-5.0.8-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION" 
     if [  "$?" -ne  "0" ]
     then
-    	$JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-3.1.12-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "2.1.1" >> log/checkmysql.log
-	    if [  "$?" -ne  "0" ]
-	    then
-	    	printf "\nThis updater requires LAMS 2.1 or 2.1.1, neither were found so aborting update.\nSee log/checkmysql.log for further details.\n"
-	    	installfailed
-	    fi
+    	installfailed
     fi
-    printf "\n"
-    ############################################################################
+
+
 }
 
 #getMysqlHost()
@@ -378,6 +362,16 @@ if [  "$?" -ne  "0" ]
         echo "Update failed, check the log/install.log file for details."
         installfailed
 fi
+
+# Slimming JBoss -- ONLY FOR 2.3 UPGRADE, REMOVE FOR NEXT RELEASE
+echo "Slimming JBoss"
+ant/bin/ant -buildfile ant-scripts/update-lams.xml -logfile log/slim-jboss.log slim-jboss
+if [  "$?" -ne  "0" ]
+        then
+        echo "Install Failed. Problem while slimming jboss, check log/slim-jboss.log for details."
+        installfailed
+fi
+
 
 # Checking the log to see if there was any failures from the tool deployer (invoked in update-lams.xml)
 failed=`grep FAILED log/*`
