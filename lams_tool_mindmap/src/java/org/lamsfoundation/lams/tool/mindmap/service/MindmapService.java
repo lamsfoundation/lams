@@ -86,6 +86,8 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
+import com.thoughtworks.xstream.XStream;
+
 /**
  * An implementation of the IMindmapService interface. As a requirement, all LAMS tool's service bean must implement
  * ToolContentManager and ToolSessionManager.
@@ -94,7 +96,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	ToolContentImport102Manager {
 
     static Logger logger = Logger.getLogger(MindmapService.class.getName());
-
+    
+    boolean exp = false;
+    
     private IMindmapDAO mindmapDAO = null;
     private IMindmapSessionDAO mindmapSessionDAO = null;
     private IMindmapUserDAO mindmapUserDAO = null;
@@ -402,20 +406,16 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	mindmapDAO.saveOrUpdate(mindmap);
     }
 
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
-	    ToolException {
+    public void removeToolContent(Long toolContentId, boolean removeSessionData) 
+    	throws SessionDataExistsException, ToolException {
 	// TODO Auto-generated method stub
     }
 
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
-     * @throws ToolException
-     *             if any other error occurs
+     * @throws DataMissingException if no tool content matches the toolSessionId
+     * @throws ToolException if any other error occurs
      */
-
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
 	if (mindmap == null) {
@@ -424,16 +424,36 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	if (mindmap == null) {
 	    throw new DataMissingException("Unable to find default content for the mindmap tool");
 	}
+	
+	// generating Mindmap XML to export
+	String mindmapContent = null;
+	List mindmapNodeList = getAuthorRootNodeByMindmapId(mindmap.getUid());
+	if (mindmapNodeList != null && mindmapNodeList.size() > 0) {
+	    MindmapNode rootMindmapNode = (MindmapNode) mindmapNodeList.get(0);
 
-	// set ResourceToolContentHandler as null to avoid copy file node in
-	// repository again.
+	    String rootMindmapUser = getMindmapMessageService().getMessage("node.instructor.label");
+
+	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(), rootMindmapNode
+		    .getText(), rootMindmapNode.getColor(), rootMindmapUser, 1));
+	    NodeModel currentNodeModel = getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
+		    mindmap.getUid(), rootNodeModel, null);
+
+	    XStream xstream = new XStream();
+	    xstream.alias("branch", NodeModel.class);
+	    mindmapContent = xstream.toXML(currentNodeModel);
+	}
+	
+	// set ResourceToolContentHandler as null to avoid copy file node in repository again.
 	mindmap = Mindmap.newInstance(mindmap, toolContentId, null);
+	
+	mindmap.setMindmapExportContent(mindmapContent);
 	mindmap.setToolContentHandler(null);
 	mindmap.setMindmapSessions(null);
 	Set<MindmapAttachment> atts = mindmap.getMindmapAttachments();
 	for (MindmapAttachment att : atts) {
 	    att.setMindmap(null);
 	}
+	
 	try {
 	    exportContentService.registerFileClassForExport(MindmapAttachment.class.getName(), "fileUuid",
 		    "fileVersionId");
@@ -445,9 +465,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     /**
      * Import the XML fragment for the tool's content, along with any files needed for the content.
-     * 
-     * @throws ToolException
-     *             if any other error occurs
+     * @throws ToolException if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
@@ -461,13 +479,33 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		throw new ImportToolContentException("Import Mindmap tool content failed. Deserialized object is "
 			+ toolPOJO);
 	    }
+
 	    Mindmap mindmap = (Mindmap) toolPOJO;
+	    
+	    String mindmapContent = mindmap.getMindmapExportContent();
+	    MindmapUser mindmapUser = null;
+
+	    XStream xstream = new XStream();
+	    xstream.alias("branch", NodeModel.class);
+	    NodeModel rootNodeModel = (NodeModel) xstream.fromXML(mindmapContent);
+	    NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();
+	    List<NodeModel> branches = rootNodeModel.getBranch();
+	    
+	    MindmapNode rootMindmapNode = null;
+	    rootMindmapNode = saveMindmapNode(rootMindmapNode, null, nodeConceptModel.getId(),
+		    nodeConceptModel.getText(), nodeConceptModel.getColor(), mindmapUser, mindmap);
+	    
+	    // saving child Nodes into database
+	    if (branches != null) {
+		getChildMindmapNodes(branches, rootMindmapNode, mindmapUser, mindmap);
+	    }
 
 	    // reset it to new toolContentId
 	    mindmap.setToolContentId(toolContentId);
-	    mindmap.setCreateBy(new Long(newUserUid.longValue()));
-
+	    //mindmap.setCreateBy(new Long(newUserUid.longValue()));
+	    
 	    mindmapDAO.saveOrUpdate(mindmap);
+	    
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}

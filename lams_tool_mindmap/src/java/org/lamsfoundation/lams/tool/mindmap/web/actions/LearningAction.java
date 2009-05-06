@@ -277,9 +277,8 @@ public class LearningAction extends LamsDispatchAction {
 	NotifyRequestModel notifyRequestModel = (NotifyRequestModel) xstream.fromXML(requestAction);
 	int requestType = notifyRequestModel.getType();
 
-	// TODO: if request was previously created
+	// if request was previously created
 	Long lastActionId = WebUtil.readLongParam(request, "lastActionId", false);
-				//= mindmapService.getMindmapByUid(mindmapId).getLastActionId();
 
 	MindmapRequest mindmapRequest = mindmapService.getRequestByUniqueId(notifyRequestModel.getID(), userId,
 		mindmapId, lastActionId);

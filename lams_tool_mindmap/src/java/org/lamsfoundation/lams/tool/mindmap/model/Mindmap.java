@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.tool.mindmap.model;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set; //import java.util.TreeSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler; //import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
@@ -56,7 +56,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     private boolean contentInUse;
     private boolean defineLater;
     private Long toolContentId;
-    private Long lastActionId;
+    private String mindmapExportContent; 
     private Set mindmapAttachments;
     private Set mindmapSessions;
 
@@ -260,20 +260,16 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
     }
-
+    
     /**
-     * @hibernate.property column="last_action_id" length="20"
+     * @hibernate.property column="export_content"
      */
-    public Long getLastActionId() {
-	return lastActionId;
+    public String getMindmapExportContent() {
+	return mindmapExportContent;
     }
-
-    /**
-     * @param lastActionId
-     *            the lastActionId to set
-     */
-    public void setLastActionId(Long lastActionId) {
-	this.lastActionId = lastActionId;
+    
+    public void setMindmapExportContent(String mindmapExportContent) {
+	this.mindmapExportContent = mindmapExportContent;
     }
 
     /**
