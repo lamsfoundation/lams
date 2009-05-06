@@ -12,7 +12,7 @@ update tl_lagmap10_configuration set config_value="" where config_key="GmapKey";
 -- From 2.2 onwards. Ensure dimdim tool is set to disabled
 update lams_learning_library set valid_flag=0 where title="Dimdim";
 
--- From 2.2 onwards. Remove lams_qtz event entires
+-- From 2.2 onwards. Remove lams_qtz event entries
 delete from lams_qtz_SIMPLE_TRIGGERS;
 delete from lams_qtz_TRIGGERS;
 delete from lams_qtz_JOB_DETAILS;
@@ -30,4 +30,8 @@ rename table lams_qtz_scheduler_state to lams_qtz_SCHEDULER_STATE;
 rename table lams_qtz_simple_triggers to lams_qtz_SIMPLE_TRIGGERS;
 rename table lams_qtz_triggers to lams_qtz_TRIGGERS;
 rename table lams_qtz_trigger_listeners to lams_qtz_TRIGGER_LISTENERS;
+
+-- From 2.3 onwards. Remove any red5 configs
+update lams_configuration set config_value="" where config_key="Red5ServerUrl";
+update lams_configuration set config_value="" where config_key="Red5RecordingsUrl";
 

@@ -16,7 +16,7 @@
 		<mkdir dir="${build.deploy}/filtered"/>
 		<copy overwrite="yes" todir="${build.deploy}/filtered"> 
 			<fileset dir="${build.deploy}">
-                <include name="deploy.xml" />
+                <include name="deploy_template.xml" />
             </fileset>
 			<filterset>  
 				<filter token="dbUsername" value="${db.username}" />
@@ -28,7 +28,7 @@
 			</filterset>
 		</copy>
 		
-		<move file="${build.deploy}/filtered/deploy.xml" tofile="${build.deploy}/deploy.xml"/>
+		<move file="${build.deploy}/filtered/deploy_template.xml" tofile="${build.deploy}/deploy.xml"/>
 		
 	    <echo>Deploy packaqe for ${signature} created.</echo>
 	              

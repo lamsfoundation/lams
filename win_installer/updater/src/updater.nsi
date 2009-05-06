@@ -1074,8 +1074,9 @@ Function update23Specific
     ############################################################################
     detailprint "Updating mysql-ds.xml for 2.3"
     setoutpath "$TEMP\lams"
-    File "${TEMPLATES}\mysql-ds.xml"
-    File "${ANT}\update-23.xml"
+    file "${TEMPLATES}\mysql-ds.xml"
+    file "${ANT}\update-23.xml"
+    file "${SQL}\update23_lamstool.sql"
     
     # generate a properties file 
     ClearErrors
@@ -1128,11 +1129,32 @@ Function update23Specific
     Pop $2 #Number of lines found in
     StrCmp $3 yes 0 +2
         goto error    
+        
+    # Running the ant scripts to update the lams_tool table
+    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\update-lams-tool-table.log" -propertyfile "$TEMP\lams\update-23.properties"  -buildfile "$TEMP\lams\update-23.xml" update-lams-tool-table'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    ${if} $0 == "error"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    DetailPrint "Result: $1"
+    
+    push "$INSTDIR\update-logs\ant-update-core-database.log"
+    push "Failed"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    StrCmp $3 yes 0 +2
+        goto error    
     
     goto done
     error:
-        DetailPrint "Error updating mysql-ds.xml"
-        MessageBox MB_OK|MB_ICONSTOP "LAMS mysql-ds.xml update failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
+        DetailPrint "Error updating mysql-ds.xml or updating the lams-tool table"
+        MessageBox MB_OK|MB_ICONSTOP "LAMS mysql-ds.xml or lams_tool table update failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
         Abort "LAMS configuration failed"
     done:
 FunctionEnd
@@ -1607,7 +1629,7 @@ Function createNewToolPackages
     SetoutPath "$1\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_assessment\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_assessment\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_assessment\build\deploy\deploy.xml"
+    File "${BASE_PROJECT_DIR}\lams_tool_assessment\build\deploy\*.xml"
     
     SetoutPath "$1\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_assessment\build\deploy\sql\*"
@@ -1627,7 +1649,7 @@ Function createNewToolPackages
     SetoutPath "$1\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\deploy\deploy.xml"
+    File "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\deploy\*.xml"
     
     SetoutPath "$1\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_pixlr\build\deploy\sql\*"
@@ -1647,7 +1669,7 @@ Function createNewToolPackages
     SetoutPath "$1\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\deploy\deploy.xml"
+    File "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\deploy\*.xml"
     
     SetoutPath "$1\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_mindmap\build\deploy\sql\*"
@@ -1667,7 +1689,7 @@ Function createNewToolPackages
     SetoutPath "$1\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_images\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_images\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_images\build\deploy\deploy.xml"
+    File "${BASE_PROJECT_DIR}\lams_tool_images\build\deploy\*.xml"
     
     SetoutPath "$1\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_images\build\deploy\sql\*"
@@ -1687,7 +1709,7 @@ Function createNewToolPackages
     SetoutPath "$1\build\deploy\"
     File "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\lib\*.jar"
     File "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\lib\*.war"
-    File "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\deploy\deploy.xml"
+    File "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\deploy\*.xml"
     
     SetoutPath "$1\build\deploy\sql"
     File /r "${BASE_PROJECT_DIR}\lams_tool_videorecorder\build\deploy\sql\*"

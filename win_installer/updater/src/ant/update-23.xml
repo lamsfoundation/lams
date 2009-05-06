@@ -16,4 +16,16 @@
 		</copy>
 	</target>
 	
+	<target name="update-lams-tool-table"  description="Updates the lams tool table so new tools can deploy" >
+        <sql driver="com.mysql.jdbc.Driver" 
+            classpath="${DEPLOYDIR}/lams.ear/mysql-connector-java-5.0.8-bin.jar" 
+            url="jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?autoReconnect=true" 
+            userid="${DB_USER}" 
+            password="${DB_PASS}"
+            encoding="utf8"
+            onerror="abort">
+            <transaction src="${TEMP}/lams/update23_lamstool.sql" />
+        </sql>
+    </target>
+	
 </project>
