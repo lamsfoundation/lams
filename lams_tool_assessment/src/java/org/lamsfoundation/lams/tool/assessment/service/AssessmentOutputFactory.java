@@ -50,20 +50,23 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	
-	ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0), null);
-	definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
-
+	ToolOutputDefinition definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS, new Long(0), null);
+	definitionMap.put(OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS, definition);
+	
 	definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_TIME_TAKEN, new Long(0), null);
 	definitionMap.put(OUTPUT_NAME_LEARNER_TIME_TAKEN, definition);
 	
-	definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS, new Long(0), null);
-	definitionMap.put(OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS, definition);
-	
 	if (toolContentObject != null) {
-
 	    Assessment assessment = (Assessment) toolContentObject;
-	    
 	    Set<AssessmentQuestion> questions = assessment.getQuestions();
+
+	    Long totalMarksPossible = new Long(0);
+	    for(AssessmentQuestion question : questions) {
+		totalMarksPossible += question.getDefaultGrade();
+	    };	    
+	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0), totalMarksPossible);
+	    definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
+
 	    for(AssessmentQuestion question : questions) {
 		definition = buildRangeDefinition(String.valueOf(question.getSequenceId()), new Long(0), null);
 		definition.setDescription(getI18NText("output.user.score.for.question", false) + question.getTitle());
