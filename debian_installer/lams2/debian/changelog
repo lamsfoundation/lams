@@ -1,3 +1,9 @@
+lams2 (2.3.0-1) unstable; urgency=low
+
+  * update to 2.3
+
+ -- LAMS Development Team <lamsdev@melcoe.mq.edu.au>  Thu, 07 May 2009 14:32:00 +0200
+
 lams2 (2.2.0-1) unstable; urgency=low
 
   * update to 2.2

@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+
+<project name="debian_installer" basedir=".">
+
+	<property file="build.properties" />
+	<property file="${lams_build}/common.properties" />
+	<property file="${lams_build}/unix.properties" />
+
+	<target name="build-lams">
+		<ant antfile="${lams_build}/build.xml" target="rebuild-db" inheritAll="false" />
+                <ant antfile="${lams_build}/build.xml" target="assemble-ear" inheritAll="false" />
+                <ant antfile="${lams_build}/build.xml" target="deploy-ear" inheritAll="false" />
+                <ant antfile="${lams_build}/build.xml" target="copyfiles" inheritAll="false" />
+                <ant antfile="${lams_build}/build.xml" target="deploy-tools" inheritAll="false" />
+		<ant antfile="${lams_build}/../lams_tool_dimdim/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="${lams_build}/../lams_tool_assessment/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="${lams_build}/../lams_tool_mindmap/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="${lams_build}/../lams_tool_pixlr/build.xml" target="deploy-tool" inheritAll="false" />
+		<!--ant antfile="${lams_build}/../lams_tool_videorecorder/build.xml" target="deploy-tool" inheritAll="false" /-->
+	</target>
+
+	<target name="copy-build">
+		<delete failonerror="false">
+			<fileset dir="${build_dir}">
+				<include name="*" />
+			</fileset>
+		</delete>
+		<mkdir dir="${build_dir}" />
+		<copy overwrite="yes" preservelastmodified="true" todir="${build_dir}">
+			<fileset dir="${jboss.ear.deploy}">
+				<include name="lams.ear/**" />
+			</fileset>
+		</copy>
+		<copy overwrite="yes" preservelastmodified="true" todir="${build_dir}">
+			<fileset dir="${lams_build}/conf/unix">
+				<include name="jboss/**" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="dump-db">
+		<exec dir="" executable="/usr/bin/mysqldump">
+			<arg line="${db.name}" />
+			<arg line="--result-file=${build_dir}/lams.sql" />
+			<arg line="--user=${db.username}" />
+			<arg line="--password=${db.password}" />
+		</exec>
+	</target>	
+
+	<target name="copy-packaged-files">
+		<copy overwrite="yes" preservelastmodified="true" todir="${build_dir}">
+			<fileset dir="lams2">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<exec dir="${build_dir}/debian" executable="/bin/chmod">
+			<arg line="755" />
+			<arg line="rules" />
+			<arg line="lams2.init" />
+		</exec>
+		<mkdir dir="${build_dir}/repository" />
+	</target>
+
+	<target name="build-binary-package">
+		<exec dir="${build_dir}" executable="/usr/bin/sudo">
+                        <arg line="dpkg-buildpackage" />
+                        <arg line="-b" />
+                </exec>
+	</target>
+
+	<target name="build-source-package">
+		<exec dir="${build_dir}" executable="/usr/bin/sudo">
+			<arg line="dpkg-buildpackage" />
+			<arg line="-S" />
+			<arg line="-sa" />
+		</exec>
+	</target>
+
+	<target name="all" depends="build-lams,copy-build,dump-db,copy-packaged-files">
+
+	</target>
+</project>

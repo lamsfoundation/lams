@@ -17,6 +17,29 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+update220to230 () {
+    # Add assessment tool, new in 2.3
+    cd /usr/share/lams2/lams_tool_assessment/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh > /dev/null || true
+
+    # Add mindmap tool, new in 2.3
+    cd /usr/share/lams2/lams_tool_mindmap/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh > /dev/null || true
+
+    # Add pixlr tool, new in 2.3
+    cd /usr/share/lams2/lams_tool_pixlr/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh > /dev/null || true
+}
+
 configure220 () {
     # Configure 2.2 tools; need to run after above tools have been deployed
     if [ "$db_root_pass" != "" ] ; then
@@ -148,11 +171,16 @@ case "$1" in
         sed -i -e "s/port=\"8080\"/port=\"$server_port\"/" server.xml
 
         case "$2" in
+            2.2.0*)
+                update;
+            ;;
+
             2.1.1*)
                 update;
                 update211to220;
                 configure220;
             ;;
+
             2.1.0*)
                 update;
                 update210to211;

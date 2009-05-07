@@ -8,7 +8,7 @@ Prerequisites
 -------------
  * a Debian or Debian based system
  * packages:
- 	* dh_make
+ 	* dh-make
  	* dpkg-dev
  	* debconf
  	* debhelper
@@ -41,20 +41,21 @@ Instructions - lams2
 2.	set lams_build to 'unix', and the path to your jboss folder
 3.	create the lams database and lams/lamsdemo user with access to it
 4.	do a full build (ant rebuild-db; ant assemble-ear; ant deploy-ear;
-	ant deploy-tools; ant copyfiles)
+	ant deploy-tools; ant copyfiles); include dimdim tool and any others
+	that should be included but are not in the main build
 5.	cd /path/to/packaging/
 6.	mkdir lams2-2.1rc1 (adjust the version as necessary)
 7.	cd lams2-2.1rc1
 8.	cp -pr /path/to/jboss-4.0.2/server/default/deploy/lams.ear/ .
 9.	cp -pr /path/to/lams_build/conf/unix/jboss/ .
-10. mysqldump lams > lams.sql -u root -p
-11.	copy index.jsp and lams2.cnf from this cvs project into the current directory
-12.	dh_make --createorig
-13.	rm -rf debian
-14.	copy the debian folder from this cvs project into the current directory
-15.	sudo dpkg-buildpackage -S -sa (add '-kxxxxxxxx' if you have a gpg key to sign
+10.	mysqldump lams > lams.sql -u root -p
+11.	update debian/files, debian/changelog and debian/postinst and others if
+	necessary
+12.	copy index.jsp, lams2.cnf and other packaged files from this cvs project
+	into the current directory
+13.	sudo dpkg-buildpackage -S -sa (add '-kxxxxxxxx' if you have a gpg key to sign
 	it) - this will create a source package in the parent folder
-16.	sudo dpkg-buildpackage -b (add '-kxxxxxxxx' if you want to sign it) - this
+14.	sudo dpkg-buildpackage -b (add '-kxxxxxxxx' if you want to sign it) - this
 	will create the binary .deb in the parent folder
 	
 
