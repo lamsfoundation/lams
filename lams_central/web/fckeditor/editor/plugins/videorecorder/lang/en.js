@@ -30,3 +30,4 @@ FCKLang.videorecorder_tooltip_start_recording_again = 'Start recording again (ov
 FCKLang.videorecorder_tooltip_start_recording_next = 'Record another recording';
 FCKLang.videorecorder_tooltip_stop_recording = 'Stop recording';
 FCKLang.videorecorder_disabled = 'Disabled';
+FCKLang.videorecorder_error_noconfig  = 'LAMS does not have a media server configured. Please contact your system administrator.';

@@ -100,6 +100,8 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     private Set videoRecorderSessions;
 
+    private VideoRecorderRecording authorRecording;
+    
     private Set<VideoRecorderCondition> conditions = new TreeSet<VideoRecorderCondition>(new TextSearchConditionComparator());
 
     // *********** NON Persisit fields
@@ -116,8 +118,8 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
 	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
 	    boolean allowUseVoice, boolean allowUseCamera, boolean allowLearnerVideoExport, boolean allowLearnerVideoVisibility,
-	    Long toolContentId, Set videoRecorderAttachments, Set videoRecorderSessions, boolean exportAll,
-	    boolean exportOffline, boolean reflectOnActivity, String reflectInstructions) {
+	    Long toolContentId, Set videoRecorderAttachments, Set videoRecorderSessions, VideoRecorderRecording authorRecording,
+	    boolean exportAll, boolean exportOffline, boolean reflectOnActivity, String reflectInstructions) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
@@ -132,6 +134,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	this.toolContentId = toolContentId;
 	this.videoRecorderAttachments = videoRecorderAttachments;
 	this.videoRecorderSessions = videoRecorderSessions;
+	this.authorRecording = authorRecording;
 	this.allowUseVoice = allowUseVoice;
 	this.allowUseCamera = allowUseCamera;
 	this.allowLearnerVideoVisibility = allowLearnerVideoVisibility;
@@ -446,7 +449,24 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     public void setVideoRecorderSessions(Set videoRecorderSessions) {
 	this.videoRecorderSessions = videoRecorderSessions;
     }
+    
+	/**
+     * @return Returns the first recording made by author
+     *
+     * @hibernate.one-to-one
+     * 		column="author_recording_id"
+     *  	cascade="none"
+     *
+     */
 
+    public VideoRecorderRecording getAuthorRecording() {
+	return authorRecording;
+    }
+
+    public void setAuthorRecording(VideoRecorderRecording authorRecording) {
+	this.authorRecording = authorRecording;
+    }
+    
     /**
      * @hibernate.set lazy="true" cascade="all"
      *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"

@@ -1,4 +1,7 @@
 // creates an httpservice and gets video recordings
+import mx.graphics.codec.JPEGEncoder;
+import mx.utils.Base64Encoder;
+
 private function getRecordingsFromServer(sortBy:String, sortDirection:String):void{
 	// show an overlay over the video listings
 	LamsAjaxOverlayManager.showOverlay(videoList);
@@ -68,7 +71,8 @@ private function saveRecordingToServer(userId:int, title:String, description:Str
 		videoRecorderActions.request.isJustSound = false;
 	
 	videoRecorderActions.request.toolContentId = -1;
-	videoRecorderActions.request.saveToLams = false;
+	
+	videoRecorderActions.request.isLocal = false;
 	
 	videoRecorderActions.request.toolSessionId = toolSessionId;
 	videoRecorderActions.addEventListener(ResultEvent.RESULT, saveRecordingSuccessHandler);
@@ -120,7 +124,7 @@ private function saveCommentSuccessHandler(e:ResultEvent):void {
 	getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);	
 	
 	// scroll the video information box to the position of the "Comments:" label
-	videoInformation.verticalScrollPosition = videoInformation.addCommentButton.y;
+	videoInformation.verticalScrollPosition = videoInformation.verticalPageScrollSize;
 	
 	// hide the overlay
   	LamsAjaxOverlayManager.hideOverlay(videoInformation);
@@ -216,5 +220,48 @@ private function deleteRecordingSuccessHandler(e:ResultEvent):void {
 
 // fault handler for detele recording
   private function deleteRecordingFaultHandler(e:FaultEvent):void {
+  	Alert.show(e.toString());
+}
+
+// attempts to save a preview image to the content folder
+private function savePreviewImage(filename:String, ext:String, image:BitmapData, toolSessionId:int):void{
+	var videoRecorderActions:HTTPService  = new HTTPService();
+	videoRecorderActions.url = servletUrl;
+	videoRecorderActions.method = "POST";
+	videoRecorderActions.resultFormat = "e4x";
+
+	videoRecorderActions.request.method = "saveImage";
+
+	videoRecorderActions.addEventListener(ResultEvent.RESULT, savePreviewImageSuccessHandler);
+	videoRecorderActions.addEventListener(FaultEvent.FAULT, savePreviewImageFaultHandler);
+				
+	var rawBytes:ByteArray = new ByteArray();
+	
+	if(ext == "png"){
+		var pngEncoder:PNGEncoder = new PNGEncoder();
+		rawBytes = pngEncoder.encode(image);
+	}
+	else if(ext == "jpg"){
+		var jpegEncoder:JPEGEncoder = new JPEGEncoder();
+		rawBytes = jpegEncoder.encode(image);	
+	}
+	
+	var encoder:Base64Encoder = new Base64Encoder(); 
+   	encoder.encodeBytes(rawBytes); 
+   	
+   	videoRecorderActions.request.filename = filename;
+	videoRecorderActions.request.ext = ext;
+	videoRecorderActions.request.toolSessionId = toolSessionId;
+	videoRecorderActions.request.data = encoder.flush();
+				
+	videoRecorderActions.send();
+}
+
+// handler for successful save preview image
+private function savePreviewImageSuccessHandler(e:ResultEvent):void {
+}
+
+// fault handler for save preview image
+  private function savePreviewImageFaultHandler(e:FaultEvent):void {
   	Alert.show(e.toString());
 }

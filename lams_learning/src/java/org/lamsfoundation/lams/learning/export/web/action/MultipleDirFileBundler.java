@@ -28,14 +28,14 @@ public class MultipleDirFileBundler extends Bundler {
 	 * 
 	 * @param request the request for the export
 	 * @param cookies cookies for the request
-	 * @param outputDirectory the location where the files should be written
-	 * @param toolImageUrlDir the url location of the images directory
+	 * @param srcDirs the locations of the files to copy
+	 * @param targetDirs the locations to store the files
 	 * @param fileNames an array of file-names (not paths) you wish to include in the bundle
 	 * @throws Exception
 	 */
-	public void bundle(HttpServletRequest request, Cookie[] cookies, String outputDirectory, String[] fileUrlDir, ArrayList<String>[] filenames) throws Exception
+	public void bundle(HttpServletRequest request, Cookie[] cookies, String[] srcDirs, String[] targetDirs, ArrayList<String>[] filenames) throws Exception
 	{
-		bundleViaHTTP(request, cookies, outputDirectory, fileUrlDir, filenames);
+		bundleViaHTTP(request, cookies, srcDirs, targetDirs, filenames);
 	}
 	
 	/**
@@ -50,20 +50,20 @@ public class MultipleDirFileBundler extends Bundler {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private void bundleViaHTTP(HttpServletRequest request, Cookie[] cookies, String outputDirectory, String[] fileUrlDir, ArrayList<String>[] filenames) 
+	private void bundleViaHTTP(HttpServletRequest request, Cookie[] cookies, String[] srcDirs, String[] targetDirs, ArrayList<String>[] filenames) 
 	throws MalformedURLException, FileNotFoundException, IOException 
 	{
-		
-		String fileDirStr = outputDirectory+File.separator+"files";
-		File fileDir = new File(fileDirStr);
-		fileDir.mkdirs();
-				
-		for(int i = 0; i < filenames.length; i++){
+		// make the target directories
+		for(int i = 0; i < targetDirs.length; i++){
+			File fileDir = new File(targetDirs[i]);
+			fileDir.mkdirs();
+			
 			ArrayList<String> filenameArray = filenames[i];
 			
 			for(int j = 0; j < filenameArray.size(); j++){
-				String url = fileUrlDir[i] + filenameArray.get(j);
-				HttpUrlConnectionUtil.writeResponseToFile(url, fileDirStr, filenameArray.get(j), cookies);
+				String srcUrl = srcDirs[i] + filenameArray.get(j);
+				String targetDir = targetDirs[i];
+				HttpUrlConnectionUtil.writeResponseToFile(srcUrl, targetDir, filenameArray.get(j), cookies);
 			}
 		}
 	}

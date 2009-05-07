@@ -1,10 +1,10 @@
 /*
 *************************************************
-LAMS 2.0
-Date modified:  22/09/2006
+LAMS 2.2
+Date modified:  29/04/2009
 
 *************************************************
-Presence style
+Presence stylesheet
 ********************************************** */
 
 #presenceUserListings {
@@ -18,6 +18,19 @@ Presence style
 	height: 300px;
 	right: 18px;
 	z-index: 10;
+}
+
+#presenceChatWarning {
+	position: absolute;
+	width: 400px;
+	right: 18px;
+	z-index: 10;
+	padding: 10px 10px 10px 40px;
+	margin: 0;
+}
+
+.startHidden {
+	display: none;
 }
 
 #presenceChatTabs {
@@ -47,14 +60,22 @@ Presence style
 	top: 0px;
 	right:0px;
 }
-.presenceName {
+.presenceListing {
 	width:"100%";
 }
 
-.presenceName:hover {
+.presenceListing:hover {
 	width:"100%";
 	background-color: #CBDBFF;
 	cursor: pointer;
+}
+
+.presenceListingNewMessage {
+	background-color: #88FF99;
+}
+
+.presenceTabNewMessage {
+	text-decoration: underline;
 }
 
 .presenceMessage {

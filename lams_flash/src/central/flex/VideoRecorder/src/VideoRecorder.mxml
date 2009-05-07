@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="100%" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]" xmlns:ns1="org.lamsfoundation.lams.common.ui.components.*" xmlns:controls="com.asfusion.controls.*" height="100%" applicationComplete="onApplicationComplete(event)"  preinitialize="onPreinitialize(event)" enabled="true" xmlns:local="*" xmlns:ns2="org.lamsfoundation.lams.common.ui.components.*">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:commonComponents="org.lamsfoundation.lams.common.ui.components.*"
+	xmlns:controls="com.asfusion.controls.*"
+	xmlns:local="*"
+	enabled="false" layout="absolute" width="100%" height="100%" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]"
+	applicationComplete="onApplicationComplete(event)" 
+	preinitialize="onPreinitialize(event)">
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.common.util.ScreenShotterEvent;
 			//includes
 			include "HTTPServices.as"
 			
@@ -34,7 +41,7 @@
 			import mx.events.ListEvent;
 			import mx.managers.PopUpManager;
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionary;
-			
+
 			// connection-related
 			private var nc:NetConnection;
 			private var client:Object;
@@ -61,13 +68,14 @@
 			[Bindable] private var servletUrl:String;
 			[Bindable] private var languageXML:XML;
 			[Bindable] private var mode:String;
+			[Bindable] private var contentFolderUrl:String;
 
 			// misc
-			private var filename:String = "";
 			[Bindable] private var itemClicked:Object = null;
-			private var ratingClicked:Rating;
 			[Bindable] private var dictionary:XMLDictionary;
 			[Bindable] private var videoRecordings:XMLList = null;
+			private var filename:String = "";
+			private var ratingClicked:Rating;
 			private var playTimer:Timer;
 			private var recLabelTimer:Timer;
 			private var metadata:Object;
@@ -121,23 +129,6 @@
 					serverUrl = "http://172.20.100.220:8080/lams/";
 					mode = AUTHOR_MODE;
 				}
-								
-				/*
-				Alert.show(
-					"contentEditable: " + contentEditable +
-					"\nuserId: " + userId +
-					"\ntoolSessionId: " + toolSessionId +
-					"\ntoolContentId: " + toolContentId +
-					"\nallowUseVoice: " + allowUseVoice +
-					"\nallowUseCamera: " + allowUseCamera +
-					"\nallowLearnerVideoVisibility: " + allowLearnerVideoVisibility +
-					"\nallowLearnerVideoExport: " + allowLearnerVideoExport +
-					"\nallowComments: " + allowComments +
-					"\nallowRatings: " + allowRatings +
-					"\nred5ServerUrl: " + red5ServerUrl +
-					"\nserverUrl: " + serverUrl +
-					"\nmode: " + mode);
-				*/
 			}
 			
 			// called from applicationComplete
@@ -169,8 +160,8 @@
 				videoDisplay.servletUrl = servletUrl;
 				
 				// if the cam is to be used, set that up
-				if(allowUseCamera){
-					cam = VideoDisplayUtil.setupCamera();
+				cam = VideoDisplayUtil.setupCamera();
+				if(allowUseCamera && cam){
 					videoDisplay.attachCamera(cam);
 				}
 				// else remove the view camera button
@@ -179,13 +170,13 @@
 				}
 				
 				// if the mic is to be used, set that up
-				if(allowUseVoice){
-					mic = VideoDisplayUtil.setupMic();
-					videoDisplay.attachMic(mic)
+				mic = VideoDisplayUtil.setupMic();
+				if(allowUseVoice && mic){
+					videoDisplay.attachMic(mic);
 				}
 				
 				// if neither mic or camera are to be used
-				if(!allowUseCamera && !allowUseVoice){
+				if((!allowUseCamera && !allowUseVoice) || (!cam && !mic)){
 					// remove recording button
 					removeChild(getChildByName("recordingBox"));
 					
@@ -193,12 +184,12 @@
 					videoList.setStyle("bottom", 10);
 					videoList.invalidateList();
 				}
-				else{
-					if(!isWebcamInfoSet())
-					{
-						Security.showSettings();
-						setWebcamInfo(true);
-					}
+				
+				// if first time using video recorder, pop flash settings
+				if(!isWebcamInfoSet())
+				{
+					Security.showSettings();
+					setWebcamInfo(true);
 				}
 				
 				// init components that need it
@@ -236,6 +227,7 @@
 				allowRatings = LAMSStringUtil.stringToBool(Application.application.parameters.allowRatings);
 				languageXML = XML(Application.application.parameters.languageXML);
 				mode = Application.application.parameters.mode;
+				contentFolderUrl = Application.application.parameters.contentFolderUrl;
 			}
 			
 			// sets initial labels
@@ -314,6 +306,8 @@
 				videoDisplay.addEventListener(VideoDisplayEvent.READYSEEK, onReadySeek);
 				seekSlider.addEventListener(SliderEvent.THUMB_PRESS, onSeekPress);
 				seekSlider.addEventListener(SliderEvent.THUMB_RELEASE, onSeekRelease);
+				
+				this.addEventListener(ScreenShotterEvent.SCREENSHOTTAKEN, onScreenShotTaken);
 			}
 			
 			// checks for previous webcam info
@@ -361,10 +355,7 @@
 			private function ncStatusHandler(event:NetStatusEvent):void {
 				// get the info object
 				var infoObject:Object = event.info;
-				
-				// print its properties
-  				//DebugPopUp.getInstance().log(VideoDisplayUtil.printInfoObject(infoObject), DebugPopUp.DEBUG);
-  				
+				  				
 				// if successful connection
 				if (infoObject.code == "NetConnection.Connect.Success") {
 					// enable application
@@ -445,10 +436,7 @@
 			
 			// view camera click handler
 			private function viewCameraClick(event:MouseEvent):void{
-				if(!videoDisplay.isCameraViewed){
-					// reset the video display
-					videoDisplay.reset();
-					
+				if(!videoDisplay.isCameraViewed){					
 					// reset the seek slider timer
 					seekSlider.resetTimerLabel();
 					
@@ -520,7 +508,6 @@
 						videoInformation.enableVideoInformationButtons(false);
 					}
 					
-				
 					// scroll the video information box back up to top
 					videoInformation.verticalScrollPosition = 0;
 					
@@ -555,7 +542,7 @@
 						videoInformation.ratingButton.toolTip = dictionary.getLabelAndConcatenate("videorecorder.tooltip.already.rated", [" ", String(itemClicked.userRating)]);
 					}
 					
-					// make ready item clickedo
+					// make ready
 					makeReadytItemClicked();
 				}
 				else{
@@ -566,13 +553,25 @@
 			
 			// makes the clicked item ready with the video display
 			private function makeReadytItemClicked():void{
+				// correct filename if needed
+				var filename;
+				
+				// is local
+				var isLocal = LAMSStringUtil.stringToBool(itemClicked.isLocal);
+							
+				if(isLocal){
+					filename = contentFolderUrl + itemClicked.filename;
+				}else{
+					filename = itemClicked.filename;
+				}
+							
 				// if playing a sound file
 				if(LAMSStringUtil.stringToBool(itemClicked.isJustSound)){
 					// change the view stack to audio view
-					videoDisplay.makeReadyAudio(itemClicked.filename);
+					videoDisplay.makeReady(filename, "audio", isLocal);
 				}else{
 					// change the view stack to player view
-					videoDisplay.makeReadyVideo(itemClicked.filename);
+					videoDisplay.makeReady(filename, "video", isLocal);
 				}
 			}
 			
@@ -757,7 +756,15 @@
 				enablePlaybackButtons(false);
 				seekSlider.enable(false);
 			}
-									   	       	
+						
+			// onScreenShotTaken callback, called from screenShotter in videoDisplay
+			private function onScreenShotTaken(event:ScreenShotterEvent):void{
+				var previewImage:BitmapData = event.previewImage;
+			
+				// call the service
+				savePreviewImage(filename, "jpg", previewImage, toolSessionId);
+			}
+						   	       	
 	        // enables/disables the playback related buttons
 	        private function enablePlaybackButtons(enabled:Boolean):void{
 	        	var trueEnable:Boolean = enabled && itemClicked != null;
@@ -855,30 +862,30 @@
 	</mx:Script>
 
 	<mx:Panel width="340" height="310" layout="absolute" left="10" top="10" title="Display:" id="videoRecorderPanel" borderColor="#E2E2E2">
-	<ns1:VideoDisplay id="videoDisplay" width="320" height="240"/>
+	<commonComponents:VideoDisplay id="videoDisplay" width="320" height="240"/>
 	<mx:ControlBar height="38" y="242">
 		<mx:Button id="playButton" label="Play" width="75" textAlign="left" fontSize="10" paddingRight="0" paddingLeft="2"/>
-		<ns1:SeekSlider id="seekSlider" videoDisplay="{videoDisplay}" width="100%"/>
+		<commonComponents:SeekSlider id="seekSlider" videoDisplay="{videoDisplay}" width="100%"/>
 	</mx:ControlBar>
 	</mx:Panel>
 	<mx:Label id="videoInformationLabel" text="Video information:" fontWeight="bold" top="328" left="10"/>
-	<local:VideoInformation id="videoInformation" allowComments="{allowComments}" allowRatings="{allowRatings}" dictionary="{dictionary}" backgroundDisabledColor="#FFFFFF" cornerRadius="5" bottom="10" top="354" left="10" width="340"/>
+	<local:VideoInformation id="videoInformation" allowComments="{allowComments}" allowRatings="{allowRatings}" dictionary="{dictionary}" backgroundDisabledColor="#FFFFFF" cornerRadius="5" bottom="10" top="354" left="10" width="340" horizontalScrollPolicy="off" verticalScrollPolicy="on"/>
 	<mx:HBox left="358" top="10" right="10">
 		<mx:Label id="videosLabel" text="Videos:" fontWeight="bold"/>
 	</mx:HBox>
-	<mx:TileList borderStyle="solid" id="videoList" itemRenderer="{new ArgumentsToRendererFactory({userId:this.userId, allowLearnerVideoExport:this.allowLearnerVideoExport, allowLearnerVideoVisibility:this.allowLearnerVideoVisibility, mode:this.mode, dictionary:this.dictionary, contentEditable: this.contentEditable},VideoProfile)}" dataProvider="{videoRecordings}" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" itemClick="videoListClick(event)" top="62" left="358" bottom="70" cornerRadius="5" right="10"></mx:TileList>
+	<mx:TileList borderStyle="solid" id="videoList" itemRenderer="{new ArgumentsToRendererFactory({userId:this.userId, allowLearnerVideoExport:this.allowLearnerVideoExport, allowLearnerVideoVisibility:this.allowLearnerVideoVisibility, mode:this.mode, dictionary:this.dictionary, contentEditable: this.contentEditable},VideoProfile)}" dataProvider="{videoRecordings}" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" itemClick="videoListClick(event)" top="62" left="358" bottom="63" cornerRadius="5" right="10"></mx:TileList>
 	<mx:HBox verticalAlign="middle" left="358" top="36" right="10">
 		<mx:Label id="sortByLabel" text="Sort by:" fontWeight="normal" fontStyle="normal"/>
-		<ns2:SortButtonGroup width="100%" horizontalGap="3" id="sortButtonGroup">
-			<ns2:SortButton id="sortDateButton" label="Date"  sortBy="date" selected="true" horizontalGap="0" sortDirection="descending"/>
-			<ns2:SortButton id="sortAuthorButton" label="Author"  sortBy="author" horizontalGap="0"/>
-			<ns2:SortButton id="sortTitleButton" label="Title"  sortBy="title" horizontalGap="0"/>
-		</ns2:SortButtonGroup>
+		<commonComponents:SortButtonGroup width="100%" horizontalGap="3" id="sortButtonGroup">
+			<commonComponents:SortButton id="sortDateButton" label="Date"  sortBy="date" selected="true" horizontalGap="0" sortDirection="descending"/>
+			<commonComponents:SortButton id="sortAuthorButton" label="Author"  sortBy="author" horizontalGap="0"/>
+			<commonComponents:SortButton id="sortTitleButton" label="Title"  sortBy="title" horizontalGap="0"/>
+		</commonComponents:SortButtonGroup>
 		<mx:Button label="Update" id="refreshButton" click="getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection)" height="17" textAlign="center"/>
 	</mx:HBox>
-	<mx:VBox height="52" horizontalAlign="right" right="10" bottom="10" left="357" id="recordingBox">
+	<mx:VBox horizontalAlign="right" right="10" bottom="10" left="357" id="recordingBox" verticalGap="5">
 		<mx:Label id="recordingControlsLabel" text="Recording controls:" fontWeight="bold"/>
-		<mx:HBox width="100%" height="100%" horizontalAlign="right"  id="recordingButtonBox">
+		<mx:HBox width="100%" horizontalAlign="right"  id="recordingButtonBox">
 			<mx:Button id="viewCameraButton" label="View Camera"/>
 			<mx:Button fontWeight="bold" id="startRecButton" label="Start Recording"/>
 		</mx:HBox>

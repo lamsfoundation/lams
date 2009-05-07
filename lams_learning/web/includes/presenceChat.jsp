@@ -25,36 +25,61 @@
 				
 				// labels
 				var presenceLabel = "<fmt:message key='label.presence'/>";
-								
+				
+				// on startup
 				$(document).ready(function (){
-					// if presence im is enabled
-					<c:if test="${param.presenceImEnabled}">
-						// create chat tabs
-						$("#presenceChatTabs").tabs({ scrollable: true });
+					// if browser is ie6
+					if($.browser.msie && parseInt($.browser.version) == 6){
+						// make warningvisible
+						$("#presenceChatWarning").removeClass("startHidden");
+					}
+					// otherwise enable presence chat
+					else{
+						// if presence im is enabled
+						<c:if test="${param.presenceImEnabled}">
+							// make visible
+							$("#presenceChat").removeClass("startHidden");
 						
-						// bind the select function which resets label to non-bold when clicked
-						$("#presenceChatTabs").bind('tabsselect', function(event, ui) {
-							var nick = getUserFromTag(ui.panel.id).nick;
-							$('#' + ui.panel.id + '_tabLabel').html(nick);
-							$("#presenceChatTabs").tabs('scrollTo', ui.tab.offsetLeft);
-						});
-					</c:if>
-					
-					// create roster tab
-					$("#presenceChatRoster").tabs({ scrollable: false });
-
-
-					// correct room name				
-					roomName = correctPresenceRoomName(roomName);
-					
-					// attempt to login once the window is loaded
-					doLogin(presenceUrl, userId, userId, userId, roomName, nickname, false);
+							// create chat tabs
+							$("#presenceChatTabs").tabs({ scrollable: true });
+							
+							// bind the select function to do extra stuff
+							$("#presenceChatTabs").bind('tabsselect', function(event, ui) {
+								// remove visual indicators of new message
+								var tag = ui.panel.id;
+								$("#" + tagToTabLabel(tag)).removeClass('presenceTabNewMessage');
+								$("#" + tagToListing(tag)).removeClass('presenceListingNewMessage');
+								
+								// scroll to the clicked tab
+								$("#presenceChatTabs").tabs('scrollTo', ui.tab.offsetLeft);
+							});
+							
+							// bind the show function to do extra stuff
+							$("#presenceChatTabs").bind('tabsshow', function(event, ui) {
+								// get the tag
+								var tag = ui.panel.id;
+								
+								// scroll to the bottom of the given message area
+								var messageArea = $("#" + tagToMessageArea(tag));
+								messageArea.attr("scrollTop", messageArea.attr("scrollHeight"));
+							});
+						</c:if>
+						
+						// create roster tab
+						$("#presenceChatRoster").tabs({ scrollable: false });
+	
+						// correct room name				
+						roomName = correctPresenceRoomName(roomName);
+						
+						// attempt to login once the window is loaded
+						doLogin(presenceUrl, userId, userId, userId, roomName, nickname, false);
+					}
 				});
 				
 			</script>
 			
 			<%-- initial html / presence.js adds on html into here --%>
-			<div id="presenceChat">
+			<div id="presenceChat" class="startHidden">
 				<%-- only pop the message box if im is enabled --%>
 				<c:if test="${param.presenceImEnabled}">
 				<div id="presenceChatTabs">
@@ -93,6 +118,7 @@
 				    </div>
 				</div>
 				</c:if>
+				<%-- always pop the roster --%>
 				<div id="presenceChatRoster">
 					<ul onclick="javascript:handlePresenceClick()">
 				        <li><a href="#presenceUserListings" onclick="javascript:handlePresenceClick()">
@@ -111,5 +137,12 @@
 				    </div>
 				</div>
 			</div>
+			
+			<%-- div reserved for storing context menus --%>
 			<div id="presenceContextMenus">		
+			</div>
+			
+			<%-- floating div shown when IE6 is being used --%>
+			<div id="presenceChatWarning" class="startHidden warning">
+				Sorry, Internet Explorer 6 is not compatible with Presence Chat
 			</div>

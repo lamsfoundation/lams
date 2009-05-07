@@ -2,6 +2,12 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-core" prefix="c"%>
+
+<%
+	String red5Url = Configuration.get(ConfigurationKeys.RED5_SERVER_URL);
+	String red5RecordingsUrl = Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL);
+%>
 
 <!-- saved from url=(0014)about:internet -->
 <lams:html>
@@ -31,9 +37,12 @@ Learn more about Flex at http://flex.org
 <style>
 body { margin: 0px; overflow:hidden }
 </style>
+
+</lams:head>
+
+<body scroll="no">
 <script language="JavaScript" type="text/javascript">
-<!--
-// -----------------------------------------------------------------------------
+
 // Globals
 // Major version of Flash required
 var requiredMajorVersion = 9;
@@ -41,13 +50,6 @@ var requiredMajorVersion = 9;
 var requiredMinorVersion = 0;
 // Minor version of Flash required
 var requiredRevision = 124;
-// -----------------------------------------------------------------------------
-// -->
-</script>
-</lams:head>
-
-<body scroll="no">
-<script language="JavaScript" type="text/javascript">
 
 var oEditor = window.opener;
 var FCKVideoRecorder=null;
@@ -64,6 +66,10 @@ if(oEditor && typeof(oEditor.FCKVideoRecorder)!='undefined')
 	if(FCKVideoRecorder) 
 		eSelected = oEditor.FCKSelection.GetSelectedElement();
 }
+
+<c:if test='<%= red5Url.equals("")  || red5RecordingsUrl.equals("") %>'>
+		alert(FCKLang.videorecorder_error_noconfig);
+</c:if>
 
 function getLanguageXML(){
 	var languageCollection = new Array('videorecorder_video_player', 'videorecorder_video_recorder',
@@ -116,8 +122,7 @@ function saveToFCKEditor(eventObj) {
 	innerHTML +=	'quality="high"';
 	innerHTML +=	'allowScriptAccess="always"';
 	innerHTML +=	'type="application/x-shockwave-flash"';
-	//innerHTML +=	'FlashVars="mode=playerModeOnline' + '&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>' + '&filename=' + eventObj.filename + '&languageXML=' + escape(getLanguageXML()) + '"';
-	innerHTML +=	'FlashVars="mode=playerModeOffline' + '&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>' + '&filename=' + eventObj.filename + '&languageXML=' + escape(getLanguageXML()) + '"';
+	innerHTML +=	'FlashVars="mode=playerModeOffline'+'&offlinePlayback=true'+'&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>' + '&filename=' + eventObj.filename + '&languageXML=' + escape(getLanguageXML()) + '"';
 	innerHTML +=	'pluginspage="http://www.adobe.com/go/getflashplayer">';
 	innerHTML +=	'</embed>';
 	innerHTML +=	'</OBJECT>';
@@ -165,7 +170,16 @@ function saveToFCKEditor(eventObj) {
 				// embed the Flash Content SWF when all tests are passed
 				AC_FL_RunContent(
 						"src", "VideoRecorderFCKEditor",
-						"FlashVars", "mode=recorderModeFCK"+'&serverUrl=<%= Configuration.get(ConfigurationKeys.SERVER_URL) %>'+'&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>'+'&red5RecordingsUrl=<%= Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL) %>'+'&lamsEarDir=<%= Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) %>' +'&saveToLamsDestUrl=/lams-www.war/secure/' + FCKConfig.ContentFolderID + '/Recordings/' + '&contentFolderUrl=/lams//www/secure/' + FCKConfig.ContentFolderID + '/Recordings/' + '&languageXML=' + escape(getLanguageXML()) + "",
+						"FlashVars", "mode=recorderModeFCK" +
+										'&offlinePlayback=false' + 
+										'&serverUrl=<%= Configuration.get(ConfigurationKeys.SERVER_URL) %>' +
+										'&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>' +
+										'&red5RecordingsUrl=<%= Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL) %>' +
+										'&lamsEarDir=<%= Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) %>' +
+										'&saveToLamsDestUrl=/lams-www.war/secure/'+FCKConfig.ContentFolderID+'/Recordings/' +
+										'&contentFolderUrl=/lams//www/secure/'+FCKConfig.ContentFolderID+'/Recordings/' +
+										'&languageXML=' + escape(getLanguageXML()) +
+										"",
 						"width", "361",
 						"height", "331",
 						"align", "middle",

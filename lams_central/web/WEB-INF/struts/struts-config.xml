@@ -189,24 +189,12 @@
       />
     </action>
     <action
-      path="/gradebook/gradebook"
-      type="org.lamsfoundation.lams.gradebook.web.action.GradeBookAction"
-      name="gradeBookForm"
-      scope="request"
-      parameter="dispatch"
+      path="/PresenceChatLogger"
+      type="org.lamsfoundation.lams.webservice.PresenceChatLoggerAction"
+      parameter="method"
       unknown="false"
       validate="false"
     >
-      <forward
-        name="error"
-        path=".error"
-        redirect="false"
-      />
-      <forward
-        name="message"
-        path=".message"
-        redirect="false"
-      />
     </action>
     <action
       path="/password"
@@ -221,6 +209,14 @@
         path=".passwordChange"
         redirect="false"
       />
+    </action>
+    <action
+      path="/Paint"
+      type="org.lamsfoundation.lams.webservice.PaintAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
     </action>
     <action
       path="/saveportrait"
@@ -532,36 +528,6 @@
       <forward
         name="result"
         path="/toolcontent/exportresult.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/gradebook/gradebookMonitoring"
-      type="org.lamsfoundation.lams.gradebook.web.action.GradeBookMonitoringAction"
-      name="monitoringForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="monitorgradebook"
-        path="/gradebook/gradeBookMonitor.jsp"
-        redirect="false"
-      />
-      <forward
-        name="monitorcoursegradebook"
-        path="/gradebook/gradeBookCourseMonitor.jsp"
-        redirect="false"
-      />
-      <forward
-        name="error"
-        path=".error"
-        redirect="false"
-      />
-      <forward
-        name="message"
-        path=".message"
         redirect="false"
       />
     </action>

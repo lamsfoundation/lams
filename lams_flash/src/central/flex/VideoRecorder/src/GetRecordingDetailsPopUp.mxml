@@ -3,6 +3,7 @@
 
 	<mx:Script>
         <![CDATA[
+        	import mx.controls.TextInput;
         	import mx.controls.Alert;
         	import mx.core.UITextField;
         	import mx.managers.IFocusManagerComponent;
@@ -20,7 +21,7 @@
 		   	private function onCreationComplete():void{
 		   		focusManager.setFocus(titleInput);
 		   	}
-		   			   	
+		   	
 		   	public function init(dictionary:XMLDictionary):void{
 		   		this.dictionary = dictionary;
 		   		this.title = dictionary.getLabel("videorecorder.new.recording.details");
@@ -58,15 +59,15 @@
 			private function validate(validator:Validator):Boolean
 			{   
 				var validatorSource:DisplayObject = validator.source as DisplayObject;
+				var component:UIComponent = validator.source as UIComponent;
 				var suppressEvents:Boolean = (validatorSource != focussedFormControl);
 				var event:ValidationResultEvent = validator.validate(null, suppressEvents); 
 				var currentControlIsValid:Boolean = (event.type == ValidationResultEvent.VALID);
-				
+							
 				formIsValid = formIsValid && currentControlIsValid;
 				
 				return currentControlIsValid;
 			}
-		   	
         ]]>
     </mx:Script>
     

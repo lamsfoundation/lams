@@ -358,26 +358,16 @@ $.widget("ui.tabs", {
 		});
 
 		if(o.scrollable){
-			/*
-			var totalWidth = 0;
-			
-			this.$lis.each(function(){
-				totalWidth += this.offsetWidth;
-			});
-			
-			totalWidth += (this.$lis.length - 1) * 7 + 3;
-			
-			this.scrollableWidth = totalWidth;
-			*/
-			
+			// calculate scrollableWidth			
 			if(this.$lis.length > 1){
 				var lastElem = this.$lis[this.$lis.length - 1];
 				var beforeLastElem = this.$lis[this.$lis.length - 2];
 				
+				// extra 15 pixels are for buffer to make sure the tabs don't wrap
 				if(this.$lis[0].offsetLeft != 0){
-					this.scrollableWidth = beforeLastElem.offsetLeft + beforeLastElem.offsetWidth + lastElem.offsetWidth;
+					this.scrollableWidth = beforeLastElem.offsetLeft + beforeLastElem.offsetWidth + lastElem.offsetWidth + 15;
 				}else{
-					this.scrollableWidth = this.$lis[0].parentNode.parentNode.offsetLeft + beforeLastElem.offsetLeft + beforeLastElem.offsetWidth + lastElem.offsetWidth;
+					this.scrollableWidth = this.$lis[0].parentNode.parentNode.offsetLeft + beforeLastElem.offsetLeft + beforeLastElem.offsetWidth + lastElem.offsetWidth + 15;
 				}
 			}
 			else{
@@ -388,7 +378,6 @@ $.widget("ui.tabs", {
 				}else{
 					this.scrollableWidth = this.$lis[0].parentNode.parentNode.offsetLeft + lastElem.offsetLeft + lastElem.offsetWidth;
 				}
-
 			}
 			
 			$(".ui-tabs-wrapped").css("width", this.scrollableWidth + "px");

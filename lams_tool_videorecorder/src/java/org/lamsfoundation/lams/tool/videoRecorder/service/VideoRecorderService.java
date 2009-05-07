@@ -88,6 +88,7 @@ import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderConstants;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderException;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -152,6 +153,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	VideoRecorderSession session = new VideoRecorderSession();
 	session.setSessionId(toolSessionId);
 	session.setSessionName(toolSessionName);
+	session.setContentFolderId(FileUtil.generateUniqueContentFolderID());
+	
 	// learner starts
 	// TODO need to also set other fields.
 	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
@@ -283,8 +286,16 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
 	videoRecorder = VideoRecorder.newInstance(videoRecorder, toolContentId, null);
+	videoRecorder.setToolContentId(null);
 	videoRecorder.setToolContentHandler(null);
 	videoRecorder.setVideoRecorderSessions(null);
+	
+	VideoRecorderRecording authorRecording = (VideoRecorderRecording)getFirstRecordingByToolContentId(toolContentId).clone();
+	authorRecording.setToolContentId(null);
+	authorRecording.setComments(null);
+	authorRecording.setRatings(null);
+	videoRecorder.setAuthorRecording(authorRecording);
+	
 	Set<VideoRecorderAttachment> atts = videoRecorder.getVideoRecorderAttachments();
 	for (VideoRecorderAttachment att : atts) {
 	    att.setVideoRecorder(null);
@@ -317,12 +328,18 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 			+ toolPOJO);
 	    }
 	    VideoRecorder videoRecorder = (VideoRecorder) toolPOJO;
-
+	    
+	    VideoRecorderRecording recording = videoRecorder.getAuthorRecording();
+	    
 	    // reset it to new toolContentId
 	    videoRecorder.setToolContentId(toolContentId);
-	    videoRecorder.setCreateBy(new Long(newUserUid.longValue()));
+	    videoRecorder.getAuthorRecording().setToolContentId(toolContentId);
 
 	    videoRecorderDAO.saveOrUpdate(videoRecorder);
+	    
+	    if(recording != null){
+	    	videoRecorderRecordingDAO.saveOrUpdate(recording);
+	    }
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}

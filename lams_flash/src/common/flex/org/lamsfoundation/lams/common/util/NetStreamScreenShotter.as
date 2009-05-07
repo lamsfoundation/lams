@@ -140,7 +140,7 @@ package org.lamsfoundation.lams.common.util
 			screenshotNs.close();
 			screenshotNs = null;
 			
-			var screenShotEvent:ScreenShotterEvent = new ScreenShotterEvent(ScreenShotterEvent.SCREENSHOTTAKEN);
+			var screenShotEvent:ScreenShotterEvent = new ScreenShotterEvent(ScreenShotterEvent.SCREENSHOTTAKEN, true, true);
 			screenShotEvent.previewImage = previewImage;
 			
 			dispatchEvent(screenShotEvent);

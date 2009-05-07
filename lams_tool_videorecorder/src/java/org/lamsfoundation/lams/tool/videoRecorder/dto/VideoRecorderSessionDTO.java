@@ -36,17 +36,20 @@ public class VideoRecorderSessionDTO implements Comparable {
 	
 	Long sessionID;
 
+	String contentFolderId;
+	
 	String sessionName;
 	
 	Set<VideoRecorderUserDTO> userDTOs = new TreeSet<VideoRecorderUserDTO>();
 	
 	int numberOfLearners;
 	
-	int numberOfFinishedLearners;;
+	int numberOfFinishedLearners;
 	
 	public VideoRecorderSessionDTO(VideoRecorderSession session) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
+		this.contentFolderId = session.getContentFolderId();
 		
 		numberOfFinishedLearners = 0;
 		for (Iterator iterator = session.getVideoRecorderUsers().iterator(); iterator.hasNext();) {
@@ -80,6 +83,14 @@ public class VideoRecorderSessionDTO implements Comparable {
 		this.sessionName = sessionName;
 	}
 
+	public String getContentFolderId() {
+		return contentFolderId;
+	}
+
+	public void setContentFolderId(String contentFolderId) {
+		this.contentFolderId = contentFolderId;
+	}
+	
 	public int compareTo(Object o) {
 		int returnValue;
 		VideoRecorderSessionDTO toSession = (VideoRecorderSessionDTO)o;

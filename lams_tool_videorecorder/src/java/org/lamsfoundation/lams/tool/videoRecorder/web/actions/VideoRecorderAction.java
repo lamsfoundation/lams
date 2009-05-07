@@ -22,7 +22,7 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.videoRecorder.web.servlets;
+package org.lamsfoundation.lams.tool.videoRecorder.web.actions;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,12 +35,16 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRatingDTO;
+import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderComment;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRating;
@@ -50,17 +54,13 @@ import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.service.IVideoRecorderService;
 import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderServiceProxy;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderRecordingComparator;
-import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderCommentDTO;
-import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRatingDTO;
-import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Base64StringToImageUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /** 
 * @author Paul Georges
@@ -90,26 +90,18 @@ public class VideoRecorderAction extends LamsDispatchAction {
 	private static final String RATING_ID = "ratingId";
 	private static final String COMMENT = "comment";
 	private static final String IS_JUST_SOUND = "isJustSound";
-	private static final String RAW_IMAGE = "rawImage";
+	private static final String IS_LOCAL = "isLocal";
 	private static final String SORT_BY = "sortBy";
 	private static final String SORT_DIR = "sortDirection";
 	private static final String GET_ALL = "getAll";
 	private static final String OK_MSG = "ok";
 	private static final String ERROR_MSG = "error";
-	private static final String SAVE_TO_LAMS = "saveToLams";
-	private static final String SAVE_TO_LAMS_DEST = "saveToLamsDest";
-	
-	private static final String VIDEORECORDER_RECORDINGS_FOLDER_DEST = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + "lams-tool-lavidr10.war" + File.separator + "previewImages" + File.separator;
-	private static final String VIDEORECORDER_RECORDINGS_FOLDER_SRC = Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL);
-	private static final String VIDEORECORDER_PREVIEWIMAGES_RELATIVE_WWW = "../../previewImages/";
+	private static final String EXTENSTION = "ext";
+	private static final String IMAGEDATA = "data";
+	private static final String DIR = "dir";
+
 	private static final String FLV_EXTENSION = ".flv";
 	private static final String JPG_EXTENSION = ".jpg";
-	
-	private Integer getUserId(HttpServletRequest request) {
-		HttpSession ss = SessionManager.getSession();
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		return user != null ? user.getUserID() : null;
-	}
 	
 	/** 
 	 * Desctipion
@@ -133,6 +125,9 @@ public class VideoRecorderAction extends LamsDispatchAction {
     	// get service
 		IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
 		
+		// get session
+		VideoRecorderSession session = videoRecorderService.getSessionBySessionId(toolSessionId);
+		
 		// create list of recording DTOs
 		List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs;
 		
@@ -150,7 +145,18 @@ public class VideoRecorderAction extends LamsDispatchAction {
 		Comparator<VideoRecorderRecordingDTO> comp = new VideoRecorderRecordingComparator(sortBy, sortDirection);
 	    Collections.sort(videoRecorderRecordingDTOs, comp);
 	    
-		String xmlOutput = buildVideoRecordingsXML(videoRecorderRecordingDTOs, userId);
+	    String contentFolderIdLearner = session.getContentFolderId();
+	    String previewImageLearnerPath = Configuration.get(ConfigurationKeys.SERVER_URL) + File.separator + "www" + File.separator + "secure" + File.separator + contentFolderIdLearner + File.separator + "previewImages" + File.separator;
+	    
+		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+		IBaseDAO baseDAO =(IBaseDAO) ctx.getBean("baseDAO");
+		ToolSession toolSession = (ToolSession)baseDAO.find(ToolSession.class, toolSessionId);
+		String contentFolderIdAuthor = toolSession.getLesson().getLearningDesign().getContentFolderID();
+	    String previewImageAuthorPath = Configuration.get(ConfigurationKeys.SERVER_URL) + File.separator + "www" + File.separator + "secure" + File.separator + contentFolderIdAuthor + File.separator + "Recordings" + File.separator;
+
+	    String soundOnlyImage = Configuration.get(ConfigurationKeys.SERVER_URL) + File.separator + "tool" + File.separator + "lavidr10" + File.separator + "images" + File.separator + "soundOnly.png";
+	    
+		String xmlOutput = buildVideoRecordingsXML(videoRecorderRecordingDTOs, userId, previewImageLearnerPath, previewImageAuthorPath, soundOnlyImage);
 		
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
@@ -172,8 +178,11 @@ public class VideoRecorderAction extends LamsDispatchAction {
 	    	String description = WebUtil.readStrParam(request, DESCRIPTION, true);
 	    	String filename = WebUtil.readStrParam(request, FILENAME, true);
 	    	Boolean isJustSound = WebUtil.readBooleanParam(request, IS_JUST_SOUND, false);
+	    	Boolean isLocal = WebUtil.readBooleanParam(request, IS_LOCAL, false);
 	    	int rating = WebUtil.readIntParam(request, RATING, false);
-	    	Boolean saveToLams = WebUtil.readBooleanParam(request, SAVE_TO_LAMS, false);
+	    	
+	    	title = title.replaceAll("[<>\"]", "");
+	    	description = description.replaceAll("[<>\"]", "");
 	    	
 	    	// get service
 			IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
@@ -201,6 +210,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 						videoRecording.setRating((float)rating);
 						videoRecording.setCreateDate(new Date());
 						videoRecording.setIsJustSound(isJustSound);
+						videoRecording.setIsLocal(isLocal);
 						videoRecording.setRatings(null);
 						videoRecording.setComments(null);
 						videoRecording.setCreateBy(null);
@@ -225,6 +235,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 					videoRecording.setRating((float)rating);
 					videoRecording.setCreateDate(new Date());
 					videoRecording.setIsJustSound(isJustSound);
+					videoRecording.setIsLocal(isLocal);
 					videoRecording.setRatings(null);
 					videoRecording.setComments(null);
 					videoRecording.setCreateBy(user);
@@ -290,6 +301,8 @@ public class VideoRecorderAction extends LamsDispatchAction {
 	    	Long toolSessionId = WebUtil.readLongParam(request, TOOL_SESSION_ID);
 	    	Long userId = WebUtil.readLongParam(request, USER_ID);
 	    	String commentText = WebUtil.readStrParam(request, COMMENT, true);
+	    	
+	    	commentText = commentText.replaceAll("[<>\"]", "");
 	    	
 	    	// get service
 			IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
@@ -433,14 +446,31 @@ public class VideoRecorderAction extends LamsDispatchAction {
 	public ActionForward saveImage(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		try{
-			String dir = VIDEORECORDER_RECORDINGS_FOLDER_DEST;
-			String filename = WebUtil.readStrParam(request, "filename");
-			String ext = WebUtil.readStrParam(request, "ext");
-			String data = WebUtil.readStrParam(request, "data");
+		try{		
+			String dir = WebUtil.readStrParam(request, DIR, true);
+			String filename = WebUtil.readStrParam(request, FILENAME);
+			String ext = WebUtil.readStrParam(request, EXTENSTION);
+			String data = WebUtil.readStrParam(request, IMAGEDATA);
+			Long toolSessionId = WebUtil.readLongParam(request, TOOL_SESSION_ID, true);
 			
-			boolean success = Base64StringToImageUtil.create(dir, filename, ext, data);
-			writeAJAXResponse(response, String.valueOf(success));
+			IVideoRecorderService videoRecorderService = VideoRecorderServiceProxy.getVideoRecorderService(getServlet().getServletContext());
+
+			// if this is being added by a learner
+			if(toolSessionId != null){
+				VideoRecorderSession session = videoRecorderService.getSessionBySessionId(toolSessionId);
+				String folder = session.getContentFolderId();
+				dir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + "lams-www.war" + File.separator + "secure" + File.separator + folder + File.separator + "previewImages" + File.separator;
+			}
+			
+			// at this point, the dir variable should contain a path to the learning design content folder (author)
+			// or a path to the session content folder (learner)
+			if(dir != null){
+				boolean success = Base64StringToImageUtil.create(dir, filename, ext, data);
+				writeAJAXResponse(response, String.valueOf(success));
+			}
+			else{
+				writeAJAXResponse(response, ERROR_MSG);
+			}
 		}catch(Exception e){
 			writeAJAXResponse(response, ERROR_MSG + e.getMessage());
 		}
@@ -466,7 +496,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 
 	}
 	
-	private String buildVideoRecordingsXML(List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs, Long userId){
+	private String buildVideoRecordingsXML(List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs, Long userId, String previewImageLearnerPath, String previewImageAuthorPath, String soundOnlyImage){
 		//start the output
 		String xmlOutput = "<recordings>";
 		
@@ -484,6 +514,7 @@ public class VideoRecorderAction extends LamsDispatchAction {
 			xmlOutput += "<recordingId>" + videoRecorderRecordingDTO.getUid() + "</recordingId>";
 			xmlOutput += "<title>" + videoRecorderRecordingDTO.getTitle() + "</title>";
 			
+			// user stuff
 			if(user != null){
 				xmlOutput += "<isToolContent>false</isToolContent>";
 				xmlOutput += "<userUid>" + user.getUid() + "</userUid>";
@@ -499,14 +530,22 @@ public class VideoRecorderAction extends LamsDispatchAction {
 			xmlOutput += "<updateDate>" + videoRecorderRecordingDTO.getUpdateDate().toLocaleString() + "</updateDate>";
 			xmlOutput += "<description>" + videoRecorderRecordingDTO.getDescription() + "</description>";
 			xmlOutput += "<filename>" + videoRecorderRecordingDTO.getFilename() + FLV_EXTENSION + "</filename>";
+			
+			// preview image stuff
 			if(videoRecorderRecordingDTO.getIsJustSound()){
-				xmlOutput += "<previewImage>" + VIDEORECORDER_PREVIEWIMAGES_RELATIVE_WWW + "soundOnly.png</previewImage>";
+				xmlOutput += "<previewImage>" + soundOnlyImage + "</previewImage>";
 			}else{
-				xmlOutput += "<previewImage>" + VIDEORECORDER_PREVIEWIMAGES_RELATIVE_WWW + videoRecorderRecordingDTO.getFilename() + JPG_EXTENSION + "</previewImage>";
+				if(user != null){
+					xmlOutput += "<previewImage>" + previewImageLearnerPath + videoRecorderRecordingDTO.getFilename() + JPG_EXTENSION + "</previewImage>";
+				}
+				else if(user == null && videoRecorderRecordingDTO.getToolContentId() != -1){
+					xmlOutput += "<previewImage>" + previewImageAuthorPath + videoRecorderRecordingDTO.getFilename() + JPG_EXTENSION + "</previewImage>";
+				}
 			}
 			xmlOutput += "<rating>" + videoRecorderRecordingDTO.getRating() + "</rating>";
 			xmlOutput += "<userRating>" + buildUserRating(ratings, userId) + "</userRating>";
 			xmlOutput += "<isJustSound>" + videoRecorderRecordingDTO.getIsJustSound() + "</isJustSound>";
+			xmlOutput += "<isLocal>" + videoRecorderRecordingDTO.getIsLocal() + "</isLocal>";
 			
 			// for every recording, print out its comments
 			xmlOutput += buildVideoCommentsXML(comments);

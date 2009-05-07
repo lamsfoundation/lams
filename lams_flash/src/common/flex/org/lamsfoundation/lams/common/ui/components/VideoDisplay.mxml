@@ -41,6 +41,7 @@
 			private var _ns:NetStream;
 			private var _metadata:Object;
 			private var _nc:NetConnection;
+			private var _ncOffline:NetConnection;
 			private var _serverUrl:String;
 			private var _servletUrl:String;
 			private var _filename:String;
@@ -67,12 +68,16 @@
 				// fix video player
 				player.addChild(video);
 				video.visible = true;		
-								
+				
+				// create offline netconnection
+				_ncOffline = new NetConnection();
+				_ncOffline.connect(null);
+				
 				// create screenshotters
 				screenshotter = new NetStreamScreenShotter();
 				
 				// add listeners for screenshots
-				screenshotter.addEventListener(ScreenShotterEvent.SCREENSHOTTAKEN, screenShotTaken);
+				//screenshotter.addEventListener(ScreenShotterEvent.SCREENSHOTTAKEN, screenShotTaken);
 				
 				// reset to make sure everything is set to default
 				reset();
@@ -93,6 +98,11 @@
 			public function setNetConnection(nc:NetConnection):void{
 				_nc = nc;
 				screenshotter.nc = nc;
+			}
+			
+			// sets a buffer time (optional)
+			public function setBufferTime(bufferTime:int):void{
+				_bufferTime = bufferTime;
 			}
 			
 			// playMode getter
@@ -127,15 +137,20 @@
 			}
 			
 			// prepares the player to receive a video
-			public function makeReadyVideo(filename:String):void{
+			public function makeReady(filename:String, type:String, offline:Boolean):void{
 				// reset the current ns
-				reset();
+				reset(offline);
 				
 				// reduce volume temporarily
 				_ns.soundTransform = new SoundTransform(0);
 				
 				// change the view
-				selectedChild = playerView;
+				if(type == "audio"){
+					selectedChild = audioView;
+				}
+				else{
+					selectedChild = playerView;
+				}
 				
 				// save filename
 				_filename = filename;
@@ -143,22 +158,7 @@
 				// play
 				_ns.play(_filename);
 			}
-			
-			// prepares the player to receive an audio file (aka video with no video)
-			public function makeReadyAudio(filename:String):void{
-				// reset the current ns
-				reset();
-								
-				// change the view
-				selectedChild = audioView;
-				
-				// save filename
-				_filename = filename;
-				
-				// play
-				_ns.play(_filename);
-			}
-			
+						
 			// like both above methods but uses old filename and view state
 			private function makeReadyAgain():void{
 				// seek the video the very beginning and pause
@@ -248,7 +248,7 @@
 			}
 			
 			// resets video
-			public function reset():void{
+			public function reset(isOffline:Boolean = false):void{
 				// change view to black
 				selectedChild = blackView;
 				
@@ -273,6 +273,7 @@
 					readyTimer.stop();
 					readyTimer = null;	
 				}
+				
 				// clear the video object
 				video.clear();
 				
@@ -280,7 +281,7 @@
 				_playMode = INIT_MODE;
 				
 				// create a new netstream
-				_ns = createNetStream();
+				_ns = createNetStream(isOffline);
 				
 				// attach the new ns
 				video.attachNetStream(_ns);
@@ -293,39 +294,48 @@
 			}
 			
 			// creates a new netstream object
-			private function createNetStream():NetStream{
-				// if nc is not null
-				if(_nc){
-					var ns:NetStream = new NetStream(_nc);
-					ns.bufferTime = _bufferTime;
-					
-					// listeners and callback stuff for netstatus object
-					var client:Object = new Object();
-					client.onMetaData = onMetaData;
-					client.onPlayStatus = onPlayStatus;
-					ns.client = client;
-					
-					ns.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
-					ns.addEventListener(NetStatusEvent.NET_STATUS, nsStatusHandler);
-					
-					// is camera is allowed, set that up
-					if(_cam){
-						ns.attachCamera(_cam);
-					}
-					
-					// if the mic is to be used, set that up
-					if(_mic){
-						ns.attachAudio(_mic);
-					}
-						
-					return ns;
-				}
-				else
+			private function createNetStream(isOffline:Boolean = false):NetStream{
+				var ns:NetStream;
+				var client:Object;
+				
+				if((isOffline && !_ncOffline) || (isOffline && !_ncOffline)){
 					return null;
+				}
+				else if(isOffline && _ncOffline){
+					ns = new NetStream(_ncOffline);
+					ns.bufferTime = _bufferTime;
+
+				}
+				else if(!isOffline && _nc){
+					ns = new NetStream(_nc);
+					ns.bufferTime = _bufferTime;
+				}
+				else{
+					return null;
+				}
+				
+				// listeners and callback stuff for netstatus object
+				client = new Object();
+				client.onMetaData = onMetaData;
+				client.onPlayStatus = onPlayStatus;
+				ns.client = client;
+				
+				ns.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
+				ns.addEventListener(NetStatusEvent.NET_STATUS, nsStatusHandler);
+				
+				// is camera is allowed, set that up
+				if(_cam){
+					ns.attachCamera(_cam);
+				}
+				
+				// if the mic is to be used, set that up
+				if(_mic){
+					ns.attachAudio(_mic);
+				}
+					
+				return ns;
 			}
 
-
-			
 			// creates a new timer object
 			private function createTimer():Timer{
 				var timer:Timer = new Timer(10);
@@ -651,25 +661,8 @@
 			
 			// callback from screenshotter
 			private function screenShotTaken(event:ScreenShotterEvent):void{
-				// get the preview image
-				var previewImage:BitmapData = event.previewImage;
-				
-				// set up the service
-				var imageService:ImageService = new ImageService(_servletUrl, saveImageMethod);
-				imageService.addEventListener(ResultEvent.RESULT, savePreviewImageSuccessHandler);
-				imageService.addEventListener(FaultEvent.FAULT, savePreviewImageFaultHandler);
-				
-				// send to server
-				imageService.sendImageToServer(null, _filename, imageService.JPG_EXT, previewImage);
-			}
-			
-			// handler for successful save preview image
-			private function savePreviewImageSuccessHandler(e:ResultEvent):void {
-			}
-			
-			// fault handler for save preview image
-			  private function savePreviewImageFaultHandler(e:FaultEvent):void {
-			  	Alert.show(e.toString());
+				// pass on the event
+				dispatchEvent(event);
 			}
 	    ]]>
 	</mx:Script>

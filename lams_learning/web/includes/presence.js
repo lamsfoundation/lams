@@ -69,6 +69,8 @@ function resizeChat(){
 		// set presence chat to minimized height
   		$("#presenceChat").css({'top': windowHeight + "px"});
 	}
+	
+	$("#presenceChatWarning").css({'top': windowHeight - 10 + "px"});
 }
  		
 function getUserFromTag(tag){
@@ -115,7 +117,7 @@ function addTab(nick, tag){
 	$("#" + tag).html(createPrivateTabContent(nick, tag));
 	
 	var anticache = new Date().getTime();
-	$.get(lamsUrl + "PresenceChatLogger.do", {method: "getConversationHistory", roomName:CONFERENCEROOM, from:NICK, to:nick, anticache:anticache}, handleGetConversation);
+	$.post(lamsUrl + "PresenceChatLogger.do", {method: "getConversationHistory", roomName:CONFERENCEROOM, from:NICK, to:nick, anticache:anticache}, handleGetConversation);
 }
 
 function htmlEnc(str) {
@@ -172,6 +174,14 @@ function nickToContentMenu(nick){
 
 function tagToContextMenu(tag){
 	return tag + '_contextMenu';
+}
+
+function nickToTabLabel(nick){
+	return tagToTabLabel(nickToTag(nick));
+}
+
+function tagToTabLabel(tag){
+	return tag + '_tabLabel';
 }
 
 function parseXml(xml) {  
@@ -285,6 +295,8 @@ function connectUserContextMenu(div, contextMenu){
 			else if(action == "block" && !blocked){
 				roster.users[rosterIndex].blocked = handleAllowBlockClick(tag, blocked);
 			}
+			
+			roster.updateDisplay();
 	});
 }
 
@@ -406,7 +418,7 @@ function UpdateRosterDisplay() {
 		if(listing.length == 0){
 			// create listing div
 			// note: attrId must be added to array before onClick
-			var listingDiv = $('<div id="' + listingName + '" rosterIndex="' + i + '" onClick="handlePresenceLeftClick(\'' + listingName + '\');" class="presenceName">' + createPresenceListing(nick, tag) + '</div>');
+			var listingDiv = $('<div id="' + listingName + '" rosterIndex="' + i + '" onClick="handlePresenceLeftClick(\'' + listingName + '\');" class="presenceListing">' + createPresenceListing(nick, tag) + '</div>');
 			
 			// add the listing div
 			rosterDiv.append(listingDiv);
@@ -446,9 +458,18 @@ function UpdateRosterDisplay() {
 		// set the correct icon depending on status
 		if(available == "available"){
 			availableCount++;
-			listingImage.attr("src", "../images/icons/user_online.png");
+			
+			if(blocked){
+				listingImage.attr("src", "../images/icons/user_online_blocked.png");
+			}else{
+				listingImage.attr("src", "../images/icons/user_online.png");
+			}
 		}else{
-			listingImage.attr("src", "../images/icons/user_offline.png");
+			if(blocked){
+				listingImage.attr("src", "../images/icons/user_offline_blocked.png");
+			}else{
+				listingImage.attr("src", "../images/icons/user_offline.png");
+			}
 		}
 	}
 	
@@ -524,10 +545,10 @@ function sendMsg(aForm) {
 	var aMsg = new JSJaCMessage();
 	
 	// prepare nick
-	var toNick = "";
+	var toNick;
 	
 	// prepare user
-	var user = null;
+	var user;
 	
 	// if the form has a hidden sendTo input, it's a private message
 	if (aForm.sendTo) {
@@ -536,34 +557,33 @@ function sendMsg(aForm) {
 		aMsg.setTo(CONFERENCEROOM + "/" + toNick);
 		aMsg.setType("chat");
 		aMsg.setBody(aForm.messageInput.value);
-  		// apending the private message to the incoming window,
-  		// since the jabber server will not echo sent private messages.
-  		// TODO: need to check if this is correct behaviour
+		
+		// append message to one's own window (jabber doesn't send message back to sender)
 		if (!(NICK == toNick)) {
 			updateMessageDisplay(nickToMessageArea(toNick), generateMessageHTML(NICK, aForm.messageInput.value, null));
 		}
-
-		// log message
-		$.get(lamsUrl + "PresenceChatLogger.do", {method: "saveMessage", roomName:CONFERENCEROOM, from:NICK, to:toNick, dateSent:new Date(), message:aForm.messageInput.value}, null);
 	}
 	// otherwise, it's a group chat message
 	else {
+		toNick = null;
+		user = null
 		aMsg.setTo(CONFERENCEROOM);
 		aMsg.setType("groupchat");
 		aMsg.setBody(aForm.messageInput.value);
-		
-		$.get(lamsUrl + "PresenceChatLogger.do", {method: "saveMessage", roomName:CONFERENCEROOM, from:NICK, to:null, dateSent:new Date(), message:aForm.messageInput.value}, null);
 	}
   	
 	aMsg.setFrom(USERNAME + "@" + XMPPDOMAIN + "/" + RESOURCE);
 	
 	// if groupchat or if user is available
-	if(user == null || user.status == "available"){
+	if(!user || user.status == "available"){
+		// log message
+		$.post(lamsUrl + "PresenceChatLogger.do", {method: "saveMessage", roomName:CONFERENCEROOM, from:NICK, to:toNick, dateSent:new Date(), message:aForm.messageInput.value}, null);
+	
 		// send message
 		con.send(aMsg);
 	}
 	// otherwise if not groupchat and user is unavailable
-	else if(user != null && user.status == "unavailable"){
+	else if(user && user.status == "unavailable"){
 		// generate the emote message and display it to user
 		var emoteMessage = generateEmoteHTML("Your previous message has not been sent because " + toNick + " is unavailable");
 		updateMessageDisplay(nickToMessageArea(toNick), emoteMessage);
@@ -591,12 +611,12 @@ function handleMessage(aJSJaCPacket) {
 	
 	// prepare htmlMessage
 	var htmlMessage;
-	
-	// get the tag from nick
-	var tag = nickToTag(nick);
-			
+				
 	// if message is private chat
-	if (type == "chat") {
+	if (type == "chat") {	
+		// get the tag from nick
+		var tag = nickToTag(nick);
+		
 		// get user from nick
 		var user = roster.getUserByNick(nick);
 		
@@ -607,27 +627,24 @@ function handleMessage(aJSJaCPacket) {
 				// add a tab
 				addTab(nick, tag);
 				
-				// make the sender's tab label bold
-				$('#' + tag + '_tabLabel').html('<b>' + nick + '</b>');
-				
 				// don't add the message, let the log take care of that
 			}
 			// if there is a tab for the send open
-			else{
-				// get the selected tab
-				var selected = $("#presenceChatTabs").tabs().data('selected.tabs');
-				
-				// if the selected tab is any other than sender's tab
-				if(getUserFromTabIndex(selected).tag != tag){
-					// make the sender's tab label bold
-					$('#' + tag + '_tabLabel').html('<b>' + nick + '</b>');
-					$("#presenceChatTabs").tabs('_tabify', false);
-				}
-				
+			else{				
 				// generate html
 				htmlMessage = generateMessageHTML(nick, message, null);
 			}
 			
+			// get the selected tab
+			var selected = $("#presenceChatTabs").tabs().data('selected.tabs');
+			
+			// if the selected tab is any other than sender's tab
+			if(getUserFromTabIndex(selected).tag != tag){
+				// notify of new message
+				$("#" + tagToTabLabel(tag)).addClass('presenceTabNewMessage');
+				$("#" + tagToListing(tag)).addClass('presenceListingNewMessage');
+			}
+				
 			// add the div to the sender's tab
 			updateMessageDisplay(nickToMessageArea(nick), htmlMessage);
 		}
@@ -641,8 +658,7 @@ function handleMessage(aJSJaCPacket) {
 			// if the selected tab is any other than groupchat
 			if(selected != 0){
 				// make the group chat label label bold
-				$('#groupchat_tabLabel').html('<b>Group Chat</b>');
-				$("#presenceChatTabs").tabs('_tabify', false);
+				$("#" + tagToTabLabel(groupChatInfo.tag)).addClass('presenceTabNewMessage');
 			}
 		
 			htmlMessage = generateMessageHTML(nick, message, null);
@@ -715,8 +731,8 @@ function handlePresence(presence) {
 		if(showStatus){
 			// if the selected tab is any other than groupchat
 			if(selected != 0){
-				// make the group chat label bold
-				$('#groupchat_tabLabel').html('<b>Group Chat</b>');
+				// make the group chat label label bold
+				$("#" + tagToTabLabel(groupChatInfo.tag)).addClass('presenceTabNewMessage');
 			}
 			
 			// generate the emote message and display it to group chat
@@ -732,13 +748,14 @@ function handlePresence(presence) {
 		
 		// if the person who got disconnected has a tab open
 		if(document.getElementById(nickToMessageArea(nick)) != null){		
-			// if the selected tab is any other than sender's tab
-			if(getUserFromTabIndex(selected).tag != tag){
-				// make the sender's tab label bold
-				$('#' + tag + '_tabLabel').html('<b>' + nick + '</b>');
-			}
-			
+			// if showing status messages			
 			if(showStatus){
+				// if the selected tab is any other than sender's tab
+				if(getUserFromTabIndex(selected).tag != tag){
+					// notify of new message
+					$("#" + tagToTabLabel(tag)).addClass('presenceTabNewMessage');
+				}
+				
 				// generate the emote message and display it to private chat
 				var emoteMessage;
 				if(user.status == "unavailable"){
@@ -779,7 +796,7 @@ function handleConnected() {
 	
 	// get group chat history
 	var anticache = new Date().getTime();
-	$.get(lamsUrl + "PresenceChatLogger.do", {method: "getGroupHistory", roomName:CONFERENCEROOM, anticache:anticache}, handleGetGroupHistory);
+	$.post(lamsUrl + "PresenceChatLogger.do", {method: "getGroupHistory", roomName:CONFERENCEROOM, anticache:anticache}, handleGetGroupHistory);
 }
 
 function handleDisconnected() {
@@ -883,7 +900,7 @@ function doLogin(presenceServerUrl, userID, password, resource, chatroom, nickna
 }
 
 function doRegistration(){
-	$.get(xmppServlet, {method: "createXmppId"}, handlePresenceRegistration);
+	$.post(xmppServlet, {method: "createXmppId"}, handlePresenceRegistration);
 }
 
 /*

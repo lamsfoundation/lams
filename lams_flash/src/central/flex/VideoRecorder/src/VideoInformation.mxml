@@ -87,8 +87,6 @@
 			<mx:Label id="descriptionLabel" text="Description:" fontStyle="italic"/>
 			<ns1:ResizeableTextArea id="description" width="100%" wordWrap="true" editable="false" verticalScrollPolicy="off" borderStyle="none"/>
 		</mx:VBox>
-		<mx:VBox width="100%" height="100%">
-		</mx:VBox>
 		<mx:VBox width="100%" id="commentsBox">
 			<mx:HRule width="100%" id="commentsRule"/>
 			<mx:Label id="commentsLabel" text="Comments:" fontStyle="italic"/>

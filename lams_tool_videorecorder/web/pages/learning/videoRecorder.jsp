@@ -1,4 +1,18 @@
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ include file="/common/taglibs.jsp"%>
+
+<%
+	String red5Url = Configuration.get(ConfigurationKeys.RED5_SERVER_URL);
+	String red5RecordingsUrl = Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL);
+%>
+
+<c:if test='<%= red5Url.equals("")  || red5RecordingsUrl.equals("") %>'>
+	<script type="text/javascript">	
+		alert("<fmt:message key='videorecorder.error.noconfig'/>");
+	</script>
+</c:if>
+
 <c:set var="formBean"value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
 <script type="text/javascript">
@@ -111,7 +125,21 @@
 			// embed the Flash Content SWF when all tests are passed
 			AC_FL_RunContent(
 					"src", "./includes/flash/VideoRecorder",
-					"FlashVars", "contentEditable="+${contentEditable}+'&toolSessionId='+${toolSessionId}+'&toolContentId='+${toolContentId}+'&mode='+'${mode}'+'&userId='+${userId}+'&allowUseVoice='+${videoRecorderDTO.allowUseVoice}+'&allowUseCamera='+${videoRecorderDTO.allowUseCamera}+'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility}+'&allowComments='+${videoRecorderDTO.allowComments}+'&allowRatings='+${videoRecorderDTO.allowRatings}+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&languageXML='+"${languageXML}"+"",
+					"FlashVars", "contentEditable="+${contentEditable} +
+									'&contentFolderUrl=/lams//www/secure/${contentFolderId}/Recordings/' +
+									'&toolSessionId='+${toolSessionId} + 
+									'&toolContentId='+${toolContentId} +
+									'&mode='+'${mode}' +
+									'&userId='+${userId} +
+									'&allowUseVoice='+${videoRecorderDTO.allowUseVoice} +
+									'&allowUseCamera='+${videoRecorderDTO.allowUseCamera} +
+									'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility} +
+									'&allowComments='+${videoRecorderDTO.allowComments} +
+									'&allowRatings='+${videoRecorderDTO.allowRatings} +
+									'&red5ServerUrl='+'${red5ServerUrl}' +
+									'&serverUrl='+'${serverUrl}' +
+									'&languageXML='+"${languageXML}" +
+									"",
 					"width", "100%",
 					"height", "676",
 					"align", "middle",

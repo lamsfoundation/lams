@@ -79,6 +79,8 @@ public class VideoRecorderDTO {
 
 	public Set<VideoRecorderSessionDTO> sessionDTOs = new TreeSet<VideoRecorderSessionDTO>();
 	
+	public VideoRecorderRecordingDTO authorRecording;
+	
 	public Long currentTab;
 	
 	/* Constructors */
@@ -101,10 +103,13 @@ public class VideoRecorderDTO {
 		exportOffline = videoRecorder.isExportOffline();
 		reflectOnActivity = videoRecorder.isReflectOnActivity();
 		reflectInstructions = videoRecorder.getReflectInstructions();
-
 		onlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
 		offlineInstructionsFiles = new TreeSet<VideoRecorderAttachmentDTO>();
 
+		if(videoRecorder.getAuthorRecording() != null){
+			authorRecording = new VideoRecorderRecordingDTO();
+		}
+		
 		for (Iterator i = videoRecorder.getVideoRecorderAttachments().iterator(); i.hasNext();) {
 			VideoRecorderAttachment att = (VideoRecorderAttachment) i.next();
 			if (att.getFileType().equals(IToolContentHandler.TYPE_OFFLINE)) {
@@ -158,6 +163,14 @@ public class VideoRecorderDTO {
 		return offlineInstructionsFiles;
 	}
 
+	public VideoRecorderRecordingDTO getAuthorRecording() {
+		return authorRecording;
+	}
+
+	public void setAuthorRecording(VideoRecorderRecordingDTO authorRecording) {
+		this.authorRecording = authorRecording;
+	}
+	
 	public void setOfflineInstructionsFiles(
 			Set<VideoRecorderAttachmentDTO> offlineInstructionsFiles) {
 		this.offlineInstructionsFiles = offlineInstructionsFiles;

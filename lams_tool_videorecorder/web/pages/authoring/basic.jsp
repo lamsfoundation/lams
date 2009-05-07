@@ -1,6 +1,5 @@
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="formBean"
@@ -10,19 +9,6 @@
 <c:set var="dto" value="${videoRecorderDTO}" />
 
 <script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
-<script language="JavaScript" type="text/javascript">
-<!--
-// -----------------------------------------------------------------------------
-// Globals
-// Major version of Flash required
-var requiredMajorVersion = 9;
-// Minor version of Flash required
-var requiredMinorVersion = 0;
-// Minor version of Flash required
-var requiredRevision = 124;
-
-// -----------------------------------------------------------------------------
-</script>
 
 <!-- ========== Basic Tab ========== -->
 <table cellpadding="0">
@@ -46,8 +32,15 @@ var requiredRevision = 124;
 	</tr>
 	<tr align="center">
 		<td>
-			<script language="JavaScript" type="text/javascript">
-			<!--
+			<script language="JavaScript" type="text/javascript">		
+			// Globals
+			// Major version of Flash required
+			var requiredMajorVersion = 9;
+			// Minor version of Flash required
+			var requiredMinorVersion = 0;
+			// Minor version of Flash required
+			var requiredRevision = 124;
+			
 			// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
 			var hasProductInstall = DetectFlashVer(6, 0, 65);
 			
@@ -81,7 +74,18 @@ var requiredRevision = 124;
 				// embed the Flash Content SWF when all tests are passed
 				AC_FL_RunContent(
 						"src", "./includes/flash/VideoRecorderFCKEditor",
-						"FlashVars", "mode=recorderModeAuthor"+'&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>'+'&serverUrl=<%= Configuration.get(ConfigurationKeys.SERVER_URL) %>'+'&filename='+'${videoRecorderRecordingDTO.filename}'+'&toolContentId='+${toolContentId}+'&languageXML='+"${languageXML}"+"",
+						"FlashVars", "mode=recorderModeAuthor" +
+										'&offlinePlayback='+'${videoRecorderRecordingDTO.isLocal}' +
+										'&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>' +
+										'&serverUrl=<%= Configuration.get(ConfigurationKeys.SERVER_URL) %>' +
+										'&red5RecordingsUrl=<%= Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL) %>' +
+										'&lamsEarDir=<%= Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) %>' +
+										'&saveToLamsDestUrl=/lams-www.war/secure/${sessionMap.contentFolderID}/Recordings/' +
+										'&contentFolderUrl=/lams//www/secure/${sessionMap.contentFolderID}/Recordings/' +
+										'&filename='+'${videoRecorderRecordingDTO.filename}'+'.flv' +
+										'&toolContentId='+${toolContentId} +
+										'&languageXML='+"${languageXML}" +
+										"",
 						"width", "361",
 						"height", "331",
 						"align", "middle",
@@ -99,7 +103,6 @@ var requiredRevision = 124;
 			   	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
 			    document.write(alternateContent);  // insert non-flash content
 			  }
-			// -->
 			</script>
 			<noscript>
 			  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"

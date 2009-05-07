@@ -68,6 +68,15 @@
             length="250"
         />
 
+        <property
+            name="contentFolderId"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="content_folder_id"
+            length="32"
+        />
+
         <many-to-one
             name="videoRecorder"
             class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder"

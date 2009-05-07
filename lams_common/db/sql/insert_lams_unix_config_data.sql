@@ -248,7 +248,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('SMTPPassword','', 'config.smtp.password', 'config.header.email', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('Red5ServerUrl','rtmp://localhost/', 'config.red5.server.url', 'config.header.red5', 'STRING', 1);
+values ('Red5ServerUrl','', 'config.red5.server.url', 'config.header.red5', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('Red5RecordingsUrl','http://localhost:8080/streams/', 'config.red5.recordings.url', 'config.header.red5', 'STRING', 1);
+values ('Red5RecordingsUrl','', 'config.red5.recordings.url', 'config.header.red5', 'STRING', 0);

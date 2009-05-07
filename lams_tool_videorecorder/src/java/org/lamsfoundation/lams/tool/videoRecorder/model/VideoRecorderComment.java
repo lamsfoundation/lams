@@ -142,7 +142,7 @@ public class VideoRecorderComment implements java.io.Serializable {
     }
 
 	/**
-     * @return Returns the VideoRecorderUser of the person who created the recording
+     * @return Returns the VideoRecorderRecording of the comment
      *
      * @hibernate.many-to-one
      * 		column="videoRecorder_recording_uid"

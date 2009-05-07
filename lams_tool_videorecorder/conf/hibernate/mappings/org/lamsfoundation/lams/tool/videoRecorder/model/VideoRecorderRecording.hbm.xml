@@ -93,6 +93,14 @@
             column="is_just_sound"
         />
 
+        <property
+            name="isLocal"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="is_local"
+        />
+
         <many-to-one
             name="videoRecorderSession"
             class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession"

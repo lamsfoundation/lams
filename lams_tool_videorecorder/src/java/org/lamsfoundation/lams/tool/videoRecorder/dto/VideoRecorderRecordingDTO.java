@@ -63,6 +63,8 @@ public class VideoRecorderRecordingDTO {
 	public Float rating;
 	
 	public Boolean isJustSound;
+	
+	public Boolean isLocal;
     
 	public VideoRecorderSession videoRecorderSession;
 	
@@ -85,6 +87,7 @@ public class VideoRecorderRecordingDTO {
 		this.description = videoRecorderRecording.getDescription();
 		this.rating = videoRecorderRecording.getRating();
 		this.isJustSound = videoRecorderRecording.getIsJustSound();
+		this.isLocal = videoRecorderRecording.getIsLocal();
 		this.videoRecorderSession = videoRecorderRecording.getVideoRecorderSession();
 		this.filename = videoRecorderRecording.getFilename();
 		this.ratings = VideoRecorderRatingDTO.getVideoRecorderRatingDTOs(videoRecorderRecording.getRatings());
@@ -177,6 +180,14 @@ public class VideoRecorderRecordingDTO {
 
 	public void setIsJustSound(Boolean isJustSound) {
 		this.isJustSound = isJustSound;
+	}
+	
+	public Boolean getIsLocal() {
+		return isLocal;
+	}
+
+	public void setIsLocal(Boolean isLocal) {
+		this.isLocal = isLocal;
 	}
 
 	public VideoRecorderSession getVideoRecorderSession() {

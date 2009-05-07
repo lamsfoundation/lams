@@ -70,10 +70,10 @@
 					event.stopImmediatePropagation();
 					
 					if(dictionary){
-						Alert.show(dictionary.getLabel("videorecorder.message.sure.delete"), dictionary.getLabel("videorecorder.confirm"), 3, this, confirmDeleteClick);  
+						Alert.show(dictionary.getLabel("videorecorder.message.sure.delete"), dictionary.getLabel("videorecorder.confirm"), 3, Sprite(Application.application), confirmDeleteClick);  
 					}
 					else{
-						Alert.show("videorecorder.message.sure.delete", "videorecorder.confirm", 3, this, confirmDeleteClick);  
+						Alert.show("videorecorder.message.sure.delete", "videorecorder.confirm", 3, Sprite(Application.application), confirmDeleteClick);  
 					}
 				}
 			}

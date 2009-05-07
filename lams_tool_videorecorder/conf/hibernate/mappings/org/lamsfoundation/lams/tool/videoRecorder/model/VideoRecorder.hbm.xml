@@ -250,6 +250,14 @@
 
         </set>
 
+        <one-to-one
+            name="authorRecording"
+            class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderRecording"
+            cascade="none"
+            outer-join="auto"
+            constrained="false"
+        />
+
         <set
             name="conditions"
             lazy="true"

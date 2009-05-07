@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.videoRecorder.dto.VideoRecorderRecordingDTO;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession;
@@ -60,6 +61,8 @@ public class VideoRecorderRecording implements java.io.Serializable, Cloneable{
     
     private String filename;
     
+    private Boolean isLocal;
+    
     private Boolean isJustSound;
     
     private VideoRecorderUser createBy;
@@ -84,6 +87,7 @@ public class VideoRecorderRecording implements java.io.Serializable, Cloneable{
 		this.title = recording.title;
 		this.description = recording.description;
 		this.rating = recording.rating;
+		this.isLocal = recording.isLocal;
 		this.isJustSound = recording.isJustSound;
 		this.ratings = VideoRecorderRating.getVideoRecorderRatings(recording.ratings);
 		this.comments = VideoRecorderComment.getVideoRecorderComments(recording.comments);
@@ -100,6 +104,7 @@ public class VideoRecorderRecording implements java.io.Serializable, Cloneable{
 		this.title = recording.title;
 		this.description = recording.description;
 		this.rating = recording.rating;
+		this.isLocal = recording.isLocal;
 		this.isJustSound = false;
 		this.ratings = null;
 		this.comments = null;
@@ -110,7 +115,7 @@ public class VideoRecorderRecording implements java.io.Serializable, Cloneable{
 	/** full constructor */
 	public VideoRecorderRecording(
 			Date createDate, Date updateDate, VideoRecorderUser createBy, String title, String description,
-			Float rating, Boolean isJustSound, Long videoRecorderUid, VideoRecorderSession videoRecorderSession, String filename,
+			Float rating, Boolean isJustSound, Boolean isLocal, Long videoRecorderUid, VideoRecorderSession videoRecorderSession, String filename,
 			Set ratings, Set comments, Long toolContentId) {
 				
 		this.createDate = createDate;
@@ -120,13 +125,14 @@ public class VideoRecorderRecording implements java.io.Serializable, Cloneable{
 		this.description = description;
 		this.rating = rating;
 		this.isJustSound = isJustSound;
+		this.isLocal = isLocal;
 		this.ratings = ratings;
 		this.comments = comments;
 		this.videoRecorderSession = videoRecorderSession;
 		this.filename = filename;
 		this.toolContentId = toolContentId;
 	}
-
+    
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
@@ -247,6 +253,19 @@ public class VideoRecorderRecording implements java.io.Serializable, Cloneable{
 
     public void setIsJustSound(Boolean isJustSound) {
 	this.isJustSound = isJustSound;
+    }   
+
+    /**
+     * @hibernate.property column="is_local"
+     * 
+     */
+
+    public Boolean getIsLocal() {
+	return isLocal;
+    }
+
+    public void setIsLocal(Boolean isLocal) {
+	this.isLocal = isLocal;
     }   
     
 	/**

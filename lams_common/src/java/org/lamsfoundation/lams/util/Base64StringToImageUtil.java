@@ -17,9 +17,11 @@ public class Base64StringToImageUtil {
 	private static Logger log = Logger.getLogger(Base64StringToImageUtil.class);
 	
 	public static boolean create(String dir, String filename, String ext, String data){	
-		try {			
-			BASE64Decoder decoder = new BASE64Decoder();
+		try {
+			File fileDir = new File(dir);
+			fileDir.mkdirs();
 			
+			BASE64Decoder decoder = new BASE64Decoder();
 			byte[] byteArray = decoder.decodeBuffer(data);
 
 			InputStream in = new ByteArrayInputStream(byteArray);

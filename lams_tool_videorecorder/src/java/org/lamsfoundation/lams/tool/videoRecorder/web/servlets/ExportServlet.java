@@ -91,8 +91,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 					.getVideoRecorderService(getServletContext());
 		}
 		
-		toolSessionID = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
-		
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
 				request.getSession().setAttribute(AttributeNames.ATTR_MODE,
@@ -258,7 +256,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				.getAttribute(AttributeNames.USER);
 		
 		// get video recording dtos from just tool content id
-		List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionId(new Long(0), toolContentID);
+		List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs = videoRecorderService.getRecordingsByToolSessionId(toolSessionID, toolContentID);
 		
 		// get nb of recordings
 		int nbRecordings = videoRecorderRecordingDTOs.size();
@@ -303,11 +301,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 		// bundling files
 		try {
-			String[] urls = new String[1];
-			urls[0] = VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL;
+			String[] srcDirs = new String[2];
+			srcDirs[0] = VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL;
+
+			String[] targetDirs = new String[2];
+			targetDirs[0] = directoryName + File.separator + "files";
 			
 			MultipleDirFileBundler fileBundler = new MultipleDirFileBundler();
-		    fileBundler.bundle(request, cookies, directoryName, urls, fileArray);
+			fileBundler.bundle(request, cookies, srcDirs, targetDirs, fileArray);
 		} catch (Exception e) {
 			logger.error("Could not bundle files", e);
 		}
@@ -316,9 +317,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	private void bundleFilesForOffline(HttpServletRequest request,
 			HttpServletResponse response, String directoryName, Cookie[] cookies,
 			List<VideoRecorderRecordingDTO> videoRecorderRecordingDTOs){
-		// prepare the file array
-		// index 0 is for the files from VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL
-		// index 1 is for the files from VIDEORECORDER_RECORDINGS_HTTP_FOLDER_URL
+		// prepare 
 		ArrayList<String>[] fileArray = new ArrayList[2];
 		fileArray[0] = new ArrayList<String>();
 		fileArray[1] = new ArrayList<String>();
@@ -336,35 +335,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 				// get the video recording
 				VideoRecorderRecordingDTO vr = (VideoRecorderRecordingDTO) iter.next();
 				
-				// success indicator
-				int success = 0;
-				
-				String absoluteFilePath = VIDEORECORDER_RECORDINGS_FOLDER_DEST + vr.getFilename() + FLV_EXTENSION;
-				
-				// fetch file locally
-				File f = new File(absoluteFilePath);
-
-				// if file doesn't exist locally
-				if(!f.exists()){
-					// create the file
-					f.createNewFile();
-					// fetch from server
-					success = HttpUrlConnectionUtil.writeResponseToFile(VIDEORECORDER_RECORDINGS_FOLDER_SRC + vr.getFilename() + FLV_EXTENSION, VIDEORECORDER_RECORDINGS_FOLDER_DEST, vr.getFilename() + FLV_EXTENSION, cookies);
-				}
-				// if it does exists
-				else{
-					// w00t
-					success = 1;
-				}
-			    
-				// if we have a file
-			    if(success == 1){
-				    // add the filename to the list
-				    fileArray[1].add(vr.getFilename() + FLV_EXTENSION);
-				    logger.debug("file copy complete");
-			    }else{
-			    	logger.debug("file copy failed");
-			    }
+				fileArray[1].add(vr.getFilename() + FLV_EXTENSION);
 		    }
 		} catch (Exception e) {
 			logger.error("Could not find files on Red5 server", e);
@@ -372,12 +343,16 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		// bundling files
 		try {
-			String[] urls = new String[2];
-			urls[0] = VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL;
-			urls[1] = VIDEORECORDER_RECORDINGS_HTTP_FOLDER_URL;
+			String[] srcDirs = new String[2];
+			srcDirs[0] = VIDEORECORDER_INCLUDES_HTTP_FOLDER_URL;
+			srcDirs[1] = VIDEORECORDER_RECORDINGS_FOLDER_SRC;
+
+			String[] targetDirs = new String[2];
+			targetDirs[0] = directoryName + File.separator + "files";
+			targetDirs[1] = directoryName + File.separator + "files";
 			
 			MultipleDirFileBundler fileBundler = new MultipleDirFileBundler();
-		    fileBundler.bundle(request, cookies, directoryName, urls, fileArray);
+		    fileBundler.bundle(request, cookies, srcDirs, targetDirs, fileArray);
 		} catch (Exception e) {
 			logger.error("Could not bundle files", e);
 		}

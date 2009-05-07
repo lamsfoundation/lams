@@ -29,13 +29,16 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -57,6 +60,8 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author
@@ -79,7 +84,7 @@ public class LearningAction extends LamsDispatchAction {
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-				
+		
 		LearningForm learningForm = (LearningForm) form;
 
 		// 'toolSessionID' and 'mode' paramters are expected to be present.
@@ -134,6 +139,14 @@ public class LearningAction extends LamsDispatchAction {
 		learningForm.setToolSessionID(toolSessionID);
 		request.setAttribute("toolSessionId", toolSessionID);
 		request.setAttribute("toolContentId", toolContentID);
+		
+		// getting the contentfolderid using the session and lesson
+		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+		IBaseDAO baseDAO =(IBaseDAO) ctx.getBean("baseDAO");
+		ToolSession toolSession = (ToolSession)baseDAO.find(ToolSession.class, toolSessionID);
+		String contentFolderId = toolSession.getLesson().getLearningDesign().getContentFolderID();
+		
+		request.setAttribute("contentFolderId", contentFolderId);
 		
 		// set language xml
 		request.setAttribute("languageXML", videoRecorderService.getLanguageXML());

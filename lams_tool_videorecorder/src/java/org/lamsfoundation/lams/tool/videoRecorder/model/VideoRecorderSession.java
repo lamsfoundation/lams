@@ -58,6 +58,8 @@ public class VideoRecorderSession implements java.io.Serializable {
 	private Long sessionId;
 
 	private String sessionName;
+	
+	private String contentFolderId;
 
 	private VideoRecorder videoRecorder;
 
@@ -71,13 +73,14 @@ public class VideoRecorderSession implements java.io.Serializable {
 
 	/** full constructor */
 	public VideoRecorderSession(Date sessionEndDate, Date sessionStartDate,
-			Integer status, Long sessionId, String sessionName, VideoRecorder videoRecorder,
+			Integer status, Long sessionId, String sessionName, String contentFolderId, VideoRecorder videoRecorder,
 			Set videoRecorderUsers) {
 		this.sessionEndDate = sessionEndDate;
 		this.sessionStartDate = sessionStartDate;
 		this.status = status;
 		this.sessionId = sessionId;
 		this.sessionName = sessionName;
+		this.contentFolderId = contentFolderId;
 		this.videoRecorder = videoRecorder;
 		this.videoRecorderUsers = videoRecorderUsers;
 	}
@@ -164,6 +167,19 @@ public class VideoRecorderSession implements java.io.Serializable {
 
 	public void setSessionName(String sessionName) {
 		this.sessionName = sessionName;
+	}
+	
+	/**
+	 * @hibernate.property column="content_folder_id" length="32"
+	 * 
+	 */
+
+	public String getContentFolderId() {
+		return this.contentFolderId;
+	}
+
+	public void setContentFolderId(String contentFolderId) {
+		this.contentFolderId = contentFolderId;
 	}
 
 	/**

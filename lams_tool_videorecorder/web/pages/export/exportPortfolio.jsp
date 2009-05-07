@@ -111,10 +111,10 @@
 												"src", "./files/VideoRecorderFCKEditor",
 												<c:choose>
 												<c:when test="${videoRecorderDTO.exportOffline == true}">
-													"FlashVars", "&mode="+'playerModeOffline'+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&filename='+'${recording.filename}'+'.flv'+'&languageXML='+"${languageXML}"+"",
+													"FlashVars", "&mode="+'playerModeOffline' + '&offlinePlayback=false' + '&red5ServerUrl='+'${red5ServerUrl}' + '&serverUrl='+'${serverUrl}' + '&filename='+'${recording.filename}'+'.flv' + '&languageXML=' + "${languageXML}"+"",
 												</c:when>
 												<c:otherwise>
-													"FlashVars", "&mode="+'playerModeOnline'+'&red5ServerUrl='+'${red5ServerUrl}'+'&serverUrl='+'${serverUrl}'+'&filename='+'${recording.filename}'+'.flv'+'&languageXML='+"${languageXML}"+"",
+													"FlashVars", "&mode="+'playerModeOnline' + '&offlinePlayback=true' + '&red5ServerUrl='+'${red5ServerUrl}' + '&serverUrl='+'${serverUrl}' + '&filename='+'${recording.filename}'+'.flv' + '&languageXML=' + "${languageXML}"+"",
 												</c:otherwise>
 												</c:choose>											
 												"width", "361",

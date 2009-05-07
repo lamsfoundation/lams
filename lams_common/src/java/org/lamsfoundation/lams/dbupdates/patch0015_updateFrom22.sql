@@ -114,6 +114,24 @@ CREATE TABLE lams_gradebook_user_lesson (
 -- LDEV-2207 ------------ Adding flag in lesson to release marks for gradebook
 ALTER TABLE lams_lesson ADD COLUMN marks_released TINYINT DEFAULT 0;
 
+-- LDEV-2197 ------------ Presence Chat Logging
+CREATE TABLE lams_presence_chat_msgs (
+	uid bigint NOT NULL auto_increment,
+	room_name VARCHAR(255),
+	from_user VARCHAR(255),
+	to_user VARCHAR(255),
+	date_sent DATETIME,
+	message VARCHAR(1023),
+	PRIMARY KEY (uid)
+)TYPE=InnoDB;
+
+-- LDEV-2005 Video Recorder configuration stuff --------------
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('Red5ServerUrl','', 'config.red5.server.url', 'config.header.red5', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('Red5RecordingsUrl','', 'config.red5.recordings.url', 'config.header.red5', 'STRING', 0);
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

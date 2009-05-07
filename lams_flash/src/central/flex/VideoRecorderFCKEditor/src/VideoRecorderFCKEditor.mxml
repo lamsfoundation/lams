@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:ns1="org.lamsfoundation.lams.common.ui.components.*" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]" width="361" height="331" preinitialize="onPreinitialize(event)" applicationComplete="onApplicationComplete(event)" xmlns:ns2="*">
-
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:ns1="org.lamsfoundation.lams.common.ui.components.*"
+	xmlns:ns2="*"
+	layout="absolute" 	backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]" width="361" height="331"
+	enabled="false"
+	preinitialize="onPreinitialize(event)"
+	applicationComplete="onApplicationComplete(event)">
+		
 	<mx:Script>
 		<![CDATA[
-			
+			import org.lamsfoundation.lams.common.conn.ImageService;
+			import org.lamsfoundation.lams.common.util.ScreenShotterEvent;
+						
 			//includes
 			include "HTTPServices.as"
 			
@@ -26,6 +34,7 @@
 			
 			// flashvars
 			[Bindable] private var mode:String;
+			private var offlinePlayback:Boolean;
 			private var red5ServerUrl:String;
 			private var red5RecordingsUrl:String;
 			private var saveToLamsDestUrl:String;
@@ -51,8 +60,10 @@
 			
 			// static strings
 			private static var red5App:String = "oflaDemo";
-			private static var toolServletLocation:String = "tool/lavidr10/videoRecorderActions.do";
+			private static var toolWWWDir:String = "tool/lavidr10/";
+			private static var toolServletLocation:String = "videoRecorderActions.do";
 			private static var saveToLamsServletLocation:String = "GetRecording";
+			private static var flvExtension:String = ".flv";
 			
 			// icon embeds
 			[Embed(source="../../../../../../lams_central/web/images/icons/control_play.png")] [Bindable] private var playIcon:Class;
@@ -118,7 +129,7 @@
 				red5ServerUrl += red5App;
 				
 				// add the tool servlet location
-				toolServletUrl = serverUrl + toolServletLocation;
+				toolServletUrl = serverUrl + toolWWWDir + toolServletLocation;
 				
 				// add the save to lams servlet location
 				saveToLamsServletUrl = serverUrl + saveToLamsServletLocation;
@@ -129,18 +140,27 @@
 								
 				// swtich on mode
 				switch(mode){
+					/*
+					In playerModeOnline mode, the parameters passed via flashVars are used to create a connection to a given Red5 server.
+					Video is streamed from that server to the user.
+					*/
 					case "playerModeOnline":{
 						createConnection();
 						break;
 					}
-
+					/*
+					In playerModeOffline mode, a null NetConnection object is used to play local video from the disk.
+					*/
 					case "playerModeOffline":{
-						var nc:NetConnection = new NetConnection();
-						nc.connect(null);
-						videoDisplay.setNetConnection(nc);
-						videoDisplay.makeReadyVideo(filename);
+						Application.application.enabled = true;
+						videoDisplay.makeReady(filename, "video", true);
 						break;
 					}
+					/*
+					In recorderModeFCK mode, a NetConnection is created to the given Red5 server. Video is streamed and recorded
+					on this server. It is then copied back to the LAMS server in the lesson's content folder for local reading
+					much like an attachment is added to the FCKEditor.
+					*/
 					case "recorderModeFCK":{
 						toolContentId = -1;
 						
@@ -152,11 +172,27 @@
 						
 						cam = VideoDisplayUtil.setupCamera();
 						mic = VideoDisplayUtil.setupMic();
-						videoDisplay.attachCamera(cam);
-						videoDisplay.attachMic(mic);
+						
+						if(cam){
+							videoDisplay.attachCamera(cam);
+						}
+
+						if(mic){
+							videoDisplay.attachMic(mic);
+						}
+						
+						if(!mic && !cam){
+							videoControlBar.recordButton.enabled = false;
+						}
+						
 						createConnection();
 						break;
 					}
+					/*
+					In recorderModeAuthor mode, a NetConnection is created to the given Red5 server. Video is streamed and recorded
+					on this server. It is then used in a VideoRecorder tool session. After it is recorded, it is immediately transfered back to
+					the LAMS server in case the lesson is exported.
+					*/
 					case "recorderModeAuthor":{
 						userId = -1;
 						
@@ -168,8 +204,19 @@
 						
 						cam = VideoDisplayUtil.setupCamera();
 						mic = VideoDisplayUtil.setupMic();
-						videoDisplay.attachCamera(cam);
-						videoDisplay.attachMic(mic);
+						
+						if(cam){
+							videoDisplay.attachCamera(cam);
+						}
+
+						if(mic){
+							videoDisplay.attachMic(mic);
+						}
+						
+						if(!mic && !cam){
+							videoControlBar.recordButton.enabled = false;
+						}
+						
 						createConnection();
 
 						break;
@@ -204,6 +251,7 @@
 				videoDisplay.addEventListener(VideoDisplayEvent.STOPPUBLISH, onStopPublish);
 				videoDisplay.addEventListener(VideoDisplayEvent.PAUSESEEK, onPauseSeek);
 				videoDisplay.addEventListener(VideoDisplayEvent.READYSEEK, onReadySeek);	
+				this.addEventListener(ScreenShotterEvent.SCREENSHOTTAKEN, onScreenShotTaken);
 				
 				videoControlBar.playButton.addEventListener(MouseEvent.CLICK, playClick);
 				
@@ -269,11 +317,12 @@
 			
 			// gets flashvars
 			private function getFlashVars():void{
+				mode = Application.application.parameters.mode;
+				offlinePlayback = LAMSStringUtil.stringToBool(Application.application.parameters.offlinePlayback);
 				red5ServerUrl = Application.application.parameters.red5ServerUrl;
 				serverUrl = Application.application.parameters.serverUrl;
 				filename = Application.application.parameters.filename;
 				languageXML = XML(Application.application.parameters.languageXML);
-				mode = Application.application.parameters.mode;
 				toolContentId = Application.application.parameters.toolContentId;
 				userId = Application.application.parameters.userId;
 				red5RecordingsUrl = Application.application.parameters.red5RecordingsUrl;
@@ -329,18 +378,28 @@
 					// enable application
 					Application.application.enabled = true;
 					
-					// if we are in a player instance
-					if(mode == "playerModeOffline" || mode == "playerModeOnline"){
-						videoDisplay.makeReadyVideo(filename);
+					// if we are in a player online instance
+					if(mode == "playerModeOnline"){
+						// extension added from fck record
+						videoDisplay.makeReady(filename, "video", false);
 					}
-					// if we are in fck mode or if we are in recorder mode AND have no input filename
-					else if(mode == "recorderModeFCK" || (mode == "recorderModeAuthor" && filename == "")){
+					// if we are in fck mode
+					else if(mode == "recorderModeFCK"){
+						videoDisplay.startViewCamera();
+					}
+					// if we are in recorder mode and have no input filename
+					else if(mode == "recorderModeAuthor" && filename == flvExtension){
 						videoDisplay.startViewCamera();
 					}
 					// if we are in author mode and are given a filename, don't start camera, play recording instead
-					else if(mode == "recorderModeAuthor" && filename != ""){					
+					else if(mode == "recorderModeAuthor" && filename != flvExtension){
+						// add on to the filename if offlinePlayback is active
+						if(offlinePlayback){
+							filename = contentFolderUrl + filename;
+						}
+						
 						// change the start recording button's label
-						videoDisplay.makeReadyVideo(filename);
+						videoDisplay.makeReady(filename, "video", offlinePlayback);
 						
 						// update tooltip
 						videoControlBar.recordButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.recording.again");
@@ -494,12 +553,15 @@
 			
 			// onStopPublish callback, called from videoDisplay
 			private function onStopPublish(event:VideoDisplayEvent):void{
-				if(mode == "recorderModeFCK"){
+				// no matter what, the video just recorded is now on the server
+				offlinePlayback = false;
+				
+				if(mode == "recorderModeFCK"){											
 					// alert complete
 					Alert.show(dictionary.getLabel("videorecorder.recording.complete.fck"));
 					
-					// change the start recording button's label
-					videoDisplay.makeReadyVideo(filename);
+					// play the movie from the Red5 server
+					videoDisplay.makeReady(filename, "video", offlinePlayback);
 					
 					// change the panel status
 					videoDisplayPanel.status = dictionary.getLabel("videorecorder.ready");
@@ -510,11 +572,8 @@
 					// enable saving and closing
 					videoControlBar.saveAndCloseButton.enabled = true;
 					videoControlBar.saveAndCloseButton.toolTip = dictionary.getLabel("videorecorder.tooltip.save.recording");
-					
-					// copy recording to lams server
-					copyRecordingToLamsServer(red5RecordingsUrl + filename + ".flv", lamsEarDir + saveToLamsDestUrl, filename + ".flv");
 				}
-				else if(mode == "recorderModeAuthor"){
+				else if(mode == "recorderModeAuthor"){							
 					// get the details needed
 					getDetailsPopUp = GetRecordingDetailsPopUp(PopUpManager.createPopUp(this, GetRecordingDetailsPopUp, true));
 					PopUpManager.centerPopUp(getDetailsPopUp);
@@ -522,6 +581,9 @@
 					getDetailsPopUp.addEventListener("popUpClose", popUpRemovedHandler);
 				}
 				
+				// copy recording to lams server
+				copyRecordingToLamsServer(red5RecordingsUrl + filename + ".flv", lamsEarDir + saveToLamsDestUrl, filename + ".flv");
+					
 				recTimer.stop();
 			}
 						
@@ -551,7 +613,18 @@
 				videoControlBar.seekSlider.enable(true);
 				videoDisplayPanel.status = dictionary.getLabel("videorecorder.ready");
 			}
-	
+			
+			// onScreenShotTaken callback, called from screenShotter in videoDisplay
+			private function onScreenShotTaken(event:ScreenShotterEvent):void{
+				// only save screenshot if in author mode
+				if(mode == "recorderModeAuthor"){
+					// get the preview image
+					var previewImage:BitmapData = event.previewImage;
+					
+					// call the service
+					savePreviewImage(lamsEarDir + saveToLamsDestUrl, filename, "jpg", previewImage);
+				}
+			}
 		]]>
 	</mx:Script>
 	<mx:Panel x="10" y="10" width="340" height="310" layout="absolute" id="videoDisplayPanel">
