@@ -68,7 +68,12 @@ public class AssessmentOutputFactory extends OutputFactory {
 	    definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
 
 	    for(AssessmentQuestion question : questions) {
-		definition = buildRangeDefinition(String.valueOf(question.getSequenceId()), new Long(0), null);
+		Long markAvailable = null;
+		if (question.getDefaultGrade() != 0) {
+		    markAvailable = new Long(question.getDefaultGrade());
+		}
+		
+		definition = buildRangeDefinition(String.valueOf(question.getSequenceId()), new Long(0), markAvailable);
 		definition.setDescription(getI18NText("output.user.score.for.question", false) + question.getTitle());
 		definitionMap.put(String.valueOf(question.getSequenceId()), definition);		
 	    };
