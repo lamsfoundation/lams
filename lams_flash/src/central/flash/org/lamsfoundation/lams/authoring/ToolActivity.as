@@ -162,7 +162,7 @@ class ToolActivity extends Activity{
 			//TODO: Have the backend send this to flash for all tool activities in the design on startup
 			if(!StringUtils.isWDDXNull(dto.toolOutputDefinitions)) {
 				for (var i=0; i<dto.toolOutputDefinitions.length; i++) {
-					addDefinition(dto.toolOutputDefinitions[i]);
+					addOrUpdateDefinition(dto.toolOutputDefinitions[i]);
 				}
 			}
 			
@@ -266,7 +266,7 @@ class ToolActivity extends Activity{
 		var numDefinitions:Number = definitions.length;
 		if (numDefinitions > 0) {
 			for (var i=0; i<numDefinitions; i++) {
-				n.addDefinition(definitions[i]);
+				n.addOrUpdateDefinition(definitions[i]);
 			}
 		}
 		
@@ -287,10 +287,12 @@ class ToolActivity extends Activity{
 		}
 	}
 	
-	public function addDefinition(dto:Object):Void {
-		if (!_toolOutputDefinitions.containsKey(dto.name)) {
-			_toolOutputDefinitions.put(dto.name, dto);
+	public function addOrUpdateDefinition(dto:Object):Void {
+		if (_toolOutputDefinitions.containsKey(dto.name)) {
+			_toolOutputDefinitions.remove(dto.name); // necessary in case the tooloutputDefinition's default conditions have changed
+			// update the mappings?
 		}
+		_toolOutputDefinitions.put(dto.name, dto);
 	}
 	
 	public function removeDefinition(key:String):Void {

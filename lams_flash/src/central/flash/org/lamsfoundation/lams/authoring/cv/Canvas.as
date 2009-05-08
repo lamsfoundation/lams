@@ -665,7 +665,7 @@ class Canvas extends CanvasHelper {
 		if(r.length > 0) {
 			for(var i=0; i < r.length; i++) {
 				Debugger.log("adding def: " + r[i].name + " desc: " + r[i].description, Debugger.CRITICAL, "setToolOutputDefinitions", "Canvas");
-				toolActivity.addDefinition(r[i]);
+				toolActivity.addOrUpdateDefinition(r[i]);
 			}
 		}
 		
