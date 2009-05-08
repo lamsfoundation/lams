@@ -170,17 +170,27 @@
 							setWebcamInfo(true);
 						}
 						
+						// set up camera
 						cam = VideoDisplayUtil.setupCamera();
-						mic = VideoDisplayUtil.setupMic();
-						
+
 						if(cam){
 							videoDisplay.attachCamera(cam);
 						}
-
+						else{
+							Alert.show(dictionary.getLabel("videorecorder.camera.not.available"));
+						}
+						
+						// set up mic
+						mic = VideoDisplayUtil.setupMic();
+						
 						if(mic){
 							videoDisplay.attachMic(mic);
 						}
+						else{
+							Alert.show(dictionary.getLabel("videorecorder.mic.not.available"));
+						}
 						
+						// don't allow recording if neither cam nor mic is enabled
 						if(!mic && !cam){
 							videoControlBar.recordButton.enabled = false;
 						}
@@ -202,17 +212,27 @@
 							setWebcamInfo(true);
 						}
 						
+						// set up camera
 						cam = VideoDisplayUtil.setupCamera();
-						mic = VideoDisplayUtil.setupMic();
-						
+
 						if(cam){
 							videoDisplay.attachCamera(cam);
 						}
-
+						else{
+							Alert.show(dictionary.getLabel("videorecorder.camera.not.available"));
+						}
+						
+						// set up mic
+						mic = VideoDisplayUtil.setupMic();
+						
 						if(mic){
 							videoDisplay.attachMic(mic);
 						}
-						
+						else{
+							Alert.show(dictionary.getLabel("videorecorder.mic.not.available"));
+						}
+
+						// don't allow recording if neither cam nor mic is enabled
 						if(!mic && !cam){
 							videoControlBar.recordButton.enabled = false;
 						}

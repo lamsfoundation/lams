@@ -65,7 +65,7 @@ private function saveRecordingToServer(userId:int, title:String, description:Str
 	videoRecorderActions.request.description = description;
 	videoRecorderActions.request.filename = filename;
 	
-	if(!allowUseCamera && allowUseVoice)
+	if((!allowUseCamera && allowUseVoice) || (mic && !cam))
 		videoRecorderActions.request.isJustSound = true;
 	else
 		videoRecorderActions.request.isJustSound = false;

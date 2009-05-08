@@ -3,6 +3,8 @@ package org.lamsfoundation.lams.common.util
 	import flash.media.Camera;
 	import flash.media.Microphone;
 	
+	import mx.controls.Alert;
+	
 	public class VideoDisplayUtil
 	{
 		public function VideoDisplayUtil() {}
@@ -57,29 +59,40 @@ package org.lamsfoundation.lams.common.util
 
 		// gets a camera and sets it up
 		public static function setupCamera():Camera {
-			// get cam
-			var cam:Camera = new Camera;
-			cam = Camera.getCamera();
-				
-			// setting dimensions and framerate
-			var iFps:int = cam.fps;
-			cam.setMode (320, 240, iFps);
+			var cam:Camera;
 			
-			// set to minimum of 90% quality
-			cam.setQuality(0, 90);
+			// if a camera exists
+			if(Camera.names.length != 0){
+				// get the camera
+				cam = Camera.getCamera();
+				
+				// setting dimensions and framerate
+				var iFps:int = cam.fps;
+				cam.setMode (320, 240, iFps);
+				
+				// set to minimum of 90% quality
+				cam.setQuality(0, 90);
+			}
+			else{
+				// no camera was detected, return null
+			}
 			
 			return cam;
 		}
 			
 		// sets up mic
 		public static function setupMic():Microphone{
-			// get mic
-			var mic:Microphone = new Microphone();
-			mic = Microphone.getMicrophone();
-				
-			// setup rate
-			mic.rate = 44;
+			var mic:Microphone;
 			
+			// if a microphone exists
+			if(Microphone.names.length != 0){
+				// get mic
+				mic = Microphone.getMicrophone();
+
+				// setup rate
+				mic.rate = 44;		
+			}
+
 			return mic;
 		}
 		

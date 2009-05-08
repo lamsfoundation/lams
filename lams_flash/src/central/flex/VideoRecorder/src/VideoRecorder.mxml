@@ -164,15 +164,28 @@
 				if(allowUseCamera && cam){
 					videoDisplay.attachCamera(cam);
 				}
-				// else remove the view camera button
-				else{
-					recordingButtonBox.removeChild(recordingButtonBox.getChildByName("viewCameraButton"));
+				// if not allowed to record and no cam available or if just no cam available
+				else if((!allowUseCamera && !cam) || !cam){
+					// remove view camera amd show an alert
+					recordingButtonBox.removeChild(recordingButtonBox.getChildByName("viewCameraButton"));	
+					Alert.show(dictionary.getLabel("videorecorder.camera.not.available"));
+	
+				}
+				// just not allowed to record
+				else if(!allowUseCamera){
+					recordingButtonBox.removeChild(recordingButtonBox.getChildByName("viewCameraButton"));	
 				}
 				
 				// if the mic is to be used, set that up
 				mic = VideoDisplayUtil.setupMic();
 				if(allowUseVoice && mic){
 					videoDisplay.attachMic(mic);
+				}
+				// if no mic detected
+				else if(!mic){
+					// pop an alert
+					Alert.show(dictionary.getLabel("videorecorder.mic.not.available"));
+	
 				}
 				
 				// if neither mic or camera are to be used
