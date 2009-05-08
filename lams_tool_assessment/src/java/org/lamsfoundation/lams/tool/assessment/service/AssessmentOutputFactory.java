@@ -64,7 +64,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 	    for(AssessmentQuestion question : questions) {
 		totalMarksPossible += question.getDefaultGrade();
 	    };	    
-	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0), totalMarksPossible);
+	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0), totalMarksPossible, true);
 	    definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
 
 	    for(AssessmentQuestion question : questions) {
