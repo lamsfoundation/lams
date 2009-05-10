@@ -1034,8 +1034,11 @@ Function update23Specific
    
     # Adding the slimming jboss files
     setoutpath $0\conf
-    file "${CONF}\jboss\*.xml"
-    
+    file "${CONF}\jboss\jboss-service.xml"
+    file "${CONF}\jboss\standardjboss.xml"
+    setoutpath $0\deploy"
+    file "${CONF}\jboss\ejb-deployer.xml"
+
     # Removing unwanted web apps and files
     rmdir /r  "$0\deploy\jboss-aop.deployer"
     rmdir /r  "$0\deploy\jboss-ws4ee.sar"
