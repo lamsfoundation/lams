@@ -18,26 +18,47 @@ set -e
 # the debian-policy package
 
 update220to230 () {
+    # Update 2.2.0 database to 2.3
+    if [ "$db_root_pass" != "" ] ; then
+        mysql $db_name < /usr/share/lams2/2.2.0to2.3.0.sql -u root -p$db_root_pass || true
+    else
+        mysql $db_name < /usr/share/lams2/2.2.0to2.3.0.sql -u root || true
+    fi
+
     # Add assessment tool, new in 2.3
     cd /usr/share/lams2/lams_tool_assessment/
     sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
     sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
     sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-    ./deploy.sh > /dev/null || true
+    ./deploy.sh || true
+
+    # Add images tool, new in 2.3
+    cd /usr/share/lams2/lams_tool_images/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh || true
 
     # Add mindmap tool, new in 2.3
     cd /usr/share/lams2/lams_tool_mindmap/
     sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
     sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
     sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-    ./deploy.sh > /dev/null || true
+    ./deploy.sh || true
 
     # Add pixlr tool, new in 2.3
     cd /usr/share/lams2/lams_tool_pixlr/
     sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
     sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
     sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-    ./deploy.sh > /dev/null || true
+    ./deploy.sh || true
+
+    # Add videorecorder tool, new in 2.3
+    cd /usr/share/lams2/lams_tool_videorecorder/
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh || true
 }
 
 configure220 () {
@@ -62,35 +83,35 @@ update211to220 () {
     sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
     sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
     sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-    ./deploy.sh > /dev/null || true
+    ./deploy.sh || true
 
     # Add dimdim tool, new in 2.2 (disabled in 2.1.1to2.2.0.sql however)
     cd /usr/share/lams2/lams_tool_dimdim/
     sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
     sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
     sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-    ./deploy.sh > /dev/null || true
+    ./deploy.sh || true
 
     # Add gmap tool, new in 2.2
     cd /usr/share/lams2/lams_tool_gmap/
     sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
     sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
     sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-    ./deploy.sh > /dev/null || true
+    ./deploy.sh || true
 
     # Add spreadsheet tool, new in 2.2
     cd /usr/share/lams2/lams_tool_spreadsheet/
     sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
     sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
     sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-    ./deploy.sh > /dev/null || true
+    ./deploy.sh || true
 
     # Add wiki tool, new in 2.2
     cd /usr/share/lams2/lams_tool_wiki/
     sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
     sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
     sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-    ./deploy.sh > /dev/null || true
+    ./deploy.sh || true
 }
 
 update21rc1to210 () {
@@ -106,7 +127,7 @@ update21rc1to210 () {
     sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
     sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
     sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
-    ./deploy.sh > /dev/null || true
+    ./deploy.sh || true
 }
 
 update210to211 () {
@@ -173,12 +194,14 @@ case "$1" in
         case "$2" in
             2.2.0*)
                 update;
+                update220to230;
             ;;
 
             2.1.1*)
                 update;
                 update211to220;
                 configure220;
+                update220to230;
             ;;
 
             2.1.0*)
@@ -186,6 +209,7 @@ case "$1" in
                 update210to211;
                 update211to220;
                 configure220;
+                update220to230;
             ;;
 
             2.1rc1*)
@@ -194,6 +218,7 @@ case "$1" in
                 update210to211;
                 update211to220;
                 configure220;
+                update220to230;
             ;;
 
             *)
@@ -368,6 +393,12 @@ case "$1" in
         rm -rf /usr/share/lams2/lams_tool_spreadsheet
         rm -rf /usr/share/lams2/lams_tool_wiki
         rm -rf /usr/share/lams2/repository
+        rm -f /usr/share/lams2/2.2.0to2.3.0.sql
+        rm -rf /usr/share/lams2/lams_tool_assessment
+        rm -rf /usr/share/lams2/lams_tool_images
+        rm -rf /usr/share/lams2/lams_tool_mindmap
+        rm -rf /usr/share/lams2/lams_tool_pixlr
+        rm -rf /usr/share/lams2/lams_tool_videorecorder
 
         # Delete default ROOT.war/index.html (replaced with redirecting index.jsp)
         rm -f /usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/ROOT.war/index.html

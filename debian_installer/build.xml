@@ -12,11 +12,12 @@
                 <ant antfile="${lams_build}/build.xml" target="deploy-ear" inheritAll="false" />
                 <ant antfile="${lams_build}/build.xml" target="copyfiles" inheritAll="false" />
                 <ant antfile="${lams_build}/build.xml" target="deploy-tools" inheritAll="false" />
-		<ant antfile="${lams_build}/../lams_tool_dimdim/build.xml" target="deploy-tool" inheritAll="false" />
-		<ant antfile="${lams_build}/../lams_tool_assessment/build.xml" target="deploy-tool" inheritAll="false" />
-		<ant antfile="${lams_build}/../lams_tool_mindmap/build.xml" target="deploy-tool" inheritAll="false" />
-		<ant antfile="${lams_build}/../lams_tool_pixlr/build.xml" target="deploy-tool" inheritAll="false" />
-		<!--ant antfile="${lams_build}/../lams_tool_videorecorder/build.xml" target="deploy-tool" inheritAll="false" /-->
+		<!--ant antfile="${projects_dir}/lams_tool_dimdim/build.xml" target="deploy-tool" inheritAll="false" /-->
+		<!-- these projects not part of main build yet -->
+		<ant antfile="${projects_dir}/lams_tool_assessment/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="${projects_dir}/lams_tool_mindmap/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="${projects_dir}/lams_tool_pixlr/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="${projects_dir}/lams_tool_videorecorder/build.xml" target="deploy-tool" inheritAll="false" />
 	</target>
 
 	<target name="copy-build">
@@ -61,7 +62,13 @@
 		<mkdir dir="${build_dir}/repository" />
 	</target>
 
-	<target name="build-binary-package">
+	<target name="chmod-tool-deployers">
+		<exec dir="${build_dir}" executable="/bin/sh">
+                        <arg line="-c 'chmod -R 755 lams_tool_*/deploy.sh'" />
+                </exec>
+	</target>
+
+	<target name="build-binary-package" depends="copy-packaged-files,chmod-tool-deployers">
 		<exec dir="${build_dir}" executable="/usr/bin/sudo">
                         <arg line="dpkg-buildpackage" />
                         <arg line="-b" />
@@ -76,7 +83,218 @@
 		</exec>
 	</target>
 
-	<target name="all" depends="build-lams,copy-build,dump-db,copy-packaged-files">
+	<target name="all" depends="build-lams,copy-build,dump-db,copy-packaged-files,
+		copy-2.2-tool-packages,copy-2.3-tool-packages">
 
 	</target>
+
+	<!-- 2.3 only; token string hard coded in replace task -->
+	<target name="copy-assessment-tool-package">
+		<delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_assessment">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+		<copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_assessment">
+			<fileset dir="${projects_dir}/lams_tool_assessment/build/deploy">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<replace file="${build_dir}/lams_tool_assessment/deploy.xml"
+			token="/home/jliew/lams_tool_assessment/build/deploy" 
+			value="/usr/share/lams2/lams_tool_assessment" />
+		<replace file="${build_dir}/lams_tool_assessment/deploy.xml"
+			token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+	</target>
+
+	<target name="copy-images-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_images">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_images">
+                        <fileset dir="${projects_dir}/lams_tool_images/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_images/deploy.xml"
+                        token="/home/jliew/lams_tool_images/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_images" />
+                <replace file="${build_dir}/lams_tool_images/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-mindmap-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_mindmap">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_mindmap">
+                        <fileset dir="${projects_dir}/lams_tool_mindmap/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_mindmap/deploy.xml"
+                        token="/home/jliew/lams_tool_mindmap/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_mindmap" />
+                <replace file="${build_dir}/lams_tool_mindmap/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-pixlr-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_pixlr">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_pixlr">
+                        <fileset dir="${projects_dir}/lams_tool_pixlr/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_pixlr/deploy.xml"
+                        token="/home/jliew/lams_tool_pixlr/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_pixlr" />
+                <replace file="${build_dir}/lams_tool_pixlr/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-videorecorder-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_videorecorder">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_videorecorder">
+                        <fileset dir="${projects_dir}/lams_tool_videorecorder/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_videorecorder/deploy.xml"
+                        token="/home/jliew/lams_tool_videorecorder/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_videorecorder" />
+                <replace file="${build_dir}/lams_tool_videorecorder/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-2.3-tool-packages" depends="copy-assessment-tool-package,copy-images-tool-package,
+		copy-mindmap-tool-package,copy-pixlr-tool-package,copy-videorecorder-tool-package">
+	</target>
+
+	<!-- 2.2 update packages; token string hard coded in replace task -->
+	<target name="copy-daco-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_daco">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_daco">
+                        <fileset dir="${projects_dir}/lams_tool_daco/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_daco/deploy.xml"
+                        token="/home/jliew/lams_tool_daco/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_daco" />
+                <replace file="${build_dir}/lams_tool_daco/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-dimdim-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_dimdim">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_dimdim">
+                        <fileset dir="${projects_dir}/lams_tool_dimdim/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_dimdim/deploy.xml"
+                        token="/home/jliew/lams_tool_dimdim/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_dimdim" />
+                <replace file="${build_dir}/lams_tool_dimdim/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-gmap-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_gmap">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_gmap">
+                        <fileset dir="${projects_dir}/lams_tool_gmap/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_gmap/deploy.xml"
+                        token="/home/jliew/lams_tool_gmap/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_gmap" />
+                <replace file="${build_dir}/lams_tool_gmap/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-spreadsheet-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_spreadsheet">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_spreadsheet">
+                        <fileset dir="${projects_dir}/lams_tool_spreadsheet/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_spreadsheet/deploy.xml"
+                        token="/home/jliew/lams_tool_spreadsheet/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_spreadsheet" />
+                <replace file="${build_dir}/lams_tool_spreadsheet/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-task-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_task">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_task">
+                        <fileset dir="${projects_dir}/lams_tool_task/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_task/deploy.xml"
+                        token="/home/jliew/lams_tool_task/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_task" />
+                <replace file="${build_dir}/lams_tool_task/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-wiki-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_wiki">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_wiki">
+                        <fileset dir="${projects_dir}/lams_tool_wiki/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_wiki/deploy.xml"
+                        token="/home/jliew/lams_tool_wiki/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_wiki" />
+                <replace file="${build_dir}/lams_tool_wiki/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
+	<target name="copy-2.2-tool-packages" depends="copy-daco-tool-package,copy-dimdim-tool-package,
+                copy-gmap-tool-package,copy-spreadsheet-tool-package,copy-wiki-tool-package">
+        </target>
+
+	<target name="copy-2.1-tool-packages" depends="copy-task-tool-package" />
 </project>
