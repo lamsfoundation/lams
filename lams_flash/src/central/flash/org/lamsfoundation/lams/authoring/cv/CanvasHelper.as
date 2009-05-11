@@ -335,6 +335,7 @@ class CanvasHelper {
 	 */
 	
 	public function recoverDesign(recData:Object) {
+		recData.readOnly = false;
 		setDesign(recData);
 		discardAutoSaveDesign();
 	}
