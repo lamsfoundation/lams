@@ -36,23 +36,23 @@ import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
 public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
     private static final String SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID =
 	" from " + MindmapRequest.class.getName() + " mr where mr.globalId > ? and " +
-	" mr.mindmap.uid = ? and mr.user.uid <> ? order by mr.globalId ";
+	" mr.mindmap.uid = ? and mr.user.uid <> ? and mr.user.mindmapSession.sessionId = ? order by mr.globalId ";
     
     private static final String SQL_QUERY_FIND_REQUEST_BY_UNIQUE_ID =
 	" from " + MindmapRequest.class.getName() + " mr where mr.uniqueId = ? and mr.user.uid = ? and " +
 	" mr.mindmap.uid = ? and mr.globalId > ? ";
     
     private static final String SQL_QUERY_FIND_LAST_GLOBAL_ID_BY_MINDMAP =
-	" select mr.globalId from " + MindmapRequest.class.getName() + " mr where mr.mindmap.uid = ? " +
-	" order by mr.globalId desc limit 1 ";
+	" select mr.globalId from " + MindmapRequest.class.getName() + " mr where mr.mindmap.uid = ? and " +
+	" mr.user.mindmapSession.sessionId = ? order by mr.globalId desc limit 1 ";
     
     public void saveOrUpdate(MindmapRequest mindmapRequest) {
 	this.getHibernateTemplate().saveOrUpdate(mindmapRequest);
     }
     
-    public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId) {
+    public List getLastRequestsAfterGlobalId(Long globalId, Long mindmapId, Long userId, Long sessionId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_REQUESTS_AFTER_GLOBAL_ID, 
-		new Object[]{globalId, mindmapId, userId});
+		new Object[]{globalId, mindmapId, userId, sessionId});
     }
     
     public MindmapRequest getRequestByUniqueId(Long uniqueId, Long userId, Long mindmapId, Long globalId) {
@@ -64,8 +64,9 @@ public class MindmapRequestDAO extends BaseDAO implements IMindmapRequestDAO {
 	    return null;
     }
     
-    public Long getLastGlobalIdByMindmapId(Long mindmapId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_LAST_GLOBAL_ID_BY_MINDMAP, mindmapId); 
+    public Long getLastGlobalIdByMindmapId(Long mindmapId, Long sessionId) {
+	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_LAST_GLOBAL_ID_BY_MINDMAP, 
+		new Object[]{mindmapId, sessionId}); 
 	if (list != null && list.size() > 0)
 	    return ((Number) list.get(0)).longValue();
 	else

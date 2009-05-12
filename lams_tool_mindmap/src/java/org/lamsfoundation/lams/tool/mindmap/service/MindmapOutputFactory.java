@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 public class MindmapOutputFactory extends OutputFactory {
 
     /** The number of nodes the learner has created in one Mindmap activity. */
-    protected final static String OUTPUT_NAME_LEARNER_NUM_NODES = "output.learner.number.of.nodes";
+    protected final static String OUTPUT_NAME_LEARNER_NUM_NODES = "number.of.nodes";
     
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
@@ -77,101 +77,4 @@ public class MindmapOutputFactory extends OutputFactory {
 	return new ToolOutput(OUTPUT_NAME_LEARNER_NUM_NODES, getI18NText(OUTPUT_NAME_LEARNER_NUM_NODES, true),
 		new Long(num));
     }
-    
-    
-    /*
-
-    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IMindmapService mindmapService,
-	    Long toolSessionId, Long learnerId) {
-
-	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
-	// cached tool output for all text search conditions
-	ToolOutput mindmapEntryOutput = null;
-	if (names == null) {
-	    // output will be set for all the existing conditions
-	    Mindmap mindmap = mindmapService.getSessionBySessionId(toolSessionId).getMindmap();
-	    
-	    /*
-	    Set<MindmapCondition> conditions = mindmap.getConditions();
-	    for (MindmapCondition condition : conditions) {
-		String name = condition.getName();
-		if (isTextSearchConditionName(name) && mindmapEntryOutput != null) {
-		    outputs.put(name, mindmapEntryOutput);
-		} else {
-		    ToolOutput output = getToolOutput(name, mindmapService, toolSessionId, learnerId);
-		    if (output != null) {
-			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    mindmapEntryOutput = output;
-			}
-		    }
-		}
-	    }
-	} else {
-	    for (String name : names) {
-		if (isTextSearchConditionName(name) && mindmapEntryOutput != null) {
-		    outputs.put(name, mindmapEntryOutput);
-		} else {
-		    ToolOutput output = getToolOutput(name, mindmapService, toolSessionId, learnerId);
-		    if (output != null) {
-			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    mindmapEntryOutput = output;
-			}
-		    }
-		}
-	    }*/
-	    
-/*	}
-	
-
-	return outputs;
-
-    }
-
-    public ToolOutput getToolOutput(String name, IMindmapService chatService, Long toolSessionId, Long learnerId) {
-	if (isTextSearchConditionName(name)) {
-
-	    // entry is loaded from DB
-	    Mindmap mindmap = chatService.getSessionBySessionId(toolSessionId).getMindmap();
-
-	    MindmapUser user = chatService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
-
-	    // NotebookEntry entry = chatService.getEntry(user.getEntryUID());
-	    //String value = entry == null ? null : entry.getEntry();
-	    String value = "";
-	    
-	    return new ToolOutput(name, getI18NText(MindmapConstants.TEXT_SEARCH_DEFINITION_NAME, true), value);
-
-	}
-	return null;
-    }
-/*
-    @Override
-    protected String[] splitConditionName(String conditionName) {
-	return super.splitConditionName(conditionName);
-    }
-
-    protected String buildConditionName(String uniquePart) {
-	return super.buildConditionName(MindmapConstants.TEXT_SEARCH_DEFINITION_NAME, uniquePart);
-    }
-
-    private boolean isTextSearchConditionName(String name) {
-	return name != null && name.startsWith(MindmapConstants.TEXT_SEARCH_DEFINITION_NAME);
-    }
-
-    /*
-     * Creates a default condition so teachers know how to use complex conditions for this tool.
-     * 
-     * @param mindmap
-     *            content of the tool
-     * @return default mindmap condition
-     */
-/*    protected MindmapCondition createDefaultComplexCondition(Mindmap mindmap) {
-	String name = buildConditionName(MindmapConstants.TEXT_SEARCH_DEFINITION_NAME, mindmap.getToolContentId()
-		.toString());
-	// Default condition checks if the text contains word "LAMS"
-	return new MindmapCondition(null, null, 1, name, getI18NText(
-		MindmapConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
-    }*/
 }

@@ -26,7 +26,7 @@
 	$.timer(60000, function (timer) {
 		if (!multiMode)
 			$.post("${get}", { dispatch: "${dispatch}", mindmapId: "${mindmapId}", userId: "${userId}", 
-				content: document['flashContent'].getMindmap() } );
+				sessionId: "${sessionId}", content: document['flashContent'].getMindmap() } );
 	});
 
 	function validateForm() {

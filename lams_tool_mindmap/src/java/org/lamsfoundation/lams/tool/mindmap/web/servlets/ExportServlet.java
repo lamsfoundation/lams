@@ -49,6 +49,8 @@ import org.lamsfoundation.lams.tool.mindmap.service.MindmapServiceProxy;
 import org.lamsfoundation.lams.tool.mindmap.util.MindmapException;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeConceptModel;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -156,10 +158,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		+ request.getContextPath();
 	writeResponseToFile(basePath + "/images/mindmap_locked.swf", directoryName, "mindmap.swf", cookies);
 	writeResponseToFile(basePath + "/includes/javascript/swfobject.js", directoryName, "swfobject.js", cookies);
-
+	writeResponseToFile(basePath + "/includes/javascript/mindmap.resize.js", directoryName, "resize.js", cookies);
+	writeResponseToFile(Configuration.get(ConfigurationKeys.SERVER_URL) 
+		+ "includes/javascript/jquery-latest.pack.js", directoryName, "jquery.js", cookies);
+	
 	List mindmapNodeList = null;
 	if (mindmap.isMultiUserMode()) // is multi-user
-	    mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapIdMulti(mindmap.getUid());
+	    mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapSession(mindmap.getUid(), toolSessionID);
 	else
 	    mindmapNodeList = mindmapService.getRootNodeByMindmapIdAndUserId(mindmap.getUid(), mindmapUser.getUid());
 
@@ -215,8 +220,90 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    throw new MindmapException(error);
 	}
 
+	
+	//Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
+	//MindmapDTO mindmapDTO = new MindmapDTO(mindmap);
+	
+	
+	MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionID);
+	//Mindmap mindmap = mindmapSession.getMindmap();
 	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
+	//Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
+	MindmapUser mindmapUser = null; //mindmapService.getUserByUserIdAndSessionId(userID, toolSessionID);
+
+	// construct dto's
 	MindmapDTO mindmapDTO = new MindmapDTO(mindmap);
+	mindmapDTO.setTitle(mindmap.getTitle());
+	mindmapDTO.setInstructions(mindmap.getInstructions());
+
+	//MindmapSessionDTO sessionDTO = new MindmapSessionDTO();
+	//sessionDTO.setSessionName(mindmapSession.getSessionName());
+	//sessionDTO.setSessionID(mindmapSession.getSessionId());
+
+	//MindmapUserDTO userDTO = new MindmapUserDTO(mindmapUser);
+
+	//sessionDTO.getUserDTOs().add(userDTO);
+	//mindmapDTO.getSessionDTOs().add(sessionDTO);
+
+	// adding Mindmap files to archive
+	request.getSession().setAttribute("mindmapContentPath", "mindmap.xml");
+
+	//String currentMindmapUser = mindmapUser.getFirstName() + " " + mindmapUser.getLastName();
+	//request.getSession().setAttribute("currentMindmapUser", currentMindmapUser);
+	
+	request.getSession().setAttribute("localizationPath", "locale.xml");
+
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+		+ request.getContextPath();
+	writeResponseToFile(basePath + "/images/mindmap_locked.swf", directoryName, "mindmap.swf", cookies);
+	writeResponseToFile(basePath + "/includes/javascript/swfobject.js", directoryName, "swfobject.js", cookies);
+	writeResponseToFile(basePath + "/includes/javascript/mindmap.resize.js", directoryName, "resize.js", cookies);
+	writeResponseToFile(Configuration.get(ConfigurationKeys.SERVER_URL) 
+		+ "includes/javascript/jquery-latest.pack.js", directoryName, "jquery.js", cookies);
+	
+	List mindmapNodeList = null;
+	if (mindmap.isMultiUserMode()) // is multi-user
+	    mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapSession(mindmap.getUid(), toolSessionID);
+	else
+	    mindmapNodeList = mindmapService.getRootNodeByMindmapIdAndUserId(mindmap.getUid(), mindmapUser.getUid());
+
+	if (mindmapNodeList != null && mindmapNodeList.size() > 0) {
+	    MindmapNode rootMindmapNode = (MindmapNode) mindmapNodeList.get(0);
+
+	    String mindmapUserName = null;
+	    if (rootMindmapNode.getUser() == null)
+		mindmapUserName = mindmapService.getMindmapMessageService().getMessage("node.instructor.label");
+	    else
+		mindmapUserName = rootMindmapNode.getUser().getFirstName() + " "
+			+ rootMindmapNode.getUser().getLastName();
+
+	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(), rootMindmapNode
+		    .getText(), rootMindmapNode.getColor(), mindmapUserName));
+
+	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
+		    mindmap.getUid(), rootNodeModel, mindmapUser);
+
+	    XStream xstream = new XStream();
+	    xstream.alias("branch", NodeModel.class);
+	    String mindmapContent = xstream.toXML(currentNodeModel);
+
+	    try {
+		File mindmapFile = new File(directoryName + "/mindmap.xml");
+		FileOutputStream fop = new FileOutputStream(mindmapFile);
+		fop.write(mindmapContent.getBytes());
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
+	}
+
+	try {
+	    File localeFile = new File(directoryName + "/locale.xml");
+	    FileOutputStream fop = new FileOutputStream(localeFile);
+	    fop.write(mindmapService.getLanguageXML().getBytes());
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+
 	request.getSession().setAttribute("mindmapDTO", mindmapDTO);
     }
 }

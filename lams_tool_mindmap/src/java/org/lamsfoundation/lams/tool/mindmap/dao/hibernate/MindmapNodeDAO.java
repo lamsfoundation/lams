@@ -38,48 +38,59 @@ import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
  * @author Ruslan Kazakov
  */
 public class MindmapNodeDAO extends BaseDAO implements IMindmapNodeDAO {
+    
     private static final String SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_ID = "from " + MindmapNode.class.getName()
 	    + " mn where mn.parent is null and mn.mindmap.uid = ? and mn.user is null ";
 
-    private static final String SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_ID_MULTI = "from " + MindmapNode.class.getName()
-	    + " mn where mn.parent is null and mn.mindmap.uid = ? ";
+    private static final String SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_SESSION = "from " + MindmapNode.class.getName()
+    + " mn where mn.parent is null and mn.mindmap.uid = ? and mn.session.sessionId = ? ";
 
     private static final String SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_ID_USER_ID = "from " + MindmapNode.class.getName()
 	    + " mn where mn.parent is null and mn.mindmap.uid = ? and mn.user.uid = ? ";
+    
+    private static final String SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_ID_SESSION_ID = "from " + MindmapNode.class.getName()
+    + " mn where mn.parent is null and mn.mindmap.uid = ? and mn.session.sessionId = ? ";
+    
+    private static final String SQL_QUERY_FIND_ROOT_NODE_BY_SESSION_ID = "from " + MindmapNode.class.getName()
+    + " mn where mn.parent is null and mn.session.sessionId = ? ";
 
-    private static final String SQL_QUERY_FIND_ROOT_NODE_BY_USER_ID = "from " + MindmapNode.class.getName()
-	    + " mn where mn.parent is null and mn.user.uid = ? ";
+    private static final String SQL_QUERY_FIND_NODE_BY_PARENT_ID_MINDMAP_ID = "from " + 
+    	MindmapNode.class.getName() + " mn where mn.parent.nodeId = ? and mn.mindmap.uid = ? ";
 
-    private static final String SQL_QUERY_FIND_NODE_BY_PARENT_ID_MINDMAP_ID = "from " + MindmapNode.class.getName()
-	    + " mn where mn.parent.nodeId = ? and mn.mindmap.uid = ? ";
-
+    private static final String SQL_QUERY_FIND_NODE_BY_PARENT_ID_MINDMAP_ID_SESSION_ID = "from " + 
+	MindmapNode.class.getName() + " mn where mn.parent.nodeId = ? and mn.mindmap.uid = ? and mn.session.sessionId = ? ";
+    
     private static final String SQL_QUERY_FIND_NODE_BY_UNIQUE_ID_MINDMAP_ID = "from " + MindmapNode.class.getName()
 	    + " mn where mn.uniqueId = ? and mn.mindmap.uid = ? ";
+    
+    private static final String SQL_QUERY_FIND_NODE_BY_UNIQUE_ID_SESSION_ID = "from " + MindmapNode.class.getName()
+    + " mn where mn.uniqueId = ? and mn.mindmap.uid = ? and mn.session.sessionId = ? ";
 
     private static final String SQL_QUERY_FIND_NODE_BY_UNIQUE_MINDMAP_ID_AND_USER_ID = "from "
 	    + MindmapNode.class.getName() + " mn where mn.uniqueId = ? and mn.mindmap.uid = ? and mn.user.uid = ? ";
 
-    private static final String SQL_QUERY_FIND_UNIQUE_ID_BY_MINDMAP_ID_AND_USER_ID = " select mn.uniqueId from "
-	    + MindmapNode.class.getName() + " mn where mn.mindmap.uid = ? and mn.user.uid = ? "
+    private static final String SQL_QUERY_FIND_NODE_LAST_UNIQUEID_BY_MINDMAPUID_SESSIONID = " select mn.uniqueId from "
+	    + MindmapNode.class.getName() + " mn where mn.mindmap.uid = ? and mn.session.sessionId = ? " 
 	    + " order by mn.uniqueId desc ";
 
-    private static final String SQL_QUERY_FIND_UNIQUE_ID_BY_MINDMAP_ID = " select mn.uniqueId from "
-	    + MindmapNode.class.getName() + " mn where mn.mindmap.uid = ? " + " order by mn.uniqueId desc ";
-
-    private static final String SQL_QUERY_NODES_NUMBER_BY_USER_SESSION = " select count(*) from "
+    private static final String SQL_QUERY_FIND_NODES_NUMBER_BY_USERUID_SESSIONID = " select count(*) from "
 	    + MindmapNode.class.getName() + " mn where mn.user.uid = ? ";
-
-    public void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId) {
-	Session session = getSessionFactory().getCurrentSession();
-	String hql = "delete from " + MindmapNode.class.getName() + " where unique_id = " + uniqueId
-		+ " and mindmap_id = " + mindmapId + " and user_id = " + userId;
-	Query query = session.createQuery(hql);
-	query.executeUpdate();
-    }
-
+    
+    /* Functions Implementations */
+    
+    // deleting Mindmap nodes in singleuser mode
     public void deleteNodes(String deletedNodesQuery) {
 	Session session = getSessionFactory().getCurrentSession();
 	String hql = "delete from " + MindmapNode.class.getName() + deletedNodesQuery;
+	Query query = session.createQuery(hql);
+	query.executeUpdate();
+    }
+    
+    // deleting Mindmap nodes in Multiuser mode
+    public void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId, Long sessionId) {
+	Session session = getSessionFactory().getCurrentSession();
+	String hql = "delete from " + MindmapNode.class.getName() + " where unique_id = " + uniqueId
+		+ " and mindmap_id = " + mindmapId + " and user_id = " + userId + " and session_id = " + sessionId;
 	Query query = session.createQuery(hql);
 	query.executeUpdate();
     }
@@ -91,46 +102,55 @@ public class MindmapNodeDAO extends BaseDAO implements IMindmapNodeDAO {
     public List getAuthorRootNodeByMindmapId(Long mindmapId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_ID, mindmapId);
     }
+    
+    public List getAuthorRootNodeBySessionId(Long sessionId) {
+	return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_NODE_BY_SESSION_ID, sessionId);
+    }
 
-    public List getAuthorRootNodeByMindmapIdMulti(Long mindmapId) {
-	return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_ID_MULTI, mindmapId);
+    public List getAuthorRootNodeByMindmapSession(Long mindmapId, Long toolSessionId) {
+	return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_SESSION,
+		new Object[] { mindmapId, toolSessionId });
     }
 
     public List getRootNodeByMindmapIdAndUserId(Long mindmapId, Long userId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_ID_USER_ID,
 		new Object[] { mindmapId, userId });
     }
-
-    public List getUserRootNodeByUserId(Long userId) {
-	return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_NODE_BY_USER_ID, userId);
+    
+    public List getRootNodeByMindmapIdAndSessionId(Long mindmapId, Long sessionId) {
+	return this.getHibernateTemplate().find(SQL_QUERY_FIND_ROOT_NODE_BY_MINDMAP_ID_SESSION_ID,
+		new Object[] { mindmapId, sessionId });
     }
 
     public List getMindmapNodeByParentId(Long parentId, Long mindmapId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_NODE_BY_PARENT_ID_MINDMAP_ID,
 		new Object[] { parentId, mindmapId });
     }
-
+    
+    public List getMindmapNodeByParentIdMindmapIdSessionId(Long parentId, Long mindmapId, Long sessionId) {
+	return this.getHibernateTemplate().find(SQL_QUERY_FIND_NODE_BY_PARENT_ID_MINDMAP_ID_SESSION_ID,
+		new Object[] { parentId, mindmapId, sessionId });
+    }
+    
     public List getMindmapNodeByUniqueId(Long uniqueId, Long mindmapId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_NODE_BY_UNIQUE_ID_MINDMAP_ID,
 		new Object[] { uniqueId, mindmapId });
+    }
+    
+    public List getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId) {
+	return this.getHibernateTemplate().find(SQL_QUERY_FIND_NODE_BY_UNIQUE_ID_SESSION_ID,
+		new Object[] { uniqueId, mindmapId, sessionId });
     }
 
     public List getMindmapNodeByUniqueIdMindmapIdUserId(Long uniqueId, Long mindmapId, Long userId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_NODE_BY_UNIQUE_MINDMAP_ID_AND_USER_ID,
 		new Object[] { uniqueId, mindmapId, userId });
     }
-
-    public Long getLastUniqueIdByMindmapIdUserId(Long mindmapId, Long userId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_UNIQUE_ID_BY_MINDMAP_ID_AND_USER_ID,
-		new Object[] { mindmapId, userId });
-	if (list != null && list.size() > 0)
-	    return ((Number) list.get(0)).longValue();
-	else
-	    return null;
-    }
-
-    public Long getLastUniqueIdByMindmapId(Long mindmapId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_UNIQUE_ID_BY_MINDMAP_ID, mindmapId);
+    
+    // Node Unique ID
+    public Long getNodeLastUniqueIdByMindmapUidSessionId(Long mindmapUid, Long sessionId) {
+	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_NODE_LAST_UNIQUEID_BY_MINDMAPUID_SESSIONID, 
+		new Object[] { mindmapUid, sessionId });
 	if (list != null && list.size() > 0)
 	    return ((Number) list.get(0)).longValue();
 	else
@@ -139,7 +159,8 @@ public class MindmapNodeDAO extends BaseDAO implements IMindmapNodeDAO {
     
     /** Outputs */
     public int getNumNodesByUserAndSession(Long userId, Long sessionId) {
-	List list = this.getHibernateTemplate().find(SQL_QUERY_NODES_NUMBER_BY_USER_SESSION, new Object[] { userId });
+	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_NODES_NUMBER_BY_USERUID_SESSIONID, 
+		new Object[] { userId });
 	if (list != null && list.size() > 0)
 	    return ((Number) list.get(0)).intValue();
 	else

@@ -32,13 +32,14 @@ import org.apache.log4j.Logger;
  */
 public class MindmapNode implements Cloneable {
 	
-	//private static Logger log = Logger.getLogger(MindmapNode.class);
+	private static Logger log = Logger.getLogger(MindmapNode.class);
 	
 	private Long nodeId;
 	private Long uniqueId;
 	private MindmapNode parent;
 	private String text;
 	private String color;
+	private MindmapSession session;
 	private MindmapUser user;
 	private Mindmap mindmap;
 	
@@ -131,6 +132,21 @@ public class MindmapNode implements Cloneable {
 	 */
 	public void setColor(String color) {
 	    this.color = color;
+	}
+
+	/**
+	 * @return Returns the sessionid of the session in Mindmap.
+	 * @hibernate.many-to-one column="session_id" cascade="all"
+	 */
+	public MindmapSession getSession() {
+	    return session;
+	}
+	
+	/**
+	 * @param session the session to set
+	 */
+	public void setSession(MindmapSession session) {
+	    this.session = session;
 	}
 	
 	/**

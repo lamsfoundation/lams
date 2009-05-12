@@ -4,16 +4,20 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript" src="swfobject.js"></script>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="jquery.js"></script>
 
 <script type="text/javascript">
 <!--
 	flashvars = { xml: "${mindmapContentPath}", user: "${currentMindmapUser}", dictionary: "${localizationPath}" }
 	
-	swfobject.embedSWF("mindmap.swf", "flashContent", "500", "375", "9.0.0", false, flashvars);
+	$(window).resize(makeNice);
 
-	function getFlashMovie(movieName) {
-		var isIE = navigator.appName.indexOf("Microsoft") != -1;
-		return (isIE) ? window[movieName] : document[movieName];
+	embedFlashObject(700, 525);
+
+	function embedFlashObject(x, y)
+	{
+		swfobject.embedSWF("mindmap.swf", "flashContent", x, y, "9.0.0", false, flashvars);
 	}
 -->
 </script>
@@ -70,11 +74,11 @@
 										<fmt:message key="label.mindmapEntry" />
 									</td>
 									<td>
-										<center>
+										<center id="center12">
 											<div id="flashContent">
 												<fmt:message>message.enableJavaScript</fmt:message>
 											</div>
-										</center>		
+										</center>
 									</td>
 								</tr>
 								

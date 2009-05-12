@@ -28,16 +28,14 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 
 /**
- * DAO for accessing the MindmapSession objects - interface defining
- * methods to be implemented by the Hibernate or other implementation.
+ * DAO for accessing the MindmapSession objects - interface defining methods to be implemented by the Hibernate or other
+ * implementation.
  */
 public interface IMindmapSessionDAO extends IBaseDAO {
 
-	void saveOrUpdate(MindmapSession session);
+    void saveOrUpdate(MindmapSession session);
 
-	MindmapSession getBySessionId(Long toolSessionId);
+    MindmapSession getBySessionId(Long toolSessionId);
 
-	void deleteBySessionID(Long toolSessionID);
-	
-	public MindmapSession getSessionByMindmapId(Long mindmapId);
+    void deleteBySessionID(Long toolSessionID);
 }

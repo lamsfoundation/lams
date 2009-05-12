@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
  */
 public interface IMindmapNodeDAO extends IBaseDAO {
 
-    public void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId);
+    public void deleteNodeByUniqueMindmapUser(Long uniqueId, Long mindmapId, Long userId, Long sessionId);
     
     public void deleteNodes(String deletedNodesQuery);
     
@@ -43,21 +43,23 @@ public interface IMindmapNodeDAO extends IBaseDAO {
     
     public List getAuthorRootNodeByMindmapId(Long mindmapId);
     
-    public List getAuthorRootNodeByMindmapIdMulti(Long mindmapId);
+    public List getAuthorRootNodeBySessionId(Long sessionId);
+    
+    public List getAuthorRootNodeByMindmapSession(Long mindmapId, Long toolSessionId);
     
     public List getRootNodeByMindmapIdAndUserId(Long mindmapId, Long userId);
     
-    public List getUserRootNodeByUserId(Long userId);
-    
     public List getMindmapNodeByParentId(Long parentId, Long mindmapId);
+    
+    public List getMindmapNodeByParentIdMindmapIdSessionId(Long parentId, Long mindmapId, Long sessionId);
     
     public List getMindmapNodeByUniqueId(Long uniqueId, Long mindmapId);
     
+    public List getMindmapNodeByUniqueIdSessionId(Long uniqueId, Long mindmapId, Long sessionId);
+    
     public List getMindmapNodeByUniqueIdMindmapIdUserId(Long uniqueId, Long mindmapId, Long userId);
     
-    public Long getLastUniqueIdByMindmapIdUserId(Long mindmapId, Long userId);
-    
-    public Long getLastUniqueIdByMindmapId(Long mindmapId);
+    public Long getNodeLastUniqueIdByMindmapUidSessionId(Long mindmapUid, Long sessionId);
     
     public int getNumNodesByUserAndSession(Long userId, Long sessionId);
 }

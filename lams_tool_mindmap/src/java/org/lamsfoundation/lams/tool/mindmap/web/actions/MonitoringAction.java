@@ -35,7 +35,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
-import org.lamsfoundation.lams.tool.mindmap.dto.MindmapSessionDTO;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapUserDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
@@ -82,7 +81,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
-	MindmapSession session = mindmapService.getSessionByMindmapId(mindmap.getUid());
 	
 	if (mindmap == null) {
 	    log.error("unspecified(): Mindmap is not found!");
@@ -95,14 +93,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	mindmapDTO.setCurrentTab(currentTab);
 
-	Object[] users = ((MindmapSessionDTO) mindmapDTO.getSessionDTOs().toArray()[0]).getUserDTOs().toArray();
-	if (users != null && users.length > 0)
-	    request.setAttribute("mindmapUser", ((MindmapUserDTO) users[0]));
-	
 	request.setAttribute("mindmapDTO", mindmapDTO);
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
-	request.setAttribute("toolSessionID", session.getSessionId());
 
 	return mapping.findForward("success");
     }
@@ -124,9 +117,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	Mindmap mindmap = mindmapService.getMindmapByUid(mindmapId);
 
 	List mindmapNodeList = null;
-	if (mindmap.isMultiUserMode()) // is multi-user
-	    mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapIdMulti(mindmapId);
-	else
+	if (!mindmap.isMultiUserMode()) // is single-user
 	    mindmapNodeList = mindmapService.getRootNodeByMindmapIdAndUserId(mindmapId, userId);
 
 	if (mindmapNodeList != null && mindmapNodeList.size() > 0) {
@@ -200,7 +191,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
 	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
-
+	
 	MindmapUserDTO userDTO = new MindmapUserDTO(mindmapUser);
 	request.setAttribute("userDTO", userDTO);
 
@@ -282,6 +273,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Long userId = WebUtil.readLongParam(request, "userId", false);
 	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
 	
+	MindmapSession mindmapSession = mindmapUser.getMindmapSession();
+	
 	String mindmapContent = WebUtil.readStrParam(request, "content", false);
 	
 	if (!mindmap.isMultiUserMode()) {
@@ -293,10 +286,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	    List<NodeModel> branches = rootNodeModel.getBranch();
 
 	    // saving root Node into database
-	    MindmapNode rootMindmapNode = (MindmapNode) mindmapService.getRootNodeByMindmapIdAndUserId(
-		    mindmap.getUid(), userId).get(0);
+	    MindmapNode rootMindmapNode = 
+		(MindmapNode) mindmapService.getRootNodeByMindmapIdAndUserId(mindmap.getUid(), userId).get(0);
+	    
 	    rootMindmapNode = mindmapService.saveMindmapNode(rootMindmapNode, null, nodeConceptModel.getId(),
-		    nodeConceptModel.getText(), nodeConceptModel.getColor(), mindmapUser, mindmap);
+		    nodeConceptModel.getText(), nodeConceptModel.getColor(), mindmapUser, mindmap, mindmapSession);
 
 	    // string to accumulate deleted nodes for query
 	    String nodesToDeleteCondition = " where uniqueId <> " + rootMindmapNode.getUniqueId();
@@ -304,7 +298,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    // saving child Nodes into database
 	    if (branches != null) {
 		mindmapService.setNodesToDeleteCondition("");
-		mindmapService.getChildMindmapNodes(branches, rootMindmapNode, mindmapUser, mindmap);
+		mindmapService.getChildMindmapNodes(branches, rootMindmapNode, mindmapUser, mindmap, mindmapSession);
 	    }
 
 	    nodesToDeleteCondition += mindmapService.getNodesToDeleteCondition() + " and mindmap_id = "

@@ -120,10 +120,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	    String childNodeName1 = mindmapService.getMindmapMessageService().getMessage("node.child1.defaultName");
 	    String childNodeName2 = mindmapService.getMindmapMessageService().getMessage("node.child2.defaultName");
 	    
-	    MindmapNode rootMindmapNode = mindmapService.saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, mindmap);
+	    MindmapNode rootMindmapNode = 
+		mindmapService.saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, mindmap, null);
 	    mindmapService.saveOrUpdateMindmapNode(rootMindmapNode);
-	    mindmapService.saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, mindmap);
-	    mindmapService.saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, mindmap);
+	    mindmapService.saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, mindmap, null);
+	    mindmapService.saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, mindmap, null);
 	}
 
 	if (mode != null && mode.isTeacher()) {
@@ -300,7 +301,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	// saving root Node into database
 	MindmapNode rootMindmapNode = (MindmapNode) mindmapService.getAuthorRootNodeByMindmapId(mindmap.getUid()).get(0);
 	rootMindmapNode = mindmapService.saveMindmapNode(rootMindmapNode, null, nodeConceptModel.getId(),
-		nodeConceptModel.getText(), nodeConceptModel.getColor(), mindmapUser, mindmap);
+		nodeConceptModel.getText(), nodeConceptModel.getColor(), mindmapUser, mindmap, null);
 
 	// string to accumulate deleted nodes for query
 	String nodesToDeleteCondition = " where uniqueId <> " + rootMindmapNode.getUniqueId();
@@ -308,7 +309,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	// saving child Nodes into database
 	if (branches != null) {
 	    mindmapService.setNodesToDeleteCondition("");
-	    mindmapService.getChildMindmapNodes(branches, rootMindmapNode, mindmapUser, mindmap);
+	    mindmapService.getChildMindmapNodes(branches, rootMindmapNode, mindmapUser, mindmap, null);
 	}
 
 	nodesToDeleteCondition += mindmapService.getNodesToDeleteCondition() + " and mindmap_id = " + mindmap.getUid();
