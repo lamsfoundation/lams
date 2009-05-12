@@ -1298,11 +1298,38 @@ class PropertyInspectorControls extends MovieClip {
 	 * @return  
 	 */
 	private function onGroupingMethodChange(evt:Object){
-		checkEnableGroupsOptions(!_canvasModel.selectedItem.activity.readOnly);
-		updateGroupingMethodData(evt);
-		setModified();
+		var groupingBy = rndGroup_radio.selection.data;
+		if (groupingBy == "num_learners") { // grouping by changed to "number of learners" check if mappings exist to previously defined groups.
+			var createGroupingUIID:Number = _canvasModel.selectedItem.activity.createGroupingUIID;
+			if (_canvasModel.getCanvas().ddm.hasBranchMappingsForGroupingUIID(createGroupingUIID)) {
+				LFMessage.showMessageConfirm(Dictionary.getValue('grp_chk_clear_branch_mappings'), Delegate.create(this, clearGroupBasedBranchMappings), Delegate.create(this, reselectGroupingByNumOfGroups));
+			} else {
+				handleGroupingMethodChange();
+			}
+		} else {
+			handleGroupingMethodChange();
+		}
 	}
 	
+	//clear branch mappings for this grouping activity
+	private function clearGroupBasedBranchMappings() {		var createGroupingUIID:Number = _canvasModel.selectedItem.activity.createGroupingUIID;
+		if (createGroupingUIID != null) {
+			_canvasModel.getCanvas().ddm.clearBranchMappingsByGroupingUIID(createGroupingUIID);
+		}
+			
+		handleGroupingMethodChange();
+	}
+	
+	private function reselectGroupingByNumOfGroups() {
+		numGroups_rdo.selected = true;
+		handleGroupingMethodChange();
+	}
+	
+	private function handleGroupingMethodChange() {
+		checkEnableGroupsOptions(!_canvasModel.selectedItem.activity.readOnly);
+		updateGroupingMethodData({type:'click'});
+		setModified();
+	}
 	
 	private function onScheduleOffsetChange(evt:Object){
 		
