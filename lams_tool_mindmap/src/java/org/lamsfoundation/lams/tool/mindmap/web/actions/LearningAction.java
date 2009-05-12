@@ -256,8 +256,7 @@ public class LearningAction extends LamsDispatchAction {
 	toMindmapNode = mindmapService.saveMindmapNode(null, toMindmapNode, fromMindmapNode.getUniqueId(),
 		fromMindmapNode.getText(), fromMindmapNode.getColor(), user, toContent, session);
 
-	List childMindmapNodes = mindmapService.getMindmapNodeByParentIdMindmapIdSessionId(fromMindmapNode.getNodeId(), 
-		fromContent.getUid(), session.getSessionId());
+	List childMindmapNodes = mindmapService.getMindmapNodeByParentId(fromMindmapNode.getNodeId(), fromContent.getUid());
 
 	if (childMindmapNodes != null && childMindmapNodes.size() > 0) {
 	    for (Iterator iterator = childMindmapNodes.iterator(); iterator.hasNext();) {
