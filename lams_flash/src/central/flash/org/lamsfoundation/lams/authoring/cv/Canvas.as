@@ -918,7 +918,7 @@ class Canvas extends CanvasHelper {
 	public function launchImportWindow(method:String):Void{
 		Debugger.log('Launching Import Window',Debugger.GEN,'launchImportWindow','Canvas');
 		if(_ddm.modified){
-			LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doImportLaunch), null);
+			LFMessage.showMessageConfirm(Dictionary.getValue('cv_design_unsaved'), Proxy.create(this,doImportLaunch,method), null);
 		} else {
 			doImportLaunch(method);
 		}
@@ -928,7 +928,11 @@ class Canvas extends CanvasHelper {
 		var serverUrl = Config.getInstance().serverUrl;
 		if (method == null) method = "import";
 		var importActionUrl:String = appendCustomCSVIfExists(serverUrl+'authoring/importToolContent.do?method='+method);
-		JsPopup.getInstance().launchPopupWindow(importActionUrl, 'Import', 298, 800, true, true, false, false, false);
+		if (method == "import") {
+			JsPopup.getInstance().launchPopupWindow(importActionUrl, 'Import', 298, 800, true, true, false, false, false);
+		} else if (method == "importLC") {
+			JsPopup.getInstance().launchPopupWindow(importActionUrl, 'ImportLC', 580, 840, true, true, false, false, false);
+		}
 	}
 	
 	/**
