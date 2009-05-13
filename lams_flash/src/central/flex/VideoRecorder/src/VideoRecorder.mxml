@@ -3,12 +3,13 @@
 	xmlns:commonComponents="org.lamsfoundation.lams.common.ui.components.*"
 	xmlns:controls="com.asfusion.controls.*"
 	xmlns:local="*"
-	enabled="false" layout="absolute" width="100%" height="100%" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]"
+	layout="absolute" width="100%" height="100%" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]"
 	applicationComplete="onApplicationComplete(event)" 
 	preinitialize="onPreinitialize(event)">
 	
 	<mx:Script>
 		<![CDATA[
+			import mx.core.UIComponent;
 			import org.lamsfoundation.lams.common.util.ScreenShotterEvent;
 			//includes
 			include "HTTPServices.as"
@@ -133,6 +134,9 @@
 			
 			// called from applicationComplete
 			private function onApplicationComplete(event:Event):void {
+				// show an overlay
+				LamsAjaxOverlayManager.showOverlay(UIComponent(Application.application));
+				
 				// init labels if languageXML is not empty
 				if(languageXML.toString() != ""){
 					dictionary = new XMLDictionary(languageXML);
@@ -372,24 +376,21 @@
 				// if successful connection
 				if (infoObject.code == "NetConnection.Connect.Success") {
 					// enable application
-					Application.application.enabled = true;
+					LamsAjaxOverlayManager.hideOverlay(UIComponent(Application.application));
 					
 					// call server and get recordings, update datagrid with results
 					getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);	
 				}
 				// if connection unsuccessful
-				else if(infoObject.code == "NetConnection.Connect.InvalidApp"){
-					Application.application.enabled = false;			
+				else if(infoObject.code == "NetConnection.Connect.InvalidApp"){		
     				// pop an alert
 					Alert.show(dictionary.getLabel("videorecorder.web.application.not.available"));
 				}
-				else if(infoObject.code == "NetConnection.Connect.Failed"){
-					Application.application.enabled = false;				
+				else if(infoObject.code == "NetConnection.Connect.Failed"){			
     				// pop an alert
 					Alert.show(dictionary.getLabel("videorecorder.net.connection.not.connected"));
 				}
 				else if(infoObject.code == "NetConnection.Connect.Closed"){
-					Application.application.enabled = false;
     				// pop an alert
 					Alert.show(dictionary.getLabel("videorecorder.net.connection.closed"));
 				}

@@ -9,6 +9,8 @@
 		
 	<mx:Script>
 		<![CDATA[
+			import mx.core.UIComponent;
+			import org.lamsfoundation.lams.common.managers.LamsAjaxOverlayManager;
 			import org.lamsfoundation.lams.common.conn.ImageService;
 			import org.lamsfoundation.lams.common.util.ScreenShotterEvent;
 						
@@ -99,6 +101,7 @@
 			
 			// called after everything is created and ready to go
 			private function onApplicationComplete(event:Event):void {
+				LamsAjaxOverlayManager.showOverlay(UIComponent(Application.application));
 				// add an external interface callback to all setLanguageXML to be called from js
 				ExternalInterface.addCallback("setLanguageXML", setLanguageXML);					
 				
@@ -152,7 +155,7 @@
 					In playerModeOffline mode, a null NetConnection object is used to play local video from the disk.
 					*/
 					case "playerModeOffline":{
-						Application.application.enabled = true;
+						LamsAjaxOverlayManager.hideOverlay(UIComponent(Application.application));
 						videoDisplay.makeReady(filename, "video", true);
 						break;
 					}
@@ -396,7 +399,7 @@
 				// if successful connection
 				if (infoObject.code == "NetConnection.Connect.Success") {
 					// enable application
-					Application.application.enabled = true;
+					LamsAjaxOverlayManager.hideOverlay(UIComponent(Application.application));
 					
 					// if we are in a player online instance
 					if(mode == "playerModeOnline"){
@@ -427,18 +430,15 @@
 
 				}
 				// if connection unsuccessful
-				else if(infoObject.code == "NetConnection.Connect.InvalidApp"){
-					Application.application.enabled = false;			
+				else if(infoObject.code == "NetConnection.Connect.InvalidApp"){		
 					// pop an alert
 					Alert.show("Web appplication not available");
 				}
 				else if(infoObject.code == "NetConnection.Connect.Failed"){
-					Application.application.enabled = false;				
 					// pop an alert
 					Alert.show("NetConnection not connected");
 				}
 				else if(infoObject.code == "NetConnection.Connect.Closed"){
-					Application.application.enabled = false;
 					// pop an alert
 					Alert.show("NetConnection closed");
 				}
