@@ -105,6 +105,7 @@ class org.lamsfoundation.lams.authoring.cv.ValidationIssuesDialog extends MovieC
 		for (var i = 0; i < _validationIssues.length; i++) {
 			maxStrWidth = Math.max(StringUtils.getButtonWidthForStr(_validationIssues[i].Issue), maxStrWidth);
 		}
+		maxStrWidth = Math.ceil(maxStrWidth*1.30); // extra width for fonts with wider characters (eg used by linux)
 		
 		var numRows:Number = Math.ceil(maxStrWidth/(column_value.width-2*MARGIN));
 		var lineHeight:Number;
