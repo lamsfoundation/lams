@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -65,7 +64,7 @@
 							<table>
 								<tr>
 									<th colspan="2">
-										${user.firstName} ${user.lastName }
+										${user.firstName} ${user.lastName}
 									</th>
 								</tr>
 								
@@ -86,6 +85,7 @@
 						</c:forEach>
 					</div>
 				</c:forEach>
+				
 			</div>
 			<!--closes content-->
 
@@ -95,4 +95,3 @@
 
 	</body>
 </html>
-
