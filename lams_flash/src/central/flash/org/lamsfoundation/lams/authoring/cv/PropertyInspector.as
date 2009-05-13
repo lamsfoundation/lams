@@ -577,6 +577,7 @@ class PropertyInspector extends PropertyInspectorControls {
 		} else {
 			maxAct_stp.value = ca.maxOptions;
 		}
+		updateMinMaxOptionalData();
 		
 		currentGrouping_lbl.text = "GroupingUIID:"+StringUtils.cleanNull(ca.runOffline.groupingUIID);
 	}
@@ -590,24 +591,30 @@ class PropertyInspector extends PropertyInspectorControls {
 	
 	private function updateOptionalData(){
 		var oa = _canvasModel.selectedItem.activity;
-		var	o = ComplexActivity(oa);
 		
-		if(minAct_stp.value > CanvasOptionalActivity(_canvasModel.selectedItem).actChildren.length)
-			minAct_stp.value = CanvasOptionalActivity(_canvasModel.selectedItem).actChildren.length;
-		
-		if(maxAct_stp.value > CanvasOptionalActivity(_canvasModel.selectedItem).actChildren.length)
-			maxAct_stp.value = CanvasOptionalActivity(_canvasModel.selectedItem).actChildren.length;
-		
-		if(minAct_stp.value > maxAct_stp.value)
-			maxAct_stp.value = minAct_stp.value;
-		
-		o.minOptions = minAct_stp.value;
-		o.maxOptions = maxAct_stp.value;
+		updateMinMaxOptionalData();
 		
 		var newChildren = _canvasModel.getCanvas().ddm.getComplexActivityChildren(oa.activityUIID);
 		CanvasOptionalActivity(_canvasModel.selectedItem).updateChildren(newChildren);
 		
 		setModified();
+	}
+	
+	private function updateMinMaxOptionalData() {
+		var selectedOptionalAct = ComplexActivity(_canvasModel.selectedItem.activity);
+		var numOptionalChildren:Number = _canvasModel.getCanvas().ddm.getComplexActivityChildren(selectedOptionalAct.activityUIID).length;
+		
+		if(minAct_stp.value > numOptionalChildren)
+			minAct_stp.value = numOptionalChildren;
+		
+		if(maxAct_stp.value > numOptionalChildren)
+			maxAct_stp.value = numOptionalChildren;
+		
+		if(minAct_stp.value > maxAct_stp.value)
+			maxAct_stp.value = minAct_stp.value;
+		
+		ComplexActivity(_canvasModel.selectedItem.activity).minOptions = minAct_stp.value;
+		ComplexActivity(_canvasModel.selectedItem.activity).maxOptions = maxAct_stp.value;
 	}
 	
 	private function updateOptionalSequenceData(){
@@ -630,13 +637,14 @@ class PropertyInspector extends PropertyInspectorControls {
 	
 	private function removeSequenceItems(itemsToRemove:Array, overwrite:Boolean):Void {
 		for(var i=0; i<itemsToRemove.length; i++) {
-					if(itemsToRemove[i].actChildren.length > 0 && !overwrite) {
-						LFMessage.showMessageConfirm(Dictionary.getValue('pi_optSequence_remove_msg'), Proxy.create(this, removeSequenceItems, itemsToRemove, true), Proxy.create(this, onUpdateOptionalSequenceData), null, null, Dictionary.getValue('pi_optSequence_remove_msg_title'));
-						return;
-					} else { 
-						_canvasModel.getCanvas().ddm.removeComplexActivity(itemsToRemove[i].activity.activityUIID, itemsToRemove[i].actChildren, true);
-					}
+			if(itemsToRemove[i].actChildren.length > 0 && !overwrite) {
+				LFMessage.showMessageConfirm(Dictionary.getValue('pi_optSequence_remove_msg'), Proxy.create(this, removeSequenceItems, itemsToRemove, true), Proxy.create(this, onUpdateOptionalSequenceData), null, null, Dictionary.getValue('pi_optSequence_remove_msg_title'));
+				return;
+			} else { 
+				_canvasModel.getCanvas().ddm.removeComplexActivity(itemsToRemove[i].activity.activityUIID, itemsToRemove[i].actChildren, true);
+			}
 		}
+		updateMinMaxOptionalData();
 		
 		this.onEnterFrame = onUpdateOptionalSequenceData;
 	}
