@@ -319,8 +319,8 @@ public class LearningAction extends LamsDispatchAction {
 		    List nodes = mindmapService.getMindmapNodeByUniqueIdSessionId(notifyRequestModel.getNodeID(), 
 			    mindmapId, toolSessionId);
 
-		    if (nodes != null && nodes.size() > 0) // check if node exists
-		    {
+		    //if (nodes != null && nodes.size() > 0) // check if node exists
+		    //{
 			MindmapNode curNode = (MindmapNode) nodes.get(0);
 			List childNodes = mindmapService.getMindmapNodeByParentIdMindmapIdSessionId(curNode.getNodeId(), 
 				mindmapId, toolSessionId);
@@ -335,8 +335,8 @@ public class LearningAction extends LamsDispatchAction {
 			} else {
 			    notifyResponse = generateNotifyResponse(0, null, null);
 			}
-		    } else
-			notifyResponse = generateNotifyResponse(0, null, null);
+		    //} else
+		//	notifyResponse = generateNotifyResponse(0, null, null);
 		} else {
 		    notifyResponse = generateNotifyResponse(0, null, null);
 		}
@@ -475,7 +475,9 @@ public class LearningAction extends LamsDispatchAction {
 
 	    MindmapNode rootMindmapNode = null;
 	    if (requestType != 0 && requestType != 1) {
-		List nodesList = mindmapService.getMindmapNodeByUniqueId(mindmapRequest.getNodeId(), mindmapId);
+		//List nodesList = mindmapService.getMindmapNodeByUniqueId(mindmapRequest.getNodeId(), mindmapId);
+		List nodesList = mindmapService.getMindmapNodeByUniqueIdSessionId(mindmapRequest.getNodeId(), mindmapId, toolSessionId);
+		
 		if (nodesList != null && nodesList.size() > 0)
 		    rootMindmapNode = (MindmapNode) nodesList.get(0);
 		else
@@ -484,12 +486,15 @@ public class LearningAction extends LamsDispatchAction {
 
 	    MindmapNode mindmapNode = null;
 	    if (requestType == 1) {
-		List nodesList = mindmapService.getMindmapNodeByUniqueId(mindmapRequest.getNodeChildId(), mindmapId);
+		//List nodesList = mindmapService.getMindmapNodeByUniqueId(mindmapRequest.getNodeChildId(), mindmapId);
+		List nodesList = mindmapService.getMindmapNodeByUniqueIdSessionId(mindmapRequest.getNodeChildId(), mindmapId, toolSessionId);
+		
 		if (nodesList != null && nodesList.size() > 0)
 		    mindmapNode = (MindmapNode) nodesList.get(0);
 		else
 		    log.error("pollServerAction(): Error finding node while creating a node!");
 	    }
+	    
 	    // delete node
 	    if (requestType == 0) {
 		notifyRequestModel = new NotifyRequestModel(mindmapRequest.getGlobalId(), mindmapRequest.getNodeId(),
