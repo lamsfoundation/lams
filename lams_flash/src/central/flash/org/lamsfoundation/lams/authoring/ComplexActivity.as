@@ -90,8 +90,8 @@ class ComplexActivity extends Activity {
 	public function toData():Object{
 		var dto:Object = super.toData();
 		if(_activityTypeID == Activity.OPTIONAL_ACTIVITY_TYPE || _activityTypeID == Activity.OPTIONS_WITH_SEQUENCES_TYPE){
-			if(_maxOptions) { dto.maxOptions = _maxOptions;	}
-			if(_minOptions) { dto.minOptions = _minOptions; }
+			dto.maxOptions = (_maxOptions == null || _maxOptions == 0) ? Config.NUMERIC_NULL_VALUE : _maxOptions;
+			dto.minOptions = (_minOptions == null || _minOptions == 0) ? Config.NUMERIC_NULL_VALUE : _minOptions;
 			if(_optionsInstructions) { dto.optionsInstructions = _optionsInstructions; }
 		}
 		
