@@ -90,6 +90,12 @@
 </table>
 </div>
 
+<c:if test="${empty dto.sessionDTOs}">
+	<p class="warning">
+		<fmt:message key="label.nogroups" />
+	</p>
+</c:if>
+
 <c:forEach var="session" items="${dto.sessionDTOs}">
 
 	<c:if test="${isGroupedActivity}">
