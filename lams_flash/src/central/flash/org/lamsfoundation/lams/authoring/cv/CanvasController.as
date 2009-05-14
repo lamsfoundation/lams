@@ -814,7 +814,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 			if(ct.hitTest(_canvasModel.getCanvas().bin) && !isTransitionTargetReadOnly(ct, Dictionary.getValue("cv_element_readOnly_action_del"))){
 				_canvasModel.getCanvas().removeTransition(ct.transition.transitionUIID); 
 			} else {
-				if (ct._x != ct.xPosition){
+				if (ct._x != ct.xPosition || ct._y != ct.yPosition){
 					var t = _canvasModel.transitionsDisplayed.remove(ct.transition.transitionUIID);
 					t.removeMovieClip();
 					_canvasModel.setDirty();

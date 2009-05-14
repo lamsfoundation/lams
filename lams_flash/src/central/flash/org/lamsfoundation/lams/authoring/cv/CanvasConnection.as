@@ -61,6 +61,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 	private var _fromAct_edgePoint:Point;
 	private var _toAct_edgePoint:Point;
 	private var xPos:Number;
+	private var yPos:Number;
 	
 	private var _dcStartTime:Number = 0;
 	private var _doubleClicking:Boolean;
@@ -85,6 +86,10 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 	
 	public function get xPosition():Number{
 		return xPos;
+	}
+	
+	public function get yPosition():Number{
+		return yPos;
 	}
 	
 	public function createConnection(fromAct_mc, toAct_mc, _startPoint:Point, _endPoint:Point, fromOTC:Object, toOTC:Object) {
@@ -122,7 +127,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasConnection extends MovieClip{
 		_midPoint = new Point(arrow_mc._x, arrow_mc._y);
 		
 		xPos = this._x;
-				
+		yPos = this._y;
 	}
 	
 	private static function convertToDegrees(angle:Number):Number {
