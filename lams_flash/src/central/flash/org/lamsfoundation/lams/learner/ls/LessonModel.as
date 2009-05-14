@@ -683,6 +683,17 @@ class LessonModel extends Observable {
 				broadcastViewUpdate("UPDATE_ACTIVITY",ddm_activity);
 			}
 		}
+		
+		// loop thru support activities
+		var refUIID:Number = learningDesignModel.referenceActivityUIID;
+		
+		if(refUIID != null) {
+			var supportArray:Array = learningDesignModel.getComplexActivityChildren(refUIID);
+			for(var i=0; i<supportArray.length; i++) {
+				var ddm_activity:Activity = supportArray[i];
+				broadcastViewUpdate("UPDATE_ACTIVITY", ddm_activity);
+			}
+		}
 	}
 	
 	public function broadcastViewUpdate(updateType, data){
