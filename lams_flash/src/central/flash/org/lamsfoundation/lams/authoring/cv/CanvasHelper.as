@@ -212,6 +212,7 @@ class CanvasHelper {
 			
 			canvasModel.clearAllElements();
 			createContentFolder();
+			Application.getInstance().getToolbar().setButtonState("support_act_btn", true, false);
 			
 			return true;
 		}else{
