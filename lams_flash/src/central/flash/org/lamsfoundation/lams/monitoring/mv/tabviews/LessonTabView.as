@@ -879,8 +879,9 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 				}
 			}
 			else if (r == "presenceAvailable") {
-				Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&lessonId=' + _root.lessonID, null, false);
 				if (learner_epres_cb.selected) {
+					Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&lessonId=' + _root.lessonID, Proxy.create(this, createRoomResponseHandler), false);
+					Cursor.showCursor(ApplicationParent.C_DEFAULT);
 					learner_eim_cb.enabled = true;
 					
 					var msg:String = Dictionary.getValue('ls_confirm_presence_enabled') ;
@@ -905,6 +906,11 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 				}
 			}
 		}
+	}
+	
+	private function createRoomResponseHandler(r) {
+		if (r instanceof LFError)
+			r.showErrorAlert();
 	}
 	
 	/**
