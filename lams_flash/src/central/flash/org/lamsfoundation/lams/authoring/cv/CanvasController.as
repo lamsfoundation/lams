@@ -193,8 +193,8 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 				ca.activity.activityUIID == referenceOnCanvas.activity.activityUIID) {
 				var canvasActs:Array = _canvasModel.activitiesDisplayed.values();
 				for (var i=0; i<canvasActs.length; i++) {
-					if (referenceOnCanvas.hitTest(canvasActs[i]) && canvasActs[i].activity.activityTypeID != Activity.REFERENCE_ACTIVITY_TYPE) {
-						
+					if (referenceOnCanvas.hitTest(canvasActs[i]) && canvasActs[i].activity.activityTypeID != Activity.REFERENCE_ACTIVITY_TYPE &&
+						canvasActs[i].activity.parentUIID == null) {
 						LFMessage.showMessageAlert(Dictionary.getValue("support_msg_cannot_be_child"), null);
 						activitySnapBack(ca);
 					}
