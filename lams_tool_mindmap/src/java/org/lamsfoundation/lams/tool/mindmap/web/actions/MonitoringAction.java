@@ -163,7 +163,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	try {
 	    response.setContentType("text/xml");
-	    // response.setCharacterEncoding("utf-8");
+	    response.setCharacterEncoding("utf-8");
 	    response.getWriter().write(mindmapService.getLanguageXML());
 	} catch (IOException e) {
 	    e.printStackTrace();

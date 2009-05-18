@@ -197,7 +197,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    
 	    try {
 		response.setContentType("text/xml");
-		//response.setCharacterEncoding("utf-8");
+		response.setCharacterEncoding("utf-8");
 		response.getWriter().write(mindmapContent);
 	    } catch (IOException e) {
 		e.printStackTrace();
@@ -221,7 +221,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	
 	try {
 	    response.setContentType("text/xml");
-	    //response.setCharacterEncoding("utf-8");
+	    response.setCharacterEncoding("utf-8");
 	    response.getWriter().write(mindmapService.getLanguageXML());
 	} catch (IOException e) {
 	    e.printStackTrace();
