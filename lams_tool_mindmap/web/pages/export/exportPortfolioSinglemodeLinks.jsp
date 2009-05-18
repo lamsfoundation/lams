@@ -28,25 +28,27 @@
 					&nbsp;
 				</p>
 				
-				<table>
-					<tr>
-						<th colspan="2">
-							<fmt:message>label.multimode</fmt:message>
-						</th>
-					</tr>
+				<c:forEach var="user" items="${session.userDTOs}">
+					<table>
+						<tr>
+							<th colspan="2">
+								${user.firstName} ${user.lastName}
+							</th>
+						</tr>
 								
-					<tr>
-						<td class="field-name" width="20%">
-							<fmt:message key="label.mindmapEntry" />
-						</td>
-						<td>
-							<a href="${session.sessionName}_${session.sessionID}.html">
-								<fmt:message key="label.view" />
-							</a>							
-						</td>
-					</tr>
+						<tr>
+							<td class="field-name" width="20%">
+								<fmt:message key="label.mindmapEntry" />
+							</td>
+							<td>
+								<a href="${user.firstName}_${user.lastName}_${user.uid}.html">
+									<fmt:message key="label.view" />
+								</a>							
+							</td>
+						</tr>
 								
-				</table>
+					</table>
+				</c:forEach>
 				
 			</div>
 		</c:forEach>

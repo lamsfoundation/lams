@@ -29,58 +29,58 @@
 	</lams:head>
 
 	<body class="stripes">
-		<div id="content">
 
-		<h1>
-			<c:out value="${mindmapDTO.title}" escapeXml="false" />
-		</h1>
+			<div id="content">
 
-		<p>
-			<c:out value="${mindmapDTO.instructions}" escapeXml="false" />
-		</p>
-	
-			<table>
-				<tr>
-					<th colspan="2">
-						<fmt:message>label.multimode</fmt:message>
-					</th>
-				</tr>
-								
-				<tr>
-					<td class="field-name" width="20%">
-						<fmt:message key="label.mindmapEntry" />
-					</td>
-							
-					<td>
-						<center id="center12">
-							<div id="flashContent">
-								<fmt:message>message.enableJavaScript</fmt:message>
-							</div>
-						</center>
-					</td>
-				</tr>
+				<h1>
+					<c:out value="${mindmapDTO.title}" escapeXml="false" />
+				</h1>
+
+				<p>
+					<c:out value="${mindmapDTO.instructions}" escapeXml="false" />
+				</p>
+
+				<c:set var="user" value="${mindmapUserDTO}" />
 				
-				<c:forEach var="user" items="${userDTOs}">
+				<table>
+					<tr>
+						<th colspan="2">
+							${user.firstName} ${user.lastName}
+						</th>
+					</tr>
+								
+					<tr>
+						<td class="field-name" width="20%">
+							<fmt:message key="label.mindmapEntry" />
+						</td>
+						<td>
+							<center id="center12">
+								<div id="flashContent">
+									<fmt:message>message.enableJavaScript</fmt:message>
+								</div>
+							</center>
+						</td>
+					</tr>
+					
 					<c:if test="${!empty user.entryDTO.entry}">
 						<tr>
 							<td class="field-name" width="20%">
-								${user.firstName} ${user.lastName}
+								<fmt:message key="label.notebookEntry" />
 							</td>
 							<td>
 								${user.entryDTO.entry}
 							</td>
 						</tr>
 					</c:if>
-				</c:forEach>		
+					
+				</table>
 				
-			</table>
-				
-		</div>
-		<!--closes content-->
-
-		<div id="footer">
 			</div>
-		<!--closes footer-->
+			<!--closes content-->
+
+			<div id="footer">
+			</div>
+			<!--closes footer-->
 
 	</body>
 </html>

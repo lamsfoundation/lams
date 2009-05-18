@@ -38,10 +38,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapSessionDTO;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapUserDTO;
+import org.lamsfoundation.lams.tool.mindmap.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
@@ -95,7 +97,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
 		request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.LEARNER);
 		doLearnerExport(request, response, directoryName, cookies);
-		writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
+		writeResponseToFile(basePath + "/pages/export/exportPortfolioSinglemode.jsp", directoryName, FILENAME, cookies);
 		
 		return FILENAME;
 	    }
@@ -103,18 +105,27 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		request.getSession().setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
 		
 		Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
+		MindmapDTO mindmapDTO = new MindmapDTO(mindmap);
+		mindmapDTO.setTitle(mindmap.getTitle());
+		mindmapDTO.setInstructions(mindmap.getInstructions());
 		
 		if (mindmap.isMultiUserMode()) {
-		    doTeacherMultiModeExport(request, response, directoryName, cookies);
-		    writeResponseToFile(basePath + "/pages/export/exportPortfolioMultimode.jsp", directoryName, FILENAME, cookies);
+		    Set<MindmapSessionDTO> sessionDTOs = mindmapDTO.getSessionDTOs();
+		    for (Iterator iterator = sessionDTOs.iterator(); iterator.hasNext();) {
+			MindmapSessionDTO mindmapSessionDTO = (MindmapSessionDTO) iterator.next();
+			
+			String filename = mindmapSessionDTO.getSessionName() + "_" + mindmapSessionDTO.getSessionID() + ".html";
+			
+			doTeacherMultiModeExport(request, response, directoryName, cookies, mindmap, mindmapSessionDTO);
+			writeResponseToFile(basePath + "/pages/export/exportPortfolioMultimode.jsp", directoryName, filename, cookies);
+		    }
+		    request.getSession().setAttribute("mindmapDTO", mindmapDTO);
+		    
+		    writeResponseToFile(basePath + "/pages/export/exportPortfolioMultimodeLinks.jsp", directoryName, FILENAME, cookies);
 		
 		    return FILENAME;
 		}
 		else {
-		    MindmapDTO mindmapDTO = new MindmapDTO(mindmap);
-		    mindmapDTO.setTitle(mindmap.getTitle());
-		    mindmapDTO.setInstructions(mindmap.getInstructions());
-		    
 		    Set<MindmapSessionDTO> sessionDTOs = mindmapDTO.getSessionDTOs();
 		    for (Iterator iterator = sessionDTOs.iterator(); iterator.hasNext();) {
 			MindmapSessionDTO mindmapSessionDTO = (MindmapSessionDTO) iterator.next();	    
@@ -127,13 +138,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			    	"_" + mindmapUser.getUid() + ".html";
 			    
 			    doTeacherSingleModeExport(request, response, directoryName, cookies, mindmap, mindmapUser);
-			    writeResponseToFile(basePath + "/pages/export/exportPortfolioMultimode.jsp", directoryName, filename, cookies);
+			    writeResponseToFile(basePath + "/pages/export/exportPortfolioSinglemode.jsp", directoryName, filename, cookies);
 			}
 		    }
 		    
 		    request.getSession().setAttribute("mindmapDTO", mindmapDTO);
 		    
-		    writeResponseToFile(basePath + "/pages/export/exportPortfolioMultimodeLinks.jsp", directoryName, FILENAME, cookies);
+		    writeResponseToFile(basePath + "/pages/export/exportPortfolioSinglemodeLinks.jsp", directoryName, FILENAME, cookies);
 		    
 		    return FILENAME;
 		}
@@ -199,7 +210,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    }
 	}
     }
-    
 
     private void doLearnerExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) throws MindmapException {
@@ -228,13 +238,21 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	sessionDTO.setSessionID(mindmapSession.getSessionId());
 
 	MindmapUserDTO userDTO = new MindmapUserDTO(mindmapUser);
-
+	
+	if (mindmap.isReflectOnActivity()) {
+	    NotebookEntry notebookEntry = mindmapService.getEntry(mindmapUser.getEntryUID());
+	    NotebookEntryDTO notebookEntryDTO = new NotebookEntryDTO(notebookEntry);
+	    userDTO.setEntryDTO(notebookEntryDTO);
+	}
+	
 	sessionDTO.getUserDTOs().add(userDTO);
 	mindmapDTO.getSessionDTOs().add(sessionDTO);
 
 	// adding Mindmap files to archive
+	
 	request.getSession().setAttribute("mindmapContentPath", "mindmap.xml");
 	request.getSession().setAttribute("localizationPath", "locale.xml");
+	request.getSession().setAttribute("mindmapUserDTO", userDTO);
 	
 	String currentMindmapUser = mindmapUser.getFirstName() + " " + mindmapUser.getLastName();
 	request.getSession().setAttribute("currentMindmapUser", currentMindmapUser);
@@ -258,6 +276,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	String filename = mindmapUser.getFirstName() + "_" + mindmapUser.getLastName() + 
 		"_" + mindmapUser.getUid();
 	
+	if (mindmap.isReflectOnActivity()) {
+	    MindmapUserDTO userDTO = new MindmapUserDTO(mindmapUser);
+	    NotebookEntry notebookEntry = mindmapService.getEntry(mindmapUser.getEntryUID());
+	    NotebookEntryDTO notebookEntryDTO = new NotebookEntryDTO(notebookEntry);
+	    userDTO.setEntryDTO(notebookEntryDTO);
+	    request.getSession().setAttribute("mindmapUserDTO", userDTO);
+	}
+	
 	request.getSession().setAttribute("mindmapContentPath", filename + ".xml");
 	request.getSession().setAttribute("localizationPath", "locale.xml");
 	
@@ -270,38 +296,32 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     }
     
     private void doTeacherMultiModeExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
-	    Cookie[] cookies) throws MindmapException {
+	    Cookie[] cookies, Mindmap mindmap, MindmapSessionDTO mindmapSessionDTO) 
+    		throws MindmapException {
 
 	logger.debug("doExportTeacher: toolContentID: " + toolContentID);
-
-	// check if toolContentID available
-	if (toolContentID == null) {
-	    String error = "Tool Content ID is missing. Unable to continue";
-	    logger.error(error);
-	    throw new MindmapException(error);
-	}
 	
-	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
-	MindmapDTO mindmapDTO = new MindmapDTO(mindmap);
-	mindmapDTO.setTitle(mindmap.getTitle());
-	mindmapDTO.setInstructions(mindmap.getInstructions());
+	String filename = mindmapSessionDTO.getSessionName() + "_" + mindmapSessionDTO.getSessionID();
 	
-	request.getSession().setAttribute("localizationPath", "locale.xml");
-	
-	// if Mindmap is in Multi-mode
-	if (mindmap.isMultiUserMode())
-	{
-	    Set<MindmapSessionDTO> sessionDTOs = mindmapDTO.getSessionDTOs();
-	    for (Iterator iterator = sessionDTOs.iterator(); iterator.hasNext();) {
-		MindmapSessionDTO mindmapSessionDTO = (MindmapSessionDTO) iterator.next();
-		    
-		List mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapSession(mindmap.getUid(), mindmapSessionDTO.getSessionID());
-		
-		exportMindmapNodes(mindmapNodeList, mindmap, null, directoryName + "/mindmap.xml");
+	if (mindmap.isReflectOnActivity()) {
+	    Set<MindmapUserDTO> userDTOs = mindmapSessionDTO.getUserDTOs();
+	    for (Iterator userIterator = userDTOs.iterator(); userIterator.hasNext();) {
+		MindmapUserDTO mindmapUserDTO = (MindmapUserDTO) userIterator.next();
+		MindmapUser mindmapUser = mindmapService.getUserByUID(mindmapUserDTO.getUid());
+		NotebookEntry notebookEntry = mindmapService.getEntry(mindmapUser.getEntryUID());
+		NotebookEntryDTO notebookEntryDTO = new NotebookEntryDTO(notebookEntry);
+		mindmapUserDTO.setEntryDTO(notebookEntryDTO);
 	    }
+	    request.getSession().setAttribute("userDTOs", userDTOs);
 	}
 	
-	request.getSession().setAttribute("mindmapDTO", mindmapDTO);
+	request.getSession().setAttribute("mindmapContentPath", filename + ".xml");
+	request.getSession().setAttribute("localizationPath", "locale.xml");
+	    
+	List mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapSession(mindmap.getUid(), mindmapSessionDTO.getSessionID());
+	    
+	exportMindmapNodes(mindmapNodeList, mindmap, null, directoryName + "/" + filename + ".xml");
+	
     }
     
 }

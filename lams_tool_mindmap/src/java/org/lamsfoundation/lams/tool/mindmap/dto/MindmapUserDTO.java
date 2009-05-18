@@ -104,4 +104,12 @@ public class MindmapUserDTO implements Comparable {
     public void setFinishedActivity(boolean finishedActivity) {
 	this.finishedActivity = finishedActivity;
     }
+    
+    public void setEntryDTO(NotebookEntryDTO entryDTO) {
+	this.entryDTO = entryDTO;
+    }
+    
+    public NotebookEntryDTO getEntryDTO() {
+	return entryDTO;
+    }
 }
