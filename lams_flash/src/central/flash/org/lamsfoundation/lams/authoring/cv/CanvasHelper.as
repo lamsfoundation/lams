@@ -212,7 +212,7 @@ class CanvasHelper {
 			
 			canvasModel.clearAllElements();
 			createContentFolder();
-			Application.getInstance().getToolbar().setButtonState("support_act_btn", true, false);
+			Application.getInstance().getToolbar().setButtonState("support_act_btn", true, Application.getInstance().getToolbar().view.isOptionalPanelVisible());
 			
 			return true;
 		}else{
@@ -801,7 +801,7 @@ class CanvasHelper {
 		canvasModel.currentBranchingActivity = (parentBranching.activity.isBranchingActivity()) ? parentBranching : null;
 		
 		if (canvasModel.currentBranchingActivity == null && canvasModel.getReferenceActivityOnCanvas() == null) {
-			Application.getInstance().getToolbar().setButtonState("support_act_btn", true, false);
+			Application.getInstance().getToolbar().setButtonState("support_act_btn", true, Application.getInstance().getToolbar().view.isOptionalPanelVisible());
 		}
 		if (canvasModel.activeView instanceof CanvasView) {
 			LFMenuBar.getInstance().enableArrangeActivities(true);

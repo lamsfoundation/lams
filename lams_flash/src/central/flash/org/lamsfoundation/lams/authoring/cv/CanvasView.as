@@ -320,7 +320,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasView extends CommonCanvasView {
 		}
 		else if(a.activityTypeID==Activity.REFERENCE_ACTIVITY_TYPE) {
 			
-			Application.getInstance().getToolbar().setButtonState("support_act_btn", false, false);
+			Application.getInstance().getToolbar().setButtonState("support_act_btn", false, Application.getInstance().getToolbar().view.isOptionalPanelVisible());
 			
 			var children:Array = cm.getCanvas().ddm.getComplexActivityChildren(a.activityUIID);
 			

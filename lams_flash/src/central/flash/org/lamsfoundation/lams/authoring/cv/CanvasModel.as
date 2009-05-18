@@ -314,7 +314,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasModel extends org.lamsfoundatio
 		//_cv.ddm.referenceActivityUIID = referenceAct.activityUIID;
 		
 		// disable the reference activity button
-		Application.getInstance().getToolbar().setButtonState("support_act_btn", false, false);
+		Application.getInstance().getToolbar().setButtonState("support_act_btn", false, Application.getInstance().getToolbar().view.isOptionalPanelVisible());
 		
 		setDirty();
 		setSelectedItem(_activitiesDisplayed.get(referenceAct.activityUIID));

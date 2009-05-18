@@ -594,7 +594,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 					Debugger.log('activityDoubleClick CanvasBranchActivity:'+ca.activity.activityUIID,Debugger.CRITICAL,'activityDoubleClick','CanvasController');
 	   
 					_canvasModel.openBranchActivityContent(ca, true);
-					Application.getInstance().getToolbar().setButtonState("support_act_btn", false, false);
+					Application.getInstance().getToolbar().setButtonState("support_act_btn", false, Application.getInstance().getToolbar().view.isOptionalPanelVisible());
 					LFMenuBar.getInstance().enableArrangeActivities(false);
 					
 					// invalidate design after opening tool content window
@@ -742,7 +742,7 @@ class org.lamsfoundation.lams.authoring.cv.CanvasController extends AbstractCont
 							_canvasModel.getCanvas().ddm.removeEntries(_canvasModel.getCanvas().ddm.getBranchMappingsByActivityUIIDAndType(ca.activity.activityUIID).all);
 						
 						if (ca.activity.isReferenceActivity()) {
-							Application.getInstance().getToolbar().setButtonState("support_act_btn", true, false);
+							Application.getInstance().getToolbar().setButtonState("support_act_btn", true, Application.getInstance().getToolbar().view.isOptionalPanelVisible());
 						}
 
 						_canvasModel.removeComplexActivity(ca);	
