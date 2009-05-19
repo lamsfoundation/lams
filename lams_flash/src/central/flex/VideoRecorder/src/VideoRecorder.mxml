@@ -5,8 +5,7 @@
 	xmlns:local="*"
 	layout="absolute" width="100%" height="100%" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#FFFFFF, #FFFFFF]"
 	applicationComplete="onApplicationComplete(event)" 
-	preinitialize="onPreinitialize(event)">
-	
+	preinitialize="onPreinitialize(event)">	
 	<mx:Script>
 		<![CDATA[
 			import mx.core.UIComponent;
@@ -48,6 +47,7 @@
 			private var client:Object;
 			private var cam:Camera = null;
 			private var mic:Microphone = null;
+			private var alertCount:uint = 0;
 			
 			// static strings
 			private static var red5App:String = "oflaDemo";
@@ -88,19 +88,25 @@
 			private var addCommentPopUp:AddCommentPopUp;			
 			
 			// icon embeds
-			[Embed(source="../../../../../../lams_central/web/images/icons/control_play.png")] [Bindable] private var playIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/control_pause.png")] [Bindable] private var pauseIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/control_record.png")] [Bindable] private var recordIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/comment_add.png")] [Bindable] private var addCommentIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/exclamation.png")] [Bindable] private var exclamationIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/webcam.png")] [Bindable] private var webcamIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/arrow_refresh_small.png")] [Bindable] private var refreshIcon:Class;
+			[Embed(source="assets/images/control_play.png")] [Bindable] private var playIcon:Class;
+			[Embed(source="assets/images/control_pause.png")] [Bindable] private var pauseIcon:Class;
+			[Embed(source="assets/images/control_record.png")] [Bindable] private var recordIcon:Class;
+			[Embed(source="assets/images/comment_add.png")] [Bindable] private var addCommentIcon:Class;
+			[Embed(source="assets/images/exclamation.png")] [Bindable] private var exclamationIcon:Class;
+			[Embed(source="assets/images/webcam.png")] [Bindable] private var webcamIcon:Class;
+			[Embed(source="assets/images/arrow_refresh_small.png")] [Bindable] private var refreshIcon:Class;
 			
 			// constants
 			public const TEACHER_MODE:String = "teacher";
 			public const AUTHOR_MODE:String = "author";
 			public const LEARNER_MODE:String = "learner";
-							
+			
+			// general alert listener for cam/mic alerts on startup
+			private function alertListener(event:CloseEvent):void {
+            	alertCount--;
+            	if(alertCount == 0 && nc == null) createConnection(); 
+            }
+					
 			// called from preinitialize
 			private function onPreinitialize(event:Event):void {
 				// get flashvars
@@ -126,8 +132,8 @@
 					allowComments = true;
 					allowRatings = true;
 					allowLearnerVideoVisibility = true;
-					red5ServerUrl = "rtmp://172.20.100.22/";
-					serverUrl = "http://172.20.100.220:8080/lams/";
+					red5ServerUrl = "rtmp://videos.lamsinternational.com/";
+					serverUrl = "http://172.20.100.8:8080/lams/";
 					mode = AUTHOR_MODE;
 				}
 			}
@@ -165,41 +171,19 @@
 				
 				// if the cam is to be used, set that up
 				cam = VideoDisplayUtil.setupCamera();
-				if(allowUseCamera && cam){
-					videoDisplay.attachCamera(cam);
-				}
-				// if not allowed to record and no cam available or if just no cam available
-				else if((!allowUseCamera && !cam) || !cam){
-					// remove view camera amd show an alert
-					recordingButtonBox.removeChild(recordingButtonBox.getChildByName("viewCameraButton"));	
-					Alert.show(dictionary.getLabel("videorecorder.camera.not.available"));
-	
-				}
-				// just not allowed to record
-				else if(!allowUseCamera){
-					recordingButtonBox.removeChild(recordingButtonBox.getChildByName("viewCameraButton"));	
-				}
 				
 				// if the mic is to be used, set that up
 				mic = VideoDisplayUtil.setupMic();
-				if(allowUseVoice && mic){
-					videoDisplay.attachMic(mic);
-				}
-				// if no mic detected
-				else if(!mic){
-					// pop an alert
-					Alert.show(dictionary.getLabel("videorecorder.mic.not.available"));
-	
-				}
 				
-				// if neither mic or camera are to be used
-				if((!allowUseCamera && !allowUseVoice) || (!cam && !mic)){
-					// remove recording button
-					removeChild(getChildByName("recordingBox"));
-					
-					// stretch the video list
-					videoList.setStyle("bottom", 10);
-					videoList.invalidateList();
+				if(!checkCamera() || !checkMic()) {
+					if((!allowUseCamera && !allowUseVoice) || (!cam && !mic)) {
+						// remove recording button
+						removeChild(getChildByName("recordingBox"));
+						
+						// stretch the video list
+						videoList.setStyle("bottom", 10);
+						videoList.invalidateList();
+					}
 				}
 				
 				// if first time using video recorder, pop flash settings
@@ -224,8 +208,46 @@
 					startRecButton.enabled = false;
 				}
 				
-				// create the connection
-				createConnection();
+				// create the connection if no open alerts
+				if(alertCount <= 0)
+					createConnection();
+			}
+			
+			private function checkCamera():Boolean {
+				// if not allowed to record and no cam available or if just no cam available
+				if((!allowUseCamera && !cam) || !cam){
+					// remove view camera amd show an alert
+					recordingButtonBox.removeChild(recordingButtonBox.getChildByName("viewCameraButton"));	
+					
+					Alert.show(dictionary.getLabel("videorecorder.camera.not.available"), "", Alert.OK, Sprite(Application.application), alertListener);
+					alertCount++;
+					
+					return false;
+				}
+				// just not allowed to record
+				else if(!allowUseCamera){
+					recordingButtonBox.removeChild(recordingButtonBox.getChildByName("viewCameraButton"));	
+				} else {
+					videoDisplay.attachCamera(cam);
+				}
+				
+				return true;
+			}
+			
+			private function checkMic():Boolean {
+				if(allowUseVoice && mic){
+					videoDisplay.attachMic(mic);
+				}
+				// if no mic detected
+				else if(!mic){
+					// pop an alert
+					Alert.show(dictionary.getLabel("videorecorder.mic.not.available"), "", Alert.OK, Sprite(Application.application), alertListener);
+					alertCount++;
+					
+					return false;
+				}
+				
+				return true;
 			}
 			
 			// gets flashvars from request

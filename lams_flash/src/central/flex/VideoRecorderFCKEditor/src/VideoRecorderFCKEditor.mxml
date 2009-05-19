@@ -9,6 +9,7 @@
 		
 	<mx:Script>
 		<![CDATA[
+			import mx.events.CloseEvent;
 			import mx.core.UIComponent;
 			import org.lamsfoundation.lams.common.managers.LamsAjaxOverlayManager;
 			import org.lamsfoundation.lams.common.conn.ImageService;
@@ -59,6 +60,7 @@
 			private var mic:Microphone;
 			private var languageTimer:Timer;
 			private var getDetailsPopUp:GetRecordingDetailsPopUp;
+			private var alertCount:uint = 0;
 			
 			// static strings
 			private static var red5App:String = "oflaDemo";
@@ -68,10 +70,10 @@
 			private static var flvExtension:String = ".flv";
 			
 			// icon embeds
-			[Embed(source="../../../../../../lams_central/web/images/icons/control_play.png")] [Bindable] private var playIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/control_pause.png")] [Bindable] private var pauseIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/control_record.png")] [Bindable] private var recordIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/accept.png")] [Bindable] private var saveIcon:Class;
+			[Embed(source="assets/images/control_play.png")] [Bindable] private var playIcon:Class;
+			[Embed(source="assets/images/control_pause.png")] [Bindable] private var pauseIcon:Class;
+			[Embed(source="assets/images/control_record.png")] [Bindable] private var recordIcon:Class;
+			[Embed(source="assets/images/accept.png")] [Bindable] private var saveIcon:Class;
 			
 			// called first of all, before any components are initialized
 			private function onPreinitialize(event:Event):void{
@@ -98,6 +100,12 @@
 				// add the control bar now, before the panel is added, so the control bar is anchored
 				videoDisplayPanel.addChild(videoControlBar);
 			}
+			
+			// general alert listener for cam/mic alerts on startup
+			private function alertListener(event:CloseEvent):void {
+            	alertCount--;
+            	if(alertCount == 0 && nc == null) createConnection(); 
+            }
 			
 			// called after everything is created and ready to go
 			private function onApplicationComplete(event:Event):void {
@@ -176,29 +184,18 @@
 						// set up camera
 						cam = VideoDisplayUtil.setupCamera();
 
-						if(cam){
-							videoDisplay.attachCamera(cam);
-						}
-						else{
-							Alert.show(dictionary.getLabel("videorecorder.camera.not.available"));
-						}
-						
 						// set up mic
 						mic = VideoDisplayUtil.setupMic();
 						
-						if(mic){
-							videoDisplay.attachMic(mic);
-						}
-						else{
-							Alert.show(dictionary.getLabel("videorecorder.mic.not.available"));
-						}
-						
-						// don't allow recording if neither cam nor mic is enabled
-						if(!mic && !cam){
-							videoControlBar.recordButton.enabled = false;
+						if(!checkCamera() && !checkMic()) {
+							// don't allow recording if neither cam nor mic is enabled
+							if(!mic && !cam){
+								videoControlBar.recordButton.enabled = false;
+							}
 						}
 						
-						createConnection();
+						if(alertCount <= 0) createConnection();
+						
 						break;
 					}
 					/*
@@ -217,34 +214,48 @@
 						
 						// set up camera
 						cam = VideoDisplayUtil.setupCamera();
-
-						if(cam){
-							videoDisplay.attachCamera(cam);
-						}
-						else{
-							Alert.show(dictionary.getLabel("videorecorder.camera.not.available"));
-						}
 						
 						// set up mic
 						mic = VideoDisplayUtil.setupMic();
 						
-						if(mic){
-							videoDisplay.attachMic(mic);
-						}
-						else{
-							Alert.show(dictionary.getLabel("videorecorder.mic.not.available"));
-						}
-
-						// don't allow recording if neither cam nor mic is enabled
-						if(!mic && !cam){
-							videoControlBar.recordButton.enabled = false;
+						if(!checkCamera() && !checkMic()) {
+							// don't allow recording if neither cam nor mic is enabled
+							if(!mic && !cam){
+								videoControlBar.recordButton.enabled = false;
+							}
 						}
 						
-						createConnection();
+						if(alertCount <= 0) createConnection();
 
 						break;
 					}
 				}
+			}
+			
+			private function checkCamera():Boolean {
+				if(cam){
+					videoDisplay.attachCamera(cam);
+				}
+				else{
+					Alert.show(dictionary.getLabel("videorecorder.camera.not.available"), "", Alert.OK, Sprite(Application.application), alertListener);
+					alertCount++;
+					return false;
+				}
+				
+				return true;	
+			}
+			
+			private function checkMic():Boolean {
+				if(mic){
+					videoDisplay.attachMic(mic);
+				}
+				else{
+					Alert.show(dictionary.getLabel("videorecorder.mic.not.available"), "", Alert.OK, Sprite(Application.application), alertListener);
+					alertCount++;
+					return false;
+				}
+				
+				return true;
 			}
 						
 			// sets language xml, usually called at a later time through javascript

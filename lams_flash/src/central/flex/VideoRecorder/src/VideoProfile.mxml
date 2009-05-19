@@ -16,12 +16,12 @@
 			public var dictionary:XMLDictionary;
 			public var contentEditable:Boolean;
 		
-			[Embed(source="../../../../../../lams_central/web/images/icons/user.png")] [Bindable] private var userIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/date.png")] [Bindable] private var dateIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/pencil.png")] [Bindable] private var titleIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/note.png")] [Bindable] private var descriptionIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/icons/cross.png")] [Bindable] private var deleteIcon:Class;
-			[Embed(source="../../../../../../lams_central/web/images/customer_logo.gif")] [Bindable] private var lamsIcon:Class;
+			[Embed(source="assets/images/user.png")] [Bindable] private var userIcon:Class;
+			[Embed(source="assets/images/date.png")] [Bindable] private var dateIcon:Class;
+			[Embed(source="assets/images/pencil.png")] [Bindable] private var titleIcon:Class;
+			[Embed(source="assets/images/note.png")] [Bindable] private var descriptionIcon:Class;
+			[Embed(source="assets/images/cross.png")] [Bindable] private var deleteIcon:Class;
+			[Embed(source="assets/images/customer_logo.gif")] [Bindable] private var lamsIcon:Class;
 			
 			private function onCreationComplete():void{	
 				// add a tooltooltip
