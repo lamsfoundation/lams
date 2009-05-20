@@ -240,9 +240,6 @@ SectionGroup "LAMS ${VERSION} Update (Requires LAMS 2.0)" update
             ; Then Calls deploy tools 
             call createAndDeployTools
             
-            ;updates tool contexts for non-default tools
-            call insertCustomToolContexts
-            
             # update application.xml 
             call updateApplicationXML
             
@@ -1723,38 +1720,6 @@ Function createNewToolPackages
     # --------------------------------------------------------------------------
 
     ############################################################################
-
-FunctionEnd
-
-Function insertCustomToolContexts
-
-    # Running the ant scripts to update web.xmls and manifests
-    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-custom-tool-contexts.log" -buildfile "$TEMP\lams\update-deploy-tools.xml" -propertyfile $TEMP\lams\$TOOL_SIG\build.properties update-custom-tool-contexts'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    ${if} $0 == "error"
-    ${orif} $0 == 1
-        goto error
-    ${endif}
-    DetailPrint "Result: $1"
-    
-    push "$INSTDIR\update-logs\ant-update-custom-tool-contexts.log"
-    push "FAILED"
-    Call FileSearch
-    Pop $0 #Number of times found throughout
-    Pop $3 #Found at all? yes/no
-    Pop $2 #Number of lines found in
-    StrCmp $3 yes 0 +2
-        goto error
-    
-    goto done
-    error:
-        DetailPrint "Web.xml update failed"
-        MessageBox MB_OK|MB_ICONSTOP "Web.xml update failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
-        Abort "LAMS configuration failed"
-    done:
 
 FunctionEnd
 

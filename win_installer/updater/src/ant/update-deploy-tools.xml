@@ -32,86 +32,8 @@
 		
 	    <echo>Deploy packaqe for ${signature} created.</echo>
 	              
-	    </target>
-	
-	
-	
-	
-	
-	<!-- =================================================================== -->
-	<!-- Generate the deploy package                                         -->
-	<!-- =================================================================== -->
-	<!--
-	<target name="create-deploy-package" description="Generate the deployment package.">
-		<echo>Generating deploy.xml for ${signature}</echo>
-	
-		<path id="deploy.lib.classpath">
-			<fileset dir="${deploy.tool.dir}">
-				<include name="lib/*.jar"/>
-			</fileset>
-		</path> 
-
-		<taskdef name="generateDeployProperties" 
-			classname="org.lamsfoundation.lams.tool.deploy.CreateToolPackageTask">
-		    <classpath refid="deploy.lib.classpath"/>
-		</taskdef>
-
-		<generateDeployProperties 
-			mode="production" 
-			outputPath="${build.deploy}"
-			dbPassword="${db.password}"
-			dbUsername="${db.username}"
-			dbDriverUrl="${db.url}"
-			dbDriverClass="com.mysql.jdbc.Driver"
-			deployFiles="${build.deploy}/${product}.war,${build.deploy}/${product}.jar"
-			toolJarFileName="${product}.jar"
-			toolSignature="${signature}"
-			toolVersion="${tool.version}"
-			hideTool="${hideTool}"
-			minServerVersionNumber="${min.server.version.number}"
-			toolUpdateScriptPath="${build.deploy}/sql/updatescripts/updateTo${tool.version}.sql"
-			toolTablesScriptPath="${build.deploy}/sql/create_lams_tool_forum.sql" 
-			toolTablesDeleteScriptPath="${build.deploy}/sql/drop_lams_tool_forum.sql" 
-			toolActivityInsertScriptPath="${build.deploy}/sql/activity_insert.sql" 
-			toolLibraryInsertScriptPath="${build.deploy}/sql/library_insert.sql" 
-			toolInsertScriptPath="${build.deploy}/sql/tool_insert.sql" 
-			toolApplicationContextPath="/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml"
-			lamsEarPath="${jboss.deploy}"
-			toolContext="${toolContext}"
-			toolWebUri="${product}.war"
-			languageFilesPackage="${language.files.package}">
-
-			<fileset dir="${build.deploy}/language">
-				<include name="**/*.properties"/>
-				<include name="**/*.txt"/>
-			</fileset>
-				
-		</generateDeployProperties>
-		
-		<echo>Deploy packaqe for ${signature} created.</echo>
-			
-		
-		
 	</target>
-	-->
-	
-	<target name="update-custom-tool-contexts" description="Updates the web.xmls for the non-custom tools">
-        <echo>Updating web.xml and MANIFEST.MF for lams-central.war, lams-monitor.war and lams-learning.war. using for custom tools</echo>
-        <path id="deploy.lib.classpath">
-            <fileset dir="${deploy.tool.dir}">
-                <include name="lib/*.jar"/>
-            </fileset>
-        </path> 
-        
-        <java classname="org.lamsfoundation.lams.tool.deploy.AddCustomWebXmlContexts" classpathref="deploy.lib.classpath" fork="true">
-            <arg value="${jboss.deploy}" />
-            <arg value="${db.username}" />
-            <arg value="${db.password}" />
-            <arg value="${db.url}" />
-        </java> 
-    </target>
-	    
-	
+
 	<target name="update-application-xml" description="Adds java modules to application.xml">
 		<path id="deploy.lib.classpath">
 			<fileset dir="${deploy.tool.dir}">
