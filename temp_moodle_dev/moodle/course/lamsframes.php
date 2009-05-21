@@ -19,7 +19,7 @@
     	?>
         /*if there is no Id of the activity, because this is being editted */
     	document.write('<frameset rows="8%,*" >');
-		document.write('<frame name="button" src="lamsbuttons.php?<?php echo('&amp;lamsUpdateURL='.$lamsupdateurl.'&amp;returnUrl='.$returnurl.'&amp;isfinished='.$isfinished)?>"  scrolling="no" noresize>'); 
+		document.write('<frame name="button" src="lamsbuttons.php?<?php echo('&amp;lamsUpdateURL='.$lamsupdateurl.'&amp;returnUrl='.$returnurl.'&amp;isfinished='.$isfinished.'&is_learner='.$is_learner)?>"  scrolling="no" noresize>'); 
 	 	document.write('<frame name="contenido" src="<?php echo($CFG->wwwroot.'/'.$dest.'?add='.$add.'&course='.$courseid.'&section='.$section.'&is_learner='.$is_learner)?>" scrolling="yes" noresize>');
 		document.write('</frameset>');
     	

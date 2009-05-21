@@ -22,6 +22,7 @@
 		$lamsupdateurl = optional_param('lamsUpdateURL', PARAM_TEXT);
 		$returnurl   = optional_param('returnUrl', PARAM_TEXT);  // lams url to proceed to next in sequence 
 		$isfinished  = optional_param('isfinished',false, PARAM_TEXT); //if you have done the activity at least once the variable will be true
+		 $is_learner  = optional_param('is_learner', 0, PARAM_INT);//0 IF IS A LEARNER AND 1 IF IS A TEACHER
 	?> 		/* Function to display Next or Finish button in LAMS sequence*/
 			function toggle(id) {  
             	var state = document.getElementById(id).style.display;  
@@ -53,7 +54,7 @@
 	<div id="next">
 	<?php //Creates button that passes returnurl variable to be able to go to the Lams Next Activity
 		echo '<div align="right"><p><input id="nextbutton" type="button" value="Next Activity" onclick="window.parent.location=\''.$returnurl.'\'" /></p></div>';
-		if($isfinished=='true'){//if you have done the activity at least once let trhe Next Activity button appeare
+		if($isfinished=='true'||($is_learner==0&&$lamsupdateurl==null)){//if you have done the activity at least once let trhe Next Activity button appeare
 			echo('<script>');
 			echo('toggle("next");');
 			echo('</script>');
