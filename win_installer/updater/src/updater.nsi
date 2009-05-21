@@ -50,9 +50,9 @@
 # constants
 !define VERSION "2.3"
 !define PREVIOUS_VERSION "2.2"
-!define LANGUAGE_PACK_VERSION "2008-12-05"
-!define LANGUAGE_PACK_VERSION_INT "20081205"
-!define DATE_TIME_STAMP "200812050000"
+!define LANGUAGE_PACK_VERSION "2009-05-22"
+!define LANGUAGE_PACK_VERSION_INT "20090522"
+!define DATE_TIME_STAMP "200905220000"
 ######################## Added in the extra .0 for 2.3 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
@@ -60,7 +60,7 @@
 !define SOURCE_LAMS_EAR "${SOURCE_JBOSS_HOME}\server\default\deploy\lams.ear\"
 !define SOURCE_JBOSS_LIB "${SOURCE_JBOSS_HOME}\server\default\lib"
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
-!define BUILD_REPOSITORY "D:\repository"
+!define BUILD_REPOSITORY "C:\lams\repository"
 
 # project directories
 !define BASE_DIR "..\..\"

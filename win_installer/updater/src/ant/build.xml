@@ -81,7 +81,8 @@
 			url="jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?characterEncoding=UTF-8" 
 			userid="${DB_USER}" 
 			password="${DB_PASS}"
-			encoding="utf8">
+			encoding="utf8"
+			keepformat="true">
 			<transaction src="${TEMP}/dump.sql" />
 			<transaction src="${TEMP}/lams/update_lams_configuration.sql" />
 		</sql>
