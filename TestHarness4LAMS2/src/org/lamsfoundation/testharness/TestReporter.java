@@ -241,16 +241,25 @@ public class TestReporter {
 	    context.put("time", new SimpleDateFormat("HH:mm:ss dd MMM yyyy").format(new Date()));
 	    long total = 0;
 	    long count = 0;
+	    long joinLessonTotal = 0;
+	    long joinLessonCount = 0;
 	    for (CallRecord r : callRecords) {
 		if (r.getHttpStatusCode() != null && r.getHttpStatusCode().equals(new Integer("200"))) {
 		    total += r.getTimeInMillis();
 		    count++;
+		    // learning/learner.do?method=joinLesson
+		    if (r.getCallee().indexOf("learner.do?method=joinLesson") > 0) {
+		    	joinLessonTotal += r.getTimeInMillis();
+		    	joinLessonCount++;
+		    }
 		}
 	    }
 	    log.info("Total response time: "+total / 1000.0+" seconds");
 	    log.info("Average response time: "+total / 1000.0 /count+" seconds");
+	    log.info("Average response time of joinLesson calls: "+joinLessonTotal / 1000.0 / joinLessonCount+" seconds");
 	    context.put("totalResponseTime", total / 1000.0);
 	    context.put("averageResponseTime", total / 1000.0 / count);
+	    context.put("joinLessonAverageResponseTime", joinLessonTotal / 1000.0 / joinLessonCount);
 	}
 
 	static String load() throws IOException {
