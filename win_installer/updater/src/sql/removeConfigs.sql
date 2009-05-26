@@ -35,3 +35,6 @@ rename table lams_qtz_trigger_listeners to lams_qtz_TRIGGER_LISTENERS;
 update lams_configuration set config_value="" where config_key="Red5ServerUrl";
 update lams_configuration set config_value="" where config_key="Red5RecordingsUrl";
 
+-- From 2.3 onwards. Ensure video recorder tool is set to disabled
+update lams_learning_library set valid_flag=0 where title="VideoRecorder";
+

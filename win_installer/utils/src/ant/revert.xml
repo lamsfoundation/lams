@@ -9,7 +9,9 @@
 			url="jdbc:mysql://localhost/${DB_NAME}?characterEncoding=UTF-8" 
 			userid="${DB_USER}" 
 			password="${DB_PASS}"
-			encoding="utf8">
+			encoding="utf8"
+			keepformat="true"
+			>
 			<transaction src="${BACKUP_DIR}/dump.sql" />
 		</sql>
 	</target>

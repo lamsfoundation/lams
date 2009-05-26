@@ -60,7 +60,7 @@
 !define SOURCE_LAMS_EAR "${SOURCE_JBOSS_HOME}\server\default\deploy\lams.ear\"
 !define SOURCE_JBOSS_LIB "${SOURCE_JBOSS_HOME}\server\default\lib"
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
-!define BUILD_REPOSITORY "C:\lams\repository"
+!define BUILD_REPOSITORY "D:\repository"
 
 # project directories
 !define BASE_DIR "..\..\"
