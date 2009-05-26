@@ -12,7 +12,7 @@
 			userid="${DB_USER}" 
 			password="${DB_PASS}"
 			encoding="utf8"
-			onerror="abort"
+			onerror="abort" keepformat="true"
 			>
 			<transaction src="../sql-scripts/alter_23_lams_tool.sql" />
 		</sql>

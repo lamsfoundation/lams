@@ -19,7 +19,9 @@
   </deployFiles>
   <languageFiles>
     <string>@toolDeployPackageDir@/language/ApplicationResources.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_el_GR.properties</string>
     <string>@toolDeployPackageDir@/language/ApplicationResources_en_AU.properties</string>
+    <string>@toolDeployPackageDir@/language/ApplicationResources_no_NO.properties</string>
     <string>@toolDeployPackageDir@/language/ApplicationResources_ru_RU.properties</string>
   </languageFiles>
   <toolVersion>20090202</toolVersion>

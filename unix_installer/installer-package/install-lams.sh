@@ -421,6 +421,15 @@ mkdir -p $REPOSITORY_DIR
 cp -r repository/* $REPOSITORY_DIR
 cp -r secure/* $EAR_DIR/lams-www.war/secure
 
+# Add sample pixlr images to lams-www.war 
+echo "Adding sample pixlr images"
+ant/bin/ant -buildfile ant-scripts/configure-deploy.xml -logfile log/deploy-pixlr-images.log deploy-pixlr-images
+if [  "$?" -ne  "0" ]
+        then
+        echo "Install Failed. Problem while adding sample pixlr images, check log/deploy-pixlr-images.log for details."
+        installfailed
+fi
+
 # configure the wrapper
 printf "\nConfiguring the java Wrapper\n"
 configureWrapper

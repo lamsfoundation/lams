@@ -37,6 +37,7 @@ create table tl_lavidr10_videoRecorder (
 	content_in_use bit,
 	define_later bit,
 	tool_content_id bigint,
+	author_recording_id bigint,
 	allow_use_voice bit,
 	allow_use_camera bit,
 	allow_learner_video_visibility bit,
@@ -55,6 +56,7 @@ create table tl_lavidr10_session (
 	status integer, session_id bigint,
 	session_name varchar(250),
 	videoRecorder_uid bigint,
+	content_folder_id varchar(32),
 	primary key (uid)
 )type=innodb;
 
@@ -68,6 +70,7 @@ create table tl_lavidr10_recording (
 	description varchar(1027),
 	rating float,
 	filename varchar(255),
+	is_local bit,
 	is_just_sound bit,
 	videoRecorder_session_uid bigint,
 	primary key (uid)

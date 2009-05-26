@@ -16,3 +16,6 @@ update lams_learning_library set valid_flag=0 where title="Dimdim";
 delete from lams_qtz_SIMPLE_TRIGGERS;
 delete from lams_qtz_TRIGGERS;
 delete from lams_qtz_JOB_DETAILS;
+
+-- From 2.3 onwards. Ensure videorecorder tool is set to disabled
+update lams_learning_library set valid_flag=0 where title="VideoRecorder";

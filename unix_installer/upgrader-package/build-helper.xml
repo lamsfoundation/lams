@@ -11,11 +11,9 @@
 		<ant antfile="${WORKSPACE}/lams_build/build.xml" target="lams-cruise" inheritall="false">
 		</ant>
 
-		<!-- since dimdim is not part of standard build, we need to deploy it -->
-		<ant antfile="${WORKSPACE}/lams_tool_dimdim/build.xml" target="deploy-tool" inheritall="false">
-		</ant>
-
 		<antcall target="setup-assembly-folder">
+		</antcall>
+		<antcall target="remove-new-tools-from-assembly">
 		</antcall>
 		<antcall target="build-new-tools">
 		</antcall>
@@ -37,13 +35,12 @@
 
 	<target name="setup-assembly-folder">
 
-		<!-- Remove existing lams.ear folder -->
+		<!-- Remove files from assembly folder -->
 		<delete includeemptydirs="true" verbose="true">
 			<fileset dir="${basedir}/assembly/">
 				<include name="lams.ear/*" />
 				<include name="lams-session.jar" />
 				<include name="lams-valve.jar" />
-				<include name="**/*" />
 			</fileset>
 		</delete>
 
@@ -61,6 +58,16 @@
 				<include name="lams-session.jar" />
 			</fileset>
 		</copy>
+
+		<!-- ensure secure folder is empty -->
+		<delete includeemptydirs="true">
+			<fileset dir="${basedir}/assembly/lams.ear/lams-www.war/secure" includes="**/*" />
+		</delete>
+
+		<!-- remove news.html -->
+		<delete file="${basedir}/assembly/lams.ear/lams-www.war/news.html">
+		</delete>
+
 	</target>
 
 	<target name="build-new-tools">
@@ -91,16 +98,50 @@
 
 	<target name="update-language-pack-libraries">
 		<delete includeemptydirs="true" verbose="true">
-			<fileset dir="${basedir}/language-pack/library/" defaultexcludes="off">
+			<fileset dir="${basedir}/language-pack/library/">
 				<include name="**/*" />
 			</fileset>
 		</delete>
 
-		<copy todir="${basedir}/language-pack/library/" verbose="true">
-			<fileset dir="${WORKSPACE}/lams_build/librarypackages/">
-				<include name="**/*" />
+		<copy todir="${basedir}/language-pack/library/chatscribe" verbose="true">
+			<fileset dir="${WORKSPACE}/lams_build/librarypackages/chatscribe/language/lams">
+				<include name="*.properties" />
 			</fileset>
 		</copy>
+		
+		<copy todir="${basedir}/language-pack/library/forumscribe" verbose="true">
+			<fileset dir="${WORKSPACE}/lams_build/librarypackages/forumscribe/language/lams">
+				<include name="*.properties" />
+			</fileset>
+		</copy>
+				
+		<copy todir="${basedir}/language-pack/library/shareresourcesforum" verbose="true">
+			<fileset dir="${WORKSPACE}/lams_build/librarypackages/shareresourcesforum/language/lams">
+				<include name="*.properties" />
+			</fileset>
+		</copy>		
+		
+	</target>
+
+	<target name="remove-new-tools-from-assembly">
+		<delete>
+			<fileset dir="${basedir}/assembly/lams.ear">
+				<include name="lams-tool-laasse10.jar" />
+				<include name="lams-tool-laasse10.war" />
+
+				<include name="lams-tool-laimag10.jar" />
+				<include name="lams-tool-laimag10.war" />
+
+				<include name="lams-tool-lamind10.jar" />
+				<include name="lams-tool-lamind10.war" />
+
+				<include name="lams-tool-lapixl10.jar" />
+				<include name="lams-tool-lapixl10.war" />
+
+				<include name="lams-tool-lavidr10.jar" />
+				<include name="lams-tool-lavidr10.war" />
+			</fileset>
+		</delete>
 	</target>
 
 </project>

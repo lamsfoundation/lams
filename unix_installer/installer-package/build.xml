@@ -51,6 +51,7 @@
 			<arg line="readme" />
 			<arg line="license" />
 			<arg line="lams.properties" />
+			<arg line="images" />
 			<arg line="${PACKAGE-ROOT}" />
 		</exec>
 		

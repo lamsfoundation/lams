@@ -293,19 +293,4 @@
 		</java>
 	</target>
 
-	<target name="update-tool-context">
-		<echo>Updating web.xml and MANIFEST.MF for lams-central.war, lams-monitor.war and lams-learning.war. using config from ${build.deploy}/deploy.xml</echo>
-
-		<path id="deploy.lib.classpath">
-			<fileset dir="${deploy.tool.dir}">
-				<include name="lib/*.jar" />
-			</fileset>
-		</path>
-
-		<java classname="org.lamsfoundation.lams.tool.deploy.UpdateToolContextPath" classpathref="deploy.lib.classpath" fork="true">
-			<arg file="${build.deploy}/deploy.xml" />
-		</java>
-	</target>
-
-
 </project>

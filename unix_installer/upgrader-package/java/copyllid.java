@@ -96,9 +96,9 @@ public class copyllid
 			run.exec("mkdir " + forumScribe);
 			
 
-			copyFiles("../language-pack/library/ChatAndScribe/", chatScribe);
-			copyFiles("../language-pack/library/ForumAndScribe/", forumScribe);
-			copyFiles("../language-pack/library/ResourcesAndForum/", resourceForum);
+			copyFiles("../language-pack/library/chatscribe/", chatScribe);
+			copyFiles("../language-pack/library/forumscribe/", forumScribe);
+			copyFiles("../language-pack/library/shareresourcesforum/", resourceForum);
 		}
 		catch (IOException e)
 		{

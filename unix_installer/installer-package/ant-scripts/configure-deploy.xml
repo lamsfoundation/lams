@@ -170,6 +170,16 @@
 			</fileset>
 		</copy>
 	</target>
+	
+	<target name="deploy-pixlr-images" description="Adds pixlr images to lams-www.war/images/pixlr">
+		<!-- Add pixlr images to lams-www.war/images/pixlr -->
+		<mkdir dir="${EAR_DIR}/lams-www.war/images/pixlr"/>
+		<copy todir="${EAR_DIR}/lams-www.war/images/pixlr" verbose="true">
+			<fileset dir="${basedir}/images/pixlr/">
+				<include name="**/*"/>
+			</fileset>	
+		</copy>
+	</target>
 
 </project>
 

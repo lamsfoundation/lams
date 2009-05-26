@@ -176,7 +176,7 @@
             userid="${DB_USER}" 
             password="${DB_PASS}"
             encoding="utf8"
-            onerror="abort"
+            onerror="abort" keepformat="true"
             >
             <transaction src="../sql-scripts/updateLocales.sql" />
         </sql>
@@ -201,7 +201,7 @@
     </target>
     	
     <target name="deploy-new-tools" description="Deploys any new tools added for this updater, must be updated for each release">
-    	<antcall target="explode-wars"/>
+    	<!--<antcall target="explode-wars"/>-->
     	
     	<echo>Deploying new tools</echo>
     	
@@ -223,7 +223,7 @@
     	</antcall>
     	<!-- ============= 2.3 Tools ============== -->
     	
-    	<antcall target="compress-wars"/>
+    	<!--<antcall target="compress-wars"/>-->
     </target>
     	
 	<target name="deploy-new-tool" description="Fully deploys a tool">
@@ -249,8 +249,8 @@
 	
 	<target name="update-2.3-specific" description="Does updates specific to 2.3, delete after 2.3">
 		<!-- Add pixlr dir to lams-www -->
-		<mkdir dir="${EAR_DIR}/lams-www/images/pixlr"/>
-		<copy file="../tools/lapixl10/blank.jpg" todir="${EAR_DIR}/lams-www.war/images/pixlr"/>
+		<mkdir dir="${EAR_DIR}/lams-www.war/images/pixlr"/>
+		<copy file="../tools/lapixl10/blank.jpg" todir="${EAR_DIR}/lams-www.war/images/pixlr" verbose="true"/>
 	</target>	
 
     <target name="set-lams-configuration" description="Updates the lams_configuration table with all the settings from lams.properties">
@@ -260,7 +260,7 @@
             userid="${DB_USER}" 
             password="${DB_PASS}"
             encoding="utf8"
-            onerror="abort"
+            onerror="abort" keepformat="true"
             >
             <transaction src="../sql-scripts/setLamsConfiguration.sql" />
         </sql>

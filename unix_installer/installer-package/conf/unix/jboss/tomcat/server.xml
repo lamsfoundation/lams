@@ -9,7 +9,7 @@
       className="org.jboss.web.tomcat.tc5.StandardService">
 
       <!-- A HTTP/1.1 Connector on port 8080 -->
-      <Connector port="@LAMS_PORT@" address="${jboss.bind.address}"
+      <Connector port="8080" address="${jboss.bind.address}"
          maxThreads="250" strategy="ms" maxHttpHeaderSize="8192"
          emptySessionPath="true"
          enableLookups="false" redirectPort="8443" acceptCount="100"

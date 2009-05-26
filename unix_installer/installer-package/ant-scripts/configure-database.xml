@@ -23,7 +23,7 @@
 			userid="root" 
 			password="${DB_ROOT_PASSWORD}"
 			encoding="utf8"
-			onerror="continue">
+			onerror="continue" keepformat="true">
 			<transaction src="../database/create-database.sql" />
                 </sql>
 
@@ -37,7 +37,7 @@
                         userid="${DB_USER}"
                         password="${DB_PASS}"
                         encoding="utf8"
-                        onerror="continue">
+                        onerror="continue" keepformat="true">
                         <transaction src="../database/dump.sql" />
 						<transaction src="../sql-scripts/removeConfigs.sql"/>
                         <transaction src="../sql-scripts/setLamsConfiguration.sql"/>
