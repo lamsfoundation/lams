@@ -142,6 +142,8 @@ update210to211 () {
 update () {
     rm -rf /var/cache/jboss/tmp/*
     rm -rf /var/cache/jboss/work/*
+    cp -p /usr/share/lams2/tmp/news.html /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-www.war/
+    rm -Rf /usr/share/lams2/tmp/
 }
 
 case "$1" in
@@ -248,8 +250,7 @@ case "$1" in
                         where user_id=1" \
                         -u root -p$db_root_pass || true
                     mysql $db_name -e "update lams_user \
-                        set password=sha1('$sysadmin_pass') \
-                        where user_id=1" \
+                        set password=sha1('$sysadmin_pass')" \
                         -u root -p$db_root_pass || true
                     mysql $db_name -e "update lams_configuration \
                         set config_value='/var/lib/lams/repository' \
@@ -285,8 +286,7 @@ case "$1" in
                         where user_id=1" \
                         -u root || true
                     mysql $db_name -e "update lams_user \
-                        set password=sha1('$sysadmin_pass') \
-                        where user_id=1" \
+                        set password=sha1('$sysadmin_pass')" \
                         -u root || true
                     mysql $db_name -e "update lams_configuration \
                         set config_value='/var/lib/lams/repository' \
