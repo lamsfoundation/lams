@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoice;
-import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceConfigItem;
 import org.lamsfoundation.lams.tool.mdchce.service.IMdlChoiceService;
 import org.lamsfoundation.lams.tool.mdchce.service.MdlChoiceServiceProxy;
 import org.lamsfoundation.lams.tool.mdchce.util.MdlChoiceConstants;
@@ -64,7 +63,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public IMdlChoiceService mdlChoiceService;
 
-  //public static final String RELATIVE_MOODLE_AUTHOR_URL =  "/course/modedit-lams.php?";
+    //public static final String RELATIVE_MOODLE_AUTHOR_URL =  "/course/modedit-lams.php?";
     public static final String RELATIVE_MOODLE_AUTHOR_URL = "course/lamsframes.php?";
     public static final String MOODLE_EDIT_URL = "course/modedit-lams.php";
 
@@ -108,12 +107,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	String userFromCSV = null;
 	String courseFromCSV = null;
 	String sectionFromCSV = null;
+	String extLmsIdFromCSV = null;
 	if (customCSV == null && mdlChoice == null) {
 	    logger.error("CustomCSV required if mdlChoice is null");
 	    throw new ToolException("CustomCSV required if mdlChoice is null");
 	} else if (customCSV != null) {
 	    String splitCSV[] = customCSV.split(",");
-	    if (splitCSV.length != 3) {
+	    if (splitCSV.length != 4) {
 		logger.error("mdlChoice tool customCSV not in required (user,course,courseURL) form: " + customCSV);
 		throw new ToolException("mdlChoice tool cusomCSV not in required (user,course,courseURL) form: "
 			+ customCSV);
@@ -121,6 +121,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		userFromCSV = splitCSV[0];
 		courseFromCSV = splitCSV[1];
 		sectionFromCSV = splitCSV[2];
+		extLmsIdFromCSV = splitCSV[3];
 	    }
 	}
 
@@ -129,6 +130,14 @@ public class AuthoringAction extends LamsDispatchAction {
 	    mdlChoice.setExtUsername(userFromCSV);
 	    mdlChoice.setExtCourseId(courseFromCSV);
 	    mdlChoice.setExtSection(sectionFromCSV);
+	    mdlChoice.setCreateDate(new Date());
+	}
+
+	if (mdlChoice.getExtLmsId() == null) {
+	    mdlChoice.setExtUsername(userFromCSV);
+	    mdlChoice.setExtCourseId(courseFromCSV);
+	    mdlChoice.setExtSection(sectionFromCSV);
+	    mdlChoice.setExtLmsId(extLmsIdFromCSV);
 	    mdlChoice.setCreateDate(new Date());
 	}
 
@@ -143,25 +152,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	// if no external content id, open the mdl author page, otherwise, open the edit page
 	try {
 
-	    // If the mdlChoice has a saved course url, use it, otherwise use the one giving in the request in customCSV
-	    //String courseUrlToBeUsed = (mdlChoice.getExtCourseUrl() != null) ? mdlChoice.getExtCourseUrl() : courseUrlFromCSV;
+	    String responseUrl = mdlChoiceService.getExtServerUrl(mdlChoice.getExtLmsId());
 
-	   String responseUrl = mdlChoiceService.getConfigItem(MdlChoiceConfigItem.KEY_EXTERNAL_SERVER_URL)
-		    .getConfigValue();		
-		
-		 responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
-		    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
-			    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
-		    
-		    
-		    returnUpdateUrl = URLEncoder.encode(returnUpdateUrl, "UTF8");
-		    
-		    responseUrl += "lamsUpdateURL=" + returnUpdateUrl;
-		    
-		    String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_EDIT_URL, "UTF8");
-		    
-		    responseUrl += "&dest=" + encodedMoodleRelativePath ;
-	    
+	    responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
+	    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
+		    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
+
+	    returnUpdateUrl = URLEncoder.encode(returnUpdateUrl, "UTF8");
+
+	    responseUrl += "lamsUpdateURL=" + returnUpdateUrl;
+
+	    String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_EDIT_URL, "UTF8");
+
+	    responseUrl += "&dest=" + encodedMoodleRelativePath;
 
 	    if (mdlChoice.getExtSection() != null) {
 		responseUrl += "&section=" + mdlChoice.getExtSection();
@@ -206,9 +209,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	mdlChoiceService.saveOrUpdateMdlChoice(mdlChoice);
 
 	String redirectString = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
-		+ MdlChoiceConstants.TOOL_SIGNATURE + "/clearsession.do" + "?action=confirm&mode=author" + "&signature="
-		+ MdlChoiceConstants.TOOL_SIGNATURE + "&toolContentID=" + toolContentID.toString() + "&defineLater=no"
-		+ "&customiseSessionID=" + "&contentFolderID=0";
+		+ MdlChoiceConstants.TOOL_SIGNATURE + "/clearsession.do" + "?action=confirm&mode=author"
+		+ "&signature=" + MdlChoiceConstants.TOOL_SIGNATURE + "&toolContentID=" + toolContentID.toString()
+		+ "&defineLater=no" + "&customiseSessionID=" + "&contentFolderID=0";
 
 	log.debug("Manual redirect for MdlChoice to: " + redirectString);
 

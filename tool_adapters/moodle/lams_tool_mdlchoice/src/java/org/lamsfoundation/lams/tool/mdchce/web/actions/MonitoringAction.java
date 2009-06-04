@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mdchce.dto.MdlChoiceDTO;
 import org.lamsfoundation.lams.tool.mdchce.dto.MdlChoiceSessionDTO;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoice;
-import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceConfigItem;
 import org.lamsfoundation.lams.tool.mdchce.service.IMdlChoiceService;
 import org.lamsfoundation.lams.tool.mdchce.service.MdlChoiceServiceProxy;
 import org.lamsfoundation.lams.tool.mdchce.util.MdlChoiceConstants;
@@ -90,8 +89,9 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	for (MdlChoiceSessionDTO sessionDTO : mdlChoiceDT0.getSessionDTOs()) {
 	    try {
-		String responseUrl = mdlChoiceService.getConfigItem(MdlChoiceConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
+		
+		String responseUrl = mdlChoiceService.getExtServerUrl(mdlChoice.getExtLmsId());
+		
 		responseUrl += RELATIVE_MONITOR_URL;
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="

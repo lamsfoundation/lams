@@ -40,7 +40,6 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mdchce.dto.MdlChoiceDTO;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoice;
-import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceConfigItem;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceSession;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceUser;
 import org.lamsfoundation.lams.tool.mdchce.service.IMdlChoiceService;
@@ -91,7 +90,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	// Retrieve the session and content.
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, false);
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 	MdlChoiceSession mdlChoiceSession = mdlChoiceService.getSessionBySessionId(toolSessionID);
 	if (mdlChoiceSession == null) {
 	    throw new MdlChoiceException("Cannot retreive session with toolSessionID: " + toolSessionID);
@@ -120,31 +119,26 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	if (mdlChoice.getExtToolContentId() != null) {
-		 try {
-				String responseUrl = mdlChoiceService.getConfigItem(MdlChoiceConfigItem.KEY_EXTERNAL_SERVER_URL)
-					.getConfigValue();
-				
-				if(mode.equals(ToolAccessMode.TEACHER))
-				{
-					responseUrl += RELATIVE_TEACHER_URL;
-				}
-				else if (mode.equals(ToolAccessMode.LEARNER)|| mode.equals(ToolAccessMode.AUTHOR))
-				{
-					responseUrl += RELATIVE_LEARNER_URL;
-				}
+	    try {
+		String responseUrl = mdlChoiceService.getExtServerUrl(mdlChoice.getExtLmsId());
+
+		if (mode.equals(ToolAccessMode.TEACHER)) {
+		    responseUrl += RELATIVE_TEACHER_URL;
+		} else if (mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR)) {
+		    responseUrl += RELATIVE_LEARNER_URL;
+		}
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ toolSessionID.toString() + "&dispatch=finishActivity";
-		
+
 		String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_VIEW_URL, "UTF8");
 
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
-		
 
-		responseUrl += "&id=" + mdlChoiceSession.getExtSessionId() + "&returnUrl=" + returnUrl
-			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1" + "&isFinished=" + mdlChoiceUser.isFinishedActivity();
-		
-		
+		responseUrl += "&id=" + mdlChoiceSession.getExtSessionId() + "&returnUrl=" + returnUrl + "&dest="
+			+ encodedMoodleRelativePath + "&is_learner=1" + "&isFinished="
+			+ mdlChoiceUser.isFinishedActivity();
+
 		log.debug("Redirecting for mdl choice learner: " + responseUrl);
 		response.sendRedirect(responseUrl);
 	    } catch (Exception e) {
@@ -160,8 +154,8 @@ public class LearningAction extends LamsDispatchAction {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	MdlChoiceUser mdlChoiceUser = mdlChoiceService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
-		toolSessionId);
+	MdlChoiceUser mdlChoiceUser = mdlChoiceService.getUserByUserIdAndSessionId(
+		new Long(user.getUserID().intValue()), toolSessionId);
 
 	if (mdlChoiceUser == null) {
 	    MdlChoiceSession mdlChoiceSession = mdlChoiceService.getSessionBySessionId(toolSessionId);

@@ -113,6 +113,15 @@
             length="255"
         />
 
+        <property
+            name="extLmsId"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="ext_lms_id"
+            length="255"
+        />
+
         <set
             name="mdlChoiceSessions"
             lazy="true"

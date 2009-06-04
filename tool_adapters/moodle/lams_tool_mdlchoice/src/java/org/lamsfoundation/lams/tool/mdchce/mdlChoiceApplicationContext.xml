@@ -19,10 +19,9 @@
 				<property name="mdlChoiceSessionDAO"><ref bean="mdlChoiceSessionDAO"/></property>
 				<property name="mdlChoiceUserDAO"><ref bean="mdlChoiceUserDAO"/></property>
 				<property name="mdlChoiceDAO"><ref bean="mdlChoiceDAO"/></property>
-				<property name="mdlChoiceConfigItemDAO"><ref bean="mdlChoiceConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property> 	
-				<!--<property name="integrationService"><ref bean="integrationService"/></property>-->
+				<property name="integrationService"><ref bean="integrationService"/></property>
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="mdlChoiceToolContentHandler"><ref bean="mdlChoiceToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
@@ -56,10 +55,6 @@
 	<bean id="mdlChoiceDAO" class="org.lamsfoundation.lams.tool.mdchce.dao.hibernate.MdlChoiceDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
-	
-	<bean id="mdlChoiceConfigItemDAO" class="org.lamsfoundation.lams.tool.mdchce.dao.hibernate.MdlChoiceConfigItemDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean> 
 
 	<bean id="mdlChoiceSessionDAO" class="org.lamsfoundation.lams.tool.mdchce.dao.hibernate.MdlChoiceSessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>

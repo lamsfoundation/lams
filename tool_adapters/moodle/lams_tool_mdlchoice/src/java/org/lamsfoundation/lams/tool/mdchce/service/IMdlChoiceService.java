@@ -25,10 +25,11 @@
 package org.lamsfoundation.lams.tool.mdchce.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoice;
-import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceConfigItem;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceSession;
 import org.lamsfoundation.lams.tool.mdchce.model.MdlChoiceUser;
 import org.lamsfoundation.lams.tool.mdchce.util.MdlChoiceException;
@@ -97,21 +98,6 @@ public interface IMdlChoiceService {
     public void saveOrUpdateMdlChoiceSession(MdlChoiceSession mdlChoiceSession);
 
     /**
-     * Get the mdlChoice config item by key
-     * 
-     * @param key
-     * @return
-     */
-    public MdlChoiceConfigItem getConfigItem(String key);
-
-    /**
-     * Save a mdl configItem
-     * 
-     * @param item
-     */
-    public void saveOrUpdateMdlChoiceConfigItem(MdlChoiceConfigItem item);
-
-    /**
      * 
      * @param userId
      * @param toolSessionId
@@ -125,13 +111,6 @@ public interface IMdlChoiceService {
      * @return
      */
     public MdlChoiceUser getUserByUID(Long uid);
-
-    /**
-     * Gets the external organisation map for this tool adapter
-     * 
-     * @return
-     */
-    public ExtServerOrgMap getExtServerOrgMap();
 
     /**
      * Creates a hash for talking to the external server
@@ -173,8 +152,8 @@ public interface IMdlChoiceService {
      * @param toolSessionId
      * @return
      */
-    public boolean getExternalToolOutputBoolean(String outputName, MdlChoice mdlChoice, Long userId, String extToolContentId,
-	    Long toolSessionId, String choiceID);
+    public boolean getExternalToolOutputBoolean(String outputName, MdlChoice mdlChoice, Long userId,
+	    String extToolContentId, Long toolSessionId, String choiceID);
 
     /**
      * Converts the customCSV parameter into a hashmap
@@ -187,8 +166,8 @@ public interface IMdlChoiceService {
     /**
      * Constructs a parameter hashmap to be used for the default parameters
      * required by the external LMS tool adapter servlet. For instance in
-     * mdlChoice, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * mdlChoice, this constructs the following: { ["un", username], ["cs",
+     * course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param mdlChoice
      * @return
@@ -198,12 +177,41 @@ public interface IMdlChoiceService {
     /**
      * Constructs a parameter hashmap based off customCSV to be used for the
      * default parameters required by the external LMS tool adapter servlet. For
-     * instance in mdlChoice, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * instance in mdlChoice, this constructs the following: { ["un", username],
+     * ["cs", course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param user
      * @param course
      * @return
      */
     public HashMap<String, String> getRequiredExtServletParams(String customCSV);
+
+    /**
+     * Gets a list of all external servers
+     * 
+     * @return
+     */
+    public List<ExtServerOrgMap> getExtServerList();
+
+    /**
+     * Gets a list of servers mapped to this tool adapter
+     * 
+     * @return
+     */
+    public List<ExtServerToolAdapterMap> getMappedServers();
+
+    /**
+     * Save all the mapped servers
+     * 
+     * @param mappableServers
+     */
+    public void saveServerMappings(String[] mappableServers);
+
+    /**
+     * Gets an external server url given the extLmsId
+     * 
+     * @param extLmsId
+     * @return
+     */
+    public String getExtServerUrl(String extLmsId);
 }
