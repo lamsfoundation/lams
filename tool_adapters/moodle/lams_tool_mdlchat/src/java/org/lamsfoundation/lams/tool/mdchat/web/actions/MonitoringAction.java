@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mdchat.dto.MdlChatDTO;
 import org.lamsfoundation.lams.tool.mdchat.dto.MdlChatSessionDTO;
 import org.lamsfoundation.lams.tool.mdchat.model.MdlChat;
-import org.lamsfoundation.lams.tool.mdchat.model.MdlChatConfigItem;
 import org.lamsfoundation.lams.tool.mdchat.service.IMdlChatService;
 import org.lamsfoundation.lams.tool.mdchat.service.MdlChatServiceProxy;
 import org.lamsfoundation.lams.tool.mdchat.util.MdlChatConstants;
@@ -90,15 +89,16 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	for (MdlChatSessionDTO sessionDTO : mdlChatDT0.getSessionDTOs()) {
 	    try {
-		String responseUrl = mdlChatService.getConfigItem(MdlChatConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
+		String responseUrl = mdlChatService.getExtServerUrl(mdlChat.getExtLmsId());
+		
 		responseUrl += RELATIVE_MONITOR_URL;
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ sessionDTO.getSessionID().toString() + "&dispatch=finishActivity";
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
 
-		responseUrl += "&update=" + sessionDTO.getExtSessionID() + "&id=" + sessionDTO.getExtSessionID() + "&returnUrl=" + returnUrl;
+		responseUrl += "&update=" + sessionDTO.getExtSessionID() + "&id=" + sessionDTO.getExtSessionID()
+			+ "&returnUrl=" + returnUrl;
 
 		sessionDTO.setRunTimeUrl(responseUrl);
 	    } catch (UnsupportedEncodingException e) {

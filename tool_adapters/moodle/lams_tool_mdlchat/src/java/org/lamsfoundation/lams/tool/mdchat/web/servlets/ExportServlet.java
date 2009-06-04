@@ -41,10 +41,9 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mdchat.dto.MdlChatDTO;
 import org.lamsfoundation.lams.tool.mdchat.model.MdlChat;
-import org.lamsfoundation.lams.tool.mdchat.model.MdlChatConfigItem;
 import org.lamsfoundation.lams.tool.mdchat.model.MdlChatSession;
-import org.lamsfoundation.lams.tool.mdchat.service.MdlChatServiceProxy;
 import org.lamsfoundation.lams.tool.mdchat.service.IMdlChatService;
+import org.lamsfoundation.lams.tool.mdchat.service.MdlChatServiceProxy;
 import org.lamsfoundation.lams.tool.mdchat.util.MdlChatException;
 import org.lamsfoundation.lams.tool.mdchat.util.WebUtility;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -166,8 +165,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private void exportFileFromExternalServer(HttpServletRequest request, HttpServletResponse response,
 	    Long extToolSessionId, MdlChat mdlChat, String fullPath) throws Exception {
-	String exportPortFolioServletUrl = mdlChatService.getConfigItem(MdlChatConfigItem.KEY_EXTERNAL_TOOL_SERVLET)
-		.getConfigValue();
+	String exportPortFolioServletUrl = mdlChatService.getExtServerUrl(mdlChat.getExtLmsId());
 
 	String extUsername = "user"; // setting user to arbitrary values since they are only used to construct the hash
 

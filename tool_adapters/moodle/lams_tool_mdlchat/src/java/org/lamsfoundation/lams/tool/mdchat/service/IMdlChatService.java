@@ -25,10 +25,11 @@
 package org.lamsfoundation.lams.tool.mdchat.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.mdchat.model.MdlChat;
-import org.lamsfoundation.lams.tool.mdchat.model.MdlChatConfigItem;
 import org.lamsfoundation.lams.tool.mdchat.model.MdlChatSession;
 import org.lamsfoundation.lams.tool.mdchat.model.MdlChatUser;
 import org.lamsfoundation.lams.tool.mdchat.util.MdlChatException;
@@ -96,21 +97,6 @@ public interface IMdlChatService {
     public void saveOrUpdateMdlChatSession(MdlChatSession mdlChatSession);
 
     /**
-     * Get the mdlChat config item by key
-     * 
-     * @param key
-     * @return
-     */
-    public MdlChatConfigItem getConfigItem(String key);
-
-    /**
-     * Save a mdl configItem
-     * 
-     * @param item
-     */
-    public void saveOrUpdateMdlChatConfigItem(MdlChatConfigItem item);
-
-    /**
      * 
      * @param userId
      * @param toolSessionId
@@ -124,13 +110,6 @@ public interface IMdlChatService {
      * @return
      */
     public MdlChatUser getUserByUID(Long uid);
-
-    /**
-     * Gets the external organisation map for this tool adapter
-     * 
-     * @return
-     */
-    public ExtServerOrgMap getExtServerOrgMap();
 
     /**
      * Creates a hash for talking to the external server
@@ -186,8 +165,8 @@ public interface IMdlChatService {
     /**
      * Constructs a parameter hashmap to be used for the default parameters
      * required by the external LMS tool adapter servlet. For instance in
-     * mdlChat, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * mdlChat, this constructs the following: { ["un", username], ["cs",
+     * course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param mdlChat
      * @return
@@ -197,12 +176,42 @@ public interface IMdlChatService {
     /**
      * Constructs a parameter hashmap based off customCSV to be used for the
      * default parameters required by the external LMS tool adapter servlet. For
-     * instance in mdlChat, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * instance in mdlChat, this constructs the following: { ["un", username],
+     * ["cs", course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param user
      * @param course
      * @return
      */
     public HashMap<String, String> getRequiredExtServletParams(String customCSV);
+
+    /**
+     * Gets a list of all external servers
+     * 
+     * @return
+     */
+    public List<ExtServerOrgMap> getExtServerList();
+
+    /**
+     * Gets a list of servers mapped to this tool adapter
+     * 
+     * @return
+     */
+    public List<ExtServerToolAdapterMap> getMappedServers();
+
+    /**
+     * Save all the mapped servers
+     * 
+     * @param mappableServers
+     */
+    public void saveServerMappings(String[] mappableServers);
+
+    /**
+     * Gets an external server url given the extLmsId
+     * 
+     * @param extLmsId
+     * @return
+     */
+    public String getExtServerUrl(String extLmsId);
+
 }

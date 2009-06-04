@@ -19,10 +19,9 @@
 				<property name="mdlChatSessionDAO"><ref bean="mdlChatSessionDAO"/></property>
 				<property name="mdlChatUserDAO"><ref bean="mdlChatUserDAO"/></property>
 				<property name="mdlChatDAO"><ref bean="mdlChatDAO"/></property>
-				<property name="mdlChatConfigItemDAO"><ref bean="mdlChatConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property> 	
-				<!--<property name="integrationService"><ref bean="integrationService"/></property>-->
+				<property name="integrationService"><ref bean="integrationService"/></property>
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="mdlChatToolContentHandler"><ref bean="mdlChatToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
@@ -55,11 +54,7 @@
 	<!--  DAO classes -->
 	<bean id="mdlChatDAO" class="org.lamsfoundation.lams.tool.mdchat.dao.hibernate.MdlChatDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>  
-	
-	<bean id="mdlChatConfigItemDAO" class="org.lamsfoundation.lams.tool.mdchat.dao.hibernate.MdlChatConfigItemDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean> 
+	</bean>   
 
 	<bean id="mdlChatSessionDAO" class="org.lamsfoundation.lams.tool.mdchat.dao.hibernate.MdlChatSessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>

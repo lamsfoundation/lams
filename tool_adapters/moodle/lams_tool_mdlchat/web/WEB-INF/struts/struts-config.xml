@@ -14,20 +14,20 @@
   <form-beans>
 
     <form-bean
-      name="mdchat10AdminForm"
-      type="org.lamsfoundation.lams.tool.mdchat.web.forms.AdminForm"
+      name="authoringForm"
+      type="org.lamsfoundation.lams.tool.mdchat.web.forms.AuthoringForm"
     />
     <form-bean
       name="monitoringForm"
       type="org.lamsfoundation.lams.tool.mdchat.web.forms.MonitoringForm"
     />
     <form-bean
-      name="learningForm"
-      type="org.lamsfoundation.lams.tool.mdchat.web.forms.LearningForm"
+      name="mdchat10AdminForm"
+      type="org.lamsfoundation.lams.tool.mdchat.web.forms.AdminForm"
     />
     <form-bean
-      name="authoringForm"
-      type="org.lamsfoundation.lams.tool.mdchat.web.forms.AuthoringForm"
+      name="learningForm"
+      type="org.lamsfoundation.lams.tool.mdchat.web.forms.LearningForm"
     />
 
   </form-beans>
@@ -71,24 +71,17 @@
       />
     </action>
     <action
-      path="/clearsession"
-      type="org.lamsfoundation.lams.tool.mdchat.web.actions.ClearSessionAction"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
-      path="/monitoring"
-      type="org.lamsfoundation.lams.tool.mdchat.web.actions.MonitoringAction"
-      name="monitoringForm"
+      path="/mdchat10admin"
+      type="org.lamsfoundation.lams.tool.mdchat.web.actions.AdminAction"
+      name="mdchat10AdminForm"
       scope="request"
       parameter="dispatch"
       unknown="false"
       validate="false"
     >
       <forward
-        name="success"
-        path="tiles:/monitoring/main"
+        name="config"
+        path="/pages/admin/config.jsp"
         redirect="false"
       />
     </action>
@@ -113,17 +106,24 @@
       />
     </action>
     <action
-      path="/mdchat10admin"
-      type="org.lamsfoundation.lams.tool.mdchat.web.actions.AdminAction"
-      name="mdchat10AdminForm"
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.mdchat.web.actions.ClearSessionAction"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/monitoring"
+      type="org.lamsfoundation.lams.tool.mdchat.web.actions.MonitoringAction"
+      name="monitoringForm"
       scope="request"
       parameter="dispatch"
       unknown="false"
       validate="false"
     >
       <forward
-        name="config"
-        path="/pages/admin/config.jsp"
+        name="success"
+        path="tiles:/monitoring/main"
         redirect="false"
       />
     </action>
