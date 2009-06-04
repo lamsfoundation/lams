@@ -36,17 +36,16 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.mdfrum.dto.MdlForumDTO;
-import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
-import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumConfigItem;
-import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession;
-import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumUser;
-import org.lamsfoundation.lams.tool.mdfrum.service.MdlForumServiceProxy;
-import org.lamsfoundation.lams.tool.mdfrum.service.IMdlForumService;
-import org.lamsfoundation.lams.tool.mdfrum.util.MdlForumConstants;
-import org.lamsfoundation.lams.tool.mdfrum.util.MdlForumException;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.mdfrum.dto.MdlForumDTO;
+import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
+import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession;
+import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumUser;
+import org.lamsfoundation.lams.tool.mdfrum.service.IMdlForumService;
+import org.lamsfoundation.lams.tool.mdfrum.service.MdlForumServiceProxy;
+import org.lamsfoundation.lams.tool.mdfrum.util.MdlForumConstants;
+import org.lamsfoundation.lams.tool.mdfrum.util.MdlForumException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -74,9 +73,7 @@ public class LearningAction extends LamsDispatchAction {
 	private static final String TOOL_APP_URL = Configuration
 			.get(ConfigurationKeys.SERVER_URL)
 			+ "/tool/" + MdlForumConstants.TOOL_SIGNATURE + "/";
-
-	// public static final String RELATIVE_LEARNER_URL = "mod/Forum/view.php?";
-
+	
 	public static final String RELATIVE_LEARNER_URL = "course/lamsframes.php?";
 	public static final String MOODLE_VIEW_URL = "mod/forum/view.php";
 	public static final String RELATIVE_TEACHER_URL = "mod/forum/view.php?";
@@ -131,9 +128,7 @@ public class LearningAction extends LamsDispatchAction {
 
 		if (mdlForum.getExtToolContentId() != null) {
 			try {
-				String responseUrl = mdlForumService.getConfigItem(
-						MdlForumConfigItem.KEY_EXTERNAL_SERVER_URL)
-						.getConfigValue();
+			    	String responseUrl = mdlForumService.getExtServerUrl(mdlForum.getExtLmsId());
 
 				if (mode.equals(ToolAccessMode.TEACHER)) {
 					responseUrl += RELATIVE_TEACHER_URL;

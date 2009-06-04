@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
-import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumConfigItem;
 import org.lamsfoundation.lams.tool.mdfrum.service.IMdlForumService;
 import org.lamsfoundation.lams.tool.mdfrum.service.MdlForumServiceProxy;
 import org.lamsfoundation.lams.tool.mdfrum.util.MdlForumConstants;
@@ -108,12 +107,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	String userFromCSV = null;
 	String courseFromCSV = null;
 	String sectionFromCSV = null;
+	String extLmsIdFromCSV = null;
 	if (customCSV == null && mdlForum == null) {
 	    logger.error("CustomCSV required if mdlForum is null");
 	    throw new ToolException("CustomCSV required if mdlForum is null");
 	} else if (customCSV != null) {
 	    String splitCSV[] = customCSV.split(",");
-	    if (splitCSV.length != 3) {
+	    if (splitCSV.length != 4) {
 		logger.error("mdlForum tool customCSV not in required (user,course,courseURL) form: " + customCSV);
 		throw new ToolException("mdlForum tool cusomCSV not in required (user,course,courseURL) form: "
 			+ customCSV);
@@ -121,6 +121,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		userFromCSV = splitCSV[0];
 		courseFromCSV = splitCSV[1];
 		sectionFromCSV = splitCSV[2];
+		extLmsIdFromCSV = splitCSV[3];
 	    }
 	}
 
@@ -129,6 +130,15 @@ public class AuthoringAction extends LamsDispatchAction {
 	    mdlForum.setExtUsername(userFromCSV);
 	    mdlForum.setExtCourseId(courseFromCSV);
 	    mdlForum.setExtSection(sectionFromCSV);
+	    mdlForum.setExtLmsId(extLmsIdFromCSV);
+	    mdlForum.setCreateDate(new Date());
+	}
+	
+	if (mdlForum.getExtLmsId() == null) {
+	    mdlForum.setExtUsername(userFromCSV);
+	    mdlForum.setExtCourseId(courseFromCSV);
+	    mdlForum.setExtSection(sectionFromCSV);
+	    mdlForum.setExtLmsId(extLmsIdFromCSV);
 	    mdlForum.setCreateDate(new Date());
 	}
 
@@ -143,11 +153,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	// if no external content id, open the mdl author page, otherwise, open the edit page
 	try {
 
-	    // If the mdlForum has a saved course url, use it, otherwise use the one giving in the request in customCSV
-	    //String courseUrlToBeUsed = (mdlForum.getExtCourseUrl() != null) ? mdlForum.getExtCourseUrl() : courseUrlFromCSV;
-
-	    String responseUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_SERVER_URL)
-		    .getConfigValue();
+	    // If the mdlForum has a saved course url, use it, otherwise use the one giving in the request in customCSV	    
+	    String responseUrl = mdlForumService.getExtServerUrl(mdlForum.getExtLmsId());
+	    
 	    responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
 	    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
 		    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
@@ -156,7 +164,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    
 	    String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_EDIT_URL, "UTF8");
 	    
-	    responseUrl += "&dest=" + encodedMoodleRelativePath ;
+	    responseUrl += "&dest=" + encodedMoodleRelativePath;
 
 	    if (mdlForum.getExtSection() != null) {
 		responseUrl += "&section=" + mdlForum.getExtSection();

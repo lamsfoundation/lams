@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mdfrum.dto.MdlForumDTO;
 import org.lamsfoundation.lams.tool.mdfrum.dto.MdlForumSessionDTO;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
-import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumConfigItem;
 import org.lamsfoundation.lams.tool.mdfrum.service.IMdlForumService;
 import org.lamsfoundation.lams.tool.mdfrum.service.MdlForumServiceProxy;
 import org.lamsfoundation.lams.tool.mdfrum.util.MdlForumConstants;
@@ -90,8 +89,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	for (MdlForumSessionDTO sessionDTO : mdlForumDT0.getSessionDTOs()) {
 	    try {
-		String responseUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
+		String responseUrl = mdlForumService.getExtServerUrl(mdlForum.getExtLmsId());
+		
 		responseUrl += RELATIVE_MONITOR_URL;
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="

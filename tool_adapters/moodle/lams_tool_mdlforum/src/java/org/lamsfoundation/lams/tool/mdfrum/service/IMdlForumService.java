@@ -25,10 +25,11 @@
 package org.lamsfoundation.lams.tool.mdfrum.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
-import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumConfigItem;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumUser;
 import org.lamsfoundation.lams.tool.mdfrum.util.MdlForumException;
@@ -96,21 +97,6 @@ public interface IMdlForumService {
     public void saveOrUpdateMdlForumSession(MdlForumSession mdlForumSession);
 
     /**
-     * Get the mdlForum config item by key
-     * 
-     * @param key
-     * @return
-     */
-    public MdlForumConfigItem getConfigItem(String key);
-
-    /**
-     * Save a mdl configItem
-     * 
-     * @param item
-     */
-    public void saveOrUpdateMdlForumConfigItem(MdlForumConfigItem item);
-
-    /**
      * 
      * @param userId
      * @param toolSessionId
@@ -125,12 +111,6 @@ public interface IMdlForumService {
      */
     public MdlForumUser getUserByUID(Long uid);
 
-    /**
-     * Gets the external organisation map for this tool adapter
-     * 
-     * @return
-     */
-    public ExtServerOrgMap getExtServerOrgMap();
 
     /**
      * Creates a hash for talking to the external server
@@ -205,4 +185,29 @@ public interface IMdlForumService {
      * @return
      */
     public HashMap<String, String> getRequiredExtServletParams(String customCSV);
+    
+    /**
+     * Gets a list of all external servers
+     * @return
+     */
+    public List<ExtServerOrgMap> getExtServerList();
+    
+    /**
+     * Gets a list of servers mapped to this tool adapter
+     * @return
+     */
+    public List<ExtServerToolAdapterMap> getMappedServers();
+    
+    /**
+     * Save all the mapped servers
+     * @param mappableServers
+     */
+    public void saveServerMappings(String[] mappableServers);
+    
+    /**
+     * Gets an external server url given the extLmsId
+     * @param extLmsId
+     * @return
+     */
+    public String getExtServerUrl(String extLmsId);
 }

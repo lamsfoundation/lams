@@ -19,10 +19,9 @@
 				<property name="mdlForumSessionDAO"><ref bean="mdlForumSessionDAO"/></property>
 				<property name="mdlForumUserDAO"><ref bean="mdlForumUserDAO"/></property>
 				<property name="mdlForumDAO"><ref bean="mdlForumDAO"/></property>
-				<property name="mdlForumConfigItemDAO"><ref bean="mdlForumConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property> 	
-				<!--<property name="integrationService"><ref bean="integrationService"/></property>-->
+				<property name="integrationService"><ref bean="integrationService"/></property>
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="mdlForumToolContentHandler"><ref bean="mdlForumToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
@@ -57,10 +56,6 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
 	
-	<bean id="mdlForumConfigItemDAO" class="org.lamsfoundation.lams.tool.mdfrum.dao.hibernate.MdlForumConfigItemDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean> 
-
 	<bean id="mdlForumSessionDAO" class="org.lamsfoundation.lams.tool.mdfrum.dao.hibernate.MdlForumSessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>

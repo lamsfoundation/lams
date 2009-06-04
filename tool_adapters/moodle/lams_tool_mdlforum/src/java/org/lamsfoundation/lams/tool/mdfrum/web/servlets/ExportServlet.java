@@ -41,10 +41,9 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mdfrum.dto.MdlForumDTO;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForum;
-import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumConfigItem;
 import org.lamsfoundation.lams.tool.mdfrum.model.MdlForumSession;
-import org.lamsfoundation.lams.tool.mdfrum.service.MdlForumServiceProxy;
 import org.lamsfoundation.lams.tool.mdfrum.service.IMdlForumService;
+import org.lamsfoundation.lams.tool.mdfrum.service.MdlForumServiceProxy;
 import org.lamsfoundation.lams.tool.mdfrum.util.MdlForumException;
 import org.lamsfoundation.lams.tool.mdfrum.util.WebUtility;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -166,8 +165,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private void exportFileFromExternalServer(HttpServletRequest request, HttpServletResponse response,
 	    Long extToolSessionId, MdlForum mdlForum, String fullPath) throws Exception {
-	String exportPortFolioServletUrl = mdlForumService.getConfigItem(MdlForumConfigItem.KEY_EXTERNAL_TOOL_SERVLET)
-		.getConfigValue();
+	
+	String exportPortFolioServletUrl = mdlForumService.getExtServerUrl(mdlForum.getExtLmsId());
 
 	String extUsername = "user"; // setting user to arbitrary values since they are only used to construct the hash
 
