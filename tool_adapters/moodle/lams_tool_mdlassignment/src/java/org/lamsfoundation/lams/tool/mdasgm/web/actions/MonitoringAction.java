@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mdasgm.dto.MdlAssignmentDTO;
 import org.lamsfoundation.lams.tool.mdasgm.dto.MdlAssignmentSessionDTO;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignment;
-import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentConfigItem;
 import org.lamsfoundation.lams.tool.mdasgm.service.IMdlAssignmentService;
 import org.lamsfoundation.lams.tool.mdasgm.service.MdlAssignmentServiceProxy;
 import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentConstants;
@@ -90,15 +89,16 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	for (MdlAssignmentSessionDTO sessionDTO : mdlAssignmentDT0.getSessionDTOs()) {
 	    try {
-		String responseUrl = mdlAssignmentService.getConfigItem(MdlAssignmentConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
+		String responseUrl = mdlAssignmentService.getExtServerUrl(mdlAssignment.getExtLmsId());
+
 		responseUrl += RELATIVE_MONITOR_URL;
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ sessionDTO.getSessionID().toString() + "&dispatch=finishActivity";
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
 
-		responseUrl += "&id=" + sessionDTO.getExtSessionID() + "&update=" + sessionDTO.getExtSessionID() + "&returnUrl=" + returnUrl;
+		responseUrl += "&id=" + sessionDTO.getExtSessionID() + "&update=" + sessionDTO.getExtSessionID()
+			+ "&returnUrl=" + returnUrl;
 
 		sessionDTO.setRunTimeUrl(responseUrl);
 	    } catch (UnsupportedEncodingException e) {
@@ -116,7 +116,8 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     private void setupService() {
 	if (mdlAssignmentService == null) {
-	    mdlAssignmentService = MdlAssignmentServiceProxy.getMdlAssignmentService(this.getServlet().getServletContext());
+	    mdlAssignmentService = MdlAssignmentServiceProxy.getMdlAssignmentService(this.getServlet()
+		    .getServletContext());
 	}
     }
 }

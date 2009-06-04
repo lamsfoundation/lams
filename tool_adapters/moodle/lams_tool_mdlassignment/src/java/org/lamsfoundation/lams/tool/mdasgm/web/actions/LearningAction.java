@@ -36,17 +36,16 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.mdasgm.dto.MdlAssignmentDTO;
-import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignment;
-import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentConfigItem;
-import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentSession;
-import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentUser;
-import org.lamsfoundation.lams.tool.mdasgm.service.MdlAssignmentServiceProxy;
-import org.lamsfoundation.lams.tool.mdasgm.service.IMdlAssignmentService;
-import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentConstants;
-import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentException;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.mdasgm.dto.MdlAssignmentDTO;
+import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignment;
+import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentSession;
+import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentUser;
+import org.lamsfoundation.lams.tool.mdasgm.service.IMdlAssignmentService;
+import org.lamsfoundation.lams.tool.mdasgm.service.MdlAssignmentServiceProxy;
+import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentConstants;
+import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -75,10 +74,10 @@ public class LearningAction extends LamsDispatchAction {
 	    + MdlAssignmentConstants.TOOL_SIGNATURE + "/";
 
     //public static final String RELATIVE_LEARNER_URL = "mod/assignment/view.php?";
-    
+
     public static final String RELATIVE_LEARNER_URL = "course/lamsframes.php?";
     public static final String MOODLE_VIEW_URL = "mod/assignment/view.php";
-    public static final String RELATIVE_TEACHER_URL = "mod/assignment/submissions.php?"; 
+    public static final String RELATIVE_TEACHER_URL = "mod/assignment/submissions.php?";
 
     private IMdlAssignmentService mdlAssignmentService;
 
@@ -89,11 +88,12 @@ public class LearningAction extends LamsDispatchAction {
 
 	// set up mdlAssignmentService
 	if (mdlAssignmentService == null) {
-	    mdlAssignmentService = MdlAssignmentServiceProxy.getMdlAssignmentService(this.getServlet().getServletContext());
+	    mdlAssignmentService = MdlAssignmentServiceProxy.getMdlAssignmentService(this.getServlet()
+		    .getServletContext());
 	}
 
 	// Retrieve the session and content.
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, false);
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 	MdlAssignmentSession mdlAssignmentSession = mdlAssignmentService.getSessionBySessionId(toolSessionID);
 	if (mdlAssignmentSession == null) {
 	    throw new MdlAssignmentException("Cannot retreive session with toolSessionID: " + toolSessionID);
@@ -123,31 +123,24 @@ public class LearningAction extends LamsDispatchAction {
 
 	if (mdlAssignment.getExtToolContentId() != null) {
 	    try {
-		String responseUrl = mdlAssignmentService.getConfigItem(MdlAssignmentConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
-		
-			if(mode.equals(ToolAccessMode.TEACHER))
-			{
-				responseUrl += RELATIVE_TEACHER_URL;
-			}
-			else if (mode.equals(ToolAccessMode.LEARNER)|| mode.equals(ToolAccessMode.AUTHOR))
-			{
-				responseUrl += RELATIVE_LEARNER_URL;
-			}
+		String responseUrl = mdlAssignmentService.getExtServerUrl(mdlAssignment.getExtLmsId());
+
+		if (mode.equals(ToolAccessMode.TEACHER)) {
+		    responseUrl += RELATIVE_TEACHER_URL;
+		} else if (mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR)) {
+		    responseUrl += RELATIVE_LEARNER_URL;
+		}
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ toolSessionID.toString() + "&dispatch=finishActivity";
-		
-		
-		
+
 		String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_VIEW_URL, "UTF8");
 
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
-		
 
-		responseUrl += "&id=" + mdlAssignmentSession.getExtSessionId() + "&returnUrl=" + returnUrl
-			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1"+ "&isFinished=" + mdlAssignmentUser.isFinishedActivity();
-		
+		responseUrl += "&id=" + mdlAssignmentSession.getExtSessionId() + "&returnUrl=" + returnUrl + "&dest="
+			+ encodedMoodleRelativePath + "&is_learner=1" + "&isFinished="
+			+ mdlAssignmentUser.isFinishedActivity();
 
 		log.debug("Redirecting for mdl assignment learner: " + responseUrl);
 		response.sendRedirect(responseUrl);
@@ -164,8 +157,8 @@ public class LearningAction extends LamsDispatchAction {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	MdlAssignmentUser mdlAssignmentUser = mdlAssignmentService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
-		toolSessionId);
+	MdlAssignmentUser mdlAssignmentUser = mdlAssignmentService.getUserByUserIdAndSessionId(new Long(user
+		.getUserID().intValue()), toolSessionId);
 
 	if (mdlAssignmentUser == null) {
 	    MdlAssignmentSession mdlAssignmentSession = mdlAssignmentService.getSessionBySessionId(toolSessionId);

@@ -41,10 +41,9 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mdasgm.dto.MdlAssignmentDTO;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignment;
-import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentConfigItem;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentSession;
-import org.lamsfoundation.lams.tool.mdasgm.service.MdlAssignmentServiceProxy;
 import org.lamsfoundation.lams.tool.mdasgm.service.IMdlAssignmentService;
+import org.lamsfoundation.lams.tool.mdasgm.service.MdlAssignmentServiceProxy;
 import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentException;
 import org.lamsfoundation.lams.tool.mdasgm.util.WebUtility;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -166,8 +165,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private void exportFileFromExternalServer(HttpServletRequest request, HttpServletResponse response,
 	    Long extToolSessionId, MdlAssignment mdlAssignment, String fullPath) throws Exception {
-	String exportPortFolioServletUrl = mdlAssignmentService.getConfigItem(MdlAssignmentConfigItem.KEY_EXTERNAL_TOOL_SERVLET)
-		.getConfigValue();
+	
+	String exportPortFolioServletUrl = mdlAssignmentService.getExtServerUrl(mdlAssignment.getExtLmsId());
 
 	String extUsername = "user"; // setting user to arbitrary values since they are only used to construct the hash
 

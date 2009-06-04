@@ -25,10 +25,11 @@
 package org.lamsfoundation.lams.tool.mdasgm.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignment;
-import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentConfigItem;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentSession;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentUser;
 import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentException;
@@ -36,7 +37,8 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
- * Defines the services available to the web layer from the MdlAssignment Service
+ * Defines the services available to the web layer from the MdlAssignment
+ * Service
  */
 public interface IMdlAssignmentService {
 
@@ -96,21 +98,6 @@ public interface IMdlAssignmentService {
     public void saveOrUpdateMdlAssignmentSession(MdlAssignmentSession mdlAssignmentSession);
 
     /**
-     * Get the mdlAssignment config item by key
-     * 
-     * @param key
-     * @return
-     */
-    public MdlAssignmentConfigItem getConfigItem(String key);
-
-    /**
-     * Save a mdl configItem
-     * 
-     * @param item
-     */
-    public void saveOrUpdateMdlAssignmentConfigItem(MdlAssignmentConfigItem item);
-
-    /**
      * 
      * @param userId
      * @param toolSessionId
@@ -124,13 +111,6 @@ public interface IMdlAssignmentService {
      * @return
      */
     public MdlAssignmentUser getUserByUID(Long uid);
-
-    /**
-     * Gets the external organisation map for this tool adapter
-     * 
-     * @return
-     */
-    public ExtServerOrgMap getExtServerOrgMap();
 
     /**
      * Creates a hash for talking to the external server
@@ -172,8 +152,8 @@ public interface IMdlAssignmentService {
      * @param toolSessionId
      * @return
      */
-    public int getExternalToolOutputInt(String outputName, MdlAssignment mdlAssignment, Long userId, String extToolContentId,
-	    Long toolSessionId);
+    public int getExternalToolOutputInt(String outputName, MdlAssignment mdlAssignment, Long userId,
+	    String extToolContentId, Long toolSessionId);
 
     /**
      * Converts the customCSV parameter into a hashmap
@@ -186,8 +166,8 @@ public interface IMdlAssignmentService {
     /**
      * Constructs a parameter hashmap to be used for the default parameters
      * required by the external LMS tool adapter servlet. For instance in
-     * mdlAssignment, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * mdlAssignment, this constructs the following: { ["un", username], ["cs",
+     * course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param mdlAssignment
      * @return
@@ -197,12 +177,41 @@ public interface IMdlAssignmentService {
     /**
      * Constructs a parameter hashmap based off customCSV to be used for the
      * default parameters required by the external LMS tool adapter servlet. For
-     * instance in mdlAssignment, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * instance in mdlAssignment, this constructs the following: { ["un",
+     * username], ["cs", course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param user
      * @param course
      * @return
      */
     public HashMap<String, String> getRequiredExtServletParams(String customCSV);
+
+    /**
+     * Gets a list of all external servers
+     * 
+     * @return
+     */
+    public List<ExtServerOrgMap> getExtServerList();
+
+    /**
+     * Gets a list of servers mapped to this tool adapter
+     * 
+     * @return
+     */
+    public List<ExtServerToolAdapterMap> getMappedServers();
+
+    /**
+     * Save all the mapped servers
+     * 
+     * @param mappableServers
+     */
+    public void saveServerMappings(String[] mappableServers);
+
+    /**
+     * Gets an external server url given the extLmsId
+     * 
+     * @param extLmsId
+     * @return
+     */
+    public String getExtServerUrl(String extLmsId);
 }

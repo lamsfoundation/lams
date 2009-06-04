@@ -27,26 +27,20 @@ package org.lamsfoundation.lams.tool.mdasgm.service;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
@@ -59,6 +53,7 @@ import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -66,35 +61,31 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAdapterContentManager;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.mdasgm.dao.IMdlAssignmentConfigItemDAO;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mdasgm.dao.IMdlAssignmentDAO;
 import org.lamsfoundation.lams.tool.mdasgm.dao.IMdlAssignmentSessionDAO;
 import org.lamsfoundation.lams.tool.mdasgm.dao.IMdlAssignmentUserDAO;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignment;
-import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentConfigItem;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentSession;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentUser;
 import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentConstants;
 import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentException;
 import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentToolContentHandler;
 import org.lamsfoundation.lams.tool.mdasgm.util.WebUtility;
-import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * An implementation of the IMdlAssignmentService interface.
@@ -111,6 +102,7 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
     public static final String CUSTOM_CSV_MAP_PARAM_USER = "user";
     public static final String CUSTOM_CSV_MAP_PARAM_COURSE = "course";
     public static final String CUSTOM_CSV_MAP_PARAM_SECTION = "section";
+    public static final String CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID = "extlmsid";
 
     public static final String EXT_SERVER_PARAM_USER = "un";
     public static final String EXT_SERVER_PARAM_COURSE = "cs";
@@ -122,7 +114,7 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
     public static final String EXT_SERVER_PARAM_UPLOAD_FILE = "upload_file";
     public static final String EXT_SERVER_PARAM_OUTPUT_NAME = "oname";
 
-    private static final int EXPECTED_CSV_SIZE = 3;
+    private static final int EXPECTED_CSV_SIZE = 4;
     private static final String EXPECTED_CSV_FORM = "user,course";
 
     private IMdlAssignmentDAO mdlAssignmentDAO = null;
@@ -130,8 +122,6 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
     private IMdlAssignmentSessionDAO mdlAssignmentSessionDAO = null;
 
     private IMdlAssignmentUserDAO mdlAssignmentUserDAO = null;
-
-    private IMdlAssignmentConfigItemDAO mdlAssignmentConfigItemDAO = null;
 
     private ILearnerService learnerService;
 
@@ -192,8 +182,7 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
      */
     public Long copyExternalToolContent(HashMap<String, String> params) throws ToolException, Exception {
 
-	String cloneServletUrl = mdlAssignmentConfigItemDAO.getConfigItemByKey(MdlAssignmentConfigItem.KEY_EXTERNAL_TOOL_SERVLET)
-		.getConfigValue();
+	String cloneServletUrl = getExtToolAdapterServletUrl(params.get(CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID));
 
 	// add the method to the params
 	params.put(EXT_SERVER_PARAM_METHOD, EXT_SERVER_METHOD_CLONE);
@@ -216,11 +205,12 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	params.put(EXT_SERVER_PARAM_COURSE, paramsCSV.get(CUSTOM_CSV_MAP_PARAM_COURSE));
 	params.put(EXT_SERVER_PARAM_USER, paramsCSV.get(CUSTOM_CSV_MAP_PARAM_USER));
 	params.put(EXT_SERVER_PARAM_SECTION, paramsCSV.get(CUSTOM_CSV_MAP_PARAM_SECTION));
+	params.put(CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID, paramsCSV.get(CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID));
 
 	String timestamp = Long.toString(new Date().getTime());
 	params.put(EXT_SERVER_PARAM_TIMESTAMP, timestamp);
 
-	ExtServerOrgMap serverMap = this.getExtServerOrgMap();
+	ExtServerOrgMap serverMap = getExtServerOrgMap(paramsCSV.get(CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID));
 	String hash = hash(serverMap, paramsCSV.get(CUSTOM_CSV_MAP_PARAM_USER), timestamp);
 	params.put(EXT_SERVER_PARAM_HASH, hash);
 
@@ -232,11 +222,12 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	params.put(EXT_SERVER_PARAM_USER, mdlassignment.getExtUsername());
 	params.put(EXT_SERVER_PARAM_COURSE, mdlassignment.getExtCourseId());
 	params.put(EXT_SERVER_PARAM_SECTION, mdlassignment.getExtSection());
+	params.put(CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID, mdlassignment.getExtLmsId());
 
 	String timestamp = Long.toString(new Date().getTime());
 	params.put(EXT_SERVER_PARAM_TIMESTAMP, timestamp);
 
-	ExtServerOrgMap serverMap = this.getExtServerOrgMap();
+	ExtServerOrgMap serverMap = getExtServerOrgMap(mdlassignment.getExtLmsId());
 	String hash = hash(serverMap, mdlassignment.getExtUsername(), timestamp);
 	params.put(EXT_SERVER_PARAM_HASH, hash);
 
@@ -253,22 +244,22 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	    map.put(CUSTOM_CSV_MAP_PARAM_USER, split[0]);
 	    map.put(CUSTOM_CSV_MAP_PARAM_COURSE, split[1]);
 	    map.put(CUSTOM_CSV_MAP_PARAM_SECTION, split[2]);
+	    map.put(CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID, split[3]);
 	    return map;
 	} else {
 	    return null;
 	}
     }
 
-    public int getExternalToolOutputInt(String outputName, MdlAssignment mdlAssignment, Long userId, String extToolContentId,
-	    Long toolSessionId) {
+    public int getExternalToolOutputInt(String outputName, MdlAssignment mdlAssignment, Long userId,
+	    String extToolContentId, Long toolSessionId) {
 	MdlAssignmentUser user = this.getUserByUserIdAndSessionId(userId, toolSessionId);
-	ExtServerOrgMap extServerMap = getExtServerOrgMap();
+	ExtServerOrgMap extServerMap = getExtServerOrgMap(mdlAssignment.getExtLmsId());
 
 	String extUserName = user.getLoginName().substring(extServerMap.getPrefix().length() + 1);
 
 	try {
-	    String outputServletUrl = mdlAssignmentConfigItemDAO.getConfigItemByKey(
-		    MdlAssignmentConfigItem.KEY_EXTERNAL_TOOL_SERVLET).getConfigValue();
+	    String outputServletUrl = getExtToolAdapterServletUrl(mdlAssignment.getExtLmsId());
 
 	    // setting the mdlAssignment username so the params are set up correctly
 	    mdlAssignment.setExtUsername(extUserName);
@@ -299,8 +290,29 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	if (session == null) {
 	    return null;
 	}
-	return mdlAssignmentOutputFactory.getToolOutput(names, this, toolSessionId, learnerId, session.getMdlAssignment(),
-		session.getExtSessionId());
+	return mdlAssignmentOutputFactory.getToolOutput(names, this, toolSessionId, learnerId, session
+		.getMdlAssignment(), session.getExtSessionId());
+    }
+
+    public String getExtServerUrl(String extLmsId) {
+	ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(extLmsId);
+	String ret = null;
+	if (serverMap != null) {
+	    ret = serverMap.getServerUrl();
+	}
+	return ret;
+    }
+
+    public String getExtToolAdapterServletUrl(String extLmsId) {
+	String ret = getExtServerUrl(extLmsId);
+	if (ret != null) {
+	    ret += MdlAssignmentConstants.RELATIVE_SERVLET_URL;
+	}
+	return ret;
+    }
+
+    public ExtServerOrgMap getExtServerOrgMap(String extLmsId) {
+	return integrationService.getExtServerOrgMap(extLmsId);
     }
 
     /**
@@ -316,8 +328,8 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	    return null;
 	}
 
-	return mdlAssignmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId, session.getMdlAssignment(), session
-		.getExtSessionId());
+	return mdlAssignmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId, session
+		.getMdlAssignment(), session.getExtSessionId());
     }
 
     /**
@@ -391,24 +403,6 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	}
 	MdlAssignment toContent = MdlAssignment.newInstance(fromContent, toContentId, mdlAssignmentToolContentHandler);
 
-	// calling the external tool to copy it's content.
-	/*
-	try
-	{
-		
-		toContent.setExtToolContentId(copyExternalToolContent(
-				fromContent.getExtToolContentId(),
-				fromContent.getExtUsername(),
-				fromContent.getExtCourseId(),
-				fromContent.getExtCourseUrl()
-				));
-		
-	}
-	catch(Exception e)
-	{
-		throw new ToolException("Failed to call external server to copy tool content" + e);
-	}*/
-
 	mdlAssignmentDAO.saveOrUpdate(toContent);
     }
 
@@ -451,7 +445,7 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 
 	if ((fromContent == null) || fromContent.getExtToolContentId() == null) {
 	    // create the fromContent using the default tool content
-	    fromContent = getDefaultContent();
+	    fromContent = getDefaultContent(params.get(CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID));
 	    try {
 		// notify the external server to create the default content
 		params.put(EXT_SERVER_PARAM_EXT_TOOL_CONTENT_ID, "0");
@@ -527,7 +521,8 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	    mdlAssignment.setMdlAssignmentSessions(null);
 
 	    try {
-		exportContentService.exportToolContent(toolContentId, mdlAssignment, mdlAssignmentToolContentHandler, rootPath);
+		exportContentService.exportToolContent(toolContentId, mdlAssignment, mdlAssignmentToolContentHandler,
+			rootPath);
 	    } catch (ExportToolContentException e) {
 		throw new ToolException(e);
 	    }
@@ -539,36 +534,39 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 		String toolPath = FileUtil.getFullPath(rootPath, toolContentId.toString());
 		FileUtil.createDirectory(toolPath);
 
-		String exportServletUrl = mdlAssignmentConfigItemDAO.getConfigItemByKey(
-			MdlAssignmentConfigItem.KEY_EXTERNAL_TOOL_SERVLET).getConfigValue();
+		String exportServletUrl = getExtToolAdapterServletUrl(mdlAssignment.getExtLmsId());
 
-		// setting these to arbitrary values since they are only used to construct the hash
+		if (exportServletUrl != null) {
+		    // setting these to arbitrary values since they are only used to construct the hash
+		    mdlAssignment.setExtCourseId("extCourse");
+		    mdlAssignment.setExtSection("0");
+		    mdlAssignment.setExtUsername("authUser");
+		    HashMap<String, String> params = this.getRequiredExtServletParams(mdlAssignment);
+		    params.put(EXT_SERVER_PARAM_METHOD, EXT_SERVER_METHOD_EXPORT);
+		    params.put(EXT_SERVER_PARAM_EXT_TOOL_CONTENT_ID, mdlAssignment.getExtToolContentId().toString());
 
-		mdlAssignment.setExtCourseId("extCourse");
-		mdlAssignment.setExtSection("0");
-		mdlAssignment.setExtUsername("authUser");
-		HashMap<String, String> params = this.getRequiredExtServletParams(mdlAssignment);
-		params.put(EXT_SERVER_PARAM_METHOD, EXT_SERVER_METHOD_EXPORT);
-		params.put(EXT_SERVER_PARAM_EXT_TOOL_CONTENT_ID, mdlAssignment.getExtToolContentId().toString());
+		    // Get the reponse stream from the external server (hopefully containing the export file
+		    InputStream in = WebUtility.getResponseInputStreamFromExternalServer(exportServletUrl, params);
 
-		// Get the reponse stream from the external server (hopefully containing the export file
-		InputStream in = WebUtility.getResponseInputStreamFromExternalServer(exportServletUrl, params);
+		    // Get the output stream to write the file for extport
+		    OutputStream out = new BufferedOutputStream(new FileOutputStream(toolPath + "/ext_tool.txt"));
 
-		// Get the output stream to write the file for extport
-		OutputStream out = new BufferedOutputStream(new FileOutputStream(toolPath + "/ext_tool.txt"));
+		    byte[] buffer = new byte[1024];
+		    int numRead;
+		    long numWritten = 0;
+		    while ((numRead = in.read(buffer)) != -1) {
+			out.write(buffer, 0, numRead);
+			numWritten += numRead;
+		    }
+		    logger.debug("Path to mdlAssignment export content: " + toolPath + "/ext_tool.txt");
 
-		byte[] buffer = new byte[1024];
-		int numRead;
-		long numWritten = 0;
-		while ((numRead = in.read(buffer)) != -1) {
-		    out.write(buffer, 0, numRead);
-		    numWritten += numRead;
+		    out.flush();
+		    out.close();
+		    in.close();
+		} else {
+		    exportContentService.exportToolContent(toolContentId, mdlAssignment,
+			    mdlAssignmentToolContentHandler, rootPath);
 		}
-		logger.debug("Path to mdlAssignment export content: " + toolPath + "/ext_tool.txt");
-
-		out.flush();
-		out.close();
-		in.close();
 	    } catch (Exception e) {
 		logger.error("Problem exporting data from external .LRN servlet", e);
 	    }
@@ -582,13 +580,6 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 
-    }
-
-    public ExtServerOrgMap getExtServerOrgMap() {
-	if (integrationService == null)
-	    integrationService = getIntegrationService();
-	IToolVO tool = toolService.getToolBySignature(MdlAssignmentConstants.TOOL_SIGNATURE);
-	return integrationService.getExtServerOrgMap(tool.getExtLmsId());
     }
 
     /**
@@ -609,9 +600,6 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 
 	    try {
 
-		String importServletUrl = mdlAssignmentConfigItemDAO.getConfigItemByKey(
-			MdlAssignmentConfigItem.KEY_EXTERNAL_TOOL_SERVLET).getConfigValue();
-
 		if (customCSV == null) {
 		    logger.error("Could not retrieve customCSV required for importing tool adapter tool. CustomCSV: "
 			    + customCSV);
@@ -619,6 +607,9 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 			    "Could not retrieve customCSV required for importing tool adapter tool. CustomCSV: "
 				    + customCSV);
 		}
+
+		HashMap<String, String> customCSVMap = decodeCustomCSV(customCSV);
+		String importServletUrl = getExtToolAdapterServletUrl(customCSVMap.get(CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID));
 
 		HashMap<String, String> params = getRequiredExtServletParams(customCSV);
 		params.put(EXT_SERVER_PARAM_METHOD, EXT_SERVER_METHOD_IMPORT);
@@ -646,11 +637,11 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	{
 
 	    try {
-		Object toolPOJO = exportContentService.importToolContent(toolContentPath, mdlAssignmentToolContentHandler,
-			fromVersion, toVersion);
+		Object toolPOJO = exportContentService.importToolContent(toolContentPath,
+			mdlAssignmentToolContentHandler, fromVersion, toVersion);
 		if (!(toolPOJO instanceof MdlAssignment))
-		    throw new ImportToolContentException("Import MdlAssignment tool content failed. Deserialized object is "
-			    + toolPOJO);
+		    throw new ImportToolContentException(
+			    "Import MdlAssignment tool content failed. Deserialized object is " + toolPOJO);
 		MdlAssignment mdlAssignment = (MdlAssignment) toolPOJO;
 		// reset it to new toolContentId
 		mdlAssignment.setToolContentId(toolContentId);
@@ -675,17 +666,13 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
     }
 
     public MdlAssignment getDefaultContent() {
-	/*
-	Long defaultContentID = getDefaultContentIdBySignature(MdlAssignmentConstants.TOOL_SIGNATURE);
-	MdlAssignment defaultContent = getMdlAssignmentByContentId(defaultContentID);
-	if (defaultContent == null) {
-		String error = "Could not retrieve default content record for this tool";
-		logger.error(error);
-		throw new MdlAssignmentException(error);
-	}
-	return defaultContent;
-	*/
 	MdlAssignment defaultContent = new MdlAssignment();
+	return defaultContent;
+    }
+
+    public MdlAssignment getDefaultContent(String extLmsId) {
+	MdlAssignment defaultContent = new MdlAssignment();
+	defaultContent.setExtLmsId(extLmsId);
 	return defaultContent;
     }
 
@@ -705,20 +692,63 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	return newContent;
     }
 
+    @SuppressWarnings("unchecked")
+    public List<ExtServerOrgMap> getExtServerList() {
+	if (integrationService.getAllExtServerOrgMaps() != null) {
+	    return (List<ExtServerOrgMap>) integrationService.getAllExtServerOrgMaps();
+	} else {
+	    return null;
+	}
+
+    }
+
+    public List<ExtServerToolAdapterMap> getMappedServers() {
+	return integrationService.getMappedServers(MdlAssignmentConstants.TOOL_SIGNATURE);
+    }
+
+    public void saveServerMappings(String[] mappedServers) {
+	Tool tool = toolService.getPersistToolBySignature(MdlAssignmentConstants.TOOL_SIGNATURE);
+
+	Set<ExtServerToolAdapterMap> mappedAdapterServers = new HashSet<ExtServerToolAdapterMap>();
+
+	List<ExtServerToolAdapterMap> alreadyMapped = getMappedServers();
+
+	if (tool != null) {
+	    if (mappedServers != null) {
+
+		for (int i = 0; i < mappedServers.length; i++) {
+
+		    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(mappedServers[i]);
+
+		    if (serverMap != null) {
+
+			ExtServerToolAdapterMap serverToolMap = integrationService.getMappedServer(serverMap
+				.getServerid(), MdlAssignmentConstants.TOOL_SIGNATURE);
+
+			if (serverToolMap == null) {
+			    serverToolMap = new ExtServerToolAdapterMap(tool, serverMap);
+			    integrationService.saveExtServerToolAdapterMap(serverToolMap);
+			}
+			mappedAdapterServers.add(serverToolMap);
+		    }
+		}
+	    }
+	}
+
+	for (ExtServerToolAdapterMap map : alreadyMapped) {
+	    if (!mappedAdapterServers.contains(map)) {
+		integrationService.deleteExtServerToolAdapterMap(map);
+	    }
+	}
+
+    }
+
     public MdlAssignment getMdlAssignmentByContentId(Long toolContentID) {
 	MdlAssignment mdlAssignment = (MdlAssignment) mdlAssignmentDAO.getByContentId(toolContentID);
 	if (mdlAssignment == null) {
 	    logger.debug("Could not find the content with toolContentID:" + toolContentID);
 	}
 	return mdlAssignment;
-    }
-
-    public MdlAssignmentConfigItem getConfigItem(String key) {
-	return mdlAssignmentConfigItemDAO.getConfigItemByKey(key);
-    }
-
-    public void saveOrUpdateMdlAssignmentConfigItem(MdlAssignmentConfigItem item) {
-	mdlAssignmentConfigItemDAO.saveOrUpdate(item);
     }
 
     public MdlAssignmentSession getSessionBySessionId(Long toolSessionId) {
@@ -793,7 +823,8 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	ICredentials credentials = new SimpleCredentials(MdlAssignmentToolContentHandler.repositoryUser,
 		MdlAssignmentToolContentHandler.repositoryId);
 	try {
-	    ITicket ticket = repositoryService.login(credentials, MdlAssignmentToolContentHandler.repositoryWorkspaceName);
+	    ITicket ticket = repositoryService.login(credentials,
+		    MdlAssignmentToolContentHandler.repositoryWorkspaceName);
 	    return ticket;
 	} catch (AccessDeniedException ae) {
 	    throw new MdlAssignmentException("Access Denied to repository." + ae.getMessage());
@@ -848,14 +879,6 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 
     public void setMdlAssignmentDAO(IMdlAssignmentDAO mdlAssignmentDAO) {
 	this.mdlAssignmentDAO = mdlAssignmentDAO;
-    }
-
-    public IMdlAssignmentConfigItemDAO getMdlAssignmentConfigItemDAO() {
-	return mdlAssignmentConfigItemDAO;
-    }
-
-    public void setMdlAssignmentConfigItemDAO(IMdlAssignmentConfigItemDAO mdlAssignmentConfigItemDAO) {
-	this.mdlAssignmentConfigItemDAO = mdlAssignmentConfigItemDAO;
     }
 
     public IToolContentHandler getMdlAssignmentToolContentHandler() {
@@ -925,34 +948,8 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 	this.mdlAssignmentOutputFactory = mdlAssignmentOutputFactory;
     }
 
-    /**
-     * TODO: Use spring injection instead of hacking a context
-     * 
-     * @return
-     */
     public IIntegrationService getIntegrationService() {
-
-	if (integrationService == null) {
-	    String contexts[] = { "/org/lamsfoundation/lams/applicationContext.xml",
-		    "/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
-		    "/org/lamsfoundation/lams/toolApplicationContext.xml",
-		    "/org/lamsfoundation/lams/integrationContext.xml",
-		    "/org/lamsfoundation/lams/learning/learningApplicationContext.xml",
-		    "/org/lamsfoundation/lams/contentrepository/applicationContext.xml",
-		    "/org/lamsfoundation/lams/tool/mdasgm/mdlAssignmentApplicationContext.xml",
-		    "/org/lamsfoundation/lams/commonContext.xml" };
-
-	    ApplicationContext context = new ClassPathXmlApplicationContext(contexts);
-
-	    if (context == null)
-		throw new MdlAssignmentException(
-			"Unable to access application context. Cannot create integration service object.");
-
-	    IIntegrationService service = (IIntegrationService) context.getBean("integrationService");
-	    return service;
-	} else {
-	    return integrationService;
-	}
+	return integrationService;
     }
 
     public void setIntegrationService(IIntegrationService integrationService) {

@@ -19,10 +19,9 @@
 				<property name="mdlAssignmentSessionDAO"><ref bean="mdlAssignmentSessionDAO"/></property>
 				<property name="mdlAssignmentUserDAO"><ref bean="mdlAssignmentUserDAO"/></property>
 				<property name="mdlAssignmentDAO"><ref bean="mdlAssignmentDAO"/></property>
-				<property name="mdlAssignmentConfigItemDAO"><ref bean="mdlAssignmentConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property> 	
-				<!--<property name="integrationService"><ref bean="integrationService"/></property>-->
+				<property name="integrationService"><ref bean="integrationService"/></property>
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="mdlAssignmentToolContentHandler"><ref bean="mdlAssignmentToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
@@ -56,10 +55,6 @@
 	<bean id="mdlAssignmentDAO" class="org.lamsfoundation.lams.tool.mdasgm.dao.hibernate.MdlAssignmentDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
-	
-	<bean id="mdlAssignmentConfigItemDAO" class="org.lamsfoundation.lams.tool.mdasgm.dao.hibernate.MdlAssignmentConfigItemDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean> 
 
 	<bean id="mdlAssignmentSessionDAO" class="org.lamsfoundation.lams.tool.mdasgm.dao.hibernate.MdlAssignmentSessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>

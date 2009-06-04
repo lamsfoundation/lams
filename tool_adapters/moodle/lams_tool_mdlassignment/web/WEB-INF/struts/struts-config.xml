@@ -18,12 +18,12 @@
       type="org.lamsfoundation.lams.tool.mdasgm.web.forms.MonitoringForm"
     />
     <form-bean
-      name="mdasgm10AdminForm"
-      type="org.lamsfoundation.lams.tool.mdasgm.web.forms.AdminForm"
-    />
-    <form-bean
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.mdasgm.web.forms.AuthoringForm"
+    />
+    <form-bean
+      name="mdasgm10AdminForm"
+      type="org.lamsfoundation.lams.tool.mdasgm.web.forms.AdminForm"
     />
     <form-bean
       name="learningForm"
@@ -61,13 +61,6 @@
       />
     </action>
     <action
-      path="/clearsession"
-      type="org.lamsfoundation.lams.tool.mdasgm.web.actions.ClearSessionAction"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.mdasgm.web.actions.AuthoringAction"
       name="authoringForm"
@@ -84,6 +77,21 @@
       <forward
         name="message_page"
         path="tiles:/generic/message"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/mdasgm10admin"
+      type="org.lamsfoundation.lams.tool.mdasgm.web.actions.AdminAction"
+      name="mdasgm10AdminForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="config"
+        path="/pages/admin/config.jsp"
         redirect="false"
       />
     </action>
@@ -113,19 +121,11 @@
       />
     </action>
     <action
-      path="/mdasgm10admin"
-      type="org.lamsfoundation.lams.tool.mdasgm.web.actions.AdminAction"
-      name="mdasgm10AdminForm"
-      scope="request"
-      parameter="dispatch"
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.mdasgm.web.actions.ClearSessionAction"
       unknown="false"
       validate="false"
     >
-      <forward
-        name="config"
-        path="/pages/admin/config.jsp"
-        redirect="false"
-      />
     </action>
 
     <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->

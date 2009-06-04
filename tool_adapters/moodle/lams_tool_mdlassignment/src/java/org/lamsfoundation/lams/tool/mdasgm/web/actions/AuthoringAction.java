@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignment;
-import org.lamsfoundation.lams.tool.mdasgm.model.MdlAssignmentConfigItem;
 import org.lamsfoundation.lams.tool.mdasgm.service.IMdlAssignmentService;
 import org.lamsfoundation.lams.tool.mdasgm.service.MdlAssignmentServiceProxy;
 import org.lamsfoundation.lams.tool.mdasgm.util.MdlAssignmentConstants;
@@ -96,7 +95,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// set up mdlAssignmentService
 	if (mdlAssignmentService == null) {
-	    mdlAssignmentService = MdlAssignmentServiceProxy.getMdlAssignmentService(this.getServlet().getServletContext());
+	    mdlAssignmentService = MdlAssignmentServiceProxy.getMdlAssignmentService(this.getServlet()
+		    .getServletContext());
 	}
 
 	// retrieving MdlAssignment with given toolContentID
@@ -108,12 +108,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	String userFromCSV = null;
 	String courseFromCSV = null;
 	String sectionFromCSV = null;
+	String extLmsIdFromCSV = null;
 	if (customCSV == null && mdlAssignment == null) {
 	    logger.error("CustomCSV required if mdlAssignment is null");
 	    throw new ToolException("CustomCSV required if mdlAssignment is null");
 	} else if (customCSV != null) {
 	    String splitCSV[] = customCSV.split(",");
-	    if (splitCSV.length != 3) {
+	    if (splitCSV.length != 4) {
 		logger.error("mdlAssignment tool customCSV not in required (user,course,courseURL) form: " + customCSV);
 		throw new ToolException("mdlAssignment tool cusomCSV not in required (user,course,courseURL) form: "
 			+ customCSV);
@@ -121,6 +122,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		userFromCSV = splitCSV[0];
 		courseFromCSV = splitCSV[1];
 		sectionFromCSV = splitCSV[2];
+		extLmsIdFromCSV = splitCSV[3];
 	    }
 	}
 
@@ -129,6 +131,15 @@ public class AuthoringAction extends LamsDispatchAction {
 	    mdlAssignment.setExtUsername(userFromCSV);
 	    mdlAssignment.setExtCourseId(courseFromCSV);
 	    mdlAssignment.setExtSection(sectionFromCSV);
+	    mdlAssignment.setCreateDate(new Date());
+	    mdlAssignment.setExtLmsId(extLmsIdFromCSV);
+	}
+
+	if (mdlAssignment.getExtLmsId() == null) {
+	    mdlAssignment.setExtUsername(userFromCSV);
+	    mdlAssignment.setExtCourseId(courseFromCSV);
+	    mdlAssignment.setExtSection(sectionFromCSV);
+	    mdlAssignment.setExtLmsId(extLmsIdFromCSV);
 	    mdlAssignment.setCreateDate(new Date());
 	}
 
@@ -144,19 +155,17 @@ public class AuthoringAction extends LamsDispatchAction {
 	try {
 
 	    // If the mdlAssignment has a saved course url, use it, otherwise use the one giving in the request in customCSV
-	    //String courseUrlToBeUsed = (mdlAssignment.getExtCourseUrl() != null) ? mdlAssignment.getExtCourseUrl() : courseUrlFromCSV;
-
-	    String responseUrl = mdlAssignmentService.getConfigItem(MdlAssignmentConfigItem.KEY_EXTERNAL_SERVER_URL)
-		    .getConfigValue();
+	    String responseUrl = mdlAssignmentService.getExtServerUrl(mdlAssignment.getExtLmsId());
+	    
 	    responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
 	    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
 		    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
-  
+
 	    responseUrl += "&lamsUpdateURL=" + returnUpdateUrl;
-	    
+
 	    String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_EDIT_URL, "UTF8");
-	    
-	    responseUrl += "&dest=" + encodedMoodleRelativePath ;
+
+	    responseUrl += "&dest=" + encodedMoodleRelativePath;
 
 	    if (mdlAssignment.getExtSection() != null) {
 		responseUrl += "&section=" + mdlAssignment.getExtSection();
@@ -201,9 +210,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	mdlAssignmentService.saveOrUpdateMdlAssignment(mdlAssignment);
 
 	String redirectString = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
-		+ MdlAssignmentConstants.TOOL_SIGNATURE + "/clearsession.do" + "?action=confirm&mode=author" + "&signature="
-		+ MdlAssignmentConstants.TOOL_SIGNATURE + "&toolContentID=" + toolContentID.toString() + "&defineLater=no"
-		+ "&customiseSessionID=" + "&contentFolderID=0";
+		+ MdlAssignmentConstants.TOOL_SIGNATURE + "/clearsession.do" + "?action=confirm&mode=author"
+		+ "&signature=" + MdlAssignmentConstants.TOOL_SIGNATURE + "&toolContentID=" + toolContentID.toString()
+		+ "&defineLater=no" + "&customiseSessionID=" + "&contentFolderID=0";
 
 	log.debug("Manual redirect for MdlAssignment to: " + redirectString);
 
