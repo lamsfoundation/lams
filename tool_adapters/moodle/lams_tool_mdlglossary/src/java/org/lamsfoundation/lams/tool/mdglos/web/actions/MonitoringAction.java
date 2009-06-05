@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mdglos.dto.MdlGlossaryDTO;
 import org.lamsfoundation.lams.tool.mdglos.dto.MdlGlossarySessionDTO;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossary;
-import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryConfigItem;
 import org.lamsfoundation.lams.tool.mdglos.service.IMdlGlossaryService;
 import org.lamsfoundation.lams.tool.mdglos.service.MdlGlossaryServiceProxy;
 import org.lamsfoundation.lams.tool.mdglos.util.MdlGlossaryConstants;
@@ -90,15 +89,15 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	for (MdlGlossarySessionDTO sessionDTO : mdlGlossaryDT0.getSessionDTOs()) {
 	    try {
-		String responseUrl = mdlGlossaryService.getConfigItem(MdlGlossaryConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
+		String responseUrl = mdlGlossaryService.getExtServerUrl(mdlGlossary.getExtLmsId());
 		responseUrl += RELATIVE_MONITOR_URL;
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ sessionDTO.getSessionID().toString() + "&dispatch=finishActivity";
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
 
-		responseUrl += "&update=" + sessionDTO.getExtSessionID()+"&id=" + sessionDTO.getExtSessionID() + "&returnUrl=" + returnUrl;
+		responseUrl += "&update=" + sessionDTO.getExtSessionID() + "&id=" + sessionDTO.getExtSessionID()
+			+ "&returnUrl=" + returnUrl;
 
 		sessionDTO.setRunTimeUrl(responseUrl);
 	    } catch (UnsupportedEncodingException e) {

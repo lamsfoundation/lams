@@ -19,10 +19,9 @@
 				<property name="mdlGlossarySessionDAO"><ref bean="mdlGlossarySessionDAO"/></property>
 				<property name="mdlGlossaryUserDAO"><ref bean="mdlGlossaryUserDAO"/></property>
 				<property name="mdlGlossaryDAO"><ref bean="mdlGlossaryDAO"/></property>
-				<property name="mdlGlossaryConfigItemDAO"><ref bean="mdlGlossaryConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property> 	
-				<!--<property name="integrationService"><ref bean="integrationService"/></property>-->
+				<property name="integrationService"><ref bean="integrationService"/></property>
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="mdlGlossaryToolContentHandler"><ref bean="mdlGlossaryToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
@@ -56,10 +55,6 @@
 	<bean id="mdlGlossaryDAO" class="org.lamsfoundation.lams.tool.mdglos.dao.hibernate.MdlGlossaryDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
-	
-	<bean id="mdlGlossaryConfigItemDAO" class="org.lamsfoundation.lams.tool.mdglos.dao.hibernate.MdlGlossaryConfigItemDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean> 
 
 	<bean id="mdlGlossarySessionDAO" class="org.lamsfoundation.lams.tool.mdglos.dao.hibernate.MdlGlossarySessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>

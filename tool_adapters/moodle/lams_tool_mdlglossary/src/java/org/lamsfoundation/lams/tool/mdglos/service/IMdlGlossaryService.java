@@ -25,10 +25,11 @@
 package org.lamsfoundation.lams.tool.mdglos.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossary;
-import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryConfigItem;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossarySession;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryUser;
 import org.lamsfoundation.lams.tool.mdglos.util.MdlGlossaryException;
@@ -96,21 +97,6 @@ public interface IMdlGlossaryService {
     public void saveOrUpdateMdlGlossarySession(MdlGlossarySession mdlGlossarySession);
 
     /**
-     * Get the mdlGlossary config item by key
-     * 
-     * @param key
-     * @return
-     */
-    public MdlGlossaryConfigItem getConfigItem(String key);
-
-    /**
-     * Save a mdl configItem
-     * 
-     * @param item
-     */
-    public void saveOrUpdateMdlGlossaryConfigItem(MdlGlossaryConfigItem item);
-
-    /**
      * 
      * @param userId
      * @param toolSessionId
@@ -124,13 +110,6 @@ public interface IMdlGlossaryService {
      * @return
      */
     public MdlGlossaryUser getUserByUID(Long uid);
-
-    /**
-     * Gets the external organisation map for this tool adapter
-     * 
-     * @return
-     */
-    public ExtServerOrgMap getExtServerOrgMap();
 
     /**
      * Creates a hash for talking to the external server
@@ -172,8 +151,8 @@ public interface IMdlGlossaryService {
      * @param toolSessionId
      * @return
      */
-    public int getExternalToolOutputInt(String outputName, MdlGlossary mdlGlossary, Long userId, String extToolContentId,
-	    Long toolSessionId);
+    public int getExternalToolOutputInt(String outputName, MdlGlossary mdlGlossary, Long userId,
+	    String extToolContentId, Long toolSessionId);
 
     /**
      * Converts the customCSV parameter into a hashmap
@@ -186,8 +165,8 @@ public interface IMdlGlossaryService {
     /**
      * Constructs a parameter hashmap to be used for the default parameters
      * required by the external LMS tool adapter servlet. For instance in
-     * mdlGlossary, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * mdlGlossary, this constructs the following: { ["un", username], ["cs",
+     * course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param mdlGlossary
      * @return
@@ -197,12 +176,41 @@ public interface IMdlGlossaryService {
     /**
      * Constructs a parameter hashmap based off customCSV to be used for the
      * default parameters required by the external LMS tool adapter servlet. For
-     * instance in mdlGlossary, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * instance in mdlGlossary, this constructs the following: { ["un",
+     * username], ["cs", course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param user
      * @param course
      * @return
      */
     public HashMap<String, String> getRequiredExtServletParams(String customCSV);
+
+    /**
+     * Gets a list of all external servers
+     * 
+     * @return
+     */
+    public List<ExtServerOrgMap> getExtServerList();
+
+    /**
+     * Gets a list of servers mapped to this tool adapter
+     * 
+     * @return
+     */
+    public List<ExtServerToolAdapterMap> getMappedServers();
+
+    /**
+     * Save all the mapped servers
+     * 
+     * @param mappableServers
+     */
+    public void saveServerMappings(String[] mappableServers);
+
+    /**
+     * Gets an external server url given the extLmsId
+     * 
+     * @param extLmsId
+     * @return
+     */
+    public String getExtServerUrl(String extLmsId);
 }

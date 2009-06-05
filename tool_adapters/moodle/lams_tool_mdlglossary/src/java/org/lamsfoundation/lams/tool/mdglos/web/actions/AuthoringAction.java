@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossary;
-import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryConfigItem;
 import org.lamsfoundation.lams.tool.mdglos.service.IMdlGlossaryService;
 import org.lamsfoundation.lams.tool.mdglos.service.MdlGlossaryServiceProxy;
 import org.lamsfoundation.lams.tool.mdglos.util.MdlGlossaryConstants;
@@ -64,7 +63,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public IMdlGlossaryService mdlGlossaryService;
 
-  //public static final String RELATIVE_MOODLE_AUTHOR_URL =  "/course/modedit-lams.php?";
+    //public static final String RELATIVE_MOODLE_AUTHOR_URL =  "/course/modedit-lams.php?";
     public static final String RELATIVE_MOODLE_AUTHOR_URL = "course/lamsframes.php?";
     public static final String MOODLE_EDIT_URL = "course/modedit-lams.php";
 
@@ -108,12 +107,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	String userFromCSV = null;
 	String courseFromCSV = null;
 	String sectionFromCSV = null;
+	String extLmsIdFromCSV = null;
 	if (customCSV == null && mdlGlossary == null) {
 	    logger.error("CustomCSV required if mdlGlossary is null");
 	    throw new ToolException("CustomCSV required if mdlGlossary is null");
 	} else if (customCSV != null) {
 	    String splitCSV[] = customCSV.split(",");
-	    if (splitCSV.length != 3) {
+	    if (splitCSV.length != 4) {
 		logger.error("mdlGlossary tool customCSV not in required (user,course,courseURL) form: " + customCSV);
 		throw new ToolException("mdlGlossary tool cusomCSV not in required (user,course,courseURL) form: "
 			+ customCSV);
@@ -121,6 +121,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		userFromCSV = splitCSV[0];
 		courseFromCSV = splitCSV[1];
 		sectionFromCSV = splitCSV[2];
+		extLmsIdFromCSV = splitCSV[3];
 	    }
 	}
 
@@ -129,6 +130,15 @@ public class AuthoringAction extends LamsDispatchAction {
 	    mdlGlossary.setExtUsername(userFromCSV);
 	    mdlGlossary.setExtCourseId(courseFromCSV);
 	    mdlGlossary.setExtSection(sectionFromCSV);
+	    mdlGlossary.setExtLmsId(extLmsIdFromCSV);
+	    mdlGlossary.setCreateDate(new Date());
+	}
+
+	if (mdlGlossary.getExtLmsId() == null) {
+	    mdlGlossary.setExtUsername(userFromCSV);
+	    mdlGlossary.setExtCourseId(courseFromCSV);
+	    mdlGlossary.setExtSection(sectionFromCSV);
+	    mdlGlossary.setExtLmsId(extLmsIdFromCSV);
 	    mdlGlossary.setCreateDate(new Date());
 	}
 
@@ -144,29 +154,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	try {
 
 	    // If the mdlGlossary has a saved course url, use it, otherwise use the one giving in the request in customCSV
-	    //String courseUrlToBeUsed = (mdlGlossary.getExtCourseUrl() != null) ? mdlGlossary.getExtCourseUrl() : courseUrlFromCSV;
+	    String responseUrl = mdlGlossaryService.getExtServerUrl(mdlGlossary.getExtLmsId());
 
-	   String responseUrl = mdlGlossaryService.getConfigItem(MdlGlossaryConfigItem.KEY_EXTERNAL_SERVER_URL)
-		    .getConfigValue();
-	   /* responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
+	    responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
 	    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
 		    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
-	    responseUrl += "&lamsUpdateURL=" + returnUpdateUrl;*/
-		
-		
-		 responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
-		    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
-			    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
-		    
-		    
-		    returnUpdateUrl = URLEncoder.encode(returnUpdateUrl, "UTF8");
-		    
-		    responseUrl += "lamsUpdateURL=" + returnUpdateUrl;
-		    
-		    String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_EDIT_URL, "UTF8");
-		    
-		    responseUrl += "&dest=" + encodedMoodleRelativePath ;
-	    
+
+	    returnUpdateUrl = URLEncoder.encode(returnUpdateUrl, "UTF8");
+
+	    responseUrl += "lamsUpdateURL=" + returnUpdateUrl;
+
+	    String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_EDIT_URL, "UTF8");
+
+	    responseUrl += "&dest=" + encodedMoodleRelativePath;
 
 	    if (mdlGlossary.getExtSection() != null) {
 		responseUrl += "&section=" + mdlGlossary.getExtSection();
@@ -211,9 +211,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	mdlGlossaryService.saveOrUpdateMdlGlossary(mdlGlossary);
 
 	String redirectString = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
-		+ MdlGlossaryConstants.TOOL_SIGNATURE + "/clearsession.do" + "?action=confirm&mode=author" + "&signature="
-		+ MdlGlossaryConstants.TOOL_SIGNATURE + "&toolContentID=" + toolContentID.toString() + "&defineLater=no"
-		+ "&customiseSessionID=" + "&contentFolderID=0";
+		+ MdlGlossaryConstants.TOOL_SIGNATURE + "/clearsession.do" + "?action=confirm&mode=author"
+		+ "&signature=" + MdlGlossaryConstants.TOOL_SIGNATURE + "&toolContentID=" + toolContentID.toString()
+		+ "&defineLater=no" + "&customiseSessionID=" + "&contentFolderID=0";
 
 	log.debug("Manual redirect for MdlGlossary to: " + redirectString);
 

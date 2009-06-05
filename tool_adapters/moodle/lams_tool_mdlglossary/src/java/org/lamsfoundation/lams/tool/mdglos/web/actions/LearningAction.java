@@ -38,11 +38,10 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryUser;
 import org.lamsfoundation.lams.tool.mdglos.dto.MdlGlossaryDTO;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossary;
-import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryConfigItem;
 import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossarySession;
+import org.lamsfoundation.lams.tool.mdglos.model.MdlGlossaryUser;
 import org.lamsfoundation.lams.tool.mdglos.service.IMdlGlossaryService;
 import org.lamsfoundation.lams.tool.mdglos.service.MdlGlossaryServiceProxy;
 import org.lamsfoundation.lams.tool.mdglos.util.MdlGlossaryConstants;
@@ -76,7 +75,7 @@ public class LearningAction extends LamsDispatchAction {
 
     public static final String RELATIVE_LEARNER_URL = "course/lamsframes.php?";
     public static final String MOODLE_VIEW_URL = "mod/glossary/view.php";
-    public static final String RELATIVE_TEACHER_URL = "mod/glossary/view.php?mode=author&"; 
+    public static final String RELATIVE_TEACHER_URL = "mod/glossary/view.php?mode=author&";
 
     private IMdlGlossaryService mdlGlossaryService;
 
@@ -91,7 +90,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	// Retrieve the session and content.
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, false);
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 	MdlGlossarySession mdlGlossarySession = mdlGlossaryService.getSessionBySessionId(toolSessionID);
 	if (mdlGlossarySession == null) {
 	    throw new MdlGlossaryException("Cannot retreive session with toolSessionID: " + toolSessionID);
@@ -120,31 +119,26 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	if (mdlGlossary.getExtToolContentId() != null) {
-		 try {
-				String responseUrl = mdlGlossaryService.getConfigItem(MdlGlossaryConfigItem.KEY_EXTERNAL_SERVER_URL)
-					.getConfigValue();
-				
-				if(mode.equals(ToolAccessMode.TEACHER))
-				{
-					responseUrl += RELATIVE_TEACHER_URL;
-				}
-				else if (mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR))
-				{
-					responseUrl += RELATIVE_LEARNER_URL;
-				}
+	    try {
+		String responseUrl = mdlGlossaryService.getExtServerUrl(mdlGlossary.getExtLmsId());
+
+		if (mode.equals(ToolAccessMode.TEACHER)) {
+		    responseUrl += RELATIVE_TEACHER_URL;
+		} else if (mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR)) {
+		    responseUrl += RELATIVE_LEARNER_URL;
+		}
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ toolSessionID.toString() + "&dispatch=finishActivity";
-		
+
 		String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_VIEW_URL, "UTF8");
 
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
-		
 
-		responseUrl += "&id=" + mdlGlossarySession.getExtSessionId() + "&returnUrl=" + returnUrl
-			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1" + "&isFinished=" + mdlGlossaryUser.isFinishedActivity();
-		
-		
+		responseUrl += "&id=" + mdlGlossarySession.getExtSessionId() + "&returnUrl=" + returnUrl + "&dest="
+			+ encodedMoodleRelativePath + "&is_learner=1" + "&isFinished="
+			+ mdlGlossaryUser.isFinishedActivity();
+
 		log.debug("Redirecting for mdl glossary learner: " + responseUrl);
 		response.sendRedirect(responseUrl);
 	    } catch (Exception e) {
@@ -160,8 +154,8 @@ public class LearningAction extends LamsDispatchAction {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	MdlGlossaryUser mdlGlossaryUser = mdlGlossaryService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
-		toolSessionId);
+	MdlGlossaryUser mdlGlossaryUser = mdlGlossaryService.getUserByUserIdAndSessionId(new Long(user.getUserID()
+		.intValue()), toolSessionId);
 
 	if (mdlGlossaryUser == null) {
 	    MdlGlossarySession mdlGlossarySession = mdlGlossaryService.getSessionBySessionId(toolSessionId);

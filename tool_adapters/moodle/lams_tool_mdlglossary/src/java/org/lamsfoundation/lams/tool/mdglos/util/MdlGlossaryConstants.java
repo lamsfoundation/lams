@@ -47,4 +47,6 @@ public interface MdlGlossaryConstants {
     public static final String PARAM_PARENT_PAGE = "parentPage";
 
     static final String FILTER_REPLACE_TEXT = "***";
+    
+    public static final String RELATIVE_SERVLET_URL = "mod/lamstwo/tooladapter_glossary.php";
 }
