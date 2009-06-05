@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mdwiki.model.MdlWiki;
-import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiConfigItem;
 import org.lamsfoundation.lams.tool.mdwiki.service.IMdlWikiService;
 import org.lamsfoundation.lams.tool.mdwiki.service.MdlWikiServiceProxy;
 import org.lamsfoundation.lams.tool.mdwiki.util.MdlWikiConstants;
@@ -107,12 +106,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	String userFromCSV = null;
 	String courseFromCSV = null;
 	String sectionFromCSV = null;
+	String extLmsIdFromCSV = null;
 	if (customCSV == null && mdlWiki == null) {
 	    logger.error("CustomCSV required if mdlWiki is null");
 	    throw new ToolException("CustomCSV required if mdlWiki is null");
 	} else if (customCSV != null) {
 	    String splitCSV[] = customCSV.split(",");
-	    if (splitCSV.length != 3) {
+	    if (splitCSV.length != 4) {
 		logger.error("mdlWiki tool customCSV not in required (user,course,courseURL) form: " + customCSV);
 		throw new ToolException("mdlWiki tool cusomCSV not in required (user,course,courseURL) form: "
 			+ customCSV);
@@ -120,6 +120,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		userFromCSV = splitCSV[0];
 		courseFromCSV = splitCSV[1];
 		sectionFromCSV = splitCSV[2];
+		extLmsIdFromCSV = splitCSV[3];
 	    }
 	}
 
@@ -128,6 +129,15 @@ public class AuthoringAction extends LamsDispatchAction {
 	    mdlWiki.setExtUsername(userFromCSV);
 	    mdlWiki.setExtCourseId(courseFromCSV);
 	    mdlWiki.setExtSection(sectionFromCSV);
+	    mdlWiki.setExtLmsId(extLmsIdFromCSV);
+	    mdlWiki.setCreateDate(new Date());
+	}
+
+	if (mdlWiki.getExtLmsId() == null) {
+	    mdlWiki.setExtUsername(userFromCSV);
+	    mdlWiki.setExtCourseId(courseFromCSV);
+	    mdlWiki.setExtSection(sectionFromCSV);
+	    mdlWiki.setExtLmsId(extLmsIdFromCSV);
 	    mdlWiki.setCreateDate(new Date());
 	}
 
@@ -143,25 +153,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	try {
 
 	    // If the mdlWiki has a saved course url, use it, otherwise use the one giving in the request in customCSV
-	    //String courseUrlToBeUsed = (mdlWiki.getExtCourseUrl() != null) ? mdlWiki.getExtCourseUrl() : courseUrlFromCSV;
+	    String responseUrl = mdlWikiService.getExtServerUrl(mdlWiki.getExtLmsId());
 
-	    String responseUrl = mdlWikiService.getConfigItem(MdlWikiConfigItem.KEY_EXTERNAL_SERVER_URL)
-		    .getConfigValue();
-	    
-	   
-	    
 	    responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
 	    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
 		    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
-	    
-	    
+
 	    returnUpdateUrl = URLEncoder.encode(returnUpdateUrl, "UTF8");
-	    
+
 	    responseUrl += "lamsUpdateURL=" + returnUpdateUrl;
-	    
+
 	    String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_EDIT_URL, "UTF8");
-	    
-	    responseUrl += "&dest=" + encodedMoodleRelativePath ;
+
+	    responseUrl += "&dest=" + encodedMoodleRelativePath;
 
 	    if (mdlWiki.getExtSection() != null) {
 		responseUrl += "&section=" + mdlWiki.getExtSection();

@@ -41,10 +41,9 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mdwiki.dto.MdlWikiDTO;
 import org.lamsfoundation.lams.tool.mdwiki.model.MdlWiki;
-import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiConfigItem;
 import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiSession;
-import org.lamsfoundation.lams.tool.mdwiki.service.MdlWikiServiceProxy;
 import org.lamsfoundation.lams.tool.mdwiki.service.IMdlWikiService;
+import org.lamsfoundation.lams.tool.mdwiki.service.MdlWikiServiceProxy;
 import org.lamsfoundation.lams.tool.mdwiki.util.MdlWikiException;
 import org.lamsfoundation.lams.tool.mdwiki.util.WebUtility;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -166,9 +165,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private void exportFileFromExternalServer(HttpServletRequest request, HttpServletResponse response,
 	    Long extToolSessionId, MdlWiki mdlWiki, String fullPath) throws Exception {
-	String exportPortFolioServletUrl = mdlWikiService.getConfigItem(MdlWikiConfigItem.KEY_EXTERNAL_TOOL_SERVLET)
-		.getConfigValue();
-
+	String exportPortFolioServletUrl = mdlWikiService.getExtServerUrl(mdlWiki.getExtLmsId());
 	String extUsername = "user"; // setting user to arbitrary values since they are only used to construct the hash
 
 	HashMap<String, String> params = mdlWikiService.getRequiredExtServletParams(mdlWiki);

@@ -35,10 +35,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.mdwiki.service.MdlWikiService;
 
 public class WebUtility {
     static Logger logger = Logger.getLogger(WebUtility.class.getName());
@@ -149,7 +149,9 @@ public class WebUtility {
 	    urlStr += "?";
 
 	for (Entry<String, String> entry : params.entrySet()) {
-	    urlStr += "&" + entry.getKey() + "=" + entry.getValue();
+	    if (!entry.getKey().equals(MdlWikiService.CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID)) {
+		urlStr += "&" + entry.getKey() + "=" + entry.getValue();
+	    }
 	}
 
 	logger.debug("Making request to external servlet: " + urlStr);

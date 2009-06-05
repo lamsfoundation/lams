@@ -34,19 +34,18 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.mdwiki.dto.MdlWikiDTO;
-import org.lamsfoundation.lams.tool.mdwiki.model.MdlWiki;
-import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiConfigItem;
-import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiSession;
-import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiUser;
-import org.lamsfoundation.lams.tool.mdwiki.service.MdlWikiServiceProxy;
-import org.lamsfoundation.lams.tool.mdwiki.service.IMdlWikiService;
-import org.lamsfoundation.lams.tool.mdwiki.util.MdlWikiConstants;
-import org.lamsfoundation.lams.tool.mdwiki.util.MdlWikiException;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.mdwiki.dto.MdlWikiDTO;
+import org.lamsfoundation.lams.tool.mdwiki.model.MdlWiki;
+import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiSession;
+import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiUser;
+import org.lamsfoundation.lams.tool.mdwiki.service.IMdlWikiService;
+import org.lamsfoundation.lams.tool.mdwiki.service.MdlWikiServiceProxy;
+import org.lamsfoundation.lams.tool.mdwiki.util.MdlWikiConstants;
+import org.lamsfoundation.lams.tool.mdwiki.util.MdlWikiException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -126,8 +125,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	if (mdlWiki.getExtToolContentId() != null) {
 	    try {
-		String responseUrl = mdlWikiService.getConfigItem(MdlWikiConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
+		String responseUrl = mdlWikiService.getExtServerUrl(mdlWiki.getExtLmsId());
 		
 		if(mode.equals(ToolAccessMode.TEACHER))
 		{

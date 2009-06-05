@@ -25,10 +25,11 @@
 package org.lamsfoundation.lams.tool.mdwiki.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.mdwiki.model.MdlWiki;
-import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiConfigItem;
 import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiSession;
 import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiUser;
 import org.lamsfoundation.lams.tool.mdwiki.util.MdlWikiException;
@@ -96,21 +97,6 @@ public interface IMdlWikiService {
     public void saveOrUpdateMdlWikiSession(MdlWikiSession mdlWikiSession);
 
     /**
-     * Get the mdlWiki config item by key
-     * 
-     * @param key
-     * @return
-     */
-    public MdlWikiConfigItem getConfigItem(String key);
-
-    /**
-     * Save a mdl configItem
-     * 
-     * @param item
-     */
-    public void saveOrUpdateMdlWikiConfigItem(MdlWikiConfigItem item);
-
-    /**
      * 
      * @param userId
      * @param toolSessionId
@@ -124,13 +110,6 @@ public interface IMdlWikiService {
      * @return
      */
     public MdlWikiUser getUserByUID(Long uid);
-
-    /**
-     * Gets the external organisation map for this tool adapter
-     * 
-     * @return
-     */
-    public ExtServerOrgMap getExtServerOrgMap();
 
     /**
      * Creates a hash for talking to the external server
@@ -186,8 +165,8 @@ public interface IMdlWikiService {
     /**
      * Constructs a parameter hashmap to be used for the default parameters
      * required by the external LMS tool adapter servlet. For instance in
-     * mdlWiki, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * mdlWiki, this constructs the following: { ["un", username], ["cs",
+     * course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param mdlWiki
      * @return
@@ -197,12 +176,41 @@ public interface IMdlWikiService {
     /**
      * Constructs a parameter hashmap based off customCSV to be used for the
      * default parameters required by the external LMS tool adapter servlet. For
-     * instance in mdlWiki, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * instance in mdlWiki, this constructs the following: { ["un", username],
+     * ["cs", course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param user
      * @param course
      * @return
      */
     public HashMap<String, String> getRequiredExtServletParams(String customCSV);
+
+    /**
+     * Gets a list of all external servers
+     * 
+     * @return
+     */
+    public List<ExtServerOrgMap> getExtServerList();
+
+    /**
+     * Gets a list of servers mapped to this tool adapter
+     * 
+     * @return
+     */
+    public List<ExtServerToolAdapterMap> getMappedServers();
+
+    /**
+     * Save all the mapped servers
+     * 
+     * @param mappableServers
+     */
+    public void saveServerMappings(String[] mappableServers);
+
+    /**
+     * Gets an external server url given the extLmsId
+     * 
+     * @param extLmsId
+     * @return
+     */
+    public String getExtServerUrl(String extLmsId);
 }

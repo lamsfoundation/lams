@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mdwiki.dto.MdlWikiDTO;
 import org.lamsfoundation.lams.tool.mdwiki.dto.MdlWikiSessionDTO;
 import org.lamsfoundation.lams.tool.mdwiki.model.MdlWiki;
-import org.lamsfoundation.lams.tool.mdwiki.model.MdlWikiConfigItem;
 import org.lamsfoundation.lams.tool.mdwiki.service.IMdlWikiService;
 import org.lamsfoundation.lams.tool.mdwiki.service.MdlWikiServiceProxy;
 import org.lamsfoundation.lams.tool.mdwiki.util.MdlWikiConstants;
@@ -90,8 +89,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	for (MdlWikiSessionDTO sessionDTO : mdlWikiDT0.getSessionDTOs()) {
 	    try {
-		String responseUrl = mdlWikiService.getConfigItem(MdlWikiConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
+		String responseUrl = mdlWikiService.getExtServerUrl(mdlWiki.getExtLmsId());
 		responseUrl += RELATIVE_MONITOR_URL;
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="

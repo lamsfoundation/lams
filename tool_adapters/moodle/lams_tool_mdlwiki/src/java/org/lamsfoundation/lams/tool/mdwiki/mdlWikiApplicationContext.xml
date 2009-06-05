@@ -19,10 +19,9 @@
 				<property name="mdlWikiSessionDAO"><ref bean="mdlWikiSessionDAO"/></property>
 				<property name="mdlWikiUserDAO"><ref bean="mdlWikiUserDAO"/></property>
 				<property name="mdlWikiDAO"><ref bean="mdlWikiDAO"/></property>
-				<property name="mdlWikiConfigItemDAO"><ref bean="mdlWikiConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property> 	
-				<!--<property name="integrationService"><ref bean="integrationService"/></property>-->
+				<property name="integrationService"><ref bean="integrationService"/></property>
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="mdlWikiToolContentHandler"><ref bean="mdlWikiToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
@@ -56,10 +55,6 @@
 	<bean id="mdlWikiDAO" class="org.lamsfoundation.lams.tool.mdwiki.dao.hibernate.MdlWikiDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
-	
-	<bean id="mdlWikiConfigItemDAO" class="org.lamsfoundation.lams.tool.mdwiki.dao.hibernate.MdlWikiConfigItemDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean> 
 
 	<bean id="mdlWikiSessionDAO" class="org.lamsfoundation.lams.tool.mdwiki.dao.hibernate.MdlWikiSessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
