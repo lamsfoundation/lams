@@ -25,10 +25,11 @@
 package org.lamsfoundation.lams.tool.mdlesn.service;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.mdlesn.model.MdlLesson;
-import org.lamsfoundation.lams.tool.mdlesn.model.MdlLessonConfigItem;
 import org.lamsfoundation.lams.tool.mdlesn.model.MdlLessonSession;
 import org.lamsfoundation.lams.tool.mdlesn.model.MdlLessonUser;
 import org.lamsfoundation.lams.tool.mdlesn.util.MdlLessonException;
@@ -96,21 +97,6 @@ public interface IMdlLessonService {
     public void saveOrUpdateMdlLessonSession(MdlLessonSession mdlLessonSession);
 
     /**
-     * Get the mdlLesson config item by key
-     * 
-     * @param key
-     * @return
-     */
-    public MdlLessonConfigItem getConfigItem(String key);
-
-    /**
-     * Save a mdl configItem
-     * 
-     * @param item
-     */
-    public void saveOrUpdateMdlLessonConfigItem(MdlLessonConfigItem item);
-
-    /**
      * 
      * @param userId
      * @param toolSessionId
@@ -124,13 +110,6 @@ public interface IMdlLessonService {
      * @return
      */
     public MdlLessonUser getUserByUID(Long uid);
-
-    /**
-     * Gets the external organisation map for this tool adapter
-     * 
-     * @return
-     */
-    public ExtServerOrgMap getExtServerOrgMap();
 
     /**
      * Creates a hash for talking to the external server
@@ -186,8 +165,8 @@ public interface IMdlLessonService {
     /**
      * Constructs a parameter hashmap to be used for the default parameters
      * required by the external LMS tool adapter servlet. For instance in
-     * mdlLesson, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * mdlLesson, this constructs the following: { ["un", username], ["cs",
+     * course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param mdlLesson
      * @return
@@ -197,12 +176,42 @@ public interface IMdlLessonService {
     /**
      * Constructs a parameter hashmap based off customCSV to be used for the
      * default parameters required by the external LMS tool adapter servlet. For
-     * instance in mdlLesson, this constructs the following:
-     *  { ["un", username], ["cs", course], ["ts", timestamp], ["hs", hash], }
+     * instance in mdlLesson, this constructs the following: { ["un", username],
+     * ["cs", course], ["ts", timestamp], ["hs", hash], }
      * 
      * @param user
      * @param course
      * @return
      */
     public HashMap<String, String> getRequiredExtServletParams(String customCSV);
+
+    /**
+     * Gets a list of all external servers
+     * 
+     * @return
+     */
+    public List<ExtServerOrgMap> getExtServerList();
+
+    /**
+     * Gets a list of servers mapped to this tool adapter
+     * 
+     * @return
+     */
+    public List<ExtServerToolAdapterMap> getMappedServers();
+
+    /**
+     * Save all the mapped servers
+     * 
+     * @param mappableServers
+     */
+    public void saveServerMappings(String[] mappableServers);
+
+    /**
+     * Gets an external server url given the extLmsId
+     * 
+     * @param extLmsId
+     * @return
+     */
+    public String getExtServerUrl(String extLmsId);
+
 }

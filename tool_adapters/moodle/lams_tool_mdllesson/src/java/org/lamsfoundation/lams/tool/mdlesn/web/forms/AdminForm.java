@@ -36,10 +36,9 @@ import org.apache.struts.action.ActionMessages;
 public class AdminForm extends ActionForm {
     private static final long serialVersionUID = 8872637862875198L;
 
-    String toolAdapterServlet;
-    String extServerUrl;
-    String serverIdMapping;
-
+    String[] mappableServers;
+    String[] mappedServers;
+    
     @Override
     public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
 	ActionErrors ac = new ActionErrors();
@@ -47,31 +46,19 @@ public class AdminForm extends ActionForm {
 	return ac;
     }
 
-    public String getToolAdapterServlet() {
-	return toolAdapterServlet;
+    public String[] getMappableServers() {
+        return mappableServers;
     }
 
-    public void setToolAdapterServlet(String toolAdapterServlet) {
-	this.toolAdapterServlet = toolAdapterServlet;
+    public void setMappableServers(String[] mappableServers) {
+        this.mappableServers = mappableServers;
     }
 
-    public String getServerIdMapping() {
-	return serverIdMapping;
+    public String[] getMappedServers() {
+        return mappedServers;
     }
 
-    public void setServerIdMapping(String serverIdMapping) {
-	this.serverIdMapping = serverIdMapping;
-    }
-
-    public String getExtServerUrl() {
-	return extServerUrl;
-    }
-
-    public void setExtServerUrl(String extServerUrl) {
-	this.extServerUrl = extServerUrl;
-    }
-
-    public static long getSerialVersionUID() {
-	return serialVersionUID;
+    public void setMappedServers(String[] mappedServers) {
+        this.mappedServers = mappedServers;
     }
 }

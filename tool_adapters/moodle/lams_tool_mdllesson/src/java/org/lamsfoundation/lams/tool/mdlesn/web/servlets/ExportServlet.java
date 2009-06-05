@@ -41,10 +41,9 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mdlesn.dto.MdlLessonDTO;
 import org.lamsfoundation.lams.tool.mdlesn.model.MdlLesson;
-import org.lamsfoundation.lams.tool.mdlesn.model.MdlLessonConfigItem;
 import org.lamsfoundation.lams.tool.mdlesn.model.MdlLessonSession;
-import org.lamsfoundation.lams.tool.mdlesn.service.MdlLessonServiceProxy;
 import org.lamsfoundation.lams.tool.mdlesn.service.IMdlLessonService;
+import org.lamsfoundation.lams.tool.mdlesn.service.MdlLessonServiceProxy;
 import org.lamsfoundation.lams.tool.mdlesn.util.MdlLessonException;
 import org.lamsfoundation.lams.tool.mdlesn.util.WebUtility;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
@@ -166,8 +165,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private void exportFileFromExternalServer(HttpServletRequest request, HttpServletResponse response,
 	    Long extToolSessionId, MdlLesson mdlLesson, String fullPath) throws Exception {
-	String exportPortFolioServletUrl = mdlLessonService.getConfigItem(MdlLessonConfigItem.KEY_EXTERNAL_TOOL_SERVLET)
-		.getConfigValue();
+	String exportPortFolioServletUrl = mdlLessonService.getExtServerUrl(mdlLesson.getExtLmsId());
 
 	String extUsername = "user"; // setting user to arbitrary values since they are only used to construct the hash
 

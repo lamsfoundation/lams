@@ -23,17 +23,19 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mdlesn.web.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.tool.Tool;
-import org.lamsfoundation.lams.tool.mdlesn.model.MdlLessonConfigItem;
+import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.mdlesn.service.IMdlLessonService;
 import org.lamsfoundation.lams.tool.mdlesn.service.MdlLessonServiceProxy;
-import org.lamsfoundation.lams.tool.mdlesn.util.MdlLessonConstants;
 import org.lamsfoundation.lams.tool.mdlesn.web.forms.AdminForm;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -60,58 +62,54 @@ public class AdminAction extends LamsDispatchAction {
 
 	AdminForm adminForm = (AdminForm) form;
 
-	if (toolService == null) {
-	    toolService = mdlLessonService.getToolService();
-	}
-	Tool tool = toolService.getPersistToolBySignature(MdlLessonConstants.TOOL_SIGNATURE);
-
-	MdlLessonConfigItem toolAdpServlet = mdlLessonService.getConfigItem(MdlLessonConfigItem.KEY_EXTERNAL_TOOL_SERVLET);
-	if (toolAdpServlet != null)
-	    adminForm.setToolAdapterServlet(toolAdpServlet.getConfigValue());
-
-	MdlLessonConfigItem extServerConfig = mdlLessonService.getConfigItem(MdlLessonConfigItem.KEY_EXTERNAL_SERVER_URL);
-	if (extServerConfig != null)
-	    adminForm.setExtServerUrl(extServerConfig.getConfigValue());
-
-	if (tool != null && tool.getExtLmsId() != null)
-	    adminForm.setServerIdMapping(tool.getExtLmsId());
+	// Get a list of possible external servers to enable this tool for
+	List<ExtServerOrgMap> serverList = mdlLessonService.getExtServerList();
+	List<ExtServerToolAdapterMap> mappedServers = mdlLessonService.getMappedServers();
+	populateServerList(adminForm, serverList, mappedServers);
 
 	request.setAttribute("error", false);
 	return mapping.findForward("config");
+    }
+
+    public void populateServerList(AdminForm adminForm, List<ExtServerOrgMap> serverList,
+	    List<ExtServerToolAdapterMap> mappedServers) {
+	ArrayList<String> mappableServers = new ArrayList<String>();
+	ArrayList<String> mappedServersInForm = new ArrayList<String>();
+
+	if (serverList != null) {
+	    for (ExtServerOrgMap serverMap : serverList) {
+		mappableServers.add(serverMap.getServerid().toString());
+		if (mappedServers != null) {
+		    for (ExtServerToolAdapterMap mappedServer : mappedServers) {
+			if (mappedServer.getExtServer().getServerid().equals(serverMap.getServerid())) {
+			    mappedServersInForm.add(serverMap.getServerid().toString());
+			}
+		    }
+		}
+	    }
+	}
+	adminForm.setMappableServers((String[]) mappableServers.toArray(new String[mappableServers.size()]));
+	adminForm.setMappedServers((String[]) mappedServersInForm.toArray(new String[mappedServersInForm.size()]));
     }
 
     public ActionForward saveContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	AdminForm adminForm = (AdminForm) form;
 
-	if (adminForm.getToolAdapterServlet() != null && !adminForm.getToolAdapterServlet().equals("")
-		&& adminForm.getServerIdMapping() != null && !adminForm.getServerIdMapping().equals("")
-		&& adminForm.getExtServerUrl() != null && !adminForm.getExtServerUrl().equals("")) {
-	    // set up mdlLessonService
-	    if (mdlLessonService == null) {
-		mdlLessonService = MdlLessonServiceProxy.getMdlLessonService(this.getServlet().getServletContext());
-	    }
-
-	    MdlLessonConfigItem servletConfig = mdlLessonService
-		    .getConfigItem(MdlLessonConfigItem.KEY_EXTERNAL_TOOL_SERVLET);
-	    servletConfig.setConfigValue(adminForm.getToolAdapterServlet());
-	    mdlLessonService.saveOrUpdateMdlLessonConfigItem(servletConfig);
-
-	    MdlLessonConfigItem extServerConfig = mdlLessonService
-		    .getConfigItem(MdlLessonConfigItem.KEY_EXTERNAL_SERVER_URL);
-	    extServerConfig.setConfigValue(adminForm.getExtServerUrl());
-	    mdlLessonService.saveOrUpdateMdlLessonConfigItem(extServerConfig);
-
-	    if (toolService == null) {
-		toolService = mdlLessonService.getToolService();
-	    }
-	    Tool tool = toolService.getPersistToolBySignature(MdlLessonConstants.TOOL_SIGNATURE);
-	    tool.setExtLmsId(adminForm.getServerIdMapping());
-	    toolService.saveOrUpdateTool(tool);
-	    return mapping.findForward("config");
-	} else {
-	    request.setAttribute("error", true);
-	    return mapping.findForward("config");
+	// set up mdlLessonService
+	if (mdlLessonService == null) {
+	    mdlLessonService = MdlLessonServiceProxy.getMdlLessonService(this.getServlet().getServletContext());
 	}
+
+	// Save all the mappings
+	mdlLessonService.saveServerMappings(adminForm.getMappedServers());
+
+	// Get a list of possible external servers to enable this tool for
+	List<ExtServerOrgMap> serverList = mdlLessonService.getExtServerList();
+	List<ExtServerToolAdapterMap> mappedServers = mdlLessonService.getMappedServers();
+	populateServerList(adminForm, serverList, mappedServers);
+
+	return mapping.findForward("config");
+
     }
 }
