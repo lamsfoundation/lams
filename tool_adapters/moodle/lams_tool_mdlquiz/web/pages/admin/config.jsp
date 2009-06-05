@@ -31,18 +31,22 @@
 				
 				<html:hidden property="dispatch" value="saveContent" />
 				<table class="alternative-color">
-					<tr>
-						<td width="30%"><fmt:message key="admin.extServerId" /></td>
-						<td width="70%"><html:text property="serverIdMapping" size="50" maxlength="255"></html:text></td>
-					</tr>
-					<tr>
-						<td width="30%"><fmt:message key="admin.extServerUrl" /></td>
-						<td width="70%"><html:text property="extServerUrl" size="50" maxlength="255"></html:text></td>
-					</tr>
-					<tr>
-						<td width="30%"><fmt:message key="admin.extToolAdapterServletUrl" /></td>
-						<td width="70%"><html:text property="toolAdapterServlet" size="50" maxlength="255"></html:text></td>
-					</tr>
+					
+					<h3>
+	                        <fmt:message key="admin.enableForIntegratedServers" />
+	                </h3>
+	                <logic:iterate name="mdquiz10AdminForm" property="mappableServers" id="mappableServer">
+	               
+	                        <html:multibox property="mappedServers">
+	                        <bean:write name="mappableServer"/>
+	                        </html:multibox>
+	                       
+	                        <bean:write name="mappableServer"/><br/>
+	               
+	                </logic:iterate>
+	
+	                <br />
+					
 				</table>
 				
 				<html:submit><fmt:message key="button.save" /></html:submit>

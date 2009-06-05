@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mdquiz.dto.MdlQuizDTO;
 import org.lamsfoundation.lams.tool.mdquiz.dto.MdlQuizSessionDTO;
 import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuiz;
-import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuizConfigItem;
 import org.lamsfoundation.lams.tool.mdquiz.service.IMdlQuizService;
 import org.lamsfoundation.lams.tool.mdquiz.service.MdlQuizServiceProxy;
 import org.lamsfoundation.lams.tool.mdquiz.util.MdlQuizConstants;
@@ -90,15 +89,15 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	for (MdlQuizSessionDTO sessionDTO : mdlQuizDT0.getSessionDTOs()) {
 	    try {
-		String responseUrl = mdlQuizService.getConfigItem(MdlQuizConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
+		String responseUrl = mdlQuizService.getExtServerUrl(mdlQuiz.getExtLmsId());
 		responseUrl += RELATIVE_MONITOR_URL;
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ sessionDTO.getSessionID().toString() + "&dispatch=finishActivity";
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
 
-		responseUrl += "&update=" + sessionDTO.getExtSessionID()+"&id=" + sessionDTO.getExtSessionID() + "&returnUrl=" + returnUrl;
+		responseUrl += "&update=" + sessionDTO.getExtSessionID() + "&id=" + sessionDTO.getExtSessionID()
+			+ "&returnUrl=" + returnUrl;
 
 		sessionDTO.setRunTimeUrl(responseUrl);
 	    } catch (UnsupportedEncodingException e) {

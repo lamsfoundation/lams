@@ -19,10 +19,9 @@
 				<property name="mdlQuizSessionDAO"><ref bean="mdlQuizSessionDAO"/></property>
 				<property name="mdlQuizUserDAO"><ref bean="mdlQuizUserDAO"/></property>
 				<property name="mdlQuizDAO"><ref bean="mdlQuizDAO"/></property>
-				<property name="mdlQuizConfigItemDAO"><ref bean="mdlQuizConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property> 	
-				<!--<property name="integrationService"><ref bean="integrationService"/></property>-->
+				<property name="integrationService"><ref bean="integrationService"/></property>
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="mdlQuizToolContentHandler"><ref bean="mdlQuizToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
@@ -56,10 +55,6 @@
 	<bean id="mdlQuizDAO" class="org.lamsfoundation.lams.tool.mdquiz.dao.hibernate.MdlQuizDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
-	
-	<bean id="mdlQuizConfigItemDAO" class="org.lamsfoundation.lams.tool.mdquiz.dao.hibernate.MdlQuizConfigItemDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean> 
 
 	<bean id="mdlQuizSessionDAO" class="org.lamsfoundation.lams.tool.mdquiz.dao.hibernate.MdlQuizSessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>

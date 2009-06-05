@@ -34,19 +34,18 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.mdquiz.dto.MdlQuizDTO;
-import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuiz;
-import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuizConfigItem;
-import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuizSession;
-import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuizUser;
-import org.lamsfoundation.lams.tool.mdquiz.service.MdlQuizServiceProxy;
-import org.lamsfoundation.lams.tool.mdquiz.service.IMdlQuizService;
-import org.lamsfoundation.lams.tool.mdquiz.util.MdlQuizConstants;
-import org.lamsfoundation.lams.tool.mdquiz.util.MdlQuizException;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.mdquiz.dto.MdlQuizDTO;
+import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuiz;
+import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuizSession;
+import org.lamsfoundation.lams.tool.mdquiz.model.MdlQuizUser;
+import org.lamsfoundation.lams.tool.mdquiz.service.IMdlQuizService;
+import org.lamsfoundation.lams.tool.mdquiz.service.MdlQuizServiceProxy;
+import org.lamsfoundation.lams.tool.mdquiz.util.MdlQuizConstants;
+import org.lamsfoundation.lams.tool.mdquiz.util.MdlQuizException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -77,7 +76,7 @@ public class LearningAction extends LamsDispatchAction {
     public static final String RELATIVE_LEARNER_URL = "course/lamsframes.php?";
     public static final String MOODLE_VIEW_URL = "mod/quiz/view.php";
     public static final String RELATIVE_TEACHER_URL = "mod/quiz/report.php?";
-    
+
     private IMdlQuizService mdlQuizService;
 
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -87,7 +86,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	// TODO need to catch exceptions and handle errors.
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, false);
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -126,28 +125,24 @@ public class LearningAction extends LamsDispatchAction {
 
 	if (mdlQuiz.getExtToolContentId() != null) {
 	    try {
-		String responseUrl = mdlQuizService.getConfigItem(MdlQuizConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
-		
-		if(mode.equals(ToolAccessMode.TEACHER))
-		{
-			responseUrl += RELATIVE_TEACHER_URL;
+		String responseUrl = mdlQuizService.getExtServerUrl(mdlQuiz.getExtLmsId());
+
+		if (mode.equals(ToolAccessMode.TEACHER)) {
+		    responseUrl += RELATIVE_TEACHER_URL;
+		} else if (mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR)) {
+		    responseUrl += RELATIVE_LEARNER_URL;
 		}
-		else if (mode.equals(ToolAccessMode.LEARNER)|| mode.equals(ToolAccessMode.AUTHOR))
-		{
-			responseUrl += RELATIVE_LEARNER_URL;
-		}
-		
+
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ toolSessionID.toString() + "&dispatch=finishActivity";
-			
+
 		String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_VIEW_URL, "UTF8");
 
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
-		
 
-		responseUrl += "&id=" + mdlQuizSession.getExtSessionId() + "&returnUrl=" + returnUrl
-			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1" + "&isFinished=" + mdlQuizUser.isFinishedActivity();
+		responseUrl += "&id=" + mdlQuizSession.getExtSessionId() + "&returnUrl=" + returnUrl + "&dest="
+			+ encodedMoodleRelativePath + "&is_learner=1" + "&isFinished="
+			+ mdlQuizUser.isFinishedActivity();
 
 		log.debug("Redirecting for mdl quiz learner: " + responseUrl);
 		response.sendRedirect(responseUrl);

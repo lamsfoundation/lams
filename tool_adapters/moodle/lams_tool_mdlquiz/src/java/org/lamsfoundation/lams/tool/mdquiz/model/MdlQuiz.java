@@ -49,6 +49,7 @@ public class MdlQuiz implements java.io.Serializable, Cloneable {
     private static final String CUSTOM_CSV_MAP_PARAM_USER = "user";
     private static final String CUSTOM_CSV_MAP_PARAM_COURSE = "course";
     private static final String CUSTOM_CSV_MAP_PARAM_SECTION = "section";
+    private static final String CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID = "extlmsid";
 
     // Fields
     /**
@@ -66,6 +67,7 @@ public class MdlQuiz implements java.io.Serializable, Cloneable {
     private String extUsername;
     private String extCourseId;
     private String extSection;
+    private String extLmsId;
 
     //*********** NON Persistent fields
     private IToolContentHandler toolContentHandler;
@@ -228,8 +230,16 @@ public class MdlQuiz implements java.io.Serializable, Cloneable {
 	this.extSection = extSection;
     }
 
-    public static long getSerialVersionUID() {
-	return serialVersionUID;
+    /**
+     * @hibernate.property column="ext_lms_id" length="255"
+     * @return
+     */
+    public String getExtLmsId() {
+        return extLmsId;
+    }
+
+    public void setExtLmsId(String extLmsId) {
+        this.extLmsId = extLmsId;
     }
 
     /**
@@ -317,5 +327,6 @@ public class MdlQuiz implements java.io.Serializable, Cloneable {
 	this.extUsername = params.get(CUSTOM_CSV_MAP_PARAM_USER);
 	this.extCourseId = params.get(CUSTOM_CSV_MAP_PARAM_COURSE);
 	this.extSection = params.get(CUSTOM_CSV_MAP_PARAM_SECTION);
+	this.extLmsId = params.get(CUSTOM_CSV_MAP_PARAM_EXT_LMS_ID);
     }
 }
