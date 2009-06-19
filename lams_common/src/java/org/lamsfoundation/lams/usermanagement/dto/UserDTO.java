@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.usermanagement.dto;
 
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -51,21 +52,25 @@ public class UserDTO {
     private String lamsCommunityToken;
     private String lamsCommunityUsername;
     private Boolean loggedIntoLamsCommunity;
+    private Boolean tutorialsDisabled;
+    private Set<String> pagesWithDisabledTutorials;
+    private Boolean firstLogin;
 
-    //	public UserDTO(Integer userID, String firstName, String lastName,
-    //			String login, String email, CSSThemeVisualElement theme) {		
-    //		this.userID = userID;
-    //		this.firstName = firstName;
-    //		this.lastName = lastName;
-    //		this.login = login;
-    //		this.email = email;
-    //		this.theme = theme;
-    //	}
+    // public UserDTO(Integer userID, String firstName, String lastName,
+    // String login, String email, CSSThemeVisualElement theme) {
+    // this.userID = userID;
+    // this.firstName = firstName;
+    // this.lastName = lastName;
+    // this.login = login;
+    // this.email = email;
+    // this.theme = theme;
+    // }
 
     public UserDTO(Integer userID, String firstName, String lastName, String login, String localeLanguage,
 	    String localeCountry, String direction, String email, CSSThemeBriefDTO flashTheme,
 	    CSSThemeBriefDTO htmlTheme, TimeZone timezone, Integer authenticationMethodId, String fckLanguageMapping,
-	    Boolean enableFlash, String lamsCommunityToken, String lamsCommunityUsername) {
+	    Boolean enableFlash, String lamsCommunityToken, String lamsCommunityUsername, Boolean tutorialsDisabled,
+	    Set<String> pagesWithDisabledTutorials, Boolean firstLogin) {
 	this.userID = userID;
 	this.firstName = firstName;
 	this.lastName = lastName;
@@ -76,20 +81,24 @@ public class UserDTO {
 	this.email = email;
 	this.flashTheme = flashTheme;
 	this.htmlTheme = htmlTheme;
-	this.timeZone = timezone;
+	timeZone = timezone;
 	this.authenticationMethodId = authenticationMethodId;
 	this.fckLanguageMapping = fckLanguageMapping;
 	this.enableFlash = enableFlash;
 	this.lamsCommunityToken = lamsCommunityToken;
 	this.lamsCommunityUsername = lamsCommunityUsername;
+	this.tutorialsDisabled = tutorialsDisabled;
+	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
+	this.firstLogin = firstLogin;
     }
 
     /**
      * Equality test of UserDTO objects
      */
+    @Override
     public boolean equals(Object o) {
-	if ((o != null) && (o.getClass() == this.getClass())) {
-	    return ((UserDTO) o).userID == this.userID;
+	if (o != null && o.getClass() == this.getClass()) {
+	    return ((UserDTO) o).userID == userID;
 	} else {
 	    return false;
 	}
@@ -98,8 +107,9 @@ public class UserDTO {
     /**
      * Returns the hash code value for this object.
      */
+    @Override
     public int hashCode() {
-	// TODO this might be an ineffcient implementation since userIDs are likely to be sequential, 
+	// TODO this might be an ineffcient implementation since userIDs are likely to be sequential,
 	// hence we dont get a good spread of values
 	return userID.intValue();
     }
@@ -174,6 +184,7 @@ public class UserDTO {
 	return authenticationMethodId;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("userID", getUserID()).append("firstName", getFirstName()).append(
 		"lastName", getLastName()).append("login", getLogin()).append("localeLanguage", getLocaleLanguage())
@@ -183,7 +194,8 @@ public class UserDTO {
 		.append("fckLanguageMapping", getFckLanguageMapping()).append("enableFlash", getEnableFlash()).append(
 			"lamsCommunityUser", this.getLamsCommunityUsername()).append("lamsCommunityToken",
 			this.getLamsCommunityToken()).append("loggedIntoLamsCommunity",
-			"" + this.getLoggedIntoLamsCommunity()).toString();
+			"" + this.getLoggedIntoLamsCommunity())
+		.append("tutorialsDisabled", "" + getTutorialsDisabled()).toString();
     }
 
     public String getFckLanguageMapping() {
@@ -222,12 +234,32 @@ public class UserDTO {
 	this.loggedIntoLamsCommunity = loggedIntoLamsCommunity;
     }
 
-    //	public CSSThemeVisualElement getTheme() {
-    //		return theme;
-    //	}
+    public Boolean getTutorialsDisabled() {
+	return tutorialsDisabled;
+    }
+
+    public void setTutorialsDisabled(Boolean tutorialsDisabled) {
+	this.tutorialsDisabled = tutorialsDisabled;
+    }
+
+    public Set<String> getPagesWithDisabledTutorials() {
+	return pagesWithDisabledTutorials;
+    }
+
+    public void setPagesWithDisabledTutorials(Set<String> pagesWithDisabledTutorials) {
+	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
+    }
+
+    public Boolean isFirstLogin() {
+	return firstLogin;
+    }
+
+    // public CSSThemeVisualElement getTheme() {
+    // return theme;
+    // }
     //	
-    //	public void setTheme(CSSThemeVisualElement theme) {
-    //		this.theme = theme;
-    //	}
+    // public void setTheme(CSSThemeVisualElement theme) {
+    // this.theme = theme;
+    // }
 
 }

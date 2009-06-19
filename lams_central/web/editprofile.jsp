@@ -139,6 +139,20 @@
 			</html:select>
 		</td>
 	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.tutorial.enabled"/>:</td>
+		<!-- For users' comfort we write it as a positive sentece - "should the tutorials be enabled"?
+			 But for simplicity of coding, we keep it as a negative value - "should the tutorials be disabled?"
+			 This is the reason to mix true/false and yes/no answers.
+		-->
+		<td><html:select property="tutorialsDisabled">
+			<html:option value="false"><fmt:message key="label.yes"/></html:option>
+			<html:option value="true"><fmt:message key="label.no"/></html:option>
+			</html:select>
+		</td>
+	</tr>
+	
+	
 	<c:if test="${not empty lamsCommunityToken}">
 		<tr>
 			<td class="align-right">
@@ -267,6 +281,18 @@
 		<td>
 			<c:set var="timeZone"><bean:write name="UserForm" property="timeZone" /></c:set>
 			<fmt:message key="label.timezone.${timeZone}"/>
+		</td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.tutorial.enabled"/>:<bean:write name="UserForm" property="tutorialsDisabled" /></td>
+		<!-- For users' comfort we write it as a positive sentece - "should the tutorials be enabled"?
+			 But for simplicity of coding, we keep it as a negative value - "should the tutorials be disabled?"
+			 This is the reason to mix true/false and yes/no answers.
+		-->
+		<td><html:select property="tutorialsDisabled">
+			<html:option value="false"><fmt:message key="label.yes"/></html:option>
+			<html:option value="true"><fmt:message key="label.no"/></html:option>
+			</html:select>
 		</td>
 	</tr>
 </c:if>

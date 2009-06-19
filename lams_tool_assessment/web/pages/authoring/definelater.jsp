@@ -15,12 +15,12 @@
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<%@ include file="/common/fckeditorheader.jsp"%>
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
+	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
-	<script type="text/javascript"> 
-		var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
+	<script type="text/javascript">
+		var pathToImageFolder = "<lams:LAMSURL/>images/";
 	</script>
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
+ 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.patched.js"></script>
 
 	<script>
         function init(){

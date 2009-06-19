@@ -170,3 +170,19 @@ h3.group4{
 	border-bottom: 0px;
 }
 
+a#tutorialVideoHref {
+	margin: 5px;
+	border: none;
+	color: inherit;
+	float: right;
+}
+
+a#tutorialVideoHref:hover {
+	border: none;
+	color: inherit;
+	cursor: pointer;
+}
+
+img#tutorialVideoImg {
+	border: none;
+}

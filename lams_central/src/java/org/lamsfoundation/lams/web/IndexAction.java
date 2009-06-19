@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -41,10 +42,13 @@ import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -92,6 +96,19 @@ public class IndexAction extends Action {
 	setHeaderLinks(request);
 	setAdminLinks(request);
 
+	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be
+	// taken based on that parameter; immediatelly, the value in DB is updated
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	if (userDTO.isFirstLogin()) {
+	    request.setAttribute("firstLogin", true);
+	    User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
+	    user.setFirstLogin(false);
+	    getUserManagementService().save(user);
+	    ss.removeAttribute(AttributeNames.USER);
+	    ss.setAttribute(AttributeNames.USER, user.getUserDTO());
+	}
+
 	// check if user is flagged as needing to change their password
 	User loggedInUser = getUserManagementService().getUserByLogin(request.getRemoteUser());
 	if (loggedInUser.getChangePassword() != null) {
@@ -118,6 +135,9 @@ public class IndexAction extends Action {
 	} else if (StringUtils.equals(tab, "lessons")) {
 	    return mapping.findForward("lessons");
 	} else if (StringUtils.equals(tab, "community")) {
+
+	    String comLoginUrl = Configuration.get(ConfigurationKeys.SERVER_URL) + "/lamsCommunityLogin.do";
+	    request.setAttribute("comLoginUrl", comLoginUrl);
 	    request.setAttribute("tab", tab);
 	    return mapping.findForward("community");
 	}
@@ -153,7 +173,8 @@ public class IndexAction extends Action {
 	}
 	headerLinks.add(new IndexLinkBean("index.myprofile", "index.do?tab=profile"));
 
-	if (Configuration.getAsBoolean(ConfigurationKeys.LAMS_COMMUNITY_ENABLE)) {
+	Registration reg = Configuration.getRegistration();
+	if (reg != null) {
 	    if (request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(Role.GROUP_ADMIN)
 		    || request.isUserInRole(Role.GROUP_MANAGER) || request.isUserInRole(Role.AUTHOR)
 		    || request.isUserInRole(Role.AUTHOR_ADMIN) || request.isUserInRole(Role.MONITOR)) {

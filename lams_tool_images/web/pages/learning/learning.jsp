@@ -25,7 +25,7 @@
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.skin.css' />" />
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/galleria.css'/>" >
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.rating.css'/>"/>
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
+	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 	<style media="screen,projection" type="text/css">
 		.galleria_container{position:relative;margin-top:2em;}
 		.gallery_demo{width:${mediumImageDimensions + 62}px;margin:0 auto 0 0;}
@@ -72,10 +72,10 @@
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.MetaData.js'/>"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.rating.1.1.js'/>"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
-	<script type="text/javascript"> 
-		var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
-	</script>
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
+	  <script type="text/javascript">
+		var pathToImageFolder = "<lams:LAMSURL/>images/";
+	  </script>
+ 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.patched.js"></script>
  	
 	<script type="text/javascript">
 	$(document).ready(function(){

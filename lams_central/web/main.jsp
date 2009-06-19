@@ -34,7 +34,7 @@
 	<script type="text/javascript">
 		var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
 	</script>
-    <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox-compressed.js"></script>
+    <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox.patched.js"></script>
 	<c:if test="${empty tab}">
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.dimensions.pack.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/interface.js"></script>
@@ -48,6 +48,15 @@
 					var display = jQuery.trim(jQuery(this).text());
 					initLoadGroup(this, <c:if test="${empty tab}">1</c:if><c:if test="${tab eq 'profile'}">3</c:if>, display);
 				});
+				</c:if>
+				<%-- If it's the user's first login, display a dialog asking if tutorial videos should be shown --%>
+				<c:if test="${firstLogin}">
+					<c:url var="disableAllTutorialVideosUrl" value="tutorial.do">
+						<c:param name="method" value="disableAllTutorialVideos" />
+					</c:url>
+					if (!confirm("<fmt:message key='label.tutorial.disable.all' />")){
+				 		$.get("${disableAllTutorialVideosUrl}");
+					}
 				</c:if>
 			});
 		

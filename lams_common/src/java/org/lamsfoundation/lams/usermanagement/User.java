@@ -21,6 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
+
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
@@ -161,12 +162,21 @@ public class User implements Serializable, Comparable {
     /** persistent field */
     private String lamsCommunityUsername;
 
+    /** persistent field */
+    private Boolean tutorialsDisabled;
+
+    /** persistent field */
+    private Set<String> pagesWithDisabledTutorials = new HashSet<String>();
+
+    /** persistent field - latch */
+    private Boolean firstLogin;
+
     // ------- TIMEZONES (hardcoded, there is no need to put them into database --------------
 
     public static String[] timezoneList = new String[] { "GMT-12", "GMT-11", "GMT-10", "GMT-9", "GMT-8", "GMT-7",
-	    "GMT-6", "GMT-5", "GMT-4", "Canada/Newfoundland", "GMT-3", "GMT-2", "GMT-1", "GMT", "GMT+1", "GMT+2",
-	    "GMT+3", "Asia/Tehran", "GMT+4", "Asia/Kabul", "GMT+5", "Asia/Calcutta", "Asia/Katmandu", "GMT+6", "GMT+7",
-	    "GMT+8", "GMT+9", "Australia/Adelaide", "GMT+10", "GMT+11", "GMT+12" };
+	    "GMT-6", "GMT-5", "GMT-4", "GMT-3:30", "GMT-3", "GMT-2", "GMT-1", "GMT", "GMT+1", "GMT+2", "GMT+3",
+	    "GMT+3:30", "GMT+4", "GMT+4:30", "GMT+5", "GMT+5:30", "GMT+5:45", "GMT+6", "GMT+7", "GMT+8", "GMT+9",
+	    "GMT+9:30", "GMT+10", "GMT+11", "GMT+12" };
 
     /** full constructor */
     public User(String login, String password, String title, String firstName, String lastName, String addressLine1,
@@ -670,11 +680,14 @@ public class User implements Serializable, Comparable {
 
 	TimeZone tz = TimeZone.getTimeZone(User.timezoneList[getTimeZone()]);
 
+	Set<String> tutorialPages = pagesWithDisabledTutorials == null || pagesWithDisabledTutorials.isEmpty() ? null
+		: pagesWithDisabledTutorials;
+
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		new CSSThemeBriefDTO(flashTheme), new CSSThemeBriefDTO(htmlTheme),
 		// TimeZone.getTimeZone("Australia/Sydney"),
 		tz, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, enableFlash,
-		lamsCommunityToken, lamsCommunityUsername);
+		lamsCommunityToken, lamsCommunityUsername, tutorialsDisabled, tutorialPages, firstLogin);
     }
 
     public UserFlashDTO getUserFlashDTO() {
@@ -847,4 +860,40 @@ public class User implements Serializable, Comparable {
 	this.timeZone = timeZone;
     }
 
+    /**
+     * @hibernate.property column="tutorials_disabled" length="1"
+     * 
+     */
+    public Boolean getTutorialsDisabled() {
+	return tutorialsDisabled;
+    }
+
+    public void setTutorialsDisabled(Boolean tutorialsDisabled) {
+	this.tutorialsDisabled = tutorialsDisabled;
+    }
+
+    /**
+     * @hibernate.set lazy="false" cascade="all-delete-orphan"
+     * @hibernate.collection-key column="user_id"
+     * @hibernate.collection-element column="page_str" type="string" length="5" not-null="true"
+     */
+    public Set<String> getPagesWithDisabledTutorials() {
+	return pagesWithDisabledTutorials;
+    }
+
+    public void setPagesWithDisabledTutorials(Set<String> pagesWithDisabledTutorials) {
+	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
+    }
+
+    /**
+     * @hibernate.property column="first_login" length="1"
+     * 
+     */
+    public Boolean isFirstLogin() {
+	return firstLogin;
+    }
+
+    public void setFirstLogin(Boolean firstLogin) {
+	this.firstLogin = firstLogin;
+    }
 }

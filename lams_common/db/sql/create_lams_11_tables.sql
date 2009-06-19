@@ -322,6 +322,8 @@ CREATE TABLE lams_user (
 	 , lams_community_token VARCHAR(255)
  	 , lams_community_username VARCHAR(255)
  	 , timezone TINYINT
+	 , tutorials_disabled TINYINT(1) DEFAULT 0
+	 , first_login TINYINT(1) DEFAULT 1
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
@@ -1134,3 +1136,10 @@ CREATE TABLE lams_gradebook_user_lesson (
 	, PRIMARY KEY (uid)
 )TYPE=InnoDB;
 
+CREATE TABLE lams_user_disabled_tutorials (
+     user_id BIGINT(20) NOT NULL
+   , page_str CHAR(5) NOT NULL
+   , CONSTRAINT FK_lams_user_disabled_tutorials_1 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+   , PRIMARY KEY (user_id,page_str)
+)TYPE=InnoDB;

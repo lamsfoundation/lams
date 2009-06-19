@@ -220,6 +220,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final Map<String, String> filterLanguageMap = new TreeMap<String, String>();
     private static final Map<String, String[]> filterStopWordsMap = new TreeMap<String, String[]>();
 
+    // Tutorial video page string for recognising which page the video was started from
+    private static final String PAGE_STRING_START_PLANNER = "StPed";
+
     static {
 	PedagogicalPlannerAction.filterLanguageMap.put("en", "English");
 	PedagogicalPlannerAction.filterLanguageMap.put("nl", "Dutch");
@@ -246,6 +249,19 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      */
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+
+	// First we check if a tutorial video should be displayed
+	HttpSession session = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+
+	boolean doNotShowAgain = userDto.getPagesWithDisabledTutorials() != null
+		&& userDto.getPagesWithDisabledTutorials().contains(PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
+	boolean showTutorial = !(userDto.getTutorialsDisabled() || doNotShowAgain);
+
+	request.setAttribute(AttributeNames.ATTR_PAGE_STR, PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
+	request.setAttribute(AttributeNames.ATTR_SHOW_TUTORIAL, showTutorial);
+	request.setAttribute(AttributeNames.ATTR_DO_NOT_SHOW_AGAIN, doNotShowAgain);
+
 	return openSequenceNode(mapping, form, request, response);
     }
 
@@ -561,7 +577,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	getMonitoringService().startLesson(lesson.getLessonId(), userDto.getUserID());
 	String newPath = mapping.findForward(PedagogicalPlannerAction.FORWARD_PREVIEW).getPath();
 	newPath = newPath + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_LESSON_ID
-		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId();
+		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId() + PedagogicalPlannerAction.CHAR_AMPERSAND
+		+ AttributeNames.PARAM_MODE + PedagogicalPlannerAction.CHAR_EQUALS + "preview";
 	return new ActionForward(newPath, true);
     }
 
