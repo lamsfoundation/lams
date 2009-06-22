@@ -48,11 +48,11 @@
 ;!insertmacro LineFind
 
 # constants
-!define VERSION "2.1.1"
-!define PREVIOUS_VERSION "2.1"
-!define LANGUAGE_PACK_VERSION "2008-09-05"
-!define LANGUAGE_PACK_VERSION_INT "20080905"
-!define DATE_TIME_STAMP "200809050000"
+!define VERSION "2.3.1"
+!define PREVIOUS_VERSION "2.3"
+!define LANGUAGE_PACK_VERSION "2009-06-19"
+!define LANGUAGE_PACK_VERSION_INT "20090619"
+!define DATE_TIME_STAMP "200906190000"
 ######################## Added in the extra .0 for 2.1 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
@@ -83,7 +83,7 @@
 Name "LAMS ${VERSION}"
 ;BrandingText "LAMS ${VERSION} -- built on ${__TIMESTAMP__}"
 BrandingText "LAMS ${VERSION} -- built on ${__DATE__} ${__TIME__}"
-OutFile "${BUILD_DIR}\LAMS-${VERSION}.exe"
+OutFile "${BUILD_DIR}\LAMS-${VERSION}-patch.exe"
 InstallDir "C:\lams"
 InstallDirRegKey HKLM "${REG_HEAD}" ""
 LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree" 
@@ -210,10 +210,7 @@ SectionGroup "LAMS ${VERSION} Patch (Requires LAMS 2.0)" update
         ; get the language files locations specific to this server from the database
         ; unpack to $INSTDIR\library\llidx
         call copyllid
-                        
-        ; Finally, add rows in the database (lams_supported_locale) for all new language files
-        call updateLanguageTables
-        
+
         # write this language pack version to registry
         Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "$VERSION_INT"'
        
@@ -227,7 +224,6 @@ SectionGroup "LAMS ${VERSION} Patch (Requires LAMS 2.0)" update
         File /a "${DOCUMENTS}\license-wrapper.txt"
         File /a "${DOCUMENTS}\readme.txt"
      
-        
         ; Update the registry
         call WriteRegEntries
     SectionEnd
@@ -357,11 +353,11 @@ Function CheckMySQL
         #StrLen $9 $MYSQL_ROOT_PASS
         
         
-        Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"'
+        Strcpy $0 '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-5.0.8-bin.jar" checkmysqlversion "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" "$DB_USER" "$DB_PASS"'
        
         
         File "${BUILD_DIR}\checkmysqlversion.class"
-        File "${LIB}\mysql-connector-java-3.1.12-bin.jar"
+        File "${LIB}\mysql-connector-java-5.0.8-bin.jar"
         nsExec::ExecToStack $0
         Pop $0
         Pop $1
@@ -375,7 +371,7 @@ Function CheckMySQL
             Abort
         ${EndIf}
         Delete "$TEMP\lams\checkmysql.class"
-        Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"  
+        Delete "$TEMP\mysql-connector-java-5.0.8-bin.jar"  
 FunctionEnd
 
 Function PreComponents
@@ -420,8 +416,8 @@ Function PostLAMSConfig
     
     Setoutpath "$TEMP\lams\"
     File "${BUILD_DIR}\checkmysql.class"
-    File "${LIB}\mysql-connector-java-3.1.12-bin.jar"
-    nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-3.1.12-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS ${PREVIOUS_VERSION}'
+    File "${LIB}\mysql-connector-java-5.0.8-bin.jar"
+    nsExec::ExecToStack '$JDK_DIR\bin\java.exe -cp ".;$TEMP\lams\mysql-connector-java-5.0.8-bin.jar" checkmysql "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8" $DB_USER $DB_PASS ${PREVIOUS_VERSION}'
     Pop $0
     Pop $1
     ${If} $0 != 0
@@ -436,7 +432,7 @@ Function PostLAMSConfig
     ${EndIf}
     
     Delete "$TEMP\lams\checkmysql.class"
-    Delete "$TEMP\mysql-connector-java-3.1.12-bin.jar"
+    Delete "$TEMP\mysql-connector-java-5.0.8-bin.jar"
 FunctionEnd
 
 
@@ -620,7 +616,7 @@ FunctionEnd
 Function updateJarsWars
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear"
     ;File "${SOURCE_LAMS_EAR}\*.*"
-    File ${ASSEMBLY}\*
+    File /r ${ASSEMBLY}\*
 
 FunctionEnd
 
@@ -670,7 +666,7 @@ Function updateDatabase
     createdirectory "$INSTDIR\update-logs"
 
     # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-database.log" -buildfile "$TEMP\lams\update-database.xml" update-database'
+    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-database-to-${VERSION}.log" -buildfile "$TEMP\lams\update-database.xml" update-database'
     DetailPrint $0
     nsExec::ExecToStack $0
     Pop $0 ; return code, 0=success, error=fail
@@ -722,8 +718,8 @@ Function copyllid
     strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
     # execute llid finder
-    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
     pop $0
     pop $CSllid
     ${if} $0 != '0'
@@ -737,8 +733,8 @@ Function copyllid
     strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
     # execute llid finder
-    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
     pop $0
     pop $FSllid
     ${if} $0 != '0'
@@ -749,8 +745,8 @@ Function copyllid
     strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
     ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
     # execute llid finder
-    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Resource and Forum" "$1" "$DB_USER" "$DB_PASS"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-3.1.12-bin.jar" GetLlidFolderNames "Resources and Forum" "$1" "$DB_USER" "$DB_PASS"'
+    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Resource and Forum" "$1" "$DB_USER" "$DB_PASS"'
+    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Resources and Forum" "$1" "$DB_USER" "$DB_PASS"'
     pop $0
     pop $RFllid
     ${if} $0 != '0'
@@ -973,85 +969,6 @@ Function SplitFirstStrPart
         Exch $R0 ;first
 FunctionEnd
 
-;checks if the languages in the language pack exist
-;inserts rows into lams_supported_locale iff the languages dont exist 
-Function updateLanguageTables
-    
-    ; get the procedure scripts required
-    setoutpath "$INSTDIR"
-    File /a ${SQL}\updateLocales.sql
-    File /a ${ANT}\LanguagePack.xml
-    
-    
-    setoutpath "$INSTDIR\apache-ant-1.6.5\bin"
-    File /a "${BASE_DIR}\apache-ant-1.6.5\bin\*"
-    
-    setoutpath "$INSTDIR\apache-ant-1.6.5\lib"
-    File /a "${BASE_DIR}\apache-ant-1.6.5\lib\*"
-    
-    ; update locals must be stored as a procedure first
-    ; nsExec wont let me do "mysql < insertLocale.sql"  so i had to use ant
-    ; create installer.properties
-    ClearErrors
-    FileOpen $0 $TEMP\installer.properties w
-    IfErrors 0 +2
-        goto error
-       
-    # convert '\' to '/' for Ant's benefit
-    Push $TEMP
-    Push "\"
-    Call StrSlash
-    Pop $2
-    FileWrite $0 "TEMP=$2$\r$\n"
-            
-    Push $INSTDIR
-    Push "\"
-    Call StrSlash
-    Pop $2
-    FileWrite $0 "INSTDIR=$2/$\r$\n"
-    FileWrite $0 "DB_NAME=$DB_NAME$\r$\n"
-    FileWrite $0 "MYSQL_HOST=$MYSQL_HOST$\r$\n"
-    FileWrite $0 "DB_USER=$DB_USER$\r$\n"
-    FileWrite $0 "DB_PASS=$DB_PASS$\r$\n"
-    Push $LAMS_DIR
-    Push "\"
-    Call StrSlash
-    Pop $2
-    FileWrite $0 "EARDIR=$2/jboss-4.0.2/server/default/deploy/lams.ear$\r$\n"
-
-    copyfiles "$TEMP\installer.properties" $INSTDIR
-    
-    SetOutPath $INSTDIR
-    File /a "${ANT}\LanguagePack.xml"
-
-    ReadRegStr $0 HKLM "${REG_HEAD}" "dir_inst"
-    
-    ; update locals must be stored as a procedure first
-    ; use ANT to store procedures
-    DetailPrint '$0\apache-ant-1.6.5\bin\newAnt.bat insertLocale-db'
-    nsExec::ExecToStack '$0\apache-ant-1.6.5\bin\newAnt.bat -logfile "..\..\..\..\..\..\..\..\..\update-logs\ant-insert-locales.log" -buildfile $INSTDIR\LanguagePack.xml insertLocale-db'
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    DetailPrint "Database insert status: $0"
-    DetailPrint "Database insert output: $1"
-    ${if} $0 != 0
-        goto error
-    ${endif}
-    
-    goto done
-    error:
-        DetailPrint "Ant insertLocale-db failed."
-        MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  Please check your LAMS configuration and try again.$\r$\nError:$\r$\n$\r$\n$1"
-        Abort "LAMS configuration failed."
-    
-    done: 
-        ; remove the sql scripts
-        delete "$INSTDIR\updateLocales.sql"
-        delete "$INSTDIR\LanguagePack.xml"
-        delete "$INSTDIR\installer.properties"
-        rmdir /r "$INSTDIR\apache-ant-1.6.5"
-       
-FunctionEnd
 ################################################################################
 # END CODE USED FOR LANGUAGE PACK                                              #
 ################################################################################

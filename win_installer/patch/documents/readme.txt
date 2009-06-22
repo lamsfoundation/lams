@@ -1,14 +1,17 @@
-LAMS 2.1.1 - Learning Activity Management System
+LAMS 2.3.1 - Learning Activity Management System
 ----------------------------------------------
 
-This is a pre-packaged copy of LAMS 2.1.1 for Windows 2000, XP, or 2003.
+This is a pre-packaged copy of LAMS 2.3.1 for Windows 2000, XP, or 2003.
 For the source code, please see the 'Building LAMS' wiki at 
 
 	http://wiki.lamsfoundation.org/display/lams/Building+LAMS 
 
 for more information.
 
-For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.1.1
+This is a patch update from LAMS 2.3, this version does not do a full install, 
+you must install LAMS 2.3 first.
+
+For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.3.1
 
 NOTE TO SYSADMINS: If you are doing an upgrade and your users report problems in 
 authoring, they may need to clear their browser cache. If you have a user see 

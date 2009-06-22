@@ -7,7 +7,7 @@
 	
 	<target name="update-database"  description="Runs some update scripts found in lams_common\db\sql\updatscripts" >
 		<sql driver="com.mysql.jdbc.Driver" 
-			classpath="${jboss.deploy}/mysql-connector-java-3.1.12-bin.jar" 
+			classpath="${jboss.deploy}/mysql-connector-java-5.0.8-bin.jar" 
 			url="${db.url}" 
 			userid="${db.username}" 
 			password="${db.password}"
