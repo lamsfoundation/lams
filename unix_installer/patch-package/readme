@@ -1,14 +1,15 @@
-LAMS 2.1.1  - Learning Activity Management System Installer
+LAMS 2.3.1  - Learning Activity Management System Installer
 --------------------------------------------------------------------------------
 
-This is an installer package for 2.1.1. Please read this 
-document carefully before installing. Please also ensure that you have read
-and understood the terms of the license agreement.
+This is an update-only package for 2.3.1. To use this updater, you must be 
+running version 2.3 of LAMS.
 
-For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.1.1
+Please read this document carefully before installing. Please also ensure that
+you have read and understood the terms of the license agreement.
 
-Special thanks to Ivan Martinez-Ortiz for helping test the patch update and
-providing fixes for some issues.
+For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.3.1
+
+
 
 CONTENTS
 ========
@@ -189,11 +190,11 @@ Backing up LAMS and reverting LAMS
 
     http://wiki.lamsfoundation.org/display/lamsdocs/Revert+To+Other+Backup
 	
-LAMS 2.1.1 developer-oriented information
+LAMS 2 developer-oriented information
 
 	http://wiki.lamsfoundation.org/display/lams
 
-LAMS 2.1.1 help documents
+LAMS 2 help documents
 
 	http://wiki.lamsfoundation.org/display/lamsdocs
 
@@ -201,7 +202,7 @@ Educational and technical forums for help and discussion
 				
 	http://www.lamscommunity.org
 
-LAMS 2.1.1 bug tracker			
+LAMS 2 bug tracker			
 
 	http://bugs.lamsfoundation.org
 

@@ -1,4 +1,5 @@
-UPDATE lams_tool SET tool_version='20080813' WHERE tool_signature='lachat11' AND tool_version='20080229';
 
-UPDATE lams_configuration SET config_value='2.1.1' WHERE config_key='Version' AND config_value='2.1';
+update lams_configuration set config_value='2.3.1' where config_key='Version';
+update lams_configuration set config_value='2.3.1.200806190000' where config_key='LearnerClientVersion' OR config_key='ServerVersionNumber' OR config_key='MonitorClientVersion' OR config_key='AuthoringClientVersion';
+update lams_configuration set config_value='2009-06-19' where config_key='DictionaryDateCreated';
 

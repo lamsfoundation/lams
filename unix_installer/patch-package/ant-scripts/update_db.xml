@@ -5,7 +5,7 @@
 	
 	<target name="update_db">
 		<sql driver="com.mysql.jdbc.Driver" 
-			classpath="${DEPLOY_DIR}/lams.ear/mysql-connector-java-3.1.12-bin.jar" 
+			classpath="${DEPLOY_DIR}/lams.ear/mysql-connector-java-5.0.8-bin.jar" 
 			url="${SQL_URL}" 
 			userid="${DB_USER}" 
 			password="${DB_PASS}"

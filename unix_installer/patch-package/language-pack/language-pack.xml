@@ -30,13 +30,13 @@
         	<arg value="${DB_NAME}"/>
         	<arg value="${SQL_URL}"/>
         	<classpath>
-                <pathelement path="../bin:../assembly/mysql-connector-java-3.1.12-bin.jar"/>
+                <pathelement path="../bin:../lib/mysql-connector-java-5.0.8-bin.jar"/>
             </classpath>
         </java>
     </target>
 
 	<target name="update-language-tables" description="Updates the database to record the current language pack">
-		<sql driver="com.mysql.jdbc.Driver" classpath="${DEPLOY_DIR}/lams.ear/mysql-connector-java-3.1.12-bin.jar" url="${SQL_URL}" userid="${DB_USER}" password="${DB_PASS}" encoding="utf8" onerror="abort">
+		<sql driver="com.mysql.jdbc.Driver" classpath="${DEPLOY_DIR}/lams.ear/mysql-connector-java-5.0.8-bin.jar" url="${SQL_URL}" userid="${DB_USER}" password="${DB_PASS}" encoding="utf8" onerror="abort">
 			<transaction src="updateLocales.sql"/>
 		</sql>
 	</target>

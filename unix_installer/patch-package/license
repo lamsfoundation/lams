@@ -1,4 +1,4 @@
-LAMS 2.1.1 is released under the GPL license detailed below.  This package
+LAMS 2.3.1 is released under the GPL license detailed below.  This package
 also includes other libraries/packages, whose respective licenses are
 detailed below.
 
@@ -37,7 +37,7 @@ jsMath					Apache License 2.0
 jstl.jar				JSTL License 1.1
 log4j-1.2.13.jar			Apache Software License 1.1
 mysql-connector-				(CDDL Common Development and 
-  java-3.1.12-bin-jar	    		Distribution License 1.0)
+  java-5.0.8-bin-jar	    		Distribution License 1.0)
 odmg-3.0.jar				ODMG 2.0 
 poi-2.5.1-final				Apache Software License 1.1
   -20040804.jar		

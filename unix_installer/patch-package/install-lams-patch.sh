@@ -22,9 +22,9 @@
 
 # Patch shell script for LAMS
 
-LAMS_VERSION_UPDATE=2.1.1
-LAMS_SERVER_VERSION=2.1.0.200806190000 
-REQ_LAMS_VERSION=2.1
+LAMS_VERSION_UPDATE=2.3.1
+LAMS_SERVER_VERSION=2.3.1.200806190000
+REQ_LAMS_VERSION=2.3
 
 USE_ETC_PROPERTIES=0;
 
@@ -45,7 +45,9 @@ then
     case "$useproperties" in
         y)
         printf "\nUsing lams.properties from /etc/lams2.\n"
-        . /etc/lams2/lams.properties    
+        . /etc/lams2/lams.properties 
+        cp lams.properties docs/lams.properties.backup.orig
+        cp /etc/lams2/lams.properties .
         USE_ETC_PROPERTIES=1; 
                 ;;
         n)
@@ -137,7 +139,7 @@ checklams()
 checkMysql()
 {
     echo ""
-    $JDK_DIR/bin/java -cp .:bin/:assembly/mysql-connector-java-3.1.12-bin.jar checkmysql "$VAR_SQL_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION"
+    $JDK_DIR/bin/java -cp .:bin/:lib/mysql-connector-java-5.0.8-bin.jar checkmysql "$VAR_SQL_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION"
 
     if [  "$?" -ne  "0" ]
     then
@@ -228,7 +230,7 @@ rm -r $DEFAULT_DIR/work/*
 rm -r $DEFAULT_DIR/tmp/*
 
 ################################################################################
-# 2.1.1 Specific updates
+# Running the 2.3.1 patch
 ################################################################################
 
 printf "\nCopying files...\n"
@@ -237,11 +239,12 @@ printf "\nDone.\n"
 
 printf "\nApplying language pack...\n"
 
+# Just updating the combined copyllid task, the rest of the language files are copied with the jars and wars
 if [ $USE_ETC_PROPERTIES -ne 1 ]
 	then 
-		ant/bin/ant -logfile language-pack.log -buildfile language-pack/language-pack.xml -Dpropertiesfile=../lams.properties update-languages
+		ant/bin/ant -logfile language-pack.log -buildfile language-pack/language-pack.xml -Dpropertiesfile=../lams.properties copy-llid
 	else
-		ant/bin/ant -logfile language-pack.log -buildfile language-pack/language-pack.xml -Dpropertiesfile=/etc/lams2/lams.properties update-languages
+		ant/bin/ant -logfile language-pack.log -buildfile language-pack/language-pack.xml -Dpropertiesfile=/etc/lams2/lams.properties copy-llid
 fi	
 
 if [  "$?" -ne  "0" ]
