@@ -164,7 +164,6 @@ Var TIMESTAMP           ; timestamp
 Var BACKUP              ; bool value to determine whether the updater will backup
 
 #LANGUAGE PACK VARIABLES #####
-Var UPDATE_LANGUAGES    ; bool value to determine whether to update languages with language pack
 Var LAMS_DIR            ; directory lams is installed at
 Var VERSION_INT         ; version of the language pack
 Var OLD_LANG_VERSION         ; previous version of language pack
@@ -202,21 +201,16 @@ SectionGroup "LAMS ${VERSION} Patch (Requires LAMS 2.0)" update
         ; Updating the database to support version
         call updateDatabase
         
-        # RUNNING THE LANGUAGE PACK ##################
         call languagePackInit
-        ; copy language files from LAMS projects to a folder in $INSTDIR
-        call copyProjects
         
         ; get the language files locations specific to this server from the database
-        ; unpack to $INSTDIR\library\llidx
+        detailprint "Copying language files for combined activities"
         call copyllid
 
         # write this language pack version to registry
         Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "$VERSION_INT"'
        
         DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
-
-        ################################################
         
         strcpy $INSTDIR $LAMS_DIR
         setoutpath $INSTDIR
@@ -616,7 +610,7 @@ FunctionEnd
 Function updateJarsWars
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear"
     ;File "${SOURCE_LAMS_EAR}\*.*"
-    File /r ${ASSEMBLY}\*
+    File /r /x CVS ${ASSEMBLY}\*
 
 FunctionEnd
 
@@ -754,14 +748,17 @@ Function copyllid
         Abort
     ${endif}
     
+    detailprint "Copying chat and scribe language files to $LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$CSllid"
     setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$CSllid"
-    file /a "${BASE_PROJECT_DIR}\lams_build\librarypackages\chatscribe\language\lams\*"
+    file /a /x CVS "${BASE_PROJECT_DIR}\lams_build\librarypackages\chatscribe\language\lams\*"
     
+    detailprint "Copying forum and scribe language files to $LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$FSllid"
     setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$FSllid"
-    file /a "${BASE_PROJECT_DIR}\lams_build\librarypackages\forumscribe\language\lams\*"
+    file /a /x CVS "${BASE_PROJECT_DIR}\lams_build\librarypackages\forumscribe\language\lams\*"
     
+    detailprint "Copying resources and forum language files to $LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$RFllid"
     setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$RFllid"
-    file /a "${BASE_PROJECT_DIR}\lams_build\librarypackages\shareresourcesforum\language\lams\*"
+    file /a /x CVS "${BASE_PROJECT_DIR}\lams_build\librarypackages\shareresourcesforum\language\lams\*"
     
 FunctionEnd
 
@@ -777,26 +774,7 @@ Function languagePackInit
     ReadRegStr $DB_NAME   HKLM "${REG_HEAD}" "db_name"
     ReadRegStr $DB_USER   HKLM "${REG_HEAD}" "db_user"
     ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
-    
-    # Abort install if already installed or if a newer version is installed
-    strcpy $OLD_LANG_VERSION "20061205" ;default old version (Date of First language pack of LAMS2)
-    ReadRegStr $0 HKLM "${REG_HEAD}" "language_pack"
-    ${VersionCompare} "$VERSION_INT" "$0" $1
-    ${If} $1 == "0"
-        DetailPrint "LAMS Language pack already up-to-date"
-        strcpy $UPDATE_LANGUAGES "0"
-        goto done
-    ${EndIf}    
-    ${if} $1 == "2"
-        DetailPrint "LAMS Language pack already up-to-date"
-        goto done
-        strcpy $UPDATE_LANGUAGES "0"
-    ${EndIf}
-    strcpy $UPDATE_LANGUAGES "1"
-    ${If} $0 != ""
-        strcpy $OLD_LANG_VERSION $0
-    ${EndIf}
-    
+   
     # Abort if there is no version of LAMS2 installed
     ReadRegStr $0 HKLM "${REG_HEAD}" "version"
     ${If} $0 = ""
@@ -837,101 +815,6 @@ Function getVersionInt
     pop $0
     strcpy $VERSION_INT "$VERSION_INT$0"
     
-FunctionEnd
-
-; copies all the lams_blah project language files from lams_blah/conf/languages
-; files are compresses then extracted to the jboss language directory:
-; C:\lams\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams
-Function copyProjects
-
-    setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-central.war\flashxml\"
-    detailprint "Extracting language files for flash"
-    file /a /r "${BASE_PROJECT_DIR}\lams_central\build\lib\lams-central.war\flashxml\*"
-
-    ;copying COMMON project language files
-    setoutpath "$INSTDIR"
-    detailprint "Extracting language files for lams_common"
-    file /a "${BASE_PROJECT_DIR}\lams_common\build\lib\language\org\lamsfoundation\lams\*"
-    
-    ;copying ADMIN project language files
-    setoutpath "$INSTDIR\admin"
-    detailprint "Extracting language files for lams_admin"
-    file /a "${BASE_PROJECT_DIR}\lams_admin\build\lib\language\org\lamsfoundation\lams\admin\*"
-    
-    ;copying CENTRAL project language files
-    setoutpath "$INSTDIR\central"
-    detailprint "Extracting language files for lams_central"
-    file /a "${BASE_PROJECT_DIR}\lams_central\build\lib\language\org\lamsfoundation\lams\central\*"
-    
-    ;copying CONTENTREPOSITORY project language files
-    setoutpath "$INSTDIR\contentrepository"
-    detailprint "Extracting language files for lams_contentrepository"
-    file /a  /x CVS "${BASE_PROJECT_DIR}\lams_contentrepository\conf\language\*"
-    
-    ;copying LEARNING project language files
-    setoutpath "$INSTDIR\learning"
-    detailprint "Extracting language files for lams_learning"
-    file /a "${BASE_PROJECT_DIR}\lams_learning\build\lib\language\org\lamsfoundation\lams\learning\*"
-     
-    ;copying MONITORING project language files
-    setoutpath "$INSTDIR\monitoring"
-    detailprint "Extracting language files for lams_monitoring"
-    file /a  "${BASE_PROJECT_DIR}\lams_monitoring\build\lib\language\org\lamsfoundation\lams\monitoring\*"
-    
-    ;copying TOOL_CHAT project language files
-    setoutpath "$INSTDIR\tool\chat"
-    detailprint "Extracting language files for lams_tool_chat"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_chat\build\deploy\language\*"
-    
-    ;copying TOOL_FORUM project language files
-    setoutpath "$INSTDIR\tool\forum"
-    detailprint "Extracting language files for lams_tool_forum"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_forum\build\deploy\language\*"
-    
-    ;copying TOOL_LAMC project language files
-    setoutpath "$INSTDIR\tool\mc"
-    detailprint "Extracting language files for lams_tool_lamc"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_lamc\build\deploy\language\*"
-    
-    ;copying TOOL_LAQA project language filesh
-    setoutpath "$INSTDIR\tool\qa"
-    detailprint "Extracting language files for lams_tool_laqa"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_laqa\build\deploy\language\*"
-    
-    ;copying TOOL_NOTEBOOK project language files
-    setoutpath "$INSTDIR\tool\notebook"
-    detailprint "Extracting language files for lams_tool_notebook"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_notebook\build\deploy\language\*"
-    
-    ;copying TOOL_NB project language files
-    setoutpath "$INSTDIR\tool\noticeboard"
-    detailprint "Extracting language files for lams_tool_nb"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_nb\build\deploy\language\*"
-    
-    ;copying TOOL_LARSRC project language files
-    setoutpath "$INSTDIR\tool\rsrc"
-    detailprint "Extracting language files for lams_tool_larsrc"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_larsrc\build\deploy\language\*"
-
-    ;copying TOOL_SBMT project language files
-    setoutpath "$INSTDIR\tool\sbmt"
-    detailprint "Extracting language files for lams_tool_sbmt"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_sbmt\build\deploy\language\*"
-    
-    ;copying TOOL_SCRIBE project language files
-    setoutpath "$INSTDIR\tool\scribe"
-    detailprint "Extracting language files for lams_tool_scribe"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_scribe\build\deploy\language\*"
-    
-    ;copying TOOL_SURVEY project language files
-    setoutpath "$INSTDIR\tool\survey"
-    detailprint "Extracting language files for lams_tool_survey"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_survey\build\deploy\language\*"
-    
-    ;copying TOOL_VOTE project language files
-    setoutpath "$INSTDIR\tool\vote"
-    detailprint "Extracting language files for lams_tool_vote"
-    file /a "${BASE_PROJECT_DIR}\lams_tool_vote\build\deploy\language\*" 
 FunctionEnd
 
 
