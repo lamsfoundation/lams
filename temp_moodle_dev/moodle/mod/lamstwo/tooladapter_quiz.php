@@ -7,6 +7,7 @@
  	    include_once('../../config.php');
  	    include_once($CFG->libdir.'/datalib.php');
  	    include_once('../quiz/lib.php');
+ 	    include_once('../quiz/editlib.php');
 	
  	    $ts       = optional_param('ts', '', PARAM_TEXT);
  	    $username = optional_param('un', '', PARAM_TEXT);
