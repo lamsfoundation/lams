@@ -60,7 +60,7 @@ if ($canmanage) {
 //-->
 </script>
 XXX;
-    $customcsv = "$USER->username,$course->id,$cm->section";
+    $customcsv = "$USER->username,$course->id,$cm->section,$CFG->lamstwo_serverid";
     $authorurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], 0, $course->id, $course->fullname, $course->timecreated, $LAMS2CONSTANTS->author_method, $customcsv);
 	
     echo $openauthorjs;

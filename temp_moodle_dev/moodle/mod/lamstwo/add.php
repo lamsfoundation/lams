@@ -31,7 +31,7 @@
         update_module_button($cm->id, $course->id, get_string('modulename', 'lamstwo')), navmenu($course, $cm));
     
 	$mform_add = new mod_lamstwo_add_form('add.php', 
-		array('course'=>$course, 'lamstwo'=>$lamstwo, 'customCSV'=>"$USER->username,$course->id,$cm->section"));
+		array('course'=>$course, 'lamstwo'=>$lamstwo, 'customCSV'=>"$USER->username,$course->id,$cm->section,$CFG->lamstwo_serverid"));
 
 	// Form processing
 	if ($form = $mform_add->get_data()) {
