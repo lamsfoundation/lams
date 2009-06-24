@@ -14,20 +14,20 @@
   <form-beans>
 
     <form-bean
-      name="monitoringForm"
-      type="org.lamsfoundation.lams.tool.mdscrm.web.forms.MonitoringForm"
-    />
-    <form-bean
-      name="mdscrm10AdminForm"
-      type="org.lamsfoundation.lams.tool.mdscrm.web.forms.AdminForm"
+      name="learningForm"
+      type="org.lamsfoundation.lams.tool.mdscrm.web.forms.LearningForm"
     />
     <form-bean
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.mdscrm.web.forms.AuthoringForm"
     />
     <form-bean
-      name="learningForm"
-      type="org.lamsfoundation.lams.tool.mdscrm.web.forms.LearningForm"
+      name="mdscrm10AdminForm"
+      type="org.lamsfoundation.lams.tool.mdscrm.web.forms.AdminForm"
+    />
+    <form-bean
+      name="monitoringForm"
+      type="org.lamsfoundation.lams.tool.mdscrm.web.forms.MonitoringForm"
     />
 
   </form-beans>
@@ -45,6 +45,31 @@
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
+    <action
+      path="/learning"
+      type="org.lamsfoundation.lams.tool.mdscrm.web.actions.LearningAction"
+      name="learningForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="mdlScorm"
+        path="tiles:/learning/main"
+        redirect="false"
+      />
+      <forward
+        name="runOffline"
+        path="tiles:/learning/runOffline"
+        redirect="false"
+      />
+      <forward
+        name="defineLater"
+        path="tiles:/learning/defineLater"
+        redirect="false"
+      />
+    </action>
     <action
       path="/monitoring"
       type="org.lamsfoundation.lams.tool.mdscrm.web.actions.MonitoringAction"
@@ -84,31 +109,6 @@
       <forward
         name="message_page"
         path="tiles:/generic/message"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/learning"
-      type="org.lamsfoundation.lams.tool.mdscrm.web.actions.LearningAction"
-      name="learningForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="mdlScorm"
-        path="tiles:/learning/main"
-        redirect="false"
-      />
-      <forward
-        name="runOffline"
-        path="tiles:/learning/runOffline"
-        redirect="false"
-      />
-      <forward
-        name="defineLater"
-        path="tiles:/learning/defineLater"
         redirect="false"
       />
     </action>

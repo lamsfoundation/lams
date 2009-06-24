@@ -37,7 +37,6 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mdscrm.dto.MdlScormDTO;
 import org.lamsfoundation.lams.tool.mdscrm.dto.MdlScormSessionDTO;
 import org.lamsfoundation.lams.tool.mdscrm.model.MdlScorm;
-import org.lamsfoundation.lams.tool.mdscrm.model.MdlScormConfigItem;
 import org.lamsfoundation.lams.tool.mdscrm.service.IMdlScormService;
 import org.lamsfoundation.lams.tool.mdscrm.service.MdlScormServiceProxy;
 import org.lamsfoundation.lams.tool.mdscrm.util.MdlScormConstants;
@@ -90,15 +89,15 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	for (MdlScormSessionDTO sessionDTO : mdlScormDT0.getSessionDTOs()) {
 	    try {
-		String responseUrl = mdlScormService.getConfigItem(MdlScormConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
+		String responseUrl = mdlScormService.getExtServerUrl(mdlScorm.getExtLmsId());
 		responseUrl += RELATIVE_MONITOR_URL;
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ sessionDTO.getSessionID().toString() + "&dispatch=finishActivity";
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
 
-		responseUrl += "&update=" + sessionDTO.getExtSessionID()+"&id=" + sessionDTO.getExtSessionID() + "&returnUrl=" + returnUrl;
+		responseUrl += "&update=" + sessionDTO.getExtSessionID() + "&id=" + sessionDTO.getExtSessionID()
+			+ "&returnUrl=" + returnUrl;
 
 		sessionDTO.setRunTimeUrl(responseUrl);
 	    } catch (UnsupportedEncodingException e) {

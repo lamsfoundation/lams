@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mdscrm.model.MdlScorm;
-import org.lamsfoundation.lams.tool.mdscrm.model.MdlScormConfigItem;
 import org.lamsfoundation.lams.tool.mdscrm.service.IMdlScormService;
 import org.lamsfoundation.lams.tool.mdscrm.service.MdlScormServiceProxy;
 import org.lamsfoundation.lams.tool.mdscrm.util.MdlScormConstants;
@@ -108,12 +107,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	String userFromCSV = null;
 	String courseFromCSV = null;
 	String sectionFromCSV = null;
+	String extLmsIdFromCSV = null;
 	if (customCSV == null && mdlScorm == null) {
 	    logger.error("CustomCSV required if mdlScorm is null");
 	    throw new ToolException("CustomCSV required if mdlScorm is null");
 	} else if (customCSV != null) {
 	    String splitCSV[] = customCSV.split(",");
-	    if (splitCSV.length != 3) {
+	    if (splitCSV.length != 4) {
 		logger.error("mdlScorm tool customCSV not in required (user,course,courseURL) form: " + customCSV);
 		throw new ToolException("mdlScorm tool cusomCSV not in required (user,course,courseURL) form: "
 			+ customCSV);
@@ -121,6 +121,7 @@ public class AuthoringAction extends LamsDispatchAction {
 		userFromCSV = splitCSV[0];
 		courseFromCSV = splitCSV[1];
 		sectionFromCSV = splitCSV[2];
+		extLmsIdFromCSV = splitCSV[3];
 	    }
 	}
 
@@ -129,6 +130,15 @@ public class AuthoringAction extends LamsDispatchAction {
 	    mdlScorm.setExtUsername(userFromCSV);
 	    mdlScorm.setExtCourseId(courseFromCSV);
 	    mdlScorm.setExtSection(sectionFromCSV);
+	    mdlScorm.setExtLmsId(extLmsIdFromCSV);
+	    mdlScorm.setCreateDate(new Date());
+	}
+
+	if (mdlScorm.getExtLmsId() == null) {
+	    mdlScorm.setExtUsername(userFromCSV);
+	    mdlScorm.setExtCourseId(courseFromCSV);
+	    mdlScorm.setExtSection(sectionFromCSV);
+	    mdlScorm.setExtLmsId(extLmsIdFromCSV);
 	    mdlScorm.setCreateDate(new Date());
 	}
 
@@ -144,19 +154,17 @@ public class AuthoringAction extends LamsDispatchAction {
 	try {
 
 	    // If the mdlScorm has a saved course url, use it, otherwise use the one giving in the request in customCSV
-	    //String courseUrlToBeUsed = (mdlScorm.getExtCourseUrl() != null) ? mdlScorm.getExtCourseUrl() : courseUrlFromCSV;
-
-	    String responseUrl = mdlScormService.getConfigItem(MdlScormConfigItem.KEY_EXTERNAL_SERVER_URL)
-		    .getConfigValue();
+	    String responseUrl = mdlScormService.getExtServerUrl(mdlScorm.getExtLmsId());
+ 	
 	    responseUrl += RELATIVE_MOODLE_AUTHOR_URL;
 	    String returnUpdateUrl = URLEncoder.encode(TOOL_APP_URL + "/authoring.do?dispatch=updateContent" + "&"
 		    + AttributeNames.PARAM_TOOL_CONTENT_ID + "=" + toolContentID.toString(), "UTF8");
-  
+
 	    responseUrl += "&lamsUpdateURL=" + returnUpdateUrl;
-	    
+
 	    String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_EDIT_URL, "UTF8");
-	    
-	    responseUrl += "&dest=" + encodedMoodleRelativePath ;
+
+	    responseUrl += "&dest=" + encodedMoodleRelativePath;
 
 	    if (mdlScorm.getExtSection() != null) {
 		responseUrl += "&section=" + mdlScorm.getExtSection();

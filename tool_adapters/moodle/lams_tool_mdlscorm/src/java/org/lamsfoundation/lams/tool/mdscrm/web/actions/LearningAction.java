@@ -36,17 +36,16 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
-import org.lamsfoundation.lams.tool.mdscrm.dto.MdlScormDTO;
-import org.lamsfoundation.lams.tool.mdscrm.model.MdlScorm;
-import org.lamsfoundation.lams.tool.mdscrm.model.MdlScormConfigItem;
-import org.lamsfoundation.lams.tool.mdscrm.model.MdlScormSession;
-import org.lamsfoundation.lams.tool.mdscrm.model.MdlScormUser;
-import org.lamsfoundation.lams.tool.mdscrm.service.MdlScormServiceProxy;
-import org.lamsfoundation.lams.tool.mdscrm.service.IMdlScormService;
-import org.lamsfoundation.lams.tool.mdscrm.util.MdlScormConstants;
-import org.lamsfoundation.lams.tool.mdscrm.util.MdlScormException;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.mdscrm.dto.MdlScormDTO;
+import org.lamsfoundation.lams.tool.mdscrm.model.MdlScorm;
+import org.lamsfoundation.lams.tool.mdscrm.model.MdlScormSession;
+import org.lamsfoundation.lams.tool.mdscrm.model.MdlScormUser;
+import org.lamsfoundation.lams.tool.mdscrm.service.IMdlScormService;
+import org.lamsfoundation.lams.tool.mdscrm.service.MdlScormServiceProxy;
+import org.lamsfoundation.lams.tool.mdscrm.util.MdlScormConstants;
+import org.lamsfoundation.lams.tool.mdscrm.util.MdlScormException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -75,10 +74,10 @@ public class LearningAction extends LamsDispatchAction {
 	    + MdlScormConstants.TOOL_SIGNATURE + "/";
 
     //public static final String RELATIVE_LEARNER_URL = "mod/scorm/view.php?";
-    
+
     public static final String RELATIVE_LEARNER_URL = "course/lamsframes.php?";
     public static final String MOODLE_VIEW_URL = "mod/scorm/view.php";
-    public static final String RELATIVE_TEACHER_URL = "mod/scorm/report.php?"; 
+    public static final String RELATIVE_TEACHER_URL = "mod/scorm/report.php?";
 
     private IMdlScormService mdlScormService;
 
@@ -93,7 +92,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	// Retrieve the session and content.
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request,AttributeNames.PARAM_MODE, false);
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, false);
 	MdlScormSession mdlScormSession = mdlScormService.getSessionBySessionId(toolSessionID);
 	if (mdlScormSession == null) {
 	    throw new MdlScormException("Cannot retreive session with toolSessionID: " + toolSessionID);
@@ -123,31 +122,24 @@ public class LearningAction extends LamsDispatchAction {
 
 	if (mdlScorm.getExtToolContentId() != null) {
 	    try {
-		String responseUrl = mdlScormService.getConfigItem(MdlScormConfigItem.KEY_EXTERNAL_SERVER_URL)
-			.getConfigValue();
-		
-			if(mode.equals(ToolAccessMode.TEACHER))
-			{
-				responseUrl += RELATIVE_TEACHER_URL;
-			}
-			else if (mode.equals(ToolAccessMode.LEARNER)|| mode.equals(ToolAccessMode.AUTHOR))
-			{
-				responseUrl += RELATIVE_LEARNER_URL;
-			}
+		String responseUrl = mdlScormService.getExtServerUrl(mdlScorm.getExtLmsId());
+
+		if (mode.equals(ToolAccessMode.TEACHER)) {
+		    responseUrl += RELATIVE_TEACHER_URL;
+		} else if (mode.equals(ToolAccessMode.LEARNER) || mode.equals(ToolAccessMode.AUTHOR)) {
+		    responseUrl += RELATIVE_LEARNER_URL;
+		}
 
 		String returnUrl = TOOL_APP_URL + "learning.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
 			+ toolSessionID.toString() + "&dispatch=finishActivity";
-		
-		
-		
+
 		String encodedMoodleRelativePath = URLEncoder.encode(MOODLE_VIEW_URL, "UTF8");
 
 		returnUrl = URLEncoder.encode(returnUrl, "UTF8");
-		
 
-		responseUrl += "&id=" + mdlScormSession.getExtSessionId() + "&returnUrl=" + returnUrl
-			+ "&dest=" + encodedMoodleRelativePath + "&is_learner=1"+ "&isFinished=" + mdlScormUser.isFinishedActivity();
-		
+		responseUrl += "&id=" + mdlScormSession.getExtSessionId() + "&returnUrl=" + returnUrl + "&dest="
+			+ encodedMoodleRelativePath + "&is_learner=1" + "&isFinished="
+			+ mdlScormUser.isFinishedActivity();
 
 		log.debug("Redirecting for mdl scorm learner: " + responseUrl);
 		response.sendRedirect(responseUrl);

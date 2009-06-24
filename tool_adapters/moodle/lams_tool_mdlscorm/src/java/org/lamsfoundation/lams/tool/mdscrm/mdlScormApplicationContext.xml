@@ -19,10 +19,9 @@
 				<property name="mdlScormSessionDAO"><ref bean="mdlScormSessionDAO"/></property>
 				<property name="mdlScormUserDAO"><ref bean="mdlScormUserDAO"/></property>
 				<property name="mdlScormDAO"><ref bean="mdlScormDAO"/></property>
-				<property name="mdlScormConfigItemDAO"><ref bean="mdlScormConfigItemDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="learnerService"><ref bean="learnerService"/></property> 	
-				<!--<property name="integrationService"><ref bean="integrationService"/></property>-->
+				<property name="integrationService"><ref bean="integrationService"/></property>
 				<property name="auditService"><ref bean="auditService"/></property>		
  				<property name="mdlScormToolContentHandler"><ref bean="mdlScormToolContentHandler"/></property>
 		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
@@ -56,10 +55,6 @@
 	<bean id="mdlScormDAO" class="org.lamsfoundation.lams.tool.mdscrm.dao.hibernate.MdlScormDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>  
-	
-	<bean id="mdlScormConfigItemDAO" class="org.lamsfoundation.lams.tool.mdscrm.dao.hibernate.MdlScormConfigItemDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean> 
 
 	<bean id="mdlScormSessionDAO" class="org.lamsfoundation.lams.tool.mdscrm.dao.hibernate.MdlScormSessionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
