@@ -18,16 +18,16 @@
       type="org.lamsfoundation.lams.tool.mdquiz.web.forms.AuthoringForm"
     />
     <form-bean
-      name="learningForm"
-      type="org.lamsfoundation.lams.tool.mdquiz.web.forms.LearningForm"
-    />
-    <form-bean
       name="mdquiz10AdminForm"
       type="org.lamsfoundation.lams.tool.mdquiz.web.forms.AdminForm"
     />
     <form-bean
       name="monitoringForm"
       type="org.lamsfoundation.lams.tool.mdquiz.web.forms.MonitoringForm"
+    />
+    <form-bean
+      name="learningForm"
+      type="org.lamsfoundation.lams.tool.mdquiz.web.forms.LearningForm"
     />
 
   </form-beans>
@@ -45,6 +45,48 @@
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
+    <action
+      path="/monitoring"
+      type="org.lamsfoundation.lams.tool.mdquiz.web.actions.MonitoringAction"
+      name="monitoringForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="tiles:/monitoring/main"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.mdquiz.web.actions.ClearSessionAction"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.mdquiz.web.actions.AuthoringAction"
+      name="authoringForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="tiles:/authoring/main"
+        redirect="false"
+      />
+      <forward
+        name="message_page"
+        path="tiles:/generic/message"
+        redirect="false"
+      />
+    </action>
     <action
       path="/learning"
       type="org.lamsfoundation.lams.tool.mdquiz.web.actions.LearningAction"
@@ -71,13 +113,6 @@
       />
     </action>
     <action
-      path="/clearsession"
-      type="org.lamsfoundation.lams.tool.mdquiz.web.actions.ClearSessionAction"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
       path="/mdquiz10admin"
       type="org.lamsfoundation.lams.tool.mdquiz.web.actions.AdminAction"
       name="mdquiz10AdminForm"
@@ -89,41 +124,6 @@
       <forward
         name="config"
         path="/pages/admin/config.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.mdquiz.web.actions.AuthoringAction"
-      name="authoringForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="tiles:/authoring/main"
-        redirect="false"
-      />
-      <forward
-        name="message_page"
-        path="tiles:/generic/message"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/monitoring"
-      type="org.lamsfoundation.lams.tool.mdquiz.web.actions.MonitoringAction"
-      name="monitoringForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="tiles:/monitoring/main"
         redirect="false"
       />
     </action>

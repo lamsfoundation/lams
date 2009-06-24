@@ -14,20 +14,20 @@
   <form-beans>
 
     <form-bean
-      name="authoringForm"
-      type="org.lamsfoundation.lams.tool.mdwiki.web.forms.AuthoringForm"
+      name="monitoringForm"
+      type="org.lamsfoundation.lams.tool.mdwiki.web.forms.MonitoringForm"
     />
     <form-bean
-      name="learningForm"
-      type="org.lamsfoundation.lams.tool.mdwiki.web.forms.LearningForm"
+      name="authoringForm"
+      type="org.lamsfoundation.lams.tool.mdwiki.web.forms.AuthoringForm"
     />
     <form-bean
       name="mdwiki10AdminForm"
       type="org.lamsfoundation.lams.tool.mdwiki.web.forms.AdminForm"
     />
     <form-bean
-      name="monitoringForm"
-      type="org.lamsfoundation.lams.tool.mdwiki.web.forms.MonitoringForm"
+      name="learningForm"
+      type="org.lamsfoundation.lams.tool.mdwiki.web.forms.LearningForm"
     />
 
   </form-beans>
@@ -46,27 +46,22 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/learning"
-      type="org.lamsfoundation.lams.tool.mdwiki.web.actions.LearningAction"
-      name="learningForm"
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.mdwiki.web.actions.AuthoringAction"
+      name="authoringForm"
       scope="request"
       parameter="dispatch"
       unknown="false"
-      validate="true"
+      validate="false"
     >
       <forward
-        name="mdlWiki"
-        path="tiles:/learning/main"
+        name="success"
+        path="tiles:/authoring/main"
         redirect="false"
       />
       <forward
-        name="runOffline"
-        path="tiles:/learning/runOffline"
-        redirect="false"
-      />
-      <forward
-        name="defineLater"
-        path="tiles:/learning/defineLater"
+        name="message_page"
+        path="tiles:/generic/message"
         redirect="false"
       />
     </action>
@@ -93,22 +88,27 @@
       />
     </action>
     <action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.mdwiki.web.actions.AuthoringAction"
-      name="authoringForm"
+      path="/learning"
+      type="org.lamsfoundation.lams.tool.mdwiki.web.actions.LearningAction"
+      name="learningForm"
       scope="request"
       parameter="dispatch"
       unknown="false"
-      validate="false"
+      validate="true"
     >
       <forward
-        name="success"
-        path="tiles:/authoring/main"
+        name="mdlWiki"
+        path="tiles:/learning/main"
         redirect="false"
       />
       <forward
-        name="message_page"
-        path="tiles:/generic/message"
+        name="runOffline"
+        path="tiles:/learning/runOffline"
+        redirect="false"
+      />
+      <forward
+        name="defineLater"
+        path="tiles:/learning/defineLater"
         redirect="false"
       />
     </action>
