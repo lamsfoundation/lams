@@ -1,0 +1,368 @@
+/**************************************************************** 
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
+ * ============================================================= 
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
+ * 
+ * This program is free software; you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * GNU General Public License for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License 
+ * along with this program; if not, write to the Free Software 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
+ * 
+ * http://www.gnu.org/licenses/gpl.txt 
+ * **************************************************************** 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.notebook.core;
+
+import java.util.Date;
+
+import org.lamsfoundation.lams.test.AbstractLamsTestCase;
+import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.tool.notebook.dao.INotebookAttachmentDAO;
+import org.lamsfoundation.lams.tool.notebook.dao.INotebookDAO;
+import org.lamsfoundation.lams.tool.notebook.dao.INotebookSessionDAO;
+import org.lamsfoundation.lams.tool.notebook.dao.INotebookUserDAO;
+import org.lamsfoundation.lams.tool.notebook.model.Notebook;
+import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
+import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
+
+/**
+ * @author Andrey Balan
+ */
+public class NotebookDataAccessTestCase extends AbstractLamsTestCase {
+
+    // ---------------------------------------------------------------------
+    // DAO instances for initializing data
+    // ---------------------------------------------------------------------
+    protected INotebookDAO notebookDAO = null;
+
+    protected INotebookSessionDAO notebookSessionDAO = null;
+
+    protected INotebookUserDAO notebookUserDAO = null;
+
+    protected INotebookAttachmentDAO notebookAttachmentDAO = null;
+
+//    protected ILamsToolService toolService;
+    protected ToolDAO toolDAO;
+
+    // ---------------------------------------------------------------------
+    // Domain Object instances
+    // ---------------------------------------------------------------------
+    protected Notebook notebook;
+    // protected NoticeboardSession nbSession;
+    // protected NoticeboardUser nbUser;
+    // protected NoticeboardAttachment nbAttachment;
+
+    // ---------------------------------------------------------------------
+    // DATA USED FOR TESTING PURPOSES ONLY
+    // ---------------------------------------------------------------------
+
+    protected final long ONE_DAY = 60 * 60 * 1000 * 24;
+
+    protected final Long TEST_NB_ID = new Long(1500);
+    protected final Long TEST_COPYNB_ID = new Long(3500);
+
+    protected final String TEST_TITLE = "Test Title";
+    protected final String TEST_CONTENT = "Welcome! We hope you enjoy the activities that are set out.";
+    protected final String TEST_ONLINE_INSTRUCTIONS = "Put your online instructions here";
+    protected final String TEST_OFFLINE_INSTRUCTIONS = "Put your offline instructions here";
+    protected final boolean TEST_DEFINE_LATER = false;
+    protected final boolean TEST_REFLECT_ON_ACTIVITY = false;
+    protected final String TEST_REFLECT_INSTRUCTIONS = "Put your reflections instructions here";
+    protected final boolean TEST_FORCE_OFFLINE = false;
+    protected final boolean TEST_CONTENT_IN_USE = false;
+    protected final Date TEST_DATE_CREATED = new Date(System.currentTimeMillis());
+    protected final Date TEST_DATE_UPDATED = new Date();
+    protected final Long TEST_CREATOR_USER_ID = new Long(1300);
+
+    protected final Long TEST_SESSION_ID = new Long(1400);
+    protected final String TEST_SESSION_NAME = "Session 1400";
+    protected final Date TEST_SESSION_START_DATE = new Date(System.currentTimeMillis());
+    protected final Date TEST_SESSION_END_DATE = new Date(System.currentTimeMillis() + ONE_DAY);
+    protected final Integer TEST_SESSION_STATUS = NotebookConstants.SESSION_NOT_STARTED;
+
+    protected final Long TEST_USER_ID = new Long(1600);
+    protected final String TEST_USERNAME = "testUsername";
+    protected final String TEST_FULLNAME = "Test User Fullname";
+    // protected final String TEST_USER_STATUS = NoticeboardUser.INCOMPLETE;
+
+    protected final String TEST_FILENAME = "testFilename";
+    protected final boolean TEST_IS_ONLINE_FILE = true;
+    protected final Long TEST_UUID = new Long(2002);
+
+    // ---------------------------------------------------------------------
+    // DEFAULT DATA INSERTED BY BUILD-DB ANT TASK
+    // ---------------------------------------------------------------------
+    protected final Long DEFAULT_CONTENT_ID = new Long(2500);
+    protected final String DEFAULT_TITLE = "Welcome";
+    protected final String DEFAULT_CONTENT = "Welcome to these activities";
+    protected final String DEFAULT_ONLINE_INSTRUCTIONS = "Enter the online instructions here";
+    protected final String DEFAULT_OFFLINE_INSTRUCTIONS = "Enter the offline instructions here";
+    protected final boolean DEFAULT_DEFINE_LATER = false;
+    protected final boolean DEFAULT_FORCE_OFFLINE = false;
+    protected final boolean DEFAULT_CONTENT_IN_USE = false;
+    protected final Long DEFAULT_CREATOR_USER_ID = new Long(2300);
+    protected final Long DEFAULT_SESSION_ID = new Long(2400);
+    protected final Integer DEFAULT_SESSION_STATUS = NotebookConstants.SESSION_IN_PROGRESS;
+    protected final Long DEFAULT_USER_ID = new Long(2600);
+    protected final String DEFAULT_USERNAME = "test";
+    protected final String DEFAULT_FULLNAME = "test";
+
+    // protected final String DEFAULT_USER_STATUS = NotebookUser.INCOMPLETE;
+
+    /** Default Constructor */
+    public NotebookDataAccessTestCase(String name) {
+	super(name);
+    }
+
+    // ---------------------------------------------------------------------
+    // Inherited Methods
+    // ---------------------------------------------------------------------
+
+    protected void setUp() throws Exception {
+	super.setUp();
+	toolDAO = (ToolDAO) this.context.getBean("toolDAO");
+	toolDAO.getToolBySignature("lanb10");
+	int a = 122;
+	// notebookDAO = (NotebookDAO) this.context.getBean("notebookDAO");
+	// notebookSessionDAO= (NotebookSessionDAO) this.context.getBean("notebookSessionDAO");
+	// notebookUserDAO = (NotebookUserDAO) this.context.getBean("notebookUserDAO");
+	// notebookAttachmentDAO = (NotebookAttachmentDAO)this.context.getBean("notebookAttachmentDAO");
+    }
+
+    protected void tearDown() throws Exception {
+	super.tearDown();
+    }
+
+    /** Define the context files. Overrides method in AbstractLamsTestCase */
+    protected String[] getContextConfigLocation() {
+	return new String[] {
+		// "org/lamsfoundation/lams/localApplicationContext.xml"};//,
+		// "org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+		// "org/lamsfoundation/lams/toolApplicationContext.xml",
+		// "org/lamsfoundation/lams/learning/learningApplicationContext.xml",
+		// "org/lamsfoundation/lams/tool/notebook/testApplicationContext.xml"};
+
+		"org/lamsfoundation/lams/localApplicationContext.xml",
+		"org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+		"org/lamsfoundation/lams/toolApplicationContext.xml",
+		
+		//"org/lamsfoundation/lams/contentrepository/applicationContext.xml",
+		
+		"org/lamsfoundation/lams/learning/learningApplicationContext.xml",
+		//"org/lamsfoundation/lams/tool/notebook/testApplicationContext.xml"
+		 };
+
+    }
+
+    // protected String[] getContextConfigLocation() {
+    // return new String[] {"org/lamsfoundation/lams/localApplicationContext.xml",
+    // "org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml",
+    // "org/lamsfoundation/lams/contentrepository/applicationContext.xml",
+    // "org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
+    // "org/lamsfoundation/lams/learning/learningApplicationContext.xml",
+    // "org/lamsfoundation/lams/toolApplicationContext.xml"};
+    // }
+
+    /** Define the sessionFactory bean name located in testApplication.xml. */
+    protected String getHibernateSessionFactoryName() {
+	return "notebookSessionFactory";
+    }
+
+    protected void initNbContentData() {
+	// notebook = new Notebook(TEST_NB_ID,
+	// TEST_TITLE,
+	// TEST_CONTENT,
+	// TEST_ONLINE_INSTRUCTIONS,
+	// TEST_OFFLINE_INSTRUCTIONS,
+	// TEST_DEFINE_LATER,
+	// TEST_FORCE_OFFLINE,
+	// TEST_REFLECT_ON_ACTIVITY,
+	// TEST_REFLECT_INSTRUCTIONS,
+	// TEST_CONTENT_IN_USE,
+	// TEST_CREATOR_USER_ID,
+	// TEST_DATE_CREATED,
+	// TEST_DATE_UPDATED);
+	//	    	
+	// notebookDAO.saveOrUpdate(notebook);
+
+    }
+
+    // protected void cleanNbContentData(Long contentId)
+    // {
+    // noticeboardDAO.removeNoticeboard(contentId);
+    // //it correspondingly removes all the sessions and users along with it.
+    // }
+    //    
+    //   
+    // protected Long getTestNoticeboardId()
+    // {
+    // return this.TEST_NB_ID;
+    // }
+    //    
+    // protected void initNbSessionContent()
+    // {
+    //
+    // NoticeboardContent nb = noticeboardDAO.findNbContentById(TEST_NB_ID);
+    //    	
+    // nbSession = new NoticeboardSession(TEST_SESSION_ID,
+    // TEST_SESSION_NAME,
+    // nb,
+    // TEST_SESSION_START_DATE,
+    // TEST_SESSION_END_DATE,
+    // TEST_SESSION_STATUS);
+    // nbSessionDAO.saveNbSession(nbSession);
+    //    	
+    // //associate the session with the content
+    // nb.getNbSessions().add(nbSession);
+    //    	
+    // }
+
+    protected void initNbUserData() {
+	NotebookSession ns = notebookSessionDAO.getBySessionId(TEST_SESSION_ID);
+
+	// NotebookUser user = new NotebookUser(TEST_USER_ID,
+	// ns,
+	// TEST_USERNAME,
+	// TEST_FULLNAME,
+	// TEST_USER_STATUS);
+	//        
+	// notebookUserDAO.saveNbUser(user);
+	//        
+	// ns.getNbUsers().add(user);
+    }
+
+    // /* TODO: have to upload attachment to repository */
+    // protected void initNbAttachmentData()
+    // {
+    // NoticeboardAttachment attachment = new NoticeboardAttachment();
+    // NoticeboardContent nb = noticeboardDAO.findNbContentById(TEST_NB_ID);
+    //        
+    // attachment.setFilename(TEST_FILENAME);
+    // attachment.setOnlineFile(TEST_IS_ONLINE_FILE);
+    // attachment.setNbContent(nbContent);
+    // attachment.setUuid(TEST_UUID);
+    //	     
+    // attachmentDAO.saveAttachment(attachment);
+    //	    
+    // nb.getNbAttachments().add(attachment);
+    // }
+
+    protected void initAllData() {
+	initNbContentData();
+	// initNbSessionContent();
+	initNbUserData();
+    }
+
+    // protected void restoreDefaultContent(Long defaultContentId)
+    // {
+    // nbContent = new NoticeboardContent(defaultContentId,
+    // DEFAULT_TITLE,
+    // DEFAULT_CONTENT,
+    // DEFAULT_ONLINE_INSTRUCTIONS,
+    // DEFAULT_OFFLINE_INSTRUCTIONS,
+    // DEFAULT_DEFINE_LATER,
+    // DEFAULT_FORCE_OFFLINE,
+    // DEFAULT_CONTENT_IN_USE,
+    // null,
+    // DEFAULT_CONTENT_IN_USE,
+    // TEST_CREATOR_USER_ID,
+    // TEST_DATE_CREATED,
+    // null);
+    //
+    // noticeboardDAO.saveNbContent(nbContent);
+    // 
+    // }
+
+    // ===========================
+    // Helper Methods
+    // ===========================
+
+    // protected void assertNbSessionIsNull(Long id)
+    // {
+    // NoticeboardSession nbSession = nbSessionDAO.findNbSessionById(id);
+    // assertNull(nbSession);
+    // }
+    //    
+    // protected void assertNbContentIsNull(Long id)
+    // {
+    // NoticeboardContent nbContent = noticeboardDAO.findNbContentById(id);
+    // assertNull(nbContent);
+    // }
+    //    
+    protected void assertContentEqualsTestData(Notebook content) {
+	assertEquals(content.getTitle(), TEST_TITLE);
+	assertEquals(content.getOnlineInstructions(), TEST_ONLINE_INSTRUCTIONS);
+	assertEquals(content.getOfflineInstructions(), TEST_OFFLINE_INSTRUCTIONS);
+	assertEquals(content.isDefineLater(), TEST_DEFINE_LATER);
+    }
+
+    // protected void assertContentEqualsDefaultData(NoticeboardContent content)
+    // {
+    //        	
+    // assertEquals(content.getTitle(), DEFAULT_TITLE);
+    // assertEquals(content.getContent(), DEFAULT_CONTENT);
+    // assertEquals(content.getOnlineInstructions(), DEFAULT_ONLINE_INSTRUCTIONS);
+    // assertEquals(content.getOfflineInstructions(), DEFAULT_OFFLINE_INSTRUCTIONS);
+    // assertEquals(content.isDefineLater(), DEFAULT_DEFINE_LATER);
+    // assertEquals(content.isForceOffline(), DEFAULT_FORCE_OFFLINE);
+    // }
+    //    
+    // protected void assertEqualsForSessionContent(NoticeboardSession ns)
+    // {
+    // assertEquals("Validate session id ",ns.getNbSessionId(), TEST_SESSION_ID);
+    // assertEquals("Validate content id ",ns.getNbContent().getNbContentId(), TEST_NB_ID);
+    // assertEquals("Validate session start date", ns.getSessionStartDate(), TEST_SESSION_START_DATE);
+    // assertEquals("Validate session end date", ns.getSessionEndDate(), TEST_SESSION_END_DATE);
+    // assertEquals("Validate session status", ns.getSessionStatus(), TEST_SESSION_STATUS);
+    // }
+    //    
+    // protected void assertSessionObjectIsNull(Long sessionId)
+    // {
+    // NoticeboardSession nsObject = nbSessionDAO.findNbSessionById(sessionId);
+    // assertNull(nsObject);
+    // }
+    //    
+    // protected void assertEqualsForNbUser(NoticeboardUser user)
+    // {
+    // assertEquals("Validate user id",user.getUserId(), TEST_USER_ID);
+    // assertEquals("Validate username",user.getUsername(), TEST_USERNAME);
+    // assertEquals("Validate fullname", user.getFullname(), TEST_FULLNAME);
+    // assertEquals("Validate user status", user.getUserStatus(), TEST_USER_STATUS);
+    // assertEquals("Validate session id",user.getNbSession().getNbSessionId(), TEST_SESSION_ID);
+    //		
+    // }
+    //    
+    // protected void assertEqualsForDefaultNbUser(NoticeboardUser user)
+    // {
+    // assertEquals("Validate user id",user.getUserId(), DEFAULT_USER_ID);
+    // assertEquals("Validate username",user.getUsername(), DEFAULT_USERNAME);
+    // assertEquals("Validate fullname", user.getFullname(), DEFAULT_FULLNAME);
+    // assertEquals("Validate user status", user.getUserStatus(), DEFAULT_USER_STATUS);
+    // assertEquals("Validate session id",user.getNbSession().getNbSessionId(), DEFAULT_SESSION_ID);
+    //		
+    // }
+    //  
+    // protected void assertUserObjectIsNull(Long userId)
+    // {
+    // NoticeboardUser user = nbUserDAO.getNbUser(userId, TEST_SESSION_ID);
+    // assertNull(user);
+    // }
+    //    
+    // protected void assertAttachmentData(NoticeboardAttachment attachment)
+    // {
+    // assertEquals("Validating the filename:", attachment.getFilename(), TEST_FILENAME);
+    // assertEquals("Validating whether it is an online file", attachment.isOnlineFile(), TEST_IS_ONLINE_FILE);
+    // assertEquals("Validating the tool content id", attachment.getNbContent().getNbContentId(), TEST_NB_ID);
+    // assertEquals("Validating the Uuid", attachment.getUuid(), TEST_UUID);
+    // }
+}
