@@ -10,6 +10,7 @@ CREATE TABLE `lams_ext_server_org_map` (
   `serverdesc` text,
   `prefix` varchar(11) NOT NULL,
   `userinfo_url` text NOT NULL,
+  `server_url` varchar(255) DEFAULT NULL,
   `timeout_url` text NOT NULL,
   `disabled` bit(1) NOT NULL,
   `orgid` bigint(20),
@@ -51,4 +52,18 @@ CREATE TABLE `lams_ext_user_userid_map` (
   KEY `ext_server_org_map_id` (`ext_server_org_map_id`),
   CONSTRAINT `lams_ext_user_userid_map_fk1` FOREIGN KEY (`ext_server_org_map_id`) REFERENCES `lams_ext_server_org_map` (`sid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `lams_ext_user_userid_map_fk` FOREIGN KEY (`user_id`) REFERENCES `lams_user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) TYPE=InnoDB;
+
+--
+-- Table structure for table `lams_ext_server_tool_map`
+--
+DROP TABLE IF EXISTS lams_ext_server_tool_map;
+CREATE TABLE lams_ext_server_tool_map (
+  uid BIGINT(20) NOT NULL auto_increment,
+  tool_id BIGINT(20) NOT NULL,
+  ext_server_org_map_id int(11) NOT NULL,
+  PRIMARY KEY  (uid),
+  UNIQUE KEY unique_adapter_map (ext_server_org_map_id, tool_id),
+  CONSTRAINT lams_ext_server_tool_map_fk1 FOREIGN KEY (ext_server_org_map_id) REFERENCES lams_ext_server_org_map (sid) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT lams_ext_server_tool_map_fk2 FOREIGN KEY (tool_id) REFERENCES lams_tool (tool_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) TYPE=InnoDB;

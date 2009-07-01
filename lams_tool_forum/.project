@@ -44,7 +44,7 @@
 		<link>
 			<name>JBOSS4-Forum</name>
 			<type>2</type>
-			<location>D:/jboss-4.0.2/server/default/deploy/lams.ear/lams-tool-lafrum11.war/WEB-INF/classes</location>
+			<location>/home/jliew/D::/jboss-4.0.2/server/default/deploy/lams.ear/lams-tool-lafrum11.war/WEB-INF/classes</location>
 		</link>
 	</linkedResources>
 </projectDescription>

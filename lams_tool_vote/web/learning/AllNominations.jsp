@@ -185,9 +185,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<strong> <fmt:message key="label.open.votes"/> </strong>
 					<c:forEach var="vote"
 						items="${requestScope.listUserEntriesContent}">
-						<div>
-							<c:out value="${vote.userEntry}" escapeXml="false" /> 
-						</div>
+						<c:if test="${vote.userEntry != null}">
+							<div>
+								<c:out value="${vote.userEntry}" escapeXml="false" /> 
+							</div>
+						</c:if>
 					</c:forEach>
 					<div>&nbsp;</div>
 				</c:if>

@@ -107,7 +107,7 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 	Map<Long, Integer> resultMap = new HashMap<Long, Integer>();
 	for (Iterator iter = list.iterator(); iter.hasNext();) {
 	    Object[] row = (Object[]) iter.next();
-	    resultMap.put((Long) row[0], (Integer) row[1]);
+	    resultMap.put((Long) row[0], ((Number) row[1]).intValue());
 	}
 	return resultMap;
     }
@@ -119,7 +119,7 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 	Map<Long, Integer> resultMap = new HashMap<Long, Integer>();
 	for (Iterator iter = list.iterator(); iter.hasNext();) {
 	    Object[] row = (Object[]) iter.next();
-	    resultMap.put((Long) row[0], (Integer) row[1]);
+	    resultMap.put((Long) row[0], ((Number) row[1]).intValue());
 	}
 	return resultMap;
     }

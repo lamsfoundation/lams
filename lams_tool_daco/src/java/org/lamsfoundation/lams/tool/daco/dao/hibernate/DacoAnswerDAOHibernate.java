@@ -95,8 +95,8 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 	QuestionSummarySingleAnswerDTO singleAnswer = new QuestionSummarySingleAnswerDTO();
 	singleAnswer.setAnswer(row[DacoConstants.QUESTION_DB_ANSWER_ENUMERATION_SUMMARY_ANSWER]);
 	singleAnswer.setCount(row[DacoConstants.QUESTION_DB_ANSWER_ENUMERATION_SUMMARY_COUNT]);
-	Integer answerCount = (Integer) getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_ANSWER_COUNT,
-		currentUid).get(0);
+	Long answerCount = (Long) getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_ANSWER_COUNT, currentUid)
+		.get(0);
 	singleAnswer.setAverage(Math.round(Float.parseFloat(singleAnswer.getCount()) / answerCount * 100) + "%");
 
 	if (Short.parseShort(row[DacoConstants.QUESTION_DB_ANSWER_ENUMERATION_SUMMARY_QUESTION_TYPE]) == DacoConstants.QUESTION_TYPE_NUMBER) {
@@ -154,11 +154,12 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
     }
 
     public Integer getGroupRecordCount(Long sessionId) {
-	return (Integer) getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_TOTAL_RECORD_COUNT, sessionId).get(0);
+	return ((Number) getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_TOTAL_RECORD_COUNT, sessionId).get(0))
+		.intValue();
     }
 
     public Integer getUserRecordCount(Long userId, Long sessionId) {
-	return (Integer) getHibernateTemplate().findByNamedParam(DacoAnswerDAOHibernate.FIND_USER_RECORD_COUNT,
-		new String[] { "userId", "sessionId" }, new Object[] { userId, sessionId }).get(0);
+	return ((Number) getHibernateTemplate().findByNamedParam(DacoAnswerDAOHibernate.FIND_USER_RECORD_COUNT,
+		new String[] { "userId", "sessionId" }, new Object[] { userId, sessionId }).get(0)).intValue();
     }
 }

@@ -48,8 +48,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <body>
 <% String clientVersion = Configuration.get(ConfigurationKeys.MONITOR_CLIENT_VERSION); %>
-		
-		<c:set var="wizard_flashvars">organisationID=<c:out value="${param.organisationID}" />&orgName=<c:out value="${param.orgName}" />&serverUrl=<lams:LAMSURL/>&userID=<lams:user property="userID"/>&buildID=<%= clientVersion %></c:set>
+		<c:set var="timeZone"><lams:user property="timeZoneDisplayName" /></c:set>
+		<c:set var="wizard_flashvars">organisationID=<c:out value="${param.organisationID}" />&serverUrl=<lams:LAMSURL/>&userID=<lams:user property="userID"/>&tz=<c:out value="${timeZone}" escapeXml="true"/>&buildID=<%= clientVersion %></c:set>
 	
 		<script language="JavaScript" type="text/javascript">
 		<!--

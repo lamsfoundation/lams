@@ -1056,13 +1056,13 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      *      java.lang.Integer)
      */
     private LearningDesign copyLearningDesignToolContent(LearningDesign design, LearningDesign originalLearningDesign,
-	    Integer copyType) throws LearningDesignException {
+	    Integer copyType, String customCSV) throws LearningDesignException {
 
 	for (Iterator i = design.getActivities().iterator(); i.hasNext();) {
 	    Activity currentActivity = (Activity) i.next();
 	    if (currentActivity.isToolActivity()) {
 		copyActivityToolContent(currentActivity, design.getCopyTypeID(), originalLearningDesign
-			.getLearningDesignId(), null);
+			.getLearningDesignId(), customCSV);
 	    }
 	}
 
@@ -1631,7 +1631,17 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		user);
 
 	if (extractor.getMode().intValue() == 1) {
-	    copyLearningDesignToolContent(design, design, design.getCopyTypeID());
+	    
+	    // adding the customCSV to the call if it is present
+	    String customCSV = null;
+	    if (table.containsKey(WDDXTAGS.CUSTOM_CSV)){
+		customCSV = WDDXProcessor.convertToString(table, WDDXTAGS.CUSTOM_CSV);
+	    }
+	
+	    copyLearningDesignToolContent(design, design, design.getCopyTypeID(), customCSV);
+
+	    
+	    
 	}
 
 	return design.getLearningDesignId();

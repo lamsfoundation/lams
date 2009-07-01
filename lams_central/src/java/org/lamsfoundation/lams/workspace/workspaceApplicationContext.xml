@@ -38,7 +38,9 @@
 				<prop key="copy*">PROPAGATION_REQUIRED</prop>
 				<prop key="rename*">PROPAGATION_REQUIRED</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED</prop>				
-				<prop key="move*">PROPAGATION_REQUIRED</prop>				
+				<prop key="move*">PROPAGATION_REQUIRED</prop>	
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>			
 			</props>
 		</property>
 	</bean>

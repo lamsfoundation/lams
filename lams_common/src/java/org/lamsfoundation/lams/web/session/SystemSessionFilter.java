@@ -34,47 +34,45 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * 
- * @author Steve.Ni
- * Create and manage system wide (across multiple webapps in JBOSS) session.
- *  
- * <p> 
- * <b>NOTICE: This filter must set before <code>org.lamsfoundation.lams.web.filter.LocaleFilter</code>
- *  in web.xml because LocaleFilter need get value from SystemSession .</b>
- *  
+ * @author Steve.Ni Create and manage system wide (across multiple webapps in JBOSS) session.
+ * 
+ * <p>
+ * <b>NOTICE: This filter must set before <code>org.lamsfoundation.lams.web.filter.LocaleFilter</code> in web.xml
+ * because LocaleFilter need get value from SystemSession .</b>
+ * 
  * @version $Revision$
  */
 public class SystemSessionFilter implements Filter {
-	
-	//The session name to trace shared session
-	public static final String SYS_SESSION_COOKIE = "JSESSIONID";
-	
-	public static final String SSO_SESSION_COOKIE = "JSESSIONIDSSO";
 
-	public void init(FilterConfig config) throws ServletException {
+    // The session name to trace shared session
+    public static final String SYS_SESSION_COOKIE = "JSESSIONID";
+
+    public static final String SSO_SESSION_COOKIE = "JSESSIONIDSSO";
+
+    public void init(FilterConfig config) throws ServletException {
+    }
+
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
+	    ServletException {
+
+	// Skip non-http request/response
+	if (!(req instanceof HttpServletRequest && res instanceof HttpServletResponse)) {
+	    chain.doFilter(req, res);
+	    return;
 	}
 
-	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) 
-				throws IOException, ServletException {
+	SessionManager.startSession(req, res);
 
-		// Skip non-http request/response
-		if (!((req instanceof HttpServletRequest) && (res instanceof HttpServletResponse))){
-			chain.doFilter(req, res);
-			return;
-		}
-		
-		SessionManager.startSession(req, res);
-		
-		//do following part of chain
-		chain.doFilter(req,res);
-		
-		SessionManager.endSession();
-		
-	}
+	// do following part of chain
+	chain.doFilter(req, res);
 
-	public void destroy() {
-		//do nothing
-	}
+	SessionManager.endSession();
+
+    }
+
+    public void destroy() {
+	// do nothing
+    }
 }

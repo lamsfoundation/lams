@@ -118,8 +118,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
      * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#createToolSession(org.lamsfoundation.lams.usermanagement.User,
      *      org.lamsfoundation.lams.learningdesign.Activity)
      */
-    public ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson)
-	    throws LamsToolServiceException {
+    public synchronized ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson)
+	    throws LamsToolServiceException, DataIntegrityViolationException {
 	// look for an existing applicable tool session
 	// could be either a grouped (class group or standard group) or an individual.
 	// more likely to be grouped (more tools work that way!)
@@ -135,19 +135,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    }
 
 	    toolSession = activity.createToolSessionForActivity(learner, lesson);
-	    try {
-		toolSessionDAO.saveToolSession(toolSession);
-	    } catch (DataIntegrityViolationException e) {
-		LamsCoreToolService.log
-			.error("There was an attempt to create two tool sessions with the same name.", e);
-		/*
-		 * LDEV-1533: Two users tried to create a tool session with the same name. One of them was successful,
-		 * the other got an error. The second one will now retry. This might create a loop; on the other hand
-		 * the second attempt should be successful, since either the existing session will be retrieved or a
-		 * session with a new name will be created.
-		 */
-		toolSession = createToolSession(learner, activity, lesson);
-	    }
+	    toolSessionDAO.saveToolSession(toolSession);
+
 	    return toolSession;
 	}
 

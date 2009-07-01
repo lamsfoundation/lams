@@ -20,8 +20,22 @@
 			<prop key="hibernate.c3p0.maxPoolSize">20</prop>
 			<prop key="hibernate.c3p0.timeout">1800</prop>
 			<prop key="hibernate.c3p0.max_statement">50</prop>
-  			<prop key="hibernate.cache.provider_class">org.jboss.hibernate.cache.DeployedTreeCacheProvider</prop>
-			<prop key="hibernate.treecache.objectName">jboss.cache:service=TreeCache</prop>
+			<prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</prop>
+			<prop key="hibernate.cache.use_second_level_cache">true</prop>
+			<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.jbc2.SharedJBossCacheRegionFactory</prop>
+			<!-- For JBoss Cache 2 and 3, and for Hibernate 3 there is a different idea of accessing Cache,
+				called Region Factory Class. Currently, Hibernate gets the Cache configuration from "treecache.xml" file
+				located in LAMS EAR and creates a local instance for its own use.
+				In the future, this will be changed to a JNDI exposed instance, for lams_admin to access.
+				It is impossible now, though - JBoss 5.1.0.CR1 does not support it yet.
+				
+				This statement will be used for JNDI exposed Cache:
+		 		<prop key="hibernate.cache.region.jbc2.cfg.shared">java:LamsCache</prop>
+		 		
+		 		This statement has been used in previously used approach:			
+				<prop key="hibernate.treecache.objectName">jboss.cache:service=TreeCache</prop>
+			-->
+			
 		</props>
 		</property>
   	</bean>
@@ -34,14 +48,14 @@
 		<property name="jndiName"><value>java:jdbc/lams-ds</value></property>
 	</bean>
 
-	<!--  Transaction manager for all transactions involving the core classes or the content repository. -->
+	<!--  Transaction manager for all transactions involving the core classes or the content repository. 
+		  For JBoss 5, it has been changed to Hibernate Transaction Manager, instead of JTA.
 	
-	<!--  If your code calls classes in the content repository or in the core, and your data needs   -->
-	<!--  to be consistent with the rest of the system (and what data doesn't.... ), then you 		 -->
-	<!--  must use this transaction manager. If you do not, then the core code data changes will be  -->
-	<!--  committed independent of your changes. 			 										 -->
-	<!--  "autodetectTransactionManager" defaults to true so we don't need to include it.  		 	 -->
-	<!--  But remember all application servers do not have the same JNDI name for their transaction manager! -->
-	<bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager"/>
+		  "autodetectTransactionManager" defaults to true so we don't need to include it.  		 	
+	  	  But remember all application servers do not have the same JNDI name for their transaction manager!
+	 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
 
 </beans>

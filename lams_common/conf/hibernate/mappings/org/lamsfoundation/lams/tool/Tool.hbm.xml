@@ -445,6 +445,17 @@
             class="org.lamsfoundation.lams.learningdesign.Activity"
         />
     </set>
+    
+    <set 
+    	name="mappedServers" 
+    	lazy="false"
+    	inverse="false" 
+    	cascade="none" 
+    	sort="unsorted" >
+    	
+		<key column="tool_id"></key>
+		<one-to-many class="org.lamsfoundation.lams.integration.ExtServerToolAdapterMap"/>
+	</set>
 
 </class>
 </hibernate-mapping>

@@ -29,14 +29,15 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.management.MBeanServer;
+import javax.management.MBeanServerInvocationHandler;
+import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
+import org.jboss.cache.Cache;
 import org.jboss.cache.CacheException;
 import org.jboss.cache.Fqn;
-import org.jboss.cache.TreeCacheListener;
-import org.jboss.cache.TreeCacheMBean;
-import org.jboss.mx.util.MBeanProxyExt;
-import org.jboss.mx.util.MBeanServerLocator;
+import org.jboss.cache.jmx.CacheJmxWrapperMBean;
+import org.jboss.mx.remoting.JMXUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 
@@ -45,202 +46,241 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
  */
 public class CacheManager implements ICacheManager {
 
-	protected Logger log = Logger.getLogger(CacheManager.class);
-	private String DEFAULT_CACHE_OBJECT_NAME="jboss.cache:service=TreeCache";
-	
-	/* Spring configured variables */
-	private String cacheObjectName = null;
-	
-	 /* There is one cache across the whole system, so it should be safe to
-	 * use a static cache bean. Do not use this attribute directly - always
-	 * get it via getCache(). */
-	private TreeCacheMBean treeCache = null;
-	private TreeCacheListener listener = null;
-	
-	/** Get the tree cache.
-	 * <p> 
-	 * If necessary, gets it via the MBean. If gets via MBean, then 
-	 * also sets up the cache listener at the same time, if required. */
-	private TreeCacheMBean getCache() {
-		if ( treeCache == null ) {
-			
-			try {
-				if ( cacheObjectName == null )
-					cacheObjectName = DEFAULT_CACHE_OBJECT_NAME;
-				MBeanServer server=MBeanServerLocator.locate();
-				treeCache = (TreeCacheMBean)MBeanProxyExt.create(TreeCacheMBean.class, cacheObjectName, server);
-				
-				if ( Configuration.getAsBoolean(ConfigurationKeys.USE_CACHE_DEBUG_LISTENER) ) {
-					if ( listener != null )
-						treeCache.removeTreeCacheListener(listener);
-					listener = new CacheDebugListener();
-					treeCache.addTreeCacheListener(listener);
-					log.info("Added tree cache listener.");
-				}
-			} catch (Exception e) {
-				log.error("Unable to access the JBOSS cache mbean "+cacheObjectName+". Cache not available.",e);
-			}
+    protected Logger log = Logger.getLogger(CacheManager.class);
+    private String DEFAULT_CACHE_OBJECT_NAME = "jboss.cache:service=TreeCache";
+
+    /* Spring configured variables */
+    private String cacheObjectName = null;
+
+    /*
+     * There is one cache across the whole system, so it should be safe to use a static cache bean. Do not use this
+     * attribute directly - always get it via getCache().
+     */
+    private Cache cache = null;
+    private Object listener = null;
+
+    /**
+     * Get the tree cache.
+     * <p>
+     * If necessary, gets it via the MBean. If gets via MBean, then also sets up the cache listener at the same time, if
+     * required.
+     */
+    private Cache getCache() {
+	if (cache == null) {
+
+	    try {
+		if (cacheObjectName == null) {
+		    cacheObjectName = DEFAULT_CACHE_OBJECT_NAME;
 		}
-		return treeCache;
-	}
-	
-	/** Get the String[] version of the objects class name. */
-	public String[] getPartsFromClass(Class clasz) {
-		return clasz.getName().split("\\.");
-	}
+		/*
+		 * When migrating to JBoss 5, the way the Cache is accessed had to be changed. Also, currently Cache is
+		 * not exposed by JMX, so it is also unavailable for Cache Manager. Trying to retrieve it causes an
+		 * error. This will be fixed in the future.
+		 */
+		MBeanServer server = JMXUtil.getMBeanServer();
+		CacheJmxWrapperMBean wrapper = (CacheJmxWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
+			server, ObjectName.getInstance(cacheObjectName), CacheJmxWrapperMBean.class, false);
+		cache = wrapper.getCache();
 
-	/** Get the Fqn for this object, based on the class name. The Fqn is used as the part of the key to the cached object. */
-	private Fqn getFqn(Class clasz) {
-		return new Fqn(getPartsFromClass(clasz));
-	}
-	
-	/** Get the Fqn for this object, based on classNameParts. The Fqn is used as the part of the key to the cached object. */
-	private Fqn getFqn(String[] classNameParts) {
-		return new Fqn(classNameParts);
-	}
+		// cache = (Cache) server.getObjectInstance(ObjectName.getInstance(cacheObjectName));
+		// cache = (Cache) server.createMBean(Cache.class.getName(), );
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.cache.ICacheManager#getItem(java.lang.String[], java.lang.Object)
-	 */
-	public Object getItem(String[] classNameParts, Object key){
-		if ( key == null || classNameParts == null )
-			return null;
-
-		return getItem(getFqn(classNameParts),key);
-	}
-		
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.cache.ICacheManager#getItem(java.lang.Class, java.lang.Object)
-	 */
-	public Object getItem(Class clasz, Object key) {
-		if ( key == null || clasz == null )
-			return null;
-
-		return getItem(getFqn(clasz), key);
-	}
-	
-	/** Does the "real" get from the cache. Key and fqn must not be null or an exception may be thrown. */
-	private Object getItem(Fqn fqn, Object key) {
-		TreeCacheMBean cache = getCache();
-		if (cache==null) {
-			log.warn("Unable to get item with fqn "+fqn+" key "+key+" as we can't get the JBOSS Cache mbean.");
-			return null;
+		if (Configuration.getAsBoolean(ConfigurationKeys.USE_CACHE_DEBUG_LISTENER)) {
+		    if (listener != null) {
+			cache.removeCacheListener(listener);
+		    }
+		    listener = new CacheDebugListener();
+		    cache.addCacheListener(listener);
+		    log.info("Added tree cache listener.");
 		}
-		
-		Object obj = null;
-		try {
-			obj = (Object) cache.get(fqn, key);
-			if ( obj != null ) {
-				log.debug("Retrieved object from cache fqn "+fqn+" key "+key);
-			}
-		} catch (CacheException e) {
-			log.error("JBOSS Cache exception occured getting object from cache. fqn "+fqn+" key "+key, e);
+	    } catch (Exception e) {
+		log.error("Unable to access the JBOSS cache mbean " + cacheObjectName + ". Cache not available.", e);
+	    }
+	}
+	return cache;
+    }
+
+    /** Get the String[] version of the objects class name. */
+    public String[] getPartsFromClass(Class clasz) {
+	return clasz.getName().split("\\.");
+    }
+
+    /**
+     * Get the Fqn for this object, based on the class name. The Fqn is used as the part of the key to the cached
+     * object.
+     */
+    private Fqn getFqn(Class clasz) {
+	return Fqn.fromElements(getPartsFromClass(clasz));
+    }
+
+    /**
+     * Get the Fqn for this object, based on classNameParts. The Fqn is used as the part of the key to the cached
+     * object.
+     */
+    private Fqn getFqn(String[] classNameParts) {
+	return Fqn.fromElements(classNameParts);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.cache.ICacheManager#getItem(java.lang.String[], java.lang.Object)
+     */
+    public Object getItem(String[] classNameParts, Object key) {
+	if (key == null || classNameParts == null) {
+	    return null;
+	}
+
+	return getItem(getFqn(classNameParts), key);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.cache.ICacheManager#getItem(java.lang.Class, java.lang.Object)
+     */
+    public Object getItem(Class clasz, Object key) {
+	if (key == null || clasz == null) {
+	    return null;
+	}
+
+	return getItem(getFqn(clasz), key);
+    }
+
+    /** Does the "real" get from the cache. Key and fqn must not be null or an exception may be thrown. */
+    private Object getItem(Fqn fqn, Object key) {
+	Cache cache = getCache();
+	if (cache == null) {
+	    log.warn("Unable to get item with fqn " + fqn + " key " + key + " as we can't get the JBOSS Cache mbean.");
+	    return null;
+	}
+
+	Object obj = null;
+	try {
+	    obj = cache.get(fqn, key);
+	    if (obj != null) {
+		log.debug("Retrieved object from cache fqn " + fqn + " key " + key);
+	    }
+	} catch (CacheException e) {
+	    log.error("JBOSS Cache exception occured getting object from cache. fqn " + fqn + " key " + key, e);
+	}
+
+	return obj;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.cache.ICacheManager#addItem(java.lang.String[], java.lang.Object, java.lang.Object)
+     */
+    public void addItem(String[] classNameParts, Object key, Object item) {
+	if (item != null && key != null && classNameParts != null) {
+	    addItem(getFqn(classNameParts), key, item);
+	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.cache.ICacheManager#addItem(java.lang.Class, java.lang.Object, java.lang.Object)
+     */
+    public void addItem(Class clasz, Object key, Object item) {
+	if (item != null && key != null && clasz != null) {
+	    addItem(getFqn(clasz), key, item);
+	}
+    }
+
+    /** Does the "real" put in the cache. Key, fqn and item must not be null or an exception may be thrown. */
+    private void addItem(Fqn fqn, Object key, Object item) {
+	Cache cache = getCache();
+	if (cache == null) {
+	    log.warn("Unable to get cache item with fqn " + fqn + " key " + key
+		    + " as we can't get the JBOSS Cache mbean.");
+	    return;
+	}
+
+	try {
+	    cache.put(fqn, key, item);
+	} catch (CacheException e) {
+	    log.error("JBOSS Cache exception occured putting object in cache. fqn " + fqn + " key " + key, e);
+	}
+    }
+
+    public Map getCachedItems() {
+	Cache cache = getCache();
+	Map allChildNames = new TreeMap();
+	if (cache == null) {
+	    log.warn("Unable to get cache items as we can't get the JBOSS Cache mbean.");
+	} else {
+	    addChildren("/", cache, allChildNames);
+	}
+	return allChildNames;
+    }
+
+    /*
+     * Recursively add all the child nodes to the map. This is where the format of FQNs is important - this code will
+     * hardcode in "/" between each step.
+     */
+    private void addChildren(String node, Cache cache, Map allChildNames) {
+	try {
+	    Set childNames = cache.getChildrenNames(node);
+	    if (childNames != null) {
+		allChildNames.put(node, childNames);
+		Iterator iter = childNames.iterator();
+		while (iter.hasNext()) {
+		    String childNode = (String) iter.next();
+		    if (node.endsWith("/")) {
+			addChildren(node + childNode, cache, allChildNames);
+		    } else {
+			addChildren(node + "/" + childNode, cache, allChildNames);
+		    }
 		}
+	    }
+	} catch (CacheException e) {
+	    log.error("JBOSS Cache exception occured getting child names from cache", e);
+	}
+    }
 
-		return obj;
-	}
+    /**
+     * Clear all the nodes in the cache with the given key. Works on nodes starting with /org, /com and /net
+     */
+    public void clearCache(String node) {
+	Cache cache = getCache();
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.cache.ICacheManager#addItem(java.lang.String[], java.lang.Object, java.lang.Object)
-	 */
-	public void addItem(String[] classNameParts, Object key, Object item){
-		if ( item != null && key != null && classNameParts != null )
-			addItem(getFqn(classNameParts), key, item);
+	if (cache == null) {
+	    log.warn("Unable to clear cache node " + node + " as we can't get the JBOSS Cache mbean.");
+	} else {
+	    try {
+		cache.removeNode(node);
+	    } catch (CacheException e) {
+		log.error("JBOSS Cache exception occured getting child names from cache", e);
+	    }
 	}
-		
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.cache.ICacheManager#addItem(java.lang.Class, java.lang.Object, java.lang.Object)
-	 */
-	public void addItem(Class clasz, Object key, Object item){
-		if ( item != null && key != null && clasz != null )
-			addItem(getFqn(clasz),key,item);
-	}
+    }
 
-	/** Does the "real" put in the cache. Key, fqn and item must not be null or an exception may be thrown. */
-	private void addItem(Fqn fqn, Object key, Object item){
-		TreeCacheMBean cache = getCache();
-		if (cache==null) {
-			log.warn("Unable to get cache item with fqn "+fqn+" key "+key+" as we can't get the JBOSS Cache mbean.");
-			return;
-		}
+    /** Remove a particular item from the cache. */
+    public void removeItem(String[] classNameParts, Object key) {
+	Cache cache = getCache();
+	if (cache == null) {
+	    log.warn("Unable to remove cache item " + classNameParts + ":" + key
+		    + "as we can't get the JBOSS Cache mbean.");
+	} else {
+	    try {
+		cache.remove(getFqn(classNameParts), key);
+	    } catch (CacheException e) {
+		log.error("JBOSS Cache exception occured getting child names from cache", e);
+	    }
+	}
+    }
 
-		try {
-			cache.put(fqn, key, item);
-		} catch (CacheException e) {
-			log.error("JBOSS Cache exception occured putting object in cache. fqn "+fqn+" key "+key,e);
-		}
-	}
+    /* **** Spring initialisation methods */
 
-	public Map getCachedItems() {
-		TreeCacheMBean cache = getCache();
-		Map allChildNames = new TreeMap();
-		if (cache==null) {
-			log.warn("Unable to get cache items as we can't get the JBOSS Cache mbean.");
-		} else {
-			addChildren("/", cache, allChildNames);
-		}
-		return allChildNames;
-	}
+    public String getCacheObjectName() {
+	return cacheObjectName;
+    }
 
-	/* Recursively add all the child nodes to the map. This is where the format of FQNs is important - 
-	 * this code will hardcode in "/" between each step. */
-	private void addChildren(String node, TreeCacheMBean cache, Map allChildNames ) {
-		try {
-			Set childNames = cache.getChildrenNames(node);
-			if ( childNames != null ) {
-				allChildNames.put(node, childNames);
-				Iterator iter = childNames.iterator();
-				while ( iter.hasNext() ) {
-					String childNode = (String) iter.next();
-					if ( node.endsWith("/") ) {
-						addChildren(node+childNode,cache,allChildNames);
-					} else {
-						addChildren(node+"/"+childNode,cache,allChildNames);
-					}
-				}
-			}
-		} catch (CacheException e) {
-			log.error("JBOSS Cache exception occured getting child names from cache",e);
-		}
-	}
+    public void setCacheObjectName(String cacheObjectName) {
+	this.cacheObjectName = cacheObjectName;
+    }
 
-	/** Clear all the nodes in the cache with the given key. 
-	 * Works on nodes starting with /org, /com and /net */
-	public void clearCache(String node) {
-		TreeCacheMBean cache = getCache();
-		if (cache==null) {
-			log.warn("Unable to clear cache node "+node+" as we can't get the JBOSS Cache mbean.");
-		} else {
-			try {
-				cache.remove(node);
-			} catch (CacheException e) {
-				log.error("JBOSS Cache exception occured getting child names from cache",e);
-			}
-		}
-	}
-	
-	/** Remove a particular item from the cache. */
-	public void removeItem(String[] classNameParts, Object key) {
-		TreeCacheMBean cache = getCache();
-		if (cache==null) {
-			log.warn("Unable to remove cache item "+classNameParts+":"+key+"as we can't get the JBOSS Cache mbean.");
-		} else {
-			try {
-				cache.remove(getFqn(classNameParts), key);
-			} catch (CacheException e) {
-				log.error("JBOSS Cache exception occured getting child names from cache",e);
-			}
-		}
-	}
-
-	/* **** Spring initialisation methods */
-	
-	public String getCacheObjectName() {
-		return cacheObjectName;
-	}
-
-	public void setCacheObjectName(String cacheObjectName) {
-		this.cacheObjectName = cacheObjectName;
-	}
-	
 }

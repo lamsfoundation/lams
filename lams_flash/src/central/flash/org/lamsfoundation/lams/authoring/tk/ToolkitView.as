@@ -28,9 +28,11 @@ import org.lamsfoundation.lams.common.style.*;
 import org.lamsfoundation.lams.authoring.*;
 import org.lamsfoundation.lams.common.ui.*
 import org.lamsfoundation.lams.authoring.tk.*;
-import org.lamsfoundation.lams.common.mvc.*;import org.lamsfoundation.lams.authoring.cv.*  
+import org.lamsfoundation.lams.common.mvc.*;
+import org.lamsfoundation.lams.authoring.cv.*  
 
-import mx.managers.*;import mx.controls.*;
+import mx.managers.*;
+import mx.controls.*;
 import mx.events.*
 /**
 * Authoring view for the toolkit
@@ -38,11 +40,13 @@ import mx.events.*
 */
 class ToolkitView extends AbstractView {
 	private var bkg_pnl:MovieClip;
-		private var toolkitLibraries_sp:MovieClip;
+	
+	private var toolkitLibraries_sp:MovieClip;
 	private var libraryActivityDesc_txa:TextArea;
 	private var title_lbl:Label;
 	private var title_btn:Button;
-	private var toolTip:MovieClip;	private var _className = "ToolkitView";
+	private var toolTip:MovieClip;
+	private var _className = "ToolkitView";
 	private var _depth:Number;
 	
 	private var dragIcon_mc:MovieClip;
@@ -74,9 +78,11 @@ class ToolkitView extends AbstractView {
 		_dictionary = Dictionary.getInstance();
 		_tip = new ToolTip();
 		_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
-		_toolkitLoaded = false;		//Debugger.log('Running',4,'Constructor','ToolkitView');
+		_toolkitLoaded = false;
+		//Debugger.log('Running',4,'Constructor','ToolkitView');
 	}
-		/**
+	
+	/**
 	* Initialisation - sets up the mvc relations ship Abstract view.
 	* Also creates a doLater handler for createToolkit
 	*/
@@ -101,7 +107,8 @@ class ToolkitView extends AbstractView {
 		dragIconListener.onLoadInit = function(dragIcon_mc){
 			//Debugger.log('dragIcon_mc:'+dragIcon_mc,4,'dragIconListener.onLoadInit','ToolkitView');
 			dragIcon_mc._visible = false;
-			//dragIcon_mc = dragIcon_mc;			//Proxy.create(this.cRef,this.cRef['setUpDrag'],dragIcon_mc);
+			//dragIcon_mc = dragIcon_mc;
+			//Proxy.create(this.cRef,this.cRef['setUpDrag'],dragIcon_mc);
 			this.cRef.setUpDrag(dragIcon_mc);
 			//dragIcon_mc.startDrag(true);
 			/*			
@@ -115,7 +122,8 @@ class ToolkitView extends AbstractView {
 		
 		//Application.getInstance().setupAppCM(false)
 		
-		//Create a clip that will wait a frame before dispatching init to give components time to setup		this.onEnterFrame = createToolkit;
+		//Create a clip that will wait a frame before dispatching init to give components time to setup
+		this.onEnterFrame = createToolkit;
 	}
 	
     public function getCopy(){
@@ -141,7 +149,8 @@ class ToolkitView extends AbstractView {
 	public function createToolkit():Void {
         //Work out difference between scrollpane and panel (container) width
         _scrollPanelWidthDiff = bkg_pnl.width - toolkitLibraries_sp.width;
-		delete this.onEnterFrame;		_depth = this.getNextHighestDepth();
+		delete this.onEnterFrame;
+		_depth = this.getNextHighestDepth();
 		
 		
         setStyles();
@@ -150,7 +159,8 @@ class ToolkitView extends AbstractView {
 		//Debugger.log('_toolkit_mc.desc_panel:'+this.desc_panel,4,'createToolkit','ToolkitView');
 		//layoutToolkit();
 	}
-        	
+        
+	
 	/**
 	* Updates state of the tookit, called by the model
 	*
@@ -166,7 +176,8 @@ class ToolkitView extends AbstractView {
                 break;
             case 'TEMPLATE_ACTIVITY_SELECTED' :
                 updateSelectedTemplateActivity(o);
-                break;            case 'SIZE' : 
+                break;
+            case 'SIZE' : 
                 //set the size
                 setSize(o);
                 break;
@@ -214,14 +225,17 @@ class ToolkitView extends AbstractView {
         this._x = p.x;
         this._y = p.y;
     }
-	/**
-	* Updates learning library activities.  Creates a templateActivity mc / class for each one.	* NOTE: Each library element contains an array of templateActivities.
+
+	/**
+	* Updates learning library activities.  Creates a templateActivity mc / class for each one.
+	* NOTE: Each library element contains an array of templateActivities.
 	* templateActivities array may contain just one ToolActivity, or a container activity
 	* like Parralel and corresponding child activities
 	*
 	* @param   o   		The model object that is broadcasting an update.
 	*/
-	private function updateLibraries(o:Observable){		Debugger.log('Running:: toolkitLoaded: ' + _toolkitLoaded, Debugger.CRITICAL, 'updateLibraries', 'ToolkitView');
+	private function updateLibraries(o:Observable){
+		Debugger.log('Running:: toolkitLoaded: ' + _toolkitLoaded, Debugger.CRITICAL, 'updateLibraries', 'ToolkitView');
 		if(_toolkitLoaded) return;
 
 		var yPos:Number = 0;
@@ -232,7 +246,8 @@ class ToolkitView extends AbstractView {
 		var tkv = ToolkitView(this);
 		var tkm:ToolkitModel = getModel();
 		//get the hashtable
-		var myLibs:Hashtable = tkm.getToolkitLibraries();	
+		var myLibs:Hashtable = tkm.getToolkitLibraries();
+	
 		//loop through the libraries
 		var keys:Array = myLibs.keys();
 		//keys.sortOn("title", Array.CASEINSENSITIVE);
@@ -249,18 +264,38 @@ class ToolkitView extends AbstractView {
 			//Debugger.log('toolActivity '+ta.title+'('+ta.activityID+')',4,'updateLibraries','ToolkitView');
 			
 			// First condition true if is a native lams tool
-			var toolAct = ToolActivity(activities[0]);
+			var toolAct:ToolActivity = ToolActivity(activities[0]);
 			if (toolAct.extLmsId == null || toolAct.extLmsId == undefined) { 
 				Debugger.log('ToolActivity->Native tool: ' + toolAct.title, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
 			}
 			// Second condition true if it is an external tool adapter tool
-			else if (_root.extlmsid != undefined && _root.extlmsid !=null && _root.extlmsid == toolAct.extLmsId){
-				Debugger.log('ToolActivity->External tool, external request: ' + toolAct.title, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
+			else if (_root.extlmsid != undefined && _root.extlmsid != null) {				
+				var mappedServers:Array = toolAct.mappedServers;
+				var found:Boolean = false;
+				
+				Debugger.log('FOR LUKE mappedServers length ' + mappedServers.length, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
+				
+				for (var j = 0; j < mappedServers.length; j++) {
+					Debugger.log('FOR LUKE mappedServers entry ' + mappedServers[j], Debugger.CRITICAL, 'updateLibraries', 'ToolView');
+					if (String(mappedServers[j]) == _root.extlmsid) {
+						found = true;
+					}
+				}
+				
+				// If the extlmsid is not matched against one of the mapped servers, the tool is invalid
+				if (!found) {
+					Debugger.log('ToolActivity->External tool, internal request: ' + toolAct.title, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
+					continue;
+				}
+				// Else the extlmsid is matched against one of the mapped servers, the tool is valid
+				else {
+					Debugger.log('ToolActivity->External tool, external request: ' + toolAct.title, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
+				}
 			}
 			// Else is a tool adapter tool, but the call was not from external server, therefore disable
-			else{
+			else {
+				Debugger.log('ToolActivity->External tool, internal request: ' + toolAct.title, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
 				continue;
-				Debugger.log('ToolActivity->Externale tool, internal request: ' + toolAct.title, Debugger.CRITICAL, 'updateLibraries', 'ToolView');
 			}
 			
 			var templateActivity_mc = toolkitLibraries_sp.content.attachMovie("TemplateActivity","ta_"+learningLib.learningLibraryID,_depth++,{_activities:activities,_toolkitView:tkv, yPos:yPos});
@@ -272,7 +307,9 @@ class ToolkitView extends AbstractView {
 			
 		}
 		_toolkitLoaded = true;
-		//toolkitLibraries_sp.refreshPane();		
+
+		//toolkitLibraries_sp.refreshPane();
+		
 		
 	}
 	
@@ -296,12 +333,16 @@ class ToolkitView extends AbstractView {
 	
 	public function hideToolTip():Void{
 		_tip.CloseToolTip();
-	}	/**
+	}
+
+	/**
 	*The currently selected Template Activity
 	* 
 	* @param   o   		The model object that is broadcasting an update.
-	*/	private function updateSelectedTemplateActivity(o:Observable):Void{
-		//_global.breakpoint();		//gett the model
+	*/
+	private function updateSelectedTemplateActivity(o:Observable):Void{
+		//_global.breakpoint();
+		//gett the model
 		var tkm = ToolkitModel(o);
 		//set the states of TKActs
 		var l = tkm.getLastSelectedTemplateActivity();

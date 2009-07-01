@@ -685,7 +685,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	logger.debug("mapGeneralCheckedOptionsContent size: " + mapGeneralCheckedOptionsContent.size());
 
 	if (mapGeneralCheckedOptionsContent.size() > 0) {
-	    LearningUtil.createAttempt(request, voteService, voteQueUsr, mapGeneralCheckedOptionsContent, userEntry,
+	    LearningUtil.createAttempt(request, voteService, voteQueUsr, mapGeneralCheckedOptionsContent, "",
 		    false, voteSession, toolContentUID);
 	}
 

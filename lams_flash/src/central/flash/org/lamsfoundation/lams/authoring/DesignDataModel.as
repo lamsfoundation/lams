@@ -767,6 +767,11 @@ class org.lamsfoundation.lams.authoring.DesignDataModel {
 			_copyTypeID = COPY_TYPE_ID_AUTHORING;
 		}
 		
+		// Appending customCSV when it is available
+		if (_root.customCSV != null) {
+			design.customCSV = _root.customCSV;
+		}
+		
 		//if the value is null, it is not included in the DTO
 		if(_copyTypeID == COPY_TYPE_ID_RUN && !_editOverrideLock){
 			design.copyTypeID = COPY_TYPE_ID_AUTHORING;

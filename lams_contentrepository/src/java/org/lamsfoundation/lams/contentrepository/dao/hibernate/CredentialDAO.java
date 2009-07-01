@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.contentrepository.dao.hibernate;
 
 import java.sql.Connection;
@@ -40,135 +40,131 @@ import org.lamsfoundation.lams.contentrepository.RepositoryRuntimeException;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
-
 /**
- *  
+ * 
  * Implements the credentials lookup using Hibernate.
  * 
  * @author Fiona Malikoff
- *
+ * 
  */
 public class CredentialDAO extends BaseDAO implements ICredentialDAO {
-  
-	protected Logger log = Logger.getLogger(CredentialDAO.class);	
 
-	/** 
-	 * Checks whether a user can login to this workspace. The 
-	 * Credential must include the password.
-	 */
-	public boolean checkCredential(ICredentials credential, IWorkspace workspace) 
-						throws RepositoryRuntimeException {
-		if ( log.isDebugEnabled() )
-			log.debug("Checking credential "+credential+" for workspace "+workspace);
+    protected Logger log = Logger.getLogger(CredentialDAO.class);
 
-		if ( credential == null || workspace == null || workspace.getWorkspaceId() == null )
-			return false;
-		
-		return checkCredentialInternal(credential, workspace);
+    /**
+     * Checks whether a user can login to this workspace. The Credential must include the password.
+     */
+    public boolean checkCredential(ICredentials credential, IWorkspace workspace) throws RepositoryRuntimeException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Checking credential " + credential + " for workspace " + workspace);
 	}
 
-	/** 
-	 * Checks whether a user can login to the repository. The 
-	 * Credential must include the password.
-	 */
-	public boolean checkCredential(ICredentials credential) 
-						throws RepositoryRuntimeException {
-		if ( log.isDebugEnabled() )
-			log.debug("Checking credential "+credential);
-
-		if ( credential == null  )
-			return false;
-		
-		return checkCredentialInternal(credential, null);
+	if (credential == null || workspace == null || workspace.getWorkspaceId() == null) {
+	    return false;
 	}
-	
-	/** 
-	 * Checks whether a user can login to the repository. The 
-	 * Credential must include the password.
-	 * 
-	 * If workspace defined then checks workspace, otherwise just checks password
-	 */
-	public boolean checkCredentialInternal(ICredentials credential, IWorkspace workspace) 
-						throws RepositoryRuntimeException {
 
-		// given the input credential, is there a credential matching
-		// in the database? why go to so much trouble in this code? I'm trying
-		// to avoid converting the char[] to a string.
-		// There will be better ways to do this, but this will do for starters
-		// until I get more familiar with Spring.
-		
-		boolean credentialMatched = false;
-		
-		Session hibernateSession = getSession();
-		Connection conn = null;
-		PreparedStatement ps = null;
+	return checkCredentialInternal(credential, workspace);
+    }
+
+    /**
+     * Checks whether a user can login to the repository. The Credential must include the password.
+     */
+    public boolean checkCredential(ICredentials credential) throws RepositoryRuntimeException {
+	if (log.isDebugEnabled()) {
+	    log.debug("Checking credential " + credential);
+	}
+
+	if (credential == null) {
+	    return false;
+	}
+
+	return checkCredentialInternal(credential, null);
+    }
+
+    /**
+     * Checks whether a user can login to the repository. The Credential must include the password.
+     * 
+     * If workspace defined then checks workspace, otherwise just checks password
+     */
+    public boolean checkCredentialInternal(ICredentials credential, IWorkspace workspace)
+	    throws RepositoryRuntimeException {
+
+	// given the input credential, is there a credential matching
+	// in the database? why go to so much trouble in this code? I'm trying
+	// to avoid converting the char[] to a string.
+	// There will be better ways to do this, but this will do for starters
+	// until I get more familiar with Spring.
+
+	boolean credentialMatched = false;
+
+	Session hibernateSession = getSession();
+	Connection conn = null;
+	PreparedStatement ps = null;
+	try {
+	    conn = hibernateSession.connection();
+
+	    StringBuffer buf = new StringBuffer(200);
+	    buf.append("select count(*) num from lams_cr_credential c");
+	    if (workspace != null) {
+		buf.append(", lams_cr_workspace_credential wc ");
+	    }
+	    buf.append(" where c.name = \"");
+	    buf.append(credential.getName());
+	    buf.append("\" and c.password = \"");
+	    buf.append(credential.getPassword());
+	    buf.append("\"");
+	    if (workspace != null) {
+		buf.append(" and wc.credential_id = c.credential_id ");
+		buf.append(" and wc.workspace_id = ");
+		buf.append(workspace.getWorkspaceId());
+	    }
+
+	    ps = conn.prepareStatement(buf.toString());
+	    ps.execute();
+	    ResultSet rs = ps.getResultSet();
+	    if (rs.next()) {
+		long val = rs.getLong("num");
+		if (val > 0) {
+		    credentialMatched = true;
+		    if (val > 1) {
+			log.warn("More than one credential found for workspace " + workspace.getWorkspaceId()
+				+ " credential name " + credential.getName());
+		    }
+		}
+	    }
+
+	} catch (HibernateException e) {
+	    log.error("Hibernate exception occured during login. ", e);
+	    throw new RepositoryRuntimeException("Unable to login due to internal error.", e);
+	} catch (SQLException se) {
+	    log.error("SQL exception occured during login. ", se);
+	    throw new RepositoryRuntimeException("Unable to login due to internal error.", se);
+	} finally {
+	    if (ps != null) {
 		try {
-			conn = hibernateSession.connection();
-			
-			StringBuffer buf = new StringBuffer(200);
-			buf.append("select count(*) num from lams_cr_credential c");
-			if ( workspace != null ) {
-				buf.append(", lams_cr_workspace_credential wc ");
-			}
-			buf.append(" where c.name = \"");
-			buf.append(credential.getName());
-			buf.append("\" and c.password = \""); 
-			buf.append(credential.getPassword());
-			buf.append("\"");
-			if ( workspace != null ) {
-					buf.append(" and wc.credential_id = c.credential_id ");
-					buf.append(" and wc.workspace_id = ");
-					buf.append(workspace.getWorkspaceId());
-			}
-	
-			ps = conn.prepareStatement(buf.toString());
-			ps.execute();
-			ResultSet rs = ps.getResultSet();
-			if ( rs.next() )  {
-				int val = rs.getInt("num");
-				if ( val > 0 ) {
-					credentialMatched = true;
-					if ( val > 1 ) {
-						log.warn("More than one credential found for workspace "
-									+workspace.getWorkspaceId()
-									+" credential name "
-									+credential.getName());
-					}
-				}
-			}
-			
-		} catch (HibernateException e) {
-			log.error("Hibernate exception occured during login. ",e);
-			throw new RepositoryRuntimeException("Unable to login due to internal error.", e);
-		} catch (SQLException se) {
-			log.error("SQL exception occured during login. ",se);
-			throw new RepositoryRuntimeException("Unable to login due to internal error.", se);
-		} finally {
-			if ( ps != null ) {
-				try {
-					ps.close();
-				} catch (SQLException se2) {
-					log.error("SQL exception occured during login, while closing statement. ",se2);
-					throw new RepositoryRuntimeException("Unable to login due to internal error.", se2);
-				}
-			}
+		    ps.close();
+		} catch (SQLException se2) {
+		    log.error("SQL exception occured during login, while closing statement. ", se2);
+		    throw new RepositoryRuntimeException("Unable to login due to internal error.", se2);
 		}
-
-		return credentialMatched;
+	    }
 	}
 
-	public CrCredential findByName(String name)  {
+	return credentialMatched;
+    }
 
-		log.debug("Getting credential for name "+name);
-		
-		String queryString = "from CrCredential as c where c.name = ?";
-		List credentials = getHibernateTemplate().find(queryString,name);
-		
-		if(credentials.size() == 0){
-			log.debug("No credentials found");
-			return null;
-		}else{
-			return (CrCredential)credentials.get(0);
-		}
+    public CrCredential findByName(String name) {
+
+	log.debug("Getting credential for name " + name);
+
+	String queryString = "from CrCredential as c where c.name = ?";
+	List credentials = getHibernateTemplate().find(queryString, name);
+
+	if (credentials.size() == 0) {
+	    log.debug("No credentials found");
+	    return null;
+	} else {
+	    return (CrCredential) credentials.get(0);
 	}
+    }
 }

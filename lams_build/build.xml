@@ -118,7 +118,6 @@
 					<include name="cglib/*.jar" />
 					<include name="dom4j/*.jar" />
 					<include name="fckeditor/*.jar" />
-					<include name="hibernate/*.jar" />
 					<include name="j2ee/*.jar" />
 					<include name="jabber/*.jar" />
 					<include name="jakarta-commons/*.jar" />
@@ -126,10 +125,8 @@
 					<include name="jakarta-taglibs/*.jar" />
 					<include name="jdom/*.jar" />
 					<include name="jfreechart/*.jar" />
-					<include name="log4j/*.jar" />
 					<include name="mysql/*.jar" />
 					<include name="odmg/*.jar" />
-					<include name="quartz/*.jar" />
 					<include name="smack/smack.jar"/>
 					<include name="smack/smackx.jar"/>
 					<include name="spring/*.jar" />
@@ -137,15 +134,14 @@
 					<include name="wddx/*.jar" />
 					<include name="concurrent/*.jar" />					
 					<include name="xstream/*.jar" />		
-					<include name="flagstone/*.jar" />		
-					<include name="slf4j/*.jar" />
+					<include name="flagstone/*.jar" />
 					<include name="lucene/*.jar" />
 					<include name="excel/*.jar" />
 					<include name="csv/*.jar" />
 				</patternset>
 			</fileset> 
 			<fileset dir="..">
-				<include name="${lams_common}/${sub.build.lib}/*.jar" />
+				<include name="${lams_common}/${sub.build.lib}/lams.jar" />
 				<include name="${lams_contentrepository}/${sub.build.lib}/*.jar" />
 				<include name="${lams_central}/${sub.build.lib}/*.jar" />
 				<include name="${lams_monitoring}/${sub.build.lib}/*.jar"/>
@@ -188,9 +184,11 @@
 		<!-- explode the ear (Why doesn't the EAR task support exploded format?) -->
 		<!-- lams-central.war is already exploded when copied -->
 		<unjar src="${assembly.temp.ear}" dest="${assembly.lams.ear}" />
-		<!-- Add local copy of DTD so developers with no internet access can still build the project -->
+		<!-- Add local copy of XSD so developers with no internet access can still build the project -->
 		<copy todir="${assembly.lams.ear}/META-INF" failonerror="true">
-			<fileset dir="${app.xml.dir}"><include name="application_1_3.dtd" /></fileset>
+			<fileset dir="${app.xml.dir}">
+				<include name="application_5.xsd" />
+			</fileset>
 		</copy>
 		<move file="${assembly.lams.ear}/lams-www.war" tofile="${assembly.lams.ear}/temp.war"/>
 		<unjar src="${assembly.lams.ear}/temp.war" dest="${assembly.lams.ear}/lams-www.war"/>
@@ -317,7 +315,33 @@
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 			<property name="generate.for.installers" value="${generate.for.installers}"/>
 		</ant>
+		<ant antfile="../${tool_dimdim_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
+		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
+		<ant antfile="../${tool_mindmap_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
+		<ant antfile="../${tool_assessment_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
+		<ant antfile="../${tool_pixlr_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
 	</target>
+	
 
 	<target name="deploy-minimal-tools" description="Deploy the tools shared between LAMS and RAMS. Called by deploy-lams-tools and deploy-rams-tools">
   		<ant antfile="../${tool_notebook_dir}/build.xml" target="deploy-tool"
@@ -394,7 +418,7 @@
 		
 		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
 			<fileset dir="${conf.jboss}/">
-				<include name="log4j.xml"/>
+				<include name="jboss-log4j.xml"/>
 			</fileset>
 			<filterset>
 				<filter token="application" value="${conf.application}"/>
@@ -404,7 +428,9 @@
 		<copy overwrite="yes" todir="${jboss.ear.deploy}">
 			<fileset dir="${conf.jboss}/service">
 				<include name="mysql*.xml" />
-				<include name="local-service.xml" />
+				<!--
+					<include name="lams-cache-jboss-beans.xml" />
+				-->
 			</fileset>
 	        <filterset>
 	            <filter token="db.name" value="${db.name}"/>
@@ -412,30 +438,31 @@
                 <filter token="db.password" value="${db.password}"/>
 	        </filterset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb-tomcat55.sar/META-INF">
-			<fileset dir="${conf.jboss}/tomcat">
-				<include name="jboss-service.xml" />
+		
+		<copy overwrite="yes" todir="${jboss.deploy}">
+			<fileset dir="${conf.jboss}/service">
+				<include name="treecache.xml" />
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb-tomcat55.sar/">
-			<fileset dir="${conf.jboss}/tomcat">
+                	
+		
+		<copy overwrite="yes" todir="${jboss.ear.deployers}/jbossweb.deployer/META-INF">
+			<fileset dir="${conf.jboss}/jbossweb">
+				<include name="war-deployers-jboss-beans.xml" />
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb.sar/">
+			<fileset dir="${conf.jboss}/jbossweb">
 				<include name="server.xml" />
 				<include name="context.xml" />
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb-tomcat55.sar/conf">
-			<fileset dir="${conf.jboss}/tomcat">
-				<include name="web.xml" />
-			</fileset>
-		</copy>
-
+		
 		<ant antfile="../${lams_common}/build.xml" target="copy-shared-session-jar" inheritAll="false"/>
 		<ant antfile="../${lams_common}/build.xml" target="copy-lams-valve-jar" inheritAll="false"/>
 		<copy overwrite="yes" todir="${jboss.server.instance.lib}">	
 			<fileset dir="${lib}/jboss">
-				<include name="jboss-cache.jar" />
-				<include name="jgroups.jar" />
-				<include name="jboss-serialization.jar" />
+				<include name="*.jar" />
 			</fileset>
 		</copy>
 		
@@ -472,12 +499,12 @@
 
 		<echo>Deploying Library Activities</echo>
 
-		<!-- Generate the deployment package for share resources / forum parallel activity. -->
+		<!-- Generate the deployment package for share resources / forum parallel activity.-->
 		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
 			<property name="assembly.activity" location="${basedir}/assembly/shareresourcesforum"/>
 			<property name="package.cfg" location="librarypackages/shareresourcesforum"/>
 		</ant> 
-
+ 
 		<!-- Generate the deployment package for chat / scribe parallel activity. -->
 		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
 			<property name="assembly.activity" value="${basedir}/assembly/chatscribe"/>
@@ -521,68 +548,72 @@
 		
 	</target>
 	
-	<target name="slim-jboss" description="makes a backup and removes unnecessary services from JBoss 4.0.2;
-		do not run it twice, otherwise you will need to copy standardjboss.xml and ejb-deployer.xml
-		from the original JBoss distribution and then build the whole LAMS project">
+	<target name="slim-jboss" description="makes a backup and removes unnecessary services from JBoss 5; do not run twice!">
 		<!-- Backup -->
 		<copy todir="${jboss.server.instance}/slim-backup/deploy">
 			<fileset dir="${jboss.ear.deploy}/">
-				<include name="ejb-deployer.xml"/>
-				<include name="client-deployer-service.xml"/>
+				<include name="ejb2-container-jboss-beans.xml"/>
+				<include name="ejb2-timer-service.xml"/>
+				<include name="ejb3-connectors-jboss-beans.xml"/>
+				<include name="ejb3-container-jboss-beans.xml"/>
+				<include name="ejb3-interceptors-aop.xml"/>
+				<include name="ejb3-timerservice-jboss-beans.xml"/>
+				<include name="jsr88-service.xml"/>
+				<include name="monitoring-service.xml"/>
+				<include name="profileservice-jboss-beans.xml"/>
 				<include name="schedule-manager-service.xml"/>
 				<include name="scheduler-service.xml"/>
-				<include name="bsh-deployer.xml"/>
-				<include name="jboss-aop.deployer/"/>
-				<include name="jboss-ws4ee.sar/"/>
-				<include name="jmx-console.war/"/>
+				<include name="transaction-service.xml"/>
+				<include name="jbossws.sar/"/>
+				<include name="profileservice-secured.jar/"/>
+				<include name="admin-console.war/"/>
+				<include name="xnio-provider.jar/"/>
 				<include name="http-invoker.sar/"/>
+			</fileset>
+		</copy>
+		
+		<copy todir="${jboss.server.instance}/slim-backup/deployers">
+			<fileset dir="${jboss.server.instance}/deployers">
+				<include name="jsr77-deployers-jboss-beans.xml"/>
+				<include name="logbridge-jboss-beans.xml"/>
+				<include name="jbossws.deployer/"/>
+				<include name="seam.deployer/"/>
 			</fileset>
 		</copy>
 		
 		<copy todir="${jboss.server.instance}/slim-backup/conf">
 			<fileset dir="${jboss.server.instance}/conf">
-				<include name="jboss-service.xml"/>
-				<include name="standardjboss.xml"/>
-			</fileset>
-		</copy>
-		
-		<copy todir="${jboss.server.instance}/slim-backup/lib">
-			<fileset dir="${jboss.server.instance.lib}">
-				<include name="autonumber-plugin.jar"/>
-				<include name="bcel.jar"/>
-				<include name="jboss-jaxrpc.jar"/>
-				<include name="jboss-saaj.jar"/>
-				<include name="scheduler-plugin.jar"/>
-				<include name="scheduler-plugin-example.jar"/>
-				<include name="bsh-1.3.0.jar"/>
-				<include name="bsh-deployer.jar"/>
+				<include name="bootstrap.xml"/>
 			</fileset>
 		</copy>
 		
 		<!-- Configuring -->
-		<copy overwrite="yes" file="${conf.jboss}/ejb-deployer.slim.xml" tofile="${jboss.ear.deploy}/ejb-deployer.xml" />
-		<copy overwrite="yes" file="${conf.jboss}/jboss-service.slim.xml" tofile="${jboss.server.instance}/conf/jboss-service.xml" />
-		<copy overwrite="yes" file="${conf.jboss}/standardjboss.slim.xml" tofile="${jboss.server.instance}/conf/standardjboss.xml" />
+		<copy overwrite="yes" file="${conf.jboss}/bootstrap.slim.xml" tofile="${jboss.server.instance}/conf/bootstrap.xml" />
 		
-		
-		<delete dir="${jboss.ear.deploy}jboss-aop.deployer" />
-		<delete dir="${jboss.ear.deploy}/jboss-ws4ee.sar" />
-		<delete dir="${jboss.ear.deploy}/jmx-console.war"/>
-		<delete dir="${jboss.ear.deploy}/http-invoker.sar"/>
-		
-		<delete file="${jboss.ear.deploy}/client-deployer-service.xml"/>
+		<delete file="${jboss.ear.deploy}/ejb2-container-jboss-beans.xml"/>
+		<delete file="${jboss.ear.deploy}/ejb2-timer-service.xml"/>
+		<delete file="${jboss.ear.deploy}/ejb3-connectors-jboss-beans.xml"/>
+		<delete file="${jboss.ear.deploy}/ejb3-container-jboss-beans.xml"/>
+		<delete file="${jboss.ear.deploy}/ejb3-interceptors-aop.xml"/>
+		<delete file="${jboss.ear.deploy}/ejb3-timerservice-jboss-beans.xml"/>
+		<delete file="${jboss.ear.deploy}/jsr88-service.xml"/>
+		<delete file="${jboss.ear.deploy}/monitoring-service.xml"/>
+		<delete file="${jboss.ear.deploy}/profileservice-jboss-beans.xml"/>
 		<delete file="${jboss.ear.deploy}/schedule-manager-service.xml"/>
 		<delete file="${jboss.ear.deploy}/scheduler-service.xml"/>
-		<delete file="${jboss.ear.deploy}/bsh-deployer.xml"/>
+		<delete file="${jboss.ear.deploy}/transaction-service.xml"/>
 		
-		<delete file="${jboss.server.instance.lib}/autonumber-plugin.jar"/>
-		<delete file="${jboss.server.instance.lib}/bcel.jar"/>
-		<delete file="${jboss.server.instance.lib}/jboss-jaxrpc.jar"/>
-		<delete file="${jboss.server.instance.lib}/jboss-saaj.jar"/>
-		<delete file="${jboss.server.instance.lib}/scheduler-plugin.jar"/>
-		<delete file="${jboss.server.instance.lib}/scheduler-plugin-example.jar"/>
-		<delete file="${jboss.server.instance.lib}/bsh-1.3.0.jar"/>
-		<delete file="${jboss.server.instance.lib}/bsh-deployer.jar"/>
+		<delete dir="${jboss.ear.deploy}/jbossws.sar/"/>
+		<delete dir="${jboss.ear.deploy}/profileservice-secured.jar/"/>
+		<delete dir="${jboss.ear.deploy}/admin-console.war/"/>
+		<delete dir="${jboss.ear.deploy}/xnio-provider.jar/"/>
+		<delete dir="${jboss.ear.deploy}/http-invoker.sar/"/>
+		
+		<delete file="${jboss.server.instance}/deployers/jsr77-deployers-jboss-beans.xml"/>
+		<delete file="${jboss.server.instance}/deployers/logbridge-jboss-beans.xml"/>
+		
+		<delete dir="${jboss.server.instance}/deployers/jbossws.deployer"/>
+		<delete dir="${jboss.server.instance}/deployers/seam.deployer"/>
 	</target>
 	
 	<target name="slim-jboss-revert" description="reverts changes made by slim-jboss task">
@@ -598,9 +629,9 @@
 			</fileset>
 		</copy>
 		
-		<copy overwrite="yes" todir="${jboss.server.instance.lib}">
-			<fileset dir="${jboss.server.instance}/slim-backup/lib">
-				<include name="*"/>
+		<copy overwrite="yes" todir="${jboss.server.instance}/deployers">
+			<fileset dir="${jboss.server.instance}/slim-backup/deployers">
+				<include name="*/"/>
 			</fileset>
 		</copy>
 	</target>

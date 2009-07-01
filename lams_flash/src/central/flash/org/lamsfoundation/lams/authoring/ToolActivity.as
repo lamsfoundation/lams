@@ -48,6 +48,8 @@ class ToolActivity extends Activity{
 	
 	private var _extLmsId:String; //external LMS id for tool adapter tools
 
+	private var _mappedServers:Array; // list of possible servers
+	
 	//flags to tell UI which to disable
 	private var _supportsContribute:Boolean;
 	private var _supportsDefineLater:Boolean;
@@ -156,6 +158,13 @@ class ToolActivity extends Activity{
 				}
 				if (_activityEvaluations[0] != null) { // currently only one output sent to gradebook
 					_gradebookToolOutputDefinitionName = _activityEvaluations[0];
+				}
+			}
+
+			if(!StringUtils.isWDDXNull(dto.mappedServers)) {
+				_mappedServers = new Array();
+				for (var i=0; i<dto.mappedServers.length; i++) {
+					_mappedServers.push(dto.mappedServers[i]);
 				}
 			}
 			
@@ -307,10 +316,14 @@ class ToolActivity extends Activity{
 		return _activityEvaluations;
 	}
 	
+	public function get mappedServers():Array {
+		return _mappedServers;
+	}
+	
 	public function get competenceMappings():Array {
 		return _competenceMappings	
 	}
-	
+
 	//GETTERS + SETTERS
 	
 	/**

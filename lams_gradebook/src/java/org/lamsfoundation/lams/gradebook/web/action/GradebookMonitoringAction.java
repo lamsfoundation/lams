@@ -23,6 +23,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook.web.action;
 
+import java.util.LinkedHashMap;
+
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -31,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.gradebook.dto.ExcelCell;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
@@ -39,7 +43,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -76,7 +79,6 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
     private static IGradebookService gradebookService;
     private static IUserManagementService userService;
     private static ILessonService lessonService;
-    private static IMonitoringService monitoringService;
 
     @SuppressWarnings("unchecked")
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -105,10 +107,11 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
 		logger.debug("user is staff");
 
+		boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
+
 		LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
 		request.setAttribute("lessonDetails", lessonDetatilsDTO);
-		request.setAttribute("marksReleased", lesson.getMarksReleased());
-		
+		request.setAttribute("marksReleased", marksReleased);
 
 		return mapping.findForward("monitorgradebook");
 	    }
@@ -220,7 +223,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	// Fetch the id based on which grid it came from
 	if (view == GBGridView.MON_ACTIVITY) {
 	    String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	    
+
 	    // Splitting the rowID param to get the activity/group id pair
 	    String[] split = rowID.split("_");
 	    if (split.length == 2) {
@@ -228,7 +231,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    } else {
 		activityID = Long.parseLong(rowID);
 	    }
-	    
+
 	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
 
 	} else if (view == GBGridView.MON_USER) {
@@ -239,7 +242,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	String markStr = WebUtil.readStrParam(request, GradebookConstants.PARAM_MARK, true);
 	String feedback = WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
 
-	Activity activity = monitoringService.getActivityById(activityID);
+	Activity activity = (Activity) userService.findById(Activity.class, activityID);
 	User learner = (User) userService.findById(User.class, userID);
 	Lesson lesson = lessonService.getLesson(lessonID);
 
@@ -247,7 +250,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
 	    if (markStr != null && !markStr.equals("")) {
 		Double mark = Double.parseDouble(markStr);
-		gradebookService.updateUserActivityGradebookMark(lesson, learner, activity, mark);
+		gradebookService.updateUserActivityGradebookMark(lesson, learner, activity, mark, true);
 	    }
 
 	    if (feedback != null) {
@@ -259,7 +262,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	}
 	return null;
     }
-    
+
     /**
      * Toggles the release mark flag for a lesson
      * 
@@ -270,18 +273,54 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward toggleReleaseMarks(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward toggleReleaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	initServices();
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
 	Lesson lesson = lessonService.getLesson(lessonID);
-	
-	lesson.setMarksReleased(!lesson.getMarksReleased());
+
+	boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
+
+	lesson.setMarksReleased(!marksReleased);
 	userService.save(lesson);
 
-	response.setContentType("text/plain");
-	response.getWriter().write("success");
+	writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, "success");
+	return null;
+    }
+
+    public ActionForward exportExcelLessonGradebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	initServices();
+
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Lesson lesson = lessonService.getLesson(lessonID);
+
+	if (lesson != null) {
+	    String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xls";
+	    
+	    response.setContentType("application/x-download");
+	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+	    logger.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
+	    ServletOutputStream out = response.getOutputStream();
+	    
+	    LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	    
+	    ExcelCell[][] summaryData = gradebookService.getSummaryDataForExcel(lesson);
+	    dataToExport.put(gradebookService.getMessage("gradebook.export.lesson.summary"), summaryData);
+	    
+	    ExcelCell[][] activityData = gradebookService.getActivityViewDataForExcel(lesson);
+	    dataToExport.put(gradebookService.getMessage("gradebook.gridtitle.activitygrid"), activityData);
+	    
+	    ExcelCell[][] userData = gradebookService.getUserViewDataForExcel(lesson);
+	    dataToExport.put(gradebookService.getMessage("gradebook.export.learner.view"), userData);
+	    
+	    GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"), dataToExport);
+
+	} else {
+	    throw new Exception("Attempt to retrieve gradebook data for null lesson");
+	}
 	return null;
     }
 
@@ -302,7 +341,6 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
     private void initServices() {
 	getUserService();
 	getLessonService();
-	getMonitoringServiceService();
 	getGradebookService();
     }
 
@@ -322,15 +360,6 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return lessonService;
-    }
-
-    private IMonitoringService getMonitoringServiceService() {
-	if (monitoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
-	}
-	return monitoringService;
     }
 
     private IGradebookService getGradebookService() {

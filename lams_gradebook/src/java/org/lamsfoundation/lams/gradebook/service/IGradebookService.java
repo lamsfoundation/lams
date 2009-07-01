@@ -25,6 +25,9 @@ package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
+import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
+import org.lamsfoundation.lams.gradebook.dto.ExcelCell;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
@@ -96,7 +99,7 @@ public interface IGradebookService {
      * @param activity
      * @param mark
      */
-    public void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark);
+    public void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark, Boolean markedInGradebook);
     
     /**
      * Updates the user's feedback for an activity
@@ -124,5 +127,84 @@ public interface IGradebookService {
      */
     public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, GBGridView view);
     
+    /**
+     * Gets a gradebook lesson mark/feedback for a given user and lesson
+     * 
+     * @param lessonID
+     * @param userID
+     * @return
+     */
+    public GradebookUserLesson getGradebookUserLesson(Long lessonID, Integer userID);
+    
+    /**
+     * Gets a gradebook activity mark/feedback for a given activity and user
+     * 
+     * @param activityID
+     * @param userID
+     * @return
+     */
+    public GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID);
+    
+    /**
+     * Returns the average mark for a given activity
+     * 
+     * @param activityID
+     * @return
+     */
+    public Double getAverageMarkForActivity(Long activityID);
+    
+    /**
+     * Returns the average mark for a lesson
+     * 
+     * @param lessonID
+     * @return
+     */
+    public Double getAverageMarkForLesson(Long lessonID);
+    
+    /**
+     * Method for updating an activity mark that tools can call
+     * 
+     * @param mark
+     * @param feedback
+     * @param userID
+     * @param toolSessionID
+     */
+    public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID, Boolean markedInGradebook);
+    
+    /**
+     * Get an activity from the db by id
+     * 
+     * @param activityID
+     * @return
+     */
+    public Activity getActivityById(Long activityID);
+    
+    /**
+     * Get a language label
+     * @param key
+     * @return
+     */
+    public String getMessage(String key);
+    
+    /**
+     * Get the activity view data in 2d array format for an excel export
+     * @param lesson
+     * @return
+     */
+    public ExcelCell[][] getActivityViewDataForExcel(Lesson lesson);
+    
+    /**
+     * Get the user view data in a 2d array format for an excel export
+     * @param lesson
+     * @return
+     */
+    public ExcelCell[][] getUserViewDataForExcel(Lesson lesson);
+    
+    /**
+     * Get the summary data in a 2s array for an excel export
+     * @param lesson
+     * @return
+     */
+    public ExcelCell[][] getSummaryDataForExcel(Lesson lesson);
 }
  

@@ -127,6 +127,20 @@
         </meta>    
     </property>
     <property
+        name="serverUrl"
+        type="java.lang.String"
+        column="server_url"
+        not-null="false"
+        length="255"
+    >
+        <meta attribute="field-description">
+           @hibernate.property
+            column="server_url"
+            length="255"
+            not-null="false"
+        </meta>    
+    </property>
+    <property
         name="timeoutUrl"
         type="java.lang.String"
         column="timeout_url"

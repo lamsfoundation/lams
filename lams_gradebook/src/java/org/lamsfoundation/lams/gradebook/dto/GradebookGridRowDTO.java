@@ -23,19 +23,20 @@
 /* $Id$ */ 
 package org.lamsfoundation.lams.gradebook.dto; 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
- 
-public abstract class GradebookGridRowDTO{
-    
+
+public abstract class GradebookGridRowDTO {
+
     public abstract ArrayList<String> toStringArray(GBGridView view);
-    
+
     public static final String CELL_EMPTY = "-";
-    
+
     // The id for a row, might be activityId, userId, lessonID etc
     public String id;
-    
+
     // The name for the row, every gradebook row has some sort of name
     // Be it the user's name, the activity name, the lesson name etc
     public String rowName;
@@ -52,6 +53,9 @@ public abstract class GradebookGridRowDTO{
     // Average mark for the corresponding task
     public Double averageMark;
 
+    // Number of marks available where applicable
+    public Long marksAvailable;
+
     /**
      * A shared function to convert milliseconds into a readable string
      * 
@@ -63,17 +67,27 @@ public abstract class GradebookGridRowDTO{
 	if (timeInMillis != null && timeInMillis > 1000) {
 	    long totalTimeInSeconds = timeInMillis / 1000;
 
-	    long seconds = (totalTimeInSeconds >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds); 
-	    long minutes = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds; 
-	    long hours = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 24 ? totalTimeInSeconds % 24 : totalTimeInSeconds; 
-	    long days = (totalTimeInSeconds = (totalTimeInSeconds / 24)); 
+	    long seconds = (totalTimeInSeconds >= 60 ? totalTimeInSeconds % 60 : totalTimeInSeconds);
+	    long minutes = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 60 ? totalTimeInSeconds % 60
+		    : totalTimeInSeconds;
+	    long hours = (totalTimeInSeconds = (totalTimeInSeconds / 60)) >= 24 ? totalTimeInSeconds % 24
+		    : totalTimeInSeconds;
+	    long days = (totalTimeInSeconds = (totalTimeInSeconds / 24));
 
-	    if (days != 0 ) { sb.append("" + days + "d, "); }
-	    if (hours != 0 ) { sb.append("" + hours + "h, "); }
-	    if (minutes != 0 ) { sb.append("" + minutes + "m, "); }
-	    if (seconds != 0 ) { sb.append("" + seconds + "s"); }
+	    if (days != 0) {
+		sb.append("" + days + "d, ");
+	    }
+	    if (hours != 0) {
+		sb.append("" + hours + "h, ");
+	    }
+	    if (minutes != 0) {
+		sb.append("" + minutes + "m, ");
+	    }
+	    if (seconds != 0) {
+		sb.append("" + seconds + "s");
+	    }
 	}
-	
+
 	if (sb.length() > 0) {
 	    return sb.toString();
 	} else {
@@ -81,58 +95,111 @@ public abstract class GradebookGridRowDTO{
 	}
     }
     
+
+    protected String markToString() {
+	if (mark != null) {
+	    if (marksAvailable != null) {
+		return "<font color='green'>" + mark.toString() + "/" + marksAvailable.toString() + "</font>";
+	    } else {
+		return mark.toString();
+	    }
+	} else {
+	    if (marksAvailable != null) {
+		return "<font color='red'>" + CELL_EMPTY + "/" + marksAvailable.toString() + "</font>";
+	    } else {
+
+	    }
+	    return CELL_EMPTY;
+
+	}
+    }
+
+    protected String averageMarkToString() {
+	if (averageMark != null) {
+	    String avgStr = new DecimalFormat("###.00").format(averageMark);
+	    if (marksAvailable != null) {
+		return avgStr + "/" + marksAvailable.toString();
+	    } else {
+		return avgStr;
+	    }
+	} else {
+	    return CELL_EMPTY;
+	}
+    }
+
     protected String toItalic(String string) {
 	return "<i>" + string + "</i>";
     }
 
     public Long getTimeTaken() {
-        return timeTaken;
+	return timeTaken;
+    }
+
+    public Long getTimeTakenSeconds() {
+	if (timeTaken != null) {
+	    return timeTaken / 1000;
+	} else {
+	    return null;
+	}
     }
 
     public void setTimeTaken(Long timeTaken) {
-        this.timeTaken = timeTaken;
+	this.timeTaken = timeTaken;
     }
 
     public Double getMark() {
-        return mark;
+	return mark;
     }
 
     public void setMark(Double mark) {
-        this.mark = mark;
+	this.mark = mark;
     }
 
     public String getId() {
-        return id;
+	return id;
     }
 
     public void setId(String id) {
-        this.id = id;
+	this.id = id;
     }
 
     public String getRowName() {
-        return rowName;
+	return rowName;
     }
 
     public void setRowName(String rowName) {
-        this.rowName = rowName;
+	this.rowName = rowName;
     }
 
     public Long getAverageTimeTaken() {
-        return averageTimeTaken;
+	return averageTimeTaken;
+    }
+    
+    public Long getAverageTimeTakenSeconds() {
+	if (averageTimeTaken != null) {
+	    return averageTimeTaken/1000;
+	} else {
+	    return null;
+	}
     }
 
     public void setAverageTimeTaken(Long averageTimeTaken) {
-        this.averageTimeTaken = averageTimeTaken;
+	this.averageTimeTaken = averageTimeTaken;
     }
 
     public Double getAverageMark() {
-        return averageMark;
+	return averageMark;
     }
 
     public void setAverageMark(Double averageMark) {
-        this.averageMark = averageMark;
+	this.averageMark = averageMark;
     }
-    
-    
+
+    public Long getMarksAvailable() {
+	return marksAvailable;
+    }
+
+    public void setMarksAvailable(Long marksAvailable) {
+	this.marksAvailable = marksAvailable;
+    }
 }
- 

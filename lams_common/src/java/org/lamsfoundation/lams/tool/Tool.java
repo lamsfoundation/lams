@@ -26,10 +26,12 @@ package org.lamsfoundation.lams.tool;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import java.util.HashSet;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.dto.AuthoringToolDTO;
 
 /**
@@ -109,6 +111,9 @@ public class Tool implements Serializable {
 
     /** persistent field */
     private Set activities;
+    
+    /** persistent field */
+    private Set<ExtServerToolAdapterMap> mappedServers;
 
     /** persistent field */
     private Integer groupingSupportTypeId;
@@ -174,6 +179,7 @@ public class Tool implements Serializable {
 	this.languageFile = languageFile;
 	this.supportsOutputs = supportsOutputs;
 	this.extLmsId = extLmsId;
+	this.mappedServers = new HashSet<ExtServerToolAdapterMap>();
     }
 
     /** default constructor */
@@ -198,6 +204,7 @@ public class Tool implements Serializable {
 	this.createDateTime = createDateTime;
 	this.toolIdentifier = toolIdentifier;
 	this.toolVersion = toolVersion;
+	this.mappedServers = new HashSet<ExtServerToolAdapterMap>();
     }
 
     /**
@@ -630,4 +637,11 @@ public class Tool implements Serializable {
 	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
     }
 
+    public Set<ExtServerToolAdapterMap> getMappedServers() {
+        return mappedServers;
+    }
+
+    public void setMappedServers(Set<ExtServerToolAdapterMap> mappedServers) {
+        this.mappedServers = mappedServers;
+    }
 }

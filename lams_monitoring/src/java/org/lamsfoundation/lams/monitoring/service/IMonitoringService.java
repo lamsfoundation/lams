@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -208,9 +209,11 @@ public interface IMonitoringService {
      *            the lesson start date and time.
      * @param userId
      *            checks that the user is a staff member for this lesson
+     * @param timeZoneIdx
+     * 			  the index of the TimeZone to use for the start date
      * @see org.lamsfoundation.lams.monitoring.service#startLesson(long)
      */
-    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) throws UserAccessDeniedException;
+    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId, Integer timeZoneIdx) throws UserAccessDeniedException;
 
     /**
      * Finish a lesson on schedule datetime.
@@ -874,5 +877,8 @@ public interface IMonitoringService {
 	
 	/** Open Time Chart */
 	public Boolean openTimeChart(long lessonId, Integer userId) throws UserAccessDeniedException;
+
+	/** Get Organisation Name */
+	public String getOrganisationName(Integer organisationId);
 	
 }

@@ -577,8 +577,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	getMonitoringService().startLesson(lesson.getLessonId(), userDto.getUserID());
 	String newPath = mapping.findForward(PedagogicalPlannerAction.FORWARD_PREVIEW).getPath();
 	newPath = newPath + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_LESSON_ID
-		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId() + PedagogicalPlannerAction.CHAR_AMPERSAND
-		+ AttributeNames.PARAM_MODE + PedagogicalPlannerAction.CHAR_EQUALS + "preview";
+		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId() 
+		+ PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_MODE 
+		+ PedagogicalPlannerAction.CHAR_EQUALS + "preview";
 	return new ActionForward(newPath, true);
     }
 

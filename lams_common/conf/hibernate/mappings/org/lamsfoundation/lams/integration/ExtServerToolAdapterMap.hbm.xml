@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<class 
+    name="org.lamsfoundation.lams.integration.ExtServerToolAdapterMap" 
+    table="lams_ext_server_tool_map"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="lams_ext_server_tool_map"
+    </meta>
+	
+    <id
+        name="uid"
+        type="java.lang.Long"
+        column="uid"
+    >
+        <meta attribute="field-description">
+           @hibernate.id
+            generator-class="native"
+            type="java.lang.Long"
+            column="uid"
+
+
+        </meta>
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="native" />
+    </id>
+
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to User -->
+    <many-to-one
+        name="tool"
+        class="org.lamsfoundation.lams.tool.Tool"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="tool_id"         
+        </meta>
+        <column name="tool_id" />
+    </many-to-one>
+    
+    <!-- bi-directional many-to-one association to User -->
+    <many-to-one
+        name="extServer"
+        class="org.lamsfoundation.lams.integration.ExtServerOrgMap"
+        not-null="true"
+    >
+        <meta attribute="field-description">
+           @hibernate.many-to-one
+            not-null="true"
+           @hibernate.column name="ext_server_org_map_id"         
+        </meta>
+        <column name="ext_server_org_map_id" />
+    </many-to-one>
+    
+</class>
+</hibernate-mapping>

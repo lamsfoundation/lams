@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -38,6 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -92,6 +94,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.AuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
@@ -672,7 +675,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startLessonOnSchedule(long
      *      , Date, User)
      */
-    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) {
+    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId, Integer timeZoneIdx) {
 
 	// we get the lesson just created
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -695,6 +698,19 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		    + " is already scheduled and cannot be rescheduled.");
 	    return;
 	}
+	
+	// Change client/users schedule date to server's timezone.
+	User user = (User) baseDAO.find(User.class, userId);
+	
+	TimeZone tz = TimeZone.getDefault();
+	TimeZone selectedTz;
+	
+	if(timeZoneIdx != null)
+		selectedTz = TimeZone.getTimeZone(User.timezoneList[timeZoneIdx]);
+	else
+		selectedTz = TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]);
+	
+	Date tzStartLessonDate = DateUtil.convertFromTimeZoneToDefault(selectedTz, startDate);
 
 	JobDetail startLessonJob = getStartScheduleLessonJob();
 	// setup the message for scheduling job
@@ -707,10 +723,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	// create customized triggers
 	Trigger startLessonTrigger = new SimpleTrigger("startLessonOnScheduleTrigger:" + lessonId,
-		Scheduler.DEFAULT_GROUP, startDate);
+		Scheduler.DEFAULT_GROUP, tzStartLessonDate);
 	// start the scheduling job
 	try {
-	    requestedLesson.setScheduleStartDate(startDate);
+	    requestedLesson.setScheduleStartDate(tzStartLessonDate);
 	    scheduler.scheduleJob(startLessonJob, startLessonTrigger);
 	    setLessonState(requestedLesson, Lesson.NOT_STARTED_STATE);
 	} catch (SchedulerException e) {
@@ -1430,15 +1446,18 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	LessonDetailsDTO dto = lessonService.getLessonDetails(lessonID);
 
 	Locale userLocale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
-
-	if (dto.getStartDateTime() != null) {
-	    dto.setStartDateTimeStr(DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, userLocale)
-		    .format(dto.getStartDateTime()));
+	TimeZone tz = TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]);
+	
+	DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
+	
+	if (dto.getStartDateTime() != WDDXTAGS.DATE_NULL_VALUE && dto.getStartDateTime() != null) {
+		Date tzStartDate = DateUtil.convertToTimeZoneFromDefault(tz, dto.getStartDateTime());
+		dto.setStartDateTimeStr(indfm.format(tzStartDate) + " " + tz.getDisplayName(userLocale));
 	}
 
-	if (dto.getScheduleStartDate() != null) {
-	    dto.setScheduleStartDateStr(DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, userLocale)
-		    .format(dto.getScheduleStartDate()));
+	if (dto.getScheduleStartDate() != WDDXTAGS.DATE_NULL_VALUE && dto.getScheduleStartDate() != null) {
+		Date tzScheduleDate = DateUtil.convertToTimeZoneFromDefault(tz, dto.getScheduleStartDate());
+		dto.setScheduleStartDateStr(indfm.format(tzScheduleDate) + " " + tz.getDisplayName(userLocale));
 	}
 	
 	MonitoringService.log.debug(dto.toString());
@@ -1554,7 +1573,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     	    Vector progressData = new Vector();
     	    
     	    if(learnerID != null) {
-    	    	LearnerProgress learnerProgress = learnerService.getProgress(userID, lessonID);
+    	    	LearnerProgress learnerProgress = learnerService.getProgress(new Integer(learnerID.intValue()), lessonID);
     	    	progressData.add(learnerProgress.getLearnerProgressCompletedData());
     	    	flashMessage = new FlashMessage("getAllCompletedActivities", progressData);
     	    } else {
@@ -2860,5 +2879,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		Group group = groupDAO.getGroupById(groupID);
 		group.setGroupName(name);
 		groupDAO.saveGroup(group);
+	}
+	
+	public String getOrganisationName(Integer organisationId) {
+		Organisation org = (Organisation) baseDAO.find(Organisation.class, organisationId);
+		return org.getName();
 	}
 }

@@ -106,12 +106,12 @@ public class UserManagementService implements IUserManagementService {
     private static IAuditService auditService;
 
     private IAuditService getAuditService() {
-	if (auditService == null) {
+	if (UserManagementService.auditService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
 		    .getInstance().getServletContext());
-	    auditService = (IAuditService) ctx.getBean("auditService");
+	    UserManagementService.auditService = (IAuditService) ctx.getBean("auditService");
 	}
-	return auditService;
+	return UserManagementService.auditService;
     }
 
     /**
@@ -125,7 +125,7 @@ public class UserManagementService implements IUserManagementService {
      * Get i18n MessageService
      */
     public MessageService getMessageService() {
-	return this.messageService;
+	return messageService;
     }
 
     public void setBaseDAO(IBaseDAO baseDAO) {
@@ -159,24 +159,24 @@ public class UserManagementService implements IUserManagementService {
 	    log.debug(e);
 	}
     }
-    
+
     protected User saveUser(User user) {
 	if (user != null) {
 	    // LDEV-2196 ensure names saved as UTF-8
 	    try {
-    	    	user.setFirstName(new String(user.getFirstName().getBytes(), "UTF-8"));
-    	    	user.setLastName(new String(user.getLastName().getBytes(), "UTF-8"));
+		user.setFirstName(new String(user.getFirstName().getBytes(), "UTF-8"));
+		user.setLastName(new String(user.getLastName().getBytes(), "UTF-8"));
 	    } catch (UnsupportedEncodingException e) {
 		log.error("Unsupported encoding...", e);
 	    }
 	    // create user
 	    if (user.getUserId() == null) {
 		baseDAO.insertOrUpdate(user); // creating a workspace needs a userId
-        	user = createWorkspaceForUser(user);
-	    } 
+		user = createWorkspaceForUser(user);
+	    }
 	    // LDEV-2030 update workspace name if name changed
 	    Workspace workspace = user.getWorkspace();
-	    if (workspace != null && !StringUtils.equals(user.getFullName(), workspace.getName())){
+	    if (workspace != null && !StringUtils.equals(user.getFullName(), workspace.getName())) {
 		workspace.setName(user.getFullName());
 		save(workspace);
 		WorkspaceFolder folder = workspace.getDefaultFolder();
@@ -192,7 +192,7 @@ public class UserManagementService implements IUserManagementService {
     public void saveAll(Collection objects) {
 	for (Object o : objects) {
 	    if (o instanceof User) {
-		baseDAO.insertOrUpdate((User) o); // creating a workspace needs
+		baseDAO.insertOrUpdate(o); // creating a workspace needs
 		// a userId
 		o = createWorkspaceForUser((User) o);
 	    }
@@ -371,8 +371,9 @@ public class UserManagementService implements IUserManagementService {
 	map.put("user.userId", user.getUserId());
 	map.put("organisation.organisationId", orgId);
 	UserOrganisation userOrg = (UserOrganisation) baseDAO.findByProperties(UserOrganisation.class, map).get(0);
-	if (userOrg == null)
+	if (userOrg == null) {
 	    return null;
+	}
 	Iterator i = userOrg.getUserOrganisationRoles().iterator();
 	while (i.hasNext()) {
 	    UserOrganisationRole userOrgRole = (UserOrganisationRole) i.next();
@@ -394,14 +395,16 @@ public class UserManagementService implements IUserManagementService {
      * @see org.lamsfoundation.lams.usermanagement.service.IUserManagementService#getUsersFromOrganisationByRole(java.lang.Integer,
      *      java.lang.String)
      */
-    public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall, boolean getUser) {
+    public Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean isFlashCall,
+	    boolean getUser) {
 	Vector users = null;
-	if (isFlashCall)
+	if (isFlashCall) {
 	    users = new Vector<UserFlashDTO>();
-	else if(getUser)
-		users = new Vector<User>();
-	else
+	} else if (getUser) {
+	    users = new Vector<User>();
+	} else {
 	    users = new Vector<UserDTO>();
+	}
 
 	Organisation organisation = (Organisation) baseDAO.find(Organisation.class, organisationID);
 	if (organisation != null) {
@@ -414,13 +417,15 @@ public class UserManagementService implements IUserManagementService {
 		    while (userOrganisationRoleIterator.hasNext()) {
 			UserOrganisationRole userOrganisationRole = (UserOrganisationRole) userOrganisationRoleIterator
 				.next();
-			if (userOrganisationRole.getRole().getName().equals(roleName))
-			    if (isFlashCall && !getUser)
-			    	users.add(userOrganisation.getUser().getUserFlashDTO());
-			    else if(getUser)
-			    	users.add(userOrganisation.getUser());
-			    else
-			    	users.add(userOrganisation.getUser().getUserDTO());
+			if (userOrganisationRole.getRole().getName().equals(roleName)) {
+			    if (isFlashCall && !getUser) {
+				users.add(userOrganisation.getUser().getUserFlashDTO());
+			    } else if (getUser) {
+				users.add(userOrganisation.getUser());
+			    } else {
+				users.add(userOrganisation.getUser().getUserDTO());
+			    }
+			}
 		    }
 		}
 	    }
@@ -438,8 +443,9 @@ public class UserManagementService implements IUserManagementService {
 	properties.put("userOrganisation.user.userId", userId);
 	properties.put("userOrganisation.organisation.organisationId", orgId);
 	properties.put("role.name", roleName);
-	if (baseDAO.findByProperties(UserOrganisationRole.class, properties).size() == 0)
+	if (baseDAO.findByProperties(UserOrganisationRole.class, properties).size() == 0) {
 	    return false;
+	}
 	return true;
     }
 
@@ -559,8 +565,9 @@ public class UserManagementService implements IUserManagementService {
 		Organisation pOrg = organisation.getParentOrganisation();
 		// set parent's child orgs
 		Set children = pOrg.getChildOrganisations();
-		if (children == null)
+		if (children == null) {
 		    children = new HashSet();
+		}
 		children.add(organisation);
 		pOrg.setChildOrganisations(children);
 		// get course managers and give them staff role in this new
@@ -585,8 +592,9 @@ public class UserManagementService implements IUserManagementService {
 		    // (i.e. if there are
 		    // several course managers).
 		    Set uos = organisation.getUserOrganisations();
-		    if (uos == null)
+		    if (uos == null) {
 			uos = new HashSet();
+		    }
 		    uos.add(uo);
 		    organisation.setUserOrganisations(uos);
 
@@ -599,11 +607,13 @@ public class UserManagementService implements IUserManagementService {
 	    if (workspace != null) {
 		workspace.setName(organisation.getName());
 		WorkspaceFolder defaultFolder = workspace.getDefaultFolder();
-		if (defaultFolder != null)
+		if (defaultFolder != null) {
 		    defaultFolder.setName(organisation.getName());
+		}
 		WorkspaceFolder runSeqFolder = workspace.getDefaultRunSequencesFolder();
-		if (runSeqFolder != null)
+		if (runSeqFolder != null) {
 		    runSeqFolder.setName(getRunSequencesFolderName(organisation.getName()));
+		}
 	    }
 	}
 
@@ -620,13 +630,15 @@ public class UserManagementService implements IUserManagementService {
 		baseDAO.update(workspace);
 
 		WorkspaceFolder defaultFolder = workspace.getDefaultFolder();
-		if (defaultFolder != null)
+		if (defaultFolder != null) {
 		    defaultFolder.setName(organisation.getName());
+		}
 		baseDAO.update(defaultFolder);
 
 		WorkspaceFolder runSeqFolder = workspace.getDefaultRunSequencesFolder();
-		if (runSeqFolder != null)
+		if (runSeqFolder != null) {
 		    runSeqFolder.setName(getRunSequencesFolderName(organisation.getName()));
+		}
 		baseDAO.update(runSeqFolder);
 	    }
 	}
@@ -636,12 +648,12 @@ public class UserManagementService implements IUserManagementService {
 	// get i18n'd message according to server locale
 	String[] tokenisedLocale = LanguageUtil.getDefaultLangCountry();
 	Locale serverLocale = new Locale(tokenisedLocale[0], tokenisedLocale[1]);
-	String runSeqName = messageService.getMessageSource().getMessage(SEQUENCES_FOLDER_NAME_KEY,
-		new Object[] { workspaceName }, serverLocale);
+	String runSeqName = messageService.getMessageSource().getMessage(
+		UserManagementService.SEQUENCES_FOLDER_NAME_KEY, new Object[] { workspaceName }, serverLocale);
 
 	if (runSeqName != null && runSeqName.startsWith("???")) {
-	    log.warn("Problem in the language file - can't find an entry for " + SEQUENCES_FOLDER_NAME_KEY
-		    + ". Creating folder as \"run sequences\" ");
+	    log.warn("Problem in the language file - can't find an entry for "
+		    + UserManagementService.SEQUENCES_FOLDER_NAME_KEY + ". Creating folder as \"run sequences\" ");
 	    runSeqName = "run sequences";
 	}
 	return runSeqName;
@@ -847,8 +859,9 @@ public class UserManagementService implements IUserManagementService {
 	    // when a user gets these roles, they need a workspace
 	    if (role.getName().equals(Role.AUTHOR) || role.getName().equals(Role.AUTHOR_ADMIN)
 		    || role.getName().equals(Role.SYSADMIN)) {
-		if (user.getWorkspace() == null)
+		if (user.getWorkspace() == null) {
 		    createWorkspaceForUser(user);
+		}
 	    }
 	}
 	uo.setUserOrganisationRoles(uors);
@@ -956,15 +969,17 @@ public class UserManagementService implements IUserManagementService {
     }
 
     public boolean hasRoleInOrganisation(User user, Integer roleId, Organisation organisation) {
-	if (roleDAO.getUserByOrganisationAndRole(user.getUserId(), roleId, organisation) != null)
+	if (roleDAO.getUserByOrganisationAndRole(user.getUserId(), roleId, organisation) != null) {
 	    return true;
-	else
+	} else {
 	    return false;
+	}
     }
 
     public void deleteChildUserOrganisations(User user, Organisation org) {
-	if (!org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE))
+	if (!org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
 	    return;
+	}
 	Set childOrgs = org.getChildOrganisations();
 	Iterator iter = childOrgs.iterator();
 	while (iter.hasNext()) {
@@ -1000,47 +1015,49 @@ public class UserManagementService implements IUserManagementService {
 
     private Integer getRequestorId() {
 	UserDTO userDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	return (userDTO != null ? userDTO.getUserID() : null);
+	return userDTO != null ? userDTO.getUserID() : null;
     }
 
     public boolean isUserGlobalGroupAdmin() {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
 	Integer requestorId = getRequestorId();
-	return (requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN) : false);
+	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN) : false;
     }
 
     public boolean isUserSysAdmin() {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
 	Integer requestorId = getRequestorId();
-	return (requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.SYSADMIN) : false);
+	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.SYSADMIN) : false;
     }
 
     public Integer getCountRoleForSystem(Integer roleId) {
 	Integer count = roleDAO.getCountRoleForSystem(roleId);
-	if (count != null)
+	if (count != null) {
 	    return count;
-	else
+	} else {
 	    return new Integer(0);
+	}
     }
 
     public Integer getCountRoleForOrg(Integer orgId, Integer roleId) {
 	Integer count = roleDAO.getCountRoleForOrg(roleId, orgId);
-	if (count != null)
+	if (count != null) {
 	    return count;
-	else
+	} else {
 	    return new Integer(0);
+	}
     }
 
     public CSSThemeVisualElement getDefaultFlashTheme() {
 	String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
 	List list = findByProperty(CSSThemeVisualElement.class, "name", flashName);
-	return (list != null ? (CSSThemeVisualElement) list.get(0) : null);
+	return list != null ? (CSSThemeVisualElement) list.get(0) : null;
     }
 
     public CSSThemeVisualElement getDefaultHtmlTheme() {
 	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
 	List list = findByProperty(CSSThemeVisualElement.class, "name", htmlName);
-	return (list != null ? (CSSThemeVisualElement) list.get(0) : null);
+	return list != null ? (CSSThemeVisualElement) list.get(0) : null;
     }
 
     public void auditPasswordChanged(User user, String moduleName) {
@@ -1072,7 +1089,7 @@ public class UserManagementService implements IUserManagementService {
     private Integer getFindIntegerResult(String query) {
 	List list = baseDAO.find(query);
 	if (list != null && list.size() > 0) {
-	    return (Integer) list.get(0);
+	    return ((Number) list.get(0)).intValue();
 	}
 	return null;
     }
@@ -1111,8 +1128,8 @@ public class UserManagementService implements IUserManagementService {
 
     public List searchUserSingleTerm(String term) {
 	term = StringEscapeUtils.escapeSql(term);
-	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%"
-		+ term + "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
+	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
+		+ "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
 		+ " and u.disabledFlag=0 order by u.login";
 	List list = baseDAO.find(query);
 	return list;
@@ -1120,8 +1137,8 @@ public class UserManagementService implements IUserManagementService {
 
     public List searchUserSingleTerm(String term, Integer filteredOrgId) {
 	term = StringEscapeUtils.escapeSql(term);
-	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%"
-		+ term + "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
+	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
+		+ "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
 		+ " and u.disabledFlag=0 and u.userId not in (select uo.user.userId from UserOrganisation uo"
 		+ " where uo.organisation.organisationId=" + filteredOrgId + ") order by u.login";
 	List list = baseDAO.find(query);
@@ -1147,8 +1164,8 @@ public class UserManagementService implements IUserManagementService {
 	    whereClause = " or uo.organisation.parentOrganisation.organisationId=" + orgId;
 	}
 
-	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%"
-		+ term + "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
+	String query = "select u from User u where (u.login like '%" + term + "%' or u.firstName like '%" + term
+		+ "%' or u.lastName like '%" + term + "%' or u.email like '%" + term + "%')"
 		+ " and u.disabledFlag=0 and u.userId in (select uo.user.userId from UserOrganisation uo"
 		+ " where uo.organisation.organisationId=" + orgId + whereClause + ") order by u.login";
 	List list = baseDAO.find(query);
@@ -1180,16 +1197,16 @@ public class UserManagementService implements IUserManagementService {
     }
 
     public boolean canEditGroup(Integer userId, Integer orgId) {
-	if (isUserSysAdmin() || isUserGlobalGroupAdmin())
+	if (isUserSysAdmin() || isUserGlobalGroupAdmin()) {
 	    return true;
+	}
 	Organisation org = (Organisation) findById(Organisation.class, orgId);
 	if (org != null) {
 	    Integer groupId = orgId;
 	    if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
 		groupId = org.getParentOrganisation().getOrganisationId();
 	    }
-	    return (isUserInRole(userId, groupId, Role.GROUP_ADMIN) || (isUserInRole(userId, groupId,
-		    Role.GROUP_MANAGER)));
+	    return isUserInRole(userId, groupId, Role.GROUP_ADMIN) || isUserInRole(userId, groupId, Role.GROUP_MANAGER);
 	}
 	return false;
     }

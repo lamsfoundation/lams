@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +45,7 @@ import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -274,7 +276,9 @@ public class MonitoringAction extends LamsDispatchAction
         	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
     		Date startDate = DateUtil.convertFromLAMSFlashFormat(dateStr);
     		
-    		monitoringService.startLessonOnSchedule(lessonId,startDate,getUserId());
+    		Integer timeZoneIdx = WebUtil.readIntParam(request, MonitoringConstants.PARAM_SCHEDULE_TIME_ZONE_IDX, true);
+    		
+    		monitoringService.startLessonOnSchedule(lessonId,startDate,getUserId(),timeZoneIdx);
     		flashMessage = new FlashMessage("startOnScheduleLesson",Boolean.TRUE);
     	}catch (Exception e) {
 			flashMessage = handleException(e, "startOnScheduleLesson", monitoringService);
@@ -673,6 +677,11 @@ public class MonitoringAction extends LamsDispatchAction
     	MessageService messageService = monitoringService.getMessageService();
     	
     	String module = WebUtil.readStrParam(request,"module",false);
+    	Integer orgId = WebUtil.readIntParam(request,"orgId",true);
+    	
+    	String orgName = null;
+    	if(orgId != null) orgName = monitoringService.getOrganisationName(orgId);
+		
     	ArrayList<String> languageCollection = new ArrayList<String>();
 		
     	if(module.equals("wizard")) {
@@ -728,6 +737,7 @@ public class MonitoringAction extends LamsDispatchAction
    			
     	} else if(module.equals("timechart")) {
 
+    		languageCollection.add(new String("sys.error"));
         	languageCollection.add(new String("chart.btn.activity.split"));
     		languageCollection.add(new String("chart.btn_completion.rate"));
     		languageCollection.add(new String("chart.series.completed.time"));
@@ -746,7 +756,8 @@ public class MonitoringAction extends LamsDispatchAction
     		languageCollection.add(new String("chart.time.format.minutes"));
     		languageCollection.add(new String("chart.time.format.seconds"));
     		languageCollection.add(new String("label.completed"));	
-    		
+    		languageCollection.add(new String("advanced.tab.form.validation.schedule.date.error"));
+    		languageCollection.add(new String("alert.no.learner.data"));
     	}
 		
 		String languageOutput = "<xml><language>";
@@ -755,10 +766,24 @@ public class MonitoringAction extends LamsDispatchAction
 			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
 		}
 		
+		if(module.equals("wizard")) {
+			String ids[] = User.timezoneList;
+			int idx = 0;
+			for(String id: ids) {
+				languageOutput += "<entry key='timezoneID" + idx + "'><name>" + id + "</name><data>" + TimeZone.getTimeZone(id).getRawOffset() + "</data></entry>";
+				idx++;
+			}
+			
+			if(orgName != null) {
+				languageOutput += "<entry key='orgName'><name>" + orgName + "</name></entry>";
+			}
+		}
+		
 		languageOutput += "</language></xml>";
 		
-	    PrintWriter writer = response.getWriter();
-        writer.println(languageOutput);
+		response.setContentType("text/xml");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().print(languageOutput);
         
         return null;
     }

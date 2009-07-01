@@ -30,14 +30,19 @@ public class XMPPUtil {
 		// using the lams userId as xmpp username and password.
 		manager.createAccount(user.getUserID().toString(), user.getUserID().toString());
 	    }
+	    
 
 	} catch (XMPPException e) {
-	    if (e.getXMPPError().getCode() != 409) {
-		logger.error(e);
-		return null;
-	    } // else conflict error, user already exists
+	    if (e.getXMPPError().getCode() == 409) { // log and continue
+		if (logger.isDebugEnabled()) {
+	    	    logger.debug(e + " : XMPP account with id = " + user.getUserID() + " already exists");
+		}
+	    }else{
+	    	logger.error(e);
+	    	return null;
+	    }
 	}
-	return user.getUserID() + "@" + Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
+	return user.getUserID() + "@" + Configuration.get(ConfigurationKeys.XMPP_DOMAIN);	
     }
 
     /**
@@ -85,9 +90,26 @@ public class XMPPUtil {
 	    return true;
 
 	} catch (XMPPException e) {
-	    logger.error(e);
-	    logger.error(e.getXMPPError());
+		// if we get a connection refused exception but the server is not configured correctly, just debug print
+		if (e.getXMPPError() != null && e.getXMPPError().getCode() == 502 && (
+				Configuration.get(ConfigurationKeys.XMPP_DOMAIN).compareTo("") == 0 ||
+				Configuration.get(ConfigurationKeys.XMPP_ADMIN).compareTo("") == 0 ||
+				Configuration.get(ConfigurationKeys.XMPP_PASSWORD).compareTo("") == 0)) {
+			logger.debug(e);
+		}
+		// if we are recreating the same room (no error code)
+		else if(e.getMessage().compareTo("Creation failed - Missing acknowledge of room creation.") == 0){
+			logger.debug(e);
+		}
+		// otherwise, we've got a problem
+		else{
+			logger.error(e);
+		}
+
 	    return false;
+	}catch (Exception e) {
+		logger.error(e);
+		return false;
 	}
     }
 

@@ -4,11 +4,11 @@
 	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
-	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jsp.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/quartz.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>

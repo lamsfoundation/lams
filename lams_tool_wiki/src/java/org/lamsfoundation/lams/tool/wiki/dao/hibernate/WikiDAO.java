@@ -24,13 +24,17 @@
 
 package org.lamsfoundation.lams.tool.wiki.dao.hibernate;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.wiki.dao.IWikiDAO;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiAttachment;
+import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
@@ -45,15 +49,21 @@ public class WikiDAO extends BaseDAO implements IWikiDAO {
 
     public Wiki getByContentId(Long toolContentId) {
 	List list = getHibernateTemplate().find(FIND_FORUM_BY_CONTENTID, toolContentId);
-	if (list != null && list.size() > 0)
-	    return (Wiki) list.get(0);
-	else
+	if (list != null && list.size() > 0) {
+	    Wiki wiki = (Wiki) list.get(0);
+	    removeDuplicatePages(wiki);
+	    return wiki;
+	} else {
 	    return null;
+	}
+
     }
 
     public void saveOrUpdate(Wiki wiki) {
+	// Removing duplicate pages 
+	removeDuplicatePages(wiki);
 	this.getHibernateTemplate().saveOrUpdate(wiki);
-	this.getHibernateTemplate().flush();
+	//this.getHibernateTemplate().flush();
     }
 
     public void deleteInstructionFile(Long toolContentId, Long uuid, Long versionId, String type) {
@@ -69,5 +79,36 @@ public class WikiDAO extends BaseDAO implements IWikiDAO {
 	    }
 	}
 
+    }
+
+    /**
+     * Although we are dealing with a set, still somehow duplicates are coming
+     * through. This method removes them.
+     * 
+     * @param wiki
+     */
+    public void removeDuplicatePages(Wiki wiki) {
+	Set<WikiPage> wikiPages = wiki.getWikiPages();
+	if (wikiPages != null) {
+	    Set<WikiPage> wikiPagesCopy = new HashSet<WikiPage>(wikiPages);
+	    Iterator<WikiPage> it = wikiPages.iterator();
+	    while (it.hasNext()) {
+		WikiPage page = (WikiPage) it.next();
+		if (containsDuplicate(page, wikiPagesCopy)) {
+		    it.remove();
+		    wikiPagesCopy = new HashSet<WikiPage>(wikiPages);
+		}
+	    }
+	}
+    }
+
+    private boolean containsDuplicate(WikiPage compPage, Set<WikiPage> wikiPages) {
+	int count = 0;
+	for (WikiPage page : wikiPages) {
+	    if (page.getTitle().equals(compPage.getTitle())) {
+		count++;
+	    }
+	}
+	return count > 1;
     }
 }

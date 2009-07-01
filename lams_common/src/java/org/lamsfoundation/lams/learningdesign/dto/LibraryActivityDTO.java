@@ -24,7 +24,9 @@
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.util.Date;
+import java.util.Set;
 
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
@@ -104,7 +106,7 @@ public class LibraryActivityDTO extends BaseDTO {
 	/** Used for I18N the URLS. Does not need to be sent to clients, so no getter exists. */
 	private String languageCode;
 
-	private Boolean toolAdapter;
+	private String[] mappedServers;
 
 	public LibraryActivityDTO(Activity activity, String languageCode) {
 		activityTypeID = activity.getActivityTypeId();
@@ -209,6 +211,17 @@ public class LibraryActivityDTO extends BaseDTO {
 			adminURL = tool.getAdminUrl();
 			supportsOutputs = tool.getSupportsOutputs();
 			extLmsId = tool.getExtLmsId();
+			
+			Set<ExtServerToolAdapterMap> mappedServersArray = tool.getMappedServers();
+			if (mappedServersArray != null) {
+			    this.mappedServers = new String[mappedServersArray.size()];
+			    int i = 0;
+			    for (ExtServerToolAdapterMap map : mappedServersArray) {
+				mappedServers[i] = map.getExtServer().getServerid();
+				i++;
+			    }
+			}
+			
 			helpURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, "", languageCode);
 		}
 
@@ -617,5 +630,15 @@ public class LibraryActivityDTO extends BaseDTO {
 	public void setExtLmsId(String extLmsId) {
 		this.extLmsId = extLmsId;
 	}
+
+	public String[] getMappedServers() {
+	    return mappedServers;
+	}
+
+	public void setMappedServers(String[] mappedServers) {
+	    this.mappedServers = mappedServers;
+	}
+	
+	
 
 }

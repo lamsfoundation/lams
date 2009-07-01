@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 
@@ -77,4 +78,12 @@ public interface IIntegrationService {
 	void saveExtServerOrgMap(ExtServerOrgMap map);
 	
 	String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp);
+	
+	List<ExtServerToolAdapterMap> getMappedServers(String toolSig);
+	
+	ExtServerToolAdapterMap getMappedServer(String serverId, String toolSig);
+	
+	void saveExtServerToolAdapterMap(ExtServerToolAdapterMap map); 
+	
+	void deleteExtServerToolAdapterMap(ExtServerToolAdapterMap map);
 }

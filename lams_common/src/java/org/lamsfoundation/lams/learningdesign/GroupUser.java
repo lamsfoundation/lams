@@ -23,21 +23,24 @@
 /* $Id$ */ 
 package org.lamsfoundation.lams.learningdesign; 
 
+import java.io.Serializable;
+
 import org.lamsfoundation.lams.usermanagement.User;
- 
+
 /**
  * A persistence bean for group/user mappings
+ * 
  * @author lfoxton
- *
+ * 
  * @hibernate.class table="lams_user_group"
  */
-public class GroupUser {
+public class GroupUser implements Serializable {
 
-    
     private Group group;
     private User user;
-    
-    public GroupUser() {}
+
+    public GroupUser() {
+    }
 
     /**
      * @hibernate.many-to-one not-null="true" lazy="false"
@@ -45,11 +48,11 @@ public class GroupUser {
      * 
      */
     public Group getGroup() {
-        return group;
+	return group;
     }
 
     public void setGroup(Group group) {
-        this.group = group;
+	this.group = group;
     }
 
     /**
@@ -58,11 +61,10 @@ public class GroupUser {
      * 
      */
     public User getUser() {
-        return user;
+	return user;
     }
 
     public void setUser(User user) {
-        this.user = user;
+	this.user = user;
     }
 }
- 

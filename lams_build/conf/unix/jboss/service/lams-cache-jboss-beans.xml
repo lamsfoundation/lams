@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<deployment xmlns="urn:jboss:bean-deployer:2.0">
+
+
+
+   <!-- First we create a Configuration object for the cache -->
+
+   <bean name="LamsCacheConfig"
+
+         class="org.jboss.cache.config.Configuration">
+
+      
+
+      <!-- Externally injected services -->  
+
+      <property name="runtimeConfig">
+
+         <bean class="org.jboss.cache.config.RuntimeConfig">
+
+            <property name="transactionManager">
+
+               <inject bean="jboss:service=TransactionManager" 
+
+                       property="TransactionManager"/>
+
+            </property>
+<!--
+            <property name="muxChannelFactory"><inject bean="JChannelFactory"/></property>
+-->
+         </bean>
+
+      </property>
+
+      
+
+      <property name="multiplexerStack">udp</property>
+
+
+
+      <property name="clusterName">TreeCache-Cluster</property>
+
+        
+
+      <property name="isolationLevel">READ_COMMITTED</property>
+
+
+
+      <property name="cacheMode">LOCAL</property>
+
+
+
+      <property name="stateRetrievalTimeout">15000</property>
+
+
+
+      <property name="syncReplTimeout">20000</property>
+
+
+
+      <property name="lockAcquisitionTimeout">15000</property>
+
+        
+
+      <property name="exposeManagementStatistics">true</property>
+
+   </bean>
+
+      <!-- Factory to build the Cache. -->
+
+   <bean name="DefaultCacheFactory" class="org.jboss.cache.DefaultCacheFactory" />
+   
+
+   <!-- The cache itself -->
+
+   <bean name="LamsCache" class="org.jboss.cache.Cache">
+	
+      <constructor factoryMethod="createCache">
+
+          <factory bean="DefaultCacheFactory"/>
+
+          <parameter class="org.jboss.cache.config.Configuration"><inject bean="LamsCacheConfig"/></parameter>
+
+          <parameter class="boolean">false</parameter>
+
+      </constructor>
+
+          
+
+   </bean>
+   <!-- JMX Management -->
+
+   <bean name="LamsJmxWrapper" class="org.jboss.cache.jmx.CacheJmxWrapper">
+
+      
+
+      <annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="jboss.cache:service=LamsCache", exposedInterface=org.jboss.cache.jmx.CacheJmxWrapperMBean.class, registerDirectly=true)</annotation>
+
+      
+
+      <constructor>
+
+          <parameter><inject bean="LamsCache"/></parameter>
+
+      </constructor>
+     </bean>   
+</deployment>

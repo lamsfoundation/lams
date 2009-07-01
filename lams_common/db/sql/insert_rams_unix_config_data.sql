@@ -14,7 +14,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('DumpDir','/var/opt/rams/dump', 'config.dump.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('EARDir','/usr/local/jboss-4.0.2/server/default/deploy/rams.ear', 'config.ear.dir', 'config.header.system', 'STRING', 1);
+values ('EARDir','/usr/local/jboss-5/server/default/deploy/rams.ear', 'config.ear.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('SMTPServer','', 'config.smtp.server', 'config.header.email', 'STRING', 0);

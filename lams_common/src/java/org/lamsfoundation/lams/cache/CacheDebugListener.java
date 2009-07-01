@@ -24,52 +24,79 @@
 package org.lamsfoundation.lams.cache;
 
 import org.apache.log4j.Logger;
+import org.jboss.cache.Cache;
 import org.jboss.cache.Fqn;
-import org.jboss.cache.TreeCache;
-import org.jboss.cache.TreeCacheListener;
+import org.jboss.cache.notifications.annotation.CacheListener;
+import org.jboss.cache.notifications.annotation.CacheStarted;
+import org.jboss.cache.notifications.annotation.CacheStopped;
+import org.jboss.cache.notifications.annotation.NodeCreated;
+import org.jboss.cache.notifications.annotation.NodeEvicted;
+import org.jboss.cache.notifications.annotation.NodeLoaded;
+import org.jboss.cache.notifications.annotation.NodeModified;
+import org.jboss.cache.notifications.annotation.NodeRemoved;
+import org.jboss.cache.notifications.annotation.NodeVisited;
+import org.jboss.cache.notifications.annotation.ViewChanged;
 
-/** Log the addition/removal/eviction of items from the JBOSS cache.
- * Turn on and off using UseCacheDebugListener entry in lams.xml
+/**
+ * Log the addition/removal/eviction of items from the JBOSS cache. Turn on and off using UseCacheDebugListener entry in
+ * lams.xml
  * 
  * @author Fiona Malikoff
  */
-public class CacheDebugListener implements TreeCacheListener {
 
-	protected Logger log = Logger.getLogger(CacheManager.class);
-	private String cacheNameString = "Cache unknown: ";
+@CacheListener
+public class CacheDebugListener {
 
-	private void logMessage(String message) {
-		log.info(cacheNameString+message);
-	}
-				
-	public void cacheStarted(TreeCache cache) {
-		 cacheNameString = "Cache "+cache.getName()+": ";
-		 logMessage("started");
-	 }
-	
-	 public void 	cacheStopped(TreeCache cache) {
-		 logMessage("stopped");
-	 }
-	 
-	 public void 	nodeCreated(Fqn fqn) {
-		 logMessage("node created "+fqn);
-	 }
-	 public void 	nodeEvicted(Fqn fqn) {
-		 logMessage("node evicted "+fqn);
-	 }
-	 public void 	nodeLoaded(Fqn fqn) {
-		 logMessage("node loaded "+fqn);
-	 }
-	 public void 	nodeModified(Fqn fqn) {
-		 logMessage("node modified "+fqn);
-	 }
-	 public void 	nodeRemoved(Fqn fqn) {
-		 logMessage("node removed "+fqn);
-	 }
-	 public void 	nodeVisited(Fqn fqn) {
-		 logMessage("node visited "+fqn);
-	 }
-	 public void 	viewChange(org.jgroups.View new_view){
-		 logMessage("view changed ");
-	 } 
+    protected Logger log = Logger.getLogger(CacheManager.class);
+    private String cacheNameString = "Cache unknown: ";
+
+    private void logMessage(String message) {
+	log.info(cacheNameString + message);
+    }
+
+    @CacheStarted
+    public void cacheStarted(Cache cache) {
+	cacheNameString = "Cache " + cache.getVersion() + ": ";
+	logMessage("started");
+    }
+
+    @CacheStopped
+    public void cacheStopped(Cache cache) {
+	logMessage("stopped");
+    }
+
+    @NodeCreated
+    public void nodeCreated(Fqn fqn) {
+	logMessage("node created " + fqn);
+    }
+
+    @NodeEvicted
+    public void nodeEvicted(Fqn fqn) {
+	logMessage("node evicted " + fqn);
+    }
+
+    @NodeLoaded
+    public void nodeLoaded(Fqn fqn) {
+	logMessage("node loaded " + fqn);
+    }
+
+    @NodeModified
+    public void nodeModified(Fqn fqn) {
+	logMessage("node modified " + fqn);
+    }
+
+    @NodeRemoved
+    public void nodeRemoved(Fqn fqn) {
+	logMessage("node removed " + fqn);
+    }
+
+    @NodeVisited
+    public void nodeVisited(Fqn fqn) {
+	logMessage("node visited " + fqn);
+    }
+
+    @ViewChanged
+    public void viewChange(org.jgroups.View new_view) {
+	logMessage("view changed ");
+    }
 }

@@ -26,49 +26,55 @@ package org.lamsfoundation.lams.tool.deploy;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Task to add a web application entry to an EAR application XML
+ * 
  * @author chris
  */
-public class AddWebAppToApplicationXmlTask extends UpdateApplicationXmlTask
-{
-    
-    
-    
+public class AddWebAppToApplicationXmlTask extends UpdateApplicationXmlTask {
+
     /** Creates a new instance of AddWebAppToApplicationXmlTask */
-    public AddWebAppToApplicationXmlTask()
-    {
+    public AddWebAppToApplicationXmlTask() {
     }
-    
+
     /**
      * Add the web uri and context root elements ot the Application xml
      */
-    protected void updateApplicationXml(Document doc) throws DeployException
-    {
-        
-        //find & remove web uri element
-        Element moduleElement = findElementWithWebURI(doc); 
-        if ( moduleElement != null ) {
-            doc.getDocumentElement().removeChild(moduleElement);
-        }
+    @Override
+    protected void updateApplicationXml(Document doc) throws DeployException {
 
-        //create new module
-        moduleElement = doc.createElement("module");
-        Element webElement = doc.createElement("web");
-        moduleElement.appendChild(webElement);
-        //create new web-uri element in the web element
-        Element webUriElement = doc.createElement("web-uri");
-        webUriElement.appendChild(doc.createTextNode(webUri));
-        webElement.appendChild(webUriElement);
-        
-        //create new context root element in the web element
-        Element contextRootElement = doc.createElement("context-root");
-        contextRootElement.appendChild(doc.createTextNode(contextRoot));
-        webElement.appendChild(contextRootElement);
-        
-        doc.getDocumentElement().appendChild(moduleElement);
-        
+	// find & remove web uri element
+	Element moduleElement = findElementWithWebURI(doc);
+	if (moduleElement != null) {
+	    doc.getDocumentElement().removeChild(moduleElement);
+	}
+
+	// create new module
+	moduleElement = doc.createElement("module");
+	Element webElement = doc.createElement("web");
+	moduleElement.appendChild(webElement);
+	// create new web-uri element in the web element
+	Element webUriElement = doc.createElement("web-uri");
+	webUriElement.appendChild(doc.createTextNode(webUri));
+	webElement.appendChild(webUriElement);
+
+	// create new context root element in the web element
+	Element contextRootElement = doc.createElement("context-root");
+	contextRootElement.appendChild(doc.createTextNode(contextRoot));
+	webElement.appendChild(contextRootElement);
+
+	// insert new module in the correct position, before "security-role" elements
+
+	NodeList docNodes = doc.getDocumentElement().getChildNodes();
+	for (int nodeIndex = 0; nodeIndex < docNodes.getLength(); nodeIndex++) {
+	    Node node = docNodes.item(nodeIndex);
+	    if ("security-role".equalsIgnoreCase(node.getNodeName())) {
+		doc.getDocumentElement().insertBefore(moduleElement, node);
+		break;
+	    }
+	}
     }
-    
 }

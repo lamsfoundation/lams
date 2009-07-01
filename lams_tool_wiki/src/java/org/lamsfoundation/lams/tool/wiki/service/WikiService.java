@@ -582,6 +582,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * @return
      */
     private Wiki insertUnsavedWikiContent(Wiki wiki) {
+	
+	wikiDAO.saveOrUpdate(wiki);
 	// Go through the wiki object and save all the pages and content
 	for (WikiPage wikiPage : wiki.getWikiPages()) {
 	    WikiPageContent currentContent = wikiPage.getCurrentWikiContent();
@@ -598,8 +600,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	    wiki.getWikiPages().add(wikiPage);
 	}
-	wikiDAO.saveOrUpdate(wiki);
-
+	
 	// Update the wiki pages to reference their parent
 	for (WikiPage wikiPage : wiki.getWikiPages()) {
 	    wikiPage.setParentWiki(wiki);

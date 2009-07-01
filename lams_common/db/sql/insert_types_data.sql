@@ -306,7 +306,7 @@ INSERT INTO lams_tool_import_support VALUES (14, 'lasurv11', 'survey');
 
 -- external server mapping to a lams organisation
 INSERT INTO lams_ext_server_org_map VALUES
-  (1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%','http://dummy','\0',7);
+  (1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%', '', 'http://dummy','\0',7);
 
 -- initialise db version
 INSERT INTO patches VALUES ('lams', 17, NOW(), 'F');

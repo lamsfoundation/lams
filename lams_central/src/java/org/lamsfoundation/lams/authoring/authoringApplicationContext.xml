@@ -80,6 +80,12 @@
 				<prop key="setup*">PROPAGATION_REQUIRED</prop>
 				<prop key="finish*">PROPAGATION_REQUIRED</prop>
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
+				<prop key="rename*">PROPAGATION_REQUIRED</prop>
+				<prop key="getToolOutputDefinitions">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
 			</props>
 		</property>
 	</bean>
