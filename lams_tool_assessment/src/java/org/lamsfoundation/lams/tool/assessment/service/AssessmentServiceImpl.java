@@ -121,14 +121,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private AssessmentSessionDAO assessmentSessionDao;
 
     private AssessmentQuestionResultDAO assessmentQuestionResultDao;
-    
+
     private AssessmentResultDAO assessmentResultDao;
 
     // tool service
     private AssessmentToolContentHandler assessmentToolContentHandler;
 
     private MessageService messageService;
-    
+
     private AssessmentOutputFactory assessmentOutputFactory;
 
     // system services
@@ -154,8 +154,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // Service method
     // *******************************************************************************
     /**
-     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
-     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
+     * Try to get the file. If forceLogin = false and an access denied exception
+     * occurs, call this method again to get a new ticket and retry file lookup.
+     * If forceLogin = true and it then fails then throw exception.
      * 
      * @param uuid
      * @param versionId
@@ -184,11 +185,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     /**
-     * This method verifies the credentials of the Assessment Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
+     * This method verifies the credentials of the Assessment Tool and gives it
+     * the <code>Ticket</code> to login and access the Content Repository.
      * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
+     * A valid ticket is needed in order to access the content from the
+     * repository. This method would be called evertime the tool needs to
+     * upload/download files from the content repository.
      * 
      * @return ITicket The ticket for repostory access
      * @throws AssessmentApplicationException
@@ -326,8 +328,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void saveOrUpdateAssessmentSession(AssessmentSession resSession) {
 	assessmentSessionDao.saveObject(resSession);
     }
-    
-    public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) { 
+
+    public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
 	AssessmentResult result = new AssessmentResult();
 	result.setAssessment(assessment);
 	result.setUser(assessmentUser);
@@ -335,18 +337,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	result.setStartDate(new Timestamp(new Date().getTime()));
 	assessmentResultDao.saveObject(result);
     }
-    
-    public void processUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions) {
+
+    public void processUserAnswers(Long assessmentUid, Long userId,
+	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions) {
 	SortedSet<AssessmentQuestionResult> questionResultList = new TreeSet<AssessmentQuestionResult>(
 		new AssessmentQuestionResultComparator());
 	int maximumGrade = 0;
 	float grade = 0;
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
-		int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid, userId, question.getUid());
+		int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid,
+			userId, question.getUid());
 		AssessmentQuestionResult processedAnswer = this.processUserAnswer(question, numberWrongAnswers);
 		questionResultList.add(processedAnswer);
-		
+
 		maximumGrade += question.getDefaultGrade();
 		grade += processedAnswer.getMark();
 	    }
@@ -358,7 +362,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	result.setFinishDate(new Timestamp(new Date().getTime()));
 	assessmentResultDao.saveObject(result);
     }
-    
+
     private AssessmentQuestionResult processUserAnswer(AssessmentQuestion question, int numberWrongAnswers) {
 	AssessmentQuestionResult questionResult = new AssessmentQuestionResult();
 
@@ -370,22 +374,23 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    optionAnswer.setAnswerBoolean(questionOption.getAnswerBoolean());
 	    optionAnswer.setAnswerInt(questionOption.getAnswerInt());
 	    optionAnswers.add(optionAnswer);
-	    
+
 	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 		optionAnswer.setAnswerInt(j++);
 	    }
-	}	
+	}
 	questionResult.setAssessmentQuestion(question);
 	questionResult.setAnswerBoolean(question.getAnswerBoolean());
 	questionResult.setAnswerFloat(question.getAnswerFloat());
 	questionResult.setAnswerString(question.getAnswerString());
-	
+	questionResult.setFinishDate(new Date());
+
 	float mark = 0;
 	float maxMark = question.getDefaultGrade();
 	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
 		if (option.getAnswerBoolean()) {
-		    mark += option.getGrade()*maxMark;
+		    mark += option.getGrade() * maxMark;
 		}
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
@@ -402,13 +407,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		if (question.isCaseSensitive()) {
 		    pattern = Pattern.compile(optionString);
 		} else {
-		    pattern = Pattern.compile(optionString, java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
-		}		
-		boolean isAnswerCorrect = (question.getAnswerString() != null) ? 
-			pattern.matcher(question.getAnswerString()).matches() : false;
-		
+		    pattern = Pattern.compile(optionString, java.util.regex.Pattern.CASE_INSENSITIVE
+			    | java.util.regex.Pattern.UNICODE_CASE);
+		}
+		boolean isAnswerCorrect = (question.getAnswerString() != null) ? pattern.matcher(
+			question.getAnswerString()).matches() : false;
+
 		if (isAnswerCorrect) {
-		    mark = option.getGrade()*maxMark;
+		    mark = option.getGrade() * maxMark;
 		    questionResult.setSubmittedOptionUid(option.getUid());
 		    break;
 		}
@@ -420,8 +426,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    boolean isAnswerCorrect = false;
 		    try {
 			float answerFloat = Float.valueOf(question.getAnswerString());
-			isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError())) 
-				&& (answerFloat <= (option.getOptionFloat() + option.getAcceptedError())));
+			isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError())) && (answerFloat <= (option
+				.getOptionFloat() + option.getAcceptedError())));
 		    } catch (Exception e) {
 		    }
 
@@ -431,7 +437,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			    Pattern pattern = Pattern.compile(regex, java.util.regex.Pattern.CASE_INSENSITIVE
 				    | java.util.regex.Pattern.UNICODE_CASE);
 			    if (pattern.matcher(answerString).matches()) {
-				String answerFloatStr = answerString.substring(0, answerString.length()	- unit.getUnit().length());
+				String answerFloatStr = answerString.substring(0, answerString.length()
+					- unit.getUnit().length());
 				try {
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
@@ -459,13 +466,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    float maxMarkForCorrectAnswer = maxMark / question.getQuestionOptions().size();
-	    TreeSet<AssessmentQuestionOption> correctOptionSet = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
+	    TreeSet<AssessmentQuestionOption> correctOptionSet = new TreeSet<AssessmentQuestionOption>(
+		    new SequencableComparator());
 	    correctOptionSet.addAll(question.getQuestionOptions());
-	    ArrayList<AssessmentQuestionOption> correctOptionList = new ArrayList<AssessmentQuestionOption>(correctOptionSet);
+	    ArrayList<AssessmentQuestionOption> correctOptionList = new ArrayList<AssessmentQuestionOption>(
+		    correctOptionSet);
 	    int i = 0;
 	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
 		if (option.getUid() == correctOptionList.get(i++).getUid()) {
-		    mark += maxMarkForCorrectAnswer*maxMark;
+		    mark += maxMarkForCorrectAnswer * maxMark;
 		}
 	    }
 	}
@@ -473,7 +482,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    mark = maxMark;
 	}
 	if (mark > 0) {
-	    float penalty = question.getPenaltyFactor()*numberWrongAnswers; 
+	    float penalty = question.getPenaltyFactor() * numberWrongAnswers;
 	    mark -= penalty;
 	    if (penalty > maxMark) {
 		penalty = maxMark;
@@ -486,20 +495,21 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	questionResult.setMark(mark);
 	return questionResult;
     }
-    
+
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
     }
-    
+
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastFinishedAssessmentResult(assessmentUid, userId);
     }
-    
+
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
     }
-    
-    public List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
+
+    public List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId,
+	    Long questionUid) {
 	return assessmentQuestionResultDao.getAssessmentQuestionResultList(assessmentUid, userId, questionUid);
     }
 
@@ -535,7 +545,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
 	    ArrayList<AssessmentResult> assessmentResults = new ArrayList<AssessmentResult>();
 	    for (AssessmentUser user : users) {
-		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId, user.getUserId());
+		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(
+			sessionId, user.getUserId());
 		if (assessmentResult == null) {
 		    assessmentResult = new AssessmentResult();
 		    assessmentResult.setUser(user);
@@ -543,21 +554,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    Set<AssessmentQuestionResult> sortedQuestionResults = new TreeSet<AssessmentQuestionResult>(
 			    new AssessmentQuestionResultComparator());
 		    sortedQuestionResults.addAll(assessmentResult.getQuestionResults());
-		    assessmentResult.setQuestionResults(sortedQuestionResults);		    
+		    assessmentResult.setQuestionResults(sortedQuestionResults);
 		}
 		assessmentResults.add(assessmentResult);
 	    }
 	    summary.setAssessmentResults(assessmentResults);
 	    summaryList.add(summary);
 	}
-	
+
 	escapeQuotes(summaryList);
 
 	return summaryList;
     }
-    
+
     public AssessmentResult getUserMasterDetail(Long sessionId, Long userId) {
-	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId, userId);
+	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId,
+		userId);
 	SortedSet questionResults = new TreeSet(new AssessmentQuestionResultComparator());
 	questionResults.addAll(lastFinishedResult.getQuestionResults());
 	lastFinishedResult.setQuestionResults(questionResults);
@@ -565,48 +577,52 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	return lastFinishedResult;
     }
-    
+
     public UserSummary getUserSummary(Long contentId, Long userId, Long sessionId) {
 	UserSummary userSummary = new UserSummary();
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	userSummary.setUser(user);
 	List<AssessmentResult> results = assessmentResultDao.getAssessmentResultsBySession(sessionId, userId);
 	userSummary.setNumberOfAttempts(results.size());
-	
-	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId, userId);
-	long timeTaken = (lastFinishedResult == null) ? 0 : (lastFinishedResult.getFinishDate().getTime() - lastFinishedResult.getStartDate().getTime()); 
+
+	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId,
+		userId);
+	long timeTaken = (lastFinishedResult == null) ? 0
+		: (lastFinishedResult.getFinishDate().getTime() - lastFinishedResult.getStartDate().getTime());
 	userSummary.setTimeOfLastAttempt(new Date(timeTaken));
 	if (lastFinishedResult != null) {
 	    userSummary.setLastAttemptGrade(lastFinishedResult.getGrade());
 	}
-	
+
 	Assessment assessment = assessmentDao.getByContentId(contentId);
 	ArrayList<UserSummaryItem> userSummaryItems = new ArrayList<UserSummaryItem>();
 	Set<AssessmentQuestion> questions = assessment.getQuestions();
 	for (AssessmentQuestion question : questions) {
 	    UserSummaryItem userSummaryItem = new UserSummaryItem(question);
 	    List<AssessmentQuestionResult> questionResultsForSummary = new ArrayList<AssessmentQuestionResult>();
-	    
+
 	    for (AssessmentResult result : results) {
 		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
-			questionResult.setFinishDate(result.getFinishDate());
-			questionResultsForSummary.add(questionResult);
-			break;
+		    if (questionResult.getFinishDate() == null) {
+			if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+			    questionResult.setFinishDate(result.getFinishDate());
+			    questionResultsForSummary.add(questionResult);
+			    break;
+			}
 		    }
 		}
-		
+
 	    }
 	    userSummaryItem.setQuestionResults(questionResultsForSummary);
 	    userSummaryItems.add(userSummaryItem);
 	}
 	userSummary.setUserSummaryItems(userSummaryItems);
-	
+
 	escapeQuotes(userSummary);
 
 	return userSummary;
     }
-    
+
     public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
 	QuestionSummary questionSummary = new QuestionSummary();
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
@@ -622,7 +638,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    // new AssessmentQuestionResultComparator());
 	    ArrayList<AssessmentQuestionResult> sessionQuestionResults = new ArrayList<AssessmentQuestionResult>();
 	    for (AssessmentUser user : users) {
-		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId, user.getUserId());
+		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(
+			sessionId, user.getUserId());
 		AssessmentQuestionResult questionResult = null;
 		if (assessmentResult == null) {
 		    questionResult = new AssessmentQuestionResult();
@@ -641,10 +658,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    questionResults.add(sessionQuestionResults);
 	}
 	questionSummary.setQuestionResultsPerSession(questionResults);
-	
+
 	int count = 0;
 	float total = 0;
-	for(List<AssessmentQuestionResult> sessionQuestionResults : questionResults) {
+	for (List<AssessmentQuestionResult> sessionQuestionResults : questionResults) {
 	    for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
 		if (questionResult.getUid() != null) {
 		    count++;
@@ -652,21 +669,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		}
 	    }
 	}
-	float averageMark = (count == 0) ? 0 : total/count;
+	float averageMark = (count == 0) ? 0 : total / count;
 	questionSummary.setAverageMark(averageMark);
-	
+
 	escapeQuotes(questionSummary);
-	
+
 	return questionSummary;
     }
-    
+
     public void changeQuestionResultMark(Long questionResultUid, float newMark) {
-	AssessmentQuestionResult questionResult = assessmentQuestionResultDao.getAssessmentQuestionResultByUid(questionResultUid);
+	AssessmentQuestionResult questionResult = assessmentQuestionResultDao
+		.getAssessmentQuestionResultByUid(questionResultUid);
 	float oldMark = questionResult.getMark();
 	questionResult.setMark(newMark);
 	assessmentQuestionResultDao.saveObject(questionResult);
-	
-	AssessmentResult result = assessmentResultDao.getAssessmentResultByUid(questionResult.getResultUid());
+
+	AssessmentResult result = questionResult.getAssessmentResult();
 	result.setGrade(result.getGrade() - oldMark + newMark);
 	assessmentResultDao.saveObject(result);
     }
@@ -678,7 +696,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // *****************************************************************************
     // private methods
     // *****************************************************************************
-    
+
     private static void escapeQuotes(Object object) {
 	if (object instanceof UserSummary) {
 	    UserSummary userSummary = (UserSummary) object;
@@ -713,7 +731,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	}
     }
-    
+
     private static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
 	String answerString = questionResult.getAnswerString();
 	if (answerString != null) {
@@ -738,7 +756,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	}
     }
-    
+
     private Assessment getDefaultAssessment() throws AssessmentApplicationException {
 	Long defaultAssessmentId = getToolDefaultContentIdBySignature(AssessmentConstants.TOOL_SIGNATURE);
 	Assessment defaultAssessment = getAssessmentByContentId(defaultAssessmentId);
@@ -789,6 +807,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	}
 	return node;
+    }
+    
+    /**
+     * Get a message from the language files with the given key
+     * @param key
+     * @return
+     */
+    public String getMessage(String key) {
+	return messageService.getMessage(key);
     }
 
     // *****************************************************************************
@@ -845,7 +872,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void setAssessmentResultDao(AssessmentResultDAO assessmentResultDao) {
 	this.assessmentResultDao = assessmentResultDao;
     }
-
 
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods
@@ -921,12 +947,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
+     * Get the definitions for possible output for an activity, based on the
+     * toolContentId. These may be definitions that are always available for the
+     * tool (e.g. number of marks for Multiple Choice) or a custom definition
+     * created for a particular activity such as the answer to the third
+     * question contains the word Koala and hence the need for the toolContentId
      * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of
+     *         each definition
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
 	Assessment assessment = getAssessmentByContentId(toolContentId);
@@ -1045,8 +1073,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     /**
      * Get the tool output for the given tool output names.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>,
+     *      java.lang.Long, java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
@@ -1055,8 +1083,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     /**
      * Get the tool output for the given tool output name.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String,
+     *      java.lang.Long, java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
@@ -1070,7 +1098,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
     }
 
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    /**
+     * Set the description, throws away the title value as this is not supported
+     * in 2.0
+     */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
 
@@ -1118,7 +1149,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
-    
+
     public AssessmentOutputFactory getAssessmentOutputFactory() {
 	return assessmentOutputFactory;
     }
@@ -1136,11 +1167,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
+     * Finds out which lesson the given tool content belongs to and returns its
+     * monitoring users.
      * 
      * @param sessionId
-     *            tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
+     *                tool session ID
+     * @return list of teachers that monitor the lesson which contains the tool
+     *         with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);

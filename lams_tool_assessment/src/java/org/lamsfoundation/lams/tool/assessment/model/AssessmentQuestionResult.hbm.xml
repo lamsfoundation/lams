@@ -35,9 +35,11 @@
             column="assessment_question_uid"
         />
 
-        <property
-            name="resultUid"
-            type="java.lang.Long"
+        <many-to-one
+            name="assessmentResult"
+            class="org.lamsfoundation.lams.tool.assessment.model.AssessmentResult"
+            cascade="none"
+            outer-join="auto"
             update="true"
             insert="true"
             column="result_uid"
@@ -108,6 +110,14 @@
             />
 
         </set>
+
+        <property
+            name="finishDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="finish_date"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

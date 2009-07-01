@@ -51,6 +51,10 @@
 		<td><html:text property="userinfoUrl" size="70"/> *</td>
 	</tr>
 	<tr>
+		<td><fmt:message key="sysadmin.serverUrl" />:</td>
+		<td><html:text property="serverUrl" size="70"/></td>
+	</tr>
+	<tr>
 		<td><fmt:message key="sysadmin.timeoutUrl" />:</td>
 		<td><html:text property="timeoutUrl" size="70"/> *</td>
 	</tr>

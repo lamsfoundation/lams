@@ -228,5 +228,13 @@ public class AssessmentUser implements Cloneable {
     public void setAccessDate(Date accessDate) {
 	this.accessDate = accessDate;
     }
+    
+    public String getFullName() {
+	if (firstName == null || lastName == null) {
+	    return null;
+	} else {
+	    return lastName + " " + firstName;
+	}
+    }
 
 }

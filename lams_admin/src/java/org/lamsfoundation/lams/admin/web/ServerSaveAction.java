@@ -69,104 +69,111 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class ServerSaveAction extends Action {
 
-	private static IIntegrationService service;
-	private static IUserManagementService userService;
-	private static MessageService messageService;
+    private static IIntegrationService service;
+    private static IUserManagementService userService;
+    private static MessageService messageService;
 
-	@SuppressWarnings("unchecked")
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @SuppressWarnings("unchecked")
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
-		if (isCancelled(request)) {
-			return mapping.findForward("success");
-		}
-
-		service = AdminServiceProxy.getIntegrationService(getServlet().getServletContext());
-		userService = AdminServiceProxy.getService(getServlet().getServletContext());
-		messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-		
-		DynaActionForm serverOrgMapForm = (DynaActionForm) form;
-		ActionMessages errors = new ActionMessages();
-		String[] requiredFields = { "serverid", "serverkey", "servername", "prefix", "userinfoUrl", "timeoutUrl" };
-		for (String requiredField : requiredFields) {
-			if (StringUtils.trimToNull(serverOrgMapForm.getString(requiredField)) == null) {
-				errors.add(requiredField, new ActionMessage("error.required", messageService.getMessage("sysadmin."+requiredField)));
-			}
-		}
-		Organisation org = null;
-		UserDTO user = (UserDTO)  SessionManager.getSession().getAttribute(AttributeNames.USER);
-		if((Boolean)serverOrgMapForm.get("newOrg")){
-			String orgName = serverOrgMapForm.getString("orgName");
-			if(StringUtils.trimToNull(orgName)==null){
-				errors.add("orgId",new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
-			}else{
-				org = new Organisation();
-				org.setName(orgName);
-				org.setParentOrganisation(userService.getRootOrganisation());
-				org.setOrganisationType((OrganisationType)userService.findById(OrganisationType.class,OrganisationType.COURSE_TYPE));
-				org.setOrganisationState((OrganisationState)userService.findById(OrganisationState.class,OrganisationState.ACTIVE));
-				SupportedLocale locale = LanguageUtil.getDefaultLocale();
-				org.setLocale(locale);
-				userService.saveOrganisation(org, user.getUserID());
-				serverOrgMapForm.set("orgId", org.getOrganisationId());
-				serverOrgMapForm.set("newOrg", false);
-				serverOrgMapForm.set("orgName", null);
-			}
-		}else{
-			Integer orgId = (Integer)serverOrgMapForm.get("orgId");
-			if(orgId.equals(-1)){
-				// LDEV-1284 no need for integration organisation anymore
-				// errors.add("orgId",new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
-			}else{
-				org = (Organisation)userService.findById(Organisation.class, orgId);
-			}
-		}
-		Integer sid = (Integer) serverOrgMapForm.get("sid");
-		if(errors.isEmpty()){//check duplication 
-			String[] uniqueFields = {"serverid","prefix"};
-			for(String uniqueField : uniqueFields){
-				List list = userService.findByProperty(ExtServerOrgMap.class,uniqueField,serverOrgMapForm.get(uniqueField));
-				if(list!=null && list.size()>0){
-					if(sid.equals(-1)){//new map
-						errors.add(uniqueField, new ActionMessage("error.not.unique", messageService.getMessage("sysadmin."+uniqueField) ));
-					}else{
-						ExtServerOrgMap map = (ExtServerOrgMap)list.get(0);
-						if(!map.getSid().equals(sid)){
-							errors.add(uniqueField, new ActionMessage("error.not.unique", messageService.getMessage("sysadmin."+uniqueField) ));
-						}
-					}
-					
-				}
-			}
-		}
-		if (errors.isEmpty()) {
-			ExtServerOrgMap map = null;
-			if (sid.equals(-1)) {
-				map = new ExtServerOrgMap();
-				BeanUtils.copyProperties(map, serverOrgMapForm);
-				map.setSid(null);
-			} else {
-				map = service.getExtServerOrgMap(sid);
-				BeanUtils.copyProperties(map, serverOrgMapForm);
-			}
-			map.setOrganisation(org);
-			service.saveExtServerOrgMap(map);
-			return mapping.findForward("success");
-		} else {
-			saveErrors(request, errors);
-			Map<String,Object> properties = new HashMap<String,Object>();
-			properties.put("organisationType.organisationTypeId", OrganisationType.COURSE_TYPE);
-			properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
-			List list = userService.findByProperties(Organisation.class, properties);
-			Organisation dummy = new Organisation();
-			dummy.setOrganisationId(-1);
-			dummy.setName(messageService.getMessage("sysadmin.organisation.select"));
-			if(list == null){
-				list = new ArrayList();
-			}
-			list.add(dummy);
-			request.setAttribute("orgs", list);
-			return mapping.getInputForward();
-		}
+	if (isCancelled(request)) {
+	    return mapping.findForward("success");
 	}
+
+	service = AdminServiceProxy.getIntegrationService(getServlet().getServletContext());
+	userService = AdminServiceProxy.getService(getServlet().getServletContext());
+	messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+
+	DynaActionForm serverOrgMapForm = (DynaActionForm) form;
+	ActionMessages errors = new ActionMessages();
+	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix", "userinfoUrl", "timeoutUrl" };
+	for (String requiredField : requiredFields) {
+	    if (StringUtils.trimToNull(serverOrgMapForm.getString(requiredField)) == null) {
+		errors.add(requiredField, new ActionMessage("error.required", messageService.getMessage("sysadmin."
+			+ requiredField)));
+	    }
+	}
+	Organisation org = null;
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	if ((Boolean) serverOrgMapForm.get("newOrg")) {
+	    String orgName = serverOrgMapForm.getString("orgName");
+	    if (StringUtils.trimToNull(orgName) == null) {
+		errors.add("orgId", new ActionMessage("error.required", messageService
+			.getMessage("sysadmin.organisation")));
+	    } else {
+		org = new Organisation();
+		org.setName(orgName);
+		org.setParentOrganisation(userService.getRootOrganisation());
+		org.setOrganisationType((OrganisationType) userService.findById(OrganisationType.class,
+			OrganisationType.COURSE_TYPE));
+		org.setOrganisationState((OrganisationState) userService.findById(OrganisationState.class,
+			OrganisationState.ACTIVE));
+		SupportedLocale locale = LanguageUtil.getDefaultLocale();
+		org.setLocale(locale);
+		userService.saveOrganisation(org, user.getUserID());
+		serverOrgMapForm.set("orgId", org.getOrganisationId());
+		serverOrgMapForm.set("newOrg", false);
+		serverOrgMapForm.set("orgName", null);
+	    }
+	} else {
+	    Integer orgId = (Integer) serverOrgMapForm.get("orgId");
+	    if (orgId.equals(-1)) {
+		// LDEV-1284 no need for integration organisation anymore
+		// errors.add("orgId",new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
+	    } else {
+		org = (Organisation) userService.findById(Organisation.class, orgId);
+	    }
+	}
+	Integer sid = (Integer) serverOrgMapForm.get("sid");
+	if (errors.isEmpty()) {//check duplication 
+	    String[] uniqueFields = { "serverid", "prefix" };
+	    for (String uniqueField : uniqueFields) {
+		List list = userService.findByProperty(ExtServerOrgMap.class, uniqueField, serverOrgMapForm
+			.get(uniqueField));
+		if (list != null && list.size() > 0) {
+		    if (sid.equals(-1)) {//new map
+			errors.add(uniqueField, new ActionMessage("error.not.unique", messageService
+				.getMessage("sysadmin." + uniqueField)));
+		    } else {
+			ExtServerOrgMap map = (ExtServerOrgMap) list.get(0);
+			if (!map.getSid().equals(sid)) {
+			    errors.add(uniqueField, new ActionMessage("error.not.unique", messageService
+				    .getMessage("sysadmin." + uniqueField)));
+			}
+		    }
+
+		}
+	    }
+	}
+	if (errors.isEmpty()) {
+	    ExtServerOrgMap map = null;
+	    if (sid.equals(-1)) {
+		map = new ExtServerOrgMap();
+		BeanUtils.copyProperties(map, serverOrgMapForm);
+		map.setSid(null);
+	    } else {
+		map = service.getExtServerOrgMap(sid);
+		BeanUtils.copyProperties(map, serverOrgMapForm);
+	    }
+	    map.setOrganisation(org);
+	    service.saveExtServerOrgMap(map);
+	    return mapping.findForward("success");
+	} else {
+	    saveErrors(request, errors);
+	    Map<String, Object> properties = new HashMap<String, Object>();
+	    properties.put("organisationType.organisationTypeId", OrganisationType.COURSE_TYPE);
+	    properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
+	    List list = userService.findByProperties(Organisation.class, properties);
+	    Organisation dummy = new Organisation();
+	    dummy.setOrganisationId(-1);
+	    dummy.setName(messageService.getMessage("sysadmin.organisation.select"));
+	    if (list == null) {
+		list = new ArrayList();
+	    }
+	    list.add(dummy);
+	    request.setAttribute("orgs", list);
+	    return mapping.getInputForward();
+	}
+    }
 }

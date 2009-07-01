@@ -39,14 +39,14 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 	    + " as q, "
 	    + AssessmentResult.class.getName()
 	    + " as r "
-	    + " where q.resultUid = r.uid and r.assessment.uid = ? and r.user.userId =? and q.assessmentQuestion.uid =? order by r.startDate asc";
+	    + " where q.assessmentResult.uid = r.uid and r.assessment.uid = ? and r.user.userId =? and q.assessmentQuestion.uid =? order by r.startDate asc";
 
     private static final String FIND_WRONG_ANSWERS_NUMBER = "select count(q) from  "
 	    + AssessmentQuestionResult.class.getName()
 	    + " as q, "
 	    + AssessmentResult.class.getName()
 	    + " as r "
-	    + " where q.resultUid = r.uid and r.assessment.uid = ? and r.user.userId =? and q.assessmentQuestion.uid =? and q.mark < q.assessmentQuestion.defaultGrade";
+	    + " where q.assessmentResult.uid = r.uid and r.assessment.uid = ? and r.user.userId =? and q.assessmentQuestion.uid =? and q.mark < q.assessmentQuestion.defaultGrade";
 
     public int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid) {
 	List list = getHibernateTemplate().find(FIND_WRONG_ANSWERS_NUMBER, new Object[] { assessmentUid, userId, questionUid });

@@ -96,6 +96,26 @@
 
         </set>
 
+        <set
+            name="assessmentUsers"
+            lazy="true"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="last_name asc"
+        >
+
+            <key
+                column="session_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
+            />
+
+        </set>
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-AssessmentSession.xml

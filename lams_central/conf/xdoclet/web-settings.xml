@@ -9,9 +9,9 @@
 	This refBeanContext.xml contains definition of the shared context. It is located by this entry:
 	<context-param>
    		<param-name>locatorFactorySelector</param-name>
-   		<param-value>classpath*:/org/lamsfoundation/lams/**/beanRefContext.xml</param-value>
+   		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
 	</context-param>
-	telling to look for refBeanContext.xml files in selected parts of the classpath.
+	telling to look for refBeanContext.xml files in selected part of the classpath.
 	Currently LAMS has only one refBeanContext.xml with one shared context definition.
 	
 	Lams_central uses only beans from the shared context "context.central". That is why there is no value
@@ -22,13 +22,20 @@
 	If there are local (private for web application; see tools and admin for example) bean definitions,
 	path to application context XML file can still be added to contextConfigLocation.
  -->
+ <!--
+ 	contextClass parameter may be removed later in the development, as it does not solve Ant-style pattern problem
+ -->
+<context-param>
+    <param-name>contextClass</param-name>
+    <param-value>org.jboss.spring.factory.VFSXmlWebApplicationContext</param-value>
+</context-param> 
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
 	<param-value></param-value>
 </context-param>
 <context-param>
    <param-name>locatorFactorySelector</param-name>
-   <param-value>classpath*:/org/lamsfoundation/lams/**/beanRefContext.xml</param-value>
+   <param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
 </context-param>
 <context-param>
 	<param-name>parentContextKey</param-name>

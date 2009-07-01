@@ -40,7 +40,7 @@ public class AssessmentQuestionResult {
 
     private Long uid;
     private AssessmentQuestion assessmentQuestion;
-    private Long resultUid;
+    private AssessmentResult assessmentResult;
     private String answerString;
     private float answerFloat;
     private boolean answerBoolean;
@@ -82,16 +82,15 @@ public class AssessmentQuestionResult {
     }
     
     /**
-     * @hibernate.property column="result_uid"
-     * 
-     * @return Returns resultUid.
+     * @hibernate.many-to-one column="result_uid" cascade="none"
+     * @return
      */
-    public Long getResultUid() {
-	return resultUid;
+    public AssessmentResult getAssessmentResult() {
+        return assessmentResult;
     }
 
-    public void setResultUid(Long resultUid) {
-	this.resultUid = resultUid;
+    public void setAssessmentResult(AssessmentResult assessmentResult) {
+        this.assessmentResult = assessmentResult;
     }
     
     /**
@@ -191,6 +190,12 @@ public class AssessmentQuestionResult {
 	this.optionAnswers = answers;
     }
     
+    
+    /**
+     * @hibernate.property column="finish_date"
+     * 
+     * @return Returns submittedOptionUid.
+     */
     public Date getFinishDate() {
 	return finishDate;
     }

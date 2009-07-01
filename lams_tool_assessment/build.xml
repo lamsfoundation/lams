@@ -231,6 +231,26 @@
 			</fileset>
 		</jar> 
 	</target>
+	
+	<!-- =================================================================== -->
+	<!-- Deploy the jar                         -->
+	<!-- =================================================================== -->
+	<target name="deploy-jar" depends="jar" description="Deploy the assessment jar file">
+		<delete quiet="true">
+			<fileset dir="${jboss.deploy}/tmp" />
+			<fileset dir="${jboss.deploy}/work" />
+		</delete>
+		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" />
+
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/tool/assessment">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+		
+		<copy file="${build.lib}/${product}.jar" todir="${sharedlib}/lams"/>
+	</target>
+	
 
     <target name="web"  description="generates xdoclet for web">
 	    <taskdef

@@ -5,6 +5,7 @@
 	<!-- import properties from the specified file -->
 	<property file="build.properties"/>
 	<property file="../lams_build/common.properties"/>
+	<property file="../lams_build/shared.properties"/>
 	<property file="../lams_build/${osPropertiesName}.properties" />
 
 	<path id="all-libs">
@@ -185,6 +186,10 @@
 		<move file="${build.lib}/lams-central.war" tofile="${build.lib}/temp.war"/>
 		<unjar src="${build.lib}/temp.war" dest="${build.lib}/lams-central.war"/>
 		<antcall target="update-logo-for-RAMS"/>
+		
+		<!-- Add Pedagogical Planner, if available -->
+		<available file="../${lams_planner}/build.xml" property="planner_available" />
+		<antcall target="copy-planner" />
 	</target>
 
 
@@ -306,7 +311,11 @@
 			</fileset>
 		</copy>
 	</target>
+	
 
+	<target name="copy-planner" if="planner_available">
+		<ant antfile="../${lams_planner}/build.xml" target="copy-to-central" />
+	</target>
 	
 	<!-- ================================= -->
 	<!--  target: synchronize-deploy          -->            

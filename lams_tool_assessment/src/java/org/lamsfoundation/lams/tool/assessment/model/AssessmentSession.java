@@ -50,6 +50,7 @@ public class AssessmentSession {
     private int status;
     // assessment Questions
     private Set assessmentQuestions;
+    private Set<AssessmentUser> assessmentUsers;
 
     // **********************************************************
     // Get/Set methods
@@ -160,5 +161,25 @@ public class AssessmentSession {
     public void setAssessmentQuestions(Set assessmentQuestions) {
 	this.assessmentQuestions = assessmentQuestions;
     }
+
+    
+    /**
+     * 
+     * 
+     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="last_name asc"
+     * @hibernate.collection-key column="session_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
+     * 
+     * @return
+     */
+    public Set<AssessmentUser> getAssessmentUsers() {
+        return assessmentUsers;
+    }
+
+    public void setAssessmentUsers(Set<AssessmentUser> assessmentUsers) {
+        this.assessmentUsers = assessmentUsers;
+    }
+    
+    
 
 }

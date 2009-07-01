@@ -117,6 +117,7 @@ create table tl_laasse10_question_result (
    submitted_option_uid bigint,
    mark float,
    penalty float,
+   finish_date datetime DEFAULT NULL,
    primary key (uid)
 )type=innodb;
 create table tl_laasse10_option_answer (

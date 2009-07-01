@@ -246,4 +246,13 @@ public interface IAssessmentService {
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId);
+    
+    /**
+     * Get a message from the language files with the given key
+     * @param key
+     * @return
+     */
+    public String getMessage(String key);
 }
+
+
