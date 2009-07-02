@@ -435,6 +435,8 @@ Ant build file.
 				<include name="**/Subscription.java" />
 				
 				<include name="**/PedagogicalPlannerSequenceNode.java" />
+				
+				<include name="**/DataFlowObject.java" />
 			</fileset>
 			<hibernate version="3.0" />
 		</hibernatedoclet>

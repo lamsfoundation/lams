@@ -559,7 +559,8 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	Daco daco = getDacoByContentId(toolContentId);
 	if (daco == null) {
 	    try {
@@ -568,7 +569,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 		DacoServiceImpl.log.error(e.getMessage());
 	    }
 	}
-	return getDacoOutputFactory().getToolOutputDefinitions(daco);
+	return getDacoOutputFactory().getToolOutputDefinitions(daco, definitionType);
     }
 
     public DacoUser getUser(Long uid) {

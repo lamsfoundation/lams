@@ -88,8 +88,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 /**
  * An implementation of the IPixlrService interface.
  * 
- * As a requirement, all LAMS tool's service bean must implement
- * ToolContentManager and ToolSessionManager.
+ * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
 public class PixlrService implements ToolSessionManager, ToolContentManager, IPixlrService, ToolContentImport102Manager {
@@ -121,7 +120,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     private ICoreNotebookService coreNotebookService;
 
     private PixlrOutputFactory pixlrOutputFactory;
-    
+
     private IPixlrConfigItemDAO pixlrConfigItemDAO;
 
     public PixlrService() {
@@ -170,8 +169,8 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     /**
      * Get the tool output for the given tool output names.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>,
-     *      java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
+     *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getPixlrOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
@@ -180,8 +179,8 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     /**
      * Get the tool output for the given tool output name.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String,
-     *      java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
+     *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getPixlrOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
@@ -214,7 +213,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	try {
 	    toContent.setImageFileName(copyImage(toContent));
 	} catch (Exception e) {
-	    logger.error("Could not copy image for tool content copy", e);
+	    PixlrService.logger.error("Could not copy image for tool content copy", e);
 	    throw new ToolException(e);
 	}
 
@@ -288,8 +287,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     /**
-     * Export the XML fragment for the tool's content, along with any files
-     * needed for the content.
+     * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
      *                 if no tool content matches the toolSessionId
@@ -326,15 +324,15 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 		    if (!tempDirFile.exists()) {
 			tempDirFile.mkdirs();
 		    }
-		    String newFilePath = tempDir + File.separator + EXPORT_IMAGE_FILE_NAME + ext;
+		    String newFilePath = tempDir + File.separator + PixlrService.EXPORT_IMAGE_FILE_NAME + ext;
 
 		    copyFile(imageFile, newFilePath);
-		    pixlr.setImageFileName(EXPORT_IMAGE_FILE_NAME + ext);
+		    pixlr.setImageFileName(PixlrService.EXPORT_IMAGE_FILE_NAME + ext);
 		}
 	    }
 
 	} catch (Exception e) {
-	    logger.error("Could not export pixlr image, image may be missing in export", e);
+	    PixlrService.logger.error("Could not export pixlr image, image may be missing in export", e);
 	}
 
 	Set<PixlrAttachment> atts = pixlr.getPixlrAttachments();
@@ -351,8 +349,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     /**
-     * Import the XML fragment for the tool's content, along with any files
-     * needed for the content.
+     * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
      *                 if any other error occurs
@@ -395,7 +392,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	} catch (Exception e) {
-	    logger.error("Error during import possibly because of file copy error", e);
+	    PixlrService.logger.error("Error during import possibly because of file copy error", e);
 	    throw new ToolException(e);
 	}
     }
@@ -410,21 +407,20 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     /**
-     * Get the definitions for possible output for an activity, based on the
-     * toolContentId. These may be definitions that are always available for the
-     * tool (e.g. number of marks for Multiple Choice) or a custom definition
-     * created for a particular activity such as the answer to the third
-     * question contains the word Koala and hence the need for the toolContentId
+     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
+     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
+     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * the toolContentId
      * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of
-     *         each definition
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	Pixlr pixlr = getPixlrDAO().getByContentId(toolContentId);
 	if (pixlr == null) {
 	    pixlr = getDefaultContent();
 	}
-	return getPixlrOutputFactory().getToolOutputDefinitions(pixlr);
+	return getPixlrOutputFactory().getToolOutputDefinitions(pixlr, definitionType);
     }
 
     /* ********** IPixlrService Methods ********************************* */
@@ -591,12 +587,11 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it
-     * the <code>Ticket</code> to login and access the Content Repository.
+     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
+     * access the Content Repository.
      * 
-     * A valid ticket is needed in order to access the content from the
-     * repository. This method would be called evertime the tool needs to
-     * upload/download files from the content repository.
+     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
+     * the tool needs to upload/download files from the content repository.
      * 
      * @return ITicket The ticket for repostory access
      * @throws SubmitFilesException
@@ -654,8 +649,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     /**
-     * Set the description, throws away the title value as this is not supported
-     * in 2.0
+     * Set the description, throws away the title value as this is not supported in 2.0
      */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
@@ -755,18 +749,18 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     public IPixlrConfigItemDAO getPixlrConfigItemDAO() {
-        return pixlrConfigItemDAO;
+	return pixlrConfigItemDAO;
     }
 
     public void setPixlrConfigItemDAO(IPixlrConfigItemDAO pixlrConfigItemDAO) {
-        this.pixlrConfigItemDAO = pixlrConfigItemDAO;
+	this.pixlrConfigItemDAO = pixlrConfigItemDAO;
     }
 
     public IRepositoryService getRepositoryService() {
-        return repositoryService;
+	return repositoryService;
     }
 
     public void setRepositoryService(IRepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
-    }    
+	this.repositoryService = repositoryService;
+    }
 }

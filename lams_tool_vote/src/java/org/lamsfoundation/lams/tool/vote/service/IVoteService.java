@@ -29,9 +29,11 @@ import java.util.Set;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
@@ -188,10 +190,9 @@ public interface IVoteService {
     public VoteSession getVoteSessionByUID(Long uid) throws VoteApplicationException;
 
     /**
-     * Get the count of all the potential learners for the vote session. This
-     * will include the people that have never logged into the lesson. Not
-     * great, but it is a better estimate of how many users there will be
-     * eventually than the number of people already known to the tool.
+     * Get the count of all the potential learners for the vote session. This will include the people that have never
+     * logged into the lesson. Not great, but it is a better estimate of how many users there will be eventually than
+     * the number of people already known to the tool.
      * 
      * @param voteSessionId
      *                The tool session id
@@ -301,4 +302,12 @@ public interface IVoteService {
     public List retrieveVoteUploadedFiles(VoteContent Vote) throws VoteApplicationException;
 
     public void removeNominationsFromCache(VoteContent voteContent);
+
+    public ToolOutput getToolInput(Long requestingToolContentId, Integer learnerId);
+
+    public List<DataFlowObject> getDataFlowObjects(Long toolContentId);
+
+    public void saveDataFlowObjectAssigment(DataFlowObject assignedDataFlowObject);
+
+    public DataFlowObject getAssignedDataFlowObject(Long toolContentId);
 }

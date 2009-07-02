@@ -87,6 +87,8 @@ import org.lamsfoundation.lams.learningdesign.Competence;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
+import org.lamsfoundation.lams.learningdesign.DataFlowObject;
+import org.lamsfoundation.lams.learningdesign.DataTransition;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -111,6 +113,7 @@ import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.BranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.CompetenceDTO;
+import org.lamsfoundation.lams.learningdesign.dto.DataFlowObjectDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupingDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
@@ -1952,36 +1955,39 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			    }
 			    boolean transitionBreak = true;
 			    for (TransitionDTO transDto : transDtoList) {
-				// find out the transition of current first
-				// activity
-				if (nextActId.equals(transDto.getFromActivityID())) {
-				    transitionBreak = false;
-				    nextActId = transDto.getToActivityID();
-				    if (nextActId != null && !removedActMap.containsKey(nextActId)) {
-					existFirstAct = nextActId;
-					found = true;
+				// we deal with progress transitions only
+				if (transDto.getTransitionType().equals(Transition.PROGRESS_TRANSITION_TYPE)) {
+				    // find out the transition of current first
+				    // activity
+				    if (nextActId.equals(transDto.getFromActivityID())) {
+					transitionBreak = false;
+					nextActId = transDto.getToActivityID();
+					if (nextActId != null && !removedActMap.containsKey(nextActId)) {
+					    existFirstAct = nextActId;
+					    found = true;
+					    break;
+					} else if (nextActId == null) {
+					    // no more activity
+					    found = true;
+					    break;
+					}
+					// already found the desire transition
 					break;
-				    } else if (nextActId == null) {
-					// no more activity
-					found = true;
-					break;
+					// if found flag is false yet, then it
+					// means the 2nd node remove as well,
+					// continue try 3rd...
 				    }
-				    // already found the desire transition
-				    break;
-				    // if found flag is false yet, then it
-				    // means the 2nd node remove as well,
-				    // continue try 3rd...
 				}
-			    }
-			    // This activity also removed!!! then retrieve
-			    // again
-			    // If found is false, then the nextAct is still
-			    // not available, then continue find.
-			    // tranisitionBreak mean the activity is removed
-			    // but it can not find its transition to
-			    // decide next available activity.
-			    if (found || transitionBreak) {
-				break;
+				// This activity also removed!!! then retrieve
+				// again
+				// If found is false, then the nextAct is still
+				// not available, then continue find.
+				// tranisitionBreak mean the activity is removed
+				// but it can not find its transition to
+				// decide next available activity.
+				if (found || transitionBreak) {
+				    break;
+				}
 			    }
 			}
 			Activity next = activityMapper.get(existFirstAct);
@@ -2010,10 +2016,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Transition trans = getTransition(transDto, activityMapper);
 	    transList.add(trans);
 
-	    // persist
 	    trans.setTransitionId(null);
-	    // leave it to learning design to save it.
-	    // transitionDAO.insert(trans);
 	}
 
 	// Once the learning design is saved, we can import the competences
@@ -2049,37 +2052,41 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	} else {
 	    ld.setValidDesign(true);
 	}
+	// Generation of title triggers Hibernate flush. After changes done to transition<->activity associations, there
+	// were errors if we tried to read LD data before saving the current one. So the workaround is to first save,
+	// then read and update the title, then save again.
+	learningDesignDAO.insert(ld);
 
 	ld.setTitle(ImportExportUtil.generateUniqueLDTitle(folder, ld.getTitle(), learningDesignDAO));
 
+	learningDesignDAO.update(ld);
 	// persist
-	learningDesignDAO.insert(ld);
 
 	// Once we have the competences saved, we can save the competence mappings
-	Set<CompetenceMapping> allCompetenceMappings = new HashSet<CompetenceMapping>(); 
+	Set<CompetenceMapping> allCompetenceMappings = new HashSet<CompetenceMapping>();
 	for (AuthoringActivityDTO actDto : actDtoList) {
-		 if (removedActMap.containsKey(actDto.getActivityID())){
-			 continue;
-		 }
-		 if (actDto.getActivityTypeID().intValue() == Activity.TOOL_ACTIVITY_TYPE){
-			 for (Activity act : actList){
-				 for(Competence competence : competenceList){
-					 for (String comptenceMappingStr : actDto.getCompetenceMappingTitles()){
-						 if (competence.getTitle() == comptenceMappingStr){
-							 if (activityMapper.get(actDto.getActivityID()).getActivityId() == act.getActivityId() ){
-								 CompetenceMapping competenceMapping = new CompetenceMapping();
-								 competenceMapping.setToolActivity((ToolActivity)act);
-								 competenceMapping.setCompetence(competence);
-								 allCompetenceMappings.add(competenceMapping);
-								 break;
-							 }
-						 }
-					 }
-				 }
-			 }
-		 }
-	 }
-	 baseDAO.insertOrUpdateAll(allCompetenceMappings);
+	    if (removedActMap.containsKey(actDto.getActivityID())) {
+		continue;
+	    }
+	    if (actDto.getActivityTypeID().intValue() == Activity.TOOL_ACTIVITY_TYPE) {
+		for (Activity act : actList) {
+		    for (Competence competence : competenceList) {
+			for (String comptenceMappingStr : actDto.getCompetenceMappingTitles()) {
+			    if (competence.getTitle() == comptenceMappingStr) {
+				if (activityMapper.get(actDto.getActivityID()).getActivityId() == act.getActivityId()) {
+				    CompetenceMapping competenceMapping = new CompetenceMapping();
+				    competenceMapping.setToolActivity((ToolActivity) act);
+				    competenceMapping.setCompetence(competence);
+				    allCompetenceMappings.add(competenceMapping);
+				    break;
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	baseDAO.insertOrUpdateAll(allCompetenceMappings);
 
 	return ld.getLearningDesignId();
     }
@@ -2347,8 +2354,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     private Transition getTransition(TransitionDTO transDto, Map<Long, Activity> activityMapper) {
-	Transition trans = new Transition();
 
+	Transition trans = null;
+	if (transDto.getTransitionType().equals(Transition.DATA_TRANSITION_TYPE)) {
+	    trans = new DataTransition();
+	} else {
+	    trans = new Transition();
+	}
 	if (transDto == null) {
 	    return trans;
 	}
@@ -2360,7 +2372,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// also set transition to activity: It is nonsense for persisit data,
 	// but it is help this learning design
 	// validated
-	fromAct.setTransitionFrom(trans);
+	if (trans.isProgressTransition()) {
+	    fromAct.setTransitionFrom(trans);
+	}
 	// set to null
 	// trans.setLearningDesign();
 	trans.setTitle(transDto.getTitle());
@@ -2371,13 +2385,32 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// also set transition to activity: It is nonsense for persisit data,
 	// but it is help this learning design
 	// validated
-	toAct.setTransitionTo(trans);
+	if (trans.isProgressTransition()) {
+	    toAct.setTransitionTo(trans);
+	}
 
 	trans.setTransitionId(transDto.getTransitionID());
 	trans.setTransitionUIID(transDto.getTransitionUIID());
 
 	// reset value
 	trans.setCreateDateTime(new Date());
+
+	// copy data flow objects
+	if (trans.isDataTransition()) {
+	    DataTransition dataTransition = (DataTransition) trans;
+	    for (DataFlowObjectDTO dataFlowObjectDto : transDto.getDataFlowObjects()) {
+		DataFlowObject dataFlowObject = new DataFlowObject();
+		dataFlowObject.setDataTransition(dataTransition);
+		dataFlowObject.setName(dataFlowObjectDto.getName());
+		dataFlowObject.setDisplayName(dataFlowObjectDto.getDisplayName());
+		dataFlowObject.setOrderId(dataFlowObjectDto.getOrderId());
+		Integer toolAssigmentId = StringUtils.isBlank(dataFlowObjectDto.getToolAssigmentId()) ? null
+			: new Integer(dataFlowObjectDto.getToolAssigmentId());
+		dataFlowObject.setToolAssigmentId(toolAssigmentId);
+		dataTransition.getDataFlowObjects().add(dataFlowObject);
+	    }
+	}
+
 	return trans;
     }
 

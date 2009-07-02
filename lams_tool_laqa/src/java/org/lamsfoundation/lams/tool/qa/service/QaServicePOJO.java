@@ -49,7 +49,6 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -97,19 +96,15 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.springframework.dao.DataAccessException;
 
 /**
- * The POJO implementation of Survey service. All business logics of survey tool
- * are implemented in this class. It translate the request from presentation
- * layer and perform approporiate database operation.
+ * The POJO implementation of Survey service. All business logics of survey tool are implemented in this class. It
+ * translate the request from presentation layer and perform approporiate database operation.
  * 
- * Two construtors are provided in this class. The constuctor with Hibernate
- * session object allows survey tool to handle long run application transaction.
- * The developer can store Hibernate session in http session and pass across
- * different http request. This implementation also make the testing out side
- * JBoss container much easier.
+ * Two construtors are provided in this class. The constuctor with Hibernate session object allows survey tool to handle
+ * long run application transaction. The developer can store Hibernate session in http session and pass across different
+ * http request. This implementation also make the testing out side JBoss container much easier.
  * 
- * Every method is implemented as a Hibernate session transaction. It open an
- * new persistent session or connect to existing persistent session in the
- * begining and it close or disconnect to the persistent session in the end.
+ * Every method is implemented as a Hibernate session transaction. It open an new persistent session or connect to
+ * existing persistent session in the begining and it close or disconnect to the persistent session in the end.
  * 
  * @author Ozgur Demirtas
  * 
@@ -657,9 +652,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * checks the paramter content in the user responses table boolean
-     * studentActivityOccurredGlobal(QaContent qaContent) throws
-     * QaApplicationException
+     * checks the paramter content in the user responses table boolean studentActivityOccurredGlobal(QaContent
+     * qaContent) throws QaApplicationException
      * 
      * @param qa
      * @return boolean
@@ -680,8 +674,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * counts the number of sessions marked INCOMPLETE for a content int
-     * countIncompleteSession(QaContent qa) throws QaApplicationException
+     * counts the number of sessions marked INCOMPLETE for a content int countIncompleteSession(QaContent qa) throws
+     * QaApplicationException
      * 
      * @param qa
      * @return int
@@ -695,13 +689,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * checks the parameter content in the tool sessions table. find out if any
-     * student has ever used (logged in through the url and replied) to this
-     * content return true even if you have only one content passed as parameter
-     * referenced in the tool sessions table
+     * checks the parameter content in the tool sessions table. find out if any student has ever used (logged in through
+     * the url and replied) to this content return true even if you have only one content passed as parameter referenced
+     * in the tool sessions table
      * 
-     * boolean studentActivityOccurred(QaContent qa) throws
-     * QaApplicationException
+     * boolean studentActivityOccurred(QaContent qa) throws QaApplicationException
      * 
      * @param qa
      * @return boolean
@@ -718,15 +710,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * gets called ONLY when a lesson is being created in monitoring mode.
-     * Should create the new content(toContent) based on what the author has
-     * created her content with. In q/a tool's case that is content + question's
-     * content but not user responses. The deep copy should go only as far as
-     * default content (or author created content) already goes.
-     * ToolContentManager CONTRACT
+     * gets called ONLY when a lesson is being created in monitoring mode. Should create the new content(toContent)
+     * based on what the author has created her content with. In q/a tool's case that is content + question's content
+     * but not user responses. The deep copy should go only as far as default content (or author created content)
+     * already goes. ToolContentManager CONTRACT
      * 
-     * similar to public void removeToolContent(Long toolContentID) gets called
-     * by Container+Flash
+     * similar to public void removeToolContent(Long toolContentID) gets called by Container+Flash
      * 
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException
@@ -776,7 +765,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		fromContent = qaDAO.loadQaById(fromContentId.longValue());
 	    }
 	    if (fromContentId.equals(defaultContentId) && fromContent != null && fromContent.getConditions().isEmpty()) {
-		fromContent.getConditions().add(getQaOutputFactory().createDefaultComplexCondition(fromContent));
+		fromContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(fromContent));
 	    }
 	    QaContent toContent = QaContent.newInstance(qaToolContentHandler, fromContent, toContentId);
 	    if (toContent == null) {
@@ -799,16 +788,15 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * setAsForceCompleteSession(Long toolSessionId) throws
-     * QaApplicationException update the tool session status to COMPLETE for
-     * this tool session
+     * setAsForceCompleteSession(Long toolSessionId) throws QaApplicationException update the tool session status to
+     * COMPLETE for this tool session
      * 
      * @param Long
      *                toolSessionId
      */
     public void setAsForceCompleteSession(Long toolSessionId) throws QaApplicationException {
-	QaServicePOJO.logger.debug("Request for setAsForceCompleteSession has come for toolSessionId: "
-		+ toolSessionId);
+	QaServicePOJO.logger
+		.debug("Request for setAsForceCompleteSession has come for toolSessionId: " + toolSessionId);
 
 	QaSession qaSession = retrieveQaSessionOrNullById(toolSessionId.longValue());
 	qaSession.setSession_status(QaSession.COMPLETED);
@@ -817,8 +805,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * setAsForceComplete(Long userId) throws QaApplicationException update the
-     * tool session status to COMPLETE for this user
+     * setAsForceComplete(Long userId) throws QaApplicationException update the tool session status to COMPLETE for this
+     * user
      * 
      * @param userId
      */
@@ -857,8 +845,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * setAsDefineLater(Long toolContentID) throws DataMissingException,
-     * ToolException
+     * setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
      * 
      * @param toolContentID
      *                return void
@@ -879,8 +866,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * setAsRunOffline(Long toolContentID) throws DataMissingException,
-     * ToolException set the runOffline to true on this content
+     * setAsRunOffline(Long toolContentID) throws DataMissingException, ToolException set the runOffline to true on this
+     * content
      * 
      * @param toolContentID
      *                return void
@@ -902,13 +889,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     /**
      * 
-     * removeToolContent(Long toolContentID) gets automatically called only in
-     * monitoring mode when the author chooses to delete a lesson.
+     * removeToolContent(Long toolContentID) gets automatically called only in monitoring mode when the author chooses
+     * to delete a lesson.
      * 
-     * The idea is to remove content + its relevant sessions + in q/a tools's
-     * case the question's content from the db. ToolContentManager CONTRACT this
-     * gets called automatically by Flash when a deletion is detected in the
-     * tool interface.
+     * The idea is to remove content + its relevant sessions + in q/a tools's case the question's content from the db.
+     * ToolContentManager CONTRACT this gets called automatically by Flash when a deletion is detected in the tool
+     * interface.
      */
     public void removeToolContent(Long toolContentID) {
 	QaServicePOJO.logger.debug("start of removeToolContent with toolContentID: " + toolContentID);
@@ -963,9 +949,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * removeToolContent(Long toolContentID, boolean removeSessionData) throws
-     * SessionDataExistsException, ToolException Will need an update on the core
-     * tool signature: reason : when qaContent is null throw an exception
+     * removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException, ToolException
+     * Will need an update on the core tool signature: reason : when qaContent is null throw an exception
      * 
      */
     public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException,
@@ -1014,8 +999,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * Export the XML fragment for the tool's content, along with any files
-     * needed for the content.
+     * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
      *                 if no tool content matches the toolSessionId
@@ -1029,7 +1013,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    toolContentObj = retrieveQa(defaultToolContentId);
 	    if (toolContentObj != null && toolContentObj.getConditions().isEmpty()) {
-		toolContentObj.getConditions().add(getQaOutputFactory().createDefaultComplexCondition(toolContentObj));
+		toolContentObj.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(toolContentObj));
 	    }
 	}
 	if (toolContentObj == null) {
@@ -1067,8 +1051,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * Import the XML fragment for the tool's content, along with any files
-     * needed for the content.
+     * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
      *                 if any other error occurs
@@ -1110,31 +1093,29 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * Get the definitions for possible output for an activity, based on the
-     * toolContentId. These may be definitions that are always available for the
-     * tool (e.g. number of marks for Multiple Choice) or a custom definition
-     * created for a particular activity such as the answer to the third
-     * question contains the word Koala and hence the need for the toolContentId
+     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
+     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
+     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * the toolContentId
      * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of
-     *         each definition
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	QaContent qaContent = qaDAO.getQaById(toolContentId);
 	if (qaContent == null) {
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    qaContent = retrieveQa(defaultToolContentId);
 	    if (qaContent != null && qaContent.getConditions().isEmpty()) {
-		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexCondition(qaContent));
+		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(qaContent));
 	    }
 	}
-	return getQaOutputFactory().getToolOutputDefinitions(qaContent);
+	return getQaOutputFactory().getToolOutputDefinitions(qaContent, definitionType);
     }
 
     /**
-     * it is possible that the tool session id already exists in the tool
-     * sessions table as the users from the same session are involved.
-     * existsSession(long toolSessionId)
+     * it is possible that the tool session id already exists in the tool sessions table as the users from the same
+     * session are involved. existsSession(long toolSessionId)
      * 
      * @param toolSessionId
      * @return boolean
@@ -1154,12 +1135,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * createToolSession(Long toolSessionId,String toolSessionName, Long
-     * toolContentID) throws ToolException ToolSessionManager CONTRACT : creates
-     * a tool session with the incoming toolSessionId in the tool session table
+     * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentID) throws ToolException
+     * ToolSessionManager CONTRACT : creates a tool session with the incoming toolSessionId in the tool session table
      * 
-     * gets called only in the Learner mode. All the learners in the same group
-     * have the same toolSessionId.
+     * gets called only in the Learner mode. All the learners in the same group have the same toolSessionId.
      * 
      */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentID) throws ToolException {
@@ -1210,7 +1189,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	    qaContent = qaDAO.loadQaById(toolContentID.longValue());
 	    if (qaContent.getConditions().isEmpty()) {
-		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexCondition(qaContent));
+		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(qaContent));
 	    }
 	}
 
@@ -1261,9 +1240,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     /**
      * Complete the tool session.
      * 
-     * Part of the ToolSessionManager contract. Called by controller service to
-     * force complete the qa session, or by the web front end to complete the qa
-     * session
+     * Part of the ToolSessionManager contract. Called by controller service to force complete the qa session, or by the
+     * web front end to complete the qa session
      * 
      */
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
@@ -1318,8 +1296,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     /**
      * Get the tool output for the given tool output names.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>,
-     *      java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
+     *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getQaOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
@@ -1328,8 +1306,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     /**
      * Get the tool output for the given tool output name.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String,
-     *      java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
+     *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getQaOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
@@ -1361,12 +1339,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it
-     * the <code>Ticket</code> to login and access the Content Repository.
+     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
+     * access the Content Repository.
      * 
-     * A valid ticket is needed in order to access the content from the
-     * repository. This method would be called evertime the tool needs to
-     * upload/download files from the content repository.
+     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
+     * the tool needs to upload/download files from the content repository.
      * 
      * @return ITicket The ticket for repostory access
      * @throws SubmitFilesException
@@ -1386,8 +1363,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * This method deletes the content with the given <code>uuid</code> and
-     * <code>versionID</code> from the content repository
+     * This method deletes the content with the given <code>uuid</code> and <code>versionID</code> from the content
+     * repository
      * 
      * @param uuid
      *                The <code>uuid</code> of the node to be deleted
@@ -1708,8 +1685,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * Set the description, throws away the title value as this is not supported
-     * in 2.0
+     * Set the description, throws away the title value as this is not supported in 2.0
      */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
@@ -1793,7 +1769,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		}
 	    }
 	} while (uniqueNumber == null);
-	return getQaOutputFactory().buildConditionName(uniqueNumber);
+	return getQaOutputFactory().buildUserAnswersConditionName(uniqueNumber);
     }
 
     public void deleteCondition(QaCondition condition) {
@@ -1803,7 +1779,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     public QaCondition createDefaultComplexCondition(QaContent qaContent) {
-	return getQaOutputFactory().createDefaultComplexCondition(qaContent);
+	return getQaOutputFactory().createDefaultComplexUserAnswersCondition(qaContent);
     }
 
     /**
@@ -1835,8 +1811,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * Saves the entire set of QaWizardCategories (including the child cognitive
-     * skills and questions)
+     * Saves the entire set of QaWizardCategories (including the child cognitive skills and questions)
      * 
      * @param categories
      */

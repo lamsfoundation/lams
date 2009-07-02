@@ -44,19 +44,22 @@ public class VideoRecorderOutputFactory extends OutputFactory {
      * {@inheritDoc}
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	
-	ToolOutputDefinition numberOfRecordingsDefinition = buildRangeDefinition(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, new Long(0), null);
+
+	ToolOutputDefinition numberOfRecordingsDefinition = buildRangeDefinition(
+		VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, new Long(0), null);
 	definitionMap.put(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, numberOfRecordingsDefinition);
-	
-	ToolOutputDefinition numberOfCommentsDefinition = buildRangeDefinition(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, new Long(0), null);
+
+	ToolOutputDefinition numberOfCommentsDefinition = buildRangeDefinition(
+		VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, new Long(0), null);
 	definitionMap.put(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, numberOfCommentsDefinition);
 
-	ToolOutputDefinition numberOfRatingsDefinition = buildRangeDefinition(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, new Long(0), null);
+	ToolOutputDefinition numberOfRatingsDefinition = buildRangeDefinition(
+		VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, new Long(0), null);
 	definitionMap.put(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, numberOfRatingsDefinition);
-	
+
 	return definitionMap;
     }
 
@@ -68,51 +71,55 @@ public class VideoRecorderOutputFactory extends OutputFactory {
 	    Long toolSessionId, Long learnerId) {
 
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
-	
+
 	if (names == null || names.contains(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME)) {
-	    outputs.put(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, getNbRecordings(videoRecorderService, learnerId, toolSessionId));
+	    outputs.put(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, getNbRecordings(videoRecorderService,
+		    learnerId, toolSessionId));
 	}
 
 	if (names == null || names.contains(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME)) {
-	    outputs.put(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, getNbComments(videoRecorderService, learnerId, toolSessionId));
+	    outputs.put(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, getNbComments(videoRecorderService,
+		    learnerId, toolSessionId));
 	}
 
 	if (names == null || names.contains(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME)) {
-	    outputs.put(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, getNbRatings(videoRecorderService, learnerId, toolSessionId));
+	    outputs.put(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, getNbRatings(videoRecorderService,
+		    learnerId, toolSessionId));
 	}
-	
+
 	return outputs;
 
     }
 
-    public ToolOutput getToolOutput(String name, IVideoRecorderService videoRecorderService, Long toolSessionId, Long learnerId) {
-    ToolOutput toolOutput = null;
-    if (name != null && name.equals(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME)) {
+    public ToolOutput getToolOutput(String name, IVideoRecorderService videoRecorderService, Long toolSessionId,
+	    Long learnerId) {
+	ToolOutput toolOutput = null;
+	if (name != null && name.equals(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME)) {
 	    toolOutput = getNbRecordings(videoRecorderService, learnerId, toolSessionId);
-	}else if (name != null && name.equals(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME)) {
+	} else if (name != null && name.equals(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME)) {
 	    toolOutput = getNbComments(videoRecorderService, learnerId, toolSessionId);
-	}else if (name != null && name.equals(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME)) {
+	} else if (name != null && name.equals(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME)) {
 	    toolOutput = getNbRatings(videoRecorderService, learnerId, toolSessionId);
 	}
-	
+
 	return toolOutput;
     }
-    
+
     private ToolOutput getNbRecordings(IVideoRecorderService videoRecorderService, Long learnerId, Long toolSessionId) {
-    	Long nb = videoRecorderService.getNbRecordings(learnerId, toolSessionId);
-    	return new ToolOutput(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, getI18NText(
-    		VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, true), new Long(nb));
+	Long nb = videoRecorderService.getNbRecordings(learnerId, toolSessionId);
+	return new ToolOutput(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, getI18NText(
+		VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, true), new Long(nb));
     }
-    
+
     private ToolOutput getNbComments(IVideoRecorderService videoRecorderService, Long learnerId, Long toolSessionId) {
-    	Long nb = videoRecorderService.getNbComments(learnerId, toolSessionId);
-    	return new ToolOutput(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, getI18NText(
-    		VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, true), new Long(nb));
+	Long nb = videoRecorderService.getNbComments(learnerId, toolSessionId);
+	return new ToolOutput(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, getI18NText(
+		VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME, true), new Long(nb));
     }
-    
+
     private ToolOutput getNbRatings(IVideoRecorderService videoRecorderService, Long learnerId, Long toolSessionId) {
-    	Long nb = videoRecorderService.getNbRatings(learnerId, toolSessionId);
-    	return new ToolOutput(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, getI18NText(
-    		VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, true), new Long(nb));
+	Long nb = videoRecorderService.getNbRatings(learnerId, toolSessionId);
+	return new ToolOutput(VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, getI18NText(
+		VideoRecorderConstants.NB_RATINGS_DEFINITION_NAME, true), new Long(nb));
     }
 }

@@ -209,7 +209,7 @@ public interface ILamsCoreToolService {
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      * @throws ToolException
      */
-    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId)
+    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId, int definitionType)
 	    throws ToolException;
 
     /**

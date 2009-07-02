@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.videoRecorder.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -48,7 +47,6 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -107,15 +105,15 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     private IVideoRecorderDAO videoRecorderDAO = null;
 
     private IVideoRecorderSessionDAO videoRecorderSessionDAO = null;
-    
+
     private IVideoRecorderRecordingDAO videoRecorderRecordingDAO = null;
 
     private IVideoRecorderUserDAO videoRecorderUserDAO = null;
 
     private IVideoRecorderAttachmentDAO videoRecorderAttachmentDAO = null;
-    
+
     private IVideoRecorderRatingDAO videoRecorderRatingDAO = null;
-    
+
     private IVideoRecorderCommentDAO videoRecorderCommentDAO = null;
 
     private ILearnerService learnerService;
@@ -135,7 +133,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     private VideoRecorderOutputFactory videoRecorderOutputFactory;
 
     private Random generator = new Random();
-    
+
     private MessageService messageService;
 
     public VideoRecorderService() {
@@ -146,15 +144,15 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     /* ************ Methods from ToolSessionManager ************* */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (VideoRecorderService.logger.isDebugEnabled()) {
-	    VideoRecorderService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
-		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	    VideoRecorderService.logger.debug("entering method createToolSession:" + " toolSessionId = "
+		    + toolSessionId + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	VideoRecorderSession session = new VideoRecorderSession();
 	session.setSessionId(toolSessionId);
 	session.setSessionName(toolSessionName);
 	session.setContentFolderId(FileUtil.generateUniqueContentFolderID());
-	
+
 	// learner starts
 	// TODO need to also set other fields.
 	VideoRecorder videoRecorder = videoRecorderDAO.getByContentId(toolContentId);
@@ -220,24 +218,23 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	if (fromContentId != null) {
 	    fromContent = videoRecorderDAO.getByContentId(fromContentId);
 	}
-	
+
 	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(fromContentId);
-	
+
 	VideoRecorderRecording vrr;
-	if(!list.isEmpty()){
-		vrr = list.get(0);
-		VideoRecorderRecording clonedRecording = new VideoRecorderRecording(vrr);
-		clonedRecording.setUid(null);
-		clonedRecording.setToolContentId(toContentId);
-		videoRecorderRecordingDAO.saveOrUpdate(clonedRecording);
+	if (!list.isEmpty()) {
+	    vrr = list.get(0);
+	    VideoRecorderRecording clonedRecording = new VideoRecorderRecording(vrr);
+	    clonedRecording.setUid(null);
+	    clonedRecording.setToolContentId(toContentId);
+	    videoRecorderRecordingDAO.saveOrUpdate(clonedRecording);
 	}
-	
+
 	if (fromContent == null) {
 	    // create the fromContent using the default tool content
 	    fromContent = getDefaultContent();
 	}
-	
-	
+
 	VideoRecorder toContent = VideoRecorder.newInstance(fromContent, toContentId, videoRecorderToolContentHandler);
 	videoRecorderDAO.saveOrUpdate(toContent);
     }
@@ -289,19 +286,20 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	videoRecorder.setToolContentId(null);
 	videoRecorder.setToolContentHandler(null);
 	videoRecorder.setVideoRecorderSessions(null);
-	
-	VideoRecorderRecording authorRecording = (VideoRecorderRecording)getFirstRecordingByToolContentId(toolContentId).clone();
-	if(authorRecording != null) {
-		authorRecording = (VideoRecorderRecording) authorRecording.clone();
-	
-		authorRecording.setToolContentId(null);
-		authorRecording.setComments(null);
-		authorRecording.setRatings(null);
-	
+
+	VideoRecorderRecording authorRecording = (VideoRecorderRecording) getFirstRecordingByToolContentId(
+		toolContentId).clone();
+	if (authorRecording != null) {
+	    authorRecording = (VideoRecorderRecording) authorRecording.clone();
+
+	    authorRecording.setToolContentId(null);
+	    authorRecording.setComments(null);
+	    authorRecording.setRatings(null);
+
 	}
-	
+
 	videoRecorder.setAuthorRecording(authorRecording);
-	
+
 	Set<VideoRecorderAttachment> atts = videoRecorder.getVideoRecorderAttachments();
 	for (VideoRecorderAttachment att : atts) {
 	    att.setVideoRecorder(null);
@@ -309,7 +307,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	try {
 	    exportContentService.registerFileClassForExport(VideoRecorderAttachment.class.getName(), "fileUuid",
 		    "fileVersionId");
-	    exportContentService.exportToolContent(toolContentId, videoRecorder, videoRecorderToolContentHandler, rootPath);
+	    exportContentService.exportToolContent(toolContentId, videoRecorder, videoRecorderToolContentHandler,
+		    rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
 	}
@@ -330,24 +329,24 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, videoRecorderToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof VideoRecorder)) {
-		throw new ImportToolContentException("Import VideoRecorder tool content failed. Deserialized object is "
-			+ toolPOJO);
+		throw new ImportToolContentException(
+			"Import VideoRecorder tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    VideoRecorder videoRecorder = (VideoRecorder) toolPOJO;
-	    
+
 	    VideoRecorderRecording recording = videoRecorder.getAuthorRecording();
-	    
+
 	    // reset it to new toolContentId
 	    videoRecorder.setToolContentId(toolContentId);
-	    
-	    if(recording != null) {
-	    	videoRecorder.getAuthorRecording().setToolContentId(toolContentId);
+
+	    if (recording != null) {
+		videoRecorder.getAuthorRecording().setToolContentId(toolContentId);
 	    }
-	    
+
 	    videoRecorderDAO.saveOrUpdate(videoRecorder);
-	    
-	    if(recording != null){
-	    	videoRecorderRecordingDAO.saveOrUpdate(recording);
+
+	    if (recording != null) {
+		videoRecorderRecordingDAO.saveOrUpdate(recording);
 	    }
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
@@ -362,12 +361,13 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	VideoRecorder videoRecorder = getVideoRecorderDAO().getByContentId(toolContentId);
 	if (videoRecorder == null) {
 	    videoRecorder = getDefaultContent();
 	}
-	return getVideoRecorderOutputFactory().getToolOutputDefinitions(videoRecorder);
+	return getVideoRecorderOutputFactory().getToolOutputDefinitions(videoRecorder, definitionType);
     }
 
     /* ********** IVideoRecorderService Methods ********************************* */
@@ -404,7 +404,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    throw new VideoRecorderException(error);
 	}
 	if (defaultContent.getConditions().isEmpty()) {
-		// needed?
+	    // needed?
 	}
 	return defaultContent;
     }
@@ -436,7 +436,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public VideoRecorderSession getSessionBySessionId(Long toolSessionId) {
 	VideoRecorderSession videoRecorderSession = videoRecorderSessionDAO.getBySessionId(toolSessionId);
 	if (videoRecorderSession == null) {
-	    VideoRecorderService.logger.debug("Could not find the videoRecorder session with toolSessionID:" + toolSessionId);
+	    VideoRecorderService.logger.debug("Could not find the videoRecorder session with toolSessionID:"
+		    + toolSessionId);
 	}
 	return videoRecorderSession;
     }
@@ -452,70 +453,71 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public VideoRecorderUser getUserByUID(Long uid) {
 	return videoRecorderUserDAO.getByUID(uid);
     }
-    
-    public VideoRecorderRecording getRecordingById(Long recordingId){
+
+    public VideoRecorderRecording getRecordingById(Long recordingId) {
 	return videoRecorderRecordingDAO.getRecordingById(recordingId);
     }
-    
-    public void deleteVideoRecorderRecording(VideoRecorderRecording videoRecorderRecording){
+
+    public void deleteVideoRecorderRecording(VideoRecorderRecording videoRecorderRecording) {
 	videoRecorderRecordingDAO.delete(videoRecorderRecording);
 	return;
     }
 
-    public VideoRecorderRating getRatingById(Long ratingId){
+    public VideoRecorderRating getRatingById(Long ratingId) {
 	return videoRecorderRatingDAO.getRatingById(ratingId);
     }
-    
-    public VideoRecorderComment getCommentById(Long commentId){
+
+    public VideoRecorderComment getCommentById(Long commentId) {
 	return videoRecorderCommentDAO.getCommentById(commentId);
     }
-    
-    public Set<VideoRecorderRating> getRatingsByUserId(Long userId){
+
+    public Set<VideoRecorderRating> getRatingsByUserId(Long userId) {
 	return videoRecorderRatingDAO.getRatingsByUserId(userId);
     }
-    
-    public Set<VideoRecorderRatingDTO> getRatingsByToolSessionId(Long toolSessionId){
-    Set<VideoRecorderRating> list = videoRecorderRatingDAO.getRatingsByToolSessionId(toolSessionId);
-    return VideoRecorderRatingDTO.getVideoRecorderRatingDTOs(list);
+
+    public Set<VideoRecorderRatingDTO> getRatingsByToolSessionId(Long toolSessionId) {
+	Set<VideoRecorderRating> list = videoRecorderRatingDAO.getRatingsByToolSessionId(toolSessionId);
+	return VideoRecorderRatingDTO.getVideoRecorderRatingDTOs(list);
     }
-    
-    public Set<VideoRecorderComment> getCommentsByUserId(Long userId){
+
+    public Set<VideoRecorderComment> getCommentsByUserId(Long userId) {
 	return videoRecorderCommentDAO.getCommentsByUserId(userId);
     }
-    
-    public Set<VideoRecorderCommentDTO> getCommentsByToolSessionId(Long toolSessionId){
-    Set<VideoRecorderComment> list = videoRecorderCommentDAO.getCommentsByToolSessionId(toolSessionId);
-    return VideoRecorderCommentDTO.getVideoRecorderCommentDTOs(list);
+
+    public Set<VideoRecorderCommentDTO> getCommentsByToolSessionId(Long toolSessionId) {
+	Set<VideoRecorderComment> list = videoRecorderCommentDAO.getCommentsByToolSessionId(toolSessionId);
+	return VideoRecorderCommentDTO.getVideoRecorderCommentDTOs(list);
     }
-    
-    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionId(Long toolSessionId, Long toolContentId){
-    	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolSessionId(toolSessionId);
-    	list.addAll(videoRecorderRecordingDAO.getByToolContentId(toolContentId));
-    	
-    	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
+
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionId(Long toolSessionId, Long toolContentId) {
+	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolSessionId(toolSessionId);
+	list.addAll(videoRecorderRecordingDAO.getByToolContentId(toolContentId));
+
+	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
-    
-    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserId(Long toolSessionId, Long userId, Long toolContentId){
-    	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getBySessionAndUserIds(toolSessionId, userId);
-    	list.addAll(videoRecorderRecordingDAO.getByToolContentId(toolContentId));
-    	
-    	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
+
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolSessionIdAndUserId(Long toolSessionId, Long userId,
+	    Long toolContentId) {
+	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getBySessionAndUserIds(toolSessionId, userId);
+	list.addAll(videoRecorderRecordingDAO.getByToolContentId(toolContentId));
+
+	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
-    
-    public List<VideoRecorderRecordingDTO> getRecordingsByToolContentId(Long toolContentId){
-    	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(toolContentId);
-    	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
+
+    public List<VideoRecorderRecordingDTO> getRecordingsByToolContentId(Long toolContentId) {
+	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(toolContentId);
+	return VideoRecorderRecordingDTO.getVideoRecorderRecordingDTOs(list);
     }
-    
-    public VideoRecorderRecording getFirstRecordingByToolContentId(Long toolContentId){
-    	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(toolContentId);
-    	if(!list.isEmpty()){
-    		return list.get(0);
-    	}else{
-    		return null;
-    	}
+
+    public VideoRecorderRecording getFirstRecordingByToolContentId(Long toolContentId) {
+	List<VideoRecorderRecording> list = videoRecorderRecordingDAO.getByToolContentId(toolContentId);
+	if (!list.isEmpty()) {
+	    return list.get(0);
+	} else {
+	    return null;
+	}
     }
-    
+
     public VideoRecorderAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
 	if (file == null || StringUtils.isEmpty(file.getFileName())) {
 	    throw new VideoRecorderException("Could not find upload file: " + file);
@@ -523,8 +525,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 
 	NodeKey nodeKey = processFile(file, type);
 
-	VideoRecorderAttachment attachment = new VideoRecorderAttachment(nodeKey.getVersion(), type, file.getFileName(), nodeKey
-		.getUuid(), new Date());
+	VideoRecorderAttachment attachment = new VideoRecorderAttachment(nodeKey.getVersion(), type,
+		file.getFileName(), nodeKey.getUuid(), new Date());
 	return attachment;
     }
 
@@ -553,19 +555,19 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public void saveOrUpdateVideoRecorderUser(VideoRecorderUser videoRecorderUser) {
 	videoRecorderUserDAO.saveOrUpdate(videoRecorderUser);
     }
-    
-    public void saveOrUpdateVideoRecorderRecording(VideoRecorderRecording videoRecorderRecording){
-    videoRecorderRecordingDAO.saveOrUpdate(videoRecorderRecording);
+
+    public void saveOrUpdateVideoRecorderRecording(VideoRecorderRecording videoRecorderRecording) {
+	videoRecorderRecordingDAO.saveOrUpdate(videoRecorderRecording);
     }
 
-    public void saveOrUpdateVideoRecorderComment(VideoRecorderComment videoRecorderComment){
-        videoRecorderCommentDAO.saveOrUpdate(videoRecorderComment);
+    public void saveOrUpdateVideoRecorderComment(VideoRecorderComment videoRecorderComment) {
+	videoRecorderCommentDAO.saveOrUpdate(videoRecorderComment);
     }
-    
-    public void saveOrUpdateVideoRecorderRating(VideoRecorderRating videoRecorderRating){
-        videoRecorderRatingDAO.saveOrUpdate(videoRecorderRating);
+
+    public void saveOrUpdateVideoRecorderRating(VideoRecorderRating videoRecorderRating) {
+	videoRecorderRatingDAO.saveOrUpdate(videoRecorderRating);
     }
-    
+
     public VideoRecorderUser createVideoRecorderUser(UserDTO user, VideoRecorderSession videoRecorderSession) {
 	VideoRecorderUser videoRecorderUser = new VideoRecorderUser(user, videoRecorderSession);
 	saveOrUpdateVideoRecorderUser(videoRecorderUser);
@@ -617,7 +619,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	ICredentials credentials = new SimpleCredentials(VideoRecorderToolContentHandler.repositoryUser,
 		VideoRecorderToolContentHandler.repositoryId);
 	try {
-	    ITicket ticket = repositoryService.login(credentials, VideoRecorderToolContentHandler.repositoryWorkspaceName);
+	    ITicket ticket = repositoryService.login(credentials,
+		    VideoRecorderToolContentHandler.repositoryWorkspaceName);
 	    return ticket;
 	} catch (AccessDeniedException ae) {
 	    throw new VideoRecorderException("Access Denied to repository." + ae.getMessage());
@@ -710,9 +713,9 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     }
 
     public void setVideoRecorderRecordingDAO(IVideoRecorderRecordingDAO videoRecorderRecordingDAO) {
-    this.videoRecorderRecordingDAO = videoRecorderRecordingDAO;
+	this.videoRecorderRecordingDAO = videoRecorderRecordingDAO;
     }
-        
+
     public ILamsToolService getToolService() {
 	return toolService;
     }
@@ -728,15 +731,15 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public void setVideoRecorderUserDAO(IVideoRecorderUserDAO userDAO) {
 	videoRecorderUserDAO = userDAO;
     }
-    
-	public void setMessageService(MessageService messageService) {
-		this.messageService = messageService;
-	}
-	
-	public MessageService getMessageService() {
-		return messageService;
-	}
-	
+
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    public MessageService getMessageService() {
+	return messageService;
+    }
+
     public IVideoRecorderCommentDAO getVideoRecorderCommentDAO() {
 	return videoRecorderCommentDAO;
     }
@@ -744,7 +747,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public void setVideoRecorderCommentDAO(IVideoRecorderCommentDAO commentDAO) {
 	videoRecorderCommentDAO = commentDAO;
     }
-    
+
     public IVideoRecorderRatingDAO getVideoRecorderRatingDAO() {
 	return videoRecorderRatingDAO;
     }
@@ -786,11 +789,11 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     }
 
     public IRepositoryService getRepositoryService() {
-        return repositoryService;
+	return repositoryService;
     }
 
     public void setRepositoryService(IRepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
+	this.repositoryService = repositoryService;
     }
 
     public void releaseConditionsFromCache(VideoRecorder videoRecorder) {
@@ -806,154 +809,156 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    videoRecorderDAO.delete(condition);
 	}
     }
-    
+
     public Long getNbRecordings(Long userID, Long sessionId) {
-    	return videoRecorderRecordingDAO.getNbRecordings(userID, sessionId);
+	return videoRecorderRecordingDAO.getNbRecordings(userID, sessionId);
     }
-    
+
     public Long getNbComments(Long userID, Long sessionId) {
-    	return videoRecorderCommentDAO.getNbComments(userID, sessionId);
+	return videoRecorderCommentDAO.getNbComments(userID, sessionId);
     }
 
     public Long getNbRatings(Long userID, Long sessionId) {
-    	return videoRecorderRatingDAO.getNbRatings(userID, sessionId);
-    }    
-    
-    public boolean isGroupedActivity(long toolContentID) {
-    	return toolService.isGroupedActivity(toolContentID);
+	return videoRecorderRatingDAO.getNbRatings(userID, sessionId);
     }
 
-	/**
-	 * @return String of xml with all needed language elements
-	 */ 
-	public String getLanguageXML(){
-		ArrayList<String> languageCollection = new ArrayList<String>();		
-		languageCollection.add(new String("button.ok"));
-		languageCollection.add(new String("button.save"));
-		languageCollection.add(new String("button.cancel"));
-		languageCollection.add(new String("button.yes"));
-		languageCollection.add(new String("button.no"));
-		languageCollection.add(new String("videorecorder.stop.recording"));
-		languageCollection.add(new String("videorecorder.start.recording"));
-		languageCollection.add(new String("videorecorder.stop.camera"));
-		languageCollection.add(new String("videorecorder.view.camera"));
-		languageCollection.add(new String("videorecorder.author"));
-		languageCollection.add(new String("videorecorder.description"));
-		languageCollection.add(new String("videorecorder.title"));
-		languageCollection.add(new String("videorecorder.new.recording.details"));
-		languageCollection.add(new String("videorecorder.comment"));
-		languageCollection.add(new String("videorecorder.date"));
-		languageCollection.add(new String("videorecorder.rating"));
-		languageCollection.add(new String("videorecorder.play"));
-		languageCollection.add(new String("videorecorder.stop"));
-		languageCollection.add(new String("videorecorder.pause"));
-		languageCollection.add(new String("videorecorder.resume"));
-		languageCollection.add(new String("videorecorder.video.information"));
-		languageCollection.add(new String("videorecorder.sort.by"));
-		languageCollection.add(new String("videorecorder.recording.controls"));
-		languageCollection.add(new String("videorecorder.videos"));
-		languageCollection.add(new String("videorecorder.add.comment"));
-		languageCollection.add(new String("videorecorder.video"));
-		languageCollection.add(new String("videorecorder.export.video"));
-		languageCollection.add(new String("videorecorder.delete.video"));
-		languageCollection.add(new String("videorecorder.enter.something.here"));
-		languageCollection.add(new String("videorecorder.message.sure.delete"));
-		languageCollection.add(new String("videorecorder.confirm"));
-		languageCollection.add(new String("videorecorder.update"));
-		languageCollection.add(new String("videorecorder.refresh"));
-		languageCollection.add(new String("videorecorder.web.application.not.available"));
-		languageCollection.add(new String("videorecorder.net.connection.not.connected"));
-		languageCollection.add(new String("videorecorder.net.connection.closed"));
-		languageCollection.add(new String("videorecorder.playing"));
-		languageCollection.add(new String("videorecorder.ready"));
-		languageCollection.add(new String("videorecorder.paused"));
-		languageCollection.add(new String("videorecorder.recording"));
-		languageCollection.add(new String("videorecorder.buffering"));
-		languageCollection.add(new String("videorecorder.waiting"));
-		languageCollection.add(new String("videorecorder.tooltip.sort.author"));
-		languageCollection.add(new String("videorecorder.tooltip.sort.title"));
-		languageCollection.add(new String("videorecorder.tooltip.sort.date"));
-		languageCollection.add(new String("videorecorder.tooltip.play"));
-		languageCollection.add(new String("videorecorder.tooltip.pause"));
-		languageCollection.add(new String("videorecorder.tooltip.resume"));
-		languageCollection.add(new String("videorecorder.tooltip.start.camera"));
-		languageCollection.add(new String("videorecorder.tooltip.stop.camera"));
-		languageCollection.add(new String("videorecorder.tooltip.add.comment"));
-		languageCollection.add(new String("videorecorder.tooltip.add.rating"));
-		languageCollection.add(new String("videorecorder.tooltip.refresh"));
-		languageCollection.add(new String("videorecorder.tooltip.save.recording"));
-		languageCollection.add(new String("videorecorder.tooltip.save.comment"));
-		languageCollection.add(new String("videorecorder.tooltip.cancel.comment"));
-		languageCollection.add(new String("videorecorder.tooltip.start.recording"));
-		languageCollection.add(new String("videorecorder.tooltip.stop.recording"));
-		languageCollection.add(new String("videorecorder.tooltip.delete.recording"));
-		languageCollection.add(new String("videorecorder.tooltip.export.recording"));
-		languageCollection.add(new String("videorecorder.tooltip.click.to.ready.recording"));
-		languageCollection.add(new String("videorecorder.tooltip.rate.recording"));
-		languageCollection.add(new String("videorecorder.tooltip.already.rated"));
-		languageCollection.add(new String("videorecorder.disabled"));
-		languageCollection.add(new String("videorecorder.camera.not.available"));
-		languageCollection.add(new String("videorecorder.mic.not.available"));
-		
-		String languageOutput = "<xml><language>";
-		
-		for(int i = 0; i < languageCollection.size(); i++){
-			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
-		}
-		
-		languageOutput += "</language></xml>";
-		
-		return languageOutput;
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
+
+    /**
+     * @return String of xml with all needed language elements
+     */
+    public String getLanguageXML() {
+	ArrayList<String> languageCollection = new ArrayList<String>();
+	languageCollection.add(new String("button.ok"));
+	languageCollection.add(new String("button.save"));
+	languageCollection.add(new String("button.cancel"));
+	languageCollection.add(new String("button.yes"));
+	languageCollection.add(new String("button.no"));
+	languageCollection.add(new String("videorecorder.stop.recording"));
+	languageCollection.add(new String("videorecorder.start.recording"));
+	languageCollection.add(new String("videorecorder.stop.camera"));
+	languageCollection.add(new String("videorecorder.view.camera"));
+	languageCollection.add(new String("videorecorder.author"));
+	languageCollection.add(new String("videorecorder.description"));
+	languageCollection.add(new String("videorecorder.title"));
+	languageCollection.add(new String("videorecorder.new.recording.details"));
+	languageCollection.add(new String("videorecorder.comment"));
+	languageCollection.add(new String("videorecorder.date"));
+	languageCollection.add(new String("videorecorder.rating"));
+	languageCollection.add(new String("videorecorder.play"));
+	languageCollection.add(new String("videorecorder.stop"));
+	languageCollection.add(new String("videorecorder.pause"));
+	languageCollection.add(new String("videorecorder.resume"));
+	languageCollection.add(new String("videorecorder.video.information"));
+	languageCollection.add(new String("videorecorder.sort.by"));
+	languageCollection.add(new String("videorecorder.recording.controls"));
+	languageCollection.add(new String("videorecorder.videos"));
+	languageCollection.add(new String("videorecorder.add.comment"));
+	languageCollection.add(new String("videorecorder.video"));
+	languageCollection.add(new String("videorecorder.export.video"));
+	languageCollection.add(new String("videorecorder.delete.video"));
+	languageCollection.add(new String("videorecorder.enter.something.here"));
+	languageCollection.add(new String("videorecorder.message.sure.delete"));
+	languageCollection.add(new String("videorecorder.confirm"));
+	languageCollection.add(new String("videorecorder.update"));
+	languageCollection.add(new String("videorecorder.refresh"));
+	languageCollection.add(new String("videorecorder.web.application.not.available"));
+	languageCollection.add(new String("videorecorder.net.connection.not.connected"));
+	languageCollection.add(new String("videorecorder.net.connection.closed"));
+	languageCollection.add(new String("videorecorder.playing"));
+	languageCollection.add(new String("videorecorder.ready"));
+	languageCollection.add(new String("videorecorder.paused"));
+	languageCollection.add(new String("videorecorder.recording"));
+	languageCollection.add(new String("videorecorder.buffering"));
+	languageCollection.add(new String("videorecorder.waiting"));
+	languageCollection.add(new String("videorecorder.tooltip.sort.author"));
+	languageCollection.add(new String("videorecorder.tooltip.sort.title"));
+	languageCollection.add(new String("videorecorder.tooltip.sort.date"));
+	languageCollection.add(new String("videorecorder.tooltip.play"));
+	languageCollection.add(new String("videorecorder.tooltip.pause"));
+	languageCollection.add(new String("videorecorder.tooltip.resume"));
+	languageCollection.add(new String("videorecorder.tooltip.start.camera"));
+	languageCollection.add(new String("videorecorder.tooltip.stop.camera"));
+	languageCollection.add(new String("videorecorder.tooltip.add.comment"));
+	languageCollection.add(new String("videorecorder.tooltip.add.rating"));
+	languageCollection.add(new String("videorecorder.tooltip.refresh"));
+	languageCollection.add(new String("videorecorder.tooltip.save.recording"));
+	languageCollection.add(new String("videorecorder.tooltip.save.comment"));
+	languageCollection.add(new String("videorecorder.tooltip.cancel.comment"));
+	languageCollection.add(new String("videorecorder.tooltip.start.recording"));
+	languageCollection.add(new String("videorecorder.tooltip.stop.recording"));
+	languageCollection.add(new String("videorecorder.tooltip.delete.recording"));
+	languageCollection.add(new String("videorecorder.tooltip.export.recording"));
+	languageCollection.add(new String("videorecorder.tooltip.click.to.ready.recording"));
+	languageCollection.add(new String("videorecorder.tooltip.rate.recording"));
+	languageCollection.add(new String("videorecorder.tooltip.already.rated"));
+	languageCollection.add(new String("videorecorder.disabled"));
+	languageCollection.add(new String("videorecorder.camera.not.available"));
+	languageCollection.add(new String("videorecorder.mic.not.available"));
+
+	String languageOutput = "<xml><language>";
+
+	for (int i = 0; i < languageCollection.size(); i++) {
+	    languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>"
+		    + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
 	}
-	
-	public String getLanguageXMLForFCK(){
-		ArrayList<String> languageCollection = new ArrayList<String>();
-		languageCollection.add(new String("button.ok"));
-		languageCollection.add(new String("button.save"));
-		languageCollection.add(new String("button.cancel"));
-		languageCollection.add(new String("button.yes"));
-		languageCollection.add(new String("button.no"));
-		languageCollection.add(new String("videorecorder.video.player"));
-		languageCollection.add(new String("videorecorder.video.recorder"));
-		languageCollection.add(new String("videorecorder.web.application.not.available"));
-		languageCollection.add(new String("videorecorder.net.connection.not.connected"));
-		languageCollection.add(new String("videorecorder.net.connection.closed"));
-		languageCollection.add(new String("videorecorder.playing"));
-		languageCollection.add(new String("videorecorder.ready"));
-		languageCollection.add(new String("videorecorder.paused"));
-		languageCollection.add(new String("videorecorder.recording"));
-		languageCollection.add(new String("videorecorder.buffering"));
-		languageCollection.add(new String("videorecorder.waiting"));
-		languageCollection.add(new String("videorecorder.description"));
-		languageCollection.add(new String("videorecorder.title"));
-		languageCollection.add(new String("videorecorder.new.recording.details"));
-		languageCollection.add(new String("videorecorder.recording.complete.authoring"));
-		languageCollection.add(new String("videorecorder.enter.something.here"));
-		languageCollection.add(new String("videorecorder.recording.complete.fck"));
-		languageCollection.add(new String("videorecorder.tooltip.play"));
-		languageCollection.add(new String("videorecorder.tooltip.pause"));
-		languageCollection.add(new String("videorecorder.tooltip.resume"));
-		languageCollection.add(new String("videorecorder.tooltip.save.recording"));
-		languageCollection.add(new String("videorecorder.tooltip.start.recording"));
-		languageCollection.add(new String("videorecorder.tooltip.start.recording.again"));
-		languageCollection.add(new String("videorecorder.tooltip.start.recording.next"));
-		languageCollection.add(new String("videorecorder.tooltip.stop.recording"));
-		languageCollection.add(new String("videorecorder.disabled"));
-		languageCollection.add(new String("videorecorder.camera.not.available"));
-		languageCollection.add(new String("videorecorder.mic.not.available"));
-		
-		String languageOutput = "<xml><language>";
-		
-		for(int i = 0; i < languageCollection.size(); i++){
-			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
-		}
-		
-		languageOutput += "</language></xml>";
-		
-		return languageOutput;
+
+	languageOutput += "</language></xml>";
+
+	return languageOutput;
+    }
+
+    public String getLanguageXMLForFCK() {
+	ArrayList<String> languageCollection = new ArrayList<String>();
+	languageCollection.add(new String("button.ok"));
+	languageCollection.add(new String("button.save"));
+	languageCollection.add(new String("button.cancel"));
+	languageCollection.add(new String("button.yes"));
+	languageCollection.add(new String("button.no"));
+	languageCollection.add(new String("videorecorder.video.player"));
+	languageCollection.add(new String("videorecorder.video.recorder"));
+	languageCollection.add(new String("videorecorder.web.application.not.available"));
+	languageCollection.add(new String("videorecorder.net.connection.not.connected"));
+	languageCollection.add(new String("videorecorder.net.connection.closed"));
+	languageCollection.add(new String("videorecorder.playing"));
+	languageCollection.add(new String("videorecorder.ready"));
+	languageCollection.add(new String("videorecorder.paused"));
+	languageCollection.add(new String("videorecorder.recording"));
+	languageCollection.add(new String("videorecorder.buffering"));
+	languageCollection.add(new String("videorecorder.waiting"));
+	languageCollection.add(new String("videorecorder.description"));
+	languageCollection.add(new String("videorecorder.title"));
+	languageCollection.add(new String("videorecorder.new.recording.details"));
+	languageCollection.add(new String("videorecorder.recording.complete.authoring"));
+	languageCollection.add(new String("videorecorder.enter.something.here"));
+	languageCollection.add(new String("videorecorder.recording.complete.fck"));
+	languageCollection.add(new String("videorecorder.tooltip.play"));
+	languageCollection.add(new String("videorecorder.tooltip.pause"));
+	languageCollection.add(new String("videorecorder.tooltip.resume"));
+	languageCollection.add(new String("videorecorder.tooltip.save.recording"));
+	languageCollection.add(new String("videorecorder.tooltip.start.recording"));
+	languageCollection.add(new String("videorecorder.tooltip.start.recording.again"));
+	languageCollection.add(new String("videorecorder.tooltip.start.recording.next"));
+	languageCollection.add(new String("videorecorder.tooltip.stop.recording"));
+	languageCollection.add(new String("videorecorder.disabled"));
+	languageCollection.add(new String("videorecorder.camera.not.available"));
+	languageCollection.add(new String("videorecorder.mic.not.available"));
+
+	String languageOutput = "<xml><language>";
+
+	for (int i = 0; i < languageCollection.size(); i++) {
+	    languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>"
+		    + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
 	}
-	
-	public String getMessage(String key){
-		return messageService.getMessage(key);
-	}
+
+	languageOutput += "</language></xml>";
+
+	return languageOutput;
+    }
+
+    public String getMessage(String key) {
+	return messageService.getMessage(key);
+    }
 }

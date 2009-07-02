@@ -42,7 +42,7 @@ public class MindmapOutputFactory extends OutputFactory {
     protected final static String OUTPUT_NAME_LEARNER_NUM_NODES = "number.of.nodes";
     
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();

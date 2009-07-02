@@ -35,8 +35,8 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.learningdesign.Competence;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
+import org.lamsfoundation.lams.learningdesign.DataTransition;
 import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -106,14 +107,8 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
  */
 public class ObjectExtractor implements IObjectExtractor {
 
-    private static final Integer DEFAULT_COORD = new Integer(10); // default
-    // coordinate
-    // used if
-    // the entry
-    // from
-    // Flash is
-    // 0 or
-    // less.
+    private static final Integer DEFAULT_COORD = new Integer(10); // default coordinate used if the entry from Flash
+    // is 0 or less.
 
     protected IBaseDAO baseDAO = null;
     protected ILearningDesignDAO learningDesignDAO = null;
@@ -862,13 +857,12 @@ public class ObjectExtractor implements IObjectExtractor {
     /**
      * This method extracts and saves the evaluation object for each activity.
      * 
-     * Here we would normally go through the tool activity evaluation list and
-     * check if there have been any added/removed. But since our current
-     * implementation only allows 1 tool output per activity to go to Gradebook,
-     * we only need to fetch the first.
+     * Here we would normally go through the tool activity evaluation list and check if there have been any
+     * added/removed. But since our current implementation only allows 1 tool output per activity to go to Gradebook, we
+     * only need to fetch the first.
      * 
-     * This implementation will need to be changed if we ever choose to allow
-     * more than one output per activity to go to Gradebook
+     * This implementation will need to be changed if we ever choose to allow more than one output per activity to go to
+     * Gradebook
      * 
      * @param activityDetails
      * @param toolActivity
@@ -881,13 +875,13 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	// Get the first (only) ActivityEvaluation if it exists
 	if (activityEvaluations != null && activityEvaluations.size() >= 1) {
-	    activityEvaluation = (ActivityEvaluation) activityEvaluations.iterator().next();
+	    activityEvaluation = activityEvaluations.iterator().next();
 	} else {
 	    activityEvaluation = new ActivityEvaluation();
 	}
 
 	if (keyExists(activityDetails, WDDXTAGS.TOOL_OUTPUT_DEFINITION)
-		&& WDDXProcessor.convertToString(activityDetails, WDDXTAGS.TOOL_OUTPUT_DEFINITION) != null 
+		&& WDDXProcessor.convertToString(activityDetails, WDDXTAGS.TOOL_OUTPUT_DEFINITION) != null
 		&& !WDDXProcessor.convertToString(activityDetails, WDDXTAGS.TOOL_OUTPUT_DEFINITION).equals("")) {
 	    activityEvaluations = new HashSet<ActivityEvaluation>();
 	    activityEvaluation.setActivity(toolActivity);
@@ -910,9 +904,8 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     /**
-     * Parses the list of activities sent from the WDDX packet for competence
-     * mappings. Each activity's new set of competenceMapping is compared
-     * against the old set and the db is updated accordingly
+     * Parses the list of activities sent from the WDDX packet for competence mappings. Each activity's new set of
+     * competenceMapping is compared against the old set and the db is updated accordingly
      * 
      * @param activitiesList
      *                The list of activities from the WDDX packet.
@@ -1558,11 +1551,18 @@ public class ObjectExtractor implements IObjectExtractor {
 	    throw new WDDXProcessorConversionException("Transition is missing its fromUUID " + transitionDetails);
 	}
 
+	Integer transitionType = WDDXProcessor.convertToInteger(transitionDetails, WDDXTAGS.TRANSITION_TYPE);
+
 	Transition transition = null;
-	Transition existingTransition = findTransition(transitionUUID, toUIID, fromUIID);
+	Transition existingTransition = findTransition(transitionUUID, toUIID, fromUIID, transitionType);
 
 	if (existingTransition == null) {
-	    transition = new Transition();
+	    if (false/* It will soon be implemented in Flash. Now we need to check what kind of transition are we dealing with
+			transitionType.equals(Transition.DATA_TRANSITION_TYPE) */) {
+		transition = new DataTransition();
+	    } else {
+		transition = new Transition();
+	    }
 	} else {
 	    transition = existingTransition;
 	}
@@ -1574,7 +1574,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	    transition.setToActivity(toActivity);
 	    transition.setToUIID(toUIID);
 	    // update the transitionTo property for the activity
-	    toActivity.setTransitionTo(transition);
+	    if (transition.isProgressTransition()) {
+		toActivity.setTransitionTo(transition);
+	    }
 	} else {
 	    transition.setToActivity(null);
 	    transition.setToUIID(null);
@@ -1585,7 +1587,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	    transition.setFromActivity(fromActivity);
 	    transition.setFromUIID(fromUIID);
 	    // update the transitionFrom property for the activity
-	    fromActivity.setTransitionFrom(transition);
+	    if (transition.isProgressTransition()) {
+		fromActivity.setTransitionFrom(transition);
+	    }
 	} else {
 	    transition.setFromActivity(null);
 	    transition.setFromUIID(null);
@@ -1632,17 +1636,19 @@ public class ObjectExtractor implements IObjectExtractor {
      * it between the same activities, then inserting a new one in the db will trigger a duplicate key exception. So we
      * need to reuse any that have the same to/from.
      */
-    private Transition findTransition(Integer transitionUUID, Integer toUIID, Integer fromUIID) {
+    private Transition findTransition(Integer transitionUUID, Integer toUIID, Integer fromUIID, Integer transitionType) {
 	Transition existingTransition = null;
 	Set transitions = learningDesign.getTransitions();
 	Iterator iter = transitions.iterator();
 	while (existingTransition == null && iter.hasNext()) {
 	    Transition element = (Transition) iter.next();
-	    if (transitionUUID != null && transitionUUID.equals(element.getTransitionUIID())) {
-		existingTransition = element;
-	    } else if (toUIID != null && toUIID.equals(element.getToUIID()) && fromUIID != null
-		    && fromUIID.equals(element.getFromUIID())) {
-		existingTransition = element;
+	    if (element.getTransitionType().equals(transitionType)) {
+		if (transitionUUID != null && transitionUUID.equals(element.getTransitionUIID())) {
+		    existingTransition = element;
+		} else if (toUIID != null && toUIID.equals(element.getToUIID()) && fromUIID != null
+			&& fromUIID.equals(element.getFromUIID())) {
+		    existingTransition = element;
+		}
 	    }
 	}
 	return existingTransition;

@@ -25,12 +25,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.DataFlowObject;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
@@ -43,61 +46,71 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**
  * 
- * <p> Keeps all operations needed for Learning mode. </p>
- *  
+ * <p>
+ * Keeps all operations needed for Learning mode.
+ * </p>
+ * 
  * @author Ozgur Demirtas
- *
+ * 
  */
 public class LearningUtil implements VoteAppConstants {
-	static Logger logger = Logger.getLogger(LearningUtil.class.getName());
-	
-	/** Build a map of the display ids -> nomination text. If checkedOptions != null then 
-	 * only include the display ids in the checkedOptions list.
-	 * 
-	 * @param request 
-	 * @param voteContent the content of the vote from the database
-	 * @param checkedOptions collection of String display IDs to which to restrict the map (optional)
-	 * @return Map of display id -> nomination text.
-	 */
-    public static Map buildQuestionContentMap(HttpServletRequest request, IVoteService voteService, 
-            VoteContent voteContent, Collection<String> checkedOptions)
-    {
-    	Map mapQuestionsContent= new TreeMap(new VoteComparator());
-    	
-        Iterator contentIterator=voteContent.getVoteQueContents().iterator();
-    	while (contentIterator.hasNext())
-    	{
-    		VoteQueContent voteQueContent=(VoteQueContent)contentIterator.next();
-    		if (voteQueContent != null)
-    		{
-    		    String displayOrder = (new Integer(voteQueContent.getDisplayOrder())).toString();
-        		if ( (checkedOptions==null || checkedOptions.contains(displayOrder)) && ! displayOrder.equals("0"))
-        		{
-        			/* add the question to the questions Map in the displayOrder*/
-        			mapQuestionsContent.put(displayOrder.toString(),voteQueContent.getQuestion());
-        		}
-    		}
-    	}
-    	return mapQuestionsContent;
+    static Logger logger = Logger.getLogger(LearningUtil.class.getName());
+
+    /**
+     * Build a map of the display ids -> nomination text. If checkedOptions != null then only include the display ids in
+     * the checkedOptions list.
+     * 
+     * @param request
+     * @param voteContent
+     *                the content of the vote from the database
+     * @param checkedOptions
+     *                collection of String display IDs to which to restrict the map (optional)
+     * @return Map of display id -> nomination text.
+     */
+    public static Map buildQuestionContentMap(HttpServletRequest request, IVoteService voteService,
+	    VoteContent voteContent, Collection<String> checkedOptions) {
+	Map mapQuestionsContent = new TreeMap(new VoteComparator());
+	Set<VoteQueContent> nominations = voteContent.getVoteQueContents();
+	if (Boolean.TRUE.equals(voteContent.getAssignedDataFlowObject())
+		&& (nominations == null || nominations.isEmpty())) {
+	    // If we are using tool input rather that previously defined nominations, we need to get this input now and
+	    // create questions. Once they are created, they will be not altered, no matter if another learner gets to
+	    // this point and the tool input changed
+	    createQuestionsFromToolInput(voteContent, voteService);
+	    nominations = voteContent.getVoteQueContents();
+	}
+
+	Iterator<VoteQueContent> contentIterator = nominations.iterator();
+	while (contentIterator.hasNext()) {
+	    VoteQueContent voteQueContent = contentIterator.next();
+	    if (voteQueContent != null) {
+		String displayOrder = (new Integer(voteQueContent.getDisplayOrder())).toString();
+		if ((checkedOptions == null || checkedOptions.contains(displayOrder)) && !displayOrder.equals("0")) {
+		    /* add the question to the questions Map in the displayOrder */
+		    mapQuestionsContent.put(displayOrder.toString(), voteQueContent.getQuestion());
+		}
+	    }
+	}
+
+	return mapQuestionsContent;
     }
 
-    
     /**
      * determines if a user is already in the tool's tables
+     * 
      * @param request
      * @return
      */
-    public static boolean doesUserExists(HttpServletRequest request, IVoteService voteService)
-	{
-		Long queUsrId=VoteUtils.getUserId();
-		VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(queUsrId);
-		
-		if (voteQueUsr != null)
-			return true;
-		
-		return false;
+    public static boolean doesUserExists(HttpServletRequest request, IVoteService voteService) {
+	Long queUsrId = VoteUtils.getUserId();
+	VoteQueUsr voteQueUsr = voteService.retrieveVoteQueUsr(queUsrId);
+
+	if (voteQueUsr != null) {
+	    return true;
 	}
 
+	return false;
+    }
 
     /**
      * creates a new user for the tool
@@ -105,32 +118,25 @@ public class LearningUtil implements VoteAppConstants {
      * @param request
      * @return
      */
-    public static VoteQueUsr createUser(HttpServletRequest request, IVoteService voteService, Long toolSessionID)
-	{
-        logger.debug("createUser: " + toolSessionID);
-        
-	    Long queUsrId=VoteUtils.getUserId();
-		String username=VoteUtils.getUserName();
-		String fullname=VoteUtils.getUserFullName();
-		VoteSession voteSession=voteService.retrieveVoteSession(toolSessionID);
-		VoteQueUsr voteQueUsr= new VoteQueUsr(queUsrId, 
-										username, 
-										fullname,  
-										voteSession, 
-										new TreeSet());		
-		voteService.createVoteQueUsr(voteQueUsr);
-		logger.debug("created voteQueUsr in the db: " + voteQueUsr);
-		return voteQueUsr;
-	}
+    public static VoteQueUsr createUser(HttpServletRequest request, IVoteService voteService, Long toolSessionID) {
+	LearningUtil.logger.debug("createUser: " + toolSessionID);
 
-    
-    public static VoteQueUsr getUser(HttpServletRequest request, IVoteService voteService)
-	{
-		Long queUsrId=VoteUtils.getUserId();
-		VoteQueUsr voteQueUsr=voteService.retrieveVoteQueUsr(queUsrId);
-		return voteQueUsr;
-	}
-    
+	Long queUsrId = VoteUtils.getUserId();
+	String username = VoteUtils.getUserName();
+	String fullname = VoteUtils.getUserFullName();
+	VoteSession voteSession = voteService.retrieveVoteSession(toolSessionID);
+	VoteQueUsr voteQueUsr = new VoteQueUsr(queUsrId, username, fullname, voteSession, new TreeSet());
+	voteService.createVoteQueUsr(voteQueUsr);
+	LearningUtil.logger.debug("created voteQueUsr in the db: " + voteQueUsr);
+	return voteQueUsr;
+    }
+
+    public static VoteQueUsr getUser(HttpServletRequest request, IVoteService voteService) {
+	Long queUsrId = VoteUtils.getUserId();
+	VoteQueUsr voteQueUsr = voteService.retrieveVoteQueUsr(queUsrId);
+	return voteQueUsr;
+    }
+
     /**
      * creates a new vote record in the database
      * 
@@ -141,197 +147,196 @@ public class LearningUtil implements VoteAppConstants {
      * @param singleUserEntry
      * @param voteSession
      */
-    public static void createAttempt(HttpServletRequest request, IVoteService voteService, 
-            VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,  
-            boolean singleUserEntry, VoteSession voteSession, Long toolContentUID)
-	{
-        logger.debug("doing voteSession: " + voteSession);
-        logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
-        logger.debug("userEntry: " + userEntry);
-        logger.debug("singleUserEntry: " + singleUserEntry);
-        
-		Date attempTime=VoteUtils.getGMTDateTime();
-		String timeZone= VoteUtils.getCurrentTimeZone();
-		logger.debug("timeZone: " + timeZone);
-		
-		logger.debug("toolContentUID: " + toolContentUID);
-		
-		
-		if ((mapGeneralCheckedOptionsContent.size() == 0))
-		{
-            logger.debug("mapGeneralCheckedOptionsContent is empty");
-            VoteQueContent localVoteQueContent=voteService.getToolDefaultQuestionContent(1);
-            logger.debug("localVoteQueContent: " + localVoteQueContent);
-            createIndividualOptions(request, voteService, localVoteQueContent, voteQueUsr, attempTime, 
-                    timeZone, userEntry, singleUserEntry, voteSession);
-		    
+    public static void createAttempt(HttpServletRequest request, IVoteService voteService, VoteQueUsr voteQueUsr,
+	    Map mapGeneralCheckedOptionsContent, String userEntry, boolean singleUserEntry, VoteSession voteSession,
+	    Long toolContentUID) {
+	LearningUtil.logger.debug("doing voteSession: " + voteSession);
+	LearningUtil.logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
+	LearningUtil.logger.debug("userEntry: " + userEntry);
+	LearningUtil.logger.debug("singleUserEntry: " + singleUserEntry);
+
+	Date attempTime = VoteUtils.getGMTDateTime();
+	String timeZone = VoteUtils.getCurrentTimeZone();
+	LearningUtil.logger.debug("timeZone: " + timeZone);
+
+	LearningUtil.logger.debug("toolContentUID: " + toolContentUID);
+
+	if (mapGeneralCheckedOptionsContent.size() == 0) {
+	    LearningUtil.logger.debug("mapGeneralCheckedOptionsContent is empty");
+	    VoteQueContent localVoteQueContent = voteService.getToolDefaultQuestionContent(1);
+	    LearningUtil.logger.debug("localVoteQueContent: " + localVoteQueContent);
+	    createIndividualOptions(request, voteService, localVoteQueContent, voteQueUsr, attempTime, timeZone,
+		    userEntry, singleUserEntry, voteSession);
+
+	} else {
+	    LearningUtil.logger.debug("mapGeneralCheckedOptionsContent is not empty");
+	    if (toolContentUID != null) {
+		Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
+		LearningUtil.logger.debug("iterating mapGeneralCheckedOptionsContent");
+		while (itCheckedMap.hasNext()) {
+		    Map.Entry checkedPairs = (Map.Entry) itCheckedMap.next();
+		    Long questionDisplayOrder = new Long(checkedPairs.getKey().toString());
+
+		    LearningUtil.logger.debug("questionDisplayOrder: " + questionDisplayOrder);
+
+		    VoteQueContent voteQueContent = voteService.getQuestionContentByDisplayOrder(questionDisplayOrder,
+			    toolContentUID);
+		    LearningUtil.logger.debug("voteQueContent: " + voteQueContent);
+		    if (voteQueContent != null) {
+			createIndividualOptions(request, voteService, voteQueContent, voteQueUsr, attempTime, timeZone,
+				userEntry, false, voteSession);
+		    }
 		}
-		else
-		{
-		    logger.debug("mapGeneralCheckedOptionsContent is not empty");
-			if (toolContentUID != null)
-			{
-				Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
-				logger.debug("iterating mapGeneralCheckedOptionsContent");
-		        while (itCheckedMap.hasNext()) 
-		        {
-		        	Map.Entry checkedPairs = (Map.Entry)itCheckedMap.next();
-		            Long questionDisplayOrder=new Long(checkedPairs.getKey().toString());
-		            
-		            logger.debug("questionDisplayOrder: " + questionDisplayOrder);
-		            
-		            VoteQueContent voteQueContent=voteService.getQuestionContentByDisplayOrder(questionDisplayOrder, toolContentUID);
-		            logger.debug("voteQueContent: " + voteQueContent);
-		            if (voteQueContent != null)
-		            {
-		                createIndividualOptions(request, voteService, voteQueContent, voteQueUsr, attempTime, timeZone, userEntry, false, voteSession);    
-		            }
-		        }			
-			}		    
+	    }
+	}
+
+    }
+
+    public static void createIndividualOptions(HttpServletRequest request, IVoteService voteService,
+	    VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry,
+	    boolean singleUserEntry, VoteSession voteSession) {
+	LearningUtil.logger.debug("doing voteSession: " + voteSession);
+	LearningUtil.logger.debug("userEntry: " + userEntry);
+	LearningUtil.logger.debug("singleUserEntry: " + singleUserEntry);
+
+	LearningUtil.logger.debug("voteQueContent: " + voteQueContent);
+	LearningUtil.logger.debug("user " + voteQueUsr.getQueUsrId());
+	LearningUtil.logger.debug("voteQueContent.getVoteContentId() " + voteQueContent.getVoteContentId());
+
+	if (voteQueContent != null) {
+	    VoteUsrAttempt existingVoteUsrAttempt = voteService.getAttemptsForUserAndQuestionContentAndSession(
+		    voteQueUsr.getQueUsrId(), voteQueContent.getVoteContentId(), voteSession.getUid());
+	    LearningUtil.logger.debug("existingVoteUsrAttempt: " + existingVoteUsrAttempt);
+
+	    if (existingVoteUsrAttempt != null) {
+		LearningUtil.logger.debug("update existingVoteUsrAttempt: " + existingVoteUsrAttempt);
+		existingVoteUsrAttempt.setUserEntry(userEntry);
+		existingVoteUsrAttempt.setAttemptTime(attempTime);
+		existingVoteUsrAttempt.setTimeZone(timeZone);
+		voteService.updateVoteUsrAttempt(existingVoteUsrAttempt);
+		LearningUtil.logger.debug("done updating existingVoteUsrAttempt: " + existingVoteUsrAttempt);
+	    } else {
+		LearningUtil.logger.debug("create new attempt");
+		VoteUsrAttempt voteUsrAttempt = new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr,
+			userEntry, singleUserEntry, true);
+		LearningUtil.logger.debug("voteUsrAttempt: " + voteUsrAttempt);
+		voteService.createVoteUsrAttempt(voteUsrAttempt);
+		LearningUtil.logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);
+	    }
+	}
+    }
+
+    public static void readParameters(HttpServletRequest request, VoteLearningForm voteLearningForm) {
+	String optionCheckBoxSelected = request.getParameter("optionCheckBoxSelected");
+	LearningUtil.logger.debug("parameter optionCheckBoxSelected: " + optionCheckBoxSelected);
+	if (optionCheckBoxSelected != null && optionCheckBoxSelected.equals("1")) {
+	    LearningUtil.logger.debug("parameter optionCheckBoxSelected is selected " + optionCheckBoxSelected);
+	    voteLearningForm.setOptionCheckBoxSelected("1");
+	}
+
+	String questionIndex = request.getParameter("questionIndex");
+	LearningUtil.logger.debug("parameter questionIndex: " + questionIndex);
+	if (questionIndex != null) {
+	    LearningUtil.logger.debug("parameter questionIndex is selected " + questionIndex);
+	    voteLearningForm.setQuestionIndex(questionIndex);
+	}
+
+	String optionIndex = request.getParameter("optionIndex");
+	LearningUtil.logger.debug("parameter optionIndex: " + optionIndex);
+	if (optionIndex != null) {
+	    LearningUtil.logger.debug("parameter optionIndex is selected " + optionIndex);
+	    voteLearningForm.setOptionIndex(optionIndex);
+	}
+
+	String optionValue = request.getParameter("optionValue");
+	LearningUtil.logger.debug("parameter optionValue: " + optionValue);
+	if (optionValue != null) {
+	    voteLearningForm.setOptionValue(optionValue);
+	}
+
+	String checked = request.getParameter("checked");
+	LearningUtil.logger.debug("parameter checked: " + checked);
+	if (checked != null) {
+	    LearningUtil.logger.debug("parameter checked is selected " + checked);
+	    voteLearningForm.setChecked(checked);
+	}
+    }
+
+    public static Map selectOptionsCheckBox(HttpServletRequest request, VoteLearningForm voteLearningForm,
+	    String questionIndex, Map mapGeneralCheckedOptionsContent, Map mapQuestionContentLearner) {
+	LearningUtil.logger.debug("requested optionCheckBoxSelected...");
+	LearningUtil.logger.debug("questionIndex: " + voteLearningForm.getQuestionIndex());
+	LearningUtil.logger.debug("optionValue: " + voteLearningForm.getOptionValue());
+	LearningUtil.logger.debug("checked: " + voteLearningForm.getChecked());
+	LearningUtil.logger.debug("mapQuestionContentLearner: " + mapQuestionContentLearner);
+
+	String selectedNomination = (String) mapQuestionContentLearner.get(voteLearningForm.getQuestionIndex());
+	LearningUtil.logger.debug("selectedNomination: " + selectedNomination);
+
+	Map mapFinal = new TreeMap(new VoteComparator());
+
+	if (mapGeneralCheckedOptionsContent.size() == 0) {
+	    LearningUtil.logger.debug("mapGeneralCheckedOptionsContent size is 0");
+	    Map mapLeanerCheckedOptionsContent = new TreeMap(new VoteComparator());
+
+	    if (voteLearningForm.getChecked().equals("true")) {
+		mapLeanerCheckedOptionsContent.put(voteLearningForm.getQuestionIndex(), selectedNomination);
+	    } else {
+		mapLeanerCheckedOptionsContent.remove(voteLearningForm.getQuestionIndex());
+	    }
+
+	    mapFinal = mapLeanerCheckedOptionsContent;
+	} else {
+	    Map mapCurrentOptions = mapGeneralCheckedOptionsContent;
+
+	    LearningUtil.logger.debug("mapCurrentOptions: " + mapCurrentOptions);
+	    if (mapCurrentOptions != null) {
+		if (voteLearningForm.getChecked().equals("true")) {
+		    mapCurrentOptions.put(voteLearningForm.getQuestionIndex(), selectedNomination);
+		} else {
+		    mapCurrentOptions.remove(voteLearningForm.getQuestionIndex());
 		}
 
-	 }
+		LearningUtil.logger.debug("updated mapCurrentOptions: " + mapCurrentOptions);
 
-    
-    public static void createIndividualOptions(HttpServletRequest request, IVoteService voteService, VoteQueContent voteQueContent, 
-            VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, boolean singleUserEntry, VoteSession voteSession)
-    {
-        logger.debug("doing voteSession: " + voteSession);
-        logger.debug("userEntry: " + userEntry);
-        logger.debug("singleUserEntry: " + singleUserEntry);
+		mapFinal = mapCurrentOptions;
+	    } else {
+		LearningUtil.logger.debug("no options for this questions has been selected yet");
+		Map mapLeanerCheckedOptionsContent = new TreeMap(new VoteComparator());
 
-    	logger.debug("voteQueContent: " + voteQueContent);
-    	logger.debug("user " + voteQueUsr.getQueUsrId());
-    	logger.debug("voteQueContent.getVoteContentId() " +voteQueContent.getVoteContentId());
-    	
-    	if (voteQueContent != null)
-    	{
-    	    VoteUsrAttempt existingVoteUsrAttempt=voteService.getAttemptsForUserAndQuestionContentAndSession(voteQueUsr.getQueUsrId(),voteQueContent.getVoteContentId(), voteSession.getUid());
-    	    logger.debug("existingVoteUsrAttempt: " + existingVoteUsrAttempt);
-    	    
-    	    if (existingVoteUsrAttempt != null)
-    	    {
-    	        logger.debug("update existingVoteUsrAttempt: " + existingVoteUsrAttempt);
-    	        existingVoteUsrAttempt.setUserEntry(userEntry);
-    	        existingVoteUsrAttempt.setAttemptTime(attempTime);
-    	        existingVoteUsrAttempt.setTimeZone(timeZone);
-    	        voteService.updateVoteUsrAttempt(existingVoteUsrAttempt);
-    	        logger.debug("done updating existingVoteUsrAttempt: " + existingVoteUsrAttempt);
-    	    }
-    	    else
-    	    {
-    	        logger.debug("create new attempt");
-        	    VoteUsrAttempt voteUsrAttempt=new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr, userEntry, singleUserEntry, true);
-        	    logger.debug("voteUsrAttempt: " + voteUsrAttempt);
-            	voteService.createVoteUsrAttempt(voteUsrAttempt);
-            	logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);    
-    	    }
-    	}
+		if (voteLearningForm.getChecked().equals("true")) {
+		    mapLeanerCheckedOptionsContent.put(voteLearningForm.getQuestionIndex(), selectedNomination);
+		} else {
+		    mapLeanerCheckedOptionsContent.remove(voteLearningForm.getOptionIndex());
+		}
+
+		mapFinal = mapLeanerCheckedOptionsContent;
+	    }
+	}
+
+	LearningUtil.logger.debug("mapFinal: " + mapFinal);
+	return mapFinal;
     }
 
-    
-    public static void readParameters(HttpServletRequest request, VoteLearningForm voteLearningForm)
-    {
-    	String optionCheckBoxSelected=request.getParameter("optionCheckBoxSelected");
-    	logger.debug("parameter optionCheckBoxSelected: " + optionCheckBoxSelected);
-    	if ((optionCheckBoxSelected != null) && optionCheckBoxSelected.equals("1"))
-    	{
-    		logger.debug("parameter optionCheckBoxSelected is selected " + optionCheckBoxSelected);
-    		voteLearningForm.setOptionCheckBoxSelected("1");
-    	}
-    	
-    	String questionIndex=request.getParameter("questionIndex");
-    	logger.debug("parameter questionIndex: " + questionIndex);
-    	if ((questionIndex != null))
-    	{
-    		logger.debug("parameter questionIndex is selected " + questionIndex);
-    		voteLearningForm.setQuestionIndex(questionIndex);
-    	}
-    	
-    	String optionIndex=request.getParameter("optionIndex");
-    	logger.debug("parameter optionIndex: " + optionIndex);
-    	if (optionIndex != null)
-    	{
-    		logger.debug("parameter optionIndex is selected " + optionIndex);
-    		voteLearningForm.setOptionIndex(optionIndex);
-    	}
-    	
-    	String optionValue=request.getParameter("optionValue");
-    	logger.debug("parameter optionValue: " + optionValue);
-    	if (optionValue != null)
-    	{
-    		voteLearningForm.setOptionValue(optionValue);
-    	}
-    	
-    	String checked=request.getParameter("checked");
-    	logger.debug("parameter checked: " + checked);
-    	if (checked != null)
-    	{
-    		logger.debug("parameter checked is selected " + checked);
-    		voteLearningForm.setChecked(checked);
-    	}
+    private static void createQuestionsFromToolInput(VoteContent voteContent, IVoteService voteService) {
+	// We get whatever the source tool provides us with and try to create questions out of it
+	DataFlowObject dataFlowObject = voteService.getAssignedDataFlowObject(voteContent.getVoteContentId());
+	ToolOutput toolInput = voteService.getToolInput(voteContent.getVoteContentId(), VoteUtils.getUserId()
+		.intValue());
+	Object value = toolInput.getValue().getComplex();
+	// If the input is array of strings, it's pretty straightforward
+	if (value instanceof String[]) {
+	    String[] stringList = (String[]) value;
+	    voteContent.getVoteQueContents().clear();
+	    for (int nominationIndex = 1; nominationIndex <= stringList.length; nominationIndex++) {
+		VoteQueContent nomination = new VoteQueContent();
+		nomination.setDisplayOrder(nominationIndex);
+		nomination.setMcContent(voteContent);
+		nomination.setQuestion(stringList[nominationIndex - 1]);
+		voteService.saveOrUpdateVoteQueContent(nomination);
+		voteContent.getVoteQueContents().add(nomination);
+	    }
+	}
     }
 
-    
-    public static Map selectOptionsCheckBox(HttpServletRequest request,VoteLearningForm voteLearningForm, String questionIndex, 
-            Map mapGeneralCheckedOptionsContent, Map mapQuestionContentLearner)
-    {
-    	logger.debug("requested optionCheckBoxSelected...");
-    	logger.debug("questionIndex: " + voteLearningForm.getQuestionIndex());
-    	logger.debug("optionValue: " + voteLearningForm.getOptionValue());
-    	logger.debug("checked: " + voteLearningForm.getChecked());
-    	logger.debug("mapQuestionContentLearner: " + mapQuestionContentLearner);
-    	
-    	String selectedNomination=(String)mapQuestionContentLearner.get(voteLearningForm.getQuestionIndex());
-    	logger.debug("selectedNomination: " + selectedNomination);
-
-    	Map mapFinal= new TreeMap(new VoteComparator());
-    	
-    	if (mapGeneralCheckedOptionsContent.size() == 0)
-    	{
-    		logger.debug("mapGeneralCheckedOptionsContent size is 0");
-    		Map mapLeanerCheckedOptionsContent= new TreeMap(new VoteComparator());
-    		
-    		if (voteLearningForm.getChecked().equals("true"))
-    			mapLeanerCheckedOptionsContent.put(voteLearningForm.getQuestionIndex(), selectedNomination);
-    		else
-    			mapLeanerCheckedOptionsContent.remove(voteLearningForm.getQuestionIndex());
-    		
-			
-    		mapFinal=mapLeanerCheckedOptionsContent;
-    	}
-    	else
-    	{
-    		Map mapCurrentOptions= mapGeneralCheckedOptionsContent;
-    		
-    		logger.debug("mapCurrentOptions: " + mapCurrentOptions);
-    		if (mapCurrentOptions != null)
-    		{
-    			if (voteLearningForm.getChecked().equals("true"))
-    				mapCurrentOptions.put(voteLearningForm.getQuestionIndex(), selectedNomination);
-    			else
-    				mapCurrentOptions.remove(voteLearningForm.getQuestionIndex());
-    			
-    			logger.debug("updated mapCurrentOptions: " + mapCurrentOptions);
-    			
-    			mapFinal=mapCurrentOptions;
-    		}
-    		else
-    		{
-    			logger.debug("no options for this questions has been selected yet");
-    			Map mapLeanerCheckedOptionsContent= new TreeMap(new VoteComparator());
-    			        			
-    			if (voteLearningForm.getChecked().equals("true"))
-    				mapLeanerCheckedOptionsContent.put(voteLearningForm.getQuestionIndex(), selectedNomination);
-    			else
-    				mapLeanerCheckedOptionsContent.remove(voteLearningForm.getOptionIndex());
-    			
-    			mapFinal=mapLeanerCheckedOptionsContent;
-    		}
-    	}
-    	
-    	logger.debug("mapFinal: " + mapFinal);
-    	return mapFinal;
-    }
 }
-

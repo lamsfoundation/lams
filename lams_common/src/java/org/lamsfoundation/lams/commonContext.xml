@@ -42,7 +42,7 @@
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Activity.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/BranchActivityEntry.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/BranchCondition.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>				
+				<value>classpath:org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>		
 				<value>classpath:org/lamsfoundation/lams/learningdesign/GroupUser.hbm.xml</value>			
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Grouping.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/LearningDesign.hbm.xml</value>
@@ -52,6 +52,7 @@
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Transition.hbm.xml</value>	
 				<value>classpath:org/lamsfoundation/lams/learningdesign/License.hbm.xml</value>	
 				<value>classpath:org/lamsfoundation/lams/learningdesign/ActivityEvaluation.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/learningdesign/DataFlowObject.hbm.xml</value>
 				
 				
 				<!-- lesson related mapping files-->
@@ -589,6 +590,11 @@
 	
 	<!--  Gradebook related beans -->
 	<bean id="gradebookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradebookDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Data flow related beans -->
+	<bean id="dataFlowDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.DataFlowDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	

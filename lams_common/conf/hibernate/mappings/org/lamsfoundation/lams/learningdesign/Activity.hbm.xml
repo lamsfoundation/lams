@@ -90,10 +90,17 @@
     <property name="stopAfterActivity" type="java.lang.Boolean" column="stop_after_activity"/>
 
     <!-- Associations -->
-    
-    <one-to-one name="transitionTo" class="org.lamsfoundation.lams.learningdesign.Transition" property-ref="toActivity"/>
-    <one-to-one name="transitionFrom" class="org.lamsfoundation.lams.learningdesign.Transition" property-ref="fromActivity"/>
-    
+    <many-to-one name="transitionTo" class="org.lamsfoundation.lams.learningdesign.Transition">
+        <meta attribute="field-description">@hibernate.column name="transition_to_id"         
+        </meta>
+        <column name="transition_to_id" />
+    </many-to-one>
+    <many-to-one name="transitionFrom" class="org.lamsfoundation.lams.learningdesign.Transition">
+        <meta attribute="field-description">@hibernate.column name="transition_from_id"         
+        </meta>
+        <column name="transition_from_id" />
+    </many-to-one>
+   
     <!-- bi-directional many-to-one association to LearningLibrary -->
     <many-to-one name="learningLibrary" class="org.lamsfoundation.lams.learningdesign.LearningLibrary">
         <meta attribute="field-description">@hibernate.column name="learning_library_id"         

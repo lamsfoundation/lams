@@ -381,14 +381,15 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	Chat chat = getChatDAO().getByContentId(toolContentId);
 
 	if (chat == null) {
 	    chat = getDefaultContent();
 	}
 
-	return getChatOutputFactory().getToolOutputDefinitions(chat);
+	return getChatOutputFactory().getToolOutputDefinitions(chat, definitionType);
     }
 
     /* IChatService Methods */
@@ -819,11 +820,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     }
 
     public IRepositoryService getRepositoryService() {
-        return repositoryService;
+	return repositoryService;
     }
 
     public void setRepositoryService(IRepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
+	this.repositoryService = repositoryService;
     }
 
     public IAuditService getAuditService() {
@@ -848,11 +849,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		    .getFromUser().getLoginName(), chatMessage.toString());
 	}
     }
-    
+
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     /* Private methods */
     private Map<Long, ChatMessageFilter> messageFilters = new ConcurrentHashMap<Long, ChatMessageFilter>();
 

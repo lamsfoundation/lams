@@ -160,6 +160,7 @@ public interface WDDXTAGS {
     public static final String TRANSITION_FROM = "from_activity_id";
     public static final String TO_ACTIVITY_UIID = "toUIID";
     public static final String FROM_ACTIVITY_UIID = "fromUIID";
+    public static final String TRANSITION_TYPE = "transitionType";
 
     /** Tool Specific tags */
     public static final String TOOL_DISPLAY_NAME = "displayName";
@@ -238,7 +239,7 @@ public interface WDDXTAGS {
 
     /** Tool adapters specific tags */
     public static final String CUSTOM_CSV = "customCSV";
-    
+
     /** Evaluation tool output tag */
     public static final String TOOL_OUTPUT_DEFINITION = "gradebookToolOutputDefinitionName";
 }

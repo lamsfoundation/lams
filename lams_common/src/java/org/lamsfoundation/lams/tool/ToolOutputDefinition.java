@@ -32,25 +32,27 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 
 /**
- * Each tool that has outputs will define a set of output definitions. Some
- * definitions will be "predefined" for a tool, e.g. "Learner's Mark". Others
- * may be created for a specific tool activity, via a Conditions/Output tab in
- * monitoring, e.g. Second answer contains the word "Mercury".
+ * Each tool that has outputs will define a set of output definitions. Some definitions will be "predefined" for a tool,
+ * e.g. "Learner's Mark". Others may be created for a specific tool activity, via a Conditions/Output tab in monitoring,
+ * e.g. Second answer contains the word "Mercury".
  * <p>
- * If the tool contains generated definitions, then they must be copied when the
- * tool content is copied, as the conditions may be modified via Live Edit. This
- * must not modify the original design.
+ * If the tool contains generated definitions, then they must be copied when the tool content is copied, as the
+ * conditions may be modified via Live Edit. This must not modify the original design.
  * <p>
- * For 2.1, we will not deal with complex outputs, so for now we will not define
- * how a complex definition is defined. The field is placed in the object so
- * that we have the place for it when we do design the complex output
- * definitions.
+ * For 2.1, we will not deal with complex outputs, so for now we will not define how a complex definition is defined.
+ * The field is placed in the object so that we have the place for it when we do design the complex output definitions.
  * <p>
- * Sample ToolOutputDefinition: ToolOutputDefinition { name = "LEARNERS_MARK",
- * description = "Mark for an individual learner"; type = "NUMERIC"; startValue =
- * "0.0"; endValue = "10.0"; complexDefinition = null; }
+ * Sample ToolOutputDefinition: ToolOutputDefinition { name = "LEARNERS_MARK", description = "Mark for an individual
+ * learner"; type = "NUMERIC"; startValue = "0.0"; endValue = "10.0"; complexDefinition = null; }
  */
 public class ToolOutputDefinition implements Comparable {
+    /*
+     * Definition Type indicates what kind of definitions should be provided. Some outputs are not valid for conditions,
+     * some are not valid for data flow between tools.
+     */
+    public static final int DATA_OUTPUT_DEFINITION_TYPE_CONDITION = 1;
+
+    public static final int DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW = 2;
 
     private String name;
     private String description;
@@ -63,13 +65,11 @@ public class ToolOutputDefinition implements Comparable {
     private List<BranchCondition> defaultConditions;
 
     /**
-     * Name must be unique within the current tool content. This will be used to
-     * identify the output. If the definition is a predefined definition then
-     * the name will always be the same (e.g. LEARNER_MARK) but if it is defined
-     * in authoring then it will need to made unique for this tool content (e.g.
-     * ANSWER_2_CONTAINS_1). At lesson time, the tool will be given back the
-     * name and will need to be able to uniquely identify the required output
-     * based on name, the tool session id and possibly the learner's user id.
+     * Name must be unique within the current tool content. This will be used to identify the output. If the definition
+     * is a predefined definition then the name will always be the same (e.g. LEARNER_MARK) but if it is defined in
+     * authoring then it will need to made unique for this tool content (e.g. ANSWER_2_CONTAINS_1). At lesson time, the
+     * tool will be given back the name and will need to be able to uniquely identify the required output based on name,
+     * the tool session id and possibly the learner's user id.
      */
     public String getName() {
 	return name;
@@ -80,10 +80,9 @@ public class ToolOutputDefinition implements Comparable {
     }
 
     /**
-     * Description: Description is an internationalised text string which is
-     * displayed to the user as the output "name". It is the responsibility of
-     * the tool to internationalise the string. We suggest that the key for each
-     * predefined definition follow the convention OUTPUT_DESC_<output name>
+     * Description: Description is an internationalised text string which is displayed to the user as the output "name".
+     * It is the responsibility of the tool to internationalise the string. We suggest that the key for each predefined
+     * definition follow the convention OUTPUT_DESC_<output name>
      */
     public String getDescription() {
 	return description;
@@ -105,10 +104,9 @@ public class ToolOutputDefinition implements Comparable {
     }
 
     /**
-     * If the output value may be compared to a range, then startValue and
-     * endValue are the inclusive start values and end values for the range.
-     * This may be used to customise fixed definitions to ranges appropriate for
-     * the current data.
+     * If the output value may be compared to a range, then startValue and endValue are the inclusive start values and
+     * end values for the range. This may be used to customise fixed definitions to ranges appropriate for the current
+     * data.
      */
     public Object getStartValue() {
 	return startValue;
@@ -135,20 +133,25 @@ public class ToolOutputDefinition implements Comparable {
 	this.complexDefinition = complexDefinition;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("name", name).append("description", description).append("type", type)
 		.append("startValue", startValue).append("endValue", endValue).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if (this == other) {
 	    return true;
-	if (!(other instanceof ToolOutputDefinition))
+	}
+	if (!(other instanceof ToolOutputDefinition)) {
 	    return false;
+	}
 	ToolOutputDefinition castOther = (ToolOutputDefinition) other;
-	return new EqualsBuilder().append(this.name, castOther.name).append(this.type, castOther.type).isEquals();
+	return new EqualsBuilder().append(name, castOther.name).append(type, castOther.type).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(name).append(type).toHashCode();
     }
@@ -156,12 +159,12 @@ public class ToolOutputDefinition implements Comparable {
     public int compareTo(Object o) {
 
 	ToolOutputDefinition myClass = (ToolOutputDefinition) o;
-	return new CompareToBuilder().append(this.name, myClass.name).append(this.type, myClass.type).toComparison();
+	return new CompareToBuilder().append(name, myClass.name).append(type, myClass.type).toComparison();
     }
 
     /**
-     * Default Conditions are sample conditions that should be presented to the
-     * user as a starting point for using this OutputDefinition
+     * Default Conditions are sample conditions that should be presented to the user as a starting point for using this
+     * OutputDefinition
      * 
      * @return
      */
@@ -174,10 +177,8 @@ public class ToolOutputDefinition implements Comparable {
     }
 
     /**
-     * Should Flash show the definition of the branch conditions (e.g. Range
-     * from blah to blah) or just the name of the condition. Set to true if the
-     * definition relates to an internal parameter and will mean nothing to the
-     * user
+     * Should Flash show the definition of the branch conditions (e.g. Range from blah to blah) or just the name of the
+     * condition. Set to true if the definition relates to an internal parameter and will mean nothing to the user
      */
     public Boolean isShowConditionNameOnly() {
 	return showConditionNameOnly;
@@ -188,18 +189,17 @@ public class ToolOutputDefinition implements Comparable {
     }
 
     /**
-     * If set, this flag makes the current tool output definition the default
-     * output to go straight to gradebook marks when the user completes an 
-     * activity. There should only be one of these per tool.
+     * If set, this flag makes the current tool output definition the default output to go straight to gradebook marks
+     * when the user completes an activity. There should only be one of these per tool.
      * 
      * @return
      */
     public Boolean isDefaultGradebookMark() {
-        return isDefaultGradebookMark;
+	return isDefaultGradebookMark;
     }
 
     public void setIsDefaultGradebookMark(Boolean isDefaultGradebookMark) {
-        this.isDefaultGradebookMark = isDefaultGradebookMark;
+	this.isDefaultGradebookMark = isDefaultGradebookMark;
     }
 
 }

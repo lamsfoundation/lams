@@ -544,6 +544,8 @@ CREATE TABLE lams_learning_activity (
      , end_xcoord INT(11)
      , end_ycoord INT(11) 
      , stop_after_activity TINYINT NOT NULL DEFAULT 0
+	 , transition_to_id BIGINT(20)
+	 , transition_from_id BIGINT(20)
      , PRIMARY KEY (activity_id)
      , INDEX (learning_library_id)
      , CONSTRAINT FK_lams_learning_activity_7 FOREIGN KEY (learning_library_id)
@@ -940,11 +942,11 @@ CREATE TABLE lams_learning_transition (
      , title VARCHAR(255)
      , to_activity_id BIGINT(20) NOT NULL
      , from_activity_id BIGINT(20) NOT NULL
-     , learning_design_id BIGINT(20) NOT NULL DEFAULT 0
+     , learning_design_id BIGINT(20)
      , create_date_time DATETIME NOT NULL
      , to_ui_id INT(11)
      , from_ui_id INT(11)
-     , UNIQUE UQ_transition_activities (from_activity_id, to_activity_id)
+	 , transition_type TINYINT NOT NULL DEFAULT 0
      , PRIMARY KEY (transition_id)
      , INDEX (from_activity_id)
      , CONSTRAINT FK_learning_transition_3 FOREIGN KEY (from_activity_id)
@@ -956,6 +958,11 @@ CREATE TABLE lams_learning_transition (
      , CONSTRAINT lddefn_transition_ibfk_1 FOREIGN KEY (learning_design_id)
                   REFERENCES lams_learning_design (learning_design_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 )TYPE=InnoDB;
+ALTER TABLE lams_learning_activity  
+	  ADD CONSTRAINT FK_lams_learning_activity_15 FOREIGN KEY (transition_to_id)
+                  REFERENCES lams_learning_transition (transition_id)
+     , ADD CONSTRAINT FK_lams_learning_activity_16 FOREIGN KEY (transition_from_id)
+                  REFERENCES lams_learning_transition (transition_id);
 
 CREATE TABLE lams_role_privilege (
        rp_id BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -1134,6 +1141,18 @@ CREATE TABLE lams_gradebook_user_lesson (
 	, CONSTRAINT FK_lams_gradebook_user_lesson_2 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 	, PRIMARY KEY (uid)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_data_flow (
+	  data_flow_object_id BIGINT(20) NOT NULL auto_increment
+	, transition_id BIGINT(20) NOT NULL
+	, order_id INT(11) 
+	, name VARCHAR(255) NOT NULL
+	, display_name VARCHAR(255)
+	, tool_assigment_id INT(11)
+	, CONSTRAINT FK_lams_learning_transition_1 FOREIGN KEY (transition_id)
+                  REFERENCES lams_learning_transition (transition_id) ON DELETE CASCADE ON UPDATE CASCADE
+	, PRIMARY KEY (data_flow_object_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_user_disabled_tutorials (

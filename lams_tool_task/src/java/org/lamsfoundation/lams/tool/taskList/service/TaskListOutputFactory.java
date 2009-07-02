@@ -57,7 +57,7 @@ public class TaskListOutputFactory extends OutputFactory{
 	/** 
 	 * {@inheritDoc}
 	 */
-	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject) throws ToolException {
+	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType) throws ToolException {
 		TreeMap<String, ToolOutputDefinition> definitionMap =  new TreeMap<String, ToolOutputDefinition>();
 		
 		ToolOutputDefinition simpleDefinition = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_TASKS_COMPLETED, new Long(0), null);

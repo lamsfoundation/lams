@@ -23,187 +23,258 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
 
+import org.lamsfoundation.lams.learningdesign.DataFlowObject;
+import org.lamsfoundation.lams.learningdesign.DataTransition;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
-
 
 /**
  * @author Manpreet Minhas
  */
-public class TransitionDTO extends BaseDTO{
-	
-	private Long transitionID;	
-	private Integer transitionUIID;
-	private Integer toUIID;
-	private Integer fromUIID;
-	private String description;
-	private String title;
-	private Date createDateTime;
-	private Long toActivityID;
-	private Long fromActivityID;
-	private Long learningDesignID;
-	
-	public TransitionDTO(){
-		
+public class TransitionDTO extends BaseDTO {
+
+    private Long transitionID;
+    private Integer transitionUIID;
+    private Integer toUIID;
+    private Integer fromUIID;
+    private String description;
+    private String title;
+    private Date createDateTime;
+    private Long toActivityID;
+    private Long fromActivityID;
+    private Long learningDesignID;
+    private Integer transitionType;
+    private ArrayList<DataFlowObjectDTO> dataFlowObjects;
+
+    public TransitionDTO() {
+
+    }
+
+    public TransitionDTO(Long transitionId, Integer transitionUIID, Integer toUIID, Integer fromUIID,
+	    String description, String title, Date createDateTime, Long toActivityID, Long fromActivityID,
+	    Long learningDesignID) {
+	super();
+	transitionID = transitionId;
+	this.transitionUIID = transitionUIID;
+	this.toUIID = toUIID;
+	this.fromUIID = fromUIID;
+	this.description = description;
+	this.title = title;
+	this.createDateTime = createDateTime;
+	this.toActivityID = toActivityID;
+	this.fromActivityID = fromActivityID;
+	this.learningDesignID = learningDesignID;
+	dataFlowObjects = new ArrayList<DataFlowObjectDTO>();
+    }
+
+    public TransitionDTO(Transition transition) {
+	transitionID = transition.getTransitionId();
+	transitionUIID = transition.getTransitionUIID();
+	toUIID = transition.getToUIID();
+	fromUIID = transition.getFromUIID();
+	description = transition.getDescription();
+	title = transition.getTitle();
+	createDateTime = transition.getCreateDateTime();
+	toActivityID = transition.getToActivity().getActivityId();
+	fromActivityID = transition.getFromActivity().getActivityId();
+	learningDesignID = transition.getLearningDesign().getLearningDesignId();
+	transitionType = transition.getTransitionType();
+	dataFlowObjects = new ArrayList<DataFlowObjectDTO>();
+	if (transition.isDataTransition()) {
+	    DataTransition dataTransition = (DataTransition) transition;
+	    for (DataFlowObject dataFlowObject : dataTransition.getDataFlowObjects()) {
+		DataFlowObjectDTO dataFlowObjectDto = new DataFlowObjectDTO(dataFlowObject);
+		dataFlowObjects.add(dataFlowObjectDto);
+	    }
 	}
-	public TransitionDTO(Long transitionId, Integer transitionUIID,
-			Integer toUIID, Integer fromUIID, String description, String title,
-			Date createDateTime, Long toActivityID, Long fromActivityID,
-			Long learningDesignID) {
-		super();
-		this.transitionID = transitionId;
-		this.transitionUIID = transitionUIID;
-		this.toUIID = toUIID;
-		this.fromUIID = fromUIID;
-		this.description = description;
-		this.title = title;
-		this.createDateTime = createDateTime;
-		this.toActivityID = toActivityID;
-		this.fromActivityID = fromActivityID;
-		this.learningDesignID = learningDesignID;
+    }
+
+    /**
+     * @return Returns the createDateTime.
+     */
+    public Date getCreateDateTime() {
+	return createDateTime;
+    }
+
+    /**
+     * @return Returns the description.
+     */
+    public String getDescription() {
+	return description;
+    }
+
+    /**
+     * @return Returns the fromActivityID.
+     */
+    public Long getFromActivityID() {
+	return fromActivityID;
+    }
+
+    /**
+     * @return Returns the fromUIID.
+     */
+    public Integer getFromUIID() {
+	return fromUIID;
+    }
+
+    /**
+     * @return Returns the learningDesignID.
+     */
+    public Long getLearningDesignID() {
+	return learningDesignID;
+    }
+
+    /**
+     * @return Returns the title.
+     */
+    public String getTitle() {
+	return title;
+    }
+
+    /**
+     * @return Returns the toActivityID.
+     */
+    public Long getToActivityID() {
+	return toActivityID;
+    }
+
+    /**
+     * @return Returns the toUIID.
+     */
+    public Integer getToUIID() {
+	return toUIID;
+    }
+
+    /**
+     * @return Returns the transitionID.
+     */
+    public Long getTransitionID() {
+	return transitionID;
+    }
+
+    /**
+     * @return Returns the transitionUIID.
+     */
+    public Integer getTransitionUIID() {
+	return transitionUIID;
+    }
+
+    /**
+     * @param createDateTime
+     *                The createDateTime to set.
+     */
+    public void setCreateDateTime(Date createDateTime) {
+	if (!createDateTime.equals(WDDXTAGS.DATE_NULL_VALUE)) {
+	    this.createDateTime = createDateTime;
 	}
-	public TransitionDTO(Transition transition){
-		this.transitionID = transition.getTransitionId();
-		this.transitionUIID = transition.getTransitionUIID();
-		this.toUIID = transition.getToUIID();
-		this.fromUIID = transition.getFromUIID();
-		this.description = transition.getDescription();
-		this.title = transition.getTitle();
-		this.createDateTime = transition.getCreateDateTime();
-		this.toActivityID = transition.getToActivity().getActivityId();
-		this.fromActivityID = transition.getFromActivity().getActivityId();							  
-		this.learningDesignID = transition.getLearningDesign().getLearningDesignId();
+    }
+
+    /**
+     * @param description
+     *                The description to set.
+     */
+    public void setDescription(String description) {
+	if (!description.equals(WDDXTAGS.STRING_NULL_VALUE)) {
+	    this.description = description;
 	}
-	/**
-	 * @return Returns the createDateTime.
-	 */
-	public Date getCreateDateTime() {
-		return createDateTime;
+    }
+
+    /**
+     * @param fromActivityID
+     *                The fromActivityID to set.
+     */
+    public void setFromActivityID(Long fromActivityID) {
+	if (!fromActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
+	    this.fromActivityID = fromActivityID;
 	}
-	/**
-	 * @return Returns the description.
-	 */
-	public String getDescription() {
-		return description;
+    }
+
+    /**
+     * @param fromUIID
+     *                The fromUIID to set.
+     */
+    public void setFromUIID(Integer fromUIID) {
+	if (!fromUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
+	    this.fromUIID = fromUIID;
 	}
-	/**
-	 * @return Returns the fromActivityID.
-	 */
-	public Long getFromActivityID() {
-		return fromActivityID;
+    }
+
+    /**
+     * @param learningDesignID
+     *                The learningDesignID to set.
+     */
+    public void setLearningDesignID(Long learningDesignID) {
+	if (!learningDesignID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
+	    this.learningDesignID = learningDesignID;
 	}
-	/**
-	 * @return Returns the fromUIID.
-	 */
-	public Integer getFromUIID() {
-		return fromUIID;
+    }
+
+    /**
+     * @param title
+     *                The title to set.
+     */
+    public void setTitle(String title) {
+	if (!title.equals(WDDXTAGS.STRING_NULL_VALUE)) {
+	    this.title = title;
 	}
-	/**
-	 * @return Returns the learningDesignID.
-	 */
-	public Long getLearningDesignID() {
-		return learningDesignID;
+    }
+
+    /**
+     * @param toActivityID
+     *                The toActivityID to set.
+     */
+    public void setToActivityID(Long toActivityID) {
+	if (!toActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
+	    this.toActivityID = toActivityID;
 	}
-	/**
-	 * @return Returns the title.
-	 */
-	public String getTitle() {
-		return title;
+    }
+
+    /**
+     * @param toUIID
+     *                The toUIID to set.
+     */
+    public void setToUIID(Integer toUIID) {
+	if (!toUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
+	    this.toUIID = toUIID;
 	}
-	/**
-	 * @return Returns the toActivityID.
-	 */
-	public Long getToActivityID() {
-		return toActivityID;
+    }
+
+    /**
+     * @param transitionID
+     *                The transitionID to set.
+     */
+    public void setTransitionID(Long transitionId) {
+	if (!transitionId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
+	    transitionID = transitionId;
 	}
-	/**
-	 * @return Returns the toUIID.
-	 */
-	public Integer getToUIID() {
-		return toUIID;
+    }
+
+    /**
+     * @param transitionUIID
+     *                The transitionUIID to set.
+     */
+    public void setTransitionUIID(Integer transitionUIID) {
+	if (!transitionUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
+	    this.transitionUIID = transitionUIID;
 	}
-	/**
-	 * @return Returns the transitionID.
-	 */
-	public Long getTransitionID() {
-		return transitionID;
-	}
-	/**
-	 * @return Returns the transitionUIID.
-	 */
-	public Integer getTransitionUIID() {
-		return transitionUIID;
-	}
-	/**
-	 * @param createDateTime The createDateTime to set.
-	 */
-	public void setCreateDateTime(Date createDateTime) {
-		if(!createDateTime.equals(WDDXTAGS.DATE_NULL_VALUE))
-			this.createDateTime = createDateTime;
-	}
-	/**
-	 * @param description The description to set.
-	 */
-	public void setDescription(String description) {
-		if(!description.equals(WDDXTAGS.STRING_NULL_VALUE))
-			this.description = description;
-	}
-	/**
-	 * @param fromActivityID The fromActivityID to set.
-	 */
-	public void setFromActivityID(Long fromActivityID) {
-		if(!fromActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			this.fromActivityID = fromActivityID;
-	}
-	/**
-	 * @param fromUIID The fromUIID to set.
-	 */
-	public void setFromUIID(Integer fromUIID) {
-		if(!fromUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			this.fromUIID = fromUIID;
-	}
-	/**
-	 * @param learningDesignID The learningDesignID to set.
-	 */
-	public void setLearningDesignID(Long learningDesignID) {
-		if(!learningDesignID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			this.learningDesignID = learningDesignID;
-	}
-	/**
-	 * @param title The title to set.
-	 */
-	public void setTitle(String title) {
-		if(!title.equals(WDDXTAGS.STRING_NULL_VALUE))
-			this.title = title;
-	}
-	/**
-	 * @param toActivityID The toActivityID to set.
-	 */
-	public void setToActivityID(Long toActivityID) {
-		if(!toActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			this.toActivityID = toActivityID;
-	}
-	/**
-	 * @param toUIID The toUIID to set.
-	 */
-	public void setToUIID(Integer toUIID) {
-		if(!toUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			this.toUIID = toUIID;
-	}
-	/**
-	 * @param transitionID The transitionID to set.
-	 */
-	public void setTransitionID(Long transitionId) {
-		if(!transitionId.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG))
-			this.transitionID = transitionId;
-	}
-	/**
-	 * @param transitionUIID The transitionUIID to set.
-	 */
-	public void setTransitionUIID(Integer transitionUIID) {
-		if(!transitionUIID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
-			this.transitionUIID = transitionUIID;
-	}
+    }
+
+    public Integer getTransitionType() {
+	return transitionType;
+    }
+
+    public void setTransitionType(Integer transitionType) {
+	this.transitionType = transitionType;
+    }
+
+    public ArrayList<DataFlowObjectDTO> getDataFlowObjects() {
+	return dataFlowObjects;
+    }
+
+    public void setDataFlowObjects(ArrayList<DataFlowObjectDTO> dataFlowObjects) {
+	this.dataFlowObjects = dataFlowObjects;
+    }
 }

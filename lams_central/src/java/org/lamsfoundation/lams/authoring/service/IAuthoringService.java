@@ -199,7 +199,7 @@ public interface IAuthoringService {
      * @return String The required definitions in WDDX format
      * @throws IOException
      */
-    public String getToolOutputDefinitions(Long toolContentID) throws IOException;
+    public String getToolOutputDefinitions(Long toolContentID, int definitionType) throws IOException;
 
     /**
      * This method returns a list of all available Learning Designs in WDDX format.

@@ -20,32 +20,36 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $$Id$$ */
-package org.lamsfoundation.lams.learning.service;
+package org.lamsfoundation.lams.learningdesign.dao;
 
-import org.lamsfoundation.lams.tool.ToolOutput;
+import java.util.List;
+
+import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 
 /**
- * Learner service methods available to tools. These methods should work fine as long as the web context contains the
- * core Spring context files.
+ * 
+ * 
+ * @author Marcin Cieslak
+ * 
  */
-public interface ILearnerService {
+public interface IDataFlowDAO extends IBaseDAO {
     /**
-     * Marks an tool session as complete and calculates the next activity against the learning design. This method is
-     * for tools to redirect the client on complete.
+     * Finds data flow objects (definitions of tool inputs) based on the tool's ID.
      * 
-     * Do not change learnerId to Integer (to match the other calls) as all the tools expect this to be a Long.
-     * 
-     * @param toolSessionId,
-     *                session ID for completed tool
-     * @param learnerId
-     *                the learner who is completing the tool session.
-     * @return the URL for the next activity
-     * @throws LearnerServiceException
-     *                 in case of problems.
+     * @param toolContentId
+     * @return
      */
-    public String completeToolSession(Long toolSessionId, Long learnerId);
+    public List<DataFlowObject> getDataFlowObjectsByToolContentId(Long toolContentId);
 
-    ToolOutput getToolInput(Long requestingToolContentId, Integer assigmentId, Integer learnerId);
+    /**
+     * Finds the data flow object assigned somewhere within the tool. It's up to tool to manage assigment ID, for core
+     * it's meaningless.
+     * 
+     * @param toolContentId
+     * @param assigmentId
+     * @return
+     */
+    public DataFlowObject getAssignedDataFlowObject(Long toolContentId, Integer assigmentId);
 }

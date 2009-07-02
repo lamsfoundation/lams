@@ -50,7 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
 
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="getElementById('newNominationForm').submit();"
+				<a href="#" onclick="javascript:window.parent.resetDataInput(); document.getElementById('newNominationForm').submit();"
 					class="button-add-item"> <fmt:message
 						key="label.save.nomination" /> </a>
 

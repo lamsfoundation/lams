@@ -739,7 +739,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	Survey survey = surveyDao.getByContentId(toolContentId);
 	if (survey == null) {
 	    try {
@@ -748,7 +749,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 		throw new ToolException(e);
 	    }
 	}
-	return getSurveyOutputFactory().getToolOutputDefinitions(survey);
+	return getSurveyOutputFactory().getToolOutputDefinitions(survey, definitionType);
     }
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {

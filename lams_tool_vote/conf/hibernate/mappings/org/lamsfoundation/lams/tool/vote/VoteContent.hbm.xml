@@ -158,7 +158,14 @@
         column="show_results"
         length="1"        
    />
-
+   
+   <property
+        name="assignedDataFlowObject"
+        type="boolean"
+        access="property"
+        column="assigned_data_flow_object"
+        length="1"        
+   />
 
     	 <set
             name="voteQueContents"
@@ -213,6 +220,6 @@
                   class="org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile"
               />
     </set>
-
+	
 </class>
 </hibernate-mapping>

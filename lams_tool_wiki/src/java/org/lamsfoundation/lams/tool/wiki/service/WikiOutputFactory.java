@@ -33,8 +33,7 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 
 /**
- * Creates the output definitions for wiki. 
- * There are two types of outputs: number of edits and number of pages added
+ * Creates the output definitions for wiki. There are two types of outputs: number of edits and number of pages added
  */
 public class WikiOutputFactory extends OutputFactory {
 
@@ -47,15 +46,18 @@ public class WikiOutputFactory extends OutputFactory {
     /**
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
+    @Override
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
-	ToolOutputDefinition definition1 = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_EDITS, new Long(0), null);
-	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_EDITS, definition1);
+	ToolOutputDefinition definition1 = buildRangeDefinition(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_EDITS,
+		new Long(0), null);
+	definitionMap.put(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_EDITS, definition1);
 
-	ToolOutputDefinition definition2 = buildRangeDefinition(OUTPUT_NAME_LEARNER_NUM_ADDS, new Long(0), null);
-	definitionMap.put(OUTPUT_NAME_LEARNER_NUM_ADDS, definition2);
+	ToolOutputDefinition definition2 = buildRangeDefinition(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_ADDS,
+		new Long(0), null);
+	definitionMap.put(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_ADDS, definition2);
 
 	return definitionMap;
     }
@@ -64,22 +66,24 @@ public class WikiOutputFactory extends OutputFactory {
 	    Long toolSessionId, Long learnerId) {
 
 	TreeMap<String, ToolOutput> map = new TreeMap<String, ToolOutput>();
-	if (names == null || names.contains(OUTPUT_NAME_LEARNER_NUM_EDITS)) {
-	    map.put(OUTPUT_NAME_LEARNER_NUM_EDITS, getNumEdits(wikiService, learnerId, toolSessionId));
+	if (names == null || names.contains(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_EDITS)) {
+	    map
+		    .put(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_EDITS, getNumEdits(wikiService, learnerId,
+			    toolSessionId));
 	}
-	if (names.contains(OUTPUT_NAME_LEARNER_NUM_ADDS)) {
-	    map.put(OUTPUT_NAME_LEARNER_NUM_ADDS, getNumAdds(wikiService, learnerId, toolSessionId));
+	if (names.contains(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_ADDS)) {
+	    map.put(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_ADDS, getNumAdds(wikiService, learnerId, toolSessionId));
 	}
 	return map;
     }
 
     public ToolOutput getToolOutput(String name, IWikiService wikiService, Long toolSessionId, Long learnerId) {
 
-	if (name != null && name.equals(OUTPUT_NAME_LEARNER_NUM_EDITS)) {
+	if (name != null && name.equals(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_EDITS)) {
 	    return getNumEdits(wikiService, learnerId, toolSessionId);
 	}
 
-	if (name != null && name.equals(OUTPUT_NAME_LEARNER_NUM_ADDS)) {
+	if (name != null && name.equals(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_ADDS)) {
 	    return getNumAdds(wikiService, learnerId, toolSessionId);
 	}
 
@@ -88,6 +92,7 @@ public class WikiOutputFactory extends OutputFactory {
 
     /**
      * Gets the number of edits by this user for tool outputs
+     * 
      * @param wikiService
      * @param learnerId
      * @param toolSessionId
@@ -95,12 +100,13 @@ public class WikiOutputFactory extends OutputFactory {
      */
     private ToolOutput getNumEdits(IWikiService wikiService, Long learnerId, Long toolSessionId) {
 	int num = wikiService.getEditsNum(learnerId, toolSessionId);
-	return new ToolOutput(OUTPUT_NAME_LEARNER_NUM_EDITS, getI18NText(OUTPUT_NAME_LEARNER_NUM_EDITS, true),
-		new Long(num));
+	return new ToolOutput(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_EDITS, getI18NText(
+		WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_EDITS, true), new Long(num));
     }
 
     /**
      * Gets the number of pages added by this user for tool outputs
+     * 
      * @param wikiService
      * @param learnerId
      * @param toolSessionId
@@ -108,7 +114,7 @@ public class WikiOutputFactory extends OutputFactory {
      */
     private ToolOutput getNumAdds(IWikiService wikiService, Long learnerId, Long toolSessionId) {
 	int num = wikiService.getAddsNum(learnerId, toolSessionId);
-	return new ToolOutput(OUTPUT_NAME_LEARNER_NUM_EDITS, getI18NText(OUTPUT_NAME_LEARNER_NUM_EDITS, true),
-		new Long(num));
+	return new ToolOutput(WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_EDITS, getI18NText(
+		WikiOutputFactory.OUTPUT_NAME_LEARNER_NUM_EDITS, true), new Long(num));
     }
 }

@@ -69,6 +69,7 @@
 					<property name="voteQueContentDAO"><ref bean="voteQueContentDAO"/></property>
 					<property name="voteUsrAttemptDAO"><ref bean="voteUsrAttemptDAO"/></property>													
 			 		<property name="voteUploadedFileDAO"><ref bean="voteUploadedFileDAO"/></property>
+			 		<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
 					<property name="toolService"><ref bean="lamsToolService"/></property>
 			 		<property name="repositoryService"><ref bean="repositoryService"/></property> 
 			 		<property name="learnerService"><ref bean="learnerService"/></property>		

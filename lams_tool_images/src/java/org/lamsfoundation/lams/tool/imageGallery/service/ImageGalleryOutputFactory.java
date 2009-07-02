@@ -48,7 +48,7 @@ public class ImageGalleryOutputFactory extends OutputFactory {
     /**
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject) {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType) {
 
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	

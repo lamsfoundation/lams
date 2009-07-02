@@ -40,7 +40,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:set var="feedback" scope="request" value="${currentDTO.feedback}" />
 			<c:set var="displayOrder" scope="request"
 				value="${currentDTO.displayOrder}" />
-
+			<c:if test="${status.first}">
+				<input type="hidden" id="firstNomination" />
+			</c:if>
+			
 			<tr>
 				<td width="10%" class="field-name align-right">
 					<fmt:message key="label.nomination" />

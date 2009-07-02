@@ -96,8 +96,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 /**
  * An implementation of the IWikiService interface.
  * 
- * As a requirement, all LAMS tool's service bean must implement
- * ToolContentManager and ToolSessionManager.
+ * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 public class WikiService implements ToolSessionManager, ToolContentManager, IWikiService, ToolContentImport102Manager {
 
@@ -130,11 +129,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     private ICoreNotebookService coreNotebookService;
 
     private WikiOutputFactory wikiOutputFactory;
-    
+
     private IEventNotificationService eventNotificationService;
-    
+
     private MessageService messageService;
-    
+
     private ILessonService lessonService;
 
     public WikiService() {
@@ -147,8 +146,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     /**
      * (non-Javadoc)
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long,
-     *      java.lang.String, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String,
+     *      java.lang.Long)
      */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (logger.isDebugEnabled()) {
@@ -224,8 +223,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>,
-     *      java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
+     *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 
@@ -238,8 +237,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String,
-     *      java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
+     *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	wikiOutputFactory = getWikiOutputFactory();
@@ -251,19 +250,18 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * Get the definitions for possible output for an activity, based on the
-     * toolContentId.
+     * Get the definitions for possible output for an activity, based on the toolContentId.
      * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of
-     *         each definition
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	wikiOutputFactory = getWikiOutputFactory();
 	Wiki wiki = getWikiByContentId(toolContentId);
 	if (wiki == null) {
 	    wiki = getDefaultContent();
 	}
-	return wikiOutputFactory.getToolOutputDefinitions(wiki);
+	return wikiOutputFactory.getToolOutputDefinitions(wiki, definitionType);
     }
 
     /* ************ Methods from ToolContentManager ************************* */
@@ -271,8 +269,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     /**
      * (non-Javadoc)
      * 
-     * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long,
-     *      java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long, java.lang.Long)
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
@@ -323,8 +320,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * Export the XML fragment for the tool's content, along with any files
-     * needed for the content.
+     * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
      *                 if no tool content matches the toolSessionId
@@ -336,8 +332,9 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	if (wiki == null) {
 	    wiki = getDefaultContent();
 	}
-	if (wiki == null)
+	if (wiki == null) {
 	    throw new DataMissingException("Unable to find default content for the wiki tool");
+	}
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
@@ -377,8 +374,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * Import the XML fragment for the tool's content, along with any files
-     * needed for the content.
+     * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
      *                 if any other error occurs
@@ -391,15 +387,16 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, wikiToolContentHandler,
 		    fromVersion, toVersion);
-	    if (!(toolPOJO instanceof Wiki))
+	    if (!(toolPOJO instanceof Wiki)) {
 		throw new ImportToolContentException("Import Wiki tool content failed. Deserialized object is "
 			+ toolPOJO);
+	    }
 	    Wiki wiki = (Wiki) toolPOJO;
 
 	    // reset it to new toolContentId
 	    wiki.setToolContentId(toolContentId);
 	    wiki.setCreateBy(new Long(newUserUid.longValue()));
-	    
+
 	    // Making sure the wiki titles do not have trailing newline characters
 	    for (WikiPage wikiPage : wiki.getWikiPages()) {
 		String title = wikiPage.getTitle();
@@ -420,8 +417,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * (non-Javadoc)
      * 
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#createNotebookEntry(java.lang.Long,
-     *      java.lang.Integer, java.lang.String, java.lang.Integer,
-     *      java.lang.String)
+     *      java.lang.Integer, java.lang.String, java.lang.Integer, java.lang.String)
      */
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
@@ -507,14 +503,16 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    line = line.replaceAll("[//r][//n][//t]", "");
 
 	    // fix up lines that dont have the div tag on them
-	    if (!line.startsWith("<div"))
+	    if (!line.startsWith("<div")) {
 		retBuf.append("<div>");
+	    }
 
 	    retBuf.append(line);
 
 	    // fix up lines that dont have the div tag on them
-	    if (!line.contains("</div>"))
+	    if (!line.contains("</div>")) {
 		retBuf.append("</div>");
+	    }
 	}
 	logger.debug("Result:");
 	logger.debug(retBuf);
@@ -575,14 +573,14 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * Takes a transient wiki object and iterates down the tree ensureing each
-     * object is saved to the db and all references are maintained
+     * Takes a transient wiki object and iterates down the tree ensureing each object is saved to the db and all
+     * references are maintained
      * 
      * @param wiki
      * @return
      */
     private Wiki insertUnsavedWikiContent(Wiki wiki) {
-	
+
 	wikiDAO.saveOrUpdate(wiki);
 	// Go through the wiki object and save all the pages and content
 	for (WikiPage wikiPage : wiki.getWikiPages()) {
@@ -600,7 +598,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	    wiki.getWikiPages().add(wikiPage);
 	}
-	
+
 	// Update the wiki pages to reference their parent
 	for (WikiPage wikiPage : wiki.getWikiPages()) {
 	    wikiPage.setParentWiki(wiki);
@@ -611,7 +609,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     public Wiki getWikiByContentId(Long toolContentID) {
-	Wiki wiki = (Wiki) wikiDAO.getByContentId(toolContentID);
+	Wiki wiki = wikiDAO.getByContentId(toolContentID);
 	if (wiki == null) {
 	    logger.debug("Could not find the content with toolContentID:" + toolContentID);
 	}
@@ -639,8 +637,9 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     public WikiAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName()))
+	if (file == null || StringUtils.isEmpty(file.getFileName())) {
 	    throw new WikiException("Could not find upload file: " + file);
+	}
 
 	NodeKey nodeKey = processFile(file, type);
 
@@ -662,8 +661,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * (non-Javadoc)
      * 
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#updateWikiPage(org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm,
-     *      org.lamsfoundation.lams.tool.wiki.model.WikiPage,
-     *      org.lamsfoundation.lams.tool.wiki.model.WikiUser)
+     *      org.lamsfoundation.lams.tool.wiki.model.WikiPage, org.lamsfoundation.lams.tool.wiki.model.WikiUser)
      */
     public void updateWikiPage(WikiPageForm wikiPageForm, WikiPage wikiPage, WikiUser user) {
 
@@ -699,8 +697,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      * (non-Javadoc)
      * 
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#insertWikiPage(org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm,
-     *      org.lamsfoundation.lams.tool.wiki.model.Wiki,
-     *      org.lamsfoundation.lams.tool.wiki.model.WikiUser,
+     *      org.lamsfoundation.lams.tool.wiki.model.Wiki, org.lamsfoundation.lams.tool.wiki.model.WikiUser,
      *      org.lamsfoundation.lams.tool.wiki.model.WikiSession)
      */
     public Long insertWikiPage(WikiPageForm wikiPageForm, Wiki wiki, WikiUser user, WikiSession session) {
@@ -831,12 +828,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * This method verifies the credentials of the Wiki Tool and gives it the
-     * <code>Ticket</code> to login and access the Content Repository.
+     * This method verifies the credentials of the Wiki Tool and gives it the <code>Ticket</code> to login and access
+     * the Content Repository.
      * 
-     * A valid ticket is needed in order to access the content from the
-     * repository. This method would be called evertime the tool needs to
-     * upload/download files from the content repository.
+     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
+     * the tool needs to upload/download files from the content repository.
      * 
      * @return ITicket The ticket for repostory access
      * @throws SubmitFilesException
@@ -901,8 +897,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /*
-     * ===============Methods implemented from ToolContentImport102Manager
-     * ===============
+     * ===============Methods implemented from ToolContentImport102Manager ===============
      */
 
     /**
@@ -939,8 +934,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /**
-     * Set the description, throws away the title value as this is not supported
-     * in 2.0
+     * Set the description, throws away the title value as this is not supported in 2.0
      */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
@@ -964,7 +958,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     public void setWikiAttachmentDAO(IWikiAttachmentDAO attachmentDAO) {
-	this.wikiAttachmentDAO = attachmentDAO;
+	wikiAttachmentDAO = attachmentDAO;
     }
 
     public IWikiDAO getWikiDAO() {
@@ -1004,7 +998,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     public void setWikiSessionDAO(IWikiSessionDAO sessionDAO) {
-	this.wikiSessionDAO = sessionDAO;
+	wikiSessionDAO = sessionDAO;
     }
 
     public ILamsToolService getToolService() {
@@ -1020,7 +1014,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     public void setWikiUserDAO(IWikiUserDAO userDAO) {
-	this.wikiUserDAO = userDAO;
+	wikiUserDAO = userDAO;
     }
 
     public ILearnerService getLearnerService() {
@@ -1060,25 +1054,25 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     public IEventNotificationService getEventNotificationService() {
-        return eventNotificationService;
+	return eventNotificationService;
     }
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
-        this.eventNotificationService = eventNotificationService;
+	this.eventNotificationService = eventNotificationService;
     }
 
     public MessageService getMessageService() {
-        return messageService;
+	return messageService;
     }
 
     public void setMessageService(MessageService messageService) {
-        this.messageService = messageService;
+	this.messageService = messageService;
     }
-    
+
     public String getLocalisedMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
     }
-    
+
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
     }
@@ -1090,13 +1084,13 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
-    
+
     public IRepositoryService getRepositoryService() {
-        return repositoryService;
+	return repositoryService;
     }
 
     public void setRepositoryService(IRepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
+	this.repositoryService = repositoryService;
     }
-    
+
 }

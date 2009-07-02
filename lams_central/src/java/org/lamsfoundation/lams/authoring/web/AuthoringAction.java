@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -51,8 +52,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author Manpreet Minhas
  * 
- * @struts.action path = "/authoring/author" parameter = "method" validate =
- *                "false"
+ * @struts.action path = "/authoring/author" parameter = "method" validate = "false"
  * 
  */
 public class AuthoringAction extends LamsDispatchAction {
@@ -80,21 +80,20 @@ public class AuthoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT
-     * is set, then it sets the session attribute "parameterName" to the wddx
-     * packet string. If USE_JSP_OUTPUT is not set, then the packet is written
-     * out to the request's PrintWriter.
+     * Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT is set, then it sets the session
+     * attribute "parameterName" to the wddx packet string. If USE_JSP_OUTPUT is not set, then the packet is written out
+     * to the request's PrintWriter.
      * 
      * @param mapping
-     *            action mapping (for the forward to the success jsp)
+     *                action mapping (for the forward to the success jsp)
      * @param request
-     *            needed to check the USE_JSP_OUTPUT parameter
+     *                needed to check the USE_JSP_OUTPUT parameter
      * @param response
-     *            to write out the wddx packet if not using the jsp
+     *                to write out the wddx packet if not using the jsp
      * @param wddxPacket
-     *            wddxPacket or message to be sent/displayed
+     *                wddxPacket or message to be sent/displayed
      * @param parameterName
-     *            session attribute to set if USE_JSP_OUTPUT is set
+     *                session attribute to set if USE_JSP_OUTPUT is set
      * @throws IOException
      */
     private ActionForward outputPacket(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
@@ -110,8 +109,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	IAuthoringService authoringService = getAuthoringService();
 	try {
 	    Long toolContentID = WebUtil.readLongParam(request, "toolContentID", false);
-
-	    wddxPacket = authoringService.getToolOutputDefinitions(toolContentID);
+	    Integer definitionType = ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION; // WebUtil.readIntParam(request,
+												    // "toolOutputDefinitionType");
+	    wddxPacket = authoringService.getToolOutputDefinitions(toolContentID, definitionType);
 
 	} catch (Exception e) {
 	    wddxPacket = handleException(e, "getToolOutputDefinitions", authoringService, true).serializeMessage();
@@ -126,7 +126,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	try {
 	    Long learningDesignID = WebUtil.readLongParam(request, "learningDesignID", false);
 	    wddxPacket = authoringService.getLearningDesignDetails(learningDesignID, getUserLanguage());
-	    log.debug("LD wddx packet: " + wddxPacket);
+	    AuthoringAction.log.debug("LD wddx packet: " + wddxPacket);
 	} catch (Exception e) {
 	    wddxPacket = handleException(e, "getLearningDesignDetails", authoringService, true).serializeMessage();
 	}
@@ -176,7 +176,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	} catch (Exception e) {
 	    wddxPacket = handleException(e, "getAllLearningDesignDetails", authoringService, true).serializeMessage();
 	}
-	log.debug("getAllLearningDesignDetails: returning " + wddxPacket);
+	AuthoringAction.log.debug("getAllLearningDesignDetails: returning " + wddxPacket);
 	return outputPacket(mapping, request, response, wddxPacket, "details");
     }
 
@@ -189,7 +189,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	} catch (Exception e) {
 	    wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService, true).serializeMessage();
 	}
-	log.debug("getAllLearningLibraryDetails: returning " + wddxPacket);
+	AuthoringAction.log.debug("getAllLearningLibraryDetails: returning " + wddxPacket);
 	return outputPacket(mapping, request, response, wddxPacket, "details");
     }
 
@@ -209,9 +209,8 @@ public class AuthoringAction extends LamsDispatchAction {
     }
 
     /**
-     * Copy some existing content. Used when the user copies an activity in
-     * authoring. Expects one parameters - toolContentId (the content to be
-     * copied)
+     * Copy some existing content. Used when the user copies an activity in authoring. Expects one parameters -
+     * toolContentId (the content to be copied)
      */
     public ActionForward copyToolContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -232,11 +231,9 @@ public class AuthoringAction extends LamsDispatchAction {
     /**
      * This method returns a list of all available license in WDDX format.
      * 
-     * This will include our supported Creative Common licenses and an "OTHER"
-     * license which may be used for user entered license details. The picture
-     * url supplied should be a full URL i.e. if it was a relative URL in the
-     * database, it should have been converted to a complete server URL
-     * (starting http://) before sending to the client.
+     * This will include our supported Creative Common licenses and an "OTHER" license which may be used for user
+     * entered license details. The picture url supplied should be a full URL i.e. if it was a relative URL in the
+     * database, it should have been converted to a complete server URL (starting http://) before sending to the client.
      * 
      * @return String The required information in WDDX format
      * @throws IOException
@@ -250,7 +247,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    Vector licenses = authoringService.getAvailableLicenses();
 	    flashMessage = new FlashMessage("getAvailableLicenses", licenses);
 	} catch (Exception e) {
-	    log.error("getAvailableLicenses: License details unavailable due to system error.", e);
+	    AuthoringAction.log.error("getAvailableLicenses: License details unavailable due to system error.", e);
 	    flashMessage = new FlashMessage("getAvailableLicenses", "License details unavailable due to system error :"
 		    + e.getMessage(), FlashMessage.ERROR);
 
@@ -310,7 +307,7 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     private FlashMessage handleException(Exception e, String methodKey, IAuthoringService authoringService,
 	    boolean useCriticalError) {
-	log.error("Exception thrown " + methodKey, e);
+	AuthoringAction.log.error("Exception thrown " + methodKey, e);
 	getAuditService().log(AuthoringAction.class.getName() + ":" + methodKey, e.toString());
 
 	String[] msg = new String[1];
@@ -325,12 +322,12 @@ public class AuthoringAction extends LamsDispatchAction {
      * @return
      */
     private IAuditService getAuditService() {
-	if (auditService == null) {
+	if (AuthoringAction.auditService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    auditService = (IAuditService) ctx.getBean("auditService");
+	    AuthoringAction.auditService = (IAuditService) ctx.getBean("auditService");
 	}
-	return auditService;
+	return AuthoringAction.auditService;
     }
 
 }

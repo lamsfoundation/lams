@@ -279,8 +279,10 @@ public interface QaAppConstants {
     public static final String PARAM_ORDER_ID = "orderId";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
     public static final int QUESTION_CUTOFF_INDEX = 40;
-    public static final String TEXT_SEARCH_DEFINITION_NAME = "text.search.output.definition.qa";
-    public static final String TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "text.search.output.definition.qa.default.condition";
+    public static final String USER_ANSWERS_DEFINITION_NAME = "user.answers.output.definition.qa";
+    public static final String USER_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "user.answers.output.definition.qa.default.condition";
+    public static final String GROUP_ANSWERS_DEFINITION_NAME = "group.answers.output.definition.qa";
+    public static final String QUESTIONS_DEFINITION_NAME = "questions.output.definition.qa";
     public static final String ATTR_WIZARD_CATEGORIES = "wizardCategories";
     public static final String ATTR_WIZARD_ENABLED = "wizardEnabled";
 }

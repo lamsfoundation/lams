@@ -946,7 +946,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
 

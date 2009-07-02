@@ -91,8 +91,14 @@ public class VoteGeneralAuthoringDTO implements Comparable
     protected String isToolSessionChanged;
     protected String responseId;
     protected String currentUid;
-	
+    protected List<String> dataFlowObjectNames;	
     
+    public List<String> getDataFlowObjectNames() {
+        return dataFlowObjectNames;
+    }
+    public void setDataFlowObjectNames(List<String> dataFlowObjectNames) {
+        this.dataFlowObjectNames = dataFlowObjectNames;
+    }
     /**
      * @return Returns the httpSessionID.
      */

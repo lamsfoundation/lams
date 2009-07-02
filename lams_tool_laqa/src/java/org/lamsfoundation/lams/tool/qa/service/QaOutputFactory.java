@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -44,8 +45,9 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
 /**
- * Output factory for Q&A tool. Currently it provides only one type of output - a user answers represented by an array
- * of strings (output type "OUTPUT_COMPLEX").
+ * Output factory for Q&A tool. For conditions it provides only one type of output - a user answers represented by an
+ * array of strings (output type "OUTPUT_COMPLEX"). For data flow between tools it provides all users' answers (from
+ * current group) and questions asked.
  * 
  * @author Marcin Cieslak
  */
@@ -55,24 +57,39 @@ public class QaOutputFactory extends OutputFactory {
      * {@inheritDoc}
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	if (toolContentObject != null) {
-	    ToolOutputDefinition allAnswersDefinition = buildComplexOutputDefinition(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME);
 	    QaContent qaContent = (QaContent) toolContentObject;
-	    // adding all existing conditions
-	    allAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
-	    // if no conditions were created in the tool instance, a default condition is added;
-	    if (allAnswersDefinition.getDefaultConditions().isEmpty() && !qaContent.getQaQueContents().isEmpty()) {
+	    // Different definitions are provided, depending how the output will be used
+	    switch (definitionType) {
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION: {
+		ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(QaAppConstants.USER_ANSWERS_DEFINITION_NAME);
 
-		QaCondition defaultCondition = createDefaultComplexCondition(qaContent);
-		qaContent.getConditions().add(defaultCondition);
+		// adding all existing conditions
+		userAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
+		// if no conditions were created in the tool instance, a default condition is added;
+		if (userAnswersDefinition.getDefaultConditions().isEmpty() && !qaContent.getQaQueContents().isEmpty()) {
 
-		allAnswersDefinition.getDefaultConditions().add(defaultCondition);
+		    QaCondition defaultCondition = createDefaultComplexUserAnswersCondition(qaContent);
+		    qaContent.getConditions().add(defaultCondition);
+
+		    userAnswersDefinition.getDefaultConditions().add(defaultCondition);
+		}
+		userAnswersDefinition.setShowConditionNameOnly(true);
+		definitionMap.put(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, userAnswersDefinition);
 	    }
-	    allAnswersDefinition.setShowConditionNameOnly(true);
-	    definitionMap.put(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME, allAnswersDefinition);
+		break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW: {
+		ToolOutputDefinition groupAnswersDefinition = buildComplexOutputDefinition(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME);
+		definitionMap.put(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, groupAnswersDefinition);
+
+		ToolOutputDefinition questionsDefinition = buildComplexOutputDefinition(QaAppConstants.QUESTIONS_DEFINITION_NAME);
+		definitionMap.put(QaAppConstants.QUESTIONS_DEFINITION_NAME, questionsDefinition);
+	    }
+		break;
+	    }
 	}
 
 	return definitionMap;
@@ -84,39 +101,39 @@ public class QaOutputFactory extends OutputFactory {
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IQaService qaService, Long toolSessionId,
 	    Long learnerId) {
-
+	// result
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
-	// cached tool output for all text search conditions
-	ToolOutput allAnswersOutput = null;
+	// tool output cache
+	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
+
 	if (names == null) {
 	    // output will be set for all the existing conditions
 	    QaContent qaContent = qaService.getQaContentBySessionId(toolSessionId);
 	    Set<QaCondition> conditions = qaContent.getConditions();
 	    for (QaCondition condition : conditions) {
 		String name = condition.getName();
-		if (isTextSearchConditionName(name) && allAnswersOutput != null) {
-		    outputs.put(name, allAnswersOutput);
+		String[] nameParts = splitConditionName(name);
+
+		if (baseOutputs.get(nameParts[0]) != null) {
+		    outputs.put(name, baseOutputs.get(nameParts[0]));
 		} else {
 		    ToolOutput output = getToolOutput(name, qaService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    allAnswersOutput = output;
-			}
+			baseOutputs.put(nameParts[0], output);
 		    }
 		}
 	    }
 	} else {
 	    for (String name : names) {
-		if (isTextSearchConditionName(name) && allAnswersOutput != null) {
-		    outputs.put(name, allAnswersOutput);
+		String[] nameParts = splitConditionName(name);
+		if (baseOutputs.get(nameParts[0]) != null) {
+		    outputs.put(name, baseOutputs.get(nameParts[0]));
 		} else {
 		    ToolOutput output = getToolOutput(name, qaService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    allAnswersOutput = output;
-			}
+			baseOutputs.put(nameParts[0], output);
 		    }
 		}
 	    }
@@ -126,7 +143,8 @@ public class QaOutputFactory extends OutputFactory {
     }
 
     public ToolOutput getToolOutput(String name, IQaService qaService, Long toolSessionId, Long learnerId) {
-	if (isTextSearchConditionName(name)) {
+	String[] nameParts = splitConditionName(name);
+	if (QaAppConstants.USER_ANSWERS_DEFINITION_NAME.equals(nameParts[0])) {
 	    // user answers are loaded from the DB and array of strings is created
 
 	    QaSession session = qaService.retrieveQaSession(toolSessionId);
@@ -145,7 +163,68 @@ public class QaOutputFactory extends OutputFactory {
 		    answers[question.getDisplayOrder() - 1] = answer;
 		}
 	    }
-	    return new ToolOutput(name, getI18NText(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME, true), answers, false);
+	    return new ToolOutput(name, getI18NText(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, true), answers, false);
+	} else if (QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME.equals(nameParts[0])) {
+	    // all users' answers are loaded from the DB and array of strings is created
+
+	    QaSession session = qaService.retrieveQaSession(toolSessionId);
+	    QaContent qaContent = session.getQaContent();
+	    Set<QaQueContent> questions = qaContent.getQaQueContents();
+	    Set<QaQueUsr> users = session.getQaQueUsers();
+	    String[] answers = new String[questions.size() * users.size()];
+	    int answerCount = 0;
+	    for (QaQueContent question : questions) {
+		int userIndex = 0;
+		for (QaQueUsr user : users) {
+		    List<QaUsrResp> attempts = null;
+		    if (user != null) {
+			attempts = qaService.getAttemptsForUserAndQuestionContent(user.getUid(), question.getUid());
+		    }
+		    if (attempts != null && !attempts.isEmpty()) {
+			// only the last attempt is taken into consideration
+			String answer = attempts.get(attempts.size() - 1).getAnswer();
+			if (!StringUtils.isBlank(answer)) {
+			    // check for duplicate answers
+			    boolean duplicate = false;
+			    for (String previousAnswer : answers) {
+				if (answer.equalsIgnoreCase(previousAnswer)) {
+				    duplicate = true;
+				    break;
+				}
+			    }
+			    if (!duplicate) {
+				answers[question.getDisplayOrder() - 1 + userIndex * questions.size()] = answer;
+				answerCount++;
+			    }
+			}
+		    }
+		    userIndex++;
+		}
+	    }
+	    if (answerCount < answers.length) {
+		String[] trimmedAnswers = new String[answerCount];
+		int answerIndex = 0;
+		for (String answer : answers) {
+		    if (answer != null) {
+			trimmedAnswers[answerIndex++] = answer;
+		    }
+		}
+		answers = trimmedAnswers;
+	    }
+
+	    return new ToolOutput(name, getI18NText(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, true), answers, false);
+	} else if (QaAppConstants.QUESTIONS_DEFINITION_NAME.equals(nameParts[0])) {
+	    // Questions asked in this Q&A activity
+	    QaSession session = qaService.retrieveQaSession(toolSessionId);
+	    QaContent qaContent = session.getQaContent();
+	    Set<QaQueContent> questions = qaContent.getQaQueContents();
+	    String[] questionArray = new String[questions.size()];
+	    int questionIndex = 0;
+	    for (QaQueContent question : questions) {
+		questionArray[questionIndex++] = question.getQuestion();
+	    }
+	    return new ToolOutput(name, getI18NText(QaAppConstants.QUESTIONS_DEFINITION_NAME, true), questionArray,
+		    false);
 	}
 	return null;
     }
@@ -155,33 +234,28 @@ public class QaOutputFactory extends OutputFactory {
 	return super.splitConditionName(conditionName);
     }
 
-    protected String buildConditionName(String uniquePart) {
-	return super.buildConditionName(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME, uniquePart);
-    }
-
-    private boolean isTextSearchConditionName(String name) {
-	return name != null && name.startsWith(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME);
+    protected String buildUserAnswersConditionName(String uniquePart) {
+	return super.buildConditionName(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, uniquePart);
     }
 
     /**
-     * Creates a default condition so teachers know how to use complex
-     * conditions for this tool.
+     * Creates a default condition so teachers know how to use complex conditions for this tool.
      * 
      * @param qaContent
      *                content of the tool
      * @return default Q&A condition
      */
-    protected QaCondition createDefaultComplexCondition(QaContent qaContent) {
+    protected QaCondition createDefaultComplexUserAnswersCondition(QaContent qaContent) {
 	if (qaContent.getQaQueContents().isEmpty()) {
 	    return null;
 	}
 	Set<QaQueContent> questions = new HashSet<QaQueContent>();
 	questions.add((QaQueContent) qaContent.getQaQueContents().iterator().next());
-	String name = buildConditionName(QaAppConstants.TEXT_SEARCH_DEFINITION_NAME, qaContent.getQaContentId()
+	String name = buildConditionName(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, qaContent.getQaContentId()
 		.toString());
 	// Default condition checks if the first answer contains word "LAMS"
 	return new QaCondition(null, null, 1, name, getI18NText(
-		QaAppConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null,
+		QaAppConstants.USER_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null,
 		questions);
     }
 }

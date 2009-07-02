@@ -347,4 +347,6 @@ public interface VoteAppConstants {
     public static final String USER_EXCEPTION_OPTIONS_DUPLICATE = "userExceptionOptionsDuplicate";
     public static final String USER_EXCEPTION_MAXNOMINATION_INVALID = "userExceptionMaxNominationInvalid";
     public static final String SUCCESS = "success";
+
+    public static final Integer DATA_FLOW_OBJECT_ASSIGMENT_ID = 0;
 }

@@ -154,9 +154,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // Service method
     // *******************************************************************************
     /**
-     * Try to get the file. If forceLogin = false and an access denied exception
-     * occurs, call this method again to get a new ticket and retry file lookup.
-     * If forceLogin = true and it then fails then throw exception.
+     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
+     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
      * 
      * @param uuid
      * @param versionId
@@ -185,12 +184,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     /**
-     * This method verifies the credentials of the Assessment Tool and gives it
-     * the <code>Ticket</code> to login and access the Content Repository.
+     * This method verifies the credentials of the Assessment Tool and gives it the <code>Ticket</code> to login and
+     * access the Content Repository.
      * 
-     * A valid ticket is needed in order to access the content from the
-     * repository. This method would be called evertime the tool needs to
-     * upload/download files from the content repository.
+     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
+     * the tool needs to upload/download files from the content repository.
      * 
      * @return ITicket The ticket for repostory access
      * @throws AssessmentApplicationException
@@ -410,7 +408,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    pattern = Pattern.compile(optionString, java.util.regex.Pattern.CASE_INSENSITIVE
 			    | java.util.regex.Pattern.UNICODE_CASE);
 		}
-		boolean isAnswerCorrect = (question.getAnswerString() != null) ? pattern.matcher(
+		boolean isAnswerCorrect = question.getAnswerString() != null ? pattern.matcher(
 			question.getAnswerString()).matches() : false;
 
 		if (isAnswerCorrect) {
@@ -426,8 +424,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    boolean isAnswerCorrect = false;
 		    try {
 			float answerFloat = Float.valueOf(question.getAnswerString());
-			isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError())) && (answerFloat <= (option
-				.getOptionFloat() + option.getAcceptedError())));
+			isAnswerCorrect = answerFloat >= option.getOptionFloat() - option.getAcceptedError()
+				&& answerFloat <= option.getOptionFloat() + option.getAcceptedError();
 		    } catch (Exception e) {
 		    }
 
@@ -442,9 +440,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 				try {
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
-				    isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option
-					    .getAcceptedError())) && (answerFloat <= (option.getOptionFloat() + option
-					    .getAcceptedError())));
+				    isAnswerCorrect = answerFloat >= option.getOptionFloat()
+					    - option.getAcceptedError()
+					    && answerFloat <= option.getOptionFloat() + option.getAcceptedError();
 				    if (isAnswerCorrect) {
 					break;
 				    }
@@ -461,7 +459,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		}
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
-	    if ((question.getAnswerBoolean() == question.getCorrectAnswer()) && (question.getAnswerString() != null)) {
+	    if (question.getAnswerBoolean() == question.getCorrectAnswer() && question.getAnswerString() != null) {
 		mark = maxMark;
 	    }
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
@@ -587,8 +585,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId,
 		userId);
-	long timeTaken = (lastFinishedResult == null) ? 0
-		: (lastFinishedResult.getFinishDate().getTime() - lastFinishedResult.getStartDate().getTime());
+	long timeTaken = lastFinishedResult == null ? 0 : lastFinishedResult.getFinishDate().getTime()
+		- lastFinishedResult.getStartDate().getTime();
 	userSummary.setTimeOfLastAttempt(new Date(timeTaken));
 	if (lastFinishedResult != null) {
 	    userSummary.setLastAttemptGrade(lastFinishedResult.getGrade());
@@ -669,7 +667,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		}
 	    }
 	}
-	float averageMark = (count == 0) ? 0 : total / count;
+	float averageMark = count == 0 ? 0 : total / count;
 	questionSummary.setAverageMark(averageMark);
 
 	escapeQuotes(questionSummary);
@@ -808,9 +806,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	return node;
     }
-    
+
     /**
      * Get a message from the language files with the given key
+     * 
      * @param key
      * @return
      */
@@ -947,21 +946,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     /**
-     * Get the definitions for possible output for an activity, based on the
-     * toolContentId. These may be definitions that are always available for the
-     * tool (e.g. number of marks for Multiple Choice) or a custom definition
-     * created for a particular activity such as the answer to the third
-     * question contains the word Koala and hence the need for the toolContentId
+     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
+     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
+     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * the toolContentId
      * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of
-     *         each definition
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	Assessment assessment = getAssessmentByContentId(toolContentId);
 	if (assessment == null) {
 	    assessment = getDefaultAssessment();
 	}
-	return getAssessmentOutputFactory().getToolOutputDefinitions(assessment);
+	return getAssessmentOutputFactory().getToolOutputDefinitions(assessment, definitionType);
     }
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
@@ -1073,8 +1071,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     /**
      * Get the tool output for the given tool output names.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>,
-     *      java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
+     *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
@@ -1083,8 +1081,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     /**
      * Get the tool output for the given tool output name.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String,
-     *      java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
+     *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
@@ -1099,8 +1097,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     /**
-     * Set the description, throws away the title value as this is not supported
-     * in 2.0
+     * Set the description, throws away the title value as this is not supported in 2.0
      */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
@@ -1167,13 +1164,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     /**
-     * Finds out which lesson the given tool content belongs to and returns its
-     * monitoring users.
+     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
      * 
      * @param sessionId
      *                tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool
-     *         with given session ID
+     * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);

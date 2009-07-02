@@ -130,8 +130,8 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
     /* Methods from ToolSessionManager */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
+	if (DimdimService.logger.isDebugEnabled()) {
+	    DimdimService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
 		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
@@ -189,9 +189,9 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
-	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
-		    + toContentId);
+	if (DimdimService.logger.isDebugEnabled()) {
+	    DimdimService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
+		    + " toContentId=" + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -238,9 +238,9 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
+     *                 if no tool content matches the toolSessionId
      * @throws ToolException
-     *             if any other error occurs
+     *                 if any other error occurs
      */
 
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
@@ -248,8 +248,9 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	if (dimdim == null) {
 	    dimdim = getDefaultContent();
 	}
-	if (dimdim == null)
+	if (dimdim == null) {
 	    throw new DataMissingException("Unable to find default content for the dimdim tool");
+	}
 
 	// set ResourceToolContentHandler as null to avoid copy file node in
 	// repository again.
@@ -273,7 +274,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *             if any other error occurs
+     *                 if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
@@ -283,9 +284,10 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, dimdimToolContentHandler,
 		    fromVersion, toVersion);
-	    if (!(toolPOJO instanceof Dimdim))
+	    if (!(toolPOJO instanceof Dimdim)) {
 		throw new ImportToolContentException("Import Dimdim tool content failed. Deserialized object is "
 			+ toolPOJO);
+	    }
 	    Dimdim dimdim = (Dimdim) toolPOJO;
 
 	    // reset it to new toolContentId
@@ -306,7 +308,8 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
 
@@ -343,7 +346,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
 	if (toolContentId == null) {
 	    String error = "Could not retrieve default content id for this tool";
-	    logger.error(error);
+	    DimdimService.logger.error(error);
 	    throw new DimdimException(error);
 	}
 	return toolContentId;
@@ -354,7 +357,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	Dimdim defaultContent = getDimdimByContentId(defaultContentID);
 	if (defaultContent == null) {
 	    String error = "Could not retrieve default content record for this tool";
-	    logger.error(error);
+	    DimdimService.logger.error(error);
 	    throw new DimdimException(error);
 	}
 	return defaultContent;
@@ -364,7 +367,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
 	if (newContentID == null) {
 	    String error = "Cannot copy the Dimdim tools default content: + " + "newContentID is null";
-	    logger.error(error);
+	    DimdimService.logger.error(error);
 	    throw new DimdimException(error);
 	}
 
@@ -420,8 +423,9 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     }
 
     public DimdimAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName()))
+	if (file == null || StringUtils.isEmpty(file.getFileName())) {
 	    throw new DimdimException("Could not find upload file: " + file);
+	}
 
 	NodeKey nodeKey = processFile(file, type);
 
@@ -445,7 +449,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	// Get Dimdim server url
 	String serverURL = getConfigValue(Constants.CFG_SERVER_URL);
 	if (serverURL == null) {
-	    logger.error("Config item : '" + Constants.CFG_SERVER_URL + "' not defined");
+	    DimdimService.logger.error("Config item : '" + Constants.CFG_SERVER_URL + "' not defined");
 	    throw new DimdimException("Standard server url not defined");
 	}
 
@@ -463,7 +467,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
 	    return serverURL + path;
 	} else {
-	    logger.error("getDimdimJoinConferenceURL: result: " + result);
+	    DimdimService.logger.error("getDimdimJoinConferenceURL: result: " + result);
 	}
 	return null;
     }
@@ -473,13 +477,13 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
 	String serverURL = getConfigValue(Constants.CFG_SERVER_URL);
 	if (serverURL == null) {
-	    logger.error("Config item : '" + Constants.CFG_SERVER_URL + "' not defined");
+	    DimdimService.logger.error("Config item : '" + Constants.CFG_SERVER_URL + "' not defined");
 	    throw new DimdimException("Standard server url not defined");
 	}
 
 	String version = getConfigValue(Constants.CFG_VERSION);
 	if (version == null) {
-	    logger.error("Config value " + Constants.CFG_VERSION + " returned null");
+	    DimdimService.logger.error("Config value " + Constants.CFG_VERSION + " returned null");
 	    throw new DimdimException("Server version not defined");
 	}
 
@@ -507,7 +511,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 		    + "&screenShareEnabled=" + "true" + "&participantListEnabled=true" + "&dialInfoVisible=true");
 
 	} else {
-	    logger.error("Unknown version type: " + version);
+	    DimdimService.logger.error("Unknown version type: " + version);
 	    throw new DimdimException("Unknown version type");
 	}
 
@@ -537,7 +541,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
     @SuppressWarnings("unchecked")
     public DimdimConfig getConfig(String key) {
-	List<DimdimConfig> list = (List<DimdimConfig>) dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
+	List<DimdimConfig> list = dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
@@ -547,7 +551,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
     @SuppressWarnings("unchecked")
     public String getConfigValue(String key) {
-	List<DimdimConfig> list = (List<DimdimConfig>) dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
+	List<DimdimConfig> list = dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
@@ -569,8 +573,8 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 
     private String sendRequest(URL url) throws IOException {
 
-	if (logger.isDebugEnabled()) {
-	    logger.debug("request = " + url);
+	if (DimdimService.logger.isDebugEnabled()) {
+	    DimdimService.logger.debug("request = " + url);
 	}
 
 	URLConnection connection = url.openConnection();
@@ -579,12 +583,13 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	String response = "";
 	String line = "";
 
-	while ((line = in.readLine()) != null)
+	while ((line = in.readLine()) != null) {
 	    response += line;
+	}
 	in.close();
 
-	if (logger.isDebugEnabled()) {
-	    logger.debug("response = " + response);
+	if (DimdimService.logger.isDebugEnabled()) {
+	    DimdimService.logger.debug("response = " + response);
 	}
 
 	return response;
@@ -675,7 +680,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
 
-	logger
+	DimdimService.logger
 		.warn("Setting the reflective field on a dimdim. This doesn't make sense as the dimdim is for reflection and we don't reflect on reflection!");
 	Dimdim dimdim = getDimdimByContentId(toolContentId);
 	if (dimdim == null) {
@@ -695,7 +700,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     }
 
     public void setDimdimAttachmentDAO(IDimdimAttachmentDAO attachmentDAO) {
-	this.dimdimAttachmentDAO = attachmentDAO;
+	dimdimAttachmentDAO = attachmentDAO;
     }
 
     public IDimdimDAO getDimdimDAO() {
@@ -719,7 +724,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     }
 
     public void setDimdimSessionDAO(IDimdimSessionDAO sessionDAO) {
-	this.dimdimSessionDAO = sessionDAO;
+	dimdimSessionDAO = sessionDAO;
     }
 
     public IDimdimConfigDAO getDimdimConfigDAO() {
@@ -743,7 +748,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     }
 
     public void setDimdimUserDAO(IDimdimUserDAO userDAO) {
-	this.dimdimUserDAO = userDAO;
+	dimdimUserDAO = userDAO;
     }
 
     public ILearnerService getLearnerService() {
@@ -769,12 +774,12 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
     }
-    
+
     public IRepositoryService getRepositoryService() {
-        return repositoryService;
+	return repositoryService;
     }
 
     public void setRepositoryService(IRepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
+	this.repositoryService = repositoryService;
     }
 }

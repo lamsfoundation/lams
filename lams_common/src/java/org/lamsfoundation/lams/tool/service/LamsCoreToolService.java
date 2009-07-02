@@ -358,7 +358,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      * @throws ToolException
      */
-    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId)
+    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromTool(Long toolContentId, int definitionType)
 	    throws ToolException {
 
 	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, toolContentId);
@@ -378,7 +378,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
 	try {
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(tool);
-	    return contentManager.getToolOutputDefinitions(toolContentId);
+	    return contentManager.getToolOutputDefinitions(toolContentId, definitionType);
 	} catch (NoSuchBeanDefinitionException e) {
 	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output definitions. ToolContentId "
 		    + toolContentId;
