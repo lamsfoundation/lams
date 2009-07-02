@@ -11,44 +11,81 @@
 <lams:head>
 	<title><fmt:message key="index.welcome" /></title>
 	<lams:css/>
+	
+	<script src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js" type="text/javascript"></script>
+	<script src="<lams:LAMSURL/>/includes/javascript/jquery.validate.pack.js" type="text/javascript"></script>
 	<script language="JavaScript" type="text/javascript">
 		function submitForm()
 		{
-			document.getElementById("lamsCommunityLogin").submit();
+			var valid = $("#lamsCommunityLoginForm").valid();
+			
+			if (valid) {
+				document.getElementById("lamsCommunityLoginForm").submit();
+			}
+			
 		}
 		
 		function init()
 		{
 			document.getElementById("lcPassword").value = "";
 		}
+		
+		function onEnter(event){
+			intKeyCode = event.keyCode;
+			if (intKeyCode == 13) {
+				submitForm();
+			}
+		}
+		
+		$().ready(function() {
+			// validate
+			$("#lamsCommunityLoginForm").validate({
+				rules: {
+					lcUserName: "required",
+					lcPassword: "required",
+				},
+				messages: {
+					lcUserName: ' <font color="red"><fmt:message key="label.required"/></font>',
+					lcPassword: ' <font color="red"><fmt:message key="label.required"/></font>',
+				}
+			});
+		});
 	</script>
 	
 </lams:head>
 
 <body style="text-align:center" onload="init()">
 
-			<c:choose>
-				<c:when test="${empty errorMessage}">
-					<p class="info">
-						<fmt:message key="label.lamscommunity.message"/>
-					</p>
-				</c:when>
-				<c:otherwise>
-					<p class="warning">
-						<fmt:message key="${errorMessage}"/>
-					</p>
-				</c:otherwise>
-			</c:choose>
-		<html:form action="/lamsCommunityLogin" method="post" styleId="lamsCommunityLogin">
+		<c:choose>
+			<c:when test="${empty errorMessage}">
+				<p class="info">
+					<fmt:message key="label.lamscommunity.message"/>
+				</p>
+			</c:when>
+			<c:otherwise>
+				<p class="warning">
+					<fmt:message key="${errorMessage}"/>
+				</p>
+			</c:otherwise>
+		</c:choose>
+		
+		<br />
+		<p>
+			<fmt:message key="label.lamscommunity.info"/>
+		</p>
+		<br />
+		
+		
+		<html:form action="/lamsCommunityLogin" method="post" styleId="lamsCommunityLoginForm">
 			
 			<html:hidden property="dispatch" value="authenticate" />
-			<html:hidden property="lcDest" />
+			<html:hidden property="dest" />
 			<p>
-				<fmt:message key="label.lamscommunity.login"/>&nbsp;<html:text property="lcUserName" tabindex="1"></html:text>
+				<fmt:message key="label.lamscommunity.login"/>&nbsp;<html:text property="lcUserName" tabindex="1" onkeypress="onEnter(event)"></html:text>
 			</p>
 			
 			<p>
-				<fmt:message key="label.lamscommunity.password"/>&nbsp;<html:password property="lcPassword" styleId="lcPassword" tabindex="2"></html:password>
+				<fmt:message key="label.lamscommunity.password"/>&nbsp;<html:password property="lcPassword" styleId="lcPassword" tabindex="2" onkeypress="onEnter(event)"></html:password>
 			</p>
 			
 			<p class="login-button">

@@ -79,6 +79,7 @@
 			<value>/org/lamsfoundation/lams/web/webApplicationContext.xml</value>
 			<value>/org/lamsfoundation/lams/integrationContext.xml</value>
 			<value>/org/lamsfoundation/lams/usermanagement/ldapContext.xml</value>
+			<value>/org/lamsfoundation/lams/gradebook/gradebookApplicationContext.xml</value>
        </list>
 	 </constructor-arg>
 	</bean>

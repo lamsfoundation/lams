@@ -48,11 +48,18 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 *                validate="false"
 * 
 * ----------------XDoclet Tags--------------------
+* 
+* Currently this action class is unused, but we will retain it in the source for any future use
+* with the Paint FCKEditor plugin.
+* 
 */
 public class PaintAction extends LamsDispatchAction {
 	
 	private static Logger logger = Logger.getLogger(PresenceChatLoggerAction.class);
 	
+	/**
+	* @deprecated
+	*/
 	public ActionForward saveImage(ActionMapping mapping,
 			ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {

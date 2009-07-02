@@ -1,35 +1,61 @@
+/* CSS file */
 Application {
-	backgroundColor:#ECECEC;	
-	backgroundGradientColors:#ECECEC,#ECECEC;
+	backgroundColor: #FFFFFF;
+	themeColor: #0087e5;
+	backgroundGradientAlphas: 1.0, 1.0;
+	backgroundGradientColors: #FFFFFF, #FFFFFF;
 }
 
-Tile {
-	top: 10;
-	bottom: 10;
-	left: 10;
-	right: 10;
-}
-
-Label {
+Alert {
+	backgroundColor: #FFFFFF;
 	color: #000000;
-	fontWeight: bold;
-	fontSize: 14;
 }
 
-.box {
-	borderColor: #50B2CB;
-	cornerRadius: 10;
-	borderStyle: solid;
-	borderThickness: 1;
-	paddingBottom: 10;
-	paddingTop: 10;
-	paddingLeft: 10;
-	paddingRight: 10;
-	backgroundColor:#ffffff;
-	backgroundAlpha: 1;
+
+Panel {
+	borderColor: #45a6ed;
+	borderThicknessLeft: 1;
+	borderThicknessRight: 1;
+	borderThicknessBottom: 1;
+	borderAlpha: 1;
+	
+	paddingTop: 0;
+	paddingLeft: 0;
+	paddingRight: 0;
+	paddingBottom: 0;
+
+	highlightAlphas: 0.67, 0;
+	headerColors: #45a6ed, #0087e5;
+
+	titleStyleName: "myPanelStyle";
 }
 
-Text {
-	fontSize: 12;
-	fontWeight: normal;
+Wizard {
+	horizontalAlign : center;	
+}
+
+.mainBody {
+	backgroundColor: #FFFFFF;
+	paddingTop: 20;
+	horizontalAlign : center;	
+}
+
+Form, Label, TextInput { 
+	   color: #000000;
+	   font-weight: normal;
+}
+
+FormItem, List { 
+	   font-weight: bold;
+	    text-align: left;
+}
+
+.myPanelStyle {
+	color: #FFFFFF;
+}
+
+.panelText {
+	color: #000000;
+	 font-weight: none;
+	 text-align: left;
 }

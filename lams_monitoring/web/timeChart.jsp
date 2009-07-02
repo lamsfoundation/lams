@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <lams:html>
 	<head>
-      <title><<fmt:message key="monitor.title"/></title>
+      <title><fmt:message key="monitor.title"/></title>
 
 		<script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
 		

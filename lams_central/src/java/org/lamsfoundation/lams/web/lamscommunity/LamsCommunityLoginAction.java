@@ -82,7 +82,8 @@ public class LamsCommunityLoginAction extends LamsDispatchAction {
     private static final String ATTR_ERROR_MESSAGE = "errorMessage";
     
     private static final String LC_METHOD_IMPORT = "import";
-    private static final String LC_METHOD_SAVE = "import";
+    private static final String LC_METHOD_NEWS = "news";
+    private static final String LC_METHOD_SAVE = "save";
     
 
     /**
@@ -93,8 +94,23 @@ public class LamsCommunityLoginAction extends LamsDispatchAction {
      */
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-
 	User user = getUser(request);
+	
+
+	// Getting the destination of the lamscommunity call
+	String dest = WebUtil.readStrParam(request, LamsCommunityUtil.PARAM_DEST, true);
+	if (dest == null) {
+	    dest = LC_METHOD_NEWS;
+	}
+	
+	// Checking the server is registered
+	Registration reg = Configuration.getRegistration();
+	if (reg == null || reg.isEnableLamsCommunityIntegration() == false) {
+	    request.setAttribute("registered", Boolean.FALSE);
+	} else {
+	    request.setAttribute("registered", Boolean.TRUE);
+	}
+	
 	if (user.getLamsCommunityToken() == null || user.getLamsCommunityToken().equals("")) {
 	    // Authenticate the user manually
 	    return mapping.findForward("lamsCommunityLogin");
@@ -241,20 +257,13 @@ public class LamsCommunityLoginAction extends LamsDispatchAction {
 	HttpSession sharedsession = SessionManager.getSession();
 	sharedsession.setAttribute(AttributeNames.USER, userDTO);
 	
-	
 	String timestamp = "" + new Date().getTime();
 	String hash = LamsCommunityUtil.createAuthenticationHash(timestamp, user.getLamsCommunityUsername(), user.getLamsCommunityToken(), serverID, serverKey);
 
 	// Redirect the user to the lamscommunity sso url
 	
 	String url = LamsCommunityUtil.LAMS_COMMUNITY_SSO_URL + "?";
-	url = LamsCommunityUtil.appendAuthInfoToURL(url);
-	
-	//String url = LamsCommunityUtil.LAMS_COMMUNITY_SSO_URL + "?";
-	//url += LamsCommunityUtil.PARAM_LC_USERNAME + "=" + URLEncoder.encode(user.getLamsCommunityUsername(), "UTF8");
-	//url += "&" + LamsCommunityUtil.PARAM_HASH + "=" + hash;
-	//url += "&" + LamsCommunityUtil.PARAM_SERVER_ID + "=" + serverID;
-	//url += "&" + LamsCommunityUtil.PARAM_TIMESTAMP + "=" + timestamp;
+	url = LamsCommunityUtil.appendAuthInfoToURL(url, user);
 	
 	if (lamscommunityDest != null)
 	{
@@ -266,13 +275,13 @@ public class LamsCommunityLoginAction extends LamsDispatchAction {
 	
 	response.sendRedirect(url);
 	return null;
-    }
+    } 
     
     private String appendReturnUrl(String url, String dest, String customCSV) throws Exception
     {
 	url += "&" + LamsCommunityUtil.PARAM_DEST + "=" + URLEncoder.encode(dest, "UTF8");
 	if (dest != null && dest.equals(LC_METHOD_IMPORT)){
-	    String returnURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/authoring/importToolContent?method=importLCFinish";
+	    String returnURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/authoring/importToolContent.do?method=importLCFinish";
 	    
 	    url += "&" + LamsCommunityUtil.PARAM_RETURN_URL + "=" + URLEncoder.encode(returnURL, "UTF8");
 	}

@@ -28,20 +28,27 @@
 			
 			<br />
 			
-			<iframe
-				src="<lams:LAMSURL/>/lamsCommunityLogin.do?dest=import&customCSV=${customCSV}"
-				id="lamsCommunityIframe" name="lamsCommunityIframe"
-				style="width:95%;height:510px;border:0px;display:block;overflow:auto;margin-left:auto; margin-right:auto;" frameborder="no"
-				>
-			</iframe>
-			<!--  
-			<iframe
-				src="http://172.20.100.188:8080/lams/authoring/importToolContent.do?method=importLCFinish"
-				id="lamsCommunityIframe" name="lamsCommunityIframe"
-				style="width:90%;height:500px;border:0px;display:block;overflow:auto" frameborder="0"
-				>
-			</iframe>
-			-->
+			<c:choose>
+				<c:when test="${registered}" >
+					<iframe
+						src="<lams:LAMSURL/>/lamsCommunityLogin.do?dest=import&customCSV=${customCSV}"
+						id="lamsCommunityIframe" name="lamsCommunityIframe"
+						style="width:95%;height:510px;border:0px;display:block;overflow:auto;margin-left:auto; margin-right:auto;" frameborder="no"
+						>
+					</iframe>
+				</c:when>
+				<c:otherwise>
+					
+					<p>
+					<fmt:message key="label.lamscommunity.notRegistered.1" />
+					</p>
+					
+					<p>
+					<fmt:message key="label.lamscommunity.notRegistered.2" /> <a href="http://lamscommunity.org/lamscentral">http://lamscommunity.org/lamscentral</a> 
+					</p>
+
+				</c:otherwise>
+			</c:choose>
 			<br />
 		</div>
 		<!--closes content-->

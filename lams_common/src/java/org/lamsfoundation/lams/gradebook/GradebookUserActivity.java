@@ -40,13 +40,16 @@ public class GradebookUserActivity {
     private User learner;
     private Double mark;
     private String feedback;
+    private Boolean markedInGradebook;
 
     public GradebookUserActivity() {
+	markedInGradebook = false;
     }
     
     public GradebookUserActivity(ToolActivity activity, User learner){
 	this.activity = activity;
 	this.learner = learner;
+	markedInGradebook = false;
     }
 
     /**
@@ -105,4 +108,17 @@ public class GradebookUserActivity {
     public void setFeedback(String feedback) {
         this.feedback = feedback;
     }
+
+    /**
+     * @hibernate.property column="marked_in_gradebook" length="1"
+     */
+    public Boolean getMarkedInGradebook() {
+        return markedInGradebook;
+    }
+
+    public void setMarkedInGradebook(Boolean markedInGradebook) {
+        this.markedInGradebook = markedInGradebook;
+    }
+    
+    
 }

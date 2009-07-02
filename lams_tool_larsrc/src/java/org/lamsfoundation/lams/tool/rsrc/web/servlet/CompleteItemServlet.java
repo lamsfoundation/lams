@@ -109,10 +109,12 @@ public class CompleteItemServlet extends HttpServlet {
 	    PrintWriter out = response.getWriter();
 	    
 	    if(!rUser.isSessionFinished()) {
-	    	out.println("window.parent.opener.checkNew();");
+	    	out.println("window.parent.opener.checkNew(false);");
 	    	out.println("window.parent.opener=null;");
 	    	out.println("window.parent.close();");
 	    } else {
+	    	out.println("window.parent.opener.checkNew(true);");
+	    	out.println("window.parent.opener=null;");
 	    	out.println("window.parent.close();");
 	    }
 	    

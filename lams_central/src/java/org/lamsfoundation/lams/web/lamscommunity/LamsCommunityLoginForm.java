@@ -37,7 +37,7 @@ public class LamsCommunityLoginForm extends ActionForm {
     
     public String lcUserName;
     public String lcPassword;
-    public String lcDest;
+    public String dest;
     public String dispatch;
     
     public LamsCommunityLoginForm() {}
@@ -66,12 +66,12 @@ public class LamsCommunityLoginForm extends ActionForm {
         this.dispatch = dispatch;
     }
 
-    public String getLcDest() {
-        return lcDest;
+    public String getDest() {
+        return dest;
     }
 
-    public void setLcDest(String lcDest) {
-        this.lcDest = lcDest;
+    public void setDest(String dest) {
+        this.dest = dest;
     }
 }
  

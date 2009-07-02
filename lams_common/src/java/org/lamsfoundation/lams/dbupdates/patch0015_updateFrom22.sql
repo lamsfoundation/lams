@@ -92,7 +92,7 @@ CREATE TABLE lams_gradebook_user_activity (
 	, activity_id BIGINT(20) NOT NULL
 	, user_id BIGINT (20) NOT NULL
 	, mark DOUBLE PRECISION 
-	, marked_in_gradebook TINYINT(1) NOT NULL DEFAULT 0
+    , marked_in_gradebook TINYINT(1) NOT NULL DEFAULT 0
 	, feedback TEXT
 	, INDEX (activity_id, user_id)
 	, CONSTRAINT FK_lams_gradebook_user_activity_1 FOREIGN KEY (activity_id)
