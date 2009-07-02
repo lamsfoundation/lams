@@ -25,11 +25,12 @@
 				function toggleGroupContents(element, stateId) {
 					jQuery("a.j-group-header, span.j-group-icon", element).click(function() {
 						var row = jQuery("div.row", element);
-						var orgId = jQuery(row).parent("div.course-bg").attr("id");
+						var courseBg = jQuery(row).parent("div.course-bg");
+						var orgId = jQuery(courseBg).attr("id");
 						var course = jQuery(row).nextAll("div.j-course-contents");
 						var groupIcon = jQuery("span.j-group-icon", element);
 						if (jQuery(course).html() == null) {
-							loadGroupContents(orgId, stateId);
+							loadGroupContents(courseBg, stateId);
 							saveCollapsed(orgId, "false");
 							jQuery(groupIcon).html("<img src='images/tree_open.gif'/>");
 						} else {
@@ -61,7 +62,8 @@
 					});
 				}
 				
-				function loadGroupContents(orgId, stateId) {
+				function loadGroupContents(courseBg, stateId) {
+					var orgId = jQuery(courseBg).attr("id");
 					jQuery.ajax({
 						url: "displayGroup.do",
 						data: {
@@ -70,7 +72,7 @@
 							display: 'contents'
 						},
 						success: function(html) {
-							jQuery("#"+orgId).append(html);
+							jQuery(courseBg).append(html);
 							registerToolTip(this);
 						}
 					});

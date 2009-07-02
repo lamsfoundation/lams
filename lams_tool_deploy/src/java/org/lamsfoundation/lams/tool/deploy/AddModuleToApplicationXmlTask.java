@@ -55,7 +55,7 @@ public class AddModuleToApplicationXmlTask extends UpdateApplicationXmlTask
     }
     
     /**
-     * Add the given web app to the application.xml file
+     * Add the given module to the application.xml file
      * @param args 
      * @throws Exception
      */

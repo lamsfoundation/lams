@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.util.List;
+import java.util.TreeMap;
 import java.lang.Integer;
 
 import java.io.IOException;
@@ -123,9 +124,11 @@ public class NotebookAction extends LamsDispatchAction
 		Long lessonID = (Long) notebookForm.get(AttributeNames.PARAM_LESSON_ID);
 		
 		// get all notebook entries for the learner
-		List<NotebookEntry> entries = notebookService.getEntry(learnerID, CoreNotebookConstants.SCRATCH_PAD);
 		
-		request.getSession().setAttribute("entries", entries);
+		
+		TreeMap<Long, List<NotebookEntry>> entries = notebookService.getEntryByLesson(learnerID, CoreNotebookConstants.SCRATCH_PAD);
+		
+		request.getSession().setAttribute("entries", entries.values());
 		request.setAttribute("lessonID", lessonID);
 		
         return mapping.findForward(VIEW_ALL);

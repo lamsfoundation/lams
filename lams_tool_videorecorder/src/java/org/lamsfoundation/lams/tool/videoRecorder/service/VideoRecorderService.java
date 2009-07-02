@@ -291,9 +291,15 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	videoRecorder.setVideoRecorderSessions(null);
 	
 	VideoRecorderRecording authorRecording = (VideoRecorderRecording)getFirstRecordingByToolContentId(toolContentId).clone();
-	authorRecording.setToolContentId(null);
-	authorRecording.setComments(null);
-	authorRecording.setRatings(null);
+	if(authorRecording != null) {
+		authorRecording = (VideoRecorderRecording) authorRecording.clone();
+	
+		authorRecording.setToolContentId(null);
+		authorRecording.setComments(null);
+		authorRecording.setRatings(null);
+	
+	}
+	
 	videoRecorder.setAuthorRecording(authorRecording);
 	
 	Set<VideoRecorderAttachment> atts = videoRecorder.getVideoRecorderAttachments();
@@ -333,8 +339,11 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    
 	    // reset it to new toolContentId
 	    videoRecorder.setToolContentId(toolContentId);
-	    videoRecorder.getAuthorRecording().setToolContentId(toolContentId);
-
+	    
+	    if(recording != null) {
+	    	videoRecorder.getAuthorRecording().setToolContentId(toolContentId);
+	    }
+	    
 	    videoRecorderDAO.saveOrUpdate(videoRecorder);
 	    
 	    if(recording != null){
@@ -395,8 +404,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	    throw new VideoRecorderException(error);
 	}
 	if (defaultContent.getConditions().isEmpty()) {
-	    defaultContent.getConditions()
-		    .add(getVideoRecorderOutputFactory().createDefaultComplexCondition(defaultContent));
+		// needed?
 	}
 	return defaultContent;
     }
@@ -785,23 +793,6 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
         this.repositoryService = repositoryService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String createConditionName(Collection<VideoRecorderCondition> existingConditions) {
-	String uniqueNumber = null;
-	do {
-	    uniqueNumber = String.valueOf(Math.abs(generator.nextInt()));
-	    for (VideoRecorderCondition condition : existingConditions) {
-		String[] splitedName = getVideoRecorderOutputFactory().splitConditionName(condition.getName());
-		if (uniqueNumber.equals(splitedName[1])) {
-		    uniqueNumber = null;
-		}
-	    }
-	} while (uniqueNumber == null);
-	return getVideoRecorderOutputFactory().buildConditionName(uniqueNumber);
-    }
-
     public void releaseConditionsFromCache(VideoRecorder videoRecorder) {
 	if (videoRecorder.getConditions() != null) {
 	    for (VideoRecorderCondition condition : videoRecorder.getConditions()) {
@@ -827,6 +818,10 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public Long getNbRatings(Long userID, Long sessionId) {
     	return videoRecorderRatingDAO.getNbRatings(userID, sessionId);
     }    
+    
+    public boolean isGroupedActivity(long toolContentID) {
+    	return toolService.isGroupedActivity(toolContentID);
+    }
 
 	/**
 	 * @return String of xml with all needed language elements
@@ -897,6 +892,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 		languageCollection.add(new String("videorecorder.tooltip.rate.recording"));
 		languageCollection.add(new String("videorecorder.tooltip.already.rated"));
 		languageCollection.add(new String("videorecorder.disabled"));
+		languageCollection.add(new String("videorecorder.camera.not.available"));
+		languageCollection.add(new String("videorecorder.mic.not.available"));
 		
 		String languageOutput = "<xml><language>";
 		
@@ -942,6 +939,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 		languageCollection.add(new String("videorecorder.tooltip.start.recording.next"));
 		languageCollection.add(new String("videorecorder.tooltip.stop.recording"));
 		languageCollection.add(new String("videorecorder.disabled"));
+		languageCollection.add(new String("videorecorder.camera.not.available"));
+		languageCollection.add(new String("videorecorder.mic.not.available"));
 		
 		String languageOutput = "<xml><language>";
 		

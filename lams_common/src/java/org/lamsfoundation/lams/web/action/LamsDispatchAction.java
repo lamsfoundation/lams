@@ -34,52 +34,58 @@ import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.web.util.TokenProcessor;
 
 /**
- * @author daveg
- *
+ * @author daveg edited by lfoxton
+ * 
  */
 public abstract class LamsDispatchAction extends DispatchAction {
-    
+
     protected static String className = "Action";
-	
+    
+    public static final String ENCODING_UTF8 = "UTF8";
+    public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
+    public static final String CONTENT_TYPE_TEXT_HTML = "text/html";
+    public static final String CONTENT_TYPE_TEXT_XML = "text/xml";
+
     protected static TokenProcessor token = TokenProcessor.getInstance();
-    protected static Logger log = Logger.getLogger(LamsDispatchAction.class);    
+    protected static Logger log = Logger.getLogger(LamsDispatchAction.class);
 
-	protected void saveToken(javax.servlet.http.HttpServletRequest request) {
-        token.saveToken(request);
-	}
-	
-	protected boolean isTokenValid(javax.servlet.http.HttpServletRequest request) {
-        return token.isTokenValid(request, false);
-	}
-    
-	protected boolean isTokenValid(javax.servlet.http.HttpServletRequest request, boolean reset) {
-        return token.isTokenValid(request, reset);
-	}
-	
+    protected void saveToken(javax.servlet.http.HttpServletRequest request) {
+	token.saveToken(request);
+    }
+
+    protected boolean isTokenValid(javax.servlet.http.HttpServletRequest request) {
+	return token.isTokenValid(request, false);
+    }
+
+    protected boolean isTokenValid(javax.servlet.http.HttpServletRequest request, boolean reset) {
+	return token.isTokenValid(request, reset);
+    }
+
     protected void resetToken(HttpServletRequest request) {
-        token.resetToken(request);
+	token.resetToken(request);
+    }
+
+    protected void writeAJAXResponse(HttpServletResponse response, String output) throws IOException {
+	// set it to unicode (LDEV-1275)
+	response.setContentType("text/html;charset=utf-8");
+	PrintWriter writer = response.getWriter();
+
+	if (output.length() > 0) {
+	    writer.println(output);
+	}
+    }
+
+    protected void writeAJAXOKResponse(HttpServletResponse response) throws IOException {
+	writeAJAXResponse(response, "OK");
     }
     
-    /*protected void saveForward(javax.servlet.http.HttpServletRequest request, ActionForward forward) {
-    	token.saveForward(request, forward);
+    protected void writeResponse(HttpServletResponse response, String contentType, String characterEncoding, String output) throws IOException {
+	response.setContentType(contentType);
+	response.setCharacterEncoding(characterEncoding);
+	PrintWriter writer = response.getWriter();
+	if (output.length() > 0) {
+	    writer.println(output);
+	}
     }
-    
-    protected ActionForward getForward(javax.servlet.http.HttpServletRequest request) {
-    	return token.getForward(request, true);
-    }*/
-    
-	protected void writeAJAXResponse(HttpServletResponse response, String output) throws IOException {
-	    // set it to unicode (LDEV-1275)
-		response.setContentType("text/html;charset=utf-8");
-	    PrintWriter writer = response.getWriter();
-
-		if (output.length()>0) {
-	        writer.println(output);
-		}
-	}
-
-	protected void writeAJAXOKResponse(HttpServletResponse response) throws IOException {
-		writeAJAXResponse(response, "OK");
-	}
 
 }

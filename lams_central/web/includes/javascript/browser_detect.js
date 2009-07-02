@@ -49,7 +49,7 @@ http://www.nic.fi/~tapio1/Teaching/FAQ.php3
 //initialization, browser, os detection
 var d, dom, nu='', brow='', ie, ie4, ie5, ie5x, ie6, ie7, ie8;
 var ns4, moz, moz_rv_sub, release_date='', moz_brow, moz_brow_nu='', moz_brow_nu_sub='', rv_full=''; 
-var mac, win, old, lin, ie5mac, ie5xwin, konq, saf, op, op4, op5, op6, op7;
+var mac, win, old, lin, ie5mac, ie5xwin, konq, saf, saf4, op, op4, op5, op6, op7, chrome;
 
 d=document;
 n=navigator;
@@ -76,6 +76,7 @@ op=(nua.indexOf('Opera')!=-1);
 saf=(nua.indexOf('Safari')!=-1);
 konq=(!saf && (nua.indexOf('Konqueror')!=-1) ) ? true : false;
 moz=( (!saf && !konq ) && ( nua.indexOf('Gecko')!=-1 ) ) ? true : false;
+chrome=(nua.indexOf('Chrome')!=-1);
 ie=((nua.indexOf('MSIE')!=-1)&&!op);
 if (op)
 {
@@ -87,6 +88,9 @@ else if (saf)
 {
 	str_pos=nua.indexOf('Safari');
 	nu=nua.substr((str_pos+7),5);
+	// checks for webkit 528 or higher introduced
+	// in safari4
+	saf4=(saf&&(nu.substring(0,3)>=528));
 	brow = 'Safari';
 }
 else if (konq)

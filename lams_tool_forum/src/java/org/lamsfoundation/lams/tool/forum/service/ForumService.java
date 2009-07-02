@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -120,7 +121,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private AttachmentDao attachmentDao;
 
     private MessageDao messageDao;
-    
+
     private TimestampDao timestampDao;
 
     private MessageSeqDao messageSeqDao;
@@ -151,6 +152,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private ICoreNotebookService coreNotebookService;
 
     private ForumOutputFactory forumOutputFactory;
+
+    private IGradebookService gradebookService;
 
     private IEventNotificationService eventNotificationService;
     private Random generator = new Random();
@@ -247,7 +250,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	MessageSeq msgSeq = messageSeqDao.getByTopicId(message.getUid());
 	Message root = msgSeq.getRootMessage();
 	// update reply date
-	//messageDao.saveOrUpdate(root); // do not update date of root posting
+	// messageDao.saveOrUpdate(root); // do not update date of root posting
 
 	return message;
     }
@@ -329,7 +332,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	root.setLastReplyDate(new Date());
 	// update reply message number for root
 	root.setReplyNumber(root.getReplyNumber() + 1);
-	//messageDao.saveOrUpdate(root); // do not update the date of root posting
+	// messageDao.saveOrUpdate(root); // do not update the date of root posting
 
 	return replyMessage;
     }
@@ -538,6 +541,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		}
 	    }
 	    messageDao.saveOrUpdate(msg);
+
 	}
 	if (notifyLearnersOnMarkRelease) {
 	    notificationMessageParameters = new Object[1];
@@ -546,6 +550,15 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		getEventNotificationService().triggerForSingleUser(ForumConstants.TOOL_SIGNATURE,
 			ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), userID,
 			notificationMessageParameters);
+
+	    }
+	}
+
+	List<ForumUser> users = getUsersBySessionId(sessionID);
+	if (users != null) {
+	    for (ForumUser user : users) {
+		// send marks to gradebook where applicable
+		sendMarksToGradebook(user, sessionID);
 	    }
 	}
 
@@ -1102,7 +1115,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     }
 
-    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    /**
+     * Set the description, throws away the title value as this is not supported in 2.0
+     */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
 
@@ -1114,6 +1129,33 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
 	toolContentObj.setReflectOnActivity(Boolean.TRUE);
 	toolContentObj.setReflectInstructions(description);
+    }
+
+    /**
+     * Sends marks straight to gradebook from a forum report
+     * 
+     * @param user
+     * @param toolSessionID
+     */
+    @SuppressWarnings("unchecked")
+    public void sendMarksToGradebook(ForumUser user, Long toolSessionID) {
+
+	List<MessageDTO> messages = getMessagesByUserUid(user.getUid(), toolSessionID);
+	if (messages != null) {
+	    Float totalMark = null;
+	    for (MessageDTO message : messages) {
+		if (totalMark == null) {
+		    totalMark = message.getMark();
+		} else if (message.getMark() != null) {
+		    totalMark += message.getMark();
+		}
+	    }
+	    if (totalMark != null) {
+		Double mark = new Double(totalMark);
+		gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionID, false);
+	    }
+	}
+
     }
 
     // ***************************************************************************************************************
@@ -1142,13 +1184,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public void setForumDao(ForumDao forumDao) {
 	this.forumDao = forumDao;
     }
-    
+
     public TimestampDao getTimestampDao() {
-        return timestampDao;
+	return timestampDao;
     }
 
     public void setTimestampDao(TimestampDao timestampDao) {
-        this.timestampDao = timestampDao;
+	this.timestampDao = timestampDao;
     }
 
     public MessageDao getMessageDao() {
@@ -1251,6 +1293,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return messageService.getMessage(key, args);
     }
 
+    public void setGradebookService(IGradebookService gradebookService) {
+	this.gradebookService = gradebookService;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -1267,47 +1313,47 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	} while (uniqueNumber == null);
 	return getForumOutputFactory().buildTextSearchConditionName(uniqueNumber);
     }
-    
+
     /**
      * Get number of new postings.
      * 
      * @param messageId
      * @param userId
-     * @return 
+     * @return
      */
     public int getNewMessagesNum(Long messageId, Long userId) {
 	return timestampDao.getNewMessagesNum(messageId, userId);
     }
-    
+
     /**
      * Get last topic date.
      * 
      * @param messageId
-     * @return 
+     * @return
      */
     public Date getLastTopicDate(Long messageId) {
 	return messageDao.getLastTopicDate(messageId);
     }
-    
+
     /**
      * Get timestamp.
      * 
      * @param messageId
      * @param forumUserId
-     * @return 
+     * @return
      */
     public Timestamp getTimestamp(Long MessageId, Long forumUserId) throws PersistenceException {
 	return timestampDao.getTimestamp(MessageId, forumUserId);
     }
-    
+
     /**
      * Save timestamp.
      * 
      * @param timestamp
-     * @return 
+     * @return
      */
     public void saveTimestamp(Timestamp timestamp) {
 	timestampDao.saveOrUpdate(timestamp);
     }
-  
+
 }

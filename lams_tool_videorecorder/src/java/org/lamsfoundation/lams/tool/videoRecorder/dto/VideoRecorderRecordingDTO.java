@@ -70,9 +70,9 @@ public class VideoRecorderRecordingDTO {
 	
 	public String filename;
 	
-	public Set ratings;
+	public Set<VideoRecorderRatingDTO> ratings;
 	
-	public Set comments;
+	public Set<VideoRecorderCommentDTO> comments;
 	
 	/* Constructors */
 	public VideoRecorderRecordingDTO(){}
@@ -206,19 +206,19 @@ public class VideoRecorderRecordingDTO {
 		this.filename = filename;
 	}
 	
-	public Set getComments() {
+	public Set<VideoRecorderCommentDTO> getComments() {
 		return this.comments;
 	}
 	
-	public void setComments(Set comments) {
+	public void setComments(Set<VideoRecorderCommentDTO> comments) {
 		this.comments = comments;
 	}
 	
-	public Set getRatings() {
+	public Set<VideoRecorderRatingDTO> getRatings() {
 		return this.ratings;
 	}
 	
-	public void setRatings(Set ratings) {
+	public void setRatings(Set<VideoRecorderRatingDTO> ratings) {
 		this.ratings = ratings;
 	}
 }

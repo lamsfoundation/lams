@@ -435,9 +435,13 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	logger.debug("lockWhenFinished: " + lockWhenFinished);
+	boolean allowRichEditor = qaContent.isAllowRichEditor();
+	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
+	
 
 	String sessionStatus = qaSession.getSession_status();
 	logger.debug("sessionStatus: " + sessionStatus);
+	
 
 	if (userID != null) {
 	    QaQueUsr qaQueUsr = qaService.getQaUserBySession(new Long(userID), qaSession.getUid());

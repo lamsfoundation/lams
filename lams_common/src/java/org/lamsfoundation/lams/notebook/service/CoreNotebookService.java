@@ -27,14 +27,19 @@ package org.lamsfoundation.lams.notebook.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.dao.INotebookEntryDAO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.Role;
 
 
 public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreNotebookService{
@@ -42,6 +47,8 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 	private static Logger log = Logger.getLogger(CoreNotebookService.class);
 
 	private INotebookEntryDAO notebookEntryDAO;
+	
+    private IBaseDAO baseDAO;
 
 	protected IUserManagementService userManagementService;
 	
@@ -54,6 +61,29 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 				user, title, entry, new Date());
 		saveOrUpdateNotebookEntry(notebookEntry);
 		return notebookEntry.getUid();
+	}
+	
+	public TreeMap<Long, List<NotebookEntry>> getEntryByLesson(Integer userID, Integer idType) {
+		TreeMap<Long, List<NotebookEntry>> entryMap = new TreeMap<Long, List<NotebookEntry>>();
+		List<NotebookEntry> list = getEntry(userID, idType);
+		
+		for (NotebookEntry entry : list) {
+			if(entryMap.containsKey(entry.getExternalID())) {
+				String lessonName = (String) entryMap.get(entry.getExternalID()).get(0).getLessonName();
+				entry.setLessonName(lessonName);
+				entryMap.get(entry.getExternalID()).add(entry);
+			} else {
+				Lesson lesson = (Lesson) baseDAO.find(Lesson.class, entry.getExternalID());
+				List<NotebookEntry> newEntryList = new ArrayList<NotebookEntry>();
+				
+				entry.setLessonName(lesson.getLessonName());
+				newEntryList.add(entry);
+				
+				entryMap.put(entry.getExternalID(), newEntryList);
+			}
+		}
+		
+		return entryMap;
 	}
 
 	public List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID) {
@@ -109,6 +139,10 @@ public class CoreNotebookService implements ICoreNotebookService, IExtendedCoreN
 
 	public void setNotebookEntryDAO(INotebookEntryDAO notebookEntryDAO) {
 		this.notebookEntryDAO = notebookEntryDAO;
+	}
+	
+	public void setBaseDAO(IBaseDAO baseDAO) {
+		this.baseDAO = baseDAO;
 	}
 	
 	/**

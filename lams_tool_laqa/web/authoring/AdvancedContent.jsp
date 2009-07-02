@@ -86,7 +86,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</label>
 </p>
 
-
+<p>
+	<html:checkbox property="allowRichEditor" value="1" styleId="allowRichEditor"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="allowRichEditor">
+		<fmt:message key="label.allowRichEditor" />
+	</label>
+</p>
 
 
 

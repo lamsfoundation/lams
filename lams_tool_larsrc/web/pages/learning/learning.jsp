@@ -34,9 +34,11 @@
 	      	showMessage(gurl);
 	      	return false;
 		}
-		function checkNew(){
+		function checkNew(checkFinishedLock){
  		    var reqIDVar = new Date();
-			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();
+				
+			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();				
+				
  		    return false;
 		}
 		function viewItem(itemUid){
@@ -105,10 +107,10 @@
 					<td>
 						<a href="javascript:;" onclick="viewItem(${item.uid})">
 							${item.title} </a>
-
+						
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
 								[${item.createBy.loginName}]
-							</c:if>
+						</c:if>
 					</td>
 					<td align="center">
 						<c:choose>

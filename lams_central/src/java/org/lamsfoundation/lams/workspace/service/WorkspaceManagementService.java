@@ -330,7 +330,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				getFolderContent(workspaceFolder,permissions,mode,contentDTO,user);
 				if(workspaceFolder.hasSubFolders())
 					getSubFolderDetails(workspaceFolder,user,contentDTO, skipFolder);	
-				Vector<FolderContentDTO> repositoryContent = getContentsFromRepository(workspaceFolder,permissions);
+				Vector<FolderContentDTO> repositoryContent = getContentsFromRepository(workspaceFolder,permissions,user);
 				if(repositoryContent!=null)
 					contentDTO.addAll(repositoryContent);
 			} else {
@@ -364,7 +364,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			if ( skipFolderID==null || ! skipFolderID.equals(subFolder.getWorkspaceFolderId()) ) {
 				Integer permissions = getPermissions(subFolder, user);
 				if ( permissions!=WorkspaceFolder.NO_ACCESS) {
-					subFolderContent.add(new FolderContentDTO(subFolder,permissions));
+					subFolderContent.add(new FolderContentDTO(subFolder,permissions, user));
 				}
 			}
 		}		
@@ -433,11 +433,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		Iterator iterator = designs.iterator();
 		while(iterator.hasNext()){
 			LearningDesign design = (LearningDesign)iterator.next();
+			FolderContentDTO folder;
 			if ( design.getUser() != null && design.getUser().equals(user) ) {
-				folderContent.add(new FolderContentDTO(design,WorkspaceFolder.OWNER_ACCESS));			
+				folder = new FolderContentDTO(design, WorkspaceFolder.OWNER_ACCESS, user);			
 			} else {
-				folderContent.add(new FolderContentDTO(design,folderPermissions));			
+				folder = new FolderContentDTO(design, folderPermissions, user);
 			}
+			
+			folderContent.add(folder);			
 		}
 		return folderContent;
 		
@@ -1082,7 +1085,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	 * @throws RepositoryCheckedException 
 	 * @throws Exception
 	 */
-	private Vector<FolderContentDTO> getContentsFromRepository(WorkspaceFolder workspaceFolder, Integer permissions) throws RepositoryCheckedException{
+	private Vector<FolderContentDTO> getContentsFromRepository(WorkspaceFolder workspaceFolder, Integer permissions, User user) throws RepositoryCheckedException{
 		log.debug("Trying to get contents from folder "+ workspaceFolder.getName());
 		Set children = workspaceFolder.getChildWorkspaceFolders();
 		if(children!=null){
@@ -1098,7 +1101,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			while(contentIterator.hasNext()){
 				WorkspaceFolderContent workspaceFolderContent = (WorkspaceFolderContent)contentIterator.next();
 				SortedSet set = repositoryService.getVersionHistory(ticket,workspaceFolderContent.getUuid());				
-				repositoryContent.add(new FolderContentDTO(permissions, workspaceFolderContent, set));
+				repositoryContent.add(new FolderContentDTO(permissions, workspaceFolderContent, set, user));
 			}
 			return repositoryContent;
 		}
@@ -1152,7 +1155,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 									if (hasWriteAccess(roles)) {
 										Integer permission = getPermissions(orgFolder,user);
 										if ( !permission.equals(WorkspaceFolder.NO_ACCESS) ) {
-											folders.add(new FolderContentDTO(orgFolder,permission));
+											folders.add(new FolderContentDTO(orgFolder,permission,user));
 										}
 									}
 								}
@@ -1187,7 +1190,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 				WorkspaceFolder privateFolder = workspace.getDefaultFolder();
 				if ( privateFolder != null ) {
 					Integer permissions = getPermissions(privateFolder,user);
-					return new FolderContentDTO(privateFolder, permissions);
+					return new FolderContentDTO(privateFolder, permissions, user);
 				} else {
 					log.warn("getUserWorkspaceFolder: User "+userID+" does not have a root folder. Returning no folders.");
 				}
@@ -1219,7 +1222,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			if(publicFolder != null) {
 				publicFolder.setName(messageService.getMessage("public.folder"));
 				Integer permissions = getPermissions(publicFolder, user);
-				return new FolderContentDTO(publicFolder, permissions);
+				return new FolderContentDTO(publicFolder, permissions, user);
 			}
 		}
 		

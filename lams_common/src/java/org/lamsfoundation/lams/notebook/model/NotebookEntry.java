@@ -54,6 +54,8 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 	
 	private Date lastModified;
 	
+	private String lessonName;
+	
 	public NotebookEntry() {}
 	
 	public NotebookEntry(Long externalID, Integer externalIDType, String externalSignature, User user, String title, String entry, Date createDate) {
@@ -166,5 +168,13 @@ public class NotebookEntry implements java.io.Serializable, Cloneable {
 
 	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
+	}
+	
+	public void setLessonName(String name) {
+		this.lessonName = name;
+	}
+	
+	public String getLessonName() {
+		return this.lessonName;
 	}
 }

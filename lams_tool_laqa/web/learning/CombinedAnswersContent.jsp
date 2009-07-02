@@ -51,8 +51,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					  <p><strong><fmt:message key="label.answer" /></strong>
 					</p>
 					
-					<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
-					
+					<c:choose>
+						<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
+							<lams:FCKEditor id="answer${questionEntry.key}" value="${answerEntry.value}"
+								toolbarSet="Default-Learner">
+							</lams:FCKEditor>
+						</c:when>
+			
+						<c:otherwise>
+							<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+						</c:otherwise>
+					</c:choose>
 		</div>
 		
 		</c:if>

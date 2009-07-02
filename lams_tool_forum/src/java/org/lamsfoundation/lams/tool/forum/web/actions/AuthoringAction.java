@@ -37,6 +37,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -1107,21 +1109,46 @@ public class AuthoringAction extends Action {
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
 	    Forum forum = getForumManager().getForumByContentId(plannerForm.getToolContentID());
+	    forum.setInstructions(plannerForm.getInstructions());
 
 	    int topicIndex = 0;
 	    String topic = null;
+	    String subject = null;
 	    Message message = null;
 	    List<Message> newTopics = new LinkedList<Message>();
 	    Iterator<Message> forumTopicIterator = forum.getMessages().iterator();
+	    Pattern regexPattern = Pattern.compile(ForumConstants.WORD_REGEX, ForumConstants.PATTERN_MATCHING_OPTIONS);
+
+	    Matcher matcher = null;
+
 	    do {
 		topic = plannerForm.getTopic(topicIndex);
+		subject = WebUtil.removeHTMLtags(topic);
+
+		// Getting 3 first words from body and making the subject out of it
+		if (StringUtils.isBlank(subject)) {
+		    subject = null;
+		} else {
+		    matcher = regexPattern.matcher(subject);
+		    int currentEnd = subject.length();
+		    for (short wordIndex = 0; wordIndex < ForumConstants.SUBJECT_WORD_COUNT; wordIndex++) {
+			if (matcher.find()) {
+			    currentEnd = matcher.end();
+			} else {
+			    break;
+			}
+		    }
+		    subject = subject.substring(0, currentEnd).concat("...");
+		}
+
 		if (StringUtils.isEmpty(topic)) {
 		    plannerForm.removeTopic(topicIndex);
 		} else {
 		    if (forumTopicIterator.hasNext()) {
 			message = forumTopicIterator.next();
 			message.setUpdated(new Date());
-			message.setSubject(topic);
+			message.setSubject(subject);
+			message.setBody(topic);
 		    } else {
 			message = new Message();
 			message.setIsAuthored(true);
@@ -1136,7 +1163,8 @@ public class AuthoringAction extends Action {
 			message.setCreatedBy(forumUser);
 			message.setModifiedBy(forumUser);
 
-			message.setSubject(topic);
+			message.setSubject(subject);
+			message.setBody(topic);
 
 			newTopics.add(message);
 			message.setForum(forum);

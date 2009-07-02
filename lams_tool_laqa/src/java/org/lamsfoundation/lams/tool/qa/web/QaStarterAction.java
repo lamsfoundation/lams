@@ -359,7 +359,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	SortedSet<QaCondition> conditionList = getQaConditionList(sessionMap);
 	conditionList.clear();
 	conditionList.addAll(qaContent.getConditions());
-
+	
+	qaGeneralAuthoringDTO.setAllowRichEditor(qaContent.isAllowRichEditor());
+	qaAuthoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
 	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, qaAuthoringForm);
 
 	

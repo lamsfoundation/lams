@@ -18,6 +18,7 @@ CREATE TABLE tl_laqa11_content (
      , reflectionSubject TEXT
      , lockWhenFinished TINYINT(1) NOT NULL DEFAULT 1
      , showOtherAnswers TINYINT(1) NOT NULL DEFAULT 1
+     , allow_rich_editor TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 

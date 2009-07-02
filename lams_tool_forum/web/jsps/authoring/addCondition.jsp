@@ -38,9 +38,9 @@
 		</html:form>
 
 		<lams:ImgButtonWrapper>
-			<a href="#" onclick="forumConditionForm.submit();" class="button-add-item"><fmt:message
+			<a href="javascript:;" onclick="javascript:forumConditionForm.submit();" class="button-add-item"><fmt:message
 					key="label.save" /> </a>
-			<a href="#" onclick="window.top.hideConditionMessage();"
+			<a href="javascript:;" onclick="javascript:window.top.hideConditionMessage();"
 				class="button space-left"><fmt:message key="button.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 	</body>

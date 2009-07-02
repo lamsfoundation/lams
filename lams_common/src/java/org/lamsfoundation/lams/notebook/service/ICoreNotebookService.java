@@ -26,6 +26,7 @@
 package org.lamsfoundation.lams.notebook.service;
 
 import java.util.List;
+import java.util.TreeMap;
 
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -37,6 +38,8 @@ public interface ICoreNotebookService {
 	Long createNotebookEntry(Long id, Integer idType, String signature,
 			Integer userID, String title, String entry);
 
+	TreeMap<Long, List<NotebookEntry>> getEntryByLesson(Integer userID, Integer idType);
+	
 	List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID);
 	
 	List<NotebookEntry> getEntry(Long id, Integer idType, String signature);

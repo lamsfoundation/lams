@@ -13,7 +13,7 @@
 <lams:html>
 
 <lams:head>
-    <lams:css  style="core"/>
+    <lams:css />
     <title><fmt:message key="title.forgot.password"/></title>
     <link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
@@ -104,47 +104,49 @@
 	<form action="<lams:LAMSURL/>/ForgotPasswordRequest" method="get" name="forgotForm">
 	    <input type="hidden" name="method" id="method" value="requestEmail" />
 	    
-	    <h1 class="no-tabs-below"><fmt:message key="label.forgot.password"/></h1>  
+	    
 		<div id="header-no-tabs"></div>
 		<div id="content">
-		            <table border="0"><tr><td>
-		            <fmt:message key="label.forgot.password.instructions.1"/>
-		            <br><br>
-		            <fmt:message key="label.forgot.password.instructions.2"/>
-		            </td></tr></table>
-		            
-		            <table border="0">
-		                <tr>
-		                    <td class="align-right" width="35%">
-	                            <fmt:message key="label.forgot.password.username"/> &nbsp; 
-	                            <input type="radio" name="selectType" value="radioUsername" onclick="radioSelected();" checked>
-		                    <td class="align-left" width="65%">
-		                        <input type="text" name="login" id="login" size="50" maxlength="50" tabindex="1" onKeyPress="return submitenter(this,event)" />
-		                    </td>
-		                </tr>
-		                <tr>
-                            <td class="align-right" width="35%">
-                                <fmt:message key="label.forgot.password.email"/> &nbsp;
-                                <input type="radio" name="selectType" value="radioEmail" onclick="radioSelected();">
-                            </td>
-                            <td class="align-left" width="65%">
-                                <input type="text" name="email" id="email" size="50" maxlength="50" tabindex="1" onKeyPress="return submitenter(this,event)" />
-                            </td>
-                        </tr>
-		                
-		                <tr>
-		                    <td>&nbsp;</td>
-		                
-		                    <td align="left">
-		                        
-		                        <html:button property="ok" styleClass="button" onclick="javascript:validateForm();"><fmt:message key="label.ok"/></html:button>     
-		                        <html:button property="cancel" styleClass="button" onclick="javascript:toHome();"><fmt:message key="button.cancel"/></html:button>
-		                    
-		                    </td>
-		                </tr>
-		            </table>
-		
-	
+            <h1 class="no-tabs-below"><fmt:message key="label.forgot.password"/></h1>  
+            
+            <p>
+            	<fmt:message key="label.forgot.password.instructions.1"/>
+           	</p>
+           	
+           	<p>
+           		<fmt:message key="label.forgot.password.instructions.2"/>
+            </p>
+            
+            <table border="0">
+                <tr>
+                    <td class="align-right" width="35%">
+                           <fmt:message key="label.forgot.password.username"/> &nbsp; 
+                           <input type="radio" name="selectType" value="radioUsername" onclick="radioSelected();" checked>
+                    <td class="align-left" width="65%">
+                        <input type="text" name="login" id="login" size="50" maxlength="50" tabindex="1" onKeyPress="return submitenter(this,event)" />
+                    </td>
+                </tr>
+                <tr>
+                          <td class="align-right" width="35%">
+                              <fmt:message key="label.forgot.password.email"/> &nbsp;
+                              <input type="radio" name="selectType" value="radioEmail" onclick="radioSelected();">
+                          </td>
+                          <td class="align-left" width="65%">
+                              <input type="text" name="email" id="email" size="50" maxlength="50" tabindex="1" onKeyPress="return submitenter(this,event)" />
+                          </td>
+                      </tr>
+                
+                <tr>
+                    <td>&nbsp;</td>
+                
+                    <td align="left">
+                        
+                        <html:button property="ok" styleClass="button" onclick="javascript:validateForm();"><fmt:message key="label.ok"/></html:button>     
+                        <html:button property="cancel" styleClass="button" onclick="javascript:toHome();"><fmt:message key="button.cancel"/></html:button>
+                    
+                    </td>
+                </tr>
+            </table>
 		</div> <!--closes content-->
 		
 	</form>  

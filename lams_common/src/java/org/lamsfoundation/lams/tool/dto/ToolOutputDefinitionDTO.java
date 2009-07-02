@@ -32,24 +32,27 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 /**
  * @author Mitchell Seaton
  * 
- * This class acts as a data transfer object for
- * transferring information between FLASH and the core module. 
+ *         This class acts as a data transfer object for transferring
+ *         information between FLASH and the core module.
  * 
- * This class is required in the authoring environment to pass
- * information about the ToolOutput for a ToolActivity 
+ *         This class is required in the authoring environment to pass
+ *         information about the ToolOutput for a ToolActivity
  */
 public class ToolOutputDefinitionDTO {
-	
+
 	private String name;
 	private String description;
 	private String type;
 	private String startValue;
 	private String endValue;
 	private String complexDefinition;
-    private Boolean showConditionNameOnly;
-    private ArrayList defaultConditions;
+	private Boolean showConditionNameOnly;
+	private Boolean isDefaultGradebookMark;
+	private ArrayList defaultConditions;
 
-	public ToolOutputDefinitionDTO(String name, String description, String type, String startValue, String endValue, String complexDefinition, Boolean showConditionNameOnly) {
+	public ToolOutputDefinitionDTO(String name, String description,
+			String type, String startValue, String endValue,
+			String complexDefinition, Boolean showConditionNameOnly) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -62,69 +65,83 @@ public class ToolOutputDefinitionDTO {
 
 		this.showConditionNameOnly = showConditionNameOnly;
 	}
-	
+
 	public ToolOutputDefinitionDTO(ToolOutputDefinition definition) {
 		super();
 		this.name = definition.getName();
 		this.description = definition.getDescription();
-		this.type = (definition.getType() != null)? definition.getType().toString() : null;
+		this.type = (definition.getType() != null) ? definition.getType()
+				.toString() : null;
 
-		this.startValue = (definition.getStartValue() != null) ? definition.getStartValue().toString() : null;
-		this.endValue = (definition.getEndValue() != null) ? definition.getEndValue().toString() : null;
+		this.startValue = (definition.getStartValue() != null) ? definition
+				.getStartValue().toString() : null;
+		this.endValue = (definition.getEndValue() != null) ? definition
+				.getEndValue().toString() : null;
 
-		this.complexDefinition = (definition.getComplexDefinition() != null) ? definition.getComplexDefinition().toString() : null;
-	
+		this.complexDefinition = (definition.getComplexDefinition() != null) ? definition
+				.getComplexDefinition().toString()
+				: null;
+
 		this.showConditionNameOnly = definition.isShowConditionNameOnly();
-		if ( definition.getDefaultConditions() != null && definition.getDefaultConditions().size() > 0 ) {
+		if (definition.getDefaultConditions() != null
+				&& definition.getDefaultConditions().size() > 0) {
 			defaultConditions = new ArrayList();
-			for ( BranchCondition condition : definition.getDefaultConditions() ) {
+			for (BranchCondition condition : definition.getDefaultConditions()) {
 				defaultConditions.add(condition.getBranchConditionDTO(null));
 			}
 		}
+		
+		this.isDefaultGradebookMark = definition.isDefaultGradebookMark() != null ? definition.isDefaultGradebookMark() : false;
 	}
-	
+
 	/**
 	 * Returns the name.
+	 * 
 	 * @return
 	 */
 	public String getName() {
 		return name;
 	}
-	
+
 	/**
 	 * Returns the description.
+	 * 
 	 * @return
 	 */
 	public String getDescription() {
 		return description;
 	}
-	
+
 	/**
 	 * Returns the output type.
+	 * 
 	 * @return
 	 */
 	public String getType() {
 		return type;
 	}
-	
+
 	/**
 	 * Returns the start value.
+	 * 
 	 * @return
 	 */
 	public String getStartValue() {
 		return startValue;
 	}
-	
+
 	/**
 	 * Returns the end value.
+	 * 
 	 * @return
 	 */
 	public String getEndValue() {
 		return endValue;
 	}
-	
+
 	/**
 	 * Returns the complex definition.
+	 * 
 	 * @return
 	 */
 	public String getComplexDefinition() {
@@ -142,17 +159,23 @@ public class ToolOutputDefinitionDTO {
 	public Boolean getShowConditionNameOnly() {
 		return showConditionNameOnly;
 	}
+
 	public void setShowConditionNameOnly(Boolean showConditionNameOnly) {
 		this.showConditionNameOnly = showConditionNameOnly;
 	}
 
 	public String toString() {
-    	return new ToStringBuilder(this)
-            .append("name", name)
-            .append("description", description)
-            .append("type", type)
-            .append("startValue", startValue)
-            .append("endValue", endValue)
-        .toString();
+		return new ToStringBuilder(this).append("name", name).append(
+				"description", description).append("type", type).append(
+				"startValue", startValue).append("endValue", endValue).append(
+				"isDefaultGradebookMark", isDefaultGradebookMark).toString();
+	}
+
+	public Boolean getIsDefaultGradebookMark() {
+		return isDefaultGradebookMark;
+	}
+
+	public void isDefaultGradebookMark(Boolean isDefaultGradebookMark) {
+		this.isDefaultGradebookMark = isDefaultGradebookMark;
 	}
 }

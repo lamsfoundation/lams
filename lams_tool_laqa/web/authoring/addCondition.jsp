@@ -38,9 +38,9 @@
 		</html:form>
 
 		<lams:ImgButtonWrapper>
-			<a href="#" onclick="QaConditionForm.submit();" class="button-add-item"><fmt:message
+			<a href="javascript:;" onclick="javascript:QaConditionForm.submit();" class="button-add-item"><fmt:message
 					key="label.save.question" /> </a>
-			<a href="#" onclick="window.top.hideConditionMessage();"
+			<a href="javascript:;" onclick="javascript:window.top.hideConditionMessage();"
 				class="button space-left"><fmt:message key="label.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 	</body>

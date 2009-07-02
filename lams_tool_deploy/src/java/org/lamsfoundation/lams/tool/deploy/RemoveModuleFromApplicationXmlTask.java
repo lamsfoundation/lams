@@ -19,7 +19,7 @@ public class RemoveModuleFromApplicationXmlTask extends UpdateApplicationXmlTask
     public static void main(String[] args) throws Exception
     {
         
-        if ((args.length < 1) || (args[0] == null))
+        if ((args.length < 2) || (args[0] == null))
         {
             throw new IllegalArgumentException("Usage: RemoveModuleFromApplicationXmlTask <lams.ear path>");
         }
@@ -28,7 +28,7 @@ public class RemoveModuleFromApplicationXmlTask extends UpdateApplicationXmlTask
             System.out.println("Attempting to update " + args[0] + "\\META-INF\\application.xml");
         	RemoveModuleFromApplicationXmlTask remModAppTask =  new RemoveModuleFromApplicationXmlTask();
             remModAppTask.setLamsEarPath(args[0]);
-            remModAppTask.setModule("ehcache-1.1.jar");
+            remModAppTask.setModule(args[1]);
             remModAppTask.execute();
             System.out.println("application.xml update completed");
         }

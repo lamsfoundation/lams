@@ -200,6 +200,7 @@ public class Lesson implements Serializable {
         this.learnerProgresses = learnerProgresses;
         this.liveEditEnabled = liveEditEnabled;
         this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
+        this.marksReleased = false;
     }
     /**
      * Factory method that create a new lesson. It initialized all necessary

@@ -102,11 +102,14 @@
 			<hibernate version="3.0"/>
 		</hibernatedoclet>
 		
+		<!-- This only makes hbm.xml file duplicated in the Java source dir
+		
 		<copy todir="${src.java.dir}" overwrite="true" verbose="true">
 			<fileset dir="${conf.hibernate.mapping.dir}">
 				<include name="**/*.hbm.xml"/>
 			</fileset>
 		</copy>
+		-->
     </target>
 	
 	<!-- exports all the hbm mappings to the specified database -->

@@ -23,27 +23,20 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.videoRecorder.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.lamsfoundation.lams.learningdesign.BranchCondition;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorder;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderCondition;
-import org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderUser;
 import org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderConstants;
 
 /**
  * Output factory for VideoRecorder tool. Currently it provides only one type of output - the entry that user provided.
  * 
- * @author Marcin Cieslak
+ * @author Paul Georges
  */
 public class VideoRecorderOutputFactory extends OutputFactory {
 
@@ -54,20 +47,6 @@ public class VideoRecorderOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
 	    throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	if (toolContentObject != null) {
-	    ToolOutputDefinition videoRecorderEntryDefinition = buildStringOutputDefinition(VideoRecorderConstants.TEXT_SEARCH_DEFINITION_NAME);
-	    VideoRecorder videoRecorder = (VideoRecorder) toolContentObject;
-	    // adding all existing conditions
-	    videoRecorderEntryDefinition.setDefaultConditions(new ArrayList<BranchCondition>(videoRecorder.getConditions()));
-	    // if no conditions were created in the tool instance, a default condition is added;
-	    if (videoRecorderEntryDefinition.getDefaultConditions().isEmpty()) {
-			VideoRecorderCondition defaultCondition = createDefaultComplexCondition(videoRecorder);
-			videoRecorder.getConditions().add(defaultCondition);
-			videoRecorderEntryDefinition.getDefaultConditions().add(defaultCondition);
-	    }
-	    videoRecorderEntryDefinition.setShowConditionNameOnly(true);
-	    definitionMap.put(VideoRecorderConstants.TEXT_SEARCH_DEFINITION_NAME, videoRecorderEntryDefinition);
-	}
 	
 	ToolOutputDefinition numberOfRecordingsDefinition = buildRangeDefinition(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, new Long(0), null);
 	definitionMap.put(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, numberOfRecordingsDefinition);
@@ -89,41 +68,6 @@ public class VideoRecorderOutputFactory extends OutputFactory {
 	    Long toolSessionId, Long learnerId) {
 
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
-	// cached tool output for all text search conditions
-	ToolOutput videoRecorderEntryOutput = null;
-	if (names == null) {
-	    // output will be set for all the existing conditions
-	    VideoRecorder videoRecorder = videoRecorderService.getSessionBySessionId(toolSessionId).getVideoRecorder();
-	    Set<VideoRecorderCondition> conditions = videoRecorder.getConditions();
-	    for (VideoRecorderCondition condition : conditions) {
-		String name = condition.getName();
-		if (isTextSearchConditionName(name) && videoRecorderEntryOutput != null) {
-		    outputs.put(name, videoRecorderEntryOutput);
-		} else {
-		    ToolOutput output = getToolOutput(name, videoRecorderService, toolSessionId, learnerId);
-		    if (output != null) {
-			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    videoRecorderEntryOutput = output;
-			}
-		    }
-		}
-	    }
-	} else {
-	    for (String name : names) {
-		if (isTextSearchConditionName(name) && videoRecorderEntryOutput != null) {
-		    outputs.put(name, videoRecorderEntryOutput);
-		} else {
-		    ToolOutput output = getToolOutput(name, videoRecorderService, toolSessionId, learnerId);
-		    if (output != null) {
-			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    videoRecorderEntryOutput = output;
-			}
-		    }
-		}
-	    }
-	}
 	
 	if (names == null || names.contains(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME)) {
 	    outputs.put(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME, getNbRecordings(videoRecorderService, learnerId, toolSessionId));
@@ -143,17 +87,7 @@ public class VideoRecorderOutputFactory extends OutputFactory {
 
     public ToolOutput getToolOutput(String name, IVideoRecorderService videoRecorderService, Long toolSessionId, Long learnerId) {
     ToolOutput toolOutput = null;
-	if (isTextSearchConditionName(name)) {
-	    // entry is loaded from DB
-	    VideoRecorder videoRecorder = videoRecorderService.getSessionBySessionId(toolSessionId).getVideoRecorder();
-
-	    VideoRecorderUser user = videoRecorderService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
-	    NotebookEntry entry = videoRecorderService.getEntry(user.getEntryUID());
-
-	    String value = entry == null ? null : entry.getEntry();
-
-	    toolOutput = new ToolOutput(name, getI18NText(VideoRecorderConstants.TEXT_SEARCH_DEFINITION_NAME, true), value);
-	}else if (name != null && name.equals(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME)) {
+    if (name != null && name.equals(VideoRecorderConstants.NB_RECORDINGS_DEFINITION_NAME)) {
 	    toolOutput = getNbRecordings(videoRecorderService, learnerId, toolSessionId);
 	}else if (name != null && name.equals(VideoRecorderConstants.NB_COMMENTS_DEFINITION_NAME)) {
 	    toolOutput = getNbComments(videoRecorderService, learnerId, toolSessionId);
@@ -162,34 +96,6 @@ public class VideoRecorderOutputFactory extends OutputFactory {
 	}
 	
 	return toolOutput;
-    }
-
-    @Override
-    protected String[] splitConditionName(String conditionName) {
-	return super.splitConditionName(conditionName);
-    }
-
-    protected String buildConditionName(String uniquePart) {
-	return super.buildConditionName(VideoRecorderConstants.TEXT_SEARCH_DEFINITION_NAME, uniquePart);
-    }
-
-    private boolean isTextSearchConditionName(String name) {
-	return name != null && name.startsWith(VideoRecorderConstants.TEXT_SEARCH_DEFINITION_NAME);
-    }
-
-    /**
-     * Creates a default condition so teachers know how to use complex conditions for this tool.
-     * 
-     * @param videoRecorder
-     *                content of the tool
-     * @return default videoRecorder condition
-     */
-    protected VideoRecorderCondition createDefaultComplexCondition(VideoRecorder videoRecorder) {
-	String name = buildConditionName(VideoRecorderConstants.TEXT_SEARCH_DEFINITION_NAME, videoRecorder.getToolContentId()
-		.toString());
-	// Default condition checks if the text contains word "LAMS"
-	return new VideoRecorderCondition(null, null, 1, name, getI18NText(
-		VideoRecorderConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
     }
     
     private ToolOutput getNbRecordings(IVideoRecorderService videoRecorderService, Long learnerId, Long toolSessionId) {

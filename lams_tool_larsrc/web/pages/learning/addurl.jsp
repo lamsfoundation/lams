@@ -43,9 +43,8 @@
 				<fmt:message key="label.learning.comment.or.instruction" />
 			</div>
 
-			<html:textarea rows="5" cols="25" tabindex="4" styleClass="text-area"
-				property="description" />
-
+			<html:text tabindex="2" property="description"
+				styleClass="text-area" maxlength="255" />
 
 			<div class="space-bottom-top">
 				<a href="#"

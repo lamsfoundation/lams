@@ -105,36 +105,10 @@ td.button-cell{
 	padding-top: 30px;
 }
 
-#content-learner {
-	/* reduced width of tabbed environment since learner is narrower */
-	width: 592px;
-	background: url('../images/body_bg_learner.jpg') repeat-y;
-	padding-bottom:40px;
-	padding-left:15px;
-	padding-right:15px;
-	font-size: 11px;
-	margin-top: -5px
-	
-}
-#footer-learner {
-	/* reduced width of tabbed environment since learner is narrower */
-	width: 592px;
-	height: 14px;
-	background: url('../images/footer_bg_learner.jpg') no-repeat bottom;
-}
-
-#header-learner {
-	/* reduced width of tabbed environment since learner is narrower */
-	width:592px; 
-	height: 49px; 
-	background: url('../images/top_bg_learner.jpg') no-repeat bottom;
-	}
-
-#page-learner {
-	/* reduced width of tabbed environment since learner is narrower */
-	margin: 25px auto;
-	width: 592px;
-	background: url('../images/lams_logo.gif') no-repeat 585px 10px;
+.nextActivity {
+	padding: 0px 20px 0px 0px; 
+	background: url('../images/next.png') no-repeat;
+	background-position: right;
 }
 
 .nextActivity {

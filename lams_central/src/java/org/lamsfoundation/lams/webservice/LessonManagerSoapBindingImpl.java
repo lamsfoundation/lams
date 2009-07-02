@@ -100,7 +100,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 			// 3. schedule lesson
 			Date date = DateUtil.convertFromLAMSFlashFormat(startDate);
 			monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser()
-					.getUserId());
+					.getUserId(), null);
 			return lesson.getLessonId();
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage(), e);

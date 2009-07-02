@@ -79,15 +79,6 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
      */
     protected static final int PATTERN_MATCHING_OPTIONS = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
 	    | Pattern.MULTILINE;
-    /**
-     * A regular expression pattern that matches HTML tags.
-     */
-    public static final String HTML_TAG_REGEX = "\\<.*?>";
-    /**
-     * A regular expression pattern that matches end-of-line HTML tags. If needed, it can extented to
-     * <code>(?:<BR>|<br>|<BR />|<br />)</code> . Right now FCKeditor creates only the first option.
-     */
-    public static final String BR_TAG_REGEX = "<BR>";
 
     private static Logger log = Logger.getLogger(TextSearchCondition.class);
     /**

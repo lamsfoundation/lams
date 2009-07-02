@@ -97,11 +97,17 @@ public class ViewItemAction extends Action {
 	 * @return
 	 */
 	private ActionForward openUrlPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID, false);
+		String mode = request.getParameter(AttributeNames.ATTR_MODE);
+		
 		if (resourceService == null) {
 		    resourceService = ResourceServiceProxy.getResourceService(getServlet().getServletContext()); 
 		}
-		ResourceItem item = resourceService.getResourceItemByUid(itemUid);
+		
+		String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+		SessionMap sessionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
+		
+		ResourceItem item = getResourceItem(request,sessionMap, mode);
+
 		request.setAttribute(ResourceConstants.PARAM_OPEN_URL_POPUP,item.getUrl());
 		request.setAttribute(ResourceConstants.PARAM_TITLE,item.getTitle());
 		return mapping.findForward(ResourceConstants.SUCCESS);
@@ -192,11 +198,12 @@ public class ViewItemAction extends Action {
 			sessionMap.put(ResourceConstants.ATT_LEARNING_OBJECT,item);
 		}
 		//set url to content frame
-		request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,getReviewUrl(item,sessionMapID));
+
+		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX));
+		request.setAttribute(ResourceConstants.ATTR_RESOURCE_REVIEW_URL,getReviewUrl(item,sessionMapID,mode,itemIdx));
 		
 		//these attribute will be use to instruction navigator page
 		request.setAttribute(AttributeNames.ATTR_MODE,mode);
-		int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX));
 		request.setAttribute(ResourceConstants.PARAM_ITEM_INDEX,itemIdx);
 		Long itemUid = NumberUtils.createLong(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 		request.setAttribute(ResourceConstants.PARAM_RESOURCE_ITEM_UID,itemUid);
@@ -239,7 +246,7 @@ public class ViewItemAction extends Action {
 	
 	private static Pattern wikipediaPattern = Pattern.compile("wikipedia", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
-	private Object getReviewUrl(ResourceItem item, String sessionMapID) {
+	private Object getReviewUrl(ResourceItem item, String sessionMapID, String mode, int itemIdx) {
 		short type = item.getType();
 		String url = null;
 		switch (type) {
@@ -249,7 +256,11 @@ public class ViewItemAction extends Action {
 			boolean wikipediaInURL = matcher.find();
 			
 			if(item.isOpenUrlNewWindow() || wikipediaInURL) {
-			    url = "/openUrlPopup.do?"+ResourceConstants.PARAM_RESOURCE_ITEM_UID+"=" + item.getUid();
+				if(ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)){
+					url = "/openUrlPopup.do?"+AttributeNames.ATTR_MODE+"=" + mode + "&" + ResourceConstants.PARAM_ITEM_INDEX + "=" + itemIdx + "&" + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+			    } else {
+			    	url = "/openUrlPopup.do?"+ResourceConstants.PARAM_RESOURCE_ITEM_UID+"=" + item.getUid() + "&" + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+			    }
 			}else
 				url = ResourceWebUtils.protocol(item.getUrl());
 			break;

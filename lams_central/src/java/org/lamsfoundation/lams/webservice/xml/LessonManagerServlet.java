@@ -217,10 +217,12 @@ public class LessonManagerServlet extends HttpServlet {
 		element = getToolOutputs(document, serverId, datetime, hashValue, username, lsId, courseId, true);
 	    } else if (method.equals("toolOutputsUser")) {
 		lsId = new Long(lsIdStr);
-		element = getToolOutputsForUser(document, serverId, datetime, hashValue, username, lsId, courseId, false, outputsUser);
+		element = getToolOutputsForUser(document, serverId, datetime, hashValue, username, lsId, courseId,
+			false, outputsUser);
 	    } else if (method.equals("authoredToolOutputsUser")) {
 		lsId = new Long(lsIdStr);
-		element = getToolOutputsForUser(document, serverId, datetime, hashValue, username, lsId, courseId, true, outputsUser);
+		element = getToolOutputsForUser(document, serverId, datetime, hashValue, username, lsId, courseId,
+			true, outputsUser);
 	    } else {
 		String msg = "Method :" + method + " is not recognised";
 		log.error(msg);
@@ -279,7 +281,7 @@ public class LessonManagerServlet extends HttpServlet {
      *                 if an error occurred
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
+	doGet(request, response);
     }
 
     public Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
@@ -323,7 +325,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson
 	    Date date = DateUtil.convertFromLAMSFlashFormat(startDate);
-	    monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser().getUserId());
+	    monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser().getUserId(), null);
 	    return lesson.getLessonId();
 	} catch (Exception e) {
 	    throw new RemoteException(e.getMessage(), e);
@@ -701,8 +703,8 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * 
-     * This method gets the tool outputs for an entire lesson and returns
-     * them in an XML format.
+     * This method gets the tool outputs for an entire lesson and returns them
+     * in an XML format.
      * 
      * @param document
      * @param serverId
@@ -740,7 +742,8 @@ public class LessonManagerServlet extends HttpServlet {
 		Iterator learnerIterator = lesson.getAllLearners().iterator();
 		while (learnerIterator.hasNext()) {
 		    User learner = (User) learnerIterator.next();
-		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities, isAuthoredToolOutputs));
+		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities,
+			    isAuthoredToolOutputs));
 		}
 	    } else {
 		// TODO: handle this error instead of throwing an exception
@@ -759,7 +762,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * 
-     * This method gets the tool outputs for a specific user in a lesson and 
+     * This method gets the tool outputs for a specific user in a lesson and
      * returns them in XML format.
      * 
      * @param document
@@ -775,7 +778,8 @@ public class LessonManagerServlet extends HttpServlet {
      */
     @SuppressWarnings("unchecked")
     public Element getToolOutputsForUser(Document document, String serverId, String datetime, String hashValue,
-	    String username, Long lsId, String courseID, boolean isAuthoredToolOutputs, String userStr) throws Exception {
+	    String username, Long lsId, String courseID, boolean isAuthoredToolOutputs, String userStr)
+	    throws Exception {
 	try {
 	    // Create the root node of the xml document
 	    Element toolOutputsElement = document.createElement("ToolOutputs");
@@ -799,8 +803,9 @@ public class LessonManagerServlet extends HttpServlet {
 
 		    toolOutputsElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
 		    toolOutputsElement.setAttribute("name", lesson.getLessonName());
-		    
-		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities, isAuthoredToolOutputs));
+
+		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities,
+			    isAuthoredToolOutputs));
 		}
 	    } else {
 		// TODO: handle this error instead of throwing an exception
@@ -841,11 +846,10 @@ public class LessonManagerServlet extends HttpServlet {
 	LearnerProgress learnerProgress = monitoringService.getLearnerProgress(learner.getUserId(), lesson
 		.getLessonId());
 
-	if (learnerProgress != null)
-	{
+	if (learnerProgress != null) {
 	    learnerElement.setAttribute("completedLesson", "" + learnerProgress.isComplete());
 	}
-	
+
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in
 	 * the sequence as a ToolActivity for some mysterious reason
@@ -924,7 +928,8 @@ public class LessonManagerServlet extends HttpServlet {
 		for (String outputName : map.keySet()) {
 
 		    try {
-
+			ToolOutputDefinition definition = map.get(outputName);
+			
 			if (isAuthoredToolOutputs) {
 			    Set<ActivityEvaluation> activityEvaluations = toolAct.getActivityEvaluations();
 			    if (activityEvaluations != null) {
@@ -932,7 +937,7 @@ public class LessonManagerServlet extends HttpServlet {
 				    if (outputName.equals(evaluation.getToolOutputDefinition())) {
 					ToolOutput toolOutput = toolService.getOutputFromTool(outputName, toolSession,
 						learner.getUserId());
-					activityElement.appendChild(getOutputElement(document, toolOutput));
+					activityElement.appendChild(getOutputElement(document, toolOutput, definition));
 				    }
 				}
 			    }
@@ -941,7 +946,7 @@ public class LessonManagerServlet extends HttpServlet {
 				    .getUserId());
 
 			    if (toolOutput != null) {
-				activityElement.appendChild(getOutputElement(document, toolOutput));
+				activityElement.appendChild(getOutputElement(document, toolOutput, definition));
 
 			    }
 
@@ -965,30 +970,49 @@ public class LessonManagerServlet extends HttpServlet {
      * @param toolOutput
      * @return
      */
-    private Element getOutputElement(Document document, ToolOutput toolOutput) {
+    private Element getOutputElement(Document document, ToolOutput toolOutput, ToolOutputDefinition definition) {
 	Element toolOutputElement = document.createElement("ToolOutput");
 	toolOutputElement.setAttribute("name", toolOutput.getName());
 	toolOutputElement.setAttribute("description", toolOutput.getDescription());
 	toolOutputElement.setAttribute("output", toolOutput.getValue().getString());
 	
+	Long marksPossible = getTotalMarksAvailable(definition);
+	
+	toolOutputElement.setAttribute("marksPossible", (marksPossible != null) ? marksPossible.toString() : "");
+
 	String type;
 	OutputType outputType = toolOutput.getValue().getType();
-	
+
 	if (outputType == OutputType.OUTPUT_BOOLEAN) {
 	    type = "boolean";
-	} else if (outputType == OutputType.OUTPUT_COMPLEX){
+	} else if (outputType == OutputType.OUTPUT_COMPLEX) {
 	    type = "complex";
-	} else if (outputType == OutputType.OUTPUT_DOUBLE){
+	} else if (outputType == OutputType.OUTPUT_DOUBLE) {
 	    type = "double";
-	} else if (outputType == OutputType.OUTPUT_LONG){
+	} else if (outputType == OutputType.OUTPUT_LONG) {
 	    type = "long";
-	} else if (outputType == OutputType.OUTPUT_SET_BOOLEAN){
+	} else if (outputType == OutputType.OUTPUT_SET_BOOLEAN) {
 	    type = "set_boolean";
 	} else {
 	    type = "string";
 	}
-	
+
 	toolOutputElement.setAttribute("type", type);
 	return toolOutputElement;
+    }
+
+    /**
+     * Gets the total marks available for a tool output definition
+     * 
+     * @param activity
+     * @return
+     */
+    private Long getTotalMarksAvailable(ToolOutputDefinition definition) {
+
+	Object upperLimit = definition.getEndValue();
+	if (upperLimit != null && upperLimit instanceof Long) {
+	    return (Long) upperLimit;
+	}
+	return null;
     }
 }

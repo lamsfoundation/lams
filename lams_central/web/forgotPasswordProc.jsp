@@ -22,7 +22,7 @@ String emailStr = request.getParameter("emailSent");
 <lams:html>
 
 <lams:head>
-    <lams:css  style="core"/>
+    <lams:css />
     <title><fmt:message key="title.forgot.password"/></title>
     <link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
@@ -45,27 +45,34 @@ String emailStr = request.getParameter("emailSent");
 
 <body class="stripes" >
     <div id="page"><!--main box 'page'-->
-
-    
-    <h1 class="no-tabs-below"><fmt:message key="label.forgot.password.confirm"/></h1>
     
     <div id="header-no-tabs"></div>
     <div id="content" align="center">
-	    <table border="0" class="body"><tr><td>
-		    <%if (stateStr.equals("0")){out.print("<font color='Red'>");}%>
-		    <fmt:message key="<%=languageKey %>"/>
-		    <%
-		    if (stateStr.equals("0"))
-		    {
-		    	out.print("</font>");
-		    }
-		    else if (emailStr!=null && !emailStr.equals(""))
+	    <h1 class="no-tabs-below"><fmt:message key="label.forgot.password.confirm"/></h1>
+	    
+	    
+	    <%
+	    	if (stateStr.equals("0")) {
+	    %>
+	    	<p class="warning">
+	    <%
+	    	} else {
+	    %>
+			<p class="info">
+	    <% 
+	    	}
+	    %>
+	   	<fmt:message key="<%=languageKey %>"/>
+	   	
+	   	<%
+	   		if (emailStr!=null && !emailStr.equals(""))
 		    {
 		    	out.print(emailStr);
 		    }
-		    %>
-	    </td></tr></table>
-	    <br><br>
+		%>	
+	    </p>
+
+	    <br>
 	    <html:button property="cancel" styleClass="button" onclick="javascript:toHome();"><fmt:message key="label.ok"/></html:button>
 	</div>
     

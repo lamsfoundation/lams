@@ -21,15 +21,19 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
@@ -40,13 +44,20 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.jfree.util.Log;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Base64StringToImageUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -258,56 +269,114 @@ public class LAMSConnectorServlet extends HttpServlet {
 		String retVal="0";
 		String newName="";
 		
-		if(!commandStr.equals("FileUpload") || !isEnabled(currentFolderStr))
-			retVal="203";
-		else {
-			DiskFileUpload upload = new DiskFileUpload();
-			try {
-				List items = upload.parseRequest(request);
-				
-				Map fields=new HashMap();
-				
-				Iterator iter = items.iterator();
-				while (iter.hasNext()) {
-				    FileItem item = (FileItem) iter.next();
-				    if (item.isFormField())
-				    	fields.put(item.getFieldName(),item.getString());
-				    else
-				    	fields.put(item.getFieldName(),item);
-				}
-				FileItem uplFile=(FileItem)fields.get("NewFile");
-				String fileNameLong=uplFile.getName();
-				fileNameLong=fileNameLong.replace('\\','/');
-				String[] pathParts=fileNameLong.split("/");
-				String fileName=pathParts[pathParts.length-1];
-				
-				String nameWithoutExt=getNameWithoutExtension(fileName);
-				String ext=getExtension(fileName);
-				File pathToSave=new File(validCurrentDirPath,fileName);
-				int counter=1;
-				while(pathToSave.exists()){
-					newName=nameWithoutExt+"_"+counter+"."+ext;
-					retVal="201";
-					pathToSave=new File(validCurrentDirPath,newName);
-					counter++;
-					}
-				uplFile.write(pathToSave);
-			}catch (Exception ex) {
-				retVal="203";
-			}
+		try {
+			if(commandStr.equals("PaintUpload"))
+				newName = createNewPaint(validCurrentDirPath, request);
+			else if(!commandStr.equals("FileUpload") || !isEnabled(currentFolderStr))
+				throw new Exception("Illegal command.");
+			else
+				newName = createNewFile(validCurrentDirPath, request);
 			
+			retVal="201";
+		} catch(Exception ex) {
+			if(debug) System.out.println(ex.getMessage());
+			retVal="203";
 		}
 		
-		out.println("<script type=\"text/javascript\">");
-		out.println("window.parent.frames['frmUpload'].OnUploadCompleted("+retVal+",'"+newName+"');");
-		out.println("</script>");
-		out.flush();
-		out.close();
+		if(!commandStr.equals("PaintUpload")) {
+			out.println("<script type=\"text/javascript\">");
+			out.println("window.parent.frames['frmUpload'].OnUploadCompleted("+retVal+",'"+newName+"');");
+			out.println("</script>");
+			out.flush();
+			out.close();
+		} else {
+			// send back URL to new Paint file
+			String currentWebPath= lamsContextPath + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR 
+			+ designFolder + typeStr +"/" + currentFolderStr;
+		
+			out.println( currentWebPath + newName);
+		}
 	
 		if (debug) System.out.println("--- END DOPOST ---");	
 		
 	}
+	
+	private String createNewFile(String validCurrentDirPath, HttpServletRequest request) throws FileUploadException, IOException, Exception {
+		if (debug) System.out.println("--- BEGIN FILE SAVE ---");	
+		String newName = "";
+		DiskFileUpload upload = new DiskFileUpload();
+		List items = upload.parseRequest(request);
+		
+		Map fields=new HashMap();
+		
+		Iterator iter = items.iterator();
+		while (iter.hasNext()) {
+		    FileItem item = (FileItem) iter.next();
+		    if (item.isFormField())
+		    	fields.put(item.getFieldName(),item.getString());
+		    else
+		    	fields.put(item.getFieldName(),item);
+		}
+		
+		FileItem uplFile = (FileItem)fields.get("NewFile");
+		String fileNameLong = uplFile.getName();
+		fileNameLong = fileNameLong.replace('\\','/');
+		String[] pathParts = fileNameLong.split("/");
+		String fileName = pathParts[pathParts.length-1];
+		
+		String nameWithoutExt = getNameWithoutExtension(fileName);
+		String ext = getExtension(fileName);
+		
+		File pathToSave = new File(validCurrentDirPath, fileName);
+		
+		int counter=1;
+		while(pathToSave.exists()){
+			fileName = nameWithoutExt+"_"+counter+"."+ext;
+			pathToSave = new File(validCurrentDirPath, fileName);
+			counter++;
+		}
+		
+		uplFile.write(pathToSave);
+		
+		if (debug) System.out.println("--- END FILE SAVE ---");	
+		
+		return fileName;
+	}
 
+	private String createNewPaint(String validCurrentDirPath, HttpServletRequest request) throws IOException {
+		if (debug) System.out.println("--- BEGIN PAINT SAVE ---");	
+		
+		String extension = "png";
+		String nameWithoutExt = getUserID() + "_" + String.valueOf(new Date().getTime());
+		String fileName = nameWithoutExt + "." + extension;
+		
+		File dir = new File(validCurrentDirPath);
+		File pathToSave = new File(validCurrentDirPath, fileName);
+		
+		int counter=1;
+		while(pathToSave.exists()){
+			fileName = nameWithoutExt+"_"+counter+"."+extension;
+			pathToSave = new File(validCurrentDirPath, fileName);
+			counter++;
+		}
+
+		if(!dir.exists()) dir.mkdirs();
+		
+		InputStream is = request.getInputStream();
+		FileOutputStream fileos = new FileOutputStream(pathToSave);
+		
+		byte[] bs = IOUtils.toByteArray(is);
+		
+		fileos.write(bs);
+		
+		fileos.flush();
+		fileos.close();
+		
+		if (debug) System.out.println("--- END PAINT SAVE ---");	
+		
+		return fileName;
+	}
+	
 	private void setCreateFolderResponse(String retValue,Node root,Document doc) {
 		Element myEl=doc.createElement("Error");
 		myEl.setAttribute("number",retValue);
@@ -383,5 +452,12 @@ public class LAMSConnectorServlet extends HttpServlet {
 	 	realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR + File.separator + baseDir;
 		lamsContextPath = "/" + Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH) +"/";
 	 }
+	 
+	 private String getUserID() {
+		HttpSession ss = SessionManager.getSession();
+		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		return user != null ? user.getUserID().toString() : "";
+	}
+
 }
 

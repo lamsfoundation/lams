@@ -89,22 +89,25 @@ public class MonitoringAction extends LamsDispatchAction {
 	GmapDTO gmapDT0 = new GmapDTO(gmap);
 
 	// Adding the markers lists to a map with tool sessions as the key
-	//Map<Long, Set<GmapMarkerDTO> > sessionMarkersMap = new HashMap<Long, Set<GmapMarkerDTO> >();
-	for (GmapSessionDTO sessionDTO : gmapDT0.getSessionDTOs()) {
-	    Long toolSessionID = sessionDTO.getSessionID();
-	    sessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(toolSessionID));
 
-	    for (GmapUserDTO userDTO : sessionDTO.getUserDTOs()) {
-		// get the notebook entry.
-		NotebookEntry notebookEntry = gmapService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-			GmapConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
-		if (notebookEntry != null) {
-		    userDTO.setFinishedReflection(true);
-		    //userDTO.setNotebookEntry(notebookEntry.getEntry());
-		} else {
-		    userDTO.setFinishedReflection(false);
+	if (gmapDT0.getSessionDTOs() != null) {
+	    for (GmapSessionDTO sessionDTO : gmapDT0.getSessionDTOs()) {
+		Long toolSessionID = sessionDTO.getSessionID();
+		sessionDTO.setMarkerDTOs(gmapService.getGmapMarkersBySessionId(toolSessionID));
+
+		for (GmapUserDTO userDTO : sessionDTO.getUserDTOs()) {
+		    // get the notebook entry.
+		    NotebookEntry notebookEntry = gmapService.getEntry(toolSessionID,
+			    CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE, userDTO.getUserId()
+				    .intValue());
+		    if (notebookEntry != null) {
+			userDTO.setFinishedReflection(true);
+			//userDTO.setNotebookEntry(notebookEntry.getEntry());
+		    } else {
+			userDTO.setFinishedReflection(false);
+		    }
+		    sessionDTO.getUserDTOs().add(userDTO);
 		}
-		sessionDTO.getUserDTOs().add(userDTO);
 	    }
 	}
 

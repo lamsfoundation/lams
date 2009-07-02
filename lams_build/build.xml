@@ -341,7 +341,6 @@
 			<property name="generate.for.installers" value="${generate.for.installers}"/>
 		</ant>
 	</target>
-	
 
 	<target name="deploy-minimal-tools" description="Deploy the tools shared between LAMS and RAMS. Called by deploy-lams-tools and deploy-rams-tools">
   		<ant antfile="../${tool_notebook_dir}/build.xml" target="deploy-tool"
@@ -516,6 +515,7 @@
 			<property name="assembly.activity" value="${basedir}/assembly/forumscribe"/>
 			<property name="package.cfg" value="librarypackages/forumscribe"/>
 		</ant> 
+		
 </target>
 
 	<!-- Copy lams.tld and the lams tags from lams-central to the other projects -->

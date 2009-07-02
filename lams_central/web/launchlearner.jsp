@@ -10,7 +10,7 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="index.welcome" /></title>
-	<lams:css style="tabbed"/>
+	<lams:css />
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="javascript" type="text/javascript" src="loadVars.jsp"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
@@ -23,7 +23,7 @@
 	</div>
 
 	<div id="content">
-		<h1><c:out value="${name}"/></h1>
+		<h1 class="no-tabs-below"><c:out value="${name}"/></h1>
 		<p><c:out value="${description}" escapeXml="false"/></p>
 		<p>
 		<!-- defined Lesson states -->

@@ -9,13 +9,18 @@
 	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
 	<param-value>org.lamsfoundation.lams.tool.imageGallery.ApplicationResources</param-value>
 </context-param>
+
+<context-param>
+    <param-name>contextClass</param-name>
+    <param-value>org.jboss.spring.factory.VFSXmlWebApplicationContext</param-value>
+</context-param> 
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
 	<param-value>classpath:/org/lamsfoundation/lams/tool/imageGallery/dbupdates/autopatchContext.xml</param-value>
 </context-param>
 <context-param>
    <param-name>locatorFactorySelector</param-name>
-   <param-value>classpath*:/org/lamsfoundation/lams/**/beanRefContext.xml</param-value>
+   <param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
 </context-param>
 <context-param>
 	<param-name>parentContextKey</param-name>
@@ -213,10 +218,10 @@
 
    	<!--  Security Constraint -->
 	<security-constraint>
-	   	<web-imageGallery-collection>
-	    	<web-imageGallery-name>Secure Content</web-imageGallery-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Secure Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
-    	</web-imageGallery-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
     		<role-name>TEACHER</role-name>
@@ -229,10 +234,10 @@
     </security-constraint>
 
     <security-constraint>
-	   	<web-imageGallery-collection>
-	    	<web-imageGallery-name>Authoring Update</web-imageGallery-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Authoring Update</web-resource-name>
 		    <url-pattern>/authoring/*</url-pattern>
-    	</web-imageGallery-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
     		<role-name>AUTHOR ADMIN</role-name>
@@ -240,20 +245,20 @@
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-imageGallery-collection>
-	    	<web-imageGallery-name>Staff Content</web-imageGallery-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
 		    <url-pattern>/monitoring.do</url-pattern>
-    	</web-imageGallery-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-imageGallery-collection>
-	    	<web-imageGallery-name>Staff Content</web-imageGallery-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Staff Content</web-resource-name>
 		    <url-pattern>/definelater.do</url-pattern>
-    	</web-imageGallery-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
     		<role-name>TEACHER</role-name>
@@ -261,29 +266,29 @@
     </security-constraint>
 
     <security-constraint>
-	   	<web-imageGallery-collection>
-	    	<web-imageGallery-name>Adminstrator Content</web-imageGallery-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Adminstrator Content</web-resource-name>
 		    <url-pattern>/admin.do</url-pattern> 
-    	</web-imageGallery-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
     <security-constraint>
-	   	<web-imageGallery-collection>
-	    	<web-imageGallery-name>LAMS System Adminstrator Content</web-imageGallery-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>LAMS System Adminstrator Content</web-resource-name>
 		    <url-pattern>/sysadmin.do</url-pattern> 
-    	</web-imageGallery-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 	<!--  some combine role security setting -->
     <security-constraint>
-	   	<web-imageGallery-collection>
-	    	<web-imageGallery-name>Download Files</web-imageGallery-name>
+	   	<web-resource-collection>
+	    	<web-resource-name>Download Files</web-resource-name>
 		    <url-pattern>/download/</url-pattern>
-    	</web-imageGallery-collection>
+    	</web-resource-collection>
     	<auth-constraint>
     		<role-name>LEARNER</role-name>
     		<role-name>AUTHOR</role-name>

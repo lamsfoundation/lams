@@ -39,7 +39,6 @@
 <!--  The download servlet, reused from the content repository jar -->
 <servlet>
 	<description>Attachment Download</description>
-	<display-name>Attachment Download</display-name>
 	<servlet-name>download</servlet-name>
 	<servlet-class>org.lamsfoundation.lams.contentrepository.client.ToolDownload</servlet-class>
 	<init-param>

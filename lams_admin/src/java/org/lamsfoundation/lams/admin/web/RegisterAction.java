@@ -78,7 +78,7 @@ import sun.misc.BASE64Decoder;
 public class RegisterAction extends LamsDispatchAction {
 
     private static final Logger log = Logger.getLogger(RegisterAction.class);
-    private static final String LAMS_COMMUNITY_REGISTER_URL = "http://lamscommunity.org/x/registration";
+    private static final String LAMS_COMMUNITY_REGISTER_URL = "http://lamscommunity.org/lams/x/registration";
     public static final String LAMS_COMMUNITY_KEY = "17^76iTkqYSywJ73";
 
     private static IUserManagementService userManagementService;
@@ -135,41 +135,6 @@ public class RegisterAction extends LamsDispatchAction {
 	
 	request.setAttribute("registerDTO", registerDTO);
 
-	/*
-	DynaActionForm registerForm = (DynaActionForm) form;
-
-	// Set Server Configuration details in dyna form 
-	registerForm.set("serverurl", Configuration.get(ConfigurationKeys.SERVER_URL));
-	registerForm.set("serverversion", Configuration.get(ConfigurationKeys.VERSION));
-	registerForm.set("serverbuild", Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
-	registerForm.set("serverlocale", Configuration.get(ConfigurationKeys.SERVER_LANGUAGE));
-	registerForm.set("langdate", Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED));
-
-	// Set user details for registration
-	UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-
-	registerForm.set("rname", sysadmin.getFirstName() + " " + sysadmin.getLastName());
-	registerForm.set("remail", sysadmin.getEmail());
-
-	// Get Server statistics for registration 
-	List groups = service.findByProperty(Organisation.class, "organisationType.organisationTypeId",
-		OrganisationType.COURSE_TYPE);
-	List subgroups = service.findByProperty(Organisation.class, "organisationType.organisationTypeId",
-		OrganisationType.CLASS_TYPE);
-
-	//Set statistics in dyna form 
-	registerForm.set("groupno", Integer.valueOf(groups.size()));
-	registerForm.set("subgroupno", Integer.valueOf(subgroups.size()));
-	registerForm.set("sysadminno", service.getCountRoleForSystem(Role.ROLE_SYSADMIN));
-	registerForm.set("adminno", service.getCountRoleForSystem(Role.ROLE_GROUP_ADMIN));
-	registerForm.set("authorno", service.getCountRoleForSystem(Role.ROLE_AUTHOR));
-	registerForm.set("monitorno", service.getCountRoleForSystem(Role.ROLE_MONITOR));
-	registerForm.set("managerno", service.getCountRoleForSystem(Role.ROLE_GROUP_MANAGER));
-	registerForm.set("learnerno", service.getCountRoleForSystem(Role.ROLE_LEARNER));
-	registerForm.set("authoradminno", service.getCountRoleForSystem(Role.ROLE_AUTHOR_ADMIN));
-	registerForm.set("userno", Integer.valueOf(service.findAll(User.class).size()));
-	*/
-
 	return mapping.findForward("register");
     }
 
@@ -196,30 +161,6 @@ public class RegisterAction extends LamsDispatchAction {
 	
 	registerForm.setPublicDirectory(reg.isPublicDirectory());
 	registerForm.setEnableLamsCommunityIntegration(reg.isEnableLamsCommunityIntegration());
-
-	// setting the config values
-//	registerForm.setServerUrl(Configuration.get(ConfigurationKeys.SERVER_URL));
-//	registerForm.setServerVersion(Configuration.get(ConfigurationKeys.VERSION));
-//	registerForm.setServerBuild(Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER));
-//	registerForm.setServerLocale(Configuration.get(ConfigurationKeys.SERVER_LANGUAGE));
-//	registerForm.setServerLanguageDate(Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED));
-
-	// Get Server statistics for registration 
-//	List groups = userManagementService.findByProperty(Organisation.class, "organisationType.organisationTypeId",
-//		OrganisationType.COURSE_TYPE);
-//	List subgroups = userManagementService.findByProperty(Organisation.class,
-//		"organisationType.organisationTypeId", OrganisationType.CLASS_TYPE);
-//
-//	registerForm.setGroupNumber(Integer.valueOf(groups.size()));
-//	registerForm.setSubgroupNumber(Integer.valueOf(subgroups.size()));
-//	registerForm.setSysadminNumber(userManagementService.getCountRoleForSystem(Role.ROLE_SYSADMIN));
-//	registerForm.setAdminNumber(userManagementService.getCountRoleForSystem(Role.ROLE_GROUP_ADMIN));
-//	registerForm.setAuthorNumber(userManagementService.getCountRoleForSystem(Role.ROLE_AUTHOR));
-//	registerForm.setMonitorNumber(userManagementService.getCountRoleForSystem(Role.ROLE_MONITOR));
-//	registerForm.setManagerNumber(userManagementService.getCountRoleForSystem(Role.ROLE_GROUP_MANAGER));
-//	registerForm.setLearnerNumber(userManagementService.getCountRoleForSystem(Role.ROLE_LEARNER));
-//	registerForm.setAuthorAdminNumber(userManagementService.getCountRoleForSystem(Role.ROLE_AUTHOR_ADMIN));
-//	registerForm.setUserNumber(Integer.valueOf(userManagementService.findAll(User.class).size()));
     }
 
     public void updateRegistration(RegisterForm registerForm, Registration reg) {
@@ -245,10 +186,10 @@ public class RegisterAction extends LamsDispatchAction {
 	if (reg == null) {
 	    reg = new Registration();
 	}
-
+	updateRegistration(registerForm, reg);
+	
 	if (reg.getServerKey() == null) {
-	    updateRegistration(registerForm, reg);
-
+	   
 	    String url = LAMS_COMMUNITY_REGISTER_URL;
 
 	    HashMap<String, String> params = new HashMap<String, String>();

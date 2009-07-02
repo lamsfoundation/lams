@@ -1,6 +1,5 @@
 package org.lamsfoundation.lams.util;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 
@@ -27,21 +25,30 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
  */
 public class WebUtil {
 
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Class level constants - Session attributs
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
     private static Logger log = Logger.getLogger(WebUtil.class);
+    /**
+     * A regular expression pattern that matches HTML tags.
+     */
+    private static final String HTML_TAG_REGEX = "\\<.*?>";
+    /**
+     * A regular expression pattern that matches end-of-line and space tags. If needed, BR tags can be extented to
+     * <code>(?:<BR>|<br>|<BR />|<br />)</code> . Right now FCKeditor creates only the first option.
+     */
+    private static final String SPACE_TAG_REGEX = "(?:<BR>)|(?:&nbsp;)|(?:</div><div>)";
 
     /**
      */
     public static boolean isTokenValid(HttpServletRequest req, String tokenName) {
 	if (req.getSession() != null) {
 	    String valueSession = (String) req.getSession().getAttribute(tokenName);
-	    String valueRequest = (String) req.getParameter(tokenName);
-	    log.debug("(Session Token) name : " + tokenName + " value : " + valueSession);
-	    log.debug("(Request Token) name : " + tokenName + " value : " + valueRequest);
-	    if ((valueSession != null) && (valueRequest != null)) {
+	    String valueRequest = req.getParameter(tokenName);
+	    WebUtil.log.debug("(Session Token) name : " + tokenName + " value : " + valueSession);
+	    WebUtil.log.debug("(Request Token) name : " + tokenName + " value : " + valueRequest);
+	    if (valueSession != null && valueRequest != null) {
 		if (valueSession.equals(valueRequest)) {
 		    return true;
 		}
@@ -70,7 +77,7 @@ public class WebUtil {
 	    resetToken(req, tokenName);
 	}
 	req.getSession().setAttribute(tokenName, tokenValue);
-	log.debug("(Save Session Token) name : " + tokenName + " value : " + tokenValue);
+	WebUtil.log.debug("(Save Session Token) name : " + tokenName + " value : " + tokenValue);
 
     }
 
@@ -91,10 +98,10 @@ public class WebUtil {
      *                    if not set
      */
     public static void checkObject(String paramName, Object paramValue) throws IllegalArgumentException {
-	boolean isNull = (paramValue == null);
+	boolean isNull = paramValue == null;
 	if (!isNull && String.class.isInstance(paramValue)) {
 	    String str = (String) paramValue;
-	    isNull = (str.trim().length() == 0);
+	    isNull = str.trim().length() == 0;
 	}
 	if (isNull) {
 	    throw new IllegalArgumentException(paramName + " is required '" + paramValue + "'");
@@ -109,8 +116,9 @@ public class WebUtil {
     public static Integer checkInteger(String paramName, String paramValue, boolean isOptional)
 	    throws IllegalArgumentException {
 	try {
-	    if (!isOptional)
+	    if (!isOptional) {
 		checkObject(paramName, paramValue);
+	    }
 	    String value = paramValue != null ? StringUtils.trimToNull(paramValue) : null;
 	    return value != null ? new Integer(value) : null;
 
@@ -127,8 +135,9 @@ public class WebUtil {
     public static Long checkLong(String paramName, String paramValue, boolean isOptional)
 	    throws IllegalArgumentException {
 	try {
-	    if (!isOptional)
+	    if (!isOptional) {
 		checkObject(paramName, paramValue);
+	    }
 	    String value = paramValue != null ? StringUtils.trimToNull(paramValue) : null;
 	    return value != null ? new Long(value) : null;
 
@@ -138,16 +147,17 @@ public class WebUtil {
     }
 
     /**
-     * Get a long version of paramValue, throwing an IllegalArgumentException if
-     * isOptional = false and the is value is null
+     * Get a long version of paramValue, throwing an IllegalArgumentException if isOptional = false and the is value is
+     * null
      * 
      * @return long value of paramValue
      * @exception IllegalArgumentException -
      *                    if not set or not long
      */
     public static long checkLong(String paramName, Long paramValue, boolean isOptional) throws IllegalArgumentException {
-	if (!isOptional)
+	if (!isOptional) {
 	    checkObject(paramName, paramValue);
+	}
 	return paramValue.longValue();
     }
 
@@ -174,8 +184,7 @@ public class WebUtil {
     }
 
     /**
-     * Read an int parameter, throwing exception if ( not optional and null ) or
-     * not a integer
+     * Read an int parameter, throwing exception if ( not optional and null ) or not a integer
      * 
      * @param req -
      * @param paramName -
@@ -198,8 +207,7 @@ public class WebUtil {
     }
 
     /**
-     * Read an long parameter, throwing exception if ( not optional and null )
-     * or not a long
+     * Read an long parameter, throwing exception if ( not optional and null ) or not a long
      * 
      * @param req -
      * @param paramName -
@@ -226,8 +234,9 @@ public class WebUtil {
      * @return parameter value
      */
     public static String readStrParam(HttpServletRequest req, String paramName, boolean isOptional) {
-	if (!isOptional)
+	if (!isOptional) {
 	    checkObject(paramName, req.getParameter(paramName));
+	}
 	return req.getParameter(paramName);
     }
 
@@ -246,8 +255,7 @@ public class WebUtil {
      * @param req -
      * @param paramName -
      * @param defaultValue -
-     *                if valid boolean parameter value is not found, return this
-     *                value
+     *                if valid boolean parameter value is not found, return this value
      * @return parameter value
      */
     public static boolean readBooleanParam(HttpServletRequest req, String paramName, boolean defaultValue) {
@@ -263,35 +271,37 @@ public class WebUtil {
     }
 
     /**
-     * TODO default proper exception at lams level to replace RuntimeException
-     * TODO isTesting should be removed when login is done properly.
+     * TODO default proper exception at lams level to replace RuntimeException TODO isTesting should be removed when
+     * login is done properly.
      * 
      * @param req -
      * @return username from principal object
      */
     public static String getUsername(HttpServletRequest req, boolean isTesting) throws RuntimeException {
-	if (isTesting)
+	if (isTesting) {
 	    return "test";
+	}
 
 	Principal prin = req.getUserPrincipal();
-	if (prin == null)
+	if (prin == null) {
 	    throw new RuntimeException("Trying to get username but principal object missing. Request is "
 		    + req.toString());
+	}
 
 	String username = prin.getName();
-	if (username == null)
+	if (username == null) {
 	    throw new RuntimeException("Name missing from principal object. Request is " + req.toString()
 		    + " Principal object is " + prin.toString());
+	}
 
 	return username;
     }
 
     /**
-     * Retrieve the tool access mode from http request. This is a utility used
-     * by the tools that share an implementation for the learner screen. They
-     * use mode=learner, mode=author and mode=teacher for learning, preview and
-     * monitoring respectively. Only used if the tool programmer wants to have
-     * one call that supports all three ways of looking at a learner screen.
+     * Retrieve the tool access mode from http request. This is a utility used by the tools that share an implementation
+     * for the learner screen. They use mode=learner, mode=author and mode=teacher for learning, preview and monitoring
+     * respectively. Only used if the tool programmer wants to have one call that supports all three ways of looking at
+     * a learner screen.
      * 
      * @param request
      * @param param_mode
@@ -301,23 +311,22 @@ public class WebUtil {
 	String mode = readStrParam(request, param_mode, optional);
 	if (mode == null) {
 	    return null;
-	} else if (mode.equals(ToolAccessMode.AUTHOR.toString()))
+	} else if (mode.equals(ToolAccessMode.AUTHOR.toString())) {
 	    return ToolAccessMode.AUTHOR;
-	else if (mode.equals(ToolAccessMode.LEARNER.toString()))
+	} else if (mode.equals(ToolAccessMode.LEARNER.toString())) {
 	    return ToolAccessMode.LEARNER;
-	else if (mode.equals(ToolAccessMode.TEACHER.toString()))
+	} else if (mode.equals(ToolAccessMode.TEACHER.toString())) {
 	    return ToolAccessMode.TEACHER;
-	else
+	} else {
 	    throw new IllegalArgumentException("[" + mode + "] is not a legal mode" + "in LAMS");
+	}
     }
 
     /**
-     * Retrieve the tool access mode from a string value, presumably from a
-     * Form. This is a utility used by the tools that share an implementation
-     * for the learner screen. They use mode=learner, mode=author and
-     * mode=teacher for learning, preview and monitoring respectively. Only used
-     * if the tool programmer wants to have one call that supports all three
-     * ways of looking at a learner screen.
+     * Retrieve the tool access mode from a string value, presumably from a Form. This is a utility used by the tools
+     * that share an implementation for the learner screen. They use mode=learner, mode=author and mode=teacher for
+     * learning, preview and monitoring respectively. Only used if the tool programmer wants to have one call that
+     * supports all three ways of looking at a learner screen.
      * 
      * @param request
      * @param param_mode
@@ -325,20 +334,21 @@ public class WebUtil {
      */
     public static ToolAccessMode getToolAccessMode(String modeValue) {
 	if (modeValue != null) {
-	    if (modeValue.equals(ToolAccessMode.AUTHOR.toString()))
+	    if (modeValue.equals(ToolAccessMode.AUTHOR.toString())) {
 		return ToolAccessMode.AUTHOR;
-	    else if (modeValue.equals(ToolAccessMode.LEARNER.toString()))
+	    } else if (modeValue.equals(ToolAccessMode.LEARNER.toString())) {
 		return ToolAccessMode.LEARNER;
-	    else if (modeValue.equals(ToolAccessMode.TEACHER.toString()))
+	    } else if (modeValue.equals(ToolAccessMode.TEACHER.toString())) {
 		return ToolAccessMode.TEACHER;
+	    }
 	}
 	throw new IllegalArgumentException("[" + modeValue + "] is not a legal mode" + "in LAMS");
     }
 
     /**
      * <p>
-     * This helper method create the struts action forward name using the path.
-     * It will chop all path related characters, such as "/" and ".do".
+     * This helper method create the struts action forward name using the path. It will chop all path related
+     * characters, such as "/" and ".do".
      * </p>
      * 
      * <p>
@@ -377,73 +387,71 @@ public class WebUtil {
      * <p>
      * This helper append the parameter deliminator for a url.
      * </p>
-     * It is using a null safe String util method to checkup the url String and
-     * append proper deliminator if necessary.
+     * It is using a null safe String util method to checkup the url String and append proper deliminator if necessary.
      * 
      * @param url
      *                the url needs to append deliminator.
      * @return target url with the deliminator;
      */
     public static String appendParameterDeliminator(String url) {
-	if (url == null)
+	if (url == null) {
 	    return null;
-	else if (StringUtils.containsNone(url, "?"))
+	} else if (StringUtils.containsNone(url, "?")) {
 	    return url + "?";
-	else
+	} else {
 	    return url + "&";
+	}
     }
 
     /**
-     * Converts a url (such as one from a tool) to a complete url. If the url
-     * starts with "http" then it is assumed to be a complete url and is
-     * returned as is. Otherwise it assumes starts with the path of the webapp
-     * so it is appended to the server url from the LAMS Configuration.
+     * Converts a url (such as one from a tool) to a complete url. If the url starts with "http" then it is assumed to
+     * be a complete url and is returned as is. Otherwise it assumes starts with the path of the webapp so it is
+     * appended to the server url from the LAMS Configuration.
      * 
      * @param url
      *                e.g. tool/lanb11/starter/learner.do
      * @return complete url
      */
     public static String convertToFullURL(String url) {
-	if (url == null)
+	if (url == null) {
 	    return null;
-	else if (url.startsWith("http"))
+	} else if (url.startsWith("http")) {
 	    return url;
-	else {
+	} else {
 	    String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
-	    if (url.charAt(0) == '/')
+	    if (url.charAt(0) == '/') {
 		return serverURL + url;
-	    else
+	    } else {
 		return serverURL + '/' + url;
+	    }
 	}
     }
 
     /**
-     * Convert any newslines in a string to <BR/>. If input = null, returns
-     * null.
+     * Convert any newslines in a string to <BR/>. If input = null, returns null.
      */
     public static String convertNewlines(String input) {
-	if (input != null)
+	if (input != null) {
 	    return input.replaceAll("[\n\r\f]", "<BR/>");
-	else
+	} else {
 	    return null;
+	}
     }
 
     /**
-     * Strips HTML tags and leave "pure" text. Useful for FCKeditor created
-     * text.
+     * Strips HTML tags and leave "pure" text. Useful for FCKeditor created text.
      * 
      * @param text
      *                string to process
      * @return string after stripping
      */
     public static String removeHTMLtags(String text) {
-	return text == null ? null : text.replaceAll(TextSearchCondition.BR_TAG_REGEX, " ").replaceAll(
-		TextSearchCondition.HTML_TAG_REGEX, "");
+	return text == null ? null : text.replaceAll(WebUtil.SPACE_TAG_REGEX, " ").replaceAll(WebUtil.HTML_TAG_REGEX,
+		"");
     }
 
     /**
-     * Makes a request to the specified url with the specified parameters and
-     * returns the response inputstream
+     * Makes a request to the specified url with the specified parameters and returns the response inputstream
      * 
      * @param urlStr
      * @param params
@@ -453,44 +461,43 @@ public class WebUtil {
      */
     public static InputStream getResponseInputStreamFromExternalServer(String urlStr, HashMap<String, String> params)
 	    throws Exception {
-	if (!urlStr.contains("?"))
+	if (!urlStr.contains("?")) {
 	    urlStr += "?";
+	}
 
 	for (Entry<String, String> entry : params.entrySet()) {
 	    urlStr += "&" + entry.getKey() + "=" + entry.getValue();
 	}
 
-	log.debug("Making request to external servlet: " + urlStr);
+	WebUtil.log.debug("Making request to external servlet: " + urlStr);
 
 	URL url = new URL(urlStr);
 	URLConnection conn = url.openConnection();
 	if (!(conn instanceof HttpURLConnection)) {
-	    log.error("Fail to connect to external server though url:  " + urlStr);
+	    WebUtil.log.error("Fail to connect to external server though url:  " + urlStr);
 	    throw new Exception("Fail to connect to external server though url:  " + urlStr);
 	}
 
 	HttpURLConnection httpConn = (HttpURLConnection) conn;
 	if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-	    log.error("Response code from external server:  " + httpConn.getResponseCode()
-		    + " Url: " + urlStr);
+	    WebUtil.log.error("Response code from external server:  " + httpConn.getResponseCode() + " Url: " + urlStr);
 	}
 
 	InputStream is = url.openConnection().getInputStream();
 	if (is == null) {
-	    log.error("Fail to fetch data from external server, return InputStream null:  " + urlStr);
+	    WebUtil.log.error("Fail to fetch data from external server, return InputStream null:  " + urlStr);
 	    throw new Exception("Fail to fetch data from external server, return inputStream null:  " + urlStr);
 	}
 
 	return is;
     }
-    
+
     /**
-     * Uploads a file to the given url. Uses a multi-part http post to
-     * post the file as well as the user, course, and hash server-authentication
-     * strings.
+     * Uploads a file to the given url. Uses a multi-part http post to post the file as well as the user, course, and
+     * hash server-authentication strings.
      * 
-     * Some of the java multipart posting libraries clashed with existing jboss
-     * libraries So instead, the multipart post is put together manually
+     * Some of the java multipart posting libraries clashed with existing jboss libraries So instead, the multipart post
+     * is put together manually
      * 
      * @param f
      * @param urlString
@@ -512,20 +519,19 @@ public class WebUtil {
 	byte[] buffer;
 	int maxBufferSize = 1 * 1024 * 1024;
 
-	//------------------ CLIENT REQUEST
+	// ------------------ CLIENT REQUEST
 	FileInputStream fileInputStream = new FileInputStream(f);
 
-	log.debug("Performing multipart post to: " + urlString);
-	
-	// open a URL connection to the Servlet 
+	WebUtil.log.debug("Performing multipart post to: " + urlString);
+
+	// open a URL connection to the Servlet
 	URL url = new URL(urlString);
 
 	// Open a HTTP connection to the URL
 	conn = (HttpURLConnection) url.openConnection();
-	
-	
+
 	if (!(conn instanceof HttpURLConnection)) {
-	    log.error("Fail to connect to external server though url:  " + urlString);
+	    WebUtil.log.error("Fail to connect to external server though url:  " + urlString);
 	    throw new Exception("Fail to connect to external server though url:  " + urlString);
 	}
 
@@ -554,10 +560,10 @@ public class WebUtil {
 	conn.setRequestMethod("POST");
 	conn.setRequestProperty("Connection", "Keep-Alive");
 	conn.setRequestProperty("Content-Length", new Long(f.length() + httpRequest.getBytes().length + 64).toString());
-	log.debug(f.length());
-	log.debug(httpRequest.getBytes().length);
-	log.debug("" + f.length() + httpRequest.getBytes().length + 64);
-	log.debug(httpRequest);
+	WebUtil.log.debug(f.length());
+	WebUtil.log.debug(httpRequest.getBytes().length);
+	WebUtil.log.debug("" + f.length() + httpRequest.getBytes().length + 64);
+	WebUtil.log.debug(httpRequest);
 
 	conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
@@ -581,19 +587,18 @@ public class WebUtil {
 	// send multipart form data necessary after file data...
 	dos.writeBytes(lineEnd);
 	dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-	// Write the file part  into the post-------------------------------
+	// Write the file part into the post-------------------------------
 
 	// close streams
 	fileInputStream.close();
 	dos.flush();
 	dos.close();
-	
+
 	InputStream ret = conn.getInputStream();
 	if (ret == null) {
-	    log.error("Fail to get response from extenal server, return InputStream null:  " + urlString);
+	    WebUtil.log.error("Fail to get response from extenal server, return InputStream null:  " + urlString);
 	    throw new Exception("Fail to fetch data from external server, return inputStream null:  " + urlString);
 	}
-	
 
 	return conn.getInputStream();
     }

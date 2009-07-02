@@ -30,7 +30,7 @@
 				<c:if test="${lesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
 				<c:forEach var="lessonlink" items="${lesson.links}">
 					<a href="<c:out value='${lessonlink.url}'/>" class="sequence-action-link"> 
-						<span class="mycourses-monitor-img"> 
+						<span class="${lessonlink.style}"> 
 							<fmt:message key="${lessonlink.name}" /> 
 						</span>
 					</a>
@@ -71,7 +71,7 @@
 					<c:if test="${childLesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
 					<c:forEach var="childlessonlink" items="${childLesson.links}">
 					<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link"> 
-						<span class="mycourses-monitor-img"> 
+						<span class="${childlessonlink.style}"> 
 							<fmt:message key="${childlessonlink.name}" /> 
 						</span>
 					</a>

@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <lams:html>
 	<lams:head>
 		<title>
@@ -13,9 +12,6 @@
 	
 	<div id="page">
 	<body class="stripes">
-		<div id="header">
-		</div>
-		
 		<div id="content" style="margin-right:75px;">
 			<h1>
 				${compareTitle} 

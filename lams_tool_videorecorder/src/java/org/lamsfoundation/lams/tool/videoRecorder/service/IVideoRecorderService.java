@@ -273,16 +273,6 @@ public interface IVideoRecorderService {
      */
     void updateEntry(Long uid, String entry);
 
-    /**
-     * Creates an unique name for a ChatCondition. It consists of the tool output definition name and a unique positive
-     * integer number.
-     * 
-     * @param existingConditions
-     *                existing conditions; required to check if a condition with the same name does not exist.
-     * @return unique ChatCondition name
-     */
-    String createConditionName(Collection<VideoRecorderCondition> existingConditions);
-
     void releaseConditionsFromCache(VideoRecorder videoRecorder);
 
     void deleteCondition(VideoRecorderCondition condition);
@@ -298,4 +288,6 @@ public interface IVideoRecorderService {
     public String getLanguageXMLForFCK();
     
     public String getMessage(String key);
+    
+    public boolean isGroupedActivity(long toolContentID);
 }

@@ -195,7 +195,7 @@
 	</tr>
 	
 	<c:if test="${empty dto.sessionDTOs}">
-		<td><i>No groups found for lesson.</i></td>
+		<td colspan="2"><i><fmt:message key="label.nogroups" /></i></td>
 	</c:if>
 	<c:forEach var="session" items="${dto.sessionDTOs}">
 		<tr>

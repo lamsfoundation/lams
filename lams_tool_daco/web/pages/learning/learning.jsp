@@ -42,16 +42,16 @@
 </lams:head>
 
 <body class="stripes" onLoad="init()" id="body">
-<div id="page-learner">
+<div id="page">
 <h1><fmt:message key="label.learning.title" /></h1>
-<div id="header-learner">
+<div id="header">
 <lams:Tabs useKey="true" control="true">
 	<lams:Tab id="1" key="label.learning.heading.add" />
 	<lams:Tab id="2" key="label.learning.heading.list" />
 	<lams:Tab id="3" key="label.learning.heading.summary" />
 </lams:Tabs></div>
 
-<div id="content-learner">
+<div id="content">
 <%-- To switch between the vertical/horizontal view --%>
 <div style="float: right; margin-left: 10px; padding-top: 4px" class="help">
 	<img src="${tool}includes/images/uparrow.gif" title="<fmt:message key="label.common.view.change" />"
@@ -94,7 +94,7 @@
 
 </div>
 
-<div id="footer-learner"></div>
+<div id="footer"></div>
 <!-- end page div --></div>
 </body>
 </lams:html>

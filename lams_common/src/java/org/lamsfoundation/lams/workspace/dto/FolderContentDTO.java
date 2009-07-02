@@ -24,11 +24,13 @@
 package org.lamsfoundation.lams.workspace.dto;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.Vector;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 
@@ -76,12 +78,12 @@ public class FolderContentDTO {
 		this.versionDetails = null;
 		this.readOnly = false;
 	}
-	public FolderContentDTO(LearningDesign design, Integer permissionCode){
+	public FolderContentDTO(LearningDesign design, Integer permissionCode, User user){
 		this.name = design.getTitle();
 		this.description = design.getDescription();
 		this.creationDateTime = design.getCreateDateTime();
 		this.lastModifiedDateTime = design.getLastModifiedDateTime();
-		this.formattedLastModifiedDateTime = formatLastModifiedDateTime();
+		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]));
 		this.resourceType = DESIGN;
 		this.resourceID = design.getLearningDesignId();
 		this.permissionCode = permissionCode;
@@ -90,12 +92,12 @@ public class FolderContentDTO {
 		this.versionDetails = null;
 		this.readOnly = design.getReadOnly();
 	}
-	public FolderContentDTO(WorkspaceFolder workspaceFolder, Integer permissionCode){
+	public FolderContentDTO(WorkspaceFolder workspaceFolder, Integer permissionCode, User user){
 		this.name = workspaceFolder.getName();
 		this.description = "Folder";
 		this.creationDateTime = workspaceFolder.getCreationDate();
 		this.lastModifiedDateTime = workspaceFolder.getLastModifiedDate();
-		this.formattedLastModifiedDateTime = formatLastModifiedDateTime();
+		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]));
 		this.resourceType = FOLDER;
 		this.resourceTypeID = new Long(workspaceFolder.getWorkspaceFolderType().intValue());
 		this.resourceID = new Long(workspaceFolder.getWorkspaceFolderId().intValue());
@@ -104,12 +106,12 @@ public class FolderContentDTO {
 		this.versionDetails = null;
 		this.readOnly = Boolean.FALSE;
 	}	
-	public FolderContentDTO(Integer permissionCode, WorkspaceFolderContent workspaceFolderContent,SortedSet details){
+	public FolderContentDTO(Integer permissionCode, WorkspaceFolderContent workspaceFolderContent, SortedSet details, User user){
 		this.name =workspaceFolderContent.getName();
 		this.description = workspaceFolderContent.getDescription();
 		this.creationDateTime = workspaceFolderContent.getCreateDate();
 		this.lastModifiedDateTime = workspaceFolderContent.getLastModified();
-		this.formattedLastModifiedDateTime = formatLastModifiedDateTime();
+		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]));
 		this.resourceID = workspaceFolderContent.getFolderContentID();
 		this.permissionCode = permissionCode;		
 		if(workspaceFolderContent.getContentTypeID().equals(WorkspaceFolderContent.CONTENT_TYPE_FILE))
@@ -209,10 +211,10 @@ public class FolderContentDTO {
 		this.readOnly = readOnly;
 	}
 	
-	private String formatLastModifiedDateTime() {
+	private String formatLastModifiedDateTime(TimeZone tz) {
 		if(this.lastModifiedDateTime != null) {
 			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-			return sdf.format(lastModifiedDateTime);
+			return sdf.format(DateUtil.convertToTimeZoneFromDefault(tz, this.lastModifiedDateTime));
 		} else {
 			return null;
 		}

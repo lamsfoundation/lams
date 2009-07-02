@@ -147,7 +147,7 @@ public class DisplayGroupAction extends Action {
 		    + "/gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID="
 		    + org.getOrganisationId() + "'," + "750,400,0,0);";
 
-	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "manage-group-button", null));
+	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "my-grades-button", null));
 	}
 
 	if ((contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,
@@ -176,17 +176,16 @@ public class DisplayGroupAction extends Action {
 			    + "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
 			    + org.getOrganisationId() + "'," + "850,400,0,0);";
 
-		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "manage-group-button",
+		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "course-gradebook-button",
 			    "index.coursegradebook.tooltip"));
 
 		}
 
 	    } else {//CLASS_TYPE
 		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
-		    moreLinks.add(new IndexLinkBean("index.coursegradebook", Configuration
-			    .get(ConfigurationKeys.SERVER_URL)
-			    + "/gradebook/ggradebookMonitoring.do?dispatch=courseMonitor&organisationID="
-			    + org.getParentOrganisation().getOrganisationId()
+		    links.add(new IndexLinkBean("index.addlesson", Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + "/home.do?method=addLesson&courseID=" + org.getParentOrganisation().getOrganisationId()
+			    + "&classID=" + org.getOrganisationId()
 			    + "&KeepThis=true&TB_iframe=true&height=480&width=610", "add-lesson-button thickbox"
 			    + org.getOrganisationId(), null));
 	    }
@@ -302,13 +301,13 @@ public class DisplayGroupAction extends Action {
 	    if (stateId.equals(OrganisationState.ACTIVE)) {
 		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR)) {
 		    lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + bean.getId()
-			    + ")"));
+			    + ")", "mycourses-monitor-img", ""));
 
 		}
 	    } else if (stateId.equals(OrganisationState.ARCHIVED)) {
 		if (contains(roles, Role.ROLE_GROUP_MANAGER)) {
 		    lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + bean.getId()
-			    + ")"));
+			    + ")", "mycourses-monitor-img", ""));
 		}
 	    }
 
@@ -320,7 +319,7 @@ public class DisplayGroupAction extends Action {
 			+ Configuration.get(ConfigurationKeys.SERVER_URL)
 			+ "/gradebook/gradebookMonitoring.do?lessonID=" + bean.getId() + "'," + "850,700,0,0);";
 
-		lessonLinks.add(new IndexLinkBean("index.coursegradebookmonitor", link));
+		lessonLinks.add(new IndexLinkBean("index.coursegradebookmonitor", link, "mycourses-mark-img", ""));
 	    }
 
 	    if (lessonLinks.size() > 0) {

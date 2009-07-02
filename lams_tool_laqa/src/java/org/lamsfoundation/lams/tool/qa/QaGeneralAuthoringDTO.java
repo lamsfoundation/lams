@@ -59,6 +59,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
     protected String lockWhenFinished;
     protected String editActivityEditMode;
     protected String reflectionSubject;
+    protected Boolean allowRichEditor;
 
     protected String monitoredContentInUse;
 
@@ -600,4 +601,14 @@ public class QaGeneralAuthoringDTO implements Comparable {
     public void setShowOtherAnswers(String showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;
     }
+
+    public Boolean getAllowRichEditor() {
+        return allowRichEditor;
+    }
+
+    public void setAllowRichEditor(Boolean allowRichEditor) {
+        this.allowRichEditor = allowRichEditor;
+    }
+    
+    
 }

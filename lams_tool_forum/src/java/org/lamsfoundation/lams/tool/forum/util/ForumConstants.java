@@ -24,6 +24,8 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.forum.util;
 
+import java.util.regex.Pattern;
+
 /**
  * User: conradb Date: 14/06/2005 Time: 10:33:00
  */
@@ -140,7 +142,7 @@ public interface ForumConstants {
     public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 
     public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-    
+
     public static final String ATTR_MINIMUM_REPLY = "minimumReply";
 
     public static final String ATTR_MAXIMUM_REPLY = "maximumReply";
@@ -167,4 +169,10 @@ public interface ForumConstants {
     // a forward key
     public static final String SUCCESS = "success";
 
+    public static final String WORD_REGEX = "\\w+";
+
+    public static final short SUBJECT_WORD_COUNT = 3;
+
+    public static final int PATTERN_MATCHING_OPTIONS = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+	    | Pattern.MULTILINE;
 }

@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.web.tag;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspException;
@@ -31,6 +33,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -94,11 +97,19 @@ public class UserTag extends TagSupport {
 				Object value = null;
 				
 		        try {
-		            value = PropertyUtils.getProperty(user, property);
-		            if( property.equals("flashTheme") || property.equals("htmlTheme")) {
+		        	if(property.equals("timeZoneDisplayName")) {
+			        	String indexLbl = ((TimeZone) PropertyUtils.getProperty(user, "timeZone")).getID();
+			        	value = URLEncoder.encode(indexLbl, "UTF8");
+			        } else {
+			        	value = PropertyUtils.getProperty(user, property);
+			        }
+		            
+		        	if( property.equals("flashTheme") || property.equals("htmlTheme")) {
 		            	CSSThemeBriefDTO cssTheme = (CSSThemeBriefDTO) value;
 		            	value = (String) cssTheme.getName();
 		            }
+		        	
+		            
 		        } catch (Exception e) {
 					log.warn("UserTag unable to write out user details due to exception while accessing property value. User id "+user.getUserID(), e);
 		        }

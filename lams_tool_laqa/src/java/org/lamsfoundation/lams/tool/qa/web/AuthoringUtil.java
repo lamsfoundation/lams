@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -349,6 +350,9 @@ public class AuthoringUtil implements QaAppConstants {
 	String questionsSequenced = request.getParameter(QaAppConstants.QUESTIONS_SEQUENCED);
 
 	String lockWhenFinished = request.getParameter("lockWhenFinished");
+	
+	String allowRichEditor = request.getParameter("allowRichEditor");
+	    
 
 	String richTextOfflineInstructions = request.getParameter(QaAppConstants.OFFLINE_INSTRUCTIONS);
 	String richTextOnlineInstructions = request.getParameter(QaAppConstants.ONLINE_INSTRUCTIONS);
@@ -370,6 +374,7 @@ public class AuthoringUtil implements QaAppConstants {
 	boolean usernameVisibleBoolean = false;
 	boolean showOtherAnswersBoolean = false;
 	boolean reflectBoolean = false;
+	boolean allowRichEditorBoolean = false;
 
 	if (questionsSequenced != null && questionsSequenced.equalsIgnoreCase("1")) {
 	    questionsSequencedBoolean = true;
@@ -389,6 +394,10 @@ public class AuthoringUtil implements QaAppConstants {
 
 	if (showOtherAnswers != null && showOtherAnswers.equalsIgnoreCase("1")) {
 	    showOtherAnswersBoolean = true;
+	}
+	
+	if (allowRichEditor != null && allowRichEditor.equalsIgnoreCase("1")) {
+	    allowRichEditorBoolean = true;
 	}
 
 	if (reflect != null && reflect.equalsIgnoreCase("1")) {
@@ -431,6 +440,7 @@ public class AuthoringUtil implements QaAppConstants {
 	    qaContent.setSynchInMonitor(synchInMonitorBoolean);
 	    qaContent.setReflect(reflectBoolean);
 	    qaContent.setReflectionSubject(reflectionSubject);
+	    qaContent.setAllowRichEditor(allowRichEditorBoolean);
 
 	}
 

@@ -25,7 +25,7 @@
 					</td>
 					<td>
 						<input type="text" name="instructionItemDesc${status.index}"
-							id="instructionItemDesc${status.index}" size="60" value="${item}">
+							id="instructionItemDesc${status.index}" size="60" maxlength="255" value="${item}">
 					</td>
 
 					<td>

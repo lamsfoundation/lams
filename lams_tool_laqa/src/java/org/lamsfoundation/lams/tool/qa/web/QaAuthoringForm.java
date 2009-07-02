@@ -97,6 +97,8 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String defaultContentIdStr;
     protected Map mapQuestionContent;
     protected IQaService qaService;
+    
+    protected boolean allowRichEditor;
 
     public void resetUserAction() {
 	this.addContent = null;
@@ -112,6 +114,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.editActivityMonitoring = null;
 	this.statsMonitoring = null;
 	this.edit = null;
+	this.allowRichEditor = false;
     }
 
     public void reset() {
@@ -143,6 +146,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.questionsSequenced = null;
 	this.lockWhenFinished = null;
 	this.reflect = null;
+	this.allowRichEditor = false;
 
 	this.summaryMonitoring = null;
 	this.instructionsMonitoring = null;
@@ -159,6 +163,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.questionsSequenced = OPTION_OFF;
 	this.lockWhenFinished = OPTION_OFF;
 	this.reflect = OPTION_OFF;
+	this.allowRichEditor = false;
     }
 
     public String toString() {
@@ -877,5 +882,13 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setShowOtherAnswers(String showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;
+    }
+
+    public boolean isAllowRichEditor() {
+        return allowRichEditor;
+    }
+
+    public void setAllowRichEditor(boolean allowRichEditor) {
+        this.allowRichEditor = allowRichEditor;
     }
 }

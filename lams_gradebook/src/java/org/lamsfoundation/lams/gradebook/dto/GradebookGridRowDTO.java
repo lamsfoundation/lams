@@ -18,10 +18,10 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dto; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.dto;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -40,16 +40,16 @@ public abstract class GradebookGridRowDTO {
     // The name for the row, every gradebook row has some sort of name
     // Be it the user's name, the activity name, the lesson name etc
     public String rowName;
- 
+
     // A unit of time in milliseconds that  determines the time taken for the corressponding task
     public Long timeTaken;
-    
+
     // Another unit of time that represents average time taken for a corresponding task
     public Long averageTimeTaken;
-    
+
     // The mark for the corresponding gradebook grid row task
     public Double mark;
-    
+
     // Average mark for the corresponding task
     public Double averageMark;
 
@@ -94,7 +94,6 @@ public abstract class GradebookGridRowDTO {
 	    return null;
 	}
     }
-    
 
     protected String markToString() {
 	if (mark != null) {

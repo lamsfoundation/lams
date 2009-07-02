@@ -85,6 +85,34 @@ public class DateUtil
     }
     
     /**
+     * Convert from local time to your client (time zone) time.
+     * 
+     * @param targetTimeZone time zone converting to.
+     * @param date date to convert.
+     * @return your time zone date time.
+     */
+    public static Date convertToTimeZoneFromDefault(TimeZone targetTimeZone, Date date) {
+    	TimeZone defaultTz = TimeZone.getDefault();
+    	Integer rawOffset = new Integer(defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime()));
+    	
+    	return new Date(date.getTime() - rawOffset);
+    }
+    
+    /**
+     * Convert from client (time zone) time to your local time.
+     * 
+     * @param targetTimeZone time zone converting from.
+     * @param date date to convert.
+     * @return your local date time.
+     */
+    public static Date convertFromTimeZoneToDefault(TimeZone targetTimeZone, Date date) {
+    	TimeZone defaultTz = TimeZone.getDefault();
+    	Integer rawOffset = new Integer(defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime()));
+    	
+    	return new Date(date.getTime() + rawOffset);
+    }
+    
+    /**
      * Convert from String formatted date to a Date. Tries the following
      * date formats:
      *  (WDDX) YYYY-MM-ddTHH:mm:ss

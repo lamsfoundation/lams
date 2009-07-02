@@ -2,19 +2,42 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js" ></script>
 <script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
-<script type="text/javascript">
-<!--
-	var evalcomixWindow = null;
-	
-	function openEvalcomixWindow(url)
-	{
-    	evalcomixWindow=window.open(url,'evalcomixWindow','width=800,height=600,scrollbars=yes,resizable=yes');
-		if (window.focus) {evalcomixWindow.focus()}
+<script lang="javascript">
+<!-- 
+	function showMessage(url, sessionId) {
+		var area=document.getElementById("videoRecorder" + sessionId);
+		if(area != null){
+			area.style.width="100%";
+			area.style.height="100%";
+			area.src=url;
+			area.style.display="block";
+		}
+		var elem = document.getElementById("showhideVRButton" + sessionId);
+		if (elem != null) {
+			//elem.style.display="none";
+			elem.href = "javascript: hideMessage('" + url + "', '" + sessionId + "');";
+			$("#showhideVRButton" + sessionId).text('<fmt:message key="monitor.summary.button.hide.video.recorder"><fmt:param><fmt:message key="activity.title" /></fmt:param></fmt:message>');
+		}
+		location.hash = "videoRecorder" + sessionId;
 	}
-//-->
+	function hideMessage(url, sessionId){
+		var area=document.getElementById("videoRecorder" + sessionId);
+		if(area != null){
+			area.style.width="0px";
+			area.style.height="0px";
+			area.style.display="none";
+		}
+		var elem = document.getElementById("showhideVRButton" + sessionId);
+		if (elem != null) {
+			//elem.style.display="block";
+			elem.href = "javascript: showMessage('" + url + "', '" + sessionId + "');";
+			$("#showhideVRButton" + sessionId).text('<fmt:message key="monitor.summary.button.show.video.recorder"><fmt:param><fmt:message key="activity.title" /></fmt:param></fmt:message>');
+		}
+	}
+	-->
 </script>
-
 <c:set var="dto" value="${videoRecorderDTO}" />
 
 <h1>
@@ -168,101 +191,45 @@
 </table>
 </div>
 
-<div id="videoRecorder">
-	<script language="JavaScript" type="text/javascript">
-	<!--
-	// Globals
-	// Major version of Flash required
-	var requiredMajorVersion = 9;
-	// Minor version of Flash required
-	var requiredMinorVersion = 0;
-	// Minor version of Flash required
-	var requiredRevision = 124;
-
-	// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
-	var hasProductInstall = DetectFlashVer(6, 0, 65);
-	
-	// Version check based upon the values defined in globals
-	var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
-	
-	if ( hasProductInstall && !hasRequestedVersion ) {
-		// DO NOT MODIFY THE FOLLOWING FOUR LINES
-		// Location visited after installation is complete if installation is required
-		var MMPlayerType = (isIE == true) ? "ActiveX" : "PlugIn";
-		var MMredirectURL = window.location;
-	    document.title = document.title.slice(0, 47) + " - Flash Player Installation";
-	    var MMdoctitle = document.title;
-	
-		AC_FL_RunContent(
-			"src", "<lams:LAMSURL/>/includes/flash/playerProductInstall",
-			"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
-			"width", "100%",
-			"height", "676",
-			"align", "middle",
-			"id", "VideoRecorder",
-			"quality", "high",
-			"bgcolor", "#ffffff",
-			"name", "VideoRecorder",
-			"allowScriptAccess","always",
-			"type", "application/x-shockwave-flash",
-			"pluginspage", "http://www.adobe.com/go/getflashplayer"
-		);
-	} else if (hasRequestedVersion) {
-		// if we've detected an acceptable version
-		// embed the Flash Content SWF when all tests are passed
-		AC_FL_RunContent(
-				"src", "./includes/flash/VideoRecorder",
-				"FlashVars", "contentEditable="+${contentEditable} +
-								'&contentFolderUrl=/lams//www/secure/${contentFolderID}/Recordings/' +
-								'&toolSessionId='+${toolSessionId} +
-								'&toolContentId='+${toolContentId} +
-								'&mode='+'${mode}' +
-								'&userId='+${userId} +
-								'&allowUseVoice='+${videoRecorderDTO.allowUseVoice} +
-								'&allowUseCamera='+${videoRecorderDTO.allowUseCamera} +
-								'&allowLearnerVideoVisibility='+${videoRecorderDTO.allowLearnerVideoVisibility} +
-								'&allowComments='+${videoRecorderDTO.allowComments} +
-								'&allowRatings='+${videoRecorderDTO.allowRatings} +
-								'&red5ServerUrl='+'${red5ServerUrl}' +
-								'&serverUrl='+'${serverUrl}' +
-								'&languageXML='+"${languageXML}" +
-								"",
-				"width", "100%",
-				"height", "676",
-				"align", "middle",
-				"id", "VideoRecorder",
-				"quality", "high",
-				"bgcolor", "#ffffff",
-				"name", "VideoRecorder",
-				"allowScriptAccess","always",
-				"type", "application/x-shockwave-flash",
-				"pluginspage", "http://www.adobe.com/go/getflashplayer"
-		);
-	  } else {  // flash is too old or we can't detect the plugin
-	    var alternateContent = 'Alternate HTML content should be placed here. '
-	  	+ 'This content requires the Adobe Flash Player. '
-	   	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
-	    document.write(alternateContent);  // insert non-flash content
-	  }
-	// -->
-	</script>
-	<noscript>
-	  	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-				id="VideoRecorder" width="680" height="676"
-				codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
-				<param name="movie" value="/includes/flash/VideoRecorder.swf" />
-				<param name="quality" value="high" />
-				<param name="bgcolor" value="#ffffff" />
-				<param name="allowScriptAccess" value="sameDomain" />
-				<embed src="./includes/flash/VideoRecorder.swf" quality="high" bgcolor="#869ca7"
-					width="100%" height="676" name="VideoRecorder" align="middle"
-					play="true"
-					loop="false"
-					quality="high"
-					allowScriptAccess="always"
-					type="application/x-shockwave-flash"
-					pluginspage="http://www.adobe.com/go/getflashplayer">
-				</embed>
-		</object>
-	</noscript>
-</div>
+<c:choose>
+	<c:when test="${empty dto.sessionDTOs}">
+		<p>
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</p>
+	</c:when>
+	<c:otherwise>
+		<c:forEach var="session" items="${dto.sessionDTOs}">
+			<table cellspacing="0">
+				<c:if test="${isGroupedActivity}">
+					<tr>
+						<td>
+							<h2>
+								${session.sessionName}
+							</h2>
+						</td>
+					</tr>
+				</c:if>
+				<tr>
+					<td>
+						<c:set var="openVRInstanceUrl">
+							<lams:WebAppURL />/monitoring.do?method=openVideoRecorderInstance&toolContentID=<c:out value="${dto.toolContentId}" />&toolSessionID=<c:out value="${session.sessionID}"/>&contentFolderID=<c:out value="${contentFolderID}"/>
+						</c:set>
+						
+						<html:link href="javascript:showMessage('${openVRInstanceUrl}','${session.sessionID}')" styleClass="button" styleId="showhideVRButton${session.sessionID}" >
+							<fmt:message key="monitor.summary.button.show.video.recorder">
+								<fmt:param><fmt:message key="activity.title" /></fmt:param>
+							</fmt:message>
+						</html:link>
+						
+						<iframe
+							onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+							id="videoRecorder<c:out value="${session.sessionID}" />" name="videoRecorder<c:out value="${session.sessionID}" />"
+							style="width:0px;height:0px;border:0px;display:none" frameborder="no"
+							scrolling="no">
+						</iframe>
+					</td>
+				</tr>
+			</table>
+		</c:forEach>
+	</c:otherwise>
+</c:choose>	

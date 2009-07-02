@@ -138,7 +138,13 @@
         length="1"
     />
     
-
+	<property
+        name="allowRichEditor"
+        type="boolean"
+        access="property"        
+        column="allow_rich_editor"
+        length="1"
+    />
     
     <property
         name="contentLocked"

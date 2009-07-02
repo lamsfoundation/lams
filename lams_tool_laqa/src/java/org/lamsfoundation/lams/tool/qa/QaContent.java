@@ -102,6 +102,8 @@ public class QaContent implements Serializable {
     private boolean lockWhenFinished;
 
     private boolean showOtherAnswers;
+    
+    private boolean allowRichEditor;
 
     /** nullable persistent field */
     private boolean usernameVisible;
@@ -138,7 +140,7 @@ public class QaContent implements Serializable {
 	    boolean defineLater, boolean runOffline, boolean questionsSequenced, boolean usernameVisible,
 	    boolean synchInMonitor, boolean lockWhenFinished, boolean contentLocked, boolean showOtherAnswers,
 	    boolean reflect, String reflectionSubject, Date creationDate, Date updateDate, Set qaQueContents,
-	    Set qaSessions, Set qaUploadedFiles, Set<QaCondition> conditions) {
+	    Set qaSessions, Set qaUploadedFiles, Set<QaCondition> conditions, boolean allowRichEditor) {
 	this.qaContentId = qaContentId;
 	this.content = content;
 	this.title = title;
@@ -164,6 +166,7 @@ public class QaContent implements Serializable {
 	this.qaSessions = qaSessions;
 	this.qaUploadedFiles = qaUploadedFiles;
 	this.conditions = conditions;
+	this.allowRichEditor = allowRichEditor;
 	QaContent.logger.debug(QaContent.logger + " " + this.getClass().getName() + "in full constructor: QaContent()");
     }
 
@@ -186,7 +189,7 @@ public class QaContent implements Serializable {
 		.isQuestionsSequenced(), qa.isUsernameVisible(), qa.isSynchInMonitor(), qa.isLockWhenFinished(), qa
 		.isContentLocked(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(), qa
 		.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet(),
-		new TreeSet<QaCondition>(new TextSearchConditionComparator()));
+		new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
 
@@ -627,6 +630,15 @@ public class QaContent implements Serializable {
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
+    }
+    
+    
+    public boolean isAllowRichEditor() {
+        return allowRichEditor;
+    }
+
+    public void setAllowRichEditor(boolean allowRichEditor) {
+        this.allowRichEditor = allowRichEditor;
     }
 
     /**

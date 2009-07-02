@@ -196,7 +196,7 @@ public class Event {
 	}
 
 	/**
-	 * @hibernate.property column="name"
+	 * @hibernate.property column="name" length="128"
 	 * @return
 	 */
 	protected String getName() {
@@ -204,7 +204,7 @@ public class Event {
 	}
 
 	/**
-	 * @hibernate.property column="scope"
+	 * @hibernate.property column="scope" length="128"
 	 * @return
 	 */
 	protected String getScope() {

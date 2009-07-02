@@ -110,6 +110,8 @@ public class GeneralLearnerFlowDTO implements Comparable {
     protected String existMultipleUserResponses;
 
     protected String usernameVisible;
+    
+    protected String allowRichEditor;
 
     /**
      * @return Returns the usernameVisible.
@@ -708,4 +710,12 @@ public class GeneralLearnerFlowDTO implements Comparable {
     public void setExistMultipleUserResponses(String existMultipleUserResponses) {
 	this.existMultipleUserResponses = existMultipleUserResponses;
     }
+
+    public String getAllowRichEditor() {
+        return allowRichEditor;
+    }
+
+    public void setAllowRichEditor(String allowRichEditor) {
+        this.allowRichEditor = allowRichEditor;
+    } 
 }

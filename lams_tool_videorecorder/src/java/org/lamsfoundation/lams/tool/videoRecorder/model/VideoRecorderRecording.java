@@ -105,7 +105,7 @@ public class VideoRecorderRecording implements java.io.Serializable, Cloneable{
 		this.description = recording.description;
 		this.rating = recording.rating;
 		this.isLocal = recording.isLocal;
-		this.isJustSound = false;
+		this.isJustSound = recording.isJustSound;
 		this.ratings = null;
 		this.comments = null;
 		this.filename = recording.filename;

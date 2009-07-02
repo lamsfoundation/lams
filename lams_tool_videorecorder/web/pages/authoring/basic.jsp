@@ -40,12 +40,13 @@
 			var requiredMinorVersion = 0;
 			// Minor version of Flash required
 			var requiredRevision = 124;
+			var requiredRevisionIE = 159;
 			
 			// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
 			var hasProductInstall = DetectFlashVer(6, 0, 65);
 			
 			// Version check based upon the values defined in globals
-			var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
+			var hasRequestedVersion = (isIE == true) ? DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevisionIE) : DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
 			
 			if ( hasProductInstall && !hasRequestedVersion ) {
 				// DO NOT MODIFY THE FOLLOWING FOUR LINES

@@ -47,7 +47,7 @@ public class ImageBundler extends Bundler {
 
     private static Logger log = Logger.getLogger(ImageBundler.class);
     private static String[] miscImages = new String[] { "dash.gif", "cross.gif", "error.jpg", "spacer.gif", "tick.gif",
-	    "tree_closed.gif", "tree_open.gif" };
+	    "tree_closed.gif", "tree_open.gif" , "help.jpg"};
 
     Map<String, File> filesToCopy = null;
     List<String> directoriesRequired = null;

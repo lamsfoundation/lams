@@ -55,11 +55,13 @@ public class LearnerProgressDAO extends HibernateDaoSupport implements ILearnerP
         "from LearnerProgress p where p.lessonComplete > 0 and p.lesson.id = :lessonId";
 
 	private final static String COUNT_ATTEMPTED_ACTIVITY ="select count(*) from LearnerProgress prog, "
-		+" Activity act where act.id = :activityId and " 
-		+" act in elements(prog.attemptedActivities)";
+		+" Activity act join prog.attemptedActivities attAct "
+		+" where act.id = :activityId and " 
+		+" index(attAct) = act";
 	private final static String COUNT_COMPLETED_ACTIVITY ="select count(*) from LearnerProgress prog, "
-		+" Activity act where act.id = :activityId and " 
-		+" act in elements(prog.completedActivities)";
+		+" Activity act join prog.completedActivities compAct "
+		+" where act.id = :activityId and " 
+		+" index(compAct) = act";
 
     private final static String COUNT_PROGRESS_BY_LESSON = 
     	"select count(*) from LearnerProgress p where p.lesson.id = :lessonId";

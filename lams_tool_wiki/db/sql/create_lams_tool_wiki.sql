@@ -20,7 +20,7 @@ create table tl_lawiki10_wiki_page (
 	added_by bigint, 
 	wiki_session_uid bigint, 
 	primary key (uid), 
-	unique key UK9406D87760B3B03B (wiki_uid, title, wiki_session_uid)
+	unique key wiki_unique_key (wiki_uid, title, wiki_session_uid)
 )TYPE=InnoDB;
 
 create table tl_lawiki10_wiki_page_content (uid bigint not null auto_increment, wiki_page_uid bigint, body text, editor bigint, edit_date datetime, version bigint, primary key (uid))TYPE=InnoDB;
@@ -32,10 +32,10 @@ alter table tl_lawiki10_session add index FKF01D63C260B3B03B (wiki_uid), add con
 alter table tl_lawiki10_session add index FKF01D63C2A3FF7EC0 (wiki_main_page_uid), add constraint FKF01D63C2A3FF7EC0 foreign key (wiki_main_page_uid) references tl_lawiki10_wiki_page (uid);
 alter table tl_lawiki10_user add index FKED5D7A1FD8004954 (wiki_session_uid), add constraint FKED5D7A1FD8004954 foreign key (wiki_session_uid) references tl_lawiki10_session (uid);
 alter table tl_lawiki10_wiki add index FKED5E3E04A3FF7EC0 (wiki_main_page_uid), add constraint FKED5E3E04A3FF7EC0 foreign key (wiki_main_page_uid) references tl_lawiki10_wiki_page (uid);
-alter table tl_lawiki10_wiki_page add index FK961AFFEAD8004954 (wiki_session_uid), add constraint FK961AFFEAD8004954 foreign key (wiki_session_uid) references tl_lawiki10_session (uid);
-alter table tl_lawiki10_wiki_page add index FK961AFFEA60B3B03B (wiki_uid), add constraint FK961AFFEA60B3B03B foreign key (wiki_uid) references tl_lawiki10_wiki (uid);
-alter table tl_lawiki10_wiki_page add index FK961AFFEA36CBA7DB (added_by), add constraint FK961AFFEA36CBA7DB foreign key (added_by) references tl_lawiki10_user (uid);
-alter table tl_lawiki10_wiki_page add index FK961AFFEAE48332B4 (wiki_current_content), add constraint FK961AFFEAE48332B4 foreign key (wiki_current_content) references tl_lawiki10_wiki_page_content (uid);
+alter table tl_lawiki10_wiki_page add index wiki_page_index_1 (wiki_session_uid), add constraint wiki_page_fk_1 foreign key (wiki_session_uid) references tl_lawiki10_session (uid);
+alter table tl_lawiki10_wiki_page add index wiki_page_index_2 (wiki_uid), add constraint wiki_page_fk_2 foreign key (wiki_uid) references tl_lawiki10_wiki (uid);
+alter table tl_lawiki10_wiki_page add index wiki_page_index_3 (added_by), add constraint wiki_page_fk_3 foreign key (added_by) references tl_lawiki10_user (uid);
+alter table tl_lawiki10_wiki_page add index wiki_page_index_4 (wiki_current_content), add constraint wiki_page_fk_4 foreign key (wiki_current_content) references tl_lawiki10_wiki_page_content (uid);
 alter table tl_lawiki10_wiki_page_content add index FK528051242D44CCF8 (wiki_page_uid), add constraint FK528051242D44CCF8 foreign key (wiki_page_uid) references tl_lawiki10_wiki_page (uid);
 alter table tl_lawiki10_wiki_page_content add index FK528051243233D952 (editor), add constraint FK528051243233D952 foreign key (editor) references tl_lawiki10_user (uid);
 

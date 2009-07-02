@@ -11,7 +11,7 @@
 	<title>
 		<fmt:message key="activity.title" />
 	</title>
-	<link href="${tool}pages/learning/videoRecorder_style.css" rel="stylesheet" type="text/css">
+	<!-- <link href="${tool}pages/learning/videoRecorder_style.css" rel="stylesheet" type="text/css"> -->
 	<lams:css/>
 
 	<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">

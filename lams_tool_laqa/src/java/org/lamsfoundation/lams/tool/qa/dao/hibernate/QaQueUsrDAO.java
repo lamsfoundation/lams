@@ -38,8 +38,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code
+ * Templates
  */
 
 public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
@@ -51,14 +51,15 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
     private static final String GET_USER_COUNT_FOR_CONTENT = "select count(*) from QaQueUsr quser, QaSession qses, QaQueContent qcon where "
 	    + "quser.qaSession=qses and " + "qses.qaContent=qcon and " + "qcon.uid=:uid";
 
-    // select count(*) from tl_laqa11_que_usr quser, tl_laqa11_session qses where quser.qa_session_id=qses.uid and qses.qa_content_id=5378; 
+    // select count(*) from tl_laqa11_que_usr quser, tl_laqa11_session qses where quser.qa_session_id=qses.uid and
+    // qses.qa_content_id=5378;
 
     public QaQueUsr getQaUserByUID(Long uid) {
 	return (QaQueUsr) this.getHibernateTemplate().get(QaQueUsr.class, uid);
     }
 
     public int countSessionUser(QaSession qaSession) {
-	return (getHibernateTemplate().findByNamedParam(COUNT_SESSION_USER, "qaSession", qaSession)).size();
+	return getHibernateTemplate().findByNamedParam(QaQueUsrDAO.COUNT_SESSION_USER, "qaSession", qaSession).size();
     }
 
     public QaQueUsr getQaQueUsrById(long qaQueUsrId) {
@@ -90,7 +91,7 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
     public List getUserBySessionOnly(final QaSession qaSession) {
 	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(LOAD_USER_FOR_SESSION).setLong("qaSessionId",
+	List list = getSession().createQuery(QaQueUsrDAO.LOAD_USER_FOR_SESSION).setLong("qaSessionId",
 		qaSession.getUid().longValue()).list();
 	return list;
     }
@@ -118,13 +119,14 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
 	int returnInt = 0;
 	if (qa != null && qa.getUid() != null) {
-	    List result = getSession().createQuery(GET_USER_COUNT_FOR_CONTENT).setLong("uid", qa.getUid()).list();
-	    Integer resultInt = (result.get(0) != null) ? (Integer) result.get(0) : new Integer(0);
-	    returnInt = resultInt.intValue();
+	    List result = getSession().createQuery(QaQueUsrDAO.GET_USER_COUNT_FOR_CONTENT).setLong("uid", qa.getUid())
+		    .list();
+	    Long resultLong = result.get(0) != null ? (Long) result.get(0) : new Long(0);
+	    returnInt = resultLong.intValue();
 	} else {
-	    logger.error("Attempt to count users from null content");
+	    QaQueUsrDAO.logger.error("Attempt to count users from null content");
 	}
-	return returnInt; 
+	return returnInt;
     }
 
 }

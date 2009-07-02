@@ -35,12 +35,15 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -65,6 +68,7 @@ import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.tool.ToolOutput;
+import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -98,6 +102,7 @@ public class LearnerService implements ICoreLearnerService {
     private ILessonService lessonService;
     private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
     protected MessageService messageService;
+    private IGradebookService gradebookService;
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -109,8 +114,9 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * Creates a new instance of LearnerService. To be used by Spring, assuming the Spring will set up the progress
-     * engine via method injection. If you are creating the bean manually then use the other constructor.
+     * Creates a new instance of LearnerService. To be used by Spring, assuming
+     * the Spring will set up the progress engine via method injection. If you
+     * are creating the bean manually then use the other constructor.
      */
     public LearnerService() {
     }
@@ -219,7 +225,8 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * Get the lesson data for a particular lesson. In a DTO format suitable for sending to the client.
+     * Get the lesson data for a particular lesson. In a DTO format suitable for
+     * sending to the client.
      */
     public LessonDTO getLessonData(Long lessonId) {
 	Lesson lesson = getLesson(lessonId);
@@ -228,18 +235,21 @@ public class LearnerService implements ICoreLearnerService {
 
     /**
      * <p>
-     * Joins a User to a lesson as a learner. It could either be a new lesson or a lesson that has been started.
+     * Joins a User to a lesson as a learner. It could either be a new lesson or
+     * a lesson that has been started.
      * </p>
      * 
      * <p>
-     * In terms of new lesson, a new learner progress would be initialized. Tool session for the next activity will be
-     * initialized if necessary.
+     * In terms of new lesson, a new learner progress would be initialized. Tool
+     * session for the next activity will be initialized if necessary.
      * </p>
      * 
      * <p>
-     * In terms of an started lesson, the learner progress will be returned without calculation. Tool session will be
-     * initialized if necessary. Note that we won't initialize tool session for current activity because we assume tool
-     * session will always initialize before it becomes a current activity.</p
+     * In terms of an started lesson, the learner progress will be returned
+     * without calculation. Tool session will be initialized if necessary. Note
+     * that we won't initialize tool session for current activity because we
+     * assume tool session will always initialize before it becomes a current
+     * activity.</p
      * 
      * 
      * @param learnerId
@@ -312,14 +322,17 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * This method creates the tool session (if needed) for a tool activity. It won't try it for the child activities,
-     * as any Sequence activities inside this activity may have a grouping WITHIN the sequence, and then the grouped
-     * activities get the won't be grouped properly (See LDEV-1774). We could get the child tool activities for a
-     * parallel activity but that could create a bug in the future - if we ever put sequences inside parallel activities
-     * then we are stuck again!
+     * This method creates the tool session (if needed) for a tool activity. It
+     * won't try it for the child activities, as any Sequence activities inside
+     * this activity may have a grouping WITHIN the sequence, and then the
+     * grouped activities get the won't be grouped properly (See LDEV-1774). We
+     * could get the child tool activities for a parallel activity but that
+     * could create a bug in the future - if we ever put sequences inside
+     * parallel activities then we are stuck again!
      * 
-     * We look up the database to check up the existence of correspondent tool session. If the tool session doesn't
-     * exist, we create a new tool session instance.
+     * We look up the database to check up the existence of correspondent tool
+     * session. If the tool session doesn't exist, we create a new tool session
+     * instance.
      * 
      * @param learnerProgress
      *                the learner progress we are processing.
@@ -486,7 +499,8 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * Calculates learner progress and returns the data required to be displayed to the learner.
+     * Calculates learner progress and returns the data required to be displayed
+     * to the learner.
      * 
      * @param completedActivity
      *                the activity just completed
@@ -513,7 +527,8 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.learning.service.ILearnerService#completeToolSession(java.lang.Long,
+     *      java.lang.Long)
      */
     public String completeToolSession(Long toolSessionId, Long learnerId) {
 	// this method is called by tools, so it mustn't do anything that relies on all the tools' Spring beans
@@ -552,9 +567,11 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * Complete the activity in the progress engine and delegate to the progress engine to calculate the next activity
-     * in the learning design. It is currently triggered by various progress engine related action classes, which then
-     * calculate the url to go to next, based on the ActivityMapping class.
+     * Complete the activity in the progress engine and delegate to the progress
+     * engine to calculate the next activity in the learning design. It is
+     * currently triggered by various progress engine related action classes,
+     * which then calculate the url to go to next, based on the ActivityMapping
+     * class.
      * 
      * @param learnerId
      *                the learner who are running this activity in the design.
@@ -587,6 +604,11 @@ public class LearnerService implements ICoreLearnerService {
 	} else {
 
 	    nextLearnerProgress = calculateProgress(activity, learnerId, progress);
+
+	    ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(progress.getUser(), activity);
+	    if (activity instanceof ToolActivity && toolSession != null) {
+		sendDataToGradebook((ToolActivity) activity, toolSession, progress);
+	    }
 	}
 	// }
 	return nextLearnerProgress;
@@ -600,6 +622,44 @@ public class LearnerService implements ICoreLearnerService {
     public LearnerProgress completeActivity(Integer learnerId, Activity activity, Long lessonId) {
 	LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), lessonId);
 	return completeActivity(learnerId, activity, currentProgress);
+    }
+
+    private void sendDataToGradebook(ToolActivity toolActivity, ToolSession toolSession, LearnerProgress progress) {
+
+	User learner = progress.getUser();
+	Lesson lesson = progress.getLesson();
+	if (toolActivity != null && toolSession != null && learner != null && lesson != null) {
+	    if (toolActivity.getActivityEvaluations() != null && toolActivity.getActivityEvaluations().size() > 0) {
+
+		// Getting the first activity evaluation
+		ActivityEvaluation eval = toolActivity.getActivityEvaluations().iterator().next();
+
+		try {
+		    ToolOutput toolOutput = lamsCoreToolService.getOutputFromTool(eval.getToolOutputDefinition(),
+			    toolSession, learner.getUserId());
+
+		    if (toolOutput != null) {
+			ToolOutputValue outputVal = toolOutput.getValue();
+			if (outputVal != null) {
+			    Double outputDouble = outputVal.getDouble();
+
+			    GradebookUserActivity gradebookUserActivity = gradebookService.getGradebookUserActivity(
+				    toolActivity.getActivityId(), learner.getUserId());
+			    
+			    // Only set the mark if it hasnt previously been set by a teacher
+			    if (gradebookUserActivity == null || !gradebookUserActivity.getMarkedInGradebook()) {
+				gradebookService.updateUserActivityGradebookMark(lesson, learner, toolActivity, outputDouble, false);
+			    }
+			}
+		    }
+
+		} catch (ToolException e) {
+		    log.debug("Runtime exception when attempted to get outputs for activity: "
+			    + toolActivity.getActivityId(), e);
+		}
+	    }
+
+	}
     }
 
     /**
@@ -632,8 +692,8 @@ public class LearnerService implements ICoreLearnerService {
 
     /**
      * @throws LearnerServiceException
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#performGrouping(java.lang.Long, java.lang.Long,
-     *      java.lang.Integer)
+     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#performGrouping(java.lang.Long,
+     *      java.lang.Long, java.lang.Integer)
      */
     public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId, boolean forceGrouping)
 	    throws LearnerServiceException {
@@ -803,9 +863,10 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * Get all the learners who may come through this gate. For a Group Based branch and the Teacher Grouped branch, it
-     * is the group of users in the Branch's group, but only the learners who have started the lesson. Otherwise we just
-     * get all learners who have started the lesson.
+     * Get all the learners who may come through this gate. For a Group Based
+     * branch and the Teacher Grouped branch, it is the group of users in the
+     * Branch's group, but only the learners who have started the lesson.
+     * Otherwise we just get all learners who have started the lesson.
      * 
      * @param gate
      * @param lesson
@@ -880,8 +941,8 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * Get the lesson for this activity. If the activity is not part of a lesson (ie is from an authoring design then it
-     * will return null.
+     * Get the lesson for this activity. If the activity is not part of a lesson
+     * (ie is from an authoring design then it will return null.
      */
     public Lesson getLessonByActivity(Activity activity) {
 	Lesson lesson = lessonDAO.getLessonForActivity(activity.getActivityId());
@@ -899,13 +960,16 @@ public class LearnerService implements ICoreLearnerService {
 
     /**
      * <p>
-     * Create a lams tool session for learner against a tool activity. This will have concurrency issues interms of
-     * grouped tool session because it might be inserting some tool session that has already been inserted by other
-     * member in the group. If the unique_check is broken, we need to query the database to get the instance instead of
-     * inserting it. It should be done in the Spring rollback strategy.
+     * Create a lams tool session for learner against a tool activity. This will
+     * have concurrency issues interms of grouped tool session because it might
+     * be inserting some tool session that has already been inserted by other
+     * member in the group. If the unique_check is broken, we need to query the
+     * database to get the instance instead of inserting it. It should be done
+     * in the Spring rollback strategy.
      * </p>
      * 
-     * Once lams tool session is inserted, we need to notify the tool to its own session.
+     * Once lams tool session is inserted, we need to notify the tool to its own
+     * session.
      * 
      * @param toolActivity
      * @param learner
@@ -940,7 +1004,8 @@ public class LearnerService implements ICoreLearnerService {
     /**
      * @throws LearnerServiceException
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#determineBranch(org.lamsfoundation.lams.lesson.Lesson,
-     *      org.lamsfoundation.lams.learningdesign.BranchingActivity, java.lang.Integer)
+     *      org.lamsfoundation.lams.learningdesign.BranchingActivity,
+     *      java.lang.Integer)
      */
     public SequenceActivity determineBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId)
 	    throws LearnerServiceException {
@@ -969,9 +1034,10 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * Get all the conditions for this branching activity, ordered by order id. Go through each condition until we find
-     * one that passes and that is the required branch. If no conditions match, use the branch that is the "default"
-     * branch for this branching activity.
+     * Get all the conditions for this branching activity, ordered by order id.
+     * Go through each condition until we find one that passes and that is the
+     * required branch. If no conditions match, use the branch that is the
+     * "default" branch for this branching activity.
      */
     private SequenceActivity determineToolBasedBranch(Lesson lesson, ToolBranchingActivity branchingActivity,
 	    User learner) {
@@ -1103,7 +1169,8 @@ public class LearnerService implements ICoreLearnerService {
      *                gate to check
      * @param learner
      *                learner who is knocking to the gate
-     * @return <code>true</code> if learner satisfied any of the conditions and is allowed to pass
+     * @return <code>true</code> if learner satisfied any of the conditions
+     *         and is allowed to pass
      */
     private boolean determineConditionGateStatus(GateActivity gate, User learner) {
 	boolean shouldOpenGate = false;
@@ -1163,11 +1230,13 @@ public class LearnerService implements ICoreLearnerService {
     }
 
     /**
-     * Select a particular branch - we are in preview mode and the author has selected a particular activity.
+     * Select a particular branch - we are in preview mode and the author has
+     * selected a particular activity.
      * 
      * @throws LearnerServiceException
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#determineBranch(org.lamsfoundation.lams.lesson.Lesson,
-     *      org.lamsfoundation.lams.learningdesign.BranchingActivity, java.lang.Integer)
+     *      org.lamsfoundation.lams.learningdesign.BranchingActivity,
+     *      java.lang.Integer)
      */
     public SequenceActivity selectBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId,
 	    Long branchId) throws LearnerServiceException {
@@ -1297,5 +1366,9 @@ public class LearnerService implements ICoreLearnerService {
 
     public Grouping getGrouping(Long groupingId) {
 	return groupingDAO.getGroupingById(groupingId);
+    }
+
+    public void setGradebookService(IGradebookService gradebookService) {
+	this.gradebookService = gradebookService;
     }
 }

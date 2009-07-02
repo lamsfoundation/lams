@@ -46,6 +46,8 @@ public class VideoRecorderSessionDTO implements Comparable {
 	
 	int numberOfFinishedLearners;
 	
+	Long monitoringUid;
+	
 	public VideoRecorderSessionDTO(VideoRecorderSession session) {
 		this.sessionID = session.getSessionId();
 		this.sessionName = session.getSessionName();
@@ -123,5 +125,13 @@ public class VideoRecorderSessionDTO implements Comparable {
 
 	public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
 		this.numberOfFinishedLearners = numberOfFinishedLearners;
+	}
+	
+	public void setMonitoringUid(Long uid) {
+		this.monitoringUid = uid;
+	}
+	
+	public Long getMonitoringUid() {
+		return this.monitoringUid;
 	}
 }

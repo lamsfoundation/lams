@@ -29,10 +29,19 @@
 	<body class="stripes">
 
 			<div id="content">
-
-				<h1>
-					<c:out value="${videoRecorderDTO.title}" escapeXml="false" />
-				</h1>
+			
+				<table>
+					<tr>
+						<td width="1">
+							<h1>
+								<c:out value="${videoRecorderDTO.title}" escapeXml="false" />
+							</h1>
+						</td>
+						<td>
+							<a href="http://wiki.lamsfoundation.org/display/lamsdocs/lavidr10#lavidr10-ExportPortfolios"><img src="../images/help.jpg"border="0" /></a>
+						</td>
+					</tr>		
+				</table>	
 	
 				<p>
 					<c:out value="${videoRecorderDTO.instructions}" escapeXml="false" />

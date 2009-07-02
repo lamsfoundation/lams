@@ -311,7 +311,6 @@
 			</fileset>
 		</copy>
 	</target>
-	
 
 	<target name="copy-planner" if="planner_available">
 		<ant antfile="../${lams_planner}/build.xml" target="copy-to-central" />

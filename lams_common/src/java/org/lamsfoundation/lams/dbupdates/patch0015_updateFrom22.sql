@@ -5,8 +5,10 @@ SET AUTOCOMMIT = 0;
 
 ----------------------Put all sql statements below here-------------------------
 
+-- LI-192 This script needs to be in updaters - before new tools are deployed
+--ALTER TABLE lams_tool ADD COLUMN pedagogical_planner_url TEXT;
+
 --  LDEV-1998 ------------- 
-ALTER TABLE lams_tool ADD COLUMN pedagogical_planner_url TEXT;
 ALTER TABLE lams_system_tool ADD COLUMN pedagogical_planner_url TEXT;
 UPDATE lams_system_tool SET pedagogical_planner_url='pedagogicalPlanner/initGrouping.do' WHERE system_tool_id=1;
 CREATE TABLE lams_planner_nodes (
@@ -28,6 +30,7 @@ CREATE TABLE lams_planner_nodes (
 -- LDEV-2074 --------------
 ALTER TABLE lams_learning_design ADD COLUMN floating_activity_id BIGINT(20);
 CREATE INDEX idx_design_floating_act ON lams_learning_design (floating_activity_id ASC);
+INSERT INTO lams_learning_activity_type VALUES (15, 'FLOATING');
 
 -- LDEV-1983 --------------
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
@@ -76,7 +79,8 @@ CREATE TABLE lams_activity_evaluation (
 )TYPE=InnoDB;
 
 -- LDEV-2174 -------------
-ALTER TABLE lams_tool DROP COLUMN classpath_addition, context_file;
+ALTER TABLE lams_tool DROP COLUMN classpath_addition;
+ALTER TABLE lams_tool DROP COLUMN context_file;
 
 -- LDEV-2205 ------------ Adding couse level settings for gradebook
 ALTER TABLE lams_organisation ADD COLUMN enable_monitor_gradebook TINYINT(1) NOT NULL DEFAULT 0;
@@ -88,6 +92,7 @@ CREATE TABLE lams_gradebook_user_activity (
 	, activity_id BIGINT(20) NOT NULL
 	, user_id BIGINT (20) NOT NULL
 	, mark DOUBLE PRECISION 
+	, marked_in_gradebook TINYINT(1) NOT NULL DEFAULT 0
 	, feedback TEXT
 	, INDEX (activity_id, user_id)
 	, CONSTRAINT FK_lams_gradebook_user_activity_1 FOREIGN KEY (activity_id)
@@ -114,6 +119,16 @@ CREATE TABLE lams_gradebook_user_lesson (
 -- LDEV-2207 ------------ Adding flag in lesson to release marks for gradebook
 ALTER TABLE lams_lesson ADD COLUMN marks_released TINYINT DEFAULT 0;
 
+-- LDEV-2165
+ALTER TABLE lams_events modify COLUMN name VARCHAR(128) NOT NULL;
+ALTER TABLE lams_events modify COLUMN scope VARCHAR(128) NOT NULL;
+
+--  LDEV-2125 ------------- 
+ALTER TABLE lams_user ADD COLUMN timezone TINYINT;
+
+-- LDEV-2054
+ALTER TABLE lams_grouping ADD COLUMN view_students_before_selection TINYINT DEFAULT 0;
+
 -- LDEV-2197 ------------ Presence Chat Logging
 CREATE TABLE lams_presence_chat_msgs (
 	uid bigint NOT NULL auto_increment,
@@ -131,6 +146,9 @@ values ('Red5ServerUrl','', 'config.red5.server.url', 'config.header.red5', 'STR
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('Red5RecordingsUrl','', 'config.red5.recordings.url', 'config.header.red5', 'STRING', 0);
+
+-- disable videorecorder
+update lams_learning_library set valid_flag=0 where title="VideoRecorder";
 
 ----------------------Put all sql statements above here-------------------------
 

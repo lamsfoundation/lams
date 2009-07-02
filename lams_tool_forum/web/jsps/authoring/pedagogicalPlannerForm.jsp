@@ -47,6 +47,10 @@
   		}
   		function prepareFormData(){
 			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			
+			var instructions = FCKeditorAPI.GetInstance('instructions').GetXHTML();
+			document.getElementById("instructions").value=instructions;
+			
 			var topicIndex = 0;
 			do{
 				var topic = document.getElementById("topic["+topicIndex+"]");
@@ -65,7 +69,7 @@
 </lams:head>
 <body id="body">
 	<%@ include file="/common/messages.jsp"%>
-	<h4 class="space-left"><fmt:message key="lable.topic.title.subject"/></h4>
+	
 	<html:form action="/authoring/saveOrUpdatePedagogicalPlannerForm.do" styleId="pedagogicalPlannerForm" method="post">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
@@ -73,6 +77,15 @@
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
+		<h4 class="space-left"><fmt:message key="label.instructions"/></h4>
+		<lams:FCKEditor id="instructions"
+			value="${formBean.instructions}"
+			contentFolderID="${formBean.contentFolderID}"
+               toolbarSet="Custom-Pedplanner" height="150px"
+               width="750px" displayExpanded="false">
+		</lams:FCKEditor>
+		
+		<h4 class="space-left small-space-top"><fmt:message key="label.planner.topic"/></h4>
 		<table id="topicTable" cellpadding="0" cellspacing="0">
 			<c:forEach var="topicIndex" begin="1" end="${formBean.topicCount}">
 				<tr>

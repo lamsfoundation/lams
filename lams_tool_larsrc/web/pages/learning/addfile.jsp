@@ -32,9 +32,10 @@
 			<div class="field-name space-top">
 				<fmt:message key="label.learning.comment.or.instruction" />
 			</div>
-			<html:textarea rows="5" cols="25" tabindex="2" property="description"
-				styleClass="text-area" />
-
+			
+			<html:text tabindex="2" property="description"
+				styleClass="text-area" maxlength="255"/>
+			
 			<div class="space-bottom-top">
 				<a href="#"
 					onclick="document.getElementById('resourceItemForm').submit()"

@@ -235,6 +235,11 @@
 
    </servlet>
    <servlet>
+      <servlet-name>PresenceChatLoggerServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.webservice.PresenceChatLoggerServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>updateCollapsedGroup</servlet-name>
       <servlet-class>org.lamsfoundation.lams.web.UpdateCollapsedGroupServlet</servlet-class>
 
@@ -462,6 +467,10 @@
       <url-pattern>/fckeditor/editor/filemanager/upload/simpleuploader</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
+      <servlet-name>PresenceChatLoggerServlet</servlet-name>
+      <url-pattern>/PresenceChatLogger</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
       <servlet-name>updateCollapsedGroup</servlet-name>
       <url-pattern>/servlet/updateCollapsedGroup</url-pattern>
    </servlet-mapping>
@@ -623,7 +632,6 @@
             <url-pattern>/admin.jsp</url-pattern>
             <url-pattern>/author.jsp</url-pattern>
             <url-pattern>/authoringConfirm.jsp</url-pattern>
-            <url-pattern>/community.jsp</url-pattern>
             <url-pattern>/editprofile.jsp</url-pattern>
             <url-pattern>/findUserLessons.jsp</url-pattern>
             <url-pattern>/findUserLessonsAutocomplete.jsp</url-pattern>
@@ -653,6 +661,7 @@
     		<url-pattern>/toolcontent/*</url-pattern>
     		<url-pattern>/development/*</url-pattern>
     		<url-pattern>/pedagogical_planner/*</url-pattern>
+    		<url-pattern>/lamscommunity/*</url-pattern>
     		<url-pattern>/JHB/*</url-pattern>
     	</web-resource-collection>
     	<auth-constraint>

@@ -1,6 +1,6 @@
 FCKConfig.ToolbarSets["Default"] = [
 	['Source','-','FitWindow', 'Preview','PasteWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','OrderedList','UnorderedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','TextColor','BGColor','Equation'], 
-	['MoviePlayer','VideoRecorder','Image','Link','Table','Rule','Smiley','SpecialChar','Templates','FontFormat','FontName','FontSize','About']
+	['Paint_Button','MoviePlayer','VideoRecorder','Image','Link','Table','Rule','Smiley','SpecialChar','Templates','FontFormat','FontName','FontSize','About']
 ] ;
 
 FCKConfig.ToolbarSets["Default-Learner"] = [
@@ -46,3 +46,4 @@ FCKConfig.Plugins.Add('wikilink', 'en', FCKConfig.BasePath + '../../../tool/lawi
 FCKConfig.Plugins.Add('equation', 'en');
 FCKConfig.Plugins.Add('movieplayer', 'en');
 FCKConfig.Plugins.Add('videorecorder', 'en');
+FCKConfig.Plugins.Add('paint', 'en');

@@ -1006,8 +1006,8 @@ CREATE UNIQUE INDEX IX_lams_psswd_rqst_key ON lams_password_request (request_key
 
 CREATE TABLE lams_events (
        uid BIGINT NOT NULL UNIQUE auto_increment
-     , scope VARCHAR(255) NOT NULL
-     , name VARCHAR(255) NOT NULL
+     , scope VARCHAR(128) NOT NULL
+     , name VARCHAR(128) NOT NULL
      , event_session_id BIGINT
      , triggered TINYINT
      , default_subject VARCHAR(255)

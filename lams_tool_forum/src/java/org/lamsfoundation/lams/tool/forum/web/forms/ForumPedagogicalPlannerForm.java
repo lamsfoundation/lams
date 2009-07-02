@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<String> topic;
     private String contentFolderID;
+    private String instructions;
 
     @Override
     public ActionMessages validate() {
@@ -68,13 +69,14 @@ public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm 
     public void fillForm(Forum forum) {
 	if (forum != null) {
 	    setToolContentID(forum.getContentId());
+	    setInstructions(forum.getInstructions());
 
 	    topic = new ArrayList<String>();
 	    Set messages = forum.getMessages();
 	    if (messages != null) {
 		int topicIndex = 0;
 		for (Message message : (Set<Message>) messages) {
-		    setTopic(topicIndex++, message.getSubject());
+		    setTopic(topicIndex++, message.getBody());
 		}
 	    }
 	}
@@ -119,5 +121,13 @@ public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm 
 
     public List<String> getTopicList() {
 	return topic;
+    }
+
+    public String getInstructions() {
+	return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
     }
 }

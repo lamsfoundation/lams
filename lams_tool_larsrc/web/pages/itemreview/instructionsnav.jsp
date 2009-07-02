@@ -83,6 +83,8 @@
 							});
 							
 					   }
+					} else {
+						window.parent.close();
 					}
 				}
 				
@@ -99,13 +101,20 @@
 	<body>
 
 		<div id="instructions">
+			
 			<h2>
-				<fmt:message key="message.step.of">
-					<fmt:param value="${instructions.current}" />
-					<fmt:param value="${instructions.total}" />
-				</fmt:message>
+				<c:if test="${instructions.total > 0}" >
+					<fmt:message key="message.step.of">
+						<fmt:param value="${instructions.current}" />
+						<fmt:param value="${instructions.total}" />
+					</fmt:message>
+				</c:if>
+				<c:if test="${instructions.total <= 0}" >
+					&nbsp;
+				</c:if>
 			</h2>
-<span class="right-buttons">
+			
+				<span class="right-buttons">
 				<c:choose>
 				
 				<c:when test="${instructions.current < instructions.total}">

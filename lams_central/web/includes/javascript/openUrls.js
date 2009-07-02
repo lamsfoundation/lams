@@ -33,6 +33,7 @@
 			if (copyrightWin && !copyrightWin.closed) copyrightWin.close();
 			if (gradebookMonWin && !gradebookMonWin.closed) gradebookMonWin.close();
 			if (gradebookLrnWin && !gradebookLrnWin.closed) gradebookLrnWin.close();
+			if (gradebookMonLessonWin && !gradebookMonLessonWin.closed) gradebookMonLessonWin.close();
 		}
 		
 		function openProfile()
@@ -318,7 +319,7 @@
 			if(gradebookMonWin && !gradebookMonWin.closed ){
 				gradebookMonWin.focus();
 			}else{
-				gradebookMonWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
+				gradebookMonWin = window.open(url, "gradebookMonWin",'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
 				gradebookMonWin.focus();
 			}
 		}
@@ -327,7 +328,7 @@
 			if(gradebookLrnWin && !gradebookLrnWin.closed ){
 				gradebookLrnWin.focus();
 			}else{
-				gradebookLrnWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
+				gradebookLrnWin = window.open(url, "gradebookLrnWin",'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
 				gradebookLrnWin.focus();
 			}
 		}
@@ -336,7 +337,7 @@
 			if(gradebookMonLessonWin && !gradebookMonLessonWin.closed ){
 				gradebookMonLessonWin.focus();
 			}else{
-				gradebookMonLessonWin = window.open(url, winname,'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
+				gradebookMonLessonWin = window.open(url, "gradebookMonLessonWin",'resizable,left='+left+',top='+top+',width='+width+',height='+height+',scrollbars');
 				gradebookMonLessonWin.focus();
 			}
 		}

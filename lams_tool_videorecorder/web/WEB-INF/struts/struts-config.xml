@@ -18,16 +18,16 @@
       type="org.lamsfoundation.lams.tool.videoRecorder.web.forms.VideoRecorderConditionForm"
     />
     <form-bean
-      name="monitoringForm"
-      type="org.lamsfoundation.lams.tool.videoRecorder.web.forms.MonitoringForm"
+      name="authoringForm"
+      type="org.lamsfoundation.lams.tool.videoRecorder.web.forms.AuthoringForm"
     />
     <form-bean
       name="learningForm"
       type="org.lamsfoundation.lams.tool.videoRecorder.web.forms.LearningForm"
     />
     <form-bean
-      name="authoringForm"
-      type="org.lamsfoundation.lams.tool.videoRecorder.web.forms.AuthoringForm"
+      name="monitoringForm"
+      type="org.lamsfoundation.lams.tool.videoRecorder.web.forms.MonitoringForm"
     />
 
   </form-beans>
@@ -45,33 +45,6 @@
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
-    <action
-      path="/clearsession"
-      type="org.lamsfoundation.lams.tool.videoRecorder.web.actions.ClearSessionAction"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.videoRecorder.web.actions.AuthoringAction"
-      name="authoringForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="tiles:/authoring/main"
-        redirect="false"
-      />
-      <forward
-        name="message_page"
-        path="tiles:/generic/message"
-        redirect="false"
-      />
-    </action>
     <action
       path="/learning"
       type="org.lamsfoundation.lams.tool.videoRecorder.web.actions.LearningAction"
@@ -98,11 +71,38 @@
       />
     </action>
     <action
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.videoRecorder.web.actions.AuthoringAction"
+      name="authoringForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="tiles:/authoring/main"
+        redirect="false"
+      />
+      <forward
+        name="message_page"
+        path="tiles:/generic/message"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.videoRecorder.web.actions.ClearSessionAction"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
       path="/monitoring"
       type="org.lamsfoundation.lams.tool.videoRecorder.web.actions.MonitoringAction"
       name="monitoringForm"
       scope="request"
-      parameter="dispatch"
+      parameter="method"
       unknown="false"
       validate="false"
     >
@@ -116,10 +116,15 @@
         path="tiles:/monitoring/videoRecorder_display"
         redirect="false"
       />
+      <forward
+        name="videoRecorder_openInstance"
+        path="/pages/monitoring/videoRecorderOpenInstance.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/videoRecorderActions"
-      type="org.lamsfoundation.lams.tool.videoRecorder.web.servlets.VideoRecorderAction"
+      type="org.lamsfoundation.lams.tool.videoRecorder.web.actions.VideoRecorderAction"
       parameter="method"
       unknown="false"
       validate="false"

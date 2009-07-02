@@ -481,8 +481,8 @@
 	
 	<p align="center">
 		<input class="button" type="submit" value="<fmt:message key="admin.register" />"/>
-		<input class="button" type="reset"  value="<fmt:message key="admin.reset" />"/>
-		<input class="button" type="button" value="<fmt:message key="admin.cancel" />" onClick="javascript:window.location.href='<lams:LAMSURL/>/sysadminstart.do'"/>
+		<html:reset styleClass="button"><fmt:message key="admin.reset" /></html:reset>
+        <input class="button" type="button" value="<fmt:message key="admin.cancel" />" onClick="javascript:window.location.href='<lams:LAMSURL/>/admin/sysadminstart.do'"/>
 	</p>
 </html:form>
 

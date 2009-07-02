@@ -47,10 +47,12 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -67,7 +69,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action path = "/authoring/importToolContent" validate = "false"
  * @struts.action-forward name="upload" path="/toolcontent/import.jsp"
  * @struts.action-forward name="success" path="/toolcontent/importresult.jsp"
- * @struts.action-forward name="successLC" path="/toolcontent/importresultLC.jsp"
+ * @struts.action-forward name="successLC"
+ *                        path="/toolcontent/importresultLC.jsp"
  * @struts.action-forward name="importLC" path="/toolcontent/importLC.jsp"
  * 
  * Import tool content servlet. It needs an uploaded learning design zip file.
@@ -103,7 +106,14 @@ public class ImportToolContentAction extends LamsAction {
 	    //display initial page for upload
 	    return mapping.findForward("upload");
 	} else if (StringUtils.equals(param, "importLC")) {
-	    
+	    // Checking the server is registered
+	    Registration reg = Configuration.getRegistration();
+	    if (reg == null || reg.isEnableLamsCommunityIntegration() == false) {
+		request.setAttribute("registered", Boolean.FALSE);
+	    } else {
+		request.setAttribute("registered", Boolean.TRUE);
+	    }
+
 	    // import from lams community, redirect to sso page
 	    if (customCSV != null) {
 		request.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
@@ -111,12 +121,11 @@ public class ImportToolContentAction extends LamsAction {
 	    //display initial lamscommunity import
 	    return mapping.findForward("importLC");
 	} else if (StringUtils.equals(param, "importLCFinish")) {
-	    
+
 	    // uploading the file from lams commmunity, have to feed the 
 	    // location from the request
-	    //String learningDesignLocation = WebUtil.readStrParam(request, PARAM_LEARNING_DESIGN_LOCATION); 
-	    
-	    String learningDesignLocation = "http://lamscommunity.org/lams/x/downloads?seq_id=712445";
+	    String learningDesignLocation = WebUtil.readStrParam(request, PARAM_LEARNING_DESIGN_LOCATION);
+
 	    importLDFromURL(request, learningDesignLocation, customCSV);
 	    return mapping.findForward("successLC");
 	} else {
@@ -223,20 +232,20 @@ public class ImportToolContentAction extends LamsAction {
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 	Long ldId = null;
 
-	String fileName = FileUtil.generateUniqueContentFolderID() + ".zip";
+	String fileExt = WebUtil.readStrParam(request, "ext");
+	String fileName = FileUtil.generateUniqueContentFolderID() + "." + fileExt;
 
 	try {
-
-	    // append the lams community auth info
-	    learningDesignLocation = LamsCommunityUtil.appendAuthInfoToURL(learningDesignLocation);
-
-	    Integer workspaceFolderUid = null;
-
 	    //get shared session
 	    HttpSession ss = SessionManager.getSession();
 	    //get back login user DTO
 	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    User user = (User) getUserService().findById(User.class, userDto.getUserID());
+
+	    // append the lams community auth info
+	    learningDesignLocation = LamsCommunityUtil.appendAuthInfoToURL(learningDesignLocation, user);
+
+	    Integer workspaceFolderUid = null;
 
 	    File designFile = null;
 	    String uploadPath = FileUtil.createTempDirectory("_uploaded_learningdesign") + File.separator

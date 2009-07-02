@@ -230,6 +230,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	
+	boolean allowRichEditor = qaContent.isAllowRichEditor();
+	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
 
 	boolean showOtherAnswers = qaContent.isShowOtherAnswers();
 	generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(showOtherAnswers).toString());
@@ -311,6 +314,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
 	generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(qaContent.isShowOtherAnswers()).toString());
+	
+	boolean allowRichEditor = qaContent.isAllowRichEditor();
+	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
 
 	/*
 	 * Learning mode requires this setting for jsp to generate the user's report 
@@ -526,6 +532,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	
+	boolean allowRichEditor = qaContent.isAllowRichEditor();
+	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
 
 	HttpSession ss = SessionManager.getSession();
 	/* get back login user DTO */
@@ -642,6 +651,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	
+	boolean allowRichEditor = qaContent.isAllowRichEditor();
+	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
 
 	HttpSession ss = SessionManager.getSession();
 	/* get back login user DTO */
@@ -995,6 +1007,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
+	
+	boolean allowRichEditor = qaContent.isAllowRichEditor();
+	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
 
 	NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
 		MY_SIGNATURE, new Integer(userID));
