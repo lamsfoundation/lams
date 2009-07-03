@@ -6,10 +6,6 @@
 -->
 <beans>
 
- 	<!-- Hibernate Properties. Should be used by all Hibernate session factories unless -->
-  	<!--  the tool has a specific need for a different setting. 						-->			
-  	<!-- If you change hibernate.treecache.objectName, you will also need to change the -->
-  	<!--  cacheManager object 															-->
   	<bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 	  	<property name="properties">
 		<props>
@@ -19,52 +15,38 @@
 			<prop key="hibernate.c3p0.maxPoolSize">20</prop>
 			<prop key="hibernate.c3p0.timeout">1800</prop>
 			<prop key="hibernate.c3p0.max_statement">50</prop>
+			<prop key="hibernate.cache.use_second_level_cache">false</prop>
 		</props>
 		</property>
   	</bean>
+
+	<!--  Transaction manager for all transactions involving the core classes or the content repository. 
+		  For JBoss 5, it has been changed to Hibernate Transaction Manager, instead of JTA.
 	
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
-		<property name="url"><value>jdbc:mysql://localhost/lams?zeroDateTimeBehavior=convertToNull&amp;characterEncoding=utf8&amp;autoReconnect=true</value></property>
-		<property name="username"><value>lams</value></property>
-		<property name="password"><value>lams</value></property>
-	</bean>
-
-	<bean id="toolDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
-		<property name="url"><value>jdbc:mysql://localhost/lams?zeroDateTimeBehavior=convertToNull&amp;characterEncoding=utf8&amp;autoReconnect=true</value></property>
-		<property name="username"><value>lams</value></property>
-		<property name="password"><value>lams</value></property>
-	</bean>
-
-	<!--  Note - as this is only a Hibernate based transaction manager (and not JTA) some transactions may 
-	 - go awry when working across jars.
-	-->
- 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		  "autodetectTransactionManager" defaults to true so we don't need to include it.  		 	
+	  	  But remember all application servers do not have the same JNDI name for their transaction manager!
+	 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
-
-
-
+	<!-- Local DataSource that works in any environment -->
+	<bean id="localDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
+		<property name="url"><value>jdbc:mysql://localhost/lams?characterEncoding=utf8</value></property>
+		<property name="username"><value>lams</value></property>
+		<property name="password"><value>lamsdemo</value></property>
+	</bean>
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
 
 	<import resource="messageContext.xml"/>
 
-	
-		<!-- Local DataSource that works in any environment -->
-	<bean id="localDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName"><value>com.mysql.jdbc.Driver</value></property>
-		<property name="url"><value>jdbc:mysql://localhost/lams?characterEncoding=utf8</value></property>
-		<property name="username"><value>lams</value></property>
-		<property name="password"><value>lams</value></property>
-	</bean>
-
-
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 
- 	<!-- Hibernate SessionFactory -->
+ 	<!-- Hibernate SessionFactory. Since LAMS 2.3 it is used in all tools and other parts of LAMS,
+ 		 rather than several local Session Factiories.
+ 	-->
 	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource"><ref bean="localDataSource"/></property>
 		<property name="mappingLocations">
@@ -92,7 +74,8 @@
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Activity.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/BranchActivityEntry.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/BranchCondition.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>				
+				<value>classpath:org/lamsfoundation/lams/learningdesign/Group.hbm.xml</value>		
+				<value>classpath:org/lamsfoundation/lams/learningdesign/GroupUser.hbm.xml</value>			
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Grouping.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/LearningDesign.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Competence.hbm.xml</value>
@@ -101,10 +84,13 @@
 				<value>classpath:org/lamsfoundation/lams/learningdesign/Transition.hbm.xml</value>	
 				<value>classpath:org/lamsfoundation/lams/learningdesign/License.hbm.xml</value>	
 				<value>classpath:org/lamsfoundation/lams/learningdesign/ActivityEvaluation.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/learningdesign/DataFlowObject.hbm.xml</value>
+				
 				
 				<!-- lesson related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/lesson/LearnerProgress.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/lesson/Lesson.hbm.xml</value>
+ 				<value>classpath:org/lamsfoundation/lams/lesson/CompletedActivityProgress.hbm.xml</value>
  				
 				<!-- Workspace related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/workspace/WorkspaceFolderContent.hbm.xml</value>
@@ -116,6 +102,9 @@
 				
 				<!-- Core Notebook Service related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/notebook/model/NotebookEntry.hbm.xml</value>
+				
+				<!-- Presence Chat Service related mapping files -->
+				<value>classpath:org/lamsfoundation/lams/presence/model/PresenceChatMessage.hbm.xml</value>
 				
 				<!-- Event notification service related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/events/Event.hbm.xml</value>
@@ -130,13 +119,13 @@
 				<value>classpath:org/lamsfoundation/lams/integration/ExtCourseClassMap.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/integration/ExtUserUseridMap.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/integration/ExtServerToolAdapterMap.hbm.xml</value>
-
+				
 				<!-- Pedagogical Planner related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/planner/PedagogicalPlannerSequenceNode.hbm.xml</value>
 				
 								<!-- Gradebook related mapping files -->
-				<value>classpath:org/lamsfoundation/lams/gradebook/GradeBookUserActivity.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/gradebook/GradeBookUserLesson.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/gradebook/GradebookUserActivity.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/gradebook/GradebookUserLesson.hbm.xml</value>
 				
 				<value>classpath:org/lamsfoundation/lams/contentrepository/CrCredential.hbm.xml</value>
  				<value>classpath:org/lamsfoundation/lams/contentrepository/CrNode.hbm.xml</value>
@@ -145,12 +134,188 @@
 				<value>classpath:org/lamsfoundation/lams/contentrepository/CrWorkspace.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/contentrepository/CrWorkspaceCredential.hbm.xml</value>
 				
-				<!-- Mapping files for tools with complex conditions -->
-
-				<value>classpath*:org/lamsfoundation/lams/tool/**/*.hbm.xml</value>
-				<value>classpath*:org/lamsfoundation/lams/tool/**/model/*.hbm.xml</value>
-				<value>classpath*:org/lamsfoundation/lams/tool/**/persistence/*.hbm.xml</value>
-				<value>classpath*:org/lamsfoundation/lams/tool/**/pojos/*.hbm.xml</value>
+				<!-- Mapping files for all tools -->
+		 		
+				<value>classpath*:org/lamsfoundation/lams/tool/**/**/*.hbm.xml</value>
+				
+				<!-- Explicit list of tools' mapping files come handy in debugging 
+				
+				<value>classpath:org/lamsfoundation/lams/tool/BasicToolVO.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/SystemTool.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/Tool.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/ToolContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/ToolImportSupport.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/ToolSession.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/forum/persistence/Attachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/forum/persistence/Forum.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/forum/persistence/ForumCondition.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/forum/persistence/ForumReport.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/forum/persistence/ForumToolSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/forum/persistence/ForumUser.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/forum/persistence/Message.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/forum/persistence/MessageSeq.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/forum/persistence/Timestamp.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/noticeboard/NoticeboardAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/noticeboard/NoticeboardContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/noticeboard/NoticeboardSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/noticeboard/NoticeboardUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/mc/McContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/mc/McOptsContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/mc/McQueContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/mc/McQueUsr.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/mc/McSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/mc/McUploadedFile.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/mc/McUsrAttempt.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/wiki/model/Wiki.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/wiki/model/WikiAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/wiki/model/WikiPage.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/wiki/model/WikiPageContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/wiki/model/WikiSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/wiki/model/WikiUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/vote/VoteContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/vote/VoteQueContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/vote/VoteQueUsr.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/vote/VoteSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/vote/VoteUploadedFile.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/vote/VoteUsrAttempt.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/taskList/model/TaskList.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/taskList/model/TaskListAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/taskList/model/TaskListCondition.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/taskList/model/TaskListItem.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/taskList/model/TaskListItemAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/taskList/model/TaskListItemComment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/taskList/model/TaskListItemVisitLog.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/taskList/model/TaskListSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/taskList/model/TaskListUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/survey/model/Survey.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyAnswer.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyCondition.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyOption.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyQuestion.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveySession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/survey/model/SurveyUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/spreadsheet/model/Spreadsheet.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetMark.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/spreadsheet/model/SpreadsheetUser.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/spreadsheet/model/UserModifiedSpreadsheet.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/scribe/model/Scribe.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/scribe/model/ScribeAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/scribe/model/ScribeHeading.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/scribe/model/ScribeReportEntry.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/scribe/model/ScribeSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/scribe/model/ScribeUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/sbmt/InstructionFiles.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/sbmt/SubmissionDetails.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/sbmt/SubmitFilesContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/sbmt/SubmitFilesReport.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/sbmt/SubmitFilesSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/sbmt/SubmitUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/pixlr/model/Pixlr.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/pixlr/model/PixlrAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/pixlr/model/PixlrConfigItem.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/pixlr/model/PixlrSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/pixlr/model/PixlrUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorder.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderComment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderCondition.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderRating.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderRecording.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/videoRecorder/model/VideoRecorderUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/Assessment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentOptionAnswer.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentOverallFeedback.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestion.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestionOption.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentQuestionResult.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentResult.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentUnit.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/assessment/model/AssessmentUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/Notebook.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/NotebookAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/NotebookCondition.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/NotebookSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/notebook/model/NotebookUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/rsrc/model/Resource.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/rsrc/model/ResourceAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/rsrc/model/ResourceItem.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/rsrc/model/ResourceItemInstruction.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/rsrc/model/ResourceItemVisitLog.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/rsrc/model/ResourceSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/rsrc/model/ResourceUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaCondition.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaConfigItem.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaQueContent.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaQueUsr.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaUploadedFile.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaUsrResp.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaWizardCategory.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaWizardCognitiveSkill.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/qa/QaWizardQuestion.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageComment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageGallery.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryConfigItem.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryItem.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryItemVisitLog.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageGallerySession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageGalleryUser.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageRating.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/imageGallery/model/ImageVote.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/gmap/model/Gmap.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/gmap/model/GmapAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/gmap/model/GmapConfigItem.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/gmap/model/GmapMarker.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/gmap/model/GmapSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/gmap/model/GmapUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/dimdim/model/Dimdim.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/dimdim/model/DimdimAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/dimdim/model/DimdimConfig.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/dimdim/model/DimdimSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/dimdim/model/DimdimUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/daco/model/Daco.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/daco/model/DacoAnswer.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/daco/model/DacoAnswerOption.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/daco/model/DacoAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/daco/model/DacoQuestion.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/daco/model/DacoSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/daco/model/DacoUser.hbm.xml</value>
+				
+				<value>classpath:org/lamsfoundation/lams/tool/chat/model/Chat.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/chat/model/ChatAttachment.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/chat/model/ChatCondition.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/chat/model/ChatMessage.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/chat/model/ChatSession.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/tool/chat/model/ChatUser.hbm.xml</value>
+				-->
 			</list>
 		</property>
 		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
@@ -295,6 +460,11 @@
 		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO" /></property>
 	</bean>
 	
+	<!--  Presence Chat Service -->
+	<bean id="presenceChatLoggerService" class="org.lamsfoundation.lams.presence.service.PresenceChatLoggerService">
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="presenceChatMessageDAO"><ref bean="presenceChatMessageDAO" /></property>
+	</bean>
 	
 	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
@@ -424,6 +594,11 @@
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>	
 	
+	<!-- Presence Chat related beans -->
+	<bean id="presenceChatMessageDAO" class="org.lamsfoundation.lams.presence.dao.hibernate.PresenceChatMessageDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>	
+	
 	<!--  Configuration related beans -->
 	<bean id="configurationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
@@ -442,6 +617,16 @@
 	
 	<!--  Pedagogical Planner related beans -->
 	<bean id="pedagogicalPlannerDAO" class="org.lamsfoundation.lams.planner.dao.hibernate.PedagogicalPlannerDAOHibernate">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Gradebook related beans -->
+	<bean id="gradebookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradebookDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Data flow related beans -->
+	<bean id="dataFlowDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.DataFlowDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
 	
