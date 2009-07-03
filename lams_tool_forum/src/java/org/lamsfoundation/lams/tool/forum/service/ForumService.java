@@ -864,12 +864,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	Forum forum = getForumByContentId(toolContentId);
 	if (forum == null) {
 	    forum = getDefaultForum();
 	}
-	return getForumOutputFactory().getToolOutputDefinitions(forum);
+	return getForumOutputFactory().getToolOutputDefinitions(forum, definitionType);
     }
 
     /**
