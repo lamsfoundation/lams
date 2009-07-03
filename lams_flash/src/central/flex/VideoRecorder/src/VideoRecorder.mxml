@@ -8,6 +8,7 @@
 	preinitialize="onPreinitialize(event)">	
 	<mx:Script>
 		<![CDATA[
+			import mx.events.ResizeEvent;
 			import mx.core.UIComponent;
 			import org.lamsfoundation.lams.common.util.ScreenShotterEvent;
 			//includes
@@ -126,20 +127,20 @@
 					contentEditable = true;
 					userId = 1;
 					toolSessionId = 1;
-					toolContentId = 5;
+					toolContentId = 23;
 					allowUseVoice = true;
 					allowUseCamera = true;
 					allowComments = true;
 					allowRatings = true;
 					allowLearnerVideoVisibility = true;
-					red5ServerUrl = "rtmp://videos.lamsinternational.com/";
-					serverUrl = "http://172.20.100.8:8080/lams/";
+					red5ServerUrl = "rtmp://172.20.100.22/";
+					serverUrl = "http://localhost:8080/lams/";
 					mode = AUTHOR_MODE;
 				}
 			}
 			
 			// called from applicationComplete
-			private function onApplicationComplete(event:Event):void {
+			private function onApplicationComplete(event:Event):void {				
 				// show an overlay
 				LamsAjaxOverlayManager.showOverlay(UIComponent(Application.application));
 				
@@ -175,15 +176,16 @@
 				// if the mic is to be used, set that up
 				mic = VideoDisplayUtil.setupMic();
 				
-				if(!checkCamera() || !checkMic()) {
-					if((!allowUseCamera && !allowUseVoice) || (!cam && !mic)) {
+				checkCamera();
+				checkMic();
+				
+				if((!allowUseCamera && !allowUseVoice) || (!cam && !mic)) {
 						// remove recording button
 						removeChild(getChildByName("recordingBox"));
 						
 						// stretch the video list
 						videoList.setStyle("bottom", 10);
 						videoList.invalidateList();
-					}
 				}
 				
 				// if first time using video recorder, pop flash settings
@@ -400,6 +402,10 @@
 					// enable application
 					LamsAjaxOverlayManager.hideOverlay(UIComponent(Application.application));
 					
+					//make application fullscreen
+					this.percentHeight = 100;
+					this.percentWidth = 100;
+					
 					// call server and get recordings, update datagrid with results
 					getRecordingsFromServer(sortButtonGroup.sortBy, sortButtonGroup.sortDirection);	
 				}
@@ -429,7 +435,7 @@
 			} 
         	
         	// bw detection handler
-			public function onBWDone(infoObject:Object):void {
+			public function onBWDone(infoObject:Object=null):void {
 				// print its properties
     			trace(VideoDisplayUtil.printInfoObject(infoObject, "onBWDone"));
 			}
@@ -724,7 +730,7 @@
 				
 				viewCameraButton.enabled = true;
 				viewCameraButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.camera");
-				
+					
 				getDetailsPopUp = GetRecordingDetailsPopUp(PopUpManager.createPopUp(this, GetRecordingDetailsPopUp, true));
 				PopUpManager.centerPopUp(getDetailsPopUp);
 				getDetailsPopUp.init(dictionary);
@@ -742,7 +748,7 @@
 				// change the view camera button's label
 				viewCameraButton.label = dictionary.getLabel("videorecorder.stop.camera");
 				viewCameraButton.toolTip = dictionary.getLabel("videorecorder.tooltip.stop.camera");
-				
+					
 				// set panel status label
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
 				
@@ -756,7 +762,7 @@
 			private function onStopCamera(event:VideoDisplayEvent):void{
 				// change the view camera button's label
 				viewCameraButton.label = dictionary.getLabel("videorecorder.view.camera");
-				viewCameraButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.camera");
+				viewCameraButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.camera");	
 				
 				// set panel status label
 				videoRecorderPanel.status = dictionary.getLabel("videorecorder.waiting");
@@ -839,7 +845,7 @@
 				}
 				
 				// if videoRecordings is defined
-				if(videoRecordings){
+				if(videoRecordings != null){
 					var length:int = videoRecordings.length();
 					// get children from videoList and enable/disable
 					for(var i:int = 0; i < length; i++){
@@ -847,7 +853,7 @@
 						var videoProfile:VideoProfile = VideoProfile(videoList.indexToItemRenderer(i));
 						var deleteButton:Button = videoProfile.deleteButton;
 						
-						if(deleteButton){
+						if(deleteButton != null){
 							deleteButton.enabled = enabled;
 							
 							if(enabled)

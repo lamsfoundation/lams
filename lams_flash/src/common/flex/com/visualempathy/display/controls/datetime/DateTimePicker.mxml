@@ -81,7 +81,7 @@
 	<mx:Spacer width="20"/>
 	<mx:NumericStepper id="hours" minimum="1" maximum="12" stepSize="1" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
 	<mx:Label text=":" textAlign="center"/>
-	<mx:NumericStepper id="minutes" minimum="0"  maximum="55" stepSize="{minuteIncrement}" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
+	<mx:NumericStepper id="minutes" minimum="0"  maximum="59" stepSize="{minuteIncrement}" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
 	<mx:Spacer width="10"/>
 	<mx:RadioButtonGroup id="ampm" selectedValue="1" change="this.handleChange()"/>
 	<mx:RadioButton id="am" value="1" label="AM" group="{ampm}"/>

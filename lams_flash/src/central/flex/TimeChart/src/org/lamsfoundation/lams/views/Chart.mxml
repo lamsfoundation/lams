@@ -8,8 +8,9 @@
 	<mx:Script>
 		<![CDATA[
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
-		
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionary;
+			import org.lamsfoundation.lams.events.ChartErrorEvent;
+			
 			import mx.charts.chartClasses.IAxis;
 			import mx.charts.LinearAxis;
 			import mx.events.ItemClickEvent;
@@ -89,6 +90,9 @@
 	<mate:Listener type="{ChartEvent.LOAD_CLASS}" 			receive="loadClass()" />
 	<mate:Listener type="{ChartEvent.UPDATE}"				receive="loadSelectedLearner()" />
 	<mate:Listener type="{ChartEvent.SELECT}"				receive="loadSelectedLearner()" />
+
+	<!-- Global error handler -->
+	<mate:Listener type="{ChartErrorEvent.SHOW_ERROR}" receive="Alert.show(event.message, 'System Error' , Alert.OK)" />
 
 	<!-- Model ______________________________________________________________________ -->
 	

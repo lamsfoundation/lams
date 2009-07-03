@@ -464,6 +464,11 @@
 						publishHelper(takeScreenshot);
 					}
 					else{
+						if(_mic && !_cam){
+							//change the view stack
+							selectedChild = audioView;
+						}
+						
 						// just start publishing
 						publishHelper(takeScreenshot);
 					}

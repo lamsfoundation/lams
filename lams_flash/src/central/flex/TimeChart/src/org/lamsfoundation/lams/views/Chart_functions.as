@@ -2,6 +2,8 @@
 import flash.events.Event;
 
 import mx.collections.ArrayCollection;
+import mx.controls.Alert;
+import mx.core.Application;
 
 import org.lamsfoundation.lams.vos.LearnerProgress;			
 	
@@ -21,23 +23,40 @@ import org.lamsfoundation.lams.vos.LearnerProgress;
 	}
 	
 	public function loadSelectedLearner():void {
-		_learnerProgressList = new ArrayCollection();
+		var hasCompletedActs:Boolean = false;
 		
-		if(selectedLearnerProgress == null) {
-			selectLearner(learnerProgressData.getItemAt(0));
-			return;
-		}
+		if(learnerProgressData.length > 0) {
 		
-		chart_lbl.htmlText = "<b>" + dictionary.getLabel("label.learner") + " :: " + selectedLearnerProgress.learner_fname + " " + selectedLearnerProgress.learner_lname + "</b>";
-		
-		for each(var cp:CompletedActivity in selectedLearnerProgress.completedActivities) {
-			_learnerProgressList.addItem(cp.dataObject);
-				
-			//trace('adding new c: ' + cp.dataObject.Completed);
-			//trace('adding new t: ' + cp.dataObject.Title);
-			//trace('adding new d: ' + cp.dataObject.Duration);
+			_learnerProgressList = new ArrayCollection();
+			
+			if(selectedLearnerProgress == null) {
+				selectLearner(learnerProgressData.getItemAt(0));
+				return;
+			}
+			
+			chart_lbl.htmlText = "<b>" + dictionary.getLabel("label.learner") + " :: " + selectedLearnerProgress.learner_fname + " " + selectedLearnerProgress.learner_lname + "</b>";
+			
+			if(selectedLearnerProgress.completedActivities.length > 0)
+				hasCompletedActs = true;
+			
+			for each(var cp:CompletedActivity in selectedLearnerProgress.completedActivities) {
+				_learnerProgressList.addItem(cp.dataObject);
+					
+				//trace('adding new c: ' + cp.dataObject.Completed);
+				//trace('adding new t: ' + cp.dataObject.Title);
+				//trace('adding new d: ' + cp.dataObject.Duration);
+			}
+		 
 		} 
-		
+
+		// show error if no data		
+		if(!hasCompletedActs)
+			mx.controls.Alert.show(dictionary.getLabel("alert.no.learner.data"), dictionary.getLabel("sys.error"), Alert.OK, null, disableApp);
+
+	}
+	
+	private function disableApp(event:Event):void {
+		Application.application.enabled = false;
 	}
 	
 	public function selectActivity(item:Object):void {

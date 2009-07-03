@@ -7,6 +7,9 @@
 
 	<mx:Script>
 		<![CDATA[
+			import mx.states.State;
+			import mx.core.Application;
+			import mx.collections.ArrayCollection;
 			import com.asfusion.mate.actions.builders.EventAnnouncer;
 			import mx.controls.ToolTip;
 			import org.lamsfoundation.lams.events.WizardEvent;
@@ -18,7 +21,7 @@
 			import org.lamsfoundation.lams.events.NavigationEvent;
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
    			
-   			public static var LAMS_FLASH_FORMAT:String = "DD/M/YYYY H:NN A";
+   			public static var LAMS_FLASH_FORMAT:String = "DD/M/YYYY L:NN A";
    			
    			[Bindable]
    			public var scheduleDateTimeStr:String;
@@ -44,6 +47,44 @@
    			private var instTxt_idx:uint;
    			private static var focusTimeout:uint;
    			
+   			[Bindable]
+   			private var tzList:Array;
+   			
+   			[Bindable]
+   			private var userTimeZone:uint;
+   			
+   			public static function getUserTimeZone(tz:String, tzList:Array):uint {
+   				var count:uint = 0;
+   				
+   				var timeZoneLbl:String = tz;
+   				var pIdx:int = timeZoneLbl.indexOf("GMT");
+   				
+   				var timeZoneType:String;
+   				var timeZoneOffset:String;
+   				var tzOffsetVal:Number;
+   				
+   				if(pIdx != -1) {
+   					timeZoneType = timeZoneLbl.substring(0, 4);
+   					timeZoneOffset = timeZoneLbl.substring(4, timeZoneLbl.length);
+   					
+   					tzOffsetVal = Number(timeZoneOffset.substring(0, timeZoneOffset.lastIndexOf(":")));
+   					
+   					timeZoneLbl = timeZoneType + tzOffsetVal;	 
+   					
+   				}
+   				
+   				for(var i:uint=0; i<tzList.length; ++i) {
+   					var label:String = tzList[i].label;
+   					
+   					if(label == timeZoneLbl) {
+   						return count;
+   					}
+   					
+   					count++;
+   				}
+   				
+   				return null;
+   			}
    			
    			public function enableSplitLessonsOption():void {
    				if(!enableSplitLessons.selected) {
@@ -122,7 +163,9 @@
    			
    			private function hasFocus(value:Boolean):void {
 				if(value) {
+					
 					// tab is current selection
+					createTimeZoneList();
 					enableSplitLessonsOption();
 
 					var valEvent:ValidationResultEvent = scheduleValidator.validate();
@@ -136,16 +179,18 @@
 			}
 			
 			private function checkScheduleDateTime(event:Event):void {
-				this.scheduleDateTimeStr = ScheduleDateDisplay.format(event.currentTarget.selectedDate);
-				var valEvent:ValidationResultEvent = scheduleValidator.validate();
-				
-				this.clearValidationFocus(valEvent.currentTarget.listener);
-   				
-				if(valEvent.results != null) {
-					this.dispatchEvent(valEvent);
-					this.setValidationFocus(valEvent.currentTarget.listener);
-				} else {
-					this.clearValidationHighlight(valEvent.currentTarget.listener);
+				if(scheduleDateTZ != null) {
+					this.scheduleDateTimeStr = ScheduleDateDisplay.format(scheduleDateTimePicker.selectedDate);
+					var valEvent:ValidationResultEvent = scheduleValidator.validate();
+					
+					this.clearValidationFocus(valEvent.currentTarget.listener);
+	   				
+					if(valEvent.results != null) {
+						this.dispatchEvent(valEvent);
+						this.setValidationFocus(valEvent.currentTarget.listener);
+					} else {
+						this.clearValidationHighlight(valEvent.currentTarget.listener);
+					}
 				}
 			}
 			
@@ -194,6 +239,31 @@
 				if(scheduleDateTimePicker.selectedDate < now)
 					scheduleDateTimePicker.selectedDate = now;
 			}
+			
+			private function createTimeZoneList():void {
+				var label:String = "";
+				var value:String = "";
+				
+				if(tzList != null && tzList.length > 0)
+					return;
+				
+				tzList = new Array();
+				
+				// populate TimeZone list from User (java) class passed through in the Dictionary data.
+				for (var i:uint = 0; i <= 30; i++) {
+					label = dictionary.getLabel(String('timezoneID' + i));
+					value = dictionary.getValue(String('timezoneID' + i)) as String;
+					
+					tzList.push({label: label, data: value });
+				}
+				
+				//tzList = [ "GMT-12", "GMT-11", "GMT-10", "GMT-9", "GMT-8", "GMT-7",
+				//    "GMT-6", "GMT-5", "GMT-4", "Canada/Newfoundland", "GMT-3", "GMT-2", "GMT-1", "GMT", "GMT+1", "GMT+2",
+				//    "GMT+3", "Asia/Tehran", "GMT+4", "Asia/Kabul", "GMT+5", "Asia/Calcutta", "Asia/Katmandu", "GMT+6", "GMT+7",
+				//    "GMT+8", "GMT+9", "Australia/Adelaide", "GMT+10", "GMT+11", "GMT+12" ]
+				
+				userTimeZone = Advanced.getUserTimeZone(Application.application.param("tz") as String, tzList);
+			}
 		]]>
 	</mx:Script>
 	
@@ -202,7 +272,7 @@
 	
 	<!-- Validators -->
 	<validate:LessonValidator id="learnersValidator" source="{lesson.newLesson}" property="learners" listener="{noLearnersPerLesson_stp}" errorMessage="{dictionary.getLabel('advanced.tab.form.validation.no.learners.error')}" />
-	<validate:LessonValidator id="scheduleValidator" source="{this}" property="scheduleDateTimePicker" listener="{dateTimePicker_fItm}" errorMessage="{dictionary.getLabel('al.validation.schtime')}" />
+	<validate:LessonValidator id="scheduleValidator" source="{this}" property="dateTimePicker_fItm"  listener="{dateTimePicker_fItm}" errorMessage="{dictionary.getLabel('al.validation.schtime')}" />
 	
 	<!-- Model ______________________________________________________________________ -->
 	
@@ -235,11 +305,14 @@
 			<!-- Scheduling options -->
 			<mx:FormHeading id="scheduling_fH" label="{dictionary.getLabel('advanced.tab.form.scheduling.label')}"  paddingTop="5"/>
 			<mx:CheckBox id="enableScheduling" name="enableScheduling" selected="false" label="{dictionary.getLabel('advanced.tab.form.enable.label')}" labelPlacement="right" change="updateSelectedDate()" />
+			<mx:VBox width="100%">
+				<mx:FormItem id="dateTimePicker_fItm" focusEnabled="true">
+					<timePicker:DateTimePicker id="scheduleDateTimePicker" enabled="{enableScheduling.selected}" selectedDate="{new Date()}" change="checkScheduleDateTime(event)" minuteIncrement="1" backgroundColor="#FFFFFF"/>        
+					<mx:ComboBox id="scheduleDateTZ" editable="false" dataProvider="{tzList}" enabled="{enableScheduling.selected}" change="checkScheduleDateTime(event)" selectedIndex="{userTimeZone}" />
+				</mx:FormItem>
+			</mx:VBox>
 			
 			<!-- DateTimePicker -->
-			<mx:FormItem id="dateTimePicker_fItm" focusEnabled="true">
-				<timePicker:DateTimePicker id="scheduleDateTimePicker" enabled="{enableScheduling.selected}" selectedDate="{new Date()}" change="checkScheduleDateTime(event)" minuteIncrement="1" backgroundColor="#FFFFFF"/>        
-			</mx:FormItem>
 		</mx:VBox>
 	</mx:Form>
 	 

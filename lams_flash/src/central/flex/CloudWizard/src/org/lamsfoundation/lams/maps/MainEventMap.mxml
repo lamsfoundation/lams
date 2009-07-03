@@ -196,7 +196,7 @@
 		
 		<!-- schedule lesson -->
 		<HTTPServiceInvoker instance="{scheduleLessonService}">
-			<Request lessonID="{event.lesson.lessonID}" lessonStartDate="{event.schedule}" userID="{userID}" />
+			<Request lessonID="{event.lesson.lessonID}" lessonStartDate="{event.schedule}" scheduleTimeZoneIdx="{event.timeZone}" userID="{userID}" />
 			<resultHandlers>
 				<MethodInvoker generator="{WDDXParser}" 
 					method="parseObject" arguments="{resultObject}" />
@@ -233,5 +233,5 @@
 	<mx:HTTPService id="scheduleLessonService" url="{serverURL}monitoring/monitoring.do?method=startOnScheduleLesson" resultFormat="xml" />
 	<mx:HTTPService id="presenceService" url="{serverURL}Presence.do?method=createXmppRoom" resultFormat="xml" />
 	<mx:HTTPService id="dictionaryService" url="{serverURL}monitoring/monitoring.do?method=getDictionaryXML" resultFormat="e4x" />         
-
+	
 </EventMap>

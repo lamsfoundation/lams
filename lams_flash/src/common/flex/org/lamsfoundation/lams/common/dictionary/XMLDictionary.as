@@ -15,6 +15,15 @@
 			eventDispatcher.dispatchEvent(new XMLDictionaryEvent(XMLDictionaryEvent.COMPLETE));
 		}
 		
+		public function getValue(s:String):String {
+			if(!isEmpty()) {
+				var value:String = dictionaryXML.language.entry.(@key==s).data;
+				return value;
+			}
+			
+			return null;
+		}
+		
 		public function getLabel(s:String):String{
 			if(!isEmpty()){
 				return dictionaryXML.language.entry.(@key==s).name;

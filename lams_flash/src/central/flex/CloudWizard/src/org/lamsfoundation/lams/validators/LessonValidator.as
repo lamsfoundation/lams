@@ -2,9 +2,14 @@ package org.lamsfoundation.lams.validators
 {
 	import com.visualempathy.display.controls.datetime.DateTimePicker;
 	
+	import mx.collections.ArrayCollection;
+	import mx.containers.FormItem;
+	import mx.controls.ComboBox;
+	import mx.core.Application;
 	import mx.validators.ValidationResult;
 	import mx.validators.Validator;
 	
+	import org.lamsfoundation.lams.views.Advanced;
 	import org.lamsfoundation.lams.vos.UserCollection;
 
 	public class LessonValidator extends Validator
@@ -26,9 +31,12 @@ package org.lamsfoundation.lams.validators
             	validateLessonName(value as String);
             } else if(value is UserCollection) {
             	validateUserCollection(value as UserCollection);
-            } else if(value is DateTimePicker) {
-            	validateScheduleDate(value as DateTimePicker);
-            }
+            } else if(value is FormItem) {
+            	var children:Array = (value as FormItem).getChildren();
+            	if(children.length > 0) {
+            		validateScheduleDate(children[0] as DateTimePicker, children[1] as ComboBox);
+            	}
+            } 
             
             // Return if there are errors.
             if(results.length > 0)
@@ -54,8 +62,16 @@ package org.lamsfoundation.lams.validators
         		results.push(new ValidationResult(true, "", "noLearners", this.errorMessage));
         }
         
-        private function validateScheduleDate(timePicker:DateTimePicker):void {
+        private function validateScheduleDate(timePicker:DateTimePicker, timeZonePicker:ComboBox):void {
         	var now:Date = new Date();
+        	var tzList:ArrayCollection = (timeZonePicker.dataProvider != null) ? timeZonePicker.dataProvider as ArrayCollection : new ArrayCollection();
+        	var usersTzIdx:uint = Advanced.getUserTimeZone(Application.application.param("tz") as String, tzList.toArray());
+        	var usersTzOffset:Number = timeZonePicker.dataProvider[usersTzIdx].data;
+ 			
+ 			var selectedTzOffset:Number = timeZonePicker.selectedItem.data;
+        	var rawOffset:Number = (usersTzOffset - selectedTzOffset);
+        	
+        	var valTime:Number = now.setTime(now.getTime() - rawOffset);
         	
         	if(timePicker.enabled) {
 	        	if(timePicker.selectedDate.date > now.date)

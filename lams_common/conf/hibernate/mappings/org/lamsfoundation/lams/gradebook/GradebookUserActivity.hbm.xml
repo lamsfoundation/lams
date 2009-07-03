@@ -67,6 +67,15 @@
             column="feedback"
             length="65535"
         />
+        
+        <property
+            name="markedInGradebook"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="marked_in_gradebook"
+            length="1"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

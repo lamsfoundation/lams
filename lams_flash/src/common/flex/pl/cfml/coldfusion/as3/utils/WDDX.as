@@ -22,6 +22,12 @@ package pl.cfml.coldfusion.as3.utils
 	public class WDDX
 	{
 		
+		private static var etRev:Array = new Array();
+		private static var at:Array = new Array();
+		private static var atRev:Array = new Array();
+		private static var et:Array = new Array();
+	
+			
 		/**
 		 * Compiles AS3 objects to WDDX.
 		 * Type are mapped against these rules:
@@ -172,6 +178,8 @@ package pl.cfml.coldfusion.as3.utils
 		
 		private static function _fromWDDX(data:XML):Object
 		{
+			setupEncoding();
+			
 			var o:Object = {};
 			switch (data.name().toString().toLowerCase())
 			{
@@ -202,7 +210,7 @@ package pl.cfml.coldfusion.as3.utils
 		
 		private static function _fromString(data:XML):String
 		{
-			return data.text();
+			return decodeStr(data.text());
 		}
 		private static function _fromBoolean(data:XML):Boolean
 		{
@@ -226,6 +234,95 @@ package pl.cfml.coldfusion.as3.utils
 				o[v.@name] = _fromWDDX(v.children()[0]);
 			}
 			return o;
+		}
+		
+		private static function setupEncoding():void {
+			for (var i:int = 0; i<256; ++i) {
+				if (i<32 && i != 9 && i != 10 && i != 13) {
+					var hex:String = i.toString(16);
+					if (hex.length == 1) {
+						hex = "0"+hex;
+					}
+					et[i] = "<char code='"+hex+"'/>";
+					at[i] = "";
+				} else if (i<128) {
+					et[i] = String.fromCharCode(i);
+					at[i] = String.fromCharCode(i);
+				} else { 
+					et[i] = "&#x"+i.toString(16)+";";
+					etRev["&#x"+i.toString(16)+";"] = String.fromCharCode(i);
+					at[i] = "&#x"+i.toString(16)+";";
+					atRev["&#x"+i.toString(16)+";"] = String.fromCharCode(i);
+				}
+			}
+			
+			et[new String("<").charCodeAt(0)] = "&lt;";
+			et[new String(">").charCodeAt(0)] = "&gt;";
+			et[new String("&").charCodeAt(0)] = "&amp;";
+			
+			etRev["&lt;"] = "<";
+			etRev["&gt;"] = ">";
+			etRev["&amp;"] = "&";
+			
+			at[new String("<").charCodeAt(0)] = "&lt;";
+			at[new String(">").charCodeAt(0)] = "&gt;";
+			at[new String("&").charCodeAt(0)] = "&amp;";
+			at[new String("'").charCodeAt(0)] = "&apos;";
+			at[new String("\"").charCodeAt(0)] = "&quot;";
+			
+			atRev["&lt;"] = "<";
+			atRev["&gt;"] = ">";
+			atRev["&amp;"] = "&";
+			atRev["&apos;"] = "'";
+			atRev["&quot;"] = "\"";
+			
+		}
+		
+		private static function encodeStr(str:String):String {
+			var tempString:String = "";
+			var max:Number = str.length;
+			
+			for (var i:Number=0; i<=max; ++i) {
+				var char:String = str.substr(i, 1);
+				var ord:Number = str.substr(i, 1).charCodeAt(0);
+				if(ord < 256) {
+					if(char == et[13]){
+						tempString += "%0D%0A";
+					} else {
+						tempString += (et[str.substr(i+1, 1).charCodeAt(0)]);
+					}
+				} else {
+					tempString += "&#" + ord.toString() + ";";
+				}
+			}
+			
+			return tempString;
+		}
+		
+		private static function decodeStr(str:String):String {
+			var max:Number = str.length;
+			var i:Number = 0;
+			var char:String;
+			var output:String = "";
+			
+			while (i<=max) {
+				char = str.substr(i, 1).charAt(0)
+				if (char == "&") {
+					var buff:String = char;
+					do {
+						++i;
+						char = str.substr(i, 1).charAt(0)
+						buff += char;
+					} while (char != ";");
+					output += etRev[buff];
+				} else {
+					output += char;
+				}
+				
+				++i;
+			}
+			
+			return output;
 		}
 	}
 }

@@ -2,6 +2,8 @@
 Application {
 	backgroundColor: #FFFFFF;
 	themeColor: #0087e5;
+	backgroundGradientAlphas: 1.0, 1.0;
+	backgroundGradientColors: #FFFFFF, #FFFFFF;
 }
 
 Alert {

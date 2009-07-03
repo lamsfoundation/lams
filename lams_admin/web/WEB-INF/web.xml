@@ -10,13 +10,18 @@
   	<param-value>org.lamsfoundation.lams.admin.ApplicationResources</param-value>
 </context-param>
 
+<context-param>
+    <param-name>contextClass</param-name>
+    <param-value>org.jboss.spring.factory.VFSXmlWebApplicationContext</param-value>
+</context-param> 
+
 <context-param> 
 	<param-name>contextConfigLocation</param-name>
 	<param-value>classpath:/org/lamsfoundation/lams/admin/adminApplicationContext.xml</param-value>
 </context-param>
 <context-param>
    <param-name>locatorFactorySelector</param-name>
-   <param-value>classpath*:/org/lamsfoundation/lams/**/beanRefContext.xml</param-value>
+   <param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
 </context-param>
 <context-param>
 	<param-name>parentContextKey</param-name>

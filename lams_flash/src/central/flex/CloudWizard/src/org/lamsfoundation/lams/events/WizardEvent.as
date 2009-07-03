@@ -40,7 +40,7 @@ package org.lamsfoundation.lams.events
 		public var folder:WorkspaceItem;
 		public var folders:Array;
 		
-		public var organisationID:uint = Application.application.parameters.organisationID;
+		public var organisationID:uint = Application.application.param("organisationID");
 		
 		public var contents:ArrayCollection;
 		
@@ -48,6 +48,7 @@ package org.lamsfoundation.lams.events
 		
 		public var startEvent_type:String;
 		public var schedule:String;
+		public var timeZone:uint;
 		
 		public var last:Boolean = true;
 		

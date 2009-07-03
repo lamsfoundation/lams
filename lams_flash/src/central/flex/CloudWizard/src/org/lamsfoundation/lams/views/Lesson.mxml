@@ -62,7 +62,7 @@
    			}
    			
    			private function createInitWorkspace():void {
-   				organisationID = Application.application.parameters.organisationID;
+   				organisationID = Application.application.param("organisationID");
    				
    				var wizardEvent:WizardEvent = new WizardEvent(WizardEvent.INIT_WORKSPACE);
    				this.dispatchEvent(wizardEvent);
@@ -131,7 +131,7 @@
 						this.dispatchEvent(new NavigationEvent(NavigationEvent.ADVANCED));
 					
 					// schedule validation (tab - advanced)
-					} else if(advanced.enableScheduling && (valEvent = advanced.scheduleValidator.validate()).results != null) {
+					} else if(advanced.enableScheduling.selected && (valEvent = advanced.scheduleValidator.validate()).results != null) {
 						this.dispatchEvent(valEvent);		// event not bubbled
 						
 						advanced.setValidationFocus(valEvent.currentTarget.listener);
@@ -191,6 +191,7 @@
 				
 				wizardEvent.lesson = newLesson;
 				wizardEvent.schedule = (newLesson.enableScheduling) ? advanced.scheduleDateTimeStr : null;
+				wizardEvent.timeZone = advanced.scheduleDateTZ.selectedIndex
 				
 				if(lessonInstances.length > 1) {
 					startLessonInstances(wizardEvent);
@@ -211,6 +212,8 @@
 					
 					wizardEvent.lesson = newLesson;
 					wizardEvent.schedule = event.schedule;
+					wizardEvent.timeZone = advanced.scheduleDateTZ.selectedIndex
+				
 					wizardEvent.last = (lessonInstances.length == count);
 				
 					this.dispatchEvent(wizardEvent);

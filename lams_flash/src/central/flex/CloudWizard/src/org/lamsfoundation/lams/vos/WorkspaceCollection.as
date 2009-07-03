@@ -16,6 +16,8 @@ package org.lamsfoundation.lams.vos
 		
 		public function getChildren(node:Object, model:Object=null):ICollectionView
 		{
+			
+			
 			return node.children;
 		}
 		

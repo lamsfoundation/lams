@@ -82,10 +82,10 @@
 				
 				// for testing purposes (when running in debug)
 				if(mode == null){
-					red5ServerUrl = new String("rtmp://172.20.100.22/");
-					serverUrl = new String("http://172.20.100.220:8080/lams/");
+					red5ServerUrl = new String("rtmp://localhost/");
+					serverUrl = new String("http://localhost:8080/lams/");
 					mode = new String("recorderModeAuthor");
-					toolContentId = 24;
+					toolContentId = 1;
 				}
 			}
 			
@@ -187,11 +187,12 @@
 						// set up mic
 						mic = VideoDisplayUtil.setupMic();
 						
-						if(!checkCamera() && !checkMic()) {
-							// don't allow recording if neither cam nor mic is enabled
-							if(!mic && !cam){
-								videoControlBar.recordButton.enabled = false;
-							}
+						checkCamera()
+						checkMic();
+						
+						// don't allow recording if neither cam nor mic is enabled
+						if(!mic && !cam){
+							videoControlBar.recordButton.enabled = false;
 						}
 						
 						if(alertCount <= 0) createConnection();
@@ -218,13 +219,14 @@
 						// set up mic
 						mic = VideoDisplayUtil.setupMic();
 						
-						if(!checkCamera() && !checkMic()) {
-							// don't allow recording if neither cam nor mic is enabled
-							if(!mic && !cam){
-								videoControlBar.recordButton.enabled = false;
-							}
-						}
+						checkCamera()
+						checkMic();
 						
+						// don't allow recording if neither cam nor mic is enabled
+						if(!mic && !cam){
+							videoControlBar.recordButton.enabled = false;
+						}
+												
 						if(alertCount <= 0) createConnection();
 
 						break;
@@ -415,7 +417,8 @@
 					// if we are in a player online instance
 					if(mode == "playerModeOnline"){
 						// extension added from fck record
-						videoDisplay.makeReady(filename, "video", false);
+						if(mic && !cam) videoDisplay.makeReady(filename, "audio", false);
+						else  videoDisplay.makeReady(filename, "video", false);
 					}
 					// if we are in fck mode
 					else if(mode == "recorderModeFCK"){
@@ -433,7 +436,8 @@
 						}
 						
 						// change the start recording button's label
-						videoDisplay.makeReady(filename, "video", offlinePlayback);
+						if(mic && !cam) videoDisplay.makeReady(filename, "audio", offlinePlayback);
+						else videoDisplay.makeReady(filename, "video", offlinePlayback);
 						
 						// update tooltip
 						videoControlBar.recordButton.toolTip = dictionary.getLabel("videorecorder.tooltip.start.recording.again");
@@ -592,7 +596,8 @@
 					Alert.show(dictionary.getLabel("videorecorder.recording.complete.fck"));
 					
 					// play the movie from the Red5 server
-					videoDisplay.makeReady(filename, "video", offlinePlayback);
+					if(mic && !cam) videoDisplay.makeReady(filename, "audio", false);
+					else videoDisplay.makeReady(filename, "video", false);
 					
 					// change the panel status
 					videoDisplayPanel.status = dictionary.getLabel("videorecorder.ready");

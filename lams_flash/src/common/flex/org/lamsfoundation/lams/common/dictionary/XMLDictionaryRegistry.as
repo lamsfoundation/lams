@@ -25,6 +25,13 @@ package org.lamsfoundation.lams.common.dictionary
 			this.dispatchEvent(new Event("updatedLabelsReplace"));
 			this.dispatchEvent(new Event("updatedLabelsConcatentate"));
 			this.dispatchEvent(new Event("updatedLabelsInsert"));
+			
+			this.dispatchEvent(new Event("updatedValues"));
+		}
+		
+		[Bindable (event="updatedValues")]
+		public function getValue(key:String):Object {
+			return _xmlDictionary.getValue(key);
 		}
 		
 		[Bindable (event="updatedLabels")]
@@ -52,6 +59,8 @@ package org.lamsfoundation.lams.common.dictionary
 			this.dispatchEvent(new Event("updatedLabelsReplace"));
 			this.dispatchEvent(new Event("updatedLabelsConcatentate"));
 			this.dispatchEvent(new Event("updatedLabelsInsert"));
+			
+			this.dispatchEvent(new Event("updatedValues"));
 		}
 	}
 }

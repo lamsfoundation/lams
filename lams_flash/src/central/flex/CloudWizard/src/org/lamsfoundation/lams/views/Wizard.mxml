@@ -30,7 +30,7 @@
 			public var orgName:String;
 			
 			private function init():void {
-				orgName = Application.application.parameters.orgName;
+				orgName = Application.application.param("orgName") as String;
 			}
 			
 			private function tabChange(event:IndexChangedEvent):void {

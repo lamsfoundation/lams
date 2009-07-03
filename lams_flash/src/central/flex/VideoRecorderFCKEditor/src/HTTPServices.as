@@ -19,7 +19,12 @@ private function saveRecordingToServer(title:String, description:String, filenam
 	videoRecorderActions.request.toolContentId = toolContentId;
 	
 	videoRecorderActions.request.isLocal = true;
-	videoRecorderActions.request.isJustSound = false;
+	
+	if(mic && !cam)
+		videoRecorderActions.request.isJustSound = true;
+	else
+		videoRecorderActions.request.isJustSound = false;
+	
 	videoRecorderActions.request.userId = -1;
 	videoRecorderActions.request.toolSessionId = -1;
 	videoRecorderActions.request.recordingId = -1;
@@ -61,7 +66,12 @@ private function copyRecordingToLamsServer(src:String, dir:String, filename:Stri
 	videoRecorderActions.request.urlStr = src;
 	videoRecorderActions.request.dir = dir;
 	videoRecorderActions.request.filename = filename;
-
+	
+	if(mic && !cam)
+		videoRecorderActions.request.isJustSound = true;
+	else
+		videoRecorderActions.request.isJustSound = false;
+	
 	videoRecorderActions.addEventListener(ResultEvent.RESULT, copyRecordingToLamsServerSuccessHandler);
 	videoRecorderActions.addEventListener(FaultEvent.FAULT, copyRecordingToLamsServerFaultHandler);
 	
