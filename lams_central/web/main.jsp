@@ -32,7 +32,7 @@
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-latest.pack.js"></script>
 	<script type="text/javascript">
-		var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
+		var pathToImageFolder = "<lams:LAMSURL/>/images/";
 	</script>
     <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox.patched.js"></script>
 	<c:if test="${empty tab}">

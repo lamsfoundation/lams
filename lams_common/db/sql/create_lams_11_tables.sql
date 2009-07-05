@@ -1121,6 +1121,7 @@ CREATE TABLE lams_gradebook_user_activity (
 	, user_id BIGINT (20) NOT NULL
 	, mark DOUBLE PRECISION 
 	, feedback TEXT
+	, marked_in_gradebook TINYINT(1) NOT NULL DEFAULT 0
 	, INDEX (activity_id, user_id)
 	, CONSTRAINT FK_lams_gradebook_user_activity_1 FOREIGN KEY (activity_id)
                   REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
