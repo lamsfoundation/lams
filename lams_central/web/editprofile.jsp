@@ -113,7 +113,6 @@
 			<html:hidden property="enableFlash" />
 		</c:otherwise>
 	</c:choose>
-	</tr>
 		
 	<tr>
 		<td class="align-right"><fmt:message key="label.language"/>:</td>
@@ -275,7 +274,7 @@
 			</c:forEach>
 		</td>
 	</tr>
-		</tr>
+
 		<tr>
 		<td class="align-right"><fmt:message key="label.timezone.title"/>:</td>
 		<td>

@@ -186,10 +186,6 @@
 		<move file="${build.lib}/lams-central.war" tofile="${build.lib}/temp.war"/>
 		<unjar src="${build.lib}/temp.war" dest="${build.lib}/lams-central.war"/>
 		<antcall target="update-logo-for-RAMS"/>
-		
-		<!-- Add Pedagogical Planner, if available -->
-		<available file="../${lams_planner}/build.xml" property="planner_available" />
-		<antcall target="copy-planner" />
 	</target>
 
 
@@ -299,6 +295,10 @@
 				<include name="**/*.properties"/>
 			</fileset>
 		</copy>
+		
+		<!-- Add Pedagogical Planner, if available -->
+		<available file="../${lams_planner}/build.xml" property="planner_available" />
+		<antcall target="deploy-planner" />
 	</target>
 	
 	<!-- deploy-war : for convenience during development. Should be deployed via the master build -->
@@ -311,9 +311,9 @@
 			</fileset>
 		</copy>
 	</target>
-
-	<target name="copy-planner" if="planner_available">
-		<ant antfile="../${lams_planner}/build.xml" target="copy-to-central" />
+	
+	<target name="deploy-planner" if="planner_available">
+		<ant antfile="../${lams_planner}/build.xml" target="deploy" />
 	</target>
 	
 	<!-- ================================= -->

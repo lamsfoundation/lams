@@ -22,6 +22,17 @@ CREATE TABLE lams_ext_server_tool_map (
   CONSTRAINT lams_ext_server_tool_map_fk2 FOREIGN KEY (tool_id) REFERENCES lams_tool (tool_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) TYPE=InnoDB;
 
+-- LDEV-2369 Add tutorial video support
+ALTER TABLE lams_user ADD COLUMN tutorials_disabled TINYINT(1) DEFAULT 0,
+	                  ADD COLUMN first_login TINYINT(1) DEFAULT 1;
+ 	
+CREATE TABLE lams_user_disabled_tutorials (
+  user_id BIGINT(20) NOT NULL,
+  page_str CHAR(5) NOT NULL,
+  CONSTRAINT FK_lams_user_disabled_tutorials_1 FOREIGN KEY (user_id) REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (user_id,page_str)
+)TYPE=InnoDB;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

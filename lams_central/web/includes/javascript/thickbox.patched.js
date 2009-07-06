@@ -5,7 +5,7 @@
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
 */
 		  
-var tb_pathToImage = pathToImageFolder + "loadingAnimation.gif";
+var tb_pathToImage = "images/loadingAnimation.gif";
 
 // fixed according to: http://jamazon.co.uk/web/2008/03/14/jquerybrowserversion-doesnt-recognise-ie7/
 $.browser.msie6 =
@@ -72,12 +72,8 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 	   var urlString = /\.jpg$|\.jpeg$|\.png$|\.gif$|\.bmp$/;
 	   var urlType = baseURL.toLowerCase().match(urlString);
 
-	var queryString = url.replace(/^[^\?]+\??/,'');
-	var params = tb_parseQuery( queryString );
-
-
-		if((!params['TB_iframe'])){//code to show images
-
+		if(urlType == '.jpg' || urlType == '.jpeg' || urlType == '.png' || urlType == '.gif' || urlType == '.bmp'){//code to show images
+				
 			TB_PrevCaption = "";
 			TB_PrevURL = "";
 			TB_PrevHTML = "";
@@ -115,10 +111,8 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			var pagesize = tb_getPageSize();
 			var x = pagesize[0] - 150;
 			var y = pagesize[1] - 150;
-			var imageWidth = (jQuery.browser.msie) ? parseInt(params['dbWidth']) : imgPreloader.width;
-			var initialImageWidth = imageWidth;
-			var imageHeight = (jQuery.browser.msie) ? parseInt(params['dbHeight']) : imgPreloader.height;
-			var initialImageHeight = imageHeight;
+			var imageWidth = imgPreloader.width;
+			var imageHeight = imgPreloader.height;
 			if (imageWidth > x) {
 				imageHeight = imageHeight * (x / imageWidth); 
 				imageWidth = x; 
@@ -138,13 +132,8 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			
 			TB_WIDTH = imageWidth + 30;
 			TB_HEIGHT = imageHeight + 60;
-
-			if ((initialImageWidth > x) ||(initialImageHeight > y)) {
-				$("#TB_window").append("<iframe id='TB_Image' style='border:0px;' frameborder='no' src='"+url+"' width='"+imageWidth+"' height='"+imageHeight+"'/></iframe>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>");
-			} else {
-				$("#TB_window").append("<a href='' id='TB_ImageOff' title='Close'><img id='TB_Image' src='"+url+"' width='"+initialImageWidth+"px' height='"+initialImageHeight+"px' alt='"+caption+"'/></a>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>");				
-			}
-		
+			$("#TB_window").append("<a href='' id='TB_ImageOff' title='Close'><img id='TB_Image' src='"+url+"' width='"+imageWidth+"' height='"+imageHeight+"' alt='"+caption+"'/></a>" + "<div id='TB_caption'>"+caption+"<div id='TB_secondLine'>" + TB_imageCount + TB_PrevHTML + TB_NextHTML + "</div></div><div id='TB_closeWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div>"); 		
+			
 			$("#TB_closeWindowButton").click(tb_remove);
 			
 			if (!(TB_PrevHTML === "")) {
@@ -198,6 +187,9 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			
 			imgPreloader.src = url;
 		}else{//code to show html
+			
+			var queryString = url.replace(/^[^\?]+\??/,'');
+			var params = tb_parseQuery( queryString );
 
 			TB_WIDTH = (params['width']*1) + 30 || 630; //defaults to 630 if no paramaters were added to URL
 			TB_HEIGHT = (params['height']*1) + 40 || 440; //defaults to 440 if no paramaters were added to URL
@@ -207,16 +199,11 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			if(url.indexOf('TB_iframe') != -1){// either iframe or ajax window		
 					urlNoQuery = url.split('TB_');
 					$("#TB_iframeContent").remove();
-					
-					var resize = "";
-					if(params['resizeIframe']){
-						resize = "resizeIframe();"
-					}
 					if(params['modal'] != "true"){//iframe no modal
-						$("#TB_window").append("<div id='TB_title'><div id='TB_ajaxWindowTitle'>"+caption+"</div><div id='TB_closeAjaxWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div></div><iframe frameborder='0' hspace='0' src='"+urlNoQuery[0]+"' id='TB_iframeContent' name='TB_iframeContent"+Math.round(Math.random()*1000)+"' onload='resizeIframe();tb_showIframe();' style='width:"+(ajaxContentW + 29)+"px;height:"+(ajaxContentH + 17)+"px;' > </iframe>");
+						$("#TB_window").append("<div id='TB_title'><div id='TB_ajaxWindowTitle'>"+caption+"</div><div id='TB_closeAjaxWindow'><a href='#' id='TB_closeWindowButton' title='Close'>close</a> or Esc Key</div></div><iframe frameborder='0' hspace='0' src='"+urlNoQuery[0]+"' id='TB_iframeContent' name='TB_iframeContent"+Math.round(Math.random()*1000)+"' onload='tb_showIframe()' style='width:"+(ajaxContentW + 29)+"px;height:"+(ajaxContentH + 17)+"px;' > </iframe>");
 					}else{//iframe modal
 					$("#TB_overlay").unbind();
-						$("#TB_window").append("<iframe frameborder='0' hspace='0' src='"+urlNoQuery[0]+"' id='TB_iframeContent' name='TB_iframeContent"+Math.round(Math.random()*1000)+"' onload='"+resize+"tb_showIframe();' style='width:"+(ajaxContentW + 29)+"px;height:"+(ajaxContentH + 17)+"px;'> </iframe>");
+						$("#TB_window").append("<iframe frameborder='0' hspace='0' src='"+urlNoQuery[0]+"' id='TB_iframeContent' name='TB_iframeContent"+Math.round(Math.random()*1000)+"' onload='tb_showIframe()' style='width:"+(ajaxContentW + 29)+"px;height:"+(ajaxContentH + 17)+"px;'> </iframe>");
 					}
 			}else{// not an iframe, ajax
 					if($("#TB_window").css("display") != "block"){
@@ -338,5 +325,3 @@ function tb_detectMacXFF() {
     return true;
   }
 }
-
-
