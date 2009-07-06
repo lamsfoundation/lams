@@ -1956,7 +1956,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			    boolean transitionBreak = true;
 			    for (TransitionDTO transDto : transDtoList) {
 				// we deal with progress transitions only
-				if (transDto.getTransitionType().equals(Transition.PROGRESS_TRANSITION_TYPE)) {
+				if (transDto.getTransitionType() == null
+					|| transDto.getTransitionType().equals(Transition.PROGRESS_TRANSITION_TYPE)) {
 				    // find out the transition of current first
 				    // activity
 				    if (nextActId.equals(transDto.getFromActivityID())) {
@@ -2356,7 +2357,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private Transition getTransition(TransitionDTO transDto, Map<Long, Activity> activityMapper) {
 
 	Transition trans = null;
-	if (transDto.getTransitionType().equals(Transition.DATA_TRANSITION_TYPE)) {
+	if (transDto.getTransitionType() != null
+		&& transDto.getTransitionType().equals(Transition.DATA_TRANSITION_TYPE)) {
 	    trans = new DataTransition();
 	} else {
 	    trans = new Transition();
