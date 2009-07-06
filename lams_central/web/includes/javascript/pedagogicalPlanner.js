@@ -168,7 +168,7 @@
   	 }
   }
   
-  function leaveNodeEditor(text,url){
+  function leavePageAfterConfirm(text,url){
 	 	if (text==null || confirm(text)){
   			document.location.href=url;
   		}

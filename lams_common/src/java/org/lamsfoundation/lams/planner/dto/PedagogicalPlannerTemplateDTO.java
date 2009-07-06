@@ -33,6 +33,15 @@ public class PedagogicalPlannerTemplateDTO {
     private List<PedagogicalPlannerActivityDTO> activities;
     private Long learningDesignID;
     private Integer activitySupportingPlannerCount = 0;
+    private Long nodeUid;
+
+    public Long getNodeUid() {
+	return nodeUid;
+    }
+
+    public void setNodeUid(Long nodeUid) {
+	this.nodeUid = nodeUid;
+    }
 
     public String getSequenceTitle() {
 	return sequenceTitle;

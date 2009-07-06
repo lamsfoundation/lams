@@ -333,11 +333,14 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	}
 	// create DTO for the whole design
+	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID);
+
 	PedagogicalPlannerTemplateDTO planner = new PedagogicalPlannerTemplateDTO();
 	planner.setActivitySupportingPlannerCount(activitySupportingPlannerCount);
 	planner.setSequenceTitle(learningDesign.getTitle());
 	planner.setActivities(activities);
 	planner.setLearningDesignID(learningDesign.getLearningDesignId());
+	planner.setNodeUid(nodeUid);
 
 	// Some additional options for submitting activity forms; should be moved to configuration file in the future
 	planner.setSendInPortions(false);
@@ -577,9 +580,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	getMonitoringService().startLesson(lesson.getLessonId(), userDto.getUserID());
 	String newPath = mapping.findForward(PedagogicalPlannerAction.FORWARD_PREVIEW).getPath();
 	newPath = newPath + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_LESSON_ID
-		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId() 
-		+ PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_MODE 
-		+ PedagogicalPlannerAction.CHAR_EQUALS + "preview";
+		+ PedagogicalPlannerAction.CHAR_EQUALS + lesson.getLessonId() + PedagogicalPlannerAction.CHAR_AMPERSAND
+		+ AttributeNames.PARAM_MODE + PedagogicalPlannerAction.CHAR_EQUALS + "preview";
 	return new ActionForward(newPath, true);
     }
 

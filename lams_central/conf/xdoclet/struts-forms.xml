@@ -37,6 +37,7 @@
 	<form-property name="lamsCommunityToken" type="java.lang.String" />
 	<form-property name="lamsCommunityUsername" type="java.lang.String" />
 	<form-property name="disableLamsCommunityUsername" type="java.lang.Boolean" />
+	<form-property name="tutorialsDisabled" type="java.lang.Boolean" />
 </form-bean>
 
 
