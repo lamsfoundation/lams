@@ -125,13 +125,6 @@ public class VideoRecorderDTO {
 						+ " contains invalid fileType: " + att.getFileType());
 			}
 		}
-		
-		for (Iterator iter = videoRecorder.getVideoRecorderSessions().iterator(); iter.hasNext();) {
-			VideoRecorderSession session = (VideoRecorderSession) iter.next();
-			VideoRecorderSessionDTO sessionDTO = new VideoRecorderSessionDTO(session);
-			
-			sessionDTOs.add(sessionDTO);
-		}
 	}
 
 	/* Getters / Setters */

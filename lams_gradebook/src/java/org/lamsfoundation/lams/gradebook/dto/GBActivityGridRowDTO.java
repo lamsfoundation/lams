@@ -44,6 +44,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
     String feedback;
     Date startDate;
 
+
     // Properties for activity view
     String monitorUrl;
     Long groupId;
@@ -65,6 +66,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	ret.add(id.toString());
 
 	if (view == GBGridView.MON_USER) {
+	    ret.add(marksAvailable != null ? marksAvailable.toString() : "");
 	    
 	    if (activityUrl != null && activityUrl.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>"
@@ -77,11 +79,13 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(competences);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    
+	    ret.add(markToString());
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
 	    
 	    ret.add(groupId != null ? groupId.toString() : "");
+
 	    if (monitorUrl != null && monitorUrl.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + monitorUrl + "\",\"" + rowName + "\",796,570)'>"
 			+ rowName + "</a>");
@@ -91,15 +95,19 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    
 	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add(competences);
-	    ret.add((averageMark != null) ? averageMark.toString() : CELL_EMPTY);
+	    
+	    
+	    ret.add(averageMarkToString());
 	} else if (view == GBGridView.LRN_ACTIVITY) {
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add(feedback);
 	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add((averageMark != null) ? averageMark.toString() : CELL_EMPTY); 
-	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY); 
+	    ret.add(averageMarkToString()); 
+	    
+	    
+	    ret.add(markToString()); 
 	}
 	
 	return ret;
@@ -159,5 +167,5 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
-    } 
+    }
 }

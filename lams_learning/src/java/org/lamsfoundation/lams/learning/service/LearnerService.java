@@ -283,7 +283,7 @@ public class LearnerService implements ICoreLearnerService {
 	    }
 	    // Use TimeStamp rather than Date directly to keep consistent with Hibnerate persiste object.
 	    learnerProgress.setStartDate(new Timestamp(new Date().getTime()));
-		learnerProgressDAO.saveLearnerProgress(learnerProgress);
+	    learnerProgressDAO.saveLearnerProgress(learnerProgress);
 
 	} else {
 

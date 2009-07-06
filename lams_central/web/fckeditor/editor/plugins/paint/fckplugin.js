@@ -7,13 +7,13 @@ FCKToolbarItems.RegisterItem( 'Paint_Button', oPaintItem ) ;
 
 var PaintCommand = new Object();
 PaintCommand.Add=function(source) {
-	FCK.InsertHtml('<img alt="FCKPainting" src="' + FCKConfig.PluginsPath + 'paint/' + source + '" style="border: none;"/>');
+	FCK.InsertHtml('<img class="fckeditor_paint" src="' + source + '" style="border: none;"/>');
 	FCK.Focus();
 }
 PaintCommand.startingImage = "";
 PaintCommand.OnDoubleClick = function( image )
 {
-	if(image.alt == "FCKPainting"){
+	if(image.getAttribute('class') == "fckeditor_paint"){
 		PaintCommand.startingImage = image.src;
 		FCKCommands.GetCommand('Paint canvas').Execute();
 	}

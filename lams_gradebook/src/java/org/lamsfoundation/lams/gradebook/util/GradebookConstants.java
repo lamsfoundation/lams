@@ -84,6 +84,9 @@ public class GradebookConstants {
     
     // Misc
     public static final String CONTENT_TYPE_TEXTXML = "text/xml";
+    public static final String CONTENT_TYPE_TEXTPLAIN = "text/plain";
+    public static final String CELL_EMPTY = "-";
+    public static final String UTF8 = "UTF8";
 
 }
  

@@ -36,7 +36,7 @@
 					// otherwise enable presence chat
 					else{
 						// if presence im is enabled
-						<c:if test="${param.presenceImEnabled}">
+						<c:if test="${param.presenceEnabledPatch}">
 							// make visible
 							$("#presenceChat").removeClass("startHidden");
 						

@@ -1,3 +1,7 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+            "http://www.w3.org/TR/html4/loose.dtd">
+            
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
@@ -23,7 +27,7 @@ Learn more about Flex at http://flex.org
 // -->
 
 <lams:head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
 <lams:css style="core"/>
 
 <title></title>
@@ -50,6 +54,7 @@ var requiredMajorVersion = 9;
 var requiredMinorVersion = 0;
 // Minor version of Flash required
 var requiredRevision = 124;
+var requiredRevisionIE = 159;
 
 var oEditor = window.opener;
 var FCKVideoRecorder=null;
@@ -81,7 +86,7 @@ function getLanguageXML(){
 		'videorecorder_tooltip_pause', 'videorecorder_tooltip_resume', 'videorecorder_tooltip_save_recording',
 		'videorecorder_tooltip_start_recording', 'videorecorder_tooltip_start_recording_again',
 		'videorecorder_tooltip_start_recording_next', 'videorecorder_tooltip_stop_recording',
-		'videorecorder_disabled', 'button_save', 'button_ok', 'button_cancel', 'button_yes', 'button_no');
+		'videorecorder_disabled', 'button_save', 'button_ok', 'button_cancel', 'button_yes', 'button_no', 'videorecorder_camera_not_available', 'videorecorder_mic_not_available');
 	
 	var languageOutput = "<xml><language>";
 	
@@ -141,7 +146,7 @@ function saveToFCKEditor(eventObj) {
 			var hasProductInstall = DetectFlashVer(6, 0, 65);
 			
 			// Version check based upon the values defined in globals
-			var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
+			var hasRequestedVersion = (isIE == true) ? DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevisionIE) : DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
 			
 			if ( hasProductInstall && !hasRequestedVersion ) {
 				// DO NOT MODIFY THE FOLLOWING FOUR LINES

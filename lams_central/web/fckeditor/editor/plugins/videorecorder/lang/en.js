@@ -31,3 +31,5 @@ FCKLang.videorecorder_tooltip_start_recording_next = 'Record another recording';
 FCKLang.videorecorder_tooltip_stop_recording = 'Stop recording';
 FCKLang.videorecorder_disabled = 'Disabled';
 FCKLang.videorecorder_error_noconfig  = 'LAMS does not have a media server configured. Please contact your system administrator.';
+FCKLang.videorecorder_camera_not_available = 'No camera was detected. Please connect one and restart your browser if you want to record video.';
+FCKLang.videorecorder_mic_not_available = 'No microphone was detected. Please connect one and restart your browser if you want to record audio.';

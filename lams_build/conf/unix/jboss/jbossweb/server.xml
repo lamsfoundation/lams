@@ -163,6 +163,12 @@
     		<!-- LAMS Login Request Valve -->
 			<Valve className="org.lamsfoundation.lams.integration.security.LoginRequestValve" />
 			
+			<!-- LAMS Single Sing On.
+				 The only difference from org.apache.catalina.authenticator.SingleSignOn,
+				 which can be enable above, is that removes some debugging info.
+				 Still, LAMS Valve does the trick and the base Valve does not...
+				 This case will be investigated in the future.
+			-->
 			<Valve className="org.lamsfoundation.lams.integration.security.SingleSignOn" debug="0"/>
        
          </Host>

@@ -11,6 +11,20 @@
 <lams:head>
 	<title>Course Gradebook Learner</title>
 	<lams:css />
+	
+	<style>
+		#content {
+			margin-top:20px;
+			margin-left:auto;
+			margin-right:auto;
+			margin-bottom:30px; 
+			width:680px; 
+			height:100%; 
+			border:1px solid #d4d8da;
+			background-color:#fff;
+			padding:20px 25px;
+		}
+	</style>
 
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 
@@ -58,7 +72,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#organisationGrid").clearGridData();
-			    	alert('<fmt:message key="gradebook.error.loaderror"/>');
+			    	info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -89,7 +103,7 @@
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
 								{name:'rowName', index:'rowName', sortable:false, editable: false, width:100},
 								{name:'status', index:'status', sortable:false, editable:false, width:50, align:"center"},
-								{name:'feedback', index:'feedback', sortable:false, editable: false},
+								{name:'feedback', index:'feedback', sortable:false, editable: false, hidden:true},
 								{name:'averageTimeTaken',index:'averageTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
 			      				{name:'timeTaken',index:'timeTaken', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
 			      				{name:'averageMark',index:'averageMark', sortable:true, editable:false, search:false, width:50, align:"center"},
@@ -97,7 +111,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	alert('<fmt:message key="gradebook.error.loaderror"/>');
+						    	info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"));
@@ -148,6 +162,7 @@
 		<div id="header-no-tabs"></div>
 		
 		<div id="content">
+			<lams:help module="gradebook" page="My+Grades" style="no-tabs"/>
 			<h1 class="no-tabs-below">
 				<fmt:message key="gradebook.title.myGradebook">
 					<fmt:param>
@@ -156,7 +171,7 @@
 				</fmt:message>
 			</h1>
 			<br />
-			<div style="width: 600px; margin-left: auto; margin-right: auto;">
+			<div style="width: 600px; margin-left: 20px; margin-right: 20px">
 				<table id="organisationGrid" class="scroll"></table>
 				<div id="organisationGridPager" class="scroll"></div>
 				

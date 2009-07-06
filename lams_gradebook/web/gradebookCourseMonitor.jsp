@@ -11,7 +11,21 @@
 <lams:head>
 	<title><fmt:message key="gradebook.title.window.courseMonitor"/></title>
 	<lams:css />
-
+	
+	<style>
+		#content {
+			margin-top:20px;
+			margin-left:auto;
+			margin-right:auto;
+			margin-bottom:30px; 
+			width:707px; 
+			height:100%; 
+			border:1px solid #d4d8da;
+			background-color:#fff;
+			padding:20px 25px;
+		}
+	</style>
+	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 
 	<script type="text/javascript">
@@ -23,7 +37,7 @@
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=monCourse&organisationID=${organisationID}",
 			    height: "100%",
-			    width: 700,
+			    width: 660,
 			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 			    sortorder: "asc", 
 			    sortname: "id", 
@@ -41,14 +55,14 @@
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
-			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false},
+			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false, width:80},
 			      {name:'startDate',index:'startDate', sortable:false, editable:false, search:false, width:80, align:"center"},
 			      {name:'avgTimeTaken',index:'avgTimeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'avgMark',index:'avgMark', sortable:true, editable:false, search:false, width:50, align:"center"}
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#organisationGrid").clearGridData();
-			    	alert('<fmt:message key="gradebook.error.loaderror"/>');
+			    	info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -60,7 +74,7 @@
 					     datatype: "xml",
 					     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monCourse&lessonID=" + lessonID,
 					     height: "100%",
-					     width: 650,
+					     width: 600,
 					     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 					     cellEdit:true,
 					     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradebookData&lessonID=" + lessonID,
@@ -87,32 +101,18 @@
 					     ],
 					     loadError: function(xhr,st,err) {
 				    		jQuery("#"+subgrid_table_id).clearGridData();
-				    		alert('<fmt:message key="gradebook.error.loaderror"/>');
+				    		info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
 				    	 },
 					     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
 					     	
 					     	// update the lesson average mark
 					     	if (cellname == "mark") {
-					     		var ids = jQuery("#"+subgrid_table_id).getDataIDs()
-						     	var sumMarks = 0.0;
-						     	var count = 0;
-						     	for (var i = 0; i < ids.length; i++) {
-						     		var rowData = jQuery("#"+subgrid_table_id).getRowData(ids[i]);
-						     		var lessonMark = rowData["mark"];
-						     		
-						     		if (lessonMark != "-") {
-						     			sumMarks += parseFloat(lessonMark);
-						     			count ++;
-						     		}
-						     	}						     	
-						     	var average;
-						     	if (count>0) {
-						     		average = sumMarks / count;
-						     	} else {
-						     		average = value;
-								}
-
-						     	jQuery("#organisationGrid").setCell(row_id, "mark", average, "", "");
+					     		// Update the average activity mark
+						     	$.get("<lams:LAMSURL/>/gradebook/gradebook.do", {dispatch:"getLessonMarkAverage", lessonID:lessonID}, function(xml) {
+							    	if (xml!=null) {
+							    		jQuery("#organisationGrid").setCell(row_id, "avgMark", xml, "", "");
+							    	} 
+							    });
 					     	}
 					     },
 						 gridComplete: function(){
@@ -174,6 +174,7 @@
 		<div id="header-no-tabs"></div>
 		
 		<div id="content">
+			<lams:help module="gradebook" page="Gradebook+Course+Monitor" style="no-tabs"/>
 			<h1 class="no-tabs-below">
 				<fmt:message key="gradebook.title.courseMonitor">
 					<fmt:param>
@@ -182,7 +183,7 @@
 				</fmt:message>
 			</h1>
 			<br />
-			<div style="width: 700px; margin-left: auto; margin-right: auto;">
+			<div style="width: 700px; margin-left: 10px; margin-right: 10px;">
 				<table id="organisationGrid" class="scroll"></table>
 				<div id="organisationGridPager" class="scroll"></div>
 				

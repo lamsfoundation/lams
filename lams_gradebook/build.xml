@@ -217,6 +217,8 @@
 				<include name="**/*.properties" />
 			</fileset>
 		</copy>
+		
+		<copy file="${build.lib}/${product}.jar" todir="${sharedlib}/lams"/>
 	</target>
 
 

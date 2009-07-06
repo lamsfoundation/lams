@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -61,17 +62,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class LearningWebUtil {
 
     private static Logger log = Logger.getLogger(LearningWebUtil.class);
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Class level constants - session attributes
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
     public static final String PARAM_PROGRESS_ID = "progressID";
 
-    //	public static final String POPUP_WINDOW_NAME = "LearnerActivity";
-    //	public static final String LEARNER_WINDOW_NAME = "lWindow";
+    // public static final String POPUP_WINDOW_NAME = "LearnerActivity";
+    // public static final String LEARNER_WINDOW_NAME = "lWindow";
 
     /**
-     * Helper method to retrieve the user data. Gets the id from the user
-     * details in the shared session
+     * Helper method to retrieve the user data. Gets the id from the user details in the shared session
      * 
      * @return the user id
      */
@@ -82,8 +82,8 @@ public class LearningWebUtil {
     }
 
     /**
-     * Helper method to retrieve the user data. Gets the id from the user
-     * details in the shared session then retrieves the real user object.
+     * Helper method to retrieve the user data. Gets the id from the user details in the shared session then retrieves
+     * the real user object.
      */
     public static User getUser(ICoreLearnerService learnerService) {
 	HttpSession ss = SessionManager.getSession();
@@ -93,9 +93,8 @@ public class LearningWebUtil {
     }
 
     /**
-     * Put the learner progress in the request. This allows some optimisation
-     * between the code that updates the progress and the next action which will
-     * access the progress.
+     * Put the learner progress in the request. This allows some optimisation between the code that updates the progress
+     * and the next action which will access the progress.
      */
     public static void putLearnerProgressInRequest(HttpServletRequest request, LearnerProgress progress) {
 	if (progress != null) {
@@ -106,22 +105,20 @@ public class LearningWebUtil {
     }
 
     /**
-     * Get the current learner progress. Check the request - in some cases it
-     * may be there.
+     * Get the current learner progress. Check the request - in some cases it may be there.
      * 
-     * If not, the learner progress id might be in the request (if we've just
-     * come from complete activity). If so, get it from the db using the learner
-     * progress.
+     * If not, the learner progress id might be in the request (if we've just come from complete activity). If so, get
+     * it from the db using the learner progress.
      * 
-     * If the learner progress id isn't available, then we have to look it up
-     * using activity based on the activity / activity id in the request.
+     * If the learner progress id isn't available, then we have to look it up using activity based on the activity /
+     * activity id in the request.
      */
     public static LearnerProgress getLearnerProgress(HttpServletRequest request, ICoreLearnerService learnerService) {
 	LearnerProgress learnerProgress = (LearnerProgress) request
 		.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
 	if (learnerProgress != null) {
-	    if (log.isDebugEnabled()) {
-		log.debug("getLearnerProgress: found progress in the request");
+	    if (LearningWebUtil.log.isDebugEnabled()) {
+		LearningWebUtil.log.debug("getLearnerProgress: found progress in the request");
 	    }
 	    return learnerProgress;
 	}
@@ -131,14 +128,16 @@ public class LearningWebUtil {
 	    // temp hack until Flash side updates it call.
 	    if (learnerProgressId == null) {
 		learnerProgressId = WebUtil.readLongParam(request, "progressId", true);
-		if (learnerProgressId != null)
-		    log.warn("Flash client still using progressId, instead of progressID in a learner call");
+		if (learnerProgressId != null) {
+		    LearningWebUtil.log
+			    .warn("Flash client still using progressId, instead of progressID in a learner call");
+		}
 	    }
 
 	    if (learnerProgressId != null) {
 		learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
-		if (learnerProgress != null && log.isDebugEnabled()) {
-		    log.debug("getLearnerProgress: found progress via progress id");
+		if (learnerProgress != null && LearningWebUtil.log.isDebugEnabled()) {
+		    LearningWebUtil.log.debug("getLearnerProgress: found progress via progress id");
 		}
 	    }
 
@@ -149,8 +148,8 @@ public class LearningWebUtil {
 	    Activity act = getActivityFromRequest(request, learnerService);
 	    Lesson lesson = learnerService.getLessonByActivity(act);
 	    learnerProgress = learnerService.getProgress(learnerId, lesson.getLessonId());
-	    if (learnerProgress != null && log.isDebugEnabled()) {
-		log.debug("getLearnerProgress: found progress via learner id and activity");
+	    if (learnerProgress != null && LearningWebUtil.log.isDebugEnabled()) {
+		LearningWebUtil.log.debug("getLearnerProgress: found progress via learner id and activity");
 	    }
 	}
 
@@ -159,9 +158,8 @@ public class LearningWebUtil {
     }
 
     /**
-     * Get the activity from request. We assume there is a parameter coming in
-     * if there is no activity can be found in the http request. Then the
-     * activity id parameter is used to retrieve from database.
+     * Get the activity from request. We assume there is a parameter coming in if there is no activity can be found in
+     * the http request. Then the activity id parameter is used to retrieve from database.
      * 
      * @param request
      * @return
@@ -183,9 +181,8 @@ public class LearningWebUtil {
     }
 
     /**
-     * Put an activity into the request. Calls LearnerService to get the
-     * activity, to ensure that it is a "real" activity, not one of the cglib
-     * proxies. activity.
+     * Put an activity into the request. Calls LearnerService to get the activity, to ensure that it is a "real"
+     * activity, not one of the cglib proxies. activity.
      * 
      * @param request
      * @param activity
@@ -201,18 +198,16 @@ public class LearningWebUtil {
     }
 
     /**
-     * "Complete" an activity from the web layer's perspective. Used for
-     * CompleteActivityAction and the Gate and Grouping actions. Calls the
-     * learningService to actually complete the activity and progress.
+     * "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and
+     * Grouping actions. Calls the learningService to actually complete the activity and progress.
      * 
      * @param redirect
-     *                Should this call redirect to the next screen (true) or use
-     *                a forward (false)
+     *                Should this call redirect to the next screen (true) or use a forward (false)
      * @param windowName
-     *                Name of the window that triggered this code. Normally
-     *                LearnerActivity (the popup window) or lWindow (normal
-     *                learner window)
+     *                Name of the window that triggered this code. Normally LearnerActivity (the popup window) or
+     *                lWindow (normal learner window)
      * @throws UnsupportedEncodingException
+     * @throws InterruptedException
      * 
      */
     public static ActionForward completeActivity(HttpServletRequest request, HttpServletResponse response,
@@ -228,12 +223,24 @@ public class LearningWebUtil {
 	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	} else {
-	    // Set activity as complete
-	    progress = learnerService.completeActivity(learnerId, currentActivity, progress);
+	    // Set activity as complete; synchronized and repeated because of deadlock exceptions
+	    try {
+		progress = learnerService.completeActivity(learnerId, currentActivity, progress);
+	    } catch (CannotAcquireLockException e) {
+		LearningWebUtil.log.warn("Can not acquire lock to complete activity " + currentActivity.getActivityId()
+			+ " by learner " + learnerId + ". Retrying...");
+		try {
+		    Thread.sleep(2000);
+		} catch (InterruptedException e1) {
+		    // do nothing, it does not hurt us...
+		}
+		progress = learnerService.completeActivity(learnerId, currentActivity, progress);
+	    }
 	}
 
-	if (currentActivity != null && currentActivity.isFloating())
+	if (currentActivity != null && currentActivity.isFloating()) {
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
+	}
 
 	LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
 	LearningWebUtil.putLearnerProgressInRequest(request, progress);
@@ -267,19 +274,20 @@ public class LearningWebUtil {
 	    activityForm.setLessonID(currentLesson.getLessonId());
 
 	    LearningDesign currentDesign = currentLesson.getLearningDesign();
-	    if (currentDesign != null)
+	    if (currentDesign != null) {
 		activityForm.setVersion(currentDesign.getDesignVersion());
+	    }
 	}
 
-	if (log.isDebugEnabled())
-	    log.debug("Entering activity: progress summary is " + activityForm.getProgressSummary());
+	if (LearningWebUtil.log.isDebugEnabled()) {
+	    LearningWebUtil.log.debug("Entering activity: progress summary is " + activityForm.getProgressSummary());
+	}
 
     }
 
     /**
-     * Setup the progress string, version and lesson id in the actionForm. The
-     * values will go in the map with the keys "progressSummary", "lessonID",
-     * "version".
+     * Setup the progress string, version and lesson id in the actionForm. The values will go in the map with the keys
+     * "progressSummary", "lessonID", "version".
      */
     public static void setupProgressInRequest(DynaActionForm actionForm, HttpServletRequest request,
 	    LearnerProgress learnerProgress) {
@@ -299,12 +307,14 @@ public class LearningWebUtil {
 	    actionForm.set("lessonID", currentLesson.getLessonId());
 
 	    LearningDesign currentDesign = currentLesson.getLearningDesign();
-	    if (currentDesign != null)
+	    if (currentDesign != null) {
 		actionForm.set("version", currentDesign.getDesignVersion());
+	    }
 	}
 
-	if (log.isDebugEnabled())
-	    log.debug("Entering activity: progress summary is " + actionForm.get("progressSummary"));
+	if (LearningWebUtil.log.isDebugEnabled()) {
+	    LearningWebUtil.log.debug("Entering activity: progress summary is " + actionForm.get("progressSummary"));
+	}
 
     }
 

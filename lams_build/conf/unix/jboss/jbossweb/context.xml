@@ -13,6 +13,10 @@
    role for servlet init/destroy events.
    -->
    <InstanceListener>org.jboss.web.tomcat.security.RunAsListener</InstanceListener>
-   		<Valve className="org.lamsfoundation.lams.web.session.LoginFormAuthenticator"
+   
+   <!-- 
+   		LAMS Valve
+    -->
+   	<Valve className="org.lamsfoundation.lams.web.session.LoginFormAuthenticator"
 			disableProxyCaching="false" />
 </Context>

@@ -52,10 +52,12 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    //ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    ret.add(markToString());
 	    
 	} else if (view == GBGridView.MON_ACTIVITY){
 	    
+	    ret.add(marksAvailable != null ? marksAvailable.toString() : "");
 	    if (activityUrl != null && activityUrl.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>" + rowName
 			+ "</a>");
@@ -66,14 +68,16 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add((output != null) ? output.toString() : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    //ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    ret.add(markToString());
 	    
 	} else if (view == GBGridView.MON_COURSE){
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    //ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    ret.add(markToString());
 	}
 
 	return ret;

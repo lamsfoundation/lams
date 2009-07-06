@@ -23,7 +23,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook.web.action;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
@@ -44,11 +44,9 @@ import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -79,7 +77,6 @@ public class GradebookAction extends LamsDispatchAction {
     private static IGradebookService gradebookService;
     private static IUserManagementService userService;
     private static ILessonService lessonService;
-    private static IMonitoringService monitoringService;
 
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -163,9 +160,7 @@ public class GradebookAction extends LamsDispatchAction {
 	    String ret = GradebookUtil.toGridXML(gradebookActivityDTOs, view, sortBy, isSearch, searchField,
 		    searchOper, searchString, sortOrder, rowLimit, page);
 
-	    response.setContentType(GradebookConstants.CONTENT_TYPE_TEXTXML);
-	    PrintWriter out = response.getWriter();
-	    out.print(ret);
+	    writeResponse(response, CONTENT_TYPE_TEXT_XML, ENCODING_UTF8, ret);
 	} else {
 	    logger.error("No lesson could be found for: " + lessonID);
 	}
@@ -237,7 +232,7 @@ public class GradebookAction extends LamsDispatchAction {
 		// Getting the group id if it is there
 		Long groupId = WebUtil.readLongParam(request, GradebookConstants.PARAM_GROUP_ID, true);
 		
-		Activity activity = monitoringService.getActivityById(activityID);
+		Activity activity = gradebookService.getActivityById(activityID);
 		if (activity != null && activity instanceof ToolActivity) {
 		    gradebookUserDTOs = gradebookService.getGBUserRowsForActivity(lesson, (ToolActivity)activity, groupId);
 		} else {
@@ -250,9 +245,7 @@ public class GradebookAction extends LamsDispatchAction {
 	    String ret = GradebookUtil.toGridXML(gradebookUserDTOs, view, sortBy, isSearch, searchField, searchOper,
 		    searchString, sortOrder, rowLimit, page);
 
-	    response.setContentType(GradebookConstants.CONTENT_TYPE_TEXTXML);
-	    PrintWriter out = response.getWriter();
-	    out.print(ret);
+	    writeResponse(response, CONTENT_TYPE_TEXT_XML, ENCODING_UTF8, ret);
 	} else {
 	    logger.error("No lesson could be found for: " + lessonID);
 	}
@@ -315,9 +308,8 @@ public class GradebookAction extends LamsDispatchAction {
 		String ret = GradebookUtil.toGridXML(gradebookLessonDTOs, view, sortBy, isSearch, searchField,
 			searchOper, searchString, sortOrder, rowLimit, page);
 
-		response.setContentType(GradebookConstants.CONTENT_TYPE_TEXTXML);
-		PrintWriter out = response.getWriter();
-		out.print(ret);
+		
+		writeResponse(response, CONTENT_TYPE_TEXT_XML, ENCODING_UTF8, ret);
 
 	    }
 
@@ -328,6 +320,109 @@ public class GradebookAction extends LamsDispatchAction {
 
 	return null;
     }
+    
+    /**
+     * Gets the total mark for a user's lesson and writes the result in the 
+     * response
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward getLessonMarkAggregate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    	    HttpServletResponse response) throws Exception {
+    	initServices();
+
+    	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+    	Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
+
+    	Lesson lesson = lessonService.getLesson(lessonID);
+    	User learner = (User) userService.findById(User.class, userID);
+
+
+    	if (lesson != null && learner != null) {
+    	    GradebookUserLesson lessonMark = gradebookService.getGradebookUserLesson(lessonID, userID);
+    	    writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, lessonMark.getMark().toString());
+    	} else {
+    	    // Grid will handle error, just log and return null
+    	    logger.error("Error: request for course gradebook data with null user or lesson. lessonID: " + lessonID);
+    	}
+    	return null;
+    }
+    
+    /**
+     * Gets the average mark for an activity and writes the result in the 
+     * response
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward getActivityMarkAverage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    	    HttpServletResponse response) throws Exception {
+	initServices();
+
+    	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+    	Activity activity = gradebookService.getActivityById(activityID);
+    	
+    	if (activity != null) {
+    	    Double averageMark = gradebookService.getAverageMarkForActivity(activityID);
+
+    	    
+    	    if (averageMark != null) {
+    		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, averageMark.toString());
+    	    } else {
+    		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, GradebookConstants.CELL_EMPTY);
+    	    }
+    	} else {
+    	    // Grid will handle error, just log and return null
+    	    logger.error("Error: request for course gradebook data with null activity. actvity: " + activityID);
+    	}
+    	return null;
+    }
+    
+    /**
+     * Gets the average mark for lesson and writes the result in the response
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward getLessonMarkAverage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    	    HttpServletResponse response) throws Exception {
+	initServices();
+
+    	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+    	Lesson lesson = lessonService.getLesson(lessonID);
+    	
+    	if (lesson != null) {
+    	    Double averageMark = gradebookService.getAverageMarkForLesson(lessonID);
+    	    
+    	    if (averageMark != null) {
+    		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, averageMark.toString());
+    	    } else {
+    		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, GradebookConstants.CELL_EMPTY);
+    	    }
+    	} else {
+    	    // Grid will handle error, just log and return null
+    	    logger.error("Error: request for course gradebook data with null lesson. lesson: " + lessonID);
+    	}
+    	return null;
+    }
+    
+
 
     private UserDTO getUser() {
 	HttpSession ss = SessionManager.getSession();
@@ -346,7 +441,6 @@ public class GradebookAction extends LamsDispatchAction {
     private void initServices() {
 	getUserService();
 	getLessonService();
-	getMonitoringServiceService();
 	getGradebookService();
     }
 
@@ -366,15 +460,6 @@ public class GradebookAction extends LamsDispatchAction {
 	    lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return lessonService;
-    }
-
-    private IMonitoringService getMonitoringServiceService() {
-	if (monitoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
-	}
-	return monitoringService;
     }
 
     private IGradebookService getGradebookService() {

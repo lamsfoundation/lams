@@ -943,6 +943,9 @@ border:0px;
 .mycourses-monitor-img {background: url('../images/css/mycourses_monitor.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
+.mycourses-mark-img {background: url('../images/css/mark.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
+}
+
 .mycourses-addlesson-img {background: url('../images/css/mycourses_addlesson.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px;
 }
 
@@ -1156,6 +1159,46 @@ ul.more-actions-list li {
 
 #content a:hover.more-actions-button {
         background: url('../images/css/more_options.png') no-repeat 0px 0px;
+        color: #47bc23;
+	padding: 5px 12px 6px 30px;
+        text-decoration: none;
+        border-right:1px solid #d2d2d2;
+        border-bottom: 0px;
+	display: run-in;
+}
+
+#content a.my-grades-button {
+	background: url('../images/css/my-grades.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	display: run-in;
+}
+
+#content a:hover.my-grades-button {
+        background: url('../images/css/my-grades.png') no-repeat 0px 0px;
+        color: #47bc23;
+	padding: 5px 12px 6px 30px;
+        text-decoration: none;
+        border-right:1px solid #d2d2d2;
+        border-bottom: 0px;
+	display: run-in;
+}
+
+#content a.course-gradebook-button {
+	background: url('../images/css/course_gradebook.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	display: run-in;
+}
+
+#content a:hover.course-gradebook-button {
+        background: url('../images/css/course_gradebook.png') no-repeat 0px 0px;
         color: #47bc23;
 	padding: 5px 12px 6px 30px;
         text-decoration: none;
