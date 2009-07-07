@@ -150,19 +150,19 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	 * Tests tool authoring.  
 	 * Should be overridden by all subclasses.
 	 */
-	protected abstract void authoringTest();
+	protected abstract void authoringTest() throws Exception;
 	
 	/**
-	 * Tests tool learning.  
+	 * Tests tool learning. Always should begin with setUpLearning() and end up with tearDownLearning() methods.
 	 * Should be overridden by all subclasses.
 	 */
-	protected abstract void learningTest();
+	protected abstract void learningTest() throws Exception;
 	
 	/**
 	 * Tests tool monitoring.  
 	 * Should be overridden by all subclasses.
 	 */
-	protected abstract void monitoringTest();
+	protected abstract void monitoringTest() throws Exception;
 
 	// TODO change this behavior (after main workflow will be setted up)
 	private String toolContentID;
@@ -288,20 +288,19 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 //		flexSelenium.flexType("resourceName_txi", "bueno");
 		flexSelenium.flexClick("startButton");
 		Thread.sleep(25000);
-		assertTrue("Lesson creation failed", lastCreatedLessonId < getLastCreatedLessonId(true));
+		assertTrue("Assertion failed. Lesson has *not* been created", lastCreatedLessonId < getLastCreatedLessonId(true));
 	}
 	
 	/**
 	 * Prepares learning environment. Should be invoked each time learning is going to be tested.
+	 * @throws InterruptedException 
 	 */
-	protected void setUpLearning() {
+	protected void setUpLearning() throws InterruptedException {
 		selenium.runScript("openLearner(" + getLastCreatedLessonId(false) + ")");
-//		selenium.click("link=" + getLearningDesignName());
 		selenium.waitForPopUp("lWindow", "30000");
-		String previousSpeed = selenium.getSpeed();
-		selenium.setSpeed("3000");
 		selenium.selectWindow("lWindow");
-		selenium.setSpeed(previousSpeed);
+		Thread.sleep(3000);
+		selenium.selectFrame("contentFrame");
 	}
 	
 	/**
@@ -360,6 +359,27 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	// methods for testing Flex
 	// *****************************************************************************
 
+	/**
+	 * Waits till element will be present on a page.
+	 * 
+	 * @param locator - an element locator
+	 * @throws InterruptedException 
+	 */
+	protected void waitForElementPresent(String locator) throws InterruptedException {
+		for (int second = 0;; second++) {
+			if (second >= 30) {
+				fail("Timeout while waiting for element with locator " + locator);
+			}
+			try {
+				if (selenium.isElementPresent(locator)) {
+					break;
+				}
+			} catch (Exception e) {
+			}
+			Thread.sleep(1000);
+		}
+	}
+	
 	protected void waitForFlexExists(String objectID, int timeout,	DefaultSeleniumFlex selenium) throws Exception {
 		while (timeout > 0	&& !selenium.getFlexExists(objectID).contains("true")) {
 			Thread.sleep(1000);

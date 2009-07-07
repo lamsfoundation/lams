@@ -48,7 +48,7 @@ public class TestNotebook extends AbstractSeleniumTestCase {
 		selenium.type("onlineInstruction__lamstextarea", "online instructions");
 	}
 
-	protected void learningTest() {
+	protected void learningTest() throws InterruptedException {
 		setUpLearning();
 		assertEquals("LAMS Learner", selenium.getTitle());
 		assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
