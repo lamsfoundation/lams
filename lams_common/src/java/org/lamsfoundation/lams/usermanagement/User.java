@@ -172,6 +172,7 @@ public class User implements Serializable, Comparable {
     /** persistent field - latch */
     private Boolean firstLogin;
 
+    /** persistent field - for Pedagogical Planner */
     private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<Long>();
 
     // ------- TIMEZONES (hardcoded, there is no need to put them into database --------------

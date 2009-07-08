@@ -40,12 +40,15 @@ public class PedagogicalPlannerSequenceNodeDTO {
     private Boolean locked;
     private List<PedagogicalPlannerSequenceNodeDTO> subnodes;
     private Long parentUid;
+    // which existing LD to open
     private Long learningDesignId;
+
     // Not node-bound variables, but simply attributes used in JSP page
     private Boolean edit = false;
     private Boolean createSubnode = false;
     private Boolean isSysAdmin = true;
     private Boolean importNode = false;
+    // for the list on the main screen
     private List<PedagogicalPlannerSequenceNodeDTO> recentlyModifiedNodes;
 
     private static final String FULL_DESCRIPTION_NOT_EMPTY = "FULL";

@@ -1468,8 +1468,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	HttpSession session = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
 	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
+	// the list is sorted most-recently-edited-on-top (so by the timestamp descending)
 	Set<Long> recentLDs = user.getRecentlyModifiedLearningDesigns();
 	List<PedagogicalPlannerSequenceNodeDTO> recentNodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
+	// create "dummy", almost empty nodes
 	for (Long learningDesignId : recentLDs) {
 	    LearningDesign learningDesign = getAuthoringService().getLearningDesign(learningDesignId);
 
@@ -1482,12 +1484,20 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return recentNodes;
     }
 
+    /**
+     * Adds the Learning Design to the list of recenlty edited sequences. It puts the selected LD on the top of the
+     * list.
+     * 
+     * @param learningDesignId
+     */
     private void updateRecentLearningDesignList(Long learningDesignId) {
 	HttpSession session = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
 	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
+	// the list is sorted most-recently-edited-on-top (so by the timestamp descending)
 	Set<Long> recentLDs = user.getRecentlyModifiedLearningDesigns();
 	boolean ldFound = false;
+	// if LD is already in the list, remove it and add it again - it a way to refresh the timestamp in DB
 	Iterator<Long> iter = recentLDs.iterator();
 	while (iter.hasNext()) {
 	    Long recentLD = iter.next();
@@ -1498,7 +1508,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		break;
 	    }
 	}
-
+	// if LD was not in the list, but the list is full, remove the last entry
 	if (!ldFound && recentLDs.size() >= CentralConstants.PLANNER_RECENT_LD_MAX_COUNT) {
 	    iter.remove();
 	}
