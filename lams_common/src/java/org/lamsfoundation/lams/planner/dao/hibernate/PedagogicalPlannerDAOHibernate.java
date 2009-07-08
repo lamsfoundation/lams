@@ -48,6 +48,12 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
     private static final String FIND_NEIGHBOUR_NODE = "FROM " + PedagogicalPlannerSequenceNode.class.getName()
 	    + " AS n WHERE ((? IS NULL AND n.parent=NULL) OR  n.parent.uid=?) AND n.order=?";
 
+    /*
+     * private static final String FIND_RECENTLY_MODIFIED_LD = "SELECT ld FROM " + LearningDesign.class.getName() + " AS
+     * ld, lams_planner_recent_learning_designs AS recent WHERE recent.user_id=? AND
+     * ld.learningDesignId=recent.learning_design_id ORDER BY recent.last_modified_date DESC LIMIT ?";
+     */
+
     public PedagogicalPlannerSequenceNode getByUid(Long uid) {
 	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().get(PedagogicalPlannerSequenceNode.class, uid);
     }

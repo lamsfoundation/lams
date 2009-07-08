@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -268,9 +269,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     /*----------------------- TEMPLATE CHOOSER METHODS --------------------*/
 
     /**
-     * Opens template from sequence chooser.
+     * Opens a new template from sequence chooser.
      */
-    public ActionForward openTemplate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward openNewTemplate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 
 	ActionMessages errors = new ActionMessages();
@@ -286,6 +287,26 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    saveErrors(request, errors);
 	    // If anything goes wrong, errors will be displayed at top. This approach is used widely in this action.
 	    return openSequenceNode(mapping, form, request, nodeUid);
+	}
+	return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
+    }
+
+    /**
+     * Opens an existing learning design.
+     */
+    public ActionForward openExistingTemplate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+
+	Long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+
+	// Open the learning design stored in DB.
+	LearningDesign learningDesign = getAuthoringService().getLearningDesign(learningDesignId);
+	ActionMessages errors = openTemplate(request, learningDesign);
+
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	    // If anything goes wrong, errors will be displayed at top. This approach is used widely in this action.
+	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
     }
@@ -333,7 +354,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	}
 	// create DTO for the whole design
-	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID);
+	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 
 	PedagogicalPlannerTemplateDTO planner = new PedagogicalPlannerTemplateDTO();
 	planner.setActivitySupportingPlannerCount(activitySupportingPlannerCount);
@@ -348,6 +369,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	planner.setActivitiesPerPortion(2);
 
 	request.setAttribute(CentralConstants.ATTR_PLANNER, planner);
+
+	updateRecentLearningDesignList(learningDesign.getLearningDesignId());
 	return errors;
     }
 
@@ -664,6 +687,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	if (dto == null) {
 	    // No filtering or something went wrong in filtering
 	    dto = new PedagogicalPlannerSequenceNodeDTO(node, node.getSubnodes());
+	    if (nodeUid == null) {
+		dto.setRecentlyModifiedNodes(getRecentlyModifiedLearnindDesignsAsNodes());
+	    }
 	}
 
 	// Additional DTO parameters
@@ -1437,6 +1463,49 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_GROUPING);
     }
 
+    private List<PedagogicalPlannerSequenceNodeDTO> getRecentlyModifiedLearnindDesignsAsNodes() {
+	// Add the recently modified learning design list, if it's the root node with no filtering
+	HttpSession session = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
+	Set<Long> recentLDs = user.getRecentlyModifiedLearningDesigns();
+	List<PedagogicalPlannerSequenceNodeDTO> recentNodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
+	for (Long learningDesignId : recentLDs) {
+	    LearningDesign learningDesign = getAuthoringService().getLearningDesign(learningDesignId);
+
+	    PedagogicalPlannerSequenceNodeDTO node = new PedagogicalPlannerSequenceNodeDTO();
+	    node.setTitle(learningDesign.getTitle());
+	    node.setLearningDesignId(learningDesignId);
+
+	    recentNodes.add(node);
+	}
+	return recentNodes;
+    }
+
+    private void updateRecentLearningDesignList(Long learningDesignId) {
+	HttpSession session = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
+	Set<Long> recentLDs = user.getRecentlyModifiedLearningDesigns();
+	boolean ldFound = false;
+	Iterator<Long> iter = recentLDs.iterator();
+	while (iter.hasNext()) {
+	    Long recentLD = iter.next();
+	    if (recentLD.equals(learningDesignId)) {
+		iter.remove();
+		getUserManagementService().save(user);
+		ldFound = true;
+		break;
+	    }
+	}
+
+	if (!ldFound && recentLDs.size() >= CentralConstants.PLANNER_RECENT_LD_MAX_COUNT) {
+	    iter.remove();
+	}
+	recentLDs.add(learningDesignId);
+	getUserManagementService().save(user);
+    }
+
     /*-------------------------- TEMPLATE BASE METHODS -----------------*/
 
     /**
@@ -1632,4 +1701,5 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	}
     }
+
 }

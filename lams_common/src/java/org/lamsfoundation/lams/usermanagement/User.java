@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -170,6 +171,8 @@ public class User implements Serializable, Comparable {
 
     /** persistent field - latch */
     private Boolean firstLogin;
+
+    private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<Long>();
 
     // ------- TIMEZONES (hardcoded, there is no need to put them into database --------------
 
@@ -896,4 +899,19 @@ public class User implements Serializable, Comparable {
     public void setFirstLogin(Boolean firstLogin) {
 	this.firstLogin = firstLogin;
     }
+
+    /**
+     * @hibernate.set lazy="true" table="lams_planner_recent_learning_designs" cascade="all-delete-orphan"
+     *                order-by="last_modified_date DESC"
+     * @hibernate.collection-key column="user_id"
+     * @hibernate.collection-element column="learning_design_id" type="long" not-null="true"
+     */
+    public Set<Long> getRecentlyModifiedLearningDesigns() {
+	return recentlyModifiedLearningDesigns;
+    }
+
+    public void setRecentlyModifiedLearningDesigns(Set<Long> recentlyModifiedLearningDesigns) {
+	this.recentlyModifiedLearningDesigns = recentlyModifiedLearningDesigns;
+    }
+
 }

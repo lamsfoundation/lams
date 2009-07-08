@@ -569,6 +569,22 @@
         </meta>    
     </property>
     
+   <set
+    name="recentlyModifiedLearningDesigns"
+    table="lams_planner_recent_learning_designs"
+    lazy="true"
+    inverse="false"
+    cascade="all-delete-orphan"
+    sort="unsorted"
+    order-by="last_modified_date DESC"
+    
+	>
+
+    	<key column="user_id"></key>
+
+	    <element  column="learning_design_id" type="long" not-null="true" />
+   </set>
+    
     <set name="pagesWithDisabledTutorials" lazy="false" table="lams_user_disabled_tutorials" cascade="all-delete-orphan">
         <key><column name="user_id" /></key>
         <element  column="page_str" type="string" length="5" not-null="true" />

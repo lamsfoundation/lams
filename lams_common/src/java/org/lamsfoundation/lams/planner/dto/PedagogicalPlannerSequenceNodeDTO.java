@@ -40,11 +40,13 @@ public class PedagogicalPlannerSequenceNodeDTO {
     private Boolean locked;
     private List<PedagogicalPlannerSequenceNodeDTO> subnodes;
     private Long parentUid;
+    private Long learningDesignId;
     // Not node-bound variables, but simply attributes used in JSP page
     private Boolean edit = false;
     private Boolean createSubnode = false;
     private Boolean isSysAdmin = true;
     private Boolean importNode = false;
+    private List<PedagogicalPlannerSequenceNodeDTO> recentlyModifiedNodes;
 
     private static final String FULL_DESCRIPTION_NOT_EMPTY = "FULL";
 
@@ -181,5 +183,21 @@ public class PedagogicalPlannerSequenceNodeDTO {
 
     public void setImportNode(Boolean importNode) {
 	this.importNode = importNode;
+    }
+
+    public Long getLearningDesignId() {
+	return learningDesignId;
+    }
+
+    public void setLearningDesignId(Long learningDesignId) {
+	this.learningDesignId = learningDesignId;
+    }
+
+    public List<PedagogicalPlannerSequenceNodeDTO> getRecentlyModifiedNodes() {
+	return recentlyModifiedNodes;
+    }
+
+    public void setRecentlyModifiedNodes(List<PedagogicalPlannerSequenceNodeDTO> recentlyModifiedNodes) {
+	this.recentlyModifiedNodes = recentlyModifiedNodes;
     }
 }
