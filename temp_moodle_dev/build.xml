@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<project name="lamstwo" basedir=".">
+
+	<property file="build.properties" />
+	
+	<target name="deploy-lamstwo">
+		<copy verbose="true" preservelastmodified="true" todir="${moodle_dir}/mod/">
+			<fileset dir="moodle/mod">
+				<include name="lamstwo/**" />
+			</fileset>
+		</copy>
+		<copy verbose="true" preservelastmodified="true" todir="${moodle_dir}/lang/en_utf8/">
+			<fileset dir="moodle/lang/en_utf8">
+				<include name="lamstwo.php" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="undeploy-lamstwo">
+		<delete verbose="true" includeemptydirs="true">
+			<fileset dir="${moodle_dir}/mod/lamstwo/">
+				<include name="**" />
+			</fileset>
+		</delete>
+		<delete verbose="true" file="${moodle_dir}/lang/en_utf8/lamstwo.php" />
+	</target>
+	
+</project>
