@@ -125,7 +125,7 @@ function xmldb_lamstwo_upgrade($oldversion=0) {
     }
     
     // LDEV-1965 add more meaningful log info
-    if ($result && $olversion < 2009033000) {
+    if ($result && $oldversion < 2009033000) {
       $log_display->module = 'lamstwo';
       $log_display->action = 'add';
       $log_display->mtable = 'lamstwo';
