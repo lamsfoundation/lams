@@ -5,6 +5,8 @@ require_once('../../config.php');
 require_once('lib.php');
 
 $id = optional_param('id', 0, PARAM_INT);    // Course Module ID
+$delete = optional_param('delete', 0, PARAM_INT);    // lamstwo_lesson id to delete
+$confirm = optional_param('confirm', 0, PARAM_INT);    // boolean confirming deletion
 
 if (! $cm = get_coursemodule_from_id('lamstwo', $id)) {
     error('Course Module ID was incorrect');
@@ -29,6 +31,32 @@ print_header_simple(format_string($lamstwo->name), "",
         "<a href=\"index.php?id=$course->id\">$strchoices</a> 
         -> ".format_string($lamstwo->name), '', '', true,
         update_module_button($cm->id, $course->id, get_string('modulename','lamstwo')), navmenu($course, $cm));
+
+// Delete lesson prompt if requested
+if (!empty($delete)) {
+  if (!empty($confirm) && $confirm == 1) {
+    // delete and redirect to this lamstwo page
+    if (lamstwo_delete_lamstwo_lesson($delete)) {
+      redirect('view.php?id='.$id, get_string('deletesuccess', 'lamstwo'));
+    } else {
+      redirect('view.php?id='.$id);
+    }
+  } else {
+    // delete confirmation
+    print_simple_box_start('center', '60%', '#FFAAAA', 20, 'noticebox');
+    print_heading(get_string('deletelessonconfirm', 'lamstwo'));
+    echo "<form method='post' action='view.php' />";
+    echo "<input type='hidden' name='id' value='$id' />";
+    echo "<input type='hidden' name='delete' value='$delete' />";
+    echo "<input type='hidden' name='confirm' value='1' />";
+    echo "<input type='submit' value='yes' />";
+    echo "<input type='button' value='no' onclick='javascript:history.go(-1);' />";
+    echo "</form>";
+    print_simple_box_end();
+    print_footer($course);
+    return;
+  }
+} 
         
 // Find out current groups mode
 $groupmode = groupmode($course, $cm);
@@ -111,6 +139,8 @@ if (!empty($lessons)) {
 			$monitorurl = "onclick=\"javascript:window.open('".$monitorurl."','monitor','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=600,resizable',0)\"";
 			$monitorlink = "<a href=\"#\" $monitorurl>".get_string('openmonitor', 'lamstwo')."</a>";
 			$links .= $monitorlink;
+			$deletelink = "<a href=\"view.php?id=$id&delete=$lesson->id\">".get_string('deletelesson', 'lamstwo')."</a>";
+			$links .= "&nbsp;&nbsp;&nbsp;".$deletelink;
 		}
 		$table->data[] = array($lessonlink, $lesson->intro, $links, date('r', $lesson->timemodified));
 	}

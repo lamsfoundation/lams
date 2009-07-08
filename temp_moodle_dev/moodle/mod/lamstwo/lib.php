@@ -73,22 +73,52 @@ function lamstwo_update_instance($lamstwo) {
 
 
 function lamstwo_delete_instance($id) {
-/// Given an ID of an instance of this module,
-/// this function will permanently delete the instance
-/// and any data that depends on it.
+  global $CFG;
 
   if (! $lamstwo = get_record('lamstwo', 'id', $id)) {
-      return false;
+    return false;
   }
 
   $result = true;
 
-  # Delete any dependent records here #
-  lamstwo_delete_lesson($USER->username,$lamstwo->lesson_id);
+  # delete child lessons
+  $sql = "SELECT * FROM {$CFG->prefix}lamstwo_lesson WHERE lamstwo=$id";
+  $lamstwolessons = get_records_sql($sql);
+  foreach ($lamstwolessons as $lamstwolesson_id => $lamstwolesson) {
+    $result = lamstwo_delete_lamstwo_lesson($lamstwolesson_id);
+  }
+  
+  # delete module entry
   if (! delete_records('lamstwo', 'id', $lamstwo->id)) {
-      $result = false;
+    $result = false;
   }
 
+  return $result;
+}
+
+function lamstwo_delete_lamstwo_lesson($id) {
+  global $CFG;
+
+  if (! $lamstwolesson = get_record('lamstwo_lesson', 'id', $id)) {
+    return false;
+  }
+  
+  $result = true;
+  lamstwo_delete_lesson($USER->username, $lamstwolesson->lesson_id);
+    
+  # delete child grades
+  $sql ="SELECT * FROM {$CFG->prefix}lamstwo_grade WHERE lamstwolesson=$lamstwolesson->id";
+  $grades = get_records_sql($sql);
+  foreach ($grades as $grade_id => $grade) {
+    if (! delete_records('lamstwo_grade', 'id', $grade_id)) {
+      $result = false;
+    }
+  }
+  
+  if (! delete_records('lamstwo_lesson', 'id', $lamstwolesson->id)) {
+    $result = false;
+  }
+  
   return $result;
 }
 

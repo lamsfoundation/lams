@@ -79,5 +79,8 @@ $string['restcall400'] = 'Call to LAMS failed: received an HTTP status of 400 Ba
 $string['restcalldefault'] = 'Call to LAMS failed: received an HTTP status of: $a';
 $string['restcallfail'] = 'Call to LAMS failed: received no response or connection was refused. Please check that you have the correct LAMS server URL and that it is online.';
 $string['parsingerror'] = 'There has been an error parsing the rest response. Please contact your system administrator.';
+$string['deletelesson'] = 'Delete this lesson';
+$string['deletelessonconfirm'] = 'Are you sure you want to delete this lesson?';
+$string['deletesuccess'] = 'Lesson successfully deleted.';
 
 ?>
