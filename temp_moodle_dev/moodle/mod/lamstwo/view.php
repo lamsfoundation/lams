@@ -122,7 +122,7 @@ if ($currentgroup != 0) {
 echo '<br />';
 if (!empty($lessons)) {
 	$canparticipate = has_capability('mod/lams:participate', $context);
-
+	
 	$table->head = array(get_string('lessonname', 'lamstwo'), get_string('introduction', 'lamstwo'), get_string('links', 'lamstwo'), 'last modified');
 	$table->align = array('left', 'left', 'left', 'right');
 
@@ -131,8 +131,8 @@ if (!empty($lessons)) {
 		$lessonlink = $lesson->name;
 		if ($canparticipate) {
 			$learnerurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], $lesson->lesson_id, $course->id, $course->fullname, $course->timecreated, $LAMS2CONSTANTS->learner_method);
-			$learnerurl = "onclick=\"javascript:window.open('".$learnerurl."','learner','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=600,resizable',0)\"";
-			$lessonlink = "<a href=\"#\" $learnerurl>$lesson->name</a>";
+			$onclick = "onclick=\"javascript:window.open('".$learnerurl."','learner','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=600,resizable',0)\"";
+			$lessonlink = "<a href=\"#\" $onclick>$lesson->name</a>";
 		}
 		if ($canmanage) {
 			$monitorurl = lamstwo_get_url($USER->username, $locale['lang'], $locale['country'], $lesson->lesson_id, $course->id, $course->fullname, $course->timecreated, $LAMS2CONSTANTS->monitor_method);
@@ -143,6 +143,20 @@ if (!empty($lessons)) {
 			$links .= "&nbsp;&nbsp;&nbsp;".$deletelink;
 		}
 		$table->data[] = array($lessonlink, $lesson->intro, $links, date('r', $lesson->timemodified));
+	}
+	
+	// if only one lesson, open lams learner immediately
+	if (count($lessons) == 1) {
+	    if ($canparticipate && !$canmanage) {
+    	    $openlearnerjs = <<<YYY
+<script language="javascript" type="text/javascript">
+    <!--
+        window.open('$learnerurl', 'learner', 'location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=600,resizable', 0);
+    //-->
+</script>
+YYY;
+            echo $openlearnerjs;
+        }
 	}
 
 	print_table($table);
