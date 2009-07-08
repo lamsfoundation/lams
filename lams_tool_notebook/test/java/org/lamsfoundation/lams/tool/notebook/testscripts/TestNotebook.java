@@ -50,7 +50,7 @@ public class TestNotebook extends AbstractSeleniumTestCase {
 
 	protected void learningTest() throws InterruptedException {
 		setUpLearning();
-		assertEquals("LAMS Learner", selenium.getTitle());
+		assertEquals("Notebook", selenium.getTitle());
 		assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
 		selenium.type("entryText", "have fun");
 		selenium.click("//a[@id='finishButton']/span");
