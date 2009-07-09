@@ -443,7 +443,7 @@ function lamstwo_add_lesson($form) {
     
     // log adding of lesson
     $cmid = 0;
-    if ($cm = get_coursemodule_from_instance('lamstwo', $lamstwo->id, $lamstwo->course)) {
+    if ($cm = get_coursemodule_from_instance('lamstwo', $form->lamstwo, $form->course)) {
       $cmid = $cm->id;
     }
     add_to_log($form->course, 'lamstwo', 'add lesson', 'view.php?id='.$cmid, $form->id, $cmid);
