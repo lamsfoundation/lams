@@ -74,6 +74,10 @@
 						success: function(html) {
 							jQuery(courseBg).append(html);
 							registerToolTip(this);
+							// unregister and re-register thickbox for this group in order to avoid double
+							// registration of thickbox for existing elements (i.e. group 'add lesson' link)
+							$('a.thickbox'+jQuery(courseBg).attr("id")).unbind("click");
+							tb_init('a.thickbox'+jQuery(courseBg).attr("id"));
 						}
 					});
 				}
