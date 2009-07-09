@@ -25,7 +25,9 @@ package org.lamsfoundation.lams.tool.notebook.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -36,6 +38,8 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -45,63 +49,52 @@ import com.thoughtworks.selenium.SeleneseTestCase;
 
 public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 
-	/**
-	 * Used as and activityUIID property while storing Learning Design 
-	 */
-	protected static int defaultActivityUIId = 1;
-
 	protected ToolDAO toolDAO;
 	protected ActivityDAO activityDAO;
 	protected UserManagementService userManagementService;
 	protected LessonDAO lessonDAO;
 	protected LearningDesignDAO learningDesignDAO;
 
-	protected ApplicationContext context;
 	private static final String[] contextConfigLocation = new String[] {
 			"org/lamsfoundation/lams/localCommonContext.xml",
 			"org/lamsfoundation/lams/lesson/lessonApplicationContext.xml",
 			"org/lamsfoundation/lams/toolApplicationContext.xml",
 	};
-
-	/** the host name on which the Selenium Server resides */
-	private static final String SERVER_HOST = "localhost";
-	/** the port on which the Selenium Server is listening */
-	private static final int SERVER_PORT = 5555;
-	/**
-	 * the command string used to launch the browser, e.g. "*firefox" or
-	 * "c:\\program files\\internet explorer\\iexplore.exe"
-	 */
-	private static final String BROWSER_START_COMMAND = "*firefox";
-	/**
-	 * the starting URL including just a domain name. We'll start the browser
-	 * pointing at the Selenium resources on this URL,
-	 */
-	private static final String BROWSER_URL = "http://127.0.0.1:8080/lams/";
-
-	protected static final String SERVER_URL = "/lams/";
-	protected static final String USER_LOGIN = "mmm";
-	protected static final String USER_PASSWORD = "mmm";
+	
+	// name of the learning design. we receive it from the subclass initially.
+	// but then it might be changed if LD with the same name already exists
+	private String learningDesignName;
 
 	public void setUp() throws Exception {
-		//TODO use super.setUp();
-		context = new ClassPathXmlApplicationContext(contextConfigLocation);
-		toolDAO = (ToolDAO) this.context.getBean("toolDAO");
-		activityDAO = (ActivityDAO) this.context.getBean("activityDAO");
-		userManagementService = (UserManagementService) this.context.getBean("userManagementService");
-		lessonDAO = (LessonDAO) this.context.getBean("lessonDAO");
-		learningDesignDAO = (LearningDesignDAO) this.context.getBean("learningDesignDAO");
-
-		// selenium = new DefaultSelenium(SERVER_HOST, SERVER_PORT, BROWSER_START_COMMAND, BROWSER_URL);
-		HttpCommandProcessor proc = new HttpCommandProcessor(SERVER_HOST,
-				SERVER_PORT, BROWSER_START_COMMAND, BROWSER_URL);
+		ApplicationContext context = new ClassPathXmlApplicationContext(contextConfigLocation);
+		toolDAO = (ToolDAO) context.getBean("toolDAO");
+		activityDAO = (ActivityDAO) context.getBean("activityDAO");
+		userManagementService = (UserManagementService) context.getBean("userManagementService");
+		lessonDAO = (LessonDAO) context.getBean("lessonDAO");
+		learningDesignDAO = (LearningDesignDAO) context.getBean("learningDesignDAO");
+		learningDesignName = getLearningDesignName();
+		
+		HttpCommandProcessor proc = new HttpCommandProcessor(
+				TestFrameworkConstants.SERVER_HOST,
+				TestFrameworkConstants.SERVER_PORT,
+				TestFrameworkConstants.BROWSER,
+				TestFrameworkConstants.WEB_APP_HOST
+						+ TestFrameworkConstants.WEB_APP_DIR);
 		selenium = new DefaultSeleniumFlex(proc);
 		selenium.start();
-		selenium.setSpeed("1000");
+		//do not reduce this parameter as Selenium might start working wrong
+		selenium.setSpeed("400");
 	}
 
 	public void tearDown() throws Exception {
-		super.tearDown();
-		selenium.stop();
+    	try {
+    		super.tearDown();
+    	} finally {
+    	    if (selenium != null) {
+    	        selenium.stop();
+    	        selenium = null;
+    	    }
+    	}
 	}
 	
 	/**
@@ -115,10 +108,9 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		loginToLams();
 		
 		//Authoring part
-		openAuthoringWindow();
+		Map<String, String> contentDetails = setUpAuthoring();
 		authoringTest();
-		storeLearningDesign();
-		closeAuthoringWindow();
+		storeLearningDesign(contentDetails);
 		
 		createNewLesson();
 		
@@ -139,7 +131,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	protected abstract String getToolSignature();
 	
 	/**
-	 * Returns the name of learning design that user entered saving it in authoring.  
+	 * Returns the name of learning design as it should be saved.  
 	 * Should be overridden by all subclasses.
 	 * 
 	 * @return name of learning design
@@ -164,20 +156,20 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	 */
 	protected abstract void monitoringTest() throws Exception;
 
-	// TODO change this behavior (after main workflow will be setted up)
-	private String toolContentID;
-	private String contentFolderID;
 	/**
 	 * Opens up all authoring windows. Should be done before testing tool's
 	 * authoring.
+	 * 
+	 * @return Map containing contentFolderID and toolContentID
+	 * @throws Exception
 	 */
-	protected void openAuthoringWindow() throws Exception {
+	protected Map<String, String> setUpAuthoring() throws Exception {
 		// open authoring canvas
 		selenium.click("//div[@id='header-my-courses']//div[@class='tab-middle-highlight']/a");
 		selenium.waitForPopUp("aWindow", "10000");
 
-		Integer userID = userManagementService.getUserByLogin(USER_LOGIN).getUserId();
-		String createUniqueContentFolderUrl = SERVER_URL
+		Integer userID = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN).getUserId();
+		String createUniqueContentFolderUrl = TestFrameworkConstants.WEB_APP_DIR
 				+ "authoring/author.do?method=createUniqueContentFolder&userID="
 				+ userID;
 		final String createUniqueContentFolderId = "createUniqueContentFolderId";
@@ -185,12 +177,12 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		selenium.waitForPopUp(createUniqueContentFolderId, "10000");
 		selenium.selectWindow(createUniqueContentFolderId);
 		String wddxPacket = selenium.getEval("this.browserbot.getDocument().getElementsByTagName('body')[0].innerHTML");
-		contentFolderID = this.extractFolderIDFromWDDXPacket(wddxPacket);
+		final String contentFolderID = this.extractFolderIDFromWDDXPacket(wddxPacket);
 		selenium.close();
 		selenium.selectWindow(null);
 
 		Tool tool = toolDAO.getToolBySignature(getToolSignature());
-		String getToolContentUrl = SERVER_URL
+		String getToolContentUrl = TestFrameworkConstants.WEB_APP_DIR
 				+ "authoring/author.do?method=getToolContentID&toolID="
 				+ tool.getToolId();
 		final String getToolContentId = "getToolContentId";
@@ -198,62 +190,48 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		selenium.waitForPopUp(getToolContentId, "10000");
 		selenium.selectWindow(getToolContentId);
 		wddxPacket = selenium.getEval("this.browserbot.getDocument().getElementsByTagName('body')[0].innerHTML");
-		toolContentID = this.extractToolContentIDFromWDDXPacket(wddxPacket);
+		final String toolContentID = this.extractToolContentIDFromWDDXPacket(wddxPacket);
 		selenium.close();
 		selenium.selectWindow(null);
 
-		String openToolUrl = SERVER_URL + tool.getAuthorUrl() + "?mode=author"
+		String openToolUrl = TestFrameworkConstants.WEB_APP_DIR + tool.getAuthorUrl() + "?mode=author"
 				+ "&toolContentID=" + toolContentID + "&contentFolderID="
 				+ contentFolderID;
 		final String openToolId = "openToolId";
 		selenium.openWindow(openToolUrl.toString(), openToolId);
 		selenium.waitForPopUp(openToolId, "10000");
 		selenium.selectWindow(openToolId);
-	}
 
-	/** checks for verification errors and stops the browser */
-	protected void closeAuthoringWindow() {
-
+		return new HashMap<String, String>() {{
+				put("contentFolderID", "contentFolderID");
+				put("toolContentID", toolContentID);
+		}};
 	}
 
 	/**
-	 * Stores learning design. Using getLearningDesignName() as a new design name.
+	 * Stores learning design. Uses getLearningDesignName() as a new design name.
 	 */
-	protected void storeLearningDesign() {
+	protected void storeLearningDesign(Map<String, String> contentDetails) {
+		//closes tool authoring screen
 		selenium.click("//span[@class='okIcon']");
 		selenium.waitForPageToLoad("10000");
-		//closes ok/reedit confirmation screen
 		selenium.click("//span[@class='close']");
-
-		//TODO remove next Paragraph
-		selenium.selectWindow(null);
-		Tool tool = toolDAO.getToolBySignature(getToolSignature());
-		String openToolUrl = SERVER_URL + tool.getAuthorUrl() + "?mode=author"
-				+ "&toolContentID=" + toolContentID + "&contentFolderID="
-				+ contentFolderID;
-		final String openToolId = "openToolId2";
-		selenium.openWindow(openToolUrl.toString(), openToolId);
-		selenium.waitForPopUp(openToolId, "10000");
-		selenium.selectWindow(openToolId);
-		
-		final String storeLearningDesignUrl = SERVER_URL + "servlet/authoring/storeLearningDesignDetails";
-		String designDetails = constructWddxDesign(getToolSignature(), getLearningDesignName());
-		selenium.runScript("var options = { " + "method:\"post\", "
-											  + "postBody:\"" + designDetails + "\" " 
-											  + "};"
-				+ "new Ajax.Request(\"" + storeLearningDesignUrl + "\",options);");
-		
-		//TODO remove next Paragraph
-		selenium.close();
 		
 		//closes Flash authoring screen
 		selenium.selectWindow("aWindow");
 		selenium.close();
 		selenium.selectWindow(null);
+		
+		final String storeLearningDesignUrl = TestFrameworkConstants.WEB_APP_DIR + "servlet/authoring/storeLearningDesignDetails";
+		String designDetails = constructWddxDesign(contentDetails);
+		//if at some point in the future we decide to use Prototype instead of jQUery we should use this command 
+//		selenium.runScript("var options = { " + "method:\"post\", " + "postBody:\"" + designDetails + "\" " + "};"
+//				+ "new Ajax.Request(\"" + storeLearningDesignUrl + "\",options);");
+		selenium.runScript("$.post(\"" + storeLearningDesignUrl + "\", \"" + designDetails + "\");");
 	}
 	
 	/**
-	 * Beware this method works wrong sometimes (due to the appearance of root element) 
+	 * Beware this method might work wrong (due to the CloudWizard's hidden/visible root element) 
 	 * 
 	 * @throws Exception
 	 */
@@ -261,34 +239,39 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		Long lastCreatedLessonId = getLastCreatedLessonId(true);
 		DefaultSeleniumFlex flexSelenium = (DefaultSeleniumFlex) selenium;
 		
-		
-		//TODO change the way workspaceFolderID setted
-		List<String> titles = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(new Integer(4));
+		User user = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN);
+		Workspace workspace = (Workspace) activityDAO.find(Workspace.class, user.getWorkspace().getWorkspaceId());
+		Integer workspaceFolderID = workspace.getDefaultFolder().getWorkspaceFolderId();
+		List<String> titles = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderID);
 		assertTrue("There is no stored learning design", titles.size() > 0);
 		Collections.sort(titles, String.CASE_INSENSITIVE_ORDER);
 		int count = 1;
 		for (String title : titles) {
-			if (title.equals(getLearningDesignName())) {
+			if (title.equals(learningDesignName)) {
 				break;
 			}
 			count++;
 		}
-		assertTrue("There isn't learning design with name" + getLearningDesignName(),count <= titles.size());
+		assertTrue("There isn't learning design with name" + learningDesignName,count <= titles.size());
 		
 		flexSelenium.click("link=Add Lesson");
 		Thread.sleep(6000);
-		waitForFlexExists("workspaceTree", 20, flexSelenium);
-
 		// flexObjId is now setted to "cloudWizard" by default, change this if
 		// you want to use another one
 		// flexSelenium.flexSetFlexObjID("cloudWizard");
-		 
+		waitForFlexExists("workspaceTree", 20, flexSelenium);
 		assertTrue(flexSelenium.getFlexEnabled("startButton").equals("true"));
+
 		flexSelenium.flexSelectIndex("workspaceTree", String.valueOf(count));
 //		flexSelenium.flexType("resourceName_txi", "bueno");
 		flexSelenium.flexClick("startButton");
-		Thread.sleep(25000);
+		Thread.sleep(5000);
 		assertTrue("Assertion failed. Lesson has *not* been created", lastCreatedLessonId < getLastCreatedLessonId(true));
+
+		 //TODO fix CloudWizard or define offset checking for lesson's LD name
+		Long lessonId = getLastCreatedLessonId(false);
+		String lessonTitle = lessonDAO.getLesson(lessonId).getLearningDesign().getTitle();
+		assertTrue("Tests aborted due to the problem with CloudWizard's root element problem. Please, restart tests", learningDesignName.equals(lessonTitle));
 	}
 	
 	/**
@@ -299,7 +282,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		selenium.runScript("openLearner(" + getLastCreatedLessonId(false) + ")");
 		selenium.waitForPopUp("lWindow", "30000");
 		selenium.selectWindow("lWindow");
-		Thread.sleep(3000);
+		waitForElementPresent("contentFrame");
 		selenium.selectFrame("contentFrame");
 	}
 	
@@ -327,7 +310,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 
 		// openning tool monitor popup
 		Tool tool = toolDAO.getToolBySignature(getToolSignature());
-		String monitorUrl = SERVER_URL + tool.getMonitorUrl()
+		String monitorUrl = TestFrameworkConstants.WEB_APP_DIR + tool.getMonitorUrl()
 				+ "?toolContentID=" + toolActivity.getToolContentId()
 				+ "&contentFolderID=" + contentFolderID;
 		final String monitorId = "monitorId";
@@ -347,9 +330,9 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	
 	/** */
 	protected void loginToLams() throws Exception {
-		selenium.open(SERVER_URL);
-		selenium.type("j_username", USER_LOGIN);
-		selenium.type("j_password", USER_PASSWORD);
+		selenium.open(TestFrameworkConstants.WEB_APP_DIR);
+		selenium.type("j_username", TestFrameworkConstants.USER_LOGIN);
+		selenium.type("j_password", TestFrameworkConstants.USER_PASSWORD);
 		selenium.click("//p[@class='login-button']/a");
 		selenium.waitForPageToLoad("10000");
 		Thread.sleep(3000);
@@ -379,6 +362,10 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 			Thread.sleep(1000);
 		}
 	}
+	
+    public String getText() {
+        return selenium.getEval("this.page().bodyText()");
+    }
 	
 	protected void waitForFlexExists(String objectID, int timeout,	DefaultSeleniumFlex selenium) throws Exception {
 		while (timeout > 0	&& !selenium.getFlexExists(objectID).contains("true")) {
@@ -414,15 +401,15 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	 * @return id
 	 */
 	private Long getLastCreatedLessonId(boolean returnNegative) {
-		Integer userID = userManagementService.getUserByLogin(USER_LOGIN).getUserId();
+		Integer userID = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN).getUserId();
 		List<Lesson> lessonsCreatedByUser = lessonDAO.getLessonsCreatedByUser(userID);
-		List<Lesson> lessonsByLDName = new ArrayList<Lesson>();
+		List<Lesson> lessonsWithLDName = new ArrayList<Lesson>();
 		for (Lesson lesson : lessonsCreatedByUser) {
-			if (lesson.getLessonName().equals(getLearningDesignName())){
-				lessonsByLDName.add(lesson);
+			if (lesson.getLessonName().equals(learningDesignName)){
+				lessonsWithLDName.add(lesson);
 			}
 		}
-		if (lessonsByLDName.size() == 0) {
+		if (lessonsWithLDName.size() == 0) {
 			if (returnNegative) {
 				return new Long(-1);
 			} else {
@@ -431,7 +418,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		}
 		
 		Lesson lastCreatedLesson = lessonsCreatedByUser.iterator().next();
-		for (Lesson lesson : lessonsByLDName) {
+		for (Lesson lesson : lessonsWithLDName) {
 			if (lesson.getCreateDateTime().after(lastCreatedLesson.getCreateDateTime()) ){
 				lastCreatedLesson = lesson;
 			}
@@ -480,11 +467,29 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		return null;
 	}
 
-	private String constructWddxDesign(String toolSignature,String newLearningDesignName) {
-		Integer userID = userManagementService.getUserByLogin(USER_LOGIN).getUserId();
-		Tool tool = toolDAO.getToolBySignature(toolSignature);
+	/**
+	 * Constructs wddx packet(the same as Flash creates) which contains LD details.
+	 * 
+	 * @return
+	 */
+	private String constructWddxDesign(Map<String, String> contentDetails) {
+		User user = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN);
+		Tool tool = toolDAO.getToolBySignature(getToolSignature());
 		
-		// TemplateActivityByLibraryID(libraryID);
+		//checks if another LD with the same name exists. If so then trying to create unique one.
+		Workspace workspace = (Workspace) activityDAO.find(Workspace.class, user.getWorkspace().getWorkspaceId());
+		Integer workspaceFolderID = workspace.getDefaultFolder().getWorkspaceFolderId();
+		List<String> existingTitles = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderID);
+		if (existingTitles.contains(learningDesignName)) {
+			int i = 2;
+			String tempLearningDesignName;
+			do {
+				tempLearningDesignName = learningDesignName + "(" + i++ + ")";	
+			} while (existingTitles.contains(tempLearningDesignName));
+			learningDesignName = tempLearningDesignName;
+		}
+		
+		// searching for the template activity
 		ToolActivity templateActivity = null;
 		for (Object activityObject : activityDAO.getAllActivities()) {
 			if (activityObject instanceof ToolActivity) {
@@ -512,7 +517,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	        						"<var name='gradebookToolOutputDefinitionName'><string>string_null_value</string></var>" +
 	        						"<var name='extLmsId'><string>string_null_value</string></var>" +
 	        						"<var name='toolID'><number>" + tool.getToolId() + "</number></var>" +
-	        						"<var name='toolContentID'><number>" + toolContentID + "</number></var>" +
+	        						"<var name='toolContentID'><number>" + contentDetails.get("toolContentID") + "</number></var>" +
 	        						"<var name='toolSignature'><string>" + tool.getToolSignature() + "</string></var>" +
 	        						"<var name='toolDisplayName'><string>" + tool.getToolDisplayName() + "</string></var>" +
 	        						"<var name='helpURL'><string>" + tool.getHelpUrl() + "</string></var>" +
@@ -532,25 +537,23 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	        						"<var name='description'><string>" + templateActivity.getDescription() + "</string></var>" +
 	        						"<var name='activityTitle'><string>" + templateActivity.getTitle() + "</string></var>" +
 	        						"<var name='learningLibraryID'><number>" + templateActivity.getLearningLibrary().getLearningLibraryId() + "</number></var>" +
-	        						"<var name='activityUIID'><number>"+ (defaultActivityUIId++) +"</number></var>" +
+	        						//works with activityUIID=1 but may be we should generate unique one.
+	        						"<var name='activityUIID'><number>1</number></var>" +
 	        						"<var name='activityCategoryID'><number>" + templateActivity.getActivityCategoryID() + "</number></var>" +
 	        						"<var name='activityID'><number>" + templateActivity.getActivityId() + "</number></var>" +
 	        						"<var name='activityTypeID'><number>" + templateActivity.getActivityTypeId() + "</number></var>" +
 	        					"</struct>" +
 	        				"</array>" +
 	        			"</var>" +
-	        			"<var name='contentFolderID'><string>" + contentFolderID + "</string></var>" +
+	        			"<var name='contentFolderID'><string>" + contentDetails.get("contentFolderID") + "</string></var>" +
 	        			"<var name='createDateTime'><dateTime>2009-6-24T22:45:24+3:0</dateTime></var>" +
-	        			//TODO may be we need provide real workspaceFolderID      	
-//	        			WorkspaceFolderContentDAO dd;
-//	        			dd.getWorkspaceFolderContentByID(new Long(2)).getWorkspaceFolder().getWorkspaceFolderId();
-	        			"<var name='workspaceFolderID'><number>4</number></var>" +
+	        			"<var name='workspaceFolderID'><number>" + workspaceFolderID + "</number></var>" +
 	        			"<var name='maxID'><number>1</number></var>" +
 	        			"<var name='saveMode'><number>0</number></var>" +
 	        			"<var name='validDesign'><boolean value='true' /></var>" +
 	        			"<var name='readOnly'><boolean value='false' /></var>" +
-	        			"<var name='userID'><string>" + userID + "</string></var>" +
-	        			"<var name='title'><string>" + newLearningDesignName + "</string></var>" +
+	        			"<var name='userID'><string>" + user.getUserId() + "</string></var>" +
+	        			"<var name='title'><string>" + learningDesignName + "</string></var>" +
 	        			"<var name='learningDesignID'><number>-111111</number></var>" +
 	        			"<var name='copyTypeID'><number>1</number></var>" +
 	        		"</struct>" +
