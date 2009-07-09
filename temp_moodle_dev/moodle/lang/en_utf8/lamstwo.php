@@ -82,5 +82,10 @@ $string['parsingerror'] = 'There has been an error parsing the rest response. Pl
 $string['deletelesson'] = 'Delete this lesson';
 $string['deletelessonconfirm'] = 'Are you sure you want to delete this lesson?';
 $string['deletesuccess'] = 'Lesson successfully deleted.';
+$string['block_title'] = 'LAMSv2 Lesson Status';
+$string['status_started'] = 'Started';
+$string['status_not_started'] = 'Not started';
+$string['status_completed'] = 'Completed';
+$string['status_unknown'] = 'Unknown';
 
 ?>
