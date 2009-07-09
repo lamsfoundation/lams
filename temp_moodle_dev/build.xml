@@ -15,6 +15,11 @@
 				<include name="lamstwo.php" />
 			</fileset>
 		</copy>
+		<copy verbose="true" preservelastmodified="true" todir="${moodle_dir}/blocks/">
+			<fileset dir="moodle/blocks">
+				<include name="lamstwo_status/**" />
+			</fileset>
+		</copy>
 	</target>
 	
 	<target name="undeploy-lamstwo">
@@ -24,6 +29,20 @@
 			</fileset>
 		</delete>
 		<delete verbose="true" file="${moodle_dir}/lang/en_utf8/lamstwo.php" />
+	</target>
+	
+	<target name="build-mod-package" depends="mk-build-dir">
+		<delete verbose="true" file="build/lamstwo.zip" />
+		<zip destfile="build/lamstwo.zip" excludes="CVS/**">
+			<fileset dir="moodle/mod">
+				<include name="lamstwo/**" />
+			</fileset>
+			<fileset dir="moodle/lang/en_utf8" includes="lamstwo.php" />
+		</zip>
+	</target>
+	
+	<target name="mk-build-dir">
+		<mkdir dir="build" />
 	</target>
 	
 </project>
