@@ -28,8 +28,10 @@ lams_tool_gmap	/usr/share/lams2/
 lams_tool_spreadsheet	/usr/share/lams2/
 lams_tool_wiki	/usr/share/lams2/
 2.2.0to2.3.0.sql	/usr/share/lams2/
+configure2.3.0.sql	/usr/share/lams2/
 lams_tool_assessment	/usr/share/lams2/
 lams_tool_images	/usr/share/lams2/
 lams_tool_mindmap	/usr/share/lams2/
 lams_tool_pixlr	/usr/share/lams2/
 lams_tool_videorecorder	/usr/share/lams2/
+2.3.0to2.3.1.sql	/usr/share/lams2/

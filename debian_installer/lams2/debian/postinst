@@ -17,6 +17,24 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+update230to231 () {
+    # Update 2.3.0 database to 2.3.1
+    if [ "$db_root_pass" != "" ] ; then
+        mysql $db_name < /usr/share/lams2/2.3.0to2.3.1.sql -u root -p$db_root_pass || true
+    else
+        mysql $db_name < /usr/share/lams2/2.3.0to2.3.1.sql -u root || true
+    fi
+}
+
+configure230 () {
+    # Configure 2.3 tools; need to run after above tools have been deployed
+    if [ "$db_root_pass" != "" ] ; then
+        mysql $db_name < /usr/share/lams2/configure2.3.0.sql -u root -p$db_root_pass || true
+    else
+        mysql $db_name < /usr/share/lams2/configure2.3.0.sql -u root || true
+    fi
+}
+
 update220to230 () {
     # Update 2.2.0 database to 2.3
     if [ "$db_root_pass" != "" ] ; then
@@ -194,9 +212,16 @@ case "$1" in
         sed -i -e "s/port=\"8080\"/port=\"$server_port\"/" server.xml
 
         case "$2" in
+            2.3.0*)
+                update;
+                update230to231;
+            ;;
+            
             2.2.0*)
                 update;
                 update220to230;
+                configure230;
+                update230to231;
             ;;
 
             2.1.1*)
@@ -204,6 +229,8 @@ case "$1" in
                 update211to220;
                 configure220;
                 update220to230;
+                configure230;
+                update230to231;
             ;;
 
             2.1.0*)
@@ -212,6 +239,8 @@ case "$1" in
                 update211to220;
                 configure220;
                 update220to230;
+                configure230;
+                update230to231;
             ;;
 
             2.1rc1*)
@@ -221,6 +250,8 @@ case "$1" in
                 update211to220;
                 configure220;
                 update220to230;
+                configure230;
+                update230to231;
             ;;
 
             *)
@@ -323,6 +354,7 @@ case "$1" in
                 cp -rp /usr/share/lams2/repository/ /var/lib/lams/
 
                 configure220;
+                configure230;
 
                 # Add user and group
                 adduser --system --group --no-create-home lams 2> /dev/null
@@ -394,11 +426,13 @@ case "$1" in
         rm -rf /usr/share/lams2/lams_tool_wiki
         rm -rf /usr/share/lams2/repository
         rm -f /usr/share/lams2/2.2.0to2.3.0.sql
+        rm -f /usr/share/lams2/configure2.3.0.sql
         rm -rf /usr/share/lams2/lams_tool_assessment
         rm -rf /usr/share/lams2/lams_tool_images
         rm -rf /usr/share/lams2/lams_tool_mindmap
         rm -rf /usr/share/lams2/lams_tool_pixlr
         rm -rf /usr/share/lams2/lams_tool_videorecorder
+        rm -f /usr/share/lams2/2.3.0to2.3.1.sql
 
         # Delete default ROOT.war/index.html (replaced with redirecting index.jsp)
         rm -f /usr/share/jboss-4.0.2/server/default/deploy/jbossweb-tomcat55.sar/ROOT.war/index.html
