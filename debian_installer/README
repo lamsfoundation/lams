@@ -4,6 +4,20 @@ Debian Packaging
 Steps for doing a full rebuild of debianised lams2 and jboss4 packages.
 
 
+Building a lams2 package using Ant build script:
+- check out desired tag of lams
+- run build-lams ant target
+- start lams and remove test users, remove Wildfire password
+- run copy-build, dump-db ant targets
+- update version strings and any scripts related to new version
+- update the replace token in each of the copy-<toolname>-tool-package targets
+(needs a better way - can't put a variable for token attribute for the replace task)
+- run copy-2.x-tool-packages ant targets
+- run build-binary-package ant target from command line (requires sudo access)
+
+NOTE: the below steps have been deprecated in favour of the ant build script.
+
+
 Prerequisites
 -------------
  * a Debian or Debian based system
