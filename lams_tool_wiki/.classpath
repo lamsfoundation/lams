@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
@@ -8,6 +9,15 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
-	<classpathentry kind="output" path="build/classes/java"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
+	<classpathentry kind="output" path="build/classes/java"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/hibernate-core.jar" sourcepath="/lams_build/lib/hibernate/src/hibernate-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.hibernate.org/hib_docs/v3/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-api.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-jboss-logging.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/lib/jboss-logging-spi.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/lib/javassist.jar"/>
 </classpath>
