@@ -1,6 +1,7 @@
 <?php //$Id$
 
 require_once($CFG->libdir.'/moodlelib.php');
+require_once($CFG->libdir.'/xmlize.php');
 
 /*
  * Requires LAMS 2.1
@@ -120,10 +121,6 @@ class block_lamstwo_status extends block_base {
         
     	$xml_array = xmlize($xml);
     	return $xml_array;
-    	//traverse_xmlize($xml_array);
-    	//print implode("", $GLOBALS['traverse_array']);
-    	
-    	//return lamstwo_process_array($xml_array['Folder']) . ']';
     }
     
     /*
