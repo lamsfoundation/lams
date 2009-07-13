@@ -97,6 +97,14 @@
         <archive path="/lams_build/lib/flagstone/transform.jar"/>
         <archive path="/lams_build/lib/flagstone/translate.jar"/>
         <archive path="/lams_build/lib/jabber/JabberHTTPBind-1.1.1.jar"/>
+        <archive path="/lams_build/lib/selenium/flash-selenium.jar"/>
+		<archive path="/lams_build/lib/selenium/flex-ui-selenium-0.1.1.jar"/>
+		<archive path="/lams_build/lib/selenium/selenium-java-client-driver-sources.jar"/>
+		<archive path="/lams_build/lib/selenium/selenium-java-client-driver-test-sources.jar"/>
+		<archive path="/lams_build/lib/selenium/selenium-java-client-driver-tests.jar"/>
+		<archive path="/lams_build/lib/selenium/selenium-java-client-driver.jar"/>
+		<archive path="/lams_build/lib/selenium/selenium-server-sources.jar"/>
+		<archive path="/lams_build/lib/selenium/selenium-server.jar"/>
         <archive javadoc="http://lucene.apache.org/java/2_4_0/api/core/" path="/lams_build/lib/lucene/lucene-core-2.4.0.jar" source="/lams_build/lib/lucene/src/lucene-2.4.0-src.zip"/>
         <archive javadoc="http://lucene.apache.org/java/2_4_0/api/contrib-snowball/" path="/lams_build/lib/lucene/lucene-snowball-2.4.0.jar" source="/lams_build/lib/lucene/src/lucene-snowball-2.4.0-src.zip"/>
         <archive javadoc="http://opencsv.sourceforge.net/api/" path="/lams_build/lib/csv/opencsv-1.8.jar" source="/lams_build/lib/csv/src/opencsv-1.8-src.zip"/>
