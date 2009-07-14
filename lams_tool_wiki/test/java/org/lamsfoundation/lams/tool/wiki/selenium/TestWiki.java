@@ -19,7 +19,7 @@
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
  */
-package org.lamsfoundation.lams.tool.selenium;
+package org.lamsfoundation.lams.tool.wiki.selenium;
 
 import java.util.Map;
 
@@ -28,7 +28,7 @@ import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 
 public class TestWiki extends AbstractSeleniumTestCase {
 
-    private static final String LEARNING_DESIGN_TITLE  ="Wiki Test";
+    private static final String LEARNING_DESIGN_TITLE  ="wikiTest";
     private static final String WIKI_TITLE1 = "Dog Wiki";
     private static final String WIKI_TITLE2 = "Blue Healers";
     private static final String WIKI_BODY1 = "Dogs come in many breeds.";
@@ -165,5 +165,16 @@ public class TestWiki extends AbstractSeleniumTestCase {
 	    fail(e.getMessage());
 	}
     }
+    
+    // *************************************************************************
+    // Wiki monitor tests
+    // *************************************************************************
 
+    public void testMonitor() {
+	try {
+	    loginToLams(); 
+	} catch (Exception e) {
+	    fail(e.getMessage());
+	}
+    }
 }
