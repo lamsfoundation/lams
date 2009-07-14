@@ -35,13 +35,13 @@ class block_lamstwo_status extends block_base {
     }
     
     function print_all_lesson_status() {
-        $return_str = '<table width="100%" style="margin-top: 6px; border-bottom: thin solid grey;">';
+        $return_str = '<table width="100%" style="margin-top: 4px; border-collapse: collapse; border-bottom: 1px solid #aaaaaa;">';
         $array = $this->get_all_lesson_status();
         if (self::$error) {
             $return_str .= '<tr><td>'.get_string($array, 'lamstwo').'</td></tr>';
         } else {
             foreach ($array as $lamstwo_id => $status_obj_array) {
-                $return_str .= '<tr><th style="border-top: thin solid grey;" colspan="2" align="left">'.$status_obj_array[0]->lamstwo_name.'</th></tr>';
+                $return_str .= '<tr><th style="border-top: 1px solid #aaaaaa;" colspan="2" align="left">'.$status_obj_array[0]->lamstwo_name.'</th></tr>';
                 foreach ($status_obj_array as $status_obj) {
                     $status_str =  get_string($status_obj->status_i18n_key, 'lamstwo');
                     $return_str .= '<tr><td>'.$status_obj->lesson_name.'</td><td align="right">'.$status_str.'</td></tr>';
