@@ -323,7 +323,7 @@ function lamstwo_get_sequences_rest($username,$courseid,$coursename,$coursecreat
     $request = "$CFG->lamstwo_serverurl$service?serverId=$CFG->lamstwo_serverid&datetime=$datetime_encoded&hashValue=$hashvalue&username=$username&courseId=$courseid&courseName=".urlencode($coursename)."&mode=2&country=$country&lang=$lang";
 
     // GET call to LAMS
-    $xml = file_get_contents($request);
+    $xml = @file_get_contents($request);
     
     if(!empty($http_response_header[0])) {
     	// Retrieve HTTP status code
