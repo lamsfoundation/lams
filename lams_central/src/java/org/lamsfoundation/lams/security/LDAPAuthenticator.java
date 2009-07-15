@@ -154,7 +154,9 @@ public class LDAPAuthenticator {
 	    }
 	    if (StringUtils.isBlank(login)) {
 		log.error("===> No LDAP user found with username: " + username
-			+ ". This could mean that the user doesn't exist or that an initial bind user is required.");
+			+ ". This could mean that the the login attribute is incorrect,"
+			+ " the user doesn't exist, or that an initial bind user is required.");
+		return false;
 	    }
 	    
 	    // authenticate
