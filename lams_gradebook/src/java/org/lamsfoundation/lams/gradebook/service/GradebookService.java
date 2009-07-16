@@ -378,8 +378,8 @@ public class GradebookService implements IGradebookService {
 
     /**
      * @see org.lamsfoundation.lams.gradebook.service.IGradebookService#updateUserActivityGradebookMark(org.lamsfoundation.lams.lesson.Lesson,
-     *      org.lamsfoundation.lams.usermanagement.User, org.lamsfoundation.lams.learningdesign.Activity,
-     *      java.lang.Double)
+     *      org.lamsfoundation.lams.usermanagement.User,
+     *      org.lamsfoundation.lams.learningdesign.Activity, java.lang.Double)
      */
     public void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
 	    Boolean markedInGradebook) {
@@ -916,7 +916,9 @@ public class GradebookService implements IGradebookService {
 		if (activityState == LearnerProgress.ACTIVITY_ATTEMPTED) {
 		    gactivityDTO.setStartDate(learnerProgress.getAttemptedActivities().get(activity));
 		} else {
-		    gactivityDTO.setStartDate(learnerProgress.getCompletedActivities().get(activity).getStartDate());
+		    if (learnerProgress.getCompletedActivities() != null && learnerProgress.getCompletedActivities().get(activity) != null) {
+			gactivityDTO.setStartDate(learnerProgress.getCompletedActivities().get(activity).getStartDate());
+		    }
 		}
 	    }
 	}
@@ -983,7 +985,8 @@ public class GradebookService implements IGradebookService {
     }
 
     /**
-     * Gets the outputs for a tool activity and returns the html for the ouputs cell in the grid
+     * Gets the outputs for a tool activity and returns the html for the ouputs
+     * cell in the grid
      * 
      * @param toolAct
      * @param toolSession
