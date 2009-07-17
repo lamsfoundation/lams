@@ -203,7 +203,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		selenium.selectWindow(openToolId);
 
 		return new HashMap<String, String>() {{
-				put("contentFolderID", "contentFolderID");
+				put("contentFolderID", contentFolderID);
 				put("toolContentID", toolContentID);
 		}};
 	}
@@ -215,7 +215,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		//closes tool authoring screen
 		selenium.click("//span[@class='okIcon']");
 		selenium.waitForPageToLoad("10000");
-		selenium.click("//span[@class='close']");
+		selenium.close();
 		
 		//closes Flash authoring screen
 		selenium.selectWindow("aWindow");
@@ -224,10 +224,12 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		
 		final String storeLearningDesignUrl = TestFrameworkConstants.WEB_APP_DIR + "servlet/authoring/storeLearningDesignDetails";
 		String designDetails = constructWddxDesign(contentDetails);
-		//if at some point in the future we decide to use Prototype instead of jQUery we should use this command 
-//		selenium.runScript("var options = { " + "method:\"post\", " + "postBody:\"" + designDetails + "\" " + "};"
-//				+ "new Ajax.Request(\"" + storeLearningDesignUrl + "\",options);");
-		selenium.runScript("$.post(\"" + storeLearningDesignUrl + "\", \"" + designDetails + "\");");
+		//callback function is aimed to let Selenium wait till StoreLDServlet finishes its work
+		selenium.runScript("$.post(\"" + storeLearningDesignUrl + "\", " +
+							"\"" + designDetails + "\", " +
+							"function(data){ return data; }" +
+							");");
+		selenium.selectWindow(null);
 	}
 	
 	/**
@@ -244,6 +246,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		Integer workspaceFolderID = workspace.getDefaultFolder().getWorkspaceFolderId();
 		List<String> titles = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderID);
 		assertTrue("There is no stored learning design", titles.size() > 0);
+		//TODO receive sorted titles list from the server because if LD was imported it's not sorted alphabetically
 		Collections.sort(titles, String.CASE_INSENSITIVE_ORDER);
 		int count = 1;
 		for (String title : titles) {
@@ -252,7 +255,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 			}
 			count++;
 		}
-		assertTrue("There isn't learning design with name" + learningDesignName,count <= titles.size());
+		assertTrue("There isn't learning design with name " + learningDesignName,count <= titles.size());
 		
 		flexSelenium.click("link=Add Lesson");
 		Thread.sleep(6000);
@@ -333,7 +336,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		selenium.open(TestFrameworkConstants.WEB_APP_DIR);
 		selenium.type("j_username", TestFrameworkConstants.USER_LOGIN);
 		selenium.type("j_password", TestFrameworkConstants.USER_PASSWORD);
-		selenium.click("//p[@class='login-button']/a");
+		selenium.click("link=Login");
 		selenium.waitForPageToLoad("10000");
 		Thread.sleep(3000);
 	}
@@ -343,7 +346,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	// *****************************************************************************
 
 	/**
-	 * Waits till element will be present on a page.
+	 * Waits till element will be presented on a page.
 	 * 
 	 * @param locator - an element locator
 	 * @throws InterruptedException 
@@ -427,23 +430,24 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	}
 
 	/**
-	 * Given a WDDX packet in our normal format, gets the id number from within
+	 * Given a WDDX packet in our normal format, gets the content folder from within
 	 * the &lt;var
-	 * name='messageValue'&gt;&lt;number&gt;num&lt;/number&gt;&lt;/var&gt;
+	 * name='messageValue'&gt;&lt;string&gt;num&lt;/string&gt;&lt;/var&gt;
 	 * 
 	 * @param wddxPacket
 	 * @return id
 	 */
 	private String extractFolderIDFromWDDXPacket(String wddxPacket) {
-		int indexMessageValue = wddxPacket.indexOf("<var name=\"messageValue\"><string>");
+		wddxPacket = wddxPacket.toLowerCase();
+		int indexMessageValue = wddxPacket.indexOf("<var name=\"messagevalue\"><string>");
 		assertTrue("<var name='messageValue'><string> string not found", indexMessageValue > 0);
 		int endIndexMessageValue = wddxPacket.indexOf("</string></var>", indexMessageValue);
 		return wddxPacket.substring(indexMessageValue
-				+ "<var name='messageValue'><string>".length(),	endIndexMessageValue);
+				+ "<var name='messagevalue'><string>".length(),	endIndexMessageValue);
 	}
 
 	/**
-	 * Given a WDDX packet in our normal format, gets the id number from within
+	 * Given a WDDX packet in our normal format, gets the tool content id from within
 	 * the &lt;var
 	 * name='messageValue'&gt;&lt;number&gt;num&lt;/number&gt;&lt;/var&gt;
 	 * 
@@ -451,17 +455,18 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	 * @return id
 	 */
 	private String extractToolContentIDFromWDDXPacket(String wddxPacket) {
-		int indexMessageValue = wddxPacket.indexOf("<var name=\"messageValue\"><number>");
-		assertTrue(wddxPacket + "!!<var name='messageValue'><number> string not found",	indexMessageValue > 0);
+		wddxPacket = wddxPacket.toLowerCase();
+		int indexMessageValue = wddxPacket.indexOf("<var name=\"messagevalue\"><number>");
+		assertTrue("<var name='messageValue'><number> string not found",	indexMessageValue > 0);
 		int endIndexMessageValue = wddxPacket.indexOf(".0</number></var>", indexMessageValue);
 		String idString = wddxPacket.substring(indexMessageValue
-				+ "<var name='messageValue'><string>".length(),
+				+ "<var name='messagevalue'><string>".length(),
 				endIndexMessageValue);
 		try {
 			Long.parseLong(idString);
 			return idString;
 		} catch (NumberFormatException e) {
-			fail("Unable to get id number from WDDX packet. Format exception. String was "
+			fail("Unable to get toolContentID from WDDX packet. Format exception. String was "
 					+ idString);
 		}
 		return null;

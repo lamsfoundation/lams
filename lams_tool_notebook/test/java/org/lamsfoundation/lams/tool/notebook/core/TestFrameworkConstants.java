@@ -30,7 +30,7 @@ public class TestFrameworkConstants {
 	/** the port on which the Selenium Server is listening */
 	public static final int SERVER_PORT = 5555;
 	/** 
-	 * the command string used to launch the browser, e.g. "firefox" or
+	 * the command string used to launch the browser, e.g. "*firefox", "*iexplore" or
 	 * "c:\\program files\\internet explorer\\iexplore.exe"
 	 */	
 	public static final String BROWSER = "*firefox";
