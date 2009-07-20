@@ -908,13 +908,12 @@ function chat_export_instance($id) {
  */
 function chat_import_instance($filepath, $userid, $courseid, $sectionid) {
     // file contents contains serialized chat object
-     $filestr = file_get_contents($filepath);
-     $all=unserialize($filestr);
-    
+    $filestr = file_get_contents($filepath);
+    $all=unserialize($filestr);
+     
     //we split the array so we can get the chat and its submissions
-    $chat = $all[0];
- //   $messages = $all[1];
-   // $users = $all[2];
+    $chat = $all;
+    
     // import this chat into a new course
     $chat->course = $courseid;
 
