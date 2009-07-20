@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.tool.forum.selenium;
 
 import java.util.Map;
 
+import org.jfree.util.Log;
 import org.lamsfoundation.lams.selenium.AbstractSeleniumTestCase;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 
@@ -50,7 +51,12 @@ public class TestForum extends AbstractSeleniumTestCase {
     private static final String TOPIC2_MESSAGE2 = "Porche 911 is the best, although everone has them.";
     private static final String TOPIC3_TITLE = "Dummy Title";
     private static final String TOPIC3_MESSAGE1 = "Dummy Message";
-    
+    private static final String REPLY_TITLE1 = "Reply title";
+    private static final String REPLY_MESSAGE1 = "This is a reply";
+    private static final String EDIT_MESSAGE1 = "This is an edited message";
+    private static final String TOPIC4_TITLE = "Learner Topic";
+    private static final String TOPIC4_MESSAGE = "Created in learner";
+
     private Map<String, String> contentDetails;
 
     protected String getToolSignature() {
@@ -95,26 +101,25 @@ public class TestForum extends AbstractSeleniumTestCase {
 
 	    // Edit the topic of the default thread
 	    testEditTopic(DEFAULT_TOPIC, TOPIC1_TITLE, TOPIC1_MESSAGE1);
-	    
+
 	    // Test adding a new topic
 	    testCreateTopic(TOPIC2_TITLE, TOPIC2_MESSAGE1);
-	    
+
 	    // Test deleting a topic
 	    testCreateTopic(TOPIC3_TITLE, TOPIC3_MESSAGE1);
 	    testRemoveTopic(TOPIC3_TITLE);
-	    
-	    
+
 	    // Testing other tabs
 	    selenium.click("tab-middle-link-2");
 	    selenium.click("lockWhenFinished");
 	    selenium.click("allowUpload");
 	    selenium.click("limitedInput");
-	    
+
 	    // TODO: Test conditions tab
 
 	    storeLearningDesign(contentDetails);
 	} catch (Exception e) {
-	    e.printStackTrace();
+	    Log.error(e);
 	    fail(e.getMessage());
 	}
 
@@ -141,31 +146,17 @@ public class TestForum extends AbstractSeleniumTestCase {
 	    setUpLearning();
 	    assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
 
-	    //	    // Test history has been emptied
-	    //	    testHistory(WIKI_TITLE1, false);
-	    //
-	    //	    // Test the main page cannot be removed
-	    //	    testRemove(WIKI_TITLE1, false);
-	    //
-	    //	    // Adding a dummy page and removing it
-	    //	    testAdd(WIKI_TITLE4, WIKI_BODY6);
-	    //	    testRemove(WIKI_TITLE4, true);
-	    //
-	    //	    // Testing wiki add page in learner
-	    //	    testAdd(WIKI_TITLE3, WIKI_BODY4);
-	    //
-	    //	    // Testing author edit again
-	    //	    selenium.runScript("changeWikiPage('" + WIKI_TITLE3 + "')");
-	    //	    selenium.waitForPageToLoad("30000");
-	    //	    testEdit(WIKI_TITLE3, WIKI_BODY5);
-	    //
-	    //	    // Test history has been added
-	    //	    testHistory(WIKI_TITLE3, true);
-	    //
-	    //	    // Removing the wiki page so it can be made again in the next test
-	    //	    testRemove(WIKI_TITLE3, true);
+	    // Testing a simple reply to a post
+	    testReplyToFirstPost(TOPIC2_TITLE, REPLY_TITLE1, REPLY_MESSAGE1);
+
+	    // Testing an edit of a post
+	    testEditFirstPost(TOPIC2_TITLE, TOPIC2_TITLE, EDIT_MESSAGE1);
+
+	    // Testing creating a topic
+	    testCreateTopicLearner(TOPIC4_TITLE, TOPIC4_MESSAGE);
 
 	} catch (Exception e) {
+	    Log.error(e);
 	    fail(e.getMessage());
 	}
     }
@@ -177,39 +168,8 @@ public class TestForum extends AbstractSeleniumTestCase {
 	try {
 	    loginToLams();
 	    openToolMonitor();
-
-	    // Should be able to edit this topic 
-	    testEditTopic(TOPIC2_TITLE, TOPIC2_TITLE, TOPIC2_MESSAGE2);
-	    returnToTopicList();
 	    
-	    // Test creating new topics
-	    
-	   
-	    
-	    //	    assertTrue("Montor page did not load properly", selenium.isTextPresent("Wiki Sessions"));
-	    //	    
-	    //	    // Clicking on the first link which pops up the monitor page
-	    //	    selenium.click("//td//a");
-	    //	    selenium.waitForPopUp("viewWindow", "10000");
-	    //	    selenium.selectWindow("viewWindow");
-	    //	    
-	    //
-	    //	    // Test history has been emptied
-	    //	    testHistory(WIKI_TITLE1, false);
-	    //
-	    //	    // Test the main page cannot be removed
-	    //	    testRemove(WIKI_TITLE1, false);
-	    //	    
-	    //	    // Adding a dummy page and removing it
-	    //	    testAdd(WIKI_TITLE4, WIKI_BODY6);
-	    //	    
-	    //	    // Editing the page
-	    //	    selenium.runScript("changeWikiPage('" + WIKI_TITLE4 + "')");
-	    //	    selenium.waitForPageToLoad("30000");
-	    //	    testEdit(WIKI_TITLE4, WIKI_BODY5);
-	    //	    
-	    //	    // Removing a page
-	    //	    testRemove(WIKI_TITLE4, true);
+	    // TODO: Work out how to access the forum page, which is opened in a _blank page
 
 	    selenium.close();
 	    selenium.selectWindow(null);
@@ -231,165 +191,191 @@ public class TestForum extends AbstractSeleniumTestCase {
      * @param message
      */
     private void testEditTopic(String title, String newTitle, String message) {
-	
+
 	// Check the topic exists
 	assertTrue("Topic does not exist", selenium.isTextPresent(title));
-	
+
 	// Open the iframe for editing the topic
 	selenium.click("//a[text()='" + title + "']");
 	selenium.waitForFrameToLoad("messageArea", "30000");
 	selenium.selectFrame("messageArea");
-	
+
 	// Edit the topic
 	selenium.click("//a[text()='Edit']");
 	selenium.waitForFrameToLoad("messageArea", "30000");
 	selenium.type("message.subject", newTitle);
 	selenium.runScript("FCKeditorAPI.GetInstance(\"message.body\").SetHTML(\"" + message + "\")");
-	
+
 	// TODO: Add tests for attaching files
-	
+
 	// Save the changes
 	selenium.click("//a[@class='button-add-item']");
 	selenium.waitForFrameToLoad("messageArea", "30000");
-	
+
 	// Return to the top frame
 	selenium.selectFrame("relative=top");
-	
+
 	// Testing that the topic was successfully edited
 	assertTrue("Topic not successfully edited: " + newTitle, selenium.isTextPresent(newTitle));
     }
-    
+
     /**
      * Tests creating a new topic, requires topic not already created
-     *
+     * 
      * @param title
      * @param message
      */
     private void testCreateTopic(String title, String message) {
-	
+
 	// Open the iframe for editing the topic
 	selenium.click("//a[text()=' Create a new topic ']");
 	selenium.waitForFrameToLoad("messageArea", "30000");
 	selenium.selectFrame("messageArea");
-	
+
 	// Add the topic 
 	selenium.type("message.subject", title);
 	selenium.runScript("FCKeditorAPI.GetInstance(\"message.body\").SetHTML(\"" + message + "\")");
-	
+
 	// TODO: Add tests for attaching files
-	
+
 	// Save the changes
 	selenium.click("//a[@class='button-add-item']");
 	selenium.waitForFrameToLoad("messageArea", "30000");
-	
+
 	// Return to the top frame
 	selenium.selectFrame("relative=top");
-	
+
 	// Testing that the topic was successfully edited
 	assertTrue("Topic not successfully added: " + title, selenium.isTextPresent(title));
     }
-    
+
     /**
      * Tests removing a title
+     * 
      * @param title
      */
     private void testRemoveTopic(String title) {
 	// Check the topic exists
 	assertTrue("Topic does not exist", selenium.isTextPresent(title));
-	
+
 	// Open the iframe for editing the topic
 	selenium.click("//a[text()='" + title + "']");
 	selenium.waitForFrameToLoad("messageArea", "30000");
 	selenium.selectFrame("messageArea");
-	
+
 	// Click the delete button
 	selenium.click("//a[text()='Delete']");
 	selenium.waitForFrameToLoad("messageArea", "30000");
-	
+
 	// Return to the top frame
 	selenium.selectFrame("relative=top");
-	
+
 	// Testing that the topic was successfully edited
 	assertFalse("Topic not successfully removed: " + title, selenium.isTextPresent(title));
     }
-    
+
     private void returnToTopicList() {
-	selenium.click("//a[@name=backToForum");
+	selenium.click("//input[@name='backToForum']");
 	selenium.waitForPageToLoad("30000");
     }
-    
-    
 
-    //    /**
-    //     * Tests editing the wiki page in author
-    //     */
-    //    private void testEdit(String title, String body) {
-    //
-    //	// Go to the edit tab
-    //	selenium.click("//div[@id='buttons']//a[@title='Edit the current Wiki page']");
-    //
-    //	// Set the  wiki title and body, then save
-    //	selenium.type("title", title);
-    //	selenium.runScript("FCKeditorAPI.GetInstance(\"wikiBody\").SetHTML(\"" + body + "\")");
-    //	selenium.runScript("doEditOrAdd('editPage')");
-    //	selenium.waitForPageToLoad("30000");
-    //
-    //	assertTrue("Title is not present on page: " + title, selenium.isTextPresent(title));
-    //	assertTrue("Wiki body is not present on page: " + body, selenium.isTextPresent(body));
-    //    }
-    //
-    //    /**
-    //     * Tests editing the wiki page in author
-    //     */
-    //    private void testAdd(String title, String body) {
-    //	// Go to the edit tab
-    //	selenium.click("//div[@id='buttons']//a[@title='Add a new Wiki page to this Wiki']");
-    //
-    //	// Set the  wiki title and body, then save
-    //	selenium.type("newPageTitle", title);
-    //	selenium.runScript("FCKeditorAPI.GetInstance(\"newPageWikiBody\").SetHTML(\"" + body + "\")");
-    //	selenium.runScript("doEditOrAdd('addPage')");
-    //	selenium.waitForPageToLoad("30000");
-    //
-    //	selenium.runScript("changeWikiPage('" + title + "')");
-    //	selenium.waitForPageToLoad("30000");
-    //
-    //	assertTrue("Title is not present on page: " + title, selenium.isTextPresent(title));
-    //	assertTrue("Wiki body is not present on page: " + body, selenium.isTextPresent(body));
-    //    }
-    //
-    //    private void testHistory(String title, boolean historyExpected) {
-    //	selenium.runScript("changeWikiPage('" + title + "')");
-    //	selenium.waitForPageToLoad("30000");
-    //
-    //	// Go to the history tab
-    //	selenium.click("//div[@id='buttons']//a[@title='View previous versions of this Wiki page']");
-    //
-    //	if (historyExpected) {
-    //	    assertTrue("Revision is not present on edited page: " + title, selenium.isTextPresent("Revert"));
-    //	    // TODO: Test the compare and revert feature
-    //	} else {
-    //	    assertFalse("Revision is not present on edited page: " + title, selenium.isTextPresent("Revert"));
-    //	}
-    //    }
-    //
-    //    private void testRemove(String title, boolean removeAllowedExpected) {
-    //	selenium.runScript("changeWikiPage('" + title + "')");
-    //	selenium.waitForPageToLoad("30000");
-    //
-    //	if (removeAllowedExpected) {
-    //	    assertTrue("Remove should be allowed for wiki page: " + title, selenium.isTextPresent("Remove"));
-    //
-    //	    // Remove the page
-    //	    selenium.runScript("submitWiki('removePage');");
-    //	    selenium.waitForPageToLoad("30000");
-    //
-    //	    selenium.runScript("toggleWikiList('removePage');");
-    //	    assertFalse("Wiki page should have been removed: " + title, selenium.isTextPresent(title));
-    //	} else {
-    //	    assertFalse("Remove should not be allowed for wiki page: " + title, selenium.isTextPresent("Remove"));
-    //	}
-    //
-    //    }
+    /**
+     * Tests replying to a post
+     * 
+     * @param topic
+     * @param title
+     * @param message
+     */
+    private void testReplyToFirstPost(String topic, String title, String message) {
+	// Check the topic exists
+	assertTrue("Topic does not exist: " + topic, selenium.isTextPresent(topic));
+
+	// Open the iframe for editing the topic
+	selenium.click("//a[text()='<b>" + topic + "</b>' or text()='" + topic + "']");
+	selenium.waitForPageToLoad("30000");
+
+	// Select the last post to reply to
+	selenium.click("//a[text()='Reply']");
+
+	// Check the reply has opened
+	assertTrue("Reply form did not open.", selenium.isTextPresent("Reply Message"));
+
+	// Do the reply
+	selenium.type("message.subject", title);
+	selenium.type("message.body__textarea", message);
+	selenium.click("//input[@type='submit']");
+	selenium.waitForPageToLoad("30000");
+
+	// Test the reply has been posted
+	assertTrue("Reply did not appear: " + title, selenium.isTextPresent(title));
+	assertTrue("Reply did not appear: " + message, selenium.isTextPresent(message));
+
+	// Return to the topic list
+	returnToTopicList();
+    }
+
+    /**
+     * Tests editing a post, must have a post available to edit
+     * 
+     * @param topic
+     * @param title
+     * @param message
+     */
+    private void testEditFirstPost(String topic, String title, String message) {
+	// Check the topic exists
+	assertTrue("Topic does not exist: " + topic, selenium.isTextPresent(topic));
+
+	// Open the iframe for editing the topic
+	selenium.click("//a[text()='<b>" + topic + "</b>' or text()='" + topic + "']");
+	selenium.waitForPageToLoad("30000");
+
+	// Select the last post to reply to
+	selenium.click("//a[text()='Edit']");
+
+	// Check the edit has opened
+	assertTrue("Edit form did not open.", selenium.isTextPresent("Edit Message"));
+
+	// Do the reply
+	selenium.type("message.subject", title);
+	selenium.type("message.body__textarea", message);
+	selenium.click("//input[@type='submit']");
+	selenium.waitForPageToLoad("30000");
+
+	// Test the reply has been posted
+	assertTrue("Reply did not appear: " + title, selenium.isTextPresent(title));
+	assertTrue("Reply did not appear: " + message, selenium.isTextPresent(message));
+
+	// Return to the topic list
+	returnToTopicList();
+    }
+
+    /**
+     * Tests creating a new topic for learner, requires topic not already
+     * created
+     * 
+     * @param title
+     * @param message
+     */
+    private void testCreateTopicLearner(String title, String message) {
+
+	// Skip the test if the topic has already been created - ie a previously passed test
+	if (!selenium.isTextPresent(title)) {
+	    // Click the new topic link
+	    selenium.click("//input[@name='newtopic']");
+	    selenium.waitForPageToLoad("30000");
+
+	    // Add the topic 
+	    selenium.type("message.subject", title);
+	    selenium.type("message.body__textarea", message);
+
+	    // Save the changes
+	    selenium.click("//input[@type='submit']");
+	    selenium.waitForPageToLoad("30000");
+
+	    // Testing that the topic was successfully edited
+	    assertTrue("Topic not successfully added: " + title, selenium.isTextPresent(title));
+	}
+
+    }
 
 }
