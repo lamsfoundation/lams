@@ -23,50 +23,50 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.notebook.testscripts;
 
-import org.lamsfoundation.lams.tool.notebook.core.AbstractSeleniumTestCase;
+
+import org.lamsfoundation.lams.selenium.AbstractSeleniumTestCase;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 
 public class TestNotebook extends AbstractSeleniumTestCase {
 
+    protected String getToolSignature() {
+	return NotebookConstants.TOOL_SIGNATURE;
+    }
 
-	protected String getToolSignature() {
-		return NotebookConstants.TOOL_SIGNATURE;
-	}
-	
-	protected String getLearningDesignName() {
-		return "bueno";
-	}
+    protected String getLearningDesignName() {
+	return "bueno";
+    }
 
-	protected void authoringTest() {
-		assertEquals("Notebook", selenium.getTitle());
+    protected void authoringTest() {
+	assertEquals("Notebook", selenium.getTitle());
 
-		selenium.type("title", "leave your comment2222");
-		selenium.runScript("FCKeditorAPI.GetInstance(\"instructions\").SetHTML(\"invent a new way of using Flash\")");
-		selenium.click("tab-middle-link-2");
-		selenium.click("lockOnFinished");
-		selenium.click("tab-middle-link-3");
-		selenium.type("onlineInstruction__lamstextarea", "online instructions");
-	}
+	selenium.type("title", "leave your comment2222");
+	selenium.runScript("FCKeditorAPI.GetInstance(\"instructions\").SetHTML(\"invent a new way of using Flash\")");
+	selenium.click("tab-middle-link-2");
+	selenium.click("lockOnFinished");
+	selenium.click("tab-middle-link-3");
+	selenium.type("onlineInstruction__lamstextarea", "online instructions");
+    }
 
-	protected void learningTest() throws InterruptedException {
-		setUpLearning();
-//		assertEquals("Notebook", selenium.getTitle());
-		assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
-		selenium.type("entryText", "have fun");
-		selenium.click("//a[@id='finishButton']/span");
-		selenium.waitForPageToLoad("30000");
-		// assertTrue(selenium.isTextPresent("Congratulations"));
-		assertFalse(selenium.isElementPresent("entryText"));
-		tearDownLearning();
+    protected void learningTest() throws InterruptedException {
+	setUpLearning();
+	// assertEquals("Notebook", selenium.getTitle());
+	assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
+	selenium.type("entryText", "have fun");
+	selenium.click("//a[@id='finishButton']/span");
+	selenium.waitForPageToLoad("30000");
+	// assertTrue(selenium.isTextPresent("Congratulations"));
+	assertFalse(selenium.isElementPresent("entryText"));
+	tearDownLearning();
 
-		setUpLearning();
-		// assertTrue(selenium.isTextPresent("Congratulations"));
-		assertFalse(selenium.isElementPresent("entryText"));
-		tearDownLearning();
-	 }
+	setUpLearning();
+	// assertTrue(selenium.isTextPresent("Congratulations"));
+	assertFalse(selenium.isElementPresent("entryText"));
+	tearDownLearning();
+    }
 
-	protected void monitoringTest() {
-		assertEquals("Notebook", selenium.getTitle());
-	}
+    protected void monitoringTest() {
+	assertEquals("Notebook", selenium.getTitle());
+    }
 
 }

@@ -221,8 +221,10 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 		+ "servlet/authoring/storeLearningDesignDetails";
 	String designDetails = constructWddxDesign(contentDetails);
 	//callback function is aimed to let Selenium wait till StoreLDServlet finishes its work
-	selenium.runScript("$.post(\"" + storeLearningDesignUrl + "\", " + "\"" + designDetails + "\", "
-		+ "function(data){ return data; }" + ");");
+	selenium.runScript("$.post(\"" + storeLearningDesignUrl + "\", " +
+			"\"" + designDetails + "\", " +
+			"function(data){ return data; }" +
+			");");
 	selenium.selectWindow(null);
     }
 
@@ -261,7 +263,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	assertTrue(flexSelenium.getFlexEnabled("startButton").equals("true"));
 
 	flexSelenium.flexSelectIndex("workspaceTree", String.valueOf(count));
-	//		flexSelenium.flexType("resourceName_txi", "bueno");
+	// flexSelenium.flexType("resourceName_txi", "bueno");
 	flexSelenium.flexClick("startButton");
 	Thread.sleep(5000);
 	assertTrue("Assertion failed. Lesson has *not* been created",
@@ -500,92 +502,59 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	    }
 	}
 
-	String design = "<wddxPacket version='1.0'>" + "<header />" + "<data>" + "<struct>"
-		+ "<var name='competences'><array length='0' /></var>"
-		+ "<var name='branchMappings'><array length='0' /></var>"
-		+ "<var name='groupings'><array length='0' /></var>"
-		+ "<var name='transitions'><array length='0' /></var>" + "<var name='activities'>"
-		+ "<array length='1'>" + "<struct>" + "<var name='competenceMappings'><array length='0' /></var>"
-		+ "<var name='gradebookToolOutputDefinitionName'><string>string_null_value</string></var>"
-		+ "<var name='extLmsId'><string>string_null_value</string></var>" + "<var name='toolID'><number>"
-		+ tool.getToolId()
-		+ "</number></var>"
-		+ "<var name='toolContentID'><number>"
-		+ contentDetails.get("toolContentID")
-		+ "</number></var>"
-		+ "<var name='toolSignature'><string>"
-		+ tool.getToolSignature()
-		+ "</string></var>"
-		+ "<var name='toolDisplayName'><string>"
-		+ tool.getToolDisplayName()
-		+ "</string></var>"
-		+ "<var name='helpURL'><string>"
-		+ tool.getHelpUrl()
-		+ "</string></var>"
-		+ "<var name='authoringURL'><string>"
-		+ tool.getAuthorUrl()
-		+ "</string></var>"
-		+ "<var name='stopAfterActivity'><boolean value='false' /></var>"
-		+ "<var name='groupingSupportType'><number>"
-		+ templateActivity.getGroupingSupportType()
-		+ "</number></var>"
-		+ "<var name='createDateTime'><dateTime>2009-6-12T1:24:50+3:0</dateTime></var>"
-		+ "<var name='defineLater'><boolean value='false' /></var>"
-		+ "<var name='runOffline'><boolean value='false' /></var>"
-		+ "<var name='applyGrouping'><boolean value='false' /></var>"
-		+ "<var name='parentActivityID'><number>-111111</number></var>"
-		+ "<var name='parentUIID'><number>-111111</number></var>"
-		+ "<var name='libraryActivityUIImage'><string>"
-		+ templateActivity.getLibraryActivityUiImage()
-		+ "</string></var>"
-		+ "<var name='xCoord'><number>124</number></var>"
-		+ "<var name='yCoord'><number>132</number></var>"
-		+ "<var name='helpText'><string>"
-		+ templateActivity.getHelpText()
-		+ "</string></var>"
-		+ "<var name='description'><string>"
-		+ templateActivity.getDescription()
-		+ "</string></var>"
-		+ "<var name='activityTitle'><string>"
-		+ templateActivity.getTitle()
-		+ "</string></var>"
-		+ "<var name='learningLibraryID'><number>"
-		+ templateActivity.getLearningLibrary().getLearningLibraryId()
-		+ "</number></var>"
-		+
-		//works with activityUIID=1 but may be we should generate unique one.
-		"<var name='activityUIID'><number>1</number></var>"
-		+ "<var name='activityCategoryID'><number>"
-		+ templateActivity.getActivityCategoryID()
-		+ "</number></var>"
-		+ "<var name='activityID'><number>"
-		+ templateActivity.getActivityId()
-		+ "</number></var>"
-		+ "<var name='activityTypeID'><number>"
-		+ templateActivity.getActivityTypeId()
-		+ "</number></var>"
-		+ "</struct>"
-		+ "</array>"
-		+ "</var>"
-		+ "<var name='contentFolderID'><string>"
-		+ contentDetails.get("contentFolderID")
-		+ "</string></var>"
-		+ "<var name='createDateTime'><dateTime>2009-6-24T22:45:24+3:0</dateTime></var>"
-		+ "<var name='workspaceFolderID'><number>"
-		+ workspaceFolderID
-		+ "</number></var>"
-		+ "<var name='maxID'><number>1</number></var>"
-		+ "<var name='saveMode'><number>0</number></var>"
-		+ "<var name='validDesign'><boolean value='true' /></var>"
-		+ "<var name='readOnly'><boolean value='false' /></var>"
-		+ "<var name='userID'><string>"
-		+ user.getUserId()
-		+ "</string></var>"
-		+ "<var name='title'><string>"
-		+ learningDesignName
-		+ "</string></var>"
-		+ "<var name='learningDesignID'><number>-111111</number></var>"
-		+ "<var name='copyTypeID'><number>1</number></var>" + "</struct>" + "</data>" + "</wddxPacket>";
+	String design = 
+	    "<wddxPacket version='1.0'>" + "<header />" + "<data>" + "<struct>" + 
+        	"<var name='competences'><array length='0' /></var>" + 
+        	"<var name='branchMappings'><array length='0' /></var>" + 
+        	"<var name='groupings'><array length='0' /></var>" + 
+        	"<var name='transitions'><array length='0' /></var>" + 
+        	"<var name='activities'>" + 
+        		"<array length='1'>" +
+        			"<struct>" +
+        				"<var name='competenceMappings'><array length='0' /></var>" +
+        				"<var name='gradebookToolOutputDefinitionName'><string>string_null_value</string></var>" +
+        				"<var name='extLmsId'><string>string_null_value</string></var>" +
+        				"<var name='toolID'><number>" + tool.getToolId() + "</number></var>" +
+        				"<var name='toolContentID'><number>" + contentDetails.get("toolContentID") + "</number></var>" +
+        				"<var name='toolSignature'><string>" + tool.getToolSignature() + "</string></var>" +
+        				"<var name='toolDisplayName'><string>" + tool.getToolDisplayName() + "</string></var>" +
+        				"<var name='helpURL'><string>" + tool.getHelpUrl() + "</string></var>" +
+        				"<var name='authoringURL'><string>" + tool.getAuthorUrl() + "</string></var>" +
+        				"<var name='stopAfterActivity'><boolean value='false' /></var>" +
+        				"<var name='groupingSupportType'><number>" + templateActivity.getGroupingSupportType() + "</number></var>" +
+        				"<var name='createDateTime'><dateTime>2009-6-12T1:24:50+3:0</dateTime></var>" +
+        				"<var name='defineLater'><boolean value='false' /></var>" +
+        				"<var name='runOffline'><boolean value='false' /></var>" +
+        				"<var name='applyGrouping'><boolean value='false' /></var>" +
+        				"<var name='parentActivityID'><number>-111111</number></var>" +
+        				"<var name='parentUIID'><number>-111111</number></var>" +
+        				"<var name='libraryActivityUIImage'><string>" + templateActivity.getLibraryActivityUiImage() + "</string></var>" +
+        				"<var name='xCoord'><number>124</number></var>" +
+        				"<var name='yCoord'><number>132</number></var>" +
+        				"<var name='helpText'><string>" + templateActivity.getHelpText() + "</string></var>" +
+        				"<var name='description'><string>" + templateActivity.getDescription() + "</string></var>" +
+        				"<var name='activityTitle'><string>" + templateActivity.getTitle() + "</string></var>" +
+        				"<var name='learningLibraryID'><number>" + templateActivity.getLearningLibrary().getLearningLibraryId() + "</number></var>" +
+        				//works with activityUIID=1 but may be we should generate unique one.
+        				"<var name='activityUIID'><number>1</number></var>" +
+        				"<var name='activityCategoryID'><number>" + templateActivity.getActivityCategoryID() + "</number></var>" +
+        				"<var name='activityID'><number>" + templateActivity.getActivityId() + "</number></var>" +
+        				"<var name='activityTypeID'><number>" + templateActivity.getActivityTypeId() + "</number></var>" +
+        			"</struct>" +
+        		"</array>" +
+        	"</var>" +
+        	"<var name='contentFolderID'><string>" + contentDetails.get("contentFolderID") + "</string></var>" +
+        	"<var name='createDateTime'><dateTime>2009-6-24T22:45:24+3:0</dateTime></var>" +
+        	"<var name='workspaceFolderID'><number>" + workspaceFolderID + "</number></var>" +
+        	"<var name='maxID'><number>1</number></var>" +
+        	"<var name='saveMode'><number>0</number></var>" +
+        	"<var name='validDesign'><boolean value='true' /></var>" +
+        	"<var name='readOnly'><boolean value='false' /></var>" +
+        	"<var name='userID'><string>" + user.getUserId() + "</string></var>" +
+        	"<var name='title'><string>" + learningDesignName + "</string></var>" +
+        	"<var name='learningDesignID'><number>-111111</number></var>" +
+        	"<var name='copyTypeID'><number>1</number></var>" +
+            "</struct>" + "</data>" + "</wddxPacket>";
 	return design;
     }
 
