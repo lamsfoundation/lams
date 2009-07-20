@@ -18,5 +18,9 @@
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/jboss-jmx-remoting.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/quartz.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-api.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-jboss-logging.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/lib/jboss-logging-spi.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/lib/javassist.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
