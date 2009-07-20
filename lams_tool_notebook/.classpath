@@ -17,13 +17,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_monitoring"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
-	<classpathentry kind="lib" path="lib/flash-selenium.jar"/>
-	<classpathentry kind="lib" path="lib/flex-ui-selenium-0.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/selenium-server.jar"/>
-	<classpathentry kind="lib" path="lib/selenium-java-client-driver.jar" sourcepath="lib/selenium-java-client-driver-sources.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-api.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/slf4j-jboss-logging.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/lib/jboss-logging-spi.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/lib/javassist.jar"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>

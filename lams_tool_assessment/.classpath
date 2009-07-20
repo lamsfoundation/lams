@@ -15,7 +15,5 @@
 			<attribute name="javadoc_location" value="http://www.hibernate.org/hib_docs/v3/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/lams_tool_notebook"/>
-	<classpathentry kind="lib" path="/lams_tool_notebook/lib/selenium-java-client-driver.jar" sourcepath="/lams_tool_notebook/lib/selenium-java-client-driver-sources.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>
