@@ -333,12 +333,23 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 
     /** */
     protected void loginToLams() throws Exception {
+	//prevent popup window for user logging in for the first time
+	//may be move to setUp()
+	User user = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN);
+	if (user.isFirstLogin()) {
+	    user.setFirstLogin(false);
+	    Workspace workspace = (Workspace) activityDAO.find(Workspace.class, user.getWorkspace().getWorkspaceId());
+	    user.setWorkspace(workspace);
+	    userManagementService.save(user);
+	}
+	
 	selenium.open(TestFrameworkConstants.WEB_APP_DIR);
 	selenium.type("j_username", TestFrameworkConstants.USER_LOGIN);
 	selenium.type("j_password", TestFrameworkConstants.USER_PASSWORD);
 	selenium.click("link=Login");
 	selenium.waitForPageToLoad("10000");
 	Thread.sleep(3000);
+
     }
 
     // *****************************************************************************
