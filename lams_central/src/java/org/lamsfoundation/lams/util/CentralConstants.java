@@ -147,7 +147,7 @@ public class CentralConstants {
 
     public static final int PLANNER_MAX_PARALLEL_ACTIVITIES = 4;
 
-    public static final int PLANNER_RECENT_LD_MAX_COUNT = 5;
+    public static final int PLANNER_RECENT_LD_MAX_COUNT = 10;
 
     public static final String MONITORING_SERVICE_BEAN_NAME = "monitoringService";
 
