@@ -479,11 +479,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    // Iterate through all the activities from the sequence, adding them to Planner activity set
 		    do {
 			addedDTO = addActivityToPlanner(learningDesign, activities, nestedActivity);
-			Transition transitionTo = nestedActivity.getTransitionTo();
-			if (transitionTo == null) {
+			Transition transitionFrom = nestedActivity.getTransitionFrom();
+			if (transitionFrom == null) {
 			    nestedActivity = null;
 			} else {
-			    nestedActivity = transitionTo.getToActivity();
+			    nestedActivity = transitionFrom.getToActivity();
 			}
 			addedDTO.setParentActivityTitle(activity.getTitle());
 			addedDTO.setGroup(branch);
