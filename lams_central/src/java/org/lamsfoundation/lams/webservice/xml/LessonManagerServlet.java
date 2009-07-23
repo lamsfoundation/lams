@@ -102,13 +102,13 @@ public class LessonManagerServlet extends HttpServlet {
      * This method is called when a form has its tag value method equals to get.
      * 
      * @param request
-     *                the request send by the client to the server
+     *            the request send by the client to the server
      * @param response
-     *                the response send by the server to the client
+     *            the response send by the server to the client
      * @throws ServletException
-     *                 if an error occurred
+     *             if an error occurred
      * @throws IOException
-     *                 if an error occurred
+     *             if an error occurred
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -271,16 +271,17 @@ public class LessonManagerServlet extends HttpServlet {
     /**
      * The doPost method of the servlet. <br>
      * 
-     * This method is called when a form has its tag value method equals to post.
+     * This method is called when a form has its tag value method equals to
+     * post.
      * 
      * @param request
-     *                the request send by the client to the server
+     *            the request send by the client to the server
      * @param response
-     *                the response send by the server to the client
+     *            the response send by the server to the client
      * @throws ServletException
-     *                 if an error occurred
+     *             if an error occurred
      * @throws IOException
-     *                 if an error occurred
+     *             if an error occurred
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -566,7 +567,7 @@ public class LessonManagerServlet extends HttpServlet {
      * Initialization of the servlet. <br>
      * 
      * @throws ServletException
-     *                 if an error occured
+     *             if an error occured
      */
     @Override
     public void init() throws ServletException {
@@ -626,8 +627,9 @@ public class LessonManagerServlet extends HttpServlet {
 	}
 
 	/**
-	 * Adds each user in learnerIds and monitorIds as learner and staff to the given lesson id; authenticates using
-	 * the 3rd party server requestor's username.
+	 * Adds each user in learnerIds and monitorIds as learner and staff to
+	 * the given lesson id; authenticates using the 3rd party server
+	 * requestor's username.
 	 * 
 	 * @param serverId
 	 * @param datetime
@@ -713,7 +715,8 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * 
-     * This method gets the tool outputs for an entire lesson and returns them in an XML format.
+     * This method gets the tool outputs for an entire lesson and returns them
+     * in an XML format.
      * 
      * @param document
      * @param serverId
@@ -731,7 +734,7 @@ public class LessonManagerServlet extends HttpServlet {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 
-	     Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
 
 	    // Get the lesson and activitied given an lsId
 	    Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
@@ -750,10 +753,10 @@ public class LessonManagerServlet extends HttpServlet {
 		Iterator learnerIterator = lesson.getAllLearners().iterator();
 		while (learnerIterator.hasNext()) {
 		    User learner = (User) learnerIterator.next();
-		    
-		    String noPrefixUserName = learner.getLogin().substring(serverMap.getPrefix().length() + 1);
+
+		    String userNoPrefixName = learner.getLogin().substring(serverMap.getPrefix().length() + 1);
 		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities,
-			    isAuthoredToolOutputs, noPrefixUserName));
+			    isAuthoredToolOutputs, userNoPrefixName));
 		}
 	    } else {
 		// TODO: handle this error instead of throwing an exception
@@ -772,7 +775,8 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * 
-     * This method gets the tool outputs for a specific user in a lesson and returns them in XML format.
+     * This method gets the tool outputs for a specific user in a lesson and
+     * returns them in XML format.
      * 
      * @param document
      * @param serverId
@@ -801,8 +805,6 @@ public class LessonManagerServlet extends HttpServlet {
 		    userStr);
 	    if (userMap != null) {
 		User learner = userMap.getUser();
-		
-		String noPrefixUserName = learner.getLogin().substring(serverMap.getPrefix().length() + 1);
 
 		// Get the lesson and activitied given an lsId
 		Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
@@ -815,8 +817,9 @@ public class LessonManagerServlet extends HttpServlet {
 		    toolOutputsElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
 		    toolOutputsElement.setAttribute("name", lesson.getLessonName());
 
+		    String userNoPrefixName = learner.getLogin().substring(serverMap.getPrefix().length() + 1);
 		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities,
-			    isAuthoredToolOutputs, noPrefixUserName));
+			    isAuthoredToolOutputs, userNoPrefixName));
 		}
 	    } else {
 		// TODO: handle this error instead of throwing an exception
@@ -834,7 +837,8 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     /**
-     * Gets the outputs for an activity for a specific learner and returns them in XML format
+     * Gets the outputs for an activity for a specific learner and returns them
+     * in XML format
      * 
      * @param document
      * @param learner
@@ -844,10 +848,10 @@ public class LessonManagerServlet extends HttpServlet {
      * @return
      */
     private Element getLearnerOutputsElement(Document document, User learner, Lesson lesson, Set<Activity> activities,
-	    boolean isAuthoredToolOutputs, String noPrefixUserName) {
+	    boolean isAuthoredToolOutputs, String userNoPrefixName) {
 	Element learnerElement = document.createElement("LearnerOutput");
-	
-	learnerElement.setAttribute("userName", learner.getLogin());
+
+	learnerElement.setAttribute("userName", userNoPrefixName);
 	learnerElement.setAttribute("lamsUserName", learner.getLogin());
 	learnerElement.setAttribute("lamsUserId", learner.getUserId().toString());
 	learnerElement.setAttribute("firstName", learner.getFirstName());
@@ -893,7 +897,8 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     /**
-     * Gets the tool output for a specified activity and learner and returns an XML representation of the data
+     * Gets the tool output for a specified activity and learner and returns an
+     * XML representation of the data
      * 
      * @param document
      * @param toolAct
