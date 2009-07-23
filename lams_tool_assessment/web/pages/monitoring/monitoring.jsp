@@ -16,7 +16,7 @@
 			var pathToImageFolder = "<lams:LAMSURL/>images/";
 			var pathToJsFolder = "<html:rewrite page='/includes/javascript/'/>"; 
 		</script>
-	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.patched.js"></script>
+ 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
 	 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jqGrid.js'/>"></script>
 	 	
 		<script>
