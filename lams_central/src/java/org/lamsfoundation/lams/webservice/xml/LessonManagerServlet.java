@@ -731,8 +731,7 @@ public class LessonManagerServlet extends HttpServlet {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 
-	    // TODO: Un-comment once finished testing as well as the prefix stuff
-	    // Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	     Authenticator.authenticate(serverMap, datetime, username, hashValue);
 
 	    // Get the lesson and activitied given an lsId
 	    Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
@@ -751,8 +750,10 @@ public class LessonManagerServlet extends HttpServlet {
 		Iterator learnerIterator = lesson.getAllLearners().iterator();
 		while (learnerIterator.hasNext()) {
 		    User learner = (User) learnerIterator.next();
+		    
+		    String noPrefixUserName = learner.getLogin().substring(serverMap.getPrefix().length() + 1);
 		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities,
-			    isAuthoredToolOutputs));
+			    isAuthoredToolOutputs, noPrefixUserName));
 		}
 	    } else {
 		// TODO: handle this error instead of throwing an exception
@@ -794,13 +795,14 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 
-	    // TODO: Un-comment once finished testing as well as the prefix stuff
-	    // Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
 
 	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(serverMap,
 		    userStr);
 	    if (userMap != null) {
 		User learner = userMap.getUser();
+		
+		String noPrefixUserName = learner.getLogin().substring(serverMap.getPrefix().length() + 1);
 
 		// Get the lesson and activitied given an lsId
 		Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
@@ -814,7 +816,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    toolOutputsElement.setAttribute("name", lesson.getLessonName());
 
 		    toolOutputsElement.appendChild(getLearnerOutputsElement(document, learner, lesson, activities,
-			    isAuthoredToolOutputs));
+			    isAuthoredToolOutputs, noPrefixUserName));
 		}
 	    } else {
 		// TODO: handle this error instead of throwing an exception
@@ -842,9 +844,9 @@ public class LessonManagerServlet extends HttpServlet {
      * @return
      */
     private Element getLearnerOutputsElement(Document document, User learner, Lesson lesson, Set<Activity> activities,
-	    boolean isAuthoredToolOutputs) {
+	    boolean isAuthoredToolOutputs, String noPrefixUserName) {
 	Element learnerElement = document.createElement("LearnerOutput");
-	// String userNoPrefixName = learner.getLogin().substring(serverMap.getPrefix().length() + 1);
+	
 	learnerElement.setAttribute("userName", learner.getLogin());
 	learnerElement.setAttribute("lamsUserName", learner.getLogin());
 	learnerElement.setAttribute("lamsUserId", learner.getUserId().toString());
