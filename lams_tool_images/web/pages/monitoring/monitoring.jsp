@@ -16,7 +16,7 @@
 	  	<script type="text/javascript">
 			var pathToImageFolder = "<lams:LAMSURL/>images/";
 	 	</script>
-	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.patched.js"></script>
+ 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>	
  			
 		<script>
 			var initialTabId = "${initialTabId}";
