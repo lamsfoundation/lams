@@ -29,6 +29,10 @@
       name="reflectionForm"
       type="org.lamsfoundation.lams.tool.sbmt.form.ReflectionForm"
     />
+    <form-bean
+      name="sbmtMarkForm"
+      type="org.lamsfoundation.lams.tool.sbmt.form.MarkForm"
+    />
 
 <form-bean name="SbmtMonitoringForm" type="org.apache.struts.action.DynaActionForm">
 
@@ -142,6 +146,31 @@
       <forward
         name="viewReflect"
         path="/monitoring/notebook.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/mark"
+      type="org.lamsfoundation.lams.tool.sbmt.web.MarkAction"
+      name="sbmtMarkForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="listMark"
+        path="/monitoring/mark/mark.jsp"
+        redirect="false"
+      />
+      <forward
+        name="updateMark"
+        path="/monitoring/mark/updatemark.jsp"
+        redirect="false"
+      />
+      <forward
+        name="listAllMarks"
+        path="/monitoring/mark/allmarks.jsp"
         redirect="false"
       />
     </action>

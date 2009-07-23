@@ -15,5 +15,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
-	<classpathentry kind="output" path="web/WEB-INF/classes"/>
+	<classpathentry kind="output" path="bin/classes"/>
 <classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/></classpath>

@@ -283,8 +283,8 @@
 		<!-- =================================================================== -->
 		<target name="deploy-war" depends="build-war" description="Deploy the SubmitFiles tool war file and jar file">
 			<delete quiet="true">
-				<fileset dir="${jboss.deploy}/tmp"/>
-				<fileset dir="${jboss.deploy}/work"/>
+				<fileset dir="${jboss.server.instance}/tmp"/>
+				<fileset dir="${jboss.server.instance}/work"/>
 			</delete>
 			<copy file="${build.lib}/${product}.jar"
 					todir="${jboss.deploy}"/> 
@@ -460,6 +460,23 @@
 	
 	<target name="deploy-tool" depends="create-deploy-package, run-deploy-package" 
 	   description="Build the war, jar and run the deploy tool. Deletes most old tool references from db, creates db tables, application.xml in ear, copies war and jar file to ear. deploy-tool is only designed to be run in a development environment, or on an empty db. Do not run on a production environment.">
+	</target>
+	
+	<target name="deploy-jar" depends="build-jar" 
+		   description="Deploys just the jar to the lams.ear directory">
+		
+		<delete >
+			<fileset dir="${jboss.server.instance}/tmp"/>
+			<fileset dir="${jboss.server.instance}/work"/>
+		</delete>
+		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}"/> 
+		
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/tool/wiki">
+		   <fileset dir="${conf.language.dir}">
+		   	<include name="**/*.properties"/>
+		    <include name="**/*.txt"/>
+		   </fileset>
+		</copy>
 	</target>
 	
 	<target name="delete-exploded-tool-folder" description="delete old tool exploded tool folder">

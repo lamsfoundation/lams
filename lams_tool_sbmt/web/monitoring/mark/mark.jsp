@@ -9,16 +9,16 @@
 	<c:set var="lams">
 		<lams:LAMSURL />
 	</c:set>
+	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
 	<script type="text/javascript">
 		function updateMark(detailId,reportId,sessionId,userId){
-			var act = "<c:url value="/monitoring.do"/>";
-			location.href=act + "?method=newMark&updateMode=listMark&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
+			location.href="<lams:WebAppURL/>mark.do?method=newMark&updateMode=listMark&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
 		}
 		function closeAndRefreshParentMonitoringWindow() {
 			refreshParentMonitoringWindow();
 			window.close();
-		}  				
+		}  			
 	</script>
 </lams:head>
 <body class="stripes">
@@ -40,6 +40,5 @@
 				</table>
 			</div>
 		<div id="footer"></div>
-		</div>
 </body>
 </lams:html>

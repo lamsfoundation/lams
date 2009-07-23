@@ -54,6 +54,9 @@ create table tl_lasbmt11_report (
    comments varchar(250),
    marks float,
    date_marks_released datetime,
+   mark_file_uuid bigint,
+   mark_file_version_id bigint,
+   mark_file_name varchar(255),
    primary key (report_id)
 )TYPE=InnoDB;
 create table tl_lasbmt11_session (

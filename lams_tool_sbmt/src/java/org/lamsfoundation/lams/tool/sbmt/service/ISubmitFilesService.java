@@ -25,12 +25,15 @@
 
 package org.lamsfoundation.lams.tool.sbmt.service;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.sbmt.InstructionFiles;
@@ -124,7 +127,25 @@ public interface ISubmitFilesService {
      */
     public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale);
 
-    public void updateMarks(Long reportID, Float marks, String comments);
+    /**
+     * Updates the marks for a file, and also allows a file to be uploaded
+     * 
+     * @param reportID
+     * @param marks
+     * @param comments
+     * @param marksFileInputStream
+     * @param marksFileName
+     */
+    public void updateMarks(Long reportID, Float marks, String comments, FormFile file) throws InvalidParameterException, RepositoryCheckedException;
+    
+    /**
+     * Removes the marks file from a report
+     * 
+     * @param reportID
+     * @param markFileUUID
+     * @param markFileVersionID
+     */
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID);
 
     public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale);
 

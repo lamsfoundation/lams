@@ -60,6 +60,9 @@ public class FileDetailsDTO implements Serializable{
 	private String marks;
 	private Date dateOfSubmission;
 	private Date dateMarksReleased;
+	private String markFileName;
+	private Long markFileUUID;
+	private Long markFileVersionID;
 	
 	//file repository info
 	private Long uuID;
@@ -68,7 +71,7 @@ public class FileDetailsDTO implements Serializable{
 	private boolean finished;
 	//if this file uploaded by current learner
 	private boolean currentLearner;
-	private String exportedURL;  // the location of this file saved by the export function.      	
+	private String exportedURL;  // the location of this file saved by the export function.   
 	
 
 	/** 
@@ -99,6 +102,9 @@ public class FileDetailsDTO implements Serializable{
 			this.dateMarksReleased = report.getDateMarksReleased();		
 			this.comments = report.getComments();
 			this.marks = report.getMarks() != null? NumberUtil.formatLocalisedNumber(report.getMarks(), numberFormat,2) : "";
+			this.markFileName = report.getMarkFileName();
+			this.markFileUUID = report.getMarkFileUUID();
+			this.markFileVersionID = report.getMarkFileVersionID();
 		}
 	}
 
@@ -260,5 +266,28 @@ public class FileDetailsDTO implements Serializable{
 	public void setOwner(SubmitUserDTO owner) {
 		this.owner = owner;
 	}
-	
+
+	public String getMarkFileName() {
+	    return markFileName;
+	}
+
+	public void setMarkFileName(String markFileName) {
+	    this.markFileName = markFileName;
+	}
+
+	public Long getMarkFileUUID() {
+	    return markFileUUID;
+	}
+
+	public void setMarkFileUUID(Long markFileUUID) {
+	    this.markFileUUID = markFileUUID;
+	}
+
+	public Long getMarkFileVersionID() {
+	    return markFileVersionID;
+	}
+
+	public void setMarkFileVersionID(Long markFileVersionID) {
+	    this.markFileVersionID = markFileVersionID;
+	}
 }

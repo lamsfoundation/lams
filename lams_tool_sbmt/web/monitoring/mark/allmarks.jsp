@@ -9,8 +9,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
 	<script type="text/javascript">
 		function updateMark(detailId,reportId,sessionId,userId){
-			var act = "<c:url value="/monitoring.do"/>";
-			location.href=act + "?method=newMark&updateMode=listAllMarks&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
+			location.href="<lams:WebAppURL/>mark.do?method=newMark&updateMode=listAllMarks&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
 		}
 		function closeAndRefreshParentMonitoringWindow() {
 			refreshParentMonitoringWindow();

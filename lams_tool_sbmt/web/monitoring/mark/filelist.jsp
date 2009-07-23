@@ -35,9 +35,34 @@
 		</c:choose>
 	</td>
 </tr>
+<tr>
+	<td class="field-name">
+		<fmt:message key="label.monitor.mark.markedFile" />
+		:
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${empty fileInfo.markFileUUID}">
+				<fmt:message key="label.learner.notAvailable" />
+			</c:when>
+			<c:otherwise>
+				<c:out value="${fileInfo.markFileName}" />
+				<c:set var="markFileViewURL">
+					<html:rewrite page="/download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=false" />
+				</c:set>
+				<a href="javascript:launchInstructionsPopup('<c:out value='${markFileViewURL}' escapeXml='false'/>')" class="button"> <fmt:message key="label.view" /> </a>&nbsp;
+				<c:set var="markFileDownloadURL">
+					<html:rewrite page="/download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=true" />
+				</c:set>
+				<a href="<c:out value='${markFileDownloadURL}' escapeXml='false'/>"  class="button"> <fmt:message key="label.download" /> </a>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
 
 <tr>
 	<td colspan="2">
 		<hr size="1" style="width:500px"/>
+		<br />
 	</td>
 </tr>

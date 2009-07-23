@@ -162,11 +162,34 @@
 								</td>
 								<td>
 									<c:choose>
-										<c:when test="${empty file.comments}">
+										<c:when test="${empty file.marks}">
 											<fmt:message key="label.learner.notAvailable" />
 										</c:when>
 										<c:otherwise>
 											<c:out value="${file.marks}" escapeXml="false" />
+										</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
+							<tr>
+								<!--Sixth row displaying the marked file-->
+								<td class="field-name">
+									<fmt:message key="label.monitor.mark.markedFile" />
+								</td>
+								<td>
+									<c:choose>
+										<c:when test="${empty file.markFileUUID}">
+											<fmt:message key="label.learner.notAvailable" />
+										</c:when>
+										<c:otherwise>
+											<c:out value="${file.markFileName}" />
+											<c:set var="markFileDownloadURL">
+											<c:url
+												value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
+											</c:set>
+											<a href="${markFileDownloadURL}"><fmt:message key="label.download" />
+											</a>
+
 										</c:otherwise>
 									</c:choose>
 								</td>

@@ -51,6 +51,31 @@
             length="19"
         />
 
+        <property
+            name="markFileUUID"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="mark_file_uuid"
+        />
+
+        <property
+            name="markFileName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="mark_file_name"
+            length="255"
+        />
+
+        <property
+            name="markFileVersionID"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="mark_file_version_id"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-SubmitFilesReport.xml

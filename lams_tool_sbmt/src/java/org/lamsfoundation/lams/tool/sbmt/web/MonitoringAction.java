@@ -38,7 +38,6 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -47,7 +46,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -63,7 +61,6 @@ import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -72,10 +69,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Manpreet Minhas
- * @struts.action path="/monitoring" parameter="method" scope="request" validate="false" name="SbmtMonitoringForm"
+ * @struts.action path="/monitoring" parameter="method" scope="request"
+ *                validate="false" name="SbmtMonitoringForm"
  * 
  * @struts.action-forward name="listMark" path="/monitoring/mark/mark.jsp"
- * @struts.action-forward name="updateMark" path="/monitoring/mark/updatemark.jsp"
  * @struts.action-forward name="listAllMarks" path="/monitoring/mark/allmarks.jsp"
  * 
  * @struts.action-forward name="success" path="/monitoring/monitoring.jsp"
@@ -325,96 +322,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 	request.setAttribute("report", files);
 	return mapping.findForward("listMark");
-    }
-
-    /**
-     * Display update mark initial page.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward newMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
-	Long detailID = new Long(WebUtil.readLongParam(request, "detailID"));
-	String updateMode = request.getParameter("updateMode");
-
-	submitFilesService = getSubmitFilesService();
-
-	List report = new ArrayList<FileDetailsDTO>();
-	report.add(submitFilesService.getFileDetails(detailID, request.getLocale()));
-
-	request.setAttribute("report", report);
-	request.setAttribute("updateMode", updateMode);
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
-
-	return mapping.findForward("updateMark");
-    }
-
-    /**
-     * Update mark.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward updateMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
-	Integer userID = WebUtil.readIntParam(request, "userID");
-	Long detailID = new Long(WebUtil.readLongParam(request, "detailID"));
-	String updateMode = request.getParameter("updateMode");
-	Long reportID = new Long(WebUtil.readLongParam(request, "reportID"));
-
-	ActionMessages errors = new ActionMessages();
-	// Check whether the mark is valid.
-	Float marks = null;
-	String markStr = request.getParameter("marks");
-	try {
-	    marks = NumberUtil.getLocalisedFloat(markStr, request.getLocale());
-	} catch (Exception e) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.mark.invalid.number"));
-	}
-
-	String comments = WebUtil.readStrParam(request, "comments", true);
-	if (!errors.isEmpty()) {
-	    submitFilesService = getSubmitFilesService();
-	    List report = new ArrayList<FileDetailsDTO>();
-	    FileDetailsDTO fileDetail = submitFilesService.getFileDetails(detailID, request.getLocale());
-	    // echo back the input, even they are wrong.
-	    fileDetail.setComments(comments);
-	    fileDetail.setMarks(markStr);
-	    report.add(fileDetail);
-
-	    request.setAttribute("report", report);
-	    request.setAttribute("updateMode", updateMode);
-	    request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
-
-	    saveErrors(request, errors);
-	    return mapping.findForward("updateMark");
-	}
-
-	// get service then update report table
-	submitFilesService = getSubmitFilesService();
-
-	submitFilesService.updateMarks(reportID, marks, comments);
-
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
-	if (StringUtils.equals(updateMode, "listMark")) {
-	    List report = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale());
-	    request.setAttribute("report", report);
-	    return mapping.findForward("listMark");
-	} else {
-	    Map report = submitFilesService.getFilesUploadedBySession(sessionID, request.getLocale());
-	    request.setAttribute("reports", report);
-	    return mapping.findForward("listAllMarks");
-	}
     }
 
     /**
