@@ -1219,4 +1219,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	return userContribution;
     }
 
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getImageGalleryOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

@@ -50,6 +50,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<html:text property="maxNominationCount" size="8" maxlength="3" />
 </p>
 
+<c:if test="${not empty voteGeneralAuthoringDTO.dataFlowObjectNames}">
+	<p>
+		<label for="maxInputs">
+		<fmt:message key="label.advanced.data.flow.limit" /></label>
+		<html:select property="maxInputs" styleId="maxInputs">
+			<html:option value="0" styleId="dataFlowLimitNoneOption">
+				<fmt:message key="label.advanced.data.flow.limit.none" />
+			</html:option>
+			<c:forEach begin="1" end="50" var="index">
+				<html:option value="${index}">${index}</html:option>
+			</c:forEach>
+		</html:select>
+	</p>
+</c:if>
+
 <p>
 	<html:checkbox property="showResults" value="1" styleClass="noBorder" styleId="showResults">
 	</html:checkbox>

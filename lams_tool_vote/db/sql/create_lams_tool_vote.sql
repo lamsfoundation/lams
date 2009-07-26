@@ -19,6 +19,8 @@ CREATE TABLE tl_lavote11_content (
      , reflectionSubject TEXT
      , show_results TINYINT(1) NOT NULL DEFAULT 1
 	 , assigned_data_flow_object TINYINT(1)
+	 , data_flow_object_used TINYINT(1) DEFAULT 0
+	 , max_inputs SMALLINT
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 

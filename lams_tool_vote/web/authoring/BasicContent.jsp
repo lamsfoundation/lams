@@ -74,25 +74,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         submitMonitoringMethod('removeNomination');
 	}
 	
-	var noneDataFlowSelectedPreviously = document.getElementById("dataFlowNoneOption")==null 
-							   || document.getElementById("dataFlowNoneOption").selected=="selected";
 	
 	function onSelectDataInput(){
-		if (document.getElementById("firstNomination")!=null
-			&& noneDataFlowSelectedPreviously
-			&& !document.getElementById("dataFlowNoneOption").selected){
-				if (!confirm("<fmt:message key='msg.data.flow.clear.nominations' />")){
-					document.getElementById("dataFlowNoneOption").selected="selected";
-			}
+		if (noneDataFlowSelectedPreviously && !document.getElementById("dataFlowNoneOption").selected){
+				document.getElementById("maxInputs").disabled=false;		
+					
+		}
+		else if (!noneDataFlowSelectedPreviously && document.getElementById("dataFlowNoneOption").selected){
+				document.getElementById("dataFlowLimitNoneOption").selected=true;
+				document.getElementById("maxInputs").disabled=true;		
 		}
 		noneDataFlowSelectedPreviously = document.getElementById("dataFlowNoneOption").selected;
-	}
-	
-	function resetDataInput(){
-		if (document.getElementById("dataFlowNoneOption")!=null){
-			document.getElementById("dataFlowNoneOption").selected=true;
-			noneDataFlowSelectedPreviously=true;
-		}
 	}
 
 </script>
@@ -137,7 +129,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <p>
 	<c:if
 		test="${voteGeneralAuthoringDTO.activeModule == 'authoring' || voteGeneralAuthoringDTO.activeModule == 'defineLater'}">
-		<a  href="javascript:resetDataInput(); showMessage('<html:rewrite page="/authoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');"
+		<a  href="showMessage('<html:rewrite page="/authoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');"
 			class="button-add-item"> <fmt:message
 				key="label.add.new.nomination" /> </a>
 	</c:if>
@@ -145,7 +137,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:if
 		test="${voteGeneralAuthoringDTO.activeModule != 'authoring' && voteGeneralAuthoringDTO.activeModule != 'defineLater'}">
 		<a
-			href="javascript:resetDataInput(); showMessage('<html:rewrite page="/monitoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');"
+			href="showMessage('<html:rewrite page="/monitoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&activeModule=${voteGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${voteGeneralAuthoringDTO.defaultContentIdStr}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}&reflectionSubject=${voteGeneralAuthoringDTO.reflectionSubject}"/>');"
 			class="button-add-item"> <fmt:message
 				key="label.add.new.nomination" /> </a>
 	</c:if>
@@ -153,7 +145,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:if test="${not empty voteGeneralAuthoringDTO.dataFlowObjectNames}">
 		<span style="margin-left: 20px;"><fmt:message key="label.data.flow.choose" /></span>
 		<html:select property="assignedDataFlowObject" onchange="javascript:onSelectDataInput();">
-			<html:option styleId="dataFlowNoneOption" value="0"><fmt:message key="label.data.flow.none" /></html:option>
+			<html:option value="0" styleId="dataFlowNoneOption"><fmt:message key="label.data.flow.none" /></html:option>
 			<c:forEach items="${voteGeneralAuthoringDTO.dataFlowObjectNames}" var="dataFlowObject" varStatus="status">
 				<html:option value="${status.index+1}">${dataFlowObject}</html:option>
 			</c:forEach>

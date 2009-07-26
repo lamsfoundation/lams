@@ -909,4 +909,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	this.coreNotebookService = coreNotebookService;
     }
 
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
+    }
 }

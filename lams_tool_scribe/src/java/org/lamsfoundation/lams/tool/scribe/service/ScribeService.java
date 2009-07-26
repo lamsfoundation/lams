@@ -704,4 +704,8 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     public void deleteHeading(Long headingUid) {
 	scribeHeadingDAO.deleteById(ScribeHeading.class, headingUid);
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
+    }
 }

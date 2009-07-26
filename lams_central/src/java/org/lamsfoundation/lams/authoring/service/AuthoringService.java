@@ -387,12 +387,34 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolOutputDefinitions(java.lang.Long)
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolOutputDefinitions(java.lang.Long, int)
      */
     public String getToolOutputDefinitions(Long toolContentID, int definitionType) throws IOException {
 
 	SortedMap<String, ToolOutputDefinition> defns = lamsCoreToolService.getOutputDefinitionsFromTool(toolContentID,
 		definitionType);
+
+	ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<ToolOutputDefinitionDTO>(defns != null ? defns
+		.size() : 0);
+	if (defns != null) {
+	    for (ToolOutputDefinition defn : defns.values()) {
+		defnDTOList.add(new ToolOutputDefinitionDTO(defn));
+	    }
+	}
+
+	FlashMessage flashMessage = new FlashMessage("getToolOutputDefinitions", defnDTOList);
+	return flashMessage.serializeMessage();
+    }
+
+    /**
+     * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getToolOutputDefinitions(java.lang.Long, int,
+     *      java.lang.Long)
+     */
+    public String getToolOutputDefinitions(Long outputToolContentID, int definitionType, Long inputToolContentID)
+	    throws IOException {
+
+	SortedMap<String, ToolOutputDefinition> defns = lamsCoreToolService.getOutputDefinitionsFromToolFiltered(
+		outputToolContentID, definitionType, inputToolContentID);
 
 	ArrayList<ToolOutputDefinitionDTO> defnDTOList = new ArrayList<ToolOutputDefinitionDTO>(defns != null ? defns
 		.size() : 0);
@@ -536,8 +558,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	}
 
 	if (design != null) { /*
-	 * only the user who is editing the design may unlock it
-	 */
+				 * only the user who is editing the design may unlock it
+				 */
 	    if (design.getEditOverrideUser().equals(user)) {
 		design.setEditOverrideLock(false);
 		design.setEditOverrideUser(null);
@@ -1343,7 +1365,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	    }
 	    if (newTransition.getFromUIID() != null) {
 		fromActivity = newActivities.get(newTransition.getFromUIID());
-		//check if we are dealing with a "real" transition, not data flow
+		// check if we are dealing with a "real" transition, not data flow
 		if (transition.isProgressTransition()) {
 		    fromActivity.setTransitionFrom(newTransition);
 		}
@@ -1620,17 +1642,15 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		user);
 
 	if (extractor.getMode().intValue() == 1) {
-	    
+
 	    // adding the customCSV to the call if it is present
 	    String customCSV = null;
-	    if (table.containsKey(WDDXTAGS.CUSTOM_CSV)){
+	    if (table.containsKey(WDDXTAGS.CUSTOM_CSV)) {
 		customCSV = WDDXProcessor.convertToString(table, WDDXTAGS.CUSTOM_CSV);
 	    }
-	
+
 	    copyLearningDesignToolContent(design, design, design.getCopyTypeID(), customCSV);
 
-	    
-	    
 	}
 
 	return design.getLearningDesignId();

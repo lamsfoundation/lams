@@ -1173,4 +1173,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getAssessmentOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

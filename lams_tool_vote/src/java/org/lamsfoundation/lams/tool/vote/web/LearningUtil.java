@@ -72,12 +72,13 @@ public class LearningUtil implements VoteAppConstants {
 	Map mapQuestionsContent = new TreeMap(new VoteComparator());
 	Set<VoteQueContent> nominations = voteContent.getVoteQueContents();
 	if (Boolean.TRUE.equals(voteContent.getAssignedDataFlowObject())
-		&& (nominations == null || nominations.isEmpty())) {
-	    // If we are using tool input rather that previously defined nominations, we need to get this input now and
+		&& !Boolean.TRUE.equals(voteContent.getDataFlowObjectUsed())) {
+	    // If we are using tool input, we need to get it now and
 	    // create questions. Once they are created, they will be not altered, no matter if another learner gets to
 	    // this point and the tool input changed
 	    createQuestionsFromToolInput(voteContent, voteService);
 	    nominations = voteContent.getVoteQueContents();
+	    voteContent.setDataFlowObjectUsed(true);
 	}
 
 	Iterator<VoteQueContent> contentIterator = nominations.iterator();
@@ -324,18 +325,54 @@ public class LearningUtil implements VoteAppConstants {
 	ToolOutput toolInput = voteService.getToolInput(voteContent.getVoteContentId(), VoteUtils.getUserId()
 		.intValue());
 	Object value = toolInput.getValue().getComplex();
-	// If the input is array of strings, it's pretty straightforward
-	if (value instanceof String[]) {
-	    String[] stringList = (String[]) value;
-	    voteContent.getVoteQueContents().clear();
-	    for (int nominationIndex = 1; nominationIndex <= stringList.length; nominationIndex++) {
+	// The input is an array (users) of arrays of strings (their answers)
+	if (value instanceof String[][]) {
+	    if (value != null) {
+		String[][] usersAndAnswers = (String[][]) value;
+		int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+		Short maxInputs = voteContent.getMaxInputs();
+		short inputCount = 0;
+		for (String[] userAnswers : usersAndAnswers) {
+		    if (userAnswers != null) {
+			if (maxInputs != null && maxInputs > 0 && inputCount >= maxInputs) {
+			    // if we reached the maximum number of inputs, i.e. number of students that will be taken
+			    // into
+			    // account
+			    break;
+			}
+			boolean anyAnswersAdded = false;
+			for (String questionText : userAnswers) {
+			    if (questionText != null) {
+				VoteQueContent nomination = new VoteQueContent();
+				nomination.setDisplayOrder(nominationIndex);
+				nomination.setMcContent(voteContent);
+				nomination.setQuestion(questionText);
+				voteService.saveOrUpdateVoteQueContent(nomination);
+				voteContent.getVoteQueContents().add(nomination);
+				nominationIndex++;
+				anyAnswersAdded = true;
+			    }
+			}
+			if (anyAnswersAdded) {
+			    inputCount++;
+			}
+		    }
+		}
+	    }
+	} else if (value instanceof String[]) {
+	    // the input is a list of strings (questions, for example)
+	    int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+	    String[] userAnswers = (String[]) value;
+	    for (String questionText : userAnswers) {
 		VoteQueContent nomination = new VoteQueContent();
 		nomination.setDisplayOrder(nominationIndex);
 		nomination.setMcContent(voteContent);
-		nomination.setQuestion(stringList[nominationIndex - 1]);
+		nomination.setQuestion(questionText);
 		voteService.saveOrUpdateVoteQueContent(nomination);
 		voteContent.getVoteQueContents().add(nomination);
+		nominationIndex++;
 	    }
+
 	}
     }
 

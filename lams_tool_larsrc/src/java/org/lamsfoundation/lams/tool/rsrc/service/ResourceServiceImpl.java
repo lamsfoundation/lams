@@ -1300,4 +1300,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
+    }
 }

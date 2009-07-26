@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
@@ -78,7 +79,7 @@ public abstract class OutputFactory {
     private ILoadedMessageSourceService loadedMessageSourceService;
     private String languageFilename;
     private MessageSource msgSource = null; // derived from toolMessageService, loadedMessageSourceService,
-					    // languageFilename
+    // languageFilename
     protected final String KEY_PREFIX = "output.desc.";
     protected final String CONDITION_NAME_SEPARATOR = "#";
 
@@ -197,7 +198,7 @@ public abstract class OutputFactory {
      * using the getDescription() method. Only use if the other buildBlahDefinitions do not suit your needs.
      */
     protected ToolOutputDefinition buildDefinition(String definitionName, OutputType type, Object startValue,
-	    Object endValue, Object complexValue, Boolean showConditionNameOnly) {
+	    Object endValue, Object complexValue, Boolean showConditionNameOnly, Class valueClass) {
 	ToolOutputDefinition definition = new ToolOutputDefinition();
 	definition.setName(definitionName);
 	definition.setDescription(getI18NText(definitionName, true));
@@ -206,6 +207,7 @@ public abstract class OutputFactory {
 	definition.setEndValue(endValue);
 	definition.setComplexDefinition(complexValue);
 	definition.setShowConditionNameOnly(showConditionNameOnly);
+	definition.setValueClass(valueClass);
 	return definition;
     }
 
@@ -213,9 +215,10 @@ public abstract class OutputFactory {
      * Wrapper method for build definition to set the isDefaultGradebookMark flag
      */
     protected ToolOutputDefinition buildDefinition(String definitionName, OutputType type, Object startValue,
-	    Object endValue, Object complexValue, Boolean showConditionNameOnly, Boolean isDefaultGradebookMark) {
+	    Object endValue, Object complexValue, Boolean showConditionNameOnly, Boolean isDefaultGradebookMark,
+	    Class valueClass) {
 	ToolOutputDefinition definition = this.buildDefinition(definitionName, type, startValue, endValue,
-		complexValue, showConditionNameOnly);
+		complexValue, showConditionNameOnly, valueClass);
 	definition.setIsDefaultGradebookMark(isDefaultGradebookMark);
 	return definition;
     }
@@ -225,7 +228,8 @@ public abstract class OutputFactory {
      * I18N file using the getDescription() method and set the type to OUTPUT_LONG.
      */
     protected ToolOutputDefinition buildRangeDefinition(String definitionName, Long startValue, Long endValue) {
-	return buildDefinition(definitionName, OutputType.OUTPUT_LONG, startValue, endValue, null, Boolean.FALSE);
+	return buildDefinition(definitionName, OutputType.OUTPUT_LONG, startValue, endValue, null, Boolean.FALSE,
+		Long.class);
     }
 
     /**
@@ -233,7 +237,8 @@ public abstract class OutputFactory {
      * I18N file using the getDescription() method and set the type to OUTPUT_LONG.
      */
     protected ToolOutputDefinition buildRangeDefinition(String definitionName, String startValue, String endValue) {
-	return buildDefinition(definitionName, OutputType.OUTPUT_STRING, startValue, endValue, null, Boolean.FALSE);
+	return buildDefinition(definitionName, OutputType.OUTPUT_STRING, startValue, endValue, null, Boolean.FALSE,
+		String.class);
     }
 
     /**
@@ -242,7 +247,7 @@ public abstract class OutputFactory {
     protected ToolOutputDefinition buildRangeDefinition(String definitionName, Long startValue, Long endValue,
 	    Boolean isDefaultGradebookMark) {
 	return buildDefinition(definitionName, OutputType.OUTPUT_LONG, startValue, endValue, null, Boolean.FALSE,
-		isDefaultGradebookMark);
+		isDefaultGradebookMark, String.class);
     }
 
     /**
@@ -251,7 +256,7 @@ public abstract class OutputFactory {
     protected ToolOutputDefinition buildRangeDefinition(String definitionName, String startValue, String endValue,
 	    Boolean isDefaultGradebookMark) {
 	return buildDefinition(definitionName, OutputType.OUTPUT_STRING, startValue, endValue, null, Boolean.FALSE,
-		isDefaultGradebookMark);
+		isDefaultGradebookMark, String.class);
     }
 
     /**
@@ -260,7 +265,7 @@ public abstract class OutputFactory {
      * the type to OUTPUT_LONG.
      */
     protected ToolOutputDefinition buildLongOutputDefinition(String definitionName) {
-	return buildDefinition(definitionName, OutputType.OUTPUT_LONG, null, null, null, Boolean.FALSE);
+	return buildDefinition(definitionName, OutputType.OUTPUT_LONG, null, null, null, Boolean.FALSE, Long.class);
     }
 
     /**
@@ -269,7 +274,7 @@ public abstract class OutputFactory {
      * and set the type to OUTPUT_DOUBLE.
      */
     protected ToolOutputDefinition buildDoubleOutputDefinition(String definitionName) {
-	return buildDefinition(definitionName, OutputType.OUTPUT_DOUBLE, null, null, null, Boolean.FALSE);
+	return buildDefinition(definitionName, OutputType.OUTPUT_DOUBLE, null, null, null, Boolean.FALSE, Double.class);
     }
 
     /**
@@ -281,7 +286,7 @@ public abstract class OutputFactory {
      */
     protected ToolOutputDefinition buildBooleanOutputDefinition(String definitionName) {
 	ToolOutputDefinition definition = buildDefinition(definitionName, OutputType.OUTPUT_BOOLEAN, null, null, null,
-		Boolean.FALSE);
+		Boolean.FALSE, Boolean.class);
 
 	List<BranchCondition> defaultConditions = new ArrayList<BranchCondition>();
 	defaultConditions.add(new BranchCondition(null, null, new Integer(1), definitionName, getI18NText(
@@ -305,7 +310,7 @@ public abstract class OutputFactory {
      */
     protected ToolOutputDefinition buildBooleanSetOutputDefinition(String definitionName) {
 	ToolOutputDefinition definition = buildDefinition(definitionName, OutputType.OUTPUT_SET_BOOLEAN, null, null,
-		null, Boolean.TRUE);
+		null, Boolean.TRUE, (new HashSet<Boolean>()).getClass());
 	List<BranchCondition> defaultConditions = new ArrayList<BranchCondition>();
 	definition.setDefaultConditions(defaultConditions);
 	return definition;
@@ -316,15 +321,15 @@ public abstract class OutputFactory {
      * I18N file using the getDescription() method and set the type to OUTPUT_STRING.
      */
     protected ToolOutputDefinition buildStringOutputDefinition(String definitionName) {
-	return buildDefinition(definitionName, OutputType.OUTPUT_STRING, null, null, null, Boolean.FALSE);
+	return buildDefinition(definitionName, OutputType.OUTPUT_STRING, null, null, null, Boolean.FALSE, String.class);
     }
 
     /**
      * Build a tool definition for a complex value output. It will get the definition's description from the I18N file
      * using the getDescription() method and set the type to OUTPUT_COMPLEX.
      */
-    protected ToolOutputDefinition buildComplexOutputDefinition(String definitionName) {
-	return buildDefinition(definitionName, OutputType.OUTPUT_COMPLEX, null, null, null, Boolean.FALSE);
+    protected ToolOutputDefinition buildComplexOutputDefinition(String definitionName, Class valueClass) {
+	return buildDefinition(definitionName, OutputType.OUTPUT_COMPLEX, null, null, null, Boolean.FALSE, valueClass);
     }
 
     /**
@@ -361,5 +366,18 @@ public abstract class OutputFactory {
 	} else {
 	    return new String[] { conditionName, "" };
 	}
+    }
+
+    /**
+     * If a tool supports data flow, it should override this method and return all the classes it supports, otherwise
+     * non matching inputs will be filtered off in Authoring. IMPORTANT: For compatibility, NULL means that all
+     * definitions are accepted! If the return value is not NULL, the definitions should be limited only to the matching
+     * ones.
+     * 
+     * @param definitionType
+     * @return
+     */
+    public Class[] getSupportedDefinitionClasses(int definitionType) {
+	return null;
     }
 }

@@ -139,4 +139,5 @@ public interface ToolContentManager {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException;
 
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType);
 }

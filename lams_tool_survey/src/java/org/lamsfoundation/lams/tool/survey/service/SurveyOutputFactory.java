@@ -58,8 +58,10 @@ public class SurveyOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	Class stringArrayClass = new String[] {}.getClass();
 	if (toolContentObject != null) {
-	    ToolOutputDefinition allAnswersDefinition = buildComplexOutputDefinition(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME);
+	    ToolOutputDefinition allAnswersDefinition = buildComplexOutputDefinition(
+		    SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, stringArrayClass);
 	    Survey survey = (Survey) toolContentObject;
 	    // adding all existing conditions
 	    allAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(survey.getConditions()));
@@ -127,9 +129,9 @@ public class SurveyOutputFactory extends OutputFactory {
 	if (isTextSearchConditionName(name)) {
 	    // user answers are loaded from the DB and array of strings is created
 
-	    //Survey survey = surveyService.getSurveyBySessionId(toolSessionId);
-	    //Set<SurveyQuestion> questions = survey.getQuestions();
-	    //String[] textAnswers = new String[questions.size()];
+	    // Survey survey = surveyService.getSurveyBySessionId(toolSessionId);
+	    // Set<SurveyQuestion> questions = survey.getQuestions();
+	    // String[] textAnswers = new String[questions.size()];
 	    String[] textAnswers = null;
 	    List<String> answersList = new ArrayList<String>();
 	    SurveyUser user = surveyService.getUserByIDAndSession(learnerId, toolSessionId);
@@ -139,12 +141,13 @@ public class SurveyOutputFactory extends OutputFactory {
 		    SurveyAnswer surveyAnswer = answerDTO.getAnswer();
 		    if (surveyAnswer != null) { // check for optional questions
 			SurveyQuestion question = surveyAnswer.getSurveyQuestion();
-			if (question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)
+			if (question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			    answersList.add(surveyAnswer.getAnswerText());
+			}
 		    }
 		}
 	    }
-	    textAnswers = (String[]) answersList.toArray(new String [answersList.size()]);
+	    textAnswers = answersList.toArray(new String[answersList.size()]);
 	    return new ToolOutput(name, getI18NText(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, true), textAnswers,
 		    false);
 	}

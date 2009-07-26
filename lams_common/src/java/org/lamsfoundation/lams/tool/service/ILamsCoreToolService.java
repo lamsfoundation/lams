@@ -213,6 +213,19 @@ public interface ILamsCoreToolService {
 	    throws ToolException;
 
     /**
+     * This method should be called to filter out definitions that are not supported. Currently used only in Data Flow
+     * between tools, when a receiving tool declares which Tool Output classes it supports.
+     * 
+     * @param outputToolContentId
+     * @param definitionType
+     * @param inputToolContentId
+     * @return
+     * @throws ToolException
+     */
+    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromToolFiltered(Long outputToolContentId,
+	    int definitionType, Long inputToolContentId) throws ToolException;
+
+    /**
      * Ask a tool for one particular ToolOutput, based on the given toolSessionId. If the tool doesn't have any content
      * matching the toolSessionId then should return an "empty" but valid set of data. e.g an empty mark would be 0.
      * 

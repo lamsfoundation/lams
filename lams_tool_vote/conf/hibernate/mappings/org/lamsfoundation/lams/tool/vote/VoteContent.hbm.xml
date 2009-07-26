@@ -166,6 +166,21 @@
         column="assigned_data_flow_object"
         length="1"        
    />
+   
+   <property
+        name="dataFlowObjectUsed"
+        type="boolean"
+        access="property"
+        column="data_flow_object_used"
+        length="1"        
+   />
+   
+   <property
+        name="maxInputs"
+        type="java.lang.Short"
+        access="property"
+        column="max_inputs"
+   />
 
     	 <set
             name="voteQueContents"

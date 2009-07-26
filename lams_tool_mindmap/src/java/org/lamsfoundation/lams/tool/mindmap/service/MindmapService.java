@@ -971,4 +971,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public MessageService getMindmapMessageService() {
 	return mindmapMessageService;
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getMindmapOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

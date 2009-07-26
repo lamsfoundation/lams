@@ -1133,5 +1133,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	}
     }
 
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getChatOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
     // =========================================================================================
 }

@@ -48,7 +48,6 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.RepositoryProxy;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -150,8 +149,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      *      java.lang.Long)
      */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
+	if (WikiService.logger.isDebugEnabled()) {
+	    WikiService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
 		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
@@ -273,9 +272,9 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
-	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
-		    + toContentId);
+	if (WikiService.logger.isDebugEnabled()) {
+	    WikiService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
+		    + " toContentId=" + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -514,8 +513,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 		retBuf.append("</div>");
 	    }
 	}
-	logger.debug("Result:");
-	logger.debug(retBuf);
+	WikiService.logger.debug("Result:");
+	WikiService.logger.debug(retBuf);
 	return retBuf.toString();
     }
 
@@ -529,7 +528,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
 	if (toolContentId == null) {
 	    String error = "Could not retrieve default content id for this tool";
-	    logger.error(error);
+	    WikiService.logger.error(error);
 	    throw new WikiException(error);
 	}
 	return toolContentId;
@@ -545,7 +544,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	Wiki defaultContent = getWikiByContentId(defaultContentID);
 	if (defaultContent == null) {
 	    String error = "Could not retrieve default content record for this tool";
-	    logger.error(error);
+	    WikiService.logger.error(error);
 	    throw new WikiException(error);
 	}
 	return defaultContent;
@@ -560,7 +559,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	if (newContentID == null) {
 	    String error = "Cannot copy the Wiki tools default content: + " + "newContentID is null";
-	    logger.error(error);
+	    WikiService.logger.error(error);
 	    throw new WikiException(error);
 	}
 
@@ -611,7 +610,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public Wiki getWikiByContentId(Long toolContentID) {
 	Wiki wiki = wikiDAO.getByContentId(toolContentID);
 	if (wiki == null) {
-	    logger.debug("Could not find the content with toolContentID:" + toolContentID);
+	    WikiService.logger.debug("Could not find the content with toolContentID:" + toolContentID);
 	}
 	return wiki;
     }
@@ -619,7 +618,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public WikiSession getSessionBySessionId(Long toolSessionId) {
 	WikiSession wikiSession = wikiSessionDAO.getBySessionId(toolSessionId);
 	if (wikiSession == null) {
-	    logger.debug("Could not find the wiki session with toolSessionID:" + toolSessionId);
+	    WikiService.logger.debug("Could not find the wiki session with toolSessionID:" + toolSessionId);
 	}
 	return wikiSession;
     }
@@ -939,7 +938,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
 
-	logger
+	WikiService.logger
 		.warn("Setting the reflective field on a wiki. This doesn't make sense as the wiki is for reflection and we don't reflect on reflection!");
 	Wiki wiki = getWikiByContentId(toolContentId);
 	if (wiki == null) {
@@ -1093,4 +1092,7 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	this.repositoryService = repositoryService;
     }
 
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getWikiOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

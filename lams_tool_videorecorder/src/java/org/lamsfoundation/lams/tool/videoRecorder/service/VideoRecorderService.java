@@ -961,4 +961,8 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     public String getMessage(String key) {
 	return messageService.getMessage(key);
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getVideoRecorderOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

@@ -763,4 +763,8 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public void setRepositoryService(IRepositoryService repositoryService) {
 	this.repositoryService = repositoryService;
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getPixlrOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

@@ -114,6 +114,7 @@ public interface VoteAppConstants {
     public static final String ONLINE_INSTRUCTIONS_KEY = "onlineInstructionsKey";
     public static final String OFFLINE_INSTRUCTIONS_KEY = "offlineInstructionsKey";
     public static final String TOTAL_NOMINATION_COUNT = "totalNominationCount";
+    public static final String MAX_INPUTS = "maxInputs";
 
     public static final String EXPORT_PORTFOLIO_DTO = "exportPortfolioDto";
     public static final String NOTEBOOK = "notebook";

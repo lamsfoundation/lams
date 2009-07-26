@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -388,6 +389,79 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    String message = "Tool "
 		    + tool.getToolDisplayName()
 		    + " doesn't support the getToolOutputDefinitions(toolContentId) method so no output definitions can be accessed.";
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	}
+
+    }
+
+    /**
+     * This method should be called to filter out definitions that are not supported. Currently used only in Data Flow
+     * between tools, when a receiving tool declares which Tool Output classes it supports.
+     * 
+     * @param outputToolContentId
+     * @param definitionType
+     * @param inputToolContentId
+     * @return
+     * @throws ToolException
+     */
+    public SortedMap<String, ToolOutputDefinition> getOutputDefinitionsFromToolFiltered(Long outputToolContentId,
+	    int definitionType, Long inputToolContentId) throws ToolException {
+	SortedMap<String, ToolOutputDefinition> definitions = getOutputDefinitionsFromTool(outputToolContentId,
+		definitionType);
+	ToolContent toolContent = (ToolContent) toolContentDAO.find(ToolContent.class, inputToolContentId);
+	if (toolContent == null) {
+	    String error = "The toolContentID " + inputToolContentId
+		    + " is not valid. No such record exists on the database.";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+
+	Tool tool = toolContent.getTool();
+	if (tool == null) {
+	    String error = "The tool for toolContentId " + inputToolContentId + " is missing.";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+
+	try {
+	    ToolContentManager contentManager = (ToolContentManager) findToolService(tool);
+
+	    Class[] supportedClasses = contentManager.getSupportedToolOutputDefinitionClasses(definitionType);
+	    if (supportedClasses != null) {
+		Set<String> keysToRemove = new TreeSet<String>();
+		for (String key : definitions.keySet()) {
+		    ToolOutputDefinition value = definitions.get(key);
+		    Class valueClass = value.getValueClass();
+		    boolean matchFound = false;
+		    if (valueClass != null) {
+			for (Class supportedClass : supportedClasses) {
+			    // we take into account also superclasses
+			    if (supportedClass.isAssignableFrom(valueClass)) {
+				matchFound = true;
+				break;
+			    }
+			}
+		    }
+		    if (!matchFound) {
+			keysToRemove.add(key);
+		    }
+		}
+
+		for (String key : keysToRemove) {
+		    definitions.remove(key);
+		}
+	    }
+	    return definitions;
+	} catch (NoSuchBeanDefinitionException e) {
+	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output definitions. ToolContentId "
+		    + inputToolContentId;
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	} catch (java.lang.AbstractMethodError e) {
+	    String message = "Tool "
+		    + tool.getToolDisplayName()
+		    + " doesn't support the getSupportedToolOutputDefinitionClasses(definitionType) method so no output definitions can be accessed.";
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	}

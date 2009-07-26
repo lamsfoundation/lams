@@ -1299,4 +1299,8 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    throw new TaskListException("Login failed." + e.getMessage());
 	}
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getTaskListOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

@@ -111,12 +111,17 @@ public class VoteContent implements Serializable {
      */
     private Boolean assignedDataFlowObject;
 
+    /** persistent field */
+    private Short maxInputs;
+
+    private Boolean dataFlowObjectUsed;
+
     /** full constructor */
     public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater,
 	    boolean runOffline, Date creationDate, Date updateDate, boolean allowText, boolean reflect,
 	    String reflectionSubject, String maxNominationCount, long createdBy, boolean lockOnFinish,
 	    boolean contentInUse, String offlineInstructions, String onlineInstructions, boolean showResults,
-	    Set voteQueContents, Set voteSessions, Set voteAttachments) {
+	    Short maxInputs, Set voteQueContents, Set voteSessions, Set voteAttachments) {
 	this.voteContentId = voteContentId;
 	this.content = content;
 	this.title = title;
@@ -138,6 +143,7 @@ public class VoteContent implements Serializable {
 	this.voteQueContents = voteQueContents;
 	this.voteSessions = voteSessions;
 	this.voteAttachments = voteAttachments;
+	this.maxInputs = maxInputs;
     }
 
     /** default constructor */
@@ -169,8 +175,8 @@ public class VoteContent implements Serializable {
 		.getInstructions(), vote.isDefineLater(), vote.isRunOffline(), vote.getCreationDate(), vote
 		.getUpdateDate(), vote.isAllowText(), vote.isReflect(), vote.getReflectionSubject(), vote
 		.getMaxNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(), vote.isContentInUse(), vote
-		.getOfflineInstructions(), vote.getOnlineInstructions(), vote.isShowResults(), new TreeSet(),
-		new TreeSet(), new TreeSet());
+		.getOfflineInstructions(), vote.getOnlineInstructions(), vote.isShowResults(), vote.getMaxInputs(),
+		new TreeSet(), new TreeSet(), new TreeSet());
 	newContent.setVoteQueContents(vote.deepCopyMcQueContent(newContent));
 	newContent.setVoteAttachments(vote.deepCopyMcAttachments(toolContentHandler, newContent));
 	newContent.setAssignedDataFlowObject(vote.getAssignedDataFlowObject());
@@ -493,5 +499,21 @@ public class VoteContent implements Serializable {
 
     public void setAssignedDataFlowObject(Boolean assignedDataFlowObject) {
 	this.assignedDataFlowObject = assignedDataFlowObject;
+    }
+
+    public Short getMaxInputs() {
+	return maxInputs;
+    }
+
+    public void setMaxInputs(Short maxInputs) {
+	this.maxInputs = maxInputs;
+    }
+
+    public Boolean getDataFlowObjectUsed() {
+	return dataFlowObjectUsed;
+    }
+
+    public void setDataFlowObjectUsed(Boolean dataFlowObjectUsed) {
+	this.dataFlowObjectUsed = dataFlowObjectUsed;
     }
 }

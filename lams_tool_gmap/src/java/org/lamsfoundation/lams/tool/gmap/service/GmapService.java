@@ -546,7 +546,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 		NodeList list = document.getElementsByTagName("marker");
 
 		for (int i = 0; i < list.getLength(); i++) {
-		    NamedNodeMap markerNode = (list.item(i)).getAttributes();
+		    NamedNodeMap markerNode = list.item(i).getAttributes();
 
 		    Long uid = Long.parseLong(markerNode.getNamedItem("markerUID").getNodeValue());
 		    String markerTitle = markerNode.getNamedItem("title").getNodeValue();
@@ -772,5 +772,9 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
      */
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
+    }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
     }
 }

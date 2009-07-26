@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.sbmt.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -184,8 +183,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     /**
      * (non-Javadoc)
      * 
-     * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long,
-     *      java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolContentManager#copyToolContent(java.lang.Long, java.lang.Long)
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 	if (toContentId == null) {
@@ -227,9 +225,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     /**
-     * If the toolContentID does not exist, then get default tool content id
-     * from tool core and initialize a emtpy <code>SubmitFilesContent</code>
-     * return.
+     * If the toolContentID does not exist, then get default tool content id from tool core and initialize a emtpy
+     * <code>SubmitFilesContent</code> return.
      * 
      * @param toolContentId
      * @return
@@ -294,8 +291,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     /**
-     * Export the XML fragment for the tool's content, along with any files
-     * needed for the content.
+     * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ExportToolContentException
      */
@@ -360,14 +356,12 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     /**
-     * Get the definitions for possible output for an activity, based on the
-     * toolContentId. These may be definitions that are always available for the
-     * tool (e.g. number of marks for Multiple Choice) or a custom definition
-     * created for a particular activity such as the answer to the third
-     * question contains the word Koala and hence the need for the toolContentId
+     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
+     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
+     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * the toolContentId
      * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of
-     *         each definition
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
@@ -413,12 +407,11 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it
-     * the <code>Ticket</code> to login and access the Content Repository.
+     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
+     * access the Content Repository.
      * 
-     * A valid ticket is needed in order to access the content from the
-     * repository. This method would be called evertime the tool needs to
-     * upload/download files from the content repository.
+     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
+     * the tool needs to upload/download files from the content repository.
      * 
      * @return ITicket The ticket for repostory access
      * @throws SubmitFilesException
@@ -439,13 +432,13 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     /**
-     * This method deletes the content with the given <code>uuid</code> and
-     * <code>versionID</code> from the content repository
+     * This method deletes the content with the given <code>uuid</code> and <code>versionID</code> from the content
+     * repository
      * 
      * @param uuid
-     *            The <code>uuid</code> of the node to be deleted
+     *                The <code>uuid</code> of the node to be deleted
      * @param versionID
-     *            The <code>version_id</code> of the node to be deleted.
+     *                The <code>version_id</code> of the node to be deleted.
      * @throws SubmitFilesException
      */
     public void deleteFromRepository(Long uuid, Long versionID) throws SubmitFilesException {
@@ -584,9 +577,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     /**
      * Get the tool output for the given tool output names.
      * 
-     * @see 
-     *      org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util
-     *      .List<String>, java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util .List<String>, java.lang.Long,
+     *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return new TreeMap<String, ToolOutput>();
@@ -595,8 +587,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     /**
      * Get the tool output for the given tool output name.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String,
-     *      java.lang.Long, java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
+     *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
@@ -605,8 +597,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     /**
      * (non-Javadoc)
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#
-     *      uploadFileToContent(Long,FormFile )
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToContent(Long,FormFile )
      */
     public InstructionFiles uploadFileToContent(Long contentID, FormFile uploadFile, String fileType)
 	    throws SubmitFilesException {
@@ -628,8 +619,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     /**
      * (non-Javadoc)
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#
-     *      uploadFileToSession(Long,FormFile,String,Long )
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager# uploadFileToSession(Long,FormFile,String,Long )
      */
     public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
 	    throws SubmitFilesException {
@@ -721,9 +711,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     /**
-     * This method save SubmissionDetails list into a map container: key is user
-     * id, value is a list container, which contains all
-     * <code>FileDetailsDTO</code> object belong to this user.
+     * This method save SubmissionDetails list into a map container: key is user id, value is a list container, which
+     * contains all <code>FileDetailsDTO</code> object belong to this user.
      */
     public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale) {
 	List list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
@@ -771,40 +760,42 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	return submitUserDAO.getUsersBySession(sessionID);
     }
 
-    public void updateMarks(Long reportID, Float marks, String comments, FormFile markFile) throws InvalidParameterException, RepositoryCheckedException {
+    public void updateMarks(Long reportID, Float marks, String comments, FormFile markFile)
+	    throws InvalidParameterException, RepositoryCheckedException {
 
-	    IToolContentHandler toolContentHandler = getSbmtToolContentHandler();
-	    SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
-	    if (report != null) {
-		report.setComments(comments);
-		report.setMarks(marks);
-		
-		// If there is a new file, delete the existing and add the mark file
-		if (markFile != null && !StringUtils.isEmpty(markFile.getFileName())) {
-		    
-		    // Delete the existing
-		    if (report.getMarkFileUUID() != null) {
-			toolContentHandler.deleteFile(report.getMarkFileUUID());
-			report.setMarkFileName(null);
-			report.setMarkFileUUID(null);
-			report.setMarkFileVersionID(null);
-		    }
-		    
-		    // Add the new file
-		    NodeKey nodeKey = this.processFile(markFile, IToolContentHandler.TYPE_ONLINE);
-		    //NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null, IToolContentHandler.TYPE_ONLINE);
+	IToolContentHandler toolContentHandler = getSbmtToolContentHandler();
+	SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
+	if (report != null) {
+	    report.setComments(comments);
+	    report.setMarks(marks);
 
-		    report.setMarkFileName(markFile.getFileName());
-		    report.setMarkFileUUID(nodeKey.getUuid());	
-		    report.setMarkFileVersionID(nodeKey.getVersion());
+	    // If there is a new file, delete the existing and add the mark file
+	    if (markFile != null && !StringUtils.isEmpty(markFile.getFileName())) {
+
+		// Delete the existing
+		if (report.getMarkFileUUID() != null) {
+		    toolContentHandler.deleteFile(report.getMarkFileUUID());
+		    report.setMarkFileName(null);
+		    report.setMarkFileUUID(null);
+		    report.setMarkFileVersionID(null);
 		}
-	
-		submitFilesReportDAO.update(report);
+
+		// Add the new file
+		NodeKey nodeKey = this.processFile(markFile, IToolContentHandler.TYPE_ONLINE);
+		// NodeKey nodeKey = toolContentHandler.uploadFile(marksFileInputStream, marksFileName, null,
+		// IToolContentHandler.TYPE_ONLINE);
+
+		report.setMarkFileName(markFile.getFileName());
+		report.setMarkFileUUID(nodeKey.getUuid());
+		report.setMarkFileVersionID(nodeKey.getVersion());
 	    }
-	
+
+	    submitFilesReportDAO.update(report);
+	}
+
     }
-    
-    public void removeMarkFile (Long reportID, Long markFileUUID, Long markFileVersionID) {
+
+    public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID) {
 	SubmitFilesReport report = submitFilesReportDAO.getReportByID(reportID);
 	if (report != null) {
 	    deleteFromRepository(markFileUUID, markFileVersionID);
@@ -1022,8 +1013,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     /**
-     * Set the description, throws away the title value as this is not supported
-     * in 2.0
+     * Set the description, throws away the title value as this is not supported in 2.0
      */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
@@ -1093,7 +1083,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param submitFilesContentDAO
-     *            The submitFilesContentDAO to set.
+     *                The submitFilesContentDAO to set.
      */
     public void setSubmitFilesContentDAO(ISubmitFilesContentDAO submitFilesContentDAO) {
 	this.submitFilesContentDAO = submitFilesContentDAO;
@@ -1101,7 +1091,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param submitFilesReportDAO
-     *            The submitFilesReportDAO to set.
+     *                The submitFilesReportDAO to set.
      */
     public void setSubmitFilesReportDAO(ISubmitFilesReportDAO submitFilesReportDAO) {
 	this.submitFilesReportDAO = submitFilesReportDAO;
@@ -1109,7 +1099,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param submitFilesSessionDAO
-     *            The submitFilesSessionDAO to set.
+     *                The submitFilesSessionDAO to set.
      */
     public void setSubmitFilesSessionDAO(ISubmitFilesSessionDAO submitFilesSessionDAO) {
 	this.submitFilesSessionDAO = submitFilesSessionDAO;
@@ -1117,7 +1107,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param submissionDetailsDAO
-     *            The submissionDetailsDAO to set.
+     *                The submissionDetailsDAO to set.
      */
     public void setSubmissionDetailsDAO(ISubmissionDetailsDAO submissionDetailsDAO) {
 	this.submissionDetailsDAO = submissionDetailsDAO;
@@ -1132,7 +1122,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param sbmtToolContentHandler
-     *            The sbmtToolContentHandler to set.
+     *                The sbmtToolContentHandler to set.
      */
     public void setSbmtToolContentHandler(IToolContentHandler sbmtToolContentHandler) {
 	this.sbmtToolContentHandler = sbmtToolContentHandler;
@@ -1147,7 +1137,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * @param learnerDAO
-     *            The learnerDAO to set.
+     *                The learnerDAO to set.
      */
     public void setSubmitUserDAO(ISubmitUserDAO learnerDAO) {
 	submitUserDAO = learnerDAO;
@@ -1231,5 +1221,10 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     public void setGradebookService(IGradebookService gradebookService) {
 	this.gradebookService = gradebookService;
+    }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
+
     }
 }

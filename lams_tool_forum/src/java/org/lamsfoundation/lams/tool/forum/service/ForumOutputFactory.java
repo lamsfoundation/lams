@@ -62,8 +62,10 @@ public class ForumOutputFactory extends OutputFactory {
 	    throws ToolException {
 
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	Class answersClass = (new HashMap<Date, Set<String>>()).getClass();
 	if (toolContentObject != null) {
-	    ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(ForumConstants.TEXT_SEARCH_DEFINITION_NAME);
+	    ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(
+		    ForumConstants.TEXT_SEARCH_DEFINITION_NAME, answersClass);
 	    Forum forum = (Forum) toolContentObject;
 	    // adding all existing conditions
 	    chosenTopicAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));

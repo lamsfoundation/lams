@@ -202,6 +202,16 @@ public interface IAuthoringService {
     public String getToolOutputDefinitions(Long toolContentID, int definitionType) throws IOException;
 
     /**
+     * This method returns a output definition of the Tool, filtered by the supported Tool Output classes, in WDDX
+     * format.
+     * 
+     * @return String The required definitions in WDDX format
+     * @throws IOException
+     */
+    public String getToolOutputDefinitions(Long outputToolContentID, int definitionType, Long inputToolContentID)
+	    throws IOException;
+
+    /**
      * This method returns a list of all available Learning Designs in WDDX format.
      * 
      * @return String The required list in WDDX format

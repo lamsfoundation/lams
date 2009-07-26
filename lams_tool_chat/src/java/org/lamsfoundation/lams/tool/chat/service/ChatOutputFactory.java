@@ -54,8 +54,10 @@ public class ChatOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	Class stringArrayClass = new String[] {}.getClass();
 	if (toolContentObject != null) {
-	    ToolOutputDefinition chatMessagesDefinition = buildComplexOutputDefinition(ChatConstants.TEXT_SEARCH_DEFINITION_NAME);
+	    ToolOutputDefinition chatMessagesDefinition = buildComplexOutputDefinition(
+		    ChatConstants.TEXT_SEARCH_DEFINITION_NAME, stringArrayClass);
 	    Chat chat = (Chat) toolContentObject;
 	    // adding all existing conditions
 	    chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));

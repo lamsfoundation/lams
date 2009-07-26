@@ -757,6 +757,13 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	VoteAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	voteAuthoringForm.setOnlineInstructions(onlineInstructions);
 	voteGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
+
+	String maxInputs = request.getParameter(VoteAppConstants.MAX_INPUTS);
+	VoteAction.logger.debug("maxInputs: " + maxInputs);
+	if (maxInputs == null) {
+	    maxInputs = "0";
+	}
+	voteAuthoringForm.setMaxInputs(new Short(maxInputs));
     }
 
     /**
@@ -1783,7 +1790,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	ActionMessages errors = new ActionMessages();
 	VoteAction.logger.debug("mapNominationContent size: " + mapNominationContent.size());
 
-	if (mapNominationContent.size() == 0) {
+	if (mapNominationContent.size() == 0
+		&& (voteAuthoringForm.getAssignedDataFlowObject() == null || voteAuthoringForm
+			.getAssignedDataFlowObject() == 0)) {
 	    ActionMessage error = new ActionMessage("nominations.none.submitted");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
@@ -1825,6 +1834,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 
+	DataFlowObject assignedDataFlowObject = null;
+
 	VoteAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(VoteAppConstants.AUTHORING)) {
 	    List attachmentListBackup = new ArrayList();
@@ -1855,6 +1866,28 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	    voteAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	    voteAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 
+	    List<DataFlowObject> dataFlowObjects = voteService.getDataFlowObjects(new Long(strToolContentID));
+	    List<String> dataFlowObjectNames = null;
+	    if (dataFlowObjects != null) {
+		dataFlowObjectNames = new ArrayList<String>(dataFlowObjects.size());
+		int objectIndex = 1;
+		for (DataFlowObject dataFlowObject : dataFlowObjects) {
+		    dataFlowObjectNames.add(dataFlowObject.getDisplayName());
+		    if (VoteAppConstants.DATA_FLOW_OBJECT_ASSIGMENT_ID.equals(dataFlowObject.getToolAssigmentId())) {
+			voteAuthoringForm.setAssignedDataFlowObject(objectIndex);
+		    }
+		    objectIndex++;
+
+		}
+
+	    }
+
+	    voteGeneralAuthoringDTO.setDataFlowObjectNames(dataFlowObjectNames);
+
+	    if (voteAuthoringForm.getAssignedDataFlowObject() != null
+		    && voteAuthoringForm.getAssignedDataFlowObject() != 0) {
+		assignedDataFlowObject = dataFlowObjects.get(voteAuthoringForm.getAssignedDataFlowObject() - 1);
+	    }
 	}
 
 	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
@@ -1897,12 +1930,6 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	    authoringUtil.removeRedundantNominations(mapNominationContent, voteService, voteAuthoringForm, request,
 		    strToolContentID);
 	    VoteAction.logger.debug("end of removing unused entries... ");
-	    DataFlowObject assignedDataFlowObject = null;
-	    if (voteAuthoringForm.getAssignedDataFlowObject() != null
-		    && voteAuthoringForm.getAssignedDataFlowObject() != 0) {
-		List<DataFlowObject> dataFlowObjects = voteService.getDataFlowObjects(new Long(strToolContentID));
-		assignedDataFlowObject = dataFlowObjects.get(voteAuthoringForm.getAssignedDataFlowObject() - 1);
-	    }
 
 	    voteContent = authoringUtil.saveOrUpdateVoteContent(mapNominationContent, mapFeedback, voteService,
 		    voteAuthoringForm, request, voteContentTest, strToolContentID, assignedDataFlowObject);

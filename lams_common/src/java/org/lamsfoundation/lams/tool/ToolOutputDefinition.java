@@ -63,6 +63,10 @@ public class ToolOutputDefinition implements Comparable {
     private Boolean showConditionNameOnly;
     private Boolean isDefaultGradebookMark;
     private List<BranchCondition> defaultConditions;
+    // we need it to filter definitions which other tools can not process; it must be set in the definition, otherwise
+    // unsupported values can be passed to the receiving end of the data flow; most methods for creating Output
+    // Definitions set the class already, but it must be set manually for complex definitions
+    private Class valueClass;
 
     /**
      * Name must be unique within the current tool content. This will be used to identify the output. If the definition
@@ -200,6 +204,14 @@ public class ToolOutputDefinition implements Comparable {
 
     public void setIsDefaultGradebookMark(Boolean isDefaultGradebookMark) {
 	this.isDefaultGradebookMark = isDefaultGradebookMark;
+    }
+
+    public Class getValueClass() {
+	return valueClass;
+    }
+
+    public void setValueClass(Class valueClass) {
+	this.valueClass = valueClass;
     }
 
 }

@@ -2029,4 +2029,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	this.messageService = messageService;
     }
 
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getMcOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+
 }

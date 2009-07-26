@@ -25,7 +25,9 @@ package org.lamsfoundation.lams.tool.qa.service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -63,9 +65,12 @@ public class QaOutputFactory extends OutputFactory {
 	if (toolContentObject != null) {
 	    QaContent qaContent = (QaContent) toolContentObject;
 	    // Different definitions are provided, depending how the output will be used
+	    Class stringArrayClass = new String[] {}.getClass();
+	    Class listOfStringArrayClass = new LinkedList<String[]>().getClass();
 	    switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION: {
-		ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(QaAppConstants.USER_ANSWERS_DEFINITION_NAME);
+		ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(
+			QaAppConstants.USER_ANSWERS_DEFINITION_NAME, stringArrayClass);
 
 		// adding all existing conditions
 		userAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
@@ -82,10 +87,12 @@ public class QaOutputFactory extends OutputFactory {
 	    }
 		break;
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW: {
-		ToolOutputDefinition groupAnswersDefinition = buildComplexOutputDefinition(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME);
+		ToolOutputDefinition groupAnswersDefinition = buildComplexOutputDefinition(
+			QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, listOfStringArrayClass);
 		definitionMap.put(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, groupAnswersDefinition);
 
-		ToolOutputDefinition questionsDefinition = buildComplexOutputDefinition(QaAppConstants.QUESTIONS_DEFINITION_NAME);
+		ToolOutputDefinition questionsDefinition = buildComplexOutputDefinition(
+			QaAppConstants.QUESTIONS_DEFINITION_NAME, stringArrayClass);
 		definitionMap.put(QaAppConstants.QUESTIONS_DEFINITION_NAME, questionsDefinition);
 	    }
 		break;
@@ -171,48 +178,66 @@ public class QaOutputFactory extends OutputFactory {
 	    QaContent qaContent = session.getQaContent();
 	    Set<QaQueContent> questions = qaContent.getQaQueContents();
 	    Set<QaQueUsr> users = session.getQaQueUsers();
-	    String[] answers = new String[questions.size() * users.size()];
-	    int answerCount = 0;
-	    for (QaQueContent question : questions) {
-		int userIndex = 0;
-		for (QaQueUsr user : users) {
-		    List<QaUsrResp> attempts = null;
-		    if (user != null) {
-			attempts = qaService.getAttemptsForUserAndQuestionContent(user.getUid(), question.getUid());
-		    }
-		    if (attempts != null && !attempts.isEmpty()) {
-			// only the last attempt is taken into consideration
-			String answer = attempts.get(attempts.size() - 1).getAnswer();
-			if (!StringUtils.isBlank(answer)) {
-			    // check for duplicate answers
-			    boolean duplicate = false;
-			    for (String previousAnswer : answers) {
-				if (answer.equalsIgnoreCase(previousAnswer)) {
-				    duplicate = true;
-				    break;
-				}
+	    String[] dummyStringArray = new String[] {};
+
+	    // answers sorted by time of adding, so "usersAndAnswers" has the newest answers at the beginning
+	    Map<Long, String[]> timeAndAnswers = new TreeMap<Long, String[]>();
+	    for (QaQueUsr user : users) {
+		if (user != null) {
+		    List<String> answers = new LinkedList<String>();
+		    long lastAttemptTime = Long.MAX_VALUE;
+		    for (QaQueContent question : questions) {
+
+			List<QaUsrResp> attempts = qaService.getAttemptsForUserAndQuestionContent(user.getUid(),
+				question.getUid());
+
+			if (attempts != null && !attempts.isEmpty()) {
+			    // only the last attempt is taken into consideration
+			    QaUsrResp attempt = attempts.get(attempts.size() - 1);
+			    // we get the time of the attempt - the "lastAttemptTime" will the time of the whole answer
+			    // set given
+			    long timeOfAttempt = attempt.getAttemptTime().getTime();
+			    if (timeOfAttempt < lastAttemptTime) {
+				lastAttemptTime = timeOfAttempt;
 			    }
-			    if (!duplicate) {
-				answers[question.getDisplayOrder() - 1 + userIndex * questions.size()] = answer;
-				answerCount++;
+
+			    String answer = attempt.getAnswer();
+			    if (!StringUtils.isBlank(answer)) {
+				// check for duplicate answers
+				boolean duplicate = false;
+				int questionIndex = question.getDisplayOrder() - 1;
+				for (String[] previousAnswers : timeAndAnswers.values()) {
+				    for (String previousAnswer : previousAnswers) {
+					if (answer.equalsIgnoreCase(previousAnswer)) {
+					    duplicate = true;
+					    break;
+					}
+				    }
+				}
+
+				if (!duplicate) {
+				    answers.add(answer);
+				}
 			    }
 			}
 		    }
-		    userIndex++;
-		}
-	    }
-	    if (answerCount < answers.length) {
-		String[] trimmedAnswers = new String[answerCount];
-		int answerIndex = 0;
-		for (String answer : answers) {
-		    if (answer != null) {
-			trimmedAnswers[answerIndex++] = answer;
+		    if (!answers.isEmpty()) {
+			while (timeAndAnswers.containsKey(lastAttemptTime)) {
+			    lastAttemptTime--;
+			}
+			timeAndAnswers.put(lastAttemptTime, answers.toArray(dummyStringArray));
 		    }
 		}
-		answers = trimmedAnswers;
+	    }
+	    String[][] usersAndAnswers = new String[timeAndAnswers.size()][];
+	    int userIndex = 0;
+	    for (Long key : timeAndAnswers.keySet()) {
+		usersAndAnswers[userIndex] = timeAndAnswers.get(key);
+		userIndex++;
 	    }
 
-	    return new ToolOutput(name, getI18NText(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, true), answers, false);
+	    return new ToolOutput(name, getI18NText(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, true),
+		    usersAndAnswers, false);
 	} else if (QaAppConstants.QUESTIONS_DEFINITION_NAME.equals(nameParts[0])) {
 	    // Questions asked in this Q&A activity
 	    QaSession session = qaService.retrieveQaSession(toolSessionId);

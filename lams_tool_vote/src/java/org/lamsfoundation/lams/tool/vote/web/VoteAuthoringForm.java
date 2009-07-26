@@ -124,6 +124,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     private String editQuestionBoxRequest;
 
     protected Integer assignedDataFlowObject;
+    private Short maxInputs;
 
     public Integer getAssignedDataFlowObject() {
 	return assignedDataFlowObject;
@@ -209,6 +210,8 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	submit = null;
 	submissionAttempt = null;
 	sbmtSuccess = null;
+
+	maxInputs = 0;
     }
 
     public void resetRadioBoxes() {
@@ -1169,5 +1172,13 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     @Override
     public void setShowResults(String showResults) {
 	this.showResults = showResults;
+    }
+
+    public Short getMaxInputs() {
+	return maxInputs;
+    }
+
+    public void setMaxInputs(Short maxInputs) {
+	this.maxInputs = maxInputs;
     }
 }

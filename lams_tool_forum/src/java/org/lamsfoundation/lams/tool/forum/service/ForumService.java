@@ -1357,4 +1357,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	timestampDao.saveOrUpdate(timestamp);
     }
 
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getForumOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

@@ -913,4 +913,8 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     public void setDacoOutputFactory(DacoOutputFactory dacoOutputFactory) {
 	this.dacoOutputFactory = dacoOutputFactory;
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getDacoOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

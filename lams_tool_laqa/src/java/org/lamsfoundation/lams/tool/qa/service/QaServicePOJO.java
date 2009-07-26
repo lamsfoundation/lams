@@ -765,7 +765,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		fromContent = qaDAO.loadQaById(fromContentId.longValue());
 	    }
 	    if (fromContentId.equals(defaultContentId) && fromContent != null && fromContent.getConditions().isEmpty()) {
-		fromContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(fromContent));
+		fromContent.getConditions().add(
+			getQaOutputFactory().createDefaultComplexUserAnswersCondition(fromContent));
 	    }
 	    QaContent toContent = QaContent.newInstance(qaToolContentHandler, fromContent, toContentId);
 	    if (toContent == null) {
@@ -1013,7 +1014,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    toolContentObj = retrieveQa(defaultToolContentId);
 	    if (toolContentObj != null && toolContentObj.getConditions().isEmpty()) {
-		toolContentObj.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(toolContentObj));
+		toolContentObj.getConditions().add(
+			getQaOutputFactory().createDefaultComplexUserAnswersCondition(toolContentObj));
 	    }
 	}
 	if (toolContentObj == null) {
@@ -1855,5 +1857,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     public void removeQuestionsFromCache(QaContent qaContent) {
 	qaDAO.removeQuestionsFromCache(qaContent);
+    }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getQaOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 }

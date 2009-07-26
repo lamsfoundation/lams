@@ -691,7 +691,7 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 
 	try {
 	    if ((originalNb = retrieveNoticeboard(fromContentId)) == null) // the id given does not have content, use
-									    // default content
+	    // default content
 	    {
 		// use default content id to grab contents
 		NoticeboardContent defaultContent = retrieveNoticeboard(getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
@@ -1112,5 +1112,9 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
      */
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
+    }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
     }
 }

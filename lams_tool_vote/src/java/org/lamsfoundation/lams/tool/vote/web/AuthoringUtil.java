@@ -661,6 +661,8 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	String showResults = request.getParameter("showResults");
 
+	String maxInputs = request.getParameter("maxInputs");
+
 	String reflect = request.getParameter(VoteAppConstants.REFLECT);
 	AuthoringUtil.logger.debug("reflect: " + reflect);
 
@@ -689,6 +691,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	boolean allowTextBoolean = false;
 	boolean reflectBoolean = false;
 	boolean showResultsBoolean = false;
+	short maxInputsShort = 0;
 
 	if (lockOnFinish != null && lockOnFinish.equalsIgnoreCase("1")) {
 	    lockedOnFinishBoolean = true;
@@ -704,6 +707,10 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	if (showResults != null && showResults.equalsIgnoreCase("1")) {
 	    showResultsBoolean = true;
+	}
+
+	if (!"0".equals(maxInputs)) {
+	    maxInputsShort = Short.parseShort(maxInputs);
 	}
 
 	long userId = 0;
@@ -758,6 +765,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setMaxNominationCount(maxNomcount);
 	    voteContent.setOnlineInstructions(richTextOnlineInstructions);
 	    voteContent.setOfflineInstructions(richTextOfflineInstructions);
+	    voteContent.setMaxInputs(maxInputsShort);
 	}
 
 	voteContent.setAssignedDataFlowObject(assignedDataFlowObject != null);
@@ -1329,14 +1337,6 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setReflectionSubject(reflectionSubject);
 	}
 
-	// If we use tool input, we clear any existing user created nominations
-	if (assignedDataFlowObject == null) {
-	    voteContent.setAssignedDataFlowObject(true);
-	    voteContent.setVoteQueContents(null);
-	} else {
-	    voteContent.setAssignedDataFlowObject(false);
-	}
-
 	if (newContent) {
 	    AuthoringUtil.logger.debug("will create: " + voteContent);
 	    voteService.createVote(voteContent);
@@ -1349,9 +1349,7 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	AuthoringUtil.logger.debug("voteContent: " + voteContent);
 
-	if (!voteContent.getAssignedDataFlowObject()) {
-	    voteContent = createQuestionContent(mapQuestionContent, mapFeedback, voteService, voteContent);
-	}
+	voteContent = createQuestionContent(mapQuestionContent, mapFeedback, voteService, voteContent);
 
 	voteService.saveDataFlowObjectAssigment(assignedDataFlowObject);
 

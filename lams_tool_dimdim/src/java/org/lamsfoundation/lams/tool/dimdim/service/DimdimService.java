@@ -782,4 +782,8 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     public void setRepositoryService(IRepositoryService repositoryService) {
 	this.repositoryService = repositoryService;
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
+    }
 }

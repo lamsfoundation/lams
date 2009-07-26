@@ -1557,8 +1557,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	Transition existingTransition = findTransition(transitionUUID, toUIID, fromUIID, transitionType);
 
 	if (existingTransition == null) {
-	    if (false/* It will soon be implemented in Flash. Now we need to check what kind of transition are we dealing with
-			transitionType.equals(Transition.DATA_TRANSITION_TYPE) */) {
+	    if (false/*
+	     * It will soon be implemented in Flash. Now we need to check what kind of transition are we
+	     * dealing with transitionType.equals(Transition.DATA_TRANSITION_TYPE)
+	     */) {
 		transition = new DataTransition();
 	    } else {
 		transition = new Transition();
@@ -1620,10 +1622,10 @@ public class ObjectExtractor implements IObjectExtractor {
      * activity but not a too activity. These cases should be picked up by Flash, but just in case.
      */
     private void cleanupTransition(Transition transition) {
-	if (transition.getFromActivity().getTransitionFrom().equals(transition)) {
+	if (transition.getFromActivity() != null && transition.equals(transition.getFromActivity().getTransitionFrom())) {
 	    transition.getFromActivity().setTransitionFrom(null);
 	}
-	if (transition.getToActivity().getTransitionTo().equals(transition)) {
+	if (transition.getToActivity() != null && transition.equals(transition.getToActivity().getTransitionTo())) {
 	    transition.getToActivity().setTransitionTo(null);
 	}
     }

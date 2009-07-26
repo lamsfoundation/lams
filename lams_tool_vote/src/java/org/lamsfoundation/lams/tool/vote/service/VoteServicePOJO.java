@@ -2214,4 +2214,8 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     public List<DataFlowObject> getDataFlowObjects(Long toolContentId) {
 	return dataFlowDAO.getDataFlowObjectsByToolContentId(toolContentId);
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getVoteOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }

@@ -1160,4 +1160,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public void deleteCondition(SurveyCondition condition) {
 	surveyDao.deleteCondition(condition);
     }
+
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getSurveyOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
 }
