@@ -1238,6 +1238,8 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	String showResults = request.getParameter("showResults");
 
+	String maxInputs = request.getParameter("maxInputs");
+
 	String reflect = request.getParameter(VoteAppConstants.REFLECT);
 	AuthoringUtil.logger.debug("reflect: " + reflect);
 
@@ -1266,6 +1268,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	boolean allowTextEntryBoolean = false;
 	boolean reflectBoolean = false;
 	boolean showResultsBoolean = false;
+	short maxInputsShort = 0;
 
 	if (lockOnFinish != null && lockOnFinish.equalsIgnoreCase("1")) {
 	    lockOnFinishBoolean = true;
@@ -1281,6 +1284,10 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	if (showResults != null && showResults.equalsIgnoreCase("1")) {
 	    showResultsBoolean = true;
+	}
+
+	if (!"0".equals(maxInputs)) {
+	    maxInputsShort = Short.parseShort(maxInputs);
 	}
 
 	AuthoringUtil.logger.debug("lockOnFinishBoolean: " + lockOnFinishBoolean);
@@ -1335,6 +1342,8 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setOfflineInstructions(richTextOfflineInstructions);
 
 	    voteContent.setReflectionSubject(reflectionSubject);
+
+	    voteContent.setMaxInputs(maxInputsShort);
 	}
 
 	if (newContent) {
