@@ -46,14 +46,17 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.thoughtworks.selenium.HttpCommandProcessor;
 import com.thoughtworks.selenium.SeleneseTestCase;
+import com.thoughtworks.selenium.Selenium;
 
 public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 
-    protected ToolDAO toolDAO;
-    protected ActivityDAO activityDAO;
-    protected UserManagementService userManagementService;
-    protected LessonDAO lessonDAO;
-    protected LearningDesignDAO learningDesignDAO;
+    protected static Selenium selenium;
+    
+    protected static ToolDAO toolDAO;
+    protected static ActivityDAO activityDAO;
+    protected static UserManagementService userManagementService;
+    protected static LessonDAO lessonDAO;
+    protected static LearningDesignDAO learningDesignDAO;
 
     private static final String[] contextConfigLocation = new String[] {
 	    "org/lamsfoundation/lams/localCommonContext.xml",
@@ -62,62 +65,89 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 
     // name of the learning design. we receive it from the subclass initially.
     // but then it might be changed if LD with the same name already exists
-    private String learningDesignName;
+    private static String learningDesignName;
+    
+    //contains contentFolderID and toolContentID received during setUpAuthoring()
+    private HashMap<String, String> authoringSettings;
 
+    @Override
     public void setUp() throws Exception {
-	ApplicationContext context = new ClassPathXmlApplicationContext(contextConfigLocation);
-	toolDAO = (ToolDAO) context.getBean("toolDAO");
-	activityDAO = (ActivityDAO) context.getBean("activityDAO");
-	userManagementService = (UserManagementService) context.getBean("userManagementService");
-	lessonDAO = (LessonDAO) context.getBean("lessonDAO");
-	learningDesignDAO = (LearningDesignDAO) context.getBean("learningDesignDAO");
-	learningDesignName = getLearningDesignName();
+	if (selenium == null) {
+	    ApplicationContext context = new ClassPathXmlApplicationContext(contextConfigLocation);
+	    toolDAO = (ToolDAO) context.getBean("toolDAO");
+	    activityDAO = (ActivityDAO) context.getBean("activityDAO");
+	    userManagementService = (UserManagementService) context.getBean("userManagementService");
+	    lessonDAO = (LessonDAO) context.getBean("lessonDAO");
+	    learningDesignDAO = (LearningDesignDAO) context.getBean("learningDesignDAO");
+	    learningDesignName = getLearningDesignName();
 
-	HttpCommandProcessor proc = new HttpCommandProcessor(TestFrameworkConstants.SERVER_HOST,
-		TestFrameworkConstants.SERVER_PORT, TestFrameworkConstants.BROWSER, TestFrameworkConstants.WEB_APP_HOST
-			+ TestFrameworkConstants.WEB_APP_DIR);
-	selenium = new DefaultSeleniumFlex(proc);
-	selenium.start();
-	//do not reduce this parameter as Selenium might start working wrong
-	selenium.setSpeed("400");
-    }
-
-    public void tearDown() throws Exception {
-	try {
-	    super.tearDown();
-	} finally {
-	    if (selenium != null) {
-		selenium.stop();
-		selenium = null;
-	    }
+	    HttpCommandProcessor proc = new HttpCommandProcessor(TestFrameworkConstants.SERVER_HOST,
+		    TestFrameworkConstants.SERVER_PORT, TestFrameworkConstants.BROWSER,
+		    TestFrameworkConstants.WEB_APP_HOST + TestFrameworkConstants.WEB_APP_DIR);
+	    selenium = new DefaultSeleniumFlex(proc);
+	    selenium.start();
+	    // do not reduce this parameter as Selenium might start working wrong
+	    selenium.setSpeed("400");
 	}
     }
-
-    /**
-     * Our main test class. Currently it tests authoring, learning and
-     * monitoring sequentially one-by-one. Also it relies on the fact that you
-     * store new LD in authoring (otherwise you should reimplement this method).
-     * 
-     * @throws Exception
-     */
-    public void testEntireTool() throws Exception {
-	loginToLams();
-
-	//Authoring part
-	Map<String, String> contentDetails = setUpAuthoring();
-	authoringTest();
-	storeLearningDesign(contentDetails);
-
-	createNewLesson();
-
-	//Learning part
-	learningTest();
-
-	//Monitoring part		
-	openToolMonitor();
-	monitoringTest();
-	closeToolMonitor();
+    
+    @Override
+    public void tearDown() throws Exception {
+	checkForVerificationErrors();
     }
+    
+    /**
+     * Tears down Selenium. Also provides output for all Selenium verify commands. 
+     */
+    public static void tearDownSelenium() {
+	if (selenium != null) {
+	    selenium.stop();
+	    selenium = null;
+	}
+    }
+    
+//    /**
+//     * Our main test class. Currently it tests authoring, learning and
+//     * monitoring sequentially one-by-one. Also it relies on the fact that you
+//     * store new LD in authoring (otherwise you should reimplement this method).
+//     * 
+//     * @throws Exception
+//     */
+//    public void testEntireTool() throws Exception {
+//	loginToLams();
+//
+//	//Authoring part
+//	Map<String, String> contentDetails = setUpAuthoring();
+//	authoringTest();
+//	storeLearningDesign(contentDetails);
+//
+//	createNewLesson();
+//
+//	//Learning part
+//	learningTest();
+//
+//	//Monitoring part		
+//	openToolMonitor();
+//	monitoringTest();
+//	closeToolMonitor();
+//    }
+//
+//    /**
+//     * Tests tool authoring. Should be overridden by all subclasses.
+//     */
+//    protected void authoringTest() throws Exception;
+//
+//    /**
+//     * Tests tool learning. Always should begin with setUpLearning() and end up with tearDownLearning() methods. Should
+//     * be overridden by all subclasses.
+//     */
+//    protected abstract void learningTest() throws Exception;
+//
+//    /**
+//     * Tests tool monitoring. Should be overridden by all subclasses.
+//     */
+//    protected abstract void monitoringTest() throws Exception;
+    
 
     /**
      * Returns tool's signature. This method should be overridden by all
@@ -134,22 +164,28 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
      * @return name of learning design
      */
     protected abstract String getLearningDesignName();
+    
+    /** */
+    protected void loginToLams() throws Exception {
+	//prevent popup window for user logging in for the first time
+	//may be move to setUp()
+	User user = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN);
+	if (user.isFirstLogin()) {
+	    user.setFirstLogin(false);
+	    Workspace workspace = (Workspace) activityDAO.find(Workspace.class, user.getWorkspace().getWorkspaceId());
+	    user.setWorkspace(workspace);
+	    userManagementService.save(user);
+	}
+	
+	selenium.open(TestFrameworkConstants.WEB_APP_DIR);
+	//TODO try to logout (solving prob with IE)
+	selenium.type("j_username", TestFrameworkConstants.USER_LOGIN);
+	selenium.type("j_password", TestFrameworkConstants.USER_PASSWORD);
+	selenium.click("link=Login");
+	selenium.waitForPageToLoad("10000");
+	Thread.sleep(3000);
 
-    /**
-     * Tests tool authoring. Should be overridden by all subclasses.
-     */
-    protected abstract void authoringTest() throws Exception;
-
-    /**
-     * Tests tool learning. Always should begin with setUpLearning() and end up
-     * with tearDownLearning() methods. Should be overridden by all subclasses.
-     */
-    protected abstract void learningTest() throws Exception;
-
-    /**
-     * Tests tool monitoring. Should be overridden by all subclasses.
-     */
-    protected abstract void monitoringTest() throws Exception;
+    }
 
     /**
      * Opens up all authoring windows. Should be done before testing tool's
@@ -158,7 +194,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
      * @return Map containing contentFolderID and toolContentID
      * @throws Exception
      */
-    protected Map<String, String> setUpAuthoring() throws Exception {
+    protected void setUpAuthoring() throws Exception {
 	// open authoring canvas
 	selenium.click("//div[@id='header-my-courses']//div[@class='tab-middle-highlight']/a");
 	selenium.waitForPopUp("aWindow", "10000");
@@ -194,7 +230,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	selenium.waitForPopUp(openToolId, "10000");
 	selenium.selectWindow(openToolId);
 
-	return new HashMap<String, String>() {
+	authoringSettings = new HashMap<String, String>() {
 	    {
 		put("contentFolderID", contentFolderID);
 		put("toolContentID", toolContentID);
@@ -206,7 +242,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
      * Stores learning design. Uses getLearningDesignName() as a new design
      * name.
      */
-    protected void storeLearningDesign(Map<String, String> contentDetails) {
+    protected void storeLearningDesign() {
 	//closes tool authoring screen
 	selenium.click("//span[@class='okIcon']");
 	selenium.waitForPageToLoad("10000");
@@ -219,7 +255,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 
 	final String storeLearningDesignUrl = TestFrameworkConstants.WEB_APP_DIR
 		+ "servlet/authoring/storeLearningDesignDetails";
-	String designDetails = constructWddxDesign(contentDetails);
+	String designDetails = constructWddxDesign(authoringSettings);
 	//callback function is aimed to let Selenium wait till StoreLDServlet finishes its work
 	selenium.runScript("$.post(\"" + storeLearningDesignUrl + "\", " +
 			"\"" + designDetails + "\", " +
@@ -234,7 +270,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
      * 
      * @throws Exception
      */
-    protected void createNewLesson() throws Exception {
+    public void createNewLesson() throws Exception {
 	Long lastCreatedLessonId = getLastCreatedLessonId(true);
 	DefaultSeleniumFlex flexSelenium = (DefaultSeleniumFlex) selenium;
 
@@ -271,7 +307,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 
 	//TODO fix CloudWizard or define offset checking for lesson's LD name
 	Long lessonId = getLastCreatedLessonId(false);
-	String lessonTitle = lessonDAO.getLesson(lessonId).getLearningDesign().getTitle();
+	String lessonTitle = lessonDAO.getLesson(lessonId).getLessonName();
 	assertTrue("Tests aborted due to the problem with CloudWizard's root element problem. Please, restart tests",
 		learningDesignName.equals(lessonTitle));
     }
@@ -302,7 +338,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
     /**
      * Launches Lams monitor, followed by tool's monitor popup.
      */
-    protected void openToolMonitor() {
+    protected void setUpMonitoring() {
 	Long lastCreatedLessonId = getLastCreatedLessonId(false);
 	LearningDesign learningDesign = lessonDAO.getLesson(lastCreatedLessonId).getLearningDesign();
 	String contentFolderID = learningDesign.getContentFolderID();
@@ -326,30 +362,9 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
     /**
      * Closes Lams monitor. (Optional activity)
      */
-    protected void closeToolMonitor() {
+    protected void tearDownMonitoring() {
 	selenium.close();
 	selenium.selectWindow(null);
-    }
-
-    /** */
-    protected void loginToLams() throws Exception {
-	//prevent popup window for user logging in for the first time
-	//may be move to setUp()
-	User user = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN);
-	if (user.isFirstLogin()) {
-	    user.setFirstLogin(false);
-	    Workspace workspace = (Workspace) activityDAO.find(Workspace.class, user.getWorkspace().getWorkspaceId());
-	    user.setWorkspace(workspace);
-	    userManagementService.save(user);
-	}
-	
-	selenium.open(TestFrameworkConstants.WEB_APP_DIR);
-	selenium.type("j_username", TestFrameworkConstants.USER_LOGIN);
-	selenium.type("j_password", TestFrameworkConstants.USER_PASSWORD);
-	selenium.click("link=Login");
-	selenium.waitForPageToLoad("10000");
-	Thread.sleep(3000);
-
     }
 
     // *****************************************************************************
@@ -378,6 +393,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	}
     }
 
+    @Override
     public String getText() {
 	return selenium.getEval("this.page().bodyText()");
     }
@@ -568,35 +584,4 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
             "</struct>" + "</data>" + "</wddxPacket>";
 	return design;
     }
-
-    // /**
-    // * Given a WDDX packet in our normal format, return the map object in the
-    // messageValue parameter. This should
-    // * contain any returned ids.
-    // *
-    // * @param wddxPacket
-    // * @return Map
-    // */
-    // protected String extractIdMapFromWDDXPacket(String wddxPacket) {
-    //
-    // Object obj = null;
-    // try {
-    // obj = WDDXProcessor.deserialize(wddxPacket);
-    // } catch (WddxDeserializationException e1) {
-    // fail("WddxDeserializationException " + e1.getMessage());
-    // e1.printStackTrace();
-    // }
-    // // WDDXProcessor.convertToBoolean(table, key)
-    //
-    // Map map = (Map) obj;
-    // Object uniqueContentFolderObj = map.get("createUniqueContentFolder");
-    // assertNotNull("createUniqueContentFolder object found",
-    // uniqueContentFolderObj);
-    // if (!String.class.isInstance(uniqueContentFolderObj)) {
-    // fail("createUniqueContentFolder is not a String - try extractIdFromWDDXPacket(packet)");
-    // }
-    //
-    // return (String) uniqueContentFolderObj;
-    // }
-
 }
