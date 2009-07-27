@@ -221,7 +221,7 @@ public class MonitoringAction extends Action {
 		LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
 		ExcelCell[][] questionSummaryData = getQuestionSummaryData(assessment, showUserNames);
-		dataToExport.put(service.getMessage("label.export.summary.by.question"), questionSummaryData);
+		dataToExport.put(service.getMessage("lable.export.summary.by.question"), questionSummaryData);
 
 		ExcelCell[][] userSummaryData = getUserSummaryData(assessment, showUserNames);
 		dataToExport.put(service.getMessage("label.export.summary.by.user"), userSummaryData);
@@ -446,26 +446,37 @@ public class MonitoringAction extends Action {
 		    // Adding the question summary 
 		    if (showUserNames) {
 			ExcelCell[] summaryRowTitle = new ExcelCell[10];
-			summaryRowTitle[0] = new ExcelCell(service.getMessage("label.monitoring.question.summary.question"), true);
-			summaryRowTitle[1] = new ExcelCell(service.getMessage("label.authoring.basic.list.header.type"), true);
-			summaryRowTitle[2] = new ExcelCell(service.getMessage("label.authoring.basic.penalty.factor"),true);
-			summaryRowTitle[3] = new ExcelCell(service.getMessage("label.monitoring.question.summary.default.mark"), true);
+			summaryRowTitle[0] = new ExcelCell(service
+				.getMessage("label.monitoring.question.summary.question"), true);
+			summaryRowTitle[1] = new ExcelCell(
+				service.getMessage("label.authoring.basic.list.header.type"), true);
+			summaryRowTitle[2] = new ExcelCell(service.getMessage("label.authoring.basic.penalty.factor"),
+				true);
+			summaryRowTitle[3] = new ExcelCell(service
+				.getMessage("label.monitoring.question.summary.default.mark"), true);
 			summaryRowTitle[4] = new ExcelCell(service.getMessage("label.export.user.id"), true);
-			summaryRowTitle[5] = new ExcelCell(service.getMessage("label.monitoring.user.summary.user.name"), true);
+			summaryRowTitle[5] = new ExcelCell(service
+				.getMessage("label.monitoring.user.summary.user.name"), true);
 			summaryRowTitle[6] = new ExcelCell(service.getMessage("label.export.date.attempted"), true);
-			summaryRowTitle[7] = new ExcelCell(service.getMessage("label.authoring.basic.option.answer"),true);
+			summaryRowTitle[7] = new ExcelCell(service.getMessage("label.authoring.basic.option.answer"),
+				true);
 			summaryRowTitle[8] = new ExcelCell(service.getMessage("label.export.time.taken"), true);
 			summaryRowTitle[9] = new ExcelCell(service.getMessage("label.export.mark"), true);
 			data.add(summaryRowTitle);
 		    } else {
 			ExcelCell[] summaryRowTitle = new ExcelCell[9];
-			summaryRowTitle[0] = new ExcelCell(service.getMessage("label.monitoring.question.summary.question"), true);
-			summaryRowTitle[1] = new ExcelCell(service.getMessage("label.authoring.basic.list.header.type"), true);
-			summaryRowTitle[2] = new ExcelCell(service.getMessage("label.authoring.basic.penalty.factor"),true);
-			summaryRowTitle[3] = new ExcelCell(service.getMessage("label.monitoring.question.summary.default.mark"), true);
+			summaryRowTitle[0] = new ExcelCell(service
+				.getMessage("label.monitoring.question.summary.question"), true);
+			summaryRowTitle[1] = new ExcelCell(
+				service.getMessage("label.authoring.basic.list.header.type"), true);
+			summaryRowTitle[2] = new ExcelCell(service.getMessage("label.authoring.basic.penalty.factor"),
+				true);
+			summaryRowTitle[3] = new ExcelCell(service
+				.getMessage("label.monitoring.question.summary.default.mark"), true);
 			summaryRowTitle[4] = new ExcelCell(service.getMessage("label.export.user.id"), true);
 			summaryRowTitle[5] = new ExcelCell(service.getMessage("label.export.date.attempted"), true);
-			summaryRowTitle[6] = new ExcelCell(service.getMessage("label.authoring.basic.option.answer"),true);
+			summaryRowTitle[6] = new ExcelCell(service.getMessage("label.authoring.basic.option.answer"),
+				true);
 			summaryRowTitle[7] = new ExcelCell(service.getMessage("label.export.time.taken"), true);
 			summaryRowTitle[8] = new ExcelCell(service.getMessage("label.export.mark"), true);
 			data.add(summaryRowTitle);
@@ -486,12 +497,17 @@ public class MonitoringAction extends Action {
 
 			    if (showUserNames) {
 				ExcelCell[] userResultRow = new ExcelCell[10];
-				userResultRow[0] = new ExcelCell(assessmentQuestionResult.getAssessmentQuestion().getTitle(), false);
-				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(assessmentQuestionResult.getAssessmentQuestion().getType()), false);
-				userResultRow[2] = new ExcelCell(new Float(assessmentQuestionResult.getAssessmentQuestion().getPenaltyFactor()), false);
-				userResultRow[3] = new ExcelCell(new Long(assessmentQuestionResult.getAssessmentQuestion().getDefaultGrade()), false);
+				userResultRow[0] = new ExcelCell(assessmentQuestionResult.getAssessmentQuestion()
+					.getTitle(), false);
+				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(assessmentQuestionResult
+					.getAssessmentQuestion().getType()), false);
+				userResultRow[2] = new ExcelCell(new Float(assessmentQuestionResult
+					.getAssessmentQuestion().getPenaltyFactor()), false);
+				userResultRow[3] = new ExcelCell(new Long(assessmentQuestionResult
+					.getAssessmentQuestion().getDefaultGrade()), false);
 				userResultRow[4] = new ExcelCell(assessmentQuestionResult.getUser().getUserId(), false);
-				userResultRow[5] = new ExcelCell(assessmentQuestionResult.getUser().getFullName(),false);
+				userResultRow[5] = new ExcelCell(assessmentQuestionResult.getUser().getFullName(),
+					false);
 				userResultRow[6] = new ExcelCell(assessmentQuestionResult.getFinishDate(), false);
 				userResultRow[7] = new ExcelCell(getAnswerObject(assessmentQuestionResult), false);
 
@@ -514,21 +530,27 @@ public class MonitoringAction extends Action {
 				data.add(userResultRow);
 			    } else {
 				ExcelCell[] userResultRow = new ExcelCell[9];
-				userResultRow[0] = new ExcelCell(assessmentQuestionResult.getAssessmentQuestion().getTitle(), false);
-				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(assessmentQuestionResult.getAssessmentQuestion().getType()), false);
-				userResultRow[2] = new ExcelCell(new Float(assessmentQuestionResult.getAssessmentQuestion().getPenaltyFactor()), false);
-				userResultRow[3] = new ExcelCell(new Long(assessmentQuestionResult.getAssessmentQuestion().getDefaultGrade()), false);
+				userResultRow[0] = new ExcelCell(assessmentQuestionResult.getAssessmentQuestion()
+					.getTitle(), false);
+				userResultRow[1] = new ExcelCell(getQuestionTypeLanguageLabel(assessmentQuestionResult
+					.getAssessmentQuestion().getType()), false);
+				userResultRow[2] = new ExcelCell(new Float(assessmentQuestionResult
+					.getAssessmentQuestion().getPenaltyFactor()), false);
+				userResultRow[3] = new ExcelCell(new Long(assessmentQuestionResult
+					.getAssessmentQuestion().getDefaultGrade()), false);
 				userResultRow[4] = new ExcelCell(assessmentQuestionResult.getUser().getUserId(), false);
 				userResultRow[5] = new ExcelCell(assessmentQuestionResult.getFinishDate(), false);
 				userResultRow[6] = new ExcelCell(getAnswerObject(assessmentQuestionResult), false);
 
-				Date startDate = assessmentQuestionResult.getAssessmentResult().getStartDate();
-				Date finishDate = assessmentQuestionResult.getFinishDate();
-				if (startDate != null && finishDate != null) {
-				    Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
-				    userResultRow[7] = new ExcelCell(seconds, false);
-				    timeTakenCount++;
-				    timeTakenTotal += seconds;
+				if (assessmentQuestionResult.getAssessmentResult() != null) {
+				    Date startDate = assessmentQuestionResult.getAssessmentResult().getStartDate();
+				    Date finishDate = assessmentQuestionResult.getFinishDate();
+				    if (startDate != null && finishDate != null) {
+					Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
+					userResultRow[7] = new ExcelCell(seconds, false);
+					timeTakenCount++;
+					timeTakenTotal += seconds;
+				    }
 				}
 
 				userResultRow[8] = new ExcelCell(assessmentQuestionResult.getMark(), false);
