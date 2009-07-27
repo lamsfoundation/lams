@@ -21,9 +21,12 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.assessment.tests;
+package org.lamsfoundation.lams.tool.assessment.selenium;
+
+import junit.framework.TestSuite;
 
 import org.lamsfoundation.lams.selenium.AbstractSeleniumTestCase;
+import org.lamsfoundation.lams.selenium.SeleniumTestSuite;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 
 public class TestAssessment extends AbstractSeleniumTestCase {
@@ -35,8 +38,16 @@ public class TestAssessment extends AbstractSeleniumTestCase {
     protected String getLearningDesignName() {
 	return "assessmentx";
     }
+    
+    public static TestSuite suite() {
+	String[] testSequence = {"testAuthoring", "testCreateNewLesson", "testLearning", "testMonitoring"};
+	return new SeleniumTestSuite(TestAssessment.class, testSequence);
+    }
 
-    protected void authoringTest() throws InterruptedException {
+    public void testAuthoring() throws Exception {
+	loginToLams();
+	setUpAuthoring();
+	
 	assertEquals("Assessment Tool Authoring", selenium.getTitle());
 	verifyTrue(selenium.isTextPresent("Assessment Tool"));
 	verifyEquals("Basic", selenium.getText("tab-middle-link-1"));
@@ -67,6 +78,8 @@ public class TestAssessment extends AbstractSeleniumTestCase {
 
 	createTrueFalse();
 	verifyEquals("Tasty question", selenium.getText("//table[@id='questionTable']/tbody/tr[3]/td[2]"));
+	
+	storeLearningDesign();
     }
 
     private void createMultipleChoice() throws InterruptedException {
@@ -129,8 +142,12 @@ public class TestAssessment extends AbstractSeleniumTestCase {
 	selenium.selectWindow("openToolId");
 	waitForElementPresent("link=Save");
     }
+    
+    public void testCreateNewLesson() throws Exception {
+	createNewLesson();	
+    }
 
-    protected void learningTest() throws InterruptedException {
+    public void testLearning() throws InterruptedException {
 	setUpLearning();
 	// assertEquals("Assessment Learning", selenium.getTitle());
 	assertTrue(selenium.isTextPresent("Only for clever"));
@@ -162,7 +179,9 @@ public class TestAssessment extends AbstractSeleniumTestCase {
 	tearDownLearning();
     }
 
-    protected void monitoringTest() throws InterruptedException {
+    public void testMonitoring() throws InterruptedException {
+	setUpMonitoring();
+	
 	assertTrue(selenium.isTextPresent("Assessment Tool"));
 	verifyTrue(selenium.isTextPresent("Summary"));
 	verifyEquals("1", selenium.getText("//tr[@id='1']/td[1]"));
@@ -207,6 +226,7 @@ public class TestAssessment extends AbstractSeleniumTestCase {
 	selenium.selectWindow("monitorId");
 	waitForElementPresent("link=Export summary");
 
+	tearDownMonitoring();
     }
 
 }

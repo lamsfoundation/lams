@@ -21,10 +21,18 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.notebook.testscripts;
+package org.lamsfoundation.lams.tool.notebook.selenium;
 
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.lamsfoundation.lams.selenium.AbstractSeleniumTestCase;
+import org.lamsfoundation.lams.selenium.SeleniumTestSuite;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 
 public class TestNotebook extends AbstractSeleniumTestCase {
@@ -37,7 +45,15 @@ public class TestNotebook extends AbstractSeleniumTestCase {
 	return "bueno";
     }
 
-    protected void authoringTest() {
+    public static TestSuite suite() {
+	String[] testSequence = {"testAuthoring", "testCreateNewLesson", "testLearning", "testMonitoring"};
+	return new SeleniumTestSuite(TestNotebook.class, testSequence);
+    }
+
+    public void testAuthoring() throws Exception {
+	loginToLams();
+	setUpAuthoring();
+	
 	assertEquals("Notebook", selenium.getTitle());
 
 	selenium.type("title", "leave your comment2222");
@@ -46,9 +62,15 @@ public class TestNotebook extends AbstractSeleniumTestCase {
 	selenium.click("lockOnFinished");
 	selenium.click("tab-middle-link-3");
 	selenium.type("onlineInstruction__lamstextarea", "online instructions");
+	
+	storeLearningDesign();	
+    }
+    
+    public void testCreateNewLesson() throws Exception {
+	createNewLesson();	
     }
 
-    protected void learningTest() throws InterruptedException {
+    public void testLearning() throws Exception {
 	setUpLearning();
 	// assertEquals("Notebook", selenium.getTitle());
 	assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
@@ -65,8 +87,12 @@ public class TestNotebook extends AbstractSeleniumTestCase {
 	tearDownLearning();
     }
 
-    protected void monitoringTest() {
+    public void testMonitoring() {
+	setUpMonitoring();
+	
 	assertEquals("Notebook", selenium.getTitle());
+	
+	tearDownMonitoring();
     }
 
 }

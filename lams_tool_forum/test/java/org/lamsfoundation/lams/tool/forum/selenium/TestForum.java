@@ -23,8 +23,11 @@ package org.lamsfoundation.lams.tool.forum.selenium;
 
 import java.util.Map;
 
+import junit.framework.TestSuite;
+
 import org.jfree.util.Log;
 import org.lamsfoundation.lams.selenium.AbstractSeleniumTestCase;
+import org.lamsfoundation.lams.selenium.SeleniumTestSuite;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 
 /**
@@ -57,8 +60,6 @@ public class TestForum extends AbstractSeleniumTestCase {
     private static final String TOPIC4_TITLE = "Learner Topic";
     private static final String TOPIC4_MESSAGE = "Created in learner";
 
-    private Map<String, String> contentDetails;
-
     protected String getToolSignature() {
 	return ForumConstants.TOOL_SIGNATURE;
     }
@@ -66,21 +67,10 @@ public class TestForum extends AbstractSeleniumTestCase {
     protected String getLearningDesignName() {
 	return LEARNING_DESIGN_TITLE;
     }
-
-    @Override
-    public void testEntireTool() throws Exception {
-    }
-
-    @Override
-    protected void learningTest() throws InterruptedException {
-    }
-
-    @Override
-    protected void monitoringTest() {
-    }
-
-    @Override
-    protected void authoringTest() throws Exception {
+    
+    public static TestSuite suite() {
+	String[] testSequence = {"testAuthor", "testStartLesson", "testLearner", "testMonitor"};
+	return new SeleniumTestSuite(TestForum.class, testSequence);
     }
 
     /**
@@ -91,7 +81,7 @@ public class TestForum extends AbstractSeleniumTestCase {
 
 	    // Logging in and opening authoring
 	    loginToLams();
-	    contentDetails = setUpAuthoring();
+	    setUpAuthoring();
 
 	    // check the author page has loaded the default content
 	    assertTrue("Default content is not present", selenium.isTextPresent(DEFAULT_TOPIC));
@@ -117,7 +107,7 @@ public class TestForum extends AbstractSeleniumTestCase {
 
 	    // TODO: Test conditions tab
 
-	    storeLearningDesign(contentDetails);
+	    storeLearningDesign();
 	} catch (Exception e) {
 	    Log.error(e);
 	    fail(e.getMessage());
@@ -130,7 +120,6 @@ public class TestForum extends AbstractSeleniumTestCase {
      */
     public void testStartLesson() {
 	try {
-	    loginToLams();
 	    createNewLesson();
 	} catch (Exception e) {
 	    fail(e.getMessage());
@@ -142,7 +131,6 @@ public class TestForum extends AbstractSeleniumTestCase {
      */
     public void testLearner() {
 	try {
-	    loginToLams();
 	    setUpLearning();
 	    assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
 
@@ -154,7 +142,8 @@ public class TestForum extends AbstractSeleniumTestCase {
 
 	    // Testing creating a topic
 	    testCreateTopicLearner(TOPIC4_TITLE, TOPIC4_MESSAGE);
-
+	    
+	    tearDownLearning();
 	} catch (Exception e) {
 	    Log.error(e);
 	    fail(e.getMessage());
@@ -166,14 +155,13 @@ public class TestForum extends AbstractSeleniumTestCase {
      */
     public void testMonitor() {
 	try {
-	    loginToLams();
-	    openToolMonitor();
+	    setUpMonitoring();
 	    
 	    // TODO: Work out how to access the forum page, which is opened in a _blank page
 
 	    selenium.close();
 	    selenium.selectWindow(null);
-	    closeToolMonitor();
+	    tearDownMonitoring();
 	} catch (Exception e) {
 	    fail(e.getMessage());
 	}

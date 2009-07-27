@@ -21,9 +21,10 @@
  */
 package org.lamsfoundation.lams.tool.wiki.selenium;
 
-import java.util.Map;
+import junit.framework.TestSuite;
 
 import org.lamsfoundation.lams.selenium.AbstractSeleniumTestCase;
+import org.lamsfoundation.lams.selenium.SeleniumTestSuite;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 
 /**
@@ -50,8 +51,6 @@ public class TestWiki extends AbstractSeleniumTestCase {
     private static final String WIKI_BODY6 = "Dummy Body";
     private static final String LOCK_ON_FINISH_MESSAGE = "Note: After you click on \"Next Activity\" and you come back to this Wiki, you won't be able to continue editing.";
 
-    private Map<String, String> contentDetails;
-
     protected String getToolSignature() {
 	return WikiConstants.TOOL_SIGNATURE;
     }
@@ -59,22 +58,11 @@ public class TestWiki extends AbstractSeleniumTestCase {
     protected String getLearningDesignName() {
 	return LEARNING_DESIGN_TITLE;
     }
-
-    @Override
-    public void testEntireTool() throws Exception {
-    }
-
-    @Override
-    protected void learningTest() throws InterruptedException {
-    }
-
-    @Override
-    protected void monitoringTest() {
-    }
-
-    @Override
-    protected void authoringTest() throws Exception {
-    }
+    
+    public static TestSuite suite() {
+	String[] testSequence = {"testAuthor", "testStartLesson", "testLearner", "testMonitor"};
+	return new SeleniumTestSuite(TestWiki.class, testSequence);
+    }    
 
     /**
      * Testing the wiki author module
@@ -84,7 +72,7 @@ public class TestWiki extends AbstractSeleniumTestCase {
 
 	    // Logging in and opening authoring
 	    loginToLams();
-	    contentDetails = setUpAuthoring();
+	    setUpAuthoring();
 
 	    // Testing wiki edit page
 	    testEdit(WIKI_TITLE1, WIKI_BODY1);
@@ -109,7 +97,7 @@ public class TestWiki extends AbstractSeleniumTestCase {
 	    selenium.click("tab-middle-link-3");
 	    selenium.type("onlineInstruction__lamstextarea", "online instructions");
 
-	    storeLearningDesign(contentDetails);
+	    storeLearningDesign();
 	} catch (Exception e) {
 	    fail(e.getMessage());
 	}
@@ -121,7 +109,6 @@ public class TestWiki extends AbstractSeleniumTestCase {
      */
     public void testStartLesson() {
 	try {
-	    loginToLams();
 	    createNewLesson();
 	} catch (Exception e) {
 	    fail(e.getMessage());
@@ -133,7 +120,6 @@ public class TestWiki extends AbstractSeleniumTestCase {
      */
     public void testLearner() {
 	try {
-	    loginToLams();
 	    setUpLearning();
 	    assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
 
@@ -164,6 +150,7 @@ public class TestWiki extends AbstractSeleniumTestCase {
 	    // Removing the wiki page so it can be made again in the next test
 	    testRemove(WIKI_TITLE3, true);
 
+	    tearDownLearning();
 	} catch (Exception e) {
 	    fail(e.getMessage());
 	}
@@ -174,8 +161,7 @@ public class TestWiki extends AbstractSeleniumTestCase {
      */
     public void testMonitor() {
 	try {
-	    loginToLams();
-	    openToolMonitor();
+	    setUpMonitoring();
 	    
 	    assertTrue("Montor page did not load properly", selenium.isTextPresent("Wiki Sessions"));
 	    
@@ -204,7 +190,7 @@ public class TestWiki extends AbstractSeleniumTestCase {
 	    
 	    selenium.close();
 	    selenium.selectWindow(null);
-	    closeToolMonitor();
+	    tearDownMonitoring();
 	} catch (Exception e) {
 	    fail(e.getMessage());
 	}
