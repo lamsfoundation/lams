@@ -709,7 +709,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    showResultsBoolean = true;
 	}
 
-	if (!"0".equals(maxInputs)) {
+	if (maxInputs != null && !"0".equals(maxInputs)) {
 	    maxInputsShort = Short.parseShort(maxInputs);
 	}
 
@@ -1286,7 +1286,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    showResultsBoolean = true;
 	}
 
-	if (!"0".equals(maxInputs)) {
+	if (maxInputs != null && !"0".equals(maxInputs)) {
 	    maxInputsShort = Short.parseShort(maxInputs);
 	}
 
