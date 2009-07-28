@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+ 
+	<!--  $Id$ -->
+ 	<!--
+ 	- Application context definition for Wookie tool business layer.
+	-->
+<beans>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	<bean id="wookieMessageService" class="org.lamsfoundation.lams.util.MessageService">
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.wookie.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="wookieOutputFactory" class="org.lamsfoundation.lams.tool.wookie.service.WookieOutputFactory">  
+    	<property name="toolMessageService"><ref bean="wookieMessageService"/></property>  
+	</bean> 
+	<bean id="wookieService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.tool.wookie.service.WookieService">
+				<property name="wookieAttachmentDAO"><ref bean="wookieAttachmentDAO"/></property>
+				<property name="wookieSessionDAO"><ref bean="wookieSessionDAO"/></property>
+				<property name="wookieUserDAO"><ref bean="wookieUserDAO"/></property>
+				<property name="wookieConfigItemDAO"><ref bean="wookieConfigItemDAO"/></property>
+				<property name="wookieDAO"><ref bean="wookieDAO"/></property>
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+				<property name="learnerService"><ref bean="learnerService"/></property>	
+				<property name="auditService"><ref bean="auditService"/></property>		
+ 				<property name="wookieToolContentHandler"><ref bean="wookieToolContentHandler"/></property>
+		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
+		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		   		<property name="wookieOutputFactory"><ref bean="wookieOutputFactory"/></property>
+		   		<property name="repositoryService"><ref bean="repositoryService" /></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED</prop>
+                <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
+
+				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED</prop>				
+			</props>
+		</property>
+	</bean>
+	
+	<!--  DAO classes -->
+	<bean id="wookieDAO" class="org.lamsfoundation.lams.tool.wookie.dao.hibernate.WookieDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>  
+
+	<bean id="wookieSessionDAO" class="org.lamsfoundation.lams.tool.wookie.dao.hibernate.WookieSessionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="wookieUserDAO" class="org.lamsfoundation.lams.tool.wookie.dao.hibernate.WookieUserDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="wookieAttachmentDAO" class="org.lamsfoundation.lams.tool.wookie.dao.hibernate.WookieAttachmentDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+ 	<bean id="wookieToolContentHandler" class="org.lamsfoundation.lams.tool.wookie.util.WookieToolContentHandler">
+ 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean>  
+	
+	<bean id="wookieConfigItemDAO" class="org.lamsfoundation.lams.tool.wookie.dao.hibernate.WookieConfigItemDAO">
+ 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+</beans>
