@@ -9,7 +9,6 @@
 	<title><fmt:message key="label.author.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
 
 	<script>
         

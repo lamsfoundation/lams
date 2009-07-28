@@ -10,7 +10,6 @@
 	<title><fmt:message key="label.authoring.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
 
 	<script>
         function init(){

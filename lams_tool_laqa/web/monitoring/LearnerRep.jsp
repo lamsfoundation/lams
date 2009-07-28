@@ -28,8 +28,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title> <fmt:message key="activity.title"/> </title>
 
 	<%@ include file="/common/header.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
-	
 	
 	<script lang="javascript">
 		var imgRoot="<c:out value="${lams}"/>images/";

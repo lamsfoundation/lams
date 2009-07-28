@@ -9,7 +9,6 @@
 <lams:head>
 	<title><fmt:message key="label.author.title" /></title>
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
 	 <link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 	 
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
