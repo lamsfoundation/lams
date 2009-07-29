@@ -202,7 +202,6 @@ public class LearningAction extends DispatchAction {
 		.getSession().getAttribute(AttributeNames.USER);
 
 	// Start a new dimdim web meeting
-
 	String meetingKey = DimdimUtil.getMeetingKey(session.getSessionId());
 	String returnURL = DimdimUtil.getReturnURL(request);
 	Integer maxAttendeeMikes = session.getDimdim().getMaxAttendeeMikes();
@@ -312,14 +311,6 @@ public class LearningAction extends DispatchAction {
 	    userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
 	}
 	request.setAttribute(Constants.ATTR_USER_DTO, userDTO);
-
-
-
-	String version = dimdimService.getConfigValue(Constants.CFG_VERSION);
-	if (version == null) {
-	    logger.error("Config value " + Constants.CFG_VERSION + " returned null");
-	    throw new DimdimException("Server version not defined");
-	}
 
 	String dispatchValue = new String();
 	boolean meetingOpen = false;
