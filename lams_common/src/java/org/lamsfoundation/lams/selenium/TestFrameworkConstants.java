@@ -33,7 +33,7 @@ public class TestFrameworkConstants {
 	 * the command string used to launch the browser, e.g. "*firefox", "*iexplore" or
 	 * "c:\\program files\\internet explorer\\iexplore.exe"
 	 */	
-	public static final String BROWSER = "*firefox";
+	public static final String BROWSER = "*iexplore";
 	public static final String WEB_APP_HOST = "http://127.0.0.1:8080";
 	/**
 	 * the starting URL including just a domain name. We'll start the browser

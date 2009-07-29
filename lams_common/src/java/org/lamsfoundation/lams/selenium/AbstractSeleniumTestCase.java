@@ -94,6 +94,8 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
     @Override
     public void tearDown() throws Exception {
 	checkForVerificationErrors();
+	//TODO close all windows except main one
+	//then we can remove all the tearDown...
     }
     
     /**
@@ -262,6 +264,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 			"function(data){ return data; }" +
 			");");
 	selenium.selectWindow(null);
+	//TODO add timeout so let servelet running first time finish its work 
     }
 
     /**
@@ -271,6 +274,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
      * @throws Exception
      */
     public void createNewLesson() throws Exception {
+	//TODO check for new design for several times letting it work
 	Long lastCreatedLessonId = getLastCreatedLessonId(true);
 	DefaultSeleniumFlex flexSelenium = (DefaultSeleniumFlex) selenium;
 
@@ -324,6 +328,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	selenium.selectWindow("lWindow");
 	waitForElementPresent("contentFrame");
 	selenium.selectFrame("contentFrame");
+	//TODO set timeout but only during the first time
     }
 
     /**
