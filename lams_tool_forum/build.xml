@@ -185,8 +185,11 @@
 		</sql>
 	</target>
 
+	<!-- =================================================================== -->
+	<!-- Run JUnit Tests                                                     -->
+	<!-- =================================================================== -->	
 	<target name="test-report" depends="compile-test, init-db">
-
+		<antcall target="start-selenium-server"/>
 		<mkdir dir="${build.report}"/>
 		<mkdir dir="${build.report}/html"/> 
 		
@@ -204,6 +207,10 @@
 				<pathelement location="${build.classes.test}"/>
 				<pathelement location="${conf.hibernate.mapping.dir}"/>
 				<pathelement location="${conf.web.dir}"/>
+				<pathelement location="${jboss.home}common/lib/slf4j-api.jar" />
+				<pathelement location="${jboss.home}common/lib/slf4j-jboss-logging.jar" />
+				<pathelement location="${jboss.home}lib/jboss-logging-spi.jar" />
+				<pathelement location="${jboss.home}lib/javassist.jar" />				
 				<path refid="project.classpath"/>
 			</classpath>
 		</junit>
@@ -215,8 +222,31 @@
 			<report todir="${build.report}/html"/> 
 		</junitreport>
 		
+		<antcall target="stop-selenium-server"/>
 		<fail message="Tests failed. Check log and/or reports" if="test.failed"/>
 	</target>
+	
+    <target name="start-selenium-server">
+        <java jar="${sharedlib}/selenium/selenium-server.jar" fork="true" spawn="true">
+            <arg line="-timeout 30" />
+        	<arg line="-port ${selenium.server.port}" />
+        	<arg line="-userExtensions ${sharedlib}/selenium/user-extensions.js" />
+        </java>
+
+        <waitfor maxwait="30" maxwaitunit="second">
+            <and>
+                 <socket server="localhost" port="${selenium.server.port}"/>
+                 <!-- this url will 403, so we say that it should start counting errors at 404 to skip -->
+                 <http url="http://localhost:${selenium.server.port}/" errorsBeginAt="404"/>
+            </and>
+        </waitfor>        	
+    </target>
+	
+	<target name="stop-selenium-server">
+		<get taskname="selenium-shutdown"
+	    	src="http://localhost:${selenium.server.port}/selenium-server/driver/?cmd=shutDown"
+	        dest="result.txt" ignoreerrors="true" />
+    </target>		
 
 	<target name="jar" description="JARs the Task" depends="generate-hbm, compile-java">
 		<echo>+------------------------------------------+</echo>
