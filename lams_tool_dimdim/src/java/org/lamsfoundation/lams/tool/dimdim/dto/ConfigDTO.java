@@ -28,21 +28,11 @@ public class ConfigDTO {
 
     String serverURL;
 
-    String version;
-
     public String getServerURL() {
         return serverURL;
-    }
-    public String getVersion() {
-	return version;
     }
 
     public void setServerURL(String serverURL) {
         this.serverURL = serverURL;
     }
-
-    public void setVersion(String version) {
-	this.version = version;
-    }
-
 }

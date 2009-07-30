@@ -16,28 +16,6 @@
 </logic:messagesPresent> <html:form action="/admin/save">
 
 	<table>
-		<c:choose>
-			<c:when test="${allowVersionChange}">
-				<tr>
-					<td><fmt:message key="config.version" /></td>
-					<td><html:select property="version">
-						<html:option value="">
-							<fmt:message key="label.version.pleaseSelect" />
-						</html:option>
-						<html:option value="standard">
-							<fmt:message key="label.version.standard" />
-						</html:option>
-						<html:option value="enterprise">
-							<fmt:message key="label.version.enterprise" />
-						</html:option>
-					</html:select></td>
-				</tr>
-			</c:when>
-			<c:otherwise>
-				<html:hidden property="version" />
-			</c:otherwise>
-		</c:choose>
-
 		<tr>
 			<td><fmt:message key="config.serverURL" /></td>
 			<td><html:text property="serverURL" /></td>

@@ -45,38 +45,21 @@ public class AdminForm extends ActionForm {
 
     private String serverURL;
 
-    private String version;
-
     // Fields
 
     public String getServerURL() {
 	return serverURL;
     }
 
-    public String getVersion() {
-	return version;
-    }
-
     public void setServerURL(String serverURL) {
 	this.serverURL = serverURL;
-    }
-
-    public void setVersion(String version) {
-	this.version = version;
     }
 
     @Override
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
 
 	ActionErrors errors = new ActionErrors();
-
 	MessageResources resources = MessageResources.getMessageResources(Constants.APP_RESOURCES);
-
-	if (!this.version.equals(Constants.CFG_VERSION_STANDARD)
-		&& !this.version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources
-		    .getMessage("config.version")));
-	}
 
 	if (StringUtils.isBlank(this.serverURL)) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.mandatoryField", resources

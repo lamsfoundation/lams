@@ -72,9 +72,7 @@ public class AdminAction extends MappingDispatchAction {
 	    HttpServletResponse response) throws Exception {
 
 	ConfigDTO configDTO = new ConfigDTO();
-
-	configDTO.setServerURL(dimdimService.getConfigValue(Constants.CFG_SERVER_URL));
-	configDTO.setVersion(dimdimService.getConfigValue(Constants.CFG_VERSION));
+	configDTO.setServerURL(dimdimService.getServerUrl().getValue());
 
 	request.setAttribute(Constants.ATTR_CONFIG_DTO, configDTO);
 	return mapping.findForward("view-success");
@@ -84,16 +82,7 @@ public class AdminAction extends MappingDispatchAction {
 	    HttpServletResponse response) {
 
 	AdminForm adminForm = (AdminForm) form;
-
-	adminForm.setServerURL(dimdimService.getConfigValue(Constants.CFG_SERVER_URL));
-	adminForm.setVersion(dimdimService.getConfigValue(Constants.CFG_VERSION));
-
-	String version = adminForm.getVersion();
-	boolean allowVersionChange = true;
-	if (isVersionSet(version)) {
-	    allowVersionChange = false;
-	}
-	request.setAttribute(Constants.ATTR_ALLOW_VERSION_CHANGE, allowVersionChange);
+	adminForm.setServerURL(dimdimService.getServerUrl().getValue());
 
 	return mapping.findForward("edit-success");
     }
@@ -102,17 +91,17 @@ public class AdminAction extends MappingDispatchAction {
 	    HttpServletResponse response) throws Exception {
 
 	if (!isCancelled(request)) {
-
 	    AdminForm adminForm = (AdminForm) form;
-
-	    // if version is already set, do not update
-	    String version = dimdimService.getConfigValue(Constants.CFG_VERSION);
-	    if (!isVersionSet(version)) {
-		updateConfig(Constants.CFG_VERSION, adminForm.getVersion());
+	    String serverUrl = adminForm.getServerURL().trim();
+	    
+	    DimdimConfig config = dimdimService.getServerUrl();
+	    if (config == null) {
+		config = new DimdimConfig(Constants.CFG_SERVER_URL, serverUrl);
+	    } else {
+		config.setValue(serverUrl);
 	    }
 
-	    updateConfig(Constants.CFG_SERVER_URL, adminForm.getServerURL().trim());
-
+	    dimdimService.saveOrUpdateConfigEntry(config);
 	}
 
 	return mapping.findForward("save-success");
@@ -120,19 +109,6 @@ public class AdminAction extends MappingDispatchAction {
 
     private void updateConfig(String key, String value) {
 
-	DimdimConfig config = dimdimService.getConfig(key);
 
-	if (config == null) {
-	    config = new DimdimConfig(key, value);
-	} else {
-	    config.setValue(value);
-	}
-
-	dimdimService.saveOrUpdateConfigEntry(config);
-    }
-
-    private boolean isVersionSet(String version) {
-	return version != null
-		&& (version.equals(Constants.CFG_VERSION_STANDARD) || version.equals(Constants.CFG_VERSION_ENTERPRISE));
     }
 }

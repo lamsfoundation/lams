@@ -161,13 +161,7 @@ public interface IDimdimService {
      * 
      * @param key
      */
-    DimdimConfig getConfig(String key);
-
-    /**
-     * 
-     * @param key
-     */
-    String getConfigValue(String key);
+    DimdimConfig getServerUrl();
 
     /**
      * 

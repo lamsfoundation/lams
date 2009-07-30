@@ -447,7 +447,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     public String getDimdimJoinConferenceURL(UserDTO userDTO, String meetingKey) throws Exception {
 
 	// Get Dimdim server url
-	String serverURL = getConfigValue(Constants.CFG_SERVER_URL);
+	String serverURL = getServerUrl().getValue();
 	if (serverURL == null) {
 	    DimdimService.logger.error("Config item : '" + Constants.CFG_SERVER_URL + "' not defined");
 	    throw new DimdimException("Standard server url not defined");
@@ -475,47 +475,30 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     public String getDimdimStartConferenceURL(UserDTO userDTO, String meetingKey, String returnURL, int maxAttendeeMikes)
 	    throws Exception {
 
-	String serverURL = getConfigValue(Constants.CFG_SERVER_URL);
+	String serverURL = getServerUrl().getValue();
 	if (serverURL == null) {
 	    DimdimService.logger.error("Config item : '" + Constants.CFG_SERVER_URL + "' not defined");
 	    throw new DimdimException("Standard server url not defined");
 	}
 
-	String version = getConfigValue(Constants.CFG_VERSION);
-	if (version == null) {
-	    DimdimService.logger.error("Config value " + Constants.CFG_VERSION + " returned null");
-	    throw new DimdimException("Server version not defined");
-	}
+	URL url = new URL(serverURL + "/dimdim/StartNewConferenceCheck.action?" + "email="
+		+ URLEncoder.encode(userDTO.getEmail(), "UTF8") + "&displayName="
+		+ URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confKey="
+		+ URLEncoder.encode(meetingKey, "UTF8") + "&lobby=false" + "&networkProfile=3" + "&meetingHours=99"
+		+ "&maxAttendeeMikes=" + maxAttendeeMikes + "&returnUrl=" + URLEncoder.encode(returnURL, "UTF8")
+		+ "&presenterAV=av" + "&privateChatEnabled=true" + "&publicChatEnabled=true"
+		+ "&screenShareEnabled=true" + "&whiteboardEnabled=true");
+	//TODO remove this commented part if this tool works Ok
+//	url = new URL(serverURL + "/dimdim/StartNewConferenceCheck.action?" + "email="
+//		+ URLEncoder.encode(userDTO.getEmail(), "UTF8") + "&meetingRoomName="
+//		+ URLEncoder.encode(meetingKey, "UTF8") + "&displayName="
+//		+ URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confName="
+//		+ "QandA" + "&lobby=" + "false" + "&networkProfile=" + "3" + "&meetingHours" + "=2"
+//		+ "&meetingMinutes=" + "0" + "&presenterAV=" + "av" + "&maxAttendeeMikes=" + maxAttendeeMikes
+//		+ "&returnUrl=" + URLEncoder.encode(returnURL, "UTF8") + "&whiteboardEnabled=" + "true"
+//		+ "&screenShareEnabled=" + "true" + "&participantListEnabled=true" + "&dialInfoVisible=true");
 
-	String response;
-	URL url;
-	if (version.equals(Constants.CFG_VERSION_STANDARD)) {
-
-	    url = new URL(serverURL + "/dimdim/StartNewConferenceCheck.action?" + "email="
-		    + URLEncoder.encode(userDTO.getEmail(), "UTF8") + "&displayName="
-		    + URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confKey="
-		    + URLEncoder.encode(meetingKey, "UTF8") + "&lobby=false" + "&networkProfile=3" + "&meetingHours=99"
-		    + "&maxAttendeeMikes=" + maxAttendeeMikes + "&returnUrl=" + URLEncoder.encode(returnURL, "UTF8")
-		    + "&presenterAV=av" + "&privateChatEnabled=true" + "&publicChatEnabled=true"
-		    + "&screenShareEnabled=true" + "&whiteboardEnabled=true");
-
-	} else if (version.equals(Constants.CFG_VERSION_ENTERPRISE)) {
-
-	    url = new URL(serverURL + "/dimdim/StartNewConferenceCheck.action?" + "email="
-		    + URLEncoder.encode(userDTO.getEmail(), "UTF8") + "&meetingRoomName="
-		    + URLEncoder.encode(meetingKey, "UTF8") + "&displayName="
-		    + URLEncoder.encode(userDTO.getFirstName() + " " + userDTO.getLastName(), "UTF8") + "&confName="
-		    + "QandA" + "&lobby=" + "false" + "&networkProfile=" + "3" + "&meetingHours" + "=2"
-		    + "&meetingMinutes=" + "0" + "&presenterAV=" + "av" + "&maxAttendeeMikes=" + maxAttendeeMikes
-		    + "&returnUrl=" + URLEncoder.encode(returnURL, "UTF8") + "&whiteboardEnabled=" + "true"
-		    + "&screenShareEnabled=" + "true" + "&participantListEnabled=true" + "&dialInfoVisible=true");
-
-	} else {
-	    DimdimService.logger.error("Unknown version type: " + version);
-	    throw new DimdimException("Unknown version type");
-	}
-
-	response = sendRequest(url);
+	String response = sendRequest(url);
 	String path = DimdimUtil.getURL(response);
 
 	return serverURL + path;
@@ -540,22 +523,12 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
     }
 
     @SuppressWarnings("unchecked")
-    public DimdimConfig getConfig(String key) {
-	List<DimdimConfig> list = dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
+    public DimdimConfig getServerUrl() {
+	List<DimdimConfig> list = dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", Constants.CFG_SERVER_URL);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
-	}
-    }
-
-    @SuppressWarnings("unchecked")
-    public String getConfigValue(String key) {
-	List<DimdimConfig> list = dimdimConfigDAO.findByProperty(DimdimConfig.class, "key", key);
-	if (list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0).getValue();
 	}
     }
 

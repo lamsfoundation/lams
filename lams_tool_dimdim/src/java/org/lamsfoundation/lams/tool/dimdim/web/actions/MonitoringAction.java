@@ -132,7 +132,6 @@ public class MonitoringAction extends DispatchAction {
 	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
 		.getSession().getAttribute(AttributeNames.USER);
 
-	// Enterprise Version
 	String meetingStartURL = dimdimService
 		.getDimdimStartConferenceURL(lamsUserDTO, DimdimUtil.getMeetingKey(session.getSessionId()), DimdimUtil
 			.getReturnURL(request), session.getMaxAttendeeMikes());

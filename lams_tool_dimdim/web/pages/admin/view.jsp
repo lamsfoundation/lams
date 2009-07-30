@@ -6,10 +6,6 @@
 
 <table>
 	<tr>
-		<td><fmt:message key="config.version" /></td>
-		<td><c:out value="${configDTO.version}" /></td>
-	</tr>
-	<tr>
 		<td><fmt:message key="config.serverURL" /></td>
 		<td><c:out value="${configDTO.serverURL}" /></td>
 	</tr>

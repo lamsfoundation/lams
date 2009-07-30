@@ -54,15 +54,16 @@ public class DimdimUtil {
     }
 
     // helper functions to extract info from json response.
-
-    // get return code -- enterprise version
-    private static Pattern patternCode = Pattern.compile("code:\"(.*?)\"");
-
-    public static String getCode(String json) {
-	Matcher matcher = patternCode.matcher(json);
-	matcher.find();
-	return matcher.group(1);
-    }
+    //TODO remove commented part  if tool works ok
+//
+//    // get return code -- enterprise version
+//    private static Pattern patternCode = Pattern.compile("code:\"(.*?)\"");
+//
+//    public static String getCode(String json) {
+//	Matcher matcher = patternCode.matcher(json);
+//	matcher.find();
+//	return matcher.group(1);
+//    }
     
     // get result -- standard version
     private static Pattern patternResult = Pattern.compile("result:\"(.*?)\"");

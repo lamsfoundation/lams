@@ -29,7 +29,6 @@ public final class Constants {
     public static final String APP_RESOURCES = "org.lamsfoundation.lams.tool.dimdim.ApplicationResources";
 
     // Attribute names
-    public static final String ATTR_ALLOW_VERSION_CHANGE = "allowVersionChange";
     public static final String ATTR_CONFIG_DTO = "configDTO";
     public static final String ATTR_CONTENT_DTO = "contentDTO";
     public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
@@ -40,11 +39,8 @@ public final class Constants {
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
     public static final String ATTR_USER_DTO = "userDTO";
 
-    // Configuration keys
+    // Configuration key
     public static final String CFG_SERVER_URL = "server_url";
-    public static final String CFG_VERSION = "version";
-    public static final String CFG_VERSION_ENTERPRISE = "enterprise";
-    public static final String CFG_VERSION_STANDARD = "standard";
 
     // Authoring SessionMap key names
     public static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
