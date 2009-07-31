@@ -46,8 +46,6 @@
 
     // Loads the brows area to the specified page number
     function loadBrowseArea(pageNumber) {
-
-		alert("Loading browse area");
     	jQuery("#pager").pager({ pagenumber: pageNumber, pagecount: pageCount, buttonClickCallback: PageClick });
         jQuery.ajax({		
 			type: "GET",
@@ -103,6 +101,8 @@
 				document.getElementById("widgetMaximise").value = widgetMaximize;
 
 				enableWidgetIframe(widgetUrl, widgetHeight, widgetWidth);
+				jQuery("#widgetBrowseArea").toggle("slow");
+				setTimeout('jQuery("#widgetViewArea").toggle("slow");',1000);
 			}
 							
 		});
@@ -115,8 +115,6 @@
 		iframe.style.width = width + "px";
 		iframe.src=url;
 		iframe.style.display="block";
-		jQuery("#widgetBrowseArea").toggle("slow");
-		setTimeout('jQuery("#widgetViewArea").toggle("slow");',1000);
     }
 
 	// Cancel a widget and return to browse mode
@@ -167,28 +165,26 @@
 	</tr>
 	<tr align="center">
 		<td>
-			<div id="widgetBrowseArea">
-				<div id="result" ></div>
-				<div id="container" class="wookie-list" >
-					<div id="pager" ></div>
+			<div id="wookieArea" style="min-height: 625px">
+				<div id="widgetBrowseArea">
+					<div id="result" ></div>
+					<div id="container" class="wookie-list" >
+						<div id="pager" ></div>
+					</div>
+				</div>
+				
+				<div id="widgetViewArea" >
+					<iframe
+						id="widgetIframe" 
+						name="widgetIframe"
+						style="width:0px;height:0px;border:0px;" 
+						frameborder="no"
+						scrolling="no">
+					</iframe>
+					<br />
+					<a href="javascript:cancelWidget()" class="button"><fmt:message key="button.cancel" /></a>
 				</div>
 			</div>
-			
-			<div id="widgetViewArea" >
-				<iframe
-					id="widgetIframe" 
-					name="widgetIframe"
-					style="width:0px;height:0px;border:0px;" 
-					frameborder="no"
-					scrolling="no">
-				</iframe>
-				
-				<a href="javascript:cancelWidget()" class="button"><fmt:message key="button.cancel" /></a>
-			</div>
-			
 		</td>
 	</tr>
 </table>
-
-<br />
-<br />
