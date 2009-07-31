@@ -143,17 +143,7 @@
 		<h2>
 			${userDTO.firstName} ${userDTO.lastName}
 		</h2>
-		<c:choose>
-			<c:when
-				test="${userDTO.imageFileName != null && userDTO.imageFileName != wookieDTO.imageFileName}">
-				<img src="tool_images/${userDTO.imageFileName}" />
-			</c:when>
-			<c:otherwise>
-				<p>
-				<fmt:message key="message.imageNotAvailable" />
-				</p>
-			</c:otherwise>
-		</c:choose>
+		
 		
 		<c:if test="${wookieDTO.reflectOnActivity}">
 			<h2>

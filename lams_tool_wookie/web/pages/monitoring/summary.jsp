@@ -41,22 +41,6 @@
 	</tr>
 	<tr>
 		<td>
-			<fmt:message key="advanced.allowViewOthersImages" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.allowViewOthersImages}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	<tr>
-		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />
 		</td>
 		
@@ -121,56 +105,7 @@
 				</c:if>
 			</tr>
 			
-			<c:forEach var="user" items="${session.userDTOs}">
-				<tr>
-					<td>
-						<a href="javascript:openPopup('${wookieImageFolderURL}/${user.imageFileName}', ${user.imageHeight}, ${user.imageWidth})">
-							${user.firstName} ${user.lastName}
-						</a>
-					</td>
-					<td align="center">
-						<c:choose>
-							<c:when test="${user.imageFileName != null && user.imageFileName != wookieDTO.imageFileName}">
-								<img src="${wookieImageFolderURL}/${user.imageFileName}" 
-									height="${user.imageThumbnailHeight}" 
-									width="${user.imageThumbnailWidth}"
-									title='<fmt:message key="tooltip.openfullsize" />'
-									onclick="openPopup('${wookieImageFolderURL}/${user.imageFileName}', ${user.imageHeight}, ${user.imageWidth})"
-								 />
-								 <c:if test="${wookieDTO.allowViewOthersImages}">
-								 	<br />
-								 	<a href="javascript:submitForm('toggleHideImage', '${user.uid}')">
-								 	<c:choose>
-								 		<c:when test="${user.imageHidden}">
-											<fmt:message key="monitoring.showImage" />
-								 		</c:when>
-								 		<c:otherwise>
-								 			<fmt:message key="monitoring.hideImage" />
-								 		</c:otherwise>
-								 	</c:choose>
-								 	</a>
-								 </c:if>
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="label.notAvailable" />
-							</c:otherwise>
-						</c:choose>
-					</td>
-					
-					<c:if test="${wookieDTO.reflectOnActivity}">
-						<td >
-							<c:choose>
-								<c:when test="${user.finishedReflection}">
-									${user.notebookEntry}
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="label.notAvailable" />
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</c:if>
-				</tr>
-			</c:forEach>
+			
 		</table>
 	
 	</c:forEach>

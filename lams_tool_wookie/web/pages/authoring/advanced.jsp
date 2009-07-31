@@ -10,14 +10,6 @@
 	</label>
 </p>
 
-<p class="small-space-top">
-	<html:checkbox property="allowViewOthersImages" value="1"
-		styleClass="noBorder" styleId="allowViewOthersImages"></html:checkbox>
-	<label for="allowViewOthersImages">
-		<fmt:message key="advanced.allowViewOthersImages" />
-	</label>
-</p>
-
 <p>
 	<html:checkbox property="reflectOnActivity" value="1"
 		styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>

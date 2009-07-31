@@ -46,27 +46,17 @@
 	<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 	<html:hidden property="mode" value="${mode}" />	
 	<div class="space-bottom-top align-right">
-		
 		<c:choose>
-			<c:when test="${wookieDTO.allowViewOthersImages}">
-				<html:submit styleClass="button" onclick="javascript:document.getElementById('dispatch').value = 'viewAllImages';">
-					<fmt:message key="button.viewAll" />
+			<c:when test="${!wookieUserDTO.finishedActivity and wookieDTO.reflectOnActivity}">
+				<html:submit styleClass="button" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook';">
+					<fmt:message key="button.continue" />
 				</html:submit>
 			</c:when>
 			<c:otherwise>
-				<c:choose>
-					<c:when test="${!wookieUserDTO.finishedActivity and wookieDTO.reflectOnActivity}">
-						<html:submit styleClass="button" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook';">
-							<fmt:message key="button.continue" />
-						</html:submit>
-					</c:when>
-					<c:otherwise>
-						<html:hidden property="dispatch" value="finishActivity" />
-						<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finished');">
-							<span class="nextActivity"><fmt:message key="button.finish" /></span>
-						</html:link>
-					</c:otherwise>
-				</c:choose>
+				<html:hidden property="dispatch" value="finishActivity" />
+				<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finished');">
+					<span class="nextActivity"><fmt:message key="button.finish" /></span>
+				</html:link>
 			</c:otherwise>
 		</c:choose>
 	</div>

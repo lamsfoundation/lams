@@ -24,9 +24,6 @@
 
 package org.lamsfoundation.lams.tool.wookie.web.actions;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,23 +31,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.wookie.dto.WidgetData;
 import org.lamsfoundation.lams.tool.wookie.dto.WidgetDefinition;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
 import org.lamsfoundation.lams.tool.wookie.model.WookieAttachment;
@@ -61,17 +54,12 @@ import org.lamsfoundation.lams.tool.wookie.util.WookieException;
 import org.lamsfoundation.lams.tool.wookie.util.WookieUtil;
 import org.lamsfoundation.lams.tool.wookie.web.forms.AuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * @author
@@ -132,6 +120,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	String wookieUrl = wookieService.getWookieURL();
 	if (wookieUrl == null) {
 	    // TODO: Forward to error, citing that wookie is not configured properly
+	    
 	}
 
 	// Get the widget count
@@ -148,7 +137,9 @@ public class AuthoringAction extends LamsDispatchAction {
 		request.setAttribute(WookieConstants.ATTR_WIDGET_PAGES, pages);
 	    }
 	} catch (Exception e) {
-	    log.error("Problem reading xml from wookie server.", e);
+	    logger.error("Problem reading xml from wookie server.", e);
+	    
+	    
 	    
 	    // TODO: Handle failed call to wookie server
 	    
@@ -230,7 +221,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    return mapping.findForward("widgetList");
 
 	} catch (Exception e) {
-	    log.error("Problem reading xml from wookie server.", e);
+	    logger.error("Problem reading xml from wookie server.", e);
 	    throw new WookieException(e);
 	}
     }
