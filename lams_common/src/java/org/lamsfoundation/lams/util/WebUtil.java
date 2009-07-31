@@ -469,7 +469,7 @@ public class WebUtil {
 	    urlStr += "&" + entry.getKey() + "=" + entry.getValue();
 	}
 
-	WebUtil.log.debug("Making request to external servlet: " + urlStr);
+	WebUtil.log.info("Making request to external servlet: " + urlStr);
 
 	URL url = new URL(urlStr);
 	URLConnection conn = url.openConnection();
@@ -522,7 +522,7 @@ public class WebUtil {
 	// ------------------ CLIENT REQUEST
 	FileInputStream fileInputStream = new FileInputStream(f);
 
-	WebUtil.log.debug("Performing multipart post to: " + urlString);
+	WebUtil.log.info("Performing multipart post to: " + urlString);
 
 	// open a URL connection to the Servlet
 	URL url = new URL(urlString);
