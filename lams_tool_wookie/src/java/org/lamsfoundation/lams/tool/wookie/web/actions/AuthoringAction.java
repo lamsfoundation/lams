@@ -119,8 +119,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	String wookieUrl = wookieService.getWookieURL();
 	if (wookieUrl == null) {
-	    // TODO: Forward to error, citing that wookie is not configured properly
-	    
+	    throw new WookieException(wookieService.getMessage("error.wookie.not.configured"));
 	}
 
 	// Get the widget count
@@ -137,13 +136,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		request.setAttribute(WookieConstants.ATTR_WIDGET_PAGES, pages);
 	    }
 	} catch (Exception e) {
-	    logger.error("Problem reading xml from wookie server.", e);
-	    
-	    
-	    
-	    // TODO: Handle failed call to wookie server
-	    
-	    throw new WookieException(e);
+	    logger.error("Error initiating widget on wookie server", e);    
+	    throw new WookieException(wookieService.getMessage("error.initiating.widget"), e);
 	}
 
 	// retrieving Wookie with given toolContentID
@@ -199,7 +193,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	try {
 	    String wookieUrl = wookieService.getWookieURL();
 	    if (wookieUrl == null) {
-		// TODO: Forward to error, citing that wookie is not configured properly
+		throw new WookieException(wookieService.getMessage("error.wookie.not.configured"));
 	    }
 
 	    List<WidgetDefinition> widgetDefinitions = WookieUtil.getWidgetDefinitions(wookieUrl);

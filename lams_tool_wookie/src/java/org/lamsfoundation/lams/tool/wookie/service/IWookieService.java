@@ -192,5 +192,12 @@ public interface IWookieService {
      * @return
      */
     public String getWookieAPIKey();
+    
+    /**
+     * Get an I18n message by key
+     * @param key
+     * @return
+     */
+    public String getMessage(String key);
 
 }

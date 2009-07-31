@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -122,6 +123,8 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     private WookieOutputFactory wookieOutputFactory;
 
     private IWookieConfigItemDAO wookieConfigItemDAO;
+    
+    private MessageService messageService;
 
     public WookieService() {
 	super();
@@ -564,6 +567,10 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	}
 	return url;
     }
+    
+    public String getMessage(String key) {
+	return messageService.getMessage(key);
+    }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 
@@ -709,4 +716,14 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     public void setRepositoryService(IRepositoryService repositoryService) {
 	this.repositoryService = repositoryService;
     }
+
+    public MessageService getMessageService() {
+        return messageService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
+    }
+    
+    
 }

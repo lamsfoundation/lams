@@ -52,6 +52,9 @@
 			url: "<lams:WebAppURL/>/authoring.do",
 			data: {dispatch : "getWidgets", pageNumber : 1},
 			cache: false,
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				alert('<fmt:message key="error.wookie.server" />');
+			},
 			success: function (html) {
 				jQuery("#result").html(html);
 			}
@@ -81,9 +84,7 @@
 			data: {dispatch :"initiateWidget", widgetid:widgetid, toolContentID:"${sessionMap.toolContentID}" },
 			cache: false,
 			error: function (XMLHttpRequest, textStatus, errorThrown) {
-					
-				// TODO: Good error message
-				alert(errorThrown);
+				alert('<fmt:message key="error.initiating.widget" />');
 			},				
 			success: function (xml) {
 
