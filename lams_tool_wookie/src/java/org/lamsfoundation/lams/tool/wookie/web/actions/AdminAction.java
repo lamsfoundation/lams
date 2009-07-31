@@ -16,8 +16,8 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @author
  * @version
  * 
- * @struts.action path="/lawook10admin" parameter="dispatch" scope="request"
- *                name="lawook10AdminForm" validate="false"
+ * @struts.action path="/admin" parameter="dispatch" scope="request"
+ *                name="wookieadminform" validate="false"
  * 
  * @struts.action-forward name="config" path="/pages/admin/config.jsp"
  */
@@ -33,9 +33,15 @@ public class AdminAction extends LamsDispatchAction {
 
 	AdminForm adminForm = (AdminForm) form;
 
-	WookieConfigItem wookieKey = wookieService.getConfigItem(WookieConfigItem.KEY_LANGUAGE_CSV);
-	if (wookieKey != null)
-	    adminForm.setLanguagesCSV(wookieKey.getConfigValue());
+	WookieConfigItem wookieKey = wookieService.getConfigItem(WookieConfigItem.KEY_API);
+	if (wookieKey != null) {
+	    adminForm.setApiKey(wookieKey.getConfigValue());
+	}
+
+	WookieConfigItem wookieUrl = wookieService.getConfigItem(WookieConfigItem.KEY_WOOKIE_URL);
+	if (wookieUrl != null) {
+	    adminForm.setWookieServerUrl(wookieUrl.getConfigValue());
+	}
 
 	request.setAttribute("error", false);
 	return mapping.findForward("config");
@@ -45,15 +51,20 @@ public class AdminAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	AdminForm adminForm = (AdminForm) form;
 
-	if (adminForm.getLanguagesCSV() != null && !adminForm.getLanguagesCSV().equals("")) {
-	    // set up mdlForumService
+	if (adminForm.getApiKey() != null && !adminForm.getApiKey().equals("")
+		&& adminForm.getWookieServerUrl() != null && !adminForm.getWookieServerUrl().equals("")) {
+
 	    if (wookieService == null) {
 		wookieService = WookieServiceProxy.getWookieService(this.getServlet().getServletContext());
 	    }
 
-	    WookieConfigItem wookieKey = wookieService.getConfigItem(WookieConfigItem.KEY_LANGUAGE_CSV);
-	    wookieKey.setConfigValue(adminForm.getLanguagesCSV());
+	    WookieConfigItem wookieKey = wookieService.getConfigItem(WookieConfigItem.KEY_API);
+	    wookieKey.setConfigValue(adminForm.getApiKey());
 	    wookieService.saveOrUpdateWookieConfigItem(wookieKey);
+	    
+	    WookieConfigItem wookieUrl = wookieService.getConfigItem(WookieConfigItem.KEY_WOOKIE_URL);
+	    wookieUrl.setConfigValue(adminForm.getWookieServerUrl());
+	    wookieService.saveOrUpdateWookieConfigItem(wookieUrl);
 
 	    request.setAttribute("savedSuccess", true);
 	    return mapping.findForward("config");

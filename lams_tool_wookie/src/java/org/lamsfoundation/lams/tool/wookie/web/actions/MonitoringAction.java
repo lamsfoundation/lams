@@ -156,32 +156,4 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	return mapping.findForward("notebook");
     }
-    
-    /**
-     * Opens a user's reflection
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    public ActionForward toggleHideImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	setupService();
-	MonitoringForm monitorForm = (MonitoringForm) form;
-	WookieUser wookieUser = wookieService.getUserByUID(monitorForm.getHideUserImageUid());
-	
-	if (wookieUser.isImageHidden())
-	{
-	    wookieUser.setImageHidden(false);
-	}
-	else
-	{
-	    wookieUser.setImageHidden(true);
-	}
-	wookieService.saveOrUpdateWookieUser(wookieUser);
-	return unspecified(mapping, monitorForm, request, response);
-    }
 }

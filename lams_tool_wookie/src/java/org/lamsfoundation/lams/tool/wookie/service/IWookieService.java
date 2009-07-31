@@ -184,6 +184,13 @@ public interface IWookieService {
      * 
      * @return
      */
-    public String getWookiURL();
+    public String getWookieURL();
+    
+    /**
+     * Get the wookie api key
+     * 
+     * @return
+     */
+    public String getWookieAPIKey();
 
 }

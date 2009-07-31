@@ -79,8 +79,6 @@ public class AuthoringForm extends ActionForm {
     
     Long toolContentID;
     
-    String existingImageFileName;
-    
     String mode;
     
     // flag of this item has attachment or not
@@ -89,6 +87,13 @@ public class AuthoringForm extends ActionForm {
     private Long fileVersionId;
     private String fileName;
     private FormFile file;
+    
+    // Wookie widget paramerters
+    String widgetAuthorUrl;
+    Integer widgetHeight;
+    Integer widgetWidth;
+    Boolean widgetMaximise;
+    String widgetIdentifier;
     
 
     @Override
@@ -267,14 +272,6 @@ public class AuthoringForm extends ActionForm {
         this.mode = mode;
     }
 
-    public String getExistingImageFileName() {
-        return existingImageFileName;
-    }
-
-    public void setExistingImageFileName(String existingImageFileName) {
-        this.existingImageFileName = existingImageFileName;
-    }
-
     public String getReflectInstructions() {
         return reflectInstructions;
     }
@@ -290,5 +287,46 @@ public class AuthoringForm extends ActionForm {
     public void setAllowViewOthersImages(boolean allowViewOthersImages) {
         this.allowViewOthersImages = allowViewOthersImages;
     }
+
+    public String getWidgetAuthorUrl() {
+        return widgetAuthorUrl;
+    }
+
+    public void setWidgetAuthorUrl(String widgetAuthorUrl) {
+        this.widgetAuthorUrl = widgetAuthorUrl;
+    }
+
+    public Integer getWidgetHeight() {
+        return widgetHeight;
+    }
+
+    public void setWidgetHeight(Integer widgetHeight) {
+        this.widgetHeight = widgetHeight;
+    }
+
+    public Integer getWidgetWidth() {
+        return widgetWidth;
+    }
+
+    public void setWidgetWidth(Integer widgetWidth) {
+        this.widgetWidth = widgetWidth;
+    }
+
+    public Boolean getWidgetMaximise() {
+        return widgetMaximise;
+    }
+
+    public void setWidgetMaximise(Boolean widgetMaximise) {
+        this.widgetMaximise = widgetMaximise;
+    }
+
+    public String getWidgetIdentifier() {
+        return widgetIdentifier;
+    }
+
+    public void setWidgetIdentifier(String widgetIdentifier) {
+        this.widgetIdentifier = widgetIdentifier;
+    }
+
     
 }

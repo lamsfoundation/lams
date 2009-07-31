@@ -51,6 +51,7 @@ public interface WookieConstants {
     public static final String ATTR_SESSION_MAP = "sessionMap";
     public static final String ATTR_WIDGET_LIST = "widgetList";
     public static final String ATTR_WIDGET_PAGES = "widgetPages";
+    public static final String ATTR_WIDGET_URL = "widgetURL";
 
     // Parameter names
     public static final String PARAM_PARENT_PAGE = "parentPage";
@@ -81,6 +82,24 @@ public interface WookieConstants {
     public static final String PARAM_PAGE_COUNT = "pageCount";
     public static final String PARAM_PAGE_NUMBER = "pageNumber";
     
+    public static final String PARAM_KEY_REQUEST_ID = "requestid";
+    public static final String PARAM_KEY_API_KEY = "api_key";
+    public static final String PARAM_KEY_SERVICE_TYPE = "servicetype";
+    public static final String PARAM_KEY_WIDGIT_ID = "widgetid";
+    public static final String PARAM_KEY_USER_ID = "userid";
+    public static final String PARAM_KEY_SHARED_DATA_KEY = "shareddatakey";
+    public static final String PARAM_KEY_PARTICIPANT_ID = "participant_id";
+    public static final String PARAM_KEY_PARTICIPANT_DISPLAY_NAME = "participant_display_name";
+    public static final String PARAM_KEY_PARTICIPANT_THUMBNAIL_URL = "participant_thumbnail_url";
+    public static final String PARAM_KEY_PROPERTY_NAME = "propertyname";
+    public static final String PARAM_KEY_PROPERTY_VALUE = "propertyvalue";
+    
+    public static final String PARAM_VALUE_GET_WIDGET= "getwidget";
+    public static final String PARAM_VALUE_ADD_PARTICIPANT = "addparticipant";
+    public static final String PARAM_VALUE_SET_PERSONAL_PROPERTY = "setpersonalproperty";
+    public static final String PARAM_VALUE_PROPERTY_NAME_MODERATOR = "moderator";
+    public static final String PARAM_VALUE_PROPERTY_VALUE_TRUE = "true";
+    
     public static final String XML_WIDGETS = "widgets";
     public static final String XML_WIDGET = "widget";
     public static final String XML_IDENTIFIER = "identifier";
@@ -88,5 +107,7 @@ public interface WookieConstants {
     public static final String XML_DESCRIPTION = "description";
     public static final String XML_ICON = "icon";
     public static final String XML_PARAMETER = "parameter";
-
+    public static final String XML_MESSAGE = "message";
+    public static final String XML_COMPLETED = "completed";
+    
 }

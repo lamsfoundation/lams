@@ -37,8 +37,7 @@
 		<html:hidden property="toolContentID" />
 		<html:hidden property="mode" value=""/>
 		<html:hidden property="contentFolderID" />
-		<html:hidden property="existingImageFileName" />
-
+		
 		<div id="message" style="text-align: center;">
 			<c:if test="${unsavedChanges}">
 				<fmt:message key="message.unsavedChanges" />

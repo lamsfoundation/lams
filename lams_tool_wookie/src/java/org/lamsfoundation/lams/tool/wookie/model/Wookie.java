@@ -67,8 +67,6 @@ public class Wookie implements java.io.Serializable, Cloneable {
     private boolean lockOnFinished;
 
     private boolean reflectOnActivity;
-    
-    private boolean allowViewOthersImages;
 
     private String reflectInstructions;
 
@@ -82,15 +80,16 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     private Long toolContentId;
 
-    private String imageFileName; // Image uploaded for wookie
-    
-    private Long imageWidth;
-    
-    private Long imageHeight;
-
     private Set<WookieAttachment> wookieAttachments;
 
     private Set<WookieSession> wookieSessions;
+    
+    // Wookie parameters
+    String widgetAuthorUrl;
+    Integer widgetHeight;
+    Integer widgetWidth;
+    Boolean widgetMaximise;
+    String widgetIdentifier;
 
     // *********** NON Persisit fields
     private IToolContentHandler toolContentHandler;
@@ -106,7 +105,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
 	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
 	    Long toolContentId, String reflectInstructions, Set<WookieAttachment> wookieAttachments,
-	    Set<WookieSession> wookieSessions, String imageFileName, Long imageWidth, Long imageHeight, boolean allowViewOthersImages) {
+	    Set<WookieSession> wookieSessions, String imageFileName, Long imageWidth, Long imageHeight) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
@@ -121,11 +120,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 	this.toolContentId = toolContentId;
 	this.wookieAttachments = wookieAttachments;
 	this.wookieSessions = wookieSessions;
-	this.imageFileName = imageFileName;
 	this.reflectInstructions = reflectInstructions;
-	this.imageHeight = imageHeight;
-	this.imageWidth = imageWidth;
-	this.allowViewOthersImages = allowViewOthersImages;
     }
 
     // Property accessors
@@ -242,17 +237,6 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
-    }
-    
-    /**
-     * @hibernate.property column="allow_view_others_images" length="1"
-     */
-    public boolean isAllowViewOthersImages() {
-        return allowViewOthersImages;
-    }
-
-    public void setAllowViewOthersImages(boolean allowViewOthersImages) {
-        this.allowViewOthersImages = allowViewOthersImages;
     }
 
     /**
@@ -439,45 +423,6 @@ public class Wookie implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="image_file_name" length="511"
-     * 
-     */
-
-    public String getImageFileName() {
-	return imageFileName;
-    }
-
-    public void setImageFileName(String imageFileName) {
-	this.imageFileName = imageFileName;
-    }
-    
-    /**
-     * @hibernate.property column="image_width" 
-     * 
-     */
-
-    public Long getImageWidth() {
-        return imageWidth;
-    }
-
-    public void setImageWidth(Long imageWidth) {
-        this.imageWidth = imageWidth;
-    }
-
-    /**
-     * @hibernate.property column="image_height" 
-     * 
-     */
-    
-    public Long getImageHeight() {
-        return imageHeight;
-    }
-
-    public void setImageHeight(Long imageHeight) {
-        this.imageHeight = imageHeight;
-    }
-
-    /**
      * @hibernate.property column="reflect_instructions" length="65535"
      */
     public String getReflectInstructions() {
@@ -488,4 +433,63 @@ public class Wookie implements java.io.Serializable, Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
+    /**
+     * @hibernate.property column="widget_author_url" length="511"
+     * @return
+     */
+    public String getWidgetAuthorUrl() {
+        return widgetAuthorUrl;
+    }
+
+    public void setWidgetAuthorUrl(String widgetAuthorUrl) {
+        this.widgetAuthorUrl = widgetAuthorUrl;
+    }
+    
+    /**
+     * @hibernate.property column="widget_height" 
+     * @return
+     */
+    public Integer getWidgetHeight() {
+        return widgetHeight;
+    }
+
+    public void setWidgetHeight(Integer widgetHeight) {
+        this.widgetHeight = widgetHeight;
+    }
+
+    /**
+     * @hibernate.property column="widget_width" 
+     * @return
+     */
+    public Integer getWidgetWidth() {
+        return widgetWidth;
+    }
+
+    public void setWidgetWidth(Integer widgetWidth) {
+        this.widgetWidth = widgetWidth;
+    }
+
+    /**
+     * @hibernate.property column="widget_maximise" 
+     * @return
+     */
+    public Boolean getWidgetMaximise() {
+        return widgetMaximise;
+    }
+
+    public void setWidgetMaximise(Boolean widgetMaximise) {
+        this.widgetMaximise = widgetMaximise;
+    }
+
+    /**
+     * @hibernate.property column="widget_identifier"  length="511"
+     * @return
+     */
+    public String getWidgetIdentifier() {
+        return widgetIdentifier;
+    }
+
+    public void setWidgetIdentifier(String widgetIdentifier) {
+        this.widgetIdentifier = widgetIdentifier;
+    }
 }

@@ -41,20 +41,26 @@
 
 .wookie-title{
 	font-family: Verdana,Arial,sans-serif;
-    margin-top: 20px;
+    margin-top: 0px;
     font-weight: bold;
     font-size: 12px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
     height: 25px;
     text-align:center;
     vertical-align: top;        
 }
 
 .wookie-description{
-	margin-top: 20px;
+	margin-top: 0px;
+	margin-bottom: 10px;
     font-size: 10px;
-    padding: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px;
     height: 90px;    
     vertical-align: top;
     font-family: Verdana,Arial,sans-serif;

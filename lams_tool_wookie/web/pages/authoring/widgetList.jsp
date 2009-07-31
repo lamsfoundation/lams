@@ -15,7 +15,7 @@
 					</tr>
 					<tr align="center">
 						<td class="wookie-title" align="center" valign="top">
-							${widget.title}
+							<a href="javascript:selectWookieWidget('${widget.identifier}')">${widget.title}</a>
 						</td>
 					</tr>
 					<tr align="center">
@@ -44,9 +44,10 @@
 					</tr>
 					<tr align="center">
 						<td class="wookie-title" align="center" valign="top">
-							${widget.title}
+							<a href="javascript:selectWookieWidget('${widget.identifier}')">${widget.title}</a>
 						</td>
 					</tr>
+					
 					<tr align="center">
 						<td class="wookie-description" align="center" valign="top">
 							${widget.description}

@@ -96,15 +96,6 @@
         />
 
         <property
-            name="allowViewOthersImages"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="allow_view_others_images"
-            length="1"
-        />
-
-        <property
             name="onlineInstructions"
             type="java.lang.String"
             update="true"
@@ -188,37 +179,54 @@
         </set>
 
         <property
-            name="imageFileName"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="image_file_name"
-            length="511"
-        />
-
-        <property
-            name="imageWidth"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="image_width"
-        />
-
-        <property
-            name="imageHeight"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="image_height"
-        />
-
-        <property
             name="reflectInstructions"
             type="java.lang.String"
             update="true"
             insert="true"
             column="reflect_instructions"
             length="65535"
+        />
+
+        <property
+            name="widgetAuthorUrl"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="widget_author_url"
+            length="511"
+        />
+
+        <property
+            name="widgetHeight"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="widget_height"
+        />
+
+        <property
+            name="widgetWidth"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="widget_width"
+        />
+
+        <property
+            name="widgetMaximise"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="widget_maximise"
+        />
+
+        <property
+            name="widgetIdentifier"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="widget_identifier"
+            length="511"
         />
 
         <!--

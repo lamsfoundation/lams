@@ -24,9 +24,6 @@
 
 package org.lamsfoundation.lams.tool.wookie.web.actions;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -35,11 +32,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Map.Entry;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,7 +50,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.wookie.dto.WookieDTO;
 import org.lamsfoundation.lams.tool.wookie.dto.WookieUserDTO;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
-import org.lamsfoundation.lams.tool.wookie.model.WookieConfigItem;
 import org.lamsfoundation.lams.tool.wookie.model.WookieSession;
 import org.lamsfoundation.lams.tool.wookie.model.WookieUser;
 import org.lamsfoundation.lams.tool.wookie.service.IWookieService;
@@ -67,7 +60,6 @@ import org.lamsfoundation.lams.tool.wookie.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -158,11 +150,6 @@ public class LearningAction extends LamsDispatchAction {
 	    wookieUser = getCurrentUser(toolSessionID);
 	}
 
-	// return to the viewAll images page if the user has already clicked it
-	if (wookieUser.isFinishedActivity() && wookie.isAllowViewOthersImages() && !isRedo) {
-	    return viewAllImages(mapping, learningForm, request, response);
-	}
-
 	// set up the user dto
 	WookieUserDTO wookieUserDTO = new WookieUserDTO(wookieUser);
 	if (wookieUser.isFinishedActivity()) {
@@ -183,19 +170,7 @@ public class LearningAction extends LamsDispatchAction {
 	String url = PIXLR_UTL + "?";
 	url += "&title=" + URLEncoder.encode(wookie.getTitle(), "UTF8");
 	url += "&referrer=LAMS";
-	url += "&loc=" + getWookieLocale();
 
-	String currentImageURL;
-
-	if (wookieUser.getImageFileName() != null && !wookieUser.getImageFileName().equals("")) {
-	    currentImageURL = WookieConstants.LAMS_WWW_PIXLR_FOLDER_URL + wookieUser.getImageFileName();
-	    returnURL += "&existingImage=" + URLEncoder.encode(wookieUser.getImageFileName(), "UTF8");
-	} else {
-	    returnURL += "&existingImage=";
-	    currentImageURL = WookieConstants.LAMS_WWW_PIXLR_FOLDER_URL + wookie.getImageFileName();
-	}
-
-	request.setAttribute("currentImageURL", currentImageURL);
 	request.setAttribute("wookieURL", url);
 	request.setAttribute("returnURL", returnURL);
 
@@ -209,62 +184,7 @@ public class LearningAction extends LamsDispatchAction {
 	return mapping.findForward("wookie");
     }
 
-    public ActionForward updateWookieImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	Boolean success;
-
-	log.debug("Saving image from wookie");
-
-	// set up wookieService
-	if (wookieService == null) {
-	    wookieService = WookieServiceProxy.getWookieService(this.getServlet().getServletContext());
-	}
-
-	String imageURL = WebUtil.readStrParam(request, "image");
-	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
-
-	WookieUser wookieUser = getCurrentUser(toolSessionID);
-
-	String imageName = WebUtil.readStrParam(request, "existingImage", true);
-
-	if (imageName == null || imageName.equals("")) {
-	    imageName = FileUtil.generateUniqueContentFolderID() + ".jpg";
-	}
-
-	try {
-	    InputStream is = getResponseInputStreamFromExternalServer(imageURL, new HashMap<String, String>());
-
-	    String realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
-		    + FileUtil.LAMS_WWW_DIR + File.separator + "images" + File.separator + "wookie";
-
-	    File imageFile = new File(realBaseDir + File.separator + imageName);
-
-	    FileOutputStream out = new FileOutputStream(imageFile);
-
-	    byte[] buf = new byte[1024];
-	    int len;
-	    while ((len = is.read(buf)) > 0) {
-		out.write(buf, 0, len);
-	    }
-	    
-	    wookieUser.setImageFileName(imageName);
-
-	    // Now save the image size
-	    BufferedImage imageBufferedFile = ImageIO.read(imageFile);
-	    int width = imageBufferedFile.getWidth();
-	    int height = imageBufferedFile.getHeight();
-	    wookieUser.setImageHeight(new Long(height));
-	    wookieUser.setImageWidth(new Long(width));
-	    wookieService.saveOrUpdateWookieUser(wookieUser);
-	    success = true;
-	} catch (Exception e) {
-	    log.error("Failed to copy wookie image from wookie server with URL: " + imageURL, e);
-	    success = false;
-	}
-
-	request.setAttribute("success", success);
-	return mapping.findForward("success");
-    }
+    
 
     private WookieUser getCurrentUser(Long toolSessionId) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -396,88 +316,5 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	return finishActivity(mapping, form, request, response);
-    }
-
-    public ActionForward viewAllImages(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, MODE_OPTIONAL);
-
-	// set up wookieService
-	if (wookieService == null) {
-	    wookieService = WookieServiceProxy.getWookieService(this.getServlet().getServletContext());
-	}
-
-	// Retrieve the session and content.
-	WookieSession wookieSession = wookieService.getSessionBySessionId(toolSessionID);
-	if (wookieSession == null) {
-	    throw new WookieException("Cannot retreive session with toolSessionID" + toolSessionID);
-	}
-
-	Wookie wookie = wookieSession.getWookie();
-
-	// get the user
-	WookieUser wookieUser;
-	if (mode.equals(ToolAccessMode.TEACHER)) {
-	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
-	    wookieUser = wookieService.getUserByUserIdAndSessionId(userID, toolSessionID);
-	} else {
-	    wookieUser = getCurrentUser(toolSessionID);
-	}
-
-	// set completed 
-	wookieUser.setFinishedActivity(true);
-	wookieService.saveOrUpdateWookieUser(wookieUser);
-
-	// set up the of images learner set
-	Set<WookieUserDTO> learnerSet = new HashSet<WookieUserDTO>();
-	for (WookieUser learner : wookieSession.getWookieUsers()) {
-	    if (learner.getImageFileName() != null && !learner.getImageFileName().equals("")
-		    && !learner.getImageFileName().equals(wookie.getImageFileName())) {
-
-		WookieUserDTO userDTO = new WookieUserDTO(learner);
-		if (userDTO.getImageFileName() == null || userDTO.getImageFileName().equals("")) {
-		    userDTO.setImageFileName(wookie.getImageFileName());
-		    userDTO.setImageHeight(wookie.getImageHeight());
-		    userDTO.setImageWidth(wookie.getImageWidth());
-		}
-		learnerSet.add(userDTO);
-	    }
-	}
-	request.setAttribute("learnerDTOs", learnerSet);
-	request.setAttribute("wookieDTO", new WookieDTO(wookie));
-	request.setAttribute("mode", mode);
-	request.setAttribute("wookieImageFolderURL", WookieConstants.LAMS_WWW_PIXLR_FOLDER_URL);
-	return mapping.findForward("viewAll");
-    }
-
-    /**
-     * Work out if this user's language is supported by wookie
-     * 
-     * @return
-     */
-    private String getWookieLocale() {
-	String locale = "en";
-
-	String languagesCSV = wookieService.getConfigItem(WookieConfigItem.KEY_LANGUAGE_CSV) != null ? wookieService
-		.getConfigItem(WookieConfigItem.KEY_LANGUAGE_CSV).getConfigValue() : null;
-
-	if (languagesCSV != null && !languagesCSV.equals("")) {
-	    UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-
-	    String[] languages = languagesCSV.split(",");
-
-	    for (int i = 0; i < languages.length; i++) {
-		if (languages[i].equals(user.getFckLanguageMapping())) {
-		    locale = languages[i];
-		    break;
-		}
-	    }
-
-	}
-
-	return locale;
     }
 }

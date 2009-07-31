@@ -210,43 +210,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	}
 	Wookie toContent = Wookie.newInstance(fromContent, toContentId, wookieToolContentHandler);
 
-	try {
-	    toContent.setImageFileName(copyImage(toContent));
-	} catch (Exception e) {
-	    WookieService.logger.error("Could not copy image for tool content copy", e);
-	    throw new ToolException(e);
-	}
-
 	wookieDAO.saveOrUpdate(toContent);
-    }
-
-    public String copyImage(Wookie toContent) throws Exception {
-
-	String realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR
-		+ File.separator + "images" + File.separator + "wookie";
-
-	File existingFile = new File(realBaseDir + File.separator + toContent.getImageFileName());
-
-	if (existingFile.exists() && existingFile.canRead()) {
-	    String ext = getFileExtension(toContent.getImageFileName());
-	    String newFileName = FileUtil.generateUniqueContentFolderID() + ext;
-
-	    String newFilePath = realBaseDir + File.separator + newFileName;
-	    copyFile(existingFile, newFilePath);
-	    return newFileName;
-	} else {
-	    // if cant find or read the file, just copy the default image file
-	    if (existingFile.exists() && existingFile.canRead()) {
-		File existingFile2 = new File(getDefaultContent().getImageFileName());
-		String ext = getFileExtension(toContent.getImageFileName());
-		String newFileName = FileUtil.generateUniqueContentFolderID() + ext;
-		String newFilePath = realBaseDir + File.separator + newFileName;
-		copyFile(existingFile2, newFilePath);
-		return newFileName;
-	    } else {
-		throw new WookieException("Could not find file to copy");
-	    }
-	}
     }
 
     public void copyFile(File srcFile, String destPath) throws Exception {
@@ -310,31 +274,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	wookie.setToolContentHandler(null);
 	wookie.setWookieSessions(null);
 
-	// bundling the author image in export
-	try {
-	    if (wookie.getImageFileName() != null) {
-		File imageFile = new File(WookieConstants.LAMS_PIXLR_BASE_DIR + File.separator
-			+ wookie.getImageFileName());
-		if (imageFile.exists()) {
-
-		    String ext = getFileExtension(wookie.getImageFileName());
-
-		    String tempDir = rootPath + File.separator + toolContentId.toString();
-		    File tempDirFile = new File(tempDir);
-		    if (!tempDirFile.exists()) {
-			tempDirFile.mkdirs();
-		    }
-		    String newFilePath = tempDir + File.separator + WookieService.EXPORT_IMAGE_FILE_NAME + ext;
-
-		    copyFile(imageFile, newFilePath);
-		    wookie.setImageFileName(WookieService.EXPORT_IMAGE_FILE_NAME + ext);
-		}
-	    }
-
-	} catch (Exception e) {
-	    WookieService.logger.error("Could not export wookie image, image may be missing in export", e);
-	}
-
 	Set<WookieAttachment> atts = wookie.getWookieAttachments();
 	for (WookieAttachment att : atts) {
 	    att.setWookie(null);
@@ -372,22 +311,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	    wookie.setToolContentId(toolContentId);
 	    wookie.setCreateBy(new Long(newUserUid.longValue()));
 
-	    // Copying the image file into lams_www.war/images/wookie
-	    File imageFile = new File(toolContentPath + File.separator + wookie.getImageFileName());
-
-	    if (imageFile.exists() && imageFile.canRead()) {
-
-		String newFileName = FileUtil.generateUniqueContentFolderID()
-			+ getFileExtension(wookie.getImageFileName());
-
-		String newFilePath = WookieConstants.LAMS_PIXLR_BASE_DIR + File.separator + newFileName;
-
-		copyFile(imageFile, newFilePath);
-		wookie.setImageFileName(newFileName);
-	    } else {
-		wookie.setImageFileName(getDefaultContent().getImageFileName());
-	    }
-
 	    wookieDAO.saveOrUpdate(wookie);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
@@ -421,6 +344,11 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	    wookie = getDefaultContent();
 	}
 	return getWookieOutputFactory().getToolOutputDefinitions(wookie, definitionType);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return getWookieOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 
     /* ********** IWookieService Methods ********************************* */
@@ -619,8 +547,22 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	wookieConfigItemDAO.saveOrUpdate(item);
     }
     
-    public String getWookiURL() {
-	return "http://172.20.100.162:8180/wookie";
+    public String getWookieURL() {
+	String url = null;
+	WookieConfigItem urlItem = wookieConfigItemDAO.getConfigItemByKey(WookieConfigItem.KEY_WOOKIE_URL);
+	if (urlItem != null) {
+	    url = urlItem.getConfigValue();
+	}
+	return url;
+    }
+    
+    public String getWookieAPIKey() {
+	String url = null;
+	WookieConfigItem apiItem = wookieConfigItemDAO.getConfigItemByKey(WookieConfigItem.KEY_API);
+	if (apiItem != null) {
+	    url = apiItem.getConfigValue();
+	}
+	return url;
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */

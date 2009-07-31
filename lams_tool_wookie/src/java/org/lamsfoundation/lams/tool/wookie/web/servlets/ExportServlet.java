@@ -193,9 +193,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	WookieDTO wookieDTO = new WookieDTO(wookie);
 	
-	// Creating a list of image files to copy for export
-	ArrayList<String> imageFiles = new ArrayList<String>();
-	imageFiles.add(wookie.getImageFileName());
+
 	
 	for (WookieSessionDTO sessionDTO : wookieDTO.getSessionDTOs()) {
 	    Long toolSessionID = sessionDTO.getSessionID();
@@ -207,31 +205,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		if (notebookEntry != null) {
 		    userDTO.notebookEntry = notebookEntry.getEntry();
 		    userDTO.setFinishedReflection(true);
-		    if (userDTO.getImageFileName() != null && !userDTO.getImageFileName().equals(wookieDTO.getImageFileName()))
-		    {
-			imageFiles.add(userDTO.getImageFileName());
-		    }
 		}
 		
 	    }
 	}
-	
-	String[] imageFileArray = new String[imageFiles.size()];
-	int i=0;
-	for (String image : imageFiles)
-	{
-	    imageFileArray[i] = image;
-	    i++;
-	}
-	
-	// bundling the images in export
-	try {
-	    CustomToolImageBundler imageBundler = new CustomToolImageBundler();
-	    imageBundler.bundle(request, cookies, directoryName, WookieConstants.LAMS_WWW_PIXLR_FOLDER_URL, imageFileArray);
-	} catch (Exception e) {
-	    logger.error("Could not export gmap images, some images may be missing in export portfolio", e);
-	}
-	
 	request.getSession().setAttribute("wookieDTO", wookieDTO);
     }
 

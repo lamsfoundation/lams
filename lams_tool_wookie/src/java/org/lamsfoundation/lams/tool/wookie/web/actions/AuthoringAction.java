@@ -27,8 +27,6 @@ package org.lamsfoundation.lams.tool.wookie.web.actions;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,7 +37,6 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -53,6 +50,7 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.wookie.dto.WidgetData;
 import org.lamsfoundation.lams.tool.wookie.dto.WidgetDefinition;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
 import org.lamsfoundation.lams.tool.wookie.model.WookieAttachment;
@@ -62,16 +60,18 @@ import org.lamsfoundation.lams.tool.wookie.util.WookieConstants;
 import org.lamsfoundation.lams.tool.wookie.util.WookieException;
 import org.lamsfoundation.lams.tool.wookie.util.WookieUtil;
 import org.lamsfoundation.lams.tool.wookie.web.forms.AuthoringForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * @author
@@ -81,7 +81,8 @@ import org.xml.sax.SAXException;
  *                scope="request" validate="false"
  * 
  * @struts.action-forward name="success" path="tiles:/authoring/main"
- * @struts.action-forward name="widgetList" path="/pages/authoring/widgetList.jsp"
+ * @struts.action-forward name="widgetList"
+ *                        path="/pages/authoring/widgetList.jsp"
  * @struts.action-forward name="message_page" path="tiles:/generic/message"
  */
 public class AuthoringAction extends LamsDispatchAction {
@@ -127,22 +128,30 @@ public class AuthoringAction extends LamsDispatchAction {
 	if (wookieService == null) {
 	    wookieService = WookieServiceProxy.getWookieService(this.getServlet().getServletContext());
 	}
-	
+
+	String wookieUrl = wookieService.getWookieURL();
+	if (wookieUrl == null) {
+	    // TODO: Forward to error, citing that wookie is not configured properly
+	}
+
 	// Get the widget count
 	try {
-	    int widgetCount = WookieUtil.getWidgetCount(wookieService.getWookiURL());    
+	    int widgetCount = WookieUtil.getWidgetCount(wookieUrl);
 	    if (widgetCount > 0) {
 		int pages = 1;
 		float pagesFloat = new Float(widgetCount) / WookieConstants.WIDGETS_PER_PAGE;
 		if (pagesFloat > 1) {
-			
-			pages = (new Float(Math.ceil(pagesFloat))).intValue();
-		    }
-	    
-		 request.setAttribute(WookieConstants.ATTR_WIDGET_PAGES, pages);
-	    } 
+
+		    pages = (new Float(Math.ceil(pagesFloat))).intValue();
+		}
+
+		request.setAttribute(WookieConstants.ATTR_WIDGET_PAGES, pages);
+	    }
 	} catch (Exception e) {
 	    log.error("Problem reading xml from wookie server.", e);
+	    
+	    // TODO: Handle failed call to wookie server
+	    
 	    throw new WookieException(e);
 	}
 
@@ -163,19 +172,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	    wookieService.saveOrUpdateWookie(wookie);
 	}
 
-	String imageUrl = WookieConstants.LAMS_WWW_PIXLR_FOLDER_URL;
-	Boolean imageExists = false;
-	if ((wookie.getImageFileName() != null && !wookie.getImageFileName().equals(""))) {
-	    imageUrl += wookie.getImageFileName();
-	    if (!wookie.getImageFileName().equals(wookieService.getDefaultContent().getImageFileName())) {
-		imageExists = true;
-	    }
-	} else {
-	    imageUrl += wookieService.getDefaultContent().getImageFileName();
-	}
-	request.setAttribute("imageURL", imageUrl);
-	request.setAttribute("imageExists", imageExists);
-
 	// Set up the authForm.
 	updateAuthForm(authForm, wookie);
 	authForm.setToolContentID(toolContentID);
@@ -185,7 +181,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    authForm.setMode("");
 	}
 	authForm.setContentFolderID(contentFolderID);
-
+	
 	// Set up sessionMap
 	SessionMap<String, Object> map = createSessionMap(wookie, getAccessMode(request), contentFolderID,
 		toolContentID);
@@ -201,12 +197,21 @@ public class AuthoringAction extends LamsDispatchAction {
     public ActionForward getWidgets(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws WookieException {
 
+	// set up wookieService
+	if (wookieService == null) {
+	    wookieService = WookieServiceProxy.getWookieService(this.getServlet().getServletContext());
+	}
+
 	Integer pageNumber = WebUtil.readIntParam(request, WookieConstants.PARAM_PAGE_NUMBER);
-	//Integer pageCount = WebUtil.readIntParam(request, WookieConstants.PARAM_PAGE_COUNT);
 
 	// Fetch all the available wookie widgets
 	try {
-	    List<WidgetDefinition> widgetDefinitions = WookieUtil.getWidgetDefinitions(wookieService.getWookiURL());
+	    String wookieUrl = wookieService.getWookieURL();
+	    if (wookieUrl == null) {
+		// TODO: Forward to error, citing that wookie is not configured properly
+	    }
+
+	    List<WidgetDefinition> widgetDefinitions = WookieUtil.getWidgetDefinitions(wookieUrl);
 	    List<WidgetDefinition> cutDownWidgetDefinitions = null;
 
 	    int startIndex = WookieConstants.WIDGETS_PER_PAGE * (pageNumber - 1);
@@ -223,11 +228,48 @@ public class AuthoringAction extends LamsDispatchAction {
 	    }
 	    request.setAttribute(WookieConstants.ATTR_WIDGET_LIST, cutDownWidgetDefinitions);
 	    return mapping.findForward("widgetList");
-	    
+
 	} catch (Exception e) {
 	    log.error("Problem reading xml from wookie server.", e);
 	    throw new WookieException(e);
 	}
+    }
+
+    public ActionForward initiateWidget(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws WookieException {
+	try {
+	    // set up wookieService
+	    if (wookieService == null) {
+		wookieService = WookieServiceProxy.getWookieService(this.getServlet().getServletContext());
+	    }
+
+	    String wookieUrl = wookieService.getWookieURL();
+	    String wookieKey = wookieService.getWookieAPIKey();
+	    String wookieIdentifier = WebUtil.readStrParam(request, WookieConstants.PARAM_KEY_WIDGIT_ID);
+	    Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+
+	    if (wookieUrl == null || wookieKey == null) {
+		// TODO: Forward to error, citing that wookie is not configured properly
+	    }
+	    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), toolContentID
+		    .toString(), true);
+
+	    // Get object from xml
+	    //XStream xstream = new XStream();
+	    //WidgetData data = (WidgetData)xstream.fromXML(returnXML);
+
+	    // retrieving Wookie with given toolContentID
+	    //Wookie wookie = wookieService.getWookieByContentId(toolContentID);
+
+	    this.writeResponse(response, "text/xml;charset=utf-8", "utf-8", returnXML);
+
+	} catch (Exception e) {
+	    log.error("Problem intitiation widget" + e);
+	    throw new WookieException(e);
+	}
+	return null;
     }
 
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -241,32 +283,6 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// get wookie content.
 	Wookie wookie = wookieService.getWookieByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
-	ActionErrors errors = new ActionErrors();
-	;
-
-	try {
-	    // TODO: Need to check if this is an edit, if so, delete the old image
-	    if (authForm.getExistingImageFileName().equals(WookieConstants.DEFAULT_IMAGE_FILE_NAME)
-		    || authForm.getExistingImageFileName().trim().equals("")) {
-		errors = validateImageFile(authForm);
-
-		if (!errors.isEmpty()) {
-		    this.addErrors(request, errors);
-		    updateAuthForm(authForm, wookie);
-		    if (mode != null) {
-			authForm.setMode(mode.toString());
-		    } else {
-			authForm.setMode("");
-		    }
-		    return mapping.findForward("success");
-		}
-		uploadFormImage(authForm, wookie);
-	    }
-	} catch (Exception e) {
-	    logger.error("Problem uploading image", e);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(WookieConstants.ERROR_MSG_FILE_UPLOAD));
-	    //throw new WookieException("Problem uploading image", e);
-	}
 
 	// update wookie content using form inputs.
 	updateWookie(wookie, authForm, mode);
@@ -480,7 +496,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	    wookie.setLockOnFinished(authForm.isLockOnFinished());
 	    wookie.setReflectOnActivity(authForm.isReflectOnActivity());
 	    wookie.setReflectInstructions(authForm.getReflectInstructions());
-	    wookie.setAllowViewOthersImages(authForm.isAllowViewOthersImages());
+	    wookie.setWidgetAuthorUrl(authForm.getWidgetAuthorUrl());
+	    wookie.setWidgetHeight(authForm.getWidgetHeight());
+	    wookie.setWidgetWidth(authForm.getWidgetWidth());
+	    wookie.setWidgetMaximise(authForm.getWidgetMaximise());
+	    wookie.setWidgetIdentifier(authForm.getWidgetIdentifier());
 	}
     }
 
@@ -498,15 +518,14 @@ public class AuthoringAction extends LamsDispatchAction {
 	authForm.setOfflineInstruction(wookie.getOfflineInstructions());
 	authForm.setLockOnFinished(wookie.isLockOnFinished());
 	authForm.setReflectOnActivity(wookie.isReflectOnActivity());
-	authForm.setExistingImageFileName(wookie.getImageFileName());
 	authForm.setReflectInstructions(wookie.getReflectInstructions());
-	authForm.setAllowViewOthersImages(wookie.isAllowViewOthersImages());
-
-	if (wookie.getImageFileName() == null || wookie.getImageFileName().trim().equals("")) {
-	    authForm.setFileName(WookieConstants.DEFAULT_IMAGE_FILE_NAME);
-	} else {
-	    authForm.setFileName(wookie.getImageFileName());
-	}
+	
+	// Set the wookie params
+	authForm.setWidgetAuthorUrl(wookie.getWidgetAuthorUrl());
+	authForm.setWidgetHeight(wookie.getWidgetHeight());
+	authForm.setWidgetWidth(wookie.getWidgetWidth());
+	authForm.setWidgetMaximise(wookie.getWidgetMaximise());
+	authForm.setWidgetIdentifier(wookie.getWidgetIdentifier());
     }
 
     /**
@@ -587,114 +606,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	return (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
     }
 
-    /**
-     * Validate imageGallery item.
-     * 
-     * @param itemForm
-     * @return
-     */
-    private ActionErrors validateImageFile(AuthoringForm itemForm) {
-	ActionErrors errors = new ActionErrors();
-
-	// validate file size
-	FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
-	// for edit validate: file already exist
-	if (!itemForm.isHasFile()
-		&& ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(WookieConstants.ERROR_MSG_FILE_BLANK));
-	}
-
-	// check for allowed format : gif, png, jpg
-	if (itemForm.getFile() != null) {
-	    String contentType = itemForm.getFile().getContentType();
-	    if (StringUtils.isEmpty(contentType)
-		    || !(contentType.equals("image/gif") || contentType.equals("image/png")
-			    || contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
-			    .equals("image/pjpeg"))) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			WookieConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
-	    }
-	}
-
-	return errors;
-    }
-
-    /**
-     * Upload the image to the open www/images/wookie folder
-     * 
-     * @param request
-     * @param imageForm
-     * @throws ImageGalleryException
-     */
-    private void uploadFormImage(AuthoringForm imageForm, Wookie wookie) throws Exception {
-
-	String filename = WookieConstants.DEFAULT_IMAGE_FILE_NAME;
-
-	// set up wookieService
-	if (wookieService == null) {
-	    wookieService = WookieServiceProxy.getWookieService(this.getServlet().getServletContext());
-	}
-
-	if (imageForm.getFile() != null) {
-
-	    // check the directory exists, then create it if it doesnt
-	    File wookieDir = new File(WookieConstants.LAMS_PIXLR_BASE_DIR);
-	    if (!wookieDir.exists()) {
-		wookieDir.mkdirs();
-	    }
-
-	    FormFile formFile = imageForm.getFile();
-
-	    filename = FileUtil.generateUniqueContentFolderID()
-		    + wookieService.getFileExtension(formFile.getFileName());
-	    String fileWriteName = WookieConstants.LAMS_PIXLR_BASE_DIR + File.separator + filename;
-	    File uploadFile = new File(fileWriteName);
-	    FileOutputStream out = new FileOutputStream(uploadFile);
-
-	    out.write(formFile.getFileData());
-
-	    // Now save the image size
-	    BufferedImage imageFile = ImageIO.read(uploadFile);
-	    int width = imageFile.getWidth();
-	    int height = imageFile.getHeight();
-
-	    wookie.setImageFileName(filename);
-	    wookie.setImageHeight(new Long(height));
-	    wookie.setImageWidth(new Long(width));
-	}
-
-    }
-
-    public ActionForward deleteImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	;
-
-	// set up wookieService
-	if (wookieService == null) {
-	    wookieService = WookieServiceProxy.getWookieService(this.getServlet().getServletContext());
-	}
-
-	// retrieving Wookie with given toolContentID
-	Wookie wookie = wookieService.getWookieByContentId(toolContentID);
-	if (wookie != null && !wookie.getImageFileName().equals(WookieConstants.DEFAULT_IMAGE_FILE_NAME)) {
-	    String realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
-		    + FileUtil.LAMS_WWW_DIR + File.separator + "images" + File.separator + "wookie";
-	    String fileName = WebUtil.readStrParam(request, "existingImageFileName");
-
-	    String imageFileName = realBaseDir + File.separator + fileName;
-
-	    File imageFile = new File(imageFileName);
-
-	    if (imageFile.exists()) {
-		imageFile.delete();
-	    }
-
-	    wookie.setImageFileName(WookieConstants.DEFAULT_IMAGE_FILE_NAME);
-	    wookieService.saveOrUpdateWookie(wookie);
-	}
-
-	return unspecified(mapping, form, request, response);
+    private UserDTO getUser() {
+	return (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
     }
 }

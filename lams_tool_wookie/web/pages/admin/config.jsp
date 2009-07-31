@@ -3,9 +3,9 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<html>
+<lams:html>
 	<lams:head>
-		<title><fmt:message key="pageTitle.admin" /></title>
+		<title><fmt:message key="admin.page.title" /></title>
 		<lams:css/>
 	</lams:head>
 	
@@ -14,7 +14,7 @@
 			<div id="content">
 
 			<h1>
-				<fmt:message key="pageTitle.admin" />
+				<fmt:message key="admin.page.title" />
 			</h1>
 			
 			<a href="<lams:LAMSURL/>/admin/sysadminstart.do"><fmt:message key="admin.return" /></a>
@@ -30,16 +30,21 @@
 			<c:if test="${savedSuccess}">
 				<p class="info">
 					<fmt:message key="admin.success" />
-				<p>
+				</p>
 			</c:if>
+			</p>
 			
-			<html:form action="/lawookie10admin" styleId="lawookie10AdminForm" method="post" enctype="multipart/form-data">
+			<html:form action="/admin" styleId="wookieadminform" method="post" enctype="multipart/form-data">
 				
 				<html:hidden property="dispatch" value="saveContent" />
 				<table class="alternative-color">
 					<tr>
-						<td width="30%"><fmt:message key="admin.wookieLanguageCSV" /></td>
-						<td width="70%"><html:text property="languagesCSV" size="50" maxlength="511"></html:text></td>
+						<td width="30%"><fmt:message key="admin.wookie.apikey" /></td>
+						<td width="70%"><html:text property="apiKey" size="50" maxlength="511"></html:text></td>
+					</tr>
+					<tr>
+						<td width="30%"><fmt:message key="admin.wookie.url" /></td>
+						<td width="70%"><html:text property="wookieServerUrl" size="50" maxlength="511"></html:text></td>
 					</tr>
 				</table>
 				
@@ -47,8 +52,6 @@
 			
 			</html:form>
 			
-			
-				
 			</div>
 			<!--closes content-->
 
@@ -58,4 +61,4 @@
 
 	</body>
 
-</head>
+</lams:html>

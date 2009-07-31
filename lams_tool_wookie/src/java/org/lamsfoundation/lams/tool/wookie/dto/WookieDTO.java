@@ -66,14 +66,8 @@ public class WookieDTO {
     public Long currentTab;
 
     private String imageFileName;
-    
+
     private String reflectInstructions;
-    
-    boolean allowViewOthersImages;
-    
-    private Long imageWidth;
-    
-    private Long imageHeight;
 
     /* Constructors */
     public WookieDTO() {
@@ -88,10 +82,7 @@ public class WookieDTO {
 	this.contentInUse = wookie.isContentInUse();
 	this.reflectOnActivity = wookie.isReflectOnActivity();
 	this.lockOnFinish = wookie.isLockOnFinished();
-	this.imageFileName = wookie.getImageFileName();
 	this.reflectInstructions = wookie.getReflectInstructions();
-	this.allowViewOthersImages = wookie.isAllowViewOthersImages();
-
 	this.onlineInstructionsFiles = new TreeSet<WookieAttachmentDTO>();
 	this.offlineInstructionsFiles = new TreeSet<WookieAttachmentDTO>();
 
@@ -191,11 +182,11 @@ public class WookieDTO {
     }
 
     public boolean isReflectOnActivity() {
-        return reflectOnActivity;
+	return reflectOnActivity;
     }
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
-        this.reflectOnActivity = reflectOnActivity;
+	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isLockOnFinish() {
@@ -215,46 +206,22 @@ public class WookieDTO {
     }
 
     public String getImageFileName() {
-        return imageFileName;
+	return imageFileName;
     }
 
     public void getImageFileName(String imageFileName) {
-        this.imageFileName = imageFileName;
+	this.imageFileName = imageFileName;
     }
 
     public void setImageFileName(String imageFileName) {
-        this.imageFileName = imageFileName;
+	this.imageFileName = imageFileName;
     }
 
     public String getReflectInstructions() {
-        return reflectInstructions;
+	return reflectInstructions;
     }
 
     public void setReflectInstructions(String reflectInstructions) {
-        this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isAllowViewOthersImages() {
-        return allowViewOthersImages;
-    }
-
-    public void setAllowViewOthersImages(boolean allowViewOthersImages) {
-        this.allowViewOthersImages = allowViewOthersImages;
-    }
-
-    public Long getImageWidth() {
-        return imageWidth;
-    }
-
-    public void setImageWidth(Long imageWidth) {
-        this.imageWidth = imageWidth;
-    }
-
-    public Long getImageHeight() {
-        return imageHeight;
-    }
-
-    public void setImageHeight(Long imageHeight) {
-        this.imageHeight = imageHeight;
+	this.reflectInstructions = reflectInstructions;
     }
 }

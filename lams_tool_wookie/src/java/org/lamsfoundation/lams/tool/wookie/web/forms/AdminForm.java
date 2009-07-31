@@ -32,13 +32,15 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 
 /**
- * @struts.form name="lawookie10AdminForm"
+ * @struts.form name="wookieadminform"
  */
 public class AdminForm extends ActionForm {
 
-    private static final long serialVersionUID = 378528935723874238L;
+    private static final long serialVersionUID = 37832445233874238L;
 
-    String languagesCSV;
+    String apiKey;
+    String wookieServerUrl;
+    
 
     public AdminForm() {
     }
@@ -50,12 +52,19 @@ public class AdminForm extends ActionForm {
 	return ac;
     }
 
-    public String getLanguagesCSV() {
-	return languagesCSV;
+    public String getApiKey() {
+        return apiKey;
     }
 
-    public void setLanguagesCSV(String languagesCSV) {
-	this.languagesCSV = languagesCSV;
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
+    public String getWookieServerUrl() {
+        return wookieServerUrl;
+    }
+
+    public void setWookieServerUrl(String wookieServerUrl) {
+        this.wookieServerUrl = wookieServerUrl;
+    }
 }

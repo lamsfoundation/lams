@@ -90,39 +90,6 @@
             column="entry_uid"
         />
 
-        <property
-            name="imageFileName"
-            type="java.lang.String"
-            update="true"
-            insert="true"
-            column="image_file_name"
-            length="511"
-        />
-
-        <property
-            name="imageHeight"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="imageHeight"
-        />
-
-        <property
-            name="imageWidth"
-            type="java.lang.Long"
-            update="true"
-            insert="true"
-            column="imageWidth"
-        />
-
-        <property
-            name="imageHidden"
-            type="boolean"
-            update="true"
-            insert="true"
-            column="imageHidden"
-        />
-
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-WookieUser.xml

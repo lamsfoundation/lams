@@ -49,16 +49,6 @@ public class WookieUserDTO implements Comparable<Object>{
 	
 	public boolean finishedReflection;
 	
-	private Long imageHeight;
-	    
-	private Long imageWidth;
-	
-	private long imageThumbnailWidth;
-	
-	private long imageThumbnailHeight;
-	
-	private boolean imageHidden;
-	
 	public WookieUserDTO(WookieUser user) {
 		this.uid = user.getUid();
 		this.loginName = user.getLoginName();
@@ -66,12 +56,7 @@ public class WookieUserDTO implements Comparable<Object>{
 		this.lastName = user.getLastName();
 		this.finishedActivity = user.isFinishedActivity();
 		this.entryUID = user.getEntryUID();
-		this.imageFileName = user.getImageFileName();
 		this.userId = user.getUserId();
-		this.imageHeight = user.getImageHeight();
-		this.imageWidth = user.getImageWidth();
-		this.imageHidden = user.isImageHidden();
-		setThumbnailDimensions();
 	}
 
 	public int compareTo(Object o) {
@@ -159,68 +144,5 @@ public class WookieUserDTO implements Comparable<Object>{
 	public Long getUserId() {
 	    return userId;
 	}
-
-	public void setUserId(Long userId) {
-	    this.userId = userId;
-	}
-
-	public Long getImageHeight() {
-	    return imageHeight;
-	}
-
-	public void setImageHeight(Long imageHeight) {
-	    this.imageHeight = imageHeight;
-	}
-
-	public Long getImageWidth() {
-	    return imageWidth;
-	}
-
-	public void setImageWidth(Long imageWidth) {
-	    this.imageWidth = imageWidth;
-	}
-
-	public long getImageThumbnailWidth() {
-	    return imageThumbnailWidth;
-	}
-
-	public void setImageThumbnailWidth(long imageThumbnailWidth) {
-	    this.imageThumbnailWidth = imageThumbnailWidth;
-	}
-
-	public long getImageThumbnailHeight() {
-	    return imageThumbnailHeight;
-	}
-
-	public void setImageThumbnailHeight(long imageThumbnailHeight) {
-	    this.imageThumbnailHeight = imageThumbnailHeight;
-	}
-	
-	public boolean isImageHidden() {
-	    return imageHidden;
-	}
-
-	public void setImageHidden(boolean imageHidden) {
-	    this.imageHidden = imageHidden;
-	}
-
-	// set thumbnail dimensions with a maximum of 100 width or height
-	public void setThumbnailDimensions()
-	{
-	    if (imageWidth != null && imageHeight != null)
-	    if (imageWidth >= imageHeight)
-	    {
-		this.imageThumbnailWidth = 100;
-		double temp = 100.0 / imageWidth.longValue();
-		this.imageThumbnailHeight = (new Double(imageHeight.longValue() * temp)).longValue();
-		 
-	    }
-	    else
-	    {
-		this.imageThumbnailHeight = 100;
-		double temp = 100.0 / imageHeight.longValue();
-		this.imageThumbnailWidth = (new Double(imageWidth.longValue() * temp)).longValue();
-	    }
-	    
-	}
 }
+

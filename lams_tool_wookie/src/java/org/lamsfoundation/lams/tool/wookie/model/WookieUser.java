@@ -59,14 +59,6 @@ public class WookieUser implements java.io.Serializable {
 
     private Long entryUID;
 
-    private String imageFileName;
-    
-    private Long imageHeight;
-    
-    private Long imageWidth;
-    
-    private boolean imageHidden;
-
     // Constructors
 
     /** default constructor */
@@ -183,56 +175,6 @@ public class WookieUser implements java.io.Serializable {
 
     public void setEntryUID(Long entryUID) {
 	this.entryUID = entryUID;
-    }
-
-    /**
-     * @hibernate.property column="image_file_name" length="511"
-     * 
-     */
-
-    public String getImageFileName() {
-	return imageFileName;
-    }
-
-    public void setImageFileName(String imageFileName) {
-	this.imageFileName = imageFileName;
-    }
-    
-    /**
-     * @hibernate.property column="image_height
-     * 
-     */
-    public Long getImageHeight() {
-        return imageHeight;
-    }
-
-    public void setImageHeight(Long imageHeight) {
-        this.imageHeight = imageHeight;
-    }
-
-    /**
-     * @hibernate.property column="image_width
-     * 
-     */
-    public Long getImageWidth() {
-        return imageWidth;
-    }
-
-    public void setImageWidth(Long imageWidth) {
-        this.imageWidth = imageWidth;
-    }
-    
-    
-    /**
-     * @hibernate.property column="image_hidden
-     * 
-     */
-    public boolean isImageHidden() {
-        return imageHidden;
-    }
-
-    public void setImageHidden(boolean imageHidden) {
-        this.imageHidden = imageHidden;
     }
 
     /**

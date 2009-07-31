@@ -22,7 +22,7 @@
       type="org.lamsfoundation.lams.tool.wookie.web.forms.LearningForm"
     />
     <form-bean
-      name="lawookie10AdminForm"
+      name="wookieadminform"
       type="org.lamsfoundation.lams.tool.wookie.web.forms.AdminForm"
     />
     <form-bean
@@ -46,9 +46,9 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/lawook10admin"
+      path="/admin"
       type="org.lamsfoundation.lams.tool.wookie.web.actions.AdminAction"
-      name="lawook10AdminForm"
+      name="wookieadminform"
       scope="request"
       parameter="dispatch"
       unknown="false"

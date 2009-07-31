@@ -58,5 +58,5 @@ NULL,
 NOW(),
 NOW(),
 0,
-'tool/lawook10/lawook10admin.do'
+'tool/lawook10/admin.do'
 )

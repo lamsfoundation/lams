@@ -30,7 +30,8 @@ public class WookieConfigItem {
 
     private static final long serialVersionUID = 930482766653472636L;
 
-    public static final String KEY_LANGUAGE_CSV = "LanguageCSV";
+    public static final String KEY_API = "APIKEY";
+    public static final String KEY_WOOKIE_URL = "WOOKIE_SERVER_URL";
 
     Long id;
     String configKey;
