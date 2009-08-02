@@ -55,20 +55,28 @@ public class ChatOutputFactory extends OutputFactory {
 	    throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	Class stringArrayClass = new String[] {}.getClass();
-	if (toolContentObject != null) {
-	    ToolOutputDefinition chatMessagesDefinition = buildComplexOutputDefinition(
-		    ChatConstants.TEXT_SEARCH_DEFINITION_NAME, stringArrayClass);
-	    Chat chat = (Chat) toolContentObject;
-	    // adding all existing conditions
-	    chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));
-	    // if no conditions were created in the tool instance, a default condition is added;
-	    if (chatMessagesDefinition.getDefaultConditions().isEmpty()) {
-		ChatCondition defaultCondition = createDefaultComplexCondition(chat);
-		chat.getConditions().add(defaultCondition);
-		chatMessagesDefinition.getDefaultConditions().add(defaultCondition);
+	switch (definitionType) {
+	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+	    if (toolContentObject != null) {
+		ToolOutputDefinition chatMessagesDefinition = buildComplexOutputDefinition(
+			ChatConstants.USER_MESSAGES_DEFINITION_NAME, stringArrayClass);
+		Chat chat = (Chat) toolContentObject;
+		// adding all existing conditions
+		chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));
+		// if no conditions were created in the tool instance, a default condition is added;
+		if (chatMessagesDefinition.getDefaultConditions().isEmpty()) {
+		    ChatCondition defaultCondition = createDefaultUserMessagesCondition(chat);
+		    chat.getConditions().add(defaultCondition);
+		    chatMessagesDefinition.getDefaultConditions().add(defaultCondition);
+		}
+		chatMessagesDefinition.setShowConditionNameOnly(true);
+		definitionMap.put(ChatConstants.USER_MESSAGES_DEFINITION_NAME, chatMessagesDefinition);
 	    }
-	    chatMessagesDefinition.setShowConditionNameOnly(true);
-	    definitionMap.put(ChatConstants.TEXT_SEARCH_DEFINITION_NAME, chatMessagesDefinition);
+	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+	    ToolOutputDefinition allUsersMessagesDefinition = buildComplexOutputDefinition(
+		    ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, stringArrayClass);
+	    definitionMap.put(ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, allUsersMessagesDefinition);
+	    break;
 	}
 
 	return definitionMap;
@@ -82,37 +90,36 @@ public class ChatOutputFactory extends OutputFactory {
 	    Long toolSessionId, Long learnerId) {
 
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
-	// cached tool output for all text search conditions
-	ToolOutput chatMessagesOutput = null;
+	// tool output cache
+	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
+
 	if (names == null) {
 	    // output will be set for all the existing conditions
 	    Chat chat = chatService.getSessionBySessionId(toolSessionId).getChat();
 	    Set<ChatCondition> conditions = chat.getConditions();
 	    for (ChatCondition condition : conditions) {
 		String name = condition.getName();
-		if (isTextSearchConditionName(name) && chatMessagesOutput != null) {
-		    outputs.put(name, chatMessagesOutput);
+		String[] nameParts = splitConditionName(name);
+		if (baseOutputs.get(nameParts[0]) != null) {
+		    outputs.put(name, baseOutputs.get(nameParts[0]));
 		} else {
 		    ToolOutput output = getToolOutput(name, chatService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    chatMessagesOutput = output;
-			}
+			baseOutputs.put(nameParts[0], output);
 		    }
 		}
 	    }
 	} else {
 	    for (String name : names) {
-		if (isTextSearchConditionName(name) && chatMessagesOutput != null) {
-		    outputs.put(name, chatMessagesOutput);
+		String[] nameParts = splitConditionName(name);
+		if (baseOutputs.get(nameParts[0]) != null) {
+		    outputs.put(name, baseOutputs.get(nameParts[0]));
 		} else {
 		    ToolOutput output = getToolOutput(name, chatService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    chatMessagesOutput = output;
-			}
+			baseOutputs.put(nameParts[0], output);
 		    }
 		}
 	    }
@@ -122,7 +129,8 @@ public class ChatOutputFactory extends OutputFactory {
     }
 
     public ToolOutput getToolOutput(String name, IChatService chatService, Long toolSessionId, Long learnerId) {
-	if (isTextSearchConditionName(name)) {
+	String[] nameParts = splitConditionName(name);
+	if (ChatConstants.USER_MESSAGES_DEFINITION_NAME.equals(nameParts[0])) {
 	    // entry is loaded from DB
 	    Chat chat = chatService.getSessionBySessionId(toolSessionId).getChat();
 
@@ -138,8 +146,26 @@ public class ChatOutputFactory extends OutputFactory {
 		}
 	    }
 
-	    return new ToolOutput(name, getI18NText(ChatConstants.TEXT_SEARCH_DEFINITION_NAME, true), textMessages,
+	    return new ToolOutput(name, getI18NText(ChatConstants.USER_MESSAGES_DEFINITION_NAME, true), textMessages,
 		    false);
+	} else if (ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME.equals(nameParts[0])) {
+	    Set<ChatUser> users = chatService.getSessionBySessionId(toolSessionId).getChatUsers();
+	    String[] usersMessages = new String[users.size()];
+	    int userIndex = 0;
+	    for (ChatUser user : users) {
+		List<ChatMessage> messages = chatService.getMessagesSentByUser(user.getUid());
+
+		if (messages != null) {
+		    StringBuilder messagesBuilder = new StringBuilder();
+		    for (ChatMessage message : messages) {
+			messagesBuilder.append(message.getBody()).append(ChatConstants.MESSAGE_SEPARATOR);
+		    }
+		    usersMessages[userIndex] = messagesBuilder.toString();
+		}
+		userIndex++;
+	    }
+	    return new ToolOutput(name, getI18NText(ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, true),
+		    usersMessages, false);
 	}
 	return null;
     }
@@ -149,12 +175,8 @@ public class ChatOutputFactory extends OutputFactory {
 	return super.splitConditionName(conditionName);
     }
 
-    protected String buildConditionName(String uniquePart) {
-	return super.buildConditionName(ChatConstants.TEXT_SEARCH_DEFINITION_NAME, uniquePart);
-    }
-
-    private boolean isTextSearchConditionName(String name) {
-	return name != null && name.startsWith(ChatConstants.TEXT_SEARCH_DEFINITION_NAME);
+    protected String buildUserMessagesConditionName(String uniquePart) {
+	return super.buildConditionName(ChatConstants.USER_MESSAGES_DEFINITION_NAME, uniquePart);
     }
 
     /**
@@ -164,10 +186,11 @@ public class ChatOutputFactory extends OutputFactory {
      *                content of the tool
      * @return default chat condition
      */
-    protected ChatCondition createDefaultComplexCondition(Chat chat) {
-	String name = buildConditionName(ChatConstants.TEXT_SEARCH_DEFINITION_NAME, chat.getToolContentId().toString());
+    protected ChatCondition createDefaultUserMessagesCondition(Chat chat) {
+	String name = buildConditionName(ChatConstants.USER_MESSAGES_DEFINITION_NAME, chat.getToolContentId()
+		.toString());
 	// Default condition checks if messages contain word "LAMS"
 	return new ChatCondition(null, null, 1, name, getI18NText(
-		ChatConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
+		ChatConstants.USER_MESSAGES_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
     }
 }

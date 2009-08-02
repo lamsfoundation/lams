@@ -62,26 +62,37 @@ public class ForumOutputFactory extends OutputFactory {
 	    throws ToolException {
 
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	Class answersClass = (new HashMap<Date, Set<String>>()).getClass();
-	if (toolContentObject != null) {
-	    ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(
-		    ForumConstants.TEXT_SEARCH_DEFINITION_NAME, answersClass);
-	    Forum forum = (Forum) toolContentObject;
-	    // adding all existing conditions
-	    chosenTopicAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));
-	    // if no conditions were created in the tool instance, a default condition is added;
-	    if (chosenTopicAnswersDefinition.getDefaultConditions().isEmpty() && !forum.getMessages().isEmpty()) {
-		ForumCondition defaultCondition = createDefaultComplexCondition(forum);
-		forum.getConditions().add(defaultCondition);
-		chosenTopicAnswersDefinition.getDefaultConditions().add(defaultCondition);
-	    }
-	    chosenTopicAnswersDefinition.setShowConditionNameOnly(true);
-	    definitionMap.put(ForumConstants.TEXT_SEARCH_DEFINITION_NAME, chosenTopicAnswersDefinition);
-	}
+	Class topicDatesToAnswersClass = (new HashMap<Date, Set<String>>()).getClass();
+	Class stringArrayClass = String[].class;
 
-	ToolOutputDefinition numberOfPostsDefinition = buildRangeDefinition(
-		ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, new Long(0), null);
-	definitionMap.put(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, numberOfPostsDefinition);
+	switch (definitionType) {
+	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+	    if (toolContentObject != null) {
+		ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(
+			ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, topicDatesToAnswersClass);
+		Forum forum = (Forum) toolContentObject;
+		// adding all existing conditions
+		chosenTopicAnswersDefinition
+			.setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));
+		// if no conditions were created in the tool instance, a default condition is added;
+		if (chosenTopicAnswersDefinition.getDefaultConditions().isEmpty() && !forum.getMessages().isEmpty()) {
+		    ForumCondition defaultCondition = createDefaultTopicDateToAnswersCondition(forum);
+		    forum.getConditions().add(defaultCondition);
+		    chosenTopicAnswersDefinition.getDefaultConditions().add(defaultCondition);
+		}
+		chosenTopicAnswersDefinition.setShowConditionNameOnly(true);
+		definitionMap.put(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, chosenTopicAnswersDefinition);
+	    }
+	    ToolOutputDefinition numberOfPostsDefinition = buildRangeDefinition(
+		    ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, new Long(0), null);
+	    definitionMap.put(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, numberOfPostsDefinition);
+	    break;
+	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+	    ToolOutputDefinition allUsersAnswersDefinition = buildComplexOutputDefinition(
+		    ForumConstants.ALL_USERS_ANSWERS_DEFINITION_NAME, stringArrayClass);
+	    definitionMap.put(ForumConstants.ALL_USERS_ANSWERS_DEFINITION_NAME, allUsersAnswersDefinition);
+	    break;
+	}
 
 	return definitionMap;
     }
@@ -89,39 +100,38 @@ public class ForumOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IForumService forumService,
 	    Long toolSessionId, Long learnerId) {
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
-	// cached tool output for all text search conditions
-	ToolOutput chosenTopicAnswersOutput = null;
+	// tool output cache
+	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
 
 	if (names == null) {
 	    // output will be set for all the existing conditions
 	    ForumToolSession session = forumService.getSessionBySessionId(toolSessionId);
 	    Forum forum = session.getForum();
+
 	    Set<ForumCondition> conditions = forum.getConditions();
 	    for (ForumCondition condition : conditions) {
 		String name = condition.getName();
-		if (isTextSearchConditionName(name) && chosenTopicAnswersOutput != null) {
-		    outputs.put(name, chosenTopicAnswersOutput);
+		String[] nameParts = splitConditionName(name);
+		if (baseOutputs.get(nameParts[0]) != null) {
+		    outputs.put(name, baseOutputs.get(nameParts[0]));
 		} else {
 		    ToolOutput output = getToolOutput(name, forumService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    chosenTopicAnswersOutput = output;
-			}
+			baseOutputs.put(nameParts[0], output);
 		    }
 		}
 	    }
 	} else {
 	    for (String name : names) {
-		if (isTextSearchConditionName(name) && chosenTopicAnswersOutput != null) {
-		    outputs.put(name, chosenTopicAnswersOutput);
+		String[] nameParts = splitConditionName(name);
+		if (baseOutputs.get(nameParts[0]) != null) {
+		    outputs.put(name, baseOutputs.get(nameParts[0]));
 		} else {
 		    ToolOutput output = getToolOutput(name, forumService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    chosenTopicAnswersOutput = output;
-			}
+			baseOutputs.put(nameParts[0], output);
 		    }
 		}
 	    }
@@ -136,8 +146,8 @@ public class ForumOutputFactory extends OutputFactory {
     }
 
     public ToolOutput getToolOutput(String name, IForumService forumService, Long toolSessionId, Long learnerId) {
-	ToolOutput toolOutput = null;
-	if (isTextSearchConditionName(name)) {
+	String[] nameParts = splitConditionName(name);
+	if (ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME.equals(nameParts[0])) {
 	    // a map of "topic creation date" -> "all learner's answers to that topic"
 	    Map<Date, Set<String>> answers = new HashMap<Date, Set<String>>();
 
@@ -163,12 +173,32 @@ public class ForumOutputFactory extends OutputFactory {
 		    answers.put(createdDate, textAnswers);
 		}
 	    }
-	    toolOutput = new ToolOutput(name, getI18NText(ForumConstants.TEXT_SEARCH_DEFINITION_NAME, true), answers,
-		    false);
-	} else if (name != null && name.equals(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME)) {
-	    toolOutput = getNumPosts(forumService, learnerId, toolSessionId);
+	    return new ToolOutput(name, getI18NText(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, true),
+		    answers, false);
+	} else if (ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME.equals(nameParts[0])) {
+	    return getNumPosts(forumService, learnerId, toolSessionId);
+	} else if (ForumConstants.ALL_USERS_ANSWERS_DEFINITION_NAME.equals(nameParts[0])) {
+	    List<ForumUser> users = forumService.getUsersBySessionId(toolSessionId);
+	    String[] usersAnswers = new String[users.size()];
+	    List<MessageDTO> userMessages = null;
+	    int userIndex = 0;
+	    for (ForumUser user : users) {
+		StringBuilder answersBuilder = new StringBuilder();
+		userMessages = forumService.getMessagesByUserUid(user.getUid(), toolSessionId);
+		if (userMessages != null) {
+		    for (MessageDTO messageDTO : userMessages) {
+			Message message = messageDTO.getMessage();
+			answersBuilder.append(message.getBody()).append(ForumConstants.ANSWERS_SEPARATOR);
+		    }
+		    usersAnswers[userIndex] = answersBuilder.toString();
+		}
+		userIndex++;
+	    }
+	    return new ToolOutput(name, getI18NText(ForumConstants.ALL_USERS_ANSWERS_DEFINITION_NAME, true),
+		    usersAnswers, false);
+
 	}
-	return toolOutput;
+	return null;
 
     }
 
@@ -183,12 +213,8 @@ public class ForumOutputFactory extends OutputFactory {
 	return super.splitConditionName(conditionName);
     }
 
-    protected String buildTextSearchConditionName(String uniquePart) {
-	return super.buildConditionName(ForumConstants.TEXT_SEARCH_DEFINITION_NAME, uniquePart);
-    }
-
-    private boolean isTextSearchConditionName(String name) {
-	return name != null && name.startsWith(ForumConstants.TEXT_SEARCH_DEFINITION_NAME);
+    protected String buildTopicDatesToAnswersConditionName(String uniquePart) {
+	return super.buildConditionName(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, uniquePart);
     }
 
     /**
@@ -198,7 +224,7 @@ public class ForumOutputFactory extends OutputFactory {
      *                content of the tool
      * @return default Forum condition
      */
-    protected ForumCondition createDefaultComplexCondition(Forum forum) {
+    protected ForumCondition createDefaultTopicDateToAnswersCondition(Forum forum) {
 
 	if (forum.getMessages().isEmpty()) {
 	    return null;
@@ -211,10 +237,11 @@ public class ForumOutputFactory extends OutputFactory {
 	    }
 	}
 
-	String name = buildConditionName(ForumConstants.TEXT_SEARCH_DEFINITION_NAME, forum.getContentId().toString());
+	String name = buildConditionName(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, forum.getContentId()
+		.toString());
 	// Default condition checks if the answers for the first topic contain word "LAMS"
 	return new ForumCondition(null, null, 1, name, getI18NText(
-		ForumConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null,
-		messages);
+		ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
+		null, messages);
     }
 }

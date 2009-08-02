@@ -976,7 +976,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
 	Forum defaultContent = getDefaultForum();
 	if (defaultContent.getConditions().isEmpty()) {
-	    defaultContent.getConditions().add(getForumOutputFactory().createDefaultComplexCondition(defaultContent));
+	    defaultContent.getConditions().add(getForumOutputFactory().createDefaultTopicDateToAnswersCondition(defaultContent));
 	}
 	// get default content by given ID.
 	Forum content = new Forum();
@@ -1312,7 +1312,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		}
 	    }
 	} while (uniqueNumber == null);
-	return getForumOutputFactory().buildTextSearchConditionName(uniqueNumber);
+	return getForumOutputFactory().buildTopicDatesToAnswersConditionName(uniqueNumber);
     }
 
     /**

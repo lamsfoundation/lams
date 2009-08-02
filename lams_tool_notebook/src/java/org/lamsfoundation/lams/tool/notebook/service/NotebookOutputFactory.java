@@ -41,8 +41,7 @@ import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 
 /**
- * Output factory for Notebook tool. Currently it provides only one type of
- * output - the entry that user provided.
+ * Output factory for Notebook tool. Currently it provides only one type of output - the entry that user provided.
  * 
  * @author Marcin Cieslak
  */
@@ -55,19 +54,28 @@ public class NotebookOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	if (toolContentObject != null) {
-	    ToolOutputDefinition notebookEntryDefinition = buildStringOutputDefinition(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME);
-	    Notebook notebook = (Notebook) toolContentObject;
-	    // adding all existing conditions
-	    notebookEntryDefinition.setDefaultConditions(new ArrayList<BranchCondition>(notebook.getConditions()));
-	    // if no conditions were created in the tool instance, a default condition is added;
-	    if (notebookEntryDefinition.getDefaultConditions().isEmpty()) {
-		NotebookCondition defaultCondition = createDefaultComplexCondition(notebook);
-		notebook.getConditions().add(defaultCondition);
-		notebookEntryDefinition.getDefaultConditions().add(defaultCondition);
+	Class stringArrayClass = new String[] {}.getClass();
+	switch (definitionType) {
+	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+	    if (toolContentObject != null) {
+		ToolOutputDefinition notebookEntryDefinition = buildStringOutputDefinition(NotebookConstants.USER_ENTRY_DEFINITION_NAME);
+		Notebook notebook = (Notebook) toolContentObject;
+		// adding all existing conditions
+		notebookEntryDefinition.setDefaultConditions(new ArrayList<BranchCondition>(notebook.getConditions()));
+		// if no conditions were created in the tool instance, a default condition is added;
+		if (notebookEntryDefinition.getDefaultConditions().isEmpty()) {
+		    NotebookCondition defaultCondition = createDefaultUserEntryCondition(notebook);
+		    notebook.getConditions().add(defaultCondition);
+		    notebookEntryDefinition.getDefaultConditions().add(defaultCondition);
+		}
+		notebookEntryDefinition.setShowConditionNameOnly(true);
+		definitionMap.put(NotebookConstants.USER_ENTRY_DEFINITION_NAME, notebookEntryDefinition);
 	    }
-	    notebookEntryDefinition.setShowConditionNameOnly(true);
-	    definitionMap.put(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME, notebookEntryDefinition);
+	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+	    ToolOutputDefinition allUsersEntriesDefinition = buildComplexOutputDefinition(
+		    NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, stringArrayClass);
+	    definitionMap.put(NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, allUsersEntriesDefinition);
+	    break;
 	}
 
 	return definitionMap;
@@ -81,37 +89,35 @@ public class NotebookOutputFactory extends OutputFactory {
 	    Long toolSessionId, Long learnerId) {
 
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
-	// cached tool output for all text search conditions
-	ToolOutput notebookEntryOutput = null;
+	// tool output cache
+	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
 	if (names == null) {
 	    // output will be set for all the existing conditions
 	    Notebook notebook = notebookService.getSessionBySessionId(toolSessionId).getNotebook();
 	    Set<NotebookCondition> conditions = notebook.getConditions();
 	    for (NotebookCondition condition : conditions) {
 		String name = condition.getName();
-		if (isTextSearchConditionName(name) && notebookEntryOutput != null) {
-		    outputs.put(name, notebookEntryOutput);
+		String[] nameParts = splitConditionName(name);
+		if (baseOutputs.get(nameParts[0]) != null) {
+		    outputs.put(name, baseOutputs.get(nameParts[0]));
 		} else {
 		    ToolOutput output = getToolOutput(name, notebookService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    notebookEntryOutput = output;
-			}
+			baseOutputs.put(nameParts[0], output);
 		    }
 		}
 	    }
 	} else {
 	    for (String name : names) {
-		if (isTextSearchConditionName(name) && notebookEntryOutput != null) {
-		    outputs.put(name, notebookEntryOutput);
+		String[] nameParts = splitConditionName(name);
+		if (baseOutputs.get(nameParts[0]) != null) {
+		    outputs.put(name, baseOutputs.get(nameParts[0]));
 		} else {
 		    ToolOutput output = getToolOutput(name, notebookService, toolSessionId, learnerId);
 		    if (output != null) {
 			outputs.put(name, output);
-			if (isTextSearchConditionName(name)) {
-			    notebookEntryOutput = output;
-			}
+			baseOutputs.put(nameParts[0], output);
 		    }
 		}
 	    }
@@ -120,20 +126,35 @@ public class NotebookOutputFactory extends OutputFactory {
 
     }
 
-    public ToolOutput getToolOutput(String name, INotebookService chatService, Long toolSessionId, Long learnerId) {
-	if (isTextSearchConditionName(name)) {
+    public ToolOutput getToolOutput(String name, INotebookService notebookService, Long toolSessionId, Long learnerId) {
+	String[] nameParts = splitConditionName(name);
+	if (NotebookConstants.USER_ENTRY_DEFINITION_NAME.equals(nameParts[0])) {
 	    // entry is loaded from DB
-	    Notebook notebook = chatService.getSessionBySessionId(toolSessionId).getNotebook();
+	    Notebook notebook = notebookService.getSessionBySessionId(toolSessionId).getNotebook();
 
-	    NotebookUser user = chatService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	    NotebookUser user = notebookService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
 
 	    if (user != null) {
-		NotebookEntry entry = chatService.getEntry(user.getEntryUID());
+		NotebookEntry entry = notebookService.getEntry(user.getEntryUID());
 
 		String value = entry == null ? null : entry.getEntry();
 
-		return new ToolOutput(name, getI18NText(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME, true), value);
+		return new ToolOutput(name, getI18NText(NotebookConstants.USER_ENTRY_DEFINITION_NAME, true), value);
 	    }
+	} else if (NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME.equals(nameParts[0])) {
+	    Set<NotebookUser> users = notebookService.getSessionBySessionId(toolSessionId).getNotebookUsers();
+	    String[] usersEntries = new String[users.size()];
+	    int userIndex = 0;
+	    for (NotebookUser user : users) {
+		Long entryUid = user.getEntryUID();
+		if (entryUid != null) {
+		    NotebookEntry entry = notebookService.getEntry(entryUid);
+		    usersEntries[userIndex] = entry.getEntry();
+		}
+		userIndex++;
+	    }
+	    return new ToolOutput(name, getI18NText(NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, true),
+		    usersEntries, false);
 	}
 	return null;
     }
@@ -143,27 +164,22 @@ public class NotebookOutputFactory extends OutputFactory {
 	return super.splitConditionName(conditionName);
     }
 
-    protected String buildConditionName(String uniquePart) {
-	return super.buildConditionName(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME, uniquePart);
-    }
-
-    private boolean isTextSearchConditionName(String name) {
-	return name != null && name.startsWith(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME);
+    protected String buildUserEntryConditionName(String uniquePart) {
+	return super.buildConditionName(NotebookConstants.USER_ENTRY_DEFINITION_NAME, uniquePart);
     }
 
     /**
-     * Creates a default condition so teachers know how to use complex
-     * conditions for this tool.
+     * Creates a default condition so teachers know how to use complex conditions for this tool.
      * 
      * @param notebook
      *                content of the tool
      * @return default notebook condition
      */
-    protected NotebookCondition createDefaultComplexCondition(Notebook notebook) {
-	String name = buildConditionName(NotebookConstants.TEXT_SEARCH_DEFINITION_NAME, notebook.getToolContentId()
+    protected NotebookCondition createDefaultUserEntryCondition(Notebook notebook) {
+	String name = buildConditionName(NotebookConstants.USER_ENTRY_DEFINITION_NAME, notebook.getToolContentId()
 		.toString());
 	// Default condition checks if the text contains word "LAMS"
 	return new NotebookCondition(null, null, 1, name, getI18NText(
-		NotebookConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
+		NotebookConstants.USER_ENTRY_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
     }
 }

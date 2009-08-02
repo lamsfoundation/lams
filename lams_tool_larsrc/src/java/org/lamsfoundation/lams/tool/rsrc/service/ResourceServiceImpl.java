@@ -158,6 +158,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     private ILessonService lessonService;
 
+    private ResourceOutputFactory resourceOutputFactory;
+
     public IVersionedNode getFileNode(Long itemUid, String relPathString) throws ResourceApplicationException {
 	ResourceItem item = (ResourceItem) resourceItemDao.getObject(ResourceItem.class, itemUid);
 	if (item == null) {
@@ -945,10 +947,19 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      * the toolContentId
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     * @throws ResourceApplicationException
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	Resource content = getResourceByContentId(toolContentId);
+	if (content == null) {
+	    try {
+		content = getDefaultContent(toolContentId);
+	    } catch (ResourceApplicationException e) {
+		throw new ToolException(e);
+	    }
+	}
+	return getResourceOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
@@ -1064,7 +1075,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return getResourceOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     /**
@@ -1074,7 +1085,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	return getResourceOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
@@ -1302,6 +1313,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
-	return null;
+	return getResourceOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+
+    public ResourceOutputFactory getResourceOutputFactory() {
+	return resourceOutputFactory;
+    }
+
+    public void setResourceOutputFactory(ResourceOutputFactory resourceOutputFactory) {
+	this.resourceOutputFactory = resourceOutputFactory;
     }
 }

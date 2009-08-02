@@ -56,16 +56,18 @@ public interface PixlrConstants {
     static final String FILTER_REPLACE_TEXT = "***";
 
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
-    
+
     public static final String DEFAULT_IMAGE_FILE_NAME = "blank.jpg";
-    
+
     // error message keys
     public static final String ERROR_MSG_NOT_ALLOWED_FORMAT = "error.resource.image.not.alowed.format";
     public static final String ERROR_MSG_FILE_BLANK = "error.resource.item.file.blank";
     public static final String ERROR_MSG_FILE_UPLOAD = "error.file.upload.failed";
-    
-    public static final String LAMS_WWW_PIXLR_FOLDER_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/www/images/pixlr/";
-    public static final String LAMS_PIXLR_BASE_DIR = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR
-	+ File.separator + "images" + File.separator + "pixlr";
 
+    public static final String LAMS_WWW_PIXLR_FOLDER_URL = Configuration.get(ConfigurationKeys.SERVER_URL)
+	    + "/www/images/pixlr/";
+    public static final String LAMS_PIXLR_BASE_DIR = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
+	    + FileUtil.LAMS_WWW_DIR + File.separator + "images" + File.separator + "pixlr";
+
+    public static final String IMAGE_URL_DEFINITION_NAME = "image.url.definition.pixlr";
 }

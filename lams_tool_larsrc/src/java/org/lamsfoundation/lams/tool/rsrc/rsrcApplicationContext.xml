@@ -45,6 +45,10 @@
             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
+    
+    <bean id="resourceOutputFactory" class="org.lamsfoundation.lams.tool.rsrc.service.ResourceOutputFactory">  
+    	<property name="toolMessageService"><ref bean="resourceMessageService"/></property>  
+	</bean> 
 
 
     <!-- Managers -->
@@ -100,7 +104,7 @@
 		<property name="lessonService">
    			<ref bean="lessonService"/>
    		</property>
-				
+				<property name="resourceOutputFactory"><ref bean="resourceOutputFactory"/></property>
     </bean>
 
     <bean id="resourceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

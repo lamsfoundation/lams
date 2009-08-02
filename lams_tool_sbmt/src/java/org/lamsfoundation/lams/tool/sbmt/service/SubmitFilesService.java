@@ -145,6 +145,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     private IGradebookService gradebookService;
 
+    private SubmitFilesOutputFactory submitFilesOutputFactory;
+
     private class FileDtoComparator implements Comparator<FileDetailsDTO> {
 
 	public int compare(FileDetailsDTO o1, FileDetailsDTO o2) {
@@ -365,7 +367,11 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	SubmitFilesContent content = getSubmitFilesContent(toolContentId);
+	if (content == null) {
+	    content = getDefaultSubmit();
+	}
+	return getSubmitFilesOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
 
     /*
@@ -581,7 +587,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      *      java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return getSubmitFilesOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     /**
@@ -591,7 +597,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      *      java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return null;
+	return getSubmitFilesOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     /**
@@ -1224,7 +1230,15 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     }
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
-	return null;
+	return getSubmitFilesOutputFactory().getSupportedDefinitionClasses(definitionType);
 
+    }
+
+    public SubmitFilesOutputFactory getSubmitFilesOutputFactory() {
+	return submitFilesOutputFactory;
+    }
+
+    public void setSubmitFilesOutputFactory(SubmitFilesOutputFactory submitFilesOutputFactory) {
+	this.submitFilesOutputFactory = submitFilesOutputFactory;
     }
 }

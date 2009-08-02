@@ -162,10 +162,12 @@ public interface ForumConstants {
     public static final String PARAM_ORDER_ID = "orderId";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
 
-    public static final String TEXT_SEARCH_DEFINITION_NAME = "text.search.output.definition.forum";
+    public static final String TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME = "topic.name.to.answers.output.definition.forum";
+    public static final String ALL_USERS_ANSWERS_DEFINITION_NAME = "all.users.answers.definition.forum";
     public final static String LEARNER_NUM_POSTS_DEFINITION_NAME = "learner.number.of.posts";
 
-    public static final String TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "text.search.output.definition.forum.default.condition";
+    public static final String TOPIC_DATE_TO_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "topic.name.to.answers.output.definition.forum.default.condition";
+    public static final String ANSWERS_SEPARATOR = "<br \\><br \\>";
     // a forward key
     public static final String SUCCESS = "success";
 

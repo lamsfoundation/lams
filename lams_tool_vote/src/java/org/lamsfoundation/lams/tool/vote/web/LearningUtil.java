@@ -31,8 +31,10 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
+import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
@@ -324,6 +326,7 @@ public class LearningUtil implements VoteAppConstants {
 	DataFlowObject dataFlowObject = voteService.getAssignedDataFlowObject(voteContent.getVoteContentId());
 	ToolOutput toolInput = voteService.getToolInput(voteContent.getVoteContentId(), VoteUtils.getUserId()
 		.intValue());
+
 	Object value = toolInput.getValue().getComplex();
 	// The input is an array (users) of arrays of strings (their answers)
 	if (value instanceof String[][]) {
@@ -336,13 +339,12 @@ public class LearningUtil implements VoteAppConstants {
 		    if (userAnswers != null) {
 			if (maxInputs != null && maxInputs > 0 && inputCount >= maxInputs) {
 			    // if we reached the maximum number of inputs, i.e. number of students that will be taken
-			    // into
-			    // account
+			    // into account
 			    break;
 			}
 			boolean anyAnswersAdded = false;
 			for (String questionText : userAnswers) {
-			    if (questionText != null) {
+			    if (!StringUtils.isBlank(questionText)) {
 				VoteQueContent nomination = new VoteQueContent();
 				nomination.setDisplayOrder(nominationIndex);
 				nomination.setMcContent(voteContent);
@@ -363,16 +365,110 @@ public class LearningUtil implements VoteAppConstants {
 	    // the input is a list of strings (questions, for example)
 	    int nominationIndex = voteContent.getVoteQueContents().size() + 1;
 	    String[] userAnswers = (String[]) value;
+	    Short maxInputs = voteContent.getMaxInputs();
+	    short inputCount = 0;
 	    for (String questionText : userAnswers) {
-		VoteQueContent nomination = new VoteQueContent();
-		nomination.setDisplayOrder(nominationIndex);
-		nomination.setMcContent(voteContent);
-		nomination.setQuestion(questionText);
-		voteService.saveOrUpdateVoteQueContent(nomination);
-		voteContent.getVoteQueContents().add(nomination);
-		nominationIndex++;
-	    }
+		if (maxInputs != null && maxInputs > 0 && inputCount >= maxInputs) {
+		    // if we reached the maximum number of inputs, i.e. number of students that will be taken
+		    // into account
+		    break;
+		}
 
+		if (!StringUtils.isBlank(questionText)) {
+		    VoteQueContent nomination = new VoteQueContent();
+		    nomination.setDisplayOrder(nominationIndex);
+		    nomination.setMcContent(voteContent);
+		    nomination.setQuestion(questionText);
+		    voteService.saveOrUpdateVoteQueContent(nomination);
+		    voteContent.getVoteQueContents().add(nomination);
+		    nominationIndex++;
+		    inputCount++;
+		}
+	    }
+	} else if (value instanceof String && !StringUtils.isBlank((String) value)) {
+	    int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+	    VoteQueContent nomination = new VoteQueContent();
+	    nomination.setDisplayOrder(nominationIndex);
+	    nomination.setMcContent(voteContent);
+	    nomination.setQuestion((String) value);
+	    voteService.saveOrUpdateVoteQueContent(nomination);
+	    voteContent.getVoteQueContents().add(nomination);
+	}
+	if (value instanceof SimpleURL[][]) {
+	    if (value != null) {
+		SimpleURL[][] usersAndUrls = (SimpleURL[][]) value;
+		int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+		Short maxInputs = voteContent.getMaxInputs();
+		short inputCount = 0;
+		for (SimpleURL[] userUrls : usersAndUrls) {
+		    if (userUrls != null) {
+			if (maxInputs != null && maxInputs > 0 && inputCount >= maxInputs) {
+			    // if we reached the maximum number of inputs, i.e. number of students that will be taken
+			    // into account
+			    break;
+			}
+			boolean anyAnswersAdded = false;
+			for (SimpleURL url : userUrls) {
+			    if (url != null) {
+				VoteQueContent nomination = new VoteQueContent();
+				nomination.setDisplayOrder(nominationIndex);
+				nomination.setMcContent(voteContent);
+
+				String link = "<a href=\"" + url.getUrl() + "\">" + url.getNameToDisplay() + "</a>";
+				nomination.setQuestion(link);
+
+				voteService.saveOrUpdateVoteQueContent(nomination);
+				voteContent.getVoteQueContents().add(nomination);
+				nominationIndex++;
+				anyAnswersAdded = true;
+			    }
+			}
+			if (anyAnswersAdded) {
+			    inputCount++;
+			}
+		    }
+		}
+	    }
+	}
+
+	else if (value instanceof SimpleURL[]) {
+	    // the input is a list of strings (questions, for example)
+	    int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+	    SimpleURL[] userUrls = (SimpleURL[]) value;
+	    Short maxInputs = voteContent.getMaxInputs();
+	    short inputCount = 0;
+	    for (SimpleURL url : userUrls) {
+		if (maxInputs != null && maxInputs > 0 && inputCount >= maxInputs) {
+		    // if we reached the maximum number of inputs, i.e. number of students that will be taken
+		    // into account
+		    break;
+		}
+		if (url != null) {
+		    VoteQueContent nomination = new VoteQueContent();
+		    nomination.setDisplayOrder(nominationIndex);
+		    nomination.setMcContent(voteContent);
+
+		    String link = "<a href=\"" + url.getUrl() + "\">" + url.getNameToDisplay() + "</a>";
+		    nomination.setQuestion(link);
+
+		    voteService.saveOrUpdateVoteQueContent(nomination);
+		    voteContent.getVoteQueContents().add(nomination);
+		    nominationIndex++;
+		    inputCount++;
+		}
+	    }
+	} else if (value instanceof SimpleURL) {
+	    int nominationIndex = voteContent.getVoteQueContents().size() + 1;
+	    VoteQueContent nomination = new VoteQueContent();
+	    nomination.setDisplayOrder(nominationIndex);
+
+	    SimpleURL url = (SimpleURL) value;
+	    String link = "<a href=\"" + url.getUrl() + "\">" + url.getNameToDisplay() + "</a>";
+	    nomination.setQuestion(link);
+
+	    nomination.setMcContent(voteContent);
+	    voteService.saveOrUpdateVoteQueContent(nomination);
+	    voteContent.getVoteQueContents().add(nomination);
 	}
     }
 

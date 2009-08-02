@@ -346,7 +346,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	}
 	if (defaultContent.getConditions().isEmpty()) {
 	    defaultContent.getConditions()
-		    .add(getNotebookOutputFactory().createDefaultComplexCondition(defaultContent));
+		    .add(getNotebookOutputFactory().createDefaultUserEntryCondition(defaultContent));
 	}
 	return defaultContent;
     }
@@ -644,7 +644,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 		}
 	    }
 	} while (uniqueNumber == null);
-	return getNotebookOutputFactory().buildConditionName(uniqueNumber);
+	return getNotebookOutputFactory().buildUserEntryConditionName(uniqueNumber);
     }
 
     public void releaseConditionsFromCache(Notebook notebook) {

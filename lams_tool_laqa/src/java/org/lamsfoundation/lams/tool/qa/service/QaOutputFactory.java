@@ -65,8 +65,8 @@ public class QaOutputFactory extends OutputFactory {
 	if (toolContentObject != null) {
 	    QaContent qaContent = (QaContent) toolContentObject;
 	    // Different definitions are provided, depending how the output will be used
-	    Class stringArrayClass = new String[] {}.getClass();
-	    Class listOfStringArrayClass = new LinkedList<String[]>().getClass();
+	    Class stringArrayClass = String[].class;
+	    Class arrayofStringArraysClass = String[][].class;
 	    switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION: {
 		ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(
@@ -88,7 +88,7 @@ public class QaOutputFactory extends OutputFactory {
 		break;
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW: {
 		ToolOutputDefinition groupAnswersDefinition = buildComplexOutputDefinition(
-			QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, listOfStringArrayClass);
+			QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, arrayofStringArraysClass);
 		definitionMap.put(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, groupAnswersDefinition);
 
 		ToolOutputDefinition questionsDefinition = buildComplexOutputDefinition(

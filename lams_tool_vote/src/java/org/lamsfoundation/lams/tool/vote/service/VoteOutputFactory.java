@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.OutputType;
+import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.vote.VoteUtils;
@@ -240,9 +241,13 @@ public class VoteOutputFactory extends OutputFactory {
 	if (ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW == definitionType) {
 	    // currently array of strings and array of arrays of strings are supported
 	    Class stringArrayClass = String[].class;
-
 	    Class arrayOfStringArrays = String[][].class;
-	    return new Class[] { stringArrayClass, arrayOfStringArrays };
+	    Class stringClass = String.class;
+	    Class simpleUrlArrayClass = SimpleURL[].class;
+	    Class arrayOfSimpleUrlArrayClass = SimpleURL[][].class;
+	    Class simpleUrlClass = SimpleURL.class;
+	    return new Class[] { stringArrayClass, arrayOfStringArrays, stringClass, simpleUrlArrayClass,
+		    arrayOfSimpleUrlArrayClass, simpleUrlClass };
 	}
 	return super.getSupportedDefinitionClasses(definitionType);
     }

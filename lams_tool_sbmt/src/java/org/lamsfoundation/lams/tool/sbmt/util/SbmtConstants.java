@@ -27,56 +27,57 @@ package org.lamsfoundation.lams.tool.sbmt.util;
 
 public class SbmtConstants {
 
-	public static final String TOOL_SIGNATURE = "lasbmt11";
+    public static final String TOOL_SIGNATURE = "lasbmt11";
 
-	public static final String DEFAULT_TITLE = "Submit Files Title";
+    public static final String DEFAULT_TITLE = "Submit Files Title";
 
-	public static final String AUTHORING_DTO = "authoring";
+    public static final String AUTHORING_DTO = "authoring";
 
-	//	public static final String TOOL_SESSION_ID = "toolSessionID";
-	//	public static final String TOOL_CONTENT_ID = "toolContentID";
-	public static final String USER_ID = "userID";
+    // public static final String TOOL_SESSION_ID = "toolSessionID";
+    // public static final String TOOL_CONTENT_ID = "toolContentID";
+    public static final String USER_ID = "userID";
 
-	public static final String ATTACHMENT_LIST = "attachmentList";
+    public static final String ATTACHMENT_LIST = "attachmentList";
 
-	public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
+    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
 
-	public static final String PAGE_EDITABLE = "isPageEditable";
+    public static final String PAGE_EDITABLE = "isPageEditable";
 
-	public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
+    public static final String ATTR_FILE_TYPE_FLAG = "fileTypeFlag";
 
-	public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
+    public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 
-	public static final String ATTR_USER_UID = "userUid";
+    public static final String ATTR_USER_UID = "userUid";
 
-	public static final String SUCCESS = "success";
+    public static final String SUCCESS = "success";
 
-	public static final String ATTR_FINISH_LOCK = "finishLock";
+    public static final String ATTR_FINISH_LOCK = "finishLock";
 
-	public static final String ATTR_REFLECTION_ON = "reflectOn";
+    public static final String ATTR_REFLECTION_ON = "reflectOn";
 
-	public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
+    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 
-	public static final String ATTR_TITLE = "title";
+    public static final String ATTR_TITLE = "title";
 
-	public static final String ATTR_INSTRUCTION = "instruction";
+    public static final String ATTR_INSTRUCTION = "instruction";
 
-	public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
+    public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
 
-	public static final String PARAM_MIN_UPLOAD = "minUpload";
+    public static final String PARAM_MIN_UPLOAD = "minUpload";
 
-	public static final String ATTR_LIMIT_UPLOAD = "limitUpload";
+    public static final String ATTR_LIMIT_UPLOAD = "limitUpload";
 
-	public static final String ATTR_LIMIT_UPLOAD_NUMBER = "limitUploadNumber";
+    public static final String ATTR_LIMIT_UPLOAD_NUMBER = "limitUploadNumber";
 
-	public static final Object ATTR_ARRIVE_LIMIT = "arriveLimit";
+    public static final Object ATTR_ARRIVE_LIMIT = "arriveLimit";
 
-	public static final String ATTR_USER_FINISHED = "userFinished";
+    public static final String ATTR_USER_FINISHED = "userFinished";
 
-	public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE = "notify_learners_on_mark_release";
+    public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE = "notify_learners_on_mark_release";
 
-	public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_FILE_SUBMIT = "notify_teachers_on_file_submit";
-	
-	public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARKED_FILE = "notify_learners_on_marked_file";
-	
+    public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_FILE_SUBMIT = "notify_teachers_on_file_submit";
+
+    public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARKED_FILE = "notify_learners_on_marked_file";
+
+    public static final String SUBMITTED_ITEMS_DEFINITION_NAME = "submitted.items.output.definition.sbmt";
 }

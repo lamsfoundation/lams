@@ -413,7 +413,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	    throw new ChatException(error);
 	}
 	if (defaultContent.getConditions().isEmpty()) {
-	    defaultContent.getConditions().add(getChatOutputFactory().createDefaultComplexCondition(defaultContent));
+	    defaultContent.getConditions().add(getChatOutputFactory().createDefaultUserMessagesCondition(defaultContent));
 	}
 	return defaultContent;
     }
@@ -1116,7 +1116,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 		}
 	    }
 	} while (uniqueNumber == null);
-	return getChatOutputFactory().buildConditionName(uniqueNumber);
+	return getChatOutputFactory().buildUserMessagesConditionName(uniqueNumber);
     }
 
     public void deleteCondition(ChatCondition condition) {

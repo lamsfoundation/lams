@@ -40,6 +40,10 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
+	<bean id="submitFilesOutputFactory" class="org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesOutputFactory">  
+    	<property name="toolMessageService"><ref bean="sbmtMessageService"/></property>  
+	</bean> 
+	
 	<bean id="submitFilesServiceTarget" class="org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesService">
 		<property name="submitFilesContentDAO"><ref bean="submitFilesContentDAO"/></property>
 		<property name="submitFilesSessionDAO"><ref bean="submitFilesSessionDAO"/></property>
@@ -58,6 +62,7 @@
 		<property name="lessonService"><ref bean="lessonService"/></property> 
 		<property name="repositoryService"><ref bean="repositoryService" /></property>
 		<property name="gradebookService"><ref bean="gradebookService" /></property>
+		<property name="submitFilesOutputFactory"><ref bean="submitFilesOutputFactory"/></property>
 	</bean>
 	
 	<bean id="submitFilesService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
