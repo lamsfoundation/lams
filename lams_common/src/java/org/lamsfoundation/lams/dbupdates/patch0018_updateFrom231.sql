@@ -1,4 +1,4 @@
--- SQL statements to update from LAMS 2.3
+-- SQL statements to update from LAMS 2.3.1
 
 SET AUTOCOMMIT = 0;
 
