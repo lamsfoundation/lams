@@ -177,10 +177,10 @@
 			
 			<br><br><br>
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="$('#assessmentQuestionForm').submit();" class="button-add-item">
+				<a href="#" onclick="$('#assessmentQuestionForm').submit();" onmousedown="self.focus();" class="button-add-item">
 					<fmt:message key="label.authoring.matching.pairs.add.matching.pairs" /> 
 				</a>
-				<a href="#" onclick="self.parent.tb_remove();" class="button space-left">
+				<a href="#" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="button space-left">
 					<fmt:message key="label.cancel" /> 
 				</a>
 			</lams:ImgButtonWrapper>
