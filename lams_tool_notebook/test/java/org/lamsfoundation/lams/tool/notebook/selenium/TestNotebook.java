@@ -24,11 +24,6 @@
 package org.lamsfoundation.lams.tool.notebook.selenium;
 
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.lamsfoundation.lams.selenium.AbstractSeleniumTestCase;
@@ -72,27 +67,25 @@ public class TestNotebook extends AbstractSeleniumTestCase {
 
     public void testLearning() throws Exception {
 	setUpLearning();
-	// assertEquals("Notebook", selenium.getTitle());
+	assertEquals("Notebook", selenium.getTitle());
 	assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
 	selenium.type("entryText", "have fun");
 	selenium.click("//a[@id='finishButton']/span");
-	selenium.waitForPageToLoad("30000");
-	// assertTrue(selenium.isTextPresent("Congratulations"));
+	waitForLearning();
+	
+	assertTrue(selenium.isTextPresent("Congratulations"));
 	assertFalse(selenium.isElementPresent("entryText"));
 	tearDownLearning();
 
 	setUpLearning();
-	// assertTrue(selenium.isTextPresent("Congratulations"));
+	assertTrue(selenium.isTextPresent("Congratulations"));
 	assertFalse(selenium.isElementPresent("entryText"));
-	tearDownLearning();
     }
 
     public void testMonitoring() {
 	setUpMonitoring();
 	
 	assertEquals("Notebook", selenium.getTitle());
-	
-	tearDownMonitoring();
     }
 
 }

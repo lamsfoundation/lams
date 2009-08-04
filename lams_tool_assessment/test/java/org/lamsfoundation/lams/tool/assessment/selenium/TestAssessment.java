@@ -114,7 +114,6 @@ public class TestAssessment extends AbstractSeleniumTestCase {
 	selenium.type("optionFeedback2__lamstextarea", "Tt could be so, on Mars");
 	selenium.click("link=Add Multiple Choice");
 
-	// TODO may be get rid of this thing
 	selenium.selectWindow("openToolId");
 	waitForElementPresent("link=Save");
     }
@@ -149,7 +148,7 @@ public class TestAssessment extends AbstractSeleniumTestCase {
 
     public void testLearning() throws InterruptedException {
 	setUpLearning();
-	// assertEquals("Assessment Learning", selenium.getTitle());
+	assertEquals("Assessment Learning", selenium.getTitle());
 	assertTrue(selenium.isTextPresent("Only for clever"));
 	verifyFalse(selenium.isTextPresent("Started on"));
 	verifyTrue(selenium.isElementPresent("question0"));
@@ -168,7 +167,7 @@ public class TestAssessment extends AbstractSeleniumTestCase {
 	verifyTrue(selenium.isTextPresent("You're ready to become a cook if you know this"));
 
 	selenium.click("link=Next Activity");
-	selenium.waitForPageToLoad("30000");
+	waitForLearning();
 	assertTrue(selenium.isTextPresent("Congratulations, you have finished."));
 	verifyFalse(selenium.isElementPresent("Only for clever"));
 	tearDownLearning();
@@ -176,11 +175,11 @@ public class TestAssessment extends AbstractSeleniumTestCase {
 	setUpLearning();
 	assertTrue(selenium.isTextPresent("Congratulations, you have finished."));
 	assertFalse(selenium.isTextPresent("Only for clever"));
-	tearDownLearning();
     }
 
     public void testMonitoring() throws InterruptedException {
 	setUpMonitoring();
+	selenium.setSpeed("600");
 	
 	assertTrue(selenium.isTextPresent("Assessment Tool"));
 	verifyTrue(selenium.isTextPresent("Summary"));
@@ -225,8 +224,6 @@ public class TestAssessment extends AbstractSeleniumTestCase {
 	selenium.click("link=Ok");
 	selenium.selectWindow("monitorId");
 	waitForElementPresent("link=Export summary");
-
-	tearDownMonitoring();
     }
 
 }

@@ -99,6 +99,7 @@ public class TestWiki extends AbstractSeleniumTestCase {
 
 	    storeLearningDesign();
 	} catch (Exception e) {
+	    e.fillInStackTrace();
 	    fail(e.getMessage());
 	}
 
@@ -111,6 +112,7 @@ public class TestWiki extends AbstractSeleniumTestCase {
 	try {
 	    createNewLesson();
 	} catch (Exception e) {
+	    e.fillInStackTrace();
 	    fail(e.getMessage());
 	}
     }
@@ -149,9 +151,8 @@ public class TestWiki extends AbstractSeleniumTestCase {
 
 	    // Removing the wiki page so it can be made again in the next test
 	    testRemove(WIKI_TITLE3, true);
-
-	    tearDownLearning();
 	} catch (Exception e) {
+	    e.fillInStackTrace();
 	    fail(e.getMessage());
 	}
     }
@@ -187,11 +188,8 @@ public class TestWiki extends AbstractSeleniumTestCase {
 	    
 	    // Removing a page
 	    testRemove(WIKI_TITLE4, true);
-	    
-	    selenium.close();
-	    selenium.selectWindow(null);
-	    tearDownMonitoring();
 	} catch (Exception e) {
+	    e.fillInStackTrace();
 	    fail(e.getMessage());
 	}
     }

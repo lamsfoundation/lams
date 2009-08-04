@@ -142,8 +142,6 @@ public class TestForum extends AbstractSeleniumTestCase {
 
 	    // Testing creating a topic
 	    testCreateTopicLearner(TOPIC4_TITLE, TOPIC4_MESSAGE);
-	    
-	    tearDownLearning();
 	} catch (Exception e) {
 	    Log.error(e);
 	    fail(e.getMessage());
@@ -159,9 +157,6 @@ public class TestForum extends AbstractSeleniumTestCase {
 	    
 	    // TODO: Work out how to access the forum page, which is opened in a _blank page
 
-	    selenium.close();
-	    selenium.selectWindow(null);
-	    tearDownMonitoring();
 	} catch (Exception e) {
 	    fail(e.getMessage());
 	}
