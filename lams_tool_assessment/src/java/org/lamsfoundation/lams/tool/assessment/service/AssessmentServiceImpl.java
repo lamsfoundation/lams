@@ -568,10 +568,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public AssessmentResult getUserMasterDetail(Long sessionId, Long userId) {
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId,
 		userId);
-	SortedSet questionResults = new TreeSet(new AssessmentQuestionResultComparator());
-	questionResults.addAll(lastFinishedResult.getQuestionResults());
-	lastFinishedResult.setQuestionResults(questionResults);
-	escapeQuotes(lastFinishedResult);
+	if (lastFinishedResult != null) {
+	    SortedSet questionResults = new TreeSet(new AssessmentQuestionResultComparator());
+	    questionResults.addAll(lastFinishedResult.getQuestionResults());
+	    lastFinishedResult.setQuestionResults(questionResults);
+	    escapeQuotes(lastFinishedResult);
+	}
 
 	return lastFinishedResult;
     }

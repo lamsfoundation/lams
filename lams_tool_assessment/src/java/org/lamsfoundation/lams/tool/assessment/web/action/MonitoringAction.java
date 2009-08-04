@@ -134,7 +134,7 @@ public class MonitoringAction extends Action {
 	AssessmentResult result = service.getUserMasterDetail(sessionId, userId);
 
 	request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return (result == null) ? null : mapping.findForward(AssessmentConstants.SUCCESS);
     }
 
     private ActionForward questionSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
