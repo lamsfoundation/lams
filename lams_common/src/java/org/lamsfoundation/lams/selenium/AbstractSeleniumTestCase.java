@@ -81,21 +81,29 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	    learningDesignDAO = (LearningDesignDAO) context.getBean("learningDesignDAO");
 	    learningDesignName = getLearningDesignName();
 
-	    HttpCommandProcessor proc = new HttpCommandProcessor(TestFrameworkConstants.SERVER_HOST,
-		    TestFrameworkConstants.SERVER_PORT, TestFrameworkConstants.BROWSER,
-		    TestFrameworkConstants.WEB_APP_HOST + TestFrameworkConstants.WEB_APP_DIR);
+	    HttpCommandProcessor proc = new HttpCommandProcessor(SeleniumConstants.SERVER_HOST,
+		    SeleniumConstants.SERVER_PORT, SeleniumConstants.BROWSER,
+		    SeleniumConstants.WEB_APP_HOST + SeleniumConstants.WEB_APP_DIR);
 	    selenium = new DefaultSeleniumFlex(proc);
 	    selenium.start();
-	    // do not reduce this parameter as Selenium might start working wrong
-	    selenium.setSpeed("400");
 	}
+	// do not reduce this parameter as Selenium might start working wrong
+	selenium.setSpeed("400");
     }
     
     @Override
     public void tearDown() throws Exception {
 	checkForVerificationErrors();
-	//TODO close all windows except main one
-	//then we can remove all the tearDown...
+	
+	//leaves only Lams main window opened
+	String[] windowNames = selenium.getAllWindowNames();
+	for (String windowName : windowNames) {
+	    if (!(windowName.equals(SeleniumConstants.LAMS_MAIN_WINDOW_NAME) || windowName.equals("null"))) {
+		selenium.selectWindow(windowName);
+		selenium.close();
+	    }
+	}
+	selenium.selectWindow(null);
     }
     
     /**
@@ -107,49 +115,6 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	    selenium = null;
 	}
     }
-    
-//    /**
-//     * Our main test class. Currently it tests authoring, learning and
-//     * monitoring sequentially one-by-one. Also it relies on the fact that you
-//     * store new LD in authoring (otherwise you should reimplement this method).
-//     * 
-//     * @throws Exception
-//     */
-//    public void testEntireTool() throws Exception {
-//	loginToLams();
-//
-//	//Authoring part
-//	Map<String, String> contentDetails = setUpAuthoring();
-//	authoringTest();
-//	storeLearningDesign(contentDetails);
-//
-//	createNewLesson();
-//
-//	//Learning part
-//	learningTest();
-//
-//	//Monitoring part		
-//	openToolMonitor();
-//	monitoringTest();
-//	closeToolMonitor();
-//    }
-//
-//    /**
-//     * Tests tool authoring. Should be overridden by all subclasses.
-//     */
-//    protected void authoringTest() throws Exception;
-//
-//    /**
-//     * Tests tool learning. Always should begin with setUpLearning() and end up with tearDownLearning() methods. Should
-//     * be overridden by all subclasses.
-//     */
-//    protected abstract void learningTest() throws Exception;
-//
-//    /**
-//     * Tests tool monitoring. Should be overridden by all subclasses.
-//     */
-//    protected abstract void monitoringTest() throws Exception;
-    
 
     /**
      * Returns tool's signature. This method should be overridden by all
@@ -169,9 +134,8 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
     
     /** */
     protected void loginToLams() throws Exception {
-	//prevent popup window for user logging in for the first time
-	//may be move to setUp()
-	User user = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN);
+	//prevent introductionary window from appearing (for users logged in for the first time)
+	User user = userManagementService.getUserByLogin(SeleniumConstants.USER_LOGIN);
 	if (user.isFirstLogin()) {
 	    user.setFirstLogin(false);
 	    Workspace workspace = (Workspace) activityDAO.find(Workspace.class, user.getWorkspace().getWorkspaceId());
@@ -179,12 +143,21 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	    userManagementService.save(user);
 	}
 	
-	selenium.open(TestFrameworkConstants.WEB_APP_DIR);
-	//TODO try to logout (solving prob with IE)
-	selenium.type("j_username", TestFrameworkConstants.USER_LOGIN);
-	selenium.type("j_password", TestFrameworkConstants.USER_PASSWORD);
+	selenium.open(SeleniumConstants.WEB_APP_DIR);
+	selenium.waitForPageToLoad("20000");
+	
+	// if it's IE try to logout
+	if (SeleniumConstants.BROWSER.equals(SeleniumConstants.BROWSER_INTERNET_EXPLORER)
+		&& selenium.isElementPresent("link=Logout")) {
+	    selenium.click("link=Logout");
+	    selenium.waitForPageToLoad("20000");
+	}
+
+	assertTrue("Unable to access LAMS login page.", selenium.isElementPresent("link=Login"));
+	selenium.type("j_username", SeleniumConstants.USER_LOGIN);
+	selenium.type("j_password", SeleniumConstants.USER_PASSWORD);
 	selenium.click("link=Login");
-	selenium.waitForPageToLoad("10000");
+	selenium.waitForPageToLoad("20000");
 	Thread.sleep(3000);
 
     }
@@ -201,8 +174,8 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	selenium.click("//div[@id='header-my-courses']//div[@class='tab-middle-highlight']/a");
 	selenium.waitForPopUp("aWindow", "10000");
 
-	Integer userID = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN).getUserId();
-	String createUniqueContentFolderUrl = TestFrameworkConstants.WEB_APP_DIR
+	Integer userID = userManagementService.getUserByLogin(SeleniumConstants.USER_LOGIN).getUserId();
+	String createUniqueContentFolderUrl = SeleniumConstants.WEB_APP_DIR
 		+ "authoring/author.do?method=createUniqueContentFolder&userID=" + userID;
 	final String createUniqueContentFolderId = "createUniqueContentFolderId";
 	selenium.openWindow(createUniqueContentFolderUrl, createUniqueContentFolderId);
@@ -214,7 +187,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	selenium.selectWindow(null);
 
 	Tool tool = toolDAO.getToolBySignature(getToolSignature());
-	String getToolContentUrl = TestFrameworkConstants.WEB_APP_DIR
+	String getToolContentUrl = SeleniumConstants.WEB_APP_DIR
 		+ "authoring/author.do?method=getToolContentID&toolID=" + tool.getToolId();
 	final String getToolContentId = "getToolContentId";
 	selenium.openWindow(getToolContentUrl, getToolContentId);
@@ -225,7 +198,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	selenium.close();
 	selenium.selectWindow(null);
 
-	String openToolUrl = TestFrameworkConstants.WEB_APP_DIR + tool.getAuthorUrl() + "?mode=author"
+	String openToolUrl = SeleniumConstants.WEB_APP_DIR + tool.getAuthorUrl() + "?mode=author"
 		+ "&toolContentID=" + toolContentID + "&contentFolderID=" + contentFolderID;
 	final String openToolId = "openToolId";
 	selenium.openWindow(openToolUrl.toString(), openToolId);
@@ -248,14 +221,9 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	//closes tool authoring screen
 	selenium.click("//span[@class='okIcon']");
 	selenium.waitForPageToLoad("10000");
-	selenium.close();
-
-	//closes Flash authoring screen
-	selenium.selectWindow("aWindow");
-	selenium.close();
 	selenium.selectWindow(null);
 
-	final String storeLearningDesignUrl = TestFrameworkConstants.WEB_APP_DIR
+	final String storeLearningDesignUrl = SeleniumConstants.WEB_APP_DIR
 		+ "servlet/authoring/storeLearningDesignDetails";
 	String designDetails = constructWddxDesign(authoringSettings);
 	//callback function is aimed to let Selenium wait till StoreLDServlet finishes its work
@@ -263,8 +231,6 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 			"\"" + designDetails + "\", " +
 			"function(data){ return data; }" +
 			");");
-	selenium.selectWindow(null);
-	//TODO add timeout so let servelet running first time finish its work 
     }
 
     /**
@@ -274,11 +240,18 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
      * @throws Exception
      */
     public void createNewLesson() throws Exception {
-	//TODO check for new design for several times letting it work
 	Long lastCreatedLessonId = getLastCreatedLessonId(true);
 	DefaultSeleniumFlex flexSelenium = (DefaultSeleniumFlex) selenium;
+	
+	flexSelenium.click("link=Add Lesson");
+	Thread.sleep(6000);
+	// flexObjId is now set to "cloudWizard" by default, change it if
+	// you want to use another one.
+	// flexSelenium.flexSetFlexObjID("cloudWizard");
+	waitForFlexExists("workspaceTree", 20, flexSelenium);
+	assertTrue(flexSelenium.getFlexEnabled("startButton").equals("true"));
 
-	User user = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN);
+	User user = userManagementService.getUserByLogin(SeleniumConstants.USER_LOGIN);
 	Workspace workspace = (Workspace) activityDAO.find(Workspace.class, user.getWorkspace().getWorkspaceId());
 	Integer workspaceFolderID = workspace.getDefaultFolder().getWorkspaceFolderId();
 	List<String> titles = learningDesignDAO.getLearningDesignTitlesByWorkspaceFolder(workspaceFolderID);
@@ -294,46 +267,44 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 	}
 	assertTrue("There isn't learning design with name " + learningDesignName, count <= titles.size());
 
-	flexSelenium.click("link=Add Lesson");
-	Thread.sleep(6000);
-	// flexObjId is now setted to "cloudWizard" by default, change this if
-	// you want to use another one
-	// flexSelenium.flexSetFlexObjID("cloudWizard");
-	waitForFlexExists("workspaceTree", 20, flexSelenium);
-	assertTrue(flexSelenium.getFlexEnabled("startButton").equals("true"));
-
 	flexSelenium.flexSelectIndex("workspaceTree", String.valueOf(count));
-	// flexSelenium.flexType("resourceName_txi", "bueno");
 	flexSelenium.flexClick("startButton");
 	Thread.sleep(5000);
-	assertTrue("Assertion failed. Lesson has *not* been created",
-		lastCreatedLessonId < getLastCreatedLessonId(true));
+	
+	// TODO fix CloudWizard or define offset checking for lesson's LD name
+	final String cloudWizardError = "Tests aborted due to the problem with CloudWizard's root element problem. Please, restart tests";
+	assertTrue(cloudWizardError, lastCreatedLessonId < getLastCreatedLessonId(true));
 
-	//TODO fix CloudWizard or define offset checking for lesson's LD name
 	Long lessonId = getLastCreatedLessonId(false);
 	String lessonTitle = lessonDAO.getLesson(lessonId).getLessonName();
-	assertTrue("Tests aborted due to the problem with CloudWizard's root element problem. Please, restart tests",
-		learningDesignName.equals(lessonTitle));
+	assertTrue(cloudWizardError, learningDesignName.equals(lessonTitle));
     }
 
     /**
-     * Prepares learning environment. Should be invoked each time learning is
-     * going to be tested.
+     * Opens up learning. It should be used in the beginning of each learner test.
      * 
      * @throws InterruptedException
      */
     protected void setUpLearning() throws InterruptedException {
 	selenium.runScript("openLearner(" + getLastCreatedLessonId(false) + ")");
+	waitForLearning();
+    }
+    
+    /**
+     * Waits for learning. It can be used after learning refresh.
+     * 
+     * @throws InterruptedException
+     */
+    protected void waitForLearning() throws InterruptedException {
 	selenium.waitForPopUp("lWindow", "30000");
 	selenium.selectWindow("lWindow");
 	waitForElementPresent("contentFrame");
 	selenium.selectFrame("contentFrame");
-	//TODO set timeout but only during the first time
+	waitForElementPresent("//html//div[@id='content']");
     }
 
     /**
-     * Shuts up learning environment. Should be invoked each time learning
-     * testing is done.
+     * Closes Lams learning. Then selects back Lams main window.
      */
     protected void tearDownLearning() {
 	selenium.close();
@@ -356,7 +327,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
 
 	// openning tool monitor popup
 	Tool tool = toolDAO.getToolBySignature(getToolSignature());
-	String monitorUrl = TestFrameworkConstants.WEB_APP_DIR + tool.getMonitorUrl() + "?toolContentID="
+	String monitorUrl = SeleniumConstants.WEB_APP_DIR + tool.getMonitorUrl() + "?toolContentID="
 		+ toolActivity.getToolContentId() + "&contentFolderID=" + contentFolderID;
 	final String monitorId = "monitorId";
 	selenium.openWindow(monitorUrl, monitorId);
@@ -365,7 +336,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
     }
 
     /**
-     * Closes Lams monitor. (Optional activity)
+     * Closes Lams monitor. Then selects back Lams main window.
      */
     protected void tearDownMonitoring() {
 	selenium.close();
@@ -433,7 +404,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
      * @return id
      */
     private Long getLastCreatedLessonId(boolean returnNegative) {
-	Integer userID = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN).getUserId();
+	Integer userID = userManagementService.getUserByLogin(SeleniumConstants.USER_LOGIN).getUserId();
 	List<Lesson> lessonsCreatedByUser = lessonDAO.getLessonsCreatedByUser(userID);
 	List<Lesson> lessonsWithLDName = new ArrayList<Lesson>();
 	for (Lesson lesson : lessonsCreatedByUser) {
@@ -506,7 +477,7 @@ public abstract class AbstractSeleniumTestCase extends SeleneseTestCase {
      * @return
      */
     private String constructWddxDesign(Map<String, String> contentDetails) {
-	User user = userManagementService.getUserByLogin(TestFrameworkConstants.USER_LOGIN);
+	User user = userManagementService.getUserByLogin(SeleniumConstants.USER_LOGIN);
 	Tool tool = toolDAO.getToolBySignature(getToolSignature());
 
 	//checks if another LD with the same name exists. If so then trying to create unique one.

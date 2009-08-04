@@ -23,24 +23,46 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.selenium;
 
-public class TestFrameworkConstants {
-	
-	/** the host name on which the Selenium Server resides */
-	public static final String SERVER_HOST = "localhost";
-	/** the port on which the Selenium Server is listening */
-	public static final int SERVER_PORT = 5555;
-	/** 
-	 * the command string used to launch the browser, e.g. "*firefox", "*iexplore" or
-	 * "c:\\program files\\internet explorer\\iexplore.exe"
-	 */	
-	public static final String BROWSER = "*iexplore";
-	public static final String WEB_APP_HOST = "http://127.0.0.1:8080";
+/**
+ *
+ *
+ * @author Andrey Balan
+ */
+public class SeleniumException extends RuntimeException {
+
+
+	private static final long serialVersionUID = -5273169461546526467L;
+
 	/**
-	 * the starting URL including just a domain name. We'll start the browser
-	 * pointing at the Selenium resources on this URL,
-	 */	
-	public static final String WEB_APP_DIR = "/lams/";
-	public static final String USER_LOGIN = "mmm";
-	public static final String USER_PASSWORD = "mmm";
+	 * Constructor for TestFrameworkException.
+	 */
+	public SeleniumException() {
+		super();
+	}
+
+	/**
+	 * Constructor for TestFrameworkException.
+	 * @param message
+	 */
+	public SeleniumException(String message) {
+		super(message);
+	}
+
+	/**
+	 * Constructor for TestFrameworkException.
+	 * @param message
+	 * @param cause
+	 */
+	public SeleniumException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	/**
+	 * Constructor for TestFrameworkException.
+	 * @param cause
+	 */
+	public SeleniumException(Throwable cause) {
+		super(cause);
+	}
 
 }
