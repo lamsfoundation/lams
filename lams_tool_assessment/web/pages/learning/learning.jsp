@@ -247,9 +247,9 @@
 					</c:when>
 					<c:otherwise>
 						<c:if test="${isResubmitAllowed}">
-							<html:button property="resubmit" onclick="return resubmit()" styleClass="button">
+							<html:link href="javascript:;" property="resubmit" onclick="return resubmit()" styleClass="button">
 								<fmt:message key="label.learning.resubmit" />
-							</html:button>				
+							</html:link>						
 						</c:if>					
 						<html:link href="javascript:;" property="FinishButton" onclick="return finishSession()" styleClass="button">
 							<span class="nextActivity"><fmt:message key="label.learning.next.activity" /></span>
