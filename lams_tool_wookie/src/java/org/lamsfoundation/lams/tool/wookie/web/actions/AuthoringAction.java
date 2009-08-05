@@ -230,23 +230,13 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	    String wookieUrl = wookieService.getWookieURL();
 	    String wookieKey = wookieService.getWookieAPIKey();
-	    String wookieIdentifier = WebUtil.readStrParam(request, WookieConstants.PARAM_KEY_WIDGIT_ID);
+	    String wookieIdentifier = WebUtil.readStrParam(request, WookieConstants.PARAM_KEY_WIDGET_ID);
 	    Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
-	    if (wookieUrl == null || wookieKey == null) {
-		// TODO: Forward to error, citing that wookie is not configured properly
-	    }
 	    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
 
 	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), toolContentID
 		    .toString(), true);
-
-	    // Get object from xml
-	    //XStream xstream = new XStream();
-	    //WidgetData data = (WidgetData)xstream.fromXML(returnXML);
-
-	    // retrieving Wookie with given toolContentID
-	    //Wookie wookie = wookieService.getWookieByContentId(toolContentID);
 
 	    this.writeResponse(response, "text/xml;charset=utf-8", "utf-8", returnXML);
 

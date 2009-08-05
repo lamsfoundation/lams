@@ -76,7 +76,7 @@ public interface WookieConstants {
     public static final String PARAM_KEY_REQUEST_ID = "requestid";
     public static final String PARAM_KEY_API_KEY = "api_key";
     public static final String PARAM_KEY_SERVICE_TYPE = "servicetype";
-    public static final String PARAM_KEY_WIDGIT_ID = "widgetid";
+    public static final String PARAM_KEY_WIDGET_ID = "widgetid";
     public static final String PARAM_KEY_USER_ID = "userid";
     public static final String PARAM_KEY_SHARED_DATA_KEY = "shareddatakey";
     public static final String PARAM_KEY_PARTICIPANT_ID = "participant_id";
@@ -84,12 +84,15 @@ public interface WookieConstants {
     public static final String PARAM_KEY_PARTICIPANT_THUMBNAIL_URL = "participant_thumbnail_url";
     public static final String PARAM_KEY_PROPERTY_NAME = "propertyname";
     public static final String PARAM_KEY_PROPERTY_VALUE = "propertyvalue";
+    public static final String PARAM_KEY_PROPERTY_TEMPLATE_SHARED_KEY = "templateSharedDataKey";
+    public static final String PARAM_KEY_PROPERTY_CLONED_SHARED_KEY = "clonedSharedDataKey";
     
     public static final String PARAM_VALUE_GET_WIDGET= "getwidget";
     public static final String PARAM_VALUE_ADD_PARTICIPANT = "addparticipant";
     public static final String PARAM_VALUE_SET_PERSONAL_PROPERTY = "setpersonalproperty";
     public static final String PARAM_VALUE_PROPERTY_NAME_MODERATOR = "moderator";
     public static final String PARAM_VALUE_PROPERTY_VALUE_TRUE = "true";
+    public static final String PARAM_VALUE_PROPERTY_VALUE_CLONE = "cloneSharedData";
     
     public static final String XML_WIDGETS = "widgets";
     public static final String XML_WIDGET = "widget";

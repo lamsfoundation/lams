@@ -29,7 +29,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
@@ -64,6 +66,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieAttachmentDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieConfigItemDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieDAO;
@@ -77,11 +80,8 @@ import org.lamsfoundation.lams.tool.wookie.model.WookieUser;
 import org.lamsfoundation.lams.tool.wookie.util.WookieConstants;
 import org.lamsfoundation.lams.tool.wookie.util.WookieException;
 import org.lamsfoundation.lams.tool.wookie.util.WookieToolContentHandler;
-import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.wookie.util.WookieUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -212,6 +212,30 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	    fromContent = getDefaultContent();
 	}
 	Wookie toContent = Wookie.newInstance(fromContent, toContentId, wookieToolContentHandler);
+	
+	String wookieUrl = getWookieURL();
+	
+	try {
+	    if (wookieUrl != null && fromContent.getWidgetIdentifier() != null && fromContent.getWidgetIdentifier() != "") {
+	       
+	        wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+	        HashMap<String, String> params = new HashMap<String, String> ();
+	        
+	        params.put(WookieConstants.PARAM_KEY_API_KEY, getWookieAPIKey());
+	        params.put(WookieConstants.PARAM_KEY_WIDGET_ID, fromContent.getWidgetIdentifier());
+	        params.put(WookieConstants.PARAM_KEY_PROPERTY_TEMPLATE_SHARED_KEY, fromContent.getToolContentId().toString());
+	        params.put(WookieConstants.PARAM_KEY_PROPERTY_CLONED_SHARED_KEY, toContentId.toString());
+	        
+	        String xml = WookieUtil.getResponseStringFromExternalServer(wookieUrl, params);
+	       
+	        
+	    } else {
+	        throw new WookieException("Wookie url is not set");
+	    }
+	} catch (Exception e) {
+	    logger.error("Problem calling wookie server to clone instance");
+	    throw new WookieException("Problem calling wookie server to clone instance", e);
+	}
 
 	wookieDAO.saveOrUpdate(toContent);
     }
