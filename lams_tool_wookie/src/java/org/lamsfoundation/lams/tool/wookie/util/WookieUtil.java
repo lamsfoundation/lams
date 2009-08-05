@@ -143,8 +143,8 @@ public class WookieUtil {
 	return 0;
     }
 
-    public static String getWidget(String url, String apiKey, String widgetIdentifier, UserDTO user, String sharedDataKey, boolean isModerator)
-	    throws Exception {
+    public static String getWidget(String url, String apiKey, String widgetIdentifier, UserDTO user,
+	    String sharedDataKey, boolean isModerator) throws Exception {
 
 	if (url == null || apiKey == null || widgetIdentifier == null || user == null || sharedDataKey == null) {
 	    return null;
@@ -156,27 +156,31 @@ public class WookieUtil {
 	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
 
 	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_GET_WIDGET, "UTF8"));
-	
+	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_GET_WIDGET,
+		"UTF8"));
+
 	String widgetXML = getResponseStringFromExternalServer(url, params);
 	String displayName = user.getFirstName() + " " + user.getLastName();
-	
+
 	// Add the participant
-	boolean participantAdded = addParticipant(url, apiKey, widgetIdentifier, user.getUserID().toString(), sharedDataKey, user.getUserID().toString(), displayName, null);
+	boolean participantAdded = addParticipant(url, apiKey, widgetIdentifier, user.getUserID().toString(),
+		sharedDataKey, user.getUserID().toString(), displayName, null);
 	if (!participantAdded) {
 	    throw new WookieException("Attempt to add participant failed, check response code in logs");
 	}
-	
 
 	// If required, set the moderator property
 	if (isModerator) {
-	    boolean propertyAdded = addProperty(url, apiKey, widgetIdentifier, user.getUserID().toString(), sharedDataKey, user.getUserID().toString(), displayName, null, WookieConstants.PARAM_VALUE_PROPERTY_NAME_MODERATOR, WookieConstants.PARAM_VALUE_PROPERTY_VALUE_TRUE);
+	    boolean propertyAdded = addProperty(url, apiKey, widgetIdentifier, user.getUserID().toString(),
+		    sharedDataKey, user.getUserID().toString(), displayName, null,
+		    WookieConstants.PARAM_VALUE_PROPERTY_NAME_MODERATOR,
+		    WookieConstants.PARAM_VALUE_PROPERTY_VALUE_TRUE);
 	    if (!propertyAdded) {
 		throw new WookieException("Attempt to add property failed, check response code in logs");
 	    }
-	    		
+
 	}
-	
+
 	return widgetXML;
 
     }
@@ -192,12 +196,12 @@ public class WookieUtil {
      * @param participantDisplayName
      * @param participantThumbnailURL
      * @return
-     * @throws Exception 
+     * @throws Exception
      * @throws Exception
      */
     public static boolean addParticipant(String url, String apiKey, String widgetIdentifier, String userId,
-	    String sharedDataKey, String participantId, String participantDisplayName, String participantThumbnailURL) throws Exception
-	     {
+	    String sharedDataKey, String participantId, String participantDisplayName, String participantThumbnailURL)
+	    throws Exception {
 	if (url == null || apiKey == null || widgetIdentifier == null || userId == null || sharedDataKey == null) {
 	    throw new WookieException("Parameters missing in addParticipant call");
 	}
@@ -211,14 +215,15 @@ public class WookieUtil {
 		.encode(participantDisplayName, "UTF8"));
 	if (participantThumbnailURL != null) {
 	    params.put(WookieConstants.PARAM_KEY_PARTICIPANT_THUMBNAIL_URL, URLEncoder.encode(participantThumbnailURL,
-		"UTF8"));
+		    "UTF8"));
 	}
 	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_ADD_PARTICIPANT, "UTF8"));
-	
+	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_ADD_PARTICIPANT,
+		"UTF8"));
+
 	// Making the request and getting the response code
 	int responseCode = WookieUtil.getResponseCodeExternalServer(url, params);
-	
+
 	// Checking the response code
 	if (responseCode == HttpServletResponse.SC_OK || responseCode == HttpServletResponse.SC_CREATED) {
 	    return true;
@@ -228,8 +233,7 @@ public class WookieUtil {
     }
 
     /**
-     * 
-     * 
+     * Add a property to the existing initiated widget
      * 
      * @param url
      * @param apiKey
@@ -240,7 +244,7 @@ public class WookieUtil {
      * @param participantDisplayName
      * @param participantThumbnailURL
      * @return
-     * @throws Exception 
+     * @throws Exception
      * @throws Exception
      */
     public static boolean addProperty(String url, String apiKey, String widgetIdentifier, String userId,
@@ -259,16 +263,17 @@ public class WookieUtil {
 		.encode(participantDisplayName, "UTF8"));
 	if (participantThumbnailURL != null) {
 	    params.put(WookieConstants.PARAM_KEY_PARTICIPANT_THUMBNAIL_URL, URLEncoder.encode(participantThumbnailURL,
-		"UTF8"));
+		    "UTF8"));
 	}
 	params.put(WookieConstants.PARAM_KEY_PROPERTY_NAME, URLEncoder.encode(propertyName, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_PROPERTY_VALUE, URLEncoder.encode(propertyValue, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_SET_PERSONAL_PROPERTY, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(
+		WookieConstants.PARAM_VALUE_SET_PERSONAL_PROPERTY, "UTF8"));
 
 	// Making the request and getting the response code
 	int responseCode = WookieUtil.getResponseCodeExternalServer(url, params);
-	
+
 	// Checking the response code
 	if (responseCode == HttpServletResponse.SC_OK || responseCode == HttpServletResponse.SC_CREATED) {
 	    return true;
@@ -277,9 +282,47 @@ public class WookieUtil {
 	}
     }
 
+    /**
+     * Make a clone of the widget identified by the shared data key
+     * 
+     * @param url
+     * @param apiKey
+     * @param widgetIdentifier
+     * @param userId
+     * @param sharedDataKey
+     * @param participantId
+     * @param participantDisplayName
+     * @param participantThumbnailURL
+     * @return
+     * @throws Exception
+     * @throws Exception
+     */
+    public static boolean cloneWidget(String url, String apiKey, String widgetIdentifier, String sharedDataKey,
+	    String newSharedDataKey, String userID) throws Exception {
+
+	HashMap<String, String> params = new HashMap<String, String>();
+	params.put(WookieConstants.PARAM_KEY_WIDGET_ID, URLEncoder.encode(widgetIdentifier, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_PROPERTY_VALUE_CLONE, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_PROPERTY_CLONED_SHARED_KEY, URLEncoder.encode(newSharedDataKey, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_USER_ID, URLEncoder.encode(userID, "UTF8"));
+
+	// Making the request and getting the response code
+	int responseCode = WookieUtil.getResponseCodeExternalServer(url, params);
+
+	// Checking the response code
+	if (responseCode == HttpServletResponse.SC_OK) {
+	    return true;
+	} else {
+	    return false;
+	}
+    }
 
     /**
-     * Makes a request to the specified url with the specified parameters and returns the response string
+     * Makes a request to the specified url with the specified parameters and
+     * returns the response string
      * 
      * @param urlStr
      * @param params
@@ -288,7 +331,7 @@ public class WookieUtil {
      * @throws IOException
      */
     public static String getResponseStringFromExternalServer(String urlStr, HashMap<String, String> params)
-    		throws Exception {
+	    throws Exception {
 	InputStream is = getResponseInputStreamFromExternalServer(urlStr, params);
 	BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 	StringBuilder sb = new StringBuilder();
@@ -299,10 +342,10 @@ public class WookieUtil {
 	is.close();
 	return sb.toString();
     }
-    
-    
+
     /**
-     * Makes a request to the specified url. Returns true if the expected status response code is returned
+     * Makes a request to the specified url. Returns true if the expected status
+     * response code is returned
      * 
      * @param urlStr
      * @param params
@@ -310,17 +353,16 @@ public class WookieUtil {
      * @throws ToolException
      * @throws IOException
      */
-    public static int getResponseCodeExternalServer(String urlStr, HashMap<String, String> params)
-    	throws Exception {
+    public static int getResponseCodeExternalServer(String urlStr, HashMap<String, String> params) throws Exception {
 	URLConnection conn = getResponseUrlConnectionFromExternalServer(urlStr, params);
 	HttpURLConnection httpConn = (HttpURLConnection) conn;
-	
+
 	return httpConn.getResponseCode();
     }
-    
-    
+
     /**
-     * Makes a request to the specified url with the specified parameters and returns the response input stream
+     * Makes a request to the specified url with the specified parameters and
+     * returns the response input stream
      * 
      * @param urlStr
      * @param params
@@ -329,15 +371,15 @@ public class WookieUtil {
      * @throws IOException
      */
     public static InputStream getResponseInputStreamFromExternalServer(String urlStr, HashMap<String, String> params)
-    	throws Exception {
+	    throws Exception {
 	URLConnection conn = getResponseUrlConnectionFromExternalServer(urlStr, params);
 	InputStream is = conn.getInputStream();
 	return is;
     }
-    
-    
+
     /**
-     * Makes a request to the specified url with the specified parameters and returns the response URLConnection
+     * Makes a request to the specified url with the specified parameters and
+     * returns the response URLConnection
      * 
      * @param urlStr
      * @param params
@@ -361,11 +403,33 @@ public class WookieUtil {
 	    logger.error("Fail to connect to external server though url:  " + urlStr);
 	    throw new Exception("Fail to connect to external server though url:  " + urlStr);
 	}
-	
+
 	HttpURLConnection httpConn = (HttpURLConnection) conn;
 	logger.info("Response code was " + new Integer(httpConn.getResponseCode()).toString() + " for URL: " + urlStr);
-	
+
 	return conn;
+    }
+    
+    /**
+     * Gets the url response from the getWidget xml
+     * @param xml
+     * @return
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public static String getWidgetUrlFromXML(String xml) throws ParserConfigurationException, SAXException, IOException {
+	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	DocumentBuilder db = dbf.newDocumentBuilder();
+	Document document = db.parse(new InputSource(new StringReader(xml)));
+	NodeList widgetList = document.getElementsByTagName(WookieConstants.XML_URL);
+	
+	if (widgetList != null && widgetList.item(0) != null) {
+	    String url = widgetList.item(0).getTextContent(); 
+	    return url;
+	} else {
+	    return null;
+	}
     }
 
 }

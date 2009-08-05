@@ -145,8 +145,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	if (wookie == null) {
 	    wookie = wookieService.copyDefaultContent(toolContentID);
 	    wookie.setCreateDate(new Date());
+	    wookie.setCreateBy(getUser().getUserID());
 	    wookieService.saveOrUpdateWookie(wookie);
-	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
 	if (mode != null && mode.isTeacher()) {

@@ -49,6 +49,11 @@ create table tl_lawook10_session (
 	session_id bigint, 
 	session_name varchar(250), 
 	wookie_uid bigint, 
+	widget_shared_data_key varchar(63),
+	widget_height integer,
+	widget_width integer,
+	widget_maximise bit,
+	widget_identifier varchar(511),
 	primary key (uid)
 )TYPE=InnoDB;
 
@@ -61,6 +66,7 @@ create table tl_lawook10_user (
 	finishedActivity bit, 
 	wookie_session_uid bigint, 
 	entry_uid bigint, 
+	user_widget_url varchar(511),
 	primary key (uid)
 )TYPE=InnoDB;
 

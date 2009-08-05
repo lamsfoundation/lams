@@ -29,13 +29,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -72,6 +75,7 @@ import org.lamsfoundation.lams.tool.wookie.dao.IWookieConfigItemDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieSessionDAO;
 import org.lamsfoundation.lams.tool.wookie.dao.IWookieUserDAO;
+import org.lamsfoundation.lams.tool.wookie.dto.WidgetData;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
 import org.lamsfoundation.lams.tool.wookie.model.WookieAttachment;
 import org.lamsfoundation.lams.tool.wookie.model.WookieConfigItem;
@@ -81,22 +85,30 @@ import org.lamsfoundation.lams.tool.wookie.util.WookieConstants;
 import org.lamsfoundation.lams.tool.wookie.util.WookieException;
 import org.lamsfoundation.lams.tool.wookie.util.WookieToolContentHandler;
 import org.lamsfoundation.lams.tool.wookie.util.WookieUtil;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * An implementation of the IWookieService interface.
  * 
- * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
+ * As a requirement, all LAMS tool's service bean must implement
+ * ToolContentManager and ToolSessionManager.
  */
 
-public class WookieService implements ToolSessionManager, ToolContentManager, IWookieService, ToolContentImport102Manager {
+public class WookieService implements ToolSessionManager, ToolContentManager, IWookieService,
+	ToolContentImport102Manager {
 
     static Logger logger = Logger.getLogger(WookieService.class.getName());
-
-    public static final String EXPORT_IMAGE_FILE_NAME = "authorImage";
 
     private IWookieDAO wookieDAO = null;
 
@@ -123,8 +135,10 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     private WookieOutputFactory wookieOutputFactory;
 
     private IWookieConfigItemDAO wookieConfigItemDAO;
-    
+
     private MessageService messageService;
+    
+    private IUserManagementService userManagementService;
 
     public WookieService() {
 	super();
@@ -145,6 +159,39 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	// TODO need to also set other fields.
 	Wookie wookie = wookieDAO.getByContentId(toolContentId);
 	session.setWookie(wookie);
+
+	// Create a copy of the widget for the session
+	// Clone the wookie widget on the external server
+	String wookieUrl = getWookieURL();
+	try {
+	    String newSharedDataKey = toolSessionId.toString() + "_" + toolContentId.toString();
+
+	    if (wookieUrl != null && wookie.getWidgetIdentifier() != null && wookie.getWidgetIdentifier() != "") {
+
+		wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+		logger.debug("Creating a new clone for session of widget: " + toolContentId.toString());
+		boolean success = WookieUtil.cloneWidget(wookieUrl, getWookieAPIKey(), wookie.getWidgetIdentifier(),
+			toolContentId.toString(), newSharedDataKey, wookie.getCreateBy().toString());
+
+		if (success) {
+		    session.setWidgetSharedDataKey(newSharedDataKey);
+		    session.setWidgetHeight(wookie.getWidgetHeight());
+		    session.setWidgetWidth(wookie.getWidgetWidth());
+		    session.setWidgetMaximise(wookie.getWidgetMaximise());
+		    session.setWidgetIdentifier(wookie.getWidgetIdentifier());
+		} else {
+		    throw new WookieException("Failed to copy widget on wookie server, check log for details.");
+		}
+
+	    } else {
+		throw new WookieException("Wookie url is not set");
+	    }
+	} catch (Exception e) {
+	    logger.error("Problem calling wookie server to clone instance", e);
+	    throw new WookieException("Problem calling wookie server to clone instance", e);
+	}
+
 	wookieSessionDAO.saveOrUpdate(session);
     }
 
@@ -172,8 +219,9 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     /**
      * Get the tool output for the given tool output names.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
-     *      java.lang.Long)
+     * @see 
+     *      org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util
+     *      .List<String>, java.lang.Long, java.lang.Long)
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
 	return getWookieOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
@@ -182,8 +230,8 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     /**
      * Get the tool output for the given tool output name.
      * 
-     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
-     *      java.lang.Long)
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String,
+     *      java.lang.Long, java.lang.Long)
      */
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getWookieOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
@@ -212,33 +260,48 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	    fromContent = getDefaultContent();
 	}
 	Wookie toContent = Wookie.newInstance(fromContent, toContentId, wookieToolContentHandler);
-	
+
+	// Clone the wookie widget on the external server
 	String wookieUrl = getWookieURL();
-	
 	try {
-	    if (wookieUrl != null && fromContent.getWidgetIdentifier() != null && fromContent.getWidgetIdentifier() != "") {
-	       
-	        wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
-	        HashMap<String, String> params = new HashMap<String, String> ();
-	        
-	        params.put(WookieConstants.PARAM_KEY_API_KEY, getWookieAPIKey());
-	        params.put(WookieConstants.PARAM_KEY_WIDGET_ID, fromContent.getWidgetIdentifier());
-	        params.put(WookieConstants.PARAM_KEY_PROPERTY_TEMPLATE_SHARED_KEY, fromContent.getToolContentId().toString());
-	        params.put(WookieConstants.PARAM_KEY_PROPERTY_CLONED_SHARED_KEY, toContentId.toString());
-	        
-	        String xml = WookieUtil.getResponseStringFromExternalServer(wookieUrl, params);
-	       
-	        
+	    if (wookieUrl != null) {
+		if (fromContent.getWidgetIdentifier() != null && fromContent.getWidgetIdentifier() != "") {
+		    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+		    logger.debug("Creating a new clone for copycontent for widget: " + fromContentId.toString());
+		    boolean success = WookieUtil.cloneWidget(wookieUrl, getWookieAPIKey(), fromContent
+			    .getWidgetIdentifier(), fromContentId.toString(), toContentId.toString(), fromContent
+			    .getCreateBy().toString());
+
+		    if (success) {
+			toContent.setWidgetHeight(fromContent.getWidgetHeight());
+			toContent.setWidgetWidth(fromContent.getWidgetWidth());
+			toContent.setWidgetAuthorUrl(fromContent.getWidgetAuthorUrl());
+			toContent.setWidgetMaximise(fromContent.getWidgetMaximise());
+			toContent.setWidgetIdentifier(fromContent.getWidgetIdentifier());
+			toContent.setCreateBy(fromContent.getCreateBy());
+
+			// Need to add the author to the widget so authoring widget url is different in the copy
+			User user = (User)userManagementService.findById(User.class, fromContent.getCreateBy());
+			String returnXML = WookieUtil.getWidget(wookieUrl, getWookieAPIKey(), fromContent.getWidgetIdentifier(), user.getUserDTO(), toContentId.toString(), true);
+			
+			toContent.setWidgetAuthorUrl(WookieUtil.getWidgetUrlFromXML(returnXML));
+			
+		    } else {
+			throw new WookieException("Failed to copy widget on wookie server, check log for details.");
+		    }
+		}
 	    } else {
-	        throw new WookieException("Wookie url is not set");
+		throw new WookieException("Wookie url is not set");
 	    }
 	} catch (Exception e) {
-	    logger.error("Problem calling wookie server to clone instance");
+	    logger.error("Problem calling wookie server to clone instance", e);
 	    throw new WookieException("Problem calling wookie server to clone instance", e);
 	}
 
 	wookieDAO.saveOrUpdate(toContent);
     }
+    
 
     public void copyFile(File srcFile, String destPath) throws Exception {
 	if (srcFile.exists() && srcFile.canRead()) {
@@ -278,12 +341,13 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     }
 
     /**
-     * Export the XML fragment for the tool's content, along with any files needed for the content.
+     * Export the XML fragment for the tool's content, along with any files
+     * needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
 
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
@@ -315,10 +379,11 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     }
 
     /**
-     * Import the XML fragment for the tool's content, along with any files needed for the content.
+     * Import the XML fragment for the tool's content, along with any files
+     * needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
@@ -336,7 +401,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 
 	    // reset it to new toolContentId
 	    wookie.setToolContentId(toolContentId);
-	    wookie.setCreateBy(new Long(newUserUid.longValue()));
+	    wookie.setCreateBy(newUserUid);
 
 	    wookieDAO.saveOrUpdate(wookie);
 	} catch (ImportToolContentException e) {
@@ -357,12 +422,14 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     }
 
     /**
-     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
-     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
-     * the toolContentId
+     * Get the definitions for possible output for an activity, based on the
+     * toolContentId. These may be definitions that are always available for the
+     * tool (e.g. number of marks for Multiple Choice) or a custom definition
+     * created for a particular activity such as the answer to the third
+     * question contains the word Koala and hence the need for the toolContentId
      * 
-     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of
+     *         each definition
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
@@ -372,7 +439,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	}
 	return getWookieOutputFactory().getToolOutputDefinitions(wookie, definitionType);
     }
-    
+
     @SuppressWarnings("unchecked")
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getWookieOutputFactory().getSupportedDefinitionClasses(definitionType);
@@ -542,11 +609,12 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     }
 
     /**
-     * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
+     * This method verifies the credentials of the SubmitFiles Tool and gives it
+     * the <code>Ticket</code> to login and access the Content Repository.
      * 
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
+     * A valid ticket is needed in order to access the content from the
+     * repository. This method would be called evertime the tool needs to
+     * upload/download files from the content repository.
      * 
      * @return ITicket The ticket for repostory access
      * @throws SubmitFilesException
@@ -573,7 +641,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     public void saveOrUpdateWookieConfigItem(WookieConfigItem item) {
 	wookieConfigItemDAO.saveOrUpdate(item);
     }
-    
+
     public String getWookieURL() {
 	String url = null;
 	WookieConfigItem urlItem = wookieConfigItemDAO.getConfigItemByKey(WookieConfigItem.KEY_WOOKIE_URL);
@@ -582,7 +650,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	}
 	return url;
     }
-    
+
     public String getWookieAPIKey() {
 	String url = null;
 	WookieConfigItem apiItem = wookieConfigItemDAO.getConfigItemByKey(WookieConfigItem.KEY_API);
@@ -591,7 +659,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	}
 	return url;
     }
-    
+
     public String getMessage(String key) {
 	return messageService.getMessage(key);
     }
@@ -606,11 +674,10 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	Date now = new Date();
 	Wookie wookie = new Wookie();
 	wookie.setContentInUse(Boolean.FALSE);
-	wookie.setCreateBy(new Long(user.getUserID().longValue()));
+	wookie.setCreateBy(user.getUserID());
 	wookie.setCreateDate(now);
 	wookie.setDefineLater(Boolean.FALSE);
-	wookie.setInstructions(WebUtil.convertNewlines((String) importValues
-		.get(ToolContentImport102Manager.CONTENT_BODY)));
+	wookie.setInstructions(WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
 	wookie.setLockOnFinished(Boolean.TRUE);
 	wookie.setOfflineInstructions(null);
 	wookie.setOnlineInstructions(null);
@@ -619,14 +686,12 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	wookie.setToolContentId(toolContentId);
 	wookie.setUpdateDate(now);
 	wookie.setReflectOnActivity(Boolean.FALSE);
-	// leave as empty, no need to set them to anything.
-	// setWookieAttachments(Set wookieAttachments);
-	// setWookieSessions(Set wookieSessions);
 	wookieDAO.saveOrUpdate(wookie);
     }
 
     /**
-     * Set the description, throws away the title value as this is not supported in 2.0
+     * Set the description, throws away the title value as this is not supported
+     * in 2.0
      */
     public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
 	    DataMissingException {
@@ -742,12 +807,19 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     }
 
     public MessageService getMessageService() {
-        return messageService;
+	return messageService;
     }
 
     public void setMessageService(MessageService messageService) {
-        this.messageService = messageService;
+	this.messageService = messageService;
     }
-    
-    
+
+    public IUserManagementService getUserManagementService() {
+        return userManagementService;
+    }
+
+    public void setUserManagementService(IUserManagementService userManagementService) {
+        this.userManagementService = userManagementService;
+    }
+
 }

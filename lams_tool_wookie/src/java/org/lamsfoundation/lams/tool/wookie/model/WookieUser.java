@@ -58,6 +58,8 @@ public class WookieUser implements java.io.Serializable {
     private boolean finishedActivity;
 
     private Long entryUID;
+    
+    private String userWidgetURL;
 
     // Constructors
 
@@ -175,6 +177,18 @@ public class WookieUser implements java.io.Serializable {
 
     public void setEntryUID(Long entryUID) {
 	this.entryUID = entryUID;
+    }
+    
+    /**
+     * @hibernate.property column="user_widget_url" length="511"
+     * @return
+     */
+    public String getUserWidgetURL() {
+        return userWidgetURL;
+    }
+
+    public void setUserWidgetURL(String userWidgetURL) {
+        this.userWidgetURL = userWidgetURL;
     }
 
     /**

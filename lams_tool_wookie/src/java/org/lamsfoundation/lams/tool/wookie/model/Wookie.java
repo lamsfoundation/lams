@@ -56,7 +56,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     private Date updateDate;
 
-    private Long createBy;
+    private Integer createBy;
 
     private String title;
 
@@ -101,7 +101,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
     }
 
     /** full constructor */
-    public Wookie(Date createDate, Date updateDate, Long createBy, String title, String instructions,
+    public Wookie(Date createDate, Date updateDate, Integer createBy, String title, String instructions,
 	    boolean runOffline, boolean lockOnFinished, boolean filteringEnabled, String filterKeywords,
 	    String onlineInstructions, String offlineInstructions, boolean contentInUse, boolean defineLater,
 	    Long toolContentId, String reflectInstructions, Set<WookieAttachment> wookieAttachments,
@@ -168,11 +168,11 @@ public class Wookie implements java.io.Serializable, Cloneable {
      * 
      */
 
-    public Long getCreateBy() {
+    public Integer getCreateBy() {
 	return createBy;
     }
 
-    public void setCreateBy(Long createBy) {
+    public void setCreateBy(Integer createBy) {
 	this.createBy = createBy;
     }
 

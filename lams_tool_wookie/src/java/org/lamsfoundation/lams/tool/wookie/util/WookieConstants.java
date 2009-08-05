@@ -84,15 +84,14 @@ public interface WookieConstants {
     public static final String PARAM_KEY_PARTICIPANT_THUMBNAIL_URL = "participant_thumbnail_url";
     public static final String PARAM_KEY_PROPERTY_NAME = "propertyname";
     public static final String PARAM_KEY_PROPERTY_VALUE = "propertyvalue";
-    public static final String PARAM_KEY_PROPERTY_TEMPLATE_SHARED_KEY = "templateSharedDataKey";
-    public static final String PARAM_KEY_PROPERTY_CLONED_SHARED_KEY = "clonedSharedDataKey";
+    public static final String PARAM_KEY_PROPERTY_CLONED_SHARED_KEY = "cloneshareddatakey";
     
     public static final String PARAM_VALUE_GET_WIDGET= "getwidget";
     public static final String PARAM_VALUE_ADD_PARTICIPANT = "addparticipant";
     public static final String PARAM_VALUE_SET_PERSONAL_PROPERTY = "setpersonalproperty";
     public static final String PARAM_VALUE_PROPERTY_NAME_MODERATOR = "moderator";
     public static final String PARAM_VALUE_PROPERTY_VALUE_TRUE = "true";
-    public static final String PARAM_VALUE_PROPERTY_VALUE_CLONE = "cloneSharedData";
+    public static final String PARAM_VALUE_PROPERTY_VALUE_CLONE = "cloneshareddata";
     
     public static final String XML_WIDGETS = "widgets";
     public static final String XML_WIDGET = "widget";
@@ -101,7 +100,6 @@ public interface WookieConstants {
     public static final String XML_DESCRIPTION = "description";
     public static final String XML_ICON = "icon";
     public static final String XML_PARAMETER = "parameter";
-    public static final String XML_MESSAGE = "message";
-    public static final String XML_COMPLETED = "completed";
+    public static final String XML_URL = "url";
     
 }
