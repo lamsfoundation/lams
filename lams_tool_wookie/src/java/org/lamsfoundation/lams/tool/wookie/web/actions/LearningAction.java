@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.wookie.dto.WidgetData;
 import org.lamsfoundation.lams.tool.wookie.dto.WookieDTO;
 import org.lamsfoundation.lams.tool.wookie.dto.WookieUserDTO;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
@@ -56,6 +57,7 @@ import org.lamsfoundation.lams.tool.wookie.service.IWookieService;
 import org.lamsfoundation.lams.tool.wookie.service.WookieServiceProxy;
 import org.lamsfoundation.lams.tool.wookie.util.WookieConstants;
 import org.lamsfoundation.lams.tool.wookie.util.WookieException;
+import org.lamsfoundation.lams.tool.wookie.util.WookieUtil;
 import org.lamsfoundation.lams.tool.wookie.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
@@ -64,6 +66,8 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * @author
@@ -95,12 +99,6 @@ public class LearningAction extends LamsDispatchAction {
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, MODE_OPTIONAL);
 
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	String redoQuestion = request.getParameter("redoQuestion");
-	boolean isRedo = false;
-	if (redoQuestion != null && redoQuestion.equals("true")) {
-	    isRedo = true;
-	}
 
 	// set up wookieService
 	if (wookieService == null) {
@@ -147,6 +145,13 @@ public class LearningAction extends LamsDispatchAction {
 	} else {
 	    wookieUser = getCurrentUser(toolSessionID);
 	}
+	
+	// Create a new widget instance for the user if required.
+	if (wookieUser.getUserWidgetURL() == null || wookieUser.getUserWidgetURL().equals("")) {
+	    String userWidgetURL = initiateWidget(wookieSession.getWidgetIdentifier(), wookieSession.getWidgetSharedDataKey());
+	    wookieUser.setUserWidgetURL(userWidgetURL);
+	    wookieService.saveOrUpdateWookieUser(wookieUser);
+	}
 
 	// set up the user dto
 	WookieUserDTO wookieUserDTO = new WookieUserDTO(wookieUser);
@@ -178,14 +183,35 @@ public class LearningAction extends LamsDispatchAction {
 	} else {
 	    request.setAttribute("contentEditable", true);
 	}
+	request.setAttribute("userWidgetURL", wookieUser.getUserWidgetURL());
+	request.setAttribute("widgetHeight", wookieSession.getWidgetHeight());
+	request.setAttribute("widgetWidth", wookieSession.getWidgetWidth());
+	request.setAttribute("widgetMaximise", wookieSession.getWidgetMaximise());
 	request.setAttribute("finishedActivity", wookieUser.isFinishedActivity());
 	return mapping.findForward("wookie");
+    }
+    
+    private String initiateWidget(String wookieIdentifier, String sharedDataKey) throws WookieException {
+	try {
+
+	    String wookieUrl = wookieService.getWookieURL();
+	    String wookieKey = wookieService.getWookieAPIKey();
+
+	    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), sharedDataKey, false);
+	    return  WookieUtil.getWidgetUrlFromXML(returnXML);
+
+	} catch (Exception e) {
+	    log.error("Problem intitating widget for learner" + e);
+	    throw new WookieException(e);
+	}
     }
 
     
 
     private WookieUser getCurrentUser(Long toolSessionId) {
-	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	UserDTO user = getUser();
 
 	// attempt to retrieve user using userId and toolSessionId
 	WookieUser wookieUser = wookieService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
@@ -197,6 +223,10 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	return wookieUser;
+    }
+    
+    private UserDTO getUser() {
+	return (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
     }
 
     public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,

@@ -85,18 +85,8 @@
         redirect="false"
       />
       <forward
-        name="success"
-        path="/pages/learning/success.jsp"
-        redirect="false"
-      />
-      <forward
         name="notebook"
         path="/pages/learning/notebook.jsp"
-        redirect="false"
-      />
-      <forward
-        name="viewAll"
-        path="/pages/learning/viewAll.jsp"
         redirect="false"
       />
     </action>

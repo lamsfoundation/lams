@@ -100,6 +100,48 @@
 
         </set>
 
+        <property
+            name="widgetSharedDataKey"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="widget_shared_data_key"
+            length="63"
+        />
+
+        <property
+            name="widgetHeight"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="widget_height"
+        />
+
+        <property
+            name="widgetWidth"
+            type="java.lang.Integer"
+            update="true"
+            insert="true"
+            column="widget_width"
+        />
+
+        <property
+            name="widgetMaximise"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="widget_maximise"
+        />
+
+        <property
+            name="widgetIdentifier"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="widget_identifier"
+            length="511"
+        />
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-WookieSession.xml

@@ -6,9 +6,6 @@
 
 <script type="text/javascript">
 <!--
-	var image;
-	var origImageHeight;
-	var origImageWidth;
 	var pageCount = ${widgetPages};
 	var browseAreaLoaded = false;
 	

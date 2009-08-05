@@ -43,7 +43,7 @@
 
         <property
             name="createBy"
-            type="java.lang.Long"
+            type="java.lang.Integer"
             update="true"
             insert="true"
             column="create_by"
