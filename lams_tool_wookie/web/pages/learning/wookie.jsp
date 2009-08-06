@@ -39,21 +39,23 @@
 
 	&nbsp;
 	
-	<table width="100%">
-		<tr align="center">
-			<td>
-				<iframe
-						id="widgetIframe"
-						src="${userWidgetURL}" 
-						name="widgetIframe"
-						style="width:${widgetWidth}px;height:${widgetHeight}px;border:0px;" 
-						frameborder="no"
-						scrolling="no"
-						>
-				</iframe>
-			</td>
-		</tr>
-	</table>
+	<c:if test="${contentEditable}">
+		<table width="100%">
+			<tr align="center">
+				<td>
+					<iframe
+							id="widgetIframe"
+							src="${userWidgetURL}" 
+							name="widgetIframe"
+							style="width:${widgetWidth}px;height:${widgetHeight}px;border:0px;" 
+							frameborder="no"
+							scrolling="no"
+							>
+					</iframe>
+				</td>
+			</tr>
+		</table>
+	</c:if>
 
 	<c:set var="lrnForm"
 		value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />

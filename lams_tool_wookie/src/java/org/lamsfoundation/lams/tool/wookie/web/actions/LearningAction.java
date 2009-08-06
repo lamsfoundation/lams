@@ -47,7 +47,6 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.wookie.dto.WidgetData;
 import org.lamsfoundation.lams.tool.wookie.dto.WookieDTO;
 import org.lamsfoundation.lams.tool.wookie.dto.WookieUserDTO;
 import org.lamsfoundation.lams.tool.wookie.model.Wookie;
@@ -66,8 +65,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * @author
@@ -207,8 +204,6 @@ public class LearningAction extends LamsDispatchAction {
 	    throw new WookieException(e);
 	}
     }
-
-    
 
     private WookieUser getCurrentUser(Long toolSessionId) {
 	UserDTO user = getUser();

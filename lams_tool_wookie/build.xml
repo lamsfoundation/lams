@@ -191,6 +191,7 @@ Ant build file.
 				<include name="pages/**" />
 				<include name="template/**" />
 				<include name="wookie_client/**" />
+				<include name="css/**" />
 				<!-- used by tiles -->
 			</fileset>
 		</war>
