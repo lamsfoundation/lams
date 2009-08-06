@@ -33,84 +33,147 @@ import org.lamsfoundation.lams.tool.wookie.model.WookieSession;
 import org.lamsfoundation.lams.tool.wookie.model.WookieUser;
 
 public class WookieSessionDTO implements Comparable<Object> {
+
+    Long sessionID;
+
+    String sessionName;
+
+    Set<WookieUserDTO> userDTOs = new TreeSet<WookieUserDTO>();
+
+    int numberOfLearners;
+
+    int numberOfFinishedLearners;;
+
+    // Wookie properties
+    String sessionUserWidgetUrl;
+    String widgetSharedDataKey;
+    Integer widgetHeight;
+    Integer widgetWidth;
+    Boolean widgetMaximise;
+    String widgetIdentifier;
+
+    public WookieSessionDTO(WookieSession session) {
+	this.sessionID = session.getSessionId();
+	this.sessionName = session.getSessionName();
+
+	numberOfFinishedLearners = 0;
+	for (Iterator<WookieUser> iterator = session.getWookieUsers().iterator(); iterator.hasNext();) {
+	    WookieUser user = (WookieUser) iterator.next();
+	    WookieUserDTO userDTO = new WookieUserDTO(user);
+	    if (userDTO.getEntryUID() != null) {
+		numberOfFinishedLearners++;
+	    }
+	    userDTOs.add(userDTO);
+	}
+
+	numberOfLearners = userDTOs.size();
 	
-	Long sessionID;
+	// Set the wookie properties
+	this.widgetHeight = session.getWidgetHeight();
+	this.widgetIdentifier = session.getWidgetIdentifier();
+	this.widgetMaximise = session.getWidgetMaximise();
+	this.widgetSharedDataKey = session.getWidgetSharedDataKey();
+	this.widgetWidth = session.getWidgetWidth();
+    }
 
-	String sessionName;
-	
-	Set<WookieUserDTO> userDTOs = new TreeSet<WookieUserDTO>();
-	
-	int numberOfLearners;
-	
-	int numberOfFinishedLearners;;
-	
-	public WookieSessionDTO(WookieSession session) {
-		this.sessionID = session.getSessionId();
-		this.sessionName = session.getSessionName();
-		
-		numberOfFinishedLearners = 0;
-		for (Iterator<WookieUser> iterator = session.getWookieUsers().iterator(); iterator.hasNext();) {
-			WookieUser user = (WookieUser) iterator.next();
-			WookieUserDTO userDTO = new WookieUserDTO(user);
-			if (userDTO.getEntryUID() != null) {
-				numberOfFinishedLearners++;
-			}
-			userDTOs.add(userDTO);
-		}
-		
-		numberOfLearners = userDTOs.size();
-		
-	}
-	
-	public WookieSessionDTO() {}
-	
-	public Long getSessionID() {
-		return sessionID;
-	}
+    public WookieSessionDTO() {
+    }
 
-	public void setSessionID(Long sessionID) {
-		this.sessionID = sessionID;
-	}
+    public Long getSessionID() {
+	return sessionID;
+    }
 
-	public String getSessionName() {
-		return sessionName;
-	}
+    public void setSessionID(Long sessionID) {
+	this.sessionID = sessionID;
+    }
 
-	public void setSessionName(String sessionName) {
-		this.sessionName = sessionName;
-	}
+    public String getSessionName() {
+	return sessionName;
+    }
 
-	public int compareTo(Object o) {
-		int returnValue;
-		WookieSessionDTO toSession = (WookieSessionDTO)o;
-		returnValue = this.sessionName.compareTo(toSession.sessionName);
-		if (returnValue == 0) {
-			returnValue = this.sessionID.compareTo(toSession.sessionID);			
-		}
-		return returnValue;		
-	}
+    public void setSessionName(String sessionName) {
+	this.sessionName = sessionName;
+    }
 
-	public Set<WookieUserDTO> getUserDTOs() {
-		return userDTOs;
+    public int compareTo(Object o) {
+	int returnValue;
+	WookieSessionDTO toSession = (WookieSessionDTO) o;
+	returnValue = this.sessionName.compareTo(toSession.sessionName);
+	if (returnValue == 0) {
+	    returnValue = this.sessionID.compareTo(toSession.sessionID);
 	}
+	return returnValue;
+    }
 
-	public void setUserDTOs(Set<WookieUserDTO> wookieUsers) {
-		this.userDTOs = wookieUsers;
-	}
+    public Set<WookieUserDTO> getUserDTOs() {
+	return userDTOs;
+    }
 
-	public int getNumberOfLearners() {
-		return numberOfLearners;
-	}
+    public void setUserDTOs(Set<WookieUserDTO> wookieUsers) {
+	this.userDTOs = wookieUsers;
+    }
 
-	public void setNumberOfLearners(int numberOfLearners) {
-		this.numberOfLearners = numberOfLearners;
-	}
+    public int getNumberOfLearners() {
+	return numberOfLearners;
+    }
 
-	public int getNumberOfFinishedLearners() {
-		return numberOfFinishedLearners;
-	}
+    public void setNumberOfLearners(int numberOfLearners) {
+	this.numberOfLearners = numberOfLearners;
+    }
 
-	public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
-		this.numberOfFinishedLearners = numberOfFinishedLearners;
-	}
+    public int getNumberOfFinishedLearners() {
+	return numberOfFinishedLearners;
+    }
+
+    public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
+	this.numberOfFinishedLearners = numberOfFinishedLearners;
+    }
+
+    public String getWidgetSharedDataKey() {
+        return widgetSharedDataKey;
+    }
+
+    public void setWidgetSharedDataKey(String widgetSharedDataKey) {
+        this.widgetSharedDataKey = widgetSharedDataKey;
+    }
+
+    public Integer getWidgetHeight() {
+        return widgetHeight;
+    }
+
+    public void setWidgetHeight(Integer widgetHeight) {
+        this.widgetHeight = widgetHeight;
+    }
+
+    public Integer getWidgetWidth() {
+        return widgetWidth;
+    }
+
+    public void setWidgetWidth(Integer widgetWidth) {
+        this.widgetWidth = widgetWidth;
+    }
+
+    public Boolean getWidgetMaximise() {
+        return widgetMaximise;
+    }
+
+    public void setWidgetMaximise(Boolean widgetMaximise) {
+        this.widgetMaximise = widgetMaximise;
+    }
+
+    public String getWidgetIdentifier() {
+        return widgetIdentifier;
+    }
+
+    public void setWidgetIdentifier(String widgetIdentifier) {
+        this.widgetIdentifier = widgetIdentifier;
+    }
+
+    public String getSessionUserWidgetUrl() {
+        return sessionUserWidgetUrl;
+    }
+
+    public void setSessionUserWidgetUrl(String sessionUserWidgetUrl) {
+        this.sessionUserWidgetUrl = sessionUserWidgetUrl;
+    }
 }

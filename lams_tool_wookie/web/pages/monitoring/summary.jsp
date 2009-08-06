@@ -78,10 +78,12 @@
 	<html:hidden property="toolContentID" value="${toolContentID}"/>
 	
 	<c:forEach var="session" items="${dto.sessionDTOs}">
-	
-		<h2>
+		
+		<c:if test="${multipleSessionFlag}">
+		<h1>
 			${session.sessionName}
-		</h2>
+		</h1>
+		</c:if>
 	
 		<table cellpadding="0">
 			<tr>
@@ -93,17 +95,58 @@
 				</td>
 			</tr>
 		</table>
-	
-		<table cellpadding="0" class="alternative-color">
-			<tr>
-				<th><fmt:message key="monitoring.th.learner" /></th>
-				<c:if test="${wookieDTO.reflectOnActivity}">
-					<th><fmt:message key="monitoring.th.reflection" /></th>
-				</c:if>
+		<table width="100%">
+			<tr align="center">
+				<td>
+					<iframe
+							id="widgetIframe"
+							src="${session.sessionUserWidgetUrl}" 
+							name="widgetIframe"
+							style="width:${session.widgetWidth}px;height:${session.widgetHeight}px;border:0px;" 
+							frameborder="no"
+							scrolling="no"
+							>
+					</iframe>
+				</td>
 			</tr>
-			
-			
 		</table>
+
+		<c:if test="${wookieDTO.reflectOnActivity}">
+			<br />
+			
+			<h3> <fmt:message key="monitoring.reflections" /></h3>
+			
+			<table cellpadding="0" class="alternative-color">
+				<tr>
+					<th><fmt:message key="monitoring.th.learner" /></th>
+					
+					<th><fmt:message key="monitoring.th.reflection" /></th>
+					
+				</tr>
+				
+				<c:forEach var="user" items="${session.userDTOs}">
+					<tr>
+						<td>
+							${user.firstName} ${user.lastName}
+						</td>
+						
+							<td >
+								<c:choose>
+									<c:when test="${user.finishedReflection}">
+										${user.notebookEntry}
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="label.notAvailable" />
+									</c:otherwise>
+								</c:choose>
+							</td>
+					</tr>
+				</c:forEach>
+			</table>
+		</c:if>
+		
+		<br /> 
+		<br />
 	
 	</c:forEach>
 

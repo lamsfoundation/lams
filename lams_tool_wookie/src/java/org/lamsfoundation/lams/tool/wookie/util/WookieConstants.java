@@ -58,11 +58,6 @@ public interface WookieConstants {
 
     static final String FILTER_REPLACE_TEXT = "***";
     
-    public static final String LAMS_WWW_PIXLR_FOLDER_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/www/images/wookie/";
-    public static final String LAMS_PIXLR_BASE_DIR = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + FileUtil.LAMS_WWW_DIR
-	+ File.separator + "images" + File.separator + "wookie";
-    
-    
     public static final int WIDGETS_PER_PAGE = 8;
     
     public static final String RELATIVE_URL_WIDGET_LIST = "/advertise"; 

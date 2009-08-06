@@ -40,9 +40,12 @@ import org.lamsfoundation.lams.tool.wookie.model.WookieUser;
 import org.lamsfoundation.lams.tool.wookie.service.IWookieService;
 import org.lamsfoundation.lams.tool.wookie.service.WookieServiceProxy;
 import org.lamsfoundation.lams.tool.wookie.util.WookieConstants;
-import org.lamsfoundation.lams.tool.wookie.web.forms.MonitoringForm;
+import org.lamsfoundation.lams.tool.wookie.util.WookieException;
+import org.lamsfoundation.lams.tool.wookie.util.WookieUtil;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -80,6 +83,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	
 	for (WookieSessionDTO sessionDTO : wookieDT0.getSessionDTOs()) {
 	    Long toolSessionID = sessionDTO.getSessionID();
+	    
+	    // Initiate the wookie widget for the monitor
+	    String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(), sessionDTO.getWidgetSharedDataKey());
+	    sessionDTO.setSessionUserWidgetUrl(sessionUserWidgetUrl);
 	   
 	    for (WookieUserDTO userDTO : sessionDTO.getUserDTOs()) {
 		// get the notebook entry.
@@ -92,6 +99,13 @@ public class MonitoringAction extends LamsDispatchAction {
 		
 	    }
 	}
+	
+	// Set a flag if there is only one session 
+	boolean multipleSessionFlag = false;
+	if (wookieDT0.getSessionDTOs() != null && wookieDT0.getSessionDTOs().size() > 1) {
+	    multipleSessionFlag = true;
+	}
+	request.setAttribute("multipleSessionFlag", multipleSessionFlag);
 
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	wookieDT0.setCurrentTab(currentTab);
@@ -99,8 +113,28 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("wookieDTO", wookieDT0);
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("toolContentID", toolContentID);
-	request.setAttribute("wookieImageFolderURL", WookieConstants.LAMS_WWW_PIXLR_FOLDER_URL);
 	return mapping.findForward("success");
+    }
+    
+    private String initiateWidget(String wookieIdentifier, String sharedDataKey) throws WookieException {
+	try {
+
+	    String wookieUrl = wookieService.getWookieURL();
+	    String wookieKey = wookieService.getWookieAPIKey();
+
+	    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), sharedDataKey, true);
+	    return  WookieUtil.getWidgetUrlFromXML(returnXML);
+
+	} catch (Exception e) {
+	    log.error("Problem intitating widget for learner" + e);
+	    throw new WookieException(e);
+	}
+    }
+    
+    private UserDTO getUser() {
+	return (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
     }
 
     public ActionForward showWookie(ActionMapping mapping, ActionForm form, HttpServletRequest request,
