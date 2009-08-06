@@ -806,25 +806,32 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	Set<ImageGalleryItem> images = toolContentObj.getImageGalleryItems();
 	for (ImageGalleryItem image : images) {
 	    image.setComments(null);
+	    
+	    //convert file extension to lower case
+	    String fileName = image.getFileName();
+	    String[] fileNameParts = fileName.split("\\.");
+	    String fileExtension = fileNameParts[fileNameParts.length - 1];
+	    fileName = fileName.replaceAll(fileExtension + "$", fileExtension.toLowerCase());
+	    image.setFileName(fileName);
 
 	    ImageGalleryAttachment originalFile = new ImageGalleryAttachment();
 	    originalFile.setFileUuid(image.getOriginalFileUuid());
 	    originalFile.setFileVersionId(image.getFileVersionId());
-	    originalFile.setFileName(image.getFileName());
+	    originalFile.setFileName(fileName);
 	    originalFile.setFileType(IToolContentHandler.TYPE_ONLINE);
 	    image.setOriginalFile(originalFile);
 
 	    ImageGalleryAttachment mediumFile = new ImageGalleryAttachment();
 	    mediumFile.setFileUuid(image.getMediumFileUuid());
 	    mediumFile.setFileVersionId(image.getFileVersionId());
-	    mediumFile.setFileName(ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX + image.getFileName());
+	    mediumFile.setFileName(ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX + fileName);
 	    mediumFile.setFileType(IToolContentHandler.TYPE_ONLINE);
 	    image.setMediumFile(mediumFile);
 
 	    ImageGalleryAttachment thumbnailFile = new ImageGalleryAttachment();
 	    thumbnailFile.setFileUuid(image.getThumbnailFileUuid());
 	    thumbnailFile.setFileVersionId(image.getFileVersionId());
-	    thumbnailFile.setFileName(ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX + image.getFileName());
+	    thumbnailFile.setFileName(ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX + fileName);
 	    thumbnailFile.setFileType(IToolContentHandler.TYPE_ONLINE);
 	    image.setThumbnailFile(thumbnailFile);
 	}
