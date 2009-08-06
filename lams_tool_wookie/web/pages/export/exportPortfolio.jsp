@@ -43,37 +43,127 @@
 <c:choose>
 	<c:when test='${mode == "teacher"}'>
 
-		<h2><fmt:message key="title.sessions" /></h2>
+		
+		<c:if test="${multipleSessionFlag}">
+			<h2><fmt:message key="title.sessions" /></h2>
 
-		<!-- Set up the anchor links -->
-		<div id="sessionContents">
-		<ul>
-			<c:forEach var="session" items="${wookieDTO.sessionDTOs}">
-				<li><a href="#sid-${session.sessionID}">${session.sessionName}</a>
-				</li>
-			</c:forEach>
-		</ul>
-		</div>
-
-		<hr>
+			<!-- Set up the anchor links -->
+			<div id="sessionContents">
+			<ul>
+				<c:forEach var="session" items="${wookieDTO.sessionDTOs}">
+					<li><a href="#sid-${session.sessionID}">${session.sessionName}</a>
+					</li>
+				</c:forEach>
+			</ul>
+			</div>
+			<br />
+			<hr>
+			<br />
+		</c:if>
 
 		<c:forEach var="session" items="${wookieDTO.sessionDTOs}">
 			<div id="sid-${session.sessionID}">
-			<h3>${session.sessionName}</h3>
+				<c:if test="${multipleSessionFlag}">
+				<h3>
+					${session.sessionName}
+				</h3>
+				</c:if>
 
-
-				<c:forEach var="user" items="${session.userDTOs}">
+				<table cellpadding="0">
+					<tr>
+						<td class="field-name" width="30%">
+							<fmt:message key="heading.totalLearners" />
+						</td>
+						<td width="70%">
+							${session.numberOfLearners}
+						</td>
+					</tr>
+				</table>
+				<table width="100%">
+					<tr align="center">
+						<td>
+							<iframe
+									id="widgetIframe"
+									src="${session.sessionUserWidgetUrl}" 
+									name="widgetIframe"
+									style="width:${session.widgetWidth}px;height:${session.widgetHeight}px;border:0px;" 
+									frameborder="no"
+									scrolling="no"
+									>
+							</iframe>
+						</td>
+					</tr>
+				</table>
+		
+				<c:if test="${wookieDTO.reflectOnActivity}">
+					<br />
 					
-				</c:forEach>
+					<h3> <fmt:message key="monitoring.reflections" /></h3>
+					
+					<table cellpadding="0" class="alternative-color">
+						<tr>
+							<th><fmt:message key="monitoring.th.learner" /></th>
+							
+							<th><fmt:message key="monitoring.th.reflection" /></th>
+							
+						</tr>
+						
+						<c:forEach var="user" items="${session.userDTOs}">
+							<tr>
+								<td>
+									${user.firstName} ${user.lastName}
+								</td>
+								
+									<td >
+										<c:choose>
+											<c:when test="${user.finishedReflection}">
+												${user.notebookEntry}
+											</c:when>
+											<c:otherwise>
+												<fmt:message key="label.notAvailable" />
+											</c:otherwise>
+										</c:choose>
+									</td>
+							</tr>
+						</c:forEach>
+					</table>
+				</c:if>
+				
+				<br /> 
+				<br />
 			</div>
 		</c:forEach>
-
 	</c:when>
 	<c:otherwise>
 		<br />
 		<h2>
 			${userDTO.firstName} ${userDTO.lastName}
 		</h2>
+		
+		<c:choose>
+			<c:when test="${wookieDTO.lockOnFinish}">
+				<div class="info">
+					<fmt:message key="export.portfolio.contentlocked" />
+				</div>
+			</c:when>
+			<c:otherwise>
+				<table width="100%" height>
+					<tr align="center">
+						<td>
+							<iframe
+									id="widgetIframe"
+									src="${userWidgetURL}" 
+									name="widgetIframe"
+									style="width:${widgetWidth}px;height:${widgetHeight}px;border:0px;" 
+									frameborder="no"
+									scrolling="no"
+									>
+							</iframe>
+						</td>
+					</tr>
+				</table>
+			</c:otherwise>
+		</c:choose>
 		
 		
 		<c:if test="${wookieDTO.reflectOnActivity}">

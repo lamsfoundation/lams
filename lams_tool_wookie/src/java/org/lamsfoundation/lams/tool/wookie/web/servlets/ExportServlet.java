@@ -25,15 +25,12 @@
 
 package org.lamsfoundation.lams.tool.wookie.web.servlets;
 
-import java.util.ArrayList;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.export.web.action.CustomToolImageBundler;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -47,6 +44,7 @@ import org.lamsfoundation.lams.tool.wookie.service.IWookieService;
 import org.lamsfoundation.lams.tool.wookie.service.WookieServiceProxy;
 import org.lamsfoundation.lams.tool.wookie.util.WookieConstants;
 import org.lamsfoundation.lams.tool.wookie.util.WookieException;
+import org.lamsfoundation.lams.tool.wookie.util.WookieUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -165,15 +163,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    imageFileArray[1] = userDTO.getImageFileName();
 	}
 	
-	// bundling the images in export
-	try {
-	    CustomToolImageBundler imageBundler = new CustomToolImageBundler();
-	    imageBundler.bundle(request, cookies, directoryName, WookieConstants.LAMS_WWW_PIXLR_FOLDER_URL, imageFileArray);
-	} catch (Exception e) {
-	    logger.error("Could not export gmap images, some images may be missing in export portfolio", e);
-	}
-	
-	request.getSession().setAttribute("userDTO", userDTO);
+	request.getSession().setAttribute("userWidgetURL", wookieUser.getUserWidgetURL());
+	request.getSession().setAttribute("widgetHeight", wookieSession.getWidgetHeight());
+	request.getSession().setAttribute("widgetWidth", wookieSession.getWidgetWidth());
+	request.getSession().setAttribute("widgetMaximise", wookieSession.getWidgetMaximise());
 	request.getSession().setAttribute("wookieDTO", wookieDTO);
     }
 
@@ -193,11 +186,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	WookieDTO wookieDTO = new WookieDTO(wookie);
 	
-
 	
 	for (WookieSessionDTO sessionDTO : wookieDTO.getSessionDTOs()) {
 	    Long toolSessionID = sessionDTO.getSessionID();
 	   
+	    // Initiate the wookie widget for the monitor
+	    String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(), sessionDTO.getWidgetSharedDataKey());
+	    sessionDTO.setSessionUserWidgetUrl(sessionUserWidgetUrl);
+	    
 	    for (WookieUserDTO userDTO : sessionDTO.getUserDTOs()) {
 		// get the notebook entry.
 		NotebookEntry notebookEntry = wookieService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -209,7 +205,36 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		
 	    }
 	}
+	
+	// Set a flag if there is only one session 
+	boolean multipleSessionFlag = false;
+	if (wookieDTO.getSessionDTOs() != null && wookieDTO.getSessionDTOs().size() > 1) {
+	    multipleSessionFlag = true;
+	}
+	request.setAttribute("multipleSessionFlag", multipleSessionFlag);
+	
 	request.getSession().setAttribute("wookieDTO", wookieDTO);
+    }
+    
+    private String initiateWidget(String wookieIdentifier, String sharedDataKey) throws WookieException {
+	try {
+
+	    String wookieUrl = wookieService.getWookieURL();
+	    String wookieKey = wookieService.getWookieAPIKey();
+
+	    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), sharedDataKey, true);
+	    return  WookieUtil.getWidgetUrlFromXML(returnXML);
+
+	} catch (Exception e) {
+	    logger.error("Problem intitating widget for learner" + e);
+	    throw new WookieException(e);
+	}
+    }
+    
+    private UserDTO getUser() {
+	return (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
     }
 
 }
