@@ -28,11 +28,11 @@ public class WidgetData {
     private String url;
     private String identifier;
     private String title;
-    private String height;
-    private String width;
+    private int height;
+    private int width;
     private Boolean maximize;
     
-    private WidgetData() {}
+    public WidgetData() {}
 
     public String getUrl() {
         return url;
@@ -58,19 +58,19 @@ public class WidgetData {
         this.title = title;
     }
 
-    public String getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public void setHeight(String height) {
+    public void setHeight(int height) {
         this.height = height;
     }
 
-    public String getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public void setWidth(String width) {
+    public void setWidth(int width) {
         this.width = width;
     }
 

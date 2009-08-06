@@ -91,6 +91,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -406,6 +407,25 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	    // reset it to new toolContentId
 	    wookie.setToolContentId(toolContentId);
 	    wookie.setCreateBy(newUserUid);
+	    
+	    User user = (User)userManagementService.findById(User.class, newUserUid);
+
+	    // If the wookie has an identifier, it has been initiated. Make an new instance using the identifier
+	    if (!StringUtils.isEmpty(wookie.getWidgetIdentifier()) && user != null) {
+		String wookieUrl = getWookieURL();
+		String wookieKey = getWookieAPIKey();
+		wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+
+		String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookie.getWidgetIdentifier(), user.getUserDTO(),
+			toolContentId.toString(), true);
+		
+		WidgetData widgetData = WookieUtil.getWidgetDataFromXML(returnXML);
+		wookie.setWidgetAuthorUrl(widgetData.getUrl());
+		wookie.setWidgetIdentifier(widgetData.getIdentifier());
+		wookie.setWidgetHeight(widgetData.getHeight());
+		wookie.setWidgetMaximise(widgetData.getMaximize());
+		wookie.setWidgetWidth(widgetData.getWidth());
+	    }
 
 	    wookieDAO.saveOrUpdate(wookie);
 	} catch (ImportToolContentException e) {

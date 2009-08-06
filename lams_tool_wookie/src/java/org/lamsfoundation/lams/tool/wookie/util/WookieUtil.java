@@ -44,6 +44,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.wookie.dto.WidgetData;
 import org.lamsfoundation.lams.tool.wookie.dto.WidgetDefinition;
 import org.lamsfoundation.lams.tool.wookie.web.actions.AuthoringAction;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -304,7 +305,8 @@ public class WookieUtil {
 	params.put(WookieConstants.PARAM_KEY_WIDGET_ID, URLEncoder.encode(widgetIdentifier, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_PROPERTY_VALUE_CLONE, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(
+		WookieConstants.PARAM_VALUE_PROPERTY_VALUE_CLONE, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_PROPERTY_CLONED_SHARED_KEY, URLEncoder.encode(newSharedDataKey, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_USER_ID, URLEncoder.encode(userID, "UTF8"));
@@ -409,9 +411,10 @@ public class WookieUtil {
 
 	return conn;
     }
-    
+
     /**
      * Gets the url response from the getWidget xml
+     * 
      * @param xml
      * @return
      * @throws ParserConfigurationException
@@ -423,13 +426,65 @@ public class WookieUtil {
 	DocumentBuilder db = dbf.newDocumentBuilder();
 	Document document = db.parse(new InputSource(new StringReader(xml)));
 	NodeList widgetList = document.getElementsByTagName(WookieConstants.XML_URL);
-	
+
 	if (widgetList != null && widgetList.item(0) != null) {
-	    String url = widgetList.item(0).getTextContent(); 
+	    String url = widgetList.item(0).getTextContent();
 	    return url;
 	} else {
 	    return null;
 	}
+    }
+
+    /**
+     * Gets the widget data response from the getWidget xml
+     * 
+     * @param xml
+     * @return
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public static WidgetData getWidgetDataFromXML(String xml) throws ParserConfigurationException, SAXException,
+	    IOException {
+	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	DocumentBuilder db = dbf.newDocumentBuilder();
+	Document document = db.parse(new InputSource(new StringReader(xml)));
+	NodeList widgetList = document.getElementsByTagName(WookieConstants.XML_WIDGET_DATA);
+
+	NodeList widgetPropertyList = (widgetList.item(0)).getChildNodes();
+	WidgetData widgetData = new WidgetData();
+	
+	for (int i = 0; i < widgetPropertyList.getLength(); i++) {
+	    Node widgetProperty = widgetPropertyList.item(i);
+	    
+	    String propertyTitle = widgetProperty.getNodeName();
+
+	    // Add the properties
+	    if (propertyTitle.equals(WookieConstants.XML_URL)) {
+		widgetData.setUrl(widgetProperty.getTextContent());
+	    } else if (propertyTitle.equals(WookieConstants.XML_IDENTIFIER)) {
+		widgetData.setIdentifier(widgetProperty.getTextContent());
+	    } else if (propertyTitle.equals(WookieConstants.XML_TITLE)) {
+		widgetData.setTitle(widgetProperty.getTextContent());
+	    } else if (propertyTitle.equals(WookieConstants.XML_HEIGHT)) {
+		String heightStr = widgetProperty.getTextContent();		
+		if (heightStr != null) {
+		    widgetData.setHeight(Integer.parseInt(heightStr));
+		}		
+	    } else if (propertyTitle.equals(WookieConstants.XML_WIDTH)) {
+		String widthStr = widgetProperty.getTextContent();		
+		if (widthStr != null) {
+		    widgetData.setWidth(Integer.parseInt(widthStr));
+		}
+	    } else if (propertyTitle.equals(WookieConstants.XML_MAXIMISE)) {
+		String maximiseStr = widgetProperty.getTextContent();		
+		if (maximiseStr != null) {
+		    widgetData.setMaximize(Boolean.parseBoolean(maximiseStr));
+		}
+	    }
+	}
+
+	return widgetData;
     }
 
 }

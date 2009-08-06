@@ -93,8 +93,14 @@ public interface WookieConstants {
     public static final String XML_IDENTIFIER = "identifier";
     public static final String XML_TITLE = "title";
     public static final String XML_DESCRIPTION = "description";
+    public static final String XML_HEIGHT = "height";
+    public static final String XML_WIDTH = "width";
+    public static final String XML_MAXIMISE = "maximize";
     public static final String XML_ICON = "icon";
     public static final String XML_PARAMETER = "parameter";
     public static final String XML_URL = "url";
+    public static final String XML_WIDGET_DATA = "widgetdata";
+
+    
     
 }
