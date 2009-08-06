@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.wookie.web.actions;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.axis.utils.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -80,26 +81,29 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	WookieDTO wookieDT0 = new WookieDTO(wookie);
-	
+
 	for (WookieSessionDTO sessionDTO : wookieDT0.getSessionDTOs()) {
 	    Long toolSessionID = sessionDTO.getSessionID();
-	    
+
 	    // Initiate the wookie widget for the monitor
-	    String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(), sessionDTO.getWidgetSharedDataKey());
-	    sessionDTO.setSessionUserWidgetUrl(sessionUserWidgetUrl);
-	   
+	    if (!StringUtils.isEmpty(sessionDTO.getWidgetSharedDataKey())) {
+		String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(), sessionDTO
+			.getWidgetSharedDataKey());
+		sessionDTO.setSessionUserWidgetUrl(sessionUserWidgetUrl);
+	    }
 	    for (WookieUserDTO userDTO : sessionDTO.getUserDTOs()) {
 		// get the notebook entry.
-		NotebookEntry notebookEntry = wookieService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-			WookieConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
+		NotebookEntry notebookEntry = wookieService.getEntry(toolSessionID,
+			CoreNotebookConstants.NOTEBOOK_TOOL, WookieConstants.TOOL_SIGNATURE, userDTO.getUserId()
+				.intValue());
 		if (notebookEntry != null) {
 		    userDTO.notebookEntry = notebookEntry.getEntry();
 		    userDTO.setFinishedReflection(true);
 		}
-		
+
 	    }
 	}
-	
+
 	// Set a flag if there is only one session 
 	boolean multipleSessionFlag = false;
 	if (wookieDT0.getSessionDTOs() != null && wookieDT0.getSessionDTOs().size() > 1) {
@@ -115,7 +119,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("toolContentID", toolContentID);
 	return mapping.findForward("success");
     }
-    
+
     private String initiateWidget(String wookieIdentifier, String sharedDataKey) throws WookieException {
 	try {
 
@@ -124,15 +128,16 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
 
-	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), sharedDataKey, true);
-	    return  WookieUtil.getWidgetUrlFromXML(returnXML);
+	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), sharedDataKey,
+		    true);
+	    return WookieUtil.getWidgetUrlFromXML(returnXML);
 
 	} catch (Exception e) {
 	    log.error("Problem intitating widget for learner" + e);
 	    throw new WookieException(e);
 	}
     }
-    
+
     private UserDTO getUser() {
 	return (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
     }
@@ -161,7 +166,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    wookieService = WookieServiceProxy.getWookieService(this.getServlet().getServletContext());
 	}
     }
-    
+
     /**
      * Opens a user's reflection
      * 

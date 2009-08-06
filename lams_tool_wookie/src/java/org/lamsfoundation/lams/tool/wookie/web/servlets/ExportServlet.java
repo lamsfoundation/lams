@@ -191,8 +191,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    Long toolSessionID = sessionDTO.getSessionID();
 	   
 	    // Initiate the wookie widget for the monitor
-	    String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(), sessionDTO.getWidgetSharedDataKey());
-	    sessionDTO.setSessionUserWidgetUrl(sessionUserWidgetUrl);
+	    if (!StringUtils.isEmpty(sessionDTO.getWidgetSharedDataKey())) {
+    	    	String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(), sessionDTO.getWidgetSharedDataKey());
+    	    	sessionDTO.setSessionUserWidgetUrl(sessionUserWidgetUrl);
+	    }
 	    
 	    for (WookieUserDTO userDTO : sessionDTO.getUserDTOs()) {
 		// get the notebook entry.

@@ -37,6 +37,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.axis.utils.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -142,12 +143,15 @@ public class LearningAction extends LamsDispatchAction {
 	} else {
 	    wookieUser = getCurrentUser(toolSessionID);
 	}
-	
+
 	// Create a new widget instance for the user if required.
-	if (wookieUser.getUserWidgetURL() == null || wookieUser.getUserWidgetURL().equals("")) {
-	    String userWidgetURL = initiateWidget(wookieSession.getWidgetIdentifier(), wookieSession.getWidgetSharedDataKey());
-	    wookieUser.setUserWidgetURL(userWidgetURL);
-	    wookieService.saveOrUpdateWookieUser(wookieUser);
+	if (!StringUtils.isEmpty(wookieSession.getWidgetSharedDataKey())) {
+	    if (wookieUser.getUserWidgetURL() == null || wookieUser.getUserWidgetURL().equals("")) {
+		String userWidgetURL = initiateWidget(wookieSession.getWidgetIdentifier(), wookieSession
+			.getWidgetSharedDataKey());
+		wookieUser.setUserWidgetURL(userWidgetURL);
+		wookieService.saveOrUpdateWookieUser(wookieUser);
+	    }
 	}
 
 	// set up the user dto
@@ -187,7 +191,7 @@ public class LearningAction extends LamsDispatchAction {
 	request.setAttribute("finishedActivity", wookieUser.isFinishedActivity());
 	return mapping.findForward("wookie");
     }
-    
+
     private String initiateWidget(String wookieIdentifier, String sharedDataKey) throws WookieException {
 	try {
 
@@ -196,8 +200,9 @@ public class LearningAction extends LamsDispatchAction {
 
 	    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
 
-	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), sharedDataKey, false);
-	    return  WookieUtil.getWidgetUrlFromXML(returnXML);
+	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), sharedDataKey,
+		    false);
+	    return WookieUtil.getWidgetUrlFromXML(returnXML);
 
 	} catch (Exception e) {
 	    log.error("Problem intitating widget for learner" + e);
@@ -219,7 +224,7 @@ public class LearningAction extends LamsDispatchAction {
 
 	return wookieUser;
     }
-    
+
     private UserDTO getUser() {
 	return (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
     }

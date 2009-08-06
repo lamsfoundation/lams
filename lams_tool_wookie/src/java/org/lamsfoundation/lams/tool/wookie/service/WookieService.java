@@ -137,7 +137,7 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     private IWookieConfigItemDAO wookieConfigItemDAO;
 
     private MessageService messageService;
-    
+
     private IUserManagementService userManagementService;
 
     public WookieService() {
@@ -166,22 +166,26 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	try {
 	    String newSharedDataKey = toolSessionId.toString() + "_" + toolContentId.toString();
 
-	    if (wookieUrl != null && wookie.getWidgetIdentifier() != null && wookie.getWidgetIdentifier() != "") {
+	    if (wookieUrl != null) {
 
-		wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
+		if (wookie.getWidgetIdentifier() != null && wookie.getWidgetIdentifier() != "") {
 
-		logger.debug("Creating a new clone for session of widget: " + toolContentId.toString());
-		boolean success = WookieUtil.cloneWidget(wookieUrl, getWookieAPIKey(), wookie.getWidgetIdentifier(),
-			toolContentId.toString(), newSharedDataKey, wookie.getCreateBy().toString());
+		    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
 
-		if (success) {
-		    session.setWidgetSharedDataKey(newSharedDataKey);
-		    session.setWidgetHeight(wookie.getWidgetHeight());
-		    session.setWidgetWidth(wookie.getWidgetWidth());
-		    session.setWidgetMaximise(wookie.getWidgetMaximise());
-		    session.setWidgetIdentifier(wookie.getWidgetIdentifier());
-		} else {
-		    throw new WookieException("Failed to copy widget on wookie server, check log for details.");
+		    logger.debug("Creating a new clone for session of widget: " + toolContentId.toString());
+		    boolean success = WookieUtil.cloneWidget(wookieUrl, getWookieAPIKey(),
+			    wookie.getWidgetIdentifier(), toolContentId.toString(), newSharedDataKey, wookie
+				    .getCreateBy().toString());
+
+		    if (success) {
+			session.setWidgetSharedDataKey(newSharedDataKey);
+			session.setWidgetHeight(wookie.getWidgetHeight());
+			session.setWidgetWidth(wookie.getWidgetWidth());
+			session.setWidgetMaximise(wookie.getWidgetMaximise());
+			session.setWidgetIdentifier(wookie.getWidgetIdentifier());
+		    } else {
+			throw new WookieException("Failed to copy widget on wookie server, check log for details.");
+		    }
 		}
 
 	    } else {
@@ -282,11 +286,12 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 			toContent.setCreateBy(fromContent.getCreateBy());
 
 			// Need to add the author to the widget so authoring widget url is different in the copy
-			User user = (User)userManagementService.findById(User.class, fromContent.getCreateBy());
-			String returnXML = WookieUtil.getWidget(wookieUrl, getWookieAPIKey(), fromContent.getWidgetIdentifier(), user.getUserDTO(), toContentId.toString(), true);
-			
+			User user = (User) userManagementService.findById(User.class, fromContent.getCreateBy());
+			String returnXML = WookieUtil.getWidget(wookieUrl, getWookieAPIKey(), fromContent
+				.getWidgetIdentifier(), user.getUserDTO(), toContentId.toString(), true);
+
 			toContent.setWidgetAuthorUrl(WookieUtil.getWidgetUrlFromXML(returnXML));
-			
+
 		    } else {
 			throw new WookieException("Failed to copy widget on wookie server, check log for details.");
 		    }
@@ -301,7 +306,6 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 
 	wookieDAO.saveOrUpdate(toContent);
     }
-    
 
     public void copyFile(File srcFile, String destPath) throws Exception {
 	if (srcFile.exists() && srcFile.canRead()) {
@@ -677,7 +681,8 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
 	wookie.setCreateBy(user.getUserID());
 	wookie.setCreateDate(now);
 	wookie.setDefineLater(Boolean.FALSE);
-	wookie.setInstructions(WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY)));
+	wookie.setInstructions(WebUtil.convertNewlines((String) importValues
+		.get(ToolContentImport102Manager.CONTENT_BODY)));
 	wookie.setLockOnFinished(Boolean.TRUE);
 	wookie.setOfflineInstructions(null);
 	wookie.setOnlineInstructions(null);
@@ -815,11 +820,11 @@ public class WookieService implements ToolSessionManager, ToolContentManager, IW
     }
 
     public IUserManagementService getUserManagementService() {
-        return userManagementService;
+	return userManagementService;
     }
 
     public void setUserManagementService(IUserManagementService userManagementService) {
-        this.userManagementService = userManagementService;
+	this.userManagementService = userManagementService;
     }
 
 }
