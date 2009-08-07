@@ -76,9 +76,9 @@ create table tl_lawook10_configuration (
 	config_value text, primary key (uid)
 )TYPE=InnoDB;
 
-alter table tl_lawook10_attachment add index FK951F889ACB8ADA74 (wookie_uid), add constraint FK951F889ACB8ADA74 foreign key (wookie_uid) references tl_lawook10_wookie (uid);
-alter table tl_lawook10_session add index FKE5C05E7FCB8ADA74 (wookie_uid), add constraint FKE5C05E7FCB8ADA74 foreign key (wookie_uid) references tl_lawook10_wookie (uid);
-alter table tl_lawook10_user add index FK9A39C08236E23005 (wookie_session_uid), add constraint FK9A39C08236E23005 foreign key (wookie_session_uid) references tl_lawook10_session (uid);
+alter table tl_lawook10_attachment add index IN_WOOKIE_ATTACH (wookie_uid), add constraint FK_WOOKIE_ATTACH foreign key (wookie_uid) references tl_lawook10_wookie (uid);
+alter table tl_lawook10_session add index IN_WOOKIE_SESSION (wookie_uid), add constraint FK_WOOKIE_SESSION foreign key (wookie_uid) references tl_lawook10_wookie (uid);
+alter table tl_lawook10_user add index IN_WOOKIE_USER (wookie_session_uid), add constraint FK_WOOKIE_USER foreign key (wookie_session_uid) references tl_lawook10_session (uid);
 
 -- Inserting the required config item into the config table
 -- Currently supported languages for wookie
