@@ -20,6 +20,13 @@
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
 	<c:set var="thumbnailImageDimensions" value="${sessionMap.thumbnailImageDimensions}" />
+	<c:set var="windowMinimumWidth" value="${thumbnailImageDimensions*5 + 160}" />
+	<c:if test="${imageGallery.allowShareImages && (mode != 'teacher')}">
+		<c:set var="windowMinimumWidth" value="${windowMinimumWidth + 120}" />
+	</c:if>
+	<c:if test="${(mediumImageDimensions + 200) > windowMinimumWidth}">
+		<c:set var="windowMinimumWidth" value="${mediumImageDimensions + 200}" />
+	</c:if>
 
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.css'/>" />
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.jcarousel.skin.css' />" />
@@ -280,7 +287,7 @@
    
 </lams:head>
 <body class="stripes">
-	<div id="content">
+	<div id="content" style="min-width: ${windowMinimumWidth}px;">
 
 		<%--ImageGallery information-----------------------------------%>
 
