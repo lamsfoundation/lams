@@ -244,6 +244,23 @@
       />
     </action>
     <action
+      path="/statistics"
+      type="org.lamsfoundation.lams.admin.web.action.StatisticsAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path=".statistics"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/serverlist"
       type="org.lamsfoundation.lams.admin.web.ServerListAction"
       unknown="false"

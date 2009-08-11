@@ -71,6 +71,7 @@ public class SysAdminStartAction extends Action {
 			links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
 			links.add(new LinkBean("register.do", "sysadmin.register.server"));
 			links.add(new LinkBean("libraryManage.do", "sysadmin.library.management"));
+			links.add(new LinkBean("statistics.do", "admin.statistics.title"));
 		} else if (request.isUserInRole(Role.AUTHOR_ADMIN)) {
 			LinkBean linkBean = new LinkBean("toolcontentlist.do", "sysadmin.tool.management");
 			links.add(linkBean);

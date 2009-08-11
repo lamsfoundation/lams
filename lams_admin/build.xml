@@ -213,6 +213,18 @@
 		<copy file="${build.lib}/${product}.war"
 				todir="${jboss.deploy}"/> 
 	</target>
+	
+	<!-- =================================================================== -->
+	<!-- Deploy the jar     -->
+	<!-- =================================================================== -->
+	<target name="deploy-jar" depends="build-jar" description="Deploy the Admin jar file">
+		<delete quiet="true">
+			<fileset dir="${jboss.deploy}/tmp"/>
+			<fileset dir="${jboss.deploy}/work"/>
+		</delete>
+		<copy file="${build.lib}/${product}.jar"
+				todir="${jboss.deploy}"/> 
+	</target>
 
 	<!-- =================================================================== -->
 	<!-- Run JUnit Tests                                                     -->
