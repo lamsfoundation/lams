@@ -47,7 +47,7 @@
         jQuery.ajax({		
 			type: "GET",
 			url: "<lams:WebAppURL/>/authoring.do",
-			data: {dispatch : "getWidgets", pageNumber : 1},
+			data: {dispatch : "getWidgets", pageNumber : pageNumber},
 			cache: false,
 			error: function (XMLHttpRequest, textStatus, errorThrown) {
 				alert('<fmt:message key="error.wookie.server" />');
