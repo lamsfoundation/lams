@@ -307,4 +307,18 @@ public interface IBaseDAO {
 	 */
 	public void initialize(Object proxy);
 	
+	/**
+	 * Count all rows in a table for a hibernate-mapped class
+	 * @param clazz
+	 * @return
+	 */
+	public long countAll(Class clazz);
+	
+	/**
+	 * Create a query based on the properties, and count the result
+	 * 
+	 * @param properties  a map of property names and values
+	 * @return a list of objects which have the same property values
+	 */
+	public long countByProperties(Class clazz, Map<String,Object> properties);
 }

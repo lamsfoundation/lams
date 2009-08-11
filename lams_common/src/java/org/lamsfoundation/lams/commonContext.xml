@@ -612,4 +612,13 @@
 		<property name="cacheObjectName"><value>jboss.cache:service=TreeCache</value></property>
 	</bean>
 	
+	<bean id="statisticsService" class="org.lamsfoundation.lams.statistics.service.StatisticsService">
+   		<property name="baseDAO">
+   			<ref bean="baseDAO"/>
+   		</property>	
+   		<property name="userService">
+   			<ref local="userManagementService"/>
+   		</property>
+    </bean>
+	
 </beans>

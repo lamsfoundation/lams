@@ -346,5 +346,36 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	public void initialize(Object proxy) {
 		getHibernateTemplate().initialize(proxy);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.dao.IBaseDAO#countAll(java.lang.Class)
+	 */
+	public long countAll(Class clazz) {
+		String query = "select count(*) from " + clazz.getSimpleName();
+		
+		List list = getHibernateTemplate().find(query);
+		
+		if (list != null && list.size() > 0) {
+			return (Long)list.get(0);
+		} else {
+			return 0;
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.lamsfoundation.lams.dao.IBaseDAO#countByProperties(java.lang.Class, java.util.Map)
+	 */
+	public long countByProperties(Class clazz, Map<String,Object> properties) {
+		Qv qv = buildQueryString(clazz,properties,SELECT,EQUAL_TO_WHAT);
+		String query = "select count(*) " + qv.queryString;
+		
+		List list = getHibernateTemplate().find(query,qv.values);
+		
+		if (list != null && list.size() > 0) {
+			return (Long)list.get(0);
+		} else {
+			return 0;
+		}
+	}
 
 }
