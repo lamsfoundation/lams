@@ -1,5 +1,23 @@
 <%@ include file="/taglibs.jsp"%>
 
+<script src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+<!--
+	function loadGroupStats(orgId) {
+		jQuery.ajax({		
+			type: "GET",
+			url: "<lams:WebAppURL/>/statistics.do",
+			data: {method : "groupStats", orgId : orgId},
+			cache: false,
+			success: function (html) {
+				jQuery("#groupDiv").html(html);
+			}
+		});
+	}
+//-->
+</script>
+
 <h4 class="align-left">
 		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 </h4>
@@ -70,101 +88,13 @@
 <br />
 <h1><fmt:message key="admin.statistics.title.byGroup" /></h1>
 
-<c:forEach var="groupStatisticDTO" items="${statisticsDTO.groupStatistics}">
-	<h3>${groupStatisticDTO.name}</h3>
-	
-	<table class="alternative-color">
-		<tr>
-			<td>
-				<fmt:message key="admin.statistics.totalUsers" />
-			</td>
-			<td>
-				${groupStatisticDTO.totalUsers}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<fmt:message key="admin.statistics.lessons" />
-			</td>
-			<td>
-				${groupStatisticDTO.lessons}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<fmt:message key="admin.statistics.group.monitors" />
-			</td>
-			<td>
-				${groupStatisticDTO.monitors}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<fmt:message key="admin.statistics.group.authors" />
-			</td>
-			<td>
-				${groupStatisticDTO.authors}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<fmt:message key="admin.statistics.group.learners" />
-			</td>
-			<td>
-				${groupStatisticDTO.learners}
-			</td>
-		</tr>
-	</table>
-	
-	<c:if test="${not empty  groupStatisticDTO.subGroups}">
-		<div style="margin-left:50px">
-			<c:forEach var="subGroupStatisticDTO" items="${groupStatisticDTO.subGroups}">
-				
-				<h3>${subGroupStatisticDTO.name}</h3>
-				
-				<table class="alternative-color">
-					<tr>
-						<td>
-							<fmt:message key="admin.statistics.totalUsers" />
-						</td>
-						<td>
-							${subGroupStatisticDTO.totalUsers}
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<fmt:message key="admin.statistics.lessons" />
-						</td>
-						<td>
-							${subGroupStatisticDTO.lessons}
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<fmt:message key="admin.statistics.group.monitors" />
-						</td>
-						<td>
-							${subGroupStatisticDTO.monitors}
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<fmt:message key="admin.statistics.group.authors" />
-						</td>
-						<td>
-							${subGroupStatisticDTO.authors}
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<fmt:message key="admin.statistics.group.learners" />
-						</td>
-						<td>
-							${subGroupStatisticDTO.learners}
-						</td>
-					</tr>
-				</table>
-			</c:forEach>
-		</div>
-	</c:if>
+<select>
+<c:forEach var="groupEntry" items="${groupMap}" >	
+	<option onclick="loadGroupStats('${groupEntry.value}')">${groupEntry.key}</option>
 </c:forEach>
+</select>
+
+<div id="groupDiv">
+
+</div>
+

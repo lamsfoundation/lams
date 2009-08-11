@@ -22,32 +22,38 @@
  */
 package org.lamsfoundation.lams.admin.web.action;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.statistics.dto.GroupStatisticsDTO;
 import org.lamsfoundation.lams.statistics.dto.StatisticsDTO;
 import org.lamsfoundation.lams.statistics.service.IStatisticsService;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
  * @author Luke Foxton
  * 
  *         Gives the overall statistics for a LAMS server
  * 
- * @struts.action path="/statistics"  validate="false"
+ * @struts.action path="/statistics" parameter="method" name="statistics"
+ *                input=".statistics" scope="request" validate="false"
  * @struts.action-forward name="success" path=".statistics"
+ * @struts.action-forward name="groupStats" path="/groupStatistics.jsp"
  * @struts.action-forward name="error" path=".error"
  */
-public class StatisticsAction extends Action {
+public class StatisticsAction extends LamsDispatchAction {
 
     private static IStatisticsService statisticsService;
 
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
@@ -59,11 +65,35 @@ public class StatisticsAction extends Action {
 	if (statisticsService == null) {
 	    statisticsService = AdminServiceProxy.getStatisticsService(getServlet().getServletContext());
 	}
-	
+
 	StatisticsDTO stats = statisticsService.getOverallStatistics();
 	
+	Map<String, Integer> groupMap = statisticsService.getGroupMap();
+
 	request.setAttribute("statisticsDTO", stats);
+	request.setAttribute("groupMap", groupMap);
 	return mapping.findForward("success");
+    }
+
+    public ActionForward groupStats(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+	Integer orgId = WebUtil.readIntParam(request, "orgId");
+
+	// check permission
+	if (!request.isUserInRole(Role.SYSADMIN)) {
+	    request.setAttribute("errorName", "RegisterAction");
+	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext()).getMessage("error.authorisation"));
+	    return mapping.findForward("error");
+	}
+
+	if (statisticsService == null) {
+	    statisticsService = AdminServiceProxy.getStatisticsService(getServlet().getServletContext());
+	}
+
+	GroupStatisticsDTO groupStats = statisticsService.getGroupStatisticsDTO(orgId);
+
+	request.setAttribute("groupStatisticsDTO", groupStats);
+	return mapping.findForward("groupStats");
     }
 
 }
