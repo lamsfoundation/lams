@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.statistics.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -23,8 +24,8 @@ public class StatisticsService implements IStatisticsService {
     private IBaseDAO baseDAO;
     private IUserManagementService userService;
 
-    /**
-     * Get the overall statistics for the server
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.statistics.service.IStatisticsService#getOverallStatistics()
      */
     public StatisticsDTO getOverallStatistics() {
 
@@ -46,45 +47,61 @@ public class StatisticsService implements IStatisticsService {
 	statisticsDTO.setLessons(baseDAO.countAll(Lesson.class));
 	statisticsDTO.setSequences(baseDAO.countAll(LearningDesign.class));
 	statisticsDTO.setUsers(baseDAO.countAll(User.class));
+	return statisticsDTO;
 
-	// Getting the stats for all the groups and sub-groups
-	ArrayList<GroupStatisticsDTO> groupStatsList = new ArrayList<GroupStatisticsDTO>();
-	List<Organisation> groups = (List<Organisation>) userService.findByProperty(Organisation.class, "organisationType.organisationTypeId",
+    }
+
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.statistics.service.IStatisticsService#getGroupStatisticsDTO(java.lang.Integer)
+     */
+    public GroupStatisticsDTO getGroupStatisticsDTO(Integer orgId) throws Exception {
+
+	Organisation group = (Organisation) baseDAO.find(Organisation.class, orgId);
+	GroupStatisticsDTO groupStats = new GroupStatisticsDTO();
+	if (group != null) {
+
+	    groupStats.setName(group.getName());
+	    groupStats.setLessons(group.getLessons().size());
+	    groupStats.setTotalUsers(userService.getAllUsers(group.getOrganisationId()).size());
+	    groupStats.setAuthors(userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.AUTHOR, false, false).size());
+	    groupStats.setMonitors(userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.MONITOR, false, false).size());
+	    groupStats.setLearners(userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.LEARNER, false, false).size());
+
+	    Set<Organisation> subGroups = (Set<Organisation>) group.getChildOrganisations();
+
+	    ArrayList<GroupStatisticsDTO> subGroupStatsList = new ArrayList<GroupStatisticsDTO>();
+	    if (subGroups != null) {
+		for (Organisation subGroup : subGroups) {
+		    GroupStatisticsDTO subGroupStats = new GroupStatisticsDTO();
+		    subGroupStats.setName(subGroup.getName());
+		    subGroupStats.setLessons(subGroup.getLessons().size());
+		    subGroupStats.setTotalUsers(userService.getAllUsers(subGroup.getOrganisationId()).size());
+		    subGroupStats.setAuthors(userService.getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.AUTHOR, false, false).size());
+		    subGroupStats.setMonitors(userService.getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.MONITOR, false, false).size());
+		    subGroupStats.setLearners(userService.getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.LEARNER, false, false).size());
+		    subGroupStatsList.add(subGroupStats);
+		}
+	    }
+	    groupStats.setSubGroups(subGroupStatsList);
+
+	} else {
+	    throw new Exception("Tried to fetch data for null group with id: " + orgId);
+	}
+
+	return groupStats;
+    }
+    
+    public Map<String, Integer> getGroupMap() {
+	Map groupMap = new HashMap<String, Integer> ();
+	
+	List<Organisation> groups = (List<Organisation>)userService.findByProperty(Organisation.class, "organisationType.organisationTypeId",
 		OrganisationType.COURSE_TYPE);
 	if (groups != null) {
 	    for (Organisation group : groups) {
-		GroupStatisticsDTO groupStats = new GroupStatisticsDTO();
-		groupStats.setName(group.getName());
-		groupStats.setLessons(group.getLessons().size());
-		groupStats.setTotalUsers(userService.getAllUsers(group.getOrganisationId()).size());
-		groupStats.setAuthors(userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.AUTHOR, false, false).size());
-		groupStats.setMonitors(userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.MONITOR, false, false).size());
-		groupStats.setLearners(userService.getUsersFromOrganisationByRole(group.getOrganisationId(), Role.LEARNER, false, false).size());
-
-		Set<Organisation> subGroups = (Set<Organisation>) group.getChildOrganisations();
-
-		ArrayList<GroupStatisticsDTO> subGroupStatsList = new ArrayList<GroupStatisticsDTO>();
-		if (subGroups != null) {	    
-		    for (Organisation subGroup : subGroups) {
-			GroupStatisticsDTO subGroupStats = new GroupStatisticsDTO();
-			subGroupStats.setName(subGroup.getName());
-			subGroupStats.setLessons(subGroup.getLessons().size());
-			subGroupStats.setTotalUsers(userService.getAllUsers(subGroup.getOrganisationId()).size());
-			subGroupStats.setAuthors(userService.getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.AUTHOR, false, false).size());
-			subGroupStats.setMonitors(userService.getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.MONITOR, false, false).size());
-			subGroupStats.setLearners(userService.getUsersFromOrganisationByRole(subGroup.getOrganisationId(), Role.LEARNER, false, false).size());
-			subGroupStatsList.add(subGroupStats);
-		    }
-		}
-		groupStats.setSubGroups(subGroupStatsList);
-
-		groupStatsList.add(groupStats);
+		groupMap.put(group.getName(), group.getOrganisationId());
 	    }
 	}
-	statisticsDTO.setGroupStatistics(groupStatsList);
-
-	return statisticsDTO;
-
+	return groupMap;
     }
 
     public void setBaseDAO(IBaseDAO baseDAO) {
