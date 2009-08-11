@@ -87,14 +87,14 @@
 
 <br />
 <h1><fmt:message key="admin.statistics.title.byGroup" /></h1>
-
+<br />
 <select>
 	<option></option>
 	<c:forEach var="groupEntry" items="${groupMap}" >	
 		<option onclick="loadGroupStats('${groupEntry.value}')">${groupEntry.key}</option>
 	</c:forEach>
 </select>
-
+<br />
 <div id="groupDiv">
 
 </div>
