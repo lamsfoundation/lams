@@ -23,7 +23,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.pixlr.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -32,8 +34,8 @@ import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
+import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
 import org.lamsfoundation.lams.tool.pixlr.util.PixlrConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -58,7 +60,7 @@ public class PixlrOutputFactory extends OutputFactory {
 	    break;
 	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
 	    ToolOutputDefinition imageUrlDefinition = buildComplexOutputDefinition(
-		    PixlrConstants.IMAGE_URL_DEFINITION_NAME, SimpleURL.class);
+		    PixlrConstants.IMAGE_URL_DEFINITION_NAME, SimpleURL[].class);
 	    definitionMap.put(PixlrConstants.IMAGE_URL_DEFINITION_NAME, imageUrlDefinition);
 	    break;
 	}
@@ -102,16 +104,25 @@ public class PixlrOutputFactory extends OutputFactory {
 	    String[] nameParts = splitConditionName(name);
 	    if (PixlrConstants.IMAGE_URL_DEFINITION_NAME.equals(nameParts[0])) {
 		PixlrSession session = pixlrService.getSessionBySessionId(toolSessionId);
-		if (session != null) {
-		    Pixlr pixlr = session.getPixlr();
-		    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-		    String imageUrl = "javascript:var dummy = window.open('" + serverUrl + "www/images/pixlr/"
-			    + pixlr.getImageFileName() + "','" + pixlr.getTitle() + "','resizable,width="
-			    + pixlr.getImageWidth() + ",height=" + pixlr.getImageHeight() + ",scrollbars')";
 
-		    SimpleURL url = new SimpleURL(session.getPixlr().getImageFileName(), imageUrl);
+		if (session != null) {
+		    Set<PixlrUser> users = session.getPixlrUsers();
+		    Set<SimpleURL> urls = new HashSet<SimpleURL>(users.size());
+		    for (PixlrUser user : users) {
+			if (user.getImageFileName() != null) {
+			    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+			    String imageName = user.getLastName() + "_" + user.getFirstName();
+			    String imageUrl = "javascript:var dummy = window.open('" + serverUrl + "www/images/pixlr/"
+				    + user.getImageFileName() + "','" + imageName + "','resizable,width="
+				    + user.getImageWidth() + ",height=" + user.getImageHeight() + ",scrollbars')";
+
+			    SimpleURL url = new SimpleURL(imageName, imageUrl);
+			    urls.add(url);
+			}
+		    }
+		    SimpleURL[] urlArray = urls.toArray(new SimpleURL[] {});
 		    return new ToolOutput(PixlrConstants.IMAGE_URL_DEFINITION_NAME, getI18NText(
-			    PixlrConstants.IMAGE_URL_DEFINITION_NAME, true), url, false);
+			    PixlrConstants.IMAGE_URL_DEFINITION_NAME, true), urlArray, false);
 		}
 	    }
 	}

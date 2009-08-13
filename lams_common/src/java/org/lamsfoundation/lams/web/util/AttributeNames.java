@@ -93,4 +93,5 @@ public class AttributeNames {
     public static final String ATTR_PAGE_STR = "pageString";
     public static final String ATTR_DO_NOT_SHOW_AGAIN = "doNotShowAgain";
     public static final String ATTR_SHOW_TUTORIAL = "showTutorial";
+    public static final String PARAM_TOOL_CONTENT_HANDLER_NAME = "toolContentHandler";
 }

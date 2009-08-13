@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class ResourceOutputFactory extends OutputFactory {
 
@@ -111,7 +112,8 @@ public class ResourceOutputFactory extends OutputFactory {
 			    String path = uploadedItem.getUrl();
 			    if (path == null) {
 				path = serverUrl + "download/?uuid=" + uploadedItem.getFileUuid()
-					+ "&preferDownload=false'";
+					+ "&preferDownload=false&" + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME
+					+ "=" + ResourceConstants.TOOL_CONTENT_HANDLER_NAME;
 
 			    }
 			    path = "javascript:var dummy = window.open('" + path + "','" + uploadedItem.getTitle()

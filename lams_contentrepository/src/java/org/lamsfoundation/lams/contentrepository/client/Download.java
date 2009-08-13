@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.contentrepository.client;
 
 import java.io.BufferedInputStream;
@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -45,339 +46,336 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.util.FileUtil;
-
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * This is a specialised servlet that supports the downloading of single
- * files and the rendering of packages. 
+ * This is a specialised servlet that supports the downloading of single files and the rendering of packages.
  * <p>
- * It has a rather odd format - you can call it initially with 
- * the file/package uuid (and optional version and preferDownload parameters) using <BR>
+ * It has a rather odd format - you can call it initially with the file/package uuid (and optional version and
+ * preferDownload parameters) using <BR>
  * download?uuid=&lt;uuid&gt;&version=&lt;version&gt;&preferDownload=[true|false].
  * <p>
- * If it is a file, then the file is downloaded. If it is a package, then
- * it redirects to download/&lt;uuid&gt;/&lt;version&gt;/relPath?preferDownload=false
- * where the &lt;uuid&gt; and &lt;version&gt; are the uuid and version
- * of the package node.
+ * If it is a file, then the file is downloaded. If it is a package, then it redirects to
+ * download/&lt;uuid&gt;/&lt;version&gt;/relPath?preferDownload=false where the &lt;uuid&gt; and &lt;version&gt; are the
+ * uuid and version of the package node.
  * <p>
- * The download/&lt;uuid&gt;/&lt;version&gt;/relPath should only be used 
- * internally - the servlet should be called with the parameter
- * version initially.
+ * The download/&lt;uuid&gt;/&lt;version&gt;/relPath should only be used internally - the servlet should be called with
+ * the parameter version initially.
  * <p>
- * This / format allows the relative pathed links
- * within an html file to work properly. 
+ * This / format allows the relative pathed links within an html file to work properly.
  * <p>
- * If you want to try to download the file rather than display the file,
- * add the parameter preferDownload=true to the url. This is only meaningful
- * for a file - it is ignored for packages.
+ * If you want to try to download the file rather than display the file, add the parameter preferDownload=true to the
+ * url. This is only meaningful for a file - it is ignored for packages.
  * <p>
- * This is an abstract class, to allow other modules to customise the
- * repository access. To implement, you must implement getTicket() 
- * and getRepositoryService(). If you are using ToolContentHandler,
- * then you can use ToolDownload, which is a concrete implementation
- * of this class using the ToolContentHandler. 
- *  
+ * This is an abstract class, to allow other modules to customise the repository access. To implement, you must
+ * implement getTicket() and getRepositoryService(). If you are using ToolContentHandler, then you can use ToolDownload,
+ * which is a concrete implementation of this class using the ToolContentHandler.
+ * 
  * @author Fiona Malikoff
  * @see org.lamsfoundation.lams.contentrepository.client.ToolDownload
  */
 
-/* A package node could be handled by either getting the
- stream from the package node - this is the first file
- in the package - or by using the property in the node
- that specifies the path to the first file and go back
- to the repository and get that node. In a roundabout 
- way, this servlet uses the second method - it redirects
- to the path for the first file.
- 
- method 1: the package node returns a stream which is the first file.
-  InputStream = node.getFile();
-  set up any header variables
-  <set up any header variables>
-
-  method 2: get initial path node and download that 
-  IValue value = node.getProperty(PropertyName.INITIALPATH);
-  String initialPath = value != null ? value.getString() : null;
-  IVersionedNode childNode = getRepository().getFileItem(ticket,uuid, initialPath, null);
-  InputStream = node.getFile();
-  <set up any header variables>
-  <copy input stream to page output stream>
-*/
+/*
+ * A package node could be handled by either getting the stream from the package node - this is the first file in the
+ * package - or by using the property in the node that specifies the path to the first file and go back to the
+ * repository and get that node. In a roundabout way, this servlet uses the second method - it redirects to the path for
+ * the first file.
+ * 
+ * method 1: the package node returns a stream which is the first file. InputStream = node.getFile(); set up any header
+ * variables <set up any header variables>
+ * 
+ * method 2: get initial path node and download that IValue value = node.getProperty(PropertyName.INITIALPATH); String
+ * initialPath = value != null ? value.getString() : null; IVersionedNode childNode =
+ * getRepository().getFileItem(ticket,uuid, initialPath, null); InputStream = node.getFile(); <set up any header
+ * variables> <copy input stream to page output stream>
+ */
 
 public abstract class Download extends HttpServlet {
 
-	public static final String UUID_NAME = "uuid";
-	public static final String VERSION_NAME = "version";
-	public static final String PREFER_DOWNLOAD = "preferDownload";
+    public static final String UUID_NAME = "uuid";
+    public static final String VERSION_NAME = "version";
+    public static final String PREFER_DOWNLOAD = "preferDownload";
+    protected static Logger log = Logger.getLogger(Download.class);
 
-	protected static Logger log = Logger.getLogger(Download.class);
+    private static final String expectedFormat = "Expected format /download?" + Download.UUID_NAME + "<num>&"
+	    + Download.VERSION_NAME + "=<num>" + Download.PREFER_DOWNLOAD
+	    + "=<true|false> (version number optional) or /download/<uuid>/<version>/<relPath>";
 
-	private static final String expectedFormat = 
-			"Expected format /download?"
-			+UUID_NAME
-			+"<num>&"
-			+VERSION_NAME
-			+"=<num>"
-			+PREFER_DOWNLOAD
-			+"=<true|false> (version number optional) or /download/<uuid>/<version>/<relPath>";
+    /**
+     * Get the ticket that may be used to access the repository.
+     */
+    public abstract ITicket getTicket() throws RepositoryCheckedException;
 
-	/** Get the ticket that may be used to access the repository.
-*/
-	public abstract ITicket getTicket() throws RepositoryCheckedException;
-	public abstract IRepositoryService getRepositoryService() throws RepositoryCheckedException;
+    public abstract ITicket getTicket(String source) throws RepositoryCheckedException;
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to get.
-	 * 
-	 * @param request the request send by the client to the server
-	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
-	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    public abstract IRepositoryService getRepositoryService() throws RepositoryCheckedException;
 
-	    try {
-	        handleCall(request, response);
-	    } catch (RepositoryCheckedException e) {
-	        log.error("Exception occured in download. Exception "+e.getMessage()
-	                +"Request URL was "+request.getRequestURL(),e);
-	        throw new ServletException(e);
+    /**
+     * The doGet method of the servlet. <br>
+     * 
+     * This method is called when a form has its tag value method equals to get.
+     * 
+     * @param request
+     *                the request send by the client to the server
+     * @param response
+     *                the response send by the server to the client
+     * @throws ServletException
+     *                 if an error occurred
+     * @throws IOException
+     *                 if an error occurred
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	try {
+	    handleCall(request, response);
+	} catch (RepositoryCheckedException e) {
+	    Download.log.error("Exception occured in download. Exception " + e.getMessage() + "Request URL was "
+		    + request.getRequestURL(), e);
+	    throw new ServletException(e);
+	}
+    }
+
+    private void handleCall(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+	    IOException, RepositoryCheckedException {
+
+	long start = System.currentTimeMillis();
+
+	ITicket ticket = null;
+	String toolContentHandlerName = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME);
+	if (StringUtils.isBlank(toolContentHandlerName)) {
+	    ticket = getTicket();
+	} else {
+	    ticket = getTicket(toolContentHandlerName);
+	}
+
+	if (ticket == null) {
+	    throw new RepositoryCheckedException("Unable to get ticket - getTicket(false) returned null");
+	}
+
+	Long uuid = getLong(request.getParameter(Download.UUID_NAME));
+	Long version = null;
+	boolean saveFile = getBoolean(request.getParameter(Download.PREFER_DOWNLOAD));
+
+	String callId = null;
+
+	if (uuid != null) {
+
+	    version = getLong(request.getParameter(Download.VERSION_NAME));
+
+	    IVersionedNode node = getFileItem(ticket, uuid, version, null);
+
+	    // update versionId in case it was null and we got the latest version...
+	    version = node.getVersion();
+
+	    if (node.isNodeType(NodeType.PACKAGENODE)) {
+
+		// now get the path of the initial page in the package
+		IValue value = node.getProperty(PropertyName.INITIALPATH);
+		String initialPage = value != null ? value.getString() : null;
+		if (initialPage == null || initialPage.length() == 0) {
+		    throw new RepositoryCheckedException("No initial page found for this set of content. Node Data is "
+			    + node.toString());
+		}
+
+		// redirect to the initial path
+		// prepend with servlet and id - initial call doesn't include the id
+		// and depending on "/"s, the servlet name is sometimes lost by the redirect.
+		// make sure it displays the file - rather than trying to download it.
+		initialPage = request.getRequestURL() + "/" + uuid + "/" + version + "/" + initialPage
+			+ "?preferDownload=false";
+		Download.log.debug("Attempting to redirect to initial page " + initialPage);
+		response.sendRedirect(initialPage);
+
+	    } else if (node.isNodeType(NodeType.FILENODE)) {
+
+		handleFileNode(response, request, node, saveFile);
+
+	    } else {
+		throw new RepositoryCheckedException("Unsupported node type " + node.getNodeType() + ". Node Data is "
+			+ node.toString(), null);
+	    }
+
+	} else {
+
+	    // using the /download/<id>/<filename> format - must be a file node!
+	    String pathString = request.getPathInfo();
+	    String[] strings = deriveIdFile(pathString);
+	    uuid = getLong(strings[0]);
+	    version = getLong(strings[1]);
+	    String relPathString = strings[2];
+
+	    callId = "download " + Math.random() + " " + uuid;
+
+	    if (uuid == null) {
+		throw new RepositoryCheckedException("UUID value is missing. " + Download.expectedFormat);
+	    }
+
+	    if (version == null) {
+		throw new RepositoryCheckedException("Version value is missing. " + Download.expectedFormat);
+	    }
+
+	    if (relPathString == null) {
+		throw new RepositoryCheckedException("Filename is missing. " + Download.expectedFormat);
+	    }
+
+	    IVersionedNode node = getFileItem(ticket, uuid, version, relPathString);
+	    if (!node.isNodeType(NodeType.FILENODE)) {
+		throw new RepositoryCheckedException("Unexpected type of node " + node.getNodeType()
+			+ " Expected File node. Data is " + node);
+	    }
+	    handleFileNode(response, request, node, saveFile);
+
+	}
+    }
+
+    /**
+     * The call getFileItem was throwing a runtime hibernate/jdbc error when being thrash tested, and I couldn't work
+     * out the context, so I've wrapped the call here so it can be debugged.
+     */
+    private IVersionedNode getFileItem(ITicket ticket, Long uuid, Long version, String relPathString)
+	    throws RepositoryCheckedException {
+	try {
+	    IVersionedNode node = null;
+	    if (relPathString != null) {
+		// get file in package
+		node = getRepositoryService().getFileItem(ticket, uuid, version, relPathString);
+	    } else {
+		// get node
+		node = getRepositoryService().getFileItem(ticket, uuid, version);
+	    }
+	    return node;
+	} catch (RuntimeException e) {
+	    Download.log.error("Exception thrown calling repository.getFileItem(<ticket>," + uuid + "," + version + ","
+		    + relPathString + "). " + e.getMessage(), e);
+	    throw e;
+	}
+    }
+
+    /**
+     * @param response
+     * @param aNode
+     * @throws IOException
+     */
+    protected void handleFileNode(HttpServletResponse response, HttpServletRequest request, IVersionedNode fileNode,
+	    boolean saveFile) throws IOException, FileException, ValueFormatException {
+
+	// Try to get the mime type and set the response content type.
+	// Use the mime type was saved with the file,
+	// the type set up in the server (e.g. tomcat's config) or failing
+	// that, make it a octet stream.
+	IValue prop = fileNode.getProperty(PropertyName.MIMETYPE);
+	String mimeType = prop != null ? prop.getString() : null;
+	if (mimeType == null) {
+	    prop = fileNode.getProperty(PropertyName.FILENAME);
+	    if (prop != null) {
+		mimeType = getServletContext().getMimeType(prop.getString());
 	    }
 	}
+	if (mimeType == null) {
+	    mimeType = "application/octet-stream";
+	}
+	response.setContentType(mimeType);
 
-	private void handleCall(HttpServletRequest request, HttpServletResponse response)
-		throws ServletException, IOException, RepositoryCheckedException {
-		
-		long start = System.currentTimeMillis();
+	// Get the filename stored with the file
+	prop = fileNode.getProperty(PropertyName.FILENAME);
+	String filename = prop != null ? prop.getString() : null;
+	filename = FileUtil.encodeFilenameForDownload(request, filename);
 
-		ITicket ticket = getTicket();
-		if ( ticket == null ) {
-		    throw new RepositoryCheckedException("Unable to get ticket - getTicket(false) returned null");
-		}
+	Download.log.debug("Downloading file " + filename + " mime type " + mimeType);
 
-		Long uuid = getLong(request.getParameter(UUID_NAME));
-		Long version = null;
-		boolean saveFile = getBoolean(request.getParameter(PREFER_DOWNLOAD));
-
-		String callId = null;
-
-		if ( uuid != null ) {
-
-			version = getLong(request.getParameter(VERSION_NAME));
-			
-			IVersionedNode node = getFileItem(ticket, uuid, version,null);
-			
-			// update versionId in case it was null and we got the latest version...
-			version = node.getVersion();
-			
-			if ( node.isNodeType(NodeType.PACKAGENODE) ) {
-			
-				// now get the path of the initial page in the package
-				IValue value = node.getProperty(PropertyName.INITIALPATH);
-				String initialPage = value != null ? value.getString() : null;
-				if ( initialPage == null || initialPage.length() ==0 ) {
-				    throw new RepositoryCheckedException("No initial page found for this set of content. Node Data is "+node.toString());
-				}
-
-				// redirect to the initial path
-				// prepend with servlet and id - initial call doesn't include the id
-				// and depending on "/"s, the servlet name is sometimes lost by the redirect.
-				// make sure it displays the file - rather than trying to download it.
-				initialPage = request.getRequestURL() + "/" + uuid 
-					+ "/" + version + "/" + initialPage+"?preferDownload=false";
-				log.debug("Attempting to redirect to initial page "+initialPage);
-				response.sendRedirect(initialPage);
-				
-			} else if ( node.isNodeType(NodeType.FILENODE) ) {
-
-				handleFileNode(response, request, node, saveFile);
-
-			} else {
-			    throw new RepositoryCheckedException("Unsupported node type "
-						+node.getNodeType()+". Node Data is "+node.toString(),null);
-			}
-			
-		} else {
-			
-			// using the /download/<id>/<filename> format - must be a file node!
-			String pathString =  request.getPathInfo();
-			String[] strings = deriveIdFile(pathString);
-			uuid = getLong(strings[0]);
-			version = getLong(strings[1]);
-			String relPathString = strings[2];
-			
-			callId = "download "+Math.random()+" "+uuid;
-			
-			if ( uuid == null ) { 
-			    throw new RepositoryCheckedException("UUID value is missing. "+expectedFormat);
-			}
-		
-			if ( version == null ) {
-			    throw new RepositoryCheckedException("Version value is missing. "+expectedFormat);
-			}
-
-			if ( relPathString == null ) {
-			    throw new RepositoryCheckedException("Filename is missing. "+expectedFormat);
-			}
-
-			IVersionedNode node = getFileItem(ticket, uuid, version, relPathString);
-			if ( ! node.isNodeType(NodeType.FILENODE) ) {
-			    throw new RepositoryCheckedException("Unexpected type of node "
-						+node.getNodeType()+" Expected File node. Data is "+node);
-			}
-			handleFileNode(response, request, node, saveFile);
-
-		}
+	if (saveFile) {
+	    Download.log.debug("Sending as attachment");
+	    response.setHeader("Content-Disposition", "attachment;filename=\"" + filename + "\"");
+	} else {
+	    Download.log.debug("Sending as inline");
+	    response.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
+	}
+	response.setHeader("Cache-control", "must-revalidate");
+	if (filename != null) {
+	    response.addHeader("Content-Description", filename);
 	}
 
-	/**
-	 * The call getFileItem was throwing a runtime hibernate/jdbc error when being
-	 * thrash tested, and I couldn't work out the context, so I've wrapped
-	 * the call here so it can be debugged.
-	 */
-	private IVersionedNode getFileItem(ITicket ticket, Long uuid, Long version, String relPathString) 
-				throws RepositoryCheckedException {
-		try { 
-			IVersionedNode node = null;
-			if ( relPathString != null ) {
-				// get file in package
-				node = getRepositoryService().getFileItem(ticket,uuid, version, relPathString);
-			} else {
-				// get node
-				node = getRepositoryService().getFileItem(ticket,uuid, version);
-			}
-			return node;
-		} catch ( RuntimeException e ) {
-			log.error("Exception thrown calling repository.getFileItem(<ticket>,"
-					+uuid+","+version+","+relPathString+"). "+e.getMessage(), e);
-			throw e;
+	InputStream in = new BufferedInputStream(fileNode.getFile());
+	OutputStream out = response.getOutputStream();
+	try {
+	    int count = 0;
+
+	    int ch;
+	    while ((ch = in.read()) != -1) {
+		out.write((char) ch);
+		count++;
+	    }
+	    Download.log.debug("Wrote out " + count + " bytes");
+	    response.setContentLength(count);
+	    out.flush();
+	} catch (IOException e) {
+	    Download.log.error("Exception occured writing out file:" + e.getMessage());
+	    throw e;
+	} finally {
+	    try {
+		if (in != null) {
+		    in.close(); // very important
 		}
+		if (out != null) {
+		    out.close();
+		}
+	    } catch (IOException e) {
+		Download.log.error("Error Closing file. File already written out - no exception being thrown.", e);
+	    }
 	}
+    }
 
-	/**
-	 * @param response
-	 * @param aNode
-	 * @throws IOException
-	 */
-	protected void handleFileNode(HttpServletResponse response, HttpServletRequest request, IVersionedNode fileNode, boolean saveFile) 
-		throws IOException, FileException, ValueFormatException {
+    // Expect format /<id>/<version>/<relPath>. No parts are optional. Filename may be a path.
+    // returns an array of three strings.
+    private String[] deriveIdFile(String pathInfo) {
+	String[] result = new String[3];
 
-	    // Try to get the mime type and set the response content type.
-	    // Use the mime type was saved with the file,
-	    // the type set up in the server (e.g. tomcat's config) or failing 
-	    // that, make it a octet stream.
-		IValue prop = fileNode.getProperty(PropertyName.MIMETYPE);
-		String mimeType = prop != null ? prop.getString() : null;
-		if ( mimeType == null ) {
-			prop = fileNode.getProperty(PropertyName.FILENAME);
-			if ( prop != null ) {
-				mimeType = getServletContext().getMimeType(prop.getString());
-			}
-		}
-		if (mimeType == null) {
-			mimeType = "application/octet-stream";
-		}
-		response.setContentType(mimeType);
-		
-		// Get the filename stored with the file
-		prop = fileNode.getProperty(PropertyName.FILENAME);
-		String filename = prop != null ? prop.getString() : null;
-		filename = FileUtil.encodeFilenameForDownload(request, filename);
-		
-		log.debug("Downloading file " + filename + " mime type " + mimeType);
+	if (pathInfo != null) {
 
-		if (saveFile) {
-		    log.debug("Sending as attachment");
-			response.setHeader("Content-Disposition","attachment;filename=\"" + filename+"\"");
-		} else {
-		    log.debug("Sending as inline");
-			response.setHeader("Content-Disposition","inline;filename=\"" + filename+"\"");
+	    String[] strings = pathInfo.split("/", 4);
+
+	    for (int i = 0, j = 0; i < strings.length && j < 3; i++) {
+		// splitting sometimes results in empty strings, so skip them!
+		if (strings[i].length() > 0) {
+		    result[j++] = strings[i];
 		}
-		response.setHeader("Cache-control","must-revalidate");
-		if ( filename != null ) {
-		    response.addHeader("Content-Description", filename);
-		}
-	
-		InputStream in = new BufferedInputStream(fileNode.getFile()); 
-		OutputStream out = response.getOutputStream();
-		try {
-			int count = 0;
-				
-			int ch;
-			while ((ch = in.read()) != -1)
-			{
-				out.write((char) ch);
-				count++;
-			}
-			log.debug("Wrote out " + count + " bytes");
-			response.setContentLength(count);
-			out.flush();
-		} catch (IOException e) {
-		    log.error( "Exception occured writing out file:" + e.getMessage());		
-		    throw e;
-		} finally {
-		    try	{
-				if (in != null) in.close(); // very important
-				if (out != null) out.close();
-			}
-			catch (IOException e) {
-			    log.error("Error Closing file. File already written out - no exception being thrown.",e);
-			}
-		}
+	    }
+
 	}
-	
-	// Expect format /<id>/<version>/<relPath>. No parts are optional. Filename may be a path.
-	// returns an array of three strings.
-	private String[] deriveIdFile(String pathInfo) {
-		String[] result = new String[3];
-		
-		if ( pathInfo != null ) {
-		
-			String[] strings = pathInfo.split("/",4);
-			
-			for ( int i=0, j=0; i<strings.length && j < 3 ; i++ ) {
-				// splitting sometimes results in empty strings, so skip them!
-				if ( strings[i].length() > 0 ) {
-					result[j++] = strings[i];
-				}
-			}
-			
-		}
-		log.debug("Split path into following strings: '"
-					+result[0]
-                    +"' '"+result[1]
-					+"' '"+result[2]);
+	Download.log.debug("Split path into following strings: '" + result[0] + "' '" + result[1] + "' '" + result[2]);
 
-		return result;
-	}
-	
+	return result;
+    }
 
-	/**
-	 * The doPost method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to post.
-	 * 
-	 * @param request the request send by the client to the server
-	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
-	 */
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-	    doGet(request, response);
-	}
+    /**
+     * The doPost method of the servlet. <br>
+     * 
+     * This method is called when a form has its tag value method equals to post.
+     * 
+     * @param request
+     *                the request send by the client to the server
+     * @param response
+     *                the response send by the server to the client
+     * @throws ServletException
+     *                 if an error occurred
+     * @throws IOException
+     *                 if an error occurred
+     */
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	doGet(request, response);
+    }
 
-	protected static Long getLong(String longAsString) {
-		try {
-			return new Long(longAsString);
-		} catch ( NumberFormatException e ) {
-			return null;
-		}
+    protected static Long getLong(String longAsString) {
+	try {
+	    return new Long(longAsString);
+	} catch (NumberFormatException e) {
+	    return null;
 	}
+    }
 
-	protected static boolean getBoolean(String booleanAsString) {
-		return Boolean.valueOf(booleanAsString).booleanValue();
-	}
+    protected static boolean getBoolean(String booleanAsString) {
+	return Boolean.valueOf(booleanAsString).booleanValue();
+    }
 }

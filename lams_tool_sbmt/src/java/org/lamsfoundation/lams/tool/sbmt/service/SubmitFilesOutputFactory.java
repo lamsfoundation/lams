@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class SubmitFilesOutputFactory extends OutputFactory {
 
@@ -111,7 +112,9 @@ public class SubmitFilesOutputFactory extends OutputFactory {
 			    int urlIndex = 0;
 			    for (FileDetailsDTO filesDetailsDTO : files) {
 				String fileUrl = "javascript:var dummy = window.open('" + serverUrl + "download/?uuid="
-					+ filesDetailsDTO.getUuID() + "&preferDownload=false','"
+					+ filesDetailsDTO.getUuID() + "&preferDownload=false&"
+					+ AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
+					+ SbmtConstants.TOOL_CONTENT_HANDLER_NAME + "','"
 					+ filesDetailsDTO.getFileDescription() + "','resizable,scrollbars')";
 
 				SimpleURL url = new SimpleURL(filesDetailsDTO.getFileDescription(), fileUrl);

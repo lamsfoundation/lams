@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageComment;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
@@ -41,6 +42,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class ImageGalleryOutputFactory extends OutputFactory {
 
@@ -144,11 +146,13 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 		    for (ImageGalleryItem image : sessionImages) {
 			if (!image.isCreateByAuthor()) {
 			    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-			    String imageUrl = "javascript:var dummy = window.open('" + serverUrl + "download/?uuid="
-				    + image.getOriginalFileUuid() + "&preferDownload=false','" + image.getTitle()
-				    + "','resizable,width=" + image.getOriginalImageWidth() + ",height="
-				    + image.getOriginalImageHeight() + ",scrollbars')";
-			    SimpleURL simpleUrl = new SimpleURL(image.getTitle(), imageUrl);
+			    String innerUrl = serverUrl + "download/?uuid=" + image.getOriginalFileUuid()
+				    + "&preferDownload=false&" + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
+				    + ImageGalleryConstants.TOOL_CONTENT_HANDLER_NAME;
+			    String fullUrl = "javascript:var dummy = window.open('" + innerUrl + "','"
+				    + image.getTitle() + "','resizable,width=" + image.getOriginalImageWidth()
+				    + ",height=" + image.getOriginalImageHeight() + ",scrollbars')";
+			    SimpleURL simpleUrl = new SimpleURL(image.getTitle(), fullUrl);
 			    uploadedImagesUrls.add(simpleUrl);
 			}
 		    }
