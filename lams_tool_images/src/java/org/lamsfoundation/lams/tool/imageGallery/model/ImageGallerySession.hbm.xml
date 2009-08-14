@@ -76,26 +76,6 @@
             length="250"
         />
 
-        <set
-            name="imageGalleryItems"
-            lazy="true"
-            inverse="false"
-            cascade="all"
-            sort="unsorted"
-            order-by="create_date desc"
-        >
-
-            <key
-                column="session_uid"
-            >
-            </key>
-
-            <one-to-many
-                  class="org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem"
-            />
-
-        </set>
-
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ImageGallerySession.xml

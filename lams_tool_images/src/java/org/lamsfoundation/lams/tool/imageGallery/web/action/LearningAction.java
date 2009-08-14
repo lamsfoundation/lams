@@ -768,13 +768,6 @@ public class LearningAction extends Action {
 	image.setCreateByAuthor(false);
 	image.setHide(false);
 
-	ImageGallerySession session = service.getImageGallerySessionBySessionId(sessionId);
-	Set<ImageGalleryItem> sessionItems = session.getImageGalleryItems();
-	if (sessionItems == null) {
-	    sessionItems = new LinkedHashSet<ImageGalleryItem>();
-	}
-	sessionItems.add(image);
-
 	// setting SequenceId
 	Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
 	int maxSeq = 0;

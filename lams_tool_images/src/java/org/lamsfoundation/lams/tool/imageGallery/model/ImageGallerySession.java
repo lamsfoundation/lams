@@ -48,8 +48,6 @@ public class ImageGallerySession {
     private Date sessionEndDate;
     // finish or not
     private int status;
-    // imageGallery Items
-    private Set imageGalleryItems;
 
     // **********************************************************
     // Get/Set methods
@@ -142,23 +140,6 @@ public class ImageGallerySession {
      */
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
-    }
-
-    /**
-     * 
-     * 
-     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
-     * @hibernate.collection-key column="session_uid"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem"
-     * 
-     * @return
-     */
-    public Set getImageGalleryItems() {
-	return imageGalleryItems;
-    }
-
-    public void setImageGalleryItems(Set imageGalleryItems) {
-	this.imageGalleryItems = imageGalleryItems;
     }
 
 }

@@ -142,7 +142,8 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 		    return getNumVotes(user, session, imageGalleryService);
 		} else if (nameParts[0].equals(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS)) {
 		    List<SimpleURL> uploadedImagesUrls = new ArrayList<SimpleURL>();
-		    Set<ImageGalleryItem> sessionImages = session.getImageGalleryItems();
+		    Set<ImageGalleryItem> sessionImages = imageGalleryService.getImagesForGroup(session
+			    .getImageGallery(), toolSessionId);
 		    for (ImageGalleryItem image : sessionImages) {
 			if (!image.isCreateByAuthor()) {
 			    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
