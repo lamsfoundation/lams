@@ -548,7 +548,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	voteAuthoringForm.setOfflineInstructions(voteContent.getOfflineInstructions());
 	voteAuthoringForm.setOnlineInstructions(voteContent.getOnlineInstructions());
 
-	Short maxInputs = voteContent.getMaxInputs();
+	Short maxInputs = voteContent.getMaxExternalInputs();
 	if (maxInputs == null) {
 	    maxInputs = 0;
 	}

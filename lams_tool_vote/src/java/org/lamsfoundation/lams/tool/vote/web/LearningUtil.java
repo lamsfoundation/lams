@@ -73,14 +73,15 @@ public class LearningUtil implements VoteAppConstants {
 	    VoteContent voteContent, Collection<String> checkedOptions) {
 	Map mapQuestionsContent = new TreeMap(new VoteComparator());
 	Set<VoteQueContent> nominations = voteContent.getVoteQueContents();
+	// should we add nominations from data flow from other activities?
 	if (Boolean.TRUE.equals(voteContent.getAssignedDataFlowObject())
-		&& !Boolean.TRUE.equals(voteContent.getDataFlowObjectUsed())) {
+		&& (voteContent.getMaxExternalInputs() == null || voteContent.getExternalInputsAdded() == null || voteContent
+			.getExternalInputsAdded() < voteContent.getMaxExternalInputs())) {
 	    // If we are using tool input, we need to get it now and
 	    // create questions. Once they are created, they will be not altered, no matter if another learner gets to
 	    // this point and the tool input changed
 	    createQuestionsFromToolInput(voteContent, voteService);
 	    nominations = voteContent.getVoteQueContents();
-	    voteContent.setDataFlowObjectUsed(true);
 	}
 
 	Iterator<VoteQueContent> contentIterator = nominations.iterator();
@@ -328,16 +329,17 @@ public class LearningUtil implements VoteAppConstants {
 		.intValue());
 
 	Object value = toolInput.getValue().getComplex();
+	short inputsAdded = voteContent.getExternalInputsAdded() == null ? 0 : voteContent.getExternalInputsAdded();
+	Short maxInputs = voteContent.getMaxExternalInputs();
+	Set<VoteQueContent> existingNominations = voteContent.getVoteQueContents();
 	// The input is an array (users) of arrays of strings (their answers)
 	if (value instanceof String[][]) {
 	    if (value != null) {
 		String[][] usersAndAnswers = (String[][]) value;
 		int nominationIndex = voteContent.getVoteQueContents().size() + 1;
-		Short maxInputs = voteContent.getMaxInputs();
-		short inputCount = 0;
 		for (String[] userAnswers : usersAndAnswers) {
 		    if (userAnswers != null) {
-			if (maxInputs != null && maxInputs > 0 && inputCount >= maxInputs) {
+			if (maxInputs != null && inputsAdded >= maxInputs) {
 			    // if we reached the maximum number of inputs, i.e. number of students that will be taken
 			    // into account
 			    break;
@@ -349,14 +351,16 @@ public class LearningUtil implements VoteAppConstants {
 				nomination.setDisplayOrder(nominationIndex);
 				nomination.setMcContent(voteContent);
 				nomination.setQuestion(questionText);
-				voteService.saveOrUpdateVoteQueContent(nomination);
-				voteContent.getVoteQueContents().add(nomination);
-				nominationIndex++;
-				anyAnswersAdded = true;
+				if (!nominationExists(nomination, existingNominations)) {
+				    voteService.saveOrUpdateVoteQueContent(nomination);
+				    voteContent.getVoteQueContents().add(nomination);
+				    nominationIndex++;
+				    anyAnswersAdded = true;
+				}
 			    }
 			}
 			if (anyAnswersAdded) {
-			    inputCount++;
+			    inputsAdded++;
 			}
 		    }
 		}
@@ -365,10 +369,8 @@ public class LearningUtil implements VoteAppConstants {
 	    // the input is a list of strings (questions, for example)
 	    int nominationIndex = voteContent.getVoteQueContents().size() + 1;
 	    String[] userAnswers = (String[]) value;
-	    Short maxInputs = voteContent.getMaxInputs();
-	    short inputCount = 0;
 	    for (String questionText : userAnswers) {
-		if (maxInputs != null && maxInputs > 0 && inputCount >= maxInputs) {
+		if (maxInputs != null && inputsAdded >= maxInputs) {
 		    // if we reached the maximum number of inputs, i.e. number of students that will be taken
 		    // into account
 		    break;
@@ -379,10 +381,12 @@ public class LearningUtil implements VoteAppConstants {
 		    nomination.setDisplayOrder(nominationIndex);
 		    nomination.setMcContent(voteContent);
 		    nomination.setQuestion(questionText);
-		    voteService.saveOrUpdateVoteQueContent(nomination);
-		    voteContent.getVoteQueContents().add(nomination);
-		    nominationIndex++;
-		    inputCount++;
+		    if (!nominationExists(nomination, existingNominations)) {
+			voteService.saveOrUpdateVoteQueContent(nomination);
+			voteContent.getVoteQueContents().add(nomination);
+			nominationIndex++;
+			inputsAdded++;
+		    }
 		}
 	    }
 	} else if (value instanceof String && !StringUtils.isBlank((String) value)) {
@@ -391,18 +395,18 @@ public class LearningUtil implements VoteAppConstants {
 	    nomination.setDisplayOrder(nominationIndex);
 	    nomination.setMcContent(voteContent);
 	    nomination.setQuestion((String) value);
-	    voteService.saveOrUpdateVoteQueContent(nomination);
-	    voteContent.getVoteQueContents().add(nomination);
+	    if (!nominationExists(nomination, existingNominations)) {
+		voteService.saveOrUpdateVoteQueContent(nomination);
+		voteContent.getVoteQueContents().add(nomination);
+	    }
 	}
 	if (value instanceof SimpleURL[][]) {
 	    if (value != null) {
 		SimpleURL[][] usersAndUrls = (SimpleURL[][]) value;
 		int nominationIndex = voteContent.getVoteQueContents().size() + 1;
-		Short maxInputs = voteContent.getMaxInputs();
-		short inputCount = 0;
 		for (SimpleURL[] userUrls : usersAndUrls) {
 		    if (userUrls != null) {
-			if (maxInputs != null && maxInputs > 0 && inputCount >= maxInputs) {
+			if (maxInputs != null && inputsAdded >= maxInputs) {
 			    // if we reached the maximum number of inputs, i.e. number of students that will be taken
 			    // into account
 			    break;
@@ -416,15 +420,16 @@ public class LearningUtil implements VoteAppConstants {
 
 				String link = "<a href=\"" + url.getUrl() + "\">" + url.getNameToDisplay() + "</a>";
 				nomination.setQuestion(link);
-
-				voteService.saveOrUpdateVoteQueContent(nomination);
-				voteContent.getVoteQueContents().add(nomination);
-				nominationIndex++;
-				anyAnswersAdded = true;
+				if (!nominationExists(nomination, existingNominations)) {
+				    voteService.saveOrUpdateVoteQueContent(nomination);
+				    voteContent.getVoteQueContents().add(nomination);
+				    nominationIndex++;
+				    anyAnswersAdded = true;
+				}
 			    }
 			}
 			if (anyAnswersAdded) {
-			    inputCount++;
+			    inputsAdded++;
 			}
 		    }
 		}
@@ -435,10 +440,8 @@ public class LearningUtil implements VoteAppConstants {
 	    // the input is a list of strings (questions, for example)
 	    int nominationIndex = voteContent.getVoteQueContents().size() + 1;
 	    SimpleURL[] userUrls = (SimpleURL[]) value;
-	    Short maxInputs = voteContent.getMaxInputs();
-	    short inputCount = 0;
 	    for (SimpleURL url : userUrls) {
-		if (maxInputs != null && maxInputs > 0 && inputCount >= maxInputs) {
+		if (maxInputs != null && inputsAdded >= maxInputs) {
 		    // if we reached the maximum number of inputs, i.e. number of students that will be taken
 		    // into account
 		    break;
@@ -450,11 +453,12 @@ public class LearningUtil implements VoteAppConstants {
 
 		    String link = "<a href=\"" + url.getUrl() + "\">" + url.getNameToDisplay() + "</a>";
 		    nomination.setQuestion(link);
-
-		    voteService.saveOrUpdateVoteQueContent(nomination);
-		    voteContent.getVoteQueContents().add(nomination);
-		    nominationIndex++;
-		    inputCount++;
+		    if (!nominationExists(nomination, existingNominations)) {
+			voteService.saveOrUpdateVoteQueContent(nomination);
+			voteContent.getVoteQueContents().add(nomination);
+			nominationIndex++;
+			inputsAdded++;
+		    }
 		}
 	    }
 	} else if (value instanceof SimpleURL) {
@@ -465,11 +469,26 @@ public class LearningUtil implements VoteAppConstants {
 	    SimpleURL url = (SimpleURL) value;
 	    String link = "<a href=\"" + url.getUrl() + "\">" + url.getNameToDisplay() + "</a>";
 	    nomination.setQuestion(link);
-
-	    nomination.setMcContent(voteContent);
-	    voteService.saveOrUpdateVoteQueContent(nomination);
-	    voteContent.getVoteQueContents().add(nomination);
+	    if (!nominationExists(nomination, existingNominations)) {
+		nomination.setMcContent(voteContent);
+		voteService.saveOrUpdateVoteQueContent(nomination);
+		voteContent.getVoteQueContents().add(nomination);
+	    }
 	}
+
+	voteContent.setExternalInputsAdded(inputsAdded);
+	voteService.saveVoteContent(voteContent);
     }
 
+    private static boolean nominationExists(VoteQueContent nomination, Set<VoteQueContent> existingNominations) {
+	if (existingNominations != null && nomination != null) {
+	    for (VoteQueContent existingNomination : existingNominations) {
+		if (existingNomination.getQuestion() != null
+			&& existingNomination.getQuestion().equals(nomination.getQuestion())) {
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }
 }

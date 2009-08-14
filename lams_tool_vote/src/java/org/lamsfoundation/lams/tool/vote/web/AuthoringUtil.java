@@ -765,7 +765,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setMaxNominationCount(maxNomcount);
 	    voteContent.setOnlineInstructions(richTextOnlineInstructions);
 	    voteContent.setOfflineInstructions(richTextOfflineInstructions);
-	    voteContent.setMaxInputs(maxInputsShort);
+	    voteContent.setMaxExternalInputs(maxInputsShort);
 	}
 
 	voteContent.setAssignedDataFlowObject(assignedDataFlowObject != null);
@@ -1343,7 +1343,7 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	    voteContent.setReflectionSubject(reflectionSubject);
 
-	    voteContent.setMaxInputs(maxInputsShort);
+	    voteContent.setMaxExternalInputs(maxInputsShort);
 	}
 
 	if (newContent) {

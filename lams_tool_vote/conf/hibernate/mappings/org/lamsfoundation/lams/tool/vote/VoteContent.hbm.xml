@@ -167,19 +167,19 @@
         length="1"        
    />
    
+  
    <property
-        name="dataFlowObjectUsed"
-        type="boolean"
+        name="maxExternalInputs"
+        type="java.lang.Short"
         access="property"
-        column="data_flow_object_used"
-        length="1"        
+        column="max_external_inputs"
    />
    
    <property
-        name="maxInputs"
+        name="externalInputsAdded"
         type="java.lang.Short"
         access="property"
-        column="max_inputs"
+        column="external_inputs_added"
    />
 
     	 <set
