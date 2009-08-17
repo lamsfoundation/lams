@@ -92,14 +92,7 @@ public class CssTag extends TagSupport {
 		    if (pageDirection.toLowerCase().equals(RTL_DIR))
 			rtl = true;
 
-		String style = getStyle();
-		List<String> themeList;
-		if(style != null && style.equals(MAIN_STYLE)){
-		    themeList = CSSThemeUtil.getAllUserThemes(CSSThemeUtil.DEFAULT_MAIN_HTML_THEME);
-		}
-		else{
-		    themeList = CSSThemeUtil.getAllUserThemes(CSSThemeUtil.DEFAULT_HTML_THEME);
-		}
+		List<String> themeList = CSSThemeUtil.getAllUserThemes();
 
 		for (String theme : themeList) {
 		    if (theme != null) {
@@ -116,8 +109,7 @@ public class CssTag extends TagSupport {
 		}
 
 	    } else {
-		log
-			.warn("CSSTag unable to write out CSS entries as the server url is missing from the configuration file.");
+		log.warn("CSSTag unable to write out CSS entries as the server url is missing from the configuration file.");
 	    }
 
 	    // Special IE stylesheet for all those IE related formatting issues
@@ -218,9 +210,10 @@ public class CssTag extends TagSupport {
      *                pages use learner, fancy pages such as index page use
      *                core"
      * 
-     * Sets whether to use blah.css (style="core") or blah_learner.css
-     * (style=learner). If this parameter is left blank, you get
-     * blah_learner.css e.g. default_learner.css
+     *                Sets whether to use blah.css (style="core") or
+     *                blah_learner.css (style=learner). If this parameter is
+     *                left blank, you get blah_learner.css e.g.
+     *                default_learner.css
      * @return Returns style.
      */
     public String getStyle() {

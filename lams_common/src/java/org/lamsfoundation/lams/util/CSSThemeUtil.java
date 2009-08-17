@@ -38,8 +38,6 @@ public class CSSThemeUtil {
 	// private static Logger log = Logger.getLogger(CSSThemeUtil.class);
 	public static String DEFAULT_HTML_THEME = "defaultHTML";
 	
-	public static String DEFAULT_MAIN_HTML_THEME = "defaultMainHTML";
-	
 	/**
 	 * Will return a list of stylesheets for the current user.
 	 * If the user does not have a specific stylesheet, then 
@@ -47,7 +45,7 @@ public class CSSThemeUtil {
 	 * The default stylesheet will always be included in this list.
 	 * @return
 	 */
-	public static List<String> getAllUserThemes(String defaultTheme)
+	public static List<String> getAllUserThemes()
 	{
 		List<String> themeList = new ArrayList<String>();
 		
@@ -55,7 +53,7 @@ public class CSSThemeUtil {
 		// define changes.
    		
 
-		themeList.add(defaultTheme);   	
+		themeList.add(DEFAULT_HTML_THEME);   	
 
 
    		boolean userThemeFound = false;

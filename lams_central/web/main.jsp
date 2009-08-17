@@ -149,7 +149,7 @@
 			</c:forEach>
 		</div>
 	</div>
-	<div id="content">
+	<div id="content-main">
 		<div id="message" style="text-align: center;"></div>
 		<div style="display: block;" class="box">
 			<table cellpadding="0">
