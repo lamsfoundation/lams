@@ -115,7 +115,7 @@ public class Configuration implements InitializingBean {
     public static String getItemValue(Object obj) {
 	ConfigurationItem item = (ConfigurationItem) obj;
 	if (item.getValue() != null)
-	    return item.getValue();
+	    return item.getValue().trim();
 	return null;
     }
 
@@ -147,6 +147,8 @@ public class Configuration implements InitializingBean {
     }
 
     public static void updateItem(String key, String value) {
+	if (value != null)
+	    value = value.trim();
 	if (items.containsKey(key))
 	    setItemValue(items.get(key), value);
     }
