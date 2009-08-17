@@ -23,12 +23,14 @@ a {
 	color: #47bc23;
 	text-decoration: none;
 	border-bottom: 1px dotted #47bc23;
+	text-decoration: none;
 }
 
 a:hover {
 	color: #47bc23;
 	text-decoration: none;
 	border-bottom: 1px solid #47bc23;
+	text-decoration: none;
 }
 
 body.stripes {
@@ -125,23 +127,52 @@ li.no-list-type  {
 	list-style-type: none;
 }
 #page { /*whole layout of page*/
-	margin: 25px auto;
-	width: 707px;
+	margin: 15px auto 10px auto;
+	width:95%;
+	min-width: 707px;
+	max-width: 1024px;
 	background: url('../images/css/lams_logo.gif') no-repeat -10px 10px;
 }
 
+#page-main { /*whole layout of page*/
+	margin: 25px auto;
+	width: 100%;
+	background: url('../images/css/lams_logo.gif') no-repeat 10px 585px;
+}
+
 #header { /*layout of the header */
-	width: 707px;
-	height: 49px;
-	background: url('../images/css/top_bg.jpg') no-repeat bottom;
+	height: 17px;
+}
+
+#header-main { /*layout of the header */
+	width: 90%;
+	min-width:707px;
+	max-width:1024px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:5px;
+	
 }
 
 #header-no-tabs { /*layout of the header  when no-tabs are required. Big enough to line up with LAMS icon - don't use for learner (see header-no-tabs-learner) */
-width:707px; height:40px; background:url('../images/css/top_bg.jpg') no-repeat bottom; }
+	width:90%;
+	margin-left:auto;
+	margin-right:auto;
+	min-width:707px;
+	max-width:1024px;
+	height:40px; 
+	background:url('../images/css/top_bg.jpg') no-repeat bottom;
+}
 
-
-
-
+#header-no-tabs-main { /*layout of the header  when no-tabs are required. Big enough to line up with LAMS icon - don't use for learner (see header-no-tabs-learner) */
+	width:90%;
+	margin-left:auto;
+	margin-right:auto;
+	min-width:707px;
+	max-width:1024px;
+	height:40px; 
+	background:url('../images/css/top_bg.jpg') no-repeat bottom;
+}
 
 /*
 *************************************************
@@ -152,9 +183,8 @@ Layout of  tab navigation section
 #nav { /* layout of box that contains the main navigation */
 	margin-top: 15px;
 	width: auto;
-	height: 40px;
-	margin-right: 3px;
-	
+	height: 24px;
+	margin-right: -1px;
 }
 
 #nav a {
@@ -269,7 +299,7 @@ Tab navigation styles
  .tab-right-highlight { /* defines right side of selected tab */ 	 
          height: 31px; 	 
          width: 8px; 	 
-         background: url('../images/css/button_highlight_right.jpg') no-repeat top right;; 	 
+         background: url('../images/css/button_highlight_right.jpg') no-repeat top right;
          float: left 	 
  }
 
@@ -280,11 +310,35 @@ Layout of main content section
 
 ********************************************** */
 #content { /*box around the main content area */
-	width: 707px;
-	background: url('../images/css/body_bg.jpg') repeat-y top right;
-	padding: 0px 15px 40px 15px;
+	min-width: 707px;
+	max-width: 1024px;
+	width: 98%;
+	margin-left:auto;
+	margin-right:auto;
+	background-color: white;
+	padding-bottom:40px;
+	padding-left:10px;
+	padding-right:10px;
 	font-size: 11px;
-	margin-top: -5px;
+	margin-top: 12px;
+	border-left:1px solid #aaa;
+	border:1px solid #aaa;
+	border-right:1px solid #aaa;
+}
+
+#content-main { /*box around the main content area */
+	background-color:#fff;
+	font-size: 11px;
+	border:1px solid #d4d8da;
+	margin-top: 0px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:-5px;
+	width:90%; 
+	height:100%; 
+	padding-bottom:-5px;
+	min-width:707px;
+	max-width:1024px;
 }
 
 /*layout of Links within the content area */
@@ -352,6 +406,20 @@ Layout of main content section
 	border: 0px none;
 	padding:5px 20px 6px 20px;
 	text-decoration: none;
+}
+
+/* OK and Cancel icon buttons */
+.okIcon {
+	padding: 0 0 5px 18px; 
+	background: url('../images/css/accept.png') no-repeat;
+	
+}
+
+/* OK and Cancel icon buttons */
+.cancelIcon {
+	padding: 0 0 5px 18px; 
+	background: url('../images/css/cancel.png') no-repeat;
+	
 }
 
 /*layout of a general button*/
@@ -438,27 +506,27 @@ a:hover.button-add-item {
 }
 
 
-#content a.sequence-name-link {
+#content-main a.sequence-name-link {
 	color:#0087E5;
 	text-decoration: none;
 	border-bottom: 1px dotted #0087E5;
 	}
 		
-#content a:hover.sequence-name-link {
+#content-main a:hover.sequence-name-link {
 	color:#0087E5;
 	text-decoration: none;
 	border-bottom: 1px solid #0087E5;
 	
 }
 
-#content a.disabled-sequence-name-link {
+#content-main a.disabled-sequence-name-link {
 	color:#FF6666;
 	text-decoration: none;
 	border-bottom: 1px dotted #FF6666;
 }
 	
 	
-#content a:hover.disabled-sequence-name-link {
+#content-main a:hover.disabled-sequence-name-link {
 	color:#FF6666;
 	text-decoration: none;
 	border-bottom: 1px solid #FF6666;
@@ -466,7 +534,7 @@ a:hover.button-add-item {
 }
 
 
-#content a.sequence-action-link {
+#content-main a.sequence-action-link {
 	color:#47bc23;
 	text-decoration: none;
 	border:0px;
@@ -474,7 +542,7 @@ a:hover.button-add-item {
 	margin-right:20px;	
 }
 
-#content a:hover.sequence-action-link {
+#content-main a:hover.sequence-action-link {
 	color:#47bc23;
 	text-decoration: none;
 	border-bottom:0px;
@@ -546,10 +614,16 @@ input.disabled {
 	min-height: 100px;
 }
 
-#footer { /*layout of the footer - the bottom of the box */
-	width: 707px;
-	height: 14px;
-	background: url('../images/css/footer_bg.jpg') no-repeat bottom;
+.box-main {
+	display: none;
+	min-height: 100px;
+	margin-right:5%;
+	margin-left:5%;
+}
+
+#footer-main { /*layout of the footer - the bottom of the box */
+	background-color: white;
+//	background: url('../images/css/footer_bg.jpg') no-repeat bottom;
 }
 
 #footer a{ /*layout of the footer - the bottom of the box */
@@ -665,14 +739,18 @@ table.chosengrouping td select {
 /*layout of the table with form elements */
 
 table { 
-	 width:94%;
-	 margin-right:7px; 
+	 width:100%;
+	 margin-left:auto; 
+	 margin-right:auto; 
 	 text-align:right; 
-	 }
+}
 
 td { 
 	padding:10px; 
 	font-size:12px;
+	margin-right:auto;
+	margin-left:auto;
+	align:center;
 }
 
 td p{ 
@@ -786,6 +864,18 @@ hr {border:0px;
 }
 
 b.error {color:#cc0000;} 
+
+/* ***********************************************
+    Monitoring page styles
+************************************************ */
+
+/* Display the adavanced options in the summary tab */
+div.monitoring-advanced {
+	margin-right: 25px;
+	margin-left: 30px;
+	margin-bottom: 20px;
+}
+
 
 /*
 *************************************************
@@ -972,15 +1062,19 @@ My Courses Pages
 
 #page-mycourses { /*whole layout of page*/
 	margin: 25px auto;
-	width: 707px;
-	background: url('../images/css/lams_logo.gif') no-repeat right -7px;
+	min-width: 707px;
+	max-width: 1024px;
+	width: 100%;
+	background: url('../images/css/lams_logo.gif') no-repeat 95% -7px;
 
 }
 
 #page-mycourses #footer { /*layout of the footer - the bottom of the box */
-	width: 707px;
-	height: 14px;
-	background: url('../images/css/footer_bg.jpg') no-repeat top;
+	width: 90%;
+	min-width:707px;
+	max-width:1024px;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 #page-mycourses #footer p{ 
@@ -993,9 +1087,12 @@ My Courses Pages
 
 
 #header-my-courses { /*layout of the header */
-	width: 707px;
-	height:65px;
-	background: url('../images/css/top_bg.jpg') no-repeat bottom;
+	width:90%;
+	min-width:707px;
+	max-width:1024px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:5px;
 }
 
 /* my courses nav */
@@ -1003,16 +1100,17 @@ My Courses Pages
 .nav-box-right {
 	height: 31px;
 	width: auto;
-	margin-left: 3px; /* was 2 */
+	margin-left: -1px;
 	margin-top: 16px;
 	float: left;
-	text-align: center;}
+	text-align: center;
+	margin-right: 3px;
+}
 
 #nav-right { /* layout of box that contains the main navigation */
 	margin-top:30px;
-	width: auto;
+	width: 100%;
 	height: 40px;
-	margin-left: 1px;
 }
 
 #nav-right a {
@@ -1034,11 +1132,17 @@ My Courses Pages
 
 /* my courses grey buttons in the green bar */
 
-.mycourses-left-buttons {float:right; padding-left:10px;}
+.mycourses-left-buttons {
+	float:right; padding-left:10px;
+}
 
-.mycourses-right-buttons {float:left; padding-left:15px;  margin-top:6px; height:24px; font-size:11px;}
+.mycourses-right-buttons {
+	float:left; padding-left:15px;  margin-top:6px; height:24px; font-size:11px;
+}
 
-#content a.add-lesson-button {
+#content-main a.sorting { border-bottom: none; cursor: pointer; }
+
+#content-main a.add-lesson-button {
 	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right;
 	color: #666;
 	padding: 5px 30px 3px 12px;
@@ -1049,7 +1153,7 @@ My Courses Pages
 }
 
 
-#content a:hover.add-lesson-button {
+#content-main a:hover.add-lesson-button {
 	background: url('../images/css/add_lesson.rtl.jpg') no-repeat top right;
 	color: #47bc23;
 	padding: 5px 30px 3px 12px;
@@ -1060,7 +1164,7 @@ My Courses Pages
 }
 
 
-#content a.manage-group-button {
+#content-main a.manage-group-button {
 	background: url('../images/css/manage_groups.rtl.jpg') no-repeat top right;
 	color: #666;
 	padding: 5px 30px 3px 12px;
@@ -1071,8 +1175,8 @@ My Courses Pages
 }
 
 
-#content a:hover.manage-group-button {
-	background: url('../images/css/manage_groups.rtl.jpg') no-repeat top right;
+#content-main a:hover.manage-group-button {
+	background: url('../images/css/manage_groups_over.rtl.jpg') no-repeat top right;
 	color: #47bc23;
 	padding: 5px 30px 3px 12px;
 	text-decoration: none;
@@ -1081,7 +1185,7 @@ My Courses Pages
     display:block;
 }
 
-#content a.show-all-groups-button {
+#content-main a.show-all-groups-button {
 	background: url('../images/css/show_all_groups.jpg') no-repeat 0px 0px;
 	color: #666;
 	padding: 5px 16px 6px 12px;
@@ -1090,7 +1194,7 @@ My Courses Pages
 	border-bottom: 0px;
 }
 
-#content a:hover.show-all-groups-button {
+#content-main a:hover.show-all-groups-button {
 	background: url('../images/css/show_all_groups.jpg') no-repeat 0px 0px;
 	color: #47bc23;
 	padding: 5px 16px 6px 12px;
@@ -1107,9 +1211,9 @@ My Courses Pages
 	margin-top:15px;
 	margin-bottom:20px;
 	width:100%;
-	background:#fff url('../images/css/mycourses_greentab.jpg') no-repeat top; 
+	background:#fff url('../images/css/mycourses_greentab-minimal.jpg') repeat-x top; 
 	margin-right:0px;
-
+	
 }
 
 .course-bg h2 {
@@ -1143,21 +1247,21 @@ My Courses Pages
 }
 
 
-#content a.sequence-name-link {
+#content-main a.sequence-name-link {
 	color:#0087E5;
 	text-decoration: none;
 	border-bottom: 1px dotted #0087E5;
 	}
 	
 	
-#content a:hover.sequence-name-link {
+#content-main a:hover.sequence-name-link {
 	color:#0087E5;
 	text-decoration: none;
 	border-bottom: 1px solid #0087E5;
 	
 }
 
-#content a.sequence-action-link {
+#content-main a.sequence-action-link {
 	color:#47bc23;
 	text-decoration: none;
 	border:0px;
@@ -1165,7 +1269,7 @@ My Courses Pages
 	margin-right:20px;	
 }
 
-#content a:hover.sequence-action-link {
+#content-main a:hover.sequence-action-link {
 	color:#47bc23;
 	text-decoration: none;
 	border-bottom:0px;
@@ -1241,3 +1345,331 @@ text-align:right;
 }
 
 .userpage-td {border-right:1px solid #ccc;}
+
+.user-img {background: url('../images/css/user.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
+}
+
+.mycourses-monitor-img {background: url('../images/css/mycourses_monitor.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
+}
+
+.mycourses-mark-img {background: url('../images/css/mark.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
+}
+
+.mycourses-addlesson-img {background: url('../images/css/mycourses_addlesson.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px;
+}
+
+.mycourses-stop-img {background: url('../images/css/lesson_disabled.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+}
+
+.mycourses-completed-img {background: url('../images/css/lesson_completed.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+}
+
+/*IE style workarounds */
+* html  #content {
+	background-color:#fff;
+	font-size: 11px;
+	border:1px solid #d4d8da;
+	margin-top: -16px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:10px;
+	width:90%; 
+	height:100%; 
+	padding-bottom:5px;
+	min-width:707px;
+	max-width:1024px;
+	position:relative;
+}
+
+* html #content-main { /*box around the main content area */
+	background-color:#fff;
+	font-size: 11px;
+	border:1px solid #d4d8da;
+	margin-top: -15px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:-5px;
+	width:90%; 
+	height:100%; 
+	padding-bottom:-5px;
+	min-width:707px;
+	max-width:1024px;
+}
+
+* html  #header { /*layout of the header */
+	width: 90%;
+	min-width:707px;
+	max-width:1024px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:5px;
+}
+	
+* html  #header-my-courses { /*layout of the header */
+	width:90%;
+	min-width:707px;
+	max-width:1024px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:5px;
+}
+
+* html .nav-box-right  {
+	height: 31px;
+	width: auto;
+	margin-left: -1px;
+	margin-top: 16px;
+	float: left;
+	text-align: center;
+	margin-right: 3px;
+}
+
+* html  #nav-right { /* layout of box that contains the main navigation */
+	margin-top:30px;
+	width: 100%;
+	height: 40px;
+}
+
+* html  .mycourses-right-buttons {
+	float:left; padding-left:15px;  margin-top:6px; height:24px; font-size:11px;
+}
+
+* html  #content-main a.add-lesson-button {
+	background: url ('../images/css/add_lesson.jpg') no-repeat 0px 0px;
+	color: #666;
+	border: 0px none;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	margin-left:5px;
+	display: run-in;
+}
+
+* html  #content-main a:hover.add-lesson-button {
+	background: url ('../images/css/add_lesson.jpg') no-repeat 0px 0px;
+	color: #47bc23;
+	border: 0px none;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	margin-top:0px;
+	margin-left:5px;
+	border-right:1px solid #d2d2d2;
+	display: run-in;
+}
+
+* html  #content-main a.manage-group-button {
+	background: url ('../images/css/manage_groups.jpg') no-repeat 0px 0px;
+	color: #666;
+	border: 0px none;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	margin-top:6px;
+	margin-left:10px;
+}
+
+* html  #content-main a:hover.manage-group-button {
+	background: url ('../images/css/manage_groups.jpg') no-repeat 0px 0px;
+	color: #47bc23;
+	border: 0px none;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	margin-top:0px;
+	margin-left:10px;
+	border-right:1px solid #d2d2d2;
+}
+
+* html  .right-buttons {float:left; padding-left:20px; padding-top:5px;}
+
+* html  .space-bottom {
+	margin-bottom: 40px;
+	
+}
+
+* html #nav-right { /* layout of box that contains the main navigation */
+	margin-top:30px;
+	width: 100%;
+	height: 40px;
+	position:relative;
+	z-index:2;
+	margin-left:-1px;
+}
+
+* html #page-mycourses { /*whole layout of page*/
+	margin: 25px auto;
+	width: 100%;
+	background: url('../images/css/lams_logo.gif') no-repeat 95% 25px;
+}
+
+/*IE 7 workarounds */
+
+*:first-child+html #content {
+	background-color:#fff;
+	font-size: 11px;
+	border:1px solid #d4d8da;
+	margin-top: 53px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:10px;
+	width:90%; 
+	height:100%; 
+	padding-bottom:15px;
+	min-width:707px;
+	max-width:1024px;
+	position:relative;
+}
+
+*:first-child+html #page-mycourses { /*whole layout of page*/
+	margin: 25px auto;
+	width: 100%;
+	background: url('../images/css/lams_logo.gif') no-repeat 95% -5px;
+}
+
+*:first-child+html .nav-box-right {
+	height: 31px;
+	width: auto;
+	margin-left: -1px;
+	margin-top: -18px;
+	float: left;
+	text-align: center;
+	margin-right: 3px;
+}
+
+*:first-child+html .mycourses-right-buttons {
+	float:left; padding-left:15px;  margin-top:6px; height:24px; font-size:11px;
+}
+
+*:first-child+html  #header { /*layout of the header */
+	width: 90%;
+	min-width:707px;
+	max-width:1024px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:5px;
+}
+	
+*:first-child+html  #header-my-courses { /*layout of the header */
+	width:90%;
+	min-width:707px;
+	max-width:1024px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:-25px;
+}
+
+*:first-child+html #nav-right { /* layout of box that contains the main navigation */
+	margin-top:30px;
+	width: 100%;
+	height: 40px;
+	position:relative;
+	z-index:2;
+}
+
+*:first-child+html .nav-box-right {
+	height: 0px;
+	width: auto;
+	margin-left: -1px;
+	margin-top: -14px;
+	float: left;
+	text-align: center;
+}
+
+
+
+
+/* Index Page more actions drop down menu */
+ul.more-actions-list {
+	background: white;
+	position: absolute; 
+	z-index: 99; 
+	display: none;
+	margin: 0px;
+	padding: 2px;
+	border:thin solid gray;
+}
+
+ul.more-actions-list li {
+	padding: 6px;
+	font-size: 10px;
+	margin: 0px;
+	list-style: none;
+}
+
+#content-main a.more-actions-button {
+	background: url('../images/css/more_options.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	display: run-in;
+}
+
+#content-main a:hover.more-actions-button {
+        background: url('../images/css/more_options.png') no-repeat 0px 0px;
+        color: #47bc23;
+	padding: 5px 12px 6px 30px;
+        text-decoration: none;
+        border-right:1px solid #d2d2d2;
+        border-bottom: 0px;
+	display: run-in;
+}
+
+#content-main a.my-grades-button {
+	background: url('../images/css/my-grades.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	display: run-in;
+}
+
+#content-main a:hover.my-grades-button {
+        background: url('../images/css/my-grades.png') no-repeat 0px 0px;
+        color: #47bc23;
+	padding: 5px 12px 6px 30px;
+        text-decoration: none;
+        border-right:1px solid #d2d2d2;
+        border-bottom: 0px;
+	display: run-in;
+}
+
+#content-main a.course-gradebook-button {
+	background: url('../images/css/course_gradebook.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	display: run-in;
+}
+
+#content-main a:hover.course-gradebook-button {
+        background: url('../images/css/course_gradebook.png') no-repeat 0px 0px;
+        color: #47bc23;
+	padding: 5px 12px 6px 30px;
+        text-decoration: none;
+        border-right:1px solid #d2d2d2;
+        border-bottom: 0px;
+	display: run-in;
+}
+
+#content-main a.search-lesson {
+	background: url('../images/css/search_lesson.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	display: run-in;
+}
+
+#content-main a:hover.search-lesson {
+	background: url('../images/css/search_lesson.png') no-repeat 0px 0px;
+        color: #47bc23;
+        padding: 5px 12px 6px 30px;
+        text-decoration: none;
+        border-right:1px solid #d2d2d2;
+        border-bottom: 0px;
+}
