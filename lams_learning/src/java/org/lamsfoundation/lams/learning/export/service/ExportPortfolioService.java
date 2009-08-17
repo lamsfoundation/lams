@@ -511,7 +511,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
      * need the full theme, not just the name, so we can get the directory names for the images.
      */
     public Collection<CSSThemeVisualElement> getUserThemes() {
-	List<String> themeNames = CSSThemeUtil.getAllUserThemes(CSSThemeUtil.DEFAULT_HTML_THEME);
+	List<String> themeNames = CSSThemeUtil.getAllUserThemes();
 	Set<CSSThemeVisualElement> userThemes = new HashSet<CSSThemeVisualElement>();
 	for (String themeName : themeNames) {
 	    CSSThemeVisualElement theme = themeService.getTheme(themeName);
