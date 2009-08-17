@@ -408,20 +408,6 @@ Layout of main content section
 	text-decoration: none;
 }
 
-/* OK and Cancel icon buttons */
-.okIcon {
-	padding: 0 0 5px 18px; 
-	background: url('../images/css/accept.png') no-repeat;
-	
-}
-
-/* OK and Cancel icon buttons */
-.cancelIcon {
-	padding: 0 0 5px 18px; 
-	background: url('../images/css/cancel.png') no-repeat;
-	
-}
-
 /*layout of a general button*/
 a.button {
 	background: url('../images/css/btn_off.gif') repeat-x 0px 0px;
@@ -1369,7 +1355,7 @@ text-align:right;
 	background-color:#fff;
 	font-size: 11px;
 	border:1px solid #d4d8da;
-	margin-top: -16px;
+	margin-top: -25px;
 	margin-left:auto;
 	margin-right:auto;
 	margin-bottom:10px;
@@ -1507,7 +1493,7 @@ text-align:right;
 	background-color:#fff;
 	font-size: 11px;
 	border:1px solid #d4d8da;
-	margin-top: 53px;
+	margin-top: -25px;
 	margin-left:auto;
 	margin-right:auto;
 	margin-bottom:10px;
@@ -1595,25 +1581,27 @@ ul.more-actions-list li {
 	list-style: none;
 }
 
+
 #content-main a.more-actions-button {
-	background: url('../images/css/more_options.png') no-repeat 0px 0px;
+	background: url('../images/css/more_options.rtl.png') no-repeat top right;
 	color: #666;
-	padding: 5px 12px 6px 30px;
+	padding: 5px 30px 3px 12px;
 	text-decoration: none;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
-	display: run-in;
+	display:block;
 }
 
 #content-main a:hover.more-actions-button {
-        background: url('../images/css/more_options.png') no-repeat 0px 0px;
-        color: #47bc23;
-	padding: 5px 12px 6px 30px;
-        text-decoration: none;
-        border-right:1px solid #d2d2d2;
-        border-bottom: 0px;
-	display: run-in;
+    background: url('../images/css/more_options.rtl.png') no-repeat top right;
+    color: #47bc23;
+	padding: 5px 30px 3px 12px;
+    text-decoration: none;
+    border-right:1px solid #d2d2d2;
+    border-bottom: 0px;
+	display: block;
 }
+
 
 #content-main a.my-grades-button {
 	background: url('../images/css/my-grades.png') no-repeat 0px 0px;
