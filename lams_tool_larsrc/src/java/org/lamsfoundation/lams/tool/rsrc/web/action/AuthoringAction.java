@@ -177,6 +177,9 @@ public class AuthoringAction extends Action {
 	if (param.equals("saveOrUpdatePedagogicalPlannerForm")) {
 	    return saveOrUpdatePedagogicalPlannerForm(mapping, form, request, response);
 	}
+	if (param.equals("switchResourceItemPosition")) {
+	    return switchResourceItemPosition(mapping, form, request, response);
+	}
 
 	return mapping.findForward(ResourceConstants.ERROR);
     }
@@ -458,6 +461,16 @@ public class AuthoringAction extends Action {
 	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 	resourceItemList.clear();
 	resourceItemList.addAll(items);
+	
+	
+	// If there is no order id, set it up
+	int i = 1;
+	for (ResourceItem resourceItem : resourceItemList) {
+	    if (resourceItem.getOrderId() == null || resourceItem.getOrderId() != i) {
+		resourceItem.setOrderId(i);
+	    }
+	    i++;
+	}
 
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, resourceForm);
 	return mapping.findForward(ResourceConstants.SUCCESS);
@@ -540,7 +553,7 @@ public class AuthoringAction extends Action {
 		// get back UID
 		resourcePO.setUid(uid);
 	    } else { // if it is Teacher, then just update basic tab content
-		     // (definelater)
+		// (definelater)
 		resourcePO.setInstructions(resource.getInstructions());
 		resourcePO.setTitle(resource.getTitle());
 		// change define later status
@@ -1046,6 +1059,7 @@ public class AuthoringAction extends Action {
 	if (itemIdx == -1) { // add
 	    item = new ResourceItem();
 	    item.setCreateDate(new Timestamp(new Date().getTime()));
+	    item.setOrderId(resourceList.size() + 1);
 	    resourceList.add(item);
 	} else { // edit
 	    List<ResourceItem> rList = new ArrayList<ResourceItem>(resourceList);
@@ -1349,4 +1363,35 @@ public class AuthoringAction extends Action {
 	plannerForm.setFileVersion(insertIndex, null);
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
+
+    private ActionForward switchResourceItemPosition(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+
+	String sessionMapID = WebUtil.readStrParam(request, "sessionMapID");
+	int resourceItemOrderID1 = WebUtil.readIntParam(request, "resourceItemOrderID1");
+	int resourceItemOrderID2 = WebUtil.readIntParam(request, "resourceItemOrderID2");
+
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	// check whether it is "edit(old item)" or "add(new item)"
+	SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
+
+	for (ResourceItem item : resourceList) {
+	    if (item.getOrderId() == resourceItemOrderID1) {
+		item.setOrderId(resourceItemOrderID2);
+		continue;
+	    }
+	    if (item.getOrderId() == resourceItemOrderID2) {
+		item.setOrderId(resourceItemOrderID1);
+		continue;
+	    }
+	}
+
+	SortedSet<ResourceItem> newItems = new TreeSet<ResourceItem>(new ResourceItemComparator());
+	newItems.addAll(resourceList);
+	sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, newItems);
+	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+	// return null to close this window
+	return mapping.findForward(ResourceConstants.SUCCESS);
+    }
+
 }

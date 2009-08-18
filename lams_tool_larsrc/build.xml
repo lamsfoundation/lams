@@ -503,12 +503,6 @@
         		<include name="**/*.*"/>
         	</fileset>
         </copy>
-        <copy verbose="yes" todir="${jboss.deploy}/${product}.war/WEB-INF/classes">
-	    	<fileset dir="${build.classes.java}">
-	    		<include name="**/*.properties"/>
-	    		<include name="**/*.xml"/>
-	    	</fileset>
-        </copy>
     </target>
 
 	<!-- end tasks **************************************************************************************************-->

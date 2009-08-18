@@ -66,6 +66,7 @@ create table tl_larsrc11_resource_item (
    open_url_new_window tinyint,
    resource_uid bigint,
    session_uid bigint,
+   order_id integer,
    primary key (uid)
 )type=innodb;
 create table tl_larsrc11_item_log (
@@ -117,8 +118,8 @@ INSERT INTO `tl_larsrc11_resource` (`uid`, `create_date`, `update_date`, `create
  `allow_add_urls`, `mini_view_resource_number`, `allow_auto_run`,`reflect_on_activity`) VALUES
   (1,NULL,NULL,NULL,'Resources','0','0','Instructions ',null,null,0,0,${default_content_id},0,0,0,0,0);
   
-INSERT INTO `tl_larsrc11_resource_item` (`uid`, `file_uuid`, `file_version_id`, `description`, `ims_schema`, `init_item`, `organization_xml`, `title`, `url`, `create_by`, `create_date`, `create_by_author`, `is_hide`, `item_type`, `file_type`, `file_name`, `open_url_new_window`, `resource_uid`, `session_uid`) VALUES 
-  (1,NULL,NULL,NULL,NULL,NULL,NULL,'Web Search','http://www.google.com ',null,NOW(),1,0,1,NULL,NULL,0,1,NULL);
+INSERT INTO `tl_larsrc11_resource_item` (`uid`, `file_uuid`, `file_version_id`, `description`, `ims_schema`, `init_item`, `organization_xml`, `title`, `url`, `create_by`, `create_date`, `create_by_author`, `is_hide`, `item_type`, `file_type`, `file_name`, `open_url_new_window`, `resource_uid`, `session_uid`, `order_id`) VALUES 
+  (1,NULL,NULL,NULL,NULL,NULL,NULL,'Web Search','http://www.google.com ',null,NOW(),1,0,1,NULL,NULL,0,1,NULL, 1);
 INSERT INTO `tl_larsrc11_item_instruction` (`uid`, `description`, `sequence_id`, `item_uid`) VALUES 
   (1,'Use Google to search the web',0,1);
     

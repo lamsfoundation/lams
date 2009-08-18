@@ -12,10 +12,10 @@
 		<img src="${ctxPath}/includes/images/indicator.gif"
 			style="display:none" id="resourceListArea_Busy" />
 	</h2>
-
+	
 	<table class="alternative-color" id="itemTable" cellspacing="0">
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
+		<c:set var="listSize" value="${fn:length(sessionMap.resourceList)}" />
 		<c:forEach var="resource" items="${sessionMap.resourceList}"
 			varStatus="status">
 			<tr>
@@ -30,6 +30,38 @@
 						<a href="#"
 							onclick="previewItem(1,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.verify.url" /> </a>
+					</td>
+					<td width="10%">
+						<%-- Don't display down icon if last line --%>
+						<c:choose>
+							<c:when test="${0 != status.index}">
+								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>"
+									onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')">
+							</c:when>
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>">
+							</c:otherwise>
+						</c:choose>
+
+						<c:choose>
+							<c:when test="${listSize != status.count}">
+								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>"
+									onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')">
+							</c:when>
+
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>">
+							</c:otherwise>
+
+						</c:choose>
+
+						<%-- Don't display down icon if last line --%>
 					</td>
 					<td width="5%">
 						<img src="${tool}includes/images/edit.gif"
@@ -55,6 +87,38 @@
 							onclick="previewItem(2,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.preview" /> </a>
 					</td>
+					<td width="10%">
+						<%-- Don't display down icon if last line --%>
+						<c:choose>
+							<c:when test="${0 != status.index}">
+								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>"
+									onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')">
+							</c:when>
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>">
+							</c:otherwise>
+						</c:choose>
+
+						<c:choose>
+							<c:when test="${listSize != status.count}">
+								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>"
+									onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')">
+							</c:when>
+
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>">
+							</c:otherwise>
+
+						</c:choose>
+
+						<%-- Don't display down icon if last line --%>
+					</td>
 					<td>
 						<img src="${tool}includes/images/edit.gif"
 							title="<fmt:message key="label.authoring.basic.resource.edit" />"
@@ -79,6 +143,38 @@
 							onclick="previewItem(3,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.preview" /> </a>
 					</td>
+					<td width="10%">
+						<%-- Don't display down icon if last line --%>
+						<c:choose>
+							<c:when test="${0 != status.index}">
+								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>"
+									onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')">
+							</c:when>
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>">
+							</c:otherwise>
+						</c:choose>
+
+						<c:choose>
+							<c:when test="${listSize != status.count}">
+								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>"
+									onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')">
+							</c:when>
+
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>">
+							</c:otherwise>
+
+						</c:choose>
+
+						<%-- Don't display down icon if last line --%>
+					</td>
 					<td>
 						<img src="${tool}includes/images/edit.gif"
 							title="<fmt:message key="label.authoring.basic.resource.edit" />"
@@ -101,6 +197,38 @@
 						<a href="#"
 							onclick="previewItem(4,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.preview" /> </a>
+					</td>
+					<td width="10%">
+						<%-- Don't display down icon if last line --%>
+						<c:choose>
+							<c:when test="${0 != status.index}">
+								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>"
+									onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')">
+							</c:when>
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.up"/>">
+							</c:otherwise>
+						</c:choose>
+
+						<c:choose>
+							<c:when test="${listSize != status.count}">
+								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>"
+									onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')">
+							</c:when>
+
+							<c:otherwise>
+								<img
+									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
+									border="0" title="<fmt:message key="label.down"/>">
+							</c:otherwise>
+
+						</c:choose>
+
+						<%-- Don't display down icon if last line --%>
 					</td>
 					<td>
 						<img src="${tool}includes/images/edit.gif"

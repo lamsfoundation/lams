@@ -72,6 +72,25 @@
 		hideBusy(resourceListTargetDiv);
 	}
 
+	function switchItem(resourceItemOrderID1, resourceItemOrderID2, sessionMapID) {
+		resourceItemOrderID1++;
+		resourceItemOrderID2++;
+		
+		var url = "<c:url value="/authoring/switchResourceItemPosition.do"/>";
+		var param = "sessionMapID=" + sessionMapID + "&resourceItemOrderID1=" + resourceItemOrderID1 + "&resourceItemOrderID2=" + resourceItemOrderID2;
+		deleteItemLoading();
+		var myAjax = new Ajax.Updater(
+	    	resourceListTargetDiv,
+	    	url,
+	    	{
+	    		method:'get',
+	    		parameters:param,
+	    		onComplete:deleteItemComplete,
+	    		evalScripts:true
+	    	}
+	    );
+	}
+
 </script>
 <!-- Basic Tab Content -->
 <table>

@@ -155,6 +155,15 @@
 			scope="request">
 			<forward name="success" path="/pages/authoring/pedagogicalPlannerForm.jsp" />
 		</action>
+		<action path="/authoring/switchResourceItemPosition"
+			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
+			name="resourceItemForm" 
+			validate="false"
+			parameter="switchResourceItemPosition"
+			scope="request">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		
 		<!-- ==========  Display Item  ========== -->
 		<action path="/reviewItem"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.ViewItemAction"
