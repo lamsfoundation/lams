@@ -281,7 +281,7 @@ Tab navigation styles
  .tab-right-highlight { /* defines right side of selected tab */ 	 
          height: 31px; 	 
          width: 8px; 	 
-         background: url('../images/css/button_highlight_right.jpg') no-repeat top right; 
+         background: url('../images/css/button_highlight_right.jpg') no-repeat top right;
          float: left 	 
  }
 
@@ -339,6 +339,34 @@ Layout of main content section
 
 #content a:hover.button {
 	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
+	color: #349018;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	text-decoration: none;
+}
+
+/*layout of authoring buttons*/
+
+/*layout of a general button*/
+#saveCancelButtons a.button {
+	background: url('../images/css/btn_off.gif') repeat-x 0px 2px;
+	color: #333;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	text-decoration: none;
+	font-size:11px;
+}
+
+/*  style to disbable input buttons */
+#saveCancelButtons a.button .disabled {
+	color: #999;
+	background: url('../images/css/btn_off.gif') repeat-x 0px 2px;
+	border: 0px none;
+	padding:5px 20px 6px 20px;
+	}
+
+#saveCancelButtons a:hover.button {
+	background: url('../images/css/btn_over.gif') repeat-x 0px 2px;
 	color: #349018;
 	border: 0px none;
 	padding:5px 20px 6px 20px;

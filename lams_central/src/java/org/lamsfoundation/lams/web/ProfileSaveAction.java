@@ -41,6 +41,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.hibernate.Hibernate;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -114,6 +115,10 @@ public class ProfileSaveAction extends Action {
 	SupportedLocale locale = (SupportedLocale) getService().findById(SupportedLocale.class,
 		(Integer) userForm.get("localeId"));
 	requestor.setLocale(locale);
+
+	CSSThemeVisualElement theme = (CSSThemeVisualElement) getService().findById(CSSThemeVisualElement.class,
+		(Long) userForm.get("userTheme"));
+	requestor.setHtmlTheme(theme);
 
 	if (userForm.get("disableLamsCommunityUsername") != null
 		&& (Boolean) userForm.get("disableLamsCommunityUsername")) {

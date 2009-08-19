@@ -27,6 +27,7 @@ import javax.servlet.ServletContext;
 
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.statistics.service.IStatisticsService;
+import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -48,6 +49,7 @@ public class AdminServiceProxy {
 	private static IImportService importService;
 	private static LdapService ldapService;
 	private static IStatisticsService statisticsService;
+	private static IThemeService themeService;
 	
 	
 	public static final IUserManagementService getService(ServletContext servletContext) {
@@ -98,6 +100,13 @@ public class AdminServiceProxy {
 		    statisticsService = (IStatisticsService)getDomainService(servletContext, "statisticsService");
 		}
 		return statisticsService;
+	}
+	
+	public static final IThemeService getThemeService(ServletContext servletContext) {
+		if (themeService == null) {
+		    themeService = (IThemeService)getDomainService(servletContext, "themeService");
+		}
+		return themeService;
 	}
 	
 	private static Object getDomainService(ServletContext servletContext,String serviceName) {

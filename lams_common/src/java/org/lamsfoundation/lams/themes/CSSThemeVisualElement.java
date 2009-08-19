@@ -70,6 +70,12 @@ public class CSSThemeVisualElement implements Serializable {
 
     /** persistent field */
     private Set elements;
+    
+    /** non-persistent field */
+    private Boolean currentDefaultTheme;
+    
+    /** non-persistent field */
+    private Boolean notEditable;
 
     /** full constructor */
     public CSSThemeVisualElement(Long id, String name, String description, boolean theme, String imageDirectory, CSSThemeVisualElement parentTheme, Set styles, Set elements) {
@@ -294,4 +300,19 @@ public class CSSThemeVisualElement implements Serializable {
             .toString();
     }
 
+    public Boolean getCurrentDefaultTheme() {
+        return currentDefaultTheme;
+    }
+
+    public void setCurrentDefaultTheme(Boolean currentDefaultTheme) {
+        this.currentDefaultTheme = currentDefaultTheme;
+    }
+
+    public Boolean getNotEditable() {
+        return notEditable;
+    }
+
+    public void setNotEditable(Boolean notEditable) {
+        this.notEditable = notEditable;
+    }
 }

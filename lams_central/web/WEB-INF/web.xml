@@ -242,11 +242,6 @@
 
    </servlet>
    <servlet>
-      <servlet-name>PresenceChatLoggerServlet</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.webservice.PresenceChatLoggerServlet</servlet-class>
-
-   </servlet>
-   <servlet>
       <servlet-name>updateCollapsedGroup</servlet-name>
       <servlet-class>org.lamsfoundation.lams.web.UpdateCollapsedGroupServlet</servlet-class>
 
@@ -466,10 +461,6 @@
    <servlet-mapping>
       <servlet-name>SimpleUploader</servlet-name>
       <url-pattern>/fckeditor/editor/filemanager/upload/simpleuploader</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>PresenceChatLoggerServlet</servlet-name>
-      <url-pattern>/PresenceChatLogger</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>updateCollapsedGroup</servlet-name>

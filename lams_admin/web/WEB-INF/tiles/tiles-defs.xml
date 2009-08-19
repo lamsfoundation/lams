@@ -155,4 +155,10 @@
 		<put name="content" value="statistics.jsp"/>
 	</definition>
 	
+	<definition name=".themeManagement" path="/template.jsp">
+		<put name="title" value="admin.themes.title"/>
+		<put name="content" value="themeManagement.jsp"/>
+	</definition>
+	
+	
 </tiles-definitions>

@@ -41,11 +41,15 @@ import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -81,6 +85,8 @@ public class ProfileAction extends LamsDispatchAction {
     private static List<SupportedLocale> locales;
 
     private static ICoreLearnerService learnerService;
+
+    private static IThemeService themeService;
 
     public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -198,10 +204,31 @@ public class ProfileAction extends LamsDispatchAction {
 	userForm.set("localeId", locale.getLocaleId());
 	request.setAttribute("locales", locales);
 	request.setAttribute("tab", "profile");
-	
+
 	boolean hasLamsCommunityToken = requestor.getLamsCommunityToken() != null;
 	request.setAttribute("hasLamsCommunityToken", hasLamsCommunityToken);
-	
+
+	themeService = getThemeService();
+
+	// Get all the themes
+	List<CSSThemeVisualElement> themes = themeService.getAllThemes();
+	request.setAttribute("themes", themes);
+
+	// Check the user theme is still installed
+	Long userSelectedTheme = null;
+	if (requestor.getHtmlTheme() != null) {
+	    for (CSSThemeVisualElement theme : themes) {
+		if (theme.getId() == requestor.getHtmlTheme().getId()) {
+		    userSelectedTheme = theme.getId();
+		}
+	    }
+	}
+	// if still null, use the default 
+	if (userSelectedTheme == null) {
+	    userSelectedTheme = themeService.getDefaultTheme().getId();
+	}
+	userForm.set("userTheme", userSelectedTheme);
+
 	return mapping.findForward("edit");
     }
 
@@ -223,5 +250,14 @@ public class ProfileAction extends LamsDispatchAction {
 	    learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
 	}
 	return learnerService;
+    }
+
+    private IThemeService getThemeService() {
+	if (themeService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    themeService = (IThemeService) ctx.getBean("themeService");
+	}
+	return themeService;
     }
 }

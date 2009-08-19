@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.themes.service;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 import org.lamsfoundation.lams.themes.exception.ThemeException;
@@ -110,6 +110,24 @@ public interface IThemeService {
 	 * Get all the installed themes
 	 * @return
 	 */
-	public Set<CSSThemeVisualElement> getAllThemes();
+	public List<CSSThemeVisualElement> getAllThemes();
+	
+	/**
+	 * Remove a theme
+	 * @param themeId
+	 */
+	public void removeTheme(Long themeId);
+	
+	/**
+	 * Saves or updates a theme
+	 * @param theme
+	 */
+	public void saveOrUpdateTheme(CSSThemeVisualElement theme);
+	
+	/**
+	 * Returns the default theme for the server
+	 * @return
+	 */
+	public CSSThemeVisualElement getDefaultTheme();
 }
 

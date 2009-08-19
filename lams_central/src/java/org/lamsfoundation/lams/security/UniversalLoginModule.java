@@ -52,9 +52,13 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
+import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethodType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
@@ -82,6 +86,9 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 
     protected String principalsQuery;
 
+    private IThemeService themeService;
+    private UserManagementService service;
+
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
 	super.initialize(subject, callbackHandler, sharedState, options);
 	dsJndiName = (String) options.get("dsJndiName");
@@ -102,8 +109,15 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 
 		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
 			.getInstance().getServletContext());
-		UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
+
+		if (service == null) {
+		    service = (UserManagementService) ctx.getBean("userManagementService");
+		}
 		User user = service.getUserByLogin(username);
+
+		if (themeService == null) {
+		    themeService = (IThemeService) ctx.getBean("themeService");
+		}
 
 		// LDAP user provisioning
 		if (user == null) {
@@ -114,8 +128,10 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 			    ldapService = (LdapService) ctx.getBean("ldapService");
 			} catch (NoSuchBeanDefinitionException e) {
 			    // LDEV-1937
-			    log.error("NoSuchBeanDefinitionException while getting ldapService bean, will try another method...",
-				    e);
+			    log
+				    .error(
+					    "NoSuchBeanDefinitionException while getting ldapService bean, will try another method...",
+					    e);
 			    ApplicationContext context = new ClassPathXmlApplicationContext(
 				    "org/lamsfoundation/lams/usermanagement/ldapContext.xml");
 			    ldapService = (LdapService) context.getBean("ldapService");
@@ -198,8 +214,26 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 
 		// if login is valid, register userDTO into session.
 		if (isValid) {
+		    UserDTO userDTO = user.getUserDTO();
+
+		    // If the user's theme has been deleted, use the default as fallback
+		    CSSThemeBriefDTO userTheme = userDTO.getHtmlTheme();
+		    if (userTheme != null) {
+			boolean themeExists = false;
+			for (CSSThemeVisualElement theme : themeService.getAllThemes()) {
+			    if (userTheme.getId().equals(theme.getId())) {
+				themeExists = true;
+				break; 
+			    }
+			}
+
+			if (!themeExists) {
+			    userDTO.setHtmlTheme(new CSSThemeBriefDTO(themeService.getDefaultTheme()));
+			}
+		    }
+
 		    HttpSession sharedsession = SessionManager.getSession();
-		    sharedsession.setAttribute(AttributeNames.USER, user.getUserDTO());
+		    sharedsession.setAttribute(AttributeNames.USER, userDTO);
 		}
 	    } catch (Exception e) {
 		e.printStackTrace();

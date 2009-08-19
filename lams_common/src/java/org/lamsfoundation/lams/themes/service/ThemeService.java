@@ -25,11 +25,9 @@ package org.lamsfoundation.lams.themes.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
@@ -40,6 +38,8 @@ import org.lamsfoundation.lams.themes.exception.ThemeException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
@@ -272,9 +272,41 @@ public class ThemeService implements IThemeService {
 	return setTheme(userId, themeId, IThemeService.FLASH_KEY);
     }
     
-    public Set<CSSThemeVisualElement> getAllThemes(){
-	Set<CSSThemeVisualElement> themes = new HashSet<CSSThemeVisualElement>();
-	return themes;
+    
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.themes.service.IThemeService#getAllThemes()
+     */
+    @SuppressWarnings("unchecked")
+    public List<CSSThemeVisualElement> getAllThemes(){
+	return (List<CSSThemeVisualElement>)themeDAO.getAllThemes();
+    }
+
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.themes.service.IThemeService#removeTheme(java.lang.Long)
+     */
+    public void removeTheme(Long themeId) {
+	themeDAO.deleteThemeById(themeId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.themes.service.IThemeService#saveOrUpdateTheme(org.lamsfoundation.lams.themes.CSSThemeVisualElement)
+     */
+    public void saveOrUpdateTheme(CSSThemeVisualElement theme) {
+	themeDAO.saveOrUpdateTheme(theme);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.themes.service.IThemeService#getDefaultTheme()
+     */
+    public CSSThemeVisualElement getDefaultTheme() {
+	List<CSSThemeVisualElement> themes = getAllThemes();
+	for (CSSThemeVisualElement theme : themes) {
+	    if (theme.getName().equals(Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME))); {
+		return theme;
+	    }
+	}
+	
+	return null;
     }
 
 }

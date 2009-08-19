@@ -41,6 +41,10 @@
       name="ImportExcelForm"
       type="org.lamsfoundation.lams.admin.web.ImportExcelForm"
     />
+    <form-bean
+      name="themeForm"
+      type="org.lamsfoundation.lams.admin.web.form.ThemeForm"
+    />
 
    <form-bean name="OrganisationForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="orgId" type="java.lang.Integer" />
@@ -246,12 +250,21 @@
     <action
       path="/statistics"
       type="org.lamsfoundation.lams.admin.web.action.StatisticsAction"
+      name="statistics"
+      scope="request"
+      input=".statistics"
+      parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
         name="success"
         path=".statistics"
+        redirect="false"
+      />
+      <forward
+        name="groupStats"
+        path="/groupStatistics.jsp"
         redirect="false"
       />
       <forward
@@ -615,6 +628,27 @@
       <forward
         name="importresult"
         path=".importresult"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/themeManagement"
+      type="org.lamsfoundation.lams.admin.web.action.ThemeManagementAction"
+      name="themeForm"
+      scope="request"
+      input=".themeManagement"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path=".themeManagement"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
         redirect="false"
       />
     </action>

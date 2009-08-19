@@ -150,7 +150,16 @@
 			</html:select>
 		</td>
 	</tr>
-	
+	<tr>
+		<td class="align-right"><fmt:message key="label.html.theme"/>:</td>
+		<td>
+		<html:select property="userTheme">
+			<c:forEach items="${themes}" var="theme">
+				<html:option value="${theme.id}">${theme.name}</html:option>
+			</c:forEach>
+		</html:select>
+		</td>
+	</tr>
 	
 	<c:if test="${not empty lamsCommunityToken}">
 		<tr>
@@ -247,6 +256,16 @@
 	<tr>
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
 		<td><bean:write name="UserForm" property="fax" /></td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.html.theme"/>:</td>
+		<td>
+		<html:select property="userTheme">
+			<c:forEach items="${themes}" var="theme">	
+				<html:option value="${theme.id}">${theme.name}</html:option>
+			</c:forEach>
+		</html:select>
+		</td>
 	</tr>
 	<c:choose>
 		<c:when test="${serverFlashEnabled}"> 
