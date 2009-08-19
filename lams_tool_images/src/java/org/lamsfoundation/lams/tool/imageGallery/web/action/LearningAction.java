@@ -230,17 +230,16 @@ public class LearningAction extends Action {
 	    sessionMap.put(ImageGalleryConstants.PARAM_RUN_OFFLINE, false);
 	}
 
-	// Create set of images besides this filtering out items added by users from other groups
+	// Create set of images, along with this filtering out items added by users from other groups
 	TreeSet<ImageGalleryItem> images = new TreeSet<ImageGalleryItem>(new ImageGalleryItemComparator());
 	if (mode.isLearner()) {
 	    Set<ImageGalleryItem> groupImages = service.getImagesForGroup(imageGallery, sessionId);
 	    for (ImageGalleryItem image : groupImages) {
-		// becuase in webpage will use this login name. Here is just
-		// initial it to avoid session close error in proxy object.
+		// initialize login name to avoid session close error in proxy object
 		if (image.getCreateBy() != null) {
 		    image.getCreateBy().getLoginName();
 		}
-		// remove hidden items.
+		// remove hidden items
 		if (!image.isHide()) {
 		    images.add(image);
 		}

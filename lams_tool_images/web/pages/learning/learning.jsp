@@ -160,7 +160,7 @@
 
 	<!--
 		function checkNew(){
-			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}";
+			document.location.href = "<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}";
  		    return false;
 		}
 		function finishSession(){
