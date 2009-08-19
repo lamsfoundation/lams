@@ -25,10 +25,11 @@ package org.lamsfoundation.lams.themes.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
@@ -48,228 +49,232 @@ import com.allaire.wddx.WddxDeserializationException;
 /**
  * 
  * @author Mitchell Seaton
- *
+ * 
  */
 public class ThemeService implements IThemeService {
 
-	protected Logger log = Logger.getLogger(ThemeService.class);
-	
-	/** Required DAO's */
-	protected ICSSThemeDAO themeDAO;
-	protected MessageService messageService;
-	protected IUserManagementService userManagementService;
-	
-	public ThemeService() {
-		
-	}
-	
-	/**********************************************
-	 * Setter Methods
-	 * *******************************************/
-	
-	/**
+    protected Logger log = Logger.getLogger(ThemeService.class);
+
+    /** Required DAO's */
+    protected ICSSThemeDAO themeDAO;
+    protected MessageService messageService;
+    protected IUserManagementService userManagementService;
+
+    public ThemeService() {
+
+    }
+
+    /**********************************************
+     * Setter Methods
+     * *******************************************/
+
+    /**
      * @return Returns the themeDAO.
      */
     public ICSSThemeDAO getThemeDAO() {
-        return themeDAO;
+	return themeDAO;
     }
-	
+
     /**
      * 
-     * @param themeDAO The ICSSThemeDAO to set.
+     * @param themeDAO
+     *            The ICSSThemeDAO to set.
      */
-	public void setThemeDAO(ICSSThemeDAO themeDAO) {
-		this.themeDAO = themeDAO;
-	}
-	
+    public void setThemeDAO(ICSSThemeDAO themeDAO) {
+	this.themeDAO = themeDAO;
+    }
+
     /**
      * 
-     * @param IUserManagementService The userManagementService to set.
+     * @param IUserManagementService
+     *            The userManagementService to set.
      */
-	public void setUserManagementService(IUserManagementService userManagementService) {
-		this.userManagementService = userManagementService;
-	}
-	
-	/**
-	 * Set i18n MessageService
-	 */
-	public void setMessageService(MessageService messageService) {
-		this.messageService = messageService;
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
+    }
+
+    /**
+     * Set i18n MessageService
+     */
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    /**
+     * Get i18n MessageService
+     */
+    public MessageService getMessageService() {
+	return this.messageService;
+    }
+
+    /**********************************************
+     * Utility/Service Methods
+     * *******************************************/
+
+    /**
+     * Store a theme created on a client.
+     * 
+     * @param wddxPacket
+     *            The WDDX packet received from Flash
+     * @return String The acknowledgement in WDDX format that the theme has been
+     *         successfully saved.
+     * @throws IOException
+     * @throws WddxDeserializationException
+     * @throws Exception
+     */
+    public String storeTheme(String wddxPacket) throws Exception {
+
+	FlashMessage flashMessage = null;
+	Hashtable table = (Hashtable) WDDXProcessor.deserialize(wddxPacket);
+
+	CSSThemeDTO themeDTO = new CSSThemeDTO(table);
+	if (log.isDebugEnabled()) {
+	    log.debug("Converted Theme packet. Packet was \n" + wddxPacket + "\nDTO is\n" + themeDTO);
 	}
 
-	/**
-	 * Get i18n MessageService
-	 */
-	public MessageService getMessageService() {
-		return this.messageService;
-	}
-	
-	/**********************************************
-	 * Utility/Service Methods
-	 * *******************************************/
-	
-
-	/**
-	 * Store a theme created on a client.
-	 * @param wddxPacket The WDDX packet received from Flash
-	 * @return String The acknowledgement in WDDX format that the theme has been
-	 * 				  successfully saved.
-	 * @throws IOException
-	 * @throws WddxDeserializationException
-	 * @throws Exception
-	 */
-	public String storeTheme(String wddxPacket) throws Exception {
-		
-		FlashMessage flashMessage= null;
-		Hashtable table = (Hashtable)WDDXProcessor.deserialize(wddxPacket);
-		
-		CSSThemeDTO themeDTO = new CSSThemeDTO(table);
-		if ( log.isDebugEnabled() ) {
-		    log.debug("Converted Theme packet. Packet was \n"+wddxPacket+
-		            "\nDTO is\n"+themeDTO);
-		}
-
-		CSSThemeVisualElement dbTheme = null;
-		CSSThemeVisualElement storedTheme = null;
-		if ( themeDTO.getId() != null )  {
-		    // Flash has supplied an id, get the record from the database for update
-		    dbTheme = themeDAO.getThemeById(themeDTO.getId());
-		}
-		
-		if ( dbTheme == null ) {
-		    storedTheme = themeDTO.createCSSThemeVisualElement();
-		} else {
-		    storedTheme = themeDTO.updateCSSTheme(dbTheme);
-		}
-		
-		themeDAO.saveOrUpdateTheme(storedTheme);
-		flashMessage = new FlashMessage(IThemeService.STORE_THEME_MESSAGE_KEY,storedTheme.getId());
-		return flashMessage.serializeMessage(); 		
+	CSSThemeVisualElement dbTheme = null;
+	CSSThemeVisualElement storedTheme = null;
+	if (themeDTO.getId() != null) {
+	    // Flash has supplied an id, get the record from the database for update
+	    dbTheme = themeDAO.getThemeById(themeDTO.getId());
 	}
 
-	/**
-	 * Returns a string representing the requested theme in WDDX format
-	 * 
-	 * @param themeId The id of the theme whose WDDX packet is requested 
-	 * @return String The requested theme in WDDX format
-	 * @throws Exception
-	 */
-	public String getThemeWDDX(Long themeId)throws IOException {
-		FlashMessage flashMessage= null;
-	    CSSThemeVisualElement theme = getTheme(themeId);
-		if(theme==null)
-			flashMessage = FlashMessage.getNoSuchTheme("wddxPacket",themeId);
-		else{
-			CSSThemeDTO dto = new CSSThemeDTO(theme);
-			flashMessage = new FlashMessage("getTheme",dto);
-		}
-		return flashMessage.serializeMessage();
+	if (dbTheme == null) {
+	    storedTheme = themeDTO.createCSSThemeVisualElement();
+	} else {
+	    storedTheme = themeDTO.updateCSSTheme(dbTheme);
 	}
 
+	themeDAO.saveOrUpdateTheme(storedTheme);
+	flashMessage = new FlashMessage(IThemeService.STORE_THEME_MESSAGE_KEY, storedTheme.getId());
+	return flashMessage.serializeMessage();
+    }
 
-	/**
-	 * Returns a theme
-	 */
-	public CSSThemeVisualElement getTheme(Long themeId) {
-	    return themeDAO.getThemeById(themeId);
+    /**
+     * Returns a string representing the requested theme in WDDX format
+     * 
+     * @param themeId
+     *            The id of the theme whose WDDX packet is requested
+     * @return String The requested theme in WDDX format
+     * @throws Exception
+     */
+    public String getThemeWDDX(Long themeId) throws IOException {
+	FlashMessage flashMessage = null;
+	CSSThemeVisualElement theme = getTheme(themeId);
+	if (theme == null)
+	    flashMessage = FlashMessage.getNoSuchTheme("wddxPacket", themeId);
+	else {
+	    CSSThemeDTO dto = new CSSThemeDTO(theme);
+	    flashMessage = new FlashMessage("getTheme", dto);
 	}
+	return flashMessage.serializeMessage();
+    }
 
+    /**
+     * Returns a theme
+     */
+    public CSSThemeVisualElement getTheme(Long themeId) {
+	return themeDAO.getThemeById(themeId);
+    }
 
-	/**
-	 * Returns a theme based on the name.
-	 */
-	public CSSThemeVisualElement getTheme(String themeName) {
-	    List themes = themeDAO.getThemeByName(themeName);
-	    if ( themes != null && themes.size() > 0 )
-	    	return (CSSThemeVisualElement) themes.get(0);
-	    else
-	    	return null;
-	}
+    /**
+     * Returns a theme based on the name.
+     */
+    public CSSThemeVisualElement getTheme(String themeName) {
+	List themes = themeDAO.getThemeByName(themeName);
+	if (themes != null && themes.size() > 0)
+	    return (CSSThemeVisualElement) themes.get(0);
+	else
+	    return null;
+    }
 
+    /**
+     * This method returns a list of all available themes in WDDX format. We
+     * need to work out if this should be restricted by user.
+     * 
+     * @return String The required information in WDDX format
+     * @throws IOException
+     */
+    public String getThemes() throws IOException {
+	FlashMessage flashMessage = null;
+	List themes = themeDAO.getAllThemes();
+	ArrayList<CSSThemeBriefDTO> themeList = new ArrayList<CSSThemeBriefDTO>();
+	Iterator iterator = themes.iterator();
+	while (iterator.hasNext()) {
+	    CSSThemeBriefDTO dto = new CSSThemeBriefDTO((CSSThemeVisualElement) iterator.next());
+	    themeList.add(dto);
+	}
+	flashMessage = new FlashMessage("getThemes", themeList);
+	return flashMessage.serializeMessage();
+    }
 
-	/**
-	 * This method returns a list of all available themes in
-	 * WDDX format. We need to work out if this should be restricted
-	 * by user.
-	 * 
-	 * @return String The required information in WDDX format
-	 * @throws IOException
-	 */
-	public String getThemes() throws IOException {
-		FlashMessage flashMessage= null;
-	    List themes = themeDAO.getAllThemes();
-		ArrayList<CSSThemeBriefDTO> themeList = new ArrayList<CSSThemeBriefDTO>();
-		Iterator iterator = themes.iterator();
-		while(iterator.hasNext()){
-		    CSSThemeBriefDTO dto = new CSSThemeBriefDTO((CSSThemeVisualElement)iterator.next());
-		    themeList.add(dto);
-		}
-		flashMessage = new FlashMessage("getThemes",themeList);		
-		return flashMessage.serializeMessage();
-	}
-	
-	/**
-	 * Set the User's theme
-	 * 
-	 * @return String The acknowledgement or error in WDDX format
-	 * @throws IOException
-	 */
-	private FlashMessage setTheme(Integer userId, Long themeId, String type) throws IOException, ThemeException, UserException {
-		FlashMessage flashMessage= null;
-		User user = (User)userManagementService.findById(User.class,userId);
-		CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
-		
-		if(theme==null)
-			throw new ThemeException(messageService.getMessage(IThemeService.NO_SUCH_THEME_KEY));
-		else if(user==null)
-			throw new UserException(messageService.getMessage(IThemeService.NO_SUCH_USER_KEY));
-		else{
-			if(type==null) {
-				user.setHtmlTheme(theme);
-				user.setFlashTheme(theme);
-			} 
-			else if(type.equals(IThemeService.FLASH_KEY))
-				user.setFlashTheme(theme);
-			
-			else if(type.equals(IThemeService.HTML_KEY))
-				user.setHtmlTheme(theme);
-			
-			userManagementService.save(user);
-			flashMessage = new FlashMessage("setTheme", messageService.getMessage(IThemeService.SET_THEME_SAVED_MESSAGE_KEY));
-		}
-		
-		return flashMessage;
-	}
-	
-	/**
-	 * Set the User's theme (Common)
-	 * 
-	 * @return FlashMessage The acknowledgement or error in WDDX format
-	 * @throws IOException
-	 */
-	public FlashMessage setTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
-		return setTheme(userId, themeId, null);
-	}
-	
-	/**
-	 * Set the User's HTML theme
-	 * 
-	 * @return FlashMessage The acknowledgement or error in WDDX format
-	 * @throws IOException
-	 */
-	public FlashMessage setHtmlTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
-		return setTheme(userId, themeId, IThemeService.HTML_KEY);
-	}
-	
-	/**
-	 * Set the User's Flash theme
-	 * 
-	 * @return FlashMessage The acknowledgement or error in WDDX format
-	 * @throws IOException
-	 */
-	public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
-		return setTheme(userId, themeId, IThemeService.FLASH_KEY);
+    /**
+     * Set the User's theme
+     * 
+     * @return String The acknowledgement or error in WDDX format
+     * @throws IOException
+     */
+    private FlashMessage setTheme(Integer userId, Long themeId, String type) throws IOException, ThemeException,
+	    UserException {
+	FlashMessage flashMessage = null;
+	User user = (User) userManagementService.findById(User.class, userId);
+	CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
+
+	if (theme == null)
+	    throw new ThemeException(messageService.getMessage(IThemeService.NO_SUCH_THEME_KEY));
+	else if (user == null)
+	    throw new UserException(messageService.getMessage(IThemeService.NO_SUCH_USER_KEY));
+	else {
+	    if (type == null) {
+		user.setHtmlTheme(theme);
+		user.setFlashTheme(theme);
+	    } else if (type.equals(IThemeService.FLASH_KEY))
+		user.setFlashTheme(theme);
+
+	    else if (type.equals(IThemeService.HTML_KEY))
+		user.setHtmlTheme(theme);
+
+	    userManagementService.save(user);
+	    flashMessage = new FlashMessage("setTheme", messageService
+		    .getMessage(IThemeService.SET_THEME_SAVED_MESSAGE_KEY));
 	}
 
-	
+	return flashMessage;
+    }
+
+    /**
+     * Set the User's theme (Common)
+     * 
+     * @return FlashMessage The acknowledgement or error in WDDX format
+     * @throws IOException
+     */
+    public FlashMessage setTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
+	return setTheme(userId, themeId, null);
+    }
+
+    /**
+     * Set the User's HTML theme
+     * 
+     * @return FlashMessage The acknowledgement or error in WDDX format
+     * @throws IOException
+     */
+    public FlashMessage setHtmlTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
+	return setTheme(userId, themeId, IThemeService.HTML_KEY);
+    }
+
+    /**
+     * Set the User's Flash theme
+     * 
+     * @return FlashMessage The acknowledgement or error in WDDX format
+     * @throws IOException
+     */
+    public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
+	return setTheme(userId, themeId, IThemeService.FLASH_KEY);
+    }
+    
+    public Set<CSSThemeVisualElement> getAllThemes(){
+	Set<CSSThemeVisualElement> themes = new HashSet<CSSThemeVisualElement>();
+	return themes;
+    }
+
 }

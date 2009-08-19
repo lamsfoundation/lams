@@ -24,11 +24,11 @@
 package org.lamsfoundation.lams.themes.service;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
-import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
-import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.themes.exception.ThemeException;
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
@@ -105,5 +105,11 @@ public interface IThemeService {
 	public FlashMessage setHtmlTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException;
 	
 	public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException;
+	
+	/**
+	 * Get all the installed themes
+	 * @return
+	 */
+	public Set<CSSThemeVisualElement> getAllThemes();
 }
 
