@@ -157,7 +157,7 @@ public class LearningAction extends Action {
 	// save toolContentID into HTTPSession
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+	request.setAttribute(ImageGalleryConstants.ATTR_TOOL_SESSION_ID, sessionId);
 
 	// get back the imageGallery and item list and display them on page
 	ImageGalleryUser imageGalleryUser = null;
@@ -733,7 +733,8 @@ public class LearningAction extends Action {
 	    throws Exception {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(imageForm.getSessionMapID());
 	IImageGalleryService service = getImageGalleryService();
-	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_RESOURCE);
+	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
+	ImageGallery imageGallery = service.getImageGalleryBySessionId(sessionId);
 
 	ImageGalleryItem image = new ImageGalleryItem();
 	image.setCreateDate(new Timestamp(new Date().getTime()));
@@ -760,7 +761,6 @@ public class LearningAction extends Action {
 	}
 	image.setTitle(title);
 
-	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 	ImageGalleryUser imageGalleryUser = getCurrentUser(service, sessionId);
 	image.setCreateBy(imageGalleryUser);
 	image.setDescription(imageForm.getDescription());
