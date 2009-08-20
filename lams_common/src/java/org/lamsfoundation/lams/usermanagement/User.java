@@ -691,7 +691,9 @@ public class User implements Serializable, Comparable {
 		new CSSThemeBriefDTO(flashTheme), new CSSThemeBriefDTO(htmlTheme),
 		// TimeZone.getTimeZone("Australia/Sydney"),
 		tz, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, enableFlash,
-		lamsCommunityToken, lamsCommunityUsername, tutorialsDisabled, tutorialPages, firstLogin);
+		lamsCommunityToken, lamsCommunityUsername, tutorialsDisabled, tutorialPages, 
+		(firstLogin == null ? true : false)  // assume no firstLogin value means they haven't logged in
+	);
     }
 
     public UserFlashDTO getUserFlashDTO() {
