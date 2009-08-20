@@ -131,6 +131,26 @@
 					</td>
 				</tr>
 				<tr>
+					<td class="align-right"><fmt:message key="label.html.htmlTheme"/>:</td>
+					<td>
+					<html:select property="userCSSTheme">
+						<c:forEach items="${cssThemes}" var="theme">	
+							<html:option value="${theme.themeId}">${theme.name}</html:option>
+						</c:forEach>
+					</html:select>
+					</td>
+				</tr>
+				<tr>
+					<td class="align-right"><fmt:message key="label.html.flashTheme"/>:</td>
+					<td>
+					<html:select property="userFlashTheme">
+						<c:forEach items="${flashThemes}" var="theme">	
+							<html:option value="${theme.themeId}">${theme.name}</html:option>
+						</c:forEach>
+					</html:select>
+					</td>
+				</tr>
+				<tr>
 					<td colspan=2 class="align-right">
 						<html-el:submit styleClass="button"><fmt:message key="admin.save"/></html-el:submit>
 						<html-el:reset styleClass="button"><fmt:message key="admin.reset"/></html-el:reset>

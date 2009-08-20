@@ -214,12 +214,13 @@ public class ProfileAction extends LamsDispatchAction {
 	List<Theme> cssThemes = themeService.getAllCSSThemes();
 	request.setAttribute("cssThemes", cssThemes);
 
-	// Check the user theme is still installed
+	// Check the user css theme is still installed
 	Long userSelectedCSSTheme = null;
 	if (requestor.getHtmlTheme() != null) {
 	    for (Theme theme : cssThemes) {
 		if (theme.getThemeId() == requestor.getHtmlTheme().getThemeId()) {
 		    userSelectedCSSTheme = theme.getThemeId();
+		    break;
 		}
 	    }
 	}
@@ -233,12 +234,13 @@ public class ProfileAction extends LamsDispatchAction {
 	List<Theme> flashThemes = themeService.getAllFlashThemes();
 	request.setAttribute("flashThemes", flashThemes);
 
-	// Check the user theme is still installed
+	// Check the user flash theme is still installed
 	Long userSelectedFlashTheme = null;
 	if (requestor.getHtmlTheme() != null) {
 	    for (Theme theme : flashThemes) {
 		if (theme.getThemeId() == requestor.getFlashTheme().getThemeId()) {
 		    userSelectedFlashTheme = theme.getThemeId();
+		    break;
 		}
 	    }
 	}

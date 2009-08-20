@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -58,7 +59,8 @@ import org.lamsfoundation.lams.util.HashUtil;
 /**
  * struts doclets
  * 
- * @struts:action path="/usersave" name="UserForm" input=".user" scope="request" validate="false"
+ * @struts:action path="/usersave" name="UserForm" input=".user" scope="request"
+ *                validate="false"
  * 
  * @struts:action-forward name="user" path="/user.do?method=edit"
  * @struts:action-forward name="userlist" path="/usermanage.do"
@@ -72,8 +74,7 @@ public class UserSaveAction extends Action {
 
     @Override
     @SuppressWarnings("unchecked")
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	UserSaveAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
 
@@ -86,10 +87,9 @@ public class UserSaveAction extends Action {
 	UserSaveAction.log.debug("orgId: " + orgId);
 	Boolean edit = false;
 	Boolean passwordChanged = true;
-	SupportedLocale locale = (SupportedLocale) UserSaveAction.service.findById(SupportedLocale.class,
-		(Integer) userForm.get("localeId"));
-	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service.findById(
-		AuthenticationMethod.class, (Integer) userForm.get("authenticationMethodId"));
+	SupportedLocale locale = (SupportedLocale) UserSaveAction.service.findById(SupportedLocale.class, (Integer) userForm.get("localeId"));
+	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service.findById(AuthenticationMethod.class, (Integer) userForm
+		.get("authenticationMethodId"));
 	UserSaveAction.log.debug("locale: " + locale);
 	UserSaveAction.log.debug("authenticationMethod:" + authenticationMethod);
 
@@ -157,6 +157,13 @@ public class UserSaveAction extends Action {
 		BeanUtils.copyProperties(user, userForm);
 		user.setLocale(locale);
 		user.setAuthenticationMethod(authenticationMethod);
+
+		Theme cssTheme = (Theme) service.findById(Theme.class, (Long) userForm.get("userCSSTheme"));
+		user.setHtmlTheme(cssTheme);
+
+		Theme flashTheme = (Theme) service.findById(Theme.class, (Long) userForm.get("userFlashTheme"));
+		user.setFlashTheme(flashTheme);
+
 		UserSaveAction.service.save(user);
 	    } else { // create user
 		user = new User();
@@ -164,15 +171,23 @@ public class UserSaveAction extends Action {
 		BeanUtils.copyProperties(user, userForm);
 		UserSaveAction.log.debug("creating user... new login: " + user.getLogin());
 		if (errors.isEmpty()) {
-		    // TODO set flash/html themes according to user input instead of server default.
+		    // TODO set flash/html themes according to user input
+		    // instead of server default.
 		    user.setFlashTheme(UserSaveAction.service.getDefaultFlashTheme());
 		    user.setHtmlTheme(UserSaveAction.service.getDefaultHtmlTheme());
 		    user.setDisabledFlag(false);
 		    user.setCreateDate(new Date());
-		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service.findByProperty(
-			    AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database").get(0));
+		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service.findByProperty(AuthenticationMethod.class,
+			    "authenticationMethodName", "LAMS-Database").get(0));
 		    user.setUserId(null);
 		    user.setLocale(locale);
+
+		    Theme cssTheme = (Theme) service.findById(Theme.class, (Long) userForm.get("userCSSTheme"));
+		    user.setHtmlTheme(cssTheme);
+
+		    Theme flashTheme = (Theme) service.findById(Theme.class, (Long) userForm.get("userFlashTheme"));
+		    user.setFlashTheme(flashTheme);
+
 		    UserSaveAction.service.save(user);
 
 		    // make 'create user' audit log entry

@@ -40,6 +40,8 @@ import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.UserOrgRoleDTO;
+import org.lamsfoundation.lams.themes.Theme;
+import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -62,7 +64,8 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  */
 
 /**
- * @struts:action path="/user" name="UserForm" scope="request" parameter="method" validate="false"
+ * @struts:action path="/user" name="UserForm" scope="request"
+ *                parameter="method" validate="false"
  * 
  * @struts:action-forward name="user" path=".user"
  * @struts:action-forward name="userlist" path="/usermanage.do"
@@ -75,6 +78,7 @@ public class UserAction extends LamsDispatchAction {
     private static Logger log = Logger.getLogger(UserAction.class);
     private IUserManagementService service;
     private MessageService messageService;
+    private static IThemeService themeService;
     private static List<SupportedLocale> locales;
     private static List<AuthenticationMethod> authenticationMethods;
 
@@ -85,10 +89,12 @@ public class UserAction extends LamsDispatchAction {
 	if (messageService == null) {
 	    messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
 	}
+	if (themeService == null) {
+	    themeService = AdminServiceProxy.getThemeService(getServlet().getServletContext());
+	}
     }
 
-    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	initServices();
 	if (UserAction.locales == null) {
@@ -103,6 +109,28 @@ public class UserAction extends LamsDispatchAction {
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 
+	// Get all the css and flash themes themes
+	List<Theme> cssThemes = themeService.getAllCSSThemes();
+	request.setAttribute("cssThemes", cssThemes);
+	List<Theme> flashThemes = themeService.getAllFlashThemes();
+	request.setAttribute("flashThemes", flashThemes);
+	
+	// Select the default themes by default
+	Theme defaultCSSTheme = themeService.getDefaultCSSTheme();
+	for (Theme theme : cssThemes) {
+	    if (theme.getThemeId().equals(defaultCSSTheme.getThemeId())) {
+		userForm.set("userCSSTheme", theme.getThemeId());
+		break;
+	    }
+	}
+	Theme defaultFlashTheme = themeService.getDefaultFlashTheme();
+	for (Theme theme : cssThemes) {
+	    if (theme.getThemeId().equals(defaultFlashTheme.getThemeId())) {
+		userForm.set("userFlashTheme", theme.getThemeId());
+		break;
+	    }
+	}
+
 	// test requestor's permission
 	Organisation org = null;
 	Boolean canEdit = service.isUserGlobalGroupAdmin();
@@ -110,8 +138,8 @@ public class UserAction extends LamsDispatchAction {
 	    org = (Organisation) service.findById(Organisation.class, orgId);
 	    if (!canEdit) {
 		OrganisationType orgType = org.getOrganisationType();
-		Integer orgIdOfCourse = orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE) ? org
-			.getParentOrganisation().getOrganisationId() : orgId;
+		Integer orgIdOfCourse = orgType.getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE) ? org.getParentOrganisation().getOrganisationId()
+			: orgId;
 		User requestor = service.getUserByLogin(request.getRemoteUser());
 		if (service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_ADMIN)
 			|| service.isUserInRole(requestor.getUserId(), orgIdOfCourse, Role.GROUP_MANAGER)) {
@@ -141,6 +169,39 @@ public class UserAction extends LamsDispatchAction {
 	    // set user's organisations to display
 	    request.setAttribute("userOrgRoles", getUserOrgRoles(user));
 	    request.setAttribute("globalRoles", getGlobalRoles(user));
+
+	    // Check the user css theme is still installed
+	    Long userSelectedCSSTheme = null;
+	    if (user.getHtmlTheme() != null) {
+		for (Theme theme : cssThemes) {
+		    if (theme.getThemeId() == user.getHtmlTheme().getThemeId()) {
+			userSelectedCSSTheme = theme.getThemeId();
+			break;
+		    }
+		}
+	    }
+	    // if still null, use the default
+	    if (userSelectedCSSTheme == null) {
+		userSelectedCSSTheme = themeService.getDefaultCSSTheme().getThemeId();
+	    }
+	    userForm.set("userCSSTheme", userSelectedCSSTheme);
+
+	    // Check the user flash theme is still installed
+	    Long userSelectedFlashTheme = null;
+	    if (user.getHtmlTheme() != null) {
+		for (Theme theme : flashThemes) {
+		    if (theme.getThemeId() == user.getFlashTheme().getThemeId()) {
+			userSelectedFlashTheme = theme.getThemeId();
+			break;
+		    }
+		}
+	    }
+	    // if still null, use the default
+	    if (userSelectedFlashTheme == null) {
+		userSelectedFlashTheme = themeService.getDefaultFlashTheme().getThemeId();
+	    }
+	    userForm.set("userFlashTheme", userSelectedFlashTheme);
+
 	} else { // create a user
 	    try {
 		SupportedLocale locale = LanguageUtil.getDefaultLocale();
@@ -170,8 +231,7 @@ public class UserAction extends LamsDispatchAction {
     // display user's global roles, if any
     private UserOrgRoleDTO getGlobalRoles(User user) {
 	initServices();
-	UserOrganisation uo = service.getUserOrganisation(user.getUserId(), service.getRootOrganisation()
-		.getOrganisationId());
+	UserOrganisation uo = service.getUserOrganisation(user.getUserId(), service.getRootOrganisation().getOrganisationId());
 	if (uo == null) {
 	    return null;
 	}
@@ -191,8 +251,8 @@ public class UserAction extends LamsDispatchAction {
 
 	initServices();
 	List<UserOrgRoleDTO> uorDTOs = new ArrayList<UserOrgRoleDTO>();
-	List<UserOrganisation> uos = service.getUserOrganisationsForUserByTypeAndStatus(user.getLogin(),
-		OrganisationType.COURSE_TYPE, OrganisationState.ACTIVE);
+	List<UserOrganisation> uos = service
+		.getUserOrganisationsForUserByTypeAndStatus(user.getLogin(), OrganisationType.COURSE_TYPE, OrganisationState.ACTIVE);
 	for (UserOrganisation uo : uos) {
 	    UserOrgRoleDTO uorDTO = new UserOrgRoleDTO();
 	    List<String> roles = new ArrayList<String>();
@@ -203,9 +263,8 @@ public class UserAction extends LamsDispatchAction {
 	    uorDTO.setOrgName(uo.getOrganisation().getName());
 	    uorDTO.setRoles(roles);
 	    List<UserOrgRoleDTO> childDTOs = new ArrayList<UserOrgRoleDTO>();
-	    List<UserOrganisation> childuos = service.getUserOrganisationsForUserByTypeAndStatusAndParent(user
-		    .getLogin(), OrganisationType.CLASS_TYPE, OrganisationState.ACTIVE, uo.getOrganisation()
-		    .getOrganisationId());
+	    List<UserOrganisation> childuos = service.getUserOrganisationsForUserByTypeAndStatusAndParent(user.getLogin(), OrganisationType.CLASS_TYPE,
+		    OrganisationState.ACTIVE, uo.getOrganisation().getOrganisationId());
 	    for (UserOrganisation childuo : childuos) {
 		UserOrgRoleDTO childDTO = new UserOrgRoleDTO();
 		List<String> childroles = new ArrayList<String>();
@@ -225,8 +284,7 @@ public class UserAction extends LamsDispatchAction {
     }
 
     // determine whether to disable or delete user based on their lams data
-    public ActionForward remove(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public ActionForward remove(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	initServices();
 
@@ -248,8 +306,7 @@ public class UserAction extends LamsDispatchAction {
 	return mapping.findForward("remove");
     }
 
-    public ActionForward disable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public ActionForward disable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	initServices();
 
@@ -275,8 +332,7 @@ public class UserAction extends LamsDispatchAction {
 	}
     }
 
-    public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	initServices();
 
@@ -309,8 +365,7 @@ public class UserAction extends LamsDispatchAction {
     }
 
     // called from disabled users screen
-    public ActionForward enable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+    public ActionForward enable(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	initServices();
 
