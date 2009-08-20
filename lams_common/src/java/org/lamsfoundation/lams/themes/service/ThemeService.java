@@ -300,8 +300,9 @@ public class ThemeService implements IThemeService {
      */
     public Theme getDefaultCSSTheme() {
 	List<Theme> themes = getAllThemes();
+	String defaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
 	for (Theme theme : themes) {
-	    if (theme.getName().equals(Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME))); {
+	    if (theme.getName().equals(defaultTheme)) {
 		return theme;
 	    }
 	}
@@ -314,8 +315,9 @@ public class ThemeService implements IThemeService {
      */
     public Theme getDefaultFlashTheme() {
 	List<Theme> themes = getAllThemes();
+	String defaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
 	for (Theme theme : themes) {
-	    if (theme.getName().equals(Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME))); {
+	    if (theme.getName().equals(defaultTheme)) {
 		return theme;
 	    }
 	}

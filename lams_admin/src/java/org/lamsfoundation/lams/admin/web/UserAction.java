@@ -124,7 +124,7 @@ public class UserAction extends LamsDispatchAction {
 	    }
 	}
 	Theme defaultFlashTheme = themeService.getDefaultFlashTheme();
-	for (Theme theme : cssThemes) {
+	for (Theme theme : flashThemes) {
 	    if (theme.getThemeId().equals(defaultFlashTheme.getThemeId())) {
 		userForm.set("userFlashTheme", theme.getThemeId());
 		break;
