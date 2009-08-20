@@ -30,7 +30,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learning.export.Portfolio;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 /**
  * @author mtruong
@@ -40,10 +40,10 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  * triggered at any time during the lesson.</p>
  *
  * <p>An export can be viewed from two perspectives:
- *<ul><li>	Teacher’s perspective: In which the export will export data for the
+ *<ul><li>	Teacherï¿½s perspective: In which the export will export data for the
  * whole class, for all activities in the learning design. The tool content
  * id will be supplied, or it can be obtained from the learning design.</li>
- *	Student’s perspective: In which the export carried out will return the data specific to the activities the student has completed. The tool session id and the user id will be supplied.
+ *	Studentï¿½s perspective: In which the export carried out will return the data specific to the activities the student has completed. The tool session id and the user id will be supplied.
  *<li>
  * The EP algorithm will work the same way regardless of whether the 
  * export is being carried out by a student or teacher. It will have a 
@@ -51,7 +51,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
  * done by a teacher) or it will contain all the activities that the 
  * student has completed. The general gist is that it will have a list 
  * of activity ids as its input and will iterate through all these activities 
- * and compile all the data returned from each tool’s export portfolio 
+ * and compile all the data returned from each toolï¿½s export portfolio 
  * functionality and will compile this data into one large plain HTML file. 
  * </li></ul></p>
  */
@@ -114,6 +114,6 @@ public interface IExportPortfolioService {
 	 /** Gets the themes for the current user. This is used to determine the stylesheets
 	  * included in the export file. We need the full theme, not just the name, so we can get
 	  * the directory names for the images. */
-	public Collection<CSSThemeVisualElement> getUserThemes();
+	public Collection<Theme> getUserThemes();
 	
 }

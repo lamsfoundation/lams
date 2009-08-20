@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
     "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
     
 <hibernate-mapping>
 <!-- 
@@ -12,27 +12,30 @@
 -->
 
 <class 
-    name="org.lamsfoundation.lams.themes.CSSProperty" 
-    table="lams_css_property"
+    name="org.lamsfoundation.lams.themes.Theme" 
+    table="lams_theme"
 >
+
     <meta attribute="class-description" inherit="false">
        @hibernate.class
-        table="lams_css_property"
+        table="lams_css_theme_ve"
     </meta>
 
+	<!--  Cache it so that is available to the user records -->
+	<cache usage="transactional" />
+
     <id
-        name="propertyId"
+        name="themeId"
         type="java.lang.Long"
-        column="property_id"
+        column="theme_id"
     >
         <meta attribute="field-description">
            @hibernate.id
             generator-class="native"
             type="java.lang.Long"
-            column="property_id"
-
-
+            column="theme_ve_id"
         </meta>
+        <meta attribute="use-in-equals">true</meta>
         <generator class="native" />
     </id>
 
@@ -41,59 +44,54 @@
         type="java.lang.String"
         column="name"
         not-null="true"
-        length="255"
+        length="100"
     >
+        <meta attribute="use-in-tostring">true</meta>
         <meta attribute="field-description">
            @hibernate.property
             column="name"
-            length="255"
-            not-null="true"
-        </meta>    
-    </property>
-    <property
-        name="value"
-        type="java.lang.String"
-        column="value"
-        not-null="true"
-        length="100"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="value"
             length="100"
             not-null="true"
         </meta>    
     </property>
     <property
-        name="type"
-        type="byte"
-        column="type"
-        not-null="true"
-        length="4"
+        name="description"
+        type="java.lang.String"
+        column="description"
+        length="100"
     >
+        <meta attribute="use-in-tostring">true</meta>
         <meta attribute="field-description">
            @hibernate.property
-            column="type"
-            length="4"
-            not-null="true"
+            column="description"
+            length="100"
+        </meta>    
+    </property>
+   <property
+        name="imageDirectory"
+        type="java.lang.String"
+        column="image_directory"
+        length="100"
+    >
+        <meta attribute="use-in-tostring">true</meta>
+        <meta attribute="field-description">
+           @hibernate.property
+            column="image_directory"
+            length="100"
         </meta>    
     </property>
     <property
-        name="styleSubset"
-        type="java.lang.String"
-        column="style_subset"
-        not-null="false"
-        length="20"
+        name="type"
+        type="java.lang.Integer"
+        column="theme_type"
+        length="11"
     >
+        <meta attribute="use-in-tostring">true</meta>
         <meta attribute="field-description">
            @hibernate.property
-            column="style_subset"
-            length="20"
-            not-null="true"
+            column="theme_type"
+            length="11"
         </meta>    
     </property>
- 
-    <!-- Associations -->
-
 </class>
 </hibernate-mapping>

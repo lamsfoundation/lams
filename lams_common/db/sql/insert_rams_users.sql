@@ -3,10 +3,10 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 -- themes and styles 
-INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag, image_directory) VALUES (1, "default", "Default Flash style", null, 1, null);
-INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag, image_directory) VALUES (2, "defaultHTML", "Default HTML style", null, 1, "css");
-INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag, image_directory) VALUES (3, "rams", "RAMS Default Flash style", null, 1, null);
-INSERT INTO lams_css_theme_ve (theme_ve_id, name, description, parent_id, theme_flag, image_directory) VALUES  (4,"ramsthemeHTML", "RAMS Default HTML sty;e", null, 1, "ramsthemecss");
+INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (1, "default", "Default Flash style", null, 2);
+INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (2, "defaultHTML", "Default HTML style", "css", 1);
+INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (3, "rams", "RAMS Default Flash style", null, 2);
+INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (4, "ramsthemeHTML", "RAMS Default HTML style", "ramsthemecss", 1);
 
 insert into lams_workspace (workspace_id, name, default_fld_id) values(1,'ROOT',1);
 insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(2,'Developers Playpen',2,22);

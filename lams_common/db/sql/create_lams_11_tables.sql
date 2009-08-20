@@ -250,43 +250,14 @@ CREATE TABLE lams_organisation (
                   REFERENCES lams_supported_locale (locale_id)
 )TYPE=InnoDB;
 
-
-
-CREATE TABLE lams_css_theme_ve (
-       theme_ve_id BIGINT(20) NOT NULL AUTO_INCREMENT
+CREATE TABLE lams_theme (
+       theme_id BIGINT(20) NOT NULL AUTO_INCREMENT
      , name VARCHAR(100) NOT NULL
      , description VARCHAR(100)
-     , parent_id BIGINT(20)
-     , theme_flag TINYINT(1) NOT NULL DEFAULT 0
      , image_directory VARCHAR(100)
-     , PRIMARY KEY (theme_ve_id)
-     , INDEX (parent_id)
-     , CONSTRAINT FK_lams_css_theme_ve_2 FOREIGN KEY (parent_id)
-                  REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-ALTER TABLE lams_css_theme_ve COMMENT='Stores both the Flash theme and visual element';
-
-CREATE TABLE lams_css_style (
-       style_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , theme_ve_id BIGINT(20) NOT NULL
-     , PRIMARY KEY (style_id)
-     , INDEX (theme_ve_id)
-     , CONSTRAINT FK_lams_css_style_1 FOREIGN KEY (theme_ve_id)
-                  REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
-)TYPE=InnoDB;
-ALTER TABLE lams_css_style COMMENT='Groups lams_css_property into a CSSStyleDeclaration.';
-
-CREATE TABLE lams_css_property (
-       property_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , style_id BIGINT(20) NOT NULL
-     , name VARCHAR(255) NOT NULL
-     , value VARCHAR(100) NOT NULL
-     , style_subset VARCHAR(20)
-     , type TINYINT NOT NULL
-     , PRIMARY KEY (property_id)
-  --   , INDEX (style_id)
-  --   , CONSTRAINT FK_lams_css_property_1 FOREIGN KEY (style_id)
-  --                REFERENCES lams_css_style (style_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , theme_type TINYINT(11)
+     , PRIMARY KEY (theme_id)
+     , UNIQUE UQ_name (name)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_user (
@@ -333,10 +304,10 @@ CREATE TABLE lams_user (
                   REFERENCES lams_workspace (workspace_id) ON DELETE NO ACTION ON UPDATE NO ACTION
      , INDEX (flash_theme_id)
      , CONSTRAINT FK_lams_user_4 FOREIGN KEY (flash_theme_id)
-                  REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+                  REFERENCES lams_theme (theme_id) ON DELETE NO ACTION ON UPDATE NO ACTION
      , INDEX (html_theme_id)
      , CONSTRAINT FK_lams_user_5 FOREIGN KEY (html_theme_id)
-                  REFERENCES lams_css_theme_ve (theme_ve_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+                  REFERENCES lams_theme (theme_id) ON DELETE NO ACTION ON UPDATE NO ACTION
      , INDEX (locale_id)
      , CONSTRAINT FK_lams_user_6 FOREIGN KEY (locale_id)
                   REFERENCES lams_supported_locale (locale_id) ON DELETE NO ACTION ON UPDATE NO ACTION

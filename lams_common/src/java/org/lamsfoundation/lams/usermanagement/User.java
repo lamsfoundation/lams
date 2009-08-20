@@ -35,7 +35,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
@@ -125,10 +125,10 @@ public class User implements Serializable, Comparable {
     private Set userOrganisations;
 
     /** persistent field */
-    private CSSThemeVisualElement flashTheme;
+    private Theme flashTheme;
 
     /** persistent field */
-    private CSSThemeVisualElement htmlTheme;
+    private Theme htmlTheme;
 
     /** nullable persistent field */
     private String chatId;
@@ -187,7 +187,7 @@ public class User implements Serializable, Comparable {
 	    String addressLine2, String addressLine3, String city, String state, String postcode, String country,
 	    String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag,
 	    Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod,
-	    CSSThemeVisualElement flashTheme, CSSThemeVisualElement htmlTheme, Set userOrganisations, String chatId,
+	    Theme flashTheme, Theme htmlTheme, Set userOrganisations, String chatId,
 	    Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons,
 	    Long portraitUuid, Boolean changePassword, Boolean enableFlash, String lamsCommunityToken) {
 	this.login = login;
@@ -527,11 +527,11 @@ public class User implements Serializable, Comparable {
      * @hibernate.column name="flash_theme_id"
      * 
      */
-    public CSSThemeVisualElement getFlashTheme() {
+    public Theme getFlashTheme() {
 	return flashTheme;
     }
 
-    public void setFlashTheme(CSSThemeVisualElement flashTheme) {
+    public void setFlashTheme(Theme flashTheme) {
 	this.flashTheme = flashTheme;
     }
 
@@ -540,11 +540,11 @@ public class User implements Serializable, Comparable {
      * @hibernate.column name="html_theme_id"
      * 
      */
-    public CSSThemeVisualElement getHtmlTheme() {
+    public Theme getHtmlTheme() {
 	return htmlTheme;
     }
 
-    public void setHtmlTheme(CSSThemeVisualElement htmlTheme) {
+    public void setHtmlTheme(Theme htmlTheme) {
 	this.htmlTheme = htmlTheme;
     }
 

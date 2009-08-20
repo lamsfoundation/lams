@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.dao.ICSSThemeDAO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.themes.dto.CSSThemeDTO;
@@ -132,8 +132,8 @@ public class ThemeService implements IThemeService {
 	    log.debug("Converted Theme packet. Packet was \n" + wddxPacket + "\nDTO is\n" + themeDTO);
 	}
 
-	CSSThemeVisualElement dbTheme = null;
-	CSSThemeVisualElement storedTheme = null;
+	Theme dbTheme = null;
+	Theme storedTheme = null;
 	if (themeDTO.getId() != null) {
 	    // Flash has supplied an id, get the record from the database for update
 	    dbTheme = themeDAO.getThemeById(themeDTO.getId());
@@ -146,7 +146,7 @@ public class ThemeService implements IThemeService {
 	}
 
 	themeDAO.saveOrUpdateTheme(storedTheme);
-	flashMessage = new FlashMessage(IThemeService.STORE_THEME_MESSAGE_KEY, storedTheme.getId());
+	flashMessage = new FlashMessage(IThemeService.STORE_THEME_MESSAGE_KEY, storedTheme.getThemeId());
 	return flashMessage.serializeMessage();
     }
 
@@ -160,7 +160,7 @@ public class ThemeService implements IThemeService {
      */
     public String getThemeWDDX(Long themeId) throws IOException {
 	FlashMessage flashMessage = null;
-	CSSThemeVisualElement theme = getTheme(themeId);
+	Theme theme = getTheme(themeId);
 	if (theme == null)
 	    flashMessage = FlashMessage.getNoSuchTheme("wddxPacket", themeId);
 	else {
@@ -173,17 +173,17 @@ public class ThemeService implements IThemeService {
     /**
      * Returns a theme
      */
-    public CSSThemeVisualElement getTheme(Long themeId) {
+    public Theme getTheme(Long themeId) {
 	return themeDAO.getThemeById(themeId);
     }
 
     /**
      * Returns a theme based on the name.
      */
-    public CSSThemeVisualElement getTheme(String themeName) {
+    public Theme getTheme(String themeName) {
 	List themes = themeDAO.getThemeByName(themeName);
 	if (themes != null && themes.size() > 0)
-	    return (CSSThemeVisualElement) themes.get(0);
+	    return (Theme) themes.get(0);
 	else
 	    return null;
     }
@@ -201,7 +201,7 @@ public class ThemeService implements IThemeService {
 	ArrayList<CSSThemeBriefDTO> themeList = new ArrayList<CSSThemeBriefDTO>();
 	Iterator iterator = themes.iterator();
 	while (iterator.hasNext()) {
-	    CSSThemeBriefDTO dto = new CSSThemeBriefDTO((CSSThemeVisualElement) iterator.next());
+	    CSSThemeBriefDTO dto = new CSSThemeBriefDTO((Theme) iterator.next());
 	    themeList.add(dto);
 	}
 	flashMessage = new FlashMessage("getThemes", themeList);
@@ -218,7 +218,7 @@ public class ThemeService implements IThemeService {
 	    UserException {
 	FlashMessage flashMessage = null;
 	User user = (User) userManagementService.findById(User.class, userId);
-	CSSThemeVisualElement theme = themeDAO.getThemeById(themeId);
+	Theme theme = themeDAO.getThemeById(themeId);
 
 	if (theme == null)
 	    throw new ThemeException(messageService.getMessage(IThemeService.NO_SUCH_THEME_KEY));
@@ -277,8 +277,8 @@ public class ThemeService implements IThemeService {
      * @see org.lamsfoundation.lams.themes.service.IThemeService#getAllThemes()
      */
     @SuppressWarnings("unchecked")
-    public List<CSSThemeVisualElement> getAllThemes(){
-	return (List<CSSThemeVisualElement>)themeDAO.getAllThemes();
+    public List<Theme> getAllThemes(){
+	return (List<Theme>)themeDAO.getAllThemes();
     }
 
     /* (non-Javadoc)
@@ -289,24 +289,51 @@ public class ThemeService implements IThemeService {
     }
 
     /* (non-Javadoc)
-     * @see org.lamsfoundation.lams.themes.service.IThemeService#saveOrUpdateTheme(org.lamsfoundation.lams.themes.CSSThemeVisualElement)
+     * @see org.lamsfoundation.lams.themes.service.IThemeService#saveOrUpdateTheme(org.lamsfoundation.lams.themes.Theme)
      */
-    public void saveOrUpdateTheme(CSSThemeVisualElement theme) {
+    public void saveOrUpdateTheme(Theme theme) {
 	themeDAO.saveOrUpdateTheme(theme);
     }
     
     /* (non-Javadoc)
      * @see org.lamsfoundation.lams.themes.service.IThemeService#getDefaultTheme()
      */
-    public CSSThemeVisualElement getDefaultTheme() {
-	List<CSSThemeVisualElement> themes = getAllThemes();
-	for (CSSThemeVisualElement theme : themes) {
+    public Theme getDefaultCSSTheme() {
+	List<Theme> themes = getAllThemes();
+	for (Theme theme : themes) {
 	    if (theme.getName().equals(Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME))); {
 		return theme;
 	    }
 	}
 	
 	return null;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.themes.service.IThemeService#getDefaultTheme()
+     */
+    public Theme getDefaultFlashTheme() {
+	List<Theme> themes = getAllThemes();
+	for (Theme theme : themes) {
+	    if (theme.getName().equals(Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME))); {
+		return theme;
+	    }
+	}
+	return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.themes.service.IThemeService#getAlCSSThemes()
+     */
+    public List<Theme> getAllCSSThemes() {
+	return themeDAO.getAllCSSThemes();
+    }
+
+    /* (non-Javadoc)
+     * @see org.lamsfoundation.lams.themes.service.IThemeService#getAlFlashThemes()
+     */
+    public List<Theme> getAllFlashThemes() {
+	return themeDAO.getAllFlashThemes();
     }
 
 }

@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.themes.dto;
 
 import org.lamsfoundation.lams.learningdesign.dto.BaseDTO;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 
 /**
  * Contains only the basic details for a theme - name, id, etc. Does not
@@ -51,9 +51,9 @@ public class CSSThemeBriefDTO extends BaseDTO {
     /**
      * Create the DTO from a database object.
      */
-    public CSSThemeBriefDTO(CSSThemeVisualElement theme) {
+    public CSSThemeBriefDTO(Theme theme) {
         if ( theme != null ) {
-    		this.id = theme.getId();
+    		this.id = theme.getThemeId();
     		this.name = theme.getName();
     		this.description = theme.getDescription();
         }

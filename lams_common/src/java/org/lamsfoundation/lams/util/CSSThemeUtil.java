@@ -37,6 +37,7 @@ public class CSSThemeUtil {
 
     // private static Logger log = Logger.getLogger(CSSThemeUtil.class);
     public static String DEFAULT_HTML_THEME = "defaultHTML";
+    public static String DEFAULT_FLASH_THEME = "default";
 
     /**
      * Will return a list of stylesheets for the current user. If the user does

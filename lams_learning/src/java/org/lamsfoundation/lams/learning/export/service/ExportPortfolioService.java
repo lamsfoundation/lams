@@ -55,7 +55,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -510,11 +510,11 @@ public class ExportPortfolioService implements IExportPortfolioService {
      * Gets the themes for the current user. This is used to determine the stylesheets included in the export file. We
      * need the full theme, not just the name, so we can get the directory names for the images.
      */
-    public Collection<CSSThemeVisualElement> getUserThemes() {
+    public Collection<Theme> getUserThemes() {
 	List<String> themeNames = CSSThemeUtil.getAllUserThemes();
-	Set<CSSThemeVisualElement> userThemes = new HashSet<CSSThemeVisualElement>();
+	Set<Theme> userThemes = new HashSet<Theme>();
 	for (String themeName : themeNames) {
-	    CSSThemeVisualElement theme = themeService.getTheme(themeName);
+	    Theme theme = themeService.getTheme(themeName);
 	    if (theme != null) {
 		userThemes.add(theme);
 	    }

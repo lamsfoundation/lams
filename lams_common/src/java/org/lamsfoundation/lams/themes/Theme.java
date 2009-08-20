@@ -1,5 +1,5 @@
 /****************************************************************
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * Copyright (C) 2009 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
@@ -20,82 +20,116 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.lams.admin.web.form;
-
-import org.apache.struts.action.ActionForm;
+/* $$Id$$ */
+package org.lamsfoundation.lams.themes;
 
 /**
- * 
- * Form for theme management
- * 
  * @author lfoxton
  * 
- * @struts.form name="themeForm"
+ * Model for theme whether it be flash, css or other
+ * 
+ * @hibernate.class table="lams_theme"
  */
-public class ThemeForm extends ActionForm {
+public class Theme {
 
-    private static final long serialVersionUID = -3127221000563399156L;
+    public static final int TYPE_CSS = 1;
+    public static final int TYPE_FLASH = 2;
     
-    public ThemeForm() {}
-   
-    private String method;
-    private Long id;
-    private String name;
-    private String description;
-    private String imageDirectory;
-    private Boolean currentDefaultTheme;
-    private String type;
+    /** identifier field */
+    private Long themeId;
 
-    public String getMethod() {
-        return method;
+    /** persistent field */
+    private String name;
+
+    /** nullable persistent field */
+    private String description;
+    
+    /** persistent field */
+    private String imageDirectory;
+    
+    /** persistent field */
+    private Integer type;
+    
+    /** non-persistent field */
+    private Boolean currentDefaultTheme;
+    
+    /** non-persistent field */
+    private Boolean notEditable;
+
+    /** default constructor */
+    public Theme() {
     }
-    public void setMethod(String method) {
-        this.method = method;
+
+    /** 
+     * @hibernate.id generator-class="assigned"  type="java.lang.Long" column="theme_id"   
+     */
+    public Long getThemeId() {
+        return themeId;
     }
-    public Long getId() {
-        return id;
+
+    public void setThemeId(Long themeId) {
+        this.themeId = themeId;
     }
-    public void setId(Long id) {
-        this.id = id;
-    }
+
+    /** 
+     *  @hibernate.property column="name" length="100" not-null="true"   
+     */
     public String getName() {
-        return name;
+        return this.name;
     }
+
+
     public void setName(String name) {
         this.name = name;
     }
+
+    /** 
+     * @hibernate.property  column="description" length="100"
+     *         
+     */
     public String getDescription() {
-        return description;
+        return this.description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
+
+    /** 
+     * @hibernate.property column="image_directory" length="100"      
+     */
     public String getImageDirectory() {
-        return imageDirectory;
+        return this.imageDirectory;
     }
+
     public void setImageDirectory(String imageDirectory) {
         this.imageDirectory = imageDirectory;
     }
+
+    /**
+     * @hibernate.property column="theme_type" length="11"      
+     */
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
     public Boolean getCurrentDefaultTheme() {
         return currentDefaultTheme;
     }
+
     public void setCurrentDefaultTheme(Boolean currentDefaultTheme) {
         this.currentDefaultTheme = currentDefaultTheme;
     }
-    public String getType() {
-        return type;
+
+    public Boolean getNotEditable() {
+        return notEditable;
     }
-    public void setType(String type) {
-        this.type = type;
-    }
-    public void clear() {
-	this.method = null;
-	this.id = null;
-	this.name = null;
-	this.description = null;
-	this.imageDirectory = null;
-	this.currentDefaultTheme = null;
-	this.type = null;
+
+    public void setNotEditable(Boolean notEditable) {
+        this.notEditable = notEditable;
     }
 }
-	

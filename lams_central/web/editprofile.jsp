@@ -151,11 +151,21 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="align-right"><fmt:message key="label.html.theme"/>:</td>
+		<td class="align-right"><fmt:message key="label.html.htmlTheme"/>:</td>
 		<td>
-		<html:select property="userTheme">
-			<c:forEach items="${themes}" var="theme">
-				<html:option value="${theme.id}">${theme.name}</html:option>
+		<html:select property="userCSSTheme">
+			<c:forEach items="${cssThemes}" var="theme">	
+				<html:option value="${theme.themeId}">${theme.name}</html:option>
+			</c:forEach>
+		</html:select>
+		</td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.html.flashTheme"/>:</td>
+		<td>
+		<html:select property="userFlashTheme">
+			<c:forEach items="${flashThemes}" var="theme">	
+				<html:option value="${theme.themeId}">${theme.name}</html:option>
 			</c:forEach>
 		</html:select>
 		</td>
@@ -258,11 +268,21 @@
 		<td><bean:write name="UserForm" property="fax" /></td>
 	</tr>
 	<tr>
-		<td class="align-right"><fmt:message key="label.html.theme"/>:</td>
+		<td class="align-right"><fmt:message key="label.html.htmlTheme"/>:</td>
 		<td>
-		<html:select property="userTheme">
-			<c:forEach items="${themes}" var="theme">	
-				<html:option value="${theme.id}">${theme.name}</html:option>
+		<html:select property="userCSSTheme">
+			<c:forEach items="${cssThemes}" var="theme">	
+				<html:option value="${theme.themeId}">${theme.name}</html:option>
+			</c:forEach>
+		</html:select>
+		</td>
+	</tr>
+	<tr>
+		<td class="align-right"><fmt:message key="label.html.flashTheme"/>:</td>
+		<td>
+		<html:select property="userFlashTheme">
+			<c:forEach items="${flashThemes}" var="theme">	
+				<html:option value="${theme.themeId}">${theme.name}</html:option>
 			</c:forEach>
 		</html:select>
 		</td>

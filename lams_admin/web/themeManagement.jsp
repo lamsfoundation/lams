@@ -3,7 +3,7 @@
 
 <script type="text/javascript">
 <!--
-	function editTheme(name, description, imageDirectory, id, currentDefaultTheme) {
+	function editTheme(name, description, imageDirectory, id, currentDefaultTheme, type) {
 		document.getElementById("name").value = name;
 		document.getElementById("description").value = description;
 		document.getElementById("imageDirectory").value = imageDirectory;
@@ -14,10 +14,9 @@
 		if(currentDefaultTheme == "true") {
 			document.getElementById("currentDefaultTheme").checked = true;
 		}
-
-		document.getElementById("cancelEdit").style.display="block";
-
+		document.getElementById("type").options[type -1].selected = true;
 		
+		document.getElementById("cancelEdit").style.display="block";
 		document.getElementById("normalSave").style.display="none";
 	}
 
@@ -29,13 +28,15 @@
 		document.getElementById("currentDefaultTheme").checked = false;
 		document.getElementById("cancelEdit").style.display="none";
 		document.getElementById("normalSave").style.display="block";
+		document.getElementById("type").options[0].selected = true;
 	}
 
-	function removeTheme(id, name) {
+	function removeTheme(id, name, type) {
 		var answer = confirm('<fmt:message key="admin.themes.deleteConfirm" />')
 		if (answer) {
 			document.getElementById("name").value = name;
 			document.getElementById("id").value = id;
+			document.getElementById("type").options[type -1].selected = true;
 			document.getElementById("method").value = "removeTheme";
 			submitForm();
 		}
@@ -93,6 +94,9 @@
 			<fmt:message key="admin.themes.defaultTheme" />
 		</th>
 		<th>
+			<fmt:message key="admin.themes.type" />
+		</th>
+		<th>
 		</th>
 	</tr>
 	<c:forEach var="theme" items="${themes}" >
@@ -111,17 +115,27 @@
 					<img src="<lams:LAMSURL/>/images/tick.png" >
 				</c:if>
 			</td>
+			<td>
+				<c:choose>
+					<c:when test="${theme.type==1}">
+						<fmt:message key="admin.themes.html" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="admin.themes.flash" />
+					</c:otherwise>
+				</c:choose>
+			</td>
 			<td align="center">
 
 				<c:choose>
 					<c:when test="${not theme.notEditable}">
 						<img src="<lams:LAMSURL/>/images/edit.gif" 
 							title='<fmt:message key="admin.themes.edit" />'
-							onclick="editTheme('${theme.name}', '${theme.description}', '${theme.imageDirectory}', '${theme.id}', '${theme.currentDefaultTheme}')"
+							onclick="editTheme('${theme.name}', '${theme.description}', '${theme.imageDirectory}', '${theme.themeId}', '${theme.currentDefaultTheme}', '${theme.type}')"
 						>
 						<img src="<lams:LAMSURL/>/images/cross.gif" 
 							title='<fmt:message key="admin.themes.remove" />'
-							onclick="removeTheme('${theme.id}', '${theme.name}')"
+							onclick="removeTheme('${theme.themeId}', '${theme.name}', '${theme.type}')"
 						>
 					</c:when>
 					<c:otherwise>
@@ -174,6 +188,17 @@
 			</td>
 			<td>
 				<html:checkbox property="currentDefaultTheme" styleId="currentDefaultTheme" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fmt:message key="admin.themes.type" />:
+			</td>
+			<td>
+				<html:select property="type" styleId="type">
+					<html:option value="1"><fmt:message key="admin.themes.html" /></html:option>
+					<html:option value="2"><fmt:message key="admin.themes.flash" /></html:option>
+				</html:select>
 			</td>
 		</tr>
 	</table>

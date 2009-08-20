@@ -364,7 +364,7 @@
     <!-- bi-directional many-to-one association to CSSTheme -->
     <many-to-one
         name="flashTheme"
-        class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        class="org.lamsfoundation.lams.themes.Theme"
         lazy="false"
         not-null="true"
     >
@@ -380,7 +380,7 @@
     <!-- bi-directional many-to-one association to CSSTheme -->
     <many-to-one
         name="htmlTheme"
-        class="org.lamsfoundation.lams.themes.CSSThemeVisualElement"
+        class="org.lamsfoundation.lams.themes.Theme"
         lazy="false"
         not-null="true"
     >

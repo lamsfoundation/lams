@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.themes.service;
 import java.io.IOException;
 import java.util.List;
 
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.exception.ThemeException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.util.MessageService;
@@ -82,12 +82,12 @@ public interface IThemeService {
 	/**
 	 * Returns a theme
 	 */
-	public CSSThemeVisualElement getTheme(Long themeId);
+	public Theme getTheme(Long themeId);
 
 	/**
 	 * Returns a theme based on the name.
 	 */
-	public CSSThemeVisualElement getTheme(String themeName);
+	public Theme getTheme(String themeName);
 
 	/**
 	 * This method returns a list of all available themes in
@@ -110,7 +110,19 @@ public interface IThemeService {
 	 * Get all the installed themes
 	 * @return
 	 */
-	public List<CSSThemeVisualElement> getAllThemes();
+	public List<Theme> getAllThemes();
+	
+	/**
+	 * Get all the installed CSS themes
+	 * @return
+	 */
+	public List<Theme> getAllCSSThemes();
+	
+	/**
+	 * Get all the installed flash themes
+	 * @return
+	 */
+	public List<Theme> getAllFlashThemes();
 	
 	/**
 	 * Remove a theme
@@ -122,12 +134,18 @@ public interface IThemeService {
 	 * Saves or updates a theme
 	 * @param theme
 	 */
-	public void saveOrUpdateTheme(CSSThemeVisualElement theme);
+	public void saveOrUpdateTheme(Theme theme);
+	
+	/**
+	 * Returns the default css theme for the server
+	 * @return
+	 */
+	public Theme getDefaultCSSTheme();
 	
 	/**
 	 * Returns the default theme for the server
 	 * @return
 	 */
-	public CSSThemeVisualElement getDefaultTheme();
+	public Theme getDefaultFlashTheme();
 }
 

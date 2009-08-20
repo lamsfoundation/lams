@@ -46,7 +46,7 @@ import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.web.dto.V1OrgRightDTO;
 import org.lamsfoundation.lams.admin.web.dto.V1OrganisationDTO;
 import org.lamsfoundation.lams.admin.web.dto.V1UserDTO;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -657,7 +657,7 @@ public class ImportService implements IImportService {
 		}
 		
 		String flashId = parseStringCell(row.getCell(FLASH_THEME));
-		CSSThemeVisualElement flashTheme = getFlashTheme(flashId);
+		Theme flashTheme = getFlashTheme(flashId);
 		if (flashTheme==null) {
 			args[0] = "("+flashId+")";
 			rowResult.add(messageService.getMessage("error.flash.theme.invalid", args));
@@ -667,7 +667,7 @@ public class ImportService implements IImportService {
 		}
 
 		String htmlId = parseStringCell(row.getCell(HTML_THEME));
-		CSSThemeVisualElement htmlTheme = getHtmlTheme(htmlId);
+		Theme htmlTheme = getHtmlTheme(htmlId);
 		if (htmlTheme==null) {
 			args[0] = "("+htmlId+")";
 			rowResult.add(messageService.getMessage("error.html.theme.invalid", args));
@@ -850,26 +850,26 @@ public class ImportService implements IImportService {
 		return true;
 	}
 
-	// set CSSThemeVisualElement to default flash theme if cell is empty
-	private CSSThemeVisualElement getFlashTheme(String flashId){
+	// set Theme to default flash theme if cell is empty
+	private Theme getFlashTheme(String flashId){
 		if (flashId==null || flashId=="") {
 			return service.getDefaultFlashTheme();
 		} else {
 			try {
-				return (CSSThemeVisualElement)service.findById(CSSThemeVisualElement.class, new Long(flashId));
+				return (Theme)service.findById(Theme.class, new Long(flashId));
 			} catch (Exception e) {
 				return null;
 			}
 		}
 	}
 	
-	// set CSSThemeVisualElement to default html theme if cell is empty
-	private CSSThemeVisualElement getHtmlTheme(String htmlId){
+	// set Theme to default html theme if cell is empty
+	private Theme getHtmlTheme(String htmlId){
 		if (htmlId==null || htmlId=="") {
 			return service.getDefaultHtmlTheme();
 		} else {
 			try {
-				return (CSSThemeVisualElement)service.findById(CSSThemeVisualElement.class, new Long(htmlId));
+				return (Theme)service.findById(Theme.class, new Long(htmlId));
 			} catch (Exception e) {
 				return null;
 			}

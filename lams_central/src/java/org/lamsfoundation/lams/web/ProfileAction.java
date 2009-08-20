@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -210,24 +210,43 @@ public class ProfileAction extends LamsDispatchAction {
 
 	themeService = getThemeService();
 
-	// Get all the themes
-	List<CSSThemeVisualElement> themes = themeService.getAllThemes();
-	request.setAttribute("themes", themes);
+	// Get all the css themes
+	List<Theme> cssThemes = themeService.getAllCSSThemes();
+	request.setAttribute("cssThemes", cssThemes);
 
 	// Check the user theme is still installed
-	Long userSelectedTheme = null;
+	Long userSelectedCSSTheme = null;
 	if (requestor.getHtmlTheme() != null) {
-	    for (CSSThemeVisualElement theme : themes) {
-		if (theme.getId() == requestor.getHtmlTheme().getId()) {
-		    userSelectedTheme = theme.getId();
+	    for (Theme theme : cssThemes) {
+		if (theme.getThemeId() == requestor.getHtmlTheme().getThemeId()) {
+		    userSelectedCSSTheme = theme.getThemeId();
 		}
 	    }
 	}
 	// if still null, use the default 
-	if (userSelectedTheme == null) {
-	    userSelectedTheme = themeService.getDefaultTheme().getId();
+	if (userSelectedCSSTheme == null) {
+	    userSelectedCSSTheme = themeService.getDefaultCSSTheme().getThemeId();
 	}
-	userForm.set("userTheme", userSelectedTheme);
+	userForm.set("userCSSTheme", userSelectedCSSTheme);
+	
+	// Get all the flash themes
+	List<Theme> flashThemes = themeService.getAllFlashThemes();
+	request.setAttribute("flashThemes", flashThemes);
+
+	// Check the user theme is still installed
+	Long userSelectedFlashTheme = null;
+	if (requestor.getHtmlTheme() != null) {
+	    for (Theme theme : flashThemes) {
+		if (theme.getThemeId() == requestor.getFlashTheme().getThemeId()) {
+		    userSelectedFlashTheme = theme.getThemeId();
+		}
+	    }
+	}
+	// if still null, use the default 
+	if (userSelectedFlashTheme == null) {
+	    userSelectedFlashTheme = themeService.getDefaultFlashTheme().getThemeId();
+	}
+	userForm.set("userFlashTheme", userSelectedFlashTheme);
 
 	return mapping.findForward("edit");
     }

@@ -96,9 +96,7 @@
 				<value>classpath:org/lamsfoundation/lams/workspace/WorkspaceFolderContent.hbm.xml</value>
 				
 				<!-- Theme related mapping files -->
-				<value>classpath:org/lamsfoundation/lams/themes/CSSProperty.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/themes/CSSStyle.hbm.xml</value>
-				<value>classpath:org/lamsfoundation/lams/themes/CSSThemeVisualElement.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/themes/Theme.hbm.xml</value>
 				
 				<!-- Core Notebook Service related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/notebook/model/NotebookEntry.hbm.xml</value>

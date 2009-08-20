@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -399,13 +399,13 @@ public interface IUserManagementService {
 	 * Get default flash theme of server.
 	 * @return default flash theme object
 	 */
-	public CSSThemeVisualElement getDefaultFlashTheme();
+	public Theme getDefaultFlashTheme();
 	
 	/**
 	 * Get default html theme of server.
 	 * @return default html theme object
 	 */
-	public CSSThemeVisualElement getDefaultHtmlTheme();
+	public Theme getDefaultHtmlTheme();
 	
 	public void auditPasswordChanged(User user, String moduleName);
 	

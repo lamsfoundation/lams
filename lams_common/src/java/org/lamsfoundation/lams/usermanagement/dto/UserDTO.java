@@ -43,7 +43,6 @@ public class UserDTO {
     private String fckLanguageMapping;
     private String direction;
     private String email;
-    // private CSSThemeVisualElement theme;
     private CSSThemeBriefDTO flashTheme;
     private CSSThemeBriefDTO htmlTheme;
     private TimeZone timeZone;
@@ -55,16 +54,6 @@ public class UserDTO {
     private Boolean tutorialsDisabled;
     private Set<String> pagesWithDisabledTutorials;
     private Boolean firstLogin;
-
-    // public UserDTO(Integer userID, String firstName, String lastName,
-    // String login, String email, CSSThemeVisualElement theme) {
-    // this.userID = userID;
-    // this.firstName = firstName;
-    // this.lastName = lastName;
-    // this.login = login;
-    // this.email = email;
-    // this.theme = theme;
-    // }
 
     public UserDTO(Integer userID, String firstName, String lastName, String login, String localeLanguage,
 	    String localeCountry, String direction, String email, CSSThemeBriefDTO flashTheme,
@@ -253,13 +242,5 @@ public class UserDTO {
     public Boolean isFirstLogin() {
 	return firstLogin;
     }
-
-    // public CSSThemeVisualElement getTheme() {
-    // return theme;
-    // }
-    //	
-    // public void setTheme(CSSThemeVisualElement theme) {
-    // this.theme = theme;
-    // }
 
 }

@@ -42,7 +42,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -1048,16 +1048,16 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
-    public CSSThemeVisualElement getDefaultFlashTheme() {
+    public Theme getDefaultFlashTheme() {
 	String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
-	List list = findByProperty(CSSThemeVisualElement.class, "name", flashName);
-	return list != null ? (CSSThemeVisualElement) list.get(0) : null;
+	List list = findByProperty(Theme.class, "name", flashName);
+	return list != null ? (Theme) list.get(0) : null;
     }
 
-    public CSSThemeVisualElement getDefaultHtmlTheme() {
+    public Theme getDefaultHtmlTheme() {
 	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
-	List list = findByProperty(CSSThemeVisualElement.class, "name", htmlName);
-	return list != null ? (CSSThemeVisualElement) list.get(0) : null;
+	List list = findByProperty(Theme.class, "name", htmlName);
+	return list != null ? (Theme) list.get(0) : null;
     }
 
     public void auditPasswordChanged(User user, String moduleName) {

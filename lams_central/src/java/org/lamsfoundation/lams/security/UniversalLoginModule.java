@@ -52,7 +52,7 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.dto.CSSThemeBriefDTO;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethodType;
@@ -216,19 +216,35 @@ public class UniversalLoginModule extends UsernamePasswordLoginModule {
 		if (isValid) {
 		    UserDTO userDTO = user.getUserDTO();
 
-		    // If the user's theme has been deleted, use the default as fallback
-		    CSSThemeBriefDTO userTheme = userDTO.getHtmlTheme();
-		    if (userTheme != null) {
+		    // If the user's css theme has been deleted, use the default as fallback
+		    CSSThemeBriefDTO userCSSTheme = userDTO.getHtmlTheme();
+		    if (userCSSTheme != null) {
 			boolean themeExists = false;
-			for (CSSThemeVisualElement theme : themeService.getAllThemes()) {
-			    if (userTheme.getId().equals(theme.getId())) {
+			for (Theme theme : themeService.getAllCSSThemes()) {
+			    if (userCSSTheme.getId().equals(theme.getThemeId())) {
 				themeExists = true;
 				break; 
 			    }
 			}
 
 			if (!themeExists) {
-			    userDTO.setHtmlTheme(new CSSThemeBriefDTO(themeService.getDefaultTheme()));
+			    userDTO.setHtmlTheme(new CSSThemeBriefDTO(themeService.getDefaultCSSTheme()));
+			}
+		    }
+		    
+		    // If the user's flash theme has been deleted, use the default as fallback
+		    CSSThemeBriefDTO userFlashTheme = userDTO.getFlashTheme();
+		    if (userFlashTheme != null) {
+			boolean themeExists = false;
+			for (Theme theme : themeService.getAllFlashThemes()) {
+			    if (userFlashTheme.getId().equals(theme.getThemeId())) {
+				themeExists = true;
+				break; 
+			    }
+			}
+
+			if (!themeExists) {
+			    userDTO.setFlashTheme(new CSSThemeBriefDTO(themeService.getDefaultFlashTheme()));
 			}
 		    }
 

@@ -37,7 +37,7 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
@@ -53,19 +53,19 @@ public class CSSBundler extends Bundler {
 	String outputDirectory  = null;
 	String centralPath  = null;
 	boolean rtl = false;
-	Collection<CSSThemeVisualElement> themes = null;
+	Collection<Theme> themes = null;
 	List<String> directoriesRequired;
 	
 	/**
  	 * @param centralPath the directory path to the lams-central.war. Assumes that it is an expanded war.
 	 */
-	public CSSBundler(HttpServletRequest request, Cookie[] cookies, String outputDirectory, Collection<CSSThemeVisualElement> themes) {
+	public CSSBundler(HttpServletRequest request, Cookie[] cookies, String outputDirectory, Collection<Theme> themes) {
 		filesToCopy = new HashMap<String,File>();
 		directoriesRequired = new ArrayList<String>();
 		this.request = request;
 		this.cookies = cookies;
 		this.outputDirectory = outputDirectory;
-		this.themes = themes != null ? themes : new ArrayList<CSSThemeVisualElement>();
+		this.themes = themes != null ? themes : new ArrayList<Theme>();
 		
 		this.centralPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
 		if ( centralPath == null )  {
@@ -119,7 +119,7 @@ public class CSSBundler extends Bundler {
 		
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
 
-		for ( CSSThemeVisualElement theme : themes) {
+		for ( Theme theme : themes) {
 			String themeName = theme.getName();
 			
 			String url = (!rtl)? basePath + "/lams/css/" + themeName + ".css" : basePath + "/lams/css/" + themeName + "_" + RTL_DIR + ".css";
@@ -163,7 +163,7 @@ public class CSSBundler extends Bundler {
 		String cssDirectory = outputDirectory+File.separatorChar+"css";
 		directoriesRequired.add(cssDirectory);
 		
-		for ( CSSThemeVisualElement theme : themes) {
+		for ( Theme theme : themes) {
 
 			String themeName = theme.getName();
 			
@@ -190,7 +190,7 @@ public class CSSBundler extends Bundler {
 
 	private void setupImageList() {
 
-		for ( CSSThemeVisualElement theme : themes) {
+		for ( Theme theme : themes) {
 
 			String dirName = theme.getImageDirectory();
 			if ( dirName != null ) {				

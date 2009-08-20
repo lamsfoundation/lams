@@ -40,9 +40,7 @@ DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 		<mapping resource="org/lamsfoundation/lams/usermanagement/OrganisationState.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/usermanagement/AuthenticationMethod.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/usermanagement/AuthenticationMethodType.hbm.xml"/>
-		<mapping resource="org/lamsfoundation/lams/themes/CSSThemeVisualElement.hbm.xml"/>
-		<mapping resource="org/lamsfoundation/lams/themes/CSSStyle.hbm.xml"/>
-		<mapping resource="org/lamsfoundation/lams/themes/CSSProperty.hbm.xml"/>
+		<mapping resource="org/lamsfoundation/lams/themes/Theme.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/usermanagement/Role.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/usermanagement/RolePrivilege.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/usermanagement/Privilege.hbm.xml"/>

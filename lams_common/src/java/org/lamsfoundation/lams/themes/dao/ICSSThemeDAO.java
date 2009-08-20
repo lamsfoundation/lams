@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.themes.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
+import org.lamsfoundation.lams.themes.Theme;
 
 /**
  * This class interacts with Spring's HibernateTemplate to save/delete and
@@ -36,13 +36,17 @@ import org.lamsfoundation.lams.themes.CSSThemeVisualElement;
 public interface ICSSThemeDAO {
     public abstract List getAllThemes();
 
-    public abstract CSSThemeVisualElement getThemeById(Long themeId);
+    public abstract Theme getThemeById(Long themeId);
 
     public abstract List getThemeByName(String name);
 
-    public abstract void saveOrUpdateTheme(CSSThemeVisualElement theme);
+    public abstract void saveOrUpdateTheme(Theme theme);
 
-    public abstract void deleteTheme(CSSThemeVisualElement theme);
+    public abstract void deleteTheme(Theme theme);
 
     public abstract void deleteThemeById(Long themeId);
+
+    public abstract List getAllCSSThemes();
+    
+    public abstract List getAllFlashThemes();
 }
