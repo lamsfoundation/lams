@@ -6,6 +6,10 @@ SET FOREIGN_KEY_CHECKS=0;
 INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (1, "default", "Default Flash style", null, 2);
 INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (2, "defaultHTML", "Default HTML style", "css", 1);
 
+-- new high contrast theme LDEV-2419
+INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (3, "highContrast", "High Contrast HTML style", "css", 1);
+
+
 insert into lams_workspace (workspace_id, name, default_fld_id) values(1,'ROOT',1);
 insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(2,'Developers Playpen',2,22);
 insert into lams_workspace (workspace_id, name, default_fld_id, def_run_seq_fld_id) values(3,'MATH111',3,23);

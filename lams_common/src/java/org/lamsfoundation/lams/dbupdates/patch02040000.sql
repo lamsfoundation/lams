@@ -24,6 +24,8 @@ CREATE TABLE lams_theme (
 
 INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (1, "default", "Default Flash style", null, 2);
 INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (2, "defaultHTML", "Default HTML style", "css", 1);
+INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (3, "highContrast", "High Contrast HTML style", "css", 1);
+
 
 ALTER TABLE lams_user ADD CONSTRAINT FK_lams_user_4 FOREIGN KEY (flash_theme_id) REFERENCES lams_theme (theme_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE lams_user ADD CONSTRAINT FK_lams_user_5 FOREIGN KEY (html_theme_id) REFERENCES lams_theme (theme_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
