@@ -103,31 +103,32 @@ public class ResourceOutputFactory extends OutputFactory {
 		    if (!item.isCreateByAuthor()) {
 			uploadedItems.add(item);
 		    }
-		    SimpleURL[] uploadedItemUrls = new SimpleURL[uploadedItems.size()];
-		    int uploadedItemIndex = 0;
-		    if (!uploadedItems.isEmpty()) {
-			String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-			for (ResourceItem uploadedItem : uploadedItems) {
-
-			    String path = uploadedItem.getUrl();
-			    if (path == null) {
-				path = serverUrl + "download/?uuid=" + uploadedItem.getFileUuid()
-					+ "&preferDownload=false&" + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME
-					+ "=" + ResourceConstants.TOOL_CONTENT_HANDLER_NAME;
-
-			    }
-			    path = "javascript:var dummy = window.open('" + path + "','" + uploadedItem.getTitle()
-				    + "','resizable,scrollbars')";
-			    SimpleURL url = new SimpleURL(uploadedItem.getTitle(), path);
-			    uploadedItemUrls[uploadedItemIndex] = url;
-			    uploadedItemIndex++;
-			}
-			return new ToolOutput(ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, getI18NText(
-				ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, true), uploadedItemUrls, false);
-		    }
-
 		}
+		SimpleURL[] uploadedItemUrls = new SimpleURL[uploadedItems.size()];
+		int uploadedItemIndex = 0;
+		if (!uploadedItems.isEmpty()) {
+		    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+		    for (ResourceItem uploadedItem : uploadedItems) {
+
+			String path = uploadedItem.getUrl();
+			if (path == null) {
+			    path = serverUrl + "download/?uuid=" + uploadedItem.getFileUuid()
+				    + "&preferDownload=false&" + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
+				    + ResourceConstants.TOOL_CONTENT_HANDLER_NAME;
+
+			}
+			path = "javascript:var dummy = window.open('" + path + "','" + uploadedItem.getTitle()
+				+ "','resizable,scrollbars')";
+			SimpleURL url = new SimpleURL(uploadedItem.getTitle(), path);
+			uploadedItemUrls[uploadedItemIndex] = url;
+			uploadedItemIndex++;
+		    }
+		    return new ToolOutput(ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, getI18NText(
+			    ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, true), uploadedItemUrls, false);
+		}
+
 	    }
+
 	}
 	return null;
     }
