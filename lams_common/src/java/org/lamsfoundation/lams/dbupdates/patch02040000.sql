@@ -2,34 +2,55 @@
 
 SET AUTOCOMMIT = 0;
 
-SET FOREIGN_KEY_CHECKS=0;
+-- LDEV-2369
+ALTER TABLE lams_user ADD COLUMN tutorials_disabled TINYINT(1) DEFAULT 0;
+ALTER TABLE lams_user ADD COLUMN first_login TINYINT(1) DEFAULT 1;
 
--- LDEV-2420 -------
-ALTER TABLE lams_user DROP FOREIGN KEY FK_lams_user_4;
-ALTER TABLE lams_user DROP FOREIGN KEY FK_lams_user_5;
-DROP TABLE lams_css_property;
-DROP TABLE lams_css_style;
-DROP TABLE lams_css_theme_ve;
-SET FOREIGN_KEY_CHECKS=1;
-
-CREATE TABLE lams_theme (
-       theme_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , name VARCHAR(100) NOT NULL
-     , description VARCHAR(100)
-     , image_directory VARCHAR(100)
-     , theme_type TINYINT(11)
-     , PRIMARY KEY (theme_id)
-     , UNIQUE UQ_name (name)
+CREATE TABLE lams_user_disabled_tutorials (
+     user_id BIGINT(20) NOT NULL
+   , page_str CHAR(5) NOT NULL
+   , CONSTRAINT FK_lams_user_disabled_tutorials_1 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+   , PRIMARY KEY (user_id,page_str)
 )TYPE=InnoDB;
 
-INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (1, "default", "Default Flash style", null, 2);
-INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (2, "defaultHTML", "Default HTML style", "css", 1);
-INSERT INTO lams_theme (theme_id, name, description, image_directory, theme_type) VALUES (3, "highContrast", "High Contrast HTML style", "css", 1);
+-- LDEV-2374
+ALTER TABLE lams_learning_activity ADD COLUMN transition_to_id BIGINT(20);
+ALTER TABLE lams_learning_activity ADD COLUMN transition_from_id BIGINT(20);
 
+ALTER TABLE lams_learning_transition MODIFY COLUMN learning_design_id BIGINT(20);
+ALTER TABLE lams_learning_transition DROP INDEX UQ_transition_activities;
+ALTER TABLE lams_learning_transition ADD COLUMN transition_type TINYINT NOT NULL DEFAULT 0;
+ALTER TABLE lams_learning_activity  
+	  ADD CONSTRAINT FK_lams_learning_activity_15 FOREIGN KEY (transition_to_id)
+                  REFERENCES lams_learning_transition (transition_id)
+     , ADD CONSTRAINT FK_lams_learning_activity_16 FOREIGN KEY (transition_from_id)
+                  REFERENCES lams_learning_transition (transition_id);
 
-ALTER TABLE lams_user ADD CONSTRAINT FK_lams_user_4 FOREIGN KEY (flash_theme_id) REFERENCES lams_theme (theme_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE lams_user ADD CONSTRAINT FK_lams_user_5 FOREIGN KEY (html_theme_id) REFERENCES lams_theme (theme_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
---------------------
+CREATE TABLE lams_data_flow (
+	  data_flow_object_id BIGINT(20) NOT NULL auto_increment
+	, transition_id BIGINT(20) NOT NULL
+	, order_id INT(11) 
+	, name VARCHAR(255) NOT NULL
+	, display_name VARCHAR(255)
+	, tool_assigment_id INT(11)
+	, CONSTRAINT FK_lams_learning_transition_1 FOREIGN KEY (transition_id)
+                  REFERENCES lams_learning_transition (transition_id) ON DELETE CASCADE ON UPDATE CASCADE
+	, PRIMARY KEY (data_flow_object_id)
+)TYPE=InnoDB;
+
+-- LDEV-2380 Add recently modified learning design list to Pedagogical Planner
+CREATE TABLE lams_planner_recent_learning_designs (
+     user_id  BIGINT(20) NOT NULL
+   , learning_design_id BIGINT(20) NOT NULL
+   , last_modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+   , CONSTRAINT FK_lams_planner_recent_learning_designs_1 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+   , CONSTRAINT FK_lams_planner_recent_learning_designs_2 FOREIGN KEY (learning_design_id)
+                  REFERENCES lams_learning_design (learning_design_id) ON DELETE CASCADE ON UPDATE CASCADE
+   , PRIMARY KEY (user_id,learning_design_id)
+)TYPE=InnoDB;
+
 
 COMMIT;
 SET AUTOCOMMIT = 1;
