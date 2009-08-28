@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,6 +36,7 @@ import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO;
 import org.lamsfoundation.lams.config.dao.hibernate.RegistrationDAO;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -55,6 +57,8 @@ public class Configuration implements InitializingBean {
     protected ConfigurationDAO configurationDAO;
     
     protected static RegistrationDAO registrationDAO;
+    
+    protected MessageService messageService;
 
     /**
      * @param configurationDAO
@@ -157,7 +161,23 @@ public class Configuration implements InitializingBean {
 	// update ssl truststore path and password
 	setSystemProperty(ConfigurationKeys.TRUSTSTORE_PATH, get(ConfigurationKeys.TRUSTSTORE_PATH));
 	setSystemProperty(ConfigurationKeys.TRUSTSTORE_PASSWORD, get(ConfigurationKeys.TRUSTSTORE_PASSWORD));
+	updatePublicFolderName();
 	configurationDAO.insertOrUpdateAll(items.values());
+    }
+
+    private void updatePublicFolderName() {
+	// LDEV-2430 update public folder name according to default server locale
+	WorkspaceFolder publicFolder = null;
+	List list = configurationDAO.findByProperty(WorkspaceFolder.class, "workspaceFolderType",
+		WorkspaceFolder.PUBLIC_SEQUENCES);
+
+	if (list != null && list.size() > 0) {
+	    publicFolder = (WorkspaceFolder) list.get(0);
+	    String[] langCountry = LanguageUtil.getDefaultLangCountry();
+	    Locale locale = new Locale(langCountry[0], langCountry[1]);
+	    publicFolder.setName(messageService.getMessageSource().getMessage("public.folder", null, locale));
+	    configurationDAO.update(publicFolder);
+	}
     }
 
     public String toString() {
@@ -188,5 +208,13 @@ public class Configuration implements InitializingBean {
 
     public void setRegistrationDAO(RegistrationDAO registrationDAO) {
         this.registrationDAO = registrationDAO;
+    }
+
+    public MessageService getMessageService() {
+        return messageService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
     }
 }

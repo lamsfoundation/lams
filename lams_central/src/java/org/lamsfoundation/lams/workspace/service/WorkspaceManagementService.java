@@ -1220,7 +1220,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			}
 			
 			if(publicFolder != null) {
-				publicFolder.setName(messageService.getMessage("public.folder"));
 				Integer permissions = getPermissions(publicFolder, user);
 				return new FolderContentDTO(publicFolder, permissions, user);
 			}

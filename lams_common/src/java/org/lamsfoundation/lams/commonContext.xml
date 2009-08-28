@@ -494,6 +494,7 @@
 	<bean id="configurationService" class="org.lamsfoundation.lams.util.Configuration">
 		<property name="configurationDAO"><ref bean="configurationDAO" /></property>
 		<property name="registrationDAO"><ref bean="registrationDAO" /></property>
+		<property name="messageService"><ref bean="commonMessageService" /></property>
 	</bean>
 	
 	<!-- auditing service -->
