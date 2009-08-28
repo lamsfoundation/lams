@@ -41,7 +41,7 @@ package org.lamsfoundation.lams.vos
 			super(dispatcher);
 			
 			_sort = new Sort();
-			_sort.fields = [new SortField("name")];
+			_sort.fields = [new SortField("name", true)];
 		}
 
 		public function get name():String {
