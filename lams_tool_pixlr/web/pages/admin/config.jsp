@@ -33,7 +33,7 @@
 				<p>
 			</c:if>
 			
-			<html:form action="/lapixlr10admin" styleId="lapixlr10AdminForm" method="post" enctype="multipart/form-data">
+			<html:form action="/lapixl10admin" styleId="lapixl10AdminForm" method="post" enctype="multipart/form-data">
 				
 				<html:hidden property="dispatch" value="saveContent" />
 				<table class="alternative-color">
