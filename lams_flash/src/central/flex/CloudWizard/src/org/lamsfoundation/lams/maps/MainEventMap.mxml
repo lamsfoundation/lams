@@ -22,9 +22,18 @@
 			[Bindable]
 			private var userID:uint;
 			
-			public function init(url:String, id:uint):void {
+			[Bindable]
+			private var orgID:uint;
+			
+			public function init(url:String, id:uint, orgId:uint):void {
 				serverURL = url;
 				userID = id;
+				orgID = orgId;
+				
+				// Uncomment to test in debug
+				//serverURL = "http://localhost:8080/lams/";
+				//userID = 5; 		// test1
+				//orgID = 2; 		// Playpen
 			}
 			
 		]]>
@@ -46,7 +55,7 @@
 	<EventHandlers type="{FlexEvent.APPLICATION_COMPLETE}">
 		<!-- load dict data -->
 		<HTTPServiceInvoker instance="{dictionaryService}">
-			<Request module="wizard" />
+			<Request module="wizard" orgId="{orgID}"/>
 			<resultHandlers>
 				<MethodInvoker generator="{WizardManager}" method="setDictionary" arguments="{resultObject}" />
 			</resultHandlers>

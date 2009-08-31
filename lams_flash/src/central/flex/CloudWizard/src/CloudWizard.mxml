@@ -16,7 +16,7 @@
 			public var orgName:String;
 			
 			private function init():void {
-				mainMap.init(Application.application.param("serverUrl") as String, uint(Application.application.param("userID")));
+				mainMap.init(Application.application.param("serverUrl") as String, uint(Application.application.param("userID")), uint(Application.application.param("organisationID")));
 			}
 			
 			public function param(object:String):Object {
