@@ -738,10 +738,10 @@ function lamstwo_get_members($courseid, $lamstwoid, $groupid) {
 	
 	foreach ($userids as $userid) {
 		$user = get_record('user', 'id', $userid);
-		if (has_capability('mod/lams:manage', $context, $user->id)) {
+		if (has_capability('mod/lamstwo:manage', $context, $user->id)) {
 			$monitoridstr .= "$user->username,";
 		}
-		if (has_capability('mod/lams:participate', $context, $user->id)) {
+		if (has_capability('mod/lamstwo:participate', $context, $user->id)) {
 			$learneridstr .= "$user->username,";
 		}
 	}

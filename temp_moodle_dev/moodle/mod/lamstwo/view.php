@@ -64,7 +64,7 @@ $currentgroup = setup_and_print_groups($course, $groupmode, 'view.php?id=' . $cm
 
 // Print intro
 echo '<br /><br /><div class="box clearer">&nbsp;</div><div id="intro" class="box generalbox"><p>' . $lamstwo->intro . '</p></div>';
-$canmanage = has_capability('mod/lams:manage', $context);
+$canmanage = has_capability('mod/lamstwo:manage', $context);
 if ($canmanage) {
 	$openauthorjs = <<<XXX
 <script language="javascript" type="text/javascript">
@@ -121,7 +121,7 @@ if ($currentgroup != 0) {
 // Arrange data
 echo '<br />';
 if (!empty($lessons)) {
-	$canparticipate = has_capability('mod/lams:participate', $context);
+	$canparticipate = has_capability('mod/lamstwo:participate', $context);
 	
 	$table->head = array(get_string('lessonname', 'lamstwo'), get_string('introduction', 'lamstwo'), get_string('links', 'lamstwo'), 'last modified');
 	$table->align = array('left', 'left', 'left', 'right');
