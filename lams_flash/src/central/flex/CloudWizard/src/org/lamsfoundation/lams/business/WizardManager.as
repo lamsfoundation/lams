@@ -45,7 +45,7 @@ package org.lamsfoundation.lams.business
         	_dictionaryRegistry = new XMLDictionaryRegistry(new XML());
         	
         	setLearners(new ArrayCollection());
-        	setStaff(new ArrayCollection());
+        	setStaff(new ArrayCollection(), 0);
         	
         	_lessonInstances = new Array();
         	
@@ -164,8 +164,14 @@ package org.lamsfoundation.lams.business
 			dispatchEvent(new Event("learnersChanged"));
 		}
 		
-		public function setStaff(newStaff:ArrayCollection):void {
+		public function setStaff(newStaff:ArrayCollection, userId:uint):void {
 			_staff = newStaff;
+			
+			for each(var staff:Object in _staff) {
+				if (staff.userID == userId) {
+					staff.isCurrentUser = true;
+				}
+			}
 			
 			dispatchEvent(new Event("staffChanged"));
 		}

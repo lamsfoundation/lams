@@ -110,7 +110,7 @@
 			<resultHandlers>
 				<MethodInvoker generator="{WDDXParser}" 
 					method="parseObject" arguments="{resultObject}" />
-				<MethodInvoker generator="{WizardManager}" method="setStaff" arguments="{[lastReturn]}" />
+				<MethodInvoker generator="{WizardManager}" method="setStaff" arguments="{[lastReturn, userID]}" />
 			</resultHandlers>
 		</HTTPServiceInvoker>
 	</EventHandlers>

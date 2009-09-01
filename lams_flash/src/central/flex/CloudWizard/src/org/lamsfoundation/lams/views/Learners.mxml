@@ -92,7 +92,7 @@
    				}
    				
    				for each(var staff:Object in staffUnselected) {
-   					if(staff.userID == 4) {
+   					if(staff.isCurrentUser == true) {
    						staffSelected = new ArrayCollection([staff]);
    						staffUnselected.removeItemAt(staffUnselected.getItemIndex(staff));
    						return;
