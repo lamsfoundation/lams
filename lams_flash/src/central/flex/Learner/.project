@@ -21,10 +21,5 @@
 			<type>2</type>
 			<location>D:/LAMS_HEAD/lams_learning/web</location>
 		</link>
-		<link>
-			<name>[source path] flex</name>
-			<type>2</type>
-			<location>D:/LAMS_HEAD/lams_flash/src/common/flex</location>
-		</link>
 	</linkedResources>
 </projectDescription>

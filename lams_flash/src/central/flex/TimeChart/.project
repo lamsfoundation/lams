@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>TimeLAMS</name>
+	<name>TimeChart</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -16,11 +16,6 @@
 		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
 	</natures>
 	<linkedResources>
-		<link>
-			<name>[source path] flex</name>
-			<type>2</type>
-			<location>C:/Documents and Settings/Admin/lams_head/lams_flash/src/common/flex</location>
-		</link>
 		<link>
 			<name>bin-release</name>
 			<type>2</type>

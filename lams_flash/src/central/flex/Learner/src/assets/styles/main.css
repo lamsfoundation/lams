@@ -86,10 +86,3 @@ FormItem, List {
 .panelControlBar
 {
 }
-@font-face
-{
-	fontFamily: Alba;
-	fontWeight: normal;
-	fontStyle: normal;
-	src: local("Alba");
-}

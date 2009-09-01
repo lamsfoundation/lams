@@ -2,7 +2,7 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="200" height="72">
 	<mx:Script>
 		<![CDATA[
-			[Embed(source="assets/images/lamsLogo.png")] [Bindable] private var lamsLogo:Class;
+			[Embed(source="common-assets/images/lamsLogo.png")] [Bindable] private var lamsLogo:Class;
 		]]>
 	</mx:Script>
 	<mx:Image source="{lamsLogo}" x="10" y="10" width="96" height="52"/>
