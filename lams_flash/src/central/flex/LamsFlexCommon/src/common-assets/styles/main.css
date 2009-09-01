@@ -1,0 +1,35 @@
+Application {
+	backgroundColor:#ECECEC;	
+	backgroundGradientColors:#ECECEC,#ECECEC;
+}
+
+Tile {
+	top: 10;
+	bottom: 10;
+	left: 10;
+	right: 10;
+}
+
+Label {
+	color: #000000;
+	fontWeight: bold;
+	fontSize: 14;
+}
+
+.box {
+	borderColor: #50B2CB;
+	cornerRadius: 10;
+	borderStyle: solid;
+	borderThickness: 1;
+	paddingBottom: 10;
+	paddingTop: 10;
+	paddingLeft: 10;
+	paddingRight: 10;
+	backgroundColor:#ffffff;
+	backgroundAlpha: 1;
+}
+
+Text {
+	fontSize: 12;
+	fontWeight: normal;
+}
