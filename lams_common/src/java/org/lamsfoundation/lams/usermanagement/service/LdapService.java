@@ -156,6 +156,9 @@ public class LdapService implements ILdapService {
 		user.setDisabledFlag(getDisabledBoolean(attrs));
 		user.setCreateDate(new Date());
 		user.setLocale(getLocale(map.get("locale")));
+		user.setTimeZone(user.getTimeZone());
+		user.setTutorialsDisabled(false);
+		user.setFirstLogin(true);
 		service.save(user);
 		service.auditUserCreated(user, "common");
 		return true;

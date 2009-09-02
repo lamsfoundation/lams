@@ -699,6 +699,7 @@ public class ImportService implements IImportService {
 		user.setFax(parseStringCell(row.getCell(FAX)));
 		user.setDisabledFlag(false);
 		user.setCreateDate(new Date());
+		user.setTimeZone(user.getTimeZone());
 		user.setTutorialsDisabled(false);
 		user.setFirstLogin(true);
 		
