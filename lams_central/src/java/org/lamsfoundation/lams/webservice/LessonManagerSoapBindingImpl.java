@@ -27,6 +27,7 @@ import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 import javax.servlet.http.HttpServlet;
 
@@ -40,7 +41,9 @@ import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -120,10 +123,21 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
 		List<User> staffList = new LinkedList<User>();
 		staffList.add(creator);
 		List<User> learnerList = new LinkedList<User>();
+		IUserManagementService userManagementService = (IUserManagementService) WebApplicationContextUtils
+				.getRequiredWebApplicationContext(
+						((HttpServlet) context
+								.getProperty(HTTPConstants.MC_HTTP_SERVLET))
+								.getServletContext()).getBean(
+						"userManagementService");
+		Vector<User> learnerVector = userManagementService
+				.getUsersFromOrganisationByRole(organisation
+						.getOrganisationId(), Role.LEARNER, false, true);
+		learnerList.addAll(learnerVector);
 		monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 				organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff",
 				staffList, creator.getUserId());

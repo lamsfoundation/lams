@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -53,7 +54,9 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -79,6 +82,8 @@ public class LessonManagerServlet extends HttpServlet {
     private static IExportToolContentService exportService = null;
 
     private static ILamsCoreToolService toolService = null;
+    
+    private static IUserManagementService userManagementService = null;
 
     /**
      * Constructor of the object.
@@ -553,10 +558,15 @@ public class LessonManagerServlet extends HttpServlet {
 
     }
 
-    private void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
+    @SuppressWarnings("unchecked")
+	private void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
 	List<User> staffList = new LinkedList<User>();
 	staffList.add(creator);
 	List<User> learnerList = new LinkedList<User>();
+	Vector<User> learnerVector = userManagementService
+			.getUsersFromOrganisationByRole(organisation
+					.getOrganisationId(), Role.LEARNER, false, true);
+	learnerList.addAll(learnerVector);
 	LessonManagerServlet.monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 		organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList, creator
 			.getUserId());
@@ -589,6 +599,8 @@ public class LessonManagerServlet extends HttpServlet {
 	LessonManagerServlet.toolService = (ILamsCoreToolService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("lamsCoreToolService");
 
+	LessonManagerServlet.userManagementService = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+			getServletContext()).getBean("userManagementService");
     }
 
     private class AddUsersToLessonThread implements Runnable {
