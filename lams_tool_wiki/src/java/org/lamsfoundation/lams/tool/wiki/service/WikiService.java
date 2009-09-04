@@ -168,10 +168,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	// Create an empty list to copy the wiki pages into
 	Set<WikiPage> sessionWikiPages = new HashSet<WikiPage>();
-
+	
 	// Here we need to clone wikipages and content for tool session versions
-	for (WikiPage childPage : wiki.getWikiPages()) {
-
+	//for (WikiPage childPage : wiki.getWikiPages()) {  // LDEV-2436
+	for (WikiPage childPage : (List<WikiPage>) wikiDAO.findByProperty(WikiPage.class, "parentWiki", wiki)) {
+	
 	    // check that this page does not already have a session
 	    if (childPage.getWikiSession() != null) {
 		continue;
