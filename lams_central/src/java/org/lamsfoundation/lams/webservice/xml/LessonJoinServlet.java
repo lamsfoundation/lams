@@ -75,6 +75,7 @@ import org.w3c.dom.Element;
  */
 public class LessonJoinServlet extends HttpServlet {
 	
+	private static final long serialVersionUID = -8013072844129192750L;
 	private static Logger log = Logger.getLogger(LessonJoinServlet.class);
 	private static ILessonService lessonService = null;
 	private static IUserManagementService userService = null;
@@ -99,7 +100,7 @@ public class LessonJoinServlet extends HttpServlet {
 				"integrationService");
 	}
 	
-	public void doGet(HttpServletRequest request, HttpServletResponse response) 
+	public synchronized void doGet(HttpServletRequest request, HttpServletResponse response) 
 		throws ServletException, IOException {
 		
 		PrintWriter out = response.getWriter();
@@ -301,6 +302,7 @@ public class LessonJoinServlet extends HttpServlet {
 	}
 	
 	private String incrementLessonName(String name) {
+		String newName = name;
 		if (!StringUtils.isBlank(name)) {
 			int i = name.lastIndexOf(' ');
 			if (i >= 0) {
@@ -308,15 +310,16 @@ public class LessonJoinServlet extends HttpServlet {
 				try {
 					int counterInt = Integer.parseInt(counterStr);
 					counterInt++;
-					return (name.substring(0, i) + " " + counterInt);
+					newName = (name.substring(0, i) + " " + counterInt);
 				} catch (NumberFormatException e) {
-					return name + " 2";
+					newName = name + " 2";
 				}
 			} else {
-				return name + " 2";
+				newName =  name + " 2";
 			}
 		}
-		return name;
+		log.debug("Created new lesson name '" + newName + "' from original '" + name + "'");
+		return newName;
 	}
 	
 	private List<User> getListFromSet(Set users) {
