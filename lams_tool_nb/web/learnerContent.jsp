@@ -77,7 +77,7 @@
 					<c:otherwise>
 
 
-						<html:link href="javascript:;" property="finishButton" styleClass="button"
+						<html:link href="#" property="finishButton" styleClass="button"
 							styleId="finishButton" onclick="submitForm('finish')">
 							<span class="nextActivity"><fmt:message key="button.finish" /></span>
 						</html:link>
