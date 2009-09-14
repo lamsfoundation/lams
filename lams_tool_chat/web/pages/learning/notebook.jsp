@@ -27,7 +27,7 @@
 		<div class="space-bottom-top align-right">
 			<html:hidden property="dispatch" value="submitReflection" />
 			<html:hidden property="chatUserUID" />
-			<html:link href="javascript:;" styleClass="button" styleId="finishButton"  onclick="submitForm('finish')">
+			<html:link href="#" styleClass="button" styleId="finishButton"  onclick="submitForm('finish')">
 				 <span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
 			</html:link>
 		</div>

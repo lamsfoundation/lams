@@ -84,7 +84,7 @@
 				</html:button>
 			</c:when>
 			<c:otherwise>
-				<html:link href="javascript:;" property="FinishButton" styleId="finishButton" onclick="javascript:finishSession()" styleClass="button">
+				<html:link href="#" property="FinishButton" styleId="finishButton" onclick="javascript:finishSession()" styleClass="button">
 					<span class="nextActivity"><fmt:message key="label.learning.finished" /></span>
 				</html:link>
 			</c:otherwise>
