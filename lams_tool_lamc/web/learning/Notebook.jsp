@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body class="stripes">
 
 	<html:form action="/learning?method=displayMc&validate=false"
-		enctype="multipart/form-data" method="POST" target="_self">
+		styleId="reflectionForm">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="httpSessionID" />
@@ -68,9 +68,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</html:textarea>
 
 			<div class="space-bottom-top align-right">
-				<html:submit property="submitReflection" styleClass="button">
-					<fmt:message key="button.endLearning" />
-				</html:submit>
+			    <html:submit property="submitReflection" styleClass="nextActivity">
+					 <fmt:message key="button.endLearning" />
+			    </html:submit>
+			     
 			</div>
 
 

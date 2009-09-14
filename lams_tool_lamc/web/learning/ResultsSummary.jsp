@@ -130,7 +130,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
 							<html:hidden property="learnerFinished" value="Finished" />
 							
-							<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+							<html:link href="#" styleClass="button" styleId="finishButton" onclick="submitForm('finish');return false">
 								<span class="nextActivity"><fmt:message key="label.finished" /></span>
 							</html:link>
 						</c:if>

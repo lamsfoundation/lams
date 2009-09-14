@@ -55,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body class="stripes">
 
 	<html:form action="/learning?method=displayMc&validate=false"
-		method="POST" target="_self" onsubmit="disableFinishButton();" styleId="messageForm">
+		method="POST" onsubmit="disableFinishButton();" styleId="messageForm">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="httpSessionID" />
@@ -77,7 +77,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
 					<html:hidden property="learnerFinished" value="Finished" />
 					
-					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+					<html:link href="#" styleClass="button" styleId="finishButton" onclick="javascript:submitForm('finish');return false">
 						<span class="nextActivity"><fmt:message key="label.finished" /></span>
 					</html:link>
 				</c:if>
