@@ -116,8 +116,8 @@
 				<c:choose>
 					<c:when test="${reflectOnActivity}">
 						<div class="space-bottom-top align-right">
-							<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-								<span class="nextActivity"><fmt:message>button.continue</fmt:message></span>
+							<html:link href="javascript:submitForm();" styleClass="button" styleId="finishButton">
+								   <span class="nextActivity"><fmt:message>button.continue</fmt:message></span>
 							</html:link>
 						</div>
 					</c:when>
