@@ -436,6 +436,13 @@ function confirmLeavePage()
 // Serialises the marker array into an xml string for processing on the back end
 function serialiseMarkers()
 {
+	if (!(markers))
+	{
+		var xmlString = '<?xml version="1.0"?><markers></markers>';
+	} 
+	else 
+	{
+
 	var xmlString = '<?xml version="1.0"?><markers>';
 	var i =0;
 	for (;i<markers.length;i++)
@@ -463,6 +470,7 @@ function serialiseMarkers()
 		}	
 	}
 	xmlString += "</markers>"
+	}
 	document.getElementById("markersXML").value=xmlString;
 	return true;
 }
