@@ -195,8 +195,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<div class="space-bottom-top" align="right">
 							<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
-								<html:link href="javascript:;" property="endLearning" styleId="finishButton"
-									onclick="javascript:submitMethod('endLearning');"
+								<html:link href="#" property="endLearning" styleId="finishButton"
+									onclick="javascript:submitMethod('endLearning');return false"
 									styleClass="button">
 									<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
 								</html:link>

@@ -105,7 +105,7 @@
 			<c:forEach var="item" items="${sessionMap.resourceList}">
 				<tr>
 					<td>
-						<a href="javascript:;" onclick="viewItem(${item.uid})">
+						<a href="#" onclick="viewItem(${item.uid})">
 							${item.title} </a>
 						
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
@@ -253,7 +253,7 @@
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="javascript:;" property="FinishButton" styleId="finishButton"
+						<html:link href="#" property="FinishButton" styleId="finishButton"
 							onclick="return finishSession()" styleClass="button">
 							<span class="nextActivity"><fmt:message key="label.finished" /></span>
 						</html:link>

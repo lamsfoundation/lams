@@ -153,7 +153,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:if test="${generalLearnerFlowDTO.showOtherAnswers != 'true'}">
 				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
-					<html:link href="javascript:;" property="endLearning" styleId="finishButton"
+					<html:link href="#" property="endLearning" styleId="finishButton"
 						onclick="javascript:submitMethod('storeAllResults');"
 						styleClass="button">
 						<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
