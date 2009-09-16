@@ -55,8 +55,12 @@
 
 			</c:when>
 			<c:otherwise>
-				<a href="javascript:continueOrFinish('finishActivity');" class="button"><span class="nextActivity"><fmt:message key="button.finish" /></span></a>
-				
+
+			<div align="right" class="space-bottom-top">
+				<html:link href="#" styleClass="button" styleId="finishButton" onclick="javascript:continueOrFinish('finishActivity'); return false">
+					<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+				</html:link>
+			</div>
 			</c:otherwise>
 		</c:choose>
 	</div>
