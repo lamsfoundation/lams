@@ -113,7 +113,7 @@
 						</html:submit>
 					</c:when>
 					<c:otherwise>
-						<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finished');">
+						<html:link href="#" styleClass="button" styleId="finishButton" onclick="submitForm('finished');return false">
 							<span class="nextActivity"><fmt:message key="button.finish" /></span>
 						</html:link>
 					</c:otherwise>
