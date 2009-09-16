@@ -107,8 +107,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if>
 
 					<div class="space-bottom-top align-right">
-						<html:link href="javascript:;" property="learnerFinished" styleClass="button" styleId="finishButton"
-							onclick="submitMethod('learnerFinished');">
+						<html:link href="#" property="learnerFinished" styleClass="button" styleId="finishButton"
+							onclick="submitMethod('learnerFinished');return false">
 							<span class="nextActivity"><fmt:message key="label.finished" /></span>
 						</html:link>
 					</div>

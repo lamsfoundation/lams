@@ -104,8 +104,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<fmt:message key="label.retake" />
 				</html:submit>
 
-				<html:link href="javascript:;" property="learnerFinished" styleId="finishButton"
-					onclick="javascript:submitMethod('learnerFinished');"
+				<html:link href="#" property="learnerFinished" styleId="finishButton"
+					onclick="javascript:submitMethod('learnerFinished');return false"
 					styleClass="button">
 					<span class="nextActivity"><fmt:message key="label.finished" /></span>
 				</html:link>

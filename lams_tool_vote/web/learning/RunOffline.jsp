@@ -41,7 +41,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) 
 		{
-			document.getElementById("finishButton").disabled = true;
 			document.VoteLearningForm.dispatch.value=actionMethod; 
 			document.VoteLearningForm.submit();
 		}
@@ -51,8 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <body class="stripes">
 
-	<html:form action="/learning?validate=false"
-		enctype="multipart/form-data" method="POST" target="_self">
+	<html:form action="/learning?validate=false" method="POST">
 		<html:hidden property="dispatch" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="userID" />
@@ -69,19 +67,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div class="space-bottom-top align-right">
 
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
-					<html:submit property="learnerFinished" styleId="finishButton"
-						onclick="javascript:submitMethod('learnerFinished');"
-						styleClass="button">
-						<fmt:message key="label.finished" />
-					</html:submit>
+
+				      <html:link href="#" property="endLearning" styleId="finishButton" 
+				      onclick="javascript:submitMethod('learnerFinished');return false"
+				      styleClass="button">
+					<span class="nextActivity"><fmt:message key="label.finished" /></span>
+				      </html:link>
+
 				</c:if>
 
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
-					<html:link href="javascript:;" property="forwardtoReflection"
+					<html:submit property="forwardtoReflection"
 						onclick="javascript:submitMethod('forwardtoReflection');"
 						styleClass="button">
-						<span class="nextActivity"><fmt:message key="label.continue" /></span>
-					</html:link>
+						<fmt:message key="label.continue" />
+					</html:submit>
 				</c:if>
 
 			</div>
