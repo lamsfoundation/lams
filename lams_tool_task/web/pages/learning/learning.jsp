@@ -200,7 +200,7 @@
 					</c:when>
 					
 					<c:otherwise>
-						<html:link href="javascript:;" property="FinishButton" styleId="finishButton"
+						<html:link href="#" property="FinishButton" styleId="finishButton"
 							onclick="return finishSession()" styleClass="button">
 							<span class="nextActivity"><fmt:message key="label.finished" /></span>
 						</html:link>
