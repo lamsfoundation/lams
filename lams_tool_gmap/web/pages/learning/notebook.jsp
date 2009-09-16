@@ -23,12 +23,6 @@
 		
 	</lams:head>
 	
-	<script type="text/javascript">
-			function disableFinishButton() {
-				document.getElementById("finishButton").disabled = true;
-			}
-		</script>
-	
 	<body class="stripes">
 	
 			<div id="content">
@@ -37,7 +31,7 @@
 				${gmapDTO.title}
 			</h1>
 		
-			<html:form action="/learning" method="post" onsubmit="disableFinishButton();">
+			<html:form action="/learning" method="post">
 				<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 				<html:hidden property="markersXML" />
 				<html:hidden property="mode" value="${mode}" />
@@ -51,9 +45,10 @@
 		
 				<div class="space-bottom-top align-right">
 					<html:hidden property="dispatch" value="submitReflection" />
-					<html:submit styleClass="button" styleId="finishButton">
-						<fmt:message>button.finish</fmt:message>
-					</html:submit>
+					<html:link href="#" styleClass="button" styleId="finishButton" 
+				          onclick="javascript:document.learningForm.submit();return false">
+						<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+					</html:link>
 				</div>
 			</html:form>
 				

@@ -1,10 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript">
-	function disableFinishButton() {
-		var finishButton = document.getElementById("finishButton");
-		if (finishButton != null) {
-			finishButton.disabled = true;
-		}
+	function saveAndFinish() {
+		 serialiseMarkers();
+		 document.learningForm.submit();
+		 return false
+
 	}
 </script>
 
@@ -40,13 +40,13 @@
 </html:form>
 </c:if>
 
-<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="learningForm">
+<html:form action="/learning" method="post" styleId="learningForm">
 	<html:hidden property="dispatch" styleId = "dispatch" value="finishActivity" />
 	<html:hidden property="toolSessionID" styleId="toolSessionID"/>
 	<html:hidden property="markersXML" value="" styleId="markersXML" />
 	<html:hidden property="mode" value="${mode}" />	
 	<div class="space-bottom-top align-right">
-		<html:submit styleClass="button" styleId="saveButton" onclick="javascript:document.getElementById('dispatch').value = 'saveMarkers'; return serialiseMarkers();;">
+		<html:submit styleClass="button" styleId="saveButton" onclick="javascript:document.getElementById('dispatch').value = 'saveMarkers'; return serialiseMarkers();">
 			<fmt:message>button.save</fmt:message>
 		</html:submit>
 		<c:choose>
@@ -57,9 +57,9 @@
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
-				<html:submit styleClass="button" styleId="finishButton" onclick="javascript:document.getElementById('dispatch').value = 'finishActivity'; return serialiseMarkers();">
-					<fmt:message key="button.finish" />
-				</html:submit>
+				<html:link href="#" styleClass="button" styleId="finishButton" onclick="javascript:saveAndFinish();">
+					<span class="nextActivity"><fmt:message key="button.finish" /></span>
+				</html:link>
 			</c:otherwise>
 		</c:choose>
 	</div>
