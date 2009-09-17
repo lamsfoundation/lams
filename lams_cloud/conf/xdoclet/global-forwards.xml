@@ -1,0 +1,3 @@
+<global-forwards>
+	<forward name="error" path=".error"/>
+</global-forwards>
