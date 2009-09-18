@@ -774,9 +774,13 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			if(isUserAuthorizedToModifyFolderContents(targetFolderID,userID)){
 				WorkspaceFolder currentFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,currentFolderID);
 				if(currentFolder!=null){
-					WorkspaceFolder targetFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,targetFolderID);
-					currentFolder.setParentWorkspaceFolder(targetFolder);
-					baseDAO.update(currentFolder);
+				    	if (currentFolderID != targetFolderID) {
+        					WorkspaceFolder targetFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,targetFolderID);
+        					currentFolder.setParentWorkspaceFolder(targetFolder);
+        					baseDAO.update(currentFolder);
+				    	} else {
+				    	    // if making a folder it's own parent, do nothing
+				    	}
 					flashMessage = new FlashMessage(MSG_KEY_MOVE, targetFolderID);
 				}else
 					throw new WorkspaceFolderException();
