@@ -511,18 +511,21 @@ public class MonitoringAction extends Action {
 				userResultRow[6] = new ExcelCell(assessmentQuestionResult.getFinishDate(), false);
 				userResultRow[7] = new ExcelCell(getAnswerObject(assessmentQuestionResult), false);
 
-				Date startDate = assessmentQuestionResult.getAssessmentResult().getStartDate();
+				AssessmentResult assessmentResult = assessmentQuestionResult.getAssessmentResult();
 				Date finishDate = assessmentQuestionResult.getFinishDate();
-				if (startDate != null && finishDate != null) {
-				    Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
-				    userResultRow[8] = new ExcelCell(seconds, false);
-				    timeTakenCount++;
-				    timeTakenTotal += seconds;
+				if (assessmentResult != null && finishDate != null) {
+				    Date startDate = assessmentResult.getStartDate();
+				    if (startDate != null) {
+					Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
+					userResultRow[8] = new ExcelCell(seconds, false);
+					timeTakenCount++;
+					timeTakenTotal += seconds;
+				    }
 				}
 
-				userResultRow[9] = new ExcelCell(assessmentQuestionResult.getMark(), false);
-
-				if (assessmentQuestionResult.getMark() != null) {
+				Float mark = assessmentQuestionResult.getMark();
+				if (mark != null) {
+				    userResultRow[9] = new ExcelCell(assessmentQuestionResult.getMark(), false);
 				    markCount++;
 				    markTotal += assessmentQuestionResult.getMark();
 				}
