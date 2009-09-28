@@ -49,6 +49,19 @@
             column="user_id"
         />
 
+        <many-to-one
+            name="event"
+            class="org.lamsfoundation.lams.events.Event"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+        >
+            <column
+                name="event_uid" 
+            />
+        </many-to-one>
+
         <property
             name="deliveryMethodId"
             type="java.lang.Short"

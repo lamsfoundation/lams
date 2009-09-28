@@ -13,8 +13,8 @@ class EventDAOHibernate extends HibernateDaoSupport implements EventDAO {
 	    + " AS e WHERE e.scope=? AND e.name=? AND e.eventSessionId=? AND e.failTime IS NULL";
 
     protected static final String GET_EVENTS_TO_RESEND_QUERY = "SELECT DISTINCT e FROM " + Event.class.getName()
-	    + " AS e LEFT JOIN FETCH e.subscriptions AS s WHERE e.failTime IS NOT NULL OR "
-	    + "(s.periodicity > 0 AND (NOW()- s.lastOperationTime >= s.periodicity))";
+	    + " AS e, Subscription AS s WHERE s.event = e AND (e.failTime IS NOT NULL OR "
+	    + "(s.periodicity > 0 AND (NOW()- s.lastOperationTime >= s.periodicity)))";
 
     public Event getEvent(String scope, String name, Long sessionId) throws InvalidParameterException {
 	List<Event> events = getHibernateTemplate().find(EventDAOHibernate.GET_EVENT_QUERY,

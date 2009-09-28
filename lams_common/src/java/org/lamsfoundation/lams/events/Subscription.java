@@ -24,6 +24,8 @@ class Subscription {
 	 * ID of the subscribed user
 	 */
 	protected Long userId;
+	
+	protected Event event;
 
 	/**
 	 * ID of the delivery method used to send a message for this subscription.
@@ -123,6 +125,19 @@ class Subscription {
 	 */
 	protected Long getUserId() {
 		return userId;
+	}
+
+	/**
+	 * @hibernate.many-to-one
+	 * @hibernate.column name="event_uid"
+	 * @return
+	 */
+	public Event getEvent() {
+		return event;
+	}
+
+	public void setEvent(Event event) {
+		this.event = event;
 	}
 
 	@Override
