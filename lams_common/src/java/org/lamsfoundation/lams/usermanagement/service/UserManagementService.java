@@ -162,13 +162,6 @@ public class UserManagementService implements IUserManagementService {
 
     protected User saveUser(User user) {
 	if (user != null) {
-	    // LDEV-2196 ensure names saved as UTF-8
-	    try {
-		user.setFirstName(new String(user.getFirstName().getBytes(), "UTF-8"));
-		user.setLastName(new String(user.getLastName().getBytes(), "UTF-8"));
-	    } catch (UnsupportedEncodingException e) {
-		log.error("Unsupported encoding...", e);
-	    }
 	    // create user
 	    if (user.getUserId() == null) {
 		baseDAO.insertOrUpdate(user); // creating a workspace needs a userId
