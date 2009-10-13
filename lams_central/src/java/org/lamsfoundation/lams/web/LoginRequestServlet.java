@@ -144,7 +144,7 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    Authenticator.authenticate(serverMap, timestamp, extUsername, method, hash);
 	    ExtCourseClassMap orgMap = getService().getExtCourseClassMap(serverMap, userMap, extCourseId,
-		    countryIsoCode, langIsoCode, courseName);
+		    countryIsoCode, langIsoCode, courseName, method);
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
 	    //was using hses.inNew() API to check if the external user has logged in yet,

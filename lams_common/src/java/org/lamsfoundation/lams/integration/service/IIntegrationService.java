@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.integration.UserInfoFetchException;
 public interface IIntegrationService {
 	
 	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
-			String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName);
+			String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method);
 	
 	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
 			String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode,

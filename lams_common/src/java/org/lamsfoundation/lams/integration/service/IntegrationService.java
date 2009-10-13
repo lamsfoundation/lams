@@ -32,14 +32,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
@@ -47,6 +46,7 @@ import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -59,6 +59,8 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CSVUtil;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
+
+
 
 /**
  * <p>
@@ -92,7 +94,7 @@ public class IntegrationService implements IIntegrationService {
 
     // wrapper method for compatibility with original integration modules
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
-	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName) {
+	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method) {
 
 	// Set the pretty course name if available, otherwise maintain the extCourseId
 	String courseName = "";
@@ -101,9 +103,13 @@ public class IntegrationService implements IIntegrationService {
 	} else {
 	    courseName = extCourseId;
 	}
-
-	return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode, service
-		.getRootOrganisation().getOrganisationId().toString(), true, true);
+	if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR) || StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR)) {
+		return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode, service
+				.getRootOrganisation().getOrganisationId().toString(), true, true);
+	} else {
+		return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode, service
+				.getRootOrganisation().getOrganisationId().toString(), false, true);
+	}
     }
 
     // newer method which accepts course name, a parent org id, a flag for whether user should get 

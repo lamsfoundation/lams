@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
@@ -159,7 +160,7 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 			ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-			integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, null);
+			integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, null, LoginRequestDispatcher.METHOD_MONITOR);
 			return buildContentTree(userMap.getUser().getUserId(), mode).toString();
 		} catch (Exception e) {
 			log.debug(e.getMessage(),e);

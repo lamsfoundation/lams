@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -72,7 +73,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-					countryIsoCode, langIsoCode, null);
+					countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
 					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
@@ -94,7 +95,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 			Authenticator.authenticate(serverMap, datetime, username, hashValue);
 			ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-					countryIsoCode, langIsoCode, null);
+					countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc,  Boolean.TRUE, ldId, orgMap
 					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);

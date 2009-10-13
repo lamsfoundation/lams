@@ -328,7 +328,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		}
 
 		// create group for external course if necessary
-		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName);
+		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, method);
 
 		String contentTree = buildContentTree(userMap.getUser().getUserId(), mode).toString();
 

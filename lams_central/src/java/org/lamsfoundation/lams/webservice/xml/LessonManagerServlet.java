@@ -301,7 +301,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
 	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
-		    courseId, countryIsoCode, langIsoCode, null);
+		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId,
 		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV,
@@ -325,7 +325,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
 	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
-		    courseId, countryIsoCode, langIsoCode, null);
+		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId,
 		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
@@ -495,7 +495,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
 	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
-		    courseId, countryIsoCode, langIsoCode, null);
+		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLessonForPreview(title, desc, ldId,
 		    userMap.getUser().getUserId(), customCSV, false, false, false);
@@ -701,7 +701,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    // adds user to group
 	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
-		    courseId, countryIsoCode, langIsoCode, null);
+		    courseId, countryIsoCode, langIsoCode, null, method);
 
 	    if (LessonManagerServlet.lessonService == null) {
 		LessonManagerServlet.lessonService = (ILessonService) WebApplicationContextUtils
