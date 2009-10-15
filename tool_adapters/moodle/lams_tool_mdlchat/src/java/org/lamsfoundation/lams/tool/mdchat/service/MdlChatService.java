@@ -321,13 +321,13 @@ public class MdlChatService implements ToolSessionManager, ToolAdapterContentMan
      * @return SortedMap of ToolOutputDefinitions with the key being the name of
      *         each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType) throws ToolException {
 	mdlChatOutputFactory = getMdlChatOutputFactory();
 	MdlChat mdchat = getMdlChatByContentId(toolContentId);
 	if (mdchat == null) {
 	    mdchat = getDefaultContent();
 	}
-	return mdlChatOutputFactory.getToolOutputDefinitions(mdchat);
+	return mdlChatOutputFactory.getToolOutputDefinitions(mdchat, definitionType);
     }
 
     public String getExtServerUrl(String extLmsId) {
@@ -950,5 +950,9 @@ public class MdlChatService implements ToolSessionManager, ToolAdapterContentMan
 
     public void setIntegrationService(IIntegrationService integrationService) {
 	this.integrationService = integrationService;
+    }
+    
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
     }
 }

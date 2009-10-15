@@ -45,7 +45,7 @@ public class MdlForumOutputFactory extends OutputFactory {
     /**
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 

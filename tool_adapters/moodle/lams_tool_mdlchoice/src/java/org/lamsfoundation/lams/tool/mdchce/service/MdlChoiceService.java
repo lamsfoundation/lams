@@ -353,7 +353,7 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
      * @return SortedMap of ToolOutputDefinitions with the key being the name of
      *         each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType) throws ToolException {
 	mdlChoiceOutputFactory = getMdlChoiceOutputFactory();
 	MdlChoice mdchce = getMdlChoiceByContentId(toolContentId);
 	if (mdchce == null) {
@@ -362,7 +362,7 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
 
 	List<MdlChoiceOutputDTO> choices = getPossibleChoices(mdchce);
 
-	return mdlChoiceOutputFactory.getToolOutputDefinitions(choices);
+	return mdlChoiceOutputFactory.getToolOutputDefinitions(choices, definitionType);
     }
 
     private List<MdlChoiceOutputDTO> getPossibleChoices(MdlChoice mdchce) {
@@ -1026,5 +1026,9 @@ public class MdlChoiceService implements ToolSessionManager, ToolAdapterContentM
 
     public void setIntegrationService(IIntegrationService integrationService) {
 	this.integrationService = integrationService;
+    }
+    
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
     }
 }

@@ -321,13 +321,13 @@ public class MdlScormService implements ToolSessionManager, ToolAdapterContentMa
      * @return SortedMap of ToolOutputDefinitions with the key being the name of
      *         each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType) throws ToolException {
 	mdlScormOutputFactory = getMdlScormOutputFactory();
 	MdlScorm mdscrm = getMdlScormByContentId(toolContentId);
 	if (mdscrm == null) {
 	    mdscrm = getDefaultContent();
 	}
-	return mdlScormOutputFactory.getToolOutputDefinitions(mdscrm);
+	return mdlScormOutputFactory.getToolOutputDefinitions(mdscrm, definitionType);
     }
 
     public String getExtServerUrl(String extLmsId) {
@@ -950,5 +950,9 @@ public class MdlScormService implements ToolSessionManager, ToolAdapterContentMa
 
     public void setIntegrationService(IIntegrationService integrationService) {
 	this.integrationService = integrationService;
+    }
+    
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
     }
 }

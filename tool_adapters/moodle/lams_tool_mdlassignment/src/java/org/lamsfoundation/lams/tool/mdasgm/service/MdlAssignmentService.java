@@ -342,13 +342,13 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
      * @return SortedMap of ToolOutputDefinitions with the key being the name of
      *         each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType) throws ToolException {
 	mdlAssignmentOutputFactory = getMdlAssignmentOutputFactory();
 	MdlAssignment mdasgm = getMdlAssignmentByContentId(toolContentId);
 	if (mdasgm == null) {
 	    mdasgm = getDefaultContent();
 	}
-	return mdlAssignmentOutputFactory.getToolOutputDefinitions(mdasgm);
+	return mdlAssignmentOutputFactory.getToolOutputDefinitions(mdasgm, definitionType);
     }
 
     public String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp) {
@@ -954,5 +954,9 @@ public class MdlAssignmentService implements ToolSessionManager, ToolAdapterCont
 
     public void setIntegrationService(IIntegrationService integrationService) {
 	this.integrationService = integrationService;
+    }
+    
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
     }
 }

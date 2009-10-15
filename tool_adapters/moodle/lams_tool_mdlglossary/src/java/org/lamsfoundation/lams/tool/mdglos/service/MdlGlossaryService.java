@@ -321,13 +321,13 @@ public class MdlGlossaryService implements ToolSessionManager, ToolAdapterConten
      * @return SortedMap of ToolOutputDefinitions with the key being the name of
      *         each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType) throws ToolException {
 	mdlGlossaryOutputFactory = getMdlGlossaryOutputFactory();
 	MdlGlossary mdglos = getMdlGlossaryByContentId(toolContentId);
 	if (mdglos == null) {
 	    mdglos = getDefaultContent();
 	}
-	return mdlGlossaryOutputFactory.getToolOutputDefinitions(mdglos);
+	return mdlGlossaryOutputFactory.getToolOutputDefinitions(mdglos, definitionType);
     }
 
     public String getExtServerUrl(String extLmsId) {
@@ -958,5 +958,9 @@ public class MdlGlossaryService implements ToolSessionManager, ToolAdapterConten
 
     public void setIntegrationService(IIntegrationService integrationService) {
 	this.integrationService = integrationService;
+    }
+    
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
     }
 }

@@ -343,13 +343,13 @@ public class MdlForumService implements ToolSessionManager, ToolAdapterContentMa
      * @return SortedMap of ToolOutputDefinitions with the key being the name of
      *         each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType) throws ToolException {
 	mdlForumOutputFactory = getMdlForumOutputFactory();
 	MdlForum mdfrum = getMdlForumByContentId(toolContentId);
 	if (mdfrum == null) {
 	    mdfrum = getDefaultContent();
 	}
-	return mdlForumOutputFactory.getToolOutputDefinitions(mdfrum);
+	return mdlForumOutputFactory.getToolOutputDefinitions(mdfrum, definitionType);
     }
 
     public String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp) {
@@ -959,5 +959,9 @@ public class MdlForumService implements ToolSessionManager, ToolAdapterContentMa
 
     public void setIntegrationService(IIntegrationService integrationService) {
 	this.integrationService = integrationService;
+    }
+    
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
     }
 }
