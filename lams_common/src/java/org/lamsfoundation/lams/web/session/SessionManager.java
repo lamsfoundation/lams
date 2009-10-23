@@ -175,16 +175,9 @@ public class SessionManager {
      */
     public static void startSession(ServletRequest req, ServletResponse res) {
 	Cookie ssoCookie = findCookie((HttpServletRequest) req, SystemSessionFilter.SSO_SESSION_COOKIE);
-	if (ssoCookie == null) {
-	    SessionManager.log.debug("==>Couldn't find the sso cookie");
-	    String value = (String) new UUIDHexGenerator().generate(null, null);
-	    ssoCookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE, value);
-	    SessionManager.log.debug("==>Created one - " + ssoCookie.getValue());
-	}
-	Cookie cookie = findCookie((HttpServletRequest) req, SystemSessionFilter.SYS_SESSION_COOKIE);
 	String currentSessionId = null;
-	if (cookie != null) {
-	    currentSessionId = cookie.getValue();
+	if (ssoCookie != null) {
+	    currentSessionId = ssoCookie.getValue();
 	    Object obj = getSession(currentSessionId);
 	    // if cookie exist, but session does not. This usually menas seesion expired.
 	    // then delete the cookie first and set it null in order to create a new one
@@ -195,18 +188,19 @@ public class SessionManager {
 		// cookie = null;
 	    }
 	}
-	// can not be in else!
-	if (cookie == null) {
-
-	    // create new session and set it into cookie
+	if (ssoCookie == null) {
+	    SessionManager.log.debug("==>Couldn't find the sso cookie");
 	    currentSessionId = (String) new UUIDHexGenerator().generate(null, null);
+	    // create new session and set it into cookie
 	    createSession(currentSessionId);
-	    // TODO remove this debugging - only put in to diagnose Ozgur's session problem
-	    if (SessionManager.log.isDebugEnabled()) {
-		SessionManager.log.debug("SessionManager: cookie is null, generating a new session: "
-			+ currentSessionId);
-	    }
-	    cookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SYS_SESSION_COOKIE, currentSessionId);
+	    ssoCookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE, currentSessionId);
+	    SessionManager.log.debug("==>Created one - " + ssoCookie.getValue());
+	}
+	
+	Cookie cookie = findCookie((HttpServletRequest) req, SystemSessionFilter.SYS_SESSION_COOKIE);
+	if (cookie == null) {
+	    String value = (String) new UUIDHexGenerator().generate(null, null);
+	    cookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SYS_SESSION_COOKIE, value);
 	}
 
 	setCurrentSessionId(currentSessionId);
