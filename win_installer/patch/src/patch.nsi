@@ -48,11 +48,11 @@
 ;!insertmacro LineFind
 
 # constants
-!define VERSION "2.3.1"
-!define PREVIOUS_VERSION "2.3"
-!define LANGUAGE_PACK_VERSION "2009-06-19"
-!define LANGUAGE_PACK_VERSION_INT "20090619"
-!define DATE_TIME_STAMP "200906190000"
+!define VERSION "2.3.2"
+!define PREVIOUS_VERSION "2.3.1"
+!define LANGUAGE_PACK_VERSION "2009-08-28"
+!define LANGUAGE_PACK_VERSION_INT "20092828"
+!define DATE_TIME_STAMP "200908280000"
 ######################## Added in the extra .0 for 2.1 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
@@ -201,6 +201,7 @@ SectionGroup "LAMS ${VERSION} Patch (Requires LAMS 2.0)" update
         ; Updating the database to support version
         call updateDatabase
         
+        /*
         call languagePackInit
         
         ; get the language files locations specific to this server from the database
@@ -209,10 +210,9 @@ SectionGroup "LAMS ${VERSION} Patch (Requires LAMS 2.0)" update
 
         # write this language pack version to registry
         Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "$VERSION_INT"'
-       
         DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
+        */
         
-        strcpy $INSTDIR $LAMS_DIR
         setoutpath $INSTDIR
         File /a "${DOCUMENTS}\license.txt"
         File /a "${DOCUMENTS}\license-wrapper.txt"
@@ -611,7 +611,6 @@ Function updateJarsWars
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear"
     ;File "${SOURCE_LAMS_EAR}\*.*"
     File /r /x CVS ${ASSEMBLY}\*
-
 FunctionEnd
 
 
@@ -702,6 +701,7 @@ FunctionEnd
 
 ; first, finds the location of the language files in the database
 ; then copy the required files to the dirname
+/*
 Var CSllid
 Var FSllid
 Var RFllid
@@ -851,7 +851,7 @@ Function SplitFirstStrPart
         Exch
         Exch $R0 ;first
 FunctionEnd
-
+*/
 ################################################################################
 # END CODE USED FOR LANGUAGE PACK                                              #
 ################################################################################
