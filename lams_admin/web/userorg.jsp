@@ -2,6 +2,8 @@
 
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-1.1.4.pack.js"></script>
 <script>
+	var removedUsers = [];
+
 	<!--
 	jQuery(document).ready(function() {
 		jQuery("div#existing").load(
@@ -33,6 +35,7 @@
 		jQuery("body").click(function(event) {
 			if (jQuery(event.target).is("a.removeLink")) {
 				if (jQuery(event.target).parent().is("li")) {
+					removedUsers[jQuery(event.target).parent().attr("id")] = jQuery(event.target).parent().text();
 					jQuery(event.target).parent().remove();
 					updateExistingTotal();
 				}
@@ -58,7 +61,7 @@
 				{orgId: <bean:write name="UserOrgForm" property="orgId"/>,
 				potential: potential}, 
 				function() {
-					loadSearchResultsCallback();
+					loadSearchResultsCallback(potential);
 				}
 			);
 		} else {
@@ -67,20 +70,37 @@
 				{term: jQuery("#term").val(),
 				orgId: <bean:write name="UserOrgForm" property="orgId"/>}, 
 				function() {
-					loadSearchResultsCallback();
+					loadSearchResultsCallback(potential);
 				}
 			);
 		}
 		return false;
 	}
 	
-	function loadSearchResultsCallback() {
+	function loadSearchResultsCallback(potential) {
 		updatePotentialTotal();
 		jQuery("li", this).each(function() {
 			var rowHtml = jQuery(this).html();
 			jQuery(this).html("<a class='addLink'>"+rowHtml+"</a>");
 		});
+
+		if (potential == '1') {
+			for (var userId in removedUsers) {
+				jQuery("div#potential").append("<li id=\"" + userId + "\"><a class='addLink'>" + removedUsers[userId] + "</a></li>");
+			}
+			removedUsers = []; 
+		} else {
+			for (var userId in removedUsers) {
+				var term = jQuery("#term").val();
+				if (removedUsers[userId].toLowerCase().indexOf(term.toLowerCase()) >= 0) {
+					jQuery("div#potential").append("<li id=\"" + userId + "\"><a class='addLink'>" + removedUsers[userId] + "</a></li>");
+					delete removedUsers[userId];
+				}
+			}
+		}
+
 		bindAddLink();
+		updatePotentialTotal();
 	}
 	
 	function populateForm() {
