@@ -497,23 +497,33 @@
 	<target name="deploy-learning-libraries">
 
 		<echo>Deploying Library Activities</echo>
+		
+		<property name="dictionary.dir" value="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/library/" />
 
 		<!-- Generate the deployment package for share resources / forum parallel activity.-->
 		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
 			<property name="assembly.activity" location="${basedir}/assembly/shareresourcesforum"/>
 			<property name="package.cfg" location="librarypackages/shareresourcesforum"/>
+			<property name="language.file.folder" value="librarypackages/shareresourcesforum/language/${conf.application}/" />
+			<property name="dest.language.file.folder" value="${dictionary.dir}/shareresourcesforum/"/>
 		</ant> 
  
 		<!-- Generate the deployment package for chat / scribe parallel activity. -->
 		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
 			<property name="assembly.activity" value="${basedir}/assembly/chatscribe"/>
 			<property name="package.cfg" value="librarypackages/chatscribe"/>
+			<property name="conf.application" value="${conf.application}"/>
+			<property name="language.file.folder" value="librarypackages/chatscribe//language/${conf.application}/" />
+			<property name="dest.language.file.folder" value="${dictionary.dir}/chatscribe/"/>
 		</ant> 
 
 		<!-- Generate the deployment package for forum / scribe parallel activity. -->
 		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
 			<property name="assembly.activity" value="${basedir}/assembly/forumscribe"/>
 			<property name="package.cfg" value="librarypackages/forumscribe"/>
+			<property name="conf.application" value="${conf.application}"/>
+			<property name="language.file.folder" value="librarypackages/forumscribe/language/${conf.application}/" />
+			<property name="dest.language.file.folder" value="${dictionary.dir}/forumscribe/"/>
 		</ant> 
 		
 </target>

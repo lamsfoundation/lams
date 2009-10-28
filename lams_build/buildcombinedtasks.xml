@@ -24,6 +24,7 @@
 			<mkdir dir="${assembly.activity}/lib"/> 
 			<mkdir dir="${assembly.activity}/sql"/> 
 			<mkdir dir="${assembly.activity}/language"/> 
+			<mkdir dir="${dest.language.file.folder}" />
 		
 			<copy overwrite="yes" todir="${assembly.activity}/sql">
 				<fileset dir="${package.cfg}">
@@ -86,6 +87,14 @@
 					<include name="lib/*.jar"/>
 				</fileset>
 			</path> 
+		
+			<!-- copy the language files to the assembly folder -->
+			<echo>Copying language files</echo>
+			<copy overwrite="yes" todir="${dest.language.file.folder}">
+				<fileset dir="${language.file.folder}">
+					<include name="*.properties"/>
+				</fileset>
+			</copy>
 	
 			<java
 				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibrary"

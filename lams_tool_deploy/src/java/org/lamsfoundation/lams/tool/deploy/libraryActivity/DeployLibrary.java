@@ -68,6 +68,9 @@ public class DeployLibrary {
 		String languageFileDirectory = lib.getLanguageFileDirectory();
 		if (languageFileDirectory != null) {
 
+		    // This is for combined tools only, deprecated
+		    
+		    /*
 		    // generate package names in which the language files are placed.
 		    String packagePath = "org.lamsfoundation.lams.library.llid" + lib.getLearningLibraryId();
 
@@ -87,6 +90,7 @@ public class DeployLibrary {
 		    activityDBTask.setActivityId(lib.getParentActivityId());
 		    activityDBTask.setLanguageFilename(packagePath + '.' + lib.getLanguageFileRoot());
 		    activityDBTask.execute();
+		    */
 		}
 
 		System.out.println("Activating learning library " + lib.getLearningLibraryId());
