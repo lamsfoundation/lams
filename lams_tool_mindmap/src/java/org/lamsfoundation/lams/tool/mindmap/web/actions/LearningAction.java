@@ -811,7 +811,7 @@ public class LearningAction extends LamsDispatchAction {
 		    mindmapService.updateEntry(entry);
 		}
 	    } else {
-		if (!mindmap.isMultiUserMode())
+		if (!mindmap.isMultiUserMode() && learningForm.getMindmapContent() != null)
 		    saveMindmapXML(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
 	    }
 
