@@ -5,13 +5,13 @@ SET AUTOCOMMIT = 0;
 
 -- LDEV-2450
 update lams_learning_activity set 
-	language_file='org.lamsfoundation.lams.library.shareresourcesforum.ApplicationResources1' 
+	language_file='org.lamsfoundation.lams.library.shareresourcesforum.ApplicationResources' 
 		where library_activity_ui_image='images/icon_urlcontentmessageboard.swf' and learning_design_id is NULL;
 update lams_learning_activity set 
-	language_file='org.lamsfoundation.lams.library.chatscribe.ApplicationResources2' 
+	language_file='org.lamsfoundation.lams.library.chatscribe.ApplicationResources' 
 		where library_activity_ui_image='images/icon_groupreporting.swf' and learning_design_id is NULL;
 update lams_learning_activity set 
-	language_file='org.lamsfoundation.lams.library.forumscribe.ApplicationResources3' 
+	language_file='org.lamsfoundation.lams.library.forumscribe.ApplicationResources' 
 		where library_activity_ui_image='images/icon_forum_and_scribe.swf' and learning_design_id is NULL;
 			
 			
