@@ -29,8 +29,8 @@
         $navlinks[] = array('name' => format_string($module->name), 'link' => "$CFG->wwwroot/mod/{$cm->modname}/view.php?id={$cm->id}", 'type' => 'title');
         $navlinks[] = array('name' => $streditingquestions, 'link' => '', 'type' => 'title');
         $navigation = build_navigation($navlinks);
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-        print_header_simple($streditingquestions, '', $navigation, "", "", true, $strupdatemodule,'',false,'',false,$cm->is_lams);
+        print_header_simple($streditingquestions, '', $navigation, "", "", true, $strupdatemodule);
+
         $currenttab = 'edit';
         $mode = 'questions';
         ${$cm->modname} = $module;
@@ -40,9 +40,9 @@
         $navlinks = array();
         $navlinks[] = array('name' => $streditingquestions, 'link' => '', 'type' => 'title');
         $navigation = build_navigation($navlinks);
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-        print_header_simple($streditingquestions, '', $navigation, "", "", true, '','',false,'',false,$cm->is_lams);
-        
+
+        print_header_simple($streditingquestions, '', $navigation);
+
         // print tabs
         $currenttab = 'questions';
         include('tabs.php');
@@ -57,6 +57,6 @@
 
     echo '</td></tr>';
     echo '</table>';
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
-    print_footer($COURSE,null, false,$cm->is_lams);
+
+    print_footer($COURSE);
 ?>

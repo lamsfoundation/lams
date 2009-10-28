@@ -4,7 +4,6 @@
 
     require_once('../../config.php');
     require_once('lib.php');
-    require_once('post_form.php');
 
     $reply   = optional_param('reply', 0, PARAM_INT);
     $forum   = optional_param('forum', 0, PARAM_INT);
@@ -15,7 +14,6 @@
     $confirm = optional_param('confirm', 0, PARAM_INT);
     $groupid = optional_param('groupid', null, PARAM_INT);
     $editing = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
-
 
     //these page_params will be passed as hidden variables later in the form.
     $page_params = array('reply'=>$reply, 'forum'=>$forum, 'edit'=>$edit);
@@ -59,19 +57,19 @@
         }
 
         $navigation = build_navigation('', $cm);
-        //if in Lams sequence don't display Moodle's navigation header
+	//if in Lams sequence don't display Moodle's navigation header
         if($cm->is_lams==1){
-        	print_header();
-        }else{
-        	print_header($course->shortname, $course->fullname, $navigation, '' , '', true, "", navmenu($course, $cm));
-        }
-        
+	    print_header();
+	} else {
+	    print_header($course->shortname, $course->fullname, $navigation, '' , '', true, "", navmenu($course, $cm));
+	}
+
         notice_yesno(get_string('noguestpost', 'forum').'<br /><br />'.get_string('liketologin'),
                      $wwwroot, get_referer(false));
-         //we pass a new parameter to the function so it won't we printed if is_lams=1
-         print_footer($course,null, false,$cm->is_lams);
+	print_footer($course,null, false,$cm->is_lams);
         exit;
     }
+
     require_login(0, false);   // Script is useless unless they're logged in
 
     if (!empty($forum)) {      // User is starting a new discussion in a forum
@@ -145,6 +143,9 @@
             error("Incorrect cm");
         }
 
+        // call course_setup to use forced language, MDL-6926 
+        course_setup($course->id);
+
         $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
         $modcontext    = get_context_instance(CONTEXT_MODULE, $cm->id);
 
@@ -190,8 +191,6 @@
         if (!(substr($post->subject, 0, strlen($strre)) == $strre)) {
             $post->subject = $strre.' '.$post->subject;
         }
-         
-        
 
         unset($SESSION->fromdiscussion);
 
@@ -272,7 +271,7 @@
 
         $replycount = forum_count_replies($post);
 
-        if (!empty($confirm)) {    // User has confirmed the delete
+        if (!empty($confirm) && confirm_sesskey()) {    // User has confirmed the delete
 
             if ($post->totalscore) {
                 notice(get_string("couldnotdeleteratings", "forum"),
@@ -326,7 +325,7 @@
                 }
                 print_header();
                 notice_yesno(get_string("deletesureplural", "forum", $replycount+1),
-                             "post.php?delete=$delete&amp;confirm=$delete",
+                             "post.php?delete=$delete&amp;confirm=$delete&amp;sesskey=".sesskey(),
                              $CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.'#p'.$post->id);
 
                 forum_print_post($post, $discussion, $forum, $cm, $course, false, false, false);
@@ -339,14 +338,13 @@
             } else {
                 print_header();
                 notice_yesno(get_string("deletesure", "forum", $replycount),
-                             "post.php?delete=$delete&amp;confirm=$delete",
+                             "post.php?delete=$delete&amp;confirm=$delete&amp;sesskey=".sesskey(),
                              $CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.'#p'.$post->id);
                 forum_print_post($post, $discussion, $forum, $cm, $course, false, false, false);
             }
 
         }
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-         print_footer($course,null, false,$cm->is_lams);
+        print_footer($course,null, false,$cm->is_lams);
         die;
 
 
@@ -376,7 +374,7 @@
             error("You can't split discussions!");
         }
 
-        if (!empty($name)) {    // User has confirmed the prune
+        if (!empty($name) && confirm_sesskey()) {    // User has confirmed the prune
 
             $newdiscussion = new object();
             $newdiscussion->course       = $discussion->course;
@@ -422,13 +420,8 @@
             $navlinks[] = array('name' => format_string($post->subject, true), 'link' => "discuss.php?d=$discussion->id", 'type' => 'title');
             $navlinks[] = array('name' => get_string("prune", "forum"), 'link' => '', 'type' => 'title');
             $navigation = build_navigation($navlinks, $cm);
-            
-            //we pass a new parameter to the function so it won't we printed if is_lams=1
-            print_header_simple(format_string($discussion->name).": ".format_string($post->subject), "", $navigation, '', "", true, "", navmenu($course, $cm),false,'',false,$cm->is_lams);	
-			
-             
-      
-        
+            print_header_simple(format_string($discussion->name).": ".format_string($post->subject), "", $navigation, '', "", true, "", navmenu($course, $cm));
+
             print_heading(get_string('pruneheading', 'forum'));
             echo '<center>';
 
@@ -437,8 +430,7 @@
             forum_print_post($post, $discussion, $forum, $cm, $course, false, false, false);
             echo '</center>';
         }
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-         print_footer($course,null, false,$cm->is_lams);
+        print_footer($course,null, false,$cm->is_lams);
         die;
     } else {
         error("No operation specified");
@@ -454,6 +446,11 @@
         error('Could not get the course module for the forum instance.');
     }
     $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+
+    // setup course variable to force form language
+    // fix for MDL-6926
+    course_setup($course->id);
+    require_once('post_form.php');
 
     $mform_post = new mod_forum_post_form('post.php', array('course'=>$course, 'cm'=>$cm, 'coursecontext'=>$coursecontext, 'modcontext'=>$modcontext, 'forum'=>$forum, 'post'=>$post));
 
@@ -472,10 +469,10 @@
         //$fromform->attachment = isset($_FILES['attachment']) ? $_FILES['attachment'] : NULL;
 
         trusttext_after_edit($fromform->message, $modcontext);
-     
-        if($editing==0&&$cm->is_lams==1){//lams: if you are a learner and have add a post to the forum display next activity button to continue the activities in Lams
-			   include('showlamsnext.php');
-		}
+
+	if($editing==0&&$cm->is_lams==1){//lams: if you are a learner and have add a post to the forum display next activity button to continue the activities in Lams
+	  include('showlamsnext.php');
+	}
 
         if ($fromform->edit) {           // Updating a post
             unset($fromform->groupid);
@@ -535,7 +532,7 @@
                     "$discussionurl&amp;parent=$fromform->id", "$fromform->id", $cm->id);
 
             redirect(forum_go_back_to("$discussionurl"), $message.$subscribemessage, $timemessage);
-			
+
             exit;
 
 
@@ -575,7 +572,7 @@
                           "$discussionurl&amp;parent=$fromform->id", "$fromform->id", $cm->id);
 
                 redirect(forum_go_back_to("$discussionurl#p$fromform->id"), $message.$subscribemessage, $timemessage);
-				
+
             } else {
                 print_error("couldnotadd", "forum", $errordestination);
             }
@@ -623,7 +620,7 @@
                 if ($subscribemessage = forum_post_subscription($discussion, $forum)) {
                     $timemessage = 4;
                 }
-         
+
                 redirect(forum_go_back_to("view.php?f=$fromform->forum"), $message.$subscribemessage, $timemessage);
 
             } else {
@@ -687,15 +684,15 @@
         $navlinks[] = array('name' => format_string($toppost->subject), 'link' => '', 'type' => 'title');
     }
     $navigation = build_navigation($navlinks, $cm);
-	// if in Lams sequence don't display moodle navigation headers 
-	if($cm->is_lams==1){
-    	print_header();
-	}else{
-    	print_header("$course->shortname: $strdiscussionname ".
-	                  format_string($toppost->subject), $course->fullname,
-	                  $navigation, $mform_post->focus($forcefocus), "", true, "", navmenu($course, $cm));
-	}
-                  
+     // if in Lams sequence don't display moodle navigation headers 
+     if($cm->is_lams==1){   
+       print_header();
+     } else {
+       
+       print_header("$course->shortname: $strdiscussionname ".
+		    format_string($toppost->subject), $course->fullname,
+		    $navigation, $mform_post->focus($forcefocus), "", true, "", navmenu($course, $cm));
+     }
 
 // checkup
     if (!empty($parent) && !forum_user_can_see_post($forum, $discussion, $post, null, $cm)) {
@@ -749,8 +746,7 @@
         } else {
             $data->name = fullname($USER);
             $post->message .= "\n\n(".get_string('editedby', 'forum', $data).')';
-        }  
-       
+        }
     }
 
     //load data into form
@@ -803,7 +799,6 @@
     $mform_post->display();
 
 
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_footer($course,null, false,$cm->is_lams);
 
 

@@ -173,13 +173,13 @@
                         $pivottoshow = fullname($user);
                     }
 
-                    echo "<p align=\"center\"><strong>".clean_text($pivottoshow)."</strong></p>" ;
+                    echo "<p class='mdl-align'><strong>".clean_text($pivottoshow)."</strong></p>" ;
                 }
             }
 
             glossary_print_entry($course, $cm, $glossary, $entry, $mode, $hook,1,$displayformat,false,true);
         }
     }
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
+
     print_footer('empty',null, false,$glossary->is_lams);
 ?>

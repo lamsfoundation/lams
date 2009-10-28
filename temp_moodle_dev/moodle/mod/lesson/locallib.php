@@ -241,12 +241,12 @@ function lesson_print_header($cm, $course, $lesson, $currenttab = '') {
     $navigation = build_navigation('', $cm);
     
 /// Print header, heading, tabs and messages
-	if($cm->is_lams==1){
-    	print_header();
-	}else{
-		 print_header("$course->shortname: $strname", $course->fullname, $navigation,
+    if($cm->is_lams==1){
+      print_header();
+    }else{
+      print_header("$course->shortname: $strname", $course->fullname, $navigation,
                   '', '', true, $button, navmenu($course, $cm));
-	}
+    }
 
     if (has_capability('mod/lesson:manage', $context)) {
         print_heading_with_help($strname, "overview", "lesson");
@@ -1448,7 +1448,7 @@ function lesson_grade($lesson, $ntries, $userid = 0) {
                     $earned += $essayinfo->score;
                     $nmanual++;
                     $manualpoints += $answers[$attempt->answerid]->score;
-                } else {
+                } else if (!empty($attempt->answerid)) {
                     $earned += $answers[$attempt->answerid]->score;
                 }
             } else {

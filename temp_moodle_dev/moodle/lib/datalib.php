@@ -210,11 +210,14 @@ function search_users($courseid, $groupid, $searchtext, $sort='', $exceptions=''
  * @uses SITEID
  * @deprecated Use {@link get_course_users()} instead.
  * @param string $fields A comma separated list of fields to be returned from the chosen table.
+ * @param string $exceptions A comma separated list of user->id to be skiped in the result returned by the function
+ * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
+ * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @return object|false  {@link $USER} records or false if error.
  */
-function get_site_users($sort='u.lastaccess DESC', $fields='*', $exceptions='') {
+function get_site_users($sort='u.lastaccess DESC', $fields='*', $exceptions='', $limitfrom='', $limitnum='') {
 
-    return get_course_users(SITEID, $sort, $exceptions, $fields);
+    return get_course_users(SITEID, $sort, $exceptions, $fields, $limitfrom, $limitnum);
 }
 
 
@@ -1017,14 +1020,14 @@ function get_my_courses($userid, $sort='visible DESC,sortorder ASC', $fields=NUL
 
             //
             // Perhaps it's actually visible to $USER
-            // check moodle/category:visibility
+            // check moodle/category:viewhiddencategories
             //
             // The name isn't obvious, but the description says
             // "See hidden categories" so the user shall see...
             // But also check if the allowvisiblecoursesinhiddencategories setting is true, and check for course visibility
             if ($viscat === false) {
                 $catctx = $cats[$courses[$n]->category]->context;
-                if (has_capability('moodle/category:visibility', $catctx, $USER->id)) {
+                if (has_capability('moodle/category:viewhiddencategories', $catctx, $USER->id)) {
                     $vcatpaths[$courses[$n]->categorypath] = true;
                     $viscat = true;
                 } elseif ($CFG->allowvisiblecoursesinhiddencategories && $courses[$n]->visible == true) {
@@ -1235,7 +1238,7 @@ function get_categories($parent='none', $sort=NULL, $shallow=true) {
     if( $rs = get_recordset_sql($sql) ){
         while ($cat = rs_fetch_next_record($rs)) {
             $cat = make_context_subobj($cat);
-            if ($cat->visible || has_capability('moodle/category:visibility',$cat->context)) {
+            if ($cat->visible || has_capability('moodle/category:viewhiddencategories',$cat->context)) {
                 $categories[$cat->id] = $cat;
             }
         }
@@ -1461,7 +1464,7 @@ function get_my_remotecourses($userid=0) {
         $userid = $USER->id;
     }
 
-    $sql = "SELECT c.remoteid, c.shortname, c.fullname,
+    $sql = "SELECT c.id, c.remoteid, c.shortname, c.fullname,
                    c.hostid, c.summary, c.cat_name,
                    h.name AS hostname
             FROM   {$CFG->prefix}mnet_enrol_course c
@@ -1613,7 +1616,7 @@ function get_course_mods($courseid) {
                             FROM {$CFG->prefix}modules m,
                                  {$CFG->prefix}course_modules cm
                             WHERE cm.course = ".intval($courseid)."
-                            AND cm.module = m.id AND m.visible = 1 AND cm.is_lams=0"); // no disabled mods
+			    AND cm.module = m.id AND m.visible = 1 AND cm.is_lams=0"); // no disabled mods
 }
 
 
@@ -1689,7 +1692,6 @@ function get_coursemodules_in_course($modulename, $courseid, $extrafields='') {
                                    cm.instance = m.id AND
                                    md.name = '$modulename' AND
                                    md.id = cm.module".(($modulename=="assignment")?" AND m.is_lams = 0":"")); // to show just activities that are created outside Lams (in that case assignments)
-                                   //old md.id = cm.module");
 }
 
 /**
@@ -1727,7 +1729,6 @@ function get_all_instances_in_courses($modulename, $courses, $userid=NULL, $incl
                                             cm.section = cw.id AND
                                             md.name = '$modulename' AND
                                             md.id = cm.module".(($modulename=="quiz"||$modulename=="choice"||$modulename=="glossary"||$modulename=="wiki"||$modulename=="lesson"||$modulename=="scorm"||$modulename=="chat")?" AND m.is_lams = 0":""))) { // to show just activities that are created outside Lams
-										    //old md.id = cm.module")) { 
         return $outputarray;
     }
 
@@ -1882,6 +1883,9 @@ function add_to_log($courseid, $module, $action, $url='', $info='', $cm=0, $user
     }
 
     $REMOTE_ADDR = getremoteaddr();
+    if (empty($REMOTE_ADDR)) {
+        $REMOTE_ADDR = '0.0.0.0';
+    }
 
     $timenow = time();
     $info = addslashes($info);
@@ -2174,7 +2178,7 @@ function print_object($object) {
  *   we'll save a dbquery
  *
  * - If we return false, you'll still need to check if
- *   the user can has the 'moodle/category:visibility'
+ *   the user can has the 'moodle/category:viewhiddencategories'
  *   capability...
  *
  * - Will generate 2 DB calls.
@@ -2255,27 +2259,15 @@ function user_can_create_courses() {
 
     if (has_capability('moodle/course:create', get_context_instance(CONTEXT_SYSTEM))) {
         return true;
-    } else {
-        return (bool) count(get_creatable_categories());
     }
-
-}
-
-/**
- * get the list of categories the current user can create courses in
- * @return array
- */
-function get_creatable_categories() {
-
-    $creatablecats = array();
     if ($cats = get_records('course_categories')) {
         foreach ($cats as $cat) {
             if (has_capability('moodle/course:create', get_context_instance(CONTEXT_COURSECAT, $cat->id))) {
-                $creatablecats[$cat->id] = $cat->name;
+                return true;
             }
         }
     }
-    return $creatablecats;
+    return false;
 }
 
 // vim:autoindent:expandtab:shiftwidth=4:tabstop=4:tw=140:

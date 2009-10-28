@@ -44,7 +44,7 @@
     $straddcomment = get_string("addcomment", "glossary");
 
     $navigation = build_navigation($strcomments, $cm);
-    //we pass a new parameter to the function so it won't we printed if is_lams=1	
+    //we pass a new parameter to the function so it won't we printed if is_lams=1    
     print_header_simple(strip_tags("$strcomments: $entry->concept"), "", $navigation,
         "", "", true, update_module_button($cm->id, $course->id, $strglossary),
         navmenu($course, $cm),false,'',false,$cm->is_lams);
@@ -71,12 +71,13 @@
     } else {
         print_heading(get_string("nocomments","glossary"));
     }
-	 if($glossary->is_lams==1&&$next==1){ //lams: display the next activity button 
-            	include('showlamsnext.php');
-	}   
+
+    if($glossary->is_lams==1&&$next==1){ //lams: display the next activity button 
+	include('showlamsnext.php');
+	}
+
 /// Finish the page
 
-     //we pass a new parameter to the function so it won't we printed if is_lams=1
-     print_footer($course,null, false,$glossary->is_lams);
+    print_footer($course,null, false,$glossary->is_lams);
 
 ?>

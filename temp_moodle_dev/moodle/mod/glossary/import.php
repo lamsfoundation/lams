@@ -46,10 +46,9 @@
     $strimportentries = get_string('importentriesfromxml', 'glossary');
 
     $navigation = build_navigation($strimportentries, $cm);
-    //we pass a new parameter to the function so it won't we printed if is_lams=1	
     print_header_simple(format_string($glossary->name), "", $navigation,
         "", "", true, update_module_button($cm->id, $course->id, $strglossary),
-        navmenu($course, $cm),false,'',false,$cm->is_lams);
+        navmenu($course, $cm));
 
     print_heading($strimportentries);
 
@@ -58,8 +57,7 @@
         include("import.html");
         print_box_end();
 
-         //we pass a new parameter to the function so it won't we printed if is_lams=1
-    	print_footer($course,null, false,$glossary->is_lams);;
+        print_footer($course);
         exit;
     }
 
@@ -74,8 +72,7 @@
         print_continue('import.php?id='.$id);
         print_box_end();
 
-         //we pass a new parameter to the function so it won't we printed if is_lams=1
-    	print_footer($course,null, false,$glossary->is_lams);
+        print_footer();
         die();
     }
 
@@ -138,8 +135,7 @@
                     notify("Error while trying to create the new glossary.");
                     echo '</center>';
                     glossary_print_tabbed_table_end();
-                     //we pass a new parameter to the function so it won't we printed if is_lams=1
-    				print_footer($course,null, false,$glossary->is_lams);
+                    print_footer($course);
                     exit;
                 } else {
                     //The instance has been created, so lets do course_modules
@@ -189,8 +185,7 @@
                 }
             } else {
                 notify("Error while trying to create the new glossary.");
-                 //we pass a new parameter to the function so it won't we printed if is_lams=1
-    			 print_footer($course,null, false,$glossary->is_lams);
+                print_footer($course);
                 exit;
             }
         }
@@ -370,7 +365,6 @@
     }
 
 /// Finish the page
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
-    print_footer($course,null, false,$glossary->is_lams);
+    print_footer($course);
 
 ?>

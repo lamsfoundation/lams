@@ -1,22 +1,22 @@
 <?php  // $Id$
 
 // This page prints a particular instance of quiz
-	
+
     require_once("../../config.php");
     require_once($CFG->libdir.'/blocklib.php');
     //add  new library so Lams can use their functions
     require_once($CFG->libdir.'/weblib.php');
-    //
     require_once($CFG->libdir.'/gradelib.php');
     require_once($CFG->dirroot.'/mod/quiz/locallib.php');
     require_once($CFG->dirroot.'/mod/quiz/pagelib.php');
+
     $id   = optional_param('id', 0, PARAM_INT); // Course Module ID, or
     $q    = optional_param('q',  0, PARAM_INT);  // quiz ID
     $edit = optional_param('edit', -1, PARAM_BOOL);
     $is_learner  = optional_param('is_learner',0, PARAM_INT);
     $editing  = optional_param('editing', 0, PARAM_INT);
     $returnurl   = optional_param('returnUrl', '', PARAM_TEXT);  // lams url to proceed to next in sequence 
-   
+
     if ($id) {
         if (! $cm = get_coursemodule_from_id('quiz', $id)) {
             error("There is no coursemodule with id $id");
@@ -38,21 +38,23 @@
             error("The course module for the quiz with id $q is missing");
         }
     }
-     //if is inside a Lams sequence we pass the Lams Update URL to be able to come back to Lams later
-   	if($quiz->is_lams==1){
-    		$lamsupdateurl = urlencode(optional_param('lamsUpdateURL', PARAM_TEXT));
-   	}
+
+    //if is inside a Lams sequence we pass the Lams Update URL to be able to come back to Lams later
+   if($quiz->is_lams==1){
+        $lamsupdateurl = urlencode(optional_param('lamsUpdateURL', PARAM_TEXT));
+    }
+
     // Check login and get context.
     require_login($course->id, false, $cm);
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 
     // if no questions have been set up yet redirect to edit.php
     if (!$quiz->questions and has_capability('mod/quiz:manage', $context)) {
-    	if($quiz->is_lams==1){ //if is inside a Lams sequence we pass the Lams Update URL to be able to come back to Lams later
-       		 redirect($CFG->wwwroot . '/mod/quiz/edit.php?cmid=' . $cm->id.'&lamsUpdateURL='.$lamsupdateurl);
-    	}else{
-    		redirect($CFG->wwwroot . '/mod/quiz/edit.php?cmid=' . $cm->id.'');
-    	}
+	if($quiz->is_lams==1){ //if is inside a Lams sequence we pass the Lams Update URL to be able to come back to Lams later
+		redirect($CFG->wwwroot . '/mod/quiz/edit.php?cmid=' . $cm->id.'&lamsUpdateURL='.$lamsupdateurl);
+	}else{
+		redirect($CFG->wwwroot . '/mod/quiz/edit.php?cmid=' . $cm->id.'');
+	}
     }
 
     add_to_log($course->id, "quiz", "view", "view.php?id=$cm->id", $quiz->id, $cm->id);
@@ -66,18 +68,17 @@
     if ($edit != -1 and $PAGE->user_allowed_editing()) {
         $USER->editing = $edit;
     }
-   
 
     //only check pop ups if the user is not a teacher, and popup is set
 
     $bodytags =(has_capability('mod/quiz:attempt', $context) && $quiz->popup)?'onload="popupchecker(\'' . get_string('popupblockerwarning', 'quiz') . '\');"':'';
-  	//if is a Lams sequence activity don't print the top header
+
+    //if is a Lams sequence activity don't print the top header
     if($quiz->is_lams==1){
-  		print_header();
+    		print_header();
     }else{
-    	$PAGE->print_header($course->shortname.': %fullname%','',$bodytags);
+	$PAGE->print_header($course->shortname.': %fullname%','',$bodytags);
     }
-    
 
     echo '<table id="layout-table"><tr>';
 
@@ -96,9 +97,8 @@
 
     // Print heading and tabs (if there is more than one).
     $currenttab = 'info';
-	
     include('tabs.php');
-	
+
     // Print quiz name
 
     print_heading(format_string($quiz->name));
@@ -108,6 +108,7 @@
         // Print quiz description
         if (trim(strip_tags($quiz->intro))) {
             $formatoptions->noclean = true;
+            $formatoptions->para    = false;
             print_box(format_text($quiz->intro, FORMAT_MOODLE, $formatoptions), 'generalbox', 'intro');
         }
 
@@ -120,23 +121,25 @@
         if ($quiz->attempts != 1) {
             echo "<p>".get_string("grademethod", "quiz").": ".quiz_get_grading_option_name($quiz->grademethod)."</p>";
         }
-        //if you are in lams and you've done more than one attempt display lams navigation buttons
-        if($quiz->is_lams==1){
-	         if ($quiz->attempts >= 1) {
-	         	if($editing == 1) {
-	         		//if you are editing, finish editing an go back to lams
-	         		include('showlamsfinish.php');
-	         	}else{
-	         		//if you a learner or a teacher that does the activity as a learner, go to the next activity
-	         		include('showlamsnext.php');
-	         	}
-	         	
-	         }
-        }
+
+	//if you are in lams and you've done more than one attempt display lams navigation buttons
+	if($quiz->is_lams==1){
+		if ($quiz->attempts >= 1) {
+			if($editing == 1) {
+				//if you are editing, finish editing an go back to lams
+				include('showlamsfinish.php');
+			 }else{
+				//if you a learner or a teacher that does the activity as a learner, go to the next activity
+				include('showlamsnext.php');
+			}
+		}
+
+	}
+	
 
         // Print information about timings.
         $timenow = time();
-        $available = ($quiz->timeopen < $timenow and ($timenow < $quiz->timeclose or !$quiz->timeclose));
+        $available = $quiz->timeopen < $timenow && ($timenow < $quiz->timeclose || !$quiz->timeclose);
         if ($available) {
             if ($quiz->timelimit) {
                 echo "<p>".get_string("quiztimelimit","quiz", format_time($quiz->timelimit * 60))."</p>";
@@ -153,6 +156,7 @@
             echo "<p>".get_string("quizclosed", "quiz", userdate($quiz->timeclose))."</p>";
         }
         echo '</div>';
+        $available = $available && has_any_capability(array('mod/quiz:attempt', 'mod/quiz:preview'), $context);
     } else {
         $available = false;
     }
@@ -160,7 +164,7 @@
     // Show number of attempts summary to those who can view reports.
     if (has_capability('mod/quiz:viewreports', $context)) {
         if ($strattemptnum = quiz_num_attempt_summary($quiz, $cm)) {
-        		echo '<div class="quizattemptcounts"><a href="report.php?mode=overview&amp;id=' .
+            echo '<div class="quizattemptcounts"><a href="report.php?mode=overview&amp;id=' .
                     $cm->id . '">' . $strattemptnum . '</a></div>';
         }
     }
@@ -177,12 +181,11 @@
         finish_page($course,$quiz);//we pass $quiz
     }
 
-    if (!(has_capability('mod/quiz:attempt', $context) || has_capability('mod/quiz:preview', $context))) {
-    	print_box('<p>' . get_string('youneedtoenrol', 'quiz') . '</p><p>' .
+    if (!has_any_capability(array('mod/quiz:reviewmyattempts', 'mod/quiz:attempt', 'mod/quiz:preview'), $context)) {
+        print_box('<p>' . get_string('youneedtoenrol', 'quiz') . '</p><p>' .
                 print_continue($CFG->wwwroot . '/course/view.php?id=' . $course->id, true) .
                 '</p>', 'generalbox', 'notice');
-        finish_page($course,$quiz);// we pass $quiz so later we can check the is_lams variable  
-        // old finish_page($course);
+        finish_page($course,$quiz);//we pass $quiz
     }
 
     // Get this user's attempts.
@@ -217,25 +220,26 @@
 
     // Print table with existing attempts
     if ($attempts) {
-    	if($quiz->is_lams==1){
-	    	if($editing==1){
-	    		include('showlamsfinish.php');
-	        }else{
-	        	 $isteacher = has_capability('mod/quiz:preview', get_context_instance(CONTEXT_MODULE, $cm->id)); // indicates if is a teacher, useful in lams
-	        	 if($isteacher){	
-	        	 	include('showlamsnext.php');
-	        	}
-	        }
-    	}
+	if($quiz->is_lams==1){
+		if($editing==1){
+			 include('showlamsfinish.php');
+		}else{
+			$isteacher = has_capability('mod/quiz:preview', get_context_instance(CONTEXT_MODULE, $cm->id)); // indicates if is a teacher, useful in lams
+			if($isteacher){  
+				include('showlamsnext.php');
+			}
+		}
+	}
+
         print_heading(get_string('summaryofattempts', 'quiz'));
 
-        // Get some strings.
-        $strattempt       = get_string("attempt", "quiz");
-        $strtimetaken     = get_string("timetaken", "quiz");
-        $strtimecompleted = get_string("timecompleted", "quiz");
-        $strgrade         = get_string("grade");
-        $strmarks         = get_string('marks', 'quiz');
-        $strfeedback      = get_string('feedback', 'quiz');
+	// Get some strings.
+	$strattempt       = get_string("attempt", "quiz");
+	$strtimetaken     = get_string("timetaken", "quiz");
+	$strtimecompleted = get_string("timecompleted", "quiz");
+	$strgrade         = get_string("grade");
+	$strmarks         = get_string('marks', 'quiz');
+	$strfeedback      = get_string('feedback', 'quiz');
 
         // Work out which columns we need, taking account what data is available in each attempt.
         list($someoptions, $alloptions) = quiz_get_combined_reviewoptions($quiz, $attempts, $context);
@@ -247,13 +251,13 @@
         $feedbackcolumn = quiz_has_feedback($quiz->id);
         $overallfeedback = $feedbackcolumn && $alloptions->overallfeedback;
 
-        // prepare table header
+        // Prepare table header
         $table->class = 'generaltable quizattemptsummary';
-        $table->head = array($strattempt, $strtimecompleted);
-        $table->align = array("center", "left");
-        $table->size = array("", "");
+	$table->head = array($strattempt, $strtimecompleted);
+	$table->align = array("center", "left");
+	$table->size = array("", "");
         if ($markcolumn) {
-            $table->head[] = "$strmarks / $quiz->sumgrades";
+	    $table->head[] = "$strmarks / $quiz->sumgrades";
             $table->align[] = 'center';
             $table->size[] = '';
         }
@@ -280,10 +284,9 @@
 
             // Add the attempt number, making it a link, if appropriate.
             if ($attempt->preview) {
-            
-                $row[] = make_review_link(get_string('preview', 'quiz'), $quiz, $attempt);
+                $row[] = make_review_link(get_string('preview', 'quiz'), $quiz, $attempt, $context);
             } else {
-                $row[] = make_review_link($attempt->attempt, $quiz, $attempt);
+                $row[] = make_review_link($attempt->attempt, $quiz, $attempt, $context);
             }
 
             // prepare strings for time taken and date completed
@@ -310,7 +313,7 @@
 
             if ($markcolumn && $attempt->timefinish > 0) {
                 if ($attemptoptions->scores) {
-                    $row[] = make_review_link(round($attempt->sumgrades, $quiz->decimalpoints), $quiz, $attempt);
+                    $row[] = make_review_link(round($attempt->sumgrades, $quiz->decimalpoints), $quiz, $attempt, $context);
                 } else {
                     $row[] = '';
                 }
@@ -327,7 +330,7 @@
                         $table->rowclass[$attempt->attempt] = 'bestrow';
                     }
 
-                    $row[] = make_review_link($formattedgrade, $quiz, $attempt);
+                    $row[] = make_review_link($formattedgrade, $quiz, $attempt, $context);
                 } else {
                     $row[] = '';
                 }
@@ -368,12 +371,12 @@
                 $resultinfo .= print_heading(get_string('gradesofar', 'quiz', $a), '', 2, 'main', true);
             } else {
                 $resultinfo .= print_heading(get_string('yourfinalgradeis', 'quiz', "$mygrade / $quiz->grade"), '', 2, 'main', true);
-                if ($mygradeoverridden) {
-                    $resultinfo .= '<p class="overriddennotice">'.get_string('overriddennotice', 'grades').'</p>';
-                }
             }
         }
 
+        if ($mygradeoverridden) {
+            $resultinfo .= '<p class="overriddennotice">'.get_string('overriddennotice', 'grades').'</p>';
+        }
         if ($gradebookfeedback) {
             $resultinfo .= print_heading(get_string('comment', 'quiz'), '', 3, 'main', true);
             $resultinfo .= '<p class="quizteacherfeedback">'.$gradebookfeedback.'</p>';
@@ -391,11 +394,11 @@
     // Print a button to start/continue an attempt, if appropriate.
     if (!$quiz->questions) {
         print_heading(get_string("noquestions", "quiz"));
-        
+
         //print button "next activity" to continue
-        if($quiz->is_lams==1){
-         	include('showlamsnext.php');
-        }
+	if($quiz->is_lams==1){
+		include('showlamsnext.php');
+	}
 
     } else if ($available && $moreattempts) {
         echo "<br />";
@@ -408,21 +411,22 @@
                 $buttontext = get_string('continueattemptquiz', 'quiz');
             }
         } else {
-        	
-        	// print next button to continue next activity in lams
-        	
-        	if($quiz->is_lams==1&&$editing==1){
-        				include('showlamsfinish.php');
-        	}
+
+		// print next button to continue next activity in lams
+		if($quiz->is_lams==1){
+			if($quiz->is_lams==1&&$editing==1){
+				include('showlamsfinish.php');
+			}
+		}
 
             // Work out the appropriate button caption.
             if (has_capability('mod/quiz:preview', $context)) {
-            	//lams: if you are a teacher and are doing a preview of the activity show next activity button 
-	            if($editing==1){
-	        		include('showlamsfinish.php');
-	        	}else{
-	        		include('showlamsnext.php');
-	        	}
+		//lams: if you are a teacher and are doing a preview of the activity show next activity button 
+		if($editing==1){
+			include('showlamsfinish.php');
+		}else{
+			include('showlamsnext.php');
+		}
                 $buttontext = get_string('previewquiznow', 'quiz');
             } else if ($numattempts == 0) {
                 $buttontext = get_string('attemptquiznow', 'quiz');
@@ -469,8 +473,8 @@
                 $strconfirmstartattempt =  '';
             }
             // Determine the URL to use.
-			$attempturl = "attempt.php?id=$cm->id";
-			
+            $attempturl = "attempt.php?id=$cm->id";
+
             // Prepare options depending on whether the quiz should be a popup.
             if (!empty($quiz->popup)) {
                 $window = 'quizpopup';
@@ -489,7 +493,7 @@
                 }
                 echo "window.open('$attempturl','$window','$windowoptions');", '" />';
             } else {
-            	print_single_button("attempt.php", array('id'=>$cm->id), $buttontext, 'get', '', false, '', false, $strconfirmstartattempt);
+                print_single_button("attempt.php", array('id'=>$cm->id), $buttontext, 'get', '', false, '', false, $strconfirmstartattempt);
             }
 
 
@@ -509,25 +513,26 @@
 
     // Should we not be seeing if we need to print right-hand-side blocks?
 
-    finish_page($course,$quiz);// we pass $quiz so later we can check the is_lams variable  
-    // old finish_page($course);
+    finish_page($course,$quiz);// we pass $quiz so later we can check the is_lams variable
 
 // Utility functions =================================================================
 
 function finish_page($course,$quiz=null) { // we pass $quiz so we can check the is_lams variable 
-	//old function finish_page($course) {
     global $THEME;
     print_container_end();
     echo '</td></tr></table>';
-	//we pass a new parameter to the function so it won't we printed if is_lams=1
-	print_footer($course,null, false,$quiz->is_lams);
+    print_footer($course,null, false,$quiz->is_lams);
     exit;
 }
 
 /** Make some text into a link to review the quiz, if that is appropriate. */
-function make_review_link($linktext, $quiz, $attempt) {
-    // If not even responses are to be shown in review then we don't allow any review
-    if (!($quiz->review & QUIZ_REVIEW_RESPONSES)) {
+function make_review_link($linktext, $quiz, $attempt, $context) {
+    static $canreview = null;
+    if (is_null($canreview)) {
+        $canreview = has_capability('mod/quiz:reviewmyattempts', $context);
+    }
+    // If not even responses are to be shown in review then we don't allow any review, or does not have review capability.
+    if (!$canreview || !($quiz->review & QUIZ_REVIEW_RESPONSES)) {
         return $linktext;
     }
 

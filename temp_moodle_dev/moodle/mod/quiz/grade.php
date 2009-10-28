@@ -17,11 +17,11 @@
     }
 
     require_login($course->id, false, $cm);
-	if (has_capability('mod/quiz:viewreports', get_context_instance(CONTEXT_MODULE, $cm->id))) {
-	      redirect('report.php?id='.$cm->id);
-	} else {
-	      redirect('view.php?id='.$cm->id);
-	}
-	
+
+    if (has_capability('mod/quiz:viewreports', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+        redirect('report.php?id='.$cm->id);
+    } else {
+        redirect('view.php?id='.$cm->id);
+    }
 
 ?>

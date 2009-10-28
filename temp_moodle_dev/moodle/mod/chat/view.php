@@ -49,9 +49,8 @@
     // show some info for guests
     if (isguestuser()) {
         $navigation = build_navigation('', $cm);
-         //we pass a new parameter to the function so it won't we printed if is_lams=1
         print_header_simple(format_string($chat->name), '', $navigation,
-                      '', '', true, '', navmenu($course, $cm),false,'',false,$cm->is_lams);
+			    '', '', true, '', navmenu($course, $cm),false,'',false,$cm->is_lams);
         $wwwroot = $CFG->wwwroot.'/login/index.php';
         if (!empty($CFG->loginhttps)) {
             $wwwroot = str_replace('http:','https:', $wwwroot);
@@ -60,12 +59,9 @@
         notice_yesno(get_string('noguests', 'chat').'<br /><br />'.get_string('liketologin'),
                 $wwwroot, $CFG->wwwroot.'/course/view.php?id='.$course->id);
 
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-		print_footer($course,null, false,$chat->is_lams);
+        print_footer($course,null, false,$chat->is_lams);
         exit;
 
-    } else {
-        require_capability('mod/chat:chat', $context);
     }
 
     add_to_log($course->id, 'chat', 'view', "view.php?id=$cm->id", $chat->id, $cm->id);
@@ -86,9 +82,9 @@
     if (($edit != -1) and $PAGE->user_allowed_editing()) {
         $USER->editing = $edit;
     }
-	//add a new parameter for lams for not to display moodle's headers
+
     $PAGE->print_header($course->shortname.': %fullname%',NULL,'','',$cm->is_lams);
-	
+
     echo '<table id="layout-table"><tr>';
 
     $lt = (empty($THEME->layouttable)) ? array('left', 'middle', 'right') : $THEME->layouttable;
@@ -135,32 +131,38 @@
 
                 print_heading(format_string($chat->name));
 
-                /// Print the main part of the page
-                print_box_start('generalbox', 'enterlink');
-                // users with screenreader set, will only see 1 link, to the manual refresh page
-                // for better accessibility
-                if (!empty($USER->screenreader)) {
-                    $chattarget = "/mod/chat/gui_basic/index.php?id=$chat->id$groupparam";
+                if (has_capability('mod/chat:chat',$context)) {
+                    /// Print the main part of the page
+                    print_box_start('generalbox', 'enterlink');
+                    // users with screenreader set, will only see 1 link, to the manual refresh page
+                    // for better accessibility
+                    if (!empty($USER->screenreader)) {
+                        $chattarget = "/mod/chat/gui_basic/index.php?id=$chat->id$groupparam";
+                    } else {
+                        $chattarget = "/mod/chat/gui_$CFG->chat_method/index.php?id=$chat->id$groupparam"; 
+                    }
+
+                    echo '<p>';
+                    link_to_popup_window ($chattarget,
+                            "chat$course->id$chat->id$groupparam", "$strenterchat", 500, 700, get_string('modulename', 'chat'));
+                    echo '</p>';
+
+                    // if user is using screen reader, then there is no need to display this link again
+                    if ($CFG->chat_method == 'header_js' && empty($USER->screenreader)) {
+                        // show frame/js-less alternative
+                        echo '<p>(';
+                                link_to_popup_window ("/mod/chat/gui_basic/index.php?id=$chat->id$groupparam",
+                                    "chat$course->id$chat->id$groupparam", get_string('noframesjs', 'message'), 500, 700, get_string('modulename', 'chat'));
+                                echo ')</p>';
+                    }
+
+                    print_box_end();
+
                 } else {
-                    $chattarget = "/mod/chat/gui_$CFG->chat_method/index.php?id=$chat->id$groupparam"; 
+                    print_box_start('generalbox', 'notallowenter');
+                    echo '<p>'.get_string('notallowenter', 'chat').'</p>';
+                    print_box_end();
                 }
-
-                echo '<p>';
-                link_to_popup_window ($chattarget,
-                        "chat$course->id$chat->id$groupparam", "$strenterchat", 500, 700, get_string('modulename', 'chat'));
-                echo '</p>';
-
-                // if user is using screen reader, then there is no need to display this link again
-                if ($CFG->chat_method == 'header_js' && empty($USER->screenreader)) {
-                    // show frame/js-less alternative
-                    echo '<p>(';
-                            link_to_popup_window ("/mod/chat/gui_basic/index.php?id=$chat->id$groupparam",
-                                "chat$course->id$chat->id$groupparam", get_string('noframesjs', 'message'), 500, 700, get_string('modulename', 'chat'));
-                            echo ')</p>';
-                }
-
-                print_box_end();
-
 
                 if ($chat->chattime and $chat->schedule) {  // A chat is scheduled
                     echo "<p class=\"nextchatsession\">$strnextsession: ".userdate($chat->chattime).' ('.usertimezone($USER->timezone).')</p>';
@@ -204,16 +206,14 @@
     
     echo '</tr></table>';
 
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
-	print_footer($course,null, false,$cm->is_lams);
-	//if is lams display navigation buttons so you can finish uploading or go to next activity
-	if($cm->is_lams==1){
-    		if($editing==1){
-				include('showlamsfinish.php');
-			}else{
-				include('showlamsnext.php');
-			}
+    print_footer($course,null, false,$cm->is_lams);
 
-	}
+    if($cm->is_lams==1){
+      if($editing==1){
+	include('showlamsfinish.php');
+      } else {
+	include('showlamsnext.php');
+      }
+    }
 
 ?>

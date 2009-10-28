@@ -16,9 +16,11 @@
     $id      = required_param('id', PARAM_INT);             // Course Module ID
     $pageid  = optional_param('pageid', NULL, PARAM_INT);   // Lesson Page ID
     $edit    = optional_param('edit', -1, PARAM_BOOL);
-    $uploaded = optional_param('uploaded',0, PARAM_INT); // 1 if something has been edited in the lesson
+    $userpassword = optional_param('userpassword','',PARAM_CLEAN);
+    $uploaded = optional_param('uploaded',0, PARAM_INT); // 1 if something has been edited in the lesson    
     $editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
     $is_learner  = optional_param('is_learner',0, PARAM_INT);
+ 
     list($cm, $course, $lesson) = lesson_get_basics($id);
 
     require_login($course->id, false, $cm);
@@ -41,25 +43,20 @@
             }
             
             lesson_print_header($cm, $course, $lesson);
-            	
-		            print_simple_box_start('center');
-		            echo '<div style="text-align:center;">';
-		            echo '<p>'.$message.'</p>';
-		            // don't display the return to lesson or to course buttons if you are in a Lams lesson
-	            	if($cm->is_lams==0){
-		            	echo '<div class="lessonbutton standardbutton" style="padding: 5px;"><a href="'.$CFG->wwwroot.'/course/view.php?id='. $course->id .'">'. get_string('returnto', 'lesson', format_string($course->fullname, true)) .'</a></div>';
-	            	}
-		            echo '</div>';
-		            print_simple_box_end();
-	            
-            //we pass a new parameter to the function so it won't we printed if is_lams=1
-    		print_footer($course,null, false,$cm->is_lams);
+            print_simple_box_start('center');
+            echo '<div style="text-align:center;">';
+            echo '<p>'.$message.'</p>';
+            echo '<div class="lessonbutton standardbutton" style="padding: 5px;"><a href="'.$CFG->wwwroot.'/course/view.php?id='. $course->id .'">'. get_string('returnto', 'lesson', format_string($course->fullname, true)) .'</a></div>';
+            echo '</div>';
+            print_simple_box_end();
+            print_footer($course,null, false,$cm->is_lams);
             exit();
         
         } else if ($lesson->usepassword and empty($USER->lessonloggedin[$lesson->id])) { // Password protected lesson code
             $correctpass = false;
-            if ($password = optional_param('userpassword', '', PARAM_CLEAN)) {
-                if ($lesson->password == md5(trim($password))) {
+            if (!empty($userpassword)) {
+                // with or without md5 for backward compatibility (MDL-11090)
+                if (($lesson->password == md5(trim($userpassword))) or ($lesson->password == trim($userpassword))) {
                     $USER->lessonloggedin[$lesson->id] = true;
                     $correctpass = true;
                     if ($lesson->highscores) {
@@ -79,20 +76,20 @@
                 if (optional_param('userpassword', 0, PARAM_CLEAN)) {
                     notify(get_string('loginfail', 'lesson'));
                 }
-				if($cm->is_lams==0){
-	                echo get_string('passwordprotectedlesson', 'lesson', format_string($lesson->name))."<br /><br />\n".
-	                     get_string('enterpassword', 'lesson')." <input type=\"password\" name=\"userpassword\" /><br /><br />\n<center>".
-	                     '<span class="lessonbutton standardbutton"><a href="'.$CFG->wwwroot.'/course/view.php?id='. $course->id .'">'. get_string('cancel', 'lesson') .'</a></span> ';
-				}else{
-					   echo get_string('passwordprotectedlesson', 'lesson', format_string($lesson->name))."<br /><br />\n".
-	                     get_string('enterpassword', 'lesson')." <input type=\"password\" name=\"userpassword\" /><br /><br />\n<center>";
-				}
+		if($cm->is_lams==0){
+
+                echo get_string('passwordprotectedlesson', 'lesson', format_string($lesson->name))."<br /><br />\n".
+                     get_string('enterpassword', 'lesson')." <input type=\"password\" name=\"userpassword\" /><br /><br />\n<center>".
+                     '<span class="lessonbutton standardbutton"><a href="'.$CFG->wwwroot.'/course/view.php?id='. $course->id .'">'. get_string('cancel', 'lesson') .'</a></span> ';
+		}else{
+		  echo get_string('passwordprotectedlesson', 'lesson', format_string($lesson->name))."<br /><br />\n".
+		    get_string('enterpassword', 'lesson')." <input type=\"password\" name=\"userpassword\" /><br /><br />\n<center>";
+		}
                 lesson_print_submit_link(get_string('continue', 'lesson'), 'password', 'center', 'standardbutton submitbutton');
                 echo '</fieldset></form>';
                 print_simple_box_end();
                 echo "</div>\n";
-                //we pass a new parameter to the function so it won't we printed if is_lams=1
-    			print_footer($course,null, false,$cm->is_lams);
+		print_footer($course,null, false,$cm->is_lams);
                 exit();
             }
         
@@ -161,8 +158,7 @@
                     echo '<p style="text-align:center;">'.implode('<br />'.get_string('and', 'lesson').'<br />', $errors).'</p>';
                     print_simple_box_end();
                     echo '</p>';
-                    //we pass a new parameter to the function so it won't we printed if is_lams=1
-    				print_footer($course,null, false,$cm->is_lams);
+                    print_footer($course,null, false,$cm->is_lams);
                     exit();
                 } 
             }
@@ -192,7 +188,7 @@
                 lesson_set_message(get_string('lessonnotready', 'lesson', $course->teacher)); // a nice message to the student
             } else {
                 if (!count_records('lesson_pages', 'lessonid', $lesson->id)) {
-                    redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id&is_learner=$is_learner"); // no pages - redirect to add pages
+                    redirect("$CFG->wwwroot/mod/lesson/edit.php?id=$cm->id&is_learner=$is_learner&count_records('lesson_pages'"); // no pages - redirect to add pages
                 } else {
                     lesson_set_message(get_string('lessonpagelinkingbroken', 'lesson'));  // ok, bad mojo
                 }
@@ -263,11 +259,11 @@
             // get the first page
             if (!$firstpageid = get_field('lesson_pages', 'id', 'lessonid', $lesson->id,
                         'prevpageid', 0)) {
-                if($cm->is_lams==0){
-                	error('Navigation: first page not found');
-                }else{
-                	include('showlamsnext.php');
-                }
+	      if($cm->is_lams==0){
+                error('Navigation: first page not found');
+	      }else{
+		include('showlamsnext.php');
+	      }
             }
             lesson_print_header($cm, $course, $lesson);
             if ($lesson->timed) {
@@ -277,17 +273,12 @@
                               '<a href="view.php?id='.$cm->id.'&amp;pageid='.$firstpageid.'&amp;startlastseen=no">'.
                                 get_string('continue', 'lesson').'</a></div>';
                 } else {
-	                
-		                print_simple_box_start('center');
-	                    echo '<div style="text-align:center;">';
-	                    echo get_string('leftduringtimednoretake', 'lesson');
-	                     // don't display the return to lesson or to course buttons if you are in a Lams lesson
-			            if($cm->is_lams==0){  
-		                    echo '<br /><br /><div class="lessonbutton standardbutton"><a href="../../course/view.php?id='. $course->id .'">'. get_string('returntocourse', 'lesson') .'</a></div>';
-			            }
-	                    echo '</div>';
-	                    print_simple_box_end();
-		            
+                    print_simple_box_start('center');
+                    echo '<div style="text-align:center;">';
+                    echo get_string('leftduringtimednoretake', 'lesson');
+                    echo '<br /><br /><div class="lessonbutton standardbutton"><a href="../../course/view.php?id='. $course->id .'">'. get_string('returntocourse', 'lesson') .'</a></div>';
+                    echo '</div>';
+                    print_simple_box_end();
                 }
                 
             } else {
@@ -303,8 +294,7 @@
                         get_string('no').'</a></div>';
                 echo '</span>';
             }
-            //we pass a new parameter to the function so it won't we printed if is_lams=1
-    		print_footer($course,null, false,$cm->is_lams);
+            print_footer($course,null, false,$cm->is_lams);
             exit();
         }
         
@@ -318,14 +308,12 @@
                 print_simple_box_start('center');
                 echo "<div style=\"text-align:center;\">";
                 echo get_string("noretake", "lesson");
-            	// don't display the return to lesson or to course buttons if you are in a Lams lesson
-			   	if($cm->is_lams==0){  
-               		 echo "<br /><br /><div class=\"lessonbutton standardbutton\"><a href=\"../../course/view.php?id=$course->id\">".get_string('returntocourse', 'lesson').'</a></div>';
-			   	}
-               	echo "</div>";
+		if($cm->is_lams==0){  
+		  echo "<br /><br /><div class=\"lessonbutton standardbutton\"><a href=\"../../course/view.php?id=$course->id\">".get_string('returntocourse', 'lesson').'</a></div>';
+		}
+                echo "</div>";
                 print_simple_box_end();
-                //we pass a new parameter to the function so it won't we printed if is_lams=1
-    			print_footer($course,null, false,$cm->is_lams);
+                print_footer($course,null, false,$cm->is_lams);
                 exit();
                   //redirect("../../course/view.php?id=$course->id", get_string("alreadytaken", "lesson"));
             // allow student to retake course even if they have the maximum grade
@@ -336,11 +324,11 @@
         }
         // start at the first page
         if (!$pageid = get_field('lesson_pages', 'id', 'lessonid', $lesson->id, 'prevpageid', 0)) {
-                if($cm->is_lams==0){
-                	error('Navigation: first page not found');
-                }else{
-                	include('showlamsnext.php');
-                }
+	  if($cm->is_lams==0){
+                error('Navigation: first page not found');
+	  }else{
+	    include('showlamsnext.php');
+	  }
         }
         /// This is the code for starting a timed test
         if(!isset($USER->startlesson[$lesson->id]) && !has_capability('mod/lesson:manage', $context)) {
@@ -381,14 +369,13 @@
         add_to_log($course->id, 'lesson', 'view', 'view.php?id='. $cm->id, $pageid, $cm->id);
         
         if (!$page = get_record('lesson_pages', 'id', $pageid)) {
-        		if($cm->is_lams==0){
-                	error('Navigation: the page record not found');
-                }else{
-                	include('showlamsnext.php');
-                	print_r("This lesson hasn't been edited yet by the teacher");
-                	break;
-                }
-            
+	  if($cm->is_lams==0){
+            error('Navigation: the page record not found');
+	  }else{
+	    include('showlamsnext.php');
+	    print_r("This lesson hasn't been edited yet by the teacher");
+	    break;
+	  }
         }
 
         if ($page->qtype == LESSON_CLUSTER) {  //this only gets called when a user starts up a new lesson and the first page is a cluster page
@@ -550,7 +537,6 @@
         }
 
     /// Print the page header, heading and tabs
-    	//LAMS: we pass a new parameter so when in a lams sequence we don't display Moodle's headers
         $PAGE->print_header('','',$cm->is_lams);
 
         if ($attemptflag) {
@@ -973,8 +959,8 @@
             echo "<p style=\"text-align:center;\">".get_string("displayofgrade", "lesson")."</p>\n";
         }
         print_simple_box_end(); //End of Lesson button to Continue.
-		 //LAMS: if the student have finished the activity
-         $finishlesson=1;
+	//LAMS: if the student have finished the activity
+	$finishlesson=1;
         // after all the grade processing, check to see if "Show Grades" is off for the course
         // if yes, redirect to the course page
         if (!$course->showgrades&&$cm->is_lams==0) {
@@ -1053,25 +1039,25 @@
                     }
             }
         }
-    // don't display the return to lesson or to course buttons if you are in a Lams lesson
-		if($cm->is_lams==0){  
-	        echo "<div style=\"text-align:center; padding:5px;\" class=\"lessonbutton standardbutton\"><a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">".get_string('returnto', 'lesson', format_string($course->fullname, true))."</a></div>\n";
-	        echo "<div style=\"text-align:center; padding:5px;\" class=\"lessonbutton standardbutton\"><a href=\"$CFG->wwwroot/grade/index.php?id=$course->id\">".get_string('viewgrades', 'lesson')."</a></div>\n";
-		}
-		
-    }
-    if($cm->is_lams==1){
-    	if($uploaded==1||$editing==1){
-		 		//lams: display the finish edditing button if we have added any kind of question
-            	include('showlamsfinish.php');   
-    	}elseif($finishlesson==1||$is_learner==1||!get_record('lesson_pages', 'lessonid', $lesson->id)){
-    			//lams: display the next activity button if we have added any kind of question
-            	include('showlamsnext.php');   
-    	}
+
+	if($cm->is_lams==0){
+	  echo "<div style=\"text-align:center; padding:5px;\" class=\"lessonbutton standardbutton\"><a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">".get_string('returnto', 'lesson', format_string($course->fullname, true))."</a></div>\n";
+	  echo "<div style=\"text-align:center; padding:5px;\" class=\"lessonbutton standardbutton\"><a href=\"$CFG->wwwroot/grade/index.php?id=$course->id\">".get_string('viewgrades', 'lesson')."</a></div>\n";
 	}
+    }
+
+    if($cm->is_lams==1){
+      if($uploaded==1||$editing==1){
+	//lams: display the finish edditing button if we have added any kind of question
+	include('showlamsfinish.php'); 
+      }elseif($finishlesson==1||$is_learner==1||!get_record('lesson_pages', 'lessonid', $lesson->id)){
+	//lams: display the next activity button if we have added any kind of question
+	include('showlamsnext.php');   
+      }
+    }
+
 
 /// Finish the page
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
-    print_footer($course,null, false,$cm->is_lams);
+   print_footer($course,null, false,$cm->is_lams);
 
 ?>

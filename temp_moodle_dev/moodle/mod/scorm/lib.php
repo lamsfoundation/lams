@@ -387,7 +387,7 @@ function scorm_cron () {
     }
 
     $timenow = time();
-    $updatetime = usergetmidnight($timenow, $sitetimezone) + ($CFG->scorm_updatetime * 3600);
+    $updatetime = usergetmidnight($timenow, $sitetimezone) + ($CFG->scorm_updatetimelast * 3600);
 
     if ($CFG->scorm_updatetimelast < $updatetime and $timenow > $updatetime) {
 
@@ -545,11 +545,12 @@ function scorm_get_post_actions() {
 }
 
 function scorm_option2text($scorm) {
-    global $SCORM_POPUP_OPTIONS;
+    $scorm_popoup_options = scorm_get_popup_options_array();
+
     if (isset($scorm->popup)) {
         if ($scorm->popup == 1) {
             $optionlist = array();
-            foreach ($SCORM_POPUP_OPTIONS as $name => $option) {
+            foreach ($scorm_popoup_options as $name => $option) {
                 if (isset($scorm->$name)) {
                     $optionlist[] = $name.'='.$scorm->$name;
                 } else {

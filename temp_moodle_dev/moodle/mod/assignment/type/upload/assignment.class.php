@@ -17,7 +17,7 @@ class assignment_upload extends assignment_base {
 
     function view() {
         global $USER;
-   
+
         require_capability('mod/assignment:view', $this->context);
 
         add_to_log($this->course->id, 'assignment', 'view', "view.php?id={$this->cm->id}", $this->assignment->id, $this->cm->id);
@@ -50,7 +50,6 @@ class assignment_upload extends assignment_base {
 
             if ($filecount and $submission) {
                 print_simple_box($this->print_user_files($USER->id, true), 'center');
-
             } else {
                 if (!$this->isopen() or $this->is_finalized($submission)) {
                     print_simple_box(get_string('nofiles', 'assignment'), 'center');
@@ -59,7 +58,8 @@ class assignment_upload extends assignment_base {
                 }
             }
 
-            $saved=$this->view_upload_form();
+            $this->view_upload_form();
+	    $saved=$this->view_upload_form();
 
             if ($this->notes_allowed()) {
                 print_heading(get_string('notes', 'assignment'), '', 3);
@@ -68,7 +68,6 @@ class assignment_upload extends assignment_base {
 
             $this->view_final_submission();
         }
-  
         $this->view_footer();
     }
 
@@ -76,7 +75,7 @@ class assignment_upload extends assignment_base {
     function view_feedback($submission=NULL) {
         global $USER, $CFG;
         require_once($CFG->libdir.'/gradelib.php');
-		
+
         if (!$submission) { /// Get submission for this assignment
             $submission = $this->get_submission($USER->id);
         }
@@ -181,7 +180,7 @@ class assignment_upload extends assignment_base {
             echo '</div>';
             echo '<br />';
         }
-    
+
     }
 
     function view_notes() {
@@ -205,6 +204,7 @@ class assignment_upload extends assignment_base {
         global $CFG, $USER;
 
         $submission = $this->get_submission($USER->id);
+
         if ($this->isopen() and $this->can_finalize($submission)) {
             //print final submit button
             print_heading(get_string('submitformarking','assignment'), '', 3);
@@ -247,7 +247,7 @@ class assignment_upload extends assignment_base {
         $mode         = optional_param('mode', '', PARAM_ALPHA);
         $offset       = optional_param('offset', 0, PARAM_INT);
         $forcerefresh = optional_param('forcerefresh', 0, PARAM_BOOL);
-		
+
         $output = get_string('responsefiles', 'assignment').': ';
 
         $output .= '<form enctype="multipart/form-data" method="post" '.
@@ -283,7 +283,7 @@ class assignment_upload extends assignment_base {
 
     function print_student_answer($userid, $return=false){
         global $CFG;
-   
+
         $filearea = $this->file_area_name($userid);
         $submission = $this->get_submission($userid);
 
@@ -328,7 +328,7 @@ class assignment_upload extends assignment_base {
 
         $mode    = optional_param('mode', '', PARAM_ALPHA);
         $offset  = optional_param('offset', 0, PARAM_INT);
-     
+
         if (!$userid) {
             if (!isloggedin()) {
                 return '';
@@ -447,6 +447,7 @@ class assignment_upload extends assignment_base {
 
     function upload() {
         $action = required_param('action', PARAM_ALPHA);
+
         switch ($action) {
             case 'finalize':
                 $this->finalize();
@@ -458,7 +459,7 @@ class assignment_upload extends assignment_base {
                 $this->unfinalize();
                 break;
             case 'uploadresponse':
-                $this->upload_responsefile();	
+                $this->upload_responsefile();
                 break;
             case 'uploadfile':
                 $this->upload_file();
@@ -571,7 +572,7 @@ class assignment_upload extends assignment_base {
 
         $returnurl = 'view.php?id='.$this->cm->id;
 
-        //$filecount = $this->count_user_files($USER->id);
+	// $filecount = $this->count_user_files($USER->id);
         $submission = $this->get_submission($USER->id);
 
         if (!$this->can_upload_file($submission)) {
@@ -587,19 +588,19 @@ class assignment_upload extends assignment_base {
 
         require_once($CFG->dirroot.'/lib/uploadlib.php');
         $um = new upload_manager('newfile',false,true,$this->course,false,$this->assignment->maxbytes,true);
-		
+
         if ($um->process_file_uploads($dir)) {
             $submission = $this->get_submission($USER->id, true); //create new submission if needed
             $updated = new object();
             $updated->id           = $submission->id;
-            //lams: store in the database the number of files submitted
+	    //lams: store in the database the number of files submitted
             $filecount = $this->count_user_files($USER->id);
-            $updated->numfiles = $filecount;
+	    $updated->numfiles = $filecount;
             $updated->timemodified = time();
 
             if (update_record('assignment_submissions', $updated)) {
-	            //lams: add 'saved' variable so lams can recognize if the student have uploaded a file	
-	            $saved=1;
+		//lams: add 'saved' variable so lams can recognize if the student have uploaded a file 
+		$saved=1;
                 add_to_log($this->course->id, 'assignment', 'upload',
                         'view.php?a='.$this->assignment->id, $this->assignment->id, $this->cm->id);
                 $submission = $this->get_submission($USER->id);
@@ -615,8 +616,9 @@ class assignment_upload extends assignment_base {
                 $this->view_footer();
                 die;
             }
-             //lams: add 'saved' variable so lams can recognize if the student have uploaded a file	
-            redirect('view.php?id='.$this->cm->id.'&saved='.$saved);
+            redirect('view.php?id='.$this->cm->id);
+	    //lams: add 'saved' variable so lams can recognize if the student have uploaded a file   
+	    redirect('view.php?id='.$this->cm->id.'&saved='.$saved);
         }
         $this->view_header(get_string('upload'));
         notify(get_string('uploaderror', 'assignment'));
@@ -628,6 +630,7 @@ class assignment_upload extends assignment_base {
 
     function finalize() {
         global $USER;
+
         $confirm    = optional_param('confirm', 0, PARAM_BOOL);
         $returnurl  = 'view.php?id='.$this->cm->id;
         $submission = $this->get_submission($USER->id);

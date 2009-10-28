@@ -107,7 +107,7 @@ function lesson_delete_instance($id) {
     }
     $pagetypes = page_import_types('mod/lesson/');
     foreach ($pagetypes as $pagetype) {
-        if (!delete_records('block_instance', 'pageid', $lesson->id, 'pagetype', $pagetype)) {
+        if (!blocks_delete_all_on_page($pagetype, $lesson->id)) {
             $result = false;
         }
     }
@@ -427,6 +427,19 @@ function lesson_grade_item_update($lesson, $grades=NULL) {
     if ($grades  === 'reset') {
         $params['reset'] = true;
         $grades = NULL;
+    } else if (!empty($grades)) {
+        // Need to calculate raw grade (Note: $grades has many forms)
+        if (is_object($grades)) {
+            $grades = array($grades->userid => $grades);
+        } else if (array_key_exists('userid', $grades)) {
+            $grades = array($grades['userid'] => $grades);
+        }
+        foreach ($grades as $key => $grade) {
+            if (!is_array($grade)) {
+                $grades[$key] = $grade = (array) $grade;
+            }
+            $grades[$key]['rawgrade'] = ($grade['rawgrade'] * $lesson->grade / 100);
+        }
     }
 
     return grade_update('mod/lesson', $lesson->course, 'mod', 'lesson', $lesson->id, 0, $grades, $params);
@@ -508,9 +521,7 @@ function lesson_process_pre_save(&$lesson) {
     unset($lesson->completed);
     unset($lesson->gradebetterthan);
 
-    if (!empty($lesson->password)) {
-        $lesson->password = md5($lesson->password);
-    } else {
+    if (empty($lesson->password)) {
         unset($lesson->password);
     }
 
@@ -661,6 +672,13 @@ function lesson_get_extra_capabilities() {
     return array('moodle/site:accessallgroups');
 }
 
+/**
+ * Tells if files in moddata are trusted and can be served without XSS protection.
+ * @return bool true if file can be submitted by teacher only (trusted), false otherwise
+ */
+function lesson_is_moddata_trusted() {
+    return true;
+}
 
 //
 /**

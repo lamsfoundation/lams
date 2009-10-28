@@ -62,8 +62,8 @@
         $navlinks[] = array('name' => format_string($module->name), 'link' => "$CFG->wwwroot/mod/{$cm->modname}/view.php?id={$cm->id}", 'type' => 'title');
         $navlinks[] = array('name' => $txt->importquestions, 'link' => '', 'type' => 'title');
         $navigation = build_navigation($navlinks);
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-        print_header_simple($txt->importquestions, '', $navigation, "", "", true, $strupdatemodule,'',false,'',false,$cm->is_lams);
+        print_header_simple($txt->importquestions, '', $navigation, "", "", true, $strupdatemodule);
+
         $currenttab = 'edit';
         $mode = 'import';
         ${$cm->modname} = $module;
@@ -73,8 +73,8 @@
         $navlinks = array();
         $navlinks[] = array('name' => $txt->importquestions, 'link' => '', 'type' => 'title');
         $navigation = build_navigation($navlinks);
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-		print_header_simple($txt->importquestions, '', $navigation, "", "", true, $strupdatemodule,'',false,'',false,$cm->is_lams);
+
+        print_header_simple($txt->importquestions, '', $navigation);
         // print tabs
         $currenttab = 'import';
         include('tabs.php');
@@ -148,8 +148,7 @@
 
             echo "<hr />";
             print_continue("edit.php?".($thispageurl->get_query_string(array('category'=>"{$qformat->category->id},{$qformat->category->contextid}"))));
-            //we pass a new parameter to the function so it won't we printed if is_lams=1
-			print_footer($COURSE,null, false,$cm->is_lams);
+            print_footer($COURSE);
             exit;
         }
     }
@@ -158,7 +157,6 @@
 
     /// Print upload form
     $import_form->display();
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
-    print_footer($COURSE,null, false,$cm->is_lams);
+    print_footer($COURSE);
 
 ?>

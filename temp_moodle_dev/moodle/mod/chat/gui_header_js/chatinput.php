@@ -6,10 +6,25 @@
     require('../lib.php');
 
     $chat_sid = required_param('chat_sid', PARAM_ALPHANUM);
+    $chatid   = required_param('chat_id', PARAM_INT);
 
     if (!$chatuser = get_record('chat_users', 'sid', $chat_sid)) {
         error('Not logged in!');
     }
+    if (!$chat = get_record('chat', 'id', $chatid)) {
+        error('Could not find that chat room!');
+    }
+
+    if (!$course = get_record('course', 'id', $chat->course)) {
+        error('Could not find the course this belongs to!');
+    }
+
+    if (!$cm = get_coursemodule_from_instance('chat', $chat->id, $course->id)) {
+        error('Course Module ID was incorrect');
+    }
+    
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    
 
     //Get the user theme
     $USER = get_record('user', 'id', $chatuser->userid);

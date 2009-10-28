@@ -12,8 +12,13 @@ class mod_forum_mod_form extends moodleform_mod {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $mform->addElement('text', 'name', get_string('forumname', 'forum'), array('size'=>'64'));
-        $mform->setType('name', PARAM_TEXT);
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('name', PARAM_TEXT);
+        } else {
+            $mform->setType('name', PARAM_CLEAN);
+        }
         $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
         $forum_types = forum_get_forum_types();
 
@@ -76,16 +81,17 @@ class mod_forum_mod_form extends moodleform_mod {
             $mform->addElement('select', 'rssarticles', get_string('rssarticles'), $choices);
             $mform->setHelpButton('rssarticles', array('rssarticles', get_string('rssarticles'), 'forum'));
         }
+
 //-------------------------------------------------------------------------------
-/*        $mform->addElement('header', '', get_string('grade'));
+        $mform->addElement('header', '', get_string('grade'));
 
         $mform->addElement('select', 'assessed', get_string('aggregatetype', 'forum') , forum_get_aggregate_types());
         $mform->setDefault('assessed', 0);
         $mform->setHelpButton('assessed', array('assessaggregate', get_string('aggregatetype', 'forum'), 'forum'));
 
-	$mform->addElement('modgrade', 'scale', get_string('grade'), false);
-	$mform->disabledIf('scale', 'assessed', 'eq', 0);
-	
+        $mform->addElement('modgrade', 'scale', get_string('grade'), false);
+        $mform->disabledIf('scale', 'assessed', 'eq', 0);
+
         $mform->addElement('checkbox', 'ratingtime', get_string('ratingtime', 'forum'));
         $mform->disabledIf('ratingtime', 'assessed', 'eq', 0);
 
@@ -94,7 +100,10 @@ class mod_forum_mod_form extends moodleform_mod {
         $mform->disabledIf('assesstimestart', 'ratingtime');
 
         $mform->addElement('date_time_selector', 'assesstimefinish', get_string('to'));
-        $mform->disabledIf('assesstimefinish', 'assessed', 'eq', 0);*/
+        $mform->disabledIf('assesstimefinish', 'assessed', 'eq', 0);
+        $mform->disabledIf('assesstimefinish', 'ratingtime');
+
+
 //-------------------------------------------------------------------------------
         $mform->addElement('header', '', get_string('blockafter', 'forum'));
         $options = array();
@@ -125,18 +134,14 @@ class mod_forum_mod_form extends moodleform_mod {
         $mform->disabledIf('warnafter', 'blockperiod', 'eq', 0);
 
 //-------------------------------------------------------------------------------
-        /*$features = new stdClass;
-        $features->groups = false;
+        $features = new stdClass;
+        $features->groups = true;
         $features->groupings = true;
         $features->groupmembersonly = true;
-        $features->gradecat = false;
-	$features->idnumber = false;
-	$this->standard_coursemodule_elements($features);*/
         $this->standard_hidden_coursemodule_elements();
 //-------------------------------------------------------------------------------
 // buttons
         $this->add_action_buttons(false, 'Save', false);
-
     }
 
     function definition_after_data(){

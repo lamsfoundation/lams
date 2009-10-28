@@ -63,6 +63,7 @@
         if (!$attempt->timefinish) {
             redirect('attempt.php?q='.$quiz->id);
         }
+        require_capability('mod/quiz:reviewmyattempts', $context);
         // If not even responses are to be shown in review then we
         // don't allow any review
         if (!($quiz->review & QUIZ_REVIEW_RESPONSES)) {
@@ -95,6 +96,10 @@
     if (!get_question_options($questions)) {
         error("Unable to load questiontype specific question information");
     }
+
+    $baseurl = $CFG->wwwroot . '/mod/quiz/reviewquestion.php?question=' . $question->id . '&amp;number=' . $number . '&amp;attempt=';
+    $quiz->thispageurl = $baseurl . $attempt->id;
+    $quiz->cmid = $cm->id;
 
     $session = get_record('question_sessions', 'attemptid', $attempt->uniqueid, 'questionid', $question->id);
     $state->sumpenalty = $session->sumpenalty;
@@ -132,7 +137,7 @@
         foreach ($attempts as $at) {
             $attemptlist .= ($at->id == $attempt->id)
                 ? '<b>'.$at->attempt.'</b>, '
-                : '<a href="reviewquestion.php?attempt='.$at->id.'&amp;question='.$question->id.'&amp;number='.$number.'">'.$at->attempt.'</a>, ';
+                : '<a href="' . $baseurl . $at->id . '">'.$at->attempt.'</a>, ';
         }
         $table->data[] = array(get_string('attempts', 'quiz').':', trim($attemptlist, ' ,'));
     }

@@ -37,6 +37,7 @@
     $strglossaries   = get_string('modulenameplural', 'glossary');
     $entryalreadyexist = get_string('entryalreadyexist','glossary');
     $entryexported = get_string('entryexported','glossary');
+
     $navigation = build_navigation('', $cm);
     print_header_simple(format_string($glossary->name), '', $navigation, '', '', true, '', navmenu($course, $cm));
 

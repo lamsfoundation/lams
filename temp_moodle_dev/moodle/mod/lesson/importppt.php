@@ -45,8 +45,6 @@
     $strlessons = get_string("modulenameplural", "lesson");
 
     $navigation = build_navigation($strimportppt, $cm);
-    
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_header_simple("$strimportppt", " $strimportppt", $navigation, "", "", true, '','',false,'',false,$cm->is_lams);
 
     if ($form = data_submitted()) {   /// Filename
@@ -71,19 +69,17 @@
                 
                 if(! $mod_save_objects($objects, $mod->id, $pageid)) {  // sends it to DB
                     error("could not save");
-                //LAMS: variable we pass to let it know we have added a new PPT while editting
+		    //LAMS: variable we pass to let it know we have added a new PPT while editting
                 }elseif($cm->is_lams==1){
-            		$uploaded=1;
-            	}
+		  $uploaded=1;
+		}
             } else {
                 error('could not get data');
             }
 
             echo "<hr>";
-            // pass a new parameter to view.php just to know if the teacher has imported any question (if he did, he will be able to finish editting Lams's sequence)
-            print_continue("$CFG->wwwroot/mod/$modname/view.php?id=$cm->id&uploaded=$uploaded");
-            //we pass a new parameter to the function so it won't we printed if is_lams=1
-    		print_footer($course,null, false,$cm->is_lams);
+	    print_continue("$CFG->wwwroot/mod/$modname/view.php?id=$cm->id&uploaded=$uploaded");
+	    print_footer($course,null, false,$cm->is_lams);
             exit;
         }
     }
@@ -110,7 +106,6 @@
     echo "</form>";
     print_simple_box_end();
 
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_footer($course,null, false,$cm->is_lams);
     
 // START OF FUNCTIONS
@@ -134,7 +129,7 @@ function readdata($file, $courseid, $modname) {
     $path_parts = pathinfo($zipfile);
     $dirname = substr($zipfile, 0, strpos($zipfile, '.'.$path_parts['extension'])); // take off the extension
     if (!file_exists($base.$dirname)) {
-        mkdir($base.$dirname);
+        mkdir($base.$dirname, $CFG->directorypermissions);
     }
 
     // move our uploaded file to temp/lesson
@@ -212,7 +207,7 @@ function extract_data($pages, $courseid, $lessonname, $modname) {
     while(true) {
         if (!file_exists($imagedir.'/'.$lessonname.$i)) {
             // ok doesnt exist so make the directory and update our paths
-            mkdir($imagedir.'/'.$lessonname.$i);
+            mkdir($imagedir.'/'.$lessonname.$i, $CFG->directorypermissions);
             $imagedir = $imagedir.'/'.$lessonname.$i;
             $imagelink = $imagelink.'/'.$lessonname.$i;
             break;

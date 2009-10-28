@@ -37,7 +37,7 @@
         $result = true;
         $request = null;
         if (has_capability('mod/scorm:savetrack', get_context_instance(CONTEXT_MODULE,$cm->id))) {
-            foreach ($_POST as $element => $value) {
+            foreach (data_submitted() as $element => $value) {
                 $element = str_replace('__','.',$element);
                 if (substr($element,0,3) == 'cmi') {
                     $netelement = preg_replace('/\.N(\d+)\./',"\.\$1\.",$element);
@@ -65,12 +65,12 @@
                         }
                     }
                 }
-//                // Log every datamodel update requested
-//                if (substr($element,0,15) == 'adl.nav.request' || substr($element,0,3) == 'cmi') {
-//                    if (debugging('',DEBUG_DEVELOPER)) {
-//                        add_to_log($course->id, 'scorm', 'trk: '.trim($scorm->name).' at: '.$attempt, 'view.php?id='.$cm->id, "$element => $value", $cm->id);
-//                    }
-//                }
+                // Log every datamodel update requested
+                if (substr($element,0,15) == 'adl.nav.request' || substr($element,0,3) == 'cmi') {
+                    if (debugging('',DEBUG_DEVELOPER)) {
+                        add_to_log($course->id, 'scorm', 'trk: '.trim($scorm->name).' at: '.$attempt, 'view.php?id='.$cm->id, "$element => $value", $cm->id);
+                    }
+                }
             }
         }
         if ($result) {

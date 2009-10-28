@@ -4,7 +4,6 @@
 //  If no post is given, displays all posts in a discussion
 
     require_once('../../config.php');
-    require_once('lib.php');
 
     $d      = required_param('d', PARAM_INT);                // Discussion ID
     $parent = optional_param('parent', 0, PARAM_INT);        // If set, then display this post and all children.
@@ -30,6 +29,13 @@
     }
 
     require_course_login($course, true, $cm);
+
+/// Add ajax-related libs
+    require_js(array('yui_yahoo', 'yui_event', 'yui_dom', 'yui_connection', 'yui_json'));
+    require_js($CFG->wwwroot . '/mod/forum/rate_ajax.js');
+
+    // move this down fix for MDL-6926
+    require_once('lib.php');
 
     $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
     require_capability('mod/forum:viewdiscussion', $modcontext, NULL, true, 'noviewdiscussionspermission', 'forum');
@@ -63,6 +69,9 @@
         if (!coursemodule_visible_for_user($cmto)) {
             error('Forum not visible', $return);
         }
+
+        require_capability('mod/forum:startdiscussion',
+            get_context_instance(CONTEXT_MODULE,$cmto->id));
 
         if (!forum_move_attachments($discussion, $forumto->id)) {
             notify("Errors occurred while moving attachment directories - check your file permissions");
@@ -139,14 +148,12 @@
 
     $navigation = build_navigation($navlinks, $cm);
     //if in Lams sequence don't display Moodle's navigation header
-        if($cm->is_lams==1){
-        	print_header();
-        }else{
-        	  print_header("$course->shortname: ".format_string($discussion->name), $course->fullname,
-                     $navigation, "", "", true, $searchform, navmenu($course, $cm));
-        }
-  
-
+    if($cm->is_lams==1){
+      print_header();
+    }else{
+      print_header("$course->shortname: ".format_string($discussion->name), $course->fullname,
+		   $navigation, "", "", true, $searchform, navmenu($course, $cm));
+    }
 
 /// Check to see if groups are being used in this forum
 /// If so, make sure the current person is allowed to see this discussion
@@ -185,7 +192,8 @@
             $section = -1;
             $forummenu = array();
             foreach ($modinfo->instances['forum'] as $forumcm) {
-                if (!$forumcm->uservisible) {
+                if (!$forumcm->uservisible || !has_capability('mod/forum:startdiscussion',
+                    get_context_instance(CONTEXT_MODULE,$forumcm->id))) {
                     continue;
                 }
 
@@ -201,7 +209,8 @@
             if (!empty($forummenu)) {
                 echo "<div style=\"float:right;\">";
                 echo popup_form("$CFG->wwwroot/mod/forum/", $forummenu, "forummenu", "",
-                                 get_string("movethisdiscussionto", "forum"), "", "", true);
+                                 get_string("movethisdiscussionto", "forum"), "", "", true,'self','',NULL,
+                                 get_string('move'));
                 echo "</div>";
             }
         }
@@ -227,8 +236,7 @@
     $canrate = has_capability('mod/forum:rate', $modcontext);
     forum_print_discussion($course, $cm, $forum, $discussion, $post, $displaymode, $canreply, $canrate);
 
-     //we pass a new parameter to the function so it won't we printed if is_lams=1
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_footer($course,null, false,$cm->is_lams);
-
 
 ?>

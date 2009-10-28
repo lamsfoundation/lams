@@ -58,7 +58,6 @@
             error("Fatal Error: Unknown action\n");
     }
 
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_footer($course,null, false,$cm->is_lams);
  
 ?>

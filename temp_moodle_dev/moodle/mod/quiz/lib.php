@@ -10,8 +10,6 @@
 */
 
 require_once($CFG->libdir.'/pagelib.php');
-require_once($CFG->libdir.'/questionlib.php');
-require_once($CFG->dirroot.'/mod/quiz/editlib.php');
 
 /// CONSTANTS ///////////////////////////////////////////////////////////////////
 
@@ -120,7 +118,6 @@ function quiz_update_instance($quiz) {
     return true;
 }
 
-
 function quiz_delete_instance($id) {
 /// Given an ID of an instance of this module,
 /// this function will permanently delete the instance
@@ -133,8 +130,9 @@ function quiz_delete_instance($id) {
     $result = true;
 
     if ($attempts = get_records("quiz_attempts", "quiz", "$quiz->id")) {
+        // TODO: this should use the delete_attempt($attempt->uniqueid) function in questionlib.php
+        // require_once($CFG->libdir.'/questionlib.php');
         foreach ($attempts as $attempt) {
-            // TODO: this should use the delete_attempt($attempt->uniqueid) function in questionlib.php
             if (! delete_records("question_states", "attempt", "$attempt->uniqueid")) {
                 $result = false;
             }
@@ -160,7 +158,7 @@ function quiz_delete_instance($id) {
 
     $pagetypes = page_import_types('mod/quiz/');
     foreach($pagetypes as $pagetype) {
-        if(!delete_records('block_instance', 'pageid', $quiz->id, 'pagetype', $pagetype)) {
+        if(!blocks_delete_all_on_page($pagetype, $quiz->id)) {
             $result = false;
         }
     }
@@ -176,6 +174,23 @@ function quiz_delete_instance($id) {
     return $result;
 }
 
+/**
+ * Get the best current grade for a particular user in a quiz.
+ *
+ * @param object $quiz the quiz object.
+ * @param integer $userid the id of the user.
+ * @return float the user's current grade for this quiz.
+ */
+function quiz_get_best_grade($quiz, $userid) {
+    $grade = get_field('quiz_grades', 'grade', 'quiz', $quiz->id, 'userid', $userid);
+
+    // Need to detect errors/no result, without catching 0 scores.
+    if (is_numeric($grade)) {
+        return round($grade, $quiz->decimalpoints);
+    } else {
+        return NULL;
+    }
+}
 
 function quiz_user_outline($course, $user, $mod, $quiz) {
 /// Return a small object with summary information about what a
@@ -183,26 +198,23 @@ function quiz_user_outline($course, $user, $mod, $quiz) {
 /// Used for user activity reports.
 /// $return->time = the time they did it
 /// $return->info = a short text description
-    if ($grade = get_record('quiz_grades', 'userid', $user->id, 'quiz', $quiz->id)) {
-
-        $result = new stdClass;
-        if ((float)$grade->grade) {
-            $result->info = get_string('grade').':&nbsp;'.round($grade->grade, $quiz->decimalpoints);
-        }
-        $result->time = $grade->timemodified;
-        return $result;
+    $grade = quiz_get_best_grade($quiz, $user->id);
+    if (is_null($grade)) {
+        return NULL;
     }
-    return NULL;
 
+    $result = new stdClass;
+    $result->info = get_string('grade') . ': ' . $grade . '/' . $quiz->grade;
+    $result->time = get_field('quiz_attempts', 'MAX(timefinish)', 'userid', $user->id, 'quiz', $quiz->id);
+    return $result;
 }
-
 
 function quiz_user_complete($course, $user, $mod, $quiz) {
 /// Print a detailed representation of what a  user has done with
 /// a given particular instance of this module, for user activity reports.
 
     if ($attempts = get_records_select('quiz_attempts', "userid='$user->id' AND quiz='$quiz->id'", 'attempt ASC')) {
-        if ($quiz->grade  and $quiz->sumgrades && $grade = get_record('quiz_grades', 'userid', $user->id, 'quiz', $quiz->id)) {
+        if ($quiz->grade && $quiz->sumgrades && $grade = get_record('quiz_grades', 'userid', $user->id, 'quiz', $quiz->id)) {
             echo get_string('grade').': '.round($grade->grade, $quiz->decimalpoints).'/'.$quiz->grade.'<br />';
         }
         foreach ($attempts as $attempt) {
@@ -221,8 +233,7 @@ function quiz_user_complete($course, $user, $mod, $quiz) {
     return true;
 }
 
-
-function quiz_cron () {
+function quiz_cron() {
 /// Function to be run periodically according to the moodle cron
 /// This function searches for things that need to be done, such
 /// as sending out mail, toggling flags etc ...
@@ -416,7 +427,6 @@ function quiz_grade_item_delete($quiz) {
     return grade_update('mod/quiz', $quiz->course, 'mod', 'quiz', $quiz->id, 0, NULL, array('deleted'=>1));
 }
 
-
 function quiz_get_participants($quizid) {
 /// Returns an array of users who have data in a given quiz
 /// (users with records in quiz_attempts and quiz_question_versions)
@@ -449,8 +459,6 @@ function quiz_get_participants($quizid) {
 }
 
 function quiz_refresh_events($courseid = 0) {
-// This horrible function only seems to be called from mod/quiz/db/[dbtype].php.
-
 // This standard function will check all instances of this module
 // and make sure there are up-to-date events created for each of them.
 // If courseid = 0, then every quiz event in the site is checked, else
@@ -574,7 +582,6 @@ function quiz_get_recent_mod_activity(&$activities, &$index, $timestart, $course
          return;
     }
 
-
     $cm_context      = get_context_instance(CONTEXT_MODULE, $cm->id);
     $grader          = has_capability('moodle/grade:viewall', $cm_context);
     $accessallgroups = has_capability('moodle/site:accessallgroups', $cm_context);
@@ -629,7 +636,6 @@ function quiz_get_recent_mod_activity(&$activities, &$index, $timestart, $course
 
   return;
 }
-
 
 function quiz_print_recent_mod_activity($activity, $courseid, $detail, $modnames) {
     global $CFG;
@@ -732,9 +738,11 @@ function quiz_process_options(&$quiz) {
         $numboundaries = $i;
 
         // Check there is nothing in the remaining unused fields.
-        for ($i = $numboundaries; $i < count($quiz->feedbackboundaries); $i += 1) {
-            if (!empty($quiz->feedbackboundaries[$i]) && trim($quiz->feedbackboundaries[$i]) != '') {
-                return get_string('feedbackerrorjunkinboundary', 'quiz', $i + 1);
+        if (!empty($quiz->feedbackboundaries)) {
+            for ($i = $numboundaries; $i < count($quiz->feedbackboundaries); $i += 1) {
+                if (!empty($quiz->feedbackboundaries[$i]) && trim($quiz->feedbackboundaries[$i]) != '') {
+                    return get_string('feedbackerrorjunkinboundary', 'quiz', $i + 1);
+                }
             }
         }
         for ($i = $numboundaries + 1; $i < count($quiz->feedbacktext); $i += 1) {
@@ -866,11 +874,10 @@ function quiz_after_add_or_update($quiz) {
         $feedback->feedbacktext = $quiz->feedbacktext[$i];
         $feedback->mingrade = $quiz->feedbackboundaries[$i];
         $feedback->maxgrade = $quiz->feedbackboundaries[$i - 1];
-       if (!insert_record('quiz_feedback', $feedback, false)) {
+        if (!insert_record('quiz_feedback', $feedback, false)) {
             return "Could not save quiz feedback.";
         }
     }
-
 
     // Update the events relating to this quiz.
     // This is slightly inefficient, deleting the old events and creating new ones. However,
@@ -997,6 +1004,13 @@ function quiz_reset_gradebook($courseid, $type='') {
  */
 function quiz_reset_userdata($data) {
     global $CFG, $QTYPES;
+    
+    if (empty($QTYPES)) {
+        require_once($CFG->libdir . '/questionlib.php');
+    }
+
+    // TODO: this should use the delete_attempt($attempt->uniqueid) function in questionlib.php
+    // require_once($CFG->libdir.'/questionlib.php');
 
     $componentstr = get_string('modulenameplural', 'quiz');
     $status = array();
@@ -1055,14 +1069,14 @@ function quiz_reset_userdata($data) {
  * Checks whether the current user is allowed to view a file uploaded in a quiz.
  * Teachers can view any from their courses, students can only view their own.
  *
- * @param int $attemptid int attempt id
+ * @param int $attemptuniqueid int attempt id
  * @param int $questionid int question id
  * @return boolean to indicate access granted or denied
  */
-function quiz_check_file_access($attemptid, $questionid) {
+function quiz_check_file_access($attemptuniqueid, $questionid) {
     global $USER;
 
-    $attempt = get_record("quiz_attempts", 'id', $attemptid);
+    $attempt = get_record("quiz_attempts", 'uniqueid', $attemptuniqueid);
     $quiz = get_record("quiz", 'id', $attempt->quiz);
     $context = get_context_instance(CONTEXT_COURSE, $quiz->course);
 
@@ -1115,7 +1129,7 @@ function quiz_print_overview($courses, &$htmlarray) {
                 // The $quiz objects returned by get_all_instances_in_course have the necessary $cm 
                 // fields set to make the following call work.
                 $str .= '<div class="info">' . quiz_num_attempt_summary($quiz, $quiz, true) . '</div>';
-            } else if (has_capability('mod/quiz:attempt', $context)){ // Student
+            } else if (has_any_capability(array('mod/quiz:reviewmyattempts', 'mod/quiz:attempt'), $context)) { // Student
             /// For student-like people, tell them how many attempts they have made.
                 if (isset($USER->id) && ($attempts = quiz_get_user_attempts($quiz->id, $USER->id))) {
                     $numattempts = count($attempts);
@@ -1174,6 +1188,25 @@ function quiz_num_attempt_summary($quiz, $cm, $returnzero = false, $currentgroup
         return get_string('attemptsnum', 'quiz', $numattempts);
     }
     return '';
+}
+
+/**
+ * Returns all other caps used in module
+ */
+function quiz_get_extra_capabilities() {
+    return array(
+        'moodle/site:accessallgroups',
+        'moodle/question:add',
+        'moodle/question:editmine',
+        'moodle/question:editall',
+        'moodle/question:viewmine',
+        'moodle/question:viewall',
+        'moodle/question:usemine',
+        'moodle/question:useall',
+        'moodle/question:movemine',
+        'moodle/question:moveall',
+        'moodle/question:managecategory',
+    );
 }
 
 /**
@@ -1333,5 +1366,6 @@ function quiz_export_portfolio($id, $userid) {
     return $text;
 
 }
+
 
 ?>

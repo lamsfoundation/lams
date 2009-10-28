@@ -72,18 +72,18 @@ function glossary_comment_add() {
         if (!$newcomment->id = insert_record('glossary_comments', $newcomment)) {
             error('Could not insert this new comment');
         } else {
-        	if($cm->is_lams==1){
-        	 	$next=1;//lams: variable we pass to the view page to tell it that there is a new entry
-        	}
+	    if($cm->is_lams==1){
+		$next=1;//lams: variable we pass to the view page to tell it that there is a new entry
+	     }
             add_to_log($course->id, 'glossary', 'add comment', "comments.php?id=$cm->id&amp;eid=$entry->id", "$newcomment->id", $cm->id);
         }
-        redirect("comments.php?id=$cm->id&amp;eid=$entry->id&amp;next=$next");
+	redirect("comments.php?id=$cm->id&amp;eid=$entry->id&amp;next=$next");
 
     } else {
         glossary_comment_print_header($course, $cm, $glossary, $entry, 'add');
         $mform->display();
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-    	print_footer($course,null, false,$glossary->is_lams);
+	//we pass a new parameter to the function so it won't we printed if is_lams=1
+	print_footer($course,null, false,$glossary->is_lams);
         die;
     }
 }
@@ -137,8 +137,8 @@ function glossary_comment_delete() {
         glossary_comment_print_header($course, $cm, $glossary, $entry, 'delete');
         glossary_print_comment($course, $cm, $glossary, $entry, $comment);
         notice_yesno($strdeletewarning, $linkyes, $linkno, $optionsyes, $optionsno, 'post', 'get');
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-    	print_footer($course,null, false,$glossary->is_lams);
+	//we pass a new parameter to the function so it won't we printed if is_lams=1
+	print_footer($course,null, false,$glossary->is_lams);
         die;
     }
 }
@@ -203,8 +203,8 @@ function glossary_comment_edit() {
     } else {
         glossary_comment_print_header($course, $cm, $glossary, $entry, 'edit');
         $mform->display();
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-    	print_footer($course,null, false,$glossary->is_lams);
+	//we pass a new parameter to the function so it won't we printed if is_lams=1
+	print_footer($course,null, false,$glossary->is_lams);
         die;
     }
 }
@@ -233,12 +233,11 @@ function glossary_comment_print_header($course, $cm, $glossary, $entry, $action)
     $navlinks[] = array('name' => $strcomments, 'link' => "comments.php?id=$cm->id&amp;eid=$entry->id", 'type' => 'title');
     $navlinks[] = array('name' => $straction, 'link' => '', 'type' => 'action');
     $navigation = build_navigation($navlinks, $cm);
-	 //we pass a new parameter to the function so it won't we printed if is_lams=1	
+
+    //we pass a new parameter to the function so it won't we printed if is_lams=1  
     print_header_simple(format_string($glossary->name), '', $navigation,
         '', '', true, update_module_button($cm->id, $course->id, $strglossary),
-        navmenu($course, $cm),false,'',false,$cm->is_lams);
-        
-        
+	navmenu($course, $cm),false,'',false,$cm->is_lams);
 /// print original glossary entry for any comment action (add, update, delete)
     glossary_print_entry($course, $cm, $glossary, $entry, 'approval', '', false);
 }

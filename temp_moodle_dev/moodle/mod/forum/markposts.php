@@ -42,8 +42,8 @@
         print_header($course->shortname, $course->fullname, $navigation, '', '', true, "", navmenu($course, $cm));
         notice_yesno(get_string('noguesttracking', 'forum').'<br /><br />'.get_string('liketologin'),
                      $wwwroot, $returnto);
-         //we pass a new parameter to the function so it won't we printed if is_lams=1
-         print_footer($course,null, false,$cm->is_lams);
+	//we pass a new parameter to the function so it won't we printed if is_lams=1
+	print_footer($course,null, false,$cm->is_lams);
         exit;
     }
 

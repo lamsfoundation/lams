@@ -633,7 +633,7 @@ class page_generic_activity extends page_base {
     function blocks_default_position() {
         return BLOCK_POS_LEFT;
     }
-    //lams: add a new parameter so we can display or not the header depending on if is in a lams sequence or not
+    
     function print_header($title, $morenavlinks = NULL, $bodytags = '', $meta = '',$is_lams=null) {
         global $USER, $CFG;
     
@@ -662,11 +662,11 @@ class page_generic_activity extends page_base {
             $morenavlinks = array();
         }
         $navigation = build_navigation($morenavlinks, $this->modulerecord);
-        if($is_lams==0){
-        	print_header($title, $this->courserecord->fullname, $navigation, '', $meta, true, $buttons, navmenu($this->courserecord, $this->modulerecord), false, $bodytags);
-        }else{
-        	print_header();
-        }
+	if($is_lams==0){
+	  print_header($title, $this->courserecord->fullname, $navigation, '', $meta, true, $buttons, navmenu($this->courserecord, $this->modulerecord), false, $bodytags);
+	} else {
+	  print_header();
+	}
     }
     
 }

@@ -92,8 +92,8 @@
             if (!$newpageid) {
                 error("Insert page: new first page not inserted");
             }else{
-            	$uploaded=1;
-            }
+		$uploaded=1;
+	    }
         } else {
             // there are existing pages put this at the start
             $newpage->lessonid = $lesson->id;

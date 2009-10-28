@@ -328,8 +328,9 @@ function choice_show_results($choice, $course, $cm, $allresponses, $forcepublish
         $forcepublish = $choice->publish;
     }
 
-    if (!$allresponses) {
+    if (empty($allresponses)) {
         print_heading(get_string("nousersyet"));
+        return false;
     }
 
     $totalresponsecount = 0;
@@ -380,15 +381,17 @@ function choice_show_results($choice, $course, $cm, $allresponses, $forcepublish
                 // we do not get <table></table> erro from w3c validator
                 // MDL-7861
                 echo "<table class=\"choiceresponse\"><tr><td></td></tr>";
-                foreach ($allresponses[0] as $user) {
-                    echo "<tr>";
-                    echo "<td class=\"picture\">";
-                    print_user_picture($user->id, $course->id, $user->picture);
-                    echo "</td><td class=\"fullname\">";
-                    echo "<a href=\"$CFG->wwwroot/user/view.php?id=$user->id&amp;course=$course->id\">";
-                    echo fullname($user, $hascapfullnames);
-                    echo "</a>";
-                    echo "</td></tr>";
+                if (!empty($allresponses[0])) {
+                    foreach ($allresponses[0] as $user) {
+                        echo "<tr>";
+                        echo "<td class=\"picture\">";
+                        print_user_picture($user->id, $course->id, $user->picture);
+                        echo "</td><td class=\"fullname\">";
+                        echo "<a href=\"$CFG->wwwroot/user/view.php?id=$user->id&amp;course=$course->id\">";
+                        echo fullname($user, $hascapfullnames);
+                        echo "</a>";
+                        echo "</td></tr>";
+                    }
                 }
                 echo "</table></td>";
             }
@@ -717,7 +720,7 @@ function choice_get_response_data($choice, $cm, $groupmode) {
 
 /// First get all the users who have access here
 /// To start with we assume they are all "unanswered" then move them later
-    $allresponses[0] = get_users_by_capability($context, 'mod/choice:choose', 'u.id, u.picture, u.firstname, u.lastname, u.idnumber', 'u.firstname ASC', '', '', $currentgroup, '', false, true);
+    $allresponses[0] = get_users_by_capability($context, 'mod/choice:choose', 'u.id, u.picture, u.firstname, u.lastname, u.idnumber', 'u.lastname ASC,u.firstname ASC', '', '', $currentgroup, '', false, true);
 
 /// Get all the recorded responses for this choice
     $rawresponses = get_records('choice_answers', 'choiceid', $choice->id);
@@ -733,7 +736,9 @@ function choice_get_response_data($choice, $cm, $groupmode) {
             }
         }
     }
-
+    if (empty($allresponses[0])) {
+        unset($allresponses[0]);
+    }
     return $allresponses;
 }
 
@@ -743,7 +748,7 @@ function choice_get_response_data($choice, $cm, $groupmode) {
 function choice_get_extra_capabilities() {
     return array('moodle/site:accessallgroups');
 }
-//m new
+
 
 /**
  * LAMS Function
@@ -945,5 +950,5 @@ function choice_export_portfolio($id, $userid) {
 
 }
 
-//fi new
+
 ?>

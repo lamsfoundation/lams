@@ -126,7 +126,7 @@ function chat_delete_instance($id) {
 
     $pagetypes = page_import_types('mod/chat/');
     foreach($pagetypes as $pagetype) {
-        if(!delete_records('block_instance', 'pageid', $chat->id, 'pagetype', $pagetype)) {
+        if(!blocks_delete_all_on_page($pagetype, $chat->id)) {
             $result = false;
         }
     }
@@ -822,6 +822,7 @@ function chat_get_extra_capabilities() {
     return array('moodle/site:accessallgroups', 'moodle/site:viewfullnames');
 }
 
+
 /**
  * LAMS Function
  * This function clones an existing instance of Moodle chat
@@ -975,5 +976,6 @@ function chat_export_portfolio($id, $userid) {
     return $text;
 
 }
+
 
 ?>

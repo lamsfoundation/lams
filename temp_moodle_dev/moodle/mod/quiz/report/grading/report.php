@@ -27,18 +27,18 @@ class quiz_report extends quiz_default_report {
     /**
      * Displays the report.
      */
-    function display($quiz, $cm, $course,$lamsupdateurl=null) {
+    function display($quiz, $cm, $course) {
         global $CFG, $QTYPES;
-        
+
         $viewoptions = array('mode'=>'grading', 'q'=>$quiz->id);
 
         if ($questionid = optional_param('questionid', 0, PARAM_INT)){
             $viewoptions += array('questionid'=>$questionid);
         }
-        
+
         // grade question specific parameters
         $gradeungraded  = optional_param('gradeungraded', 0, PARAM_INT);
-        
+
         if ($userid    = optional_param('userid', 0, PARAM_INT)){
             $viewoptions += array('userid'=>$userid);
         }
@@ -54,11 +54,11 @@ class quiz_report extends quiz_default_report {
         if ($gradenextungraded  = optional_param('gradenextungraded', 0, PARAM_INT)){
             $viewoptions += array('gradenextungraded'=> $gradenextungraded);
         }
-        
-        
+
+
         $this->cm = $cm;
-        
-        $this->print_header_and_tabs($cm, $course, $quiz, $reportmode="grading",$lamsupdateurl);
+
+        $this->print_header_and_tabs($cm, $course, $quiz, $reportmode="grading");
 
         // Check permissions
         $this->context = get_context_instance(CONTEXT_MODULE, $cm->id);
@@ -68,12 +68,13 @@ class quiz_report extends quiz_default_report {
         }
 
         $gradeableqs = quiz_report_load_questions($quiz);
-        foreach ($gradeableqs as $qid => $questionformenu){
-            if (!$QTYPES[$questionformenu->qtype]->is_manual_graded()){
+        $questionsinuse = implode(',', array_keys($gradeableqs));
+        foreach ($gradeableqs as $qid => $question){
+            if (!$QTYPES[$question->qtype]->is_question_manual_graded($question, $questionsinuse)){
                 unset($gradeableqs[$qid]);
             }
         }
-        
+
         if (empty($gradeableqs)) {
             print_heading(get_string('noessayquestionsfound', 'quiz'));
             return true;
@@ -82,8 +83,8 @@ class quiz_report extends quiz_default_report {
         }
 
         $currentgroup = groups_get_activity_group($this->cm, true);
-        $this->users     = get_users_by_capability($this->context, 'mod/quiz:attempt','','','','',$currentgroup,'',false);
-        $this->userids   = implode(',', array_keys($this->users));
+        $this->users = get_users_by_capability($this->context, array('mod/quiz:reviewmyattempts', 'mod/quiz:attempt'),'','','','',$currentgroup,'',false);
+        $this->userids = implode(',', array_keys($this->users));
 
 
         if (!empty($questionid)) {
@@ -152,7 +153,7 @@ class quiz_report extends quiz_default_report {
                 notify(get_string('changessavedwitherrors', 'quiz'), 'notifysuccess');
             }
         }
-        $this->viewurl = new moodle_url($CFG->wwwroot.'/mod/quiz/report.php?lamsUpdateURL='.urlencode($lamsupdateurl), $viewoptions); 
+        $this->viewurl = new moodle_url($CFG->wwwroot.'/mod/quiz/report.php', $viewoptions); 
         /// find out current groups mode
 
         if ($groupmode = groups_get_activity_groupmode($this->cm)) {   // Groups are being used
@@ -216,7 +217,7 @@ class quiz_report extends quiz_default_report {
 
         $ungraded = $qattempts[$questionid]->totalattempts- $qattempts[$questionid]->gradedattempts;
         if ($gradenextungraded ||$gradeungraded || $gradeall || $userid || $attemptid){
-            $this->print_questions_and_form($quiz, $question, $userid, $attemptid, $gradeungraded, $gradenextungraded, $ungraded,$lamsupdateurl);
+            $this->print_questions_and_form($quiz, $question, $userid, $attemptid, $gradeungraded, $gradenextungraded, $ungraded);
         } else {
             $this->view_question($quiz, $question, $qattempts[$questionid]->totalattempts, $ungraded);
         }
@@ -287,11 +288,11 @@ class quiz_report extends quiz_default_report {
         // get the attempts and process them
         if ($attempts = get_records_sql($select.$from.$where.$sort,$table->get_page_start(), $table->get_page_size())) {
             // grade all link
-            $links = "<strong><a href=\"report.php?mode=grading&lamsUpdateURL=".urlencode($lamsupdateurl)."&amp;gradeall=1&amp;q=$quiz->id&amp;questionid=$question->id\">".get_string('gradeall', 'quiz_grading', $totalattempts).'</a></strong>';
+            $links = "<strong><a href=\"report.php?mode=grading&amp;gradeall=1&amp;q=$quiz->id&amp;questionid=$question->id\">".get_string('gradeall', 'quiz_grading', $totalattempts).'</a></strong>';
             if ($ungraded>0){
-                $links .="<br /><strong><a href=\"report.php?mode=grading&lamsUpdateURL=".urlencode($lamsupdateurl)."&amp;gradeungraded=1&amp;q=$quiz->id&amp;questionid=$question->id\">".get_string('gradeungraded', 'quiz_grading', $ungraded).'</a></strong>';
+                $links .="<br /><strong><a href=\"report.php?mode=grading&amp;gradeungraded=1&amp;q=$quiz->id&amp;questionid=$question->id\">".get_string('gradeungraded', 'quiz_grading', $ungraded).'</a></strong>';
                 if ($ungraded>QUIZ_REPORT_DEFAULT_GRADING_PAGE_SIZE){
-                    $links .="<br /><strong><a href=\"report.php?mode=grading&lamsUpdateURL=".urlencode($lamsupdateurl)."&amp;gradenextungraded=1&amp;q=$quiz->id&amp;questionid=$question->id\">".get_string('gradenextungraded', 'quiz_grading', QUIZ_REPORT_DEFAULT_GRADING_PAGE_SIZE).'</a></strong>';
+                    $links .="<br /><strong><a href=\"report.php?mode=grading&amp;gradenextungraded=1&amp;q=$quiz->id&amp;questionid=$question->id\">".get_string('gradenextungraded', 'quiz_grading', QUIZ_REPORT_DEFAULT_GRADING_PAGE_SIZE).'</a></strong>';
                 }
             }
             $table->add_data_keyed(array('grade'=> $links));
@@ -308,12 +309,12 @@ class quiz_report extends quiz_default_report {
                 $gradedstring = question_state_is_graded($attempt)?(' '.get_string('graded','quiz_grading')):'';
 
                 // link for the attempt
-                $attemptlink = "<a {$gradedclass}href=\"report.php?mode=grading&lamsUpdateURL=".urlencode($lamsupdateurl)."&amp;q=$quiz->id&amp;questionid=$question->id&amp;attemptid=$attempt->attemptid\">".
+                $attemptlink = "<a {$gradedclass}href=\"report.php?mode=grading&amp;q=$quiz->id&amp;questionid=$question->id&amp;attemptid=$attempt->attemptid\">".
                         userdate($attempt->timefinish, get_string('strftimedatetime')).
                         $gradedstring.'</a>';
 
                 // grade all attempts for this user
-                $gradelink = "<a href=\"report.php?mode=grading&lamsUpdateURL=".urlencode($lamsupdateurl)."&amp;q=$quiz->id&amp;questionid=$question->id&amp;userid=$attempt->userid\">".
+                $gradelink = "<a href=\"report.php?mode=grading&amp;q=$quiz->id&amp;questionid=$question->id&amp;userid=$attempt->userid\">".
                         get_string('grade').'</a>';
 
                 $table->add_data( array($picture, $userlink, $attemptlink, $gradelink) );
@@ -336,7 +337,7 @@ class quiz_report extends quiz_default_report {
      * @return void
      * @todo Finish documenting this function
      **/
-    function print_questions_and_form($quiz, $question, $userid, $attemptid, $gradeungraded, $gradenextungraded, $ungraded,$lamsupdateurl=null) {
+    function print_questions_and_form($quiz, $question, $userid, $attemptid, $gradeungraded, $gradenextungraded, $ungraded) {
         global $CFG;
 
         // TODO get the context, and put in proper roles an permissions checks.
@@ -348,7 +349,7 @@ class quiz_report extends quiz_default_report {
         list($select, $from, $where) = $this->attempts_sql($quiz->id, false, $question->id, $userid, $attemptid, $gradeungraded, $gradenextungraded);
 
         $sort = 'ORDER BY u.firstname, u.lastname, qa.attempt ASC';
-        
+
         if ($gradenextungraded){
             $attempts = get_records_sql($select.$from.$where.$sort, 0, QUIZ_REPORT_DEFAULT_GRADING_PAGE_SIZE);
         } else {
@@ -371,54 +372,59 @@ class quiz_report extends quiz_default_report {
             } else {
                 print_heading(get_string('gradingall','quiz_grading', count($attempts)), '', 3);
             }
-    
+
             // Display the form with one part for each selected attempt
-    
-            echo '<form method="post" action="report.php?lamsUpdateURL='.urlencode($lamsupdateurl).'">'.
+
+            echo '<form method="post" action="report.php">'.
                 '<input type="hidden" name="mode" value="grading" />'.
                 '<input type="hidden" name="q" value="'.$quiz->id.'" />'.
                 '<input type="hidden" name="sesskey" value="'.sesskey().'" />'.
                 '<input type="hidden" name="questionid" value="'.$question->id.'" />';
-    
+
             foreach ($attempts as $attempt) {
-    
+
                 // Load the state for this attempt (The questions array was created earlier)
                 $states = get_question_states($questions, $quiz, $attempt);
                 // The $states array is indexed by question id but because we are dealing
                 // with only one question there is only one entry in this array
                 $state = &$states[$question->id];
-    
+
                 $options = quiz_get_reviewoptions($quiz, $attempt, $context);
                 unset($options->questioncommentlink);
+                $options->noeditlink = true;
                 $copy = $state->manualcomment;
                 $state->manualcomment = '';
-    
+
                 $options->readonly = 1;
-                
+
                 $gradedclass = question_state_is_graded($state)?' class="highlightgraded" ':'';
                 $gradedstring = question_state_is_graded($state)?(' '.get_string('graded','quiz_grading')):'';
                 $a = new object();
                 $a->fullname = fullname($attempt, true);
                 $a->attempt = $attempt->attempt;
-                
+
                 // print the user name, attempt count, the question, and some more hidden fields
                 echo '<div class="boxaligncenter" width="80%" style="clear:left;padding:15px;">';
                 echo "<span$gradedclass>".get_string('gradingattempt','quiz_grading', $a);
                 echo $gradedstring."</span>";
-    
+
                 print_question($question, $state, '', $quiz, $options);
-    
-                $prefix         = "manualgrades[$attempt->uniqueid]";
-                $grade          = round($state->last_graded->grade, 3);
+
+                $prefix = "manualgrades[$attempt->uniqueid]";
+                if (!question_state_is_graded($state)) {
+                    $grade = '';
+                } else {
+                    $grade = round($state->last_graded->grade, 3);
+                }
                 $state->manualcomment = $copy;
-    
+
                 include($CFG->dirroot . '/question/comment.html');
-    
+
                 echo '</div>';
             }
             echo '<div class="boxaligncenter"><input type="submit" value="'.get_string('savechanges').'" /></div>'.
                 '</form>';
-    
+
             if ($usehtmleditor) {
                 use_html_editor();
             }
@@ -426,7 +432,7 @@ class quiz_report extends quiz_default_report {
             notify(get_string('noattemptstoshow', 'quiz'));
         }
     }
-    
+
     function attempts_sql($quizid, $wantstateevent=false, $questionid=0, $userid=0, $attemptid=0, $gradeungraded=0, $gradenextungraded=0){
         global $CFG;
         // this sql joins the attempts table and the user table
@@ -452,7 +458,7 @@ class quiz_report extends quiz_default_report {
         } else { // get all user attempts
             $where  = 'WHERE u.id IN ('.$this->userids.') ';
         }
-        
+
         $where .= ' AND u.id = qa.userid AND qa.quiz = '.$quizid;
         // ignore previews
         $where .= ' AND preview = 0 ';

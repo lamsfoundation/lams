@@ -49,8 +49,7 @@
                 </div>
                 </form>
                 </div>';
-            //we pass a new parameter to the function so it won't we printed if is_lams=1
-    		print_footer($course,null, false,$lesson->is_lams);
+            print_footer($course,null, false,$lesson->is_lams);
         }
         exit();
     }
@@ -207,6 +206,5 @@
        echo '</div>';
     }
     
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_footer($course,null, false,$cm->is_lams);
 ?>

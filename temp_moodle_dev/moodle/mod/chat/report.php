@@ -40,9 +40,8 @@
 
     if ($start and $end and !$confirmdelete) {   // Show a full transcript
         $navigation = build_navigation($strchatreport, $cm);
-         //we pass a new parameter to the function so it won't we printed if is_lams=1
         print_header_simple(format_string($chat->name).": $strchatreport", '', $navigation,
-                      '', '', true, '', navmenu($course, $cm),false,'',false,$cm->is_lams);
+			    '', '', true, '', navmenu($course, $cm),false,'',false,$cm->is_lams);
 
     /// Check to see if groups are being used here
         $groupmode = groups_get_activity_groupmode($cm);
@@ -84,17 +83,15 @@
             print_continue("report.php?id=$cm->id");
         }
 
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-		print_footer($course,null, false,$cm->is_lams);
+        print_footer($course,null, false,$cm->is_lams);
         exit;
     }
 
 
 /// Print the Sessions display
     $navigation = build_navigation($strchatreport, $cm);
-     //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_header_simple(format_string($chat->name).": $strchatreport", '', $navigation,
-                  '', '', true, '', navmenu($course, $cm),false,'',false,$cm->is_lams);
+			'', '', true, '', navmenu($course, $cm),false,'',false,$cm->is_lams);
 
     print_heading(format_string($chat->name).': '.get_string('sessions', 'chat'));
 
@@ -130,8 +127,7 @@
     if (empty($messages)) {   /// May have already got them above
         if (!$messages = get_records_select('chat_messages', "chatid = '$chat->id' $groupselect", "timestamp DESC")) {
             print_heading(get_string('nomessages', 'chat'));
-            //we pass a new parameter to the function so it won't we printed if is_lams=1
-			print_footer($course,null, false,$chat->is_lams);
+            print_footer($course,null, false,$chat->is_lams);
             exit;
         }
     }
@@ -199,7 +195,6 @@
     }
 
 /// Finish the page
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
-	print_footer($course,null, false,$cm->is_lams);
+     print_footer($course,null, false,$cm->is_lams);
 
 ?>

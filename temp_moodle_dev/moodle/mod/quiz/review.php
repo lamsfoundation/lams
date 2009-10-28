@@ -52,6 +52,12 @@
         if ($attempt->userid != $USER->id) {
             error("This is not your attempt!", 'view.php?q=' . $quiz->id);
         }
+        // Check capabilities.
+        if ($options->quizstate == QUIZ_STATE_IMMEDIATELY) {
+            require_capability('mod/quiz:attempt', $context);
+        } else {
+            require_capability('mod/quiz:reviewmyattempts', $context);
+        }
         // Can't review if Student's may review ... Responses is turned on.
         if (!$options->responses) {
             if ($options->quizstate == QUIZ_STATE_IMMEDIATELY) {
@@ -74,7 +80,15 @@
         }
     }
 
-    add_to_log($course->id, "quiz", "review", "review.php?id=$cm->id&amp;attempt=$attempt->id", "$quiz->id", "$cm->id");
+/// Bits needed to print a good URL for this page.
+    $urloptions = '';
+    if ($showall) {
+        $urloptions .= '&amp;showall=true';
+    } else if ($page > 0) {
+        $urloptions .= '&amp;page=' . $page;
+    }
+
+    add_to_log($course->id, 'quiz', 'review', 'review.php?attempt=' . $attempt->id . $urloptions, $quiz->id, $cm->id);
 
 /// Load all the questions and states needed by this script
 
@@ -121,10 +135,7 @@
                     : "";
         get_string('reviewofattempt', 'quiz', $attempt->attempt);
         $navigation = build_navigation($strreviewtitle, $cm);
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-	    print_header_simple(format_string($quiz->name), "", $navigation, "", $headtags, true, $strupdatemodule,'',false,'',false,$quiz->is_lams);
-		//old print_header_simple(format_string($quiz->name), "", $navigation, "", $headtags, true, $strupdatemodule);
-        
+	print_header_simple(format_string($quiz->name), "", $navigation, "", $headtags, true, $strupdatemodule,'',false,'',false,$quiz->is_lams);
     }
     echo '<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>'; // for overlib
 
@@ -154,9 +165,7 @@
 
     // print javascript button to close the window, if necessary
 	//always include attempt_close_js.php so when we are doing a preview we can access to appearbutton() function in lams
-    //old if (!$isteacher) {
         include('attempt_close_js.php');
-    //old }
 
 /// Work out some time-related things.
     $timelimit = (int)$quiz->timelimit * 60;
@@ -190,12 +199,6 @@
     if (has_capability('mod/quiz:viewreports', $context) &&
             count($attempts = get_records_select('quiz_attempts', "quiz = '$quiz->id' AND userid = '$attempt->userid'", 'attempt ASC')) > 1) {
     /// List of all this user's attempts for people who can see reports.
-        $urloptions = '';
-        if ($showall) {
-            $urloptions .= '&amp;showall=true';
-        } else if ($page > 0) {
-            $urloptions .= '&amp;page=' . $page;
-        }
         $attemptlist = array();
         foreach ($attempts as $at) {
             if ($at->id == $attempt->id) {
@@ -273,6 +276,8 @@
     }
 
 /// Print all the questions
+    $quiz->thispageurl = $CFG->wwwroot . '/mod/quiz/review.php?attempt=' . $attempt->id . $urloptions;
+    $quiz->cmid = $cm->id;
     $number = quiz_first_questionnumber($attempt->layout, $pagelist);
     foreach ($pagequestions as $i) {
         if (!isset($questions[$i])) {
@@ -295,13 +300,11 @@
         print_paging_bar($numpages, $page, 1, 'review.php?attempt='.$attempt->id.'&amp;');
     }
 
-    // print javascript button to close the window always, so we can access to the appearbutton function
-   //m if (!$isteacher) {
+    // print javascript button to close the window, if necessary
+	// print javascript button to close the window always, so we can access to the appearbutton function
         include('attempt_close_js.php');
-    //m}
 
     if (empty($popup)) {
-    		//we pass a new parameter to the function so it won't we printed if is_lams=1
-			print_footer($course,null, false,$quiz->is_lams);
+        print_footer($course,null, false,$quiz->is_lams);
     }
 ?>

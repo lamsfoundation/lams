@@ -97,22 +97,22 @@ class assignment_base {
      * This in turn calls the methods producing individual parts of the page
      */
     function view() {
+
         $context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
         require_capability('mod/assignment:view', $context);
 
         add_to_log($this->course->id, "assignment", "view", "view.php?id={$this->cm->id}",
                    $this->assignment->id, $this->cm->id);
-		
-	    $this->view_header();
-	
-	    $this->view_intro();
-	
-	    $this->view_dates();
-	
-	    $this->view_feedback();
-	
-	    $this->view_footer();
-		
+
+        $this->view_header();
+
+        $this->view_intro();
+
+        $this->view_dates();
+
+        $this->view_feedback();
+
+        $this->view_footer();
     }
 
     /**
@@ -126,29 +126,35 @@ class assignment_base {
      * @param $subpage string Description of subpage to be used in navigation trail
      */
     function view_header($subpage='') {
-		
+
         global $CFG;
-		
+
+
         if ($subpage) {
             $navigation = build_navigation($subpage, $this->cm);
         } else {
             $navigation = build_navigation('', $this->cm);
         }
-        //lams: if is a lams sequence don't display the moodle's navigation menus
-		if($this->cm->is_lams==1){
-			 print_header($this->pagetitle, '', '', '', '',
-	                     true, update_module_button($this->cm->id, $this->course->id, $this->strassignment));
-		}else{
-	        print_header($this->pagetitle, $this->course->fullname, $navigation, '', '',
-	                     true, update_module_button($this->cm->id, $this->course->id, $this->strassignment),
-	                     navmenu($this->course, $this->cm));
-		}
-		
+
+	//lams: if is a lams sequence don't display the moodle's navigation menus
+	if($this->cm->is_lams==1){
+		print_header($this->pagetitle, '', '', '', '',
+			true, update_module_button($this->cm->id, $this->course->id, $this->strassignment));
+	}else{
+		print_header($this->pagetitle, $this->course->fullname, $navigation, '', '',
+		true, update_module_button($this->cm->id, $this->course->id, $this->strassignment),
+		navmenu($this->course, $this->cm));
+	}
+	
+
+        print_header($this->pagetitle, $this->course->fullname, $navigation, '', '',
+                     true, update_module_button($this->cm->id, $this->course->id, $this->strassignment),
+                     navmenu($this->course, $this->cm));
+
         groups_print_activity_menu($this->cm, 'view.php?id=' . $this->cm->id);
 
         echo '<div class="reportlink">'.$this->submittedlink().'</div>';
         echo '<div class="clearer"></div>';
-        
     }
 
 
@@ -199,8 +205,8 @@ class assignment_base {
      * This will be suitable for most assignment types
      */
     function view_footer() {
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
-        print_footer($this->course,null, false,$this->cm->is_lams);
+	//we pass a new parameter to the function so it won't we printed if is_lams=1
+	print_footer($this->course,null, false,$this->cm->is_lams);
     }
 
     /**
@@ -2853,6 +2859,8 @@ function assignment_print_overview($courses, &$htmlarray) {
         return;
     }
 
+    $assignmentids = array();
+
     // Do assignment_base::isopen() here without loading the whole thing for speed
     foreach ($assignments as $key => $assignment) {
         $time = time();
@@ -2865,7 +2873,14 @@ function assignment_print_overview($courses, &$htmlarray) {
         }
         if (empty($isopen) || empty($assignment->timedue)) {
             unset($assignments[$key]);
+        }else{
+            $assignmentids[] = $assignment->id;
         }
+    }
+
+    if(empty($assignmentids)){
+        // no assigments to look at - we're done
+        return true;
     }
 
     $strduedate = get_string('duedate', 'assignment');
@@ -2876,6 +2891,29 @@ function assignment_print_overview($courses, &$htmlarray) {
     $strsubmitted = get_string('submitted', 'assignment');
     $strassignment = get_string('modulename', 'assignment');
     $strreviewed = get_string('reviewed','assignment');
+
+
+    // NOTE: we do all possible database work here *outside* of the loop to ensure this scales 
+    
+    // build up and array of unmarked submissions indexed by assigment id/ userid
+    // for use where the user has grading rights on assigment
+    $rs = get_recordset_sql("SELECT id, assignment, userid 
+                            FROM {$CFG->prefix}assignment_submissions
+                            WHERE teacher = 0 AND timemarked = 0
+                            AND assignment IN (". implode(',', $assignmentids).")");
+
+    $unmarkedsubmissions = array();
+    while ($ra = rs_fetch_next_record($rs)) {
+        $unmarkedsubmissions[$ra->assignment][$ra->userid] = $ra->id;
+    }
+    rs_close($rs);
+
+
+    // get all user submissions, indexed by assigment id
+    $mysubmissions = get_records_sql("SELECT assignment, timemarked, teacher, grade
+                                      FROM {$CFG->prefix}assignment_submissions 
+                                      WHERE userid = {$USER->id} AND 
+                                      assignment IN (".implode(',', $assignmentids).")");
 
     foreach ($assignments as $assignment) {
         $str = '<div class="assignment overview"><div class="name">'.$strassignment. ': '.
@@ -2893,13 +2931,9 @@ function assignment_print_overview($courses, &$htmlarray) {
 
             // count how many people can submit
             $submissions = 0; // init
-            if ($students = get_users_by_capability($context, 'mod/assignment:submit', '', '', '', '', 0, '', false)) {
-                 foreach ($students as $student) {
-                    if (record_exists_sql("SELECT id FROM {$CFG->prefix}assignment_submissions
-                                           WHERE assignment = $assignment->id AND
-                                               userid = $student->id AND
-                                               teacher = 0 AND
-                                               timemarked = 0")) {
+            if ($students = get_users_by_capability($context, 'mod/assignment:submit', 'u.id', '', '', '', 0, '', false)) {
+                foreach($students as $student){
+                    if(isset($unmarkedsubmissions[$assignment->id][$student->id])){
                         $submissions++;
                     }
                 }
@@ -2909,11 +2943,10 @@ function assignment_print_overview($courses, &$htmlarray) {
                 $str .= get_string('submissionsnotgraded', 'assignment', $submissions);
             }
         } else {
-            $sql = "SELECT *
-                      FROM {$CFG->prefix}assignment_submissions
-                     WHERE userid = '$USER->id'
-                       AND assignment = '{$assignment->id}'";
-            if ($submission = get_record_sql($sql)) {
+            if(isset($mysubmissions[$assignment->id])){
+
+                $submission = $mysubmissions[$assignment->id];
+
                 if ($submission->teacher == 0 && $submission->timemarked == 0) {
                     $str .= $strsubmitted . ', ' . $strnotgradedyet;
                 } else if ($submission->grade <= 0) {

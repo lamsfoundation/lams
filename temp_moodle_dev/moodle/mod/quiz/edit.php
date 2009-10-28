@@ -30,7 +30,7 @@
     //Gets Lams update URL if the quiz was created in a sequence
     $lamsupdateurl = optional_param('lamsUpdateURL', PARAM_TEXT);//lams update address to come back to Lams after editing the quiz
     $is_learner  = optional_param('is_learner',0, PARAM_INT);
-	/**
+    /**
      * Callback function called from question_list() function (which is called from showbank())
      * Displays action icon as first action for each question.
      */
@@ -44,7 +44,7 @@
                 $movearrow = 'moveleft.gif'; 
             } 
             $straddtoquiz = get_string("addtoquiz", "quiz");
-            $out = "<a title=\"$straddtoquiz\" href=\"edit.php?".$pageurl->get_query_string()."&amp;addquestion=$questionid&amp;sesskey=".sesskey()."&hola\"><img
+	    $out = "<a title=\"$straddtoquiz\" href=\"edit.php?".$pageurl->get_query_string()."&amp;addquestion=$questionid&amp;sesskey=".sesskey()."&hola\"><img            
                   src=\"$CFG->pixpath/t/$movearrow\" alt=\"$straddtoquiz\" /></a>&nbsp;";
             return $out;
         } else {
@@ -67,22 +67,27 @@
      * Callback function called from question_list() function (which is called from showbank())
      */
     function module_specific_controls($totalnumber, $recurse, $category, $cmid){
+        global $QTYPES;
+        $out = '';
         $catcontext = get_context_instance_by_id($category->contextid);
         if (has_capability('moodle/question:useall', $catcontext)){
-            for ($i = 1;$i <= min(10, $totalnumber); $i++) {
-                $randomcount[$i] = $i;
+            $randomusablequestions = $QTYPES['random']->get_usable_questions_from_category(
+                    $category->id, $recurse, '0');
+            $maxrand = count($randomusablequestions);
+            if ($maxrand > 0) {
+                for ($i = 1;$i <= min(10, $maxrand); $i++) {
+                    $randomcount[$i] = $i;
+                }
+                for ($i = 20;$i <= min(100, $maxrand); $i += 10) {
+                    $randomcount[$i] = $i;
+                }
+                $out .= '<br />';
+                $out .= get_string('addrandom', 'quiz', choose_from_menu($randomcount, 'randomcount', '1', '', '', '', true));
+                $out .= '<input type="hidden" name="recurse" value="'.$recurse.'" />';
+                $out .= '<input type="hidden" name="categoryid" value="'.$category->id.'" />';
+                $out .= ' <input type="submit" name="addrandom" value="'. get_string('add') .'" />';
+                $out .= helpbutton('random', get_string('random', 'quiz'), 'quiz', true, false, '', true);
             }
-            for ($i = 20;$i <= min(100, $totalnumber); $i += 10) {
-                $randomcount[$i] = $i;
-            }
-            $out = '<br />';
-            $out .= get_string('addrandom', 'quiz', choose_from_menu($randomcount, 'randomcount', '1', '', '', '', true));
-            $out .= '<input type="hidden" name="recurse" value="'.$recurse.'" />';
-            $out .= "<input type=\"hidden\" name=\"categoryid\" value=\"$category->id\" />";
-            $out .= ' <input type="submit" name="addrandom" value="'. get_string('add') .'" />';
-            $out .= helpbutton('random', get_string('random', 'quiz'), 'quiz', true, false, '', true);
-        } else {
-            $out = '';
         }
         return $out;
     }
@@ -167,7 +172,7 @@
     }
 
     if (($addquestion = optional_param('addquestion', 0, PARAM_INT)) and confirm_sesskey()) { /// Add a single question to the current quiz
-    	quiz_add_quiz_question($addquestion, $quiz);
+        quiz_add_quiz_question($addquestion, $quiz);
         $significantchangemade = true;
     }
 
@@ -199,8 +204,6 @@
                 WHERE qtype = '" . RANDOM . "'
                     AND category = $category->id
                     AND " . sql_compare_text('questiontext') . " = '$recurse'
-                    
-                  
                     AND NOT EXISTS (SELECT * FROM " . $CFG->prefix . "quiz_question_instances WHERE question = q.id)
                 ORDER BY id")) {
             // Take as many of these as needed.
@@ -303,16 +306,17 @@
                 error('Could not set a new maximum grade for the quiz');
             }
         }
-        //If there is a Quiz inside a Lams sequence after saving changes from your question's list you are redirect back to the Lams page
-        if ($quiz->is_lams==1){
-        	// old redirect(urldecode($lamsupdateurl)."&extToolContentID=$quiz->id");
-        	//include the javascript code so we can call the button frame and change the button properties so it can be shown
-	        if($is_learner==0){	
-	        	include('showlamsfinish.php');
-	        }else{
-	        	include('showlamsnext.php');
-	        }
-        }
+	//If there is a Quiz inside a Lams sequence after saving changes from your question's list you are redirect back to the Lams page
+	if ($quiz->is_lams==1){
+		// old redirect(urldecode($lamsupdateurl)."&extToolContentID=$quiz->id");
+		//include the javascript code so we can call the button frame and change the button properties so it can be shown
+		include('showlamsfinish.php');
+	        if($is_learner==0){ 
+			include('showlamsfinish.php');
+		}else{
+			include('showlamsnext.php');
+		}
+	}
         $significantchangemade = true;
     }
 
@@ -338,30 +342,28 @@
                     ? update_module_button($cm->id, $course->id, get_string('modulename', 'quiz'))
                     : "";
         $navigation = build_navigation($streditingquiz, $cm);
-        
-        //we pass a new parameter to the function so it won't we printed if is_lams=1
         print_header_simple($streditingquiz, '', $navigation, "", "",true, $strupdatemodule,'',false,'',false,$cm->is_lams);
-      	
+
         $currenttab = 'edit';
         $mode = 'editq';
 
         include('tabs.php');
 
         print_box_start();
+
         echo "<div class=\"quizattemptcounts\">\n";
-        echo '<a href="report.php?mode=overview&amp;id=' . $cm->id.'">' .
+        echo '<a href="report.php?mode=overview&amp;id=' . $cm->id . '">' .
                 quiz_num_attempt_summary($quiz, $cm) . '</a><br />' .
                 get_string('cannoteditafterattempts', 'quiz');
         echo "</div>\n";
+
         $sumgrades = quiz_print_question_list($quiz,  $thispageurl, false, $quiz_showbreaks, $quiz_reordertool);
-        
         if (!set_field('quiz', 'sumgrades', $sumgrades, 'id', $quiz->instance)) {
             error('Failed to set sumgrades');
         }
 
         print_box_end();
-	    //we pass a new parameter to the function so it won't we printed if is_lams=1
-	    print_footer(null,null, false,$quiz->is_lams);
+        print_footer(null,null, false,$quiz->is_lams);
         exit;
     }
 
@@ -370,9 +372,7 @@
         ? update_module_button($cm->id, $course->id, get_string('modulename', 'quiz'))
         : "";
     $navigation = build_navigation($streditingquiz, $cm);
-	//we pass a new parameter to the function so it won't we printed if is_lams=1
-	print_header_simple($streditingquiz, '', $navigation, "", "", true, $strupdatemodule,'',false,'',false,$quiz->is_lams);
-	//old print_header_simple($streditingquiz, '', $navigation, "", "", true, $strupdatemodule);
+    print_header_simple($streditingquiz, '', $navigation, "", "", true, $strupdatemodule,'',false,'',false,$quiz->is_lams);
 
     $currenttab = 'edit';
     $mode = 'editq';
@@ -383,8 +383,8 @@
     echo '<tr><td style="width:50%" valign="top">';
     print_box_start('generalbox quizquestions');
     print_heading(get_string('questionsinthisquiz', 'quiz'), '', 2);
-	$sumgrades = quiz_print_question_list($quiz, $thispageurl, true, $quiz_showbreaks, $quiz_reordertool);
-    
+
+    $sumgrades = quiz_print_question_list($quiz, $thispageurl, true, $quiz_showbreaks, $quiz_reordertool);
     if (!set_field('quiz', 'sumgrades', $sumgrades, 'id', $quiz->instance)) {
         error('Failed to set sumgrades');
     }
@@ -392,11 +392,13 @@
     print_box_end();
 
     echo '</td><td style="width:50%" valign="top">';
-	question_showbank('editq', $contexts, $thispageurl, $cm, $pagevars['qpage'], $pagevars['qperpage'], $pagevars['qsortorder'], $pagevars['qsortorderdecoded'],
-                   $pagevars['cat'], $pagevars['recurse'], $pagevars['showhidden'], $pagevars['showquestiontext']);
-                               
+
+    question_showbank('editq', $contexts, $thispageurl, $cm, $pagevars['qpage'], $pagevars['qperpage'], $pagevars['qsortorder'], $pagevars['qsortorderdecoded'],
+                    $pagevars['cat'], $pagevars['recurse'], $pagevars['showhidden'], $pagevars['showquestiontext']);
+
     echo '</td></tr>';
     echo '</table>';
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
-	print_footer($course,null, false,$quiz->is_lams);
+
+    print_footer($course,null, false,$quiz->is_lams);
 ?>
+

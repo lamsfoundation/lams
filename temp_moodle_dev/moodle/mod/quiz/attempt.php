@@ -60,8 +60,8 @@
     $ispreviewing = has_capability('mod/quiz:preview', $context);
 
     // if no questions have been set up yet redirect to edit.php
-    if (!$quiz->questions and has_capability('mod/quiz:manage', $context)) {	
-    		redirect($CFG->wwwroot . '/mod/quiz/edit.php?cmid=' . $cm->id);	
+    if (!$quiz->questions and has_capability('mod/quiz:manage', $context)) {
+        redirect($CFG->wwwroot . '/mod/quiz/edit.php?cmid=' . $cm->id);
     }
 
     if (!$ispreviewing) {
@@ -85,14 +85,13 @@
 /// Check number of attempts
     $numberofpreviousattempts = count_records_select('quiz_attempts', "quiz = '{$quiz->id}' AND " .
         "userid = '{$USER->id}' AND timefinish > 0 AND preview != 1");
-    
-    if ($quiz->attempts and $numberofpreviousattempts >= $quiz->attempts) {
-        	print_error('nomoreattempts', 'quiz', "view.php?id={$cm->id}");
+    if (!empty($quiz->attempts) and $numberofpreviousattempts >= $quiz->attempts) {
+        print_error('nomoreattempts', 'quiz', "view.php?id={$cm->id}");
     }
 
 /// Check subnet access
-    if (!$ispreviewing && $quiz->subnet && !address_in_subnet(getremoteaddr(), $quiz->subnet)) {
-	        	print_error('subneterror', 'quiz', "view.php?id={$cm->id}");
+    if (!$ispreviewing && !empty($quiz->subnet) && !address_in_subnet(getremoteaddr(), $quiz->subnet)) {
+        print_error("subneterror", "quiz", "view.php?id=$cm->id");
     }
 
 /// Check password access
@@ -100,16 +99,18 @@
         unset($SESSION->passwordcheckedquizzes[$quiz->id]);
     }
 
-    if ($quiz->password and empty($SESSION->passwordcheckedquizzes[$quiz->id])) {
+    if (!empty($quiz->password) and empty($SESSION->passwordcheckedquizzes[$quiz->id])) {
         $enteredpassword = optional_param('quizpassword', '', PARAM_RAW);
         if (optional_param('cancelpassword', false)) {
-        		redirect($CFG->wwwroot . '/mod/quiz/view.php?q=' . $quiz->id);
+            // User clicked cancel in the password form.
+            redirect($CFG->wwwroot . '/mod/quiz/view.php?q=' . $quiz->id);
         } else if (strcmp($quiz->password, $enteredpassword) === 0) {
             // User entered the correct password.
             $SESSION->passwordcheckedquizzes[$quiz->id] = true;
         } else {
-        		
-        	$url = $CFG->wwwroot . '/mod/quiz/attempt.php?q=' . $quiz->id;
+            // User entered the wrong password, or has not entered one yet.
+            $url = $CFG->wwwroot . '/mod/quiz/attempt.php?q=' . $quiz->id;
+
             if (empty($popup)) {
                 print_header('', '', '', 'quizpassword');
             }
@@ -122,7 +123,6 @@
             if (!empty($enteredpassword)) {
                 echo '<p class="notifyproblem">', get_string('passworderror', 'quiz'), '</p>';
             }
-            
 ?>
 <p><?php print_string('requirepasswordmessage', 'quiz'); ?></p>
 <form id="passwordform" method="post" action="<?php echo $url; ?>" onclick="this.autocomplete='off'">
@@ -136,14 +136,13 @@
 <?php
             print_box_end();
             if (empty($popup)) {
-            	//we pass a new parameter to the function so it won't we printed if is_lams=1
-	    		print_footer(null,null, false,$cm->is_lams);
+                print_footer(null,null, false,$cm->is_lams);
             }
             exit;
         }
     }
 
-    if ($quiz->delay1 or $quiz->delay2) {
+    if (!empty($quiz->delay1) or !empty($quiz->delay2)) {
         //quiz enforced time delay
         if ($attempts = quiz_get_user_attempts($quiz->id, $USER->id)) {
             $numattempts = count($attempts);
@@ -155,13 +154,13 @@
         if ($lastattempt_obj) {
             $lastattempt = $lastattempt_obj->timefinish;
         }
-        if ($numattempts == 1 && $quiz->delay1) {
+        if ($numattempts == 1 && !empty($quiz->delay1)) {
             if ($timenow - $quiz->delay1 < $lastattempt) {
-	        		 print_error('timedelay', 'quiz', 'view.php?q='.$quiz->id);
+                print_error('timedelay', 'quiz', 'view.php?q='.$quiz->id);
             }
-        } else if($numattempts > 1 && $quiz->delay2) {
+        } else if($numattempts > 1 && !empty($quiz->delay2)) {
             if ($timenow - $quiz->delay2 < $lastattempt) {
-	        		 print_error('timedelay', 'quiz', 'view.php?q='.$quiz->id);
+                print_error('timedelay', 'quiz', 'view.php?q='.$quiz->id);
             }
         }
     }
@@ -198,24 +197,17 @@
         }
         // make log entries
         if ($ispreviewing) {
-	        	
             add_to_log($course->id, 'quiz', 'preview',
-                           'attempt.php?id='.$cm->id,
+                           "attempt.php?id=$cm->id",
                            "$quiz->id", $cm->id);
         } else {
- 
             add_to_log($course->id, 'quiz', 'attempt',
-                           'review.php?attempt='.$attempt->id,
+                           "review.php?attempt=$attempt->id",
                            "$quiz->id", $cm->id);
         }
     } else {
-        // log continuation of attempt only if some time has lapsed
-        if (($timestamp - $attempt->timemodified) > 600) { // 10 minutes have elapsed 
-	            $address5='review.php?attempt='.$attempt->id;
-             add_to_log($course->id, 'quiz', 'continue attemp', // this action used to be called 'continue attempt' but the database field has only 15 characters
-                           $address5,
-                           "$quiz->id", $cm->id);
-        }
+         add_to_log($course->id, 'quiz', 'continue attemp', // this action used to be called 'continue attempt' but the database field has only 15 characters
+                       'review.php?attempt=' . $attempt->id, $quiz->id, $cm->id);
     }
     if (!$attempt->timestart) { // shouldn't really happen, just for robustness
         debugging('timestart was not set for this attempt. That should be impossible.', DEBUG_DEVELOPER);
@@ -239,7 +231,7 @@
     }
 
     if (!$questionlist) {
-	            print_error('noquestionsfound', 'quiz', 'view.php?q='.$quiz->id);
+        print_error('noquestionsfound', 'quiz', 'view.php?q='.$quiz->id);
     }
 
     $sql = "SELECT q.*, i.grade AS maxgrade, i.id AS instance".
@@ -250,7 +242,7 @@
 
     // Load the questions
     if (!$questions = get_records_sql($sql)) {
-	            print_error('noquestionsfound', 'quiz', 'view.php?q='.$quiz->id);
+        print_error('noquestionsfound', 'quiz', 'view.php?q='.$quiz->id);
     }
 
     // Load the question type specific information
@@ -326,9 +318,8 @@
             if ($page) {
                 $pagebit = '&amp;page=' . $page;
             }
-	            $address6=$CFG->wwwroot . '/mod/quiz/attempt.php?q=' . $quiz->id . $pagebit;
             print_error('errorprocessingresponses', 'question',
-                    $address6);
+                    $CFG->wwwroot . '/mod/quiz/attempt.php?q=' . $quiz->id . $pagebit);
         }
 
         $attempt->timemodified = $timestamp;
@@ -384,9 +375,8 @@
             print_error('errorprocessingresponses', 'question',
                     $CFG->wwwroot . '/mod/quiz/attempt.php?q=' . $quiz->id . $pagebit);
         }
-        add_to_log($course->id, 'quiz', 'close attempt',
-                           'review.php?attempt='.$attempt->id,
-                           "$quiz->id", $cm->id);
+
+        add_to_log($course->id, 'quiz', 'close attempt', 'review.php?attempt=' . $attempt->id, $quiz->id, $cm->id);
     }
 
 /// Update the quiz attempt and the overall grade for the quiz
@@ -408,12 +398,12 @@
         if (!empty($SESSION->passwordcheckedquizzes[$quiz->id])) {
             unset($SESSION->passwordcheckedquizzes[$quiz->id]);
         }
-        	 redirect($CFG->wwwroot . '/mod/quiz/review.php?attempt='.$attempt->id, 0);
+        redirect($CFG->wwwroot . '/mod/quiz/review.php?attempt='.$attempt->id, 0);
     }
 
 // Now is the right time to check the open and close times.
     if (!$ispreviewing && ($timestamp < $quiz->timeopen || ($quiz->timeclose && $timestamp > $quiz->timeclose))) {
-    	 		print_error('notavailable', 'quiz', "view.php?id={$cm->id}");
+        print_error('notavailable', 'quiz', "view.php?id={$cm->id}");
     }
 
 /// Print the quiz page ////////////////////////////////////////////////////////
@@ -431,8 +421,7 @@
                     ? update_module_button($cm->id, $course->id, get_string('modulename', 'quiz'))
                     : "";
         $navigation = build_navigation($strattemptnum, $cm);
-     //we pass a new parameter to the function so it won't we printed if is_lams=1
-	  print_header_simple(format_string($quiz->name), "", $navigation, "", $headtags, true, $strupdatemodule,'',false,'',false,$quiz->is_lams);
+        print_header_simple(format_string($quiz->name), "", $navigation, "", $headtags, true, $strupdatemodule,'',false,'',false,$quiz->is_lams);
     }
 
     echo '<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>'; // for overlib
@@ -468,8 +457,10 @@
     }
 
     // Start the form
-    echo '<form id="responseform" method="post" action="', 'attempt.php?q='. s($quiz->id). '&amp;page='. s($page), '" enctype="multipart/form-data"' .
-            ' onclick="this.autocomplete=\'off\'" onkeypress="return check_enter(event);">', "\n";
+    $quiz->thispageurl = $CFG->wwwroot . '/mod/quiz/attempt.php?q=' . s($quiz->id) . '&amp;page=' . s($page);
+    $quiz->cmid = $cm->id;
+    echo '<form id="responseform" method="post" action="', $quiz->thispageurl . '" enctype="multipart/form-data"' .
+            ' onclick="this.autocomplete=\'off\'" onkeypress="return check_enter(event);" accept-charset="utf-8">', "\n";
     if($quiz->timelimit > 0) {
         // Make sure javascript is enabled for time limited quizzes
         ?>
@@ -510,7 +501,7 @@
     if ($quiz->optionflags & QUESTION_ADAPTIVE) {
         echo "<input type=\"submit\" name=\"markall\" value=\"".get_string("markall", "quiz")."\" />\n";
     }
-    echo "<input type=\"submit\" name=\"finishattempt\" value=\"".get_string("finishattempt", "quiz")."\"onclick=\"$onclick\" />\n";
+    echo "<input type=\"submit\" name=\"finishattempt\" value=\"".get_string("finishattempt", "quiz")."\" onclick=\"$onclick\" />\n";
 
     echo "</div>";
 
@@ -548,7 +539,6 @@
 
     // Finish the page
     if (empty($popup)) {
-    	//we pass a new parameter to the function so it won't we printed if is_lams=1
-	    print_footer($course,null, false,$cm->is_lams);
+        print_footer($course,null, false,$cm->is_lams);
     }
 ?>

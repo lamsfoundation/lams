@@ -34,8 +34,8 @@
     $navlinks[] = array('name' => $strquizzes, 'link' => '', 'type' => 'activity');
     $navigation = build_navigation($navlinks);
 
-   	print_header_simple($strquizzes, '', $navigation,'', '', true, $streditquestions, navmenu($course));
-    
+    print_header_simple($strquizzes, '', $navigation,
+                 '', '', true, $streditquestions, navmenu($course));
 
 // Get all the appropriate data
     if (!$quizzes = get_all_instances_in_course("quiz", $course)) {
@@ -53,15 +53,16 @@
     }
     array_unshift($align, 'center');
 
-    $showing = 'scores';  // default
+    $showing = '';  // default
 
     if (has_capability('mod/quiz:viewreports', $coursecontext)) {
         array_push($headings, get_string('attempts', 'quiz'));
         array_push($align, 'left');
         $showing = 'stats';
-    } else if (has_capability('mod/quiz:attempt', $coursecontext)) {
+    } else if (has_any_capability(array('mod/quiz:reviewmyattempts', 'mod/quiz:attempt'), $coursecontext)) {
         array_push($headings, get_string('bestgrade', 'quiz'), get_string('feedback', 'quiz'));
         array_push($align, 'left', 'left');
+        $showing = 'scores';  // default
     }
 
     $table->head = $headings;

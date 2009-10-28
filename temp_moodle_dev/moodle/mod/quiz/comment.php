@@ -74,14 +74,14 @@
             notify(get_string('changessaved'));
             echo '<div class="boxaligncenter"><input type="button" onclick="window.opener.location.reload(1); self.close();return false;" value="' .
                     get_string('closewindow') . "\" /></div>";
-			//we pass a new parameter to the function so it won't we printed if is_lams=1
+
             print_footer(null,null, false,$quiz->is_lams);
             exit;
         }
     }
 
     question_print_comment_box($question, $state, $attempt, $CFG->wwwroot.'/mod/quiz/comment.php');
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
-    print_footer(null,null, false,$quiz->is_lams);	
+
+    print_footer(null,null, false,$quiz->is_lams);      
 
 ?>

@@ -16,12 +16,10 @@
     $mode    = optional_param('mode', get_user_preferences('lesson_view', 'collapsed'), PARAM_ALPHA);
     $pageid = optional_param('pageid', 0, PARAM_INT);
     $uploaded = optional_param('uploaded',0, PARAM_INT); // 1 if something has been edited in the lesson
-  //  $learner = optional_param('learner',0, PARAM_INT); // 1 if learner
     
     if ($mode != 'single') {
         set_user_preference('lesson_view', $mode);
     }
-    
     
     list($cm, $course, $lesson) = lesson_get_basics($id);
     
@@ -297,10 +295,11 @@
                 break;
         }
     } 
-	if($cm->is_lams==1&&$uploaded==1&&$is_learner==0){
-		 		//lams: display the next activity button 
-            	include('showlamsfinish.php');   
-	}
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
+
+    if($cm->is_lams==1&&$uploaded==1&&$is_learner==0){
+      //lams: display the next activity button
+      include('showlamsfinish.php');   
+    }
+
     print_footer($course,null, false,$cm->is_lams);
 ?>

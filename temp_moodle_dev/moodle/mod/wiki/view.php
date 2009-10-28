@@ -20,7 +20,7 @@
     $canceledit   = optional_param('canceledit','', PARAM_ALPHA);        // Editing has been cancelled
     $cacheme      = optional_param('allowcache', 1, PARAM_INT);          // Set this to 0 to try and disable page caching.
     $editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
-    
+
     // Only want to add edit log entries if we have made some changes ie submitted a form
     $editsave = optional_param('thankyou', '');
     
@@ -61,7 +61,7 @@
             error("Course Module ID was incorrect");
         }
     }
-	
+
     require_course_login($course, true, $cm);
     
     /// Add the course module info to the wiki object, for easy access.
@@ -284,13 +284,9 @@
     }
 
     $navigation = build_navigation($navlinks, $cm);
-    
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_header_simple($ewiki_title?$ewiki_title:format_string($wiki->name), "", $navigation,
                 "", "", $cacheme, update_module_button($cm->id, $course->id, $strwiki),
                 navmenu($course, $cm),false,'',false,$cm->is_lams);
-                 
-        
 
 
     /// Print Page
@@ -497,16 +493,12 @@ $strnojslockwarning
     ';
 //if is lams display navigation buttons so you can finish uploading or go to next activity
 	if($cm->is_lams==1){
-    		if($editing==1){
-				include('showlamsfinish.php');
-			}else{
-		     	//$isteacher = has_capability('mod/wiki:preview', get_context_instance(CONTEXT_MODULE, $cm->id)); // indicates if is a teacher, useful in lams
-				//if($isteacher){
-				       include('showlamsnext.php');
-				//}
-			}
+		if($editing==1){
+			include('showlamsfinish.php');
+		}else{
+			include('showlamsnext.php');
+		}
 	}
 
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_footer($course,null, false,$cm->is_lams);
 ?>

@@ -13,7 +13,8 @@
     $page        = optional_param('page', 0, PARAM_INT);     // which page to show
     $search      = optional_param('search', '');             // search string
     $returnurl   = optional_param('returnUrl', '', PARAM_TEXT);  // lams url to proceed to next in sequence
-	$editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
+    $editing  = optional_param('editing', 0, PARAM_INT); // 1 if editing in Lams
+
     $buttontext = '';
 
     if ($id) {
@@ -26,6 +27,9 @@
         if (! $forum = get_record("forum", "id", $cm->instance)) {
             error("Forum ID was incorrect");
         }
+        // move require_course_login here to use forced language for course
+        // fix for MDL-6926
+        require_course_login($course, true, $cm);
         $strforums = get_string("modulenameplural", "forum");
         $strforum = get_string("modulename", "forum");
         $buttontext = update_module_button($cm->id, $course->id, $strforum);
@@ -39,13 +43,16 @@
             error("Forum is misconfigured - don't know what course it's from");
         }
 
-        $strforums = get_string("modulenameplural", "forum");
-        $strforum = get_string("modulename", "forum");
-
         if (!$cm = get_coursemodule_from_instance("forum", $forum->id, $course->id)) {
             error("Course Module missing");
         }
 
+        // move require_course_login here to use forced language for course
+        // fix for MDL-6926
+        require_course_login($course, true, $cm);
+
+        $strforums = get_string("modulenameplural", "forum");
+        $strforum = get_string("modulename", "forum");
         $buttontext = update_module_button($cm->id, $course->id, $strforum);
 
     } else {
@@ -56,16 +63,13 @@
         $buttontext = forum_search_form($course, $search);
     }
 
-
-    require_course_login($course, true, $cm);
     $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-
 
 /// Print header.
     $navigation = build_navigation('', $cm);
     //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_header_simple(format_string($forum->name), "",
-                 $navigation, "", "", true, $buttontext, navmenu($course, $cm),false,'',false,$cm->is_lams);
+			$navigation, "", "", true, $buttontext, navmenu($course, $cm),false,'',false,$cm->is_lams);
 
 /// Some capability checks.
     if (empty($cm->visible) and !has_capability('moodle/course:viewhiddenactivities', $context)) {
@@ -87,7 +91,7 @@
     } else {
         add_to_log($course->id, "forum", "view forum", "view.php?f=$forum->id", "$forum->id");
     }
-	
+
     if($editing==1&&$cm->is_lams==1){//lams: if you are a teacher editing show lams navigation button to finish editing
 			include('showlamsfinish.php');
 	}
@@ -124,45 +128,46 @@
 
     if (!empty($USER->id) && !has_capability('moodle/legacy:guest', $context, NULL, false)) {
         $SESSION->fromdiscussion = "$FULLME";
-	        if (forum_is_forcesubscribed($forum)) {
-	            $streveryoneisnowsubscribed = get_string('everyoneisnowsubscribed', 'forum');
-	            $strallowchoice = get_string('allowchoice', 'forum');
-	            echo '<span class="helplink">' . get_string("forcessubscribe", 'forum') . '</span><br />';
-	            helpbutton("subscription", $strallowchoice, "forum");
-	            echo '&nbsp;<span class="helplink">';
-	            if (has_capability('mod/forum:managesubscriptions', $context)) {
-	                echo "<a title=\"$strallowchoice\" href=\"subscribe.php?id=$forum->id&amp;force=no\">$strallowchoice</a>";
-	            } else {
-	                echo $streveryoneisnowsubscribed;
-	            }
-	            echo '</span><br />';
-	
-	        } else if ($forum->forcesubscribe == FORUM_DISALLOWSUBSCRIBE) {
-	            $strsubscriptionsoff = get_string('disallowsubscribe','forum');
-	            echo $strsubscriptionsoff;
-	            helpbutton("subscription", $strsubscriptionsoff, "forum");
-	        } else {
-	            $streveryonecannowchoose = get_string("everyonecannowchoose", "forum");
-	            $strforcesubscribe = get_string("forcesubscribe", "forum");
-	            $strshowsubscribers = get_string("showsubscribers", "forum");
-	            echo '<span class="helplink">' . get_string("allowsallsubscribe", 'forum') . '</span><br />';
-	            helpbutton("subscription", $strforcesubscribe, "forum");
-	            echo '&nbsp;';
-	
-	            if (has_capability('mod/forum:managesubscriptions', $context)) {
-	                echo "<span class=\"helplink\"><a title=\"$strforcesubscribe\" href=\"subscribe.php?id=$forum->id&amp;force=yes\">$strforcesubscribe</a></span>";
-	            } else {
-	                echo '<span class="helplink">'.$streveryonecannowchoose.'</span>';
-	            }
-	
-	            if(has_capability('mod/forum:viewsubscribers', $context)){
-	                echo "<br />";
-	                echo "<span class=\"helplink\"><a href=\"subscribers.php?id=$forum->id\">$strshowsubscribers</a></span>";
-	            }
-	
-	            echo '<div class="helplink" id="subscriptionlink">', forum_get_subscribe_link($forum, $context,
-	                    array('forcesubscribed' => '', 'cantsubscribe' => '')), '</div>';
+        if (forum_is_forcesubscribed($forum)) {
+            $streveryoneisnowsubscribed = get_string('everyoneisnowsubscribed', 'forum');
+            $strallowchoice = get_string('allowchoice', 'forum');
+            echo '<span class="helplink">' . get_string("forcessubscribe", 'forum') . '</span><br />';
+            helpbutton("subscription", $strallowchoice, "forum");
+            echo '&nbsp;<span class="helplink">';
+            if (has_capability('mod/forum:managesubscriptions', $context)) {
+                echo "<a title=\"$strallowchoice\" href=\"subscribe.php?id=$forum->id&amp;force=no\">$strallowchoice</a>";
+            } else {
+                echo $streveryoneisnowsubscribed;
+            }
+            echo '</span><br />';
+
+        } else if ($forum->forcesubscribe == FORUM_DISALLOWSUBSCRIBE) {
+            $strsubscriptionsoff = get_string('disallowsubscribe','forum');
+            echo $strsubscriptionsoff;
+            helpbutton("subscription", $strsubscriptionsoff, "forum");
+        } else {
+            $streveryonecannowchoose = get_string("everyonecannowchoose", "forum");
+            $strforcesubscribe = get_string("forcesubscribe", "forum");
+            $strshowsubscribers = get_string("showsubscribers", "forum");
+            echo '<span class="helplink">' . get_string("allowsallsubscribe", 'forum') . '</span><br />';
+            helpbutton("subscription", $strforcesubscribe, "forum");
+            echo '&nbsp;';
+
+            if (has_capability('mod/forum:managesubscriptions', $context)) {
+                echo "<span class=\"helplink\"><a title=\"$strforcesubscribe\" href=\"subscribe.php?id=$forum->id&amp;force=yes\">$strforcesubscribe</a></span>";
+            } else {
+                echo '<span class="helplink">'.$streveryonecannowchoose.'</span>';
+            }
+
+            if(has_capability('mod/forum:viewsubscribers', $context)){
+                echo "<br />";
+                echo "<span class=\"helplink\"><a href=\"subscribers.php?id=$forum->id\">$strshowsubscribers</a></span>";
+            }
+
+            echo '<div class="helplink" id="subscriptionlink">', forum_get_subscribe_link($forum, $context,
+                    array('forcesubscribed' => '', 'cantsubscribe' => '')), '</div>';
         }
+
         if (forum_tp_can_track_forums($forum)) {
             echo '<div class="helplink" id="trackinglink">'. forum_get_tracking_link($forum). '</div>';
         }
@@ -185,7 +190,7 @@
         }
 //        print_box_start('rsslink');
         echo '<span class="wrap rsslink">';
-       rss_print_link($course->id, $userid, "forum", $forum->id, $tooltiptext);
+        rss_print_link($course->id, $userid, "forum", $forum->id, $tooltiptext);
         echo '</span>';
 //        print_box_end(); // subscription
 
@@ -237,9 +242,11 @@
 
         case 'eachuser':
             if (!empty($forum->intro)) {
-                print_box(format_text($forum->intro), 'generalbox', 'intro');
+                $options = new stdclass;
+                $options->para = false;
+                print_box(format_text($forum->intro, FORMAT_MOODLE, $options), 'generalbox', 'intro');
             }
-            echo '<p align="center">';
+            echo '<p class="mdl-align">';
             if (forum_user_can_post_discussion($forum, null, -1, $cm)) {
                 print_string("allowsdiscussions", "forum");
             } else {
@@ -263,7 +270,9 @@
 
         default:
             if (!empty($forum->intro)) {
-                print_box(format_text($forum->intro), 'generalbox', 'intro');
+                $options = new stdclass;
+                $options->para = false;
+                print_box(format_text($forum->intro, FORMAT_MOODLE, $options), 'generalbox', 'intro');
             }
             echo '<br />';
             if (!empty($showall)) {
@@ -275,8 +284,9 @@
 
             break;
     }
-  
+   
         //we pass a new parameter to the function so it won't we printed if is_lams=1
          print_footer($course,null, false,$cm->is_lams);
+
 
 ?>

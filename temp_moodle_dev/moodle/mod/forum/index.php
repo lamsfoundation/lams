@@ -80,7 +80,7 @@
     // some special ones are not.  These get placed in the general forums
     // category with the forums in section 0.
 
-    #$forums = get_records('forum', 'course', $course->id);
+    //$forums = get_records('forum', 'course', $course->id);
     $forums = get_records_select('forum', "course=$course->id and is_lams=0");
 
     $generalforums  = array();
@@ -122,18 +122,20 @@
     if (!is_null($subscribe) and !isguestuser() and !isguest()) {
         foreach ($modinfo->instances['forum'] as $forumid=>$cm) {
             $forum = $forums[$forumid];
+            $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id); 
             $cansub = false;
-            if (has_capability('mod/forum:viewdiscussion', $cm)) {
+
+            if (has_capability('mod/forum:viewdiscussion', $modcontext)) {
                 $cansub = true;
             }
             if ($cansub && $cm->visible == 0 &&
-                !has_capability('mod/forum:managesubscriptions', $cm)) 
+                !has_capability('mod/forum:managesubscriptions', $modcontext)) 
             {
                 $cansub = false;
             }
             if (!forum_is_forcesubscribed($forum)) {
                 $subscribed = forum_is_subscribed($USER->id, $forum);
-                if ($subscribe && !$subscribed && $cansub) {
+                if ((has_capability('moodle/course:manageactivities', $coursecontext, $USER->id) || $forum->forcesubscribe != FORUM_DISALLOWSUBSCRIBE) && $subscribe && !$subscribed && $cansub) {
                     forum_subscribe($USER->id, $forumid);
                 } else if (!$subscribe && $subscribed) {
                     forum_unsubscribe($USER->id, $forumid);
@@ -404,7 +406,8 @@
         print_table($learningtable);
     }
 
-     //we pass a new parameter to the function so it won't we printed if is_lams=1
-     print_footer($course,null, false,$cm->is_lams);
+    //we pass a new parameter to the function so it won't we printed if is_lams=1
+    print_footer($course,null, false,$cm->is_lams);
+
 
 ?>

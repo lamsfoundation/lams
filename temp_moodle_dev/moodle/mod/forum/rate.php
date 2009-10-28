@@ -2,6 +2,7 @@
 
 //  Collect ratings, store them, then return to where we came from
 
+/// TODO: Centralise duplicate code in rate.php and rate_ajax.php
 
     require_once('../../config.php');
     require_once('lib.php');
@@ -9,7 +10,7 @@
     $forumid = required_param('forumid', PARAM_INT); // The forum the rated posts are from
 
     if (!$forum = get_record('forum', 'id', $forumid)) {
-        error("Course ID was incorrect");
+        error("Forum ID was incorrect");
     }
 
     if (!$course = get_record('course', 'id', $forum->course)) {
@@ -39,6 +40,9 @@
 
         $discussionid = false;
 
+    /// Calculate scale values
+        $scale_values = make_grades_menu($forum->scale);
+
         foreach ((array)$data as $postid => $rating) {
             if (!is_numeric($postid)) {
                 continue;
@@ -60,6 +64,11 @@
                     // we can not rate this, ignore it - this should not happen anyway unless teacher changes setting
                     continue;
                 }
+            }
+
+        /// Check rate is valid for for that forum scale values
+            if (!array_key_exists($rating, $scale_values) && $rating != FORUM_UNSET_POST_RATING) {
+                print_error('invalidrate', 'forum', '', $rating);
             }
 
             if ($rating == FORUM_UNSET_POST_RATING) {

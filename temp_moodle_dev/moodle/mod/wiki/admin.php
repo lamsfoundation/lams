@@ -116,12 +116,11 @@
     }
 
     $navigation = build_navigation(get_string("administration","wiki"), $cm);
-    
     //we pass a new parameter to the function so it won't we printed if is_lams=1
     print_header_simple("$wiki_entry->pagename", "", $navigation,
                 $focus, "", true, update_module_button($cm->id, $course->id, $strwiki),
                 navmenu($course, $cm),false,'',false,$cm->is_lams);
-	
+
 
     ////////////////////////////////////////////////////////////
     /// Check if the Form has been submitted and display confirmation
@@ -155,8 +154,7 @@
               if(!$confirm && $form->pagestodelete) {
                 notice_yesno(get_string("removepagecheck", "wiki")."<br />".join(", ", $form->pagestodelete),
                   $link."&amp;confirm=".urlencode(join(" ",$form->pagestodelete)), $link);
-                //we pass a new parameter to the function so it won't we printed if is_lams=1
-    			print_footer($course,null, false,$cm->is_lams);
+                print_footer($course,null, false,$cm->is_lams);
                 exit;
               }
             }
@@ -177,8 +175,7 @@
                   }
                   notice_yesno(get_string("strippagecheck", "wiki")."<br />".join(", ", $pagestostrip),
                       $link.$confirm, $link);
-                  //we pass a new parameter to the function so it won't we printed if is_lams=1
-    			  print_footer($course,null, false,$cm->is_lams);
+                  print_footer($course,null, false,$cm->is_lams);
                   exit;
                 }
               }
@@ -190,8 +187,7 @@
                 $confirm="&amp;confirm=".$form->pagetocheck;
                 notice_yesno(get_string("checklinkscheck", "wiki").$form->pagetocheck,
                     $link.$confirm, $link);
-                 //we pass a new parameter to the function so it won't we printed if is_lams=1
-    			 print_footer($course,null, false,$cm->is_lams);
+                print_footer($course,null, false,$cm->is_lams);
                 exit;
               }
             }
@@ -211,8 +207,7 @@
                   if($revertedpages) {
                     notice_yesno(get_string("revertpagescheck", "wiki")."<br />".$revertedpages,
                       $link.$confirm, $link);
-                     //we pass a new parameter to the function so it won't we printed if is_lams=1
-    			     print_footer($course,null, false,$cm->is_lams);
+                    print_footer($course,null, false,$cm->is_lams);
                     exit;
                   } else {
                     $err->remark=get_string("nochangestorevert","wiki");
@@ -347,8 +342,7 @@
     print_simple_box_end();
 
 /// Finish the page
-     //we pass a new parameter to the function so it won't we printed if is_lams=1
-     print_footer($course,null, false,$cm->is_lams);
+    print_footer($course,null, false,$cm->is_lams);
     exit;
 
 ?>

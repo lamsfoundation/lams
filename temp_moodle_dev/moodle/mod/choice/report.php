@@ -3,10 +3,11 @@
     require_once("../../config.php");
     require_once("lib.php");
 
-    $id       = required_param('id', PARAM_INT);   //moduleid
-    $format   = optional_param('format', CHOICE_PUBLISH_NAMES, PARAM_INT);
-    $download = optional_param('download', '', PARAM_ALPHA);
-    $action   = optional_param('action', '', PARAM_ALPHA);
+    $id         = required_param('id', PARAM_INT);   //moduleid
+    $format     = optional_param('format', CHOICE_PUBLISH_NAMES, PARAM_INT);
+    $download   = optional_param('download', '', PARAM_ALPHA);
+    $action     = optional_param('action', '', PARAM_ALPHA);
+    $attemptids = optional_param('attemptid', array(), PARAM_INT); //get array of responses to delete.
 
     if (! $cm = get_coursemodule_from_id('choice', $id)) {
         error("Course Module ID was incorrect");
@@ -33,7 +34,6 @@
     add_to_log($course->id, "choice", "report", "report.php?id=$cm->id", "$choice->id",$cm->id);
       
     if ($action == 'delete' && has_capability('mod/choice:deleteresponses',$context)) {
-        $attemptids = isset($_POST['attemptid']) ? $_POST['attemptid'] : array(); //get array of repsonses to delete.
         choice_delete_responses($attemptids, $choice->id); //delete responses.
         redirect("report.php?id=$cm->id");
     }
@@ -41,14 +41,14 @@
     if (!$download) {
 
         $navigation = build_navigation($strresponses, $cm);
-         //we pass a new parameter to the function so it won't we printed if is_lams=1
         print_header_simple(format_string($choice->name).": $strresponses", "", $navigation, "", '', true,
-                  update_module_button($cm->id, $course->id, $strchoice), navmenu($course, $cm),false,'',false,$cm->is_lams);
-
+                  update_module_button($cm->id, $course->id, $strchoice), navmenu($course, $cm));
         /// Check to see if groups are being used in this choice
         $groupmode = groups_get_activity_groupmode($cm);
-        groups_get_activity_group($cm, true);
-        groups_print_activity_menu($cm, 'report.php?id='.$id);
+        if ($groupmode) {
+            groups_get_activity_group($cm, true);
+            groups_print_activity_menu($cm, 'report.php?id='.$id);
+        }
     } else {
         $groupmode = groups_get_activity_groupmode($cm);
     }
@@ -93,7 +93,7 @@
                     $myxls->write_string($row,3,$ug2);
 
                     if (isset($option_text)) {
-                        $myxls->write_string($row,4,format_string($useroption,true));
+                        $myxls->write_string($row,4,format_string($option_text,true));
                     }
                     $row++;
                     $pos=4;
@@ -206,7 +206,7 @@
     choice_show_results($choice, $course, $cm, $users, $format); //show table with students responses.
 
    //now give links for downloading spreadsheets. 
-    if (has_capability('mod/choice:downloadresponses',$context)) {
+    if (!empty($users) && has_capability('mod/choice:downloadresponses',$context)) {
         echo "<br />\n";
         echo "<table class=\"downloadreport\"><tr>\n";
         echo "<td>";
@@ -223,6 +223,6 @@
 
         echo "</td></tr></table>";
     }
-    //we pass a new parameter to the function so it won't we printed if is_lams=1
-	print_footer($course,null, false,$choice->is_lams);
+    print_footer($course,null, false,$choice->is_lams);
+
 ?>

@@ -62,7 +62,6 @@ function quiz_delete_quiz_question($id, &$quiz) {
 *                         This is updated by this function
 */
 function quiz_add_quiz_question($id, &$quiz) {
-	
     $questions = explode(",", $quiz->questions);
 
     if (in_array($id, $questions)) {
@@ -92,7 +91,8 @@ function quiz_add_quiz_question($id, &$quiz) {
 
     // update question grades
     $questionrecord = get_record("question", "id", $id);
-    $quiz->grades[$id] = $questionrecord->defaultgrade;
+    $quiz->grades[$id]
+            = $questionrecord->defaultgrade;
     quiz_update_question_instance($quiz->grades[$id], $id, $quiz->instance);
 
     return true;
@@ -132,10 +132,7 @@ function quiz_update_question_instance($grade, $questionid, $quizid) {
 * @param boolean $showbreaks  Indicates whether the page breaks should be displayed
 * @param boolean $showbreaks  Indicates whether the reorder tool should be displayed
 */
-
-function quiz_print_question_list($quiz, $pageurl, $allowdelete=true, $showbreaks=true, $reordertool=false, $lamsupdateurl=null) { //we pass the Lams update URL to be able later to go back to the Lams page
-	// old function quiz_print_question_list($quiz, $pageurl, $allowdelete=true, $showbreaks=true, $reordertool=false) {
-	
+function quiz_print_question_list($quiz, $pageurl, $allowdelete=true, $showbreaks=true, $reordertool=false) {
     global $USER, $CFG, $QTYPES;
 
     $strorder = get_string("order");
@@ -179,13 +176,7 @@ function quiz_print_question_list($quiz, $pageurl, $allowdelete=true, $showbreak
         $order[] = 0;
         $lastindex++;
     }
-    // If this is a Quiz inside a Lams sequence we pass the Lams update URL to the edit page
-    if($quiz->is_lams==1){
-     $address="edit.php?lamsUpdateURL=".urlencode($lamsupdateurl);
-    echo '<form method="post" action="'.$address.'">';
-    }else{
-    	echo '<form method="post" action="edit.php">';
-    }
+    echo "<form method=\"post\" action=\"edit.php\">";
     echo '<fieldset class="invisiblefieldset" style="display: block;">';
     echo "<input type=\"hidden\" name=\"sesskey\" value=\"$USER->sesskey\" />";
     echo $pageurl->hidden_params_out();
@@ -339,13 +330,7 @@ function quiz_print_question_list($quiz, $pageurl, $allowdelete=true, $showbreak
     echo "</form>\n";
 
 /// Form to choose to show pagebreaks and to repaginate quiz
-	 if($quiz->is_lams==1){ //if press GO button and in a Lams sequence you keep the lamsupdateurl to be able to come back to lams later
-	     $address2="edit.php?lamsUpdateURL=".urlencode($lamsupdateurl);
-	    echo '<form method="post" action="'.$address2.'" id="showbreaks">';
-	  }else{
-	    	echo '<form method="post" action="edit.php" id="showbreaks">';
-	  }
-    
+    echo '<form method="post" action="edit.php" id="showbreaks">';
     echo '<fieldset class="invisiblefieldset">';
     echo $pageurl->hidden_params_out(array('showbreaks', 'reordertool'));
     echo '<input type="hidden" name="sesskey" value="'.$USER->sesskey.'" />';
