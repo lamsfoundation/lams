@@ -87,7 +87,7 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="comments" length="250"
+     * @hibernate.property column="comments" length="65535"
      */
     public String getComments() {
 	return this.comments;

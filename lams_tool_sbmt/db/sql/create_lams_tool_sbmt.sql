@@ -51,7 +51,7 @@ create table tl_lasbmt11_instruction_files (
 )TYPE=InnoDB;
 create table tl_lasbmt11_report (
    report_id bigint not null auto_increment,
-   comments varchar(250),
+   comments text,
    marks float,
    date_marks_released datetime,
    mark_file_uuid bigint,
