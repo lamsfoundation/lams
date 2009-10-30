@@ -110,10 +110,15 @@ public class PasswordChangeAction extends Action {
 						errors.add("oldPassword", new ActionMessage("error.oldpassword.mismatch"));
 						log.debug("old pass wrong");
 					}
-					if(password == null || password.length() == 0 || !password.equals(passwordConfirm)) 
+					if(!password.equals(passwordConfirm)) 
 					{
 						errors.add("password", new ActionMessage("error.newpassword.mismatch"));
 						log.debug("new pass wrong");
+					}
+					if(password == null || password.length() == 0)
+					{
+					    	errors.add("password", new ActionMessage("error.password.empty"));
+					    	log.debug("new password cannot be empty");
 					}
 					if (errors.isEmpty())
 					{
