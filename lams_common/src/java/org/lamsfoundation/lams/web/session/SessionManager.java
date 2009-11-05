@@ -179,30 +179,23 @@ public class SessionManager {
 	if (ssoCookie != null) {
 	    currentSessionId = ssoCookie.getValue();
 	    Object obj = getSession(currentSessionId);
-	    // if cookie exist, but session does not. This usually menas seesion expired.
-	    // then delete the cookie first and set it null in order to create a new one
+	    log.debug(ssoCookie.getName() + " cookie exists, value " + currentSessionId);
+	    // if cookie exists, but session does not - usually means session expired.
+	    // delete the cookie first and set it to null in order to create a new one
 	    if (obj == null) {
-		createSession(currentSessionId);
-		// After changing cookie name to JSESSIONID, left cookie lifecycle management to Server
-		// removeCookie((HttpServletResponse) res,SystemSessionFilter.SYS_SESSION_COOKIE);
-		// cookie = null;
+		log.debug("corresponding session doesn't exist, removing cookie");
+		removeCookie((HttpServletResponse) res,SystemSessionFilter.SSO_SESSION_COOKIE);
+		ssoCookie = null;
 	    }
 	}
 	if (ssoCookie == null) {
-	    SessionManager.log.debug("==>Couldn't find the sso cookie");
 	    currentSessionId = (String) new UUIDHexGenerator().generate(null, null);
 	    // create new session and set it into cookie
 	    createSession(currentSessionId);
 	    ssoCookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE, currentSessionId);
-	    SessionManager.log.debug("==>Created one - " + ssoCookie.getValue());
+	    SessionManager.log.debug("==>Creating new " + SystemSessionFilter.SSO_SESSION_COOKIE + " - " + ssoCookie.getValue());
 	}
-	
-	Cookie cookie = findCookie((HttpServletRequest) req, SystemSessionFilter.SYS_SESSION_COOKIE);
-	if (cookie == null) {
-	    String value = (String) new UUIDHexGenerator().generate(null, null);
-	    cookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SYS_SESSION_COOKIE, value);
-	}
-
+	 
 	setCurrentSessionId(currentSessionId);
 	// reset session last access time
 	SessionVisitor sessionVisitor = getSessionVisitor();
@@ -441,13 +434,14 @@ public class SessionManager {
 	 * {@inheritDoc}
 	 */
 	public void invalidate() {
-
 	    Iterator iter = valueMap.entrySet().iterator();
 	    while (iter.hasNext()) {
 		Map.Entry entry = (Map.Entry) iter.next();
 		fireUnbound((String) entry.getKey(), entry.getValue());
 	    }
 	    valueMap.clear();
+	    // remove from map
+	    SessionManager.getInstance().sessionContainer.remove(this.sessionId);
 	}
 
 	/**
