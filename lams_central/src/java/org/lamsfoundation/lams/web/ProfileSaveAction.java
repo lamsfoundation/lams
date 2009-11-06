@@ -40,11 +40,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
-import org.hibernate.Hibernate;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -78,15 +79,22 @@ public class ProfileSaveAction extends Action {
 	}
 
 	ActionMessages errors = new ActionMessages();
+	
+	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)) {
+	    if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)) {
+	    	return mapping.findForward("editprofile");
+	    }
+	}
+	
 	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
 	DynaActionForm userForm = (DynaActionForm) form;
 
 	// check requestor is same as user being edited
-	log.debug("requestor: " + requestor.getLogin() + ", form login: " + userForm.get("login"));
 	if (!requestor.getLogin().equals(userForm.get("login"))) {
+	    log.warn(requestor.getLogin() + " tried to edit profile of user " + userForm.get("login"));
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.authorisation"));
 	    saveErrors(request, errors);
-	    return (mapping.getInputForward());
+	    return mapping.findForward("editprofile");
 	}
 
 	// (dyna)form validation
@@ -111,27 +119,35 @@ public class ProfileSaveAction extends Action {
 	    return (mapping.findForward("editprofile"));
 	}
 
-	BeanUtils.copyProperties(requestor, userForm);
-	SupportedLocale locale = (SupportedLocale) getService().findById(SupportedLocale.class,
-		(Integer) userForm.get("localeId"));
-	requestor.setLocale(locale);
+	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)
+		&& Configuration.getAsBoolean(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)) {
+	    // update only contact fields
+	    requestor.setEmail(userForm.getString("email"));
+	    requestor.setDayPhone(userForm.getString("dayPhone"));
+	    requestor.setEveningPhone(userForm.getString("eveningPhone"));
+	    requestor.setMobilePhone(userForm.getString("mobilePhone"));
+	    requestor.setFax(userForm.getString("fax"));
+	} else {
+	    // update all fields
+	    BeanUtils.copyProperties(requestor, userForm);
+	    SupportedLocale locale = (SupportedLocale) getService().findById(SupportedLocale.class,
+		    (Integer) userForm.get("localeId"));
+	    requestor.setLocale(locale);
 
-	Theme cssTheme = (Theme) getService().findById(Theme.class,
-		(Long) userForm.get("userCSSTheme"));
-	requestor.setHtmlTheme(cssTheme);
-	
-	Theme flashTheme = (Theme) getService().findById(Theme.class,
-		(Long) userForm.get("userFlashTheme"));
-	requestor.setFlashTheme(flashTheme);
+	    Theme cssTheme = (Theme) getService().findById(Theme.class, (Long) userForm.get("userCSSTheme"));
+	    requestor.setHtmlTheme(cssTheme);
 
-	if (userForm.get("disableLamsCommunityUsername") != null
-		&& (Boolean) userForm.get("disableLamsCommunityUsername")) {
-	    requestor.setLamsCommunityToken(null);
-	    requestor.setLamsCommunityUsername(null);
+	    Theme flashTheme = (Theme) getService().findById(Theme.class, (Long) userForm.get("userFlashTheme"));
+	    requestor.setFlashTheme(flashTheme);
+
+	    if (userForm.get("disableLamsCommunityUsername") != null
+		    && (Boolean) userForm.get("disableLamsCommunityUsername")) {
+		requestor.setLamsCommunityToken(null);
+		requestor.setLamsCommunityUsername(null);
+	    }
 	}
 
 	getService().save(requestor);
-	log.debug("profile edited: " + requestor);
 
 	// replace UserDTO in the shared session
 	HttpSession ss = SessionManager.getSession();

@@ -19,6 +19,8 @@
 </logic:messagesPresent>
 
 <c:set var="serverFlashEnabled"><%=Configuration.get(ConfigurationKeys.FLASH_ENABLE)%></c:set>
+<c:set var="profileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_EDIT_ENABLE)%></c:set>
+<c:set var="partialProfileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)%></c:set>
 
 <div style="clear:both;"></div>
 
@@ -40,69 +42,69 @@
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.title"/>:</td>
-		<td><html:text property="title" size="32" maxlength="32" /></td>
+		<td><html:text property="title" size="32" maxlength="32" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.first_name"/> *:</td>
-		<td><html:text property="firstName" size="50" maxlength="128" /></td>
+		<td><html:text property="firstName" size="50" maxlength="128" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.last_name"/> *:</td>
-		<td><html:text property="lastName" size="50" maxlength="128" /></td>
+		<td><html:text property="lastName" size="50" maxlength="128" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.email"/> *:</td>
-		<td><html:text property="email" size="50" maxlength="128" /></td>
+		<td><html:text property="email" size="50" maxlength="128" disabled="${!profileEditEnabled and !partialProfileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.address_line_1"/>:</td>
-		<td><html:text property="addressLine1" size="50" maxlength="64" /></td>
+		<td><html:text property="addressLine1" size="50" maxlength="64" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.address_line_2"/>:</td>
-		<td><html:text property="addressLine2" size="50" maxlength="64" /></td>
+		<td><html:text property="addressLine2" size="50" maxlength="64" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.address_line_3"/>:</td>
-		<td><html:text property="addressLine3" size="50" maxlength="64" /></td>
+		<td><html:text property="addressLine3" size="50" maxlength="64" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.city"/>:</td>
-		<td><html:text property="city" size="50" maxlength="64" /></td>
+		<td><html:text property="city" size="50" maxlength="64" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.state"/>:</td>
-		<td><html:text property="state" size="50" maxlength="64" /></td>
+		<td><html:text property="state" size="50" maxlength="64" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.postcode"/>:</td>
-		<td><html:text property="postcode" size="10" maxlength="10" /></td>
+		<td><html:text property="postcode" size="10" maxlength="10" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.country"/>:</td>
-		<td><html:text property="country" size="50" maxlength="64" /></td>
+		<td><html:text property="country" size="50" maxlength="64" disabled="${!profileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.day_phone"/>:</td>
-		<td><html:text property="dayPhone" size="50" maxlength="64" /></td>
+		<td><html:text property="dayPhone" size="50" maxlength="64" disabled="${!profileEditEnabled and !partialProfileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.evening_phone"/>:</td>
-		<td><html:text property="eveningPhone" size="50" maxlength="64" /></td>
+		<td><html:text property="eveningPhone" size="50" maxlength="64" disabled="${!profileEditEnabled and !partialProfileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.mobile_phone"/>:</td>
-		<td><html:text property="mobilePhone" size="50" maxlength="64" /></td>
+		<td><html:text property="mobilePhone" size="50" maxlength="64" disabled="${!profileEditEnabled and !partialProfileEditEnabled}" /></td>
 	</tr>
 	<tr>
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
-		<td><html:text property="fax" size="50" maxlength="64" /></td>
+		<td><html:text property="fax" size="50" maxlength="64" disabled="${!profileEditEnabled and !partialProfileEditEnabled}" /></td>
 	</tr>
 	<c:choose>
 		<c:when test="${serverFlashEnabled}"> 
 			<tr>
 			<td class="align-right"><fmt:message key="label.enable.flash"/>:</td>
-			<td><html:select property="enableFlash">
+			<td><html:select property="enableFlash" disabled="${!profileEditEnabled}" >
 				<html:option value="true"><fmt:message key="label.yes"/></html:option>
 				<html:option value="false"><fmt:message key="label.no"/></html:option>
 				</html:select>
@@ -117,7 +119,7 @@
 	<tr>
 		<td class="align-right"><fmt:message key="label.language"/>:</td>
 		<td>
-			<html:select property="localeId">
+			<html:select property="localeId" disabled="${!profileEditEnabled}" >
 				<c:forEach items="${locales}" var="locale">
 					<html:option value="${locale.localeId}">
 						<c:out value="${locale.description}" />
@@ -129,7 +131,7 @@
 		<tr>
 		<td class="align-right"><fmt:message key="label.timezone.title"/>:</td>
 		<td>
-			<html:select property="timeZone">
+			<html:select property="timeZone" disabled="${!profileEditEnabled}" >
 				<c:forEach begin="0" end="30" var="index">
 					<html:option value="${index}">
 						<fmt:message key="label.timezone.${index}"/>
@@ -144,7 +146,7 @@
 			 But for simplicity of coding, we keep it as a negative value - "should the tutorials be disabled?"
 			 This is the reason to mix true/false and yes/no answers.
 		-->
-		<td><html:select property="tutorialsDisabled">
+		<td><html:select property="tutorialsDisabled" disabled="${!profileEditEnabled}" >
 			<html:option value="false"><fmt:message key="label.yes"/></html:option>
 			<html:option value="true"><fmt:message key="label.no"/></html:option>
 			</html:select>
@@ -153,7 +155,7 @@
 	<tr>
 		<td class="align-right"><fmt:message key="label.html.htmlTheme"/>:</td>
 		<td>
-		<html:select property="userCSSTheme">
+		<html:select property="userCSSTheme" disabled="${!profileEditEnabled}" >
 			<c:forEach items="${cssThemes}" var="theme">	
 				<html:option value="${theme.themeId}">${theme.name}</html:option>
 			</c:forEach>
@@ -163,7 +165,7 @@
 	<tr>
 		<td class="align-right"><fmt:message key="label.html.flashTheme"/>:</td>
 		<td>
-		<html:select property="userFlashTheme">
+		<html:select property="userFlashTheme" disabled="${!profileEditEnabled}" >
 			<c:forEach items="${flashThemes}" var="theme">	
 				<html:option value="${theme.themeId}">${theme.name}</html:option>
 			</c:forEach>
@@ -179,7 +181,7 @@
 				</fmt:message>
 			:</td> 
 			<td>
-				<html:checkbox property="disableLamsCommunityUsername"></html:checkbox>
+				<html:checkbox property="disableLamsCommunityUsername" disabled="${!profileEditEnabled}" ></html:checkbox>
 			</td>
 		</tr>
 	</c:if>
@@ -270,7 +272,7 @@
 	<tr>
 		<td class="align-right"><fmt:message key="label.html.htmlTheme"/>:</td>
 		<td>
-		<html:select property="userCSSTheme">
+		<html:select property="userCSSTheme" disabled="${!profileEditEnabled}" >
 			<c:forEach items="${cssThemes}" var="theme">	
 				<html:option value="${theme.themeId}">${theme.name}</html:option>
 			</c:forEach>
@@ -280,7 +282,7 @@
 	<tr>
 		<td class="align-right"><fmt:message key="label.html.flashTheme"/>:</td>
 		<td>
-		<html:select property="userFlashTheme">
+		<html:select property="userFlashTheme" disabled="${!profileEditEnabled}" >
 			<c:forEach items="${flashThemes}" var="theme">	
 				<html:option value="${theme.themeId}">${theme.name}</html:option>
 			</c:forEach>
@@ -291,7 +293,7 @@
 		<c:when test="${serverFlashEnabled}"> 
 			<tr>
 			<td class="align-right"><fmt:message key="label.enable.flash"/>:<bean:write name="UserForm" property="enableFlash" /></td>
-			<td><html:select property="enableFlash">
+			<td><html:select property="enableFlash" disabled="${!profileEditEnabled}" >
 				<html:option value="true"><fmt:message key="label.yes"/></html:option>
 				<html:option value="false"><fmt:message key="label.no"/></html:option>
 				</html:select>
@@ -327,7 +329,7 @@
 			 But for simplicity of coding, we keep it as a negative value - "should the tutorials be disabled?"
 			 This is the reason to mix true/false and yes/no answers.
 		-->
-		<td><html:select property="tutorialsDisabled">
+		<td><html:select property="tutorialsDisabled" disabled="${!profileEditEnabled}" >
 			<html:option value="false"><fmt:message key="label.yes"/></html:option>
 			<html:option value="true"><fmt:message key="label.no"/></html:option>
 			</html:select>
@@ -341,8 +343,10 @@
 			
 			
 			<div class="space-top" align="center">
+			<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
 			<html:submit styleClass="button"><fmt:message key="button.save"/></html:submit>
 			<html:reset styleClass="button"><fmt:message key="button.reset"/></html:reset>
+			</c:if>
 			<html:cancel styleClass="button"><fmt:message key="button.cancel"/></html:cancel>
 			</div>
 

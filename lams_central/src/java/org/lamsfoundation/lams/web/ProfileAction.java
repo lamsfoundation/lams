@@ -36,6 +36,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
@@ -194,6 +196,16 @@ public class ProfileAction extends LamsDispatchAction {
     public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
+	ActionMessages errors = new ActionMessages();
+	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)) {
+	    if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.edit.disabled"));
+	    } else {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.partial.edit.only"));
+	    }
+	    saveErrors(request, errors);
+	}
+	
 	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
 	DynaActionForm userForm = (DynaActionForm) form;
 	BeanUtils.copyProperties(userForm, requestor);

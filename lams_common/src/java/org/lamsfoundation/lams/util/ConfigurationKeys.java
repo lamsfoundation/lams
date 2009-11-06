@@ -252,5 +252,9 @@ public class ConfigurationKeys {
     public static String SMTP_AUTH_USER = "SMTPUser";
     
     public static String SMTP_AUTH_PASSWORD = "SMTPPassword";
+    
+    public static String PROFILE_EDIT_ENABLE = "ProfileEditEnable";
+    
+    public static String PROFILE_PARTIAL_EDIT_ENABLE = "ProfilePartialEditEnable";
 
 }
