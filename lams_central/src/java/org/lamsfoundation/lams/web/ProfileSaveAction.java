@@ -57,14 +57,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 
 /**
- * @struts.action path="/saveprofile" name="UserForm" input=".editprofile"
- *                scope="request" validate="false"
+ * @struts.action path="/saveprofile" name="UserForm" input=".editprofile" scope="request" validate="false"
  * 
- * @struts.action-forward name="profile"
- *                        path="/index.do?state=active&amp;tab=profile"
- *                        redirect="true"
- * @struts.action-forward name="editprofile"
- *                        path="/index.do?state=active&amp;tab=editprofile"
+ * @struts.action-forward name="profile" path="/index.do?state=active&amp;tab=profile" redirect="true"
+ * @struts.action-forward name="editprofile" path="/index.do?state=active&amp;tab=editprofile"
  */
 public class ProfileSaveAction extends Action {
 
@@ -79,13 +75,13 @@ public class ProfileSaveAction extends Action {
 	}
 
 	ActionMessages errors = new ActionMessages();
-	
+
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)) {
 	    if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)) {
-	    	return mapping.findForward("editprofile");
+		return mapping.findForward("editprofile");
 	    }
 	}
-	
+
 	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
 	DynaActionForm userForm = (DynaActionForm) form;
 

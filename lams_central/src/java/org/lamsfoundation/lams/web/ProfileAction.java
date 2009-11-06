@@ -71,8 +71,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 
 /**
- * @struts:action path="/profile" name="UserForm" scope="request"
- *                parameter="method" validate="false"
+ * @struts:action path="/profile" name="UserForm" scope="request" parameter="method" validate="false"
  * 
  * @struts:action-forward name="view" path=".profile"
  * @struts:action-forward name="lessons" path=".lessons"
@@ -205,7 +204,7 @@ public class ProfileAction extends LamsDispatchAction {
 	    }
 	    saveErrors(request, errors);
 	}
-	
+
 	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
 	DynaActionForm userForm = (DynaActionForm) form;
 	BeanUtils.copyProperties(userForm, requestor);
@@ -236,12 +235,12 @@ public class ProfileAction extends LamsDispatchAction {
 		}
 	    }
 	}
-	// if still null, use the default 
+	// if still null, use the default
 	if (userSelectedCSSTheme == null) {
 	    userSelectedCSSTheme = themeService.getDefaultCSSTheme().getThemeId();
 	}
 	userForm.set("userCSSTheme", userSelectedCSSTheme);
-	
+
 	// Get all the flash themes
 	List<Theme> flashThemes = themeService.getAllFlashThemes();
 	request.setAttribute("flashThemes", flashThemes);
@@ -256,7 +255,7 @@ public class ProfileAction extends LamsDispatchAction {
 		}
 	    }
 	}
-	// if still null, use the default 
+	// if still null, use the default
 	if (userSelectedFlashTheme == null) {
 	    userSelectedFlashTheme = themeService.getDefaultFlashTheme().getThemeId();
 	}
