@@ -179,11 +179,12 @@ public class SessionManager {
 	if (ssoCookie != null) {
 	    currentSessionId = ssoCookie.getValue();
 	    Object obj = getSession(currentSessionId);
-	    log.debug(ssoCookie.getName() + " cookie exists, value " + currentSessionId);
+	    //log.debug(ssoCookie.getName() + " cookie exists, value " + currentSessionId);
 	    // if cookie exists, but session does not - usually means session expired.
 	    // delete the cookie first and set it to null in order to create a new one
 	    if (obj == null) {
-		log.debug("corresponding session doesn't exist, removing cookie");
+		log.debug(SystemSessionFilter.SSO_SESSION_COOKIE + " " + currentSessionId 
+			+ " cookie exists, but corresponding session doesn't exist, removing cookie");
 		removeCookie((HttpServletResponse) res,SystemSessionFilter.SSO_SESSION_COOKIE);
 		ssoCookie = null;
 	    }
