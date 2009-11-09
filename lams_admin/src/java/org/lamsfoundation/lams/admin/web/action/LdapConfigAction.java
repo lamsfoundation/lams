@@ -48,184 +48,177 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 
 /**
  * @author jliew
- *
- * @struts:action path="/ldap"
- *              scope="request"
- * 				validate="false"
+ * 
+ * @struts:action path="/ldap" scope="request" validate="false"
  * 
  * @struts:action-forward name="ldap" path=".ldap"
  * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
  */
 public class LdapConfigAction extends Action {
 
-	private static Logger log = Logger.getLogger(LdapConfigAction.class);
-	private static IUserManagementService service;
-	private static LdapService ldapService;
-	private static MessageService messageService;
-	private static Configuration configurationService;
-	
-	private IUserManagementService getService() {
-		if (service == null) {
-			service = AdminServiceProxy.getService(getServlet().getServletContext());
-		}
-		return service;
+    private static Logger log = Logger.getLogger(LdapConfigAction.class);
+    private static IUserManagementService service;
+    private static LdapService ldapService;
+    private static MessageService messageService;
+    private static Configuration configurationService;
+
+    private IUserManagementService getService() {
+	if (service == null) {
+	    service = AdminServiceProxy.getService(getServlet().getServletContext());
 	}
-	
-	private LdapService getLdapService() {
-		if (ldapService == null) {
-			ldapService = AdminServiceProxy.getLdapService(getServlet().getServletContext());
-		}
-		return ldapService;
+	return service;
+    }
+
+    private LdapService getLdapService() {
+	if (ldapService == null) {
+	    ldapService = AdminServiceProxy.getLdapService(getServlet().getServletContext());
 	}
-	
-	private MessageService getMessageService() {
-		if (messageService == null) {
-			messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-		}
-		return messageService;
+	return ldapService;
+    }
+
+    private MessageService getMessageService() {
+	if (messageService == null) {
+	    messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
 	}
-	
-	private Configuration getConfiguration() {
-		if (configurationService == null) {
-		    configurationService = AdminServiceProxy.getConfiguration(getServlet().getServletContext());
-		}
-		return configurationService;
+	return messageService;
+    }
+
+    private Configuration getConfiguration() {
+	if (configurationService == null) {
+	    configurationService = AdminServiceProxy.getConfiguration(getServlet().getServletContext());
 	}
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		String action = WebUtil.readStrParam(request, "action", true);
-		if (action != null) {
-			if (StringUtils.equals(action, "sync")) return sync(mapping, form, request, response);
-			if (StringUtils.equals(action, "waiting")) return waiting(mapping, form, request, response);
-			if (StringUtils.equals(action, "results")) return results(mapping, form, request, response);
-		}
-		
-		request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_ONLY_LDAP));
-		
-		int numLdapUsers = getNumLdapUsers();
-		request.setAttribute("numLdapUsersMsg", getNumLdapUsersMsg(numLdapUsers));
-		
-		return mapping.findForward("ldap");
+	return configurationService;
+    }
+
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	String action = WebUtil.readStrParam(request, "action", true);
+	if (action != null) {
+	    if (StringUtils.equals(action, "sync"))
+		return sync(mapping, form, request, response);
+	    if (StringUtils.equals(action, "waiting"))
+		return waiting(mapping, form, request, response);
+	    if (StringUtils.equals(action, "results"))
+		return results(mapping, form, request, response);
 	}
-	
-	public ActionForward sync(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		String sessionId = (String)SessionManager.getSession().getId();
-		Thread t = new Thread(new LdapSyncThread(sessionId));
-		t.start();
-		
-		request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));
-		
-		return mapping.findForward("ldap");
+
+	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_ONLY_LDAP));
+
+	int numLdapUsers = getNumLdapUsers();
+	request.setAttribute("numLdapUsersMsg", getNumLdapUsersMsg(numLdapUsers));
+
+	return mapping.findForward("ldap");
+    }
+
+    public ActionForward sync(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	String sessionId = (String) SessionManager.getSession().getId();
+	Thread t = new Thread(new LdapSyncThread(sessionId));
+	t.start();
+
+	request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));
+
+	return mapping.findForward("ldap");
+    }
+
+    public ActionForward waiting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));
+
+	return mapping.findForward("ldap");
+    }
+
+    public ActionForward results(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	HttpSession ss = SessionManager.getSession();
+	Object o = ss.getAttribute(ILdapService.SYNC_RESULTS);
+	if (o instanceof BulkUpdateResultDTO) {
+	    BulkUpdateResultDTO dto = (BulkUpdateResultDTO) o;
+
+	    int numLdapUsers = getNumLdapUsers();
+	    request.setAttribute("numLdapUsersMsg", getNumLdapUsersMsg(numLdapUsers));
+
+	    request.setAttribute("numSearchResults", getNumSearchResultsUsersMsg(dto.getNumSearchResults()));
+	    request.setAttribute("numLdapUsersCreated", getNumCreatedUsersMsg(dto.getNumUsersCreated()));
+	    request.setAttribute("numLdapUsersUpdated", getNumUpdatedUsersMsg(dto.getNumUsersUpdated()));
+	    request.setAttribute("numLdapUsersDisabled", getNumDisabledUsersMsg(dto.getNumUsersDisabled()));
+	    request.setAttribute("messages", dto.getMessages());
+	    request.setAttribute("done", getMessageService().getMessage("msg.done"));
+	} else {
+	    ArrayList<String> list = new ArrayList<String>();
+	    list.add((String) o);
+	    request.setAttribute("messages", list);
+	    request.setAttribute("done", getMessageService().getMessage("msg.done"));
 	}
-	
-	public ActionForward waiting(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		request.setAttribute("wait", getMessageService().getMessage("msg.ldap.synchronise.wait"));
-		
-		return mapping.findForward("ldap");
+
+	// remove session variable that flags bulk update as done
+	ss.removeAttribute(ILdapService.SYNC_RESULTS);
+
+	return mapping.findForward("ldap");
+    }
+
+    private int getNumLdapUsers() {
+	Integer count = getService().getCountUsers(AuthenticationMethod.LDAP);
+	return (count != null ? count.intValue() : -1);
+    }
+
+    private String getNumLdapUsersMsg(int numLdapUsers) {
+	String[] args = new String[1];
+	args[0] = String.valueOf(numLdapUsers);
+	return getMessageService().getMessage("msg.num.ldap.users", args);
+    }
+
+    private String getNumSearchResultsUsersMsg(int searchResults) {
+	String[] args = new String[1];
+	args[0] = String.valueOf(searchResults);
+	return getMessageService().getMessage("msg.num.search.results.users", args);
+    }
+
+    private String getNumCreatedUsersMsg(int created) {
+	String[] args = new String[1];
+	args[0] = String.valueOf(created);
+	return getMessageService().getMessage("msg.num.created.users", args);
+    }
+
+    private String getNumUpdatedUsersMsg(int updated) {
+	String[] args = new String[1];
+	args[0] = String.valueOf(updated);
+	return getMessageService().getMessage("msg.num.updated.users", args);
+    }
+
+    private String getNumDisabledUsersMsg(int disabled) {
+	String[] args = new String[1];
+	args[0] = String.valueOf(disabled);
+	return getMessageService().getMessage("msg.num.disabled.users", args);
+    }
+
+    private class LdapSyncThread implements Runnable {
+	private String sessionId;
+
+	private Logger log = Logger.getLogger(LdapSyncThread.class);
+
+	public LdapSyncThread(String sessionId) {
+	    this.sessionId = sessionId;
 	}
-	
-	public ActionForward results(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		HttpSession ss = SessionManager.getSession();
-		Object o = ss.getAttribute(ILdapService.SYNC_RESULTS);
-		if (o instanceof BulkUpdateResultDTO) {
-        		BulkUpdateResultDTO dto = (BulkUpdateResultDTO)o;
-        		
-        		int numLdapUsers = getNumLdapUsers();
-        		request.setAttribute("numLdapUsersMsg", getNumLdapUsersMsg(numLdapUsers));
-        		
-        		request.setAttribute("numSearchResults", getNumSearchResultsUsersMsg(dto.getNumSearchResults()));
-        		request.setAttribute("numLdapUsersCreated", getNumCreatedUsersMsg(dto.getNumUsersCreated()));
-        		request.setAttribute("numLdapUsersUpdated", getNumUpdatedUsersMsg(dto.getNumUsersUpdated()));
-        		request.setAttribute("numLdapUsersDisabled", getNumDisabledUsersMsg(dto.getNumUsersDisabled()));
-        		request.setAttribute("messages", dto.getMessages());
-        		request.setAttribute("done", getMessageService().getMessage("msg.done"));
-		} else {
-		    	ArrayList<String> list = new ArrayList<String>();
-		    	list.add((String)o);
-		    	request.setAttribute("messages", list);
-    			request.setAttribute("done", getMessageService().getMessage("msg.done"));
-		}
-		
-		// remove session variable that flags bulk update as done
-		ss.removeAttribute(ILdapService.SYNC_RESULTS);
-		
-		return mapping.findForward("ldap");
+
+	public void run() {
+	    this.log.info("=== Beginning LDAP user sync ===");
+	    long start = System.currentTimeMillis();
+	    try {
+		BulkUpdateResultDTO dto = getLdapService().bulkUpdate();
+		long end = System.currentTimeMillis();
+		this.log.info("=== Finished LDAP user sync ===");
+		this.log.info("Bulk update took " + (end - start) / 1000 + " seconds.");
+		SessionManager.getSession(sessionId).setAttribute(ILdapService.SYNC_RESULTS, dto);
+	    } catch (Exception e) {
+		String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+		SessionManager.getSession(sessionId).setAttribute(ILdapService.SYNC_RESULTS, message);
+		e.printStackTrace();
+	    }
 	}
-	
-	private int getNumLdapUsers() {
-		Integer count = getService().getCountUsers(AuthenticationMethod.LDAP);
-		return (count != null ? count.intValue() : -1);
-	}
-	
-	private String getNumLdapUsersMsg(int numLdapUsers) {
-		String[] args = new String[1];
-		args[0] = String.valueOf(numLdapUsers);
-		return getMessageService().getMessage("msg.num.ldap.users", args);
-	}
-	
-	private String getNumSearchResultsUsersMsg(int searchResults) {
-		String[] args = new String[1];
-		args[0] = String.valueOf(searchResults);
-		return getMessageService().getMessage("msg.num.search.results.users", args);
-	}
-	
-	private String getNumCreatedUsersMsg(int created) {
-		String[] args = new String[1];
-		args[0] = String.valueOf(created);
-		return getMessageService().getMessage("msg.num.created.users", args);
-	}
-	
-	private String getNumUpdatedUsersMsg(int updated) {
-		String[] args = new String[1];
-		args[0] = String.valueOf(updated);
-		return getMessageService().getMessage("msg.num.updated.users", args);
-	}
-	
-	private String getNumDisabledUsersMsg(int disabled) {
-		String[] args = new String[1];
-		args[0] = String.valueOf(disabled);
-		return getMessageService().getMessage("msg.num.disabled.users", args);
-	}
-	
-	private class LdapSyncThread implements Runnable {
-		private String sessionId;
-		
-		private Logger log = Logger.getLogger(LdapSyncThread.class); 
-		
-		public LdapSyncThread(String sessionId) {
-			this.sessionId = sessionId;
-		}
-		
-		public void run() {
-		    this.log.info("=== Beginning LDAP user sync ===");
-			long start = System.currentTimeMillis();
-			try {
-        			BulkUpdateResultDTO dto = getLdapService().bulkUpdate();
-        			long end = System.currentTimeMillis();
-        			this.log.info("=== Finished LDAP user sync ===");
-        			this.log.info("Bulk update took " + (end-start)/1000 + " seconds.");
-        			SessionManager.getSession(sessionId).setAttribute(ILdapService.SYNC_RESULTS, dto);
-			} catch (Exception e) {
-			    String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
-			    SessionManager.getSession(sessionId).setAttribute(ILdapService.SYNC_RESULTS, message);
-			    e.printStackTrace();
-			}
-		}
-	}
+    }
 }
