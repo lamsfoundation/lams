@@ -23,7 +23,9 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,6 +61,12 @@ public class Configuration implements InitializingBean {
     protected static RegistrationDAO registrationDAO;
     
     protected MessageService messageService;
+    
+    public static final int ITEMS_ALL = 1;
+    
+    public static final int ITEMS_NON_LDAP = 2;
+    
+    public static final int ITEMS_ONLY_LDAP = 3;
 
     /**
      * @param configurationDAO
@@ -192,6 +200,60 @@ public class Configuration implements InitializingBean {
 	} else {
 	    System.setProperty(key, value);
 	}
+    }
+    
+    /**
+     * Get contents of lams_configuration and group them using header names as key.
+     * @param filter ITEMS_ALL: include all items; ITEMS_NON_LDAP: include non-ldap items only; 
+     * ITEMS_ONLY_LDAP: include ldap-only items.
+     * @return
+     */
+    public HashMap<String, ArrayList<ConfigurationItem>> arrangeItems(int filter) {
+	List originalList = getAllItems();
+	HashMap<String, ArrayList<ConfigurationItem>> groupedList = new HashMap<String, ArrayList<ConfigurationItem>>();
+
+	for (int i = 0; i < originalList.size(); i++) {
+	    ConfigurationItem item = (ConfigurationItem) originalList.get(i);
+	    String header = item.getHeaderName();
+	    
+	    switch (filter) {
+	    case ITEMS_ALL:
+		// all items included
+		break;
+	    case ITEMS_NON_LDAP:
+		// non-ldap items only
+		if (StringUtils.contains(header, "config.header.ldap")) {
+		    continue;
+		}
+		break;
+	    case ITEMS_ONLY_LDAP:
+		// ldap-only items
+		if (!StringUtils.contains(header, "config.header.ldap")) {
+		    continue;
+		}
+		break;
+	    default:
+		break;
+	    }
+	    
+	    if (!groupedList.containsKey(header)) {
+		groupedList.put(header, new ArrayList<ConfigurationItem>());
+	    }
+	    ArrayList<ConfigurationItem> currentList = groupedList.get(header);
+	    currentList.add(item);
+	    groupedList.put(header, currentList);
+	}
+	
+	return groupedList;
+    }
+    
+    /**
+     * Get contents of lams_configuration and group them using header names as key.  Includes ldap
+     * items.
+     * @return
+     */
+    public HashMap<String, ArrayList<ConfigurationItem>> arrangeItems() {
+	return arrangeItems(ITEMS_ALL);
     }
     
     public static void saveOrUpdateRegistration(Registration reg){

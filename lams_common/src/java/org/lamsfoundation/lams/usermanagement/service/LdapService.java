@@ -480,7 +480,7 @@ public class LdapService implements ILdapService {
 		// if supported
 		ctx.setRequestControls(new Control[] { new PagedResultsControl(pageSize, Control.NONCRITICAL) });
 	    } catch (Exception e) {
-		messages.add("Error creating control.");
+		messages.add("Error creating control: " + e.getMessage());
 		log.error(e, e);
 	    }
 
@@ -546,6 +546,9 @@ public class LdapService implements ILdapService {
 	    log.error(e, e);
 	} catch (IOException e) {
 	    messages.add("Error setting response cookie to continue paged ldap search results: " + e.getMessage());
+	    log.error(e, e);
+	} catch (Exception e) {
+	    messages.add("Unknown error: " + e.getMessage());
 	    log.error(e, e);
 	}
 	totalResults += contextResults;

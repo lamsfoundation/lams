@@ -22,13 +22,10 @@
  */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -38,8 +35,6 @@ import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * ConfigAction
@@ -49,8 +44,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * struts doclets
  * 
- * @struts.action path="/config" parameter="method" name="ConfigForm" input=".config" scope="request" validate="false"
- * @struts.action-forward name="config" path=".config"
+ * @struts.action path="/config" parameter="method" name="ConfigForm" input=".editconfig" scope="request" validate="false"
+ * @struts.action-forward name="config" path=".editconfig"
+ * @struts.action-forward name="ldap" path=".ldap"
  * @struts.action-forward name="sysadmin" path="/sysadminstart.do"
  */
 public class ConfigAction extends LamsDispatchAction {
@@ -60,10 +56,7 @@ public class ConfigAction extends LamsDispatchAction {
 
 	private Configuration getConfiguration() {
 		if (configurationService == null) {
-			WebApplicationContext ctx = WebApplicationContextUtils
-					.getRequiredWebApplicationContext(getServlet().getServletContext());
-			configurationService = (Configuration) ctx.getBean("configurationService");
-
+		    configurationService = AdminServiceProxy.getConfiguration(getServlet().getServletContext());
 		}
 		return configurationService;
 	}
@@ -80,7 +73,7 @@ public class ConfigAction extends LamsDispatchAction {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 		
-		request.setAttribute("config", arrangeItems());
+		request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
 		
 		return mapping.findForward("config");
 	}
@@ -98,14 +91,22 @@ public class ConfigAction extends LamsDispatchAction {
 		String[] keys = (String[])configForm.get("key");
 		String[] values = (String[])configForm.get("value");
 		
+		String errorForward = "config";
+		
 		for(int i=0; i<keys.length; i++) {
 			ConfigurationItem item = getConfiguration().getConfigItemByKey(keys[i]);
+			
+			// return to ldap page if that's where we came from
+			if (StringUtils.contains(item.getHeaderName(), "config.header.ldap")) {
+			    errorForward = "ldap";
+			}
+			
 			if (item!=null) {
 				if (item.getRequired()) {
 					if (!(values[i]!=null && values[i].length()>0)) {
 						request.setAttribute("error", getRequiredError(item.getDescriptionKey()));
-						request.setAttribute("config", arrangeItems());
-						return mapping.findForward("config");
+						request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+						return mapping.findForward(errorForward);
 					}
 				}
 				String format = item.getFormat();
@@ -114,8 +115,8 @@ public class ConfigAction extends LamsDispatchAction {
 						Long.parseLong(values[i]);
 					} catch (NumberFormatException e) {
 						request.setAttribute("error", getNumericError(item.getDescriptionKey()));
-						request.setAttribute("config", arrangeItems());
-						return mapping.findForward("config");
+						request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+						return mapping.findForward(errorForward);
 					}
 				}
 				Configuration.updateItem(keys[i], values[i]);
@@ -138,21 +139,4 @@ public class ConfigAction extends LamsDispatchAction {
 		return getMessageService().getMessage("error.numeric", args);
 	}
 	
-	// get contents of lams_configuration and group them using header names as key
-	private HashMap<String, ArrayList<ConfigurationItem>> arrangeItems() {
-		List originalList = getConfiguration().getAllItems();
-		HashMap<String, ArrayList<ConfigurationItem>> groupedList = new HashMap<String, ArrayList<ConfigurationItem>>();
-		
-		for (int i=0; i<originalList.size(); i++) {
-			ConfigurationItem item = (ConfigurationItem)originalList.get(i);
-			String header = item.getHeaderName();
-			if (!groupedList.containsKey(header)) {
-				groupedList.put(header, new ArrayList<ConfigurationItem>());
-			}
-			ArrayList<ConfigurationItem> currentList = groupedList.get(header);
-			currentList.add(item);
-			groupedList.put(header, currentList);
-		}
-		return groupedList;
-	}
 }

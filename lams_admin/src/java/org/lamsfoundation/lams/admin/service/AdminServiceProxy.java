@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.statistics.service.IStatisticsService;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.LdapService;
+import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.web.context.WebApplicationContext;
@@ -50,7 +51,7 @@ public class AdminServiceProxy {
 	private static LdapService ldapService;
 	private static IStatisticsService statisticsService;
 	private static IThemeService themeService;
-	
+	private static Configuration configurationService;
 	
 	public static final IUserManagementService getService(ServletContext servletContext) {
 		if (manageService == null) {
@@ -107,6 +108,13 @@ public class AdminServiceProxy {
 		    themeService = (IThemeService)getDomainService(servletContext, "themeService");
 		}
 		return themeService;
+	}
+	
+	public static final Configuration getConfiguration(ServletContext servletContext) {
+		if (configurationService == null) {
+		    configurationService = (Configuration)getDomainService(servletContext, "configurationService");
+		}
+		return configurationService;
 	}
 	
 	private static Object getDomainService(ServletContext servletContext,String serviceName) {
