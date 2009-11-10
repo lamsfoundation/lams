@@ -261,7 +261,7 @@ public class SessionManager {
     private static Cookie createCookie(HttpServletResponse res, String name, String value) {
 	Cookie cookie = new Cookie(name, value);
 	cookie.setPath("/");
-	cookie.setMaxAge(-1);
+	cookie.setMaxAge(Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME));
 	res.addCookie(cookie);
 
 	return cookie;
