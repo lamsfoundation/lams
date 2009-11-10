@@ -177,6 +177,8 @@ public class UserManagementService implements IUserManagementService {
 		    save(folder);
 		}
 	    }
+	    // LDEV-1356 modification date
+	    user.setModifiedDate(new Date());
 	}
 	return user;
     }

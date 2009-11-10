@@ -174,6 +174,8 @@ public class User implements Serializable, Comparable {
 
     /** persistent field - for Pedagogical Planner */
     private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<Long>();
+    
+    private Date modifiedDate;
 
     // ------- TIMEZONES (hardcoded, there is no need to put them into database --------------
 
@@ -917,6 +919,18 @@ public class User implements Serializable, Comparable {
 
     public void setRecentlyModifiedLearningDesigns(Set<Long> recentlyModifiedLearningDesigns) {
 	this.recentlyModifiedLearningDesigns = recentlyModifiedLearningDesigns;
+    }
+
+    /**
+     * @hibernate.property column="modified_date" length="19" not-null="false"
+     * @return
+     */
+    public Date getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Date modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 
 }

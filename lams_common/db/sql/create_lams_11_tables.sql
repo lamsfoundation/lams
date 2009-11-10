@@ -295,6 +295,7 @@ CREATE TABLE lams_user (
  	 , timezone TINYINT
 	 , tutorials_disabled TINYINT(1) DEFAULT 0
 	 , first_login TINYINT(1) DEFAULT 1
+         , modified_date DATETIME
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
