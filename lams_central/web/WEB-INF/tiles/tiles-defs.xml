@@ -56,4 +56,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="content" value="errorContent.jsp" />	
 		<put name="footer" value="footer.jsp"/>	
 	</definition>
+	
+	<definition name=".message" path="/template.jsp">
+		<put name="titleKey" value="heading.general.error"/>
+		<put name="content" value="msgContent.jsp" />
+	</definition>
 </tiles-definitions>
