@@ -104,7 +104,7 @@
 		
 		if (max > 0 && min > max)
 		{
-			alert('<fmt:message key="advanced.editingLimits.error" />');
+			alert("<fmt:message key="advanced.editingLimits.error" />");
 			minMenu.selectedIndex = max;
 		}
 	}

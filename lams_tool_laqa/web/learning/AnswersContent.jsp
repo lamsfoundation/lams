@@ -45,7 +45,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			if (actionMethod != 'getPreviousQuestion') {
 				jQuery(".text-area").each(function() {
 					if (jQuery.trim($(this).val()) == "") {
-						if (confirm('<fmt:message key="warning.empty.answers" />')) {
+						if (confirm("<fmt:message key="warning.empty.answers" />")) {
 							doSubmit(actionMethod);
 							return false;
 						} else {

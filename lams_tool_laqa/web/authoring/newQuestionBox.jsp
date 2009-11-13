@@ -82,7 +82,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                         
                         var i;
                         with (catMenu) {
-                            options[0] = new Option('<fmt:message key="wizard.selectCategory" />', "none");
+                            options[0] = new Option("<fmt:message key="wizard.selectCategory" />", "none");
                             for(i = 0; i < categoryArray.length; i++)
                             {
                                 options[i+1] = new Option(categoryArray[i].title, i);

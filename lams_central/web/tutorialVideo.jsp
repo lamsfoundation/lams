@@ -30,7 +30,7 @@
 			 	}
 			 	else {
 			 		if ($("#doNotShowAgain").attr("checked")){
-			 			alert('<fmt:message key="label.tutorial.disable.single" />');
+			 			alert("<fmt:message key="label.tutorial.disable.single" />");
 			 			
 				 		$.ajax({		
 							type: "GET",

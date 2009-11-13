@@ -23,12 +23,12 @@
 	
 	function updateExistingTotal() {
 		var size = jQuery("li", "#existing").size();
-		jQuery("span#totalUsers").text('<fmt:message key="label.number.of.users"><fmt:param>'+size+'</fmt:param></fmt:message>');
+		jQuery("span#totalUsers").text("<fmt:message key="label.number.of.users"><fmt:param>"+size+"</fmt:param></fmt:message>");
 	}
 	
 	function updatePotentialTotal() {
 		var size = jQuery("li", "#potential").size();
-		jQuery("span#potentialUsers").text('<fmt:message key="label.number.of.potential.users"><fmt:param>'+size+'</fmt:param></fmt:message>');
+		jQuery("span#potentialUsers").text("<fmt:message key="label.number.of.potential.users"><fmt:param>"+size+"</fmt:param></fmt:message>");
 	}
 	
 	function bindRemoveLink() {

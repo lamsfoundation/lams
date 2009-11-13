@@ -33,9 +33,9 @@
 	  					shrinkToFit: true,
 	  					
 	  				   	colNames:['questionResultUid',
-	  		  				   	'<fmt:message key="label.monitoring.summary.user.name" />',
-	  							'<fmt:message key="label.monitoring.user.summary.response" />',
-	  						    '<fmt:message key="label.monitoring.user.summary.grade" />'],
+	  		  				   	"<fmt:message key="label.monitoring.summary.user.name" />",
+	  							"<fmt:message key="label.monitoring.user.summary.response" />",
+	  						    "<fmt:message key="label.monitoring.user.summary.grade" />"],
 	  						    
 	  				   	colModel:[
 							{name:'questionResultUid', index:'questionResultUid', width:0},

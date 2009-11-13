@@ -36,10 +36,10 @@ p {
 	<form>
 	
 	<div class="floatRight">
-		<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit' />
-		<input class="button" type="button" value='<fmt:message key="admin.user.find"/>' onclick=javascript:document.location='usersearch.do' />
+		<input class="button" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit' />
+		<input class="button" type="button" value="<fmt:message key="admin.user.find"/>" onclick=javascript:document.location='usersearch.do' />
 		<logic:equal name="manageGlobalRoles" value="true">
-			<input class="button" type="button" value='<fmt:message key="admin.global.roles.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+			<input class="button" type="button" value="<fmt:message key="admin.global.roles.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 		</logic:equal>
 	</div>
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
@@ -50,7 +50,7 @@ p {
 				<c:param name="typeId" value="2" />
 				<c:param name="parentId" value="${OrgManageForm.parentId}" />
 			</c:url>
-			<input class="button" type="button" value='<fmt:message key="admin.course.add"/>' onclick=javascript:document.location='<c:out value="${editaction}"/>' />
+			<input class="button" type="button" value="<fmt:message key="admin.course.add"/>" onclick=javascript:document.location='<c:out value="${editaction}"/>' />
 		</logic:equal>
 	</div>
 	</form>
@@ -102,12 +102,12 @@ p {
 	
 	<p>
 	<logic:equal name="editGroup" value="true">
-		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+		<input class="button" type="button" value="<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>" onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
 	</logic:equal>
 	</p>
 	
 	<div class="floatRight">
-		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+		<input class="button" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 	</div>
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 	
@@ -117,7 +117,7 @@ p {
 			<c:param name="typeId" value="3" />
 			<c:param name="parentId" value="${OrgManageForm.parentId}" />
 		</c:url>
-		<input class="button" type="button" value='<fmt:message key="admin.class.add"/>' onclick=javascript:document.location='<c:out value="${createSubgroupLink}"/>' />
+		<input class="button" type="button" value="<fmt:message key="admin.class.add"/>" onclick=javascript:document.location='<c:out value="${createSubgroupLink}"/>' />
 	</div>
 	</form>
 	<html:form styleClass="indentPad" action="orgmanage.do" method="post">
@@ -169,12 +169,12 @@ p {
 	
 	<p>
 	<logic:equal name="editGroup" value="true">
-		<input class="button" type="button" value='<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>' onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
+		<input class="button" type="button" value="<fmt:message key="admin.edit" /> <bean:write name="OrgManageForm" property="parentName"/>" onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
 	</logic:equal>
 	</p>
 	
 	<div class="floatRight">
-		<input class="button" type="button" value='<fmt:message key="admin.user.manage" />' onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+		<input class="button" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 	</div>
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 	

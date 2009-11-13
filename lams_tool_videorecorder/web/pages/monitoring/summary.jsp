@@ -18,7 +18,7 @@
 		if (elem != null) {
 			//elem.style.display="none";
 			elem.href = "javascript: hideMessage('" + url + "', '" + sessionId + "');";
-			$("#showhideVRButton" + sessionId).text('<fmt:message key="monitor.summary.button.hide.video.recorder"><fmt:param><fmt:message key="activity.title" /></fmt:param></fmt:message>');
+			$("#showhideVRButton" + sessionId).text("<fmt:message key="monitor.summary.button.hide.video.recorder"><fmt:param><fmt:message key="activity.title" /></fmt:param></fmt:message>");
 		}
 		location.hash = "videoRecorder" + sessionId;
 	}
@@ -33,7 +33,7 @@
 		if (elem != null) {
 			//elem.style.display="block";
 			elem.href = "javascript: showMessage('" + url + "', '" + sessionId + "');";
-			$("#showhideVRButton" + sessionId).text('<fmt:message key="monitor.summary.button.show.video.recorder"><fmt:param><fmt:message key="activity.title" /></fmt:param></fmt:message>');
+			$("#showhideVRButton" + sessionId).text("<fmt:message key="monitor.summary.button.show.video.recorder"><fmt:param><fmt:message key="activity.title" /></fmt:param></fmt:message>");
 		}
 	}
 	-->

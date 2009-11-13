@@ -294,7 +294,7 @@ function showAddress()
 			{
 				if (!point) 
 				{
-					alert('<fmt:message key="error.cantFindAddress"/> ' + address );
+					alert("<fmt:message key="error.cantFindAddress"/> " + address );
 				} 
 				else 
 				{
@@ -375,8 +375,8 @@ function updateMarkerInfoWindowHtml(markerIn)
 			markerIn.linksBar = "<br/ >" + markerIn.removeLink + "&nbsp;" + markerIn.editLink;
 		}
 		markerIn.markerMetaData = "<span style='font-size:90%; color:#999999;'>";
-		markerIn.markerMetaData += '<fmt:message key="label.createdBy"/> ' + markerIn.createdBy + "<br />";
-		markerIn.markerMetaData += '<nobr><fmt:message key="label.latitudeLongitude"/> (' + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
+		markerIn.markerMetaData += "<fmt:message key="label.createdBy"/> " + markerIn.createdBy + "<br />";
+		markerIn.markerMetaData += "<nobr><fmt:message key="label.latitudeLongitude"/> (" + markerIn.getPoint().lat() + "-" + markerIn.getPoint().lng() +")</nobr>";
 		markerIn.markerMetaData += "</span>";
 		markerIn.infoWindowHtml = "<h4>" + markerIn.title + "</h4><div style='overflow:auto; width:350px; height:80px'>" +  markerIn.infoMessage.replace(/\n/g, "<br />") + "</div>"+ markerIn.markerMetaData  + markerIn.linksBar;
 	}	
@@ -419,7 +419,7 @@ function confirmLeavePage()
 		// Check if there are unsaved markers
 		if (markers[i].state == "unsaved" || markers[i].state == "update")
 		{
-			var ans = confirm('<fmt:message key="label.unsavedMarkers" />');
+			var ans = confirm("<fmt:message key="label.unsavedMarkers" />");
 			if (ans)
 			{
 				return true;
@@ -450,7 +450,7 @@ function serialiseMarkers()
 		// Check if there are unsaved markers
 		if (markers[i].state == "unsaved")
 		{
-			var ans = confirm('<fmt:message key="label.unsavedMarkers" />');
+			var ans = confirm("<fmt:message key="label.unsavedMarkers" />");
 			if (!ans)
 			{
 				return false;

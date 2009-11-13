@@ -87,12 +87,12 @@ p {
 <form>
 	
 <p>
-	<input class="button" type="button" value='<fmt:message key="admin.user.add"/>' onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
+	<input class="button" type="button" value="<fmt:message key="admin.user.add"/>" onclick=javascript:document.location='userorg.do?orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 </p>
 
 <div class="floatRight">
 	<logic:equal name="UserManageForm" property="courseAdminCanAddNewUsers" value="true">
-		<input class="button" type="button" value='<fmt:message key="admin.user.create"/>' onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
+		<input class="button" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit&orgId=<bean:write name="UserManageForm" property="orgId"/>' />
 	</logic:equal>
 </div>
 <p style="padding-top:10px;">

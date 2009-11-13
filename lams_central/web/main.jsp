@@ -61,11 +61,11 @@
 			});
 		
 			function getEnableSortingText() {
-				return '<fmt:message key="label.enable.lesson.sorting"/>';
+				return "<fmt:message key="label.enable.lesson.sorting"/>";
 			}
 			
 			function getSortingEnabledText() {
-				return '<fmt:message key="label.lesson.sorting.enabled"/>';
+				return "<fmt:message key="label.lesson.sorting.enabled"/>";
 			}
 			
 			function refresh(){
@@ -165,7 +165,7 @@
 								<div class="float-right">
 									<c:if test="${not empty adminLinks}">
 										<c:forEach var="adminlink" items="${adminLinks}">
-											<a title='<fmt:message key="${adminlink.name}"/>' href='<c:out value="${adminlink.url}"/>'><fmt:message key="${adminlink.name}"/></a> | 
+											<a title="<fmt:message key="${adminlink.name}"/>" href='<c:out value="${adminlink.url}"/>'><fmt:message key="${adminlink.name}"/></a> | 
 										</c:forEach>
 									</c:if>
 									<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:refresh()">

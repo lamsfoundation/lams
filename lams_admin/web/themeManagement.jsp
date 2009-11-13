@@ -32,7 +32,7 @@
 	}
 
 	function removeTheme(id, name, type) {
-		var answer = confirm('<fmt:message key="admin.themes.deleteConfirm" />')
+		var answer = confirm("<fmt:message key="admin.themes.deleteConfirm" />")
 		if (answer) {
 			document.getElementById("name").value = name;
 			document.getElementById("id").value = id;
@@ -52,13 +52,13 @@
 		var name = document.getElementById("name").value;
 
 		if (name == null || name == "") {
-			alert('<fmt:message key="admin.themes.nameAlreadyExists" />');
+			alert("<fmt:message key="admin.themes.nameAlreadyExists" />");
 			return;
 		}
 		
 		<c:forEach var="theme" items="${themes}" >
 			if (name == '${theme.name}') {
-				alert('<fmt:message key="admin.themes.nameAlreadyExists" />');
+				alert("<fmt:message key="admin.themes.nameAlreadyExists" />");
 				return;
 			}
 
@@ -130,16 +130,16 @@
 				<c:choose>
 					<c:when test="${not theme.notEditable}">
 						<img src="<lams:LAMSURL/>/images/edit.gif" 
-							title='<fmt:message key="admin.themes.edit" />'
+							title="<fmt:message key="admin.themes.edit" />"
 							onclick="editTheme('${theme.name}', '${theme.description}', '${theme.imageDirectory}', '${theme.themeId}', '${theme.currentDefaultTheme}', '${theme.type}')"
 						>
 						<img src="<lams:LAMSURL/>/images/cross.gif" 
-							title='<fmt:message key="admin.themes.remove" />'
+							title="<fmt:message key="admin.themes.remove" />"
 							onclick="removeTheme('${theme.themeId}', '${theme.name}', '${theme.type}')"
 						>
 					</c:when>
 					<c:otherwise>
-						<a href="javascript:setAsDefault('${theme.name}')" class="button" title='<fmt:message key="admin.themes.makeThemeDefault"/>'>
+						<a href="javascript:setAsDefault('${theme.name}')" class="button" title="<fmt:message key="admin.themes.makeThemeDefault"/>">
 							<fmt:message key="admin.themes.makeDefault" />
 						</a>
 					</c:otherwise>

@@ -18,11 +18,11 @@
 			   	colNames:['#',
 						'userId',
 						'sessionId',
-						'<fmt:message key="label.monitoring.summary.user.name" />',
+						"<fmt:message key="label.monitoring.summary.user.name" />",
 			   	        <c:forEach var="question" items="${assessment.questions}">
 			   	     		"${question.title}", 
 			   	        </c:forEach>
-					    '<fmt:message key="label.monitoring.summary.total" />'],
+					    "<fmt:message key="label.monitoring.summary.total" />"],
 					    
 			   	colModel:[
 			   		{name:'id',index:'id', width:20, sorttype:"int"},
@@ -104,12 +104,12 @@
 				height: 90,
 				width: ${width},
 				shrinkToFit: true,
-				caption: '<fmt:message key="label.monitoring.summary.learner.summary" />',
+				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
 			   	colNames:['#',
 						'questionResultUid',
   						'Question',
-  						'<fmt:message key="label.monitoring.user.summary.response" />',
-  						'<fmt:message key="label.monitoring.user.summary.grade" />'],
+  						"<fmt:message key="label.monitoring.user.summary.response" />",
+  						"<fmt:message key="label.monitoring.user.summary.grade" />"],
 					    
 			   	colModel:[
 	  			   		{name:'id', index:'id', width:20, sorttype:"int"},

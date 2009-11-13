@@ -68,7 +68,7 @@
 												<img src="${pixlrImageFolderURL}/${learner.imageFileName}" 
 													height="${learner.imageThumbnailHeight}" 
 													width="${learner.imageThumbnailWidth}"
-													title='<fmt:message key="tooltip.openfullsize" />'
+													title="<fmt:message key="tooltip.openfullsize" />"
 													onclick="openPopup('${pixlrImageFolderURL}/${learner.imageFileName}', ${learner.imageHeight}, ${learner.imageWidth})"
 												/>
 											</c:when>

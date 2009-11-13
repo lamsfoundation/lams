@@ -52,7 +52,7 @@
 			<c:choose>
 				<c:when test='${imageExists}'>
 					<div style="text-align:center;">
-					<img id="image"  title='<fmt:message key="tooltip.openfullsize" />' onclick="openImage('${imageURL}')" src="${imageURL}"/>
+					<img id="image"  title="<fmt:message key="tooltip.openfullsize" />" onclick="openImage('${imageURL}')" src="${imageURL}"/>
 					<br><br>
 				
 					<a href="javascript:submitForm('deleteImage')"><fmt:message key="label.authoring.remove"></fmt:message></a>

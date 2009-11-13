@@ -301,7 +301,7 @@
 	{
 		sessionName = '${session.sessionName}';
 		document.getElementById("toolSessionID").value ="${session.sessionID}";
-		addUserToList('0','<fmt:message key="label.authoring.basic.authored"></fmt:message>' );
+		addUserToList('0',"<fmt:message key="label.authoring.basic.authored"></fmt:message>" );
 		<c:forEach var="user" items="${session.userDTOs}">
 			addUserToList('${user.uid}','${user.firstName} ${user.lastName}' );
 		</c:forEach>

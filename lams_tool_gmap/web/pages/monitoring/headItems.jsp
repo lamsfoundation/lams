@@ -33,9 +33,9 @@ var LIGHTBLUE_MARKER_ICON = "${tool}/images/paleblue_Marker.png";
 var RED_MARKER_ICON = "${tool}/images/red_Marker.png";
 var TREE_CLOSED_ICON = "${tool}/images/tree_closed.gif";
 var TREE_OPEN_ICON = "${tool}/images/tree_open.gif";
-var errorMissingTitle = '<fmt:message key="error.missingMarkerTitle"/>';
-var markerLimitMsg = '<fmt:message key="label.learner.markerLimitReached"/>'
-var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>';
+var errorMissingTitle = "<fmt:message key="error.missingMarkerTitle"/>";
+var markerLimitMsg = "<fmt:message key="label.learner.markerLimitReached"/>"
+var confirmDelete = "<fmt:message key="label.authoring.basic.confirmDelete"/>";
 
 var map;
 var markers;
@@ -96,7 +96,7 @@ function addMarkerToCenterMonitoring()
 {
 	var bounds = map.getBounds();
 	var point = bounds.getCenter();
-	addMarker(point, "", "", -1, false, true, '<fmt:message key="label.authoring.basic.authored"></fmt:message>', 0);
+	addMarker(point, "", "", -1, false, true, "<fmt:message key="label.authoring.basic.authored"></fmt:message>", 0);
 }
 
 //-->

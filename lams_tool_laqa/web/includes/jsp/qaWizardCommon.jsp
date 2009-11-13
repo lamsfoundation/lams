@@ -48,7 +48,7 @@
 			
 			var i;
 			with (skillMenu) {
-				options[0] = new Option('<fmt:message key="wizard.selectSkill" />', "none");
+				options[0] = new Option("<fmt:message key="wizard.selectSkill" />", "none");
 				for(i = 0; i < skillArray.length; i++)
 				{
 					options[i+1] = new Option(skillArray[i].title, i);
@@ -69,7 +69,7 @@
 			
 			var i;
 			with (qMenu) {
-				options[0] = new Option('<fmt:message key="wizard.selectQuestion" />', "none");
+				options[0] = new Option("<fmt:message key="wizard.selectQuestion" />", "none");
 				for(i = 0; i < questionArray.length; i++)
 				{
 					options[i+1] = new Option(questionArray[i].question, i);

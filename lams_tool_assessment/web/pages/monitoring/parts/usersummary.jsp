@@ -31,11 +31,11 @@
 	  					width: 500,
 	  					shrinkToFit: true,
 	  					
-	  				   	colNames:['<fmt:message key="label.monitoring.user.summary.attempt" />',
+	  				   	colNames:["<fmt:message key="label.monitoring.user.summary.attempt" />",
 	  							'questionResultUid',
-	  							'<fmt:message key="label.monitoring.user.summary.time" />',
-	  							'<fmt:message key="label.monitoring.user.summary.response" />',
-	  						    '<fmt:message key="label.monitoring.user.summary.grade" />'],
+	  							"<fmt:message key="label.monitoring.user.summary.time" />",
+	  							"<fmt:message key="label.monitoring.user.summary.response" />",
+	  						    "<fmt:message key="label.monitoring.user.summary.grade" />"],
 	  						    
 	  				   	colModel:[
 	  				   		{name:'id', index:'id', width:55, sorttype:"int"},

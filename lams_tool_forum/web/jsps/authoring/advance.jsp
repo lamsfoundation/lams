@@ -180,11 +180,11 @@
 				var errors = '';
 				var num = parseFloat(this.value);
 				if(isNaN(num)) 
-					errors = '<fmt:message key="js.error.invalid.number"/>\n';
+					errors = "<fmt:message key="js.error.invalid.number"/>\n";
 				else if (num <= min)
-					errors = '<fmt:message key="js.error.min.number"/>';
+					errors = "<fmt:message key="js.error.min.number"/>";
 				if(errors)
-					alert('<fmt:message key="js.error.title"/>\n'+errors);
+					alert("<fmt:message key="js.error.title"/>\n"+errors);
 				
 			}
 			function allowNewTopic(){

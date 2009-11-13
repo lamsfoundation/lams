@@ -43,7 +43,7 @@
 	<input 
 		class="button" 
 		type="button" 
-		value='<fmt:message key="label.synchronise" />' 
+		value="<fmt:message key="label.synchronise" />" 
 		onclick='startSync();'
 	/>
 </p>

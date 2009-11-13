@@ -11,7 +11,7 @@
 	<script type="text/javascript">
 		function removeMarkFile() {
 
-			var answer = confirm('<fmt:message key="message.monitor.mark.confirmDeleteFile"/>');
+			var answer = confirm("<fmt:message key="message.monitor.mark.confirmDeleteFile"/>");
 			if (answer) {	
 				document.getElementById("method").value = "removeMarkFile";
 				document.getElementById("updateMarkForm").submit();

@@ -14,19 +14,19 @@
 	</div>
 	
 	<div id="buttons" style="float: right; width: 50%; text-align:right; " >
-		<a href="javascript:changeDiv('view');" title='<fmt:message key="label.wiki.view.toolTip"></fmt:message>'>
+		<a href="javascript:changeDiv('view');" title="<fmt:message key="label.wiki.view.toolTip"></fmt:message>">
 			<fmt:message key="label.wiki.view"></fmt:message>
 		</a> 
 		&nbsp;
-		<a href="javascript:changeDiv('edit');" title='<fmt:message key="label.wiki.edit.toolTip"></fmt:message>'>
+		<a href="javascript:changeDiv('edit');" title="<fmt:message key="label.wiki.edit.toolTip"></fmt:message>">
 			<fmt:message key="label.wiki.edit"></fmt:message>
 		</a> 
 		&nbsp;
-		<a href="javascript:cancelAdd();changeDiv('add');" title='<fmt:message key="label.wiki.add.toolTip"></fmt:message>'>
+		<a href="javascript:cancelAdd();changeDiv('add');" title="<fmt:message key="label.wiki.add.toolTip"></fmt:message>">
 			<fmt:message key="label.wiki.add"></fmt:message>
 		</a> 
 		&nbsp;
-		<a href="javascript:changeDiv('history');" title='<fmt:message key="label.wiki.history.toolTip"></fmt:message>'>
+		<a href="javascript:changeDiv('history');" title="<fmt:message key="label.wiki.history.toolTip"></fmt:message>">
 			<fmt:message key="label.wiki.history"></fmt:message>
 		</a> 
 		<c:if test="${currentWikiPage.title != mainWikiPage.title}">
@@ -124,15 +124,15 @@
 								</c:choose>
 							</td>
 							<td>
-								<a href="javascript:doRevert('${wikiContentPageVersion.uid}');" title='<fmt:message key="label.wiki.history.actions.compare.tooltip" />'>
+								<a href="javascript:doRevert('${wikiContentPageVersion.uid}');" title="<fmt:message key="label.wiki.history.actions.compare.tooltip" />">
 									<fmt:message key="label.wiki.history.actions.revert" /> 
 								</a>
 								&nbsp; 
-								<a href="javascript:doCompareOrView('<lams:WebAppURL/>', '${wikiContentPageVersion.uid}', '${currentWikiPage.uid}', 'comparePage');" title='<fmt:message key="label.wiki.history.actions.compare.tooltip" />'>
+								<a href="javascript:doCompareOrView('<lams:WebAppURL/>', '${wikiContentPageVersion.uid}', '${currentWikiPage.uid}', 'comparePage');" title="<fmt:message key="label.wiki.history.actions.compare.tooltip" />">
 									<fmt:message key="label.wiki.history.actions.compare" /> 
 								</a>
 								&nbsp;
-								<a href="javascript:doCompareOrView('<lams:WebAppURL/>', '${wikiContentPageVersion.uid}', '${currentWikiPage.uid}', 'viewPage');" title='<fmt:message key="label.wiki.history.actions.compare.tooltip" />'>
+								<a href="javascript:doCompareOrView('<lams:WebAppURL/>', '${wikiContentPageVersion.uid}', '${currentWikiPage.uid}', 'viewPage');" title="<fmt:message key="label.wiki.history.actions.compare.tooltip" />">
 									<fmt:message key="label.wiki.history.actions.view" /> 
 								</a>
 							</td>
@@ -283,7 +283,7 @@
 		
 		if (title == null || trim(title).length == 0)
 		{
-			alert('<fmt:message key="label.wiki.add.title.required"></fmt:message>');
+			alert("<fmt:message key="label.wiki.add.title.required"></fmt:message>");
 			return;
 		}
 		
@@ -296,7 +296,7 @@
 			
 			if (trim(title) == wikiLinkArray[i])
 			{
-				alert('<fmt:message key="label.wiki.add.title.exists"><fmt:param>' + title + '</fmt:param></fmt:message>');
+				alert("<fmt:message key="label.wiki.add.title.exists"><fmt:param>" + title + "</fmt:param></fmt:message>");
 				return;
 			}
 		}

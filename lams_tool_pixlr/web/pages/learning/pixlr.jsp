@@ -7,7 +7,7 @@
 	
 	function openPixlr(url)
 	{
-		alert('<fmt:message key="message.learner.saveWhenFinished" />');
+		alert("<fmt:message key="message.learner.saveWhenFinished" />");
 		
 		url += "&target=" + escape("${returnURL}");
 		url += "&image=" + escape("${currentImageURL}");
@@ -63,7 +63,7 @@
 
 	<br />
 	<div style="text-align:center;">
-		<img id="image" border="1" title='<fmt:message key="tooltip.openfullsize" />' onclick="openImage('${currentImageURL}')" src="${currentImageURL}" />
+		<img id="image" border="1" title="<fmt:message key="tooltip.openfullsize" />" onclick="openImage('${currentImageURL}')" src="${currentImageURL}" />
 		
 		<br />
 		<br />

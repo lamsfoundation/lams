@@ -60,7 +60,7 @@
 					onclick="javascript:editQuestion(${status.index},'${sessionMapID}')" /></td>
 				<td><img src="${tool}includes/images/cross.gif"
 					title="<fmt:message key="label.common.delete" />"
-					onclick="javascript:if (confirm('<fmt:message key="message.authoring.delete.question" />')) deleteQuestion(${status.index},'${sessionMapID}');" /></td>
+					onclick='javascript:if (confirm("<fmt:message key="message.authoring.delete.question" />")) deleteQuestion(${status.index},"${sessionMapID}");' /></td>
 		</tr>
 	</c:forEach>
 </table>

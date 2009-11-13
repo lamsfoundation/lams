@@ -86,7 +86,7 @@
 
 							<td valign="middle" width="105px">
 								<input id="sendButton" class="button" type="submit"
-									value='<fmt:message>button.send</fmt:message>' />
+									value="<fmt:message>button.send</fmt:message>" />
 
 							</td>
 						</tr>

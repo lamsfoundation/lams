@@ -43,9 +43,9 @@
 		var TREE_CLOSED_ICON = "${tool}/images/tree_closed.gif";
 		var TREE_OPEN_ICON = "${tool}/images/tree_open.gif";
 		
-		var errorMissingTitle = '<fmt:message key="error.missingMarkerTitle"/>';
-		var markerLimitMsg = '<fmt:message key="label.learner.markerLimitReached"/>'
-		var confirmDelete = '<fmt:message key="label.authoring.basic.confirmDelete"/>';
+		var errorMissingTitle = "<fmt:message key="error.missingMarkerTitle"/>";
+		var markerLimitMsg = "<fmt:message key="label.learner.markerLimitReached"/>"
+		var confirmDelete = "<fmt:message key="label.authoring.basic.confirmDelete"/>";
 		
 		var sessionName = '${gmapSessionDTO.sessionName}';
 		
@@ -85,7 +85,7 @@
 		    	
 		    	
 		    	
-		    	addUserToList('0','<fmt:message key="label.authoring.basic.authored"></fmt:message>' );
+		    	addUserToList('0',"<fmt:message key="label.authoring.basic.authored"></fmt:message>" );
 		    	<c:forEach var="user" items="${gmapSessionDTO.userDTOs}">
 		    		addUserToList('${user.uid}','${user.firstName} ${user.lastName}');
 		    	</c:forEach>
@@ -99,7 +99,7 @@
 					<c:otherwise>
 						<c:choose>
 						<c:when  test="${marker.isAuthored}">
-						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, false, '<fmt:message key="label.authoring.basic.authored"></fmt:message>', '0' );
+						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, false, "<fmt:message key="label.authoring.basic.authored"></fmt:message>", '0' );
 						</c:when>
 						<c:when  test="${gmapDTO.allowShowAllMarkers}">
 						addMarker(new GLatLng('${marker.latitude}', '${marker.longitude}' ), decode_utf8('<c:out value="${marker.infoWindowMessage}"/>'), decode_utf8('<c:out value="${marker.title}" />'), '${marker.uid}', true, false, '${marker.createdBy.firstName} ${marker.createdBy.lastName}', '${marker.createdBy.uid}' );

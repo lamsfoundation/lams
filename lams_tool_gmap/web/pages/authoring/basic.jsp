@@ -71,7 +71,7 @@ function initGmap()
     	markers = new Array();
     	geocoder = new GClientGeocoder();
 
-    	currUser = '<fmt:message key="label.authoring.basic.authored"></fmt:message>';
+    	currUser = "<fmt:message key="label.authoring.basic.authored"></fmt:message>";
     	currUserId = '0';
 		map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));
 		map.setCenter(new GLatLng('${formBean.gmap.mapCenterLatitude}', '${formBean.gmap.mapCenterLongitude}' ));

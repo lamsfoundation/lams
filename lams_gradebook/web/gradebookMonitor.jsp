@@ -37,9 +37,9 @@
 			
 			var conf;
 			if (marksReleased) {
-				conf = confirm('<fmt:message key="gradebook.monitor.releasemarks.check2"/>');
+				conf = confirm("<fmt:message key="gradebook.monitor.releasemarks.check2"/>");
 			} else {
-				conf = confirm('<fmt:message key="gradebook.monitor.releasemarks.check"/>');
+				conf = confirm("<fmt:message key="gradebook.monitor.releasemarks.check"/>");
 			}
 			
 			if (conf) {
@@ -55,7 +55,7 @@
 			    		displayReleaseOption();
 			    	} else {
 			    		
-			    		info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="error.releasemarks.fail"/>', '<fmt:message key="label.ok"/>');
+			    		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.releasemarks.fail"/>", "<fmt:message key="label.ok"/>");
 			    	}
 			    });
 		    }
@@ -77,7 +77,7 @@
 			
 			// Create the user view grid with sub grid for activities	
 			jQuery("#userView").jqGrid({
-				caption: '<fmt:message key="gradebook.gridtitle.usergrid"/>',
+				caption: "<fmt:message key="gradebook.gridtitle.usergrid"/>",
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monUserView&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
@@ -92,11 +92,11 @@
 			    rowNum:10,
 				cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradebookData&lessonID=${lessonDetails.lessonID}",
 			    colNames:["", 
-			    	'<fmt:message key="gradebook.columntitle.name"/>', 
-			    	'<fmt:message key="gradebook.columntitle.progress"/>', 
-			    	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
-			    	'<fmt:message key="gradebook.columntitle.lessonFeedback"/>', 
-			    	'<fmt:message key="gradebook.columntitle.mark"/>'
+			    	"<fmt:message key="gradebook.columntitle.name"/>", 
+			    	"<fmt:message key="gradebook.columntitle.progress"/>", 
+			    	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+			    	"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
+			    	"<fmt:message key="gradebook.columntitle.mark"/>"
 			    ],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
@@ -108,7 +108,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#userView").clearGridData();
-			    	info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
+			    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -130,13 +130,13 @@
 						     colNames: [
 						     	'',
 						     	'',
-						     	'<fmt:message key="gradebook.columntitle.activity"/>',
-						     	'<fmt:message key="gradebook.columntitle.progress"/>',
-						     	'<fmt:message key="gradebook.columntitle.outputs"/>', 
-						     	'<fmt:message key="gradebook.columntitle.competences"/>', 
-						     	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
-						     	'<fmt:message key="gradebook.columntitle.activityFeedback"/>', 
-						     	'<fmt:message key="gradebook.columntitle.mark"/>'
+						     	"<fmt:message key="gradebook.columntitle.activity"/>",
+						     	"<fmt:message key="gradebook.columntitle.progress"/>",
+						     	"<fmt:message key="gradebook.columntitle.outputs"/>", 
+						     	"<fmt:message key="gradebook.columntitle.competences"/>", 
+						     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
+						     	"<fmt:message key="gradebook.columntitle.mark"/>"
 						     ],
 						     colModel: [
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
@@ -151,7 +151,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
+						    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 						     },
 						     formatCell: function(rowid, cellname,value, iRow, iCol) {
 					    	 	if (cellname == "mark") {
@@ -191,7 +191,7 @@
 					    	 		var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
 						     		if (currRowData['marksAvailable'] != null && currRowData['marksAvailable'] != "") {
 						     			if (parseFloat(value) > parseFloat(currRowData['marksAvailable'])){
-						     				info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="error.markhigher"/>', '<fmt:message key="label.ok"/>');
+						     				info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
 						     				jQuery("#"+subgrid_table_id).restoreCell( iRow, iCol);
 						     				throw("Mark must be lower than maximum mark");
 						     			}
@@ -219,7 +219,7 @@
 						     	}
 						     },
 						     errorCell: function(serverresponse, status) {
-						     	info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="error.cellsave"/>', '<fmt:message key="label.ok"/>');
+						     	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.cellsave"/>", "<fmt:message key="label.ok"/>");
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"));
@@ -266,7 +266,7 @@
 				
 				// Creating activity view with sub learner view
 				jQuery("#activityView").jqGrid({
-					caption: '<fmt:message key="gradebook.gridtitle.activitygrid"/>',
+					caption: "<fmt:message key="gradebook.gridtitle.activitygrid"/>",
 				    datatype: "xml",
 				    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}",
 				    height: "100%",
@@ -280,10 +280,10 @@
 				    colNames:[
 				    	'', 
 				    	'',
-				    	'<fmt:message key="gradebook.columntitle.name"/>', 
-				    	'<fmt:message key="gradebook.columntitle.averageTimeTaken"/>', 
-				    	'<fmt:message key="gradebook.columntitle.competences"/>', 
-				    	'<fmt:message key="gradebook.columntitle.averageMark"/>'
+				    	"<fmt:message key="gradebook.columntitle.name"/>", 
+				    	"<fmt:message key="gradebook.columntitle.averageTimeTaken"/>", 
+				    	"<fmt:message key="gradebook.columntitle.competences"/>", 
+				    	"<fmt:message key="gradebook.columntitle.averageMark"/>"
 				    ],
 				    colModel:[
 				      {name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
@@ -295,7 +295,7 @@
 				    ],
 				    loadError: function(xhr,st,err) {
 			    		jQuery("#activityView").clearGridData();
-			    		info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
+			    		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 			    	},
 				    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 				    subGrid: true,
@@ -322,12 +322,12 @@
 						     colNames: [
 						     	'',
 						     	'',
-						     	'<fmt:message key="gradebook.columntitle.name"/>',
-						     	'<fmt:message key="gradebook.columntitle.progress"/>', 
-						     	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
-						     	'<fmt:message key="gradebook.columntitle.outputs"/>', 
-						     	'<fmt:message key="gradebook.columntitle.activityFeedback"/>', 
-						     	'<fmt:message key="gradebook.columntitle.mark"/>'
+						     	"<fmt:message key="gradebook.columntitle.name"/>",
+						     	"<fmt:message key="gradebook.columntitle.progress"/>", 
+						     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+						     	"<fmt:message key="gradebook.columntitle.outputs"/>", 
+						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
+						     	"<fmt:message key="gradebook.columntitle.mark"/>"
 						     ],
 						     colModel:[
 						     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
@@ -341,7 +341,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 					    		jQuery("#"+subgrid_table_id).clearGridData();
-					    		info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
+					    		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 					    	 },
 					    	 formatCell: function(rowid, cellname,value, iRow, iCol) {
 					    	 	if (cellname == "mark") {
@@ -381,7 +381,7 @@
 					    	 		var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
 						     		if (currRowData['marksAvailable'] != null && currRowData['marksAvailable'] != "") {
 						     			if (parseFloat(value) > parseFloat(currRowData['marksAvailable'])){
-						     				info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="error.markhigher"/>', '<fmt:message key="label.ok"/>');
+						     				info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
 						     				jQuery("#"+subgrid_table_id).restoreCell( iRow, iCol);
 						     				throw("Mark must be lower than maximum mark");
 						     			}
@@ -405,7 +405,7 @@
 						     	}
 						     },
 						     errorCell: function(serverresponse, status) {
-						     	info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="error.cellsave"/>', '<fmt:message key="label.ok"/>');
+						     	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.cellsave"/>", "<fmt:message key="label.ok"/>");
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"));	// applying tooltips for this grid
@@ -442,7 +442,7 @@
 				// Enable show/hide columns
 				jQuery("#activityView").navButtonAdd('#activityViewPager',{
 					caption: "",
-					title: '<fmt:message key="gradebook.function.window.showColumns"/>',
+					title: "<fmt:message key="gradebook.function.window.showColumns"/>",
 					buttonimg:"<lams:LAMSURL />images/table_edit.png", 
 					onClickButton: function(){
 						jQuery("#activityView").setColumns();

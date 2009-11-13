@@ -67,7 +67,7 @@
 <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img
 	src="tool_images/${pixlrDTO.imageFileName}" id="originalImage"
-	title='<fmt:message key="tooltip.openfullsize" />'
+	title="<fmt:message key="tooltip.openfullsize" />"
 	onclick="openPopup('tool_images/${pixlrDTO.imageFileName}', origImageHeight, origImageWidth);" />
 
 <br />
@@ -113,7 +113,7 @@
 								<img src="tool_images/${user.imageFileName}"
 									height="${user.imageThumbnailHeight}"
 									width="${user.imageThumbnailWidth}"
-									title='<fmt:message key="tooltip.openfullsize" />'
+									title="<fmt:message key="tooltip.openfullsize" />"
 									onclick="openPopup('tool_images/${user.imageFileName}', ${user.imageHeight}, ${user.imageWidth})" />
 							</c:when>
 							<c:otherwise>

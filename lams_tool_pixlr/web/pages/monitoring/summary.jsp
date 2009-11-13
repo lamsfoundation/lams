@@ -134,7 +134,7 @@
 								<img src="${pixlrImageFolderURL}/${user.imageFileName}" 
 									height="${user.imageThumbnailHeight}" 
 									width="${user.imageThumbnailWidth}"
-									title='<fmt:message key="tooltip.openfullsize" />'
+									title="<fmt:message key="tooltip.openfullsize" />"
 									onclick="openPopup('${pixlrImageFolderURL}/${user.imageFileName}', ${user.imageHeight}, ${user.imageWidth})"
 								 />
 								 <c:if test="${pixlrDTO.allowViewOthersImages}">

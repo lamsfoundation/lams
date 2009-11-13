@@ -71,7 +71,7 @@
 				
 				var i;
 				with (catMenu) {
-					options[0] = new Option('<fmt:message key="wizard.selectCategory" />', "none");
+					options[0] = new Option("<fmt:message key="wizard.selectCategory" />", "none");
 					for(i = 0; i < categoryArray.length; i++)
 					{
 						options[i+1] = new Option(categoryArray[i].title, i);
@@ -115,11 +115,11 @@
 			{
 				if (catMenu.selectedIndex == null || catMenu.selectedIndex <= 0)
 				{
-					alert('<fmt:message key="wizard.delete.notselected" />');
+					alert("<fmt:message key="wizard.delete.notselected" />");
 				}
 				else
 				{
-					if (confirm('<fmt:message key="wizard.delete.warnDeleteCategory" />'))
+					if (confirm("<fmt:message key="wizard.delete.warnDeleteCategory" />"))
 					{
 						var uid = categoryArray[catMenu.selectedIndex-1].uid;
 						
@@ -140,11 +140,11 @@
 			{
 				if (skillMenu.selectedIndex == null || skillMenu.selectedIndex <= 0)
 				{
-					alert('<fmt:message key="wizard.delete.notselected" />');
+					alert("<fmt:message key="wizard.delete.notselected" />");
 				}
 				else
 				{
-					if (confirm('<fmt:message key="wizard.delete.warnDeleteSkill" />'))
+					if (confirm("<fmt:message key="wizard.delete.warnDeleteSkill" />"))
 					{
 						var uid = categoryArray[catMenu.selectedIndex-1].skills[skillMenu.selectedIndex-1].uid;
 						
@@ -165,11 +165,11 @@
 			{
 				if (qMenu.selectedIndex == null || qMenu.selectedIndex <= 0)
 				{
-					alert('<fmt:message key="wizard.delete.notselected" />');
+					alert("<fmt:message key="wizard.delete.notselected" />");
 				}
 				else
 				{
-					if (confirm('<fmt:message key="wizard.delete.warnDeleteQuestion" />'))
+					if (confirm("<fmt:message key="wizard.delete.warnDeleteQuestion" />"))
 					{
 						var uid = categoryArray[catMenu.selectedIndex-1].skills[skillMenu.selectedIndex-1].questions[qMenu.selectedIndex-1].uid;
 						
@@ -201,7 +201,7 @@
 				}
 				else
 				{
-					alert('<fmt:message key="wizard.edit.notSelected" />');
+					alert("<fmt:message key="wizard.edit.notSelected" />");
 				}
 			}
 			
@@ -215,7 +215,7 @@
 					{ 
 				    	buttons: 
 				    	{ 
-					        '<fmt:message key="wizard.ok" />': function() 
+					        "<fmt:message key="wizard.ok" />": function() 
 					        { 
 					            if(handleDialogInput(inputType, isAdd))
 					            {
@@ -223,7 +223,7 @@
 					            	$(this).dialog("close"); 
 					            }
 					        }, 
-					       '<fmt:message key="label.cancel" />': function() 
+					       "<fmt:message key="label.cancel" />": function() 
 					        { 
 					            document.getElementById('inputText').value = "";
 					            $(this).dialog("close"); 
@@ -243,7 +243,7 @@
 				var inputText = trim(document.getElementById("inputText").value);
 				if (inputText == null || inputText == "")
 				{
-					alert('<fmt:message key="wizard.edit.fieldRequired" />');
+					alert("<fmt:message key="wizard.edit.fieldRequired" />");
 					return false
 				}
 
@@ -285,7 +285,7 @@
 							}
 							else
 							{
-								alert('<fmt:message key="wizard.add.mustSelectCategory" />');
+								alert("<fmt:message key="wizard.add.mustSelectCategory" />");
 								return false;
 							}
 						}
@@ -316,7 +316,7 @@
 							}
 							else
 							{
-								alert('<fmt:message key="wizard.add.mustSelectSkill" />');
+								alert("<fmt:message key="wizard.add.mustSelectSkill" />");
 								return false;
 							}
 							
@@ -422,7 +422,7 @@
 			
 			function disableExport()
 			{
-				msg = '<fmt:message key="wizard.export.savefirst" />'
+				msg = "<fmt:message key="wizard.export.savefirst" />"
 				document.getElementById("exportButton").href = "javascript:alert('" + msg + "');";
 			}
 			
@@ -434,7 +434,7 @@
 				}
 				else
 				{
-					if(confirm('<fmt:message key="wizard.import.warn" />'))
+					if(confirm("<fmt:message key="wizard.import.warn" />"))
 					{
 						customSubmit("importWizard");
 					}

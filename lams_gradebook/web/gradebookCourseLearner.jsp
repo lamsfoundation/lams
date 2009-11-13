@@ -47,16 +47,16 @@
 			    rowNum:10,
 			    colNames:[
 			    	'', 
-			    	'<fmt:message key="gradebook.columntitle.lessonName"/>', 
-			    	'<fmt:message key="gradebook.columntitle.subGroup"/>', 
-			    	'<fmt:message key="gradebook.columntitle.progress"/>', 
-			    	'<fmt:message key="gradebook.columntitle.lessonFeedback"/>', 
-			    	'<fmt:message key="gradebook.columntitle.startDate"/>', 
-			    	'<fmt:message key="gradebook.columntitle.completeDate"/>', 
-			    	'<fmt:message key="gradebook.columntitle.averageTimeTaken"/>', 
-			    	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
-			    	'<fmt:message key="gradebook.columntitle.averageMark"/>', 
-			    	'<fmt:message key="gradebook.columntitle.mark"/>'],
+			    	"<fmt:message key="gradebook.columntitle.lessonName"/>", 
+			    	"<fmt:message key="gradebook.columntitle.subGroup"/>", 
+			    	"<fmt:message key="gradebook.columntitle.progress"/>", 
+			    	"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
+			    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
+			    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
+			    	"<fmt:message key="gradebook.columntitle.averageTimeTaken"/>", 
+			    	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+			    	"<fmt:message key="gradebook.columntitle.averageMark"/>", 
+			    	"<fmt:message key="gradebook.columntitle.mark"/>"],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
@@ -72,7 +72,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#organisationGrid").clearGridData();
-			    	info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
+			    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -91,13 +91,13 @@
 							 rowNum:10,
 						     colNames: [
 						     	'',
-						     	'<fmt:message key="gradebook.columntitle.activity"/>',
-						     	'<fmt:message key="gradebook.columntitle.progress"/>', 
-						     	'<fmt:message key="gradebook.columntitle.activityFeedback"/>', 
-						     	'<fmt:message key="gradebook.columntitle.averageTimeTaken"/>', 
-						     	'<fmt:message key="gradebook.columntitle.timeTaken"/>', 
-						     	'<fmt:message key="gradebook.columntitle.averageMark"/>', 
-						     	'<fmt:message key="gradebook.columntitle.mark"/>'
+						     	"<fmt:message key="gradebook.columntitle.activity"/>",
+						     	"<fmt:message key="gradebook.columntitle.progress"/>", 
+						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
+						     	"<fmt:message key="gradebook.columntitle.averageTimeTaken"/>", 
+						     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+						     	"<fmt:message key="gradebook.columntitle.averageMark"/>", 
+						     	"<fmt:message key="gradebook.columntitle.mark"/>"
 						     ],
 						     colModel: [
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
@@ -111,7 +111,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	info_dialog('<fmt:message key="label.error"/>', '<fmt:message key="gradebook.error.loaderror"/>', '<fmt:message key="label.ok"/>');
+						    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 						     },
 							 gridComplete: function(){
 							 	toolTip($(".jqgrow"));

@@ -28,7 +28,7 @@
                 var login = document.forgotForm.login.value;
                 if (login == null || login=="")
 	            {
-	                alert('<fmt:message key="error.forgot.password.username" />');
+	                alert("<fmt:message key="error.forgot.password.username" />");
 	                return false;
 	            }
 	            else
@@ -44,12 +44,12 @@
                
                 if (email == null || email=="")
                 {
-                    alert('<fmt:message key="error.forgot.password.email" />');
+                    alert("<fmt:message key="error.forgot.password.email" />");
                     return false;
                 }
                 else if (!filter.test(email)) 
                 {
-                    alert('<fmt:message key="error.valid.email.required" />');
+                    alert("<fmt:message key="error.valid.email.required" />");
                     return false;
                 }
                 else

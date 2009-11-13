@@ -48,7 +48,7 @@
 	var imageGalleryListTargetDiv = "imageGalleryListArea";
 	function deleteItem(idx,sessionMapID){
 
-		var	deletionConfirmed = confirm('<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>');
+		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
 		
 		if (deletionConfirmed) {
 			var url = "<c:url value="/authoring/removeImage.do"/>";

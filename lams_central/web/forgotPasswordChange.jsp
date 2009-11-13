@@ -32,11 +32,11 @@ String key = request.getParameter("key");
             
             if (pass == null || pass=="" || passConfirm == null || passConfirm =="")
             {
-                alert('<fmt:message key="error.forgot.password.fields" />');
+                alert("<fmt:message key="error.forgot.password.fields" />");
             }
             else if (pass != passConfirm)
             {
-                alert('<fmt:message key="error.newpassword.mismatch" />');
+                alert("<fmt:message key="error.newpassword.mismatch" />");
             }
             else
             {

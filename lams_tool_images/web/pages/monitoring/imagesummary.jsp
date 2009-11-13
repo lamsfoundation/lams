@@ -17,7 +17,7 @@
 		<script type="text/javascript">
 
 			function deleteComment(commentUid) {
-				var	deletionConfirmed = confirm('<fmt:message key="warning.msg.monitoring.do.you.want.to.delete"></fmt:message>');
+				var	deletionConfirmed = confirm("<fmt:message key="warning.msg.monitoring.do.you.want.to.delete"></fmt:message>");
 
 				if (deletionConfirmed) {
 					window.location.href = "<c:url value='/monitoring/removeComment.do'/>?sessionMapID=${sessionMapID}&commentUid=" + commentUid;
