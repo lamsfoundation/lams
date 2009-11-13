@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -72,15 +74,25 @@ public class FindUserLessonsAction extends DispatchAction {
 	    Organisation group = (Organisation) userManagementService.findById(Organisation.class, courseID);
 
 	    Set<User> users = getUserSet(query, group);
+	    
+	    User viewer = (User) userManagementService.getUserByLogin(request.getRemoteUser());
 
-	    Map<User, List<Lesson>> userLessonsMap = new HashMap<User, List<Lesson>>();
+	    Map<User, List<LessonDTO>> userLessonsMap = new HashMap<User, List<LessonDTO>>();
 	    for (User user : users) {
 
 		// get all lessons for 'user' in 'group' and add to lessons map
 		List<Lesson> lessons = (lessonService.getLessonsByGroupAndUser(user.getUserId(), group
 			.getOrganisationId()));
 		
-		userLessonsMap.put(user, lessons);
+		List<LessonDTO> lessonDTOs = new ArrayList<LessonDTO>();
+		for (Lesson lesson : lessons) {
+		    LessonDTO dto = new LessonDTO(lesson);
+		    // flag to display monitor link only if user is staff member of lesson
+		    dto.setDisplayMonitor(lesson.getLessonClass().isStaffMember(viewer));
+		    lessonDTOs.add(dto);
+		}
+		
+		userLessonsMap.put(user, lessonDTOs);
 	    }
 
 	    request.setAttribute("userLessonsMap", userLessonsMap);

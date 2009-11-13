@@ -88,10 +88,13 @@
 			${user.key.lastName}</strong> <c:choose>
 				<c:when test="${user.value ne null and not empty user.value}">
 					<ul>
-						<c:forEach var="lesson" items="${user.value}">
-							<li>${lesson.lessonName} <a
-								href="javascript:openMonitorLesson(${lesson.lessonId})"><fmt:message
-								key="index.monitor" /></a></li>
+						<c:forEach var="lessonDto" items="${user.value}">
+							<li>${lessonDto.lessonName} 
+								<c:if test="${lessonDto.displayMonitor}">
+								<a href="javascript:openMonitorLesson(${lessonDto.lessonID})">
+								<fmt:message key="index.monitor" /></a>
+								</c:if>
+							</li>
 						</c:forEach>
 					</ul>
 					<br>

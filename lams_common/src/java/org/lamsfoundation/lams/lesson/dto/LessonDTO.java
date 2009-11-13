@@ -59,6 +59,7 @@ public class LessonDTO
 	private Boolean learnerExportAvailable;
 	private Boolean learnerPresenceAvailable;
 	private Boolean learnerImAvailable;
+	private Boolean displayMonitor;
 
     //---------------------------------------------------------------------
     // Construtors
@@ -152,6 +153,14 @@ public class LessonDTO
 		return learnerImAvailable;
 	}
 	
+	public Boolean getDisplayMonitor() {
+	    return displayMonitor;
+	}
+	
+	public void setDisplayMonitor(Boolean displayMonitor) {
+	    this.displayMonitor = displayMonitor;
+	}
+	
     /**
      * Returns the String representation of lesson data transfer object.
      * @see java.lang.Object#toString()
@@ -171,6 +180,7 @@ public class LessonDTO
         sb.append("learnerExportAvailable='" + getLearnerExportAvailable() + "'; ");
         sb.append("learnerPresenceAvailable='" + getLearnerPresenceAvailable() + "'; ");
         sb.append("learnerImAvailable='" + getLearnerImAvailable() + "'; ");
+        sb.append("displayMonitor='" + getDisplayMonitor() + "'; ");
         return sb.toString();
     }
 }
