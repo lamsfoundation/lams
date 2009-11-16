@@ -32,7 +32,7 @@
 		<c:if test="${currentWikiPage.title != mainWikiPage.title}">
 			&nbsp;
 			<a href="javascript:doRemove(&#39;<fmt:message key="label.wiki.remove.confirm"></fmt:message>&#39;)"
-				title='<fmt:message key="label.wiki.remove.toolTip"></fmt:message>'
+				title="<fmt:message key="label.wiki.remove.toolTip"></fmt:message>"
 			>
 				<fmt:message key="label.wiki.remove"></fmt:message>
 			</a>
