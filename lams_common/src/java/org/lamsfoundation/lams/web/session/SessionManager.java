@@ -196,6 +196,16 @@ public class SessionManager {
 	    ssoCookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE, currentSessionId);
 	    SessionManager.log.debug("==>Creating new " + SystemSessionFilter.SSO_SESSION_COOKIE + " - " + ssoCookie.getValue());
 	}
+	
+	Cookie cookie = findCookie((HttpServletRequest) req, SystemSessionFilter.SYS_SESSION_COOKIE);
+	if (cookie == null) {
+	    // If a session exists in the request without a corresponding JSESSIONID cookie, assume
+	    // user lost their cookie or closed their browser, so invalidate the session
+	    HttpSession session = ((HttpServletRequest)req).getSession(false);
+	    if (session != null) {
+		session.invalidate();
+	    }
+	}
 	 
 	setCurrentSessionId(currentSessionId);
 	// reset session last access time
