@@ -1,8 +1,8 @@
-LAMS 2.3.2 - Learning Activity Management System
+LAMS 2.3.3 - Learning Activity Management System
 ----------------------------------------------
 
-This is a patch update from LAMS 2.3.1 to 2.3.2, this version does not do a 
-full install, you must install LAMS 2.3.1 first.
+This is a patch update from LAMS 2.3.2 to 2.3.3, this version does not do a 
+full install, you must install LAMS 2.3.2 first.
 
 For release notes goto: http://is.gd/2IDib
 

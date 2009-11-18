@@ -48,11 +48,11 @@
 ;!insertmacro LineFind
 
 # constants
-!define VERSION "2.3.2"
-!define PREVIOUS_VERSION "2.3.1"
-!define LANGUAGE_PACK_VERSION "2009-08-28"
-!define LANGUAGE_PACK_VERSION_INT "20092828"
-!define DATE_TIME_STAMP "200908280000"
+!define VERSION "2.3.3"
+!define PREVIOUS_VERSION "2.3.2"
+!define LANGUAGE_PACK_VERSION "2009-11-18"
+!define LANGUAGE_PACK_VERSION_INT "20091118"
+!define DATE_TIME_STAMP "200911180000"
 ######################## Added in the extra .0 for 2.1 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
@@ -197,21 +197,6 @@ SectionGroup "LAMS ${VERSION} Patch (Requires LAMS 2.0)" update
         
         ; Updating the the core lams jars/wars
         call updateJarsWars
-        
-        ; Updating the database to support version
-        call updateDatabase
-        
-        /*
-        call languagePackInit
-        
-        ; get the language files locations specific to this server from the database
-        detailprint "Copying language files for combined activities"
-        call copyllid
-
-        # write this language pack version to registry
-        Detailprint 'Writing Language pack version ${LANGUAGE_PACK_VERSION} to registry: "$VERSION_INT"'
-        DetailPrint "LAMS Language Pack ${LANGUAGE_PACK_VERSION} install successfull"
-        */
         
         setoutpath $INSTDIR
         File /a "${DOCUMENTS}\license.txt"
@@ -614,78 +599,6 @@ Function updateJarsWars
 FunctionEnd
 
 
-
-; Updating the database to support version
-Function updateDatabase
-    # generate a properties file 
-    ClearErrors
-    FileOpen $0 $TEMP\lams\core.properties w
-    IfErrors 0 +3
-        Detailprint "Problem opening core.properties to write"
-        goto error
-    
-    # convert '\' to '/' for Ant's benefit
-    Push $TEMP
-    Push "\"
-    Call StrSlash
-    Pop $2
-    FileWrite $0 "temp=$2/$\r$\n"
-            
-    Push $INSTDIR
-    Push "\"
-    Call StrSlash
-    Pop $2
-    
-    FileWrite $0 "instdir=$2/$\r$\n"
-    FileWrite $0 "db.name=$DB_NAME$\r$\n"
-    FileWrite $0 "db.username=$DB_USER$\r$\n"
-    FileWrite $0 "db.password=$DB_PASS$\r$\n"
-    FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
-    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST/$${db.name}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
-    FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
-
-    Fileclose $0
-    IfErrors 0 +2
-        goto error
-    
-
-    # Copying the core sql update scriptes to $TEMP/lams/sql
-    setoutpath "$TEMP\lams\sql"
-    file "${SQL}\update-script.sql" 
-     
-    setoutpath "$TEMP\lams\"
-    file "${ANT}\update-database.xml"
-    
-    createdirectory "$INSTDIR\update-logs"
-
-    # Running the ant scripts to create deploy.xml for the normal tools 
-    strcpy $0 '"$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat" -logfile "$INSTDIR\update-logs\ant-update-database-to-${VERSION}.log" -buildfile "$TEMP\lams\update-database.xml" update-database'
-    DetailPrint $0
-    nsExec::ExecToStack $0
-    Pop $0 ; return code, 0=success, error=fail
-    Pop $1 ; console output
-    ${if} $0 == "error"
-    ${orif} $0 == 1
-        goto error
-    ${endif}
-    DetailPrint "Result: $1"
-    
-    push "$INSTDIR\update-logs\ant-update-database.log"
-    push "Failed"
-    Call FileSearch
-    Pop $0 #Number of times found throughout
-    Pop $3 #Found at all? yes/no
-    Pop $2 #Number of lines found in
-    StrCmp $3 yes 0 +2
-        goto error
-    goto done
-    error:
-        DetailPrint "LAMS database updates failed"
-        MessageBox MB_OK|MB_ICONSTOP "LAMS database updates failed, check update logs in the installation directory for details $\r$\nError:$\r$\n$\r$\n$1"
-        Abort "LAMS configuration failed"
-    done:
-FunctionEnd 
-
 Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "dir_jdk" $JDK_DIR
     WriteRegStr HKLM "${REG_HEAD}" "mysql_host" "$MYSQL_HOST"
@@ -693,166 +606,4 @@ Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "version" "${VERSION}"
     WriteRegStr HKLM "${REG_HEAD}" "language_pack" "${VERSION}"
 FunctionEnd
-
-
-################################################################################
-# CODE USED FOR LANGUAGE PACK                                                  #
-################################################################################
-
-; first, finds the location of the language files in the database
-; then copy the required files to the dirname
-/*
-Var CSllid
-Var FSllid
-Var RFllid
-Function copyllid
-    setoutpath "$TEMP\lams"
-    File "${BUILD_DIR}\GetLlidFolderNames.class"
-    
-    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
-    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
-    # execute llid finder
-    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Chat and Scribe" "$1" "$DB_USER" "$DB_PASS"'
-    pop $0
-    pop $CSllid
-    ${if} $0 != '0'
-        Messagebox MB_OK|MB_ICONSTOP "Error while finding Chat and Scrbe llid folders: $CSllid"
-        Abort
-    ${endif}
-    
-    setoutpath "$TEMP\lams"
-    File "${BUILD_DIR}\GetLlidFolderNames.class"
-    
-    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
-    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
-    # execute llid finder
-    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Forum and Scribe" "$1" "$DB_USER" "$DB_PASS"'
-    pop $0
-    pop $FSllid
-    ${if} $0 != '0'
-        Messagebox MB_OK|MB_ICONSTOP "Error while finding Forum and Scribe llid folders"
-        Abort
-    ${endif}
-    
-    strcpy $1 "jdbc:mysql://$MYSQL_HOST/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true"
-    ReadRegStr $3 HKLM "${REG_HEAD}" "dir_jdk"
-    # execute llid finder
-    Detailprint '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Resource and Forum" "$1" "$DB_USER" "$DB_PASS"'
-    nsExec::ExecToStack '"$3\bin\java.exe" -cp ".;$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\mysql-connector-java-5.0.8-bin.jar" GetLlidFolderNames "Resources and Forum" "$1" "$DB_USER" "$DB_PASS"'
-    pop $0
-    pop $RFllid
-    ${if} $0 != '0'
-        Messagebox MB_OK|MB_ICONSTOP "Error while finding Resource and Forum llid folders"
-        Abort
-    ${endif}
-    
-    detailprint "Copying chat and scribe language files to $LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$CSllid"
-    setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$CSllid"
-    file /a /x CVS "${BASE_PROJECT_DIR}\lams_build\librarypackages\chatscribe\language\lams\*"
-    
-    detailprint "Copying forum and scribe language files to $LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$FSllid"
-    setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$FSllid"
-    file /a /x CVS "${BASE_PROJECT_DIR}\lams_build\librarypackages\forumscribe\language\lams\*"
-    
-    detailprint "Copying resources and forum language files to $LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$RFllid"
-    setoutpath "$LAMS_DIR\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams\library\llid$RFllid"
-    file /a /x CVS "${BASE_PROJECT_DIR}\lams_build\librarypackages\shareresourcesforum\language\lams\*"
-    
-FunctionEnd
-
-Function languagePackInit
-    InitPluginsDir
-
-    
-    #get the version in from the version date yyyy-mm-dd
-    call getVersionInt
- 
-    # getting the mysql database details
-    ReadRegStr $MYSQL_DIR HKLM "${REG_HEAD}" "dir_mysql"
-    ReadRegStr $DB_NAME   HKLM "${REG_HEAD}" "db_name"
-    ReadRegStr $DB_USER   HKLM "${REG_HEAD}" "db_user"
-    ReadRegStr $DB_PASS   HKLM "${REG_HEAD}" "db_pass"
-   
-    # Abort if there is no version of LAMS2 installed
-    ReadRegStr $0 HKLM "${REG_HEAD}" "version"
-    ${If} $0 = ""
-        MessageBox MB_OK|MB_ICONSTOP "No version of LAMS 2.x is installed$\n$\n\
-                                      Please install LAMS 2 before continuing"
-        Abort
-    ${EndIf}
-    
-    #set the installation directory
-    ReadRegStr $0 HKLM "${REG_HEAD}" "dir_inst"
-    strcpy $LAMS_DIR $0
-    strcpy $INSTDIR "$0\jboss-4.0.2\server\default\deploy\lams.ear\lams-dictionary.jar\org\lamsfoundation\lams"
-    
-    done:
-FunctionEnd
-
-Function getVersionInt
-    push ${LANGUAGE_PACK_VERSION}
-    push "-"
-    push 0
-    push 1
-    call Strtok
-    pop $VERSION_INT
-    
-    push ${LANGUAGE_PACK_VERSION}
-    push "-"
-    push 1
-    push 1
-    call Strtok
-    pop $0
-    strcpy $VERSION_INT "$VERSION_INT$0"
-    
-    push ${LANGUAGE_PACK_VERSION}
-    push "-"
-    push 2
-    push 1
-    call Strtok
-    pop $0
-    strcpy $VERSION_INT "$VERSION_INT$0"
-    
-FunctionEnd
-
-
-Function SplitFirstStrPart
-    Exch $R0
-    Exch
-    Exch $R1
-    Push $R2
-    Push $R3
-    StrCpy $R3 $R1
-    StrLen $R1 $R0
-    IntOp $R1 $R1 + 1
-    loop:
-        IntOp $R1 $R1 - 1
-        StrCpy $R2 $R0 1 -$R1
-        StrCmp $R1 0 exit0
-        StrCmp $R2 $R3 exit1 loop
-    exit0:
-        StrCpy $R1 ""
-        Goto exit2
-    exit1:
-        IntOp $R1 $R1 - 1
-        StrCmp $R1 0 0 +3
-        StrCpy $R2 ""
-        Goto +2
-        StrCpy $R2 $R0 "" -$R1
-        IntOp $R1 $R1 + 1
-        StrCpy $R0 $R0 -$R1
-        StrCpy $R1 $R2
-    exit2:
-        Pop $R3
-        Pop $R2
-        Exch $R1 ;rest
-        Exch
-        Exch $R0 ;first
-FunctionEnd
-*/
-################################################################################
-# END CODE USED FOR LANGUAGE PACK                                              #
-################################################################################
 
