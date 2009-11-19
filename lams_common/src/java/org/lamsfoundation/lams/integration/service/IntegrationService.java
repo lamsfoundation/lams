@@ -342,6 +342,9 @@ public class IntegrationService implements IIntegrationService {
 	    if (str == null) {
 		throw new UserInfoFetchException("Fail to fetch user data from external server:"
 			+ serverMap.getServerid() + " - No data returned from external server");
+	    } else {
+	    	// LDEV-2468 read user data from ext server as UTF-8 
+	    	str = new String(str.getBytes(), "UTF-8");
 	    }
 
 	    return CSVUtil.parse(str);
