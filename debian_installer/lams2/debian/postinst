@@ -17,6 +17,21 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+update232to233 () {
+    # Remove old llid language files
+    cd /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/
+    for dir in `ls`
+    do
+        if [ $dir != "chatscribe" ] ; then
+            if [ $dir != "forumscribe" ] ; then
+                if [ $dir != "shareresourcesforum" ] ; then
+                    rm -rf $dir
+                fi
+            fi
+        fi
+    done 
+}
+
 update230to231 () {
     # Update 2.3.0 database to 2.3.1
     if [ "$db_root_pass" != "" ] ; then
@@ -212,6 +227,15 @@ case "$1" in
         sed -i -e "s/port=\"8080\"/port=\"$server_port\"/" server.xml
 
         case "$2" in
+            2.3.2*)
+                update;
+                update232to233;
+            ;;
+            
+            2.3.1*)
+                update;
+            ;;
+        
             2.3.0*)
                 update;
                 update230to231;
@@ -373,44 +397,7 @@ case "$1" in
             ;;
         esac
 
-        # Set learning library dictionary folder names right
-        if [ "$db_root_pass" != "" ] ; then
-            forum_scribe_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Forum and Scribe"' \
-                -u root -p$db_root_pass | tail -1`
-            chat_scribe_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Chat and Scribe"' \
-                -u root -p$db_root_pass | tail -1`
-            resources_forum_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Resources and Forum"' \
-                -u root -p$db_root_pass | tail -1`
-        else
-            forum_scribe_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Forum and Scribe"' \
-                -u root | tail -1`
-            chat_scribe_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Chat and Scribe"' \
-                -u root | tail -1`
-            resources_forum_id=`mysql $db_name -e'select learning_library_id from lams_learning_library where title="Resources and Forum"' \
-                -u root | tail -1`
-        fi
-
-        cd /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/
-        set +e  # don't want to fail if grep finds nothing 
-        for dir in `ls` 
-        do
-            grep resources_and_forum $dir/ApplicationResources.properties > /dev/null 2>&1
-            if [ $? = 0 ] ; then
-                if [ $dir != "llid$resources_forum_id" ]; then mv $dir llid$resources_forum_id; fi
-                continue
-            fi
-            grep chatscribe $dir/ApplicationResources.properties > /dev/null 2>&1
-            if [ $? = 0 ] ; then
-                if [ $dir != "llid$chat_scribe_id" ]; then mv $dir llid$chat_scribe_id; fi
-                continue
-            fi
-            grep forumscribe $dir/ApplicationResources.properties > /dev/null 2>&1
-            if [ $? = 0 ] ; then
-                if [ $dir != "llid$forum_scribe_id" ]; then mv $dir llid$forum_scribe_id; fi
-                continue
-            fi
-        done
-        set -e
+        
 
         # Remove temp files
         rm -f /usr/share/lams2/2.1rc1to2.1.sql
