@@ -1,5 +1,7 @@
 <?php
 
+require_once($CFG->libdir.'/filelib.php');
+
 // This file keeps track of upgrades to 
 // the forum module
 //
@@ -19,6 +21,7 @@
 
 function xmldb_lamstwo_upgrade($oldversion=0) {
 
+    global $CFG;
     $result = true;
 
     if ($result && $oldversion < 2008052100) {
@@ -142,6 +145,12 @@ function xmldb_lamstwo_upgrade($oldversion=0) {
       
       $log_display->action = 'view lamstwo';
       insert_record('log_display', $log_display);
+    }
+    
+    if ($result && $oldversion < 2009112400) {
+        // language file moved to mod/lamstwo/lang/en_utf8 in this version;
+        // remove old one.
+        fulldelete($CFG->dirroot.'/lang/en_utf8/lamstwo.php');
     }
 
     return $result;

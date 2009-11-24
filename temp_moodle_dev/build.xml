@@ -61,11 +61,6 @@
 				<include name="lamstwo/**" />
 			</fileset>
 		</copy>
-		<copy verbose="true" preservelastmodified="true" todir="${moodle_dir}/lang/en_utf8/">
-			<fileset dir="moodle/lang/en_utf8">
-				<include name="lamstwo.php" />
-			</fileset>
-		</copy>
 	</target>
 	
 	<target name="undeploy-lamstwo">
@@ -102,7 +97,6 @@
 			<fileset dir="moodle/blocks">
 				<include name="lamstwo_status/**" />
 			</fileset>
-			<fileset dir="moodle/lang/en_utf8" includes="lamstwo.php" />
 		</zip>
 	</target>
 	
