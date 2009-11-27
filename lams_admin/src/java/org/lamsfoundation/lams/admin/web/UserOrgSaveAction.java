@@ -41,7 +41,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
@@ -56,99 +55,91 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 /**
  * struts doclets
  * 
- * @struts:action path="/userorgsave"
- *                name="UserOrgForm"
- *                input=".userorg"
- *                scope="request"
- *                validate="false"
- *
- * @struts:action-forward name="userlist"
- *                        path="/usermanage.do"
- * @struts:action-forward name="userorgrole"
- *                        path="/userorgrole.do"
+ * @struts:action path="/userorgsave" name="UserOrgForm" input=".userorg" scope="request" validate="false"
+ * 
+ * @struts:action-forward name="userlist" path="/usermanage.do"
+ * @struts:action-forward name="userorgrole" path="/userorgrole.do"
  */
-public class UserOrgSaveAction extends Action{
+public class UserOrgSaveAction extends Action {
 
-	private static Logger log = Logger.getLogger(UserOrgSaveAction.class);
-	private static IUserManagementService service;
-	private List<Role> rolelist;
-	
-	@SuppressWarnings("unchecked")
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		DynaActionForm userOrgForm = (DynaActionForm)form;
-				
-		Integer orgId = (Integer)userOrgForm.get("orgId");
-		request.setAttribute("org",orgId);
-		
-		if(isCancelled(request)){
-			return mapping.findForward("userlist");
-		}
-		
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		if (rolelist==null) rolelist = service.findAll(Role.class);
-		
-		Organisation organisation = (Organisation)service.findById(Organisation.class, orgId);
-		Set uos = organisation.getUserOrganisations();
-		
-		String[] userIds = (String[])userOrgForm.get("userIds");
-		List<String> userIdList = Arrays.asList(userIds);
-		log.debug("new user membership of orgId="+orgId+" will be: "+userIdList);
-		
-		// remove UserOrganisations that aren't in form data
-		Iterator iter = uos.iterator();
-		while(iter.hasNext()){
-			UserOrganisation uo = (UserOrganisation)iter.next();
-			Integer userId = uo.getUser().getUserId();
-			if(userIdList.indexOf(userId.toString())<0){
-				User user = (User)service.findById(User.class, userId);
-				Set userUos = user.getUserOrganisations();
-				userUos.remove(uo);
-				user.setUserOrganisations(userUos);
-				iter.remove();
-				log.debug("removed userId="+userId+" from orgId="+orgId);
-				// remove from subgroups
-				service.deleteChildUserOrganisations(uo.getUser(), uo.getOrganisation());
-			}
-		}
-		// add UserOrganisations that are in form data
-		List newUserOrganisations = new ArrayList();
-		for(int i=0; i<userIdList.size(); i++){
-			Integer userId = new Integer((String)userIdList.get(i));
-			Iterator iter2 = uos.iterator();
-			Boolean alreadyInOrg = false;
-			while(iter2.hasNext()){
-				UserOrganisation uo = (UserOrganisation)iter2.next();
-				if(uo.getUser().getUserId().equals(userId)){
-					alreadyInOrg = true;
-					break;
-				}
-			}
-			if(!alreadyInOrg){
-				User user = (User)service.findById(User.class,userId);
-				UserOrganisation uo = new UserOrganisation(user,organisation);
-				newUserOrganisations.add(uo);
-			}
-		}
-		
-		organisation.setUserOrganisations(uos);
-		service.save(organisation);
-		
-		// if no new users, then finish; otherwise forward to where roles can be assigned for new users.
-		if(newUserOrganisations.isEmpty()){
-			log.debug("no new users to add to orgId="+orgId);
-			return mapping.findForward("userlist");
-		}else{
-			request.setAttribute("roles",service.filterRoles(rolelist,
-					request.isUserInRole(Role.SYSADMIN),
-					organisation.getOrganisationType()));
-			request.setAttribute("newUserOrganisations",newUserOrganisations);
-			request.setAttribute("orgId",orgId);
-			return mapping.findForward("userorgrole");
-		}
+    private static Logger log = Logger.getLogger(UserOrgSaveAction.class);
+    private static IUserManagementService service;
+    private List<Role> rolelist;
+
+    @SuppressWarnings("unchecked")
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	DynaActionForm userOrgForm = (DynaActionForm) form;
+
+	Integer orgId = (Integer) userOrgForm.get("orgId");
+	request.setAttribute("org", orgId);
+
+	if (isCancelled(request)) {
+	    return mapping.findForward("userlist");
 	}
+
+	service = AdminServiceProxy.getService(getServlet().getServletContext());
+	if (rolelist == null)
+	    rolelist = service.findAll(Role.class);
+
+	Organisation organisation = (Organisation) service.findById(Organisation.class, orgId);
+	Set uos = organisation.getUserOrganisations();
+
+	String[] userIds = (String[]) userOrgForm.get("userIds");
+	List<String> userIdList = Arrays.asList(userIds);
+	log.debug("new user membership of orgId=" + orgId + " will be: " + userIdList);
+
+	// remove UserOrganisations that aren't in form data
+	Iterator iter = uos.iterator();
+	while (iter.hasNext()) {
+	    UserOrganisation uo = (UserOrganisation) iter.next();
+	    Integer userId = uo.getUser().getUserId();
+	    if (userIdList.indexOf(userId.toString()) < 0) {
+		User user = (User) service.findById(User.class, userId);
+		Set userUos = user.getUserOrganisations();
+		userUos.remove(uo);
+		user.setUserOrganisations(userUos);
+		iter.remove();
+		log.debug("removed userId=" + userId + " from orgId=" + orgId);
+		// remove from subgroups
+		service.deleteChildUserOrganisations(uo.getUser(), uo.getOrganisation());
+	    }
+	}
+	// add UserOrganisations that are in form data
+	List newUserOrganisations = new ArrayList();
+	for (int i = 0; i < userIdList.size(); i++) {
+	    Integer userId = new Integer((String) userIdList.get(i));
+	    Iterator iter2 = uos.iterator();
+	    Boolean alreadyInOrg = false;
+	    while (iter2.hasNext()) {
+		UserOrganisation uo = (UserOrganisation) iter2.next();
+		if (uo.getUser().getUserId().equals(userId)) {
+		    alreadyInOrg = true;
+		    break;
+		}
+	    }
+	    if (!alreadyInOrg) {
+		User user = (User) service.findById(User.class, userId);
+		UserOrganisation uo = new UserOrganisation(user, organisation);
+		newUserOrganisations.add(uo);
+	    }
+	}
+
+	organisation.setUserOrganisations(uos);
+	service.save(organisation);
+
+	// if no new users, then finish; otherwise forward to where roles can be assigned for new users.
+	if (newUserOrganisations.isEmpty()) {
+	    log.debug("no new users to add to orgId=" + orgId);
+	    return mapping.findForward("userlist");
+	} else {
+	    request.setAttribute("roles", service.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN),
+		    organisation.getOrganisationType()));
+	    request.setAttribute("newUserOrganisations", newUserOrganisations);
+	    request.setAttribute("orgId", orgId);
+	    return mapping.findForward("userorgrole");
+	}
+    }
 
 }
