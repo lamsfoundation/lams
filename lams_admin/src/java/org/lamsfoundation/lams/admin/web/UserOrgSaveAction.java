@@ -104,11 +104,11 @@ public class UserOrgSaveAction extends Action{
 			UserOrganisation uo = (UserOrganisation)iter.next();
 			Integer userId = uo.getUser().getUserId();
 			if(userIdList.indexOf(userId.toString())<0){
-				iter.remove();
 				User user = (User)service.findById(User.class, userId);
 				Set userUos = user.getUserOrganisations();
 				userUos.remove(uo);
 				user.setUserOrganisations(userUos);
+				iter.remove();
 				log.debug("removed userId="+userId+" from orgId="+orgId);
 				// remove from subgroups
 				service.deleteChildUserOrganisations(uo.getUser(), uo.getOrganisation());
