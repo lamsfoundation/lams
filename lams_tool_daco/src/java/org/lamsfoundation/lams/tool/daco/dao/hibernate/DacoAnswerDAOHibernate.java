@@ -116,11 +116,15 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 		answerIndex++;
 	    } while (currentSingleAnswer != null);
 	} else {
-	    int answerIndex = Integer.parseInt(singleAnswer.getAnswer()) - 1;
-	    if (isUserSummary) {
-		summary.addUserSummarySingleAnswer(answerIndex, singleAnswer);
-	    } else {
-		summary.addGroupSummarySingleAnswer(answerIndex, singleAnswer);
+	    try {
+		int answerIndex = Integer.parseInt(singleAnswer.getAnswer()) - 1;
+		if (isUserSummary) {
+		    summary.addUserSummarySingleAnswer(answerIndex, singleAnswer);
+		} else {
+		    summary.addGroupSummarySingleAnswer(answerIndex, singleAnswer);
+		}
+	    } catch (NumberFormatException e) {
+		log.debug("Found non-integer value '" + singleAnswer.getAnswer() + "' for question uid " + currentUid);
 	    }
 	}
     }
