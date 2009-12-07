@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.daco.web.action;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -238,15 +239,15 @@ public class MonitoringAction extends Action {
 	String dateHeader = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_DATE, null);
 
 	Set<DacoQuestion> questions = daco.getDacoQuestions();
+	HashMap<Long, Integer> questionUidToSpreadsheetColumnIndex = new HashMap<Long, Integer>();
 	// First two columns are "user" and date when was the answer added
 	int columnIndex = 2;
 	String[] columnNames = new String[questions.size() + 2];
-	short[] questionTypes = new short[questions.size()];
 	columnNames[0] = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_USER, null);
 	columnNames[1] = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_ANSWER_DATE, null);
 	for (DacoQuestion question : questions) {
+	    questionUidToSpreadsheetColumnIndex.put(question.getUid(), columnIndex);
 	    columnNames[columnIndex] = WebUtil.removeHTMLtags(question.getDescription());
-	    questionTypes[columnIndex - 2] = question.getType();
 	    columnIndex++;
 	}
 
@@ -279,7 +280,6 @@ public class MonitoringAction extends Action {
 		    row[0] = user.getFullName();
 
 		    List<DacoAnswer> record = records.get(rowIndex);
-		    columnIndex = 2;
 		    for (int answerIndex = 0; answerIndex < record.size(); answerIndex++) {
 			DacoAnswer answer = record.get(answerIndex);
 			// we set the date of the whole row to the latest from all the participating answers
@@ -294,8 +294,9 @@ public class MonitoringAction extends Action {
 			}
 			Object cell = null;
 			String answerString = answer.getAnswer();
+			columnIndex = questionUidToSpreadsheetColumnIndex.get(answer.getQuestion().getUid());
 			// we extract answers and add them to "data" array in readable form
-			switch (questionTypes[columnIndex - 2]) {
+			switch (answer.getQuestion().getType()) {
 			case DacoConstants.QUESTION_TYPE_NUMBER:
 			    if (!StringUtils.isBlank(answerString)) {
 				Short fractionDigits = answer.getQuestion().getDigitsDecimal();
@@ -320,9 +321,13 @@ public class MonitoringAction extends Action {
 				StringBuilder cellStringBuilder = new StringBuilder();
 				// instead of number, we create a comma-separated string of chosen options
 				do {
-				    int chosenAnswer = Integer.parseInt(answerString) - 1;
-				    String chosenAnswerOption = answerOptions.get(chosenAnswer).getAnswerOption();
-				    cellStringBuilder.append(chosenAnswerOption).append(", ");
+				    try {
+					int chosenAnswer = Integer.parseInt(answerString) - 1;
+					String chosenAnswerOption = answerOptions.get(chosenAnswer).getAnswerOption();
+					cellStringBuilder.append(chosenAnswerOption).append(", ");
+				    } catch (Exception e) {
+					log.error("exportToSpreadsheet encountered '" + e + "' while parsing checkbox answer; answer was " + answerString);
+				    }
 				    answerIndex++;
 				    answer = record.get(answerIndex);
 				    currentQuestion = answer.getQuestion();
@@ -330,8 +335,9 @@ public class MonitoringAction extends Action {
 				} while (currentQuestion.equals(question));
 				// we went one answer too far, so we go back
 				answerIndex--;
-				cell = cellStringBuilder.delete(cellStringBuilder.length() - 2,
-					cellStringBuilder.length()).toString();
+				cell = (cellStringBuilder.length() > 1 
+					? cellStringBuilder.delete(cellStringBuilder.length() - 2, cellStringBuilder.length()).toString()
+					: cellStringBuilder.toString());
 			    }
 			    break;
 			case DacoConstants.QUESTION_TYPE_LONGLAT:
@@ -359,10 +365,14 @@ public class MonitoringAction extends Action {
 			case DacoConstants.QUESTION_TYPE_RADIO:
 			case DacoConstants.QUESTION_TYPE_DROPDOWN:
 			    if (!StringUtils.isBlank(answerString)) {
-				List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(answer
-					.getQuestion().getAnswerOptions());
-				int chosenAnswer = Integer.parseInt(answerString) - 1;
-				cell = answerOptions.get(chosenAnswer).getAnswerOption();
+					List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(answer
+						.getQuestion().getAnswerOptions());
+					try {
+						int chosenAnswer = Integer.parseInt(answerString) - 1;
+						cell = answerOptions.get(chosenAnswer).getAnswerOption();
+					} catch (Exception e) {
+						log.error("exportToSpreadsheet encountered '" + e + "' while parsing dropdown or radio answer; answer was " + answerString);
+					}
 			    }
 			    break;
 			default:
@@ -370,7 +380,6 @@ public class MonitoringAction extends Action {
 			    break;
 			}
 			row[columnIndex] = cell;
-			columnIndex++;
 		    }
 		    rows.add(row);
 		}
