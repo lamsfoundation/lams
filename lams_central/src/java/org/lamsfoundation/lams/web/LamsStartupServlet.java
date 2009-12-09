@@ -41,25 +41,31 @@ public class LamsStartupServlet extends HttpServlet {
 	// Removing all the files in the temp directory
 	String tempDirStr = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
 	File tempDir = new File(tempDirStr);
-	File[] files = tempDir.listFiles();
-	log.info("Deleting temporary files from: " + tempDir);
-	for (File file : files) {
 
-	    if (file.isDirectory()) {
-		// Recursively delete each directory
-		log.debug("Deleting temporary file directory: " + file);
-		if (!deleteDir(file)) {
-		    log.equals("Failed to delete " + file); 
+	if (tempDir != null && tempDir.canWrite()) {
+	    File[] files = tempDir.listFiles();
+	    log.info("Deleting temporary files from: " + tempDir);
+	    for (File file : files) {
+
+		if (file.isDirectory()) {
+		    // Recursively delete each directory
+		    log.debug("Deleting temporary file directory: " + file);
+		    if (!deleteDir(file)) {
+			log.error("Failed to delete " + file);
+		    }
+		} else {
+		    //Delete each file
+		    log.debug("Deleting temporary file: " + file);
+		    if (!file.delete()) {
+			log.error("Failed to delete " + file);
+		    }
 		}
-	    } else {
-		//Delete each file
-		log.debug("Deleting temporary file: " + file);
-		if (!file.delete()) {
-		    log.equals("Failed to delete " + file);
-		}
+
 	    }
-
+	} else {
+	    log.error("Cannot delete temporary files, do not have permission for folder: " + tempDirStr);
 	}
+
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
