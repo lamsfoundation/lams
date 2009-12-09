@@ -313,6 +313,13 @@
 
    </servlet>
    <servlet>
+      <servlet-name>lamsStartupServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.LamsStartupServlet</servlet-class>
+
+      <load-on-startup>1</load-on-startup>
+
+   </servlet>
+   <servlet>
       <servlet-name>GetRecordingServlet</servlet-name>
       <servlet-class>org.lamsfoundation.lams.webservice.GetRecordingServlet</servlet-class>
 
@@ -509,6 +516,10 @@
    <servlet-mapping>
       <servlet-name>storeNotebookEntry</servlet-name>
       <url-pattern>/servlet/notebook/storeNotebookEntry</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>lamsStartupServlet</servlet-name>
+      <url-pattern>/lamsstartupservlet</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>GetRecordingServlet</servlet-name>

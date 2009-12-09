@@ -85,7 +85,7 @@ public class FileUtil {
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
 
     protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
-    public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
+    public static final String TEMP_DIR = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
 
     /**
      * Deleting a directory using File.delete() only works if the directory is empty. This method deletes a directory
