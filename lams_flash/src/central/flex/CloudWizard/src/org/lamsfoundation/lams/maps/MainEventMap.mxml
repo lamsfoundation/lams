@@ -49,17 +49,19 @@
 	
 	<EventHandlers type="{FlexEvent.PREINITIALIZE}">
 		<ObjectBuilder id="wizardManager" generator="{WizardManager}"/>
+		
+		
 	</EventHandlers>
 	
 	<!-- FlexEvent.APPLICATION_COMPLETE ___________________________________________________________ -->
-	<EventHandlers type="{FlexEvent.APPLICATION_COMPLETE}">
+	<EventHandlers type="{FlexEvent.INITIALIZE}">
 		<!-- load dict data -->
 		<HTTPServiceInvoker instance="{dictionaryService}">
 			<Request module="wizard" orgId="{orgID}"/>
 			<resultHandlers>
 				<MethodInvoker generator="{WizardManager}" method="setDictionary" arguments="{resultObject}" />
 			</resultHandlers>
-		</HTTPServiceInvoker>
+		</HTTPServiceInvoker>	
 	</EventHandlers>
 
 	<EventHandlers type="{WizardEvent.INIT_WORKSPACE}">
@@ -241,6 +243,6 @@
 	<mx:HTTPService id="startLessonService" url="{serverURL}monitoring/monitoring.do?method=startLesson" resultFormat="xml" />
 	<mx:HTTPService id="scheduleLessonService" url="{serverURL}monitoring/monitoring.do?method=startOnScheduleLesson" resultFormat="xml" />
 	<mx:HTTPService id="presenceService" url="{serverURL}Presence.do?method=createXmppRoom" resultFormat="xml" />
-	<mx:HTTPService id="dictionaryService" url="{serverURL}monitoring/monitoring.do?method=getDictionaryXML" resultFormat="e4x" />         
+	<mx:HTTPService id="dictionaryService" url="monitoring.do?method=getDictionaryXML" resultFormat="e4x" />         
 	
 </EventMap>
