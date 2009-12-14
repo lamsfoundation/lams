@@ -42,29 +42,36 @@ public class LamsStartupServlet extends HttpServlet {
 	String tempDirStr = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
 	File tempDir = new File(tempDirStr);
 
-	if (tempDir != null && tempDir.canWrite()) {
-	    File[] files = tempDir.listFiles();
-	    log.info("Deleting temporary files from: " + tempDir);
-	    for (File file : files) {
-
-		if (file.isDirectory()) {
-		    // Recursively delete each directory
-		    log.debug("Deleting temporary file directory: " + file);
-		    if (!deleteDir(file)) {
-			log.error("Failed to delete " + file);
-		    }
-		} else {
-		    //Delete each file
-		    log.debug("Deleting temporary file: " + file);
-		    if (!file.delete()) {
-			log.error("Failed to delete " + file);
-		    }
-		}
-
+	if (tempDir != null) { 
+	    // create temp directory if it doesn't exist
+	    if (!tempDir.exists()) {
+		tempDir.mkdirs();
 	    }
-	} else {
-	    log.error("Cannot delete temporary files, do not have permission for folder: " + tempDirStr);
+	    if (tempDir.canWrite()) {
+    	    	File[] files = tempDir.listFiles();
+		log.info("Deleting temporary files from: " + tempDir);
+		for (File file : files) {
+
+		    if (file.isDirectory()) {
+			// Recursively delete each directory
+			log.debug("Deleting temporary file directory: " + file);
+			if (!deleteDir(file)) {
+			    log.error("Failed to delete " + file);
+			}
+		    } else {
+			// Delete each file
+			log.debug("Deleting temporary file: " + file);
+			if (!file.delete()) {
+			    log.error("Failed to delete " + file);
+			}
+		    }
+		    
+		}
+		return;
+	    }
 	}
+	
+	log.error("Cannot delete temporary files, do not have permission for folder: " + tempDirStr);
 
     }
 
