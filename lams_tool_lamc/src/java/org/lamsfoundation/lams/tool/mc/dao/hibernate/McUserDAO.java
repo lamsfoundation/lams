@@ -107,7 +107,16 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 			.setLong("mcSessionUid",sessionUid.longValue())
 			.uniqueResult();
 		
-		return new Integer[]{(Integer)stats[0], (Integer)stats[1], new Integer(((Float)stats[2]).intValue())};
+		if (stats!= null) {
+		    if (stats[2] instanceof Float) {
+			return new Integer[]{(Integer)stats[0], (Integer)stats[1], new Integer(((Float)stats[2]).intValue())};
+		    } else if(stats[2] instanceof Double) {
+			return new Integer[]{(Integer)stats[0], (Integer)stats[1], new Integer(((Double)stats[2]).intValue())};
+		    }
+		} 
+		
+		return null;
+
 	}	
 
 
