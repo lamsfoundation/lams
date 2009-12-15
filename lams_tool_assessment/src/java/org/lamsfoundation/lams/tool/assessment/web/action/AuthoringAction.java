@@ -1140,6 +1140,7 @@ public class AuthoringAction extends Action {
 	form.setShuffle(question.isShuffle());
 	form.setCaseSensitive(question.isCaseSensitive());
 	form.setCorrectAnswer(question.getCorrectAnswer());
+	form.setAllowRichEditor(question.isAllowRichEditor());
 	if (questionIdx >= 0) {
 	    form.setQuestionIndex(new Integer(questionIdx).toString());
 	}
@@ -1223,7 +1224,7 @@ public class AuthoringAction extends Action {
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());	    
 	} else if ((type == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
-	    
+	    question.setAllowRichEditor(questionForm.isAllowRichEditor());
 	} else if (type == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());

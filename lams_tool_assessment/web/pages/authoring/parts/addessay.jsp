@@ -107,6 +107,11 @@
 					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
 				</div>
 				<html:text property="defaultGrade" size="3" />
+				
+				<div class="field-name space-top" >
+					<fmt:message key="label.authoring.basic.allow.learners.rich.editor" />
+				</div>
+				<html:checkbox property="allowRichEditor" styleClass="noBorder" />
 					
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />

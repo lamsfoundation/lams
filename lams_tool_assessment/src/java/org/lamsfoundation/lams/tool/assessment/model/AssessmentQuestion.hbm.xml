@@ -147,6 +147,14 @@
         />
 
         <property
+            name="allowRichEditor"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_rich_editor"
+        />
+
+        <property
             name="createDate"
             type="java.util.Date"
             update="true"

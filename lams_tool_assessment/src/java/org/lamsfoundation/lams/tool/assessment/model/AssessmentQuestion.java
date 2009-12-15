@@ -74,6 +74,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
     private boolean caseSensitive;
     
     private boolean correctAnswer;
+    
+    private boolean allowRichEditor;
 
     private Date createDate;
     private AssessmentUser createBy;
@@ -355,6 +357,18 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
 
     public void setCorrectAnswer(boolean correctAnswer) {
 	this.correctAnswer = correctAnswer;
+    }
+    
+    /**
+     * @hibernate.property column="allow_rich_editor"
+     * @return
+     */
+    public boolean isAllowRichEditor() {
+	return allowRichEditor;
+    }
+
+    public void setAllowRichEditor(boolean allowRichEditor) {
+	this.allowRichEditor = allowRichEditor;
     }
 
     /**
