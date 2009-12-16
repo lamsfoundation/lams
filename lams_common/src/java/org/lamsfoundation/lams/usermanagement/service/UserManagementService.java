@@ -1017,6 +1017,12 @@ public class UserManagementService implements IUserManagementService {
 	Integer requestorId = getRequestorId();
 	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN) : false;
     }
+    
+    public boolean isUserGlobalAuthorAdmin() {
+	Integer rootOrgId = getRootOrganisation().getOrganisationId();
+	Integer requestorId = getRequestorId();
+	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.AUTHOR_ADMIN) : false;
+    }
 
     public boolean isUserSysAdmin() {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();

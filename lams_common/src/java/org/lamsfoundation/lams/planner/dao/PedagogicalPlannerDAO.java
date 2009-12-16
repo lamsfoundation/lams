@@ -41,4 +41,12 @@ public interface PedagogicalPlannerDAO {
     Integer getNextOrderId(Long parentUid);
 
     PedagogicalPlannerSequenceNode getNeighbourNode(PedagogicalPlannerSequenceNode node, Integer orderDelta);
+    
+    Boolean canUserWriteToNode(Integer userId, Long nodeUid, Integer roleId);
+    
+    List getNodeUsers(Long nodeUid, Integer roleId);
+    
+    void saveNodeRole(Integer userId, Long nodeUid, Integer roleId);
+    
+    void removeNodeRole(Integer userId, Long nodeUid, Integer roleId);
 }

@@ -28,8 +28,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.lamsfoundation.lams.planner.PedagogicalPlannerNodeRole;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 import org.lamsfoundation.lams.planner.dao.PedagogicalPlannerDAO;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -47,6 +50,10 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	    + PedagogicalPlannerSequenceNode.class.getName() + " AS n WHERE n.parent.uid=?";
     private static final String FIND_NEIGHBOUR_NODE = "FROM " + PedagogicalPlannerSequenceNode.class.getName()
 	    + " AS n WHERE ((? IS NULL AND n.parent=NULL) OR  n.parent.uid=?) AND n.order=?";
+    private static final String GET_PLANNER_NODE_ROLE = "FROM " + PedagogicalPlannerNodeRole.class.getName()
+    	+ " WHERE user.userId=? AND node.uid=? AND role.roleId=?";
+    private static final String GET_PLANNER_NODE_ROLE_USERS = "SELECT p.user FROM " 
+	+ PedagogicalPlannerNodeRole.class.getName() + " AS p WHERE p.node.uid=? AND p.role.roleId=?";
 
     /*
      * private static final String FIND_RECENTLY_MODIFIED_LD = "SELECT ld FROM " + LearningDesign.class.getName() + " AS
@@ -115,5 +122,38 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().find(
 		PedagogicalPlannerDAOHibernate.FIND_NEIGHBOUR_NODE, new Object[] { parentUid, parentUid, order })
 		.get(0);
+    }
+    
+    private List getPlannerNodeRoles(Integer userId, Long nodeUid, Integer roleId) {
+	return getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.GET_PLANNER_NODE_ROLE, 
+		new Object[] { userId, nodeUid, roleId });
+    }
+    
+    // TODO check parent nodes for inherited role
+    public Boolean canUserWriteToNode(Integer userId, Long nodeUid, Integer roleId) {
+	List l = getPlannerNodeRoles(userId, nodeUid, roleId);
+	return (l != null && l.size() > 0 ? true : false);
+    }
+    
+    public List getNodeUsers(Long nodeUid, Integer roleId) {
+	return getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.GET_PLANNER_NODE_ROLE_USERS, 
+		new Object[] { nodeUid, roleId });
+    }
+    
+    public void saveNodeRole(Integer userId, Long nodeUid, Integer roleId) {
+	PedagogicalPlannerSequenceNode node = getByUid(nodeUid);
+	User user = (User) getHibernateTemplate().get(User.class, userId);
+	Role role = (Role) getHibernateTemplate().get(Role.class, roleId);
+	PedagogicalPlannerNodeRole nodeRole = new PedagogicalPlannerNodeRole(node, user, role);
+	getHibernateTemplate().saveOrUpdate(nodeRole);
+	getHibernateTemplate().flush();
+    }
+    
+    public void removeNodeRole(Integer userId, Long nodeUid, Integer roleId) {
+	List l = getPlannerNodeRoles(userId, nodeUid, roleId);
+	for (Object o : l) {
+	    getHibernateTemplate().delete(o);
+	}
+	getHibernateTemplate().flush();
     }
 }

@@ -46,7 +46,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
     // Not node-bound variables, but simply attributes used in JSP page
     private Boolean edit = false;
     private Boolean createSubnode = false;
-    private Boolean isSysAdmin = true;
+    private Boolean hasRole = true;
     private Boolean importNode = false;
     // for the list on the main screen
     private List<PedagogicalPlannerSequenceNodeDTO> recentlyModifiedNodes;
@@ -172,12 +172,12 @@ public class PedagogicalPlannerSequenceNodeDTO {
 	this.createSubnode = createSubnode;
     }
 
-    public Boolean getIsSysAdmin() {
-	return isSysAdmin;
+    public Boolean getHasRole() {
+	return hasRole;
     }
 
-    public void setIsSysAdmin(Boolean isSysAdmin) {
-	this.isSysAdmin = isSysAdmin;
+    public void setHasRole(Boolean hasRole) {
+	this.hasRole = hasRole;
     }
 
     public Boolean getImportNode() {

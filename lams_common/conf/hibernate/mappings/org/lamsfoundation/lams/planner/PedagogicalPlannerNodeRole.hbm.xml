@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="org.lamsfoundation.lams.planner.PedagogicalPlannerNodeRole"
+		table="lams_planner_node_role">
+
+		<id name="uid" column="uid" type="java.lang.Long">
+			<generator class="native">
+				<!--
+					To add non XDoclet generator parameters, create a file named
+					hibernate-generator-params-PedagogicalPlannerSequenceNode.xml
+					containing the additional parameters and place it in your merge
+					dir.
+				-->
+			</generator>
+		</id>
+
+		<many-to-one name="node"
+			class="org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode"
+			not-null="true" column="node_uid" />
+
+		<many-to-one name="user"
+			class="org.lamsfoundation.lams.usermanagement.User" not-null="true"
+			column="user_id" />
+
+		<many-to-one name="role"
+			class="org.lamsfoundation.lams.usermanagement.Role" not-null="true"
+			column="role_id" />
+
+	</class>
+
+</hibernate-mapping>

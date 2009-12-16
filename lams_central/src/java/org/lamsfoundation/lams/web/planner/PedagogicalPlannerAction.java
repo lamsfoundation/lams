@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -93,6 +94,7 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerNodeRole;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 import org.lamsfoundation.lams.planner.dao.PedagogicalPlannerDAO;
 import org.lamsfoundation.lams.planner.dto.PedagogicalPlannerActivityDTO;
@@ -134,6 +136,7 @@ import com.thoughtworks.xstream.XStream;
  * @struts:action path="/pedagogicalPlanner/grouping" scope="request" name="PedagogicalPlannerGroupingForm"
  *                validate="false" parameter="method"
  * @struts:action-forward name="grouping" path="/pedagogical_planner/grouping.jsp"
+ * @struts:action-forward name="editAuthors" path="/pedagogical_planner/editAuthors.jsp"
  */
 public class PedagogicalPlannerAction extends LamsDispatchAction {
 
@@ -638,10 +641,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      */
     public ActionForward openSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    Long nodeUid) throws ServletException {
-	// Only SysAdmin can open the editor
-	Boolean isSysAdmin = request.isUserInRole(Role.SYSADMIN);
-	Boolean edit = WebUtil.readBooleanParam(request, CentralConstants.PARAM_EDIT, false);
-	edit &= isSysAdmin;
 	String filterText = WebUtil.readStrParam(request, CentralConstants.PARAM_FILTER_TEXT, true);
 	// Do we display the root (top) node or an existing one
 	PedagogicalPlannerSequenceNode node = null;
@@ -652,6 +651,13 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	}
 	PedagogicalPlannerAction.log.debug("Opening sequence node with UID: " + nodeUid);
 
+	// Only certain roles can open the editor
+	User user = (User) getUserManagementService().getUserByLogin(request.getRemoteUser());
+	Boolean hasRole = request.isUserInRole(Role.SYSADMIN) || getUserManagementService().isUserGlobalAuthorAdmin()
+		|| getPedagogicalPlannerDAO().canUserWriteToNode(user.getUserId(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	Boolean edit = WebUtil.readBooleanParam(request, CentralConstants.PARAM_EDIT, false);
+	edit &= hasRole;
+	
 	// Fill the DTO
 	PedagogicalPlannerSequenceNodeDTO dto = null;
 	if (filterText != null) {
@@ -698,7 +704,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Boolean importNode = WebUtil.readBooleanParam(request, CentralConstants.PARAM_IMPORT_NODE, false);
 	dto.setCreateSubnode(createSubnode);
 	dto.setEdit(edit);
-	dto.setIsSysAdmin(isSysAdmin);
+	dto.setHasRole(hasRole);
 	dto.setImportNode(importNode);
 	dto.setTitlePath(titlePath);
 
@@ -1599,6 +1605,45 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
 	}
 	writeOutFile(response, zipFilePath);
+	return null;
+    }
+    
+    public ActionForward editAuthors(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
+	
+	// TODO only sysadmin and author admins of the given (or parent) node can edit authors
+	
+	Integer orgId = getUserManagementService().getRootOrganisation().getOrganisationId();
+	Vector potentialUsers = getUserManagementService().getUsersFromOrganisationByRole(orgId, Role.AUTHOR_ADMIN, false, true);
+	
+	List existingUsers = getPedagogicalPlannerDAO().getNodeUsers(nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	
+	request.setAttribute("existingUsers", existingUsers);
+	request.setAttribute("potentialUsers", potentialUsers);
+	
+	return mapping.findForward("editAuthors");
+    }
+    
+    public ActionForward addAuthor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Integer userId = WebUtil.readIntParam(request, CentralConstants.PARAM_USER_ID, false);
+	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
+	
+	// TODO only sysadmin and author admin of given (or parent) node can add admin
+	
+	getPedagogicalPlannerDAO().saveNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	return null;
+    }
+    
+    public ActionForward removeAuthor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Integer userId = WebUtil.readIntParam(request, CentralConstants.PARAM_USER_ID, false);
+	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, false);
+	
+	// TODO only sysadmin and author admin of given (or parent) node can remove admin
+	
+	getPedagogicalPlannerDAO().removeNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
 	return null;
     }
 
