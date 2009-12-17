@@ -94,7 +94,6 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
-import org.lamsfoundation.lams.planner.PedagogicalPlannerNodeRole;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 import org.lamsfoundation.lams.planner.dao.PedagogicalPlannerDAO;
 import org.lamsfoundation.lams.planner.dto.PedagogicalPlannerActivityDTO;
@@ -103,6 +102,7 @@ import org.lamsfoundation.lams.planner.dto.PedagogicalPlannerTemplateDTO;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
@@ -652,9 +652,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	PedagogicalPlannerAction.log.debug("Opening sequence node with UID: " + nodeUid);
 
 	// Only certain roles can open the editor
-	User user = (User) getUserManagementService().getUserByLogin(request.getRemoteUser());
-	Boolean hasRole = request.isUserInRole(Role.SYSADMIN) || getUserManagementService().isUserGlobalAuthorAdmin()
-		|| getPedagogicalPlannerDAO().canUserWriteToNode(user.getUserId(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	Boolean hasRole = hasRole(request, nodeUid);
 	Boolean edit = WebUtil.readBooleanParam(request, CentralConstants.PARAM_EDIT, false);
 	edit &= hasRole;
 	
@@ -768,6 +766,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    // It's an existing node
 	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    nodeUid = node.getUid();
+	}
+	
+	if (!hasRole(request, nodeUid)) {
+	    log.debug("Unauthorised attempt to saveSequenceNode");
+	    throw new UserAccessDeniedException();
 	}
 	PedagogicalPlannerAction.log.debug("Saving sequence node with UID: " + nodeUid);
 
@@ -1082,6 +1085,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     public ActionForward importNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 
+	if (!hasRole(request, null)) {
+	    log.debug("Unauthorised access to importNode");
+	    throw new UserAccessDeniedException();
+	}
+	
 	PedagogicalPlannerSequenceNodeForm nodeForm = (PedagogicalPlannerSequenceNodeForm) form;
 	ActionMessages errors = validateFormFile(nodeForm);
 
@@ -1608,47 +1616,78 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return null;
     }
     
-    public ActionForward editAuthors(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward addRemoveEditors(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 	
-	// TODO only sysadmin and author admins of the given (or parent) node can edit authors
-	
-	Integer orgId = getUserManagementService().getRootOrganisation().getOrganisationId();
-	Vector potentialUsers = getUserManagementService().getUsersFromOrganisationByRole(orgId, Role.AUTHOR_ADMIN, false, true);
-	
-	List existingUsers = getPedagogicalPlannerDAO().getNodeUsers(nodeUid, Role.ROLE_AUTHOR_ADMIN);
-	
-	request.setAttribute("existingUsers", existingUsers);
-	request.setAttribute("potentialUsers", potentialUsers);
-	
-	return mapping.findForward("editAuthors");
+	if (hasRole(request, nodeUid)) {
+	    List existingUsers = getPedagogicalPlannerDAO().getNodeUsers(nodeUid, Role.ROLE_AUTHOR_ADMIN);
+
+	    Integer orgId = getUserManagementService().getRootOrganisation().getOrganisationId();
+	    Vector potentialUsersVector = getUserManagementService().getUsersFromOrganisationByRole(orgId,
+		    Role.AUTHOR_ADMIN, false, true);
+
+	    // filter existing users from list of potential users
+	    List potentialUsers = new ArrayList();
+	    for (Object o : potentialUsersVector) {
+		User u = (User) o;
+		if (existingUsers.contains(u)) {
+		    continue;   
+		}
+		// filter self
+		if (StringUtils.equals(u.getLogin(), request.getRemoteUser())) {
+		    continue;
+		}
+		potentialUsers.add(u);
+	    }
+
+	    request.setAttribute("existingUsers", existingUsers);
+	    request.setAttribute("potentialUsers", potentialUsers);
+	    
+	    return mapping.findForward("editAuthors");
+	} else {
+	    log.debug("Unauthorised attempt to access add/remove editors page.");
+	    throw new UserAccessDeniedException();
+	}
     }
     
-    public ActionForward addAuthor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward addEditor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = WebUtil.readIntParam(request, CentralConstants.PARAM_USER_ID, false);
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 	
-	// TODO only sysadmin and author admin of given (or parent) node can add admin
+	if (hasRole(request, nodeUid)) {
+	    getPedagogicalPlannerDAO().saveNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	} else {
+	    log.debug("Unauthorised attempt to add editor to node.");
+	}
 	
-	getPedagogicalPlannerDAO().saveNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
 	return null;
     }
     
-    public ActionForward removeAuthor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward removeEditor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = WebUtil.readIntParam(request, CentralConstants.PARAM_USER_ID, false);
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, false);
 	
-	// TODO only sysadmin and author admin of given (or parent) node can remove admin
+	if (hasRole(request, nodeUid)) {
+	    getPedagogicalPlannerDAO().removeNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	} else {
+	    log.debug("Unauthorised attempt to remove editor from node.");
+	}
 	
-	getPedagogicalPlannerDAO().removeNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
 	return null;
     }
 
     /*------------------------ COMMON METHODS --------------------*/
 
+    // only these roles can edit nodes and give this role on this node to others
+    private Boolean hasRole(HttpServletRequest request, Long nodeUid) {
+	User user = (User) getUserManagementService().getUserByLogin(request.getRemoteUser());
+	return request.isUserInRole(Role.SYSADMIN) 
+		|| getPedagogicalPlannerDAO().isEditor(user.getUserId(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
+    }
+    
     private IExportToolContentService getExportService() {
 	if (PedagogicalPlannerAction.exportService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()

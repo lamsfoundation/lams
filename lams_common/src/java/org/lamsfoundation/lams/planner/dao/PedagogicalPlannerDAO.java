@@ -42,7 +42,7 @@ public interface PedagogicalPlannerDAO {
 
     PedagogicalPlannerSequenceNode getNeighbourNode(PedagogicalPlannerSequenceNode node, Integer orderDelta);
     
-    Boolean canUserWriteToNode(Integer userId, Long nodeUid, Integer roleId);
+    Boolean isEditor(Integer userId, Long nodeUid, Integer roleId);
     
     List getNodeUsers(Long nodeUid, Integer roleId);
     

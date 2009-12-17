@@ -129,10 +129,21 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 		new Object[] { userId, nodeUid, roleId });
     }
     
-    // TODO check parent nodes for inherited role
-    public Boolean canUserWriteToNode(Integer userId, Long nodeUid, Integer roleId) {
+    public Boolean isEditor(Integer userId, Long nodeUid, Integer roleId) {
 	List l = getPlannerNodeRoles(userId, nodeUid, roleId);
-	return (l != null && l.size() > 0 ? true : false);
+	if (l != null && l.size() > 0) {
+	    return true;
+	} else {
+	    // check parent nodes for 'inherited' role
+	    if (nodeUid != null) {
+		PedagogicalPlannerSequenceNode node = getByUid(nodeUid);
+		if (node != null) {
+		    PedagogicalPlannerSequenceNode parent = node.getParent();
+		    return isEditor(userId, (parent != null ? parent.getUid() : null), roleId);
+		}
+	    }
+	}
+	return false;
     }
     
     public List getNodeUsers(Long nodeUid, Integer roleId) {
