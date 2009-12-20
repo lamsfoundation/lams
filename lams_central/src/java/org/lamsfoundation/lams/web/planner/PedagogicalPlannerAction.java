@@ -673,7 +673,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 			filteredNodes.add(subnode);
 		    }
 
-		    dto = new PedagogicalPlannerSequenceNodeDTO(node, filteredNodes);
+		    dto = new PedagogicalPlannerSequenceNodeDTO(node, filteredNodes, hasRole, getPedagogicalPlannerDAO());
 		    for (PedagogicalPlannerSequenceNodeDTO subnodeDTO : dto.getSubnodes()) {
 			List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(subnodeDTO.getUid());
 			subnodeDTO.setTitlePath(titlePath);
@@ -690,7 +690,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	if (dto == null) {
 	    // No filtering or something went wrong in filtering
-	    dto = new PedagogicalPlannerSequenceNodeDTO(node, node.getSubnodes());
+	    dto = new PedagogicalPlannerSequenceNodeDTO(node, node.getSubnodes(), hasRole, getPedagogicalPlannerDAO());
 	    if (nodeUid == null) {
 		dto.setRecentlyModifiedNodes(getRecentlyModifiedLearnindDesignsAsNodes());
 	    }
@@ -924,14 +924,21 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @return
      * @throws IOException
      * @throws ServletException
+     * @throws UserAccessDeniedException
      */
     public ActionForward removeSequenceNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, UserAccessDeniedException {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID);
 	PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	Long parentUid = node.getParent() == null ? null : node.getParent().getUid();
-	PedagogicalPlannerAction.log.debug("Removing sequence node with UID" + nodeUid);
-	getPedagogicalPlannerDAO().removeNode(node);
+	
+	if (hasRole(request, nodeUid)) {
+	    PedagogicalPlannerAction.log.debug("Removing sequence node with UID" + nodeUid);
+	    getPedagogicalPlannerDAO().removeNode(node);
+	} else {
+	    log.debug("Unauthorised attempt to removeSequenceNode");
+	    throw new UserAccessDeniedException();
+	}
 	return openSequenceNode(mapping, form, request, parentUid);
     }
 
@@ -1619,7 +1626,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     public ActionForward addRemoveEditors(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
-	
+
 	if (hasRole(request, nodeUid)) {
 	    List existingUsers = getPedagogicalPlannerDAO().getNodeUsers(nodeUid, Role.ROLE_AUTHOR_ADMIN);
 
@@ -1639,6 +1646,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    continue;
 		}
 		potentialUsers.add(u);
+		// TODO filter nodeEditor of parent node
 	    }
 
 	    request.setAttribute("existingUsers", existingUsers);
@@ -1683,9 +1691,23 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     // only these roles can edit nodes and give this role on this node to others
     private Boolean hasRole(HttpServletRequest request, Long nodeUid) {
+	if (request.isUserInRole(Role.SYSADMIN)) {
+	    // sysadmins have all permission
+	    return true;
+	} else {
+	    if (nodeUid == null) {
+		// all global author admins (GAA) can create and edit at the root level
+		return getUserManagementService().isUserGlobalAuthorAdmin();
+	    } else {
+		// at any other node, a GAA needs to be linked to that node or one of its parents
+		return isNodeEditor(request, nodeUid);
+	    }
+	}
+    }
+    
+    private Boolean isNodeEditor(HttpServletRequest request, Long nodeUid) {
 	User user = (User) getUserManagementService().getUserByLogin(request.getRemoteUser());
-	return request.isUserInRole(Role.SYSADMIN) 
-		|| getPedagogicalPlannerDAO().isEditor(user.getUserId(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	return getPedagogicalPlannerDAO().isEditor(user.getUserId(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
     }
     
     private IExportToolContentService getExportService() {

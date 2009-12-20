@@ -27,8 +27,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
+import org.lamsfoundation.lams.planner.dao.PedagogicalPlannerDAO;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class PedagogicalPlannerSequenceNodeDTO {
     private Long uid;
@@ -50,14 +57,16 @@ public class PedagogicalPlannerSequenceNodeDTO {
     private Boolean importNode = false;
     // for the list on the main screen
     private List<PedagogicalPlannerSequenceNodeDTO> recentlyModifiedNodes;
+    // for the 1st level nodes on the main screen
+    private Boolean displayAddRemoveEditorsLink = true;
 
     private static final String FULL_DESCRIPTION_NOT_EMPTY = "FULL";
 
     public PedagogicalPlannerSequenceNodeDTO() {
     }
-
+    
     public PedagogicalPlannerSequenceNodeDTO(PedagogicalPlannerSequenceNode node,
-	    Set<PedagogicalPlannerSequenceNode> subnodes) {
+	    Set<PedagogicalPlannerSequenceNode> subnodes, Boolean displayAddRemoveEditorsLink, PedagogicalPlannerDAO dao) {
 	uid = node.getUid();
 	title = node.getTitle();
 	briefDescription = node.getBriefDescription();
@@ -66,9 +75,13 @@ public class PedagogicalPlannerSequenceNodeDTO {
 	locked = node.getLocked();
 	if (node.getParent() != null) {
 	    parentUid = node.getParent().getUid();
+	} else {
+	    this.displayAddRemoveEditorsLink = displayAddRemoveEditorsLink;
 	}
 	this.subnodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
 	if (subnodes != null) {
+	    HttpSession s = SessionManager.getSession();
+	    UserDTO u = (UserDTO) s.getAttribute(AttributeNames.USER);
 	    for (PedagogicalPlannerSequenceNode subnode : subnodes) {
 		PedagogicalPlannerSequenceNodeDTO subnodeDTO = new PedagogicalPlannerSequenceNodeDTO();
 		subnodeDTO.setTitle(subnode.getTitle());
@@ -79,6 +92,9 @@ public class PedagogicalPlannerSequenceNodeDTO {
 		subnodeDTO.setLocked(subnode.getLocked());
 		subnodeDTO.setFileName(subnode.getFileName());
 		subnodeDTO.setUid(subnode.getUid());
+		if (u != null) {
+		    subnodeDTO.setDisplayAddRemoveEditorsLink(dao.isEditor(u.getUserID(), subnode.getUid(), Role.ROLE_AUTHOR_ADMIN));
+		}
 		this.subnodes.add(subnodeDTO);
 	    }
 	}
@@ -202,5 +218,13 @@ public class PedagogicalPlannerSequenceNodeDTO {
 
     public void setRecentlyModifiedNodes(List<PedagogicalPlannerSequenceNodeDTO> recentlyModifiedNodes) {
 	this.recentlyModifiedNodes = recentlyModifiedNodes;
+    }
+
+    public Boolean getDisplayAddRemoveEditorsLink() {
+        return displayAddRemoveEditorsLink;
+    }
+
+    public void setDisplayAddRemoveEditorsLink(Boolean displayAddRemoveEditorsLink) {
+        this.displayAddRemoveEditorsLink = displayAddRemoveEditorsLink;
     }
 }
