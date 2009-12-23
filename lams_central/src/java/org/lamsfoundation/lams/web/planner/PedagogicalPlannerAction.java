@@ -673,7 +673,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 			filteredNodes.add(subnode);
 		    }
 
-		    dto = new PedagogicalPlannerSequenceNodeDTO(node, filteredNodes, hasRole, getPedagogicalPlannerDAO());
+		    dto = new PedagogicalPlannerSequenceNodeDTO(node, filteredNodes, request.isUserInRole(Role.SYSADMIN), getPedagogicalPlannerDAO());
 		    for (PedagogicalPlannerSequenceNodeDTO subnodeDTO : dto.getSubnodes()) {
 			List<String[]> titlePath = getPedagogicalPlannerDAO().getTitlePath(subnodeDTO.getUid());
 			subnodeDTO.setTitlePath(titlePath);
@@ -690,7 +690,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	if (dto == null) {
 	    // No filtering or something went wrong in filtering
-	    dto = new PedagogicalPlannerSequenceNodeDTO(node, node.getSubnodes(), hasRole, getPedagogicalPlannerDAO());
+	    dto = new PedagogicalPlannerSequenceNodeDTO(node, node.getSubnodes(), request.isUserInRole(Role.SYSADMIN), getPedagogicalPlannerDAO());
 	    if (nodeUid == null) {
 		dto.setRecentlyModifiedNodes(getRecentlyModifiedLearnindDesignsAsNodes());
 	    }

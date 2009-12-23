@@ -57,7 +57,6 @@ public class PedagogicalPlannerSequenceNodeDTO {
     private Boolean importNode = false;
     // for the list on the main screen
     private List<PedagogicalPlannerSequenceNodeDTO> recentlyModifiedNodes;
-    // for the 1st level nodes on the main screen
     private Boolean displayAddRemoveEditorsLink = true;
 
     private static final String FULL_DESCRIPTION_NOT_EMPTY = "FULL";
@@ -66,7 +65,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
     }
     
     public PedagogicalPlannerSequenceNodeDTO(PedagogicalPlannerSequenceNode node,
-	    Set<PedagogicalPlannerSequenceNode> subnodes, Boolean displayAddRemoveEditorsLink, PedagogicalPlannerDAO dao) {
+	    Set<PedagogicalPlannerSequenceNode> subnodes, Boolean isSysadmin, PedagogicalPlannerDAO dao) {
 	uid = node.getUid();
 	title = node.getTitle();
 	briefDescription = node.getBriefDescription();
@@ -75,8 +74,6 @@ public class PedagogicalPlannerSequenceNodeDTO {
 	locked = node.getLocked();
 	if (node.getParent() != null) {
 	    parentUid = node.getParent().getUid();
-	} else {
-	    this.displayAddRemoveEditorsLink = displayAddRemoveEditorsLink;
 	}
 	this.subnodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
 	if (subnodes != null) {
@@ -93,7 +90,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
 		subnodeDTO.setFileName(subnode.getFileName());
 		subnodeDTO.setUid(subnode.getUid());
 		if (u != null) {
-		    subnodeDTO.setDisplayAddRemoveEditorsLink(dao.isEditor(u.getUserID(), subnode.getUid(), Role.ROLE_AUTHOR_ADMIN));
+		    subnodeDTO.setDisplayAddRemoveEditorsLink(isSysadmin || dao.isEditor(u.getUserID(), subnode.getUid(), Role.ROLE_AUTHOR_ADMIN));
 		}
 		this.subnodes.add(subnodeDTO);
 	    }
