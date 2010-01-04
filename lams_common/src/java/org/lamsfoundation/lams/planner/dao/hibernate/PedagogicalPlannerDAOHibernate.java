@@ -48,8 +48,10 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
 	    + PedagogicalPlannerSequenceNode.class.getName() + " AS n WHERE n.uid=?";
     private static final String FIND_MAX_ORDER_ID = "SELECT MAX(n.order) FROM "
 	    + PedagogicalPlannerSequenceNode.class.getName() + " AS n WHERE n.parent.uid=?";
-    private static final String FIND_NEIGHBOUR_NODE = "FROM " + PedagogicalPlannerSequenceNode.class.getName()
-	    + " AS n WHERE ((? IS NULL AND n.parent=NULL) OR  n.parent.uid=?) AND n.order=?";
+    private static final String FIND_NEIGHBOUR_NODE_ASC = "FROM " + PedagogicalPlannerSequenceNode.class.getName()
+	    + " AS n WHERE ((? IS NULL AND n.parent=NULL) OR  n.parent.uid=?) AND n.order>=?";
+    private static final String FIND_NEIGHBOUR_NODE_DESC = "FROM " + PedagogicalPlannerSequenceNode.class.getName()
+    + " AS n WHERE ((? IS NULL AND n.parent=NULL) OR  n.parent.uid=?) AND n.order<=? ORDER BY n.order DESC";
     private static final String GET_PLANNER_NODE_ROLE = "FROM " + PedagogicalPlannerNodeRole.class.getName()
     	+ " WHERE user.userId=? AND node.uid=? AND role.roleId=?";
     private static final String GET_PLANNER_NODE_ROLE_USERS = "SELECT p.user FROM " 
@@ -119,9 +121,10 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
     public PedagogicalPlannerSequenceNode getNeighbourNode(PedagogicalPlannerSequenceNode node, Integer orderDelta) {
 	Integer order = node.getOrder() + orderDelta;
 	Long parentUid = node.getParent() == null ? null : node.getParent().getUid();
-	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().find(
-		PedagogicalPlannerDAOHibernate.FIND_NEIGHBOUR_NODE, new Object[] { parentUid, parentUid, order })
-		.get(0);
+	String query = (orderDelta < 0) ? PedagogicalPlannerDAOHibernate.FIND_NEIGHBOUR_NODE_DESC
+		: PedagogicalPlannerDAOHibernate.FIND_NEIGHBOUR_NODE_ASC;
+	return (PedagogicalPlannerSequenceNode) getHibernateTemplate().find(query,
+		new Object[] { parentUid, parentUid, order }).get(0);
     }
     
     private List getPlannerNodeRoles(Integer userId, Long nodeUid, Integer roleId) {
