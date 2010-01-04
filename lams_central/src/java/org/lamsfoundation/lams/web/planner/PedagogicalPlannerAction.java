@@ -753,6 +753,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	PedagogicalPlannerSequenceNode node = null;
 	PedagogicalPlannerSequenceNodeForm nodeForm = (PedagogicalPlannerSequenceNodeForm) form;
 
+	boolean newRootNode = false;
 	if (nodeUid == null) {
 	    // It's a new subnode
 	    node = new PedagogicalPlannerSequenceNode();
@@ -760,6 +761,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    if (parentUid != null) {
 		PedagogicalPlannerSequenceNode parent = getPedagogicalPlannerDAO().getByUid(parentUid);
 		node.setParent(parent);
+	    } else {
+		newRootNode = true;
 	    }
 	    node.setOrder(getPedagogicalPlannerDAO().getNextOrderId(parentUid));
 	} else {
@@ -829,6 +832,16 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		getPedagogicalPlannerDAO().saveOrUpdateNode(node);
 		// If it was a new subnode, we need to retrieved the assigned UID
 		nodeUid = node.getUid();
+		// If it was a new root node, add creator's role
+		if (newRootNode) {
+		    try {
+			HttpSession s = SessionManager.getSession();
+			UserDTO u = (UserDTO) s.getAttribute(AttributeNames.USER);
+			getPedagogicalPlannerDAO().saveNodeRole(u.getUserID(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
+		    } catch (Exception e) {
+			log.error("Error saving role for newly created root node: " + e.getMessage());
+		    }
+		}
 
 	    } catch (RepositoryCheckedException e) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
