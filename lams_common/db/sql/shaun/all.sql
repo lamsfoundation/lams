@@ -625,7 +625,7 @@ INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organis
 -- tr_TR
 -- need a new workspace_id and the name changes for each user.
 insert into lams_workspace_folder(workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
-values(36,null,'Malay Workspace',36,now(),now(),1);
+values(36,null,'Turkish Workspace',36,now(),now(),1);
 insert into lams_workspace (workspace_id, default_fld_id, name) values (36,36,'Turkish Test');
 
 insert into lams_user(user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,city,state,country,
@@ -645,5 +645,29 @@ INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organis
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (225,81,4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (226,81,5);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (227,81,2);
+
+-- ca_ES
+-- need a new workspace_id and the name changes for each user.
+insert into lams_workspace_folder(workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(37,null,'Catalan Workspace',37,now(),now(),1);
+insert into lams_workspace (workspace_id, default_fld_id, name) values (37,37,'Catalan Test');
+
+insert into lams_user(user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,city,state,country,
+day_phone,evening_phone,mobile_phone,fax,email,disabled_flag,create_date,authentication_method_id,workspace_id, flash_theme_id,html_theme_id,locale_id)
+values(37,'catalan','catalan','Dr','Catalan','Test','37','Las Ramblas',null,'Barcelona',null,'Catalunya',
+'0211111111','0211111112','0411111111','0211111113','catalan@example.com',0,'20100105',1,37,1,2,27);
+
+-- need a new user_organisation_id for each row, user_id must match user_id created in the lams_user
+-- belongs to course Playpen, Class Everybody
+INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (82, 2, 37);
+INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (83, 3, 37);
+
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (228,82,3);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (229,82,5);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (230,82,2);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (231,83,4);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (232,83,5);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (233,83,2);
 
 update lams_user set password=SHA1(password) where user_id>8;
