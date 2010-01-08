@@ -8,7 +8,7 @@
 	function removeInstruction(idx){
 	    var param = $("#instructionForm").serialize() + "&removeIdx="+idx;
 	    removeInstructionLoading();
-	    $.get(removeInstructionUrl, param, function(xml) {
+	    $.post(removeInstructionUrl, param, function(xml) {
 	    	removeInstructionComplete();	
 	    	document.getElementById("instructionArea").innerHTML = xml;
 	    });
@@ -32,7 +32,7 @@
 	function addInstruction(){
 	    var param = $("#instructionForm").serialize();
 		addInstructionLoading();
-	    $.get(addInstructionUrl, param, function(xml) {
+	    $.post(addInstructionUrl, param, function(xml) {
 	    	addInstructionComplete();
 	    	document.getElementById("instructionArea").innerHTML = xml;
 	    });
