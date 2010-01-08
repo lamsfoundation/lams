@@ -1647,11 +1647,23 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    Vector potentialUsersVector = getUserManagementService().getUsersFromOrganisationByRole(orgId,
 		    Role.AUTHOR_ADMIN, false, true);
 
+	    // list existing users (inherited role from parent nodes)
+	    Set allInheritedUsers = getPedagogicalPlannerDAO().getInheritedNodeUsers(nodeUid, Role.ROLE_AUTHOR_ADMIN);
+	    ArrayList<User> filteredInheritedUsers = new ArrayList<User>();
+	    for (Object o : allInheritedUsers) {
+		User u = (User) o;
+		// filter existing users of the actual node
+		if (existingUsers.contains(u)) {
+		    continue;
+		}
+		filteredInheritedUsers.add(u);
+	    }
+	    
 	    // filter existing users from list of potential users
-	    List potentialUsers = new ArrayList();
+	    ArrayList<User> potentialUsers = new ArrayList<User>();
 	    for (Object o : potentialUsersVector) {
 		User u = (User) o;
-		if (existingUsers.contains(u)) {
+		if (existingUsers.contains(u) || allInheritedUsers.contains(u)) {
 		    continue;   
 		}
 		// filter self
@@ -1659,11 +1671,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    continue;
 		}
 		potentialUsers.add(u);
-		// TODO filter nodeEditor of parent node
 	    }
 
 	    request.setAttribute("existingUsers", existingUsers);
 	    request.setAttribute("potentialUsers", potentialUsers);
+	    request.setAttribute("inheritedUsers", filteredInheritedUsers);
 	    
 	    return mapping.findForward("editAuthors");
 	} else {

@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.planner.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 
@@ -45,6 +46,8 @@ public interface PedagogicalPlannerDAO {
     Boolean isEditor(Integer userId, Long nodeUid, Integer roleId);
     
     List getNodeUsers(Long nodeUid, Integer roleId);
+    
+    Set getInheritedNodeUsers(Long nodeUid, Integer roleId);
     
     void saveNodeRole(Integer userId, Long nodeUid, Integer roleId);
     

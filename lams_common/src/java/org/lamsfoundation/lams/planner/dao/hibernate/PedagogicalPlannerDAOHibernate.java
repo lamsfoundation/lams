@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.planner.dao.hibernate;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,6 +55,7 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
     + " AS n WHERE ((? IS NULL AND n.parent=NULL) OR  n.parent.uid=?) AND n.order<=? ORDER BY n.order DESC";
     private static final String GET_PLANNER_NODE_ROLE = "FROM " + PedagogicalPlannerNodeRole.class.getName()
     	+ " WHERE user.userId=? AND node.uid=? AND role.roleId=?";
+    // TODO include inherited users
     private static final String GET_PLANNER_NODE_ROLE_USERS = "SELECT p.user FROM " 
 	+ PedagogicalPlannerNodeRole.class.getName() + " AS p WHERE p.node.uid=? AND p.role.roleId=?";
 
@@ -152,6 +154,19 @@ public class PedagogicalPlannerDAOHibernate extends HibernateDaoSupport implemen
     public List getNodeUsers(Long nodeUid, Integer roleId) {
 	return getHibernateTemplate().find(PedagogicalPlannerDAOHibernate.GET_PLANNER_NODE_ROLE_USERS, 
 		new Object[] { nodeUid, roleId });
+    }
+    
+    public Set getInheritedNodeUsers(Long nodeUid, Integer roleId) {
+	HashSet users = new HashSet();  // use set to avoid duplicates
+	
+	PedagogicalPlannerSequenceNode node = getByUid(nodeUid);
+	while (node.getParent() != null) {
+	    PedagogicalPlannerSequenceNode parent = node.getParent();
+	    users.addAll(getNodeUsers(parent.getUid(), roleId));
+	    node = parent;
+	}
+	
+	return users;
     }
     
     public void saveNodeRole(Integer userId, Long nodeUid, Integer roleId) {
