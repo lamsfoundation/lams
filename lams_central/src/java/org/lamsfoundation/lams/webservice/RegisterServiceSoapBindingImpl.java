@@ -45,7 +45,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * </p>
  * 
  * <p>
- * To authenticate your request to LAMS, each method accepts a server id, datetime and hash parameter.
+ * To authenticate your request to LAMS, each method accepts a datetime, server id, and hash parameter.
  * </p>
  * 
  * <ul>
@@ -55,9 +55,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <ul>
  * <li>$datetime = date("F d,Y g:i a");
  * </ul>
- * <li>hash: SHA1 hash of the server id, secret key, datetime, and username. e.g. in PHP,
+ * <li>hash: SHA1 hash of the datetime, server id, and secret key, in that order. e.g. in PHP,
  * <ul>
- * <li>$rawstring = trim($datetime).trim($username).trim($CFG->lamstwo_serverid).trim($CFG->lamstwo_serverkey);
+ * <li>$rawstring = trim($datetime).trim($CFG->lamstwo_serverid).trim($CFG->lamstwo_serverkey);
  * <li>$hashvalue = sha1(strtolower($rawstring));
  * </ul>
  * </ul>
