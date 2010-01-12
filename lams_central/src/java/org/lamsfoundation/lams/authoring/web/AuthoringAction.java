@@ -98,6 +98,7 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     private ActionForward outputPacket(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
 	    String wddxPacket, String parameterName) throws IOException {
+	response.addHeader("Cache-Control", "no-cache");
 	PrintWriter writer = response.getWriter();
 	writer.println(wddxPacket);
 	return null;
