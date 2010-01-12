@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute"
+	verticalAlign="left"
+	xmlns:components="org.lamsfoundation.lams.author.components.*"
+	xmlns:maps="org.lamsfoundation.lams.author.maps.*" 
+	preinitialize="preInit()"
+	>
+
+	<mx:Script>
+		<![CDATA[
+			import mx.rpc.events.ResultEvent;
+			import org.lamsfoundation.lams.common.util.WDDXParser;
+			import flash.utils.Dictionary;
+			
+			
+			// If testing is set to true, load data from test directory
+			public const TESTING:Boolean = true;
+			public const TESTING_LOCAL:Boolean = true;	// If true use assets folder, else use localhost
+			public const TESTING_URL:String = "assets/test/default/";
+			public const TESTING_LAMS_URL:String = "http://localhost:8080/lams/";
+			
+			// LAMS URL
+			public var lamsURL:String;
+			
+			// Learning library xml
+			public var learningLibrary:Dictionary;
+			
+			private function preInit():void {
+				
+				if (TESTING && !TESTING_LOCAL) {
+					lamsURL = TESTING_LAMS_URL;
+				} else {
+					lamsURL = Application.application.parameters.serverUrl;
+				}
+				
+				mainMap.init();
+			}
+		]]>
+	</mx:Script>
+
+	<maps:MainEventMap id="mainMap" />
+	<maps:ModelMap id="modelMap" />
+
+	<!--<components:ControlPanel id="compControlPanel"
+		left="0" right="0"
+		height="50"
+	/>-->
+	
+	<mx:MenuBar id="myMenuBar" labelField="@label" width="100%">
+        <mx:XMLList>
+            <menuitem label="File">
+                <menuitem label="SubMenuItem A-1" enabled="false"/>
+                <menuitem label="SubMenuItem A-2"/>
+            </menuitem>
+            <menuitem label="Edit"/>
+            <menuitem label="Tools"/>
+            <menuitem label="Help">
+                <menuitem label="SubMenuItem D-1" 
+                    type="radio" groupName="one"/>
+                <menuitem label="SubMenuItem D-2" 
+                    type="radio" groupName="one"
+                    selected="true"/>
+                <menuitem label="SubMenuItem D-3" 
+                    type="radio" groupName="one"/>
+            </menuitem>
+        </mx:XMLList>
+    </mx:MenuBar>
+
+	
+		
+	<components:CanvasArea height="100%" width="100%" id="canvasArea" top="20"
+		backgroundColor="#FFFFF8" >
+	</components:CanvasArea>
+	
+</mx:Application>

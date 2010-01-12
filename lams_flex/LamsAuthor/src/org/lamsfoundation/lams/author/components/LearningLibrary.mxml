@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" 
+	backgroundColor="#C2D5FE" 
+	xmlns:flexlib="http://code.google.com/p/flexlib/"
+	paddingTop="10" paddingLeft="5" paddingRight="5" paddingBottom="10"
+	
+	>
+
+	<mx:Style source="assets/css/learningLibrary.css" />
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import mx.controls.Label;
+			import mx.containers.HBox;
+			import mx.core.DragSource;
+			import mx.binding.utils.BindingUtils;
+			import mx.core.MovieClipAsset;
+			import mx.events.DragEvent;
+			import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
+			import mx.controls.Image;
+			import mx.collections.ArrayCollection;
+			import org.lamsfoundation.lams.author.util.Constants;
+			import mx.managers.DragManager;
+			import org.lamsfoundation.lams.author.components.activity.LearningLibraryEntryComponent;
+				
+			[Bindable] 
+			public var learningLibraryTree:ArrayCollection;
+			
+          	public function loadLearningLibrary():void {
+   				
+   				
+   				for each(var learningLibraryEntry:LearningLibraryEntry in Application.application.learningLibrary) {
+   					var llcomp:LearningLibraryEntryComponent = new LearningLibraryEntryComponent();
+		   			llcomp.load(learningLibraryEntry);
+   					switch (learningLibraryEntry.category) {
+   						case Constants.TOOL_CATEGORY_ASSESSMENT:
+		   					wsAssessment.addChild(llcomp);
+   							break;
+   						case Constants.TOOL_CATEGORY_INFORMATIVE:
+		   					wsInformative.addChild(llcomp);
+   							break;
+   						case Constants.TOOL_CATEGORY_REFLECTIVE:
+		   					wsReflective.addChild(llcomp);
+   							break;
+   						case Constants.TOOL_CATEGORY_COLLABORATIVE:
+   							wsCollaborative.addChild(llcomp);
+   							break;
+   					}
+   				}
+   			}
+		]]>
+	</mx:Script>
+	
+
+	<flexlib:WindowShade id="wsInformative" tabChildren="{wsInformative.opened}" styleName="informative" opened="false"
+      	label="Informative" width="100%" paddingLeft="20" paddingBottom="20" backgroundColor="#FFEEC8"  shadowDirection="right">	
+    </flexlib:WindowShade>
+     
+    <flexlib:WindowShade id="wsReflective" tabChildren="{wsReflective.opened}" styleName="reflective" opened="false"
+      	label="Reflective" width="100%" paddingLeft="20" paddingBottom="20" backgroundColor="#DDFCB1" shadowDirection="right" >
+    </flexlib:WindowShade>
+    
+    <flexlib:WindowShade id="wsCollaborative" tabChildren="{wsCollaborative.opened}" styleName="collaborative" opened="false"
+      	label="Collaborative" width="100%" paddingLeft="20" paddingBottom="20" backgroundColor="#FFFDBE" shadowDirection="right" >
+    </flexlib:WindowShade>
+    
+    <flexlib:WindowShade id="wsAssessment" tabChildren="{wsAssessment.opened}" styleName="assessment" opened="false"
+      	label="Asessment" width="100%" paddingLeft="20" paddingBottom="20" backgroundColor="#E9E2F5" shadowDirection="right" > 
+    </flexlib:WindowShade>
+    
+</mx:VBox>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:components="org.lamsfoundation.lams.author.components.*"
+	horizontalGap="0">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Label;
+			import org.lamsfoundation.lams.author.components.activity.ToolActivityComponent;
+			import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
+			import mx.controls.Image;
+			import mx.core.Container;
+			import mx.core.UIComponent;
+			import mx.managers.DragManager;
+            import mx.core.DragSource;
+            import mx.events.DragEvent;
+            import flash.events.MouseEvent;
+            import mx.collections.ArrayCollection;
+            import org.lamsfoundation.lams.author.components.activity.*;
+            
+            
+            [Bindable]
+			public var learningDesign:ArrayCollection;
+			
+			private function doZoom(component:UIComponent,val:Number):void
+			{
+				component.scaleX = val;
+				component.scaleY = val;
+				
+				if (component is Button) {
+					var button:Button = component as Button;
+					button
+				}
+				
+				
+				if(component is Container)
+				{
+					var children:Array = Container(component).getChildren();
+					for(var i:int = 0; i < children.length; i++)
+					{
+						doZoom(children[i], val);
+					}
+				}
+			} 
+			public function applyZoom():void
+			{
+				if(canvasBox == null)
+				{
+					return;
+				}
+				//doZoom(canvasBox,zoomSlider.value);
+			}
+			
+			private function toggleLearningLibrary():void{
+				compLearningLibrary.includeInLayout = !compLearningLibrary.includeInLayout;
+				compLearningLibrary.visible = !compLearningLibrary.visible;
+				
+				if (compLearningLibrary.visible) {
+					hideButton.label = "<";
+				} else {
+					hideButton.label = ">";
+				}
+		    }
+		  		             
+            // The dragEnter event handler for the Canvas container
+            // enables dropping.
+            private function dragEnterHandler(event:DragEvent):void {
+                if (event.dragSource.hasFormat("img"))
+                {
+                    DragManager.acceptDragDrop(Canvas(event.currentTarget));
+                }
+            }
+
+            // The dragDrop event handler for the Canvas container
+            // sets the Image control's position by 
+            // "dropping" it in its new location.
+            private function dragDropHandler(event:DragEvent):void {
+                
+                var image:Image;
+                
+                if (event.dragInitiator is ActivityComponent) {
+                	var activityComponent:ActivityComponent;
+                	activityComponent = event.dragInitiator as ActivityComponent;
+                	activityComponent.x = UIComponent(event.currentTarget).mouseX - 10;
+              		activityComponent.y = UIComponent(event.currentTarget).mouseY - 10;
+                } else {
+                	var learningLibraryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent;
+                	
+                	if (learningLibraryComponent.learningLibraryEntry.isCombined) {
+                		var combinedActivityComponent:CombinedActivityComponent = new CombinedActivityComponent();
+	                	combinedActivityComponent.learningLibraryEntry = learningLibraryComponent.learningLibraryEntry;
+	                	combinedActivityComponent.load()
+						combinedActivityComponent.x = UIComponent(event.currentTarget).mouseX;
+	              		combinedActivityComponent.y = UIComponent(event.currentTarget).mouseY;
+	                	canvasBox.addChild(combinedActivityComponent);
+                	} else {
+                		var toolActivityComponent:ToolActivityComponent = new ToolActivityComponent();
+	                	toolActivityComponent.tool = learningLibraryComponent.learningLibraryEntry.toolTemplates[0];
+	                	toolActivityComponent.load()
+						toolActivityComponent.x = UIComponent(event.currentTarget).mouseX;
+	              		toolActivityComponent.y = UIComponent(event.currentTarget).mouseY;
+	                	canvasBox.addChild(toolActivityComponent);
+                	}
+                }                    
+            }
+		]]>
+	</mx:Script>
+	
+	
+	
+	<components:LearningLibrary id="compLearningLibrary"
+			height="100%" width="190"
+		/>	
+	<mx:HBox id="canvasblock" height="100%" width="25" verticalAlign="middle" >
+		<mx:Button id="hideButton" label="&lt;" click="toggleLearningLibrary()" 
+			width="25" paddingLeft="0" textAlign="right" />
+	</mx:HBox>
+	<!--<mx:HSlider id="zoomSlider" minimum="0.8" value="1.5"
+			maximum="3" change="applyZoom()" width="150"/>-->
+	<mx:Canvas height="100%" width="100%" >
+		
+				<!-- The Canvas is the drag target --> 
+			    <mx:Canvas id="canvasBox" 
+			        width="100%" height="100%"   
+			        backgroundColor="#FFFFF8"
+			        dragEnter="dragEnterHandler(event);" 
+			        dragDrop="dragDropHandler(event);">
+			        	
+			    </mx:Canvas>
+			    <components:LearningLibrary2 id="compLearningLibrary2"
+						height="120"  horizontalCenter="0" bottom="0"
+						width="900"
+					/>
+	</mx:Canvas>
+	
+</mx:HBox>

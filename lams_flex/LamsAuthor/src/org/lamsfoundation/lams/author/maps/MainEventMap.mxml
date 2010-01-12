@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EventMap xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="http://mate.asfusion.com/">
+	
+	<mx:Script>
+		<![CDATA[
+			import org.lamsfoundation.lams.author.events.AuthorEvent;
+			import com.asfusion.mate.actions.builders.EventAnnouncer;
+			import com.asfusion.mate.actions.builders.HTTPServiceInvoker;
+      		import com.asfusion.mate.events.UnhandledFaultEvent;
+      
+			import mx.events.*;
+			import mx.collections.ArrayCollection;
+			import mx.core.Application;
+			
+			import org.lamsfoundation.lams.common.dictionary.XMLDictionary;
+			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryEvent;
+			import org.lamsfoundation.lams.common.util.WDDXParser;
+			import org.lamsfoundation.lams.author.controller.AuthorController;
+	
+			[Bindable]
+			private var learningLibraryUrl:String;
+			
+			public function init():void {
+				
+				if (Application.application.TESTING) {
+					
+					var testingUrl:String;
+					if (Application.application.TESTING_LOCAL) {
+						testingUrl = Application.application.TESTING_URL;
+						learningLibraryUrl = testingUrl + "LearningLibraryDetails.xml";
+					} else {
+						testingUrl = Application.application.lamsURL;
+						learningLibraryUrl = testingUrl + "authoring/author.do";
+					}
+				}
+				
+				
+				var authorEvent:AuthorEvent = new AuthorEvent(AuthorEvent.INIT_DATA_EVENT);
+				this.dispatchEvent(authorEvent);
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<!-- UnhandledFaultEvent.FAULT -->
+<!--	<EventHandlers type="{UnhandledFaultEvent.FAULT}">
+      	<EventAnnouncer generator="{WizardErrorEvent}" type="{WizardErrorEvent.SHOW_ERROR}">
+      		<Properties message="{event.fault.message}" />
+      	</EventAnnouncer>
+	</EventHandlers>-->
+	
+	<!-- FlexEvent.PREINITIALIZE __________________________________________________________________ -->
+	
+<!--	<EventHandlers type="{FlexEvent.PREINITIALIZE}">
+		
+	</EventHandlers>
+	-->
+	
+	<Debugger level="{Debugger.ALL}" />
+	
+	<!-- FlexEvent.APPLICATION_COMPLETE ___________________________________________________________ -->
+	<EventHandlers type="{FlexEvent.INITIALIZE}" debug="true" >
+		<ObjectBuilder id="authorController" generator="{AuthorController}"/>
+		
+		<!-- load dict data -->
+		<HTTPServiceInvoker instance="{learningLibraryService}">
+			<Request method="getAllLearningLibraryDetails"/>
+			<resultHandlers>
+				<MethodInvoker generator="{WDDXParser}" 
+					method="parseObject" arguments="{resultObject}" />
+				<MethodInvoker generator="{AuthorController}" method="setLearningLibrary" arguments="{[lastReturn]}" />
+			</resultHandlers>
+		</HTTPServiceInvoker>
+		
+	</EventHandlers>
+
+	
+	<!-- ======================================================================================== -->
+	<!-- Services   Note: you can have an external file if you have more services -->
+	<!-- _________________________________________________________________________________________ -->
+
+	<mx:HTTPService id="learningLibraryService" url="{learningLibraryUrl}" resultFormat="xml" />
+        
+	
+</EventMap>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" 
+	backgroundColor="#C2D5FE" 
+	xmlns:flexlib="http://code.google.com/p/flexlib/"
+	height="70"
+	horizontalAlign="center"
+	borderStyle="solid"
+	cornerRadius="20"
+	dropShadowEnabled="true"
+	shadowDirection="right" 
+	
+	>
+
+	<mx:Style source="assets/css/learningLibrary.css" />
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import mx.controls.Label;
+			import mx.containers.HBox;
+			import mx.core.DragSource;
+			import mx.binding.utils.BindingUtils;
+			import mx.core.MovieClipAsset;
+			import mx.events.DragEvent;
+			import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
+			import mx.controls.Image;
+			import mx.collections.ArrayCollection;
+			import org.lamsfoundation.lams.author.util.Constants;
+			import org.lamsfoundation.lams.author.model.learninglibrary.ToolCategory;
+			import mx.managers.DragManager;
+			import org.lamsfoundation.lams.author.components.activity.LearningLibraryEntryComponent2;
+			import mx.events.ItemClickEvent;
+        	import mx.controls.tabBarClasses.Tab;
+		
+          	public function loadLearningLibrary():void {
+   				
+   				
+   				
+   				
+   				
+   				for each(var toolCategory:ToolCategory in Application.application.learningLibrary) {
+   					
+   					loadCategory(toolCategory, hboxAll);
+   					switch (toolCategory._category) {
+   						case ToolCategory.TOOL_CATEGORY_ASSESSMENT:
+   							loadCategory(toolCategory, hboxAssessment);
+   							break;
+   						case ToolCategory.TOOL_CATEGORY_INFORMATIVE:
+   							loadCategory(toolCategory, hboxInformative);
+   							break;
+   						case ToolCategory.TOOL_CATEGORY_REFLECTIVE:
+   							loadCategory(toolCategory, hboxReflective);
+   							break;
+   						case ToolCategory.TOOL_CATEGORY_COLLABORATIVE:
+   							loadCategory(toolCategory, hboxCollaborative);
+   							break;
+   					}
+   				}
+   			}
+
+   			private function loadCategory(category:ToolCategory, window:HBox):void {
+   				
+   				for each(var learningLibraryEntry:LearningLibraryEntry in category._learningLibraryEntries) {
+   					
+   					var llcomp:LearningLibraryEntryComponent2 = new LearningLibraryEntryComponent2();
+   					llcomp.load(learningLibraryEntry);
+   					
+   					window.addChild(llcomp);
+   				}
+   			}
+   			
+   			private function categorySelect(evt:ItemClickEvent):void {
+	            categoryViewStack.selectedIndex = evt.index;
+	        }
+
+		]]>
+	</mx:Script>
+	
+	
+	<mx:Array id="arr">
+		<mx:Object label="All" />
+        <mx:Object label="Informative" />
+        <mx:Object label="Reflective" />
+        <mx:Object label="Collaborative" />
+        <mx:Object label="Assessment" />
+        <mx:Object label="Flow" />
+        <mx:Object label="Optional" />
+        <mx:Object label="Grouping" />
+        <mx:Object label="Other" />
+    </mx:Array>
+
+	<mx:VBox>
+		<mx:TabBar id="categoryBar" dataProvider="{arr}" itemClick="categorySelect(event);"></mx:TabBar>
+	  	<mx:ViewStack id="categoryViewStack"   selectedIndex="0" >
+	  		<mx:HBox id="hboxAll" label="All" horizontalGap="20" width="700" height="85" paddingLeft="20" paddingRight="20"></mx:HBox>
+			<mx:HBox id="hboxInformative" label="Informative" horizontalGap="20" width="700" height="85" paddingLeft="20" paddingRight="20" horizontalScrollPolicy="on"></mx:HBox>
+			<mx:HBox id="hboxReflective" label="Reflective" horizontalGap="20" width="700" height="85" paddingLeft="20" paddingRight="20" horizontalScrollPolicy="on"></mx:HBox>
+			<mx:HBox id="hboxCollaborative" label="Collaborative" horizontalGap="20" width="700" height="85" paddingLeft="20" paddingRight="20" horizontalScrollPolicy="on"></mx:HBox>
+			<mx:HBox id="hboxAssessment" label="Assessment" horizontalGap="20" width="700" height="85" paddingLeft="20" paddingRight="20" horizontalScrollPolicy="on"></mx:HBox>
+			<mx:HBox id="hboxFlow" label="Flow" horizontalGap="20" width="700" height="85" paddingLeft="20" paddingRight="20" horizontalScrollPolicy="on"></mx:HBox>
+			<mx:HBox id="hboxGrouping" label="Grouping" horizontalGap="20" width="700" height="85" paddingLeft="20" paddingRight="20" horizontalScrollPolicy="on"></mx:HBox>
+			<mx:HBox id="hboxOptional" label="Assessment" horizontalGap="20" width="700" height="85" paddingLeft="20" paddingRight="20" horizontalScrollPolicy="on"></mx:HBox>
+			<mx:HBox id="hboxOther" label="Other" horizontalGap="20" width="700" height="85" paddingLeft="20" paddingRight="20" horizontalScrollPolicy="on"></mx:HBox>
+		</mx:ViewStack>
+	</mx:VBox>
+	
+	<mx:VBox paddingTop="40" paddingLeft="30">
+		<mx:Button label="Transition"></mx:Button>
+		<mx:Button label="Data Flow"></mx:Button>
+	</mx:VBox>
+
+</mx:HBox>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" 
+	backgroundColor="#C2D5FE" 
+	xmlns:flexlib="http://code.google.com/p/flexlib/"
+	height="70"
+	horizontalAlign="center"
+	borderStyle="solid"
+	cornerRadius="20"
+	dropShadowEnabled="true"
+	shadowDirection="right" 
+	>
+
+	<mx:Style source="assets/css/learningLibrary.css" />
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
+			import org.lamsfoundation.lams.author.util.Constants;
+			import org.lamsfoundation.lams.author.components.activity.LearningLibraryEntryComponent2;
+			import mx.events.ItemClickEvent;
+			import mx.controls.tabBarClasses.Tab;
+		
+          	public function loadLearningLibrary():void {
+   				for each(var learningLibraryEntry:LearningLibraryEntry in Application.application.learningLibrary) {
+   					var llcomp:LearningLibraryEntryComponent2 = new LearningLibraryEntryComponent2();
+		   			llcomp.learningLibraryEntry = learningLibraryEntry;
+		   			llcomp.load();
+		   			
+		   			var llcomp2:LearningLibraryEntryComponent2 = new LearningLibraryEntryComponent2();
+		   			llcomp2.learningLibraryEntry = learningLibraryEntry;
+		   			llcomp2.load();
+					hboxAll.addChild(llcomp2);
+					
+   					switch (learningLibraryEntry.category) {
+   						case Constants.TOOL_CATEGORY_ASSESSMENT:
+		   					hboxAssessment.addChild(llcomp);
+		   					hboxAssessment.addChild(llcomp);
+   							break;
+   						case Constants.TOOL_CATEGORY_INFORMATIVE:
+		   					hboxInformative.addChild(llcomp);
+   							break;
+   						case Constants.TOOL_CATEGORY_REFLECTIVE:
+		   					hboxReflective.addChild(llcomp);
+   							break;
+   						case Constants.TOOL_CATEGORY_COLLABORATIVE:
+   							hboxCollaborative.addChild(llcomp);
+   							break;
+   					}
+   				}
+   			}
+   			
+   			private function categorySelect(evt:ItemClickEvent):void {
+	            categoryViewStack.selectedIndex = evt.index;
+	        }
+	        
+	        private function categoryBarCreationComplete():void {
+	 			var informativeTab:Tab = Tab(categoryBar.getChildAt(1));
+	 			informativeTab.setStyle("fillColors", ["#FFEEC8", "white"]);
+        		informativeTab.setStyle("fillAlphas", [1.0, 1.0]);
+        		informativeTab.setStyle("backgroundColor", "#FFEEC8");
+        		
+        		var reflectiveTab:Tab = Tab(categoryBar.getChildAt(2));
+	 			reflectiveTab.setStyle("fillColors", ["#DDFCB1", "white"]);
+        		reflectiveTab.setStyle("fillAlphas", [1.0, 1.0]);
+        		reflectiveTab.setStyle("backgroundColor", "#DDFCB1");
+        		
+        		var collaborativeTab:Tab = Tab(categoryBar.getChildAt(3));
+	 			collaborativeTab.setStyle("fillColors", ["#FFFDBE", "white"]);
+        		collaborativeTab.setStyle("fillAlphas", [1.0, 1.0]);
+        		collaborativeTab.setStyle("backgroundColor", "#FFFDBE");
+        		
+        		var assessmentTab:Tab = Tab(categoryBar.getChildAt(4));
+	 			assessmentTab.setStyle("fillColors", ["#E9E2F5", "white"]);
+        		assessmentTab.setStyle("fillAlphas", [1.0, 1.0]);
+        		assessmentTab.setStyle("backgroundColor", "#E9E2F5");
+	 
+	        }
+
+		]]>
+	</mx:Script>
+	
+	
+	<mx:Array id="arr">
+		<mx:Object label="All" />
+        <mx:Object label="Informative" />
+        <mx:Object label="Reflective" />
+        <mx:Object label="Collaborative" />
+        <mx:Object label="Assessment" />
+        <mx:Object label="Flow" />
+        <mx:Object label="Optional" />
+        <mx:Object label="Grouping" />
+        <mx:Object label="Other" />
+    </mx:Array>
+
+	<mx:VBox>
+		<mx:TabBar id="categoryBar" 
+			dataProvider="{arr}" 
+			itemClick="categorySelect(event);"
+			creationComplete="categoryBarCreationComplete();"
+			>
+		</mx:TabBar>
+	  	
+	  	
+	  	<mx:ViewStack id="categoryViewStack"   selectedIndex="0" >
+	  		<mx:HBox id="hboxAll" label="All" width="700" height="85" horizontalScrollPolicy="on" horizontalGap="0"></mx:HBox>
+			<mx:HBox id="hboxInformative" label="Informative" width="700" height="85" horizontalScrollPolicy="on" horizontalGap="0"></mx:HBox>
+			<mx:HBox id="hboxReflective" label="Reflective" width="700" height="85" horizontalScrollPolicy="on" horizontalGap="0"></mx:HBox>
+			<mx:HBox id="hboxCollaborative" label="Collaborative" width="700" height="85" horizontalScrollPolicy="on" horizontalGap="0"></mx:HBox>
+			<mx:HBox id="hboxAssessment" label="Assessment" width="700" height="85" horizontalScrollPolicy="on" horizontalGap="0"></mx:HBox>
+			<mx:HBox id="hboxFlow" label="Flow"  width="700" height="85" horizontalScrollPolicy="on" horizontalGap="0"></mx:HBox>
+			<mx:HBox id="hboxGrouping" label="Grouping" width="700" height="85" horizontalScrollPolicy="on" horizontalGap="0"></mx:HBox>
+			<mx:HBox id="hboxOptional" label="Assessment" width="700" height="85" horizontalScrollPolicy="on" horizontalGap="0"></mx:HBox>
+			<mx:HBox id="hboxOther" label="Other" width="700" height="85" horizontalScrollPolicy="on" horizontalGap="0"></mx:HBox>
+		</mx:ViewStack>
+	</mx:VBox>
+	
+	<mx:VBox paddingTop="40" paddingLeft="30">
+		<mx:Button label="Transition"></mx:Button>
+		<mx:Button label="Data Flow"></mx:Button>
+	</mx:VBox>
+
+</mx:HBox>

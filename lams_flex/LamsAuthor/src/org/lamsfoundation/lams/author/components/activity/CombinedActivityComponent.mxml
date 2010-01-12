@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ActivityComponent xmlns="org.lamsfoundation.lams.author.components.activity.*" 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	verticalAlign="middle" horizontalAlign="center" 
+	horizontalScrollPolicy="off" 
+	>
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.containers.VBox;
+			import mx.core.Application;
+			import mx.controls.Label;
+			import org.lamsfoundation.lams.author.model.learninglibrary.Tool;
+			import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
+			
+			public var toolActivityComponent1:ToolActivityComponent;
+			public var toolActivityComponent2:ToolActivityComponent;
+			public var learningLibraryEntry:LearningLibraryEntry;
+			
+			override public function load():void {
+				
+				var vbox:VBox = new VBox();
+				vbox.setConstraintValue("verticalAlign", "middle");
+				vbox.setConstraintValue("horizontalAlign", "center");
+				vbox.setStyle('borderStyle', 'solid');
+				vbox.setStyle('dropShadowEnabled', true);
+				vbox.setStyle('shadowDirection', "right");
+				vbox.setStyle('cornerRadius', '10');
+				vbox.setStyle('backgroundColor', '#C2D5FE');
+				vbox.horizontalScrollPolicy = "off";
+				vbox.height = 150;
+				vbox.minWidth = 100;
+				
+				
+				var tool1:Tool = learningLibraryEntry.toolTemplates[1];
+				var tool2:Tool = learningLibraryEntry.toolTemplates[2];
+				
+				if (tool1 != null) {
+					toolActivityComponent1 = new ToolActivityComponent();
+					toolActivityComponent1.tool = learningLibraryEntry.toolTemplates[1];
+					toolActivityComponent1.load();
+					vbox.addChild(toolActivityComponent1);
+				}
+				
+				if (tool1 != null) {
+					toolActivityComponent2 = new ToolActivityComponent();
+					toolActivityComponent2.tool = learningLibraryEntry.toolTemplates[2];
+					toolActivityComponent2.load();
+					vbox.addChild(toolActivityComponent2);
+				}
+				
+				this.addChild(vbox);
+				
+				title = new Label();
+   				title.text = learningLibraryEntry.title;
+   				this.addChild(title);
+				
+				addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
+			}
+			
+		]]>
+	</mx:Script>
+	
+	
+	
+	
+	
+	
+</ActivityComponent>

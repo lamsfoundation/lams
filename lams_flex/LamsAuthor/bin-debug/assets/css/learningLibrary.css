@@ -1,0 +1,66 @@
+/* CSS file */
+
+.linkButtonWindowShade {
+  	headerClass:ClassReference('mx.controls.LinkButton');
+  	header-style-name: linkButtonStyle;
+ 	drop-shadow-enabled:true;
+  	corner-radius:10;
+  	border-style:solid;
+  	font-weight:bold;
+   	use-roll-over: false;
+}
+
+.linkButtonStyle {
+	corner-radius:10;	
+	fill-alphas:1,1;
+	padding-left:10;
+	
+}
+
+.informative {
+  	headerClass:ClassReference('mx.controls.LinkButton');
+  	header-style-name: linkButtonStyle;
+ 	drop-shadow-enabled:true;
+  	corner-radius:10;
+  	border-style:solid;
+  	font-weight:bold;
+   	use-roll-over: false;
+   	roll-over-color:#FFEEC8;
+   	selectionColor:#FFEEC8;
+
+}
+
+.reflective {
+  	headerClass:ClassReference('mx.controls.LinkButton');
+  	header-style-name: linkButtonStyle;
+ 	drop-shadow-enabled:true;
+  	corner-radius:10;
+  	border-style:solid;
+  	font-weight:bold;
+   	use-roll-over: false;
+   	roll-over-color:#DDFCB1;
+   	selectionColor:#DDFCB1;
+}
+
+.collaborative {
+  	headerClass:ClassReference('mx.controls.LinkButton');
+  	header-style-name: linkButtonStyle;
+ 	drop-shadow-enabled:true;
+  	corner-radius:10;
+  	border-style:solid;
+  	font-weight:bold;
+   	use-roll-over: false;
+   	roll-over-color:#FFFDBE;
+   	selectionColor:#FFFDBE;
+}
+
+.assessment {
+  	headerClass:ClassReference('mx.controls.LinkButton');
+  	header-style-name: linkButtonStyle;
+ 	drop-shadow-enabled:true;
+  	corner-radius:10;
+  	border-style:solid;
+  	font-weight:bold;
+   	roll-over-color:#E9E2F5;
+   	selectionColor:#E9E2F5;    	
+}
