@@ -45,7 +45,17 @@
 				<c:out value="${option.optionString}" escapeXml="false" />
 			</td>
 			<c:if test="${finishedLock && option.answerBoolean && assessment.allowQuestionFeedback}">
-				<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px; font-style: italic; color:#47bc23;" width="30%">
+
+			      	<c:choose>
+                                 <c:when test="${option.grade <= 0}">
+                                  <c:set var="color" scope="page" value="red" />
+        			 </c:when>
+				 <c:otherwise>
+                                  <c:set var="color" scope="page" value="blue" />
+        			 </c:otherwise>
+                                </c:choose>
+
+				<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px; font-style: italic; color:${color};" width="30%">
 					<c:out value="${option.feedback}" escapeXml="false" />
 				</td>		
 			</c:if>
