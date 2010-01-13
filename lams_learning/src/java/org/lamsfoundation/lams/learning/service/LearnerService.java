@@ -366,7 +366,12 @@ public class LearnerService implements ICoreLearnerService {
      *      org.lamsfoundation.lams.usermanagement.User)
      */
     public LearnerProgressDTO getProgressDTOByLessonId(Long lessonId, Integer learnerId) {
-	return learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId).getLearnerProgressData();
+    	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
+    	if (progress != null) {
+    		return progress.getLearnerProgressData();
+    	} else {
+    		return null;
+    	}
     }
 
     /**
