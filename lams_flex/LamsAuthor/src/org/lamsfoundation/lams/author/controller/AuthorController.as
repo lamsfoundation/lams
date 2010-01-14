@@ -1,9 +1,11 @@
 package org.lamsfoundation.lams.author.controller
 {
 	import flash.utils.Dictionary;
+	
 	import mx.collections.ArrayCollection;
 	import mx.core.Application;
 	
+	import org.lamsfoundation.lams.author.events.TransitionEvent;
 	import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
 	
 	public class AuthorController
@@ -30,6 +32,11 @@ package org.lamsfoundation.lams.author.controller
    			Application.application.canvasArea.compLearningLibrary.loadLearningLibrary();
    			Application.application.canvasArea.compLearningLibrary2.loadLearningLibrary();
 			
+		}
+		
+		public function startTransitionDraw(event:TransitionEvent):void {
+			var x:int = 0;
+			var y:int = 1;
 		}
 		
 		

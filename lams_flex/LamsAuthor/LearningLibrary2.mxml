@@ -72,6 +72,10 @@
    			private function categorySelect(evt:ItemClickEvent):void {
 	            categoryViewStack.selectedIndex = evt.index;
 	        }
+	        
+	        private function changeCursorState(state:int):void {
+	        	Application.application.cursorState = state;
+	        }
 
 		]]>
 	</mx:Script>
@@ -105,8 +109,8 @@
 	</mx:VBox>
 	
 	<mx:VBox paddingTop="40" paddingLeft="30">
-		<mx:Button label="Transition"></mx:Button>
-		<mx:Button label="Data Flow"></mx:Button>
+		<mx:Button label="Transition" click="changeCursorState(Constants.CURSOR_STATE_TRANSITION)"></mx:Button>
+		<mx:Button label="Data Flow" click="changeCursorState(Constants.CURSOR_STATE_DATAFLOW)"></mx:Button>
 	</mx:VBox>
 
 </mx:HBox>

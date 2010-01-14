@@ -9,6 +9,7 @@
 
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.util.Constants;
 			import mx.rpc.events.ResultEvent;
 			import org.lamsfoundation.lams.common.util.WDDXParser;
 			import flash.utils.Dictionary;
@@ -25,6 +26,9 @@
 			
 			// Learning library xml
 			public var learningLibrary:Dictionary;
+			
+			// State of cursor transition/help/dataflow etc...
+			public var cursorState:int = Constants.CURSOR_STATE_NORMAL;
 			
 			private function preInit():void {
 				

@@ -3,7 +3,7 @@
 	
 	<mx:Script>
 		<![CDATA[
-			import org.lamsfoundation.lams.author.events.AuthorEvent;
+			import org.lamsfoundation.lams.author.events.DropEvent;
 			import com.asfusion.mate.actions.builders.EventAnnouncer;
 			import com.asfusion.mate.actions.builders.HTTPServiceInvoker;
       		import com.asfusion.mate.events.UnhandledFaultEvent;
@@ -16,6 +16,7 @@
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryEvent;
 			import org.lamsfoundation.lams.common.util.WDDXParser;
 			import org.lamsfoundation.lams.author.controller.AuthorController;
+			import org.lamsfoundation.lams.author.events.*;
 	
 			[Bindable]
 			private var learningLibraryUrl:String;
@@ -32,11 +33,7 @@
 						testingUrl = Application.application.lamsURL;
 						learningLibraryUrl = testingUrl + "authoring/author.do";
 					}
-				}
-				
-				
-				var authorEvent:AuthorEvent = new AuthorEvent(AuthorEvent.INIT_DATA_EVENT);
-				this.dispatchEvent(authorEvent);
+				}	
 			}
 			
 		]]>
@@ -73,6 +70,11 @@
 		</HTTPServiceInvoker>
 		
 	</EventHandlers>
+	
+	<EventHandlers type="{TransitionEvent.TRANSITION_EVENT}">
+		<MethodInvoker generator="{AuthorController}" method="startTransitionDraw" arguments="{[event]}" />
+	</EventHandlers>
+	
 
 	
 	<!-- ======================================================================================== -->

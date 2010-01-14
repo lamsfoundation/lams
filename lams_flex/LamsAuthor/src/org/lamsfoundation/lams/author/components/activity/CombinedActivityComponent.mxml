@@ -15,7 +15,7 @@
 			
 			public var toolActivityComponent1:ToolActivityComponent;
 			public var toolActivityComponent2:ToolActivityComponent;
-			public var learningLibraryEntry:LearningLibraryEntry;
+			public var learningLibraryEntry:LearningLibraryEntry;	
 			
 			override public function load():void {
 				

@@ -58,6 +58,7 @@
    				this.addChild(title);
    				
    				addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
+   				addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			}
 			
 		]]>

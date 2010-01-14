@@ -20,6 +20,7 @@
 			import org.lamsfoundation.lams.author.components.activity.LearningLibraryEntryComponent2;
 			import mx.events.ItemClickEvent;
 			import mx.controls.tabBarClasses.Tab;
+			import mx.managers.CursorManager;
 		
           	public function loadLearningLibrary():void {
    				for each(var learningLibraryEntry:LearningLibraryEntry in Application.application.learningLibrary) {
@@ -76,6 +77,10 @@
         		assessmentTab.setStyle("backgroundColor", "#E9E2F5");
 	 
 	        }
+	        
+	        private function changeCursorState(e:MouseEvent, state:int):void{
+				Application.application.cursorState = state;
+			}
 
 		]]>
 	</mx:Script>
@@ -115,8 +120,9 @@
 		</mx:ViewStack>
 	</mx:VBox>
 	
-	<mx:VBox paddingTop="40" paddingLeft="30">
-		<mx:Button label="Transition"></mx:Button>
+	<mx:VBox paddingTop="20" paddingLeft="30">
+		<mx:Button label="Normal" click="changeCursorState(event, Constants.CURSOR_STATE_NORMAL)"></mx:Button>
+		<mx:Button label="Transition" click="changeCursorState(event, Constants.CURSOR_STATE_TRANSITION)"></mx:Button>
 		<mx:Button label="Data Flow"></mx:Button>
 	</mx:VBox>
 

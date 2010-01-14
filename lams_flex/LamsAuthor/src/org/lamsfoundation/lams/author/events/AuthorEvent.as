@@ -4,9 +4,7 @@ package org.lamsfoundation.lams.author.events
 
 	public class AuthorEvent extends Event
 	{
-		public static const INIT_DATA_EVENT:String = "initDataEvent";
-		
-		public function AuthorEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=false)
+		public function AuthorEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
 		}
