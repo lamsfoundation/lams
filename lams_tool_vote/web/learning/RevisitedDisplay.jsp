@@ -137,8 +137,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>
 					<div>&nbsp;</div>
 				</c:if>
-				
-				<strong> <fmt:message key="label.learner.nominations" /> </strong>
+
+				<c:choose>
+				 <c:when test="${fn:length(requestScope.listGeneralCheckedOptionsContent) > 1}">
+                                      <strong><fmt:message key="label.learner.nominations" />  </strong>
+				 </c:when>
+                                 <c:otherwise>
+
+				     <strong><fmt:message key="label.learner.nomination" />  </strong>
+				 </c:otherwise>
+				</c:choose>
 
 				<c:forEach var="entry"
 					items="${requestScope.listGeneralCheckedOptionsContent}">
