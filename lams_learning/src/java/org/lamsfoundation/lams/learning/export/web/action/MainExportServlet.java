@@ -242,7 +242,7 @@ public class MainExportServlet extends HttpServlet {
 	    //Open and input stream
 	    FileInputStream fis = new FileInputStream(fin);
 
-	    BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+	    BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
 
 	    // The pattern matches control characters
 	    Pattern p = Pattern.compile(fckeditorpath);
@@ -286,7 +286,7 @@ public class MainExportServlet extends HttpServlet {
 
 	    File fout = new File(filename);
 	    FileOutputStream fos = new FileOutputStream(fout);
-	    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(fos));
+	    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
 
 	    out.write(output);
 	    out.newLine();
