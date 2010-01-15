@@ -17,6 +17,15 @@
 	
 }
 
+.all {
+  	headerClass:ClassReference('mx.controls.LinkButton');
+  	header-style-name: linkButtonStyle;
+ 	drop-shadow-enabled:true;
+  	corner-radius:10;
+  	border-style:solid;
+  	font-weight:bold;
+}
+
 .informative {
   	headerClass:ClassReference('mx.controls.LinkButton');
   	header-style-name: linkButtonStyle;

@@ -39,6 +39,7 @@
                 	activityComponent.x = UIComponent(event.currentTarget).mouseX - 10;
               		activityComponent.y = UIComponent(event.currentTarget).mouseY - 10;
               		activityComponent.setCenter();
+              		activityComponent.updateTransitionPositions();
                 } else {
                 	var learningLibraryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent;
                 	

@@ -14,6 +14,8 @@ package org.lamsfoundation.lams.author.components.transition
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
 			
+			graphics.clear();
+			
 			var origin:Point = new Point(startX,startY);
 			var destination:Point = new Point(endX,endY);
 			
@@ -26,16 +28,19 @@ package org.lamsfoundation.lams.author.components.transition
 			var middle1:Point = Point.interpolate(origin, destination, 0.41);
 			
 			// Draw an arrow to half-way
-			graphics.clear();
 			graphics.beginFill(lineColor,lineAlpha);
-			GraphicsUtil.drawArrow(graphics,origin,middle, {shaftThickness:lineThickness,headWidth:15,headLength:15, shaftPosition:0,edgeControlPosition:0.5});
+			GraphicsUtil.drawArrow(graphics,origin,middle, {shaftThickness:lineThickness,headWidth:10,headLength:10, shaftPosition:0,edgeControlPosition:0.5});
 			
 			// Draw the rest of the line
 			graphics.lineStyle(2, 0x999999, 1);
 			graphics.moveTo(middle1.x,middle1.y);
 			graphics.lineTo(endX,endY);
-			parent.setChildIndex(this, 0);
-
+			
+			// Setting the z index to lower than the activities
+			if (parent != null) {
+				parent.setChildIndex(this, 0);
+			}
+			
 		}
 
 	}

@@ -4,7 +4,6 @@
 	mouseDown="mouseDown(event)"
 	mouseOver="mouseOver(event)" 
 	mouseOut="mouseOut(event)"
-	
 	>
 
 	<!--
@@ -51,21 +50,8 @@
 				        ds.addData(activityComponent, "img");               
 				        DragManager.doDrag(activityComponent, ds, event);
 				        setCenter();
-				   		
-				   		if (transitionOut != null)
-				   		{
-				   			transitionOut.startX = centerX;
-				   			transitionOut.startY = centerY;
-				   			transitionOut.invalidateDisplayList();
-				   		} 
-				   		
-				   		
-				   		if (transitionIn != null) {
-				   			transitionIn.endX = centerX;
-				   			transitionIn.endY = centerY;
-				   			transitionIn.invalidateDisplayList();
-				   		}
-				   		
+				        
+				        
 				        break;
 		        }
 		    }
@@ -122,6 +108,8 @@
 			    systemManager.removeEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);			
 			    systemManager.removeEventListener(MouseEvent.MOUSE_UP, systemManagerMouseUpHandler, true);
 			    systemManager.stage.removeEventListener(Event.MOUSE_LEAVE, stageMouseLeaveHandler);
+			    
+				updateTransitionPositions();
 			}
 			
 			private function systemManagerMouseMoveHandler(event:MouseEvent):void
@@ -153,6 +141,7 @@
 		    	}
 		    	
 		    	if (!validTransition) {
+		    		transitionOut.graphics.clear();
 		    		parent.removeChild(transitionOut);
 		    		transitionOut = null;
 		    	}
@@ -178,6 +167,20 @@
 				this.setStyle('borderStyle', 'none');
 			}
 			
+			public function updateTransitionPositions():void {
+				if (transitionOut != null)
+		   		{
+		   			transitionOut.startX = centerX;
+		   			transitionOut.startY = centerY;
+		   			transitionOut.invalidateDisplayList();
+		   		} 
+		   		if (transitionIn != null) {
+		   			transitionIn.endX = centerX;
+		   			transitionIn.endY = centerY;
+		   			transitionIn.invalidateDisplayList();
+		   		}
+			}
+
 			
 		]]>
 	</mx:Script>
