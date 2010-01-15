@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	mouseMove="mouseMove(event)"
+	mouseDown="mouseDown(event)"
+	mouseOver="mouseOver(event)" 
+	mouseOut="mouseOut(event)"
+	
+	>
+
+	<!--
+	Root component for the activities. 
+	All activities inherit from this component
+	-->
+
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.DragManager;
+			import mx.core.DragSource;
+			import org.lamsfoundation.lams.author.util.Constants;
+			import mx.core.Application;
+			import org.lamsfoundation.lams.author.events.TransitionEvent;
+			import mx.controls.Label;
+			import org.lamsfoundation.lams.author.components.transition.TransitionComponent;
+			
+			public var xpos:int;
+			public var ypos:int;
+			public var title:Label;
+			
+			public var centerX:int;
+			public var centerY:int;
+			
+			private var transitionIn:TransitionComponent
+			private var transitionOut:TransitionComponent;
+			
+			
+			private var state:int = Constants.ACTIVITY_STATE_NORMAL;
+			
+			// Function used to load a new activity 
+			public function load():void { 	
+		    }
+			
+			
+			// The mouseMove event handler for the Image control
+		    // initiates the drag-and-drop operation.
+		    protected function mouseMove(event:MouseEvent):void 
+		    {                
+		        switch (Application.application.cursorState) {
+		        	case Constants.CURSOR_STATE_NORMAL:
+		        		var activityComponent:ActivityComponent = event.currentTarget as ActivityComponent;
+				        var ds:DragSource = new DragSource();
+				        ds.addData(activityComponent, "img");               
+				        DragManager.doDrag(activityComponent, ds, event);
+				        setCenter();
+				   		
+				   		if (transitionOut != null)
+				   		{
+				   			transitionOut.startX = centerX;
+				   			transitionOut.startY = centerY;
+				   			transitionOut.invalidateDisplayList();
+				   		} 
+				   		
+				   		
+				   		if (transitionIn != null) {
+				   			transitionIn.endX = centerX;
+				   			transitionIn.endY = centerY;
+				   			transitionIn.invalidateDisplayList();
+				   		}
+				   		
+				        break;
+		        }
+		    }
+
+		    protected function mouseDown(event:MouseEvent):void {
+		    	
+		    	switch (Application.application.cursorState) {
+		    		case Constants.CURSOR_STATE_TRANSITION:
+		    		var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_EVENT);
+		    		transitionEvent.sourceAcivityComponent = this;
+		    		transitionEvent.localX = event.localX;
+		    		transitionEvent.localY = event.localY;
+		    		//Application.application.dispatchEvent(transitionEvent);
+		    		startDragging(transitionEvent)
+		    		break;	
+		    	}
+		    	
+		    }
+		    
+		    public function setCenter():void {
+		    	centerX = x + height/2;
+				centerY = y + height/2 -10;
+		    }
+		    
+	        protected function startDragging(event:TransitionEvent):void {
+			 
+				if (transitionOut != null) {
+					parent.removeChild(transitionOut);
+				}
+				
+				setCenter();
+				
+				state = Constants.ACTIVITY_STATE_DRAWING;
+
+				Application.application.uiState = Constants.UI_STATE_DRAWING;
+				transitionOut = new TransitionComponent();
+				transitionOut.startX = event.sourceAcivityComponent.centerX;
+				transitionOut.startY = event.sourceAcivityComponent.centerY;
+				transitionOut.endX = event.sourceAcivityComponent.centerX;
+				transitionOut.endY = event.sourceAcivityComponent.centerY;
+				transitionOut.invalidateProperties();
+				
+				parent.addChild(transitionOut);
+				
+				systemManager.addEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);
+				systemManager.addEventListener(MouseEvent.MOUSE_UP, systemManagerMouseUpHandler, true);
+				systemManager.stage.addEventListener(Event.MOUSE_LEAVE, stageMouseLeaveHandler);
+			
+			}
+			
+			protected function stopDragging():void
+			{
+			    Application.application.uiState = Constants.UI_STATE_NORMAL;
+			    systemManager.removeEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);			
+			    systemManager.removeEventListener(MouseEvent.MOUSE_UP, systemManagerMouseUpHandler, true);
+			    systemManager.stage.removeEventListener(Event.MOUSE_LEAVE, stageMouseLeaveHandler);
+			}
+			
+			private function systemManagerMouseMoveHandler(event:MouseEvent):void
+		    {
+		    	var pt:Point = new Point(event.stageX,event.stageY);
+		    	pt = parent.globalToLocal(pt);
+		    	
+		    	transitionOut.endX = pt.x;
+		    	transitionOut.endY = pt.y;
+		    	
+		    	transitionOut.invalidateDisplayList();
+		    }
+		    
+		    private function systemManagerMouseUpHandler(event:MouseEvent):void
+		    {
+		    	stopDragging();
+		    	
+		    	var validTransition:Boolean = false;
+		    	for (var i:int = 0; i < parent.numChildren; i++) {
+		    		
+		    		if (parent.getChildAt(i) is ActivityComponent) {
+		    			
+		    			var activityComponent:ActivityComponent = parent.getChildAt(i) as ActivityComponent;
+		    			if (activityComponent.state == Constants.ACTIVITY_STATE_MOUSE_OVER) {
+		    				activityComponent.transitionIn = transitionOut;	
+		    				validTransition = true;		
+		    			}
+		    		}
+		    	}
+		    	
+		    	if (!validTransition) {
+		    		parent.removeChild(transitionOut);
+		    		transitionOut = null;
+		    	}
+		    	
+		    }
+		    
+		    private function stageMouseLeaveHandler(event:MouseEvent):void
+		    {
+		    	stopDragging();
+		    }
+		    
+		    private function mouseOver(event:MouseEvent):void {
+				
+				if (Application.application.uiState == Constants.UI_STATE_DRAWING && this.state != Constants.ACTIVITY_STATE_DRAWING) {
+					this.setStyle('borderStyle', 'solid');
+					this.setStyle('borderColor', '#66CCFF');
+					this.state = Constants.ACTIVITY_STATE_MOUSE_OVER;
+				}
+				
+			}
+			
+			private function mouseOut(event:MouseEvent):void {
+				this.setStyle('borderStyle', 'none');
+			}
+			
+			
+		]]>
+	</mx:Script>
+	
+	
+</mx:VBox>

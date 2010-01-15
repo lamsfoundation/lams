@@ -22,7 +22,7 @@
 			import mx.collections.ArrayCollection;
 			import org.lamsfoundation.lams.author.util.Constants;
 			import mx.managers.DragManager;
-			import org.lamsfoundation.lams.author.components.activity.LearningLibraryEntryComponent;
+			import org.lamsfoundation.lams.author.components.LearningLibraryEntryComponent;
 				
 			[Bindable] 
 			public var learningLibraryTree:ArrayCollection;
@@ -33,6 +33,11 @@
    				for each(var learningLibraryEntry:LearningLibraryEntry in Application.application.learningLibrary) {
    					var llcomp:LearningLibraryEntryComponent = new LearningLibraryEntryComponent();
 		   			llcomp.load(learningLibraryEntry);
+		   			
+		   			var llcomp2:LearningLibraryEntryComponent = new LearningLibraryEntryComponent();
+		   			llcomp2.load(learningLibraryEntry);
+					wsAll.addChild(llcomp2);
+		   			
    					switch (learningLibraryEntry.category) {
    						case Constants.TOOL_CATEGORY_ASSESSMENT:
 		   					wsAssessment.addChild(llcomp);
@@ -52,6 +57,9 @@
 		]]>
 	</mx:Script>
 	
+	<flexlib:WindowShade id="wsAll" tabChildren="{wsInformative.opened}" styleName="all" opened="false"
+      	label="All" width="100%" paddingLeft="20" paddingBottom="20"  shadowDirection="right">	
+    </flexlib:WindowShade>
 
 	<flexlib:WindowShade id="wsInformative" tabChildren="{wsInformative.opened}" styleName="informative" opened="false"
       	label="Informative" width="100%" paddingLeft="20" paddingBottom="20" backgroundColor="#FFEEC8"  shadowDirection="right">	

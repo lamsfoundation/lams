@@ -9,7 +9,6 @@
 	<mx:Script>
 		<![CDATA[
 			import mx.controls.Alert;
-			import org.lamsfoundation.lams.author.components.transition.Transition;
 			import mx.core.UIComponent;
 			import org.lamsfoundation.lams.author.components.activity.*;
 			import org.lamsfoundation.lams.author.events.TransitionEvent;

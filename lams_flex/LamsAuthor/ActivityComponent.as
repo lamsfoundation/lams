@@ -23,7 +23,6 @@ package org.lamsfoundation.lams.author.components.activity
 		public var centerX:int;
 		public var centerY:int;
 		
-		
 		private var transitionIn:Transition;
 		private var transitionOut:Transition;
 		
@@ -91,6 +90,7 @@ package org.lamsfoundation.lams.author.components.activity
 			}
 			
 			setCenter();
+			Application.application.uiState = Constants.UI_STATE_DRAWING;
 			transitionOut = new Transition();
 			transitionOut.startX = event.sourceAcivityComponent.centerX;
 			transitionOut.startY = event.sourceAcivityComponent.centerY;
@@ -108,6 +108,7 @@ package org.lamsfoundation.lams.author.components.activity
 		
 		protected function stopDragging():void
 		{
+		    Application.application.uiState = Constants.UI_STATE_NORMAL;
 		    systemManager.removeEventListener(MouseEvent.MOUSE_MOVE, systemManager_mouseMoveHandler, true);			
 		    systemManager.removeEventListener(MouseEvent.MOUSE_UP, systemManager_mouseUpHandler, true);
 		    systemManager.stage.removeEventListener(Event.MOUSE_LEAVE, stage_mouseLeaveHandler);

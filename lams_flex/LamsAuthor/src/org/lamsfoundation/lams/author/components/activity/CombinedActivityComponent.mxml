@@ -3,6 +3,7 @@
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
 	verticalAlign="middle" horizontalAlign="center" 
 	horizontalScrollPolicy="off" 
+	paddingTop="3" paddingLeft="3" paddingRight="6" paddingBottom="3"
 	>
 	
 	<mx:Script>
@@ -15,22 +16,24 @@
 			
 			public var toolActivityComponent1:ToolActivityComponent;
 			public var toolActivityComponent2:ToolActivityComponent;
-			public var learningLibraryEntry:LearningLibraryEntry;	
+			public var learningLibraryEntry:LearningLibraryEntry;
 			
 			override public function load():void {
 				
 				var vbox:VBox = new VBox();
 				vbox.setConstraintValue("verticalAlign", "middle");
+				vbox.setConstraintValue("verticalGap", 0);
 				vbox.setConstraintValue("horizontalAlign", "center");
 				vbox.setStyle('borderStyle', 'solid');
 				vbox.setStyle('dropShadowEnabled', true);
 				vbox.setStyle('shadowDirection', "right");
 				vbox.setStyle('cornerRadius', '10');
 				vbox.setStyle('backgroundColor', '#C2D5FE');
+				vbox.setStyle('paddingTop', 6);
+				vbox.setStyle('paddingBottom', 4);
 				vbox.horizontalScrollPolicy = "off";
-				vbox.height = 150;
+				vbox.height = 120;
 				vbox.minWidth = 100;
-				
 				
 				var tool1:Tool = learningLibraryEntry.toolTemplates[1];
 				var tool2:Tool = learningLibraryEntry.toolTemplates[2];
@@ -39,6 +42,9 @@
 					toolActivityComponent1 = new ToolActivityComponent();
 					toolActivityComponent1.tool = learningLibraryEntry.toolTemplates[1];
 					toolActivityComponent1.load();
+					toolActivityComponent1.toolTip = toolActivityComponent1.title.text;
+					toolActivityComponent1.title.visible = false;
+					toolActivityComponent1.title.height = 0;
 					vbox.addChild(toolActivityComponent1);
 				}
 				
@@ -46,6 +52,9 @@
 					toolActivityComponent2 = new ToolActivityComponent();
 					toolActivityComponent2.tool = learningLibraryEntry.toolTemplates[2];
 					toolActivityComponent2.load();
+					toolActivityComponent2.toolTip = toolActivityComponent2.title.text;
+					toolActivityComponent2.title.visible = false;
+					toolActivityComponent2.title.height = 0;
 					vbox.addChild(toolActivityComponent2);
 				}
 				
@@ -55,7 +64,6 @@
    				title.text = learningLibraryEntry.title;
    				this.addChild(title);
 				
-				addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
 			}
 			
 		]]>

@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ActivityComponent xmlns="org.lamsfoundation.lams.author.components.activity.*" 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
-	verticalAlign="middle" horizontalAlign="center" horizontalScrollPolicy="off">
+	verticalAlign="middle" horizontalAlign="center" horizontalScrollPolicy="off" 
+	paddingTop="3" paddingLeft="3" paddingRight="3" paddingBottom="3"
+	>
 	
 	<mx:Script>
 		<![CDATA[
+			import mx.core.Application;
 			import org.lamsfoundation.lams.author.model.learninglibrary.Tool;
 			import mx.containers.HBox;
 			import mx.containers.VBox;
@@ -19,7 +22,7 @@
 			public var tool:Tool;
 
 			
-			public override function load():void {
+			 override public function load():void {
 				
 				var vbox:VBox = new VBox();
 				vbox.setConstraintValue("verticalAlign", "middle");
@@ -57,9 +60,9 @@
    				title.text = tool.toolName;
    				this.addChild(title);
    				
-   				addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
-   				addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			}
+			
+			
 			
 		]]>
 	</mx:Script>

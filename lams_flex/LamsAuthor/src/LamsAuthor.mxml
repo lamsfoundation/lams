@@ -30,6 +30,10 @@
 			// State of cursor transition/help/dataflow etc...
 			public var cursorState:int = Constants.CURSOR_STATE_NORMAL;
 			
+			// ui state
+			public var uiState:int = Constants.UI_STATE_NORMAL;
+			
+			
 			private function preInit():void {
 				
 				if (TESTING && !TESTING_LOCAL) {
