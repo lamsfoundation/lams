@@ -1,19 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
-	horizontalGap="5" verticalAlign="middle"
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
 	styleName="toolBar"
-	>
+	xmlns:components="org.lamsfoundation.lams.author.components.*">
 	
 	<mx:Style source="assets/css/toolBar.css" />
 	
 	<mx:Script>
 		<![CDATA[
+			import mx.managers.PopUpManager;
 			import org.lamsfoundation.lams.author.util.Constants;
 			import mx.core.Application;
+			
+
+			public function toggleDropDownMenu(menu:ToolBarDropDown):void {
+				
+				if (menu == optionalMenu) {
+					flowMenu.closeDropDown();
+					groupMenu.closeDropDown();
+					optionalMenu.toggleDropDown();
+				} else if (menu == flowMenu) {
+					optionalMenu.closeDropDown();
+					groupMenu.closeDropDown();
+					flowMenu.toggleDropDown();
+				} else if (menu == groupMenu) {
+					optionalMenu.closeDropDown();
+					flowMenu.closeDropDown();
+					groupMenu.toggleDropDown();
+				}
+				
+			}
+			
+			
 		]]>
 	</mx:Script>
 	
-	<mx:MenuBar id="myMenuBar" labelField="@label" iconField="@icon" height="30" >
+	<mx:HBox horizontalGap="5" verticalAlign="middle"  >
+
+		<mx:MenuBar id="myMenuBar" labelField="@label" iconField="@icon" height="30" >
 	        <mx:XMLList>
 	            <menuitem label="File">
 	                <menuitem label="SubMenuItem A-1" enabled="false"/>
@@ -43,17 +66,53 @@
 	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/zoom_out.png')" toolTip="Zoom In"></mx:Button>
 	    <mx:Spacer width="5"></mx:Spacer>
 	    <mx:Button height="25" icon="@Embed(source='assets/icons/transition.png')" label="Transition" click="Application.application.changeCursorState(Constants.CURSOR_STATE_TRANSITION)"></mx:Button>
-	    <mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Optional"></mx:Button>
-	    <!--<mx:MenuBar labelField="@label" iconField="@icon" height="25" >
-	        <mx:XMLList>
-	            <menuitem label="Optional" icon="optionalIcon">
-	                <menuitem label="Activity" icon="optionalIcon"/>
-	                <menuitem label="Sequence" icon="optionalIcon"/>
-	                <menuitem label="Support" icon="optionalIcon"/>
-	            </menuitem>
-	        </mx:XMLList>
-	    </mx:MenuBar>-->
-	    <mx:Button height="25" icon="@Embed(source='assets/icons/flow.png')" label="Flow"></mx:Button>
-	    <mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Group"></mx:Button>
+	    <mx:Button id="optionalButton" height="25" icon="@Embed(source='assets/icons/optional.png')" label="Optional" click="toggleDropDownMenu(optionalMenu)"></mx:Button>
+	    <mx:Button id="flowButton" height="25" icon="@Embed(source='assets/icons/flow.png')" label="Flow" click="toggleDropDownMenu(flowMenu)"></mx:Button>
+	    <mx:Button id="groupButton" height="25" icon="@Embed(source='assets/icons/group.png')" label="Group" click="toggleDropDownMenu(groupMenu)"></mx:Button>
 	    <mx:Button height="25" icon="@Embed(source='assets/icons/preview.png')" label="Preview"></mx:Button>
-</mx:HBox>
+	</mx:HBox>  
+	
+	  
+	    
+    <!--<mx:VBox id="flowMenu" 
+    	styleName="toolBar" visible="false" 
+    	verticalGap="5"  
+    	paddingTop="5" paddingBottom="5"  paddingLeft="5" paddingRight="5"
+    	>
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Group"></mx:Button>
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/preview.png')" label="Preview"></mx:Button>
+    </mx:VBox>-->
+    
+    
+    <components:ToolBarDropDown id="optionalMenu">
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Activity"></mx:Button>
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Sequence"></mx:Button>
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Support"></mx:Button>
+    </components:ToolBarDropDown>
+    <mx:Binding destination="optionalMenu.x" source="optionalButton.x - 5" />
+    <mx:Binding destination="optionalMenu.y" source="optionalButton.y + optionalButton.height" />
+    
+    <components:ToolBarDropDown id="flowMenu">
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/gate.png')" label="Gate"></mx:Button>
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/branch.png')" label="Branch"></mx:Button>
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/converge.png')" label="Converge"></mx:Button>
+    </components:ToolBarDropDown>
+    <mx:Binding destination="flowMenu.x" source="flowButton.x - 5" />
+    <mx:Binding destination="flowMenu.y" source="flowButton.y + flowButton.height" />
+    
+    <components:ToolBarDropDown id="groupMenu">
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Random"></mx:Button>
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Choose in Monitor"></mx:Button>
+    	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Learner's Choice"></mx:Button>
+    </components:ToolBarDropDown>
+    <mx:Binding destination="groupMenu.x" source="groupButton.x - 5" />
+    <mx:Binding destination="groupMenu.y" source="groupButton.y + groupButton.height" />
+    
+    
+    
+    
+    
+    
+    
+    
+</mx:Canvas>
