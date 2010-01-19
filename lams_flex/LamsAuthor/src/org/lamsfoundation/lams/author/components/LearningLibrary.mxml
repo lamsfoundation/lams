@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" 
-	backgroundColor="#C2D5FE" 
+	styleName="learningLibrary"
 	xmlns:flexlib="http://code.google.com/p/flexlib/"
-	paddingTop="10" paddingLeft="5" paddingRight="5" paddingBottom="10"
-	
+	paddingTop="10" paddingLeft="2" paddingRight="5" paddingBottom="10"
+	borderStyle="solid"
+	dropShadowEnabled="true"
+	shadowDirection="right"
+	horizontalScrollPolicy="off"
 	>
 
 	<mx:Style source="assets/css/learningLibrary.css" />
@@ -58,23 +61,23 @@
 	</mx:Script>
 	
 	<flexlib:WindowShade id="wsAll" tabChildren="{wsInformative.opened}" styleName="all" opened="false"
-      	label="All" width="100%" paddingLeft="20" paddingBottom="20"  shadowDirection="right">	
+      	label="All" width="100%" paddingLeft="10" paddingBottom="20"  shadowDirection="right">	
     </flexlib:WindowShade>
 
 	<flexlib:WindowShade id="wsInformative" tabChildren="{wsInformative.opened}" styleName="informative" opened="false"
-      	label="Informative" width="100%" paddingLeft="20" paddingBottom="20" backgroundColor="#FFEEC8"  shadowDirection="right">	
+      	label="Informative" width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#FFEEC8"  shadowDirection="right">	
     </flexlib:WindowShade>
      
     <flexlib:WindowShade id="wsReflective" tabChildren="{wsReflective.opened}" styleName="reflective" opened="false"
-      	label="Reflective" width="100%" paddingLeft="20" paddingBottom="20" backgroundColor="#DDFCB1" shadowDirection="right" >
+      	label="Reflective" width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#DDFCB1" shadowDirection="right" >
     </flexlib:WindowShade>
     
     <flexlib:WindowShade id="wsCollaborative" tabChildren="{wsCollaborative.opened}" styleName="collaborative" opened="false"
-      	label="Collaborative" width="100%" paddingLeft="20" paddingBottom="20" backgroundColor="#FFFDBE" shadowDirection="right" >
+      	label="Collaborative" width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#FFFDBE" shadowDirection="right" >
     </flexlib:WindowShade>
     
     <flexlib:WindowShade id="wsAssessment" tabChildren="{wsAssessment.opened}" styleName="assessment" opened="false"
-      	label="Asessment" width="100%" paddingLeft="20" paddingBottom="20" backgroundColor="#E9E2F5" shadowDirection="right" > 
+      	label="Asessment" width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#E9E2F5" shadowDirection="right" > 
     </flexlib:WindowShade>
     
 </mx:VBox>

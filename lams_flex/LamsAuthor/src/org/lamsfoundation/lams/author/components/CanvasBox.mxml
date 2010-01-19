@@ -8,6 +8,8 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.util.Constants;
+			import mx.core.Application;
 			import mx.controls.Alert;
 			import mx.core.UIComponent;
 			import org.lamsfoundation.lams.author.components.activity.*;
@@ -60,7 +62,10 @@
 	                	this.addChild(toolActivityComponent);
 	                	toolActivityComponent.setCenter();
                 	}
-                }                    
+                }
+                
+                // Return cursor state to normal
+				Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);                    
             }
             
             

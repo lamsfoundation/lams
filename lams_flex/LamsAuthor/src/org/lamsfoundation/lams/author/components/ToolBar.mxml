@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	horizontalGap="5" verticalAlign="middle"
+	styleName="toolBar"
+	>
+	
+	<mx:Style source="assets/css/toolBar.css" />
+	
+	<mx:Script>
+		<![CDATA[
+			import org.lamsfoundation.lams.author.util.Constants;
+			import mx.core.Application;
+		]]>
+	</mx:Script>
+	
+	<mx:MenuBar id="myMenuBar" labelField="@label" iconField="@icon" height="30" >
+	        <mx:XMLList>
+	            <menuitem label="File">
+	                <menuitem label="SubMenuItem A-1" enabled="false"/>
+	                <menuitem label="SubMenuItem A-2"/>
+	            </menuitem>
+	            <menuitem label="Edit"/>
+	            <menuitem label="Tools"/>
+	            <menuitem label="Show"/>
+	            <menuitem label="Help">
+	                <menuitem label="SubMenuItem D-1" 
+	                    type="radio" groupName="one"/>
+	                <menuitem label="SubMenuItem D-2" 
+	                    type="radio" groupName="one"
+	                    selected="true"/>
+	                <menuitem label="SubMenuItem D-3" 
+	                    type="radio" groupName="one"/>
+	            </menuitem>
+	        </mx:XMLList>
+	    </mx:MenuBar>
+	    <mx:Spacer width="5"></mx:Spacer>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/new.png')" toolTip="New Learning Design"></mx:Button>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/open.png')" toolTip="Open Learning Design"></mx:Button>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/save.png')" toolTip="Save"></mx:Button>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/copy.png')" toolTip="Copy Activity"></mx:Button>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/paste.png')" toolTip="Paste Activity"></mx:Button>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/zoom_in.png')" toolTip="Zoom Out"></mx:Button>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/zoom_out.png')" toolTip="Zoom In"></mx:Button>
+	    <mx:Spacer width="5"></mx:Spacer>
+	    <mx:Button height="25" icon="@Embed(source='assets/icons/transition.png')" label="Transition" click="Application.application.changeCursorState(Constants.CURSOR_STATE_TRANSITION)"></mx:Button>
+	    <mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Optional"></mx:Button>
+	    <!--<mx:MenuBar labelField="@label" iconField="@icon" height="25" >
+	        <mx:XMLList>
+	            <menuitem label="Optional" icon="optionalIcon">
+	                <menuitem label="Activity" icon="optionalIcon"/>
+	                <menuitem label="Sequence" icon="optionalIcon"/>
+	                <menuitem label="Support" icon="optionalIcon"/>
+	            </menuitem>
+	        </mx:XMLList>
+	    </mx:MenuBar>-->
+	    <mx:Button height="25" icon="@Embed(source='assets/icons/flow.png')" label="Flow"></mx:Button>
+	    <mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Group"></mx:Button>
+	    <mx:Button height="25" icon="@Embed(source='assets/icons/preview.png')" label="Preview"></mx:Button>
+</mx:HBox>

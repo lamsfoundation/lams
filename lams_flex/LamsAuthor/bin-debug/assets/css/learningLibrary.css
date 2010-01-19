@@ -1,5 +1,10 @@
 /* CSS file */
 
+.learningLibrary {
+	background-color:#C2D5FE;
+	color:#000000;	
+}
+
 .linkButtonWindowShade {
   	headerClass:ClassReference('mx.controls.LinkButton');
   	header-style-name: linkButtonStyle;
@@ -36,7 +41,6 @@
    	use-roll-over: false;
    	roll-over-color:#FFEEC8;
    	selectionColor:#FFEEC8;
-
 }
 
 .reflective {

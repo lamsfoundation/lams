@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="30" verticalAlign="middle">
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="100%" height="25" 
+	verticalAlign="middle" 
+	horizontalGap="0"
+	>
 	
 	<mx:Script>
 		<![CDATA[
@@ -21,6 +25,7 @@
 				
 				iconImage = new Image();
 				iconImage.source = learningLibraryEntry.icon;
+				iconImage.height = 25;
 				this.addChild(iconImage);
 	
 				title = new Label();

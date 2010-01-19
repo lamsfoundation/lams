@@ -30,7 +30,7 @@ package org.lamsfoundation.lams.author.controller
    			// Set the application learning library
    			Application.application.learningLibrary = learningLibrary;
    			Application.application.canvasArea.compLearningLibrary.loadLearningLibrary();
-   			Application.application.canvasArea.compLearningLibrary2.loadLearningLibrary();
+   			//Application.application.canvasArea.compLearningLibrary2.loadLearningLibrary();
 			
 		}
 		

@@ -144,6 +144,13 @@
 		    		transitionOut.graphics.clear();
 		    		parent.removeChild(transitionOut);
 		    		transitionOut = null;
+		    		
+		    		
+		    	}
+		    	else {
+		    		// Return cursor state to normal
+					Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);
+
 		    	}
 		    	
 		    }

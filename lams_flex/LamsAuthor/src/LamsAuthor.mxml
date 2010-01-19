@@ -4,11 +4,14 @@
 	verticalAlign="left"
 	xmlns:components="org.lamsfoundation.lams.author.components.*"
 	xmlns:maps="org.lamsfoundation.lams.author.maps.*" 
+	xmlns:flexlib="http://code.google.com/p/flexlib/"
 	preinitialize="preInit()"
 	>
 
 	<mx:Script>
 		<![CDATA[
+			import mx.managers.CursorManager;
+			import mx.events.MenuEvent;
 			import org.lamsfoundation.lams.author.util.Constants;
 			import mx.rpc.events.ResultEvent;
 			import org.lamsfoundation.lams.common.util.WDDXParser;
@@ -33,6 +36,10 @@
 			// ui state
 			public var uiState:int = Constants.UI_STATE_NORMAL;
 			
+        	
+        	[Bindable]
+            [Embed("assets/icons/optional.png")]
+            public var optionalIcon:Class; 
 			
 			private function preInit():void {
 				
@@ -43,6 +50,25 @@
 				}
 				
 				mainMap.init();
+			}
+		
+			
+			[Embed("assets/icons/transition.png")]
+            public var transitionCursor:Class;
+
+			public function changeCursorState(state:int):void{
+				cursorState = state;
+				
+				switch (cursorState) {
+					case Constants.CURSOR_STATE_NORMAL:
+						CursorManager.removeCursor(CursorManager.currentCursorID);
+						break;
+					case Constants.CURSOR_STATE_TRANSITION:
+						CursorManager.setCursor(transitionCursor);
+						break;
+				}
+			
+			
 			}
 		]]>
 	</mx:Script>
@@ -55,29 +81,11 @@
 		height="50"
 	/>-->
 	
-	<mx:MenuBar id="myMenuBar" labelField="@label" width="100%">
-        <mx:XMLList>
-            <menuitem label="File">
-                <menuitem label="SubMenuItem A-1" enabled="false"/>
-                <menuitem label="SubMenuItem A-2"/>
-            </menuitem>
-            <menuitem label="Edit"/>
-            <menuitem label="Tools"/>
-            <menuitem label="Help">
-                <menuitem label="SubMenuItem D-1" 
-                    type="radio" groupName="one"/>
-                <menuitem label="SubMenuItem D-2" 
-                    type="radio" groupName="one"
-                    selected="true"/>
-                <menuitem label="SubMenuItem D-3" 
-                    type="radio" groupName="one"/>
-            </menuitem>
-        </mx:XMLList>
-    </mx:MenuBar>
-
+	
+	<components:ToolBar id="toolBar" width="100%" ></components:ToolBar>
 	
 		
-	<components:CanvasArea height="100%" width="100%" id="canvasArea" top="20"
+	<components:CanvasArea height="100%" width="100%" id="canvasArea" top="30"
 		backgroundColor="#FFFFF8" >
 	</components:CanvasArea>
 	
