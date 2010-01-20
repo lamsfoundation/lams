@@ -14,20 +14,13 @@
 	    });
 	}
 	function removeItemAttachment(idx){
- 		var url= removeItemAttachmentUrl;
-	    var reqIDVar = new Date();
-	    var param = "reqID="+reqIDVar.getTime();
 	    removeItemAttachmentLoading();
-	    var myAjax = new Ajax.Updater(
-		    	itemAttachmentTargetDiv,
-		    	url,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		onComplete:removeItemAttachmentComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$("#" + itemAttachmentTargetDiv).load(
+			removeItemAttachmentUrl,
+			{
+				reqID: new Date()
+			}
+		);	    
 	}
 	function addInstruction(){
 	    var param = $("#instructionForm").serialize();
