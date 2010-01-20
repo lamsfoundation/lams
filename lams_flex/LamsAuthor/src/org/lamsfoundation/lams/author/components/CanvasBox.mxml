@@ -4,10 +4,15 @@
     dragEnter="dragEnterHandler(event);" 
     dragDrop="dragDropHandler(event);"
     xmlns:mate="http://mate.asfusion.com/"
+    click="doZoom(event)"
+    borderStyle="solid"
+    width="4000" height="3000"   
+    x="0" y="0"
 	>
 	
 	<mx:Script>
 		<![CDATA[
+			import mx.containers.Canvas;
 			import org.lamsfoundation.lams.author.util.Constants;
 			import mx.core.Application;
 			import mx.controls.Alert;
@@ -17,7 +22,13 @@
 			import mx.controls.Image;
 			import mx.managers.DragManager;
 			import mx.events.DragEvent;
+			import mx.effects.Zoom;
 			
+			public var currentZoom:Number = 1;
+			
+			public const MAX_ZOOM:Number = 1;
+			public const MIN_ZOOM:Number = 0.2;
+			public const ZOOM_LEVEL:Number = 0.2;
 			
 		  		             
             // The dragEnter event handler for the Canvas container
@@ -69,6 +80,54 @@
             }
             
             
+            
+            
+            
+            
+            /* private function doZoom(component:UIComponent,val:Number):void
+			{
+				component.scaleX = val;
+				component.scaleY = val;
+				
+				if(component is Container)
+				{
+					var children:Array = Container(component).getChildren();
+					for(var i:int = 0; i < children.length; i++)
+					{
+						doZoom(children[i], val);
+					}
+				}
+			} */ 
+			
+			
+			private function doZoom(event:MouseEvent):void
+			{
+				var zoom:Zoom = new Zoom();
+				
+				//zoom.originX = event.localX;
+				//zoom.originY = event.localY;
+				zoom.originX = 0;
+				zoom.originY = 0;
+				zoom.zoomHeightFrom = currentZoom;
+				zoom.zoomWidthFrom = currentZoom;
+				
+				if (Application.application.cursorState == Constants.CURSOR_STATE_ZOOM_IN && currentZoom < MAX_ZOOM) {
+					zoom.zoomHeightTo = currentZoom + ZOOM_LEVEL;
+					zoom.zoomWidthTo = currentZoom + ZOOM_LEVEL;
+					currentZoom += 0.2;
+					currentZoom = Math.round(currentZoom * 10)/10;
+					zoom.play([this], false);
+				} else if (Application.application.cursorState == Constants.CURSOR_STATE_ZOOM_OUT && currentZoom > MIN_ZOOM) {
+					zoom.zoomHeightTo = currentZoom - ZOOM_LEVEL;
+					zoom.zoomWidthTo = currentZoom - ZOOM_LEVEL;
+					currentZoom -= 0.2;
+					currentZoom = Math.round(currentZoom * 10)/10;
+					
+					zoom.play([this], false);
+				}
+				
+				
+			}
             
              
 		]]>

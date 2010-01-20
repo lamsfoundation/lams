@@ -2,10 +2,12 @@
 <mx:HBox 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
 	xmlns:components="org.lamsfoundation.lams.author.components.*"
-	horizontalGap="0">
+	horizontalGap="0"
+	>
 	
 	<mx:Script>
 		<![CDATA[
+			import mx.containers.Canvas;
 			import mx.core.Application;
 			import mx.controls.Label;
 			import mx.controls.Image;
@@ -23,36 +25,7 @@
             [Bindable]
 			public var learningDesign:ArrayCollection;
 			
-			private function doZoom(component:UIComponent,val:Number):void
-			{
-				component.scaleX = val;
-				component.scaleY = val;
-				
-				if (component is Button) {
-					var button:Button = component as Button;
-					button
-				}
-				
-				
-				if(component is Container)
-				{
-					var children:Array = Container(component).getChildren();
-					for(var i:int = 0; i < children.length; i++)
-					{
-						doZoom(children[i], val);
-					}
-				}
-			} 
-			public function applyZoom():void
-			{
-				if(canvasBox == null)
-				{
-					return;
-				}
-				//doZoom(canvasBox,zoomSlider.value);
-			}
-			
-			private function toggleLearningLibrary():void{
+			/* private function toggleLearningLibrary():void{
 				compLearningLibrary.includeInLayout = !compLearningLibrary.includeInLayout;
 				compLearningLibrary.visible = !compLearningLibrary.visible;
 				
@@ -61,9 +34,10 @@
 				} else {
 					hideButton.label = ">";
 				}
-		    }
-		  		             
-            // The dragEnter event handler for the Canvas container
+		    } */
+		  	
+		  	/*	             
+           	// The dragEnter event handler for the Canvas container
             // enables dropping.
             private function dragEnterHandler(event:DragEvent):void {
                 if (event.dragSource.hasFormat("img"))
@@ -105,16 +79,16 @@
                 }  
                 
                                   
-            }
+            }*/ 
             
             /* private function maximizeLearningLibrary():void {
 	        	var effResize:Resize = new Resize();
 	        	effResize.stop();
 	            effResize.heightFrom = 0;
-	            effResize.heightTo = 120;
+	            effResize.heightTo = 12yy0;
 	            effResize.duration = 100;
 	            effResize.play([compLearningLibrary2]);
-	        } */
+	        }  */
 		]]>
 	</mx:Script>
 	
@@ -123,22 +97,21 @@
 	<components:LearningLibrary id="compLearningLibrary"
 			height="{Application.application.height - 30}" width="190" verticalScrollPolicy="on"
 		/>	
-	<mx:HBox id="canvasblock" height="100%" width="25" verticalAlign="middle" >
+	<!--<mx:HBox id="canvasblock" height="100%" width="25" verticalAlign="middle" >
 		<mx:Button id="hideButton" label="&lt;" click="toggleLearningLibrary()" 
 			width="25" paddingLeft="0" textAlign="right" />
-	</mx:HBox>
+	</mx:HBox>-->
 	
-	<mx:Canvas height="100%" width="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off" >
-				<!-- The Canvas is the drag target --> 
-			    <components:CanvasBox id="canvasBox" 
-			        width="100%" height="100%"   
+	<mx:Canvas id="dragCanvas"
+               height="100%" width="100%" >
+               
+               <components:CanvasBox id="canvasBox" backgroundColor="#FFFFF8"  
+			        
 			     >
 			     </components:CanvasBox>
-			    
-				<!--<mx:Button horizontalCenter="0" bottom="0" click="maximizeLearningLibrary()" label="^"></mx:Button>
-			    <components:LearningLibrary2 id="compLearningLibrary2"
-						height="120"  horizontalCenter="0" bottom="0"
-						width="900"
-				/>-->
-	</mx:Canvas>
+               
+    </mx:Canvas>
+               
+	
+	
 </mx:HBox>

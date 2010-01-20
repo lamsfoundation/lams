@@ -10,6 +10,9 @@
 
 	<mx:Script>
 		<![CDATA[
+			import mx.core.Container;
+			import mx.controls.Button;
+			import mx.core.UIComponent;
 			import mx.managers.CursorManager;
 			import mx.events.MenuEvent;
 			import org.lamsfoundation.lams.author.util.Constants;
@@ -55,21 +58,33 @@
 			
 			[Embed("assets/icons/transition.png")]
             public var transitionCursor:Class;
+            
+            [Embed("assets/icons/zoom_in.png")]
+            public var zoomInCursor:Class;
+            
+            [Embed("assets/icons/zoom_out.png")]
+            public var zoomOutCursor:Class;
 
 			public function changeCursorState(state:int):void{
 				cursorState = state;
-				
+				CursorManager.removeCursor(CursorManager.currentCursorID);
 				switch (cursorState) {
 					case Constants.CURSOR_STATE_NORMAL:
-						CursorManager.removeCursor(CursorManager.currentCursorID);
 						break;
 					case Constants.CURSOR_STATE_TRANSITION:
 						CursorManager.setCursor(transitionCursor);
+						break;
+					case Constants.CURSOR_STATE_ZOOM_IN:
+						CursorManager.setCursor(zoomInCursor);
+						break;
+					case Constants.CURSOR_STATE_ZOOM_OUT:
+						CursorManager.setCursor(zoomOutCursor);
 						break;
 				}
 			
 			
 			}
+		
 		]]>
 	</mx:Script>
 
@@ -86,7 +101,7 @@
 	
 		
 	<components:CanvasArea height="100%" width="100%" id="canvasArea" top="30"
-		backgroundColor="#FFFFF8" >
+		 >
 	</components:CanvasArea>
 	
 	<components:ToolBar id="toolBar" width="100%" height="30"></components:ToolBar>

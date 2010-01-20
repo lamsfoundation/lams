@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
 	styleName="toolBar"
-	xmlns:components="org.lamsfoundation.lams.author.components.*">
+	xmlns:components="org.lamsfoundation.lams.author.components.*"
+	horizontalScrollPolicy="off"
+	>
 	
 	<mx:Style source="assets/css/toolBar.css" />
 	
@@ -34,7 +36,7 @@
 		]]>
 	</mx:Script>
 	
-	<mx:HBox horizontalGap="5" verticalAlign="middle"  >
+	<mx:HBox horizontalGap="5" verticalAlign="middle" horizontalScrollPolicy="off" >
 
 		<mx:MenuBar id="myMenuBar" labelField="@label" iconField="@icon" height="30" >
 	        <mx:XMLList>
@@ -62,8 +64,9 @@
 	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/save.png')" toolTip="Save"></mx:Button>
 	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/copy.png')" toolTip="Copy Activity"></mx:Button>
 	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/paste.png')" toolTip="Paste Activity"></mx:Button>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/zoom_in.png')" toolTip="Zoom Out"></mx:Button>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/zoom_out.png')" toolTip="Zoom In"></mx:Button>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/zoom_in.png')" toolTip="Zoom In" click="Application.application.changeCursorState(Constants.CURSOR_STATE_ZOOM_IN)"></mx:Button>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/zoom_out.png')" toolTip="Zoom Out" click="Application.application.changeCursorState(Constants.CURSOR_STATE_ZOOM_OUT)"></mx:Button>
+	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/cursor.png')" toolTip="Normal Cursor" click="Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL)"></mx:Button>
 	    <mx:Spacer width="5"></mx:Spacer>
 	    <mx:Button height="25" icon="@Embed(source='assets/icons/transition.png')" label="Transition" click="Application.application.changeCursorState(Constants.CURSOR_STATE_TRANSITION)"></mx:Button>
 	    <mx:Button id="optionalButton" height="25" icon="@Embed(source='assets/icons/optional.png')" label="Optional" click="toggleDropDownMenu(optionalMenu)"></mx:Button>

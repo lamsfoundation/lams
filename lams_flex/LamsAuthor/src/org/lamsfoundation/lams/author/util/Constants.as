@@ -17,7 +17,8 @@ package org.lamsfoundation.lams.author.util
 	    public static const CURSOR_STATE_TRANSITION:int = 2;
 	    public static const CURSOR_STATE_DATAFLOW:int = 3;
 	    public static const CURSOR_STATE_HELP:int = 4;
-	    
+	    public static const CURSOR_STATE_ZOOM_IN:int = 5;
+	    public static const CURSOR_STATE_ZOOM_OUT:int = 6;
 	    
 	    public static const UI_STATE_NORMAL:int = 1;
 	    public static const UI_STATE_DRAWING:int = 2;
