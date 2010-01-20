@@ -58,12 +58,6 @@
 			
 			[Embed("assets/icons/transition.png")]
             public var transitionCursor:Class;
-            
-            [Embed("assets/icons/zoom_in.png")]
-            public var zoomInCursor:Class;
-            
-            [Embed("assets/icons/zoom_out.png")]
-            public var zoomOutCursor:Class;
 
 			public function changeCursorState(state:int):void{
 				cursorState = state;
@@ -73,12 +67,6 @@
 						break;
 					case Constants.CURSOR_STATE_TRANSITION:
 						CursorManager.setCursor(transitionCursor);
-						break;
-					case Constants.CURSOR_STATE_ZOOM_IN:
-						CursorManager.setCursor(zoomInCursor);
-						break;
-					case Constants.CURSOR_STATE_ZOOM_OUT:
-						CursorManager.setCursor(zoomOutCursor);
 						break;
 				}
 			

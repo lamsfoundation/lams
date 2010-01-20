@@ -32,6 +32,14 @@
 				
 			}
 			
+			public function doZoom(isOut:Boolean):void {
+				var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
+				
+				canvasBox.doZoom(isOut);
+				
+				zoomInButton.enabled = canvasBox.currentZoom < canvasBox.MAX_ZOOM; 
+				zoomOutButton.enabled = canvasBox.currentZoom > canvasBox.MIN_ZOOM;
+			}
 			
 		]]>
 	</mx:Script>
@@ -64,8 +72,8 @@
 	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/save.png')" toolTip="Save"></mx:Button>
 	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/copy.png')" toolTip="Copy Activity"></mx:Button>
 	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/paste.png')" toolTip="Paste Activity"></mx:Button>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/zoom_in.png')" toolTip="Zoom In" click="Application.application.changeCursorState(Constants.CURSOR_STATE_ZOOM_IN)"></mx:Button>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/zoom_out.png')" toolTip="Zoom Out" click="Application.application.changeCursorState(Constants.CURSOR_STATE_ZOOM_OUT)"></mx:Button>
+	    <mx:Button id="zoomInButton" height="25" width="27" icon="@Embed(source='assets/icons/zoom_in.png')" toolTip="Zoom In" click="doZoom(false)" enabled="false"></mx:Button>
+	    <mx:Button id="zoomOutButton" height="25" width="27" icon="@Embed(source='assets/icons/zoom_out.png')" toolTip="Zoom Out" click="doZoom(true)"></mx:Button>
 	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/cursor.png')" toolTip="Normal Cursor" click="Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL)"></mx:Button>
 	    <mx:Spacer width="5"></mx:Spacer>
 	    <mx:Button height="25" icon="@Embed(source='assets/icons/transition.png')" label="Transition" click="Application.application.changeCursorState(Constants.CURSOR_STATE_TRANSITION)"></mx:Button>

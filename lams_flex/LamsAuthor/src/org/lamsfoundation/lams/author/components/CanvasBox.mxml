@@ -78,29 +78,8 @@
                 // Return cursor state to normal
 				Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);                    
             }
-            
-            
-            
-            
-            
-            
-            /* private function doZoom(component:UIComponent,val:Number):void
-			{
-				component.scaleX = val;
-				component.scaleY = val;
-				
-				if(component is Container)
-				{
-					var children:Array = Container(component).getChildren();
-					for(var i:int = 0; i < children.length; i++)
-					{
-						doZoom(children[i], val);
-					}
-				}
-			} */ 
 			
-			
-			private function doZoom(event:MouseEvent):void
+			public function doZoom(isOut:Boolean):void
 			{
 				var zoom:Zoom = new Zoom();
 				
@@ -111,13 +90,13 @@
 				zoom.zoomHeightFrom = currentZoom;
 				zoom.zoomWidthFrom = currentZoom;
 				
-				if (Application.application.cursorState == Constants.CURSOR_STATE_ZOOM_IN && currentZoom < MAX_ZOOM) {
+				if (!isOut && currentZoom < MAX_ZOOM) {
 					zoom.zoomHeightTo = currentZoom + ZOOM_LEVEL;
 					zoom.zoomWidthTo = currentZoom + ZOOM_LEVEL;
 					currentZoom += 0.2;
 					currentZoom = Math.round(currentZoom * 10)/10;
 					zoom.play([this], false);
-				} else if (Application.application.cursorState == Constants.CURSOR_STATE_ZOOM_OUT && currentZoom > MIN_ZOOM) {
+				} else if (isOut && currentZoom > MIN_ZOOM) {
 					zoom.zoomHeightTo = currentZoom - ZOOM_LEVEL;
 					zoom.zoomWidthTo = currentZoom - ZOOM_LEVEL;
 					currentZoom -= 0.2;
