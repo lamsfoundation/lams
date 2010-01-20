@@ -31,13 +31,23 @@
 			private var transitionIn:TransitionComponent
 			private var transitionOut:TransitionComponent;
 			
+			// Activity states
+			public var isDragable:Boolean = true;
+			public var isTransitionable:Boolean = true;
+			
 			
 			private var state:int = Constants.ACTIVITY_STATE_NORMAL;
 			
 			// Function used to load a new activity 
 			public function load():void { 	
 		    }
-			
+		    
+		    public function disableTitle():void {
+		    	toolTip = title.text;
+				title.visible = false;
+				title.height = 0;
+		    }
+		    
 			
 			// The mouseMove event handler for the Image control
 		    // initiates the drag-and-drop operation.
@@ -45,13 +55,15 @@
 		    {                
 		        switch (Application.application.cursorState) {
 		        	case Constants.CURSOR_STATE_NORMAL:
+		        		
 		        		var activityComponent:ActivityComponent = event.currentTarget as ActivityComponent;
-				        var ds:DragSource = new DragSource();
-				        ds.addData(activityComponent, "img");               
-				        DragManager.doDrag(activityComponent, ds, event);
-				        setCenter();
 				        
-				        
+				        if (activityComponent.isDragable) {
+				        	var ds:DragSource = new DragSource();
+				        	ds.addData(activityComponent, "img");               
+				        	DragManager.doDrag(activityComponent, ds, event);
+				        	setCenter();
+				        }
 				        break;
 		        }
 		    }
@@ -60,13 +72,16 @@
 		    	
 		    	switch (Application.application.cursorState) {
 		    		case Constants.CURSOR_STATE_TRANSITION:
-		    		var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_EVENT);
-		    		transitionEvent.sourceAcivityComponent = this;
-		    		transitionEvent.localX = event.localX;
-		    		transitionEvent.localY = event.localY;
-		    		//Application.application.dispatchEvent(transitionEvent);
-		    		startDragging(transitionEvent)
-		    		break;	
+			    		if (this.isTransitionable) {
+			    			var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_EVENT);
+				    		transitionEvent.sourceAcivityComponent = this;
+				    		transitionEvent.localX = event.localX;
+				    		transitionEvent.localY = event.localY;
+				    		//Application.application.dispatchEvent(transitionEvent);
+			    			startDragging(transitionEvent);
+			    		}
+			    		
+		    			break;	
 		    	}
 		    	
 		    }
@@ -133,7 +148,7 @@
 		    		if (parent.getChildAt(i) is ActivityComponent) {
 		    			
 		    			var activityComponent:ActivityComponent = parent.getChildAt(i) as ActivityComponent;
-		    			if (activityComponent.state == Constants.ACTIVITY_STATE_MOUSE_OVER) {
+		    			if (activityComponent.state == Constants.ACTIVITY_STATE_MOUSE_OVER && activityComponent.isTransitionable) {
 		    				activityComponent.transitionIn = transitionOut;	
 		    				validTransition = true;		
 		    			}
@@ -162,7 +177,7 @@
 		    
 		    private function mouseOver(event:MouseEvent):void {
 				
-				if (Application.application.uiState == Constants.UI_STATE_DRAWING && this.state != Constants.ACTIVITY_STATE_DRAWING) {
+				if (Application.application.uiState == Constants.UI_STATE_DRAWING && this.state != Constants.ACTIVITY_STATE_DRAWING && isTransitionable) {
 					this.setStyle('borderStyle', 'solid');
 					this.setStyle('borderColor', '#66CCFF');
 					this.state = Constants.ACTIVITY_STATE_MOUSE_OVER;

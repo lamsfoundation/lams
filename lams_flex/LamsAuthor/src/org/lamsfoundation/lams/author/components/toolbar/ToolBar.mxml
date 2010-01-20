@@ -2,6 +2,7 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
 	styleName="toolBar"
 	xmlns:components="org.lamsfoundation.lams.author.components.*"
+	xmlns:toolbar="org.lamsfoundation.lams.author.components.toolbar.*"
 	horizontalScrollPolicy="off"
 	>
 	
@@ -9,6 +10,11 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.components.CanvasBox;
+			import mx.managers.DragManager;
+			import mx.core.UIComponent;
+			import mx.core.DragSource;
+			import org.lamsfoundation.lams.author.components.activity.OptionalActivityComponent;
 			import mx.managers.PopUpManager;
 			import org.lamsfoundation.lams.author.util.Constants;
 			import mx.core.Application;
@@ -40,6 +46,21 @@
 				zoomInButton.enabled = canvasBox.currentZoom < canvasBox.MAX_ZOOM; 
 				zoomOutButton.enabled = canvasBox.currentZoom > canvasBox.MIN_ZOOM;
 			}
+			
+			private function mouseClick(event:MouseEvent):void 
+	        {                
+	        	var dragInitiator:SystemActivityComponent = event.currentTarget as SystemActivityComponent;
+	        	
+	        	var ds:DragSource = new DragSource();
+				var optionalActivity:OptionalActivityComponent = new OptionalActivityComponent();
+	        	
+	        	
+	        	//dragInitiator.x = UIComponent(event.currentTarget).mouseX;
+          		//dragInitiator.y = UIComponent(event.currentTarget).mouseY;
+          		//Application.application.addChild(dragInitiator);
+          		ds.addData(optionalActivity, "img");  
+          		DragManager.doDrag(dragInitiator, ds, event, optionalActivity, 25, 15, 1.00, false);
+	        }
 			
 		]]>
 	</mx:Script>
@@ -95,27 +116,27 @@
     </mx:VBox>-->
     
     
-    <components:ToolBarDropDown id="optionalMenu">
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Activity"></mx:Button>
+    <toolbar:ToolBarDropDown id="optionalMenu">
+    	<toolbar:SystemActivityComponent type="{Constants.SYTEM_ACTIVITY_TYPE_OPTIONAL}" height="25" icon="@Embed(source='assets/icons/optional.png')" label="Activity" click="mouseClick(event)"></toolbar:SystemActivityComponent>
     	<mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Sequence"></mx:Button>
     	<mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Support"></mx:Button>
-    </components:ToolBarDropDown>
+    </toolbar:ToolBarDropDown>
     <mx:Binding destination="optionalMenu.x" source="optionalButton.x - 5" />
     <mx:Binding destination="optionalMenu.y" source="optionalButton.y + optionalButton.height" />
     
-    <components:ToolBarDropDown id="flowMenu">
+    <toolbar:ToolBarDropDown id="flowMenu">
     	<mx:Button height="25" icon="@Embed(source='assets/icons/gate.png')" label="Gate"></mx:Button>
     	<mx:Button height="25" icon="@Embed(source='assets/icons/branch.png')" label="Branch"></mx:Button>
     	<mx:Button height="25" icon="@Embed(source='assets/icons/converge.png')" label="Converge"></mx:Button>
-    </components:ToolBarDropDown>
+    </toolbar:ToolBarDropDown>
     <mx:Binding destination="flowMenu.x" source="flowButton.x - 5" />
     <mx:Binding destination="flowMenu.y" source="flowButton.y + flowButton.height" />
     
-    <components:ToolBarDropDown id="groupMenu">
+    <toolbar:ToolBarDropDown id="groupMenu">
     	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Random"></mx:Button>
     	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Choose in Monitor"></mx:Button>
     	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Learner's Choice"></mx:Button>
-    </components:ToolBarDropDown>
+    </toolbar:ToolBarDropDown>
     <mx:Binding destination="groupMenu.x" source="groupButton.x - 5" />
     <mx:Binding destination="groupMenu.y" source="groupButton.y + groupButton.height" />
     

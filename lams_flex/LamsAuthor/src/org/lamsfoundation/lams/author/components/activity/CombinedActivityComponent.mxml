@@ -42,9 +42,9 @@
 					toolActivityComponent1 = new ToolActivityComponent();
 					toolActivityComponent1.tool = learningLibraryEntry.toolTemplates[1];
 					toolActivityComponent1.load();
-					toolActivityComponent1.toolTip = toolActivityComponent1.title.text;
-					toolActivityComponent1.title.visible = false;
-					toolActivityComponent1.title.height = 0;
+					toolActivityComponent1.isDragable = false;
+					toolActivityComponent1.isTransitionable = false;
+					toolActivityComponent1.disableTitle()
 					vbox.addChild(toolActivityComponent1);
 				}
 				
@@ -52,9 +52,9 @@
 					toolActivityComponent2 = new ToolActivityComponent();
 					toolActivityComponent2.tool = learningLibraryEntry.toolTemplates[2];
 					toolActivityComponent2.load();
-					toolActivityComponent2.toolTip = toolActivityComponent2.title.text;
-					toolActivityComponent2.title.visible = false;
-					toolActivityComponent2.title.height = 0;
+					toolActivityComponent2.isDragable = false;
+					toolActivityComponent2.isTransitionable = false;
+					toolActivityComponent2.disableTitle()
 					vbox.addChild(toolActivityComponent2);
 				}
 				

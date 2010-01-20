@@ -24,8 +24,8 @@ package org.lamsfoundation.lams.author.components.transition
 			var lineAlpha:Number = 1;
 			
 			// Find the middle point to draw the arrow
-			var middle:Point = Point.interpolate(origin, destination, 0.4);
-			var middle1:Point = Point.interpolate(origin, destination, 0.41);
+			var middle:Point = Point.interpolate(origin, destination, 0.5);
+			var middle1:Point = Point.interpolate(origin, destination, 0.51);
 			
 			// Draw an arrow to half-way
 			graphics.beginFill(lineColor,lineAlpha);

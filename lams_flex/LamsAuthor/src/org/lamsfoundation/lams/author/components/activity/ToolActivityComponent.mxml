@@ -20,9 +20,8 @@
 			
 			public var iconImage:Image;
 			public var tool:Tool;
-
 			
-			 override public function load():void {
+			override public function load():void {
 				
 				var vbox:VBox = new VBox();
 				vbox.setConstraintValue("verticalAlign", "middle");

@@ -3,6 +3,7 @@
 	layout="absolute"
 	verticalAlign="left"
 	xmlns:components="org.lamsfoundation.lams.author.components.*"
+	xmlns:toolbar="org.lamsfoundation.lams.author.components.toolbar.*"
 	xmlns:maps="org.lamsfoundation.lams.author.maps.*" 
 	xmlns:flexlib="http://code.google.com/p/flexlib/"
 	preinitialize="preInit()"
@@ -79,19 +80,8 @@
 	<maps:MainEventMap id="mainMap" />
 	<maps:ModelMap id="modelMap" />
 
-	<!--<components:ControlPanel id="compControlPanel"
-		left="0" right="0"
-		height="50"
-	/>-->
+	<components:CanvasArea height="100%" width="100%" id="canvasArea" top="30"></components:CanvasArea>
 	
-	
-	
-	
-		
-	<components:CanvasArea height="100%" width="100%" id="canvasArea" top="30"
-		 >
-	</components:CanvasArea>
-	
-	<components:ToolBar id="toolBar" width="100%" height="30"></components:ToolBar>
+	<toolbar:ToolBar id="toolBar" width="100%" height="30"></toolbar:ToolBar>
 	
 </mx:Application>

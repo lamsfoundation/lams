@@ -3,6 +3,7 @@
 	width="100%" height="25" 
 	verticalAlign="middle" 
 	horizontalGap="0"
+	mouseMove="mouseMoveHandler(event)"
 	>
 	
 	<mx:Script>
@@ -32,8 +33,6 @@
 				title.text = learningLibraryEntry.title;
 				this.addChild(title);
 				
-				// Adding event listener for drag
-				addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
 			}
 			
 			
