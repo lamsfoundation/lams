@@ -62,6 +62,8 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	    + " l " + "where l.learningDesign.originalLearningDesign.learningDesignId = ? "
 	    + "and l.learningDesign.copyTypeID != " + LearningDesign.COPY_TYPE_PREVIEW + " " + "and l.lessonStateId = "
 	    + Lesson.STARTED_STATE + " " + "and l.organisation.organisationId = ? " + " order by l.lessonName";
+    private final static String LESSONS_BY_GROUP = "from " + Lesson.class.getName()
+    	+ " where organisation.organisationId=? and lessonStateId <= 6";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
@@ -319,6 +321,10 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	    }
 	});
 	return dtos;
+    }
+    
+    public List getLessonsByGroup(final Integer orgId) {
+	return this.getHibernateTemplate().find(LessonDAO.LESSONS_BY_GROUP, orgId);
     }
 
     /**

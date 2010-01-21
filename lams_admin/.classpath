@@ -4,6 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_monitoring"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/quartz.jar"/>

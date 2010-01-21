@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tiles-definitions>
+	<definition name=".clone-result" path="/template.jsp">
+		<put name="title" value="Clone Lessons"/>
+		<put name="content" value=".clone-result-breadcrumbs" />	
+	</definition>
+	
+	<definition name=".clone-result-breadcrumbs" path="/organisation/cloneResult.jsp">
+		<put name="breadcrumbs" value="/organisation/parts/breadcrumbs.jsp" />
+	</definition>
+
+	<definition name=".clone-start" path="/template.jsp">
+		<put name="title" value="Clone Lessons"/>
+		<put name="content" value=".clone-start-breadcrumbs" />	
+	</definition>
+	
+	<definition name=".clone-start-breadcrumbs" path="/organisation/cloneStart.jsp">
+		<put name="breadcrumbs" value="/organisation/parts/breadcrumbs.jsp" />
+	</definition>
+
 	<definition name=".ldap" path="/template.jsp">
 		<put name="title" value="sysadmin.ldap.configuration"/>
 		<put name="content" value=".ldap-items" />	

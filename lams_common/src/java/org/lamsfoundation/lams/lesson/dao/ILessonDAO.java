@@ -177,6 +177,14 @@ public interface ILessonDAO extends IBaseDAO {
     public List getLessonsByGroupAndUser(final Integer userId, final Integer orgId);
 
     /**
+     * Gets all non-removed lessons for a group.
+     * 
+     * @param orgId
+     * @return
+     */
+    public List getLessonsByGroup(final Integer orgId);
+    
+    /**
      * Get lessons based on learning designs where the original learning design has the given id.
      * 
      * @param ldId

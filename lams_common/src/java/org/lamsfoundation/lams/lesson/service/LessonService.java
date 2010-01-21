@@ -783,8 +783,12 @@ public class LessonService implements ILessonService {
     }
 
     public List<Lesson> getLessonsByGroupAndUser(Integer userId, Integer organisationId) {
-	TreeMap<Long, IndexLessonBean> map = new TreeMap<Long, IndexLessonBean>();
 	List<Lesson> list = lessonDAO.getLessonsByGroupAndUser(userId, organisationId);
+	return list;
+    }
+    
+    public List<Lesson> getLessonsByGroup(Integer organisationId) {
+	List<Lesson> list = lessonDAO.getLessonsByGroup(organisationId);
 	return list;
     }
 

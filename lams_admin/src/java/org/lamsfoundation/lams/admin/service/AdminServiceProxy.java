@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.admin.service;
 import javax.servlet.ServletContext;
 
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.statistics.service.IStatisticsService;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -52,6 +54,8 @@ public class AdminServiceProxy {
 	private static IStatisticsService statisticsService;
 	private static IThemeService themeService;
 	private static Configuration configurationService;
+	private static ILessonService lessonService;
+	private static IMonitoringService monitoringService;
 	
 	public static final IUserManagementService getService(ServletContext servletContext) {
 		if (manageService == null) {
@@ -115,6 +119,20 @@ public class AdminServiceProxy {
 		    configurationService = (Configuration)getDomainService(servletContext, "configurationService");
 		}
 		return configurationService;
+	}
+	
+	public static final ILessonService getLessonService(ServletContext servletContext) {
+		if (lessonService == null) {
+		    lessonService = (ILessonService)getDomainService(servletContext, "lessonService");
+		}
+		return lessonService;
+	}
+	
+	public static final IMonitoringService getMonitoringService(ServletContext servletContext) {
+		if (monitoringService == null) {
+		    monitoringService = (IMonitoringService)getDomainService(servletContext, "monitoringService");
+		}
+		return monitoringService;
 	}
 	
 	private static Object getDomainService(ServletContext servletContext,String serviceName) {

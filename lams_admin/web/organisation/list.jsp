@@ -112,6 +112,11 @@ p {
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 	
 	<div class="floatRight">
+		<input class="button" type="button" value="Clone Lessons" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
+	</div>
+	<p style="padding-top:10px;">&nbsp;</p>
+	
+	<div class="floatRight">
 		<c:url var="createSubgroupLink" value="organisation.do">
 			<c:param name="method" value="create" />
 			<c:param name="typeId" value="3" />
@@ -177,6 +182,11 @@ p {
 		<input class="button" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
 	</div>
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
+	
+	<div class="floatRight">
+		<input class="button" type="button" value="Clone Lessons" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
+	</div>
+	<p style="padding-top:10px;">&nbsp;</p>
 	
 	</form>
 </logic:equal>

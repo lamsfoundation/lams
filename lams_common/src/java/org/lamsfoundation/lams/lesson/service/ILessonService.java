@@ -347,14 +347,22 @@ public interface ILessonService {
 
     /**
      * 
-     * Returns map of lessons in a group (including sub-groups) for a particular user
+     * Returns list of lessons in a group (including sub-groups) for a particular user
      * 
      * @param userId
      * @param organisationId
-     * @return map of lesson beans
+     * @return list of lessons
      */
     public abstract List<Lesson> getLessonsByGroupAndUser(Integer userId, Integer organisationId);
 
+    /**
+     * Return list of organisation's non-removed lessons.
+     * 
+     * @param organisationId
+     * @return list of lessons
+     */
+    public List<Lesson> getLessonsByGroup(Integer organisationId);
+    
     /**
      * Gets the learner's progress details for a particular lesson. Will return null if the user has not started the
      * lesson.
