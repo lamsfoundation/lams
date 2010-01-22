@@ -71,11 +71,16 @@
 		
 	</EventHandlers>
 	
+	<!-- Event fires when a traniition finishes -->
 	<EventHandlers type="{TransitionEvent.TRANSITION_EVENT}">
-		<MethodInvoker generator="{AuthorController}" method="startTransitionDraw" arguments="{[event]}" />
+		<MethodInvoker generator="{AuthorController}" method="drawTransition" arguments="{[event]}" />
 	</EventHandlers>
 	
-
+	<!-- Event fires when you drop an activity directly on the canvas -->
+	<EventHandlers type="{DropActivityEvent.DROP_ACTIVITY_EVENT}">
+		<MethodInvoker generator="{AuthorController}" method="dropActivity" arguments="{[event]}" />
+	</EventHandlers>
+	
 	
 	<!-- ======================================================================================== -->
 	<!-- Services   Note: you can have an external file if you have more services -->

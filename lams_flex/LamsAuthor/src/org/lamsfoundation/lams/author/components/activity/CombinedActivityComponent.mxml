@@ -43,7 +43,8 @@
 					toolActivityComponent1.tool = learningLibraryEntry.toolTemplates[1];
 					toolActivityComponent1.load();
 					toolActivityComponent1.isDragable = false;
-					toolActivityComponent1.isTransitionable = false;
+					toolActivityComponent1.canStartTransitions = false;
+					toolActivityComponent1.canAcceptTransitions = false;
 					toolActivityComponent1.disableTitle()
 					vbox.addChild(toolActivityComponent1);
 				}
@@ -53,7 +54,8 @@
 					toolActivityComponent2.tool = learningLibraryEntry.toolTemplates[2];
 					toolActivityComponent2.load();
 					toolActivityComponent2.isDragable = false;
-					toolActivityComponent2.isTransitionable = false;
+					toolActivityComponent2.canStartTransitions = false;
+					toolActivityComponent2.canAcceptTransitions = false;
 					toolActivityComponent2.disableTitle()
 					vbox.addChild(toolActivityComponent2);
 				}

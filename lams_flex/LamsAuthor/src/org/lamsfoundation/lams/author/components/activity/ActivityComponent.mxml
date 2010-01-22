@@ -28,15 +28,14 @@
 			public var centerX:int;
 			public var centerY:int;
 			
-			private var transitionIn:TransitionComponent
-			private var transitionOut:TransitionComponent;
+			public var transitionIn:TransitionComponent
+			public var transitionOut:TransitionComponent;
 			
 			// Activity states
 			public var isDragable:Boolean = true;
-			public var isTransitionable:Boolean = true;
-			
-			
-			private var state:int = Constants.ACTIVITY_STATE_NORMAL;
+			public var canStartTransitions:Boolean = true;  	// True if this activty can start transitions
+			public var canAcceptTransitions:Boolean = true;		// True if this activty can accept transitions
+			public var state:int = Constants.ACTIVITY_STATE_NORMAL;
 			
 			// Function used to load a new activity 
 			public function load():void { 	
@@ -72,13 +71,8 @@
 		    	
 		    	switch (Application.application.cursorState) {
 		    		case Constants.CURSOR_STATE_TRANSITION:
-			    		if (this.isTransitionable) {
-			    			var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_EVENT);
-				    		transitionEvent.sourceAcivityComponent = this;
-				    		transitionEvent.localX = event.localX;
-				    		transitionEvent.localY = event.localY;
-				    		//Application.application.dispatchEvent(transitionEvent);
-			    			startDragging(transitionEvent);
+			    		if (this.canStartTransitions) {
+			    			startDragging(event);
 			    		}
 			    		
 		    			break;	
@@ -91,7 +85,7 @@
 				centerY = y + height/2 -10;
 		    }
 		    
-	        protected function startDragging(event:TransitionEvent):void {
+	        protected function startDragging(event:MouseEvent):void {
 			 
 				if (transitionOut != null) {
 					parent.removeChild(transitionOut);
@@ -103,10 +97,10 @@
 
 				Application.application.uiState = Constants.UI_STATE_DRAWING;
 				transitionOut = new TransitionComponent();
-				transitionOut.startX = event.sourceAcivityComponent.centerX;
-				transitionOut.startY = event.sourceAcivityComponent.centerY;
-				transitionOut.endX = event.sourceAcivityComponent.centerX;
-				transitionOut.endY = event.sourceAcivityComponent.centerY;
+				transitionOut.startX = centerX;
+				transitionOut.startY = centerY;
+				transitionOut.endX = centerX;
+				transitionOut.endY = centerY;
 				transitionOut.invalidateProperties();
 				
 				parent.addChild(transitionOut);
@@ -123,8 +117,6 @@
 			    systemManager.removeEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);			
 			    systemManager.removeEventListener(MouseEvent.MOUSE_UP, systemManagerMouseUpHandler, true);
 			    systemManager.stage.removeEventListener(Event.MOUSE_LEAVE, stageMouseLeaveHandler);
-			    
-				updateTransitionPositions();
 			}
 			
 			private function systemManagerMouseMoveHandler(event:MouseEvent):void
@@ -138,17 +130,33 @@
 		    	transitionOut.invalidateDisplayList();
 		    }
 		    
+		   
+		    /**
+		    * This event fires at the end of a transition.
+		    * 
+		    * Needs to be handled by the controller as it changes the learningDesing state
+		    * 
+		    */ 
 		    private function systemManagerMouseUpHandler(event:MouseEvent):void
 		    {
 		    	stopDragging();
 		    	
-		    	var validTransition:Boolean = false;
+		    	
+		    	var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_EVENT);
+	    		transitionEvent.sourceAcivityComponent = this;
+	    		transitionEvent.transition = transitionOut;
+	    		//transitionEvent.localX = event.localX;
+	    		//transitionEvent.localY = event.localY;
+	    		Application.application.dispatchEvent(transitionEvent);
+		    	
+		    	
+		    	/* var validTransition:Boolean = false;
 		    	for (var i:int = 0; i < parent.numChildren; i++) {
 		    		
 		    		if (parent.getChildAt(i) is ActivityComponent) {
 		    			
 		    			var activityComponent:ActivityComponent = parent.getChildAt(i) as ActivityComponent;
-		    			if (activityComponent.state == Constants.ACTIVITY_STATE_MOUSE_OVER && activityComponent.isTransitionable) {
+		    			if (activityComponent.state == Constants.ACTIVITY_STATE_MOUSE_OVER && activityComponent.canAcceptTransitions) {
 		    				activityComponent.transitionIn = transitionOut;	
 		    				validTransition = true;		
 		    			}
@@ -165,8 +173,8 @@
 		    	else {
 		    		// Return cursor state to normal
 					Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);
-
-		    	}
+					updateTransitionPositions();
+		    	} */
 		    	
 		    }
 		    
@@ -177,7 +185,7 @@
 		    
 		    private function mouseOver(event:MouseEvent):void {
 				
-				if (Application.application.uiState == Constants.UI_STATE_DRAWING && this.state != Constants.ACTIVITY_STATE_DRAWING && isTransitionable) {
+				if (Application.application.uiState == Constants.UI_STATE_DRAWING && this.state != Constants.ACTIVITY_STATE_DRAWING && canAcceptTransitions) {
 					this.setStyle('borderStyle', 'solid');
 					this.setStyle('borderColor', '#66CCFF');
 					this.state = Constants.ACTIVITY_STATE_MOUSE_OVER;
@@ -190,6 +198,7 @@
 			}
 			
 			public function updateTransitionPositions():void {
+				this.setCenter();
 				if (transitionOut != null)
 		   		{
 		   			transitionOut.startX = centerX;

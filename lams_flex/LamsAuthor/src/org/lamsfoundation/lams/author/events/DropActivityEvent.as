@@ -1,16 +1,14 @@
 package org.lamsfoundation.lams.author.events
 {
-	import flash.events.Event;
+	import mx.events.DragEvent;
 	
-	public class DropEvent extends DragEvent
+	public class DropActivityEvent extends DragEvent
 	{
-		public static const DROP_EVENT:String = "dropEvent";
+		public static const DROP_ACTIVITY_EVENT:String = "dropActivityEvent";
 		
-		
-		public function DropEvent(type:String, event:DrageEvent, bubbles:Boolean=true, cancelable:Boolean=false)
+		public function DropActivityEvent(type:String, event:DragEvent, bubbles:Boolean=true, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
-			
 			this.dragInitiator = event.dragInitiator;
 			this.dragSource = event.dragSource;
 			this.action = event.action;

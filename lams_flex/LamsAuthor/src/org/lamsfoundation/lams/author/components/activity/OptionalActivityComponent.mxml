@@ -36,7 +36,8 @@
                 if (event.dragInitiator is ActivityComponent) {
                 	var activityComponent:ActivityComponent;
                 	activityComponent = event.dragInitiator as ActivityComponent;
-                	activityComponent.isTransitionable = false;
+                	activityComponent.canStartTransitions = false;
+                	activityComponent.canAcceptTransitions = false;
                 	activityComponent.disableTitle();
                 	//parent.removeChild(activityComponent);
                 	optionalArea.addChild(activityComponent);
