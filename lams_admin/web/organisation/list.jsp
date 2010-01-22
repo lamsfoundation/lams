@@ -1,4 +1,5 @@
 <%@ include file="/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
 
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-1.1.4.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
@@ -111,10 +112,12 @@ p {
 	</div>
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 	
+	<% if (request.isUserInRole(Role.SYSADMIN)) { %>
 	<div class="floatRight">
-		<input class="button" type="button" value="Clone Lessons" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
+		<input class="button" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
 	</div>
 	<p style="padding-top:10px;">&nbsp;</p>
+	<% } %>
 	
 	<div class="floatRight">
 		<c:url var="createSubgroupLink" value="organisation.do">
@@ -183,10 +186,12 @@ p {
 	</div>
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 	
+	<% if (request.isUserInRole(Role.SYSADMIN)) { %>
 	<div class="floatRight">
-		<input class="button" type="button" value="Clone Lessons" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
+		<input class="button" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
 	</div>
 	<p style="padding-top:10px;">&nbsp;</p>
+	<% } %>
 	
 	</form>
 </logic:equal>
